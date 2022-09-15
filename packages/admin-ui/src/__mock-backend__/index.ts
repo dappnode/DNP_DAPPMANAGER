@@ -248,6 +248,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         return {
           executionClients: [
             {
+              status: "ok",
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -262,6 +263,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -276,6 +278,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -290,6 +293,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -306,6 +310,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           ],
           consensusClients: [
             {
+              status: "ok",
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -323,6 +328,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
+              status: "ok",
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -337,6 +343,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -351,6 +358,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -369,6 +377,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           ],
           web3Signer: {
+            status: "ok",
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -383,6 +392,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           },
           mevBoost: {
+            status: "ok",
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -401,6 +411,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         return {
           executionClients: [
             {
+              status: "ok",
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -415,6 +426,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -429,6 +441,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -443,6 +456,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -459,6 +473,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           ],
           consensusClients: [
             {
+              status: "ok",
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -476,6 +491,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
+              status: "ok",
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -490,6 +506,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -504,6 +521,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -522,6 +540,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           ],
           web3Signer: {
+            status: "ok",
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -536,6 +555,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           },
           mevBoost: {
+            status: "ok",
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -555,6 +575,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         return {
           executionClients: [
             {
+              status: "ok",
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -569,6 +590,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -583,6 +605,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -596,7 +619,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
                 version: "0.1.0"
               }
             },
+
             {
+              status: "ok",
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -613,6 +638,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           ],
           consensusClients: [
             {
+              status: "ok",
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -630,6 +656,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               checkpointSync: "https://checkpoint-sync.dappnode.io/"
             },
             {
+              status: "ok",
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -644,6 +671,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -658,6 +686,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
               }
             },
             {
+              status: "ok",
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -676,6 +705,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           ],
           web3Signer: {
+            status: "ok",
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -690,6 +720,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
             }
           },
           mevBoost: {
+            status: "ok",
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,

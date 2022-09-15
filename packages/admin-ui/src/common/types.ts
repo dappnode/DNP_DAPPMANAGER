@@ -1208,8 +1208,19 @@ export type ConsensusClientGnosis =
   | "nimbus-gnosis.dnp.dappnode.eth";
 export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth";
 
-export interface StakerItem {
+export type StakerItem = StakerItemOk | StakerItemError;
+
+interface StakerItemBasic {
   dnpName: string;
+}
+
+export interface StakerItemError extends StakerItemBasic {
+  status: "error";
+  error: string;
+}
+
+export interface StakerItemOk extends StakerItemBasic {
+  status: "ok";
   avatarUrl: string;
   isInstalled: boolean;
   isRunning: boolean;

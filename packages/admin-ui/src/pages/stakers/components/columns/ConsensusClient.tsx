@@ -4,8 +4,9 @@ import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
 import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
-import defaultAvatar from "img/defaultAvatar.png";
 import "./columns.scss";
+import defaultAvatar from "img/defaultAvatar.png";
+import errorAvatar from "img/errorAvatarTrim.png";
 
 export default function ConsensusClient({
   consensusClient,
@@ -34,7 +35,14 @@ export default function ConsensusClient({
       shadow={isSelected}
     >
       <div className="avatar">
-        <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
+        <img
+          src={
+            consensusClient.status === "error"
+              ? errorAvatar
+              : consensusClient.avatarUrl || defaultAvatar
+          }
+          alt="avatar"
+        />
       </div>
       <div
         className="title"
@@ -45,9 +53,13 @@ export default function ConsensusClient({
         }
       >
         {prettyDnpName(consensusClient.dnpName)}{" "}
-        {consensusClient.metadata.version}
+        {consensusClient.status === "ok" && consensusClient.metadata.version}
       </div>
-      <div className="description">{consensusClient.metadata.description}</div>
+      {consensusClient.status === "ok" && (
+        <div className="description">
+          {consensusClient.metadata.description}
+        </div>
+      )}
       {isSelected && newConsClient && (
         <>
           <hr />

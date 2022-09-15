@@ -3,6 +3,7 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
+import errorAvatar from "img/errorAvatarTrim.png";
 import "./columns.scss";
 import { StakerItem } from "common";
 
@@ -24,12 +25,22 @@ export default function RemoteSigner({
       shadow={isSelected}
     >
       <div className="avatar">
-        <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
+        <img
+          src={
+            signer.status === "error"
+              ? errorAvatar
+              : signer.avatarUrl || defaultAvatar
+          }
+          alt="avatar"
+        />
       </div>
       <div className="title">
-        {prettyDnpName(signer.dnpName)} {signer.metadata.version}
+        {prettyDnpName(signer.dnpName)}{" "}
+        {signer.status === "ok" && signer.metadata.version}
       </div>
-      <div className="description">{signer.metadata.description}</div>
+      <div className="description">
+        {signer.status === "ok" && signer.metadata.description}
+      </div>
     </Card>
   );
 }

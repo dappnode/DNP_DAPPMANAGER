@@ -5,6 +5,7 @@ import { joinCssClass } from "utils/css";
 import { StakerItem } from "common";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
+import errorAvatar from "img/errorAvatarTrim.png";
 
 export default function MevBoost({
   mevBoost,
@@ -24,12 +25,22 @@ export default function MevBoost({
       shadow={isSelected}
     >
       <div className="avatar">
-        <img src={mevBoost.avatarUrl || defaultAvatar} alt="avatar" />
+        <img
+          src={
+            mevBoost.status === "error"
+              ? errorAvatar
+              : mevBoost.avatarUrl || defaultAvatar
+          }
+          alt="avatar"
+        />
       </div>
       <div className="title">
-        {prettyDnpName(mevBoost.dnpName)} {mevBoost.metadata.version}
+        {prettyDnpName(mevBoost.dnpName)}{" "}
+        {mevBoost.status === "ok" && mevBoost.metadata.version}
       </div>
-      <div className="description">{mevBoost.metadata.description}</div>
+      {mevBoost.status === "ok" && (
+        <div className="description">{mevBoost.metadata.description}</div>
+      )}
     </Card>
   );
 }

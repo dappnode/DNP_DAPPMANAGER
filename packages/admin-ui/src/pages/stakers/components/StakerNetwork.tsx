@@ -63,14 +63,25 @@ export default function StakerNetwork({
 
       const executionClient =
         executionClients.find(
-          ec => ec.isSelected && ec.isInstalled && ec.isRunning
+          ec =>
+            ec.status === "ok" &&
+            ec.isSelected &&
+            ec.isInstalled &&
+            ec.isRunning
         )?.dnpName || "";
       const consensusClient = consensusClients.find(
-        cc => cc.isSelected && cc.isInstalled && cc.isRunning
+        cc =>
+          cc.status === "ok" && cc.isSelected && cc.isInstalled && cc.isRunning
       ) || { dnpName: "" };
       const enableMevBoost =
-        mevBoost.isInstalled && mevBoost.isRunning && mevBoost.isSelected;
-      const enableWeb3signer = web3Signer.isInstalled && web3Signer.isRunning;
+        mevBoost.status === "ok" &&
+        mevBoost.isInstalled &&
+        mevBoost.isRunning &&
+        mevBoost.isSelected;
+      const enableWeb3signer =
+        web3Signer.status === "ok" &&
+        web3Signer.isInstalled &&
+        web3Signer.isRunning;
 
       // Set default values for new staker config
       setNewExecClient(executionClient);
