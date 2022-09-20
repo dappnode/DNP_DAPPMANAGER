@@ -28,7 +28,7 @@ export default function ExecutionClient({
       }
       shadow={isSelected}
     >
-      {executionClient.status === "ok" && isSelected ? (
+      {executionClient.status === "ok" ? (
         <div className="avatar">
           <img src={executionClient.avatarUrl || defaultAvatar} alt="avatar" />
         </div>

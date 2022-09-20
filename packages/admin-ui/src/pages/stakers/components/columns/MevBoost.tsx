@@ -24,7 +24,7 @@ export default function MevBoost({
       onClick={() => setEnableMevBoost(!isSelected)}
       shadow={isSelected}
     >
-      {mevBoost.status === "ok" && isSelected ? (
+      {mevBoost.status === "ok" ? (
         <div className="avatar">
           <img src={mevBoost.avatarUrl || defaultAvatar} alt="avatar" />
         </div>

@@ -12,13 +12,9 @@
 .mev-boost,
 .remote-signer {
   width: 100%;
-}
-
-.consensus-client,
-.execution-client,
-.mev-boost,
-.remote-signer {
   text-align: center;
+  align-items: center;
+
   // For the underline line that highlights on select
   border-bottom: 6px solid white;
   .title {
@@ -56,4 +52,12 @@
   }
   transition: color 0.15s, background-color 0.15s, border-color 0.15s,
     box-shadow 0.15s;
+
+  .avatar {
+    --avatar-size: 6rem;
+    display: flex;
+    height: var(--avatar-size);
+    justify-content: center;
+    width: var(--avatar-size);
+  }
 }

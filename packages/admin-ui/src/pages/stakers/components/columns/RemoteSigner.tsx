@@ -24,7 +24,7 @@ export default function RemoteSigner({
       onClick={() => setEnableWeb3signer(!isSelected)}
       shadow={isSelected}
     >
-      {signer.status === "ok" && isSelected ? (
+      {signer.status === "ok" ? (
         <div className="avatar">
           <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
         </div>

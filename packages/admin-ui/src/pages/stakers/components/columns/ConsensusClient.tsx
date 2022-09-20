@@ -34,7 +34,7 @@ export default function ConsensusClient({
       className={`consensus-client ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
-      {consensusClient.status === "ok" && isSelected ? (
+      {consensusClient.status === "ok" ? (
         <div className="avatar">
           <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
         </div>
