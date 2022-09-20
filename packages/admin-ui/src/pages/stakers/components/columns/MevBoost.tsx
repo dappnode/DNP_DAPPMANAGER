@@ -6,6 +6,9 @@ import { StakerItem } from "common";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
+import Button from "components/Button";
+import { rootPath as installedRootPath } from "pages/installer";
+import { Link } from "react-router-dom";
 
 export default function MevBoost({
   mevBoost,
@@ -38,8 +41,19 @@ export default function MevBoost({
         {prettyDnpName(mevBoost.dnpName)}{" "}
         {mevBoost.status === "ok" &&
           mevBoost.isInstalled &&
+          isSelected &&
           mevBoost.metadata.version}
       </div>
+
+      {mevBoost.status === "ok" && isSelected && !mevBoost.isUpdated && (
+        <>
+          <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
+            <Button variant="dappnode">UPDATE</Button>
+          </Link>
+          <br />
+          <br />
+        </>
+      )}
 
       {mevBoost.status === "ok" && (
         <div className="description">

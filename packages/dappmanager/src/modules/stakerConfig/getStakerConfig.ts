@@ -1,5 +1,5 @@
 import { packageGet } from "../../calls";
-import { getIsInstalled } from "../../calls/fetchDnpRequest";
+import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
 import {
   InstalledPackageData,
   Network,
@@ -59,6 +59,7 @@ export async function getStakerConfig(
               dnpName: repository.dnpName,
               avatarUrl: fileToGatewayUrl(repository.avatarFile),
               isInstalled: getIsInstalled(repository, dnpList),
+              isUpdated: getIsUpdated(repository, dnpList),
               isRunning: getIsRunning(repository, dnpList),
               metadata: repository.metadata,
               isSelected: repository.dnpName === currentExecClient
@@ -101,6 +102,7 @@ export async function getStakerConfig(
               dnpName: repository.dnpName,
               avatarUrl: fileToGatewayUrl(repository.avatarFile),
               isInstalled: getIsInstalled(repository, dnpList),
+              isUpdated: getIsUpdated(repository, dnpList),
               isRunning: getIsRunning(repository, dnpList),
               metadata: repository.metadata,
               isSelected: repository.dnpName === currentConsClient,
@@ -130,6 +132,7 @@ export async function getStakerConfig(
             dnpName: repository.dnpName,
             avatarUrl: fileToGatewayUrl(repository.avatarFile),
             isInstalled: getIsInstalled(repository, dnpList),
+            isUpdated: getIsUpdated(repository, dnpList),
             isRunning: signerIsRunning,
             metadata: repository.metadata,
             isSelected: signerIsRunning
@@ -152,6 +155,7 @@ export async function getStakerConfig(
             dnpName: repository.dnpName,
             avatarUrl: fileToGatewayUrl(repository.avatarFile),
             isInstalled: getIsInstalled(repository, dnpList),
+            isUpdated: getIsUpdated(repository, dnpList),
             isRunning: getIsRunning(repository, dnpList),
             metadata: repository.metadata,
             isSelected: isMevBoostSelected

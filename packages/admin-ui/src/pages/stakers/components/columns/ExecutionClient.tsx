@@ -6,6 +6,9 @@ import "./columns.scss";
 import { StakerItem } from "common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
+import Button from "components/Button";
+import { rootPath as installedRootPath } from "pages/installer";
+import { Link } from "react-router-dom";
 
 export default function ExecutionClient({
   executionClient,
@@ -42,8 +45,21 @@ export default function ExecutionClient({
         {prettyDnpName(executionClient.dnpName)}{" "}
         {executionClient.status === "ok" &&
           executionClient.isInstalled &&
+          isSelected &&
           executionClient.metadata.version}
       </div>
+
+      {executionClient.status === "ok" &&
+        isSelected &&
+        !executionClient.isUpdated && (
+          <>
+            <Link to={`${installedRootPath}/${executionClient.dnpName}`}>
+              <Button variant="dappnode">UPDATE</Button>
+            </Link>
+            <br />
+            <br />
+          </>
+        )}
 
       {executionClient.status === "ok" && (
         <div className="description">

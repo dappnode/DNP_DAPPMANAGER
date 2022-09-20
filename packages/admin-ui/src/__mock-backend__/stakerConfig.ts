@@ -15,6 +15,7 @@ export const stakerConfig: Pick<
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: true,
               avatarUrl: "",
               metadata: {
@@ -29,6 +30,7 @@ export const stakerConfig: Pick<
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -43,6 +45,7 @@ export const stakerConfig: Pick<
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -57,6 +60,7 @@ export const stakerConfig: Pick<
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -73,6 +77,7 @@ export const stakerConfig: Pick<
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: true,
               avatarUrl: "",
               metadata: {
@@ -90,6 +95,7 @@ export const stakerConfig: Pick<
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -104,6 +110,7 @@ export const stakerConfig: Pick<
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -118,6 +125,7 @@ export const stakerConfig: Pick<
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -136,6 +144,7 @@ export const stakerConfig: Pick<
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: true,
             avatarUrl: "",
             metadata: {
@@ -150,6 +159,7 @@ export const stakerConfig: Pick<
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: true,
             avatarUrl: "",
             metadata: {
@@ -168,6 +178,7 @@ export const stakerConfig: Pick<
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -182,6 +193,7 @@ export const stakerConfig: Pick<
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -196,7 +208,8 @@ export const stakerConfig: Pick<
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
-              isSelected: false,
+              isUpdated: false,
+              isSelected: true,
               avatarUrl: "",
               metadata: {
                 name: "besu.dnp.dappnode.eth",
@@ -210,6 +223,7 @@ export const stakerConfig: Pick<
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -226,6 +240,7 @@ export const stakerConfig: Pick<
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: true,
               avatarUrl: "",
               metadata: {
@@ -243,6 +258,7 @@ export const stakerConfig: Pick<
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -257,6 +273,7 @@ export const stakerConfig: Pick<
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -271,6 +288,7 @@ export const stakerConfig: Pick<
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -289,6 +307,7 @@ export const stakerConfig: Pick<
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: false,
             avatarUrl: "",
             metadata: {
@@ -303,6 +322,7 @@ export const stakerConfig: Pick<
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: false,
             avatarUrl: "",
             metadata: {
@@ -322,6 +342,7 @@ export const stakerConfig: Pick<
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: true,
               avatarUrl: "",
               metadata: {
@@ -336,6 +357,7 @@ export const stakerConfig: Pick<
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -350,6 +372,7 @@ export const stakerConfig: Pick<
               dnpName: "besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -365,6 +388,7 @@ export const stakerConfig: Pick<
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -381,6 +405,7 @@ export const stakerConfig: Pick<
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: true,
               avatarUrl: "",
               metadata: {
@@ -398,6 +423,7 @@ export const stakerConfig: Pick<
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -412,6 +438,7 @@ export const stakerConfig: Pick<
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -426,6 +453,7 @@ export const stakerConfig: Pick<
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
+              isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
@@ -444,6 +472,7 @@ export const stakerConfig: Pick<
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: true,
             avatarUrl: "",
             metadata: {
@@ -458,6 +487,7 @@ export const stakerConfig: Pick<
             dnpName: "mevboost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
+            isUpdated: true,
             isSelected: true,
             avatarUrl: "",
             metadata: {

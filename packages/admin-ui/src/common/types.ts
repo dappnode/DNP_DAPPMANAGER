@@ -1223,6 +1223,7 @@ export interface StakerItemOk extends StakerItemBasic {
   status: "ok";
   avatarUrl: string;
   isInstalled: boolean;
+  isUpdated: boolean;
   isRunning: boolean;
   metadata: Manifest;
   isSelected: boolean;

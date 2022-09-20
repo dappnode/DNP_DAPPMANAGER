@@ -7,6 +7,9 @@ import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
+import Button from "components/Button";
+import { rootPath as installedRootPath } from "pages/installer";
+import { Link } from "react-router-dom";
 
 export default function ConsensusClient({
   consensusClient,
@@ -55,8 +58,22 @@ export default function ConsensusClient({
         {prettyDnpName(consensusClient.dnpName)}{" "}
         {consensusClient.status === "ok" &&
           consensusClient.isInstalled &&
+          isSelected &&
           consensusClient.metadata.version}
       </div>
+
+      {consensusClient.status === "ok" &&
+        isSelected &&
+        !consensusClient.isUpdated && (
+          <>
+            <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
+              <Button variant="dappnode">UPDATE</Button>
+            </Link>
+            <br />
+            <br />
+          </>
+        )}
+
       {consensusClient.status === "ok" && (
         <div className="description">
           {isSelected && consensusClient.metadata.shortDescription}

@@ -6,6 +6,9 @@ import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import "./columns.scss";
 import { StakerItem } from "common";
+import Button from "components/Button";
+import { rootPath as installedRootPath } from "pages/installer";
+import { Link } from "react-router-dom";
 
 export default function RemoteSigner({
   signer,
@@ -38,8 +41,19 @@ export default function RemoteSigner({
         {prettyDnpName(signer.dnpName)}{" "}
         {signer.status === "ok" &&
           signer.isInstalled &&
+          isSelected &&
           signer.metadata.version}
       </div>
+
+      {signer.status === "ok" && isSelected && !signer.isUpdated && (
+        <>
+          <Link to={`${installedRootPath}/${signer.dnpName}`}>
+            <Button variant="dappnode">UPDATE</Button>
+          </Link>
+          <br />
+          <br />
+        </>
+      )}
 
       {signer.status === "ok" && (
         <div className="description">
