@@ -37,25 +37,27 @@ export default function ConsensusClient({
       className={`consensus-client ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
-      {consensusClient.status === "ok" ? (
-        <div className="avatar">
-          <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
-        </div>
-      ) : consensusClient.status === "error" ? (
-        <div className="avatar">
-          <img src={errorAvatar} alt="avatar" />
-        </div>
-      ) : null}
-
       <div
-        className="title"
         onClick={
           isSelected
             ? () => setNewConsClient({ dnpName: "" })
             : () => setNewConsClient(consensusClient)
         }
       >
-        {prettyDnpName(consensusClient.dnpName)}
+        {consensusClient.status === "ok" ? (
+          <div className="avatar">
+            <img
+              src={consensusClient.avatarUrl || defaultAvatar}
+              alt="avatar"
+            />
+          </div>
+        ) : consensusClient.status === "error" ? (
+          <div className="avatar">
+            <img src={errorAvatar} alt="avatar" />
+          </div>
+        ) : null}
+
+        <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
       </div>
 
       {consensusClient.status === "ok" &&
