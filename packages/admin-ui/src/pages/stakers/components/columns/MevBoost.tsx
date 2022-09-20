@@ -41,9 +41,7 @@ export default function MevBoost({
 
       {mevBoost.status === "ok" && (
         <div className="description">
-          {isSelected
-            ? mevBoost.metadata.description
-            : mevBoost.metadata.shortDescription}
+          {isSelected && mevBoost.metadata.shortDescription}
         </div>
       )}
     </Card>

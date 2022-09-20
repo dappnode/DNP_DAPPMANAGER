@@ -45,9 +45,7 @@ export default function ExecutionClient({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected
-            ? executionClient.metadata.description
-            : executionClient.metadata.shortDescription}
+          {isSelected && executionClient.metadata.shortDescription}
         </div>
       )}
     </Card>

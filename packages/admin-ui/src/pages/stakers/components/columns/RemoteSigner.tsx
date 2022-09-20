@@ -41,9 +41,7 @@ export default function RemoteSigner({
 
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected
-            ? signer.metadata.description
-            : signer.metadata.shortDescription}
+          {isSelected && signer.metadata.shortDescription}
         </div>
       )}
     </Card>

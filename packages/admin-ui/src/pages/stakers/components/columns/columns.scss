@@ -56,8 +56,8 @@
   .avatar {
     --avatar-size: 6rem;
     display: flex;
+    margin: auto;
     height: var(--avatar-size);
-    justify-content: center;
     width: var(--avatar-size);
   }
 }

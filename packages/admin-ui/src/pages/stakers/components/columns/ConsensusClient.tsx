@@ -57,9 +57,7 @@ export default function ConsensusClient({
       </div>
       {consensusClient.status === "ok" && (
         <div className="description">
-          {isSelected
-            ? consensusClient.metadata.description
-            : consensusClient.metadata.shortDescription}
+          {isSelected && consensusClient.metadata.shortDescription}
         </div>
       )}
       {isSelected && newConsClient && (
