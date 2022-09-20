@@ -36,7 +36,9 @@ export default function RemoteSigner({
 
       <div className="title">
         {prettyDnpName(signer.dnpName)}{" "}
-        {signer.status === "ok" && signer.metadata.version}
+        {signer.status === "ok" &&
+          signer.isInstalled &&
+          signer.metadata.version}
       </div>
 
       {signer.status === "ok" && (

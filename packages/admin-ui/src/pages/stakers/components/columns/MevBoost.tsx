@@ -36,7 +36,9 @@ export default function MevBoost({
 
       <div className="title">
         {prettyDnpName(mevBoost.dnpName)}{" "}
-        {mevBoost.status === "ok" && mevBoost.metadata.version}
+        {mevBoost.status === "ok" &&
+          mevBoost.isInstalled &&
+          mevBoost.metadata.version}
       </div>
 
       {mevBoost.status === "ok" && (
