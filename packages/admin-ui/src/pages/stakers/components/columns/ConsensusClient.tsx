@@ -64,6 +64,7 @@ export default function ConsensusClient({
 
       {consensusClient.status === "ok" &&
         isSelected &&
+        consensusClient.isInstalled &&
         !consensusClient.isUpdated && (
           <>
             <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>

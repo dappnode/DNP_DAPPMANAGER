@@ -51,6 +51,7 @@ export default function ExecutionClient({
 
       {executionClient.status === "ok" &&
         isSelected &&
+        executionClient.isInstalled &&
         !executionClient.isUpdated && (
           <>
             <Link to={`${installedRootPath}/${executionClient.dnpName}`}>

@@ -45,15 +45,18 @@ export default function MevBoost({
           mevBoost.metadata.version}
       </div>
 
-      {mevBoost.status === "ok" && isSelected && !mevBoost.isUpdated && (
-        <>
-          <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
-            <Button variant="dappnode">UPDATE</Button>
-          </Link>
-          <br />
-          <br />
-        </>
-      )}
+      {mevBoost.status === "ok" &&
+        isSelected &&
+        mevBoost.isInstalled &&
+        !mevBoost.isUpdated && (
+          <>
+            <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
+              <Button variant="dappnode">UPDATE</Button>
+            </Link>
+            <br />
+            <br />
+          </>
+        )}
 
       {mevBoost.status === "ok" && (
         <div className="description">

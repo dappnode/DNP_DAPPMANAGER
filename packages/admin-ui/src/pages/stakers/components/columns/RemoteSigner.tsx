@@ -45,15 +45,18 @@ export default function RemoteSigner({
           signer.metadata.version}
       </div>
 
-      {signer.status === "ok" && isSelected && !signer.isUpdated && (
-        <>
-          <Link to={`${installedRootPath}/${signer.dnpName}`}>
-            <Button variant="dappnode">UPDATE</Button>
-          </Link>
-          <br />
-          <br />
-        </>
-      )}
+      {signer.status === "ok" &&
+        isSelected &&
+        signer.isInstalled &&
+        !signer.isUpdated && (
+          <>
+            <Link to={`${installedRootPath}/${signer.dnpName}`}>
+              <Button variant="dappnode">UPDATE</Button>
+            </Link>
+            <br />
+            <br />
+          </>
+        )}
 
       {signer.status === "ok" && (
         <div className="description">
