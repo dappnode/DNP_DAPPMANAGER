@@ -41,13 +41,7 @@ export default function ExecutionClient({
         </div>
       ) : null}
 
-      <div className="title">
-        {prettyDnpName(executionClient.dnpName)}{" "}
-        {executionClient.status === "ok" &&
-          executionClient.isInstalled &&
-          isSelected &&
-          executionClient.metadata.version}
-      </div>
+      <div className="title">{prettyDnpName(executionClient.dnpName)} </div>
 
       {executionClient.status === "ok" &&
         isSelected &&

@@ -55,11 +55,7 @@ export default function ConsensusClient({
             : () => setNewConsClient(consensusClient)
         }
       >
-        {prettyDnpName(consensusClient.dnpName)}{" "}
-        {consensusClient.status === "ok" &&
-          consensusClient.isInstalled &&
-          isSelected &&
-          consensusClient.metadata.version}
+        {prettyDnpName(consensusClient.dnpName)}
       </div>
 
       {consensusClient.status === "ok" &&
