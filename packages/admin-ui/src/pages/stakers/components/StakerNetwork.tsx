@@ -61,18 +61,14 @@ export default function StakerNetwork({
         web3Signer
       } = currentStakerConfigReq.data;
 
-      const executionClient =
-        executionClients.find(
-          ec =>
-            ec.status === "ok" &&
-            ec.isSelected &&
-            ec.isInstalled &&
-            ec.isRunning
-        )?.dnpName || "";
+      const executionClient = executionClients.find(
+        ec =>
+          ec.status === "ok" && ec.isSelected && ec.isInstalled && ec.isRunning
+      )?.dnpName;
       const consensusClient = consensusClients.find(
         cc =>
           cc.status === "ok" && cc.isSelected && cc.isInstalled && cc.isRunning
-      ) || { dnpName: "" };
+      );
       const enableMevBoost =
         mevBoost.status === "ok" &&
         mevBoost.isInstalled &&
