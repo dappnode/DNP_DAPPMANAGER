@@ -39,9 +39,17 @@ export default function ConsensusClient({
     >
       <div
         onClick={
-          isSelected
-            ? () => setNewConsClient({ dnpName: "" })
-            : () => setNewConsClient(consensusClient)
+          consensusClient.status === "ok"
+            ? isSelected
+              ? () => setNewConsClient({ dnpName: "" })
+              : () =>
+                  setNewConsClient({
+                    dnpName: consensusClient.dnpName,
+                    graffiti: consensusClient.graffiti,
+                    feeRecipient: consensusClient.feeRecipient,
+                    checkpointSync: consensusClient.checkpointSync
+                  })
+            : undefined
         }
       >
         {consensusClient.status === "ok" ? (
