@@ -180,7 +180,8 @@ export default function StakerNetwork({
             }),
           {
             message: `Setting new staker configuration...`,
-            onSuccess: `Successfully set new staker configuration`
+            onSuccess: `Successfully set new staker configuration`,
+            onError: `Error setting new staker configuration`
           }
         );
         setReqStatus({ result: true });
@@ -189,7 +190,11 @@ export default function StakerNetwork({
       setReqStatus({ error: e });
     } finally {
       setReqStatus({ loading: true });
-      await currentStakerConfigReq.revalidate();
+      await withToast(() => currentStakerConfigReq.revalidate(), {
+        message: `Getting new ${network} staker configuration`,
+        onSuccess: `Successfully loaded ${network} staker configuration`,
+        onError: `Error new loading ${network} staker configuration`
+      });
       setReqStatus({ loading: false });
     }
   }
