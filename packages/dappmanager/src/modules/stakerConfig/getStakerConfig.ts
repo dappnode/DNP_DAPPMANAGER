@@ -1,6 +1,14 @@
-import { packagesGet } from "../../calls";
-import { Network, PkgStatus, StakerConfigGet } from "../../types";
-import { ComposeFileEditor } from "../compose/editor";
+import { packageGet } from "../../calls";
+import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
+import {
+  InstalledPackageData,
+  Network,
+  StakerConfigGet,
+  StakerItem
+} from "../../types";
+import { fileToGatewayUrl } from "../../utils/distributedFile";
+import { listPackages } from "../docker/list";
+import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
   getNetworkStakerPkgs,
@@ -22,89 +30,159 @@ export async function getStakerConfig(
   network: Network
 ): Promise<StakerConfigGet> {
   try {
+    const releaseFetcher = new ReleaseFetcher();
+
     const {
       execClients,
       currentExecClient,
       consClients,
       currentConsClient,
       web3signer,
-      mevBoostAvail,
+      mevBoostDnpName,
       isMevBoostSelected
     } = getNetworkStakerPkgs(network);
 
-    const pkgs = await packagesGet();
-
-    // Execution clients
-    const executionClients: PkgStatus[] = [];
-    for (const exCl of execClients.map(exexClient => exexClient.dnpName)) {
-      const execClientPkg = pkgs.find(pkg => pkg.dnpName === exCl);
-      executionClients.push({
-        dnpName: exCl,
-        isInstalledAndRunning:
-          execClientPkg?.containers.every(c => c.running) ?? false,
-        isSelected: currentExecClient === exCl
-      });
-    }
-
-    // Consensus clients
-    const consensusClients: PkgStatus[] = [];
-    for (const conCl of consClients.map(consClient => consClient.dnpName)) {
-      const consClientPkg = pkgs.find(pkg => pkg.dnpName === conCl);
-      let graffiti = "";
-      let feeRecipient = "";
-      let checkpointSync = "";
-      if (consClientPkg) {
-        const environment = new ComposeFileEditor(
-          consClientPkg.dnpName,
-          consClientPkg.isCore
-        ).getUserSettings().environment;
-        if (environment) {
-          const validatorService = getValidatorServiceName(
-            consClientPkg.dnpName
-          );
-          const beaconService = getBeaconServiceName(consClientPkg.dnpName);
-          graffiti = environment[validatorService]["GRAFFITI"];
-          feeRecipient = environment[validatorService]["FEE_RECIPIENT_ADDRESS"];
-          checkpointSync = environment[beaconService]["CHECKPOINT_SYNC_URL"];
-        }
-      }
-      consensusClients.push({
-        dnpName: conCl,
-        isInstalledAndRunning:
-          consClientPkg?.containers.every(c => c.running) ?? false,
-        isSelected: currentConsClient === conCl,
-        graffiti,
-        feeRecipient,
-        checkpointSync
-      });
-    }
-
-    // Web3signer
-    const web3signerPkg = pkgs.find(pkg => pkg.dnpName === web3signer.dnpName);
-    const web3signerPkgIsInstalledAndRunning =
-      web3signerPkg?.containers.every(c => c.running) ?? false;
-    const signer = {
-      dnpName: web3signer.dnpName,
-      isInstalledAndRunning: web3signerPkgIsInstalledAndRunning,
-      isSelected: web3signerPkgIsInstalledAndRunning
-    };
-
-    // Mevboost
-    const mevBoostPkg = pkgs.find(pkg => pkg.dnpName === mevBoostAvail);
-    const mevBoost = {
-      dnpName: mevBoostAvail,
-      isInstalledAndRunning:
-        mevBoostPkg?.containers.every(c => c.running) ?? false,
-      isSelected: isMevBoostSelected
-    };
+    const dnpList = await listPackages();
 
     return {
-      executionClients,
-      consensusClients,
-      web3signer: signer,
-      mevBoost
+      executionClients: await Promise.all(
+        execClients.map(async execClient => {
+          try {
+            if (!(await releaseFetcher.repoExists(execClient.dnpName)))
+              throw Error(`Repository ${execClient.dnpName} does not exist`);
+            const repository = await releaseFetcher.getRelease(
+              execClient.dnpName
+            );
+            // Print the object respository
+            return {
+              status: "ok",
+              dnpName: repository.dnpName,
+              avatarUrl: fileToGatewayUrl(repository.avatarFile),
+              isInstalled: getIsInstalled(repository, dnpList),
+              isUpdated: getIsUpdated(repository, dnpList),
+              isRunning: getIsRunning(repository, dnpList),
+              metadata: repository.metadata,
+              isSelected: repository.dnpName === currentExecClient
+            };
+          } catch (error) {
+            return {
+              status: "error",
+              dnpName: execClient.dnpName,
+              error
+            };
+          }
+        })
+      ),
+      consensusClients: await Promise.all(
+        consClients.map(async consClient => {
+          try {
+            if (!(await releaseFetcher.repoExists(consClient.dnpName)))
+              throw Error(`Repository ${consClient.dnpName} does not exist`);
+            const repository = await releaseFetcher.getRelease(
+              consClient.dnpName
+            );
+            const isInstalled = getIsInstalled(repository, dnpList);
+            let graffiti, feeRecipient, checkpointSync;
+            if (isInstalled) {
+              const pkgEnv = (await packageGet({ dnpName: repository.dnpName }))
+                .userSettings?.environment;
+              if (pkgEnv) {
+                const validatorService = getValidatorServiceName(
+                  repository.dnpName
+                );
+                const beaconService = getBeaconServiceName(repository.dnpName);
+                graffiti = pkgEnv[validatorService]["GRAFFITI"];
+                feeRecipient =
+                  pkgEnv[validatorService]["FEE_RECIPIENT_ADDRESS"];
+                checkpointSync = pkgEnv[beaconService]["CHECKPOINT_SYNC_URL"];
+              }
+            }
+            return {
+              status: "ok",
+              dnpName: repository.dnpName,
+              avatarUrl: fileToGatewayUrl(repository.avatarFile),
+              isInstalled: getIsInstalled(repository, dnpList),
+              isUpdated: getIsUpdated(repository, dnpList),
+              isRunning: getIsRunning(repository, dnpList),
+              metadata: repository.metadata,
+              isSelected: repository.dnpName === currentConsClient,
+              graffiti,
+              feeRecipient,
+              checkpointSync
+            };
+          } catch (error) {
+            return {
+              status: "error",
+              dnpName: consClient.dnpName,
+              error
+            };
+          }
+        })
+      ),
+      web3Signer: await new Promise<StakerItem>(async resolve => {
+        try {
+          if (!(await releaseFetcher.repoExists(web3signer.dnpName)))
+            throw Error(`Repository ${web3signer.dnpName} does not exist`);
+          const repository = await releaseFetcher.getRelease(
+            web3signer.dnpName
+          );
+          const signerIsRunning = getIsRunning(repository, dnpList);
+          resolve({
+            status: "ok",
+            dnpName: repository.dnpName,
+            avatarUrl: fileToGatewayUrl(repository.avatarFile),
+            isInstalled: getIsInstalled(repository, dnpList),
+            isUpdated: getIsUpdated(repository, dnpList),
+            isRunning: signerIsRunning,
+            metadata: repository.metadata,
+            isSelected: signerIsRunning
+          });
+        } catch (error) {
+          resolve({
+            status: "error",
+            dnpName: web3signer.dnpName,
+            error
+          });
+        }
+      }),
+      mevBoost: await new Promise<StakerItem>(async resolve => {
+        try {
+          if (!(await releaseFetcher.repoExists(mevBoostDnpName)))
+            throw Error(`Repository ${mevBoostDnpName} does not exist`);
+          const repository = await releaseFetcher.getRelease(mevBoostDnpName);
+          resolve({
+            status: "ok",
+            dnpName: repository.dnpName,
+            avatarUrl: fileToGatewayUrl(repository.avatarFile),
+            isInstalled: getIsInstalled(repository, dnpList),
+            isUpdated: getIsUpdated(repository, dnpList),
+            isRunning: getIsRunning(repository, dnpList),
+            metadata: repository.metadata,
+            isSelected: isMevBoostSelected
+          });
+        } catch (error) {
+          resolve({
+            status: "error",
+            dnpName: mevBoostDnpName,
+            error
+          });
+        }
+      })
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);
   }
+}
+
+// Utils
+
+function getIsRunning(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): boolean {
+  return (
+    dnpList
+      .find(dnp => dnp.dnpName === dnpName)
+      ?.containers.every(c => c.running) ?? false
+  );
 }

@@ -3,8 +3,13 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface } from "types";
+import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
 import "./columns.scss";
+import defaultAvatar from "img/defaultAvatar.png";
+import errorAvatar from "img/errorAvatarTrim.png";
+import Button from "components/Button";
+import { rootPath as installedRootPath } from "pages/installer";
+import { Link } from "react-router-dom";
 
 export default function ConsensusClient({
   consensusClient,
@@ -13,9 +18,10 @@ export default function ConsensusClient({
   isSelected,
   feeRecipientError,
   graffitiError,
-  checkpointSyncPlaceHolder
+  checkpointSyncPlaceHolder,
+  ...props
 }: {
-  consensusClient: ConsensusClientIface;
+  consensusClient: StakerItem;
   setNewConsClient: React.Dispatch<
     React.SetStateAction<ConsensusClientIface | undefined>
   >;
@@ -27,19 +33,59 @@ export default function ConsensusClient({
 }) {
   return (
     <Card
+      {...props}
       className={`consensus-client ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
       <div
-        className="title"
         onClick={
-          isSelected
-            ? () => setNewConsClient({ dnpName: "" })
-            : () => setNewConsClient(consensusClient)
+          consensusClient.status === "ok"
+            ? isSelected
+              ? () => setNewConsClient({ dnpName: "" })
+              : () =>
+                  setNewConsClient({
+                    dnpName: consensusClient.dnpName,
+                    graffiti: consensusClient.graffiti,
+                    feeRecipient: consensusClient.feeRecipient,
+                    checkpointSync: consensusClient.checkpointSync
+                  })
+            : undefined
         }
       >
-        {prettyDnpName(consensusClient.dnpName)}
+        {consensusClient.status === "ok" ? (
+          <div className="avatar">
+            <img
+              src={consensusClient.avatarUrl || defaultAvatar}
+              alt="avatar"
+            />
+          </div>
+        ) : consensusClient.status === "error" ? (
+          <div className="avatar">
+            <img src={errorAvatar} alt="avatar" />
+          </div>
+        ) : null}
+
+        <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
       </div>
+
+      {consensusClient.status === "ok" &&
+        isSelected &&
+        consensusClient.isInstalled &&
+        !consensusClient.isUpdated && (
+          <>
+            <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
+              <Button variant="dappnode">UPDATE</Button>
+            </Link>
+            <br />
+            <br />
+          </>
+        )}
+
+      {consensusClient.status === "ok" && (
+        <div className="description">
+          {isSelected && consensusClient.metadata.shortDescription}
+        </div>
+      )}
       {isSelected && newConsClient && (
         <>
           <hr />

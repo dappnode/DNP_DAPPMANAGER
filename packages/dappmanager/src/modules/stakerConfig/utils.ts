@@ -36,7 +36,7 @@ export function getNetworkStakerPkgs(network: Network): {
   consClients: { dnpName: string; minVersion: string }[];
   currentConsClient: string;
   web3signer: { dnpName: string; minVersion: string };
-  mevBoostAvail: string;
+  mevBoostDnpName: string;
   isMevBoostSelected: boolean;
 } {
   switch (network) {
@@ -60,7 +60,7 @@ export function getNetworkStakerPkgs(network: Network): {
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostAvail: "mevboost.dnp.dappnode.eth",
+        mevBoostDnpName: "mevboost.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostMainnet.get()
       };
 
@@ -84,7 +84,7 @@ export function getNetworkStakerPkgs(network: Network): {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostAvail: "mevboost-gnosis.dnp.dappnode.eth",
+        mevBoostDnpName: "mevboost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
       };
     case "prater":
@@ -112,7 +112,7 @@ export function getNetworkStakerPkgs(network: Network): {
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"
         },
-        mevBoostAvail: "mev-boost-goerli.dnp.dappnode.eth",
+        mevBoostDnpName: "mev-boost-goerli.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
       };
   }

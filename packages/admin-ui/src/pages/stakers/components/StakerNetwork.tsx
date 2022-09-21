@@ -58,18 +58,26 @@ export default function StakerNetwork({
         executionClients,
         consensusClients,
         mevBoost,
-        web3signer
+        web3Signer
       } = currentStakerConfigReq.data;
 
-      const executionClient =
-        executionClients.find(ec => ec.isSelected && ec.isInstalledAndRunning)
-          ?.dnpName || "";
+      const executionClient = executionClients.find(
+        ec =>
+          ec.status === "ok" && ec.isSelected && ec.isInstalled && ec.isRunning
+      )?.dnpName;
       const consensusClient = consensusClients.find(
-        cc => cc.isSelected && cc.isInstalledAndRunning
-      ) || { dnpName: "" };
+        cc =>
+          cc.status === "ok" && cc.isSelected && cc.isInstalled && cc.isRunning
+      );
       const enableMevBoost =
-        mevBoost.isInstalledAndRunning && mevBoost.isSelected;
-      const enableWeb3signer = web3signer.isInstalledAndRunning;
+        mevBoost.status === "ok" &&
+        mevBoost.isInstalled &&
+        mevBoost.isRunning &&
+        mevBoost.isSelected;
+      const enableWeb3signer =
+        web3Signer.status === "ok" &&
+        web3Signer.isInstalled &&
+        web3Signer.isRunning;
 
       // Set default values for new staker config
       setNewExecClient(executionClient);
@@ -172,7 +180,8 @@ export default function StakerNetwork({
             }),
           {
             message: `Setting new staker configuration...`,
-            onSuccess: `Successfully set new staker configuration`
+            onSuccess: `Successfully set new staker configuration`,
+            onError: `Error setting new staker configuration`
           }
         );
         setReqStatus({ result: true });
@@ -180,117 +189,128 @@ export default function StakerNetwork({
     } catch (e) {
       setReqStatus({ error: e });
     } finally {
-      currentStakerConfigReq.revalidate();
+      setReqStatus({ loading: true });
+      await withToast(() => currentStakerConfigReq.revalidate(), {
+        message: `Getting new ${network} staker configuration`,
+        onSuccess: `Successfully loaded ${network} staker configuration`,
+        onError: `Error new loading ${network} staker configuration`
+      });
+      setReqStatus({ loading: false });
     }
   }
 
-  if (currentStakerConfigReq.error)
-    return <ErrorView error={currentStakerConfigReq.error} hideIcon red />;
-  if (currentStakerConfigReq.isValidating)
-    return <Loading steps={[`Loading ${network} staker configuration`]} />;
-  if (!currentStakerConfigReq.data)
-    return <ErrorView error={"No data"} hideIcon red />;
-
   return (
-    <Card>
-      <p>
-        Setup your staker configuration by selecting the Execution and Consensus
-        clients based on your needs, enable and disable the remote signer and
-        the mev boost.
-      </p>
-      <br />
-      <p>{description}</p>
-      <Row className="staker-network">
-        <Col>
-          <SubTitle>Execution Clients</SubTitle>
-          {currentStakerConfigReq.data.executionClients.map(
-            (executionClient, i) => (
-              <ExecutionClient
-                key={i}
-                executionClient={executionClient.dnpName}
-                setNewExecClient={setNewExecClient}
-                isSelected={
-                  executionClient.dnpName === newExecClient ? true : false
-                }
+    <>
+      {currentStakerConfigReq.data ? (
+        <Card>
+          <p>
+            Setup your staker configuration by selecting the Execution and
+            Consensus clients based on your needs, enable and disable the remote
+            signer and the mev boost.
+          </p>
+          <br />
+          <p>{description}</p>
+          <Row className="staker-network">
+            <Col>
+              <SubTitle>Execution Clients</SubTitle>
+              {currentStakerConfigReq.data.executionClients.map(
+                (executionClient, i) => (
+                  <ExecutionClient
+                    key={i}
+                    executionClient={executionClient}
+                    setNewExecClient={setNewExecClient}
+                    isSelected={
+                      executionClient.dnpName === newExecClient ? true : false
+                    }
+                  />
+                )
+              )}
+            </Col>
+
+            <Col>
+              <SubTitle>Consensus Clients</SubTitle>
+              {currentStakerConfigReq.data.consensusClients.map(
+                (consensusClient, i) => (
+                  <ConsensusClient
+                    key={i}
+                    consensusClient={consensusClient}
+                    setNewConsClient={setNewConsClient}
+                    newConsClient={newConsClient}
+                    isSelected={
+                      consensusClient.dnpName === newConsClient?.dnpName
+                        ? true
+                        : false
+                    }
+                    graffitiError={graffitiError}
+                    feeRecipientError={feeRecipientError}
+                    checkpointSyncPlaceHolder={
+                      network === "mainnet"
+                        ? "https://checkpoint-sync.dappnode.io"
+                        : network === "prater"
+                        ? "https://checkpoint-sync-prater.dappnode.io"
+                        : ""
+                    }
+                  />
+                )
+              )}
+            </Col>
+
+            <Col>
+              <SubTitle>Remote signer</SubTitle>
+              <RemoteSigner
+                signer={currentStakerConfigReq.data.web3Signer}
+                setEnableWeb3signer={setNewEnableWeb3signer}
+                isSelected={newEnableWeb3signer}
               />
-            )
-          )}
-        </Col>
+            </Col>
+            {network === "prater" && (
+              <Col>
+                <SubTitle>Mev Boost</SubTitle>
+                <MevBoost
+                  mevBoost={currentStakerConfigReq.data.mevBoost}
+                  setEnableMevBoost={setNewEnableMevBoost}
+                  isSelected={newEnableMevBoost}
+                />
+              </Col>
+            )}
+          </Row>
 
-        <Col>
-          <SubTitle>Consensus Clients</SubTitle>
-          {currentStakerConfigReq.data.consensusClients.map(
-            (consensusClient, i) => (
-              <ConsensusClient
-                key={i}
-                consensusClient={consensusClient}
-                setNewConsClient={setNewConsClient}
-                newConsClient={newConsClient}
-                isSelected={
-                  consensusClient.dnpName === newConsClient?.dnpName
-                    ? true
-                    : false
-                }
-                graffitiError={graffitiError}
-                feeRecipientError={feeRecipientError}
-                checkpointSyncPlaceHolder={
-                  network === "mainnet"
-                    ? "https://checkpoint-sync.dappnode.io"
-                    : network === "prater"
-                    ? "https://checkpoint-sync-prater.dappnode.io"
-                    : ""
-                }
+          <hr />
+
+          <div>
+            {currentStakerConfig && (
+              <AdvanceView
+                currentStakerConfig={currentStakerConfig}
+                newStakerConfig={{
+                  network,
+                  executionClient: newExecClient,
+                  consensusClient: newConsClient,
+                  enableMevBoost: newEnableMevBoost,
+                  enableWeb3signer: newEnableWeb3signer
+                }}
               />
-            )
-          )}
-        </Col>
+            )}
 
-        <Col>
-          <SubTitle>Remote signer</SubTitle>
-          <RemoteSigner
-            signer={currentStakerConfigReq.data.web3signer.dnpName}
-            setEnableWeb3signer={setNewEnableWeb3signer}
-            isSelected={newEnableWeb3signer}
-          />
-        </Col>
-        {network === "prater" && (
-          <Col>
-            <SubTitle>Mev Boost</SubTitle>
-            <MevBoost
-              mevBoost={currentStakerConfigReq.data.mevBoost.dnpName}
-              setEnableMevBoost={setNewEnableMevBoost}
-              isSelected={newEnableMevBoost}
-            />
-          </Col>
-        )}
-      </Row>
+            <Button
+              variant="dappnode"
+              disabled={!setStakerConfigIsAllowed() || reqStatus.loading}
+              onClick={setNewConfig}
+            >
+              Apply changes
+            </Button>
 
-      <hr />
-
-      <div>
-        {currentStakerConfig && (
-          <AdvanceView
-            currentStakerConfig={currentStakerConfig}
-            newStakerConfig={{
-              network,
-              executionClient: newExecClient,
-              consensusClient: newConsClient,
-              enableMevBoost: newEnableMevBoost,
-              enableWeb3signer: newEnableWeb3signer
-            }}
-          />
-        )}
-
-        <Button
-          variant="dappnode"
-          disabled={!setStakerConfigIsAllowed() || reqStatus.loading}
-          onClick={setNewConfig}
-        >
-          Apply changes
-        </Button>
-
-        {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
-      </div>
-    </Card>
+            {reqStatus.error && (
+              <ErrorView error={reqStatus.error} hideIcon red />
+            )}
+          </div>
+        </Card>
+      ) : currentStakerConfigReq.error ? (
+        <ErrorView error={currentStakerConfigReq.error} hideIcon red />
+      ) : currentStakerConfigReq.isValidating ? (
+        <Loading steps={[`Loading ${network} staker configuration`]} />
+      ) : (
+        <ErrorView error={"No data"} hideIcon red />
+      )}
+    </>
   );
 }

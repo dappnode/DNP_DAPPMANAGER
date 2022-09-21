@@ -1,4 +1,4 @@
-import { PortProtocol, Routes, IpfsClientTarget, Network } from "../common";
+import { PortProtocol, Routes, IpfsClientTarget } from "../common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
@@ -15,6 +15,7 @@ import { volumes } from "./volumes";
 import { wireguard } from "./wireguard";
 import { wifi } from "./wifi";
 import { releaseTrustedKey } from "./releaseTrustedKey";
+import { stakerConfig } from "./stakerConfig";
 
 const namedSpacedCalls = {
   ...autoUpdate,
@@ -28,6 +29,7 @@ const namedSpacedCalls = {
   ...password,
   ...releaseTrustedKey,
   ...ssh,
+  ...stakerConfig,
   ...telegram,
   ...userActionLogs,
   ...volumes,
@@ -241,203 +243,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
-  }),
-  stakerConfigGet: async (network: Network) => {
-    switch (network) {
-      case "mainnet":
-        return {
-          executionClients: [
-            {
-              dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
-            },
-            {
-              dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            }
-          ],
-          consensusClients: [
-            {
-              dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true,
-              graffiti: "Validating_from_prysm-mainnet",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            },
-            {
-              dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false,
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            }
-          ],
-          web3signer: {
-            dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          },
-          mevBoost: {
-            dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          }
-        };
-      case "prater":
-        return {
-          executionClients: [
-            {
-              dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
-            },
-            {
-              dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            }
-          ],
-          consensusClients: [
-            {
-              dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true,
-              graffiti: "Validating_from_prysm-mainnet",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            },
-            {
-              dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false,
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            }
-          ],
-          web3signer: {
-            dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          },
-          mevBoost: {
-            dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          }
-        };
-
-      case "gnosis":
-        return {
-          executionClients: [
-            {
-              dnpName: "geth.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true
-            },
-            {
-              dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "besu.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "erigon.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            }
-          ],
-          consensusClients: [
-            {
-              dnpName: "prysm.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: true,
-              graffiti: "Validating_from_prysm-mainnet",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            },
-            {
-              dnpName: "lighthouse.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "teku.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false
-            },
-            {
-              dnpName: "nimbus.dnp.dappnode.eth",
-              isInstalledAndRunning: true,
-              isSelected: false,
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
-            }
-          ],
-          web3signer: {
-            dnpName: "web3signer.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          },
-          mevBoost: {
-            dnpName: "mevboost.dnp.dappnode.eth",
-            isInstalledAndRunning: true,
-            isSelected: false
-          }
-        };
-    }
-  },
-
-  stakerConfigSet: async () => {}
+  })
 };
 
 export const calls: Routes = {
