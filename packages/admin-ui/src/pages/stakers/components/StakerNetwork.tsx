@@ -204,9 +204,14 @@ export default function StakerNetwork({
       {currentStakerConfigReq.data ? (
         <Card>
           <p>
-            Setup your staker configuration by selecting the Execution and
-            Consensus clients based on your needs, enable and disable the remote
-            signer and the mev boost.
+            Set up your Proof-of-Stake validator configuration for Ethereum and
+            Ethereum-based chains. You will need to: <br />
+            (1) Choose an Execution Layer client <br />
+            (2) Choose a Consensus Layer client (+ validator) <br />
+            (3) Install the web3signer, which will hold the validator keys and
+            sign <br />
+            (4) Optional; delegate block-building capacities through the MEV
+            Boost network and potentially profit from MEV
           </p>
           <br />
           <p>{description}</p>

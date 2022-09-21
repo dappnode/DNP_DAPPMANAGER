@@ -40,7 +40,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: StakerNetwork({
         network: "prater",
         description:
-          "The Prater testnet allows developers to test node operations such as adding and removing validators, migrating between clients and performing upgrades and backups. The Prater testnet is unique because it involves a proof-of-stake testing environment rather than proof-of-work."
+          "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
       })
     }
   ];
