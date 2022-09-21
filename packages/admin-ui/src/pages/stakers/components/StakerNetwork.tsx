@@ -188,7 +188,9 @@ export default function StakerNetwork({
     } catch (e) {
       setReqStatus({ error: e });
     } finally {
+      setReqStatus({ loading: true });
       currentStakerConfigReq.revalidate();
+      setReqStatus({ loading: false });
     }
   }
 
