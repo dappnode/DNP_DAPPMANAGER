@@ -6,7 +6,6 @@ services:
       resources:
         limits:
           memory: "16384M"
-    dns: 172.33.1.2
     image: "vpn.dnp.dappnode.eth:0.2.5"
     logging:
       driver: journald

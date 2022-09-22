@@ -6,7 +6,6 @@ services:
       resources:
         limits:
           memory: "16384M"
-    dns: 172.33.1.2
     image: "s1.sample-core.dnp.dappnode.eth:0.2.33"
     logging:
       driver: json-file
@@ -27,7 +26,6 @@ services:
       resources:
         limits:
           memory: "16384M"
-    dns: 172.33.1.2
     image: "s2.sample-core.dnp.dappnode.eth:0.2.33"
     logging:
       driver: json-file

@@ -6,7 +6,6 @@ services:
       resources:
         limits:
           memory: "16384M"
-    dns: 172.33.1.2
     environment:
       DISABLE_UPNP: ""
       ETH_MAINNET_RPC_URL_OVERRIDE: ""

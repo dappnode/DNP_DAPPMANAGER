@@ -28,7 +28,6 @@ services:
     image: "chentex/random-logger"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
     networks:
       dncore_network:
         ipv4_address: 172.33.1.7`;
@@ -46,7 +45,6 @@ services:
     image: "chentex/random-logger"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
     networks:
       network:
         ipv4_address: 172.33.1.7`;
@@ -101,7 +99,6 @@ services:
     image: chentex/random-logger
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
-    dns: 172.33.1.2
     networks:
       dncore_network:
         ipv4_address: 172.33.1.7
