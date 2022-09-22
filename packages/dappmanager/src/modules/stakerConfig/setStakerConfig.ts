@@ -14,7 +14,8 @@ import { logs } from "../../logs";
 import {
   getValidatorServiceName,
   setStakerConfigOnDb,
-  getNetworkStakerPkgs
+  getNetworkStakerPkgs,
+  getBeaconServiceName
 } from "./utils";
 import { dockerContainerStop } from "../docker/api";
 import { listPackageNoThrow } from "../docker/list/listPackages";
@@ -252,23 +253,15 @@ async function setConsensusClientConfig({
   currentConsClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-  const userSettings: UserSettingsAllDnps = {
-    [targetConsensusClient.dnpName]: {
-      environment: {
-        [getValidatorServiceName(targetConsensusClient.dnpName)]: {
-          // Graffiti is a mandatory value
-          ["GRAFFITI"]:
-            targetConsensusClient.graffiti || "Validating_from_DAppNode",
-          // Fee recipient is a mandatory value
-          ["FEE_RECIPIENT_ADDRESS"]:
-            targetConsensusClient.feeRecipient ||
-            "0x0000000000000000000000000000000000000000",
-          // Checkpoint sync is an optional value
-          ["CHECKPOINT_SYNC_URL"]: targetConsensusClient.checkpointSync || ""
-        }
-      }
-    }
-  };
+  const validatorServiceName = getValidatorServiceName(
+    targetConsensusClient.dnpName
+  );
+  const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
+  const userSettings: UserSettingsAllDnps = getUserSettings(
+    targetConsensusClient,
+    validatorServiceName,
+    beaconServiceName
+  );
 
   if (!targetConsensusClient.dnpName && !currentConsClient) {
     // Stop the current consensus client if no option and not current consensus client
@@ -416,4 +409,53 @@ async function stopAllPkgContainers(
         dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
       )
   ).catch(e => logs.error(e.message));
+}
+
+/**
+ * Get the user settings for the consensus client.
+ * It may be different depending if it is multiservice or monoservice and all the envs are
+ * set in the same service
+ */
+function getUserSettings(
+  targetConsensusClient: ConsensusClient,
+  validatorServiceName: string,
+  beaconServiceName: string
+): UserSettingsAllDnps {
+  return {
+    [targetConsensusClient.dnpName]: {
+      environment:
+        beaconServiceName === validatorServiceName
+          ? {
+              [validatorServiceName]: {
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]:
+                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                // Fee recipient is a mandatory value
+                ["FEE_RECIPIENT_ADDRESS"]:
+                  targetConsensusClient.feeRecipient ||
+                  "0x0000000000000000000000000000000000000000",
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  targetConsensusClient.checkpointSync || ""
+              }
+            }
+          : {
+              [validatorServiceName]: {
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]:
+                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                // Fee recipient is a mandatory value
+                ["FEE_RECIPIENT_ADDRESS"]:
+                  targetConsensusClient.feeRecipient ||
+                  "0x0000000000000000000000000000000000000000"
+              },
+
+              [beaconServiceName]: {
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  targetConsensusClient.checkpointSync || ""
+              }
+            }
+    }
+  };
 }
