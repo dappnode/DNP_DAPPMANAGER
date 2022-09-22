@@ -109,7 +109,6 @@ describe("setDappnodeComposeDefaults", () => {
           container_name:
             "DAppNodePackage-beacon-chain.teku-gnosis.dnp.dappnode.eth",
           deploy: { resources: { limits: { memory: "16384M" } } },
-          dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
             BEACON_API_PORT: "3500",
@@ -133,7 +132,6 @@ describe("setDappnodeComposeDefaults", () => {
           container_name:
             "DAppNodePackage-validator.teku-gnosis.dnp.dappnode.eth",
           deploy: { resources: { limits: { memory: "16384M" } } },
-          dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
             BEACON_NODE_ADDR: "http://beacon-chain.teku-gnosis.dappnode:3500",
@@ -193,7 +191,6 @@ describe("setDappnodeComposeDefaults", () => {
             "IPFS_HOST=",
             "DISABLE_UPNP="
           ],
-          dns: "172.33.1.2",
           networks: {
             dncore_network: {
               ipv4_address: "172.33.1.7",
@@ -237,7 +234,6 @@ describe("setDappnodeComposeDefaults", () => {
         "dappmanager.dnp.dappnode.eth": {
           container_name: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
           deploy: { resources: { limits: { memory: "16384M" } } },
-          dns: "172.33.1.2",
           environment: {
             LOG_LEVEL: "info",
             ETH_MAINNET_RPC_URL_OVERRIDE: "",

@@ -76,7 +76,6 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=dist \
   GIT_DATA_PATH=.git-data.json
 
-COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 
 # Copy the src last as it's the layer most likely to change
@@ -85,8 +84,5 @@ COPY packages/dappmanager/hostServices /usr/src/app/hostServices
 COPY --from=build-monorepo /app/packages/admin-ui/build $UI_FILES_PATH
 COPY --from=build-monorepo /app/packages/dappmanager/build /usr/src/app/
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
-
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
 CMD [ "node", "index" ]

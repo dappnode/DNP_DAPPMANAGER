@@ -205,7 +205,7 @@ export default async function initializeDb(): Promise<void> {
       const internalIp = db.internalIp.get();
       if (internalIp !== publicIp && internalIp && domain) {
         try {
-          await shell(`update_local_dyndns ${domain} ${internalIp}`);
+          await shell(`update_local_dyndns ${domain} ${internalIp}`); //TODO
           logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
         } catch (e) {
           // Log the error in each attempt for transparency / debugging
