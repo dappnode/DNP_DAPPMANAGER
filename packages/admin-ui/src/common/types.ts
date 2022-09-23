@@ -1199,7 +1199,7 @@ export type ConsensusClientPrater =
   | "nimbus-prater.dnp.dappnode.eth";
 export type ExecutionClientPrater = 
   | "goerli-geth.dnp.dappnode.eth"
-  | "besu-goerli.dnp.dappnode.eth";
+  | "goerli-besu.dnp.dappnode.eth";
 
 // Gnosis
 
