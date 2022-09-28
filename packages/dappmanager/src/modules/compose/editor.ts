@@ -317,6 +317,7 @@ export class ComposeEditor {
         !Array.isArray(service.environment)
       )
         service.environment = stringifyEnvironment(service.environment);
+        service.dns = undefined; // Making sure that old dns server is not set
       return {
         ...omitBy(service, el => isObject(el) && isEmpty(el)),
         // Add mandatory properties for the ts compiler
