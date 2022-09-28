@@ -34,13 +34,6 @@ export function setDappnodeComposeDefaults(
       (serviceUnsafe, serviceName) => {
         return sortServiceKeys({
           // OVERRIDABLE VALUES: values that in case of not been set, it will take the following values
-          deploy: {
-            resources: {
-              limits: {
-                memory: "16384M"
-              }
-            }
-          },
           logging: {
             driver: "json-file",
             options: {
