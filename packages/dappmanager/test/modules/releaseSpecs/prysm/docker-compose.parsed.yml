@@ -25,10 +25,6 @@ services:
         max-size: "10m"
   validator:
     container_name: DAppNodePackage-validator.prysm.dnp.dappnode.eth
-    deploy:
-      resources:
-        limits:
-          memory: "16384M"
     image: "validator.prysm.dnp.dappnode.eth:1.0.0"
     volumes:
       - "validator-data:/root/"
