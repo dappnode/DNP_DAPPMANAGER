@@ -67,7 +67,7 @@ function WireguardDeviceDetailsLoaded({
         <a
           href={apiRoutes.downloadWireguardConfig({
             device: id,
-            isLocal: false
+            isLocal: showLocalCreds
           })}
         >
           <Button>
