@@ -25,7 +25,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
     if (stakerConfig.currentExecClient === null) {
-      let newExexClientValue = "";
+      let newExexClientValue: any;
 
       for (const execClient of stakerConfig.execClients.map(
         exCl => exCl.dnpName
@@ -62,7 +62,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If the web3signer is installed then grab the value from its compose ENV value
     // If not web3signer then is undefined
     if (stakerConfig.currentConsClient === null) {
-      let newConsClientValue = "";
+      let newConsClientValue: any;
 
       const web3signerPkg = pkgs.find(
         pkg => pkg.dnpName === stakerConfig.web3signer.dnpName

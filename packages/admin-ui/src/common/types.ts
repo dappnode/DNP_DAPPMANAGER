@@ -1188,7 +1188,7 @@ export type ExecutionClientMainnet =
   | "geth.dnp.dappnode.eth"
   | "besu.dnp.dappnode.eth"
   | "erigon.dnp.dappnode.eth"
-  | "nethermind.dnp.dappnode.eth";
+  | "nethermind.public.dappnode.eth";
 
 // Prater
 
@@ -1197,7 +1197,10 @@ export type ConsensusClientPrater =
   | "lighthouse-prater.dnp.dappnode.eth"
   | "teku-prater.dnp.dappnode.eth"
   | "nimbus-prater.dnp.dappnode.eth";
-export type ExecutionClientPrater = "goerli-geth.dnp.dappnode.eth";
+export type ExecutionClientPrater =
+  | "goerli-geth.dnp.dappnode.eth"
+  | "goerli-erigon.dnp.dappnode.eth"
+  | "goerli-nethermind.dnp.dappnode.eth";
 
 // Gnosis
 
@@ -1246,9 +1249,8 @@ export interface StakerConfigSet {
   enableWeb3signer?: boolean;
   enableMevBoost?: boolean;
 }
-
 export interface ConsensusClient {
-  dnpName: string;
+  dnpName?: string;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;

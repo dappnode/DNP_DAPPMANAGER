@@ -34,10 +34,10 @@ export default function AdvanceView({
     },
     {
       name: "Consensus Client",
-      current: currentStakerConfig.consensusClient
+      current: currentStakerConfig.consensusClient?.dnpName
         ? prettyDnpName(currentStakerConfig.consensusClient.dnpName)
         : "-",
-      new: newStakerConfig.consensusClient
+      new: newStakerConfig.consensusClient?.dnpName
         ? prettyDnpName(newStakerConfig.consensusClient.dnpName)
         : "-"
     },

@@ -45,6 +45,10 @@ export async function setStakerConfig({
     mevBoostDnpName
   } = getNetworkStakerPkgs(stakerConfig.network);
 
+  // Ensure execution and consensus clients do not take the null value (used to indicate intention)
+  if (currentExecClient === null) throw Error("Invalid execution client");
+  if (currentConsClient === null) throw Error("Invalid consensus client");
+
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&
@@ -178,7 +182,7 @@ async function setExecutionClientConfig({
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  currentExecClient: string;
+  currentExecClient: string | undefined;
   targetExecutionClient: string;
   currentExecClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
@@ -248,30 +252,38 @@ async function setConsensusClientConfig({
   targetConsensusClient,
   currentConsClientPkg
 }: {
-  currentConsClient: string;
+  currentConsClient: string | undefined;
   targetConsensusClient: ConsensusClient;
   currentConsClientPkg: InstalledPackageDataApiReturn | undefined;
 }): Promise<void> {
+  if (!targetConsensusClient.dnpName) {
+    if (!currentConsClient) {
+      // Stop the current consensus client if no option and not current consensus client
+      logs.info(`Not consensus client selected`);
+      if (currentConsClientPkg)
+        await stopAllPkgContainers(currentConsClientPkg);
+    } else if (!targetConsensusClient.dnpName && currentConsClient) {
+      // Stop the current consensus client if no target provided
+      logs.info(`Not consensus client selected`);
+      if (currentConsClientPkg)
+        await stopAllPkgContainers(currentConsClientPkg);
+    }
+    // Return if no consensus client is selected
+    return;
+  }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const validatorServiceName = getValidatorServiceName(
     targetConsensusClient.dnpName
   );
   const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
   const userSettings: UserSettingsAllDnps = getUserSettings(
+    targetConsensusClient.dnpName,
     targetConsensusClient,
     validatorServiceName,
     beaconServiceName
   );
 
-  if (!targetConsensusClient.dnpName && !currentConsClient) {
-    // Stop the current consensus client if no option and not current consensus client
-    logs.info(`Not consensus client selected`);
-    if (currentConsClientPkg) await stopAllPkgContainers(currentConsClientPkg);
-  } else if (!targetConsensusClient.dnpName && currentConsClient) {
-    // Stop the current consensus client if no target provided
-    logs.info(`Not consensus client selected`);
-    if (currentConsClientPkg) await stopAllPkgContainers(currentConsClientPkg);
-  } else if (targetConsensusClient.dnpName && !currentConsClient) {
+  if (targetConsensusClient.dnpName && !currentConsClient) {
     const targetConsClientPkg = await listPackageNoThrow({
       dnpName: targetConsensusClient.dnpName
     });
@@ -417,12 +429,13 @@ async function stopAllPkgContainers(
  * set in the same service
  */
 function getUserSettings(
+  dnpName: string,
   targetConsensusClient: ConsensusClient,
   validatorServiceName: string,
   beaconServiceName: string
 ): UserSettingsAllDnps {
   return {
-    [targetConsensusClient.dnpName]: {
+    [dnpName]: {
       environment:
         beaconServiceName === validatorServiceName
           ? {
