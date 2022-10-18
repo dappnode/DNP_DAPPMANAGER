@@ -16,31 +16,20 @@ import params from "../params";
  * ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
  * @param dbSetter
  */
-export function interceptGlobalEnvOnSet({
-  get,
-  set,
-  globEnvKey
-}: {
+export function interceptGlobalEnvOnSet<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get: () => any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set: (globEnvValue: any) => void;
-  globEnvKey: string;
-}): {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get: () => any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set: (globEnvValue: any) => void;
-} {
+  F extends (...args: any[]) => any,
+  T extends { set: F }
+>(dbSetter: T, globEnvKey: string): T {
   return {
-    get,
+    ...dbSetter,
 
     set: function (globEnvValue: string): void {
       // Must be with prefix _DAPPNODE_GLOBAL_
       if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
         globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
 
-      set(globEnvValue);
+      dbSetter.set(globEnvValue);
       // Update the global env file
       writeGlobalEnvsToEnvFile();
       // List packages using the global env and update the global envs in composes files
