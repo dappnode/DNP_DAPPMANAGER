@@ -1,8 +1,8 @@
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
-import params, { ethClientData } from "../../params";
+import params from "../../params";
 import { packageRemove, packageGet } from "../../calls";
-import { EthClientTarget, UserSettings } from "../../types";
+import { Eth2ClientTarget, EthClientRemote } from "../../types";
 import { logs } from "../../logs";
 import { ComposeFileEditor } from "../compose/editor";
 import { parseServiceNetworks } from "../compose/networks";
@@ -12,8 +12,7 @@ import {
   dockerContainerInspect
 } from "../docker";
 import Dockerode from "dockerode";
-
-// Types
+import { isEqual } from "lodash";
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -22,43 +21,61 @@ import Dockerode from "dockerode";
  * @param deletePrevEthClient If set delete previous eth1 client
  */
 export async function changeEthMultiClient(
-  nextTarget: EthClientTarget,
-  deletePrevEthClient?: boolean,
-  userSettings?: UserSettings
+  nextTarget: Eth2ClientTarget,
+  deletePrevExecClient?: boolean,
+  deletePrevConsClient?: boolean
 ): Promise<void> {
-  const prevTarget = db.ethClientTarget.get();
+  const prevTarget: Eth2ClientTarget =
+    db.ethClientRemote.get() === EthClientRemote.on
+      ? "remote"
+      : {
+          execClient: db.executionClientMainnet.get(),
+          consClient: db.consensusClientMainnet.get()
+        };
 
-  // Set user settings of next target if any
-  if (userSettings) db.ethClientUserSettings.set(nextTarget, userSettings);
+  if (prevTarget !== "remote" && !isEqual(prevTarget, nextTarget)) {
+    // Remove Consensus client
+    if (prevTarget.consClient && deletePrevConsClient)
+      await packageRemove({ dnpName: prevTarget.consClient }).catch(e =>
+        logs.error(
+          `Error removing consensus client ${prevTarget.consClient}`,
+          e
+        )
+      );
 
-  // Delete previous ETH client on demmand by the user
-  if (prevTarget !== nextTarget && prevTarget && prevTarget !== "remote") {
-    const clientData = ethClientData[prevTarget];
-    if (deletePrevEthClient) {
-      try {
-        clientData && (await packageRemove({ dnpName: clientData.dnpName }));
-        // Must await uninstall because geth -> light, light -> geth
-        // will create conflicts since it's the same DNP
-      } catch (e) {
-        logs.error("Error removing previous ETH multi-client", e);
-      }
+    // Remove Execution client
+    if (prevTarget.execClient && deletePrevExecClient) {
+      await packageRemove({ dnpName: prevTarget.execClient }).catch(e =>
+        logs.error(
+          `Error removing execution client ${prevTarget.consClient}`,
+          e
+        )
+      );
     } else {
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
-      try {
-        await setDefaultEthClientFullNode(clientData.dnpName);
-      } catch (e) {
+      await setDefaultEthClientFullNode(true, prevTarget.execClient).catch(e =>
         logs.error(
           "Error removing fullnode.dappnode alias from previous ETH multi-client",
           e
-        );
-      }
+        )
+      );
     }
   }
 
   // Setting the status to selected will trigger an install
-  db.ethClientTarget.set(nextTarget);
+  if (nextTarget === "remote") {
+    db.ethClientRemote.set(EthClientRemote.on);
+  } else {
+    db.executionClientMainnet.set(nextTarget.execClient);
+    db.consensusClientMainnet.set(nextTarget.consClient);
+  }
   if (prevTarget !== nextTarget && nextTarget !== "remote") {
-    db.ethClientInstallStatus.set(nextTarget, { status: "TO_INSTALL" });
+    db.ethExecClientInstallStatus.set(nextTarget.execClient, {
+      status: "TO_INSTALL"
+    });
+    db.ethConsClientInstallStatus.set(nextTarget.consClient, {
+      status: "TO_INSTALL"
+    });
     eventBus.runEthClientInstaller.emit();
   }
 }
@@ -66,6 +83,7 @@ export async function changeEthMultiClient(
 // Utils
 
 export async function setDefaultEthClientFullNode(
+  removeAlias: boolean,
   dnpName: string
 ): Promise<void> {
   const previousEthClientPackage = await packageGet({
@@ -97,8 +115,10 @@ export async function setDefaultEthClientFullNode(
       )
     ]
   };
-  // Remove fullnode alias from compose
-  removeFullnodeAliasFromCompose(dnpName, serviceName);
+
+  if (removeAlias) removeFullnodeAliasFromCompose(dnpName, serviceName);
+  else addFullnodeAliasToCompose(dnpName, serviceName);
+
   await dockerNetworkDisconnect(
     params.DNP_PRIVATE_NETWORK_NAME,
     previousEthClientContainerName
