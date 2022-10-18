@@ -18,7 +18,8 @@
     "server-mock": "PORT=5000 nodemon server-mock/index.ts",
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json",
     "mock-standalone": "REACT_APP_MOCK=true yarn start",
-    "mock-standalone:build": "REACT_APP_MOCK=true yarn build"
+    "mock-standalone:build": "REACT_APP_MOCK=true yarn build",
+    "watch": "nodemon --ignore \"*.json\" --watch src/ --exec \"yarn build\""
   },
   "dependencies": {
     "@dappnode/dappnodesdk": "^0.2.65",
