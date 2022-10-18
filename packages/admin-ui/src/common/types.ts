@@ -999,21 +999,23 @@ export enum IpfsClientTarget {
 /**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
+ * TO BE DEPRECATED
  */
 export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
 export type EthClientTarget = EthClientTargetPackage | "remote";
-export const ethClientTargets: EthClientTarget[] = [
-  "remote",
-  "geth",
-  "nethermind",
-  "besu",
-  "erigon"
-];
+export type Eth2ClientTarget =
+  | { execClient: ExecutionClientMainnet; consClient: ConsensusClientMainnet }
+  | "remote";
 
 /**
  * If the DAPPMANAGER should use a eth remote node in cases of error syncing
  */
 export type EthClientFallback = "on" | "off";
+
+export enum EthClientRemote {
+  on = "on",
+  off = "off"
+}
 
 export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
 
@@ -1079,6 +1081,9 @@ export interface SystemInfo {
   identityAddress: string;
   // Eth multi-client configuration
   ethClientTarget: EthClientTarget | null;
+  ethClientRemote: EthClientRemote | null;
+  ethClientExecution: ExecutionClientMainnet | null;
+  ethClientConsensus: ConsensusClientMainnet | null;
   ethClientFallback: EthClientFallback;
   // Eth multi-client status (cached, may be a small delay with real status)
   // - EthClientStatus = status of the current target

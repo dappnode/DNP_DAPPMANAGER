@@ -32,6 +32,9 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     identityAddress: db.identityAddress.get(),
     // Eth provider configured URL
     ethClientTarget,
+    ethClientRemote: db.ethClientRemote.get(),
+    ethClientExecution: db.executionClientMainnet.get(),
+    ethClientConsensus: db.consensusClientMainnet.get(),
     ethClientStatus: ethClientTarget
       ? db.ethClientStatus.get(ethClientTarget)
       : null,
