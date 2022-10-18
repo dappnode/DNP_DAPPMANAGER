@@ -12,10 +12,10 @@ const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
 
-export const serverName = interceptGlobalEnvOnSet({
-  ...dbMain.staticKey<string>(SERVER_NAME, ""),
-  globEnvKey: Object.keys({ SERVER_NAME })[0]
-});
+export const serverName = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string>(SERVER_NAME, ""),
+  Object.keys({ SERVER_NAME })[0]
+);
 
 // Domains
 
