@@ -1,11 +1,12 @@
 import { dbCache, dbMain } from "./dbFactory";
 import {
   EthClientTarget,
-  UserSettings,
   EthClientFallback,
   EthClientStatus,
-  EthClientTargetPackage,
-  EthClientSyncedNotificationStatus
+  EthClientSyncedNotificationStatus,
+  EthClientRemote,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
 } from "../types";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
 import { eventBus } from "../eventBus";
@@ -13,13 +14,13 @@ import { eventBus } from "../eventBus";
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";
 const ETH_CLIENT_FALLBACK = "eth-client-fallback";
-const ETH_CLIENT_USER_SETTINGS = "eth-client-user-settings";
+const ETH_CLIENT_REMOTE = "eth-client-remote";
 // Cached status
-const ETH_CLIENT_INSTALL_STATUS = "eth-client-install-status";
+const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
+const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
 const ETH_CLIENT_STATUS = "eth-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
-const ETH_CLIENT_MIGRATION_TEMP_SETTINGS = "eth-client-migration-temp-status";
 const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
   "eth-client-synced-notification-status";
 
@@ -33,32 +34,34 @@ export const ethClientTarget = {
   set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue)
 };
 
+export const ethClientRemote = interceptOnSet(
+  dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null)
+);
+
 export const ethClientFallback = interceptOnSet(
   dbMain.staticKey<EthClientFallback>(ETH_CLIENT_FALLBACK, "off")
 );
 
-// Persist the user settings of each client
-// This is necessary if there was a migration and the settings have to
-// be kept after switching between clients
-
-export const ethClientUserSettings = dbMain.indexedByKey<
-  UserSettings,
-  EthClientTarget
->({
-  rootKey: ETH_CLIENT_USER_SETTINGS,
-  getKey: target => target,
-  validate: (id, userSettings) =>
-    typeof id === "string" && typeof userSettings === "object"
-});
-
 // Cached status, not critical
 
 /**
- * Cache the status of the eth client install loop
+ * Cache the status of the eth exec client install loop
  */
-export const ethClientInstallStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientInstallStatus, EthClientTarget>({
-    rootKey: ETH_CLIENT_INSTALL_STATUS,
+export const ethExecClientInstallStatus = interceptOnSet(
+  dbCache.indexedByKey<EthClientInstallStatus, ExecutionClientMainnet>({
+    rootKey: ETH_EXEC_CLIENT_INSTALL_STATUS,
+    getKey: target => target,
+    validate: (id, installStatus) =>
+      typeof id === "string" && typeof installStatus === "object"
+  })
+);
+
+/**
+ * Cache the status of the eth cons client install loop
+ */
+export const ethConsClientInstallStatus = interceptOnSet(
+  dbCache.indexedByKey<EthClientInstallStatus, ConsensusClientMainnet>({
+    rootKey: ETH_CONS_CLIENT_INSTALL_STATUS,
     getKey: target => target,
     validate: (id, installStatus) =>
       typeof id === "string" && typeof installStatus === "object"
@@ -99,16 +102,6 @@ function interceptOnSet<
     }
   };
 }
-
-/**
- * Temporal cache settings that must survive a reset
- * Store settings in the cache. It is possible that the migration is stopped
- * because the DAPPMANAGER resets and then the eth client will not be installed
- */
-export const ethClientMigrationTempSettings = dbCache.staticKey<{
-  target: EthClientTargetPackage;
-  EXTRA_OPTS: string;
-} | null>(ETH_CLIENT_MIGRATION_TEMP_SETTINGS, null);
 
 /**
  * Cache the status of the eth client install loop
