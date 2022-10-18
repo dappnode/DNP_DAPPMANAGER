@@ -19,7 +19,7 @@
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json",
     "mock-standalone": "REACT_APP_MOCK=true yarn start",
     "mock-standalone:build": "REACT_APP_MOCK=true yarn build",
-    "watch": "nodemon --ignore \"*.json\" --watch src/ --exec \"yarn build\""
+    "dev": "nodemon --ignore \"*.json\" -e ts,tsx --watch src/ --exec \"yarn build\""
   },
   "dependencies": {
     "@dappnode/dappnodesdk": "^0.2.65",

@@ -43,7 +43,7 @@ RUN apk add --no-cache bind-tools docker
 
 ENV DOCKER_COMPOSE_VERSION v2.5.0
 
-RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind \
+RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind tmux \
   # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
   avahi-tools
 
@@ -63,5 +63,5 @@ COPY packages/dappmanager/hostServices /usr/src/app/hostServices
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
-#CMD [ "node", "index" ]
-ENTRYPOINT [ "bash" ]
+COPY docker/start_dev.sh /usr/src/app/start_dev.sh
+ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]

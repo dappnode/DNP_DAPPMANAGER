@@ -15,7 +15,7 @@ services:
     restart: always
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
-      - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
+      - "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data:/usr/src/app/dnp_repo/"
       - "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/etc/hostname:/etc/dappnodename:ro"
