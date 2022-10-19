@@ -1201,7 +1201,7 @@ export type ConsensusClientPrater =
 export type ExecutionClientPrater =
   | "goerli-geth.dnp.dappnode.eth"
   | "goerli-erigon.dnp.dappnode.eth"
-  | "goerli-nethermind.dnp.dappnode.eth";
+  | "goerli-nethermind.dnp.dappnode.eth"
   | "goerli-besu.dnp.dappnode.eth";
 
 // Gnosis
