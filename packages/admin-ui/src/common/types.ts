@@ -1197,10 +1197,12 @@ export type ConsensusClientPrater =
   | "lighthouse-prater.dnp.dappnode.eth"
   | "teku-prater.dnp.dappnode.eth"
   | "nimbus-prater.dnp.dappnode.eth";
+
 export type ExecutionClientPrater =
   | "goerli-geth.dnp.dappnode.eth"
   | "goerli-erigon.dnp.dappnode.eth"
-  | "goerli-nethermind.dnp.dappnode.eth";
+  | "goerli-nethermind.dnp.dappnode.eth"
+  | "goerli-besu.dnp.dappnode.eth";
 
 // Gnosis
 

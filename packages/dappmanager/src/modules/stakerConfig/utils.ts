@@ -112,7 +112,8 @@ export function getNetworkStakerPkgs<T extends Network>(
           {
             dnpName: "goerli-nethermind.dnp.dappnode.eth",
             minVersion: "1.0.1"
-          }
+          },
+          { dnpName: "goerli-besu.dnp.dappnode.eth", minVersion: "0.1.0" }
         ],
         currentExecClient: db.executionClientPrater.get(),
         consClients: [
