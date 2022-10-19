@@ -7,19 +7,25 @@ import * as db from "../../db";
 export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
   switch (stakerConfig.network) {
     case "mainnet":
-      db.executionClientMainnet.set(stakerConfig.executionClient);
-      db.consensusClientMainnet.set(stakerConfig.consensusClient?.dnpName);
-      db.mevBoostMainnet.set(stakerConfig.enableMevBoost);
+      db.executionClientMainnet.set(stakerConfig.executionClient as any);
+      db.consensusClientMainnet.set(
+        stakerConfig.consensusClient?.dnpName as any
+      );
+      db.mevBoostMainnet.set(stakerConfig.enableMevBoost as any);
       break;
     case "gnosis":
-      db.executionClientGnosis.set(stakerConfig.executionClient);
-      db.consensusClientGnosis.set(stakerConfig.consensusClient?.dnpName);
-      db.mevBoostGnosis.set(stakerConfig.enableMevBoost);
+      db.executionClientGnosis.set(stakerConfig.executionClient as any);
+      db.consensusClientGnosis.set(
+        stakerConfig.consensusClient?.dnpName as any
+      );
+      db.mevBoostGnosis.set(stakerConfig.enableMevBoost as any);
       break;
     case "prater":
-      db.executionClientPrater.set(stakerConfig.executionClient);
-      db.consensusClientPrater.set(stakerConfig.consensusClient?.dnpName);
-      db.mevBoostPrater.set(stakerConfig.enableMevBoost);
+      db.executionClientPrater.set(stakerConfig.executionClient as any);
+      db.consensusClientPrater.set(
+        stakerConfig.consensusClient?.dnpName as any
+      );
+      db.mevBoostPrater.set(stakerConfig.enableMevBoost as any);
       break;
     default:
       throw new Error(`Unsupported network: ${stakerConfig.network}`);
@@ -30,12 +36,23 @@ export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
  * Get the current staker config (execution and consensus clients selected) as well as
  * the pkgs available for each network
  */
-export function getNetworkStakerPkgs(network: Network): {
-  execClients: { dnpName: string; minVersion: string }[];
-  currentExecClient: string;
-  consClients: { dnpName: string; minVersion: string }[];
-  currentConsClient: string;
-  web3signer: { dnpName: string; minVersion: string };
+export function getNetworkStakerPkgs<T extends Network>(
+  network: T
+): {
+  execClients: {
+    dnpName: string;
+    minVersion: string;
+  }[];
+  currentExecClient: string | null | undefined;
+  consClients: {
+    dnpName: string;
+    minVersion: string;
+  }[];
+  currentConsClient: string | null | undefined;
+  web3signer: {
+    dnpName: string;
+    minVersion: string;
+  };
   mevBoostDnpName: string;
   isMevBoostSelected: boolean;
 } {
@@ -60,7 +77,7 @@ export function getNetworkStakerPkgs(network: Network): {
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostDnpName: "mevboost.dnp.dappnode.eth",
+        mevBoostDnpName: "mev-boost.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostMainnet.get()
       };
 
@@ -84,7 +101,7 @@ export function getNetworkStakerPkgs(network: Network): {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostDnpName: "mevboost-gnosis.dnp.dappnode.eth",
+        mevBoostDnpName: "mev-boost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
       };
     case "prater":
@@ -116,6 +133,8 @@ export function getNetworkStakerPkgs(network: Network): {
         mevBoostDnpName: "mev-boost-goerli.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
       };
+    default:
+      throw Error(`Unsupported network: ${network}`);
   }
 }
 

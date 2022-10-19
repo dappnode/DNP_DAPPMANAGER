@@ -31,6 +31,10 @@ export default function ConsensusClient({
   graffitiError: string | null;
   checkpointSyncPlaceHolder: string;
 }) {
+  const newFeeRecipient =
+    consensusClient.status === "ok" && consensusClient.feeRecipient
+      ? consensusClient.feeRecipient
+      : "";
   return (
     <Card
       {...props}
@@ -97,7 +101,7 @@ export default function ConsensusClient({
                 name: "fee-recipient-address",
                 autoComplete: "fee-recipient-address",
                 secret: false,
-                value: newConsClient.feeRecipient || "",
+                value: newConsClient.feeRecipient || newFeeRecipient,
                 onValueChange: (value: string) =>
                   setNewConsClient({ ...newConsClient, feeRecipient: value }),
                 error: feeRecipientError
@@ -108,7 +112,7 @@ export default function ConsensusClient({
                 name: "graffiti",
                 autoComplete: "validating_from_DAppNode",
                 secret: false,
-                value: newConsClient.graffiti || "",
+                value: newConsClient.graffiti || "validating_from_DAppNode",
                 onValueChange: (value: string) =>
                   setNewConsClient({ ...newConsClient, graffiti: value }),
                 error: graffitiError

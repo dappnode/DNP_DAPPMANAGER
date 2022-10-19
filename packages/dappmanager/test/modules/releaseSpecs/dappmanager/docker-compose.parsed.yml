@@ -2,10 +2,6 @@ version: "3.5"
 services:
   dappmanager.dnp.dappnode.eth:
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    deploy:
-      resources:
-        limits:
-          memory: "16384M"
     dns: 172.33.1.2
     environment:
       DISABLE_UPNP: ""
