@@ -21,7 +21,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     const stakerConfig = getNetworkStakerPkgs(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
-    // If the user has selected the repository full node option (geth-light should be considered as remote) then use this value.
+    // If the user has selected the repository full node option then use this value.
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
     if (stakerConfig.currentExecClient === null) {

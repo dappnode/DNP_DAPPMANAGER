@@ -13,7 +13,6 @@ import SwitchBig from "components/SwitchBig";
  * View to chose or change the Eth multi-client
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */

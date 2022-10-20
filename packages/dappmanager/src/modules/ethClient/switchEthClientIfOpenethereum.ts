@@ -6,7 +6,7 @@ import { packageGet } from "../../calls";
 import { ethClientData } from "../../params";
 
 /**
- * Switches ethClientTarget in the following preference order: geth/geth light > nethermind > remote
+ * Switches ethClientTarget in the following preference order: geth > nethermind > remote
  */
 export async function switchEthClientIfOpenethereum(): Promise<void> {
   const ethClientTarget = db.ethClientTarget.get() as
@@ -29,12 +29,7 @@ export async function switchEthClientIfOpenethereum(): Promise<void> {
       if (!gethEnvironment)
         throw Error("geth package installed but no environment found");
 
-      const isLightClient =
-        gethEnvironment["geth.dnp.dappnode.eth"]["SYNCMODE"] === "light";
-
-      isLightClient
-        ? db.ethClientTarget.set("geth-light")
-        : db.ethClientTarget.set("geth");
+      db.ethClientTarget.set("geth");
       return;
     }
 

@@ -23,12 +23,14 @@ export function getEthClientPrettyName(target: EthClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth-light":
-      return "Geth light client";
     case "geth":
       return "Geth";
     case "nethermind":
       return "Nethermind";
+    case "besu":
+      return "Besu";
+    case "erigon":
+      return "Erigon";
   }
 }
 
@@ -39,10 +41,10 @@ export function getEthClientType(target: EthClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth-light":
-      return "Light client";
     case "geth":
     case "nethermind":
+    case "besu":
+    case "erigon":
       return "Full node";
   }
 }
@@ -109,20 +111,9 @@ const clients: EthClientData[] = [
     highlight: "syncTime"
   },
   {
-    title: "Light client",
-    description: "Lightweight client for low-resource devices",
-    options: ["geth-light"],
-    stats: {
-      syncTime: "Fast sync",
-      requirements: "Light requirements",
-      trust: "Semi-decentralized"
-    },
-    highlight: "requirements"
-  },
-  {
     title: "Full node",
     description: "Your own Ethereum node w/out 3rd parties",
-    options: ["geth", "nethermind"],
+    options: ["geth", "nethermind", "besu", "erigon"],
     stats: {
       syncTime: "Slow sync",
       requirements: "High requirements",
@@ -165,7 +156,6 @@ function getOptionsMap(options?: EthClientTarget[]): OptionsMap {
  * View to chose or change the Eth multi-client
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
@@ -264,7 +254,6 @@ function EthMultiClientFallback({
  * View to chose or change the Eth multi-client, plus choose to use a fallback
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
