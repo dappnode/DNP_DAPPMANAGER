@@ -578,7 +578,7 @@ export interface DirectoryDnp {
 
 export interface ChainData {
   dnpName: string; // "geth.dnp.dappnode.eth"
-  name?: string; // Optional pretty name: "Geth (light client)"
+  name?: string; // Optional pretty name: "Geth"
   syncing: boolean; // if chain is syncing
   error: boolean; // If there was an error retrieving state
   message: string; // "Blocks synced: 543000 / 654000"
@@ -1000,13 +1000,14 @@ export enum IpfsClientTarget {
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
  */
-export type EthClientTargetPackage = "geth-light" | "geth" | "nethermind";
+export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
 export type EthClientTarget = EthClientTargetPackage | "remote";
 export const ethClientTargets: EthClientTarget[] = [
   "remote",
-  "geth-light",
   "geth",
-  "nethermind"
+  "nethermind",
+  "besu",
+  "erigon"
 ];
 
 /**

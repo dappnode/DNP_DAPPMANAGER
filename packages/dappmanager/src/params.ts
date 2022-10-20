@@ -327,17 +327,13 @@ export const ethClientData: {
     dnpName: string; // "geth.dnp.dappnode.eth"
     url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
     version?: string;
-    userSettings?: UserSettings; // Custom installation for geth light client
+    userSettings?: UserSettings;
   };
 } = {
-  "geth-light": {
-    dnpName: "geth.dnp.dappnode.eth",
-    userSettings: {
-      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
-    }
-  },
   geth: { dnpName: "geth.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" },
+  besu: { dnpName: "besu.dnp.dappnode.eth" },
+  erigon: { dnpName: "erigon.dnp.dappnode.eth" }
 };
 
 // Naming
