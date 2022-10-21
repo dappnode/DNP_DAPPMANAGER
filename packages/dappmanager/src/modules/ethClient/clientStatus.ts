@@ -1,7 +1,10 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
-import { ethClientData } from "../../params";
-import { EthClientStatus, EthClientTargetPackage } from "../../types";
+import {
+  EthClientStatus,
+  ExecutionClientMainnet,
+  executionClientsMainnet
+} from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { serializeError } from "./types";
 import { getEthClientApiUrl } from "./apiUrl";
@@ -41,13 +44,14 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
  *       enforces that all possible states are covered
  */
 export async function getClientStatus(
-  target: EthClientTargetPackage
+  execClientDnpName: ExecutionClientMainnet
 ): Promise<EthClientStatus> {
   try {
-    const clientData = ethClientData[target];
-    if (!clientData) throw Error(`Unsupported target '${target}'`);
-    const dnpName = clientData.dnpName;
-    const url = clientData.url || getEthClientApiUrl(dnpName);
+    if (!executionClientsMainnet.includes(execClientDnpName))
+      throw Error(
+        `Unsupported execution client in mainnet '${execClientDnpName}'`
+      );
+    const url = getEthClientApiUrl(execClientDnpName);
     try {
       // Provider API works? Do a single test call to check state
       if (await isSyncing(url)) {
@@ -56,7 +60,7 @@ export async function getClientStatus(
         try {
           if (await isApmStateCorrect(url)) {
             // All okay!
-            return { ok: true, url, dnpName };
+            return { ok: true, url, dnpName: execClientDnpName };
           } else {
             // State is not correct, node is not synced but eth_syncing did not picked it up
             return { ok: false, code: "STATE_NOT_SYNCED" };
@@ -73,7 +77,7 @@ export async function getClientStatus(
       }
     } catch (eFromSyncing) {
       // syncing call failed, the node is not available, find out why
-      const dnp = await listPackageNoThrow({ dnpName });
+      const dnp = await listPackageNoThrow({ dnpName: execClientDnpName });
       if (dnp) {
         // DNP is installed
         if (dnp.containers[0]?.running) {
@@ -89,7 +93,8 @@ export async function getClientStatus(
         }
       } else {
         // DNP is not installed, figure out why
-        const installStatus = db.ethClientInstallStatus.get(target);
+        const installStatus =
+          db.ethExecClientInstallStatus.get(execClientDnpName);
         if (installStatus) {
           switch (installStatus.status) {
             case "TO_INSTALL":
@@ -148,8 +153,7 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   // Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
   const testTxData = {
     to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-    data:
-      "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
+    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
   };
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";

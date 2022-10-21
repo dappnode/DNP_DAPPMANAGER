@@ -1,11 +1,11 @@
 import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { Network } from "../../types";
 import { pickStakerItemData } from "../../modules/stakerConfig/utils";
 import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork";
 import { ReleaseFetcher } from "../../modules/release";
 import { memoizeDebounce } from "../../utils/asyncFlows";
+import { EthClientRemote, Network } from "../../types";
 
 function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   try {
@@ -18,6 +18,8 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
         switch (network) {
           case "mainnet":
             db.executionClientMainnet.set("");
+            // Set ETH repository to remote, EC cannot sync without CC
+            db.ethClientRemote.set(EthClientRemote.on);
           case "gnosis":
             db.executionClientGnosis.set("");
           case "prater":
@@ -31,6 +33,8 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
         switch (network) {
           case "mainnet":
             db.consensusClientMainnet.set("");
+            // Set ETH repository to remote
+            db.ethClientRemote.set(EthClientRemote.on);
           case "gnosis":
             db.consensusClientGnosis.set("");
           case "prater":
