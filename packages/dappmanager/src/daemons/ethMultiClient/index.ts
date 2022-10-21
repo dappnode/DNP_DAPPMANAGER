@@ -13,22 +13,15 @@ import {
 import { logs } from "../../logs";
 import {
   ConsensusClientMainnet,
-  ConsensusClientsMainnet,
   EthClientRemote,
-  ExecutionClientMainnet,
-  ExecutionClientsMainnet
+  ExecutionClientMainnet
 } from "../../types";
 import {
+  ethereumClient,
   EthProviderError,
-  getLocalFallbackContentHash,
-  setDefaultEthClientFullNode
+  getLocalFallbackContentHash
 } from "../../modules/ethClient";
-
-const isExecClient = (client: string): client is ExecutionClientMainnet =>
-  ExecutionClientsMainnet.includes(client as ExecutionClientMainnet);
-
-const isConsClient = (client: string): client is ConsensusClientMainnet =>
-  ConsensusClientsMainnet.includes(client as ConsensusClientMainnet);
+import { isExecClient, isConsClient } from "../../modules/ethClient/utils";
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -67,7 +60,6 @@ export async function runEthClientInstaller(
       case "TO_INSTALL":
       case "INSTALLING_ERROR":
         // OK: Expected state, run / retry installation
-
         try {
           if (isExecClient(target))
             db.ethExecClientInstallStatus.set(
@@ -160,6 +152,8 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
         return; // Nothing to install
 
       for (const client of [execClient, consClient]) {
+        if (!client) continue;
+
         const prev = isExecClient(client)
           ? db.ethExecClientInstallStatus.get(client)
           : db.ethConsClientInstallStatus.get(client);
@@ -180,7 +174,10 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
             // 1. Domain for BIND package
             db.fullnodeDomainTarget.set(execClient);
             // 2. Add network alias for docker DNS
-            await setDefaultEthClientFullNode(false, execClient);
+            ethereumClient.setDefaultEthClientFullNode({
+              dnpName: execClient,
+              removeAlias: true
+            });
           }
         }
       }

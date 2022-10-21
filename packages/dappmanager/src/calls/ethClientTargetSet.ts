@@ -1,5 +1,5 @@
 import { Eth2ClientTarget } from "../types";
-import { changeEthMultiClient } from "../modules/ethClient";
+import { ethereumClient } from "../modules/ethClient";
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -15,8 +15,9 @@ export async function ethClientTargetSet({
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
 
-  await changeEthMultiClient(
+  await ethereumClient.changeEthClient(
     target,
+    false,
     deletePrevExecClient,
     deletePrevConsClient
   );

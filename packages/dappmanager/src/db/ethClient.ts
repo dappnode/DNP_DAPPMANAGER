@@ -19,6 +19,8 @@ const ETH_CLIENT_REMOTE = "eth-client-remote";
 const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
 const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
 const ETH_CLIENT_STATUS = "eth-client-status";
+const ETH_EXEC_CLIENT_STATUS = "eth-exec-client-status";
+const ETH_CONS_CLIENT_STATUS = "eth-cons-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
 const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
@@ -29,11 +31,25 @@ const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
 const _ethClientTarget = interceptOnSet(
   dbMain.staticKey<EthClientTarget | null>(ETH_CLIENT_TARGET, null)
 );
+
+/**
+ * To be DEPRECATED from dappmanager v0.2.54
+ * The ethclientTarget will be splitted into:
+ * - consensusClientMainnet, executionClientMainnet and ethClientRemote
+ * - users can use the stakers UI in mainnet while using the "remote" option
+ * - whenever a user switches the EC and/or CC then consensusClientMainnet, executionClientMainnet will change as well
+ */
 export const ethClientTarget = {
   get: _ethClientTarget.get,
   set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue)
 };
 
+/**
+ * New introduced in dappmanager v0.2.54
+ * - tracks if the user is using remote option
+ * - remote is compatible while stakingig in mainnet with EC and CC defined by the user
+ * - default value set at initializeDb. Deppends on the old ethClientTarget
+ */
 export const ethClientRemote = interceptOnSet(
   dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null)
 );
@@ -65,6 +81,30 @@ export const ethConsClientInstallStatus = interceptOnSet(
     getKey: target => target,
     validate: (id, installStatus) =>
       typeof id === "string" && typeof installStatus === "object"
+  })
+);
+
+/**
+ * Cache the general status of the eth client, if it's available or not
+ */
+export const ethExecClientStatus = interceptOnSet(
+  dbCache.indexedByKey<EthClientStatus, ExecutionClientMainnet>({
+    rootKey: ETH_EXEC_CLIENT_STATUS,
+    getKey: target => target,
+    validate: (id, status) =>
+      typeof id === "string" && typeof status === "object"
+  })
+);
+
+/**
+ * Cache the general status of the eth client, if it's available or not
+ */
+export const ethConsClientStatus = interceptOnSet(
+  dbCache.indexedByKey<EthClientStatus, ConsensusClientMainnet>({
+    rootKey: ETH_CONS_CLIENT_STATUS,
+    getKey: target => target,
+    validate: (id, status) =>
+      typeof id === "string" && typeof status === "object"
   })
 );
 
