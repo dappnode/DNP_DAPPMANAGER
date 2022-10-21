@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientTarget, EthClientFallback } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "types";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
@@ -21,7 +21,7 @@ export default function Repository({
   onNext: () => void;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
-  const [target, setTarget] = useState<EthClientTarget>("remote");
+  const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
 

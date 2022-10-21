@@ -1084,9 +1084,7 @@ export interface SystemInfo {
   identityAddress: string;
   // Eth multi-client configuration
   ethClientTarget: EthClientTarget | null;
-  ethClientRemote: EthClientRemote | null;
-  ethClientExecution: ExecutionClientMainnet | undefined | null;
-  ethClientConsensus: ConsensusClientMainnet | undefined | null;
+  eth2ClientTarget: Eth2ClientTarget;
   ethClientFallback: EthClientFallback;
   // Eth multi-client status (cached, may be a small delay with real status)
   // - EthClientStatus = status of the current target

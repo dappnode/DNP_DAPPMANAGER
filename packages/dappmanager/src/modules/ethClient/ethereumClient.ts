@@ -24,13 +24,29 @@ import { getEndpointConfig } from "../https-portal/migration";
 import Dockerode from "dockerode";
 
 export class EthereumClient {
-  executionClient = db.executionClientMainnet.get();
-  consensusClient = db.consensusClientMainnet.get();
-  remote = db.ethClientRemote.get();
-  currentTarget: Eth2ClientTarget;
+  /**
+   * Computes the current eth2ClientTarget based on:
+   * - remote
+   * - executionClient
+   * - consensusClient
+   */
+  computeEthereumTarget(): Eth2ClientTarget {
+    const executionClient = db.executionClientMainnet.get();
+    const consensusClient = db.consensusClientMainnet.get();
+    const remote = db.ethClientRemote.get();
+    switch (remote) {
+      case null:
+      case EthClientRemote.on:
+        return "remote";
 
-  constructor() {
-    this.currentTarget = this.computeEthereumTarget();
+      case EthClientRemote.off:
+        if (!executionClient || !consensusClient) return "remote";
+
+        return {
+          execClient: executionClient,
+          consClient: consensusClient
+        };
+    }
   }
 
   /**
@@ -46,28 +62,29 @@ export class EthereumClient {
     deletePrevExecClient?: boolean,
     deletePrevConsClient?: boolean
   ): Promise<void> {
+    const currentTarget = this.computeEthereumTarget();
     // Return if the target is the same
-    if (isEqual(nextTarget, this.currentTarget)) return;
+    if (isEqual(nextTarget, currentTarget)) return;
     // Remove clients if currentTarge is !== remote
-    if (this.currentTarget !== "remote") {
+    if (currentTarget !== "remote") {
       // Remove Execution client
       if (deletePrevExecClient)
-        await packageRemove({ dnpName: this.currentTarget.execClient }).catch(
-          e => logs.error(`Error removing prev exec client: ${e}`)
+        await packageRemove({ dnpName: currentTarget.execClient }).catch(e =>
+          logs.error(`Error removing prev exec client: ${e}`)
         );
       // Remove Consensus client
       if (deletePrevConsClient)
-        await packageRemove({ dnpName: this.currentTarget.consClient }).catch(
-          e => logs.error(`Error removing prev cons client: ${e}`)
+        await packageRemove({ dnpName: currentTarget.consClient }).catch(e =>
+          logs.error(`Error removing prev cons client: ${e}`)
         );
     }
 
     if (nextTarget === "remote") {
       db.ethClientRemote.set(EthClientRemote.on);
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
-      if (!deletePrevExecClient && this.currentTarget !== "remote")
+      if (!deletePrevExecClient && currentTarget !== "remote")
         await this.setDefaultEthClientFullNode({
-          dnpName: this.currentTarget.execClient,
+          dnpName: currentTarget.execClient,
           removeAlias: true
         }).catch(e =>
           logs.error(
@@ -184,28 +201,6 @@ export class EthereumClient {
       status: "TO_INSTALL"
     });
     eventBus.runEthClientInstaller.emit();
-  }
-
-  /**
-   * Computes the current eth2ClientTarget based on:
-   * - remote
-   * - executionClient
-   * - consensusClient
-   */
-  private computeEthereumTarget(): Eth2ClientTarget {
-    switch (this.remote) {
-      case null:
-      case EthClientRemote.on:
-        return "remote";
-
-      case EthClientRemote.off:
-        if (!this.executionClient || !this.consensusClient) return "remote";
-
-        return {
-          execClient: this.executionClient,
-          consClient: this.consensusClient
-        };
-    }
   }
 
   // Utils

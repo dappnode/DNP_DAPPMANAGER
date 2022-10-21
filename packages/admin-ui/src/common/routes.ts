@@ -1,6 +1,5 @@
 import {
   AutoUpdateDataView,
-  EthClientTarget,
   CoreUpdateData,
   DirectoryItem,
   RequestedDnp,
@@ -44,7 +43,8 @@ import {
   TrustedReleaseKey,
   Network,
   StakerConfigSet,
-  StakerConfigGet
+  StakerConfigGet,
+  Eth2ClientTarget
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -223,8 +223,9 @@ export interface Routes {
    * Changes the ethereum client used to fetch package data
    */
   ethClientTargetSet: (kwargs: {
-    target: EthClientTarget;
-    deletePrevEthClient?: boolean;
+    target: Eth2ClientTarget;
+    deletePrevExecClient?: boolean;
+    deletePrevConsClient?: boolean;
   }) => Promise<void>;
 
   /**

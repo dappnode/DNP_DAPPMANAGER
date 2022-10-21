@@ -29,7 +29,7 @@ export async function getEthProviderUrl(): Promise<string> {
   if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
     return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 
-  const target = ethereumClient.currentTarget;
+  const target = ethereumClient.computeEthereumTarget();
   const fallback = db.ethClientFallback.get();
 
   // Initial case where the user has not selected any client yet
@@ -40,7 +40,7 @@ export async function getEthProviderUrl(): Promise<string> {
 
   const status = await getClientStatus(target.execClient);
   db.ethExecClientStatus.set(target.execClient, status);
-  emitSyncedNotification(target.execClient, status);
+  emitSyncedNotification(target, status);
 
   if (status.ok) {
     // Package test succeeded return its url

@@ -7,7 +7,10 @@ import {
   EthClientTarget,
   EthClientFallback,
   EthClientStatus,
-  EthClientStatusError
+  EthClientStatusError,
+  Eth2ClientTarget,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
 } from "types";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
@@ -19,32 +22,22 @@ export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
 export const booleanToFallback = (bool: boolean): EthClientFallback =>
   bool ? "on" : "off";
 
-export function getEthClientPrettyName(target: EthClientTarget): string {
-  switch (target) {
-    case "remote":
-      return "Remote";
-    case "geth":
-      return "Geth";
-    case "nethermind":
-      return "Nethermind";
-    case "besu":
-      return "Besu";
-    case "erigon":
-      return "Erigon";
-  }
+export function getEthClientPrettyName(
+  target: "remote" | ExecutionClientMainnet | ConsensusClientMainnet
+): string {
+  if (target === "remote") return "Remote";
+  const dnpName = target.split(".")[0];
+  return dnpName.charAt(0).toUpperCase() + dnpName.slice(1);
 }
 
 /**
  * Get client type from a target
  */
-export function getEthClientType(target: EthClientTarget): string {
+export function getEthClientType(target: Eth2ClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth":
-    case "nethermind":
-    case "besu":
-    case "erigon":
+    default:
       return "Full node";
   }
 }
@@ -137,15 +130,15 @@ interface EthClientDataStats {
 }
 
 interface OptionsMap {
-  [name: string]: EthClientTarget;
+  [name: string]: Eth2ClientTarget;
 }
 
 /**
  * Utility to pretty names to the actual target of that option
  */
-function getOptionsMap(options?: EthClientTarget[]): OptionsMap {
+function getOptionsMap(options?: Eth2ClientTarget[]): OptionsMap {
   return options
-    ? options.reduce((optMap: { [name: string]: EthClientTarget }, target) => {
+    ? options.reduce((optMap: { [name: string]: Eth2ClientTarget }, target) => {
         optMap[getEthClientPrettyName(target)] = target;
         return optMap;
       }, {})
@@ -164,8 +157,8 @@ function EthMultiClients({
   onTargetChange,
   showStats
 }: {
-  target: EthClientTarget | null;
-  onTargetChange: (newTarget: EthClientTarget) => void;
+  target: Eth2ClientTarget | null;
+  onTargetChange: (newTarget: Eth2ClientTarget) => void;
   showStats?: boolean;
 }) {
   return (
@@ -232,7 +225,7 @@ function EthMultiClientFallback({
   fallback,
   onFallbackChange
 }: {
-  target: EthClientTarget | null;
+  target: Eth2ClientTarget | null;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
 }) {
@@ -264,8 +257,8 @@ export function EthMultiClientsAndFallback({
   fallback,
   onFallbackChange
 }: {
-  target: EthClientTarget | null;
-  onTargetChange: (newTarget: EthClientTarget) => void;
+  target: Eth2ClientTarget | null;
+  onTargetChange: (newTarget: Eth2ClientTarget) => void;
   showStats?: boolean;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;

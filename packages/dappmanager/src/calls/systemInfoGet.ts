@@ -2,6 +2,7 @@ import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { NewFeatureId, SystemInfo } from "../types";
+import { ethereumClient } from "../modules/ethClient";
 
 /**
  * Returns the current DAppNode system info
@@ -32,9 +33,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     identityAddress: db.identityAddress.get(),
     // Eth provider configured URL
     ethClientTarget,
-    ethClientRemote: db.ethClientRemote.get(),
-    ethClientExecution: db.executionClientMainnet.get(),
-    ethClientConsensus: db.consensusClientMainnet.get(),
+    eth2ClientTarget: ethereumClient.computeEthereumTarget(),
     ethClientStatus: ethClientTarget
       ? db.ethClientStatus.get(ethClientTarget)
       : null,
