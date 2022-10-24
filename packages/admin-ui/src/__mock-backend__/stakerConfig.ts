@@ -88,7 +88,7 @@ export const stakerConfig: Pick<
               },
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
             },
             {
               status: "ok",
@@ -136,7 +136,7 @@ export const stakerConfig: Pick<
               },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
           ],
           web3Signer: {
@@ -175,7 +175,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "geth.dnp.dappnode.eth",
+              dnpName: "goerli-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -190,7 +190,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nethermind.dnp.dappnode.eth",
+              dnpName: "goerli-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -205,7 +205,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "besu.dnp.dappnode.eth",
+              dnpName: "goerli-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -220,7 +220,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "erigon.dnp.dappnode.eth",
+              dnpName: "goerli-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -237,7 +237,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm.dnp.dappnode.eth",
+              dnpName: "prysm-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -249,13 +249,13 @@ export const stakerConfig: Pick<
                 shortDescription: "Prysm consensus client",
                 version: "0.1.0"
               },
-              graffiti: "Validating_from_prysm-mainnet",
+              graffiti: "Validating_from_prysm-prater",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync-prater.dappnode.io"
             },
             {
               status: "ok",
-              dnpName: "lighthouse.dnp.dappnode.eth",
+              dnpName: "lighthouse-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -270,9 +270,9 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "teku.dnp.dappnode.eth",
-              isInstalled: true,
-              isRunning: true,
+              dnpName: "teku-prater.dnp.dappnode.eth",
+              isInstalled: false,
+              isRunning: false,
               isUpdated: true,
               isSelected: false,
               avatarUrl: "",
@@ -285,7 +285,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nimbus.dnp.dappnode.eth",
+              dnpName: "nimbus-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -299,12 +299,12 @@ export const stakerConfig: Pick<
               },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer.dnp.dappnode.eth",
+            dnpName: "web3signer-prater.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -416,7 +416,7 @@ export const stakerConfig: Pick<
               },
               graffiti: "Validating_from_prysm-mainnet",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
             },
             {
               status: "ok",
@@ -464,7 +464,7 @@ export const stakerConfig: Pick<
               },
               graffiti: "Validating_from_prysm-nimbus",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io/"
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
           ],
           web3Signer: {

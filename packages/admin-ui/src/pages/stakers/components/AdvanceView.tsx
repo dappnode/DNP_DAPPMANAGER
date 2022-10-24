@@ -6,21 +6,28 @@ import { prettyDnpName } from "utils/format";
 
 export default function AdvanceView({
   currentStakerConfig,
-  newStakerConfig
+  newStakerConfig,
+  defaultCheckpointSync,
+  defaultGraffiti,
+  defaultFeeRecipient
 }: {
   currentStakerConfig: StakerConfigSet;
   newStakerConfig: StakerConfigSet;
+  defaultCheckpointSync: string;
+  defaultGraffiti: string;
+  defaultFeeRecipient: string;
 }) {
   const consClientGraffiti = currentStakerConfig.consensusClient?.graffiti;
-  const newConstClientGraffiti = newStakerConfig.consensusClient?.graffiti;
+  const newConstClientGraffiti =
+    newStakerConfig.consensusClient?.graffiti || defaultGraffiti;
   const consClientFeeRecipient =
     currentStakerConfig.consensusClient?.feeRecipient;
   const newConstClientFeeRecipient =
-    newStakerConfig.consensusClient?.feeRecipient;
+    newStakerConfig.consensusClient?.feeRecipient || defaultFeeRecipient;
   const consClientCheckpointSync =
     currentStakerConfig.consensusClient?.checkpointSync;
   const newConstClientCheckpointSync =
-    newStakerConfig.consensusClient?.checkpointSync;
+    newStakerConfig.consensusClient?.checkpointSync || defaultCheckpointSync;
 
   const stakerConfig = [
     {
