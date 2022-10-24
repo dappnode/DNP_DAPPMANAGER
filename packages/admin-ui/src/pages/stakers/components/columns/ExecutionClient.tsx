@@ -17,7 +17,7 @@ export default function ExecutionClient({
   ...props
 }: {
   executionClient: StakerItem;
-  setNewExecClient: (executionClient: string) => void;
+  setNewExecClient: (executionClient: string | undefined) => void;
   isSelected: boolean;
 }) {
   return (
@@ -26,7 +26,7 @@ export default function ExecutionClient({
       className={`execution-client ${joinCssClass({ isSelected })}`}
       onClick={
         isSelected
-          ? () => setNewExecClient("")
+          ? () => setNewExecClient(undefined)
           : () => setNewExecClient(executionClient.dnpName)
       }
       shadow={isSelected}
