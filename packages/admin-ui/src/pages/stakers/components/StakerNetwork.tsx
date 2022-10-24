@@ -22,6 +22,7 @@ import AdvanceView from "./AdvanceView";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { validateEthereumAddress, validateGraffiti } from "./utils";
+import { isEqual, pick } from "lodash";
 
 export default function StakerNetwork({
   network,
@@ -44,11 +45,18 @@ export default function StakerNetwork({
   const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
     false
   );
+  // Apply button state
+  const [isApplyAllowed, setIsApplyAllowed] = useState(false);
 
   // Current config
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
   >();
+  const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
+    ""
+  );
+  const [defaultGraffiti, setDefaultGraffiti] = useState<string>("");
+  const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
 
   const currentStakerConfigReq = useApi.stakerConfigGet(network);
 
@@ -93,6 +101,21 @@ export default function StakerNetwork({
         enableMevBoost,
         enableWeb3signer
       });
+
+      // Set default consensus client: fee recipient, checkpointsync and graffiti
+      if (consensusClient && consensusClient.status === "ok") {
+        setDefaultFeeRecipient(consensusClient.feeRecipient || "");
+        setDefaultCheckpointSync(
+          consensusClient.checkpointSync
+            ? consensusClient.checkpointSync
+            : network === "mainnet"
+            ? "https://checkpoint-sync.dappnode.io"
+            : network === "prater"
+            ? "https://checkpoint-sync-prater.dappnode.io"
+            : ""
+        );
+        setDefaultGraffiti(consensusClient?.graffiti || "");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStakerConfigReq.data]);
@@ -106,7 +129,7 @@ export default function StakerNetwork({
     }
   }, [newConsClient]);
 
-  function setStakerConfigIsAllowed(): boolean {
+  useEffect(() => {
     if (currentStakerConfig) {
       const {
         executionClient,
@@ -120,18 +143,44 @@ export default function StakerNetwork({
       const isExecAndConsDeSelected = Boolean(
         !newExecClient && !newConsClient?.dnpName
       );
-      return (
+      const isConsClientEqual = isEqual(
+        pick(consensusClient, [
+          "checkpointSync",
+          "dnpName",
+          "feeRecipient",
+          "graffiti"
+        ]),
+        pick(newConsClient, [
+          "checkpointSync",
+          "dnpName",
+          "feeRecipient",
+          "graffiti"
+        ])
+      );
+
+      if (
         !feeRecipientError &&
         !graffitiError &&
         (isExecAndConsSelected || isExecAndConsDeSelected) &&
         (executionClient !== newExecClient ||
-          consensusClient !== newConsClient ||
+          !isConsClientEqual ||
           enableMevBoost !== newEnableMevBoost ||
           enableWeb3signer !== newEnableWeb3signer)
-      );
+      ) {
+        setIsApplyAllowed(true);
+      } else setIsApplyAllowed(false);
+    } else {
+      setIsApplyAllowed(false);
     }
-    return false;
-  }
+  }, [
+    currentStakerConfig,
+    feeRecipientError,
+    graffitiError,
+    newConsClient,
+    newEnableMevBoost,
+    newEnableWeb3signer,
+    newExecClient
+  ]);
 
   /**
    * Set new staker config
@@ -139,7 +188,7 @@ export default function StakerNetwork({
   async function setNewConfig() {
     try {
       // Make sure there are changes
-      if (setStakerConfigIsAllowed()) {
+      if (isApplyAllowed) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
@@ -241,6 +290,9 @@ export default function StakerNetwork({
                     consensusClient={consensusClient}
                     setNewConsClient={setNewConsClient}
                     newConsClient={newConsClient}
+                    defaultCheckpointSync={defaultCheckpointSync}
+                    defaultFeeRecipient={defaultFeeRecipient}
+                    defaultGraffiti={defaultGraffiti}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
                         ? true
@@ -248,13 +300,7 @@ export default function StakerNetwork({
                     }
                     graffitiError={graffitiError}
                     feeRecipientError={feeRecipientError}
-                    checkpointSyncPlaceHolder={
-                      network === "mainnet"
-                        ? "https://checkpoint-sync.dappnode.io"
-                        : network === "prater"
-                        ? "https://checkpoint-sync-prater.dappnode.io"
-                        : ""
-                    }
+                    checkpointSyncPlaceHolder={defaultCheckpointSync}
                   />
                 )
               )}
@@ -293,12 +339,15 @@ export default function StakerNetwork({
                   enableMevBoost: newEnableMevBoost,
                   enableWeb3signer: newEnableWeb3signer
                 }}
+                defaultCheckpointSync={defaultCheckpointSync}
+                defaultFeeRecipient={defaultFeeRecipient}
+                defaultGraffiti={defaultGraffiti}
               />
             )}
 
             <Button
               variant="dappnode"
-              disabled={!setStakerConfigIsAllowed() || reqStatus.loading}
+              disabled={!isApplyAllowed || reqStatus.loading}
               onClick={setNewConfig}
             >
               Apply changes

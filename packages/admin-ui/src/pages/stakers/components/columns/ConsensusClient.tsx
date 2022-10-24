@@ -15,6 +15,9 @@ export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   newConsClient,
+  defaultCheckpointSync,
+  defaultGraffiti,
+  defaultFeeRecipient,
   isSelected,
   feeRecipientError,
   graffitiError,
@@ -26,15 +29,14 @@ export default function ConsensusClient({
     React.SetStateAction<ConsensusClientIface | undefined>
   >;
   newConsClient: ConsensusClientIface | undefined;
+  defaultCheckpointSync: string;
+  defaultGraffiti: string;
+  defaultFeeRecipient: string;
   isSelected: boolean;
   feeRecipientError: string | null;
   graffitiError: string | null;
   checkpointSyncPlaceHolder: string;
 }) {
-  const newFeeRecipient =
-    consensusClient.status === "ok" && consensusClient.feeRecipient
-      ? consensusClient.feeRecipient
-      : "";
   return (
     <Card
       {...props}
@@ -49,9 +51,11 @@ export default function ConsensusClient({
               : () =>
                   setNewConsClient({
                     dnpName: consensusClient.dnpName,
-                    graffiti: consensusClient.graffiti,
-                    feeRecipient: consensusClient.feeRecipient,
-                    checkpointSync: consensusClient.checkpointSync
+                    graffiti: consensusClient.graffiti || defaultGraffiti,
+                    feeRecipient:
+                      consensusClient.feeRecipient || defaultFeeRecipient,
+                    checkpointSync:
+                      consensusClient.checkpointSync || defaultCheckpointSync
                   })
             : undefined
         }
@@ -101,7 +105,7 @@ export default function ConsensusClient({
                 name: "fee-recipient-address",
                 autoComplete: "fee-recipient-address",
                 secret: false,
-                value: newConsClient.feeRecipient || newFeeRecipient,
+                value: newConsClient.feeRecipient || "",
                 onValueChange: (value: string) =>
                   setNewConsClient({ ...newConsClient, feeRecipient: value }),
                 error: feeRecipientError
@@ -112,7 +116,7 @@ export default function ConsensusClient({
                 name: "graffiti",
                 autoComplete: "validating_from_DAppNode",
                 secret: false,
-                value: newConsClient.graffiti || "validating_from_DAppNode",
+                value: newConsClient.graffiti || "",
                 onValueChange: (value: string) =>
                   setNewConsClient({ ...newConsClient, graffiti: value }),
                 error: graffitiError
