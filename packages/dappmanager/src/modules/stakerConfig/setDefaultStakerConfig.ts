@@ -1,4 +1,12 @@
-import { Network } from "../../types";
+import {
+  ConsensusClientGnosis,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
+  Network
+} from "../../types";
 import { getNetworkStakerPkgs } from "./utils";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
@@ -25,7 +33,8 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
     if (stakerConfig.currentExecClient === null) {
-      let newExexClientValue: any;
+      // Set default empty string value
+      let newExexClientValue = "";
 
       for (const execClient of stakerConfig.execClients.map(
         exCl => exCl.dnpName
@@ -45,13 +54,19 @@ export async function setDefaultStakerConfig(): Promise<void> {
 
       switch (network) {
         case "mainnet":
-          db.executionClientMainnet.set(newExexClientValue);
+          db.executionClientMainnet.set(
+            newExexClientValue as ExecutionClientMainnet
+          );
           break;
         case "gnosis":
-          db.executionClientGnosis.set(newExexClientValue);
+          db.executionClientGnosis.set(
+            newExexClientValue as ExecutionClientGnosis
+          );
           break;
         case "prater":
-          db.executionClientPrater.set(newExexClientValue);
+          db.executionClientPrater.set(
+            newExexClientValue as ExecutionClientPrater
+          );
           break;
         default:
           break;
@@ -62,7 +77,8 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If the web3signer is installed then grab the value from its compose ENV value
     // If not web3signer then is undefined
     if (stakerConfig.currentConsClient === null) {
-      let newConsClientValue: any;
+      // Set default empty string value
+      let newConsClientValue = "";
 
       const web3signerPkg = pkgs.find(
         pkg => pkg.dnpName === stakerConfig.web3signer.dnpName
@@ -94,13 +110,19 @@ export async function setDefaultStakerConfig(): Promise<void> {
 
       switch (network) {
         case "mainnet":
-          db.consensusClientMainnet.set(newConsClientValue);
+          db.consensusClientMainnet.set(
+            newConsClientValue as ConsensusClientMainnet
+          );
           break;
         case "gnosis":
-          db.consensusClientGnosis.set(newConsClientValue);
+          db.consensusClientGnosis.set(
+            newConsClientValue as ConsensusClientGnosis
+          );
           break;
         case "prater":
-          db.consensusClientPrater.set(newConsClientValue);
+          db.consensusClientPrater.set(
+            newConsClientValue as ConsensusClientPrater
+          );
           break;
         default:
           break;

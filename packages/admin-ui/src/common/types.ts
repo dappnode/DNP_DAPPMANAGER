@@ -1184,12 +1184,14 @@ export type ConsensusClientMainnet =
   | "prysm.dnp.dappnode.eth"
   | "lighthouse.dnp.dappnode.eth"
   | "teku.dnp.dappnode.eth"
-  | "nimbus.dnp.dappnode.eth";
+  | "nimbus.dnp.dappnode.eth"
+  | "";
 export type ExecutionClientMainnet =
   | "geth.dnp.dappnode.eth"
   | "besu.dnp.dappnode.eth"
   | "erigon.dnp.dappnode.eth"
-  | "nethermind.public.dappnode.eth";
+  | "nethermind.public.dappnode.eth"
+  | "";
 
 // Prater
 
@@ -1197,13 +1199,15 @@ export type ConsensusClientPrater =
   | "prysm-prater.dnp.dappnode.eth"
   | "lighthouse-prater.dnp.dappnode.eth"
   | "teku-prater.dnp.dappnode.eth"
-  | "nimbus-prater.dnp.dappnode.eth";
+  | "nimbus-prater.dnp.dappnode.eth"
+  | "";
 
 export type ExecutionClientPrater =
   | "goerli-geth.dnp.dappnode.eth"
   | "goerli-erigon.dnp.dappnode.eth"
   | "goerli-nethermind.dnp.dappnode.eth"
-  | "goerli-besu.dnp.dappnode.eth";
+  | "goerli-besu.dnp.dappnode.eth"
+  | "";
 
 // Gnosis
 
@@ -1211,8 +1215,9 @@ export type ConsensusClientGnosis =
   | "gnosis-beacon-chain-prysm.dnp.dappnode.eth"
   | "lighthouse-gnosis.dnp.dappnode.eth"
   | "teku-gnosis.dnp.dappnode.eth"
-  | "nimbus-gnosis.dnp.dappnode.eth";
-export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth";
+  | "nimbus-gnosis.dnp.dappnode.eth"
+  | "";
+export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth" | "";
 
 export type StakerItem = StakerItemOk | StakerItemError;
 
