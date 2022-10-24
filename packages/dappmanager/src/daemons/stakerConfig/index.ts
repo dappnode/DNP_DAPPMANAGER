@@ -14,11 +14,11 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
       ) {
         switch (network) {
           case "mainnet":
-            db.executionClientMainnet.set(undefined);
+            db.executionClientMainnet.set("");
           case "gnosis":
-            db.executionClientGnosis.set(undefined);
+            db.executionClientGnosis.set("");
           case "prater":
-            db.executionClientPrater.set(undefined);
+            db.executionClientPrater.set("");
         }
       }
 
@@ -27,11 +27,11 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
       ) {
         switch (network) {
           case "mainnet":
-            db.consensusClientMainnet.set(undefined);
+            db.consensusClientMainnet.set("");
           case "gnosis":
-            db.consensusClientGnosis.set(undefined);
+            db.consensusClientGnosis.set("");
           case "prater":
-            db.consensusClientPrater.set(undefined);
+            db.consensusClientPrater.set("");
         }
       }
 

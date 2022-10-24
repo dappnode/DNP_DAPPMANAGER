@@ -1,4 +1,13 @@
-import { StakerConfigSet, Network } from "../../types";
+import {
+  StakerConfigSet,
+  Network,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
+  ExecutionClientGnosis,
+  ConsensusClientGnosis,
+  ExecutionClientPrater,
+  ConsensusClientPrater
+} from "../../types";
 import * as db from "../../db";
 
 /**
@@ -7,25 +16,31 @@ import * as db from "../../db";
 export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
   switch (stakerConfig.network) {
     case "mainnet":
-      db.executionClientMainnet.set(stakerConfig.executionClient as any);
-      db.consensusClientMainnet.set(
-        stakerConfig.consensusClient?.dnpName as any
+      db.executionClientMainnet.set(
+        (stakerConfig.executionClient || "") as ExecutionClientMainnet
       );
-      db.mevBoostMainnet.set(stakerConfig.enableMevBoost as any);
+      db.consensusClientMainnet.set(
+        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientMainnet
+      );
+      db.mevBoostMainnet.set(stakerConfig.enableMevBoost || false);
       break;
     case "gnosis":
-      db.executionClientGnosis.set(stakerConfig.executionClient as any);
-      db.consensusClientGnosis.set(
-        stakerConfig.consensusClient?.dnpName as any
+      db.executionClientGnosis.set(
+        (stakerConfig.executionClient || "") as ExecutionClientGnosis
       );
-      db.mevBoostGnosis.set(stakerConfig.enableMevBoost as any);
+      db.consensusClientGnosis.set(
+        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientGnosis
+      );
+      db.mevBoostGnosis.set(stakerConfig.enableMevBoost || false);
       break;
     case "prater":
-      db.executionClientPrater.set(stakerConfig.executionClient as any);
-      db.consensusClientPrater.set(
-        stakerConfig.consensusClient?.dnpName as any
+      db.executionClientPrater.set(
+        (stakerConfig.executionClient || "") as ExecutionClientPrater
       );
-      db.mevBoostPrater.set(stakerConfig.enableMevBoost as any);
+      db.consensusClientPrater.set(
+        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientPrater
+      );
+      db.mevBoostPrater.set(stakerConfig.enableMevBoost || false);
       break;
     default:
       throw new Error(`Unsupported network: ${stakerConfig.network}`);
