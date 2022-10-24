@@ -16,7 +16,7 @@ const EXECUTION_CLIENT_MAINNET = "execution-client-mainnet";
 const MEVBOOST_MAINNET = "mevboost-mainnet";
 
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientMainnet | null | undefined>(
+  dbMain.staticKey<ConsensusClientMainnet | null>(
     CONSENSUS_CLIENT_MAINNET,
     null
   ),
@@ -24,7 +24,7 @@ export const consensusClientMainnet = interceptGlobalEnvOnSet(
 );
 
 export const executionClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientMainnet | null | undefined>(
+  dbMain.staticKey<ExecutionClientMainnet | null>(
     EXECUTION_CLIENT_MAINNET,
     null
   ),
@@ -43,18 +43,12 @@ const EXECUTION_CLIENT_GNOSIS = "execution-client-gnosis";
 const MEVBOOST_GNOSIS = "mevboost-gnosis";
 
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientGnosis | null | undefined>(
-    CONSENSUS_CLIENT_GNOSIS,
-    null
-  ),
+  dbMain.staticKey<ConsensusClientGnosis | null>(CONSENSUS_CLIENT_GNOSIS, null),
   Object.keys({ CONSENSUS_CLIENT_GNOSIS })[0]
 );
 
 export const executionClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientGnosis | null | undefined>(
-    EXECUTION_CLIENT_GNOSIS,
-    null
-  ),
+  dbMain.staticKey<ExecutionClientGnosis | null>(EXECUTION_CLIENT_GNOSIS, null),
   Object.keys({ EXECUTION_CLIENT_GNOSIS })[0]
 );
 
@@ -70,18 +64,12 @@ const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
 
 export const consensusClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientPrater | null | undefined>(
-    CONSENSUS_CLIENT_PRATER,
-    null
-  ),
+  dbMain.staticKey<ConsensusClientPrater | null>(CONSENSUS_CLIENT_PRATER, null),
   Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
 );
 
 export const executionClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientPrater | null | undefined>(
-    EXECUTION_CLIENT_PRATER,
-    null
-  ),
+  dbMain.staticKey<ExecutionClientPrater | null>(EXECUTION_CLIENT_PRATER, null),
   Object.keys({ EXECUTION_CLIENT_PRATER })[0]
 );
 
