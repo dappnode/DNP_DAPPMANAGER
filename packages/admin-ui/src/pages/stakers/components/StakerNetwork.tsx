@@ -53,9 +53,15 @@ export default function StakerNetwork({
     StakerConfigSet
   >();
   const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
-    ""
+    network === "mainnet"
+      ? "https://checkpoint-sync.dappnode.io"
+      : network === "prater"
+      ? "https://checkpoint-sync-prater.dappnode.io"
+      : ""
   );
-  const [defaultGraffiti, setDefaultGraffiti] = useState<string>("");
+  const [defaultGraffiti, setDefaultGraffiti] = useState<string>(
+    "validating_from_DAppNode"
+  );
   const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
 
   const currentStakerConfigReq = useApi.stakerConfigGet(network);
@@ -104,17 +110,12 @@ export default function StakerNetwork({
 
       // Set default consensus client: fee recipient, checkpointsync and graffiti
       if (consensusClient && consensusClient.status === "ok") {
-        setDefaultFeeRecipient(consensusClient.feeRecipient || "");
-        setDefaultCheckpointSync(
-          consensusClient.checkpointSync
-            ? consensusClient.checkpointSync
-            : network === "mainnet"
-            ? "https://checkpoint-sync.dappnode.io"
-            : network === "prater"
-            ? "https://checkpoint-sync-prater.dappnode.io"
-            : ""
-        );
-        setDefaultGraffiti(consensusClient?.graffiti || "");
+        if (consensusClient.feeRecipient)
+          setDefaultFeeRecipient(consensusClient.feeRecipient);
+        if (consensusClient.checkpointSync)
+          setDefaultCheckpointSync(consensusClient.checkpointSync);
+        if (consensusClient.graffiti)
+          setDefaultGraffiti(consensusClient.graffiti);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
