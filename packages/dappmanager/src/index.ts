@@ -5,7 +5,7 @@ import initializeDb from "./initializeDb";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
 import { generateKeyPair } from "./utils/publickeyEncryption";
 import { copyHostScripts } from "./modules/hostScripts";
-import { switchEthClientIfOpenethereum } from "./modules/ethClient";
+import { switchEthClientIfOpenethereumOrGethLight } from "./modules/ethClient";
 import { runLegacyActions } from "./modules/legacy";
 import { migrateUserActionLogs } from "./logUserAction";
 import { postRestartPatch } from "./modules/installer/restartPatch";
@@ -51,8 +51,8 @@ const server = startDappmanager({
 
 // Deprecate openethereum. MUST be executed before EthClientInstaller daemon to avoid have the error:
 // `Error on eth client installer daemon Error: No client data for target: openethereum`
-switchEthClientIfOpenethereum().catch(e =>
-  logs.error("Error switch client openethereum", e)
+switchEthClientIfOpenethereumOrGethLight().catch(e =>
+  logs.error("Error deprecating ethereum client: ", e)
 );
 
 // Initialize DB

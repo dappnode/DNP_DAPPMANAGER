@@ -1,4 +1,4 @@
 export * from "./changeEthMultiClient";
 export * from "./ethersProvider";
-export * from "./switchEthClientIfOpenethereum";
+export * from "./switchEthClientIfOpenethereumOrGethLight";
 export * from "./localFallbackVersions";
