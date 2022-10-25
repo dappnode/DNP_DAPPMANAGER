@@ -131,22 +131,6 @@ interface EthClientDataStats {
   trust: string;
 }
 
-interface OptionsMap {
-  [name: string]: Eth2ClientTarget;
-}
-
-/**
- * Utility to pretty names to the actual target of that option
- */
-function getOptionsMap(options?: Eth2ClientTarget[]): OptionsMap {
-  return options
-    ? options.reduce((optMap: { [name: string]: Eth2ClientTarget }, target) => {
-        optMap[prettyDnpName(target)] = target;
-        return optMap;
-      }, {})
-    : {};
-}
-
 /**
  * View to chose or change the Eth multi-client
  * There are three main options:
@@ -166,32 +150,30 @@ function EthMultiClients({
   return (
     <div className="eth-multi-clients">
       {clients.map(({ title, description, options, stats, highlight }) => {
-        let _defaultTarget: Eth2ClientTarget;
-        let _selected: boolean;
-        if (typeof options === "object" && typeof selectedTarget === "object") {
-          _defaultTarget = {
-            execClient: options.execClients[0],
-            consClient: options.consClients[0]
-          };
-          _selected =
+        const defaultTarget: Eth2ClientTarget =
+          options === "remote"
+            ? options
+            : {
+                execClient: options.execClients[0],
+                consClient: options.consClients[0]
+              };
+        let selected: boolean;
+        if (options === "remote") {
+          selected = selectedTarget === options ? true : false;
+        } else {
+          selected =
             selectedTarget &&
-            selectedTarget.execClient === _defaultTarget.execClient &&
-            selectedTarget.consClient === _defaultTarget.consClient
+            selectedTarget !== "remote" &&
+            options.execClients.includes(selectedTarget.execClient) &&
+            options.consClients.includes(selectedTarget.consClient)
               ? true
               : false;
-        } else {
-          _defaultTarget = options;
-          _selected =
-            selectedTarget && selectedTarget === options ? true : false;
         }
-        const defaultTarget = options[0];
-        const selected = selectedTarget && options.includes(selectedTarget);
-        const optionMap = getOptionsMap(options);
         const getSvgClass = (_highlight: keyof EthClientDataStats) =>
           joinCssClass({ active: highlight === _highlight });
         return (
           <Card
-            key={defaultTarget}
+            key={title}
             shadow
             className={`eth-multi-client ${joinCssClass({ selected })}`}
             onClick={() => {
@@ -214,19 +196,55 @@ function EthMultiClients({
               </div>
             )}
 
-            {selected && options.length > 1 && (
-              <>
-                <Select
-                  value={
-                    selectedTarget ? prettyDnpName(selectedTarget) : undefined
-                  }
-                  options={options.map(prettyDnpName)}
-                  onValueChange={(newOpt: string) => {
-                    onTargetChange(optionMap[newOpt]);
-                  }}
-                ></Select>
-              </>
-            )}
+            {selected &&
+              selectedTarget &&
+              selectedTarget !== "remote" &&
+              options !== "remote" && (
+                <>
+                  <Select
+                    value={
+                      selectedTarget
+                        ? prettyDnpName(selectedTarget.execClient)
+                        : undefined
+                    }
+                    options={options.execClients
+                      .filter(ec => ec)
+                      .map(ec => prettyDnpName(ec))}
+                    onValueChange={(newOpt: string) => {
+                      const newEc = executionClientsMainnet.find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
+                      if (newEc)
+                        onTargetChange({
+                          ...selectedTarget,
+                          execClient: newEc
+                        });
+                    }}
+                    prepend="Execution client"
+                  ></Select>
+                  <Select
+                    value={
+                      selectedTarget
+                        ? prettyDnpName(selectedTarget.consClient)
+                        : undefined
+                    }
+                    options={options.consClients
+                      .filter(ec => ec)
+                      .map(ec => prettyDnpName(ec))}
+                    onValueChange={(newOpt: string) => {
+                      const newCc = consensusClientsMainnet.find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
+                      if (newCc)
+                        onTargetChange({
+                          ...selectedTarget,
+                          consClient: newCc
+                        });
+                    }}
+                    prepend="Consensus client"
+                  ></Select>
+                </>
+              )}
           </Card>
         );
       })}
