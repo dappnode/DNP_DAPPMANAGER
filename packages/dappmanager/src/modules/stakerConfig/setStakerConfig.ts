@@ -119,27 +119,25 @@ export async function setStakerConfig({
     );
 
   // EXECUTION CLIENT
-  if (stakerConfig.executionClient !== undefined)
-    await setExecutionClientConfig({
-      currentExecClient,
-      targetExecutionClient: stakerConfig.executionClient,
-      currentExecClientPkg
-    });
+  await setExecutionClientConfig({
+    currentExecClient,
+    targetExecutionClient: stakerConfig.executionClient,
+    currentExecClientPkg
+  });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-  if (stakerConfig.consensusClient !== undefined)
-    await setConsensusClientConfig({
-      currentConsClient,
-      targetConsensusClient: stakerConfig.consensusClient,
-      currentConsClientPkg
-    }).catch(e => {
-      // The previous EXECUTION CLIENT must be persisted
-      setStakerConfigOnDb({
-        ...stakerConfig,
-        executionClient: currentExecClient
-      });
-      throw e;
+  await setConsensusClientConfig({
+    currentConsClient,
+    targetConsensusClient: stakerConfig.consensusClient,
+    currentConsClientPkg
+  }).catch(e => {
+    // The previous EXECUTION CLIENT must be persisted
+    setStakerConfigOnDb({
+      ...stakerConfig,
+      executionClient: currentExecClient
     });
+    throw e;
+  });
 
   // WEB3SIGNER
   if (stakerConfig.enableWeb3signer !== undefined)
@@ -182,9 +180,9 @@ async function setExecutionClientConfig({
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  currentExecClient: string | undefined;
-  targetExecutionClient: string;
-  currentExecClientPkg: InstalledPackageDataApiReturn | undefined;
+  currentExecClient?: string;
+  targetExecutionClient?: string;
+  currentExecClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
   if (!targetExecutionClient && !currentExecClient) {
     // Stop the current execution client if no option and not currentu execution client
@@ -210,7 +208,10 @@ async function setExecutionClientConfig({
         true
       ).catch(err => logs.error(err));
     }
-  } else if (targetExecutionClient === currentExecClient) {
+  } else if (
+    targetExecutionClient &&
+    targetExecutionClient === currentExecClient
+  ) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
       await packageInstall({ name: targetExecutionClient });
@@ -222,7 +223,10 @@ async function setExecutionClientConfig({
         true
       ).catch(err => logs.error(err));
     }
-  } else if (targetExecutionClient !== currentExecClient) {
+  } else if (
+    targetExecutionClient &&
+    targetExecutionClient !== currentExecClient
+  ) {
     const targetExecClientPkg = await listPackageNoThrow({
       dnpName: targetExecutionClient
     });
@@ -252,17 +256,17 @@ async function setConsensusClientConfig({
   targetConsensusClient,
   currentConsClientPkg
 }: {
-  currentConsClient: string | undefined;
-  targetConsensusClient: ConsensusClient;
-  currentConsClientPkg: InstalledPackageDataApiReturn | undefined;
+  currentConsClient?: string;
+  targetConsensusClient?: ConsensusClient;
+  currentConsClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
-  if (!targetConsensusClient.dnpName) {
+  if (!targetConsensusClient?.dnpName) {
     if (!currentConsClient) {
       // Stop the current consensus client if no option and not current consensus client
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
-    } else if (!targetConsensusClient.dnpName && currentConsClient) {
+    } else if (!targetConsensusClient?.dnpName && currentConsClient) {
       // Stop the current consensus client if no target provided
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
