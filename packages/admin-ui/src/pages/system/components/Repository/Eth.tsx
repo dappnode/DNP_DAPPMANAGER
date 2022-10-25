@@ -5,19 +5,19 @@ import {
   getEthClientStatus,
   getEthClientFallback
 } from "services/dappnodeStatus/selectors";
-import { EthClientTarget, EthClientFallback } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "types";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import SubTitle from "components/SubTitle";
 import {
-  getEthClientPrettyName,
   getEthClientPrettyStatus,
   EthMultiClientsAndFallback
 } from "components/EthMultiClient";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import Card from "components/Card";
+import { prettyDnpName } from "utils/format";
 
 export default function Eth() {
   const ethClientTarget = useSelector(getEthClientTarget);
@@ -25,7 +25,7 @@ export default function Eth() {
   const ethClientFallback = useSelector(getEthClientFallback);
   const dispatch = useDispatch();
 
-  const [target, setTarget] = useState<EthClientTarget | null>(
+  const [target, setTarget] = useState<Eth2ClientTarget | null>(
     ethClientTarget || null
   );
 
@@ -88,7 +88,10 @@ export default function Eth() {
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (
         <div className="description">
-          <strong>Client:</strong> {getEthClientPrettyName(ethClientTarget)}
+          <strong>Execution Client:</strong>{" "}
+          {prettyDnpName(ethClientTarget.execClient)}
+          <strong>Consensu Client:</strong>{" "}
+          {prettyDnpName(ethClientTarget.consClient)}
           <br />
           <strong>Status:</strong>{" "}
           {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}

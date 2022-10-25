@@ -4,31 +4,25 @@ import "./multiClient.scss";
 import { joinCssClass } from "utils/css";
 import Select from "components/Select";
 import {
-  EthClientTarget,
   EthClientFallback,
   EthClientStatus,
   EthClientStatusError,
   Eth2ClientTarget,
   ExecutionClientMainnet,
-  ConsensusClientMainnet
+  ConsensusClientMainnet,
+  executionClientsMainnet,
+  consensusClientsMainnet
 } from "types";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
+import { prettyDnpName } from "utils/format";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
 export const booleanToFallback = (bool: boolean): EthClientFallback =>
   bool ? "on" : "off";
-
-export function getEthClientPrettyName(
-  target: "remote" | ExecutionClientMainnet | ConsensusClientMainnet
-): string {
-  if (target === "remote") return "Remote";
-  const dnpName = target.split(".")[0];
-  return dnpName.charAt(0).toUpperCase() + dnpName.slice(1);
-}
 
 /**
  * Get client type from a target
@@ -95,7 +89,7 @@ const clients: EthClientData[] = [
   {
     title: "Remote",
     description: "Public node API mantained by DAppNode",
-    options: ["remote"],
+    options: "remote",
     stats: {
       syncTime: "Instant",
       requirements: "No requirements",
@@ -106,7 +100,10 @@ const clients: EthClientData[] = [
   {
     title: "Full node",
     description: "Your own Ethereum node w/out 3rd parties",
-    options: ["geth", "nethermind", "besu", "erigon"],
+    options: {
+      execClients: [...executionClientsMainnet],
+      consClients: [...consensusClientsMainnet]
+    },
     stats: {
       syncTime: "Slow sync",
       requirements: "High requirements",
@@ -119,7 +116,12 @@ const clients: EthClientData[] = [
 interface EthClientData {
   title: string;
   description: string;
-  options: EthClientTarget[];
+  options:
+    | "remote"
+    | {
+        execClients: ExecutionClientMainnet[];
+        consClients: ConsensusClientMainnet[];
+      };
   stats: EthClientDataStats;
   highlight: keyof EthClientDataStats;
 }
@@ -139,7 +141,7 @@ interface OptionsMap {
 function getOptionsMap(options?: Eth2ClientTarget[]): OptionsMap {
   return options
     ? options.reduce((optMap: { [name: string]: Eth2ClientTarget }, target) => {
-        optMap[getEthClientPrettyName(target)] = target;
+        optMap[prettyDnpName(target)] = target;
         return optMap;
       }, {})
     : {};
@@ -163,55 +165,71 @@ function EthMultiClients({
 }) {
   return (
     <div className="eth-multi-clients">
-      {clients
-        .filter(({ options }) => options.length > 0)
-        .map(({ title, description, options, stats, highlight }) => {
-          const defaultTarget = options[0];
-          const selected = selectedTarget && options.includes(selectedTarget);
-          const optionMap = getOptionsMap(options);
-          const getSvgClass = (_highlight: keyof EthClientDataStats) =>
-            joinCssClass({ active: highlight === _highlight });
-          return (
-            <Card
-              key={defaultTarget}
-              shadow
-              className={`eth-multi-client ${joinCssClass({ selected })}`}
-              onClick={() => {
-                // Prevent over-riding the options onTargetChange call
-                if (!selected) onTargetChange(defaultTarget);
-              }}
-            >
-              <div className="title">{title}</div>
-              <div className="description">{description}</div>
+      {clients.map(({ title, description, options, stats, highlight }) => {
+        let _defaultTarget: Eth2ClientTarget;
+        let _selected: boolean;
+        if (typeof options === "object" && typeof selectedTarget === "object") {
+          _defaultTarget = {
+            execClient: options.execClients[0],
+            consClient: options.consClients[0]
+          };
+          _selected =
+            selectedTarget &&
+            selectedTarget.execClient === _defaultTarget.execClient &&
+            selectedTarget.consClient === _defaultTarget.consClient
+              ? true
+              : false;
+        } else {
+          _defaultTarget = options;
+          _selected =
+            selectedTarget && selectedTarget === options ? true : false;
+        }
+        const defaultTarget = options[0];
+        const selected = selectedTarget && options.includes(selectedTarget);
+        const optionMap = getOptionsMap(options);
+        const getSvgClass = (_highlight: keyof EthClientDataStats) =>
+          joinCssClass({ active: highlight === _highlight });
+        return (
+          <Card
+            key={defaultTarget}
+            shadow
+            className={`eth-multi-client ${joinCssClass({ selected })}`}
+            onClick={() => {
+              // Prevent over-riding the options onTargetChange call
+              if (!selected) onTargetChange(defaultTarget);
+            }}
+          >
+            <div className="title">{title}</div>
+            <div className="description">{description}</div>
 
-              {showStats && <hr></hr>}
-              {showStats && (
-                <div className="eth-multi-client-stats">
-                  <AiFillClockCircle className={getSvgClass("syncTime")} />
-                  <FaDatabase className={getSvgClass("requirements")} />
-                  <AiFillSafetyCertificate className={getSvgClass("trust")} />
-                  <div className="tag">{stats.syncTime}</div>
-                  <div className="tag">{stats.requirements}</div>
-                  <div className="tag">{stats.trust}</div>
-                </div>
-              )}
+            {showStats && <hr></hr>}
+            {showStats && (
+              <div className="eth-multi-client-stats">
+                <AiFillClockCircle className={getSvgClass("syncTime")} />
+                <FaDatabase className={getSvgClass("requirements")} />
+                <AiFillSafetyCertificate className={getSvgClass("trust")} />
+                <div className="tag">{stats.syncTime}</div>
+                <div className="tag">{stats.requirements}</div>
+                <div className="tag">{stats.trust}</div>
+              </div>
+            )}
 
-              {selected && options.length > 1 && (
+            {selected && options.length > 1 && (
+              <>
                 <Select
                   value={
-                    selectedTarget
-                      ? getEthClientPrettyName(selectedTarget)
-                      : undefined
+                    selectedTarget ? prettyDnpName(selectedTarget) : undefined
                   }
-                  options={options.map(getEthClientPrettyName)}
+                  options={options.map(prettyDnpName)}
                   onValueChange={(newOpt: string) => {
                     onTargetChange(optionMap[newOpt]);
                   }}
                 ></Select>
-              )}
-            </Card>
-          );
-        })}
+              </>
+            )}
+          </Card>
+        );
+      })}
     </div>
   );
 }
