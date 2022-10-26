@@ -8,11 +8,12 @@ import { ethClientData } from "../../params";
 /**
  * Switches ethClientTarget in the following preference order: geth > nethermind > remote
  */
-export async function switchEthClientIfOpenethereum(): Promise<void> {
+export async function switchEthClientIfOpenethereumOrGethLight(): Promise<void> {
   const ethClientTarget = db.ethClientTarget.get() as
     | EthClientTarget
     | null
-    | "openethereum"; // Add old deprecated type
+    | "openethereum" // Add old deprecated type
+    | "geth-light"; // Add old deprecated type
 
   if (ethClientTarget === "openethereum") {
     // Check for geth
@@ -44,6 +45,11 @@ export async function switchEthClientIfOpenethereum(): Promise<void> {
     }
 
     logs.info("Setting ethClientTarget to remote");
+    db.ethClientTarget.set("remote");
+  } else if (ethClientTarget === "geth-light") {
+    logs.info(
+      "Execution client geth-light deprecated in release v0.2.59. Using remote"
+    );
     db.ethClientTarget.set("remote");
   }
 }
