@@ -129,10 +129,14 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: (network: Network) => Promise<StakerConfigGet>;
+  stakerConfigGet: <T extends Network>(
+    network: T
+  ) => Promise<StakerConfigGet<T>>;
 
   /** Sets the staker configuration for a given network */
-  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
+  stakerConfigSet: <T extends Network>(kwargs: {
+    stakerConfig: StakerConfigSet<T>;
+  }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;

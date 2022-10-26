@@ -3,7 +3,11 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
+import {
+  ConsensusClient as ConsensusClientIface,
+  Network,
+  StakerItem
+} from "types";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
@@ -11,7 +15,7 @@ import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 
-export default function ConsensusClient({
+export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
   newConsClient,
@@ -24,7 +28,7 @@ export default function ConsensusClient({
   checkpointSyncPlaceHolder,
   ...props
 }: {
-  consensusClient: StakerItem;
+  consensusClient: StakerItem<T>;
   setNewConsClient: React.Dispatch<
     React.SetStateAction<ConsensusClientIface | undefined>
   >;

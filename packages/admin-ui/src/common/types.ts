@@ -11,6 +11,7 @@ import {
   Dependencies,
   PackageEnvs
 } from "@dappnode/dappnodesdk";
+import ConsensusClient from "pages/stakers/components/columns/ConsensusClient";
 
 // Aliases
 
@@ -1192,6 +1193,8 @@ export type ExecutionClientMainnet =
   | "erigon.dnp.dappnode.eth"
   | "nethermind.public.dappnode.eth"
   | "";
+export type SignerMainnet = "web3signer.dnp.dappnode.eth" | "";
+export type MevBoostMainnet = "mev-boost.dnp.dappnode.eth" | "";
 
 // Prater
 
@@ -1208,6 +1211,8 @@ export type ExecutionClientPrater =
   | "goerli-nethermind.dnp.dappnode.eth"
   | "goerli-besu.dnp.dappnode.eth"
   | "";
+export type SignerPrater = "web3signer-prater.dnp.dappnode.eth" | "";
+export type MevBoostPrater = "mev-boost-prater.dnp.dappnode.eth" | "";
 
 // Gnosis
 
@@ -1218,6 +1223,8 @@ export type ConsensusClientGnosis =
   | "nimbus-gnosis.dnp.dappnode.eth"
   | "";
 export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth" | "";
+export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
+export type MevBoostGnosis = "mev-boost-gnosis.dnp.dappnode.eth" | "";
 
 export type StakerItem = StakerItemOk | StakerItemError;
 
@@ -1241,6 +1248,7 @@ export interface StakerItemOk extends StakerItemBasic {
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;
+  relays?: string[];
 }
 
 export interface StakerConfigGet {
@@ -1250,16 +1258,37 @@ export interface StakerConfigGet {
   mevBoost: StakerItem;
 }
 
-export interface StakerConfigSet {
-  network: Network;
-  executionClient?: string;
-  consensusClient?: ConsensusClient;
+export interface StakerConfigSet<T extends Network> {
+  network: T;
+  executionClient?: ExececutionClient<T>;
+  consensusClient?: ConsensusClient<T>;
   enableWeb3signer?: boolean;
   enableMevBoost?: boolean;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
+  relays?: string[];
 }
-export interface ConsensusClient {
+
+export type ExececutionClient<T extends Network> = T extends "mainnet"
+  ? ExecutionClientMainnet
+  : T extends "gnosis"
+  ? ExecutionClientGnosis
+  : T extends "prater"
+  ? ExecutionClientPrater
+  : never;
+
+export type ConsensusClient<T extends Network> = T extends "mainnet"
+  ? ConsensusClientMainnet
+  : T extends "gnosis"
+  ? ConsensusClientGnosis
+  : T extends "prater"
+  ? ConsensusClientPrater
+  : never;
+
+/* export interface ConsensusClient {
   dnpName?: string;
   graffiti?: string;
   feeRecipient?: string;
   checkpointSync?: string;
-}
+} */
