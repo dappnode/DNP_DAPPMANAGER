@@ -2,12 +2,12 @@ import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { Network } from "../../types";
-import { getNetworkStakerPkgs } from "../../modules/stakerConfig/utils";
+import { getStakerParamsByNetwork } from "../../modules/stakerConfig/utils";
 
 function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   try {
     for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
-      const stakerConfig = getNetworkStakerPkgs(network);
+      const stakerConfig = getStakerParamsByNetwork(network);
 
       if (
         dnpNames.find(dnpName => dnpName === stakerConfig.currentExecClient)

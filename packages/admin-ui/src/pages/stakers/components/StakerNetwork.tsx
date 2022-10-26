@@ -24,11 +24,11 @@ import Loading from "components/Loading";
 import { validateEthereumAddress, validateGraffiti } from "./utils";
 import { isEqual, pick } from "lodash";
 
-export default function StakerNetwork({
+export default function StakerNetwork<T extends Network>({
   network,
   description
 }: {
-  network: Network;
+  network: T;
   description: string;
 }) {
   // Error
@@ -47,10 +47,8 @@ export default function StakerNetwork({
   );
   // Apply button state
   const [isApplyAllowed, setIsApplyAllowed] = useState(false);
-
-  // Current config
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
-    StakerConfigSet
+    StakerConfigSet<T>
   >();
   const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
     network === "mainnet"

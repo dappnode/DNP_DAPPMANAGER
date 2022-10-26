@@ -11,7 +11,7 @@ import { listPackages } from "../docker/list";
 import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
-  getNetworkStakerPkgs,
+  getStakerParamsByNetwork,
   getValidatorServiceName
 } from "./utils";
 
@@ -40,7 +40,7 @@ export async function getStakerConfig(
       web3signer,
       mevBoostDnpName,
       isMevBoostSelected
-    } = getNetworkStakerPkgs(network);
+    } = getStakerParamsByNetwork(network);
 
     const dnpList = await listPackages();
 

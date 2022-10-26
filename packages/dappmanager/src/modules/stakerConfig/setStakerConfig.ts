@@ -4,9 +4,15 @@ import {
   packageSetEnvironment
 } from "../../calls";
 import {
-  ConsensusClient,
+  ConsensusClientGnosis,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
   InstalledPackageData,
   InstalledPackageDataApiReturn,
+  Network,
   StakerConfigSet,
   UserSettingsAllDnps
 } from "../../types";
@@ -14,7 +20,7 @@ import { logs } from "../../logs";
 import {
   getValidatorServiceName,
   setStakerConfigOnDb,
-  getNetworkStakerPkgs,
+  getStakerParamsByNetwork,
   getBeaconServiceName
 } from "./utils";
 import { dockerContainerStop } from "../docker/api";
@@ -31,10 +37,10 @@ import semver from "semver";
  * @param stakerConfig
  * TODO: add option to remove previous or not
  */
-export async function setStakerConfig({
+export async function setStakerConfig<T extends Network>({
   stakerConfig
 }: {
-  stakerConfig: StakerConfigSet;
+  stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
   const {
     execClients,
@@ -43,11 +49,14 @@ export async function setStakerConfig({
     currentConsClient,
     web3signer,
     mevBoostDnpName
-  } = getNetworkStakerPkgs(stakerConfig.network);
+  } = getStakerParamsByNetwork<T>(stakerConfig.network);
 
   // Ensure execution and consensus clients do not take the null value (used to indicate intention)
   if (currentExecClient === null) throw Error("Invalid execution client");
   if (currentConsClient === null) throw Error("Invalid consensus client");
+
+  if (stakerConfig.network === "mainnet")
+    currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
 
   // Ensure Execution clients DNP's names are valid
   if (
@@ -61,13 +70,13 @@ export async function setStakerConfig({
     );
   // Ensure Consensus clients DNP's names are valid
   if (
-    stakerConfig.consensusClient?.dnpName &&
+    stakerConfig.consensusClient &&
     !consClients
       .map(coCl => coCl.dnpName)
-      .includes(stakerConfig.consensusClient.dnpName)
+      .includes(stakerConfig.consensusClient)
   )
     throw Error(
-      `Invalid consensus client ${stakerConfig.consensusClient.dnpName} for network ${stakerConfig.network}`
+      `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
     );
 
   const pkgs = await packagesGet();
@@ -119,14 +128,14 @@ export async function setStakerConfig({
     );
 
   // EXECUTION CLIENT
-  await setExecutionClientConfig({
+  await setExecutionClientConfig<T>({
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-  await setConsensusClientConfig({
+  await setConsensusClientConfig<T>({
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
@@ -175,13 +184,21 @@ export async function setStakerConfig({
   setStakerConfigOnDb(stakerConfig);
 }
 
-async function setExecutionClientConfig({
+async function setExecutionClientConfig<T extends Network>({
   currentExecClient,
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  currentExecClient?: string;
-  targetExecutionClient?: string;
+  currentExecClient?: T extends "mainnet"
+    ? ExecutionClientMainnet
+    : T extends "gnosis"
+    ? ExecutionClientGnosis
+    : ExecutionClientPrater;
+  targetExecutionClient?: T extends "mainnet"
+    ? ExecutionClientMainnet
+    : T extends "gnosis"
+    ? ExecutionClientGnosis
+    : ExecutionClientPrater;
   currentExecClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
   if (!targetExecutionClient && !currentExecClient) {
@@ -251,22 +268,36 @@ async function setExecutionClientConfig({
   }
 }
 
-async function setConsensusClientConfig({
+async function setConsensusClientConfig<T extends Network>({
   currentConsClient,
   targetConsensusClient,
-  currentConsClientPkg
+  currentConsClientPkg,
+  targetGraffiti,
+  targetFeeRecipient,
+  targetCheckpointSync
 }: {
-  currentConsClient?: string;
-  targetConsensusClient?: ConsensusClient;
+  currentConsClient?: T extends "mainnet"
+    ? ConsensusClientMainnet
+    : T extends "gnosis"
+    ? ConsensusClientGnosis
+    : ConsensusClientPrater;
+  targetConsensusClient?: T extends "mainnet"
+    ? ConsensusClientMainnet
+    : T extends "gnosis"
+    ? ConsensusClientGnosis
+    : ConsensusClientPrater;
   currentConsClientPkg?: InstalledPackageDataApiReturn;
+  targetGraffiti?: string;
+  targetFeeRecipient?: string;
+  targetCheckpointSync?: string;
 }): Promise<void> {
-  if (!targetConsensusClient?.dnpName) {
+  if (!targetConsensusClient) {
     if (!currentConsClient) {
       // Stop the current consensus client if no option and not current consensus client
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
-    } else if (!targetConsensusClient?.dnpName && currentConsClient) {
+    } else if (!targetConsensusClient && currentConsClient) {
       // Stop the current consensus client if no target provided
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
@@ -276,25 +307,25 @@ async function setConsensusClientConfig({
     return;
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-  const validatorServiceName = getValidatorServiceName(
-    targetConsensusClient.dnpName
-  );
-  const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
-  const userSettings: UserSettingsAllDnps = getUserSettings(
-    targetConsensusClient.dnpName,
+  const validatorServiceName = getValidatorServiceName(targetConsensusClient);
+  const beaconServiceName = getBeaconServiceName(targetConsensusClient);
+  const userSettings: UserSettingsAllDnps = getUserSettings({
     targetConsensusClient,
     validatorServiceName,
-    beaconServiceName
-  );
+    beaconServiceName,
+    targetGraffiti,
+    targetFeeRecipient,
+    targetCheckpointSync
+  });
 
-  if (targetConsensusClient.dnpName && !currentConsClient) {
+  if (targetConsensusClient && !currentConsClient) {
     const targetConsClientPkg = await listPackageNoThrow({
-      dnpName: targetConsensusClient.dnpName
+      dnpName: targetConsensusClient
     });
     if (!targetConsClientPkg) {
       // Install new consensus client if not installed
       await packageInstall({
-        name: targetConsensusClient.dnpName,
+        name: targetConsensusClient,
         userSettings
       });
     } else {
@@ -306,11 +337,11 @@ async function setConsensusClientConfig({
         true
       ).catch(err => logs.error(err));
     }
-  } else if (targetConsensusClient.dnpName === currentConsClient) {
+  } else if (targetConsensusClient === currentConsClient) {
     if (!currentConsClientPkg) {
       logs.info("Installing consensus client " + targetConsensusClient);
       await packageInstall({
-        name: targetConsensusClient.dnpName,
+        name: targetConsensusClient,
         userSettings
       });
     } else {
@@ -320,33 +351,26 @@ async function setConsensusClientConfig({
         {},
         true
       ).catch(err => logs.error(err));
-      if (
-        targetConsensusClient.graffiti ||
-        targetConsensusClient.feeRecipient ||
-        targetConsensusClient.checkpointSync
-      ) {
-        const serviceEnv =
-          userSettings[targetConsensusClient.dnpName].environment;
+      if (targetGraffiti || targetFeeRecipient || targetCheckpointSync) {
+        const serviceEnv = userSettings[targetConsensusClient].environment;
 
         if (serviceEnv) {
-          logs.info(
-            "Updating environment for " + targetConsensusClient.dnpName
-          );
+          logs.info("Updating environment for " + targetConsensusClient);
           await packageSetEnvironment({
-            dnpName: targetConsensusClient.dnpName,
+            dnpName: targetConsensusClient,
             environmentByService: serviceEnv
           });
         }
       }
     }
-  } else if (targetConsensusClient.dnpName !== currentConsClient) {
+  } else if (targetConsensusClient !== currentConsClient) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetConsensusClient.dnpName
+      dnpName: targetConsensusClient
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
       await packageInstall({
-        name: targetConsensusClient.dnpName,
+        name: targetConsensusClient,
         userSettings
       });
       // Stop old client
@@ -432,45 +456,53 @@ async function stopAllPkgContainers(
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-function getUserSettings(
-  dnpName: string,
-  targetConsensusClient: ConsensusClient,
-  validatorServiceName: string,
-  beaconServiceName: string
-): UserSettingsAllDnps {
+function getUserSettings({
+  targetConsensusClient,
+  validatorServiceName,
+  beaconServiceName,
+  targetGraffiti,
+  targetFeeRecipient,
+  targetCheckpointSync
+}: {
+  targetConsensusClient:
+    | ConsensusClientMainnet
+    | ConsensusClientGnosis
+    | ConsensusClientPrater;
+  validatorServiceName: string;
+  beaconServiceName: string;
+  targetGraffiti?: string;
+  targetFeeRecipient?: string;
+  targetCheckpointSync?: string;
+}): UserSettingsAllDnps {
   return {
-    [dnpName]: {
+    [targetConsensusClient]: {
       environment:
         beaconServiceName === validatorServiceName
           ? {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                ["GRAFFITI"]: targetGraffiti || "Validating_from_DAppNode",
                 // Fee recipient is a mandatory value
                 ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
+                  targetFeeRecipient ||
                   "0x0000000000000000000000000000000000000000",
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: targetCheckpointSync || ""
               }
             }
           : {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                ["GRAFFITI"]: targetGraffiti || "Validating_from_DAppNode",
                 // Fee recipient is a mandatory value
                 ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
+                  targetFeeRecipient ||
                   "0x0000000000000000000000000000000000000000"
               },
 
               [beaconServiceName]: {
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: targetCheckpointSync || ""
               }
             }
     }

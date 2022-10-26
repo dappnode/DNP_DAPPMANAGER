@@ -9,36 +9,39 @@ import {
   ConsensusClientPrater
 } from "../../types";
 import * as db from "../../db";
+import { StakerParamsByNetwork } from "./types";
 
 /**
  * Sets the staker configuration on db for a given network
  */
-export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
+export function setStakerConfigOnDb<T extends Network>(
+  stakerConfig: StakerConfigSet<T>
+): void {
   switch (stakerConfig.network) {
     case "mainnet":
       db.executionClientMainnet.set(
-        (stakerConfig.executionClient || "") as ExecutionClientMainnet
+        stakerConfig.executionClient as ExecutionClientMainnet
       );
       db.consensusClientMainnet.set(
-        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientMainnet
+        stakerConfig.consensusClient as ConsensusClientMainnet
       );
       db.mevBoostMainnet.set(stakerConfig.enableMevBoost || false);
       break;
     case "gnosis":
       db.executionClientGnosis.set(
-        (stakerConfig.executionClient || "") as ExecutionClientGnosis
+        stakerConfig.executionClient as ExecutionClientGnosis
       );
       db.consensusClientGnosis.set(
-        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientGnosis
+        stakerConfig.consensusClient as ConsensusClientGnosis
       );
       db.mevBoostGnosis.set(stakerConfig.enableMevBoost || false);
       break;
     case "prater":
       db.executionClientPrater.set(
-        (stakerConfig.executionClient || "") as ExecutionClientPrater
+        stakerConfig.executionClient as ExecutionClientPrater
       );
       db.consensusClientPrater.set(
-        (stakerConfig.consensusClient?.dnpName || "") as ConsensusClientPrater
+        stakerConfig.consensusClient as ConsensusClientPrater
       );
       db.mevBoostPrater.set(stakerConfig.enableMevBoost || false);
       break;
@@ -51,103 +54,134 @@ export function setStakerConfigOnDb(stakerConfig: StakerConfigSet): void {
  * Get the current staker config (execution and consensus clients selected) as well as
  * the pkgs available for each network
  */
-export function getNetworkStakerPkgs<T extends Network>(
+export function getStakerParamsByNetwork<T extends Network>(
   network: T
-): {
-  execClients: {
-    dnpName: string;
-    minVersion: string;
-  }[];
-  currentExecClient: string | null | undefined;
-  consClients: {
-    dnpName: string;
-    minVersion: string;
-  }[];
-  currentConsClient: string | null | undefined;
-  web3signer: {
-    dnpName: string;
-    minVersion: string;
-  };
-  mevBoostDnpName: string;
-  isMevBoostSelected: boolean;
-} {
+): StakerParamsByNetwork<T> {
   switch (network) {
     case "mainnet":
       return {
         execClients: [
-          { dnpName: "geth.dnp.dappnode.eth", minVersion: "" },
-          { dnpName: "nethermind.public.dappnode.eth", minVersion: "" },
-          { dnpName: "erigon.dnp.dappnode.eth", minVersion: "" }
+          {
+            dnpName: "geth.dnp.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "nethermind.public.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "erigon.dnp.dappnode.eth",
+            minVersion: ""
+          }
           //"besu.dnp.dappnode.eth",
         ],
-        currentExecClient: db.executionClientMainnet.get(),
+        currentExecClient: db.executionClientMainnet.get() || "",
         consClients: [
-          { dnpName: "prysm.dnp.dappnode.eth", minVersion: "" },
-          { dnpName: "lighthouse.dnp.dappnode.eth", minVersion: "" },
-          { dnpName: "teku.dnp.dappnode.eth", minVersion: "" },
-          { dnpName: "nimbus.dnp.dappnode.eth", minVersion: "" }
+          {
+            dnpName: "prysm.dnp.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "lighthouse.dnp.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "teku.dnp.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "nimbus.dnp.dappnode.eth",
+            minVersion: ""
+          }
         ],
-        currentConsClient: db.consensusClientMainnet.get(),
+        currentConsClient: db.consensusClientMainnet.get() || "",
         web3signer: {
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: ""
         },
         mevBoostDnpName: "mev-boost.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostMainnet.get()
-      };
+      } as StakerParamsByNetwork<T>;
 
     case "gnosis":
       return {
         execClients: [
-          { dnpName: "nethermind-xdai.dnp.dappnode.eth", minVersion: "" }
+          {
+            dnpName: "nethermind-xdai.dnp.dappnode.eth",
+            minVersion: ""
+          }
         ],
-        currentExecClient: db.executionClientGnosis.get(),
+        currentExecClient: db.executionClientGnosis.get() || "",
         consClients: [
           {
             dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
             minVersion: ""
           },
-          { dnpName: "lighthouse-gnosis.dnp.dappnode.eth", minVersion: "" },
-          { dnpName: "teku-gnosis.dnp.dappnode.eth", minVersion: "" }
+          {
+            dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
+            minVersion: ""
+          },
+          {
+            dnpName: "teku-gnosis.dnp.dappnode.eth",
+            minVersion: ""
+          }
           //"nimbus-gnosis.dnp.dappnode.eth"
         ],
-        currentConsClient: db.consensusClientGnosis.get(),
+        currentConsClient: db.consensusClientGnosis.get() || "",
         web3signer: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: ""
         },
         mevBoostDnpName: "mev-boost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
-      };
+      } as StakerParamsByNetwork<T>;
     case "prater":
       return {
         execClients: [
-          { dnpName: "goerli-geth.dnp.dappnode.eth", minVersion: "0.4.26" },
-          { dnpName: "goerli-erigon.dnp.dappnode.eth", minVersion: "0.1.0" },
+          {
+            dnpName: "goerli-geth.dnp.dappnode.eth",
+            minVersion: "0.4.26"
+          },
+          {
+            dnpName: "goerli-erigon.dnp.dappnode.eth",
+            minVersion: "0.1.0"
+          },
           {
             dnpName: "goerli-nethermind.dnp.dappnode.eth",
             minVersion: "1.0.1"
           },
-          { dnpName: "goerli-besu.dnp.dappnode.eth", minVersion: "0.1.0" }
+          {
+            dnpName: "goerli-besu.dnp.dappnode.eth",
+            minVersion: "0.1.0"
+          }
         ],
-        currentExecClient: db.executionClientPrater.get(),
+        currentExecClient: db.executionClientPrater.get() || "",
         consClients: [
-          { dnpName: "prysm-prater.dnp.dappnode.eth", minVersion: "1.0.15" },
+          {
+            dnpName: "prysm-prater.dnp.dappnode.eth",
+            minVersion: "1.0.15"
+          },
           {
             dnpName: "lighthouse-prater.dnp.dappnode.eth",
             minVersion: "0.1.9"
           },
-          { dnpName: "teku-prater.dnp.dappnode.eth", minVersion: "0.1.10" },
-          { dnpName: "nimbus-prater.dnp.dappnode.eth", minVersion: "0.1.7" }
+          {
+            dnpName: "teku-prater.dnp.dappnode.eth",
+            minVersion: "0.1.10"
+          },
+          {
+            dnpName: "nimbus-prater.dnp.dappnode.eth",
+            minVersion: "0.1.7"
+          }
         ],
-        currentConsClient: db.consensusClientPrater.get(),
+        currentConsClient: db.consensusClientPrater.get() || "",
         web3signer: {
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"
         },
         mevBoostDnpName: "mev-boost-goerli.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
-      };
+      } as StakerParamsByNetwork<T>;
     default:
       throw Error(`Unsupported network: ${network}`);
   }
