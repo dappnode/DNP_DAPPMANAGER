@@ -51,10 +51,6 @@ export async function setStakerConfig<T extends Network>({
     mevBoostDnpName
   } = getStakerParamsByNetwork<T>(stakerConfig.network);
 
-  // Ensure execution and consensus clients do not take the null value (used to indicate intention)
-  if (currentExecClient === null) throw Error("Invalid execution client");
-  if (currentConsClient === null) throw Error("Invalid consensus client");
-
   if (stakerConfig.network === "mainnet")
     currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
 
@@ -63,7 +59,7 @@ export async function setStakerConfig<T extends Network>({
     stakerConfig.executionClient &&
     !execClients
       .map(exCl => exCl.dnpName)
-      .includes(stakerConfig.executionClient)
+      .includes(stakerConfig.executionClient.dnpName)
   )
     throw Error(
       `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
@@ -73,7 +69,7 @@ export async function setStakerConfig<T extends Network>({
     stakerConfig.consensusClient &&
     !consClients
       .map(coCl => coCl.dnpName)
-      .includes(stakerConfig.consensusClient)
+      .includes(stakerConfig.consensusClient.dnpName)
   )
     throw Error(
       `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
@@ -130,20 +126,22 @@ export async function setStakerConfig<T extends Network>({
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
     currentExecClient,
-    targetExecutionClient: stakerConfig.executionClient,
+    targetExecutionClient: stakerConfig.executionClient?.dnpName,
     currentExecClientPkg
   });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
     currentConsClient,
-    targetConsensusClient: stakerConfig.consensusClient,
+    targetConsensusClient: stakerConfig.consensusClient?.dnpName,
     currentConsClientPkg
   }).catch(e => {
     // The previous EXECUTION CLIENT must be persisted
-    setStakerConfigOnDb({
-      ...stakerConfig,
-      executionClient: currentExecClient
+    setStakerConfigOnDb<T>({
+      network: stakerConfig.network,
+      executionClient: currentExecClient,
+      consensusClient: stakerConfig.consensusClient?.dnpName,
+      enableMevBoost: stakerConfig.enableMevBoost
     });
     throw e;
   });
@@ -159,7 +157,7 @@ export async function setStakerConfig<T extends Network>({
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: { dnpName: currentConsClient }
+        consensusClient: currentConsClient
       });
       throw e;
     });
@@ -175,13 +173,18 @@ export async function setStakerConfig<T extends Network>({
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: { dnpName: currentConsClient }
+        consensusClient: currentConsClient
       });
       throw e;
     });
 
   // Persist the staker config on db
-  setStakerConfigOnDb(stakerConfig);
+  setStakerConfigOnDb({
+    network: stakerConfig.network,
+    executionClient: stakerConfig.executionClient?.dnpName,
+    consensusClient: stakerConfig.consensusClient?.dnpName,
+    enableMevBoost: stakerConfig.enableMevBoost
+  });
 }
 
 async function setExecutionClientConfig<T extends Network>({

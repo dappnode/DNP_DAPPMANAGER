@@ -1,50 +1,47 @@
 import React from "react";
-import { StakerConfigSet } from "common";
+import { Network, StakerConfigSet } from "common";
 import { BsArrowRight } from "react-icons/bs";
 import "./advance-view.scss";
 import { prettyDnpName } from "utils/format";
 
-export default function AdvanceView({
+export default function AdvanceView<T extends Network>({
   currentStakerConfig,
   newStakerConfig,
   defaultCheckpointSync,
   defaultGraffiti,
   defaultFeeRecipient
 }: {
-  currentStakerConfig: StakerConfigSet;
-  newStakerConfig: StakerConfigSet;
+  currentStakerConfig: StakerConfigSet<T>;
+  newStakerConfig: StakerConfigSet<T>;
   defaultCheckpointSync: string;
   defaultGraffiti: string;
   defaultFeeRecipient: string;
 }) {
-  const consClientGraffiti = currentStakerConfig.consensusClient?.graffiti;
-  const newConstClientGraffiti =
-    newStakerConfig.consensusClient?.graffiti || defaultGraffiti;
-  const consClientFeeRecipient =
-    currentStakerConfig.consensusClient?.feeRecipient;
+  const consClientGraffiti = currentStakerConfig.graffiti;
+  const newConstClientGraffiti = newStakerConfig.graffiti || defaultGraffiti;
+  const consClientFeeRecipient = currentStakerConfig.feeRecipient;
   const newConstClientFeeRecipient =
-    newStakerConfig.consensusClient?.feeRecipient || defaultFeeRecipient;
-  const consClientCheckpointSync =
-    currentStakerConfig.consensusClient?.checkpointSync;
+    newStakerConfig.feeRecipient || defaultFeeRecipient;
+  const consClientCheckpointSync = currentStakerConfig.checkpointSync;
   const newConstClientCheckpointSync =
-    newStakerConfig.consensusClient?.checkpointSync || defaultCheckpointSync;
+    newStakerConfig.checkpointSync || defaultCheckpointSync;
 
   const stakerConfig = [
     {
       name: "Execution Client",
       current: currentStakerConfig.executionClient
-        ? prettyDnpName(currentStakerConfig.executionClient)
+        ? prettyDnpName(currentStakerConfig.executionClient.dnpName)
         : "-",
       new: newStakerConfig.executionClient
-        ? prettyDnpName(newStakerConfig.executionClient)
+        ? prettyDnpName(newStakerConfig.executionClient.dnpName)
         : "-"
     },
     {
       name: "Consensus Client",
-      current: currentStakerConfig.consensusClient?.dnpName
+      current: currentStakerConfig.consensusClient
         ? prettyDnpName(currentStakerConfig.consensusClient.dnpName)
         : "-",
-      new: newStakerConfig.consensusClient?.dnpName
+      new: newStakerConfig.consensusClient
         ? prettyDnpName(newStakerConfig.consensusClient.dnpName)
         : "-"
     },
