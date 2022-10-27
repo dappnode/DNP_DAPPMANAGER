@@ -9,14 +9,15 @@ import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { Network } from "types";
 
-export default function MevBoost({
+export default function MevBoost<T extends Network>({
   mevBoost,
   setEnableMevBoost,
   isSelected,
   ...props
 }: {
-  mevBoost: StakerItem;
+  mevBoost: StakerItem<T, "mev-boost">;
   setEnableMevBoost: (installMevBoost: boolean) => void;
   isSelected: boolean;
 }) {

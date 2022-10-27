@@ -5,10 +5,11 @@ import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {
-  ConsensusClient as ConsensusClientIface,
   Network,
   ReqStatus,
-  StakerConfigSet
+  StakerConfigGet,
+  StakerConfigSet,
+  StakerItemOk
 } from "types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
@@ -21,8 +22,13 @@ import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
-import { validateEthereumAddress, validateGraffiti } from "./utils";
+import {
+  isOkSelectedInstalledAndRunning,
+  validateEthereumAddress,
+  validateGraffiti
+} from "./utils";
 import { isEqual, pick } from "lodash";
+import { responseInterface } from "swr";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -39,8 +45,12 @@ export default function StakerNetwork<T extends Network>({
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
-  const [newExecClient, setNewExecClient] = useState<string>();
-  const [newConsClient, setNewConsClient] = useState<ConsensusClientIface>();
+  const [newExecClient, setNewExecClient] = useState<
+    StakerItemOk<T, "execution">
+  >();
+  const [newConsClient, setNewConsClient] = useState<
+    StakerItemOk<T, "consensus">
+  >();
   const [newEnableMevBoost, setNewEnableMevBoost] = useState<boolean>(false);
   const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
     false
@@ -62,7 +72,9 @@ export default function StakerNetwork<T extends Network>({
   );
   const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
 
-  const currentStakerConfigReq = useApi.stakerConfigGet(network);
+  const currentStakerConfigReq = useApi.stakerConfigGet(
+    network
+  ) as responseInterface<StakerConfigGet<T>, Error>;
 
   useEffect(() => {
     if (currentStakerConfigReq.data) {
@@ -73,35 +85,32 @@ export default function StakerNetwork<T extends Network>({
         web3Signer
       } = currentStakerConfigReq.data;
 
-      const executionClient = executionClients.find(
-        ec =>
-          ec.status === "ok" && ec.isSelected && ec.isInstalled && ec.isRunning
-      )?.dnpName;
-      const consensusClient = consensusClients.find(
-        cc =>
-          cc.status === "ok" && cc.isSelected && cc.isInstalled && cc.isRunning
+      const executionClient = executionClients.find(ec =>
+        isOkSelectedInstalledAndRunning(ec)
       );
-      const enableMevBoost =
-        mevBoost.status === "ok" &&
-        mevBoost.isInstalled &&
-        mevBoost.isRunning &&
-        mevBoost.isSelected;
-      const enableWeb3signer =
-        web3Signer.status === "ok" &&
-        web3Signer.isInstalled &&
-        web3Signer.isRunning;
+
+      const consensusClient = consensusClients.find(cc =>
+        isOkSelectedInstalledAndRunning(cc)
+      );
+
+      const enableMevBoost = isOkSelectedInstalledAndRunning(mevBoost);
+      const enableWeb3signer = isOkSelectedInstalledAndRunning(web3Signer);
 
       // Set default values for new staker config
-      setNewExecClient(executionClient);
-      setNewConsClient(consensusClient);
+      if (executionClient)
+        setNewExecClient(executionClient as StakerItemOk<T, "execution">);
+      if (consensusClient)
+        setNewConsClient(consensusClient as StakerItemOk<T, "consensus">);
       setNewEnableMevBoost(enableMevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
         network,
-        executionClient,
-        consensusClient,
+        executionClient:
+          executionClient?.status === "ok" ? executionClient : undefined,
+        consensusClient:
+          consensusClient?.status === "ok" ? consensusClient : undefined,
         enableMevBoost,
         enableWeb3signer
       });
@@ -136,12 +145,8 @@ export default function StakerNetwork<T extends Network>({
         enableMevBoost,
         enableWeb3signer
       } = currentStakerConfig;
-      const isExecAndConsSelected = Boolean(
-        newExecClient && newConsClient?.dnpName
-      );
-      const isExecAndConsDeSelected = Boolean(
-        !newExecClient && !newConsClient?.dnpName
-      );
+      const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
+      const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
       const isConsClientEqual = isEqual(
         pick(consensusClient, [
           "checkpointSync",
@@ -268,12 +273,14 @@ export default function StakerNetwork<T extends Network>({
               <SubTitle>Execution Clients</SubTitle>
               {currentStakerConfigReq.data.executionClients.map(
                 (executionClient, i) => (
-                  <ExecutionClient
+                  <ExecutionClient<T>
                     key={i}
                     executionClient={executionClient}
                     setNewExecClient={setNewExecClient}
                     isSelected={
-                      executionClient.dnpName === newExecClient ? true : false
+                      executionClient.dnpName === newExecClient?.dnpName
+                        ? true
+                        : false
                     }
                   />
                 )
@@ -284,7 +291,7 @@ export default function StakerNetwork<T extends Network>({
               <SubTitle>Consensus Clients</SubTitle>
               {currentStakerConfigReq.data.consensusClients.map(
                 (consensusClient, i) => (
-                  <ConsensusClient
+                  <ConsensusClient<T>
                     key={i}
                     consensusClient={consensusClient}
                     setNewConsClient={setNewConsClient}
@@ -329,7 +336,7 @@ export default function StakerNetwork<T extends Network>({
 
           <div>
             {currentStakerConfig && (
-              <AdvanceView
+              <AdvanceView<T>
                 currentStakerConfig={currentStakerConfig}
                 newStakerConfig={{
                   network,

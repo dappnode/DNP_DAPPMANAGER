@@ -11,7 +11,6 @@ import {
   Dependencies,
   PackageEnvs
 } from "@dappnode/dappnodesdk";
-import ConsensusClient from "pages/stakers/components/columns/ConsensusClient";
 
 // Aliases
 
@@ -1175,7 +1174,9 @@ export interface TrustedReleaseKey {
   key: string;
 }
 
-// CONSENSUS-EXECUTION CLIENTS
+/**
+ * STAKER types
+ */
 
 export type Network = "mainnet" | "prater" | "gnosis";
 
@@ -1226,18 +1227,51 @@ export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth" | "";
 export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
 export type MevBoostGnosis = "mev-boost-gnosis.dnp.dappnode.eth" | "";
 
-export type StakerItem = StakerItemOk | StakerItemError;
+export type StakerType = "execution" | "consensus" | "signer" | "mev-boost";
 
-interface StakerItemBasic {
-  dnpName: string;
+export type StakerItem<T extends Network, P extends StakerType> =
+  | StakerItemOk<T, P>
+  | StakerItemError<T, P>;
+
+interface StakerExecution<T extends Network> {
+  dnpName: ExececutionClient<T>;
 }
 
-export interface StakerItemError extends StakerItemBasic {
+interface StakerConsensus<T extends Network> {
+  dnpName: ConsensusClient<T>;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
+}
+
+interface StakerSigner<T extends Network> {
+  dnpName: Signer<T>;
+}
+
+interface StakerMevBoost<T extends Network> {
+  dnpName: MevBoost<T>;
+  relays?: string[];
+}
+
+type StakerItemBasic<
+  T extends Network,
+  P extends StakerType
+> = P extends "execution"
+  ? StakerExecution<T>
+  : P extends "consensus"
+  ? StakerConsensus<T>
+  : P extends "signer"
+  ? StakerSigner<T>
+  : P extends "mev-boost"
+  ? StakerMevBoost<T>
+  : never;
+
+export type StakerItemError<T extends Network, P extends StakerType> = {
   status: "error";
   error: string;
-}
+} & StakerItemBasic<T, P>;
 
-export interface StakerItemOk extends StakerItemBasic {
+export type StakerItemOk<T extends Network, P extends StakerType> = {
   status: "ok";
   avatarUrl: string;
   isInstalled: boolean;
@@ -1245,23 +1279,19 @@ export interface StakerItemOk extends StakerItemBasic {
   isRunning: boolean;
   metadata: Manifest;
   isSelected: boolean;
-  graffiti?: string;
-  feeRecipient?: string;
-  checkpointSync?: string;
-  relays?: string[];
-}
+} & StakerItemBasic<T, P>;
 
-export interface StakerConfigGet {
-  executionClients: StakerItem[];
-  consensusClients: StakerItem[];
-  web3Signer: StakerItem;
-  mevBoost: StakerItem;
+export interface StakerConfigGet<T extends Network> {
+  executionClients: StakerItem<T, "execution">[];
+  consensusClients: StakerItem<T, "consensus">[];
+  web3Signer: StakerItem<T, "signer">;
+  mevBoost: StakerItem<T, "mev-boost">;
 }
 
 export interface StakerConfigSet<T extends Network> {
   network: T;
-  executionClient?: ExececutionClient<T>;
-  consensusClient?: ConsensusClient<T>;
+  executionClient?: StakerItemOk<T, "execution">;
+  consensusClient?: StakerItemOk<T, "consensus">;
   enableWeb3signer?: boolean;
   enableMevBoost?: boolean;
   graffiti?: string;
@@ -1286,9 +1316,37 @@ export type ConsensusClient<T extends Network> = T extends "mainnet"
   ? ConsensusClientPrater
   : never;
 
-/* export interface ConsensusClient {
-  dnpName?: string;
-  graffiti?: string;
-  feeRecipient?: string;
-  checkpointSync?: string;
-} */
+export type Signer<T extends Network> = T extends "mainnet"
+  ? SignerMainnet
+  : T extends "gnosis"
+  ? SignerGnosis
+  : T extends "prater"
+  ? SignerPrater
+  : never;
+
+export type MevBoost<T extends Network> = T extends "mainnet"
+  ? MevBoostMainnet
+  : T extends "gnosis"
+  ? MevBoostGnosis
+  : T extends "prater"
+  ? MevBoostPrater
+  : never;
+
+export interface StakerParamsByNetwork<T extends Network> {
+  execClients: {
+    dnpName: ExececutionClient<T>;
+    minVersion: string;
+  }[];
+  currentExecClient: ExececutionClient<T>;
+  consClients: {
+    dnpName: ConsensusClient<T>;
+    minVersion: string;
+  }[];
+  currentConsClient: ConsensusClient<T>;
+  web3signer: {
+    dnpName: string;
+    minVersion: string;
+  };
+  mevBoostDnpName: string;
+  isMevBoostSelected: boolean;
+}

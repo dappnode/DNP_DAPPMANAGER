@@ -5,18 +5,18 @@ import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import "./columns.scss";
-import { StakerItem } from "common";
+import { Network, StakerItem } from "common";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 
-export default function RemoteSigner({
+export default function RemoteSigner<T extends Network>({
   signer,
   setEnableWeb3signer,
   isSelected,
   ...props
 }: {
-  signer: StakerItem;
+  signer: StakerItem<T, "signer">;
   setEnableWeb3signer: (installWeb3signer: boolean) => void;
   isSelected: boolean;
 }) {

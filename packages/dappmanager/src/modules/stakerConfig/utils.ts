@@ -1,52 +1,49 @@
 import {
-  StakerConfigSet,
   Network,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
   ExecutionClientGnosis,
   ConsensusClientGnosis,
   ExecutionClientPrater,
-  ConsensusClientPrater
+  ConsensusClientPrater,
+  StakerParamsByNetwork,
+  ExececutionClient,
+  ConsensusClient
 } from "../../types";
 import * as db from "../../db";
-import { StakerParamsByNetwork } from "./types";
 
 /**
  * Sets the staker configuration on db for a given network
  */
-export function setStakerConfigOnDb<T extends Network>(
-  stakerConfig: StakerConfigSet<T>
-): void {
-  switch (stakerConfig.network) {
+export function setStakerConfigOnDb<T extends Network>({
+  network,
+  executionClient,
+  consensusClient,
+  enableMevBoost
+}: {
+  network: T;
+  executionClient?: ExececutionClient<T>;
+  consensusClient?: ConsensusClient<T>;
+  enableMevBoost?: boolean;
+}): void {
+  switch (network) {
     case "mainnet":
-      db.executionClientMainnet.set(
-        stakerConfig.executionClient as ExecutionClientMainnet
-      );
-      db.consensusClientMainnet.set(
-        stakerConfig.consensusClient as ConsensusClientMainnet
-      );
-      db.mevBoostMainnet.set(stakerConfig.enableMevBoost || false);
+      db.executionClientMainnet.set(executionClient as ExecutionClientMainnet);
+      db.consensusClientMainnet.set(consensusClient as ConsensusClientMainnet);
+      db.mevBoostMainnet.set(enableMevBoost || false);
       break;
     case "gnosis":
-      db.executionClientGnosis.set(
-        stakerConfig.executionClient as ExecutionClientGnosis
-      );
-      db.consensusClientGnosis.set(
-        stakerConfig.consensusClient as ConsensusClientGnosis
-      );
-      db.mevBoostGnosis.set(stakerConfig.enableMevBoost || false);
+      db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
+      db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
+      db.mevBoostGnosis.set(enableMevBoost || false);
       break;
     case "prater":
-      db.executionClientPrater.set(
-        stakerConfig.executionClient as ExecutionClientPrater
-      );
-      db.consensusClientPrater.set(
-        stakerConfig.consensusClient as ConsensusClientPrater
-      );
-      db.mevBoostPrater.set(stakerConfig.enableMevBoost || false);
+      db.executionClientPrater.set(executionClient as ExecutionClientPrater);
+      db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
+      db.mevBoostPrater.set(enableMevBoost || false);
       break;
     default:
-      throw new Error(`Unsupported network: ${stakerConfig.network}`);
+      throw new Error(`Unsupported network: ${network}`);
   }
 }
 

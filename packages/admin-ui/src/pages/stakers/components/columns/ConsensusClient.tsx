@@ -3,11 +3,7 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import {
-  ConsensusClient as ConsensusClientIface,
-  Network,
-  StakerItem
-} from "types";
+import { Network, StakerItem, StakerItemOk } from "types";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
@@ -28,11 +24,11 @@ export default function ConsensusClient<T extends Network>({
   checkpointSyncPlaceHolder,
   ...props
 }: {
-  consensusClient: StakerItem<T>;
+  consensusClient: StakerItem<T, "consensus">;
   setNewConsClient: React.Dispatch<
-    React.SetStateAction<ConsensusClientIface | undefined>
+    React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
-  newConsClient: ConsensusClientIface | undefined;
+  newConsClient: StakerItemOk<T, "consensus"> | undefined;
   defaultCheckpointSync: string;
   defaultGraffiti: string;
   defaultFeeRecipient: string;
@@ -54,7 +50,7 @@ export default function ConsensusClient<T extends Network>({
               ? () => setNewConsClient(undefined)
               : () =>
                   setNewConsClient({
-                    dnpName: consensusClient.dnpName,
+                    ...consensusClient,
                     graffiti: consensusClient.graffiti || defaultGraffiti,
                     feeRecipient:
                       consensusClient.feeRecipient || defaultFeeRecipient,
