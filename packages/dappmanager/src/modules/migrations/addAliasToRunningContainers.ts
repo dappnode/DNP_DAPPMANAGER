@@ -1,23 +1,23 @@
+import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
+import Dockerode from "dockerode";
 import { uniq } from "lodash";
-import semver from "semver";
-import params from "../../params";
-import { logs } from "../../logs";
+import { PackageContainer } from "../../common";
 import { getPrivateNetworkAlias } from "../../domains";
+import { logs } from "../../logs";
+import params from "../../params";
+import { parseComposeSemver } from "../../utils/sanitizeVersion";
+import shell from "../../utils/shell";
+import { ComposeFileEditor } from "../compose/editor";
+import { parseServiceNetworks } from "../compose/networks";
 import {
   dockerComposeUp,
-  dockerContainerInspect,
-  dockerNetworkConnect,
-  dockerNetworkDisconnect
+  dockerNetworkDisconnect,
+  dockerNetworkConnect
 } from "../docker";
 import { listContainers } from "../docker/list";
-import Dockerode from "dockerode";
-import shell from "../../utils/shell";
 import * as getPath from "../../utils/getPath";
-import { ComposeFileEditor } from "../compose/editor";
-import { PackageContainer } from "../../types";
-import { parseServiceNetworks } from "../compose/networks";
-import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
-import { parseComposeSemver } from "../../utils/sanitizeVersion";
+import semver from "semver";
+import { getEndpointConfig } from "../ethClient/changeEthMultiClient";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -28,7 +28,7 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * This will run every single time dappmanager restarts and will list al packages
  * and do docker inspect.
  */
-export async function addAliasToRunningContainersMigration(): Promise<void> {
+export async function addAliasToRunningContainers(): Promise<void> {
   for (const container of await listContainers()) {
     const containerName = container.containerName;
     const alias = getPrivateNetworkAlias(container);
@@ -70,7 +70,7 @@ export async function addAliasToRunningContainersMigration(): Promise<void> {
 }
 
 /** Return true if endpoint config exists and has alias */
-export function hasAlias(
+function hasAlias(
   endpointConfig: Dockerode.NetworkInfo | null,
   alias: string
 ): boolean {
@@ -80,14 +80,6 @@ export function hasAlias(
       Array.isArray(endpointConfig.Aliases) &&
       endpointConfig.Aliases.includes(alias)
   );
-}
-
-/** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
-export async function getEndpointConfig(
-  containerName: string
-): Promise<Dockerode.NetworkInfo | null> {
-  const inspectInfo = await dockerContainerInspect(containerName);
-  return inspectInfo.NetworkSettings.Networks[dncoreNetworkName] ?? null;
 }
 
 /**

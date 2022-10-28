@@ -1,11 +1,7 @@
-import fs from "fs";
-import { orderBy } from "lodash";
 import { eventBus } from "./eventBus";
 import params from "./params";
 import { UserActionLog } from "./types";
 import { logSafeObjects } from "./utils/logs";
-import { logs } from "./logs";
-import { isNotFoundError } from "./utils/node";
 import { JsonFileDb } from "./utils/fileDb";
 
 /**
@@ -64,43 +60,6 @@ export function get(): UserActionLog[] {
  * Overwrites to the db a new array of logs
  * @param userActionLogs
  */
-function set(userActionLogs: UserActionLog[]): void {
+export function set(userActionLogs: UserActionLog[]): void {
   getDb().write(userActionLogs.slice(0, maxNumOfLogs));
-}
-
-/**
- * Migrate winston .log JSON file to a lowdb
- * Prevents having to manually parse the .log file which was happening on every
- * ADMIN UI visit
- */
-export async function migrateUserActionLogs(): Promise<void> {
-  const userActionLogLegacyFile = params.userActionLogsFilename;
-  try {
-    const fileData = fs.readFileSync(userActionLogLegacyFile, "utf8");
-
-    const userActionLogs: UserActionLog[] = [];
-    for (const row of fileData.trim().split(/\r?\n/)) {
-      try {
-        const winstonLog = JSON.parse(row);
-        userActionLogs.push({
-          ...winstonLog,
-          args: winstonLog.args || [winstonLog.kwargs],
-          timestamp: new Date(winstonLog.timestamp).getTime()
-        });
-      } catch (e) {
-        logs.debug(`Error parsing user action log row: ${e.message}\n${row}`);
-      }
-    }
-
-    set(orderBy([...get(), ...userActionLogs], log => log.timestamp, "desc"));
-    fs.unlinkSync(userActionLogLegacyFile);
-
-    logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
-  } catch (e) {
-    if (isNotFoundError(e)) {
-      logs.debug("userActionLogs file not found, already migrated");
-    } else {
-      logs.error("Error migrating userActionLogs", e);
-    }
-  }
 }

@@ -7,7 +7,7 @@ import {
   ExecutionClientPrater,
   Network
 } from "../../types";
-import { getNetworkStakerPkgs } from "./utils";
+import { getNetworkStakerPkgs } from "../stakerConfig/utils";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
