@@ -6,8 +6,11 @@ import { EthClientTarget, UserSettings } from "../../types";
 import { logs } from "../../logs";
 import { ComposeFileEditor } from "../compose/editor";
 import { parseServiceNetworks } from "../compose/networks";
-import { dockerNetworkDisconnect, dockerNetworkConnect } from "../docker";
-import { getEndpointConfig } from "../https-portal/migration";
+import {
+  dockerNetworkDisconnect,
+  dockerNetworkConnect,
+  dockerContainerInspect
+} from "../docker";
 import Dockerode from "dockerode";
 
 // Types
@@ -126,6 +129,17 @@ export function addFullnodeAliasToCompose(
     false,
     ethClientDnpName,
     ethClientServiceName
+  );
+}
+
+/** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
+export async function getEndpointConfig(
+  containerName: string
+): Promise<Dockerode.NetworkInfo | null> {
+  const inspectInfo = await dockerContainerInspect(containerName);
+  return (
+    inspectInfo.NetworkSettings.Networks[params.DNP_PRIVATE_NETWORK_NAME] ??
+    null
   );
 }
 

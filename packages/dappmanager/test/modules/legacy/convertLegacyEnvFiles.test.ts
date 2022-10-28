@@ -5,8 +5,7 @@ import { createTestDir, cleanTestDir } from "../../testUtils";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
 import { yamlDump } from "../../../src/utils/yaml";
-
-import { migrateLegacyEnvFile } from "../../../src/modules/legacy/migrateLegacyEnvFiles";
+import { migrateLegacyEnvFile } from "../../../src/modules/migrations/removeLegacyDockerAssets";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {

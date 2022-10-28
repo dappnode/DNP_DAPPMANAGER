@@ -12,7 +12,6 @@ import { HttpsPortalApiClient } from "./apiClient";
 import { ComposeEditor } from "../compose/editor";
 import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose";
 import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose";
-export { addAliasToRunningContainersMigration } from "./migration";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable";
 
