@@ -7,10 +7,10 @@ import {
   ExecutionClientPrater,
   Network
 } from "../../types";
-import { getStakerParamsByNetwork } from "./utils";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
+import { getStakerParamsByNetwork } from "../stakerConfig/utils";
 
 /**
  * Sets default values for the global environment variables:

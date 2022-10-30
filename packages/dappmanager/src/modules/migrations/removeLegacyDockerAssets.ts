@@ -1,11 +1,17 @@
-import fs from "fs";
-import { dockerVolumesList } from "../docker/api";
-import { listPackages } from "../docker/list";
-import { dockerContainerRemove, dockerVolumeRemove } from "../docker";
 import { logs } from "../../logs";
 import shell from "../../utils/shell";
+import {
+  dockerVolumesList,
+  dockerVolumeRemove,
+  dockerContainerRemove
+} from "../docker";
+import { listPackages } from "../docker/list";
 import * as getPath from "../../utils/getPath";
-import { migrateLegacyEnvFiles } from "./migrateLegacyEnvFiles";
+import fs from "fs";
+import { InstalledPackageData } from "../../common";
+import { isNotFoundError } from "../../utils/node";
+import { parseEnvironment } from "../compose";
+import { ComposeFileEditor } from "../compose/editor";
 
 const volumesToRemove = [
   // After core version 0.2.30 there will be an orphan volume of the
@@ -31,7 +37,7 @@ const dnpsToRemove = [
 /**
  * Bundle legacy ops to prevent spamming the docker API
  */
-export async function runLegacyActions(): Promise<void> {
+export async function removeLegacyDockerAssets(): Promise<void> {
   const dnpList = await listPackages();
   const volumes = await dockerVolumesList();
 
@@ -72,5 +78,54 @@ export async function runLegacyActions(): Promise<void> {
       } catch (e) {
         logs.error(`Error removing legacy DNP ${dnpName}`);
       }
+  }
+}
+
+// Utils
+
+/**
+ * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
+ * This function will read the contents of .env files and add them in the
+ * compose itself in the `environment` field in array format
+ */
+export async function migrateLegacyEnvFiles(
+  dnpList: InstalledPackageData[]
+): Promise<void> {
+  try {
+    for (const dnp of dnpList) migrateLegacyEnvFile(dnp.dnpName, dnp.isCore);
+    logs.info("Finished migrating legacy DNP .env files if any");
+  } catch (e) {
+    logs.error("Error migrating DNP .env files", e);
+  }
+}
+
+export function migrateLegacyEnvFile(
+  dnpName: string,
+  isCore: boolean
+): boolean {
+  const envFilePath = getPath.envFile(dnpName, isCore);
+  try {
+    const envFileData = fs.readFileSync(envFilePath, "utf8");
+    const envsArray = envFileData.trim().split("\n");
+
+    const compose = new ComposeFileEditor(dnpName, isCore);
+    const singleService = compose.firstService();
+    if (singleService && singleService.serviceName === dnpName) {
+      singleService.mergeEnvs(parseEnvironment(envsArray));
+      singleService.omitDnpEnvFile();
+      compose.write();
+
+      fs.unlinkSync(envFilePath);
+      logs.info(`Converted ${dnpName} .env file to compose environment`);
+      return true;
+    } else {
+      throw Error(
+        `Can not migrate ENVs for multi-service packages: ${dnpName}`
+      );
+    }
+  } catch (e) {
+    if (!isNotFoundError(e))
+      logs.error(`Error migrating ${dnpName} .env file`, e);
+    return false;
   }
 }
