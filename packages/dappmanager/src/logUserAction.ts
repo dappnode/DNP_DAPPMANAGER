@@ -3,16 +3,17 @@ import params from "./params";
 import { UserActionLog } from "./types";
 import { logSafeObjects } from "./utils/logs";
 import { JsonFileDb } from "./utils/fileDb";
+import { logs } from "./logs";
 
 /**
  * Max number of logs to prevent the log file from growing too big
  * An averagae single log weights 1-0.5KB in file as JSON
  */
-const maxNumOfLogs = 2000;
-const dbPath = params.USER_ACTION_LOGS_DB_PATH;
+
 let db: JsonFileDb<UserActionLog[]> | null = null;
 function getDb(): JsonFileDb<UserActionLog[]> {
-  if (!db) db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+  if (!db)
+    db = new JsonFileDb<UserActionLog[]>(params.USER_ACTION_LOGS_DB_PATH, []);
   return db;
 }
 
@@ -26,6 +27,7 @@ type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
  * should be logged by this module.
  */
 function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
+  const maxLogSize = 3072; // 3072 Bytes = 3KB
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
@@ -33,6 +35,15 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
     ...(log.args ? { args: logSafeObjects(log.args) } : {}),
     ...(log.result ? { result: logSafeObjects(log.result) } : {})
   };
+
+  // Skip for logs greater than 3 KB
+  const logSize = Buffer.byteLength(JSON.stringify(userActionLog), "utf8");
+  if (logSize > maxLogSize) {
+    logs.warn(
+      `The log ${userActionLog.event} is too big (>${maxLogSize} bytes). It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
+    );
+    return;
+  }
 
   // Emit the log to the UI
   eventBus.logUserAction.emit(userActionLog);
@@ -61,5 +72,6 @@ export function get(): UserActionLog[] {
  * @param userActionLogs
  */
 export function set(userActionLogs: UserActionLog[]): void {
+  const maxNumOfLogs = 2000;
   getDb().write(userActionLogs.slice(0, maxNumOfLogs));
 }

@@ -674,7 +674,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   cleanCache: {},
   cleanDb: {},
   copyFileTo: { log: true },
-  stakerConfigGet: { log: true },
+  stakerConfigGet: {},
   stakerConfigSet: { log: true },
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
