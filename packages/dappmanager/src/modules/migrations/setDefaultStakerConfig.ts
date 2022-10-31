@@ -7,10 +7,10 @@ import {
   ExecutionClientPrater,
   Network
 } from "../../types";
-import { getNetworkStakerPkgs } from "../stakerConfig/utils";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
+import { getStakerParamsByNetwork } from "../stakerConfig/utils";
 
 /**
  * Sets default values for the global environment variables:
@@ -26,7 +26,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
   for (const network of [/* "mainnet", "gnosis",  */ "prater"] as Network[]) {
-    const stakerConfig = getNetworkStakerPkgs(network);
+    const stakerConfig = getStakerParamsByNetwork(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
     // If the user has selected the repository full node option then use this value.
@@ -48,7 +48,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
       if (network === "mainnet") {
         const repository = db.ethClientTarget.get();
         if (repository === "nethermind")
-          newExexClientValue = "nethermind.dnp.dappnode.eth";
+          newExexClientValue = "nethermind.public.dappnode.eth";
         if (repository === "geth") newExexClientValue = "geth.dnp.dappnode.eth";
       }
 

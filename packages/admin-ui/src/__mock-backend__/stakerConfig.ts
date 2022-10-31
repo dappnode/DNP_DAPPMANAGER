@@ -1,11 +1,11 @@
-import { Network, Routes } from "common";
+import { Network, Routes, StakerConfigGet } from "common";
 
 export const stakerConfig: Pick<
   Routes,
   "stakerConfigGet" | "stakerConfigSet"
 > = {
   stakerConfigSet: async () => {},
-  stakerConfigGet: async (network: Network) => {
+  stakerConfigGet: async <T extends Network>(network: T) => {
     switch (network) {
       case "mainnet":
         return {
@@ -156,7 +156,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mevboost.dnp.dappnode.eth",
+            dnpName: "mev-boost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -169,7 +169,7 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        };
+        } as StakerConfigGet<T>;
       case "prater":
         return {
           executionClients: [
@@ -319,7 +319,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mevboost.dnp.dappnode.eth",
+            dnpName: "mev-boost-goerli.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -332,14 +332,14 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        };
+        } as StakerConfigGet<T>;
 
       case "gnosis":
         return {
           executionClients: [
             {
               status: "ok",
-              dnpName: "geth.dnp.dappnode.eth",
+              dnpName: "nethermind-xdai.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -351,58 +351,12 @@ export const stakerConfig: Pick<
                 shortDescription: "Geth execution client",
                 version: "0.1.0"
               }
-            },
-            {
-              status: "ok",
-              dnpName: "nethermind.dnp.dappnode.eth",
-              isInstalled: true,
-              isRunning: true,
-              isUpdated: true,
-              isSelected: false,
-              avatarUrl: "",
-              metadata: {
-                name: "nethermind.dnp.dappnode.eth",
-                description: "Nethermind execution client",
-                shortDescription: "Nethermind execution client",
-                version: "0.1.0"
-              }
-            },
-            {
-              status: "ok",
-              dnpName: "besu.dnp.dappnode.eth",
-              isInstalled: true,
-              isRunning: true,
-              isUpdated: true,
-              isSelected: false,
-              avatarUrl: "",
-              metadata: {
-                name: "besu.dnp.dappnode.eth",
-                description: "Besu execution client",
-                shortDescription: "Besu execution client",
-                version: "0.1.0"
-              }
-            },
-
-            {
-              status: "ok",
-              dnpName: "erigon.dnp.dappnode.eth",
-              isInstalled: true,
-              isRunning: true,
-              isUpdated: true,
-              isSelected: false,
-              avatarUrl: "",
-              metadata: {
-                name: "erigon.dnp.dappnode.eth",
-                description: "Erigon execution client",
-                shortDescription: "Erigon execution client",
-                version: "0.1.0"
-              }
             }
           ],
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm.dnp.dappnode.eth",
+              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -420,7 +374,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "lighthouse.dnp.dappnode.eth",
+              dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -435,7 +389,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "teku.dnp.dappnode.eth",
+              dnpName: "teku-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -450,7 +404,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nimbus.dnp.dappnode.eth",
+              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -469,7 +423,7 @@ export const stakerConfig: Pick<
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer.dnp.dappnode.eth",
+            dnpName: "web3signer-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -484,7 +438,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mevboost.dnp.dappnode.eth",
+            dnpName: "mev-boost-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -497,7 +451,9 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        };
+        } as StakerConfigGet<T>;
+      default:
+        throw Error(`Unknown network ${network}`);
     }
   }
 };

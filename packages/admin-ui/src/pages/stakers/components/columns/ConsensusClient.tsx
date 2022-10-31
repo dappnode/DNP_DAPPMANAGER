@@ -3,7 +3,7 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
+import { Network, StakerItem, StakerItemOk } from "types";
 import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
@@ -11,31 +11,29 @@ import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 
-export default function ConsensusClient({
+export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
   newConsClient,
-  defaultCheckpointSync,
-  defaultGraffiti,
-  defaultFeeRecipient,
   isSelected,
   feeRecipientError,
   graffitiError,
-  checkpointSyncPlaceHolder,
+  defaultGraffiti,
+  defaultFeeRecipient,
+  defaultCheckpointSync,
   ...props
 }: {
-  consensusClient: StakerItem;
+  consensusClient: StakerItem<T, "consensus">;
   setNewConsClient: React.Dispatch<
-    React.SetStateAction<ConsensusClientIface | undefined>
+    React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
-  newConsClient: ConsensusClientIface | undefined;
-  defaultCheckpointSync: string;
-  defaultGraffiti: string;
-  defaultFeeRecipient: string;
+  newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
   feeRecipientError: string | null;
   graffitiError: string | null;
-  checkpointSyncPlaceHolder: string;
+  defaultGraffiti: string;
+  defaultFeeRecipient: string;
+  defaultCheckpointSync: string;
 }) {
   return (
     <Card
@@ -50,7 +48,7 @@ export default function ConsensusClient({
               ? () => setNewConsClient(undefined)
               : () =>
                   setNewConsClient({
-                    dnpName: consensusClient.dnpName,
+                    ...consensusClient,
                     graffiti: consensusClient.graffiti || defaultGraffiti,
                     feeRecipient:
                       consensusClient.feeRecipient || defaultFeeRecipient,
@@ -126,7 +124,6 @@ export default function ConsensusClient({
                 labelId: "checkpoint-sync",
                 name: "checkpoint-sync",
                 autoComplete: "checkpoint-sync",
-                placeholder: checkpointSyncPlaceHolder,
                 secret: false,
                 value: newConsClient.checkpointSync || "",
                 onValueChange: (value: string) =>

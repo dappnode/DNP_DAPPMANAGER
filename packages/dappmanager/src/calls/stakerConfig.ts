@@ -6,10 +6,10 @@ import { Network, StakerConfigGet, StakerConfigSet } from "../types";
  * Sets the staker configuration: execution and consensus clients, remote signer,
  * mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigSet({
+export async function stakerConfigSet<T extends Network>({
   stakerConfig
 }: {
-  stakerConfig: StakerConfigSet;
+  stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
   await setStakerConfig({ stakerConfig });
 }
@@ -18,8 +18,8 @@ export async function stakerConfigSet({
  * Returns the current staker configuration: execution and consensus clients,
  * remote signer, mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigGet(
+export async function stakerConfigGet<T extends Network>(
   network: Network
-): Promise<StakerConfigGet> {
-  return await getStakerConfig(network);
+): Promise<StakerConfigGet<T>> {
+  return await getStakerConfig<T>(network);
 }

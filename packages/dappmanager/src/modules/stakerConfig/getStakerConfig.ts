@@ -1,8 +1,12 @@
 import { packageGet } from "../../calls";
 import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
 import {
+  ConsensusClient,
+  ExececutionClient,
   InstalledPackageData,
+  MevBoost,
   Network,
+  Signer,
   StakerConfigGet,
   StakerItem
 } from "../../types";
@@ -11,7 +15,7 @@ import { listPackages } from "../docker/list";
 import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
-  getNetworkStakerPkgs,
+  getStakerParamsByNetwork,
   getValidatorServiceName
 } from "./utils";
 
@@ -26,9 +30,9 @@ import {
  * - checkpoint sync url
  * @param network
  */
-export async function getStakerConfig(
+export async function getStakerConfig<T extends Network>(
   network: Network
-): Promise<StakerConfigGet> {
+): Promise<StakerConfigGet<T>> {
   try {
     const releaseFetcher = new ReleaseFetcher();
 
@@ -40,7 +44,7 @@ export async function getStakerConfig(
       web3signer,
       mevBoostDnpName,
       isMevBoostSelected
-    } = getNetworkStakerPkgs(network);
+    } = getStakerParamsByNetwork(network);
 
     const dnpList = await listPackages();
 
@@ -56,7 +60,7 @@ export async function getStakerConfig(
             // Print the object respository
             return {
               status: "ok",
-              dnpName: repository.dnpName,
+              dnpName: repository.dnpName as ExececutionClient<T>,
               avatarUrl: fileToGatewayUrl(repository.avatarFile),
               isInstalled: getIsInstalled(repository, dnpList),
               isUpdated: getIsUpdated(repository, dnpList),
@@ -67,7 +71,7 @@ export async function getStakerConfig(
           } catch (error) {
             return {
               status: "error",
-              dnpName: execClient.dnpName,
+              dnpName: execClient.dnpName as ExececutionClient<T>,
               error
             };
           }
@@ -99,7 +103,7 @@ export async function getStakerConfig(
             }
             return {
               status: "ok",
-              dnpName: repository.dnpName,
+              dnpName: repository.dnpName as ConsensusClient<T>,
               avatarUrl: fileToGatewayUrl(repository.avatarFile),
               isInstalled: getIsInstalled(repository, dnpList),
               isUpdated: getIsUpdated(repository, dnpList),
@@ -113,13 +117,13 @@ export async function getStakerConfig(
           } catch (error) {
             return {
               status: "error",
-              dnpName: consClient.dnpName,
+              dnpName: consClient.dnpName as ConsensusClient<T>,
               error
             };
           }
         })
       ),
-      web3Signer: await new Promise<StakerItem>(async resolve => {
+      web3Signer: await new Promise<StakerItem<T, "signer">>(async resolve => {
         try {
           if (!(await releaseFetcher.repoExists(web3signer.dnpName)))
             throw Error(`Repository ${web3signer.dnpName} does not exist`);
@@ -129,7 +133,7 @@ export async function getStakerConfig(
           const signerIsRunning = getIsRunning(repository, dnpList);
           resolve({
             status: "ok",
-            dnpName: repository.dnpName,
+            dnpName: repository.dnpName as Signer<T>,
             avatarUrl: fileToGatewayUrl(repository.avatarFile),
             isInstalled: getIsInstalled(repository, dnpList),
             isUpdated: getIsUpdated(repository, dnpList),
@@ -140,19 +144,19 @@ export async function getStakerConfig(
         } catch (error) {
           resolve({
             status: "error",
-            dnpName: web3signer.dnpName,
+            dnpName: web3signer.dnpName as Signer<T>,
             error
           });
         }
       }),
-      mevBoost: await new Promise<StakerItem>(async resolve => {
+      mevBoost: await new Promise<StakerItem<T, "mev-boost">>(async resolve => {
         try {
           if (!(await releaseFetcher.repoExists(mevBoostDnpName)))
             throw Error(`Repository ${mevBoostDnpName} does not exist`);
           const repository = await releaseFetcher.getRelease(mevBoostDnpName);
           resolve({
             status: "ok",
-            dnpName: repository.dnpName,
+            dnpName: repository.dnpName as MevBoost<T>,
             avatarUrl: fileToGatewayUrl(repository.avatarFile),
             isInstalled: getIsInstalled(repository, dnpList),
             isUpdated: getIsUpdated(repository, dnpList),
@@ -163,7 +167,7 @@ export async function getStakerConfig(
         } catch (error) {
           resolve({
             status: "error",
-            dnpName: mevBoostDnpName,
+            dnpName: mevBoostDnpName as MevBoost<T>,
             error
           });
         }

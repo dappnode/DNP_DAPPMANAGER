@@ -22,7 +22,7 @@
     "dev": "nodemon --ignore \"*.json\" -e ts,tsx --watch src/ --exec \"yarn build\""
   },
   "dependencies": {
-    "@dappnode/dappnodesdk": "^0.2.67",
+    "@dappnode/dappnodesdk": "^0.2.68",
     "@reduxjs/toolkit": "^1.3.5",
     "@types/clipboard": "^2.0.1",
     "@types/jest": "^24.9.1",

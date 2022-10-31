@@ -1,23 +1,25 @@
+import { packagesGet, packageInstall } from "../../calls";
 import {
-  packagesGet,
-  packageInstall,
-  packageSetEnvironment
-} from "../../calls";
-import {
-  ConsensusClient,
-  InstalledPackageData,
+  ConsensusClientGnosis,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
   InstalledPackageDataApiReturn,
+  Network,
   StakerConfigSet,
+  StakerItemOk,
   UserSettingsAllDnps
 } from "../../types";
 import { logs } from "../../logs";
 import {
-  getValidatorServiceName,
   setStakerConfigOnDb,
-  getNetworkStakerPkgs,
-  getBeaconServiceName
+  getStakerParamsByNetwork,
+  getUserSettings,
+  stopAllPkgContainers,
+  updateConsensusEnv
 } from "./utils";
-import { dockerContainerStop } from "../docker/api";
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
 import semver from "semver";
@@ -31,10 +33,10 @@ import semver from "semver";
  * @param stakerConfig
  * TODO: add option to remove previous or not
  */
-export async function setStakerConfig({
+export async function setStakerConfig<T extends Network>({
   stakerConfig
 }: {
-  stakerConfig: StakerConfigSet;
+  stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
   const {
     execClients,
@@ -43,31 +45,30 @@ export async function setStakerConfig({
     currentConsClient,
     web3signer,
     mevBoostDnpName
-  } = getNetworkStakerPkgs(stakerConfig.network);
+  } = getStakerParamsByNetwork<T>(stakerConfig.network);
 
-  // Ensure execution and consensus clients do not take the null value (used to indicate intention)
-  if (currentExecClient === null) throw Error("Invalid execution client");
-  if (currentConsClient === null) throw Error("Invalid consensus client");
+  if (stakerConfig.network === "mainnet")
+    currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
 
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&
     !execClients
       .map(exCl => exCl.dnpName)
-      .includes(stakerConfig.executionClient)
+      .includes(stakerConfig.executionClient.dnpName)
   )
     throw Error(
       `Invalid execution client ${stakerConfig.executionClient} for network ${stakerConfig.network}`
     );
   // Ensure Consensus clients DNP's names are valid
   if (
-    stakerConfig.consensusClient?.dnpName &&
+    stakerConfig.consensusClient &&
     !consClients
       .map(coCl => coCl.dnpName)
       .includes(stakerConfig.consensusClient.dnpName)
   )
     throw Error(
-      `Invalid consensus client ${stakerConfig.consensusClient.dnpName} for network ${stakerConfig.network}`
+      `Invalid consensus client ${stakerConfig.consensusClient} for network ${stakerConfig.network}`
     );
 
   const pkgs = await packagesGet();
@@ -119,22 +120,24 @@ export async function setStakerConfig({
     );
 
   // EXECUTION CLIENT
-  await setExecutionClientConfig({
+  await setExecutionClientConfig<T>({
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-  await setConsensusClientConfig({
+  await setConsensusClientConfig<T>({
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
   }).catch(e => {
     // The previous EXECUTION CLIENT must be persisted
-    setStakerConfigOnDb({
-      ...stakerConfig,
-      executionClient: currentExecClient
+    setStakerConfigOnDb<T>({
+      network: stakerConfig.network,
+      executionClient: currentExecClient,
+      consensusClient: stakerConfig.consensusClient?.dnpName,
+      enableMevBoost: stakerConfig.enableMevBoost
     });
     throw e;
   });
@@ -150,7 +153,7 @@ export async function setStakerConfig({
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: { dnpName: currentConsClient }
+        consensusClient: currentConsClient
       });
       throw e;
     });
@@ -166,39 +169,48 @@ export async function setStakerConfig({
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: { dnpName: currentConsClient }
+        consensusClient: currentConsClient
       });
       throw e;
     });
 
   // Persist the staker config on db
-  setStakerConfigOnDb(stakerConfig);
+  setStakerConfigOnDb({
+    network: stakerConfig.network,
+    executionClient: stakerConfig.executionClient?.dnpName,
+    consensusClient: stakerConfig.consensusClient?.dnpName,
+    enableMevBoost: stakerConfig.enableMevBoost
+  });
 }
 
-async function setExecutionClientConfig({
+async function setExecutionClientConfig<T extends Network>({
   currentExecClient,
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  currentExecClient?: string;
-  targetExecutionClient?: string;
+  currentExecClient?: T extends "mainnet"
+    ? ExecutionClientMainnet
+    : T extends "gnosis"
+    ? ExecutionClientGnosis
+    : ExecutionClientPrater;
+  targetExecutionClient?: StakerItemOk<T, "execution">;
   currentExecClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
-  if (!targetExecutionClient && !currentExecClient) {
+  if (!targetExecutionClient?.dnpName && !currentExecClient) {
     // Stop the current execution client if no option and not currentu execution client
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (!targetExecutionClient && currentExecClient) {
+  } else if (!targetExecutionClient?.dnpName && currentExecClient) {
     // Stop the current execution client if no target provided
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (targetExecutionClient && !currentExecClient) {
+  } else if (targetExecutionClient?.dnpName && !currentExecClient) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient
+      dnpName: targetExecutionClient.dnpName
     });
     if (!targetExecClientPkg) {
       // Install new consensus client if not installed
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
     } else {
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -209,12 +221,12 @@ async function setExecutionClientConfig({
       ).catch(err => logs.error(err));
     }
   } else if (
-    targetExecutionClient &&
-    targetExecutionClient === currentExecClient
+    targetExecutionClient?.dnpName &&
+    targetExecutionClient.dnpName === currentExecClient
   ) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
     } else {
       await dockerComposeUpPackage(
         { dnpName: currentExecClientPkg.dnpName },
@@ -225,14 +237,14 @@ async function setExecutionClientConfig({
     }
   } else if (
     targetExecutionClient &&
-    targetExecutionClient !== currentExecClient
+    targetExecutionClient.dnpName !== currentExecClient
   ) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient
+      dnpName: targetExecutionClient.dnpName
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);
@@ -251,13 +263,17 @@ async function setExecutionClientConfig({
   }
 }
 
-async function setConsensusClientConfig({
+async function setConsensusClientConfig<T extends Network>({
   currentConsClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
-  currentConsClient?: string;
-  targetConsensusClient?: ConsensusClient;
+  currentConsClient?: T extends "mainnet"
+    ? ConsensusClientMainnet
+    : T extends "gnosis"
+    ? ConsensusClientGnosis
+    : ConsensusClientPrater;
+  targetConsensusClient?: StakerItemOk<T, "consensus">;
   currentConsClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
   if (!targetConsensusClient?.dnpName) {
@@ -276,16 +292,9 @@ async function setConsensusClientConfig({
     return;
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-  const validatorServiceName = getValidatorServiceName(
-    targetConsensusClient.dnpName
-  );
-  const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
-  const userSettings: UserSettingsAllDnps = getUserSettings(
-    targetConsensusClient.dnpName,
-    targetConsensusClient,
-    validatorServiceName,
-    beaconServiceName
-  );
+  const userSettings: UserSettingsAllDnps = getUserSettings({
+    targetConsensusClient
+  });
 
   if (targetConsensusClient.dnpName && !currentConsClient) {
     const targetConsClientPkg = await listPackageNoThrow({
@@ -298,13 +307,18 @@ async function setConsensusClientConfig({
         userSettings
       });
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
         { dnpName: targetConsClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      );
     }
   } else if (targetConsensusClient.dnpName === currentConsClient) {
     if (!currentConsClientPkg) {
@@ -314,30 +328,18 @@ async function setConsensusClientConfig({
         userSettings
       });
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
+      // Start package
       await dockerComposeUpPackage(
         { dnpName: currentConsClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
-      if (
-        targetConsensusClient.graffiti ||
-        targetConsensusClient.feeRecipient ||
-        targetConsensusClient.checkpointSync
-      ) {
-        const serviceEnv =
-          userSettings[targetConsensusClient.dnpName].environment;
-
-        if (serviceEnv) {
-          logs.info(
-            "Updating environment for " + targetConsensusClient.dnpName
-          );
-          await packageSetEnvironment({
-            dnpName: targetConsensusClient.dnpName,
-            environmentByService: serviceEnv
-          });
-        }
-      }
+      );
     }
   } else if (targetConsensusClient.dnpName !== currentConsClient) {
     const targetExecClientPkg = await listPackageNoThrow({
@@ -353,13 +355,18 @@ async function setConsensusClientConfig({
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
       // Start new client
       await dockerComposeUpPackage(
         { dnpName: targetExecClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      );
       // Stop old client
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
@@ -413,66 +420,4 @@ async function setMevBoostConfig(
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoostDnpName });
   }
-}
-
-async function stopAllPkgContainers(
-  pkg: InstalledPackageDataApiReturn | InstalledPackageData
-): Promise<void> {
-  await Promise.all(
-    pkg.containers
-      .filter(c => c.running)
-      .map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
-  ).catch(e => logs.error(e.message));
-}
-
-/**
- * Get the user settings for the consensus client.
- * It may be different depending if it is multiservice or monoservice and all the envs are
- * set in the same service
- */
-function getUserSettings(
-  dnpName: string,
-  targetConsensusClient: ConsensusClient,
-  validatorServiceName: string,
-  beaconServiceName: string
-): UserSettingsAllDnps {
-  return {
-    [dnpName]: {
-      environment:
-        beaconServiceName === validatorServiceName
-          ? {
-              [validatorServiceName]: {
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
-                  "0x0000000000000000000000000000000000000000",
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
-              }
-            }
-          : {
-              [validatorServiceName]: {
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
-                  "0x0000000000000000000000000000000000000000"
-              },
-
-              [beaconServiceName]: {
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
-              }
-            }
-    }
-  };
 }

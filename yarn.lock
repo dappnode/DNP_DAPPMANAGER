@@ -1152,10 +1152,10 @@
   dependencies:
     postcss-value-parser "^4.2.0"
 
-"@dappnode/dappnodesdk@^0.2.67":
-  version "0.2.67"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.67.tgz#a1a5cfa896457b0b81749dcc949f7b21e6e82344"
-  integrity sha512-sbrb8wG3MxtHF6viGUjudB+O8dPurCNd7mVy/2D3bIALG97Q5QAXZ/yeFWq+qQ5OFDngPveiaK/LwELE0TmoXA==
+"@dappnode/dappnodesdk@^0.2.68":
+  version "0.2.68"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.68.tgz#d015f15fc86a8388cc942a058172420e235d6c3c"
+  integrity sha512-4l/Z5psr4FxF7GuOuPi6FOAuRuu08DSsf1jOeySXDBIp6bQHyjpvayNspSAmm+e2mvoAmPHx7UdvnhgACe7g4g==
   dependencies:
     "@octokit/rest" "^18.0.12"
     ajv "^8.11.0"

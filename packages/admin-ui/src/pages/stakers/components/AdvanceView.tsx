@@ -1,21 +1,21 @@
 import React from "react";
-import { StakerConfigSet } from "common";
+import { Network, StakerConfigSet } from "common";
 import { BsArrowRight } from "react-icons/bs";
 import "./advance-view.scss";
 import { prettyDnpName } from "utils/format";
 
-export default function AdvanceView({
+export default function AdvanceView<T extends Network>({
   currentStakerConfig,
   newStakerConfig,
-  defaultCheckpointSync,
   defaultGraffiti,
-  defaultFeeRecipient
+  defaultFeeRecipient,
+  defaultCheckpointSync
 }: {
-  currentStakerConfig: StakerConfigSet;
-  newStakerConfig: StakerConfigSet;
-  defaultCheckpointSync: string;
+  currentStakerConfig: StakerConfigSet<T>;
+  newStakerConfig: StakerConfigSet<T>;
   defaultGraffiti: string;
   defaultFeeRecipient: string;
+  defaultCheckpointSync: string;
 }) {
   const consClientGraffiti = currentStakerConfig.consensusClient?.graffiti;
   const newConstClientGraffiti =
@@ -33,18 +33,18 @@ export default function AdvanceView({
     {
       name: "Execution Client",
       current: currentStakerConfig.executionClient
-        ? prettyDnpName(currentStakerConfig.executionClient)
+        ? prettyDnpName(currentStakerConfig.executionClient.dnpName)
         : "-",
       new: newStakerConfig.executionClient
-        ? prettyDnpName(newStakerConfig.executionClient)
+        ? prettyDnpName(newStakerConfig.executionClient.dnpName)
         : "-"
     },
     {
       name: "Consensus Client",
-      current: currentStakerConfig.consensusClient?.dnpName
+      current: currentStakerConfig.consensusClient
         ? prettyDnpName(currentStakerConfig.consensusClient.dnpName)
         : "-",
-      new: newStakerConfig.consensusClient?.dnpName
+      new: newStakerConfig.consensusClient
         ? prettyDnpName(newStakerConfig.consensusClient.dnpName)
         : "-"
     },
