@@ -1294,10 +1294,6 @@ export interface StakerConfigSet<T extends Network> {
   consensusClient?: StakerItemOk<T, "consensus">;
   enableWeb3signer?: boolean;
   enableMevBoost?: boolean;
-  graffiti?: string;
-  feeRecipient?: string;
-  checkpointSync?: string;
-  relays?: string[];
 }
 
 export type ExececutionClient<T extends Network> = T extends "mainnet"

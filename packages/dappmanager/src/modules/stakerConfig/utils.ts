@@ -8,9 +8,16 @@ import {
   ConsensusClientPrater,
   StakerParamsByNetwork,
   ExececutionClient,
-  ConsensusClient
+  ConsensusClient,
+  UserSettingsAllDnps,
+  InstalledPackageData,
+  InstalledPackageDataApiReturn,
+  StakerItemOk
 } from "../../types";
 import * as db from "../../db";
+import { packageSetEnvironment } from "../../calls";
+import { logs } from "../../logs";
+import { dockerContainerStop } from "../docker";
 
 /**
  * Sets the staker configuration on db for a given network
@@ -186,7 +193,8 @@ export function getStakerParamsByNetwork<T extends Network>(
 
 /**
  * Get the validator service name.
- * Nimbus package is monoservice (beacon-validator)
+ * - Nimbus package is monoservice (beacon-validator)
+ * - Prysm, Teku, Lighthouse are multiservice (beacon, validator)
  */
 export function getValidatorServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
@@ -194,8 +202,105 @@ export function getValidatorServiceName(dnpName: string): string {
 
 /**
  * Get the beacon service name
- * Nimbus package is monoservice (beacon-validator)
+ * - Nimbus package is monoservice (beacon-validator)
+ * - Prysm, Teku, Lighthouse are multiservice (beacon, validator)
  */
 export function getBeaconServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain";
+}
+
+/**
+ * Stop all the containers from a given package dnpName
+ */
+export async function stopAllPkgContainers(
+  pkg: InstalledPackageDataApiReturn | InstalledPackageData
+): Promise<void> {
+  await Promise.all(
+    pkg.containers
+      .filter(c => c.running)
+      .map(async c =>
+        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+      )
+  ).catch(e => logs.error(e.message));
+}
+
+/**
+ * Get the user settings for the consensus client.
+ * It may be different depending if it is multiservice or monoservice and all the envs are
+ * set in the same service
+ */
+export function getUserSettings<T extends Network>({
+  targetConsensusClient
+}: {
+  targetConsensusClient: StakerItemOk<T, "consensus">;
+}): UserSettingsAllDnps {
+  const validatorServiceName = getValidatorServiceName(
+    targetConsensusClient.dnpName
+  );
+  const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
+  return {
+    [targetConsensusClient.dnpName]: {
+      environment:
+        beaconServiceName === validatorServiceName
+          ? {
+              [validatorServiceName]: {
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]:
+                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                // Fee recipient is a mandatory value
+                ["FEE_RECIPIENT_ADDRESS"]:
+                  targetConsensusClient.feeRecipient ||
+                  "0x0000000000000000000000000000000000000000",
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  targetConsensusClient.checkpointSync || ""
+              }
+            }
+          : {
+              [validatorServiceName]: {
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]:
+                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                // Fee recipient is a mandatory value
+                ["FEE_RECIPIENT_ADDRESS"]:
+                  targetConsensusClient.feeRecipient ||
+                  "0x0000000000000000000000000000000000000000"
+              },
+
+              [beaconServiceName]: {
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  targetConsensusClient.checkpointSync || ""
+              }
+            }
+    }
+  };
+}
+
+/**
+ * Update environemnt variables for the consensus client
+ * only if graffiti, fee recipient or checkpoint sync are set
+ */
+export async function updateConsensusEnv<T extends Network>({
+  targetConsensusClient,
+  userSettings
+}: {
+  targetConsensusClient: StakerItemOk<T, "consensus">;
+  userSettings: UserSettingsAllDnps;
+}): Promise<void> {
+  if (
+    targetConsensusClient.graffiti ||
+    targetConsensusClient.feeRecipient ||
+    targetConsensusClient.checkpointSync
+  ) {
+    const serviceEnv = userSettings[targetConsensusClient.dnpName].environment;
+
+    if (serviceEnv) {
+      logs.info("Updating environment for " + targetConsensusClient.dnpName);
+      await packageSetEnvironment({
+        dnpName: targetConsensusClient.dnpName,
+        environmentByService: serviceEnv
+      });
+    }
+  }
 }

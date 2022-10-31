@@ -1,8 +1,4 @@
-import {
-  packagesGet,
-  packageInstall,
-  packageSetEnvironment
-} from "../../calls";
+import { packagesGet, packageInstall } from "../../calls";
 import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,
@@ -10,20 +6,20 @@ import {
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
-  InstalledPackageData,
   InstalledPackageDataApiReturn,
   Network,
   StakerConfigSet,
+  StakerItemOk,
   UserSettingsAllDnps
 } from "../../types";
 import { logs } from "../../logs";
 import {
-  getValidatorServiceName,
   setStakerConfigOnDb,
   getStakerParamsByNetwork,
-  getBeaconServiceName
+  getUserSettings,
+  stopAllPkgContainers,
+  updateConsensusEnv
 } from "./utils";
-import { dockerContainerStop } from "../docker/api";
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
 import semver from "semver";
@@ -126,14 +122,14 @@ export async function setStakerConfig<T extends Network>({
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
     currentExecClient,
-    targetExecutionClient: stakerConfig.executionClient?.dnpName,
+    targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
     currentConsClient,
-    targetConsensusClient: stakerConfig.consensusClient?.dnpName,
+    targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
   }).catch(e => {
     // The previous EXECUTION CLIENT must be persisted
@@ -197,28 +193,24 @@ async function setExecutionClientConfig<T extends Network>({
     : T extends "gnosis"
     ? ExecutionClientGnosis
     : ExecutionClientPrater;
-  targetExecutionClient?: T extends "mainnet"
-    ? ExecutionClientMainnet
-    : T extends "gnosis"
-    ? ExecutionClientGnosis
-    : ExecutionClientPrater;
+  targetExecutionClient?: StakerItemOk<T, "execution">;
   currentExecClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
-  if (!targetExecutionClient && !currentExecClient) {
+  if (!targetExecutionClient?.dnpName && !currentExecClient) {
     // Stop the current execution client if no option and not currentu execution client
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (!targetExecutionClient && currentExecClient) {
+  } else if (!targetExecutionClient?.dnpName && currentExecClient) {
     // Stop the current execution client if no target provided
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (targetExecutionClient && !currentExecClient) {
+  } else if (targetExecutionClient?.dnpName && !currentExecClient) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient
+      dnpName: targetExecutionClient.dnpName
     });
     if (!targetExecClientPkg) {
       // Install new consensus client if not installed
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
     } else {
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -229,12 +221,12 @@ async function setExecutionClientConfig<T extends Network>({
       ).catch(err => logs.error(err));
     }
   } else if (
-    targetExecutionClient &&
-    targetExecutionClient === currentExecClient
+    targetExecutionClient?.dnpName &&
+    targetExecutionClient.dnpName === currentExecClient
   ) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
     } else {
       await dockerComposeUpPackage(
         { dnpName: currentExecClientPkg.dnpName },
@@ -245,14 +237,14 @@ async function setExecutionClientConfig<T extends Network>({
     }
   } else if (
     targetExecutionClient &&
-    targetExecutionClient !== currentExecClient
+    targetExecutionClient.dnpName !== currentExecClient
   ) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient
+      dnpName: targetExecutionClient.dnpName
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
-      await packageInstall({ name: targetExecutionClient });
+      await packageInstall({ name: targetExecutionClient.dnpName });
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);
@@ -274,33 +266,23 @@ async function setExecutionClientConfig<T extends Network>({
 async function setConsensusClientConfig<T extends Network>({
   currentConsClient,
   targetConsensusClient,
-  currentConsClientPkg,
-  targetGraffiti,
-  targetFeeRecipient,
-  targetCheckpointSync
+  currentConsClientPkg
 }: {
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
     ? ConsensusClientGnosis
     : ConsensusClientPrater;
-  targetConsensusClient?: T extends "mainnet"
-    ? ConsensusClientMainnet
-    : T extends "gnosis"
-    ? ConsensusClientGnosis
-    : ConsensusClientPrater;
+  targetConsensusClient?: StakerItemOk<T, "consensus">;
   currentConsClientPkg?: InstalledPackageDataApiReturn;
-  targetGraffiti?: string;
-  targetFeeRecipient?: string;
-  targetCheckpointSync?: string;
 }): Promise<void> {
-  if (!targetConsensusClient) {
+  if (!targetConsensusClient?.dnpName) {
     if (!currentConsClient) {
       // Stop the current consensus client if no option and not current consensus client
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
-    } else if (!targetConsensusClient && currentConsClient) {
+    } else if (!targetConsensusClient?.dnpName && currentConsClient) {
       // Stop the current consensus client if no target provided
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
@@ -310,83 +292,81 @@ async function setConsensusClientConfig<T extends Network>({
     return;
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-  const validatorServiceName = getValidatorServiceName(targetConsensusClient);
-  const beaconServiceName = getBeaconServiceName(targetConsensusClient);
   const userSettings: UserSettingsAllDnps = getUserSettings({
-    targetConsensusClient,
-    validatorServiceName,
-    beaconServiceName,
-    targetGraffiti,
-    targetFeeRecipient,
-    targetCheckpointSync
+    targetConsensusClient
   });
 
-  if (targetConsensusClient && !currentConsClient) {
+  if (targetConsensusClient.dnpName && !currentConsClient) {
     const targetConsClientPkg = await listPackageNoThrow({
-      dnpName: targetConsensusClient
+      dnpName: targetConsensusClient.dnpName
     });
     if (!targetConsClientPkg) {
       // Install new consensus client if not installed
       await packageInstall({
-        name: targetConsensusClient,
+        name: targetConsensusClient.dnpName,
         userSettings
       });
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
         { dnpName: targetConsClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      );
     }
-  } else if (targetConsensusClient === currentConsClient) {
+  } else if (targetConsensusClient.dnpName === currentConsClient) {
     if (!currentConsClientPkg) {
       logs.info("Installing consensus client " + targetConsensusClient);
       await packageInstall({
-        name: targetConsensusClient,
+        name: targetConsensusClient.dnpName,
         userSettings
       });
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
+      // Start package
       await dockerComposeUpPackage(
         { dnpName: currentConsClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
-      if (targetGraffiti || targetFeeRecipient || targetCheckpointSync) {
-        const serviceEnv = userSettings[targetConsensusClient].environment;
-
-        if (serviceEnv) {
-          logs.info("Updating environment for " + targetConsensusClient);
-          await packageSetEnvironment({
-            dnpName: targetConsensusClient,
-            environmentByService: serviceEnv
-          });
-        }
-      }
+      );
     }
-  } else if (targetConsensusClient !== currentConsClient) {
+  } else if (targetConsensusClient.dnpName !== currentConsClient) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetConsensusClient
+      dnpName: targetConsensusClient.dnpName
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
       await packageInstall({
-        name: targetConsensusClient,
+        name: targetConsensusClient.dnpName,
         userSettings
       });
       // Stop old client
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
+      // Update env if needed
+      await updateConsensusEnv({
+        targetConsensusClient,
+        userSettings
+      });
       // Start new client
       await dockerComposeUpPackage(
         { dnpName: targetExecClientPkg.dnpName },
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      );
       // Stop old client
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
@@ -440,74 +420,4 @@ async function setMevBoostConfig(
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoostDnpName });
   }
-}
-
-async function stopAllPkgContainers(
-  pkg: InstalledPackageDataApiReturn | InstalledPackageData
-): Promise<void> {
-  await Promise.all(
-    pkg.containers
-      .filter(c => c.running)
-      .map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
-  ).catch(e => logs.error(e.message));
-}
-
-/**
- * Get the user settings for the consensus client.
- * It may be different depending if it is multiservice or monoservice and all the envs are
- * set in the same service
- */
-function getUserSettings({
-  targetConsensusClient,
-  validatorServiceName,
-  beaconServiceName,
-  targetGraffiti,
-  targetFeeRecipient,
-  targetCheckpointSync
-}: {
-  targetConsensusClient:
-    | ConsensusClientMainnet
-    | ConsensusClientGnosis
-    | ConsensusClientPrater;
-  validatorServiceName: string;
-  beaconServiceName: string;
-  targetGraffiti?: string;
-  targetFeeRecipient?: string;
-  targetCheckpointSync?: string;
-}): UserSettingsAllDnps {
-  return {
-    [targetConsensusClient]: {
-      environment:
-        beaconServiceName === validatorServiceName
-          ? {
-              [validatorServiceName]: {
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: targetGraffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  targetFeeRecipient ||
-                  "0x0000000000000000000000000000000000000000",
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: targetCheckpointSync || ""
-              }
-            }
-          : {
-              [validatorServiceName]: {
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: targetGraffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  targetFeeRecipient ||
-                  "0x0000000000000000000000000000000000000000"
-              },
-
-              [beaconServiceName]: {
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: targetCheckpointSync || ""
-              }
-            }
-    }
-  };
 }

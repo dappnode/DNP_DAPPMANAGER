@@ -15,13 +15,12 @@ export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
   newConsClient,
-  defaultCheckpointSync,
-  defaultGraffiti,
-  defaultFeeRecipient,
   isSelected,
   feeRecipientError,
   graffitiError,
-  checkpointSyncPlaceHolder,
+  defaultGraffiti,
+  defaultFeeRecipient,
+  defaultCheckpointSync,
   ...props
 }: {
   consensusClient: StakerItem<T, "consensus">;
@@ -29,13 +28,12 @@ export default function ConsensusClient<T extends Network>({
     React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
   newConsClient: StakerItemOk<T, "consensus"> | undefined;
-  defaultCheckpointSync: string;
-  defaultGraffiti: string;
-  defaultFeeRecipient: string;
   isSelected: boolean;
   feeRecipientError: string | null;
   graffitiError: string | null;
-  checkpointSyncPlaceHolder: string;
+  defaultGraffiti: string;
+  defaultFeeRecipient: string;
+  defaultCheckpointSync: string;
 }) {
   return (
     <Card
@@ -126,7 +124,6 @@ export default function ConsensusClient<T extends Network>({
                 labelId: "checkpoint-sync",
                 name: "checkpoint-sync",
                 autoComplete: "checkpoint-sync",
-                placeholder: checkpointSyncPlaceHolder,
                 secret: false,
                 value: newConsClient.checkpointSync || "",
                 onValueChange: (value: string) =>
