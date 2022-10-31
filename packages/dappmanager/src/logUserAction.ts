@@ -3,16 +3,17 @@ import params from "./params";
 import { UserActionLog } from "./types";
 import { logSafeObjects } from "./utils/logs";
 import { JsonFileDb } from "./utils/fileDb";
+import { logs } from "./logs";
 
 /**
  * Max number of logs to prevent the log file from growing too big
  * An averagae single log weights 1-0.5KB in file as JSON
  */
-const maxNumOfLogs = 2000;
-const dbPath = params.USER_ACTION_LOGS_DB_PATH;
+
 let db: JsonFileDb<UserActionLog[]> | null = null;
 function getDb(): JsonFileDb<UserActionLog[]> {
-  if (!db) db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+  if (!db)
+    db = new JsonFileDb<UserActionLog[]>(params.USER_ACTION_LOGS_DB_PATH, []);
   return db;
 }
 
@@ -25,7 +26,10 @@ type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
  * Specific RPCs will have a ```userAction``` flag to indicate that the result
  * should be logged by this module.
  */
-function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
+export function push(
+  log: UserActionLogPartial,
+  level: UserActionLog["level"]
+): void {
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
@@ -34,11 +38,25 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
     ...(log.result ? { result: logSafeObjects(log.result) } : {})
   };
 
+  // Skip for logs greater than 3 KB
+  if (isLogTooBig(userActionLog)) {
+    logs.warn(
+      `The log ${userActionLog.event} is too big. It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
+    );
+    return;
+  }
+
   // Emit the log to the UI
   eventBus.logUserAction.emit(userActionLog);
 
   // Store the log in disk
   set([userActionLog, ...get()]);
+}
+
+export function isLogTooBig(log: UserActionLog): boolean {
+  const maxLogSize = 3072; // 3072 Bytes = 3KB
+  const logSize = Buffer.byteLength(JSON.stringify(log), "utf8");
+  return logSize > maxLogSize;
 }
 
 export function info(log: UserActionLogPartial): void {
@@ -61,5 +79,6 @@ export function get(): UserActionLog[] {
  * @param userActionLogs
  */
 export function set(userActionLogs: UserActionLog[]): void {
+  const maxNumOfLogs = 2000;
   getDb().write(userActionLogs.slice(0, maxNumOfLogs));
 }

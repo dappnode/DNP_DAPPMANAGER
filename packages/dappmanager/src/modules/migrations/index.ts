@@ -4,6 +4,7 @@ import { migrateUserActionLogs } from "./migrateUserActionLogs";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers";
 import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight";
+import { pruneUserActionLogs } from "./pruneUserActionLogs";
 
 export class MigrationError extends Error {
   migration: string;
@@ -69,6 +70,16 @@ export async function executeMigrations(): Promise<void> {
       migration:
         "switch client if the current selected is geth-light or openethereum",
       coreVersion: "0.2.58",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack
+    })
+  );
+
+  pruneUserActionLogs().catch(e =>
+    migrationErrors.push({
+      migration: "prune user action logs if the size is greater than 4 MB",
+      coreVersion: "0.2.59",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack
