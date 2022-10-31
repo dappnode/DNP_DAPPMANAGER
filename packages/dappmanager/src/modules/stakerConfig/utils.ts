@@ -76,8 +76,11 @@ export function getStakerParamsByNetwork<T extends Network>(
           {
             dnpName: "erigon.dnp.dappnode.eth",
             minVersion: ""
+          },
+          {
+            dnpName: "besu.dnp.dappnode.eth",
+            minVersion: ""
           }
-          //"besu.dnp.dappnode.eth",
         ],
         currentExecClient: db.executionClientMainnet.get() || "",
         consClients: [

@@ -48,7 +48,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
       if (network === "mainnet") {
         const repository = db.ethClientTarget.get();
         if (repository === "nethermind")
-          newExexClientValue = "nethermind.dnp.dappnode.eth";
+          newExexClientValue = "nethermind.public.dappnode.eth";
         if (repository === "geth") newExexClientValue = "geth.dnp.dappnode.eth";
       }
 
