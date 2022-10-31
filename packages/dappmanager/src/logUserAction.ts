@@ -26,8 +26,10 @@ type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
  * Specific RPCs will have a ```userAction``` flag to indicate that the result
  * should be logged by this module.
  */
-function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
-  const maxLogSize = 3072; // 3072 Bytes = 3KB
+export function push(
+  log: UserActionLogPartial,
+  level: UserActionLog["level"]
+): void {
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
@@ -37,10 +39,9 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
   };
 
   // Skip for logs greater than 3 KB
-  const logSize = Buffer.byteLength(JSON.stringify(userActionLog), "utf8");
-  if (logSize > maxLogSize) {
+  if (isLogTooBig(userActionLog)) {
     logs.warn(
-      `The log ${userActionLog.event} is too big (>${maxLogSize} bytes). It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
+      `The log ${userActionLog.event} is too big. It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
     );
     return;
   }
@@ -50,6 +51,12 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
 
   // Store the log in disk
   set([userActionLog, ...get()]);
+}
+
+export function isLogTooBig(log: UserActionLog): boolean {
+  const maxLogSize = 3072; // 3072 Bytes = 3KB
+  const logSize = Buffer.byteLength(JSON.stringify(log), "utf8");
+  return logSize > maxLogSize;
 }
 
 export function info(log: UserActionLogPartial): void {
