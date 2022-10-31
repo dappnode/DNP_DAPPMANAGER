@@ -1213,7 +1213,7 @@ export type ExecutionClientPrater =
   | "goerli-besu.dnp.dappnode.eth"
   | "";
 export type SignerPrater = "web3signer-prater.dnp.dappnode.eth" | "";
-export type MevBoostPrater = "mev-boost-prater.dnp.dappnode.eth" | "";
+export type MevBoostPrater = "mev-boost-goerli.dnp.dappnode.eth" | "";
 
 // Gnosis
 

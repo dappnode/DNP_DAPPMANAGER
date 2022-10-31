@@ -171,7 +171,7 @@ export const stakerConfig: Pick<
           }
         } as StakerConfigGet<T>;
       case "prater":
-        return ({
+        return {
           executionClients: [
             {
               status: "ok",
@@ -332,7 +332,7 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        } as unknown) as StakerConfigGet<T>;
+        } as StakerConfigGet<T>;
 
       case "gnosis":
         return {
