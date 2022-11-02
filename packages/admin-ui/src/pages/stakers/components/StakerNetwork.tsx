@@ -23,11 +23,11 @@ import AdvanceView from "./AdvanceView";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import {
+  areChangesAllowed,
   isOkSelectedInstalledAndRunning,
   validateEthereumAddress,
   validateGraffiti
 } from "./utils";
-import { isEqual, pick } from "lodash";
 import { responseInterface } from "swr";
 
 export default function StakerNetwork<T extends Network>({
@@ -51,10 +51,13 @@ export default function StakerNetwork<T extends Network>({
   const [newConsClient, setNewConsClient] = useState<
     StakerItemOk<T, "consensus">
   >();
-  const [newEnableMevBoost, setNewEnableMevBoost] = useState<boolean>(false);
+  const [newMevBoost, setNewMevBoost] = useState<
+    StakerItemOk<T, "mev-boost">
+  >();
   const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
     false
   );
+
   // Default config
   const [defaultGraffiti, setDefaultGraffiti] = useState<string>("");
   const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
@@ -83,20 +86,16 @@ export default function StakerNetwork<T extends Network>({
       const executionClient = executionClients.find(ec =>
         isOkSelectedInstalledAndRunning(ec)
       );
-
       const consensusClient = consensusClients.find(cc =>
         isOkSelectedInstalledAndRunning(cc)
       );
-
-      const enableMevBoost = isOkSelectedInstalledAndRunning(mevBoost);
       const enableWeb3signer = isOkSelectedInstalledAndRunning(web3Signer);
 
       if (executionClient && executionClient.status === "ok")
         setNewExecClient(executionClient);
       if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
-
-      setNewEnableMevBoost(enableMevBoost);
+      if (mevBoost && mevBoost.status === "ok") setNewMevBoost(mevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
 
       // Set the current config to be displayed in advance view
@@ -106,7 +105,7 @@ export default function StakerNetwork<T extends Network>({
           executionClient?.status === "ok" ? executionClient : undefined,
         consensusClient:
           consensusClient?.status === "ok" ? consensusClient : undefined,
-        enableMevBoost,
+        mevBoost: newMevBoost,
         enableWeb3signer
       });
 
@@ -154,37 +153,16 @@ export default function StakerNetwork<T extends Network>({
 
   useEffect(() => {
     if (currentStakerConfig) {
-      const {
-        executionClient,
-        consensusClient,
-        enableMevBoost,
-        enableWeb3signer
-      } = currentStakerConfig;
-      const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
-      const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
-      const isConsClientEqual = isEqual(
-        pick(consensusClient, [
-          "checkpointSync",
-          "dnpName",
-          "feeRecipient",
-          "graffiti"
-        ]),
-        pick(newConsClient, [
-          "checkpointSync",
-          "dnpName",
-          "feeRecipient",
-          "graffiti"
-        ])
-      );
-
       if (
-        !feeRecipientError &&
-        !graffitiError &&
-        (isExecAndConsSelected || isExecAndConsDeSelected) &&
-        (executionClient !== newExecClient ||
-          !isConsClientEqual ||
-          enableMevBoost !== newEnableMevBoost ||
-          enableWeb3signer !== newEnableWeb3signer)
+        areChangesAllowed({
+          currentStakerConfig,
+          feeRecipientError,
+          graffitiError,
+          newConsClient,
+          newMevBoost,
+          newEnableWeb3signer,
+          newExecClient
+        })
       ) {
         setIsApplyAllowed(true);
       } else setIsApplyAllowed(false);
@@ -196,7 +174,7 @@ export default function StakerNetwork<T extends Network>({
     feeRecipientError,
     graffitiError,
     newConsClient,
-    newEnableMevBoost,
+    newMevBoost,
     newEnableWeb3signer,
     newExecClient
   ]);
@@ -242,7 +220,7 @@ export default function StakerNetwork<T extends Network>({
                 network,
                 executionClient: newExecClient,
                 consensusClient: newConsClient,
-                enableMevBoost: newEnableMevBoost,
+                mevBoost: newMevBoost,
                 enableWeb3signer: newEnableWeb3signer
               }
             }),
@@ -338,9 +316,10 @@ export default function StakerNetwork<T extends Network>({
               <Col>
                 <SubTitle>Mev Boost</SubTitle>
                 <MevBoost
+                  network={network}
                   mevBoost={currentStakerConfigReq.data.mevBoost}
-                  setEnableMevBoost={setNewEnableMevBoost}
-                  isSelected={newEnableMevBoost}
+                  setNewMevBoost={setNewMevBoost}
+                  isSelected={newMevBoost?.dnpName ? true : false}
                 />
               </Col>
             )}
@@ -356,7 +335,7 @@ export default function StakerNetwork<T extends Network>({
                   network,
                   executionClient: newExecClient,
                   consensusClient: newConsClient,
-                  enableMevBoost: newEnableMevBoost,
+                  mevBoost: newMevBoost,
                   enableWeb3signer: newEnableWeb3signer
                 }}
                 defaultGraffiti={defaultGraffiti}

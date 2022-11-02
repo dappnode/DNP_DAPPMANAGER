@@ -42,7 +42,7 @@ export async function getStakerConfig<T extends Network>(
       consClients,
       currentConsClient,
       web3signer,
-      mevBoostDnpName,
+      mevBoost: mevBoostDnpName,
       isMevBoostSelected
     } = getStakerParamsByNetwork(network);
 

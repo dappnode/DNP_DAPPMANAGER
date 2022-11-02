@@ -7,6 +7,9 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
+  MevBoostGnosis,
+  MevBoostMainnet,
+  MevBoostPrater,
   Network,
   StakerConfigSet,
   StakerItemOk,
@@ -44,7 +47,7 @@ export async function setStakerConfig<T extends Network>({
     consClients,
     currentConsClient,
     web3signer,
-    mevBoostDnpName
+    mevBoost
   } = getStakerParamsByNetwork<T>(stakerConfig.network);
 
   if (stakerConfig.network === "mainnet")
@@ -137,7 +140,7 @@ export async function setStakerConfig<T extends Network>({
       network: stakerConfig.network,
       executionClient: currentExecClient,
       consensusClient: stakerConfig.consensusClient?.dnpName,
-      enableMevBoost: stakerConfig.enableMevBoost
+      mevBoost: stakerConfig.mevBoost?.dnpName
     });
     throw e;
   });
@@ -153,23 +156,25 @@ export async function setStakerConfig<T extends Network>({
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: currentConsClient
+        consensusClient: currentConsClient,
+        mevBoost: stakerConfig.mevBoost?.dnpName
       });
       throw e;
     });
 
   // MEV BOOST
-  if (stakerConfig.enableMevBoost !== undefined)
-    await setMevBoostConfig(
-      stakerConfig.enableMevBoost,
-      mevBoostDnpName,
-      pkgs.find(pkg => pkg.dnpName === mevBoostDnpName)
-    ).catch(e => {
+  if (stakerConfig.mevBoost !== undefined)
+    await setMevBoostConfig({
+      mevBoost,
+      targetMevBoost: stakerConfig.mevBoost,
+      currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
+    }).catch(e => {
       // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
       setStakerConfigOnDb({
         ...stakerConfig,
         executionClient: currentExecClient,
-        consensusClient: currentConsClient
+        consensusClient: currentConsClient,
+        mevBoost: stakerConfig.mevBoost?.dnpName
       });
       throw e;
     });
@@ -179,7 +184,7 @@ export async function setStakerConfig<T extends Network>({
     network: stakerConfig.network,
     executionClient: stakerConfig.executionClient?.dnpName,
     consensusClient: stakerConfig.consensusClient?.dnpName,
-    enableMevBoost: stakerConfig.enableMevBoost
+    mevBoost: stakerConfig.mevBoost?.dnpName
   });
 }
 
@@ -398,26 +403,34 @@ async function setWeb3signerConfig(
   }
 }
 
-async function setMevBoostConfig(
-  enableMevBoost: boolean,
-  mevBoostDnpName: string,
-  mevBoostPkg: InstalledPackageDataApiReturn | undefined
-): Promise<void> {
+async function setMevBoostConfig<T extends Network>({
+  mevBoost,
+  targetMevBoost,
+  currentMevBoostPkg
+}: {
+  mevBoost: T extends "mainnet"
+    ? MevBoostMainnet
+    : T extends "gnosis"
+    ? MevBoostGnosis
+    : MevBoostPrater;
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+  currentMevBoostPkg?: InstalledPackageDataApiReturn;
+}): Promise<void> {
   // MevBoost installed and enable => make sure its running
-  if (mevBoostPkg && enableMevBoost) {
+  if (currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("MevBoost is already installed");
     await dockerComposeUpPackage(
-      { dnpName: mevBoostPkg.dnpName },
+      { dnpName: currentMevBoostPkg.dnpName },
       {},
       {},
       true
     ).catch(err => logs.error(err));
   } // MevBoost installed and disabled => make sure its stopped
-  else if (mevBoostPkg && !enableMevBoost) {
-    await stopAllPkgContainers(mevBoostPkg);
+  else if (currentMevBoostPkg && !targetMevBoost.dnpName) {
+    await stopAllPkgContainers(currentMevBoostPkg);
   } // MevBoost not installed and enable => make sure its installed
-  else if (!mevBoostPkg && enableMevBoost) {
+  else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
-    await packageInstall({ name: mevBoostDnpName });
+    await packageInstall({ name: mevBoost });
   }
 }

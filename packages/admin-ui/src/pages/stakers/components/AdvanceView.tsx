@@ -70,8 +70,8 @@ export default function AdvanceView<T extends Network>({
     },
     {
       name: "Mev Boost",
-      current: currentStakerConfig.enableMevBoost ? "enabled" : "disabled",
-      new: newStakerConfig.enableMevBoost ? "enabled" : "disabled"
+      current: currentStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled",
+      new: newStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled"
     }
   ];
   return (
