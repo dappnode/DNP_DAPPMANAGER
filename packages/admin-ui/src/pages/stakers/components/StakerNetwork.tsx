@@ -105,7 +105,7 @@ export default function StakerNetwork<T extends Network>({
           executionClient?.status === "ok" ? executionClient : undefined,
         consensusClient:
           consensusClient?.status === "ok" ? consensusClient : undefined,
-        mevBoost: newMevBoost,
+        mevBoost: mevBoost?.status === "ok" ? mevBoost : undefined,
         enableWeb3signer
       });
 

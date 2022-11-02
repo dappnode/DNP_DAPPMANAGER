@@ -3,6 +3,7 @@ import { Network, StakerConfigSet } from "common";
 import { BsArrowRight } from "react-icons/bs";
 import "./advance-view.scss";
 import { prettyDnpName } from "utils/format";
+import { getDefaultRelays } from "../data";
 
 export default function AdvanceView<T extends Network>({
   currentStakerConfig,
@@ -28,6 +29,18 @@ export default function AdvanceView<T extends Network>({
     currentStakerConfig.consensusClient?.checkpointSync;
   const newConstClientCheckpointSync =
     newStakerConfig.consensusClient?.checkpointSync || defaultCheckpointSync;
+  const mevBoostRelays = currentStakerConfig.mevBoost?.relays?.map(
+    relayUrl =>
+      getDefaultRelays(currentStakerConfig.network).find(
+        relay => relay.url === relayUrl
+      )?.operator
+  );
+  const newMevBoostRelays = newStakerConfig.mevBoost?.relays?.map(
+    relayUrl =>
+      getDefaultRelays(currentStakerConfig.network).find(
+        relay => relay.url === relayUrl
+      )?.operator
+  );
 
   const stakerConfig = [
     {
@@ -72,6 +85,11 @@ export default function AdvanceView<T extends Network>({
       name: "Mev Boost",
       current: currentStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled",
       new: newStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled"
+    },
+    {
+      name: "Relays",
+      current: mevBoostRelays ? mevBoostRelays.join(", ") : "-",
+      new: newMevBoostRelays ? newMevBoostRelays.join(", ") : "-"
     }
   ];
   return (

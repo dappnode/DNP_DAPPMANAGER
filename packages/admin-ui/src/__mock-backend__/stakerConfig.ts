@@ -4,7 +4,8 @@ export const stakerConfig: Pick<
   Routes,
   "stakerConfigGet" | "stakerConfigSet"
 > = {
-  stakerConfigSet: async () => {},
+  stakerConfigSet: async () => {
+  },
   stakerConfigGet: async <T extends Network>(network: T) => {
     switch (network) {
       case "mainnet":
@@ -323,8 +324,12 @@ export const stakerConfig: Pick<
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
-            isSelected: false,
+            isSelected: true,
             avatarUrl: "",
+            relays: [
+              "https://0xb1d229d9c21298a87846c7022ebeef277dfc321fe674fa45312e20b5b6c400bfde9383f801848d7837ed5fc449083a12@relay-goerli.edennetwork.io",
+              "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@builder-relay-goerli.flashbots.net"
+            ],
             metadata: {
               name: "mevboost.dnp.dappnode.eth",
               description: "MEV Boost",
