@@ -19,9 +19,11 @@ import { logs } from "../../logs";
 import {
   setStakerConfigOnDb,
   getStakerParamsByNetwork,
-  getUserSettings,
+  getConsensusUserSettings,
   stopAllPkgContainers,
-  updateConsensusEnv
+  updateConsensusEnv,
+  getMevBoostUserSettings,
+  updateMevBoostEnv
 } from "./utils";
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
@@ -297,7 +299,7 @@ async function setConsensusClientConfig<T extends Network>({
     return;
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
-  const userSettings: UserSettingsAllDnps = getUserSettings({
+  const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
     targetConsensusClient
   });
 
@@ -416,9 +418,19 @@ async function setMevBoostConfig<T extends Network>({
   targetMevBoost: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
+  // User settings object: RELAYS
+  const userSettings: UserSettingsAllDnps = getMevBoostUserSettings({
+    targetMevBoost
+  });
+
   // MevBoost installed and enable => make sure its running
   if (currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("MevBoost is already installed");
+    // Update env if needed
+    await updateMevBoostEnv({
+      targetMevBoost,
+      userSettings
+    });
     await dockerComposeUpPackage(
       { dnpName: currentMevBoostPkg.dnpName },
       {},
@@ -431,6 +443,6 @@ async function setMevBoostConfig<T extends Network>({
   } // MevBoost not installed and enable => make sure its installed
   else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
-    await packageInstall({ name: mevBoost });
+    await packageInstall({ name: mevBoost, userSettings });
   }
 }

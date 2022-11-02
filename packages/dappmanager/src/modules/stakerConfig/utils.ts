@@ -233,7 +233,7 @@ export async function stopAllPkgContainers(
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-export function getUserSettings<T extends Network>({
+export function getConsensusUserSettings<T extends Network>({
   targetConsensusClient
 }: {
   targetConsensusClient: StakerItemOk<T, "consensus">;
@@ -303,6 +303,49 @@ export async function updateConsensusEnv<T extends Network>({
       logs.info("Updating environment for " + targetConsensusClient.dnpName);
       await packageSetEnvironment({
         dnpName: targetConsensusClient.dnpName,
+        environmentByService: serviceEnv
+      });
+    }
+  }
+}
+
+/**
+ * Get the user settings for the mev boost
+ */
+export function getMevBoostUserSettings<T extends Network>({
+  targetMevBoost
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+}): UserSettingsAllDnps {
+  return {
+    [targetMevBoost.dnpName]: {
+      environment: {
+        "mev-boost": {
+          ["RELAYS"]: targetMevBoost.relays?.join(",") || ""
+        }
+      }
+    }
+  };
+}
+
+/**
+ * Update environemnt variables for the mev boost
+ * only if relays are set
+ */
+export async function updateMevBoostEnv<T extends Network>({
+  targetMevBoost,
+  userSettings
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+  userSettings: UserSettingsAllDnps;
+}): Promise<void> {
+  if (targetMevBoost.relays) {
+    const serviceEnv = userSettings[targetMevBoost.dnpName].environment;
+
+    if (serviceEnv) {
+      logs.info("Updating environment for " + targetMevBoost.dnpName);
+      await packageSetEnvironment({
+        dnpName: targetMevBoost.dnpName,
         environmentByService: serviceEnv
       });
     }
