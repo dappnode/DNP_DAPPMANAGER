@@ -9,6 +9,7 @@ import { Network, StakerItem } from "common";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { MdOpenInNew } from "react-icons/md";
 
 export default function RemoteSigner<T extends Network>({
   signer,
@@ -49,6 +50,16 @@ export default function RemoteSigner<T extends Network>({
             </Link>
             <br />
             <br />
+          </>
+        )}
+
+      {signer.status === "ok" &&
+        isSelected &&
+        signer.isInstalled &&
+        signer.metadata.links?.ui && (
+          <>
+            <MdOpenInNew />
+            <Link to={signer.metadata.links.ui}> Upload keystores</Link>
           </>
         )}
 

@@ -308,13 +308,16 @@ export const stakerConfig: Pick<
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
-            isSelected: false,
+            isSelected: true,
             avatarUrl: "",
             metadata: {
               name: "web3signer.dnp.dappnode.eth",
               description: "Web3Signer",
               shortDescription: "Web3Signer",
-              version: "0.1.0"
+              version: "0.1.0",
+              links: {
+                ui: "http://web3signer-prater.dappnode:9000"
+              }
             }
           },
           mevBoost: {
