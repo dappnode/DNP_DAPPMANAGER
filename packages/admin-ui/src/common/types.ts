@@ -1292,8 +1292,8 @@ export interface StakerConfigSet<T extends Network> {
   network: T;
   executionClient?: StakerItemOk<T, "execution">;
   consensusClient?: StakerItemOk<T, "consensus">;
+  mevBoost?: StakerItemOk<T, "mev-boost">;
   enableWeb3signer?: boolean;
-  enableMevBoost?: boolean;
 }
 
 export type ExececutionClient<T extends Network> = T extends "mainnet"
@@ -1343,6 +1343,6 @@ export interface StakerParamsByNetwork<T extends Network> {
     dnpName: string;
     minVersion: string;
   };
-  mevBoostDnpName: string;
+  mevBoost: MevBoost<T>;
   isMevBoostSelected: boolean;
 }

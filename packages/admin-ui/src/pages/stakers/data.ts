@@ -1,6 +1,11 @@
 export const rootPath = "/stakers";
 export const title = "Stakers";
 
+export const defaultDappnodeGraffiti = "validating_from_DAppNode";
+export const defaultPraterCheckpointSync =
+  "https://checkpoint-sync-prater.dappnode.io";
+export const defaultMainnetCheckpointSync =
+  "https://checkpoint-sync.dappnode.io";
 export const disclaimer = `## Terms of Use - DAppNode
 
 Effective as of Oct 14, 2020

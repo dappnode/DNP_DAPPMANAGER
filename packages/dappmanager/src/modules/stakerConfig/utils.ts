@@ -12,7 +12,8 @@ import {
   UserSettingsAllDnps,
   InstalledPackageData,
   InstalledPackageDataApiReturn,
-  StakerItemOk
+  StakerItemOk,
+  MevBoost
 } from "../../types";
 import * as db from "../../db";
 import { packageSetEnvironment } from "../../calls";
@@ -26,28 +27,28 @@ export function setStakerConfigOnDb<T extends Network>({
   network,
   executionClient,
   consensusClient,
-  enableMevBoost
+  mevBoost
 }: {
   network: T;
   executionClient?: ExececutionClient<T>;
   consensusClient?: ConsensusClient<T>;
-  enableMevBoost?: boolean;
+  mevBoost?: MevBoost<T>;
 }): void {
   switch (network) {
     case "mainnet":
       db.executionClientMainnet.set(executionClient as ExecutionClientMainnet);
       db.consensusClientMainnet.set(consensusClient as ConsensusClientMainnet);
-      db.mevBoostMainnet.set(enableMevBoost || false);
+      db.mevBoostMainnet.set(mevBoost ? true : false);
       break;
     case "gnosis":
       db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
       db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
-      db.mevBoostGnosis.set(enableMevBoost || false);
+      db.mevBoostGnosis.set(mevBoost ? true : false);
       break;
     case "prater":
       db.executionClientPrater.set(executionClient as ExecutionClientPrater);
       db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
-      db.mevBoostPrater.set(enableMevBoost || false);
+      db.mevBoostPrater.set(mevBoost ? true : false);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
@@ -106,7 +107,7 @@ export function getStakerParamsByNetwork<T extends Network>(
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostDnpName: "mev-boost.dnp.dappnode.eth",
+        mevBoost: "mev-boost.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostMainnet.get()
       } as StakerParamsByNetwork<T>;
 
@@ -139,7 +140,7 @@ export function getStakerParamsByNetwork<T extends Network>(
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: ""
         },
-        mevBoostDnpName: "mev-boost-gnosis.dnp.dappnode.eth",
+        mevBoost: "mev-boost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
       } as StakerParamsByNetwork<T>;
     case "prater":
@@ -186,7 +187,7 @@ export function getStakerParamsByNetwork<T extends Network>(
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"
         },
-        mevBoostDnpName: "mev-boost-goerli.dnp.dappnode.eth",
+        mevBoost: "mev-boost-goerli.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostPrater.get()
       } as StakerParamsByNetwork<T>;
     default:
@@ -232,7 +233,7 @@ export async function stopAllPkgContainers(
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-export function getUserSettings<T extends Network>({
+export function getConsensusUserSettings<T extends Network>({
   targetConsensusClient
 }: {
   targetConsensusClient: StakerItemOk<T, "consensus">;
@@ -302,6 +303,49 @@ export async function updateConsensusEnv<T extends Network>({
       logs.info("Updating environment for " + targetConsensusClient.dnpName);
       await packageSetEnvironment({
         dnpName: targetConsensusClient.dnpName,
+        environmentByService: serviceEnv
+      });
+    }
+  }
+}
+
+/**
+ * Get the user settings for the mev boost
+ */
+export function getMevBoostUserSettings<T extends Network>({
+  targetMevBoost
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+}): UserSettingsAllDnps {
+  return {
+    [targetMevBoost.dnpName]: {
+      environment: {
+        "mev-boost": {
+          ["RELAYS"]: targetMevBoost.relays?.join(",") || ""
+        }
+      }
+    }
+  };
+}
+
+/**
+ * Update environemnt variables for the mev boost
+ * only if relays are set
+ */
+export async function updateMevBoostEnv<T extends Network>({
+  targetMevBoost,
+  userSettings
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+  userSettings: UserSettingsAllDnps;
+}): Promise<void> {
+  if (targetMevBoost.relays) {
+    const serviceEnv = userSettings[targetMevBoost.dnpName].environment;
+
+    if (serviceEnv) {
+      logs.info("Updating environment for " + targetMevBoost.dnpName);
+      await packageSetEnvironment({
+        dnpName: targetMevBoost.dnpName,
         environmentByService: serviceEnv
       });
     }

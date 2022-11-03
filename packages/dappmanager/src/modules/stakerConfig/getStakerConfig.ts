@@ -42,7 +42,7 @@ export async function getStakerConfig<T extends Network>(
       consClients,
       currentConsClient,
       web3signer,
-      mevBoostDnpName,
+      mevBoost,
       isMevBoostSelected
     } = getStakerParamsByNetwork(network);
 
@@ -151,23 +151,35 @@ export async function getStakerConfig<T extends Network>(
       }),
       mevBoost: await new Promise<StakerItem<T, "mev-boost">>(async resolve => {
         try {
-          if (!(await releaseFetcher.repoExists(mevBoostDnpName)))
-            throw Error(`Repository ${mevBoostDnpName} does not exist`);
-          const repository = await releaseFetcher.getRelease(mevBoostDnpName);
+          if (!(await releaseFetcher.repoExists(mevBoost)))
+            throw Error(`Repository ${mevBoost} does not exist`);
+          const repository = await releaseFetcher.getRelease(mevBoost);
+          const isInstalled = getIsInstalled(repository, dnpList);
+          const relays: string[] = [];
+          if (isInstalled) {
+            const pkgEnv = (await packageGet({ dnpName: repository.dnpName }))
+              .userSettings?.environment;
+            if (pkgEnv) {
+              pkgEnv["mev-boost"]["RELAYS"]
+                .split(",")
+                .forEach(relay => relays.push(relay));
+            }
+          }
           resolve({
             status: "ok",
             dnpName: repository.dnpName as MevBoost<T>,
             avatarUrl: fileToGatewayUrl(repository.avatarFile),
-            isInstalled: getIsInstalled(repository, dnpList),
+            isInstalled,
             isUpdated: getIsUpdated(repository, dnpList),
             isRunning: getIsRunning(repository, dnpList),
             metadata: repository.metadata,
-            isSelected: isMevBoostSelected
+            isSelected: isMevBoostSelected,
+            relays
           });
         } catch (error) {
           resolve({
             status: "error",
-            dnpName: mevBoostDnpName as MevBoost<T>,
+            dnpName: mevBoost as MevBoost<T>,
             error
           });
         }

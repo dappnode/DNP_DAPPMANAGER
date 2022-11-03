@@ -326,8 +326,13 @@ export const stakerConfig: Pick<
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
-            isSelected: false,
+            isSelected: true,
             avatarUrl: "",
+            relays: [
+              "https://0x8f7b17a74569b7a57e9bdafd2e159380759f5dc3ccbd4bf600414147e8c4e1dc6ebada83c0139ac15850eb6c975e82d0@builder-relay-goerli.blocknative.com",
+              "https://0xb1d229d9c21298a87846c7022ebeef277dfc321fe674fa45312e20b5b6c400bfde9383f801848d7837ed5fc449083a12@relay-goerli.edennetwork.io",
+              "https://0x8a72a5ec3e2909fff931c8b42c9e0e6c6e660ac48a98016777fc63a73316b3ffb5c622495106277f8dbcc17a06e92ca3@goerli-relay.securerpc.com/"
+            ],
             metadata: {
               name: "mevboost.dnp.dappnode.eth",
               description: "MEV Boost",
