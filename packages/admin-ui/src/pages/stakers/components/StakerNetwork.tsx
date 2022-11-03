@@ -276,8 +276,6 @@ export default function StakerNetwork<T extends Network>({
                     setNewExecClient={setNewExecClient}
                     isSelected={
                       executionClient.dnpName === newExecClient?.dnpName
-                        ? true
-                        : false
                     }
                   />
                 )
@@ -295,8 +293,6 @@ export default function StakerNetwork<T extends Network>({
                     newConsClient={newConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
-                        ? true
-                        : false
                     }
                     graffitiError={graffitiError}
                     feeRecipientError={feeRecipientError}
@@ -324,7 +320,10 @@ export default function StakerNetwork<T extends Network>({
                   mevBoost={currentStakerConfigReq.data.mevBoost}
                   newMevBoost={newMevBoost}
                   setNewMevBoost={setNewMevBoost}
-                  isSelected={newMevBoost?.dnpName ? true : false}
+                  isSelected={
+                    currentStakerConfigReq.data.mevBoost.dnpName ===
+                    newMevBoost?.dnpName
+                  }
                 />
               </Col>
             )}
