@@ -165,21 +165,20 @@ export async function setStakerConfig<T extends Network>({
     });
 
   // MEV BOOST
-  if (stakerConfig.mevBoost !== undefined)
-    await setMevBoostConfig({
-      mevBoost,
-      targetMevBoost: stakerConfig.mevBoost,
-      currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
-    }).catch(e => {
-      // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
-      setStakerConfigOnDb({
-        ...stakerConfig,
-        executionClient: currentExecClient,
-        consensusClient: currentConsClient,
-        mevBoost: stakerConfig.mevBoost?.dnpName
-      });
-      throw e;
+  await setMevBoostConfig({
+    mevBoost,
+    targetMevBoost: stakerConfig.mevBoost,
+    currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
+  }).catch(e => {
+    // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
+    setStakerConfigOnDb({
+      ...stakerConfig,
+      executionClient: currentExecClient,
+      consensusClient: currentConsClient,
+      mevBoost: stakerConfig.mevBoost?.dnpName
     });
+    throw e;
+  });
 
   // Persist the staker config on db
   setStakerConfigOnDb({
@@ -415,9 +414,23 @@ async function setMevBoostConfig<T extends Network>({
     : T extends "gnosis"
     ? MevBoostGnosis
     : MevBoostPrater;
-  targetMevBoost: StakerItemOk<T, "mev-boost">;
+  targetMevBoost?: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
+  if (!targetMevBoost?.dnpName) {
+    if (!mevBoost) {
+      // Stop the mev boost if no option
+      logs.info(`Not mev boost selected`);
+      if (currentMevBoostPkg) await stopAllPkgContainers(currentMevBoostPkg);
+    } else if (!targetMevBoost?.dnpName && mevBoost) {
+      // Stop the current mev boost if no target provided
+      logs.info(`Not mev boost selected`);
+      if (currentMevBoostPkg) await stopAllPkgContainers(currentMevBoostPkg);
+    }
+    // Return if no mev boost selected
+    return;
+  }
+
   // User settings object: RELAYS
   const userSettings: UserSettingsAllDnps = getMevBoostUserSettings({
     targetMevBoost
