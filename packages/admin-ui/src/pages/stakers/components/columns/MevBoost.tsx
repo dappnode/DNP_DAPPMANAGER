@@ -13,17 +13,19 @@ import { Link } from "react-router-dom";
 import { Network } from "types";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
-import { getDefaultRelays, RelayIface } from "pages/stakers/data";
+import { getDefaultRelays, RelayIface } from "../utils";
 
 export default function MevBoost<T extends Network>({
   network,
   mevBoost,
+  newMevBoost,
   setNewMevBoost,
   isSelected,
   ...props
 }: {
   network: T;
   mevBoost: StakerItem<T, "mev-boost">;
+  newMevBoost: StakerItemOk<T, "mev-boost"> | undefined;
   setNewMevBoost: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
@@ -70,10 +72,10 @@ export default function MevBoost<T extends Network>({
           </>
         )}
 
-      {mevBoost.status === "ok" && isSelected && (
+      {newMevBoost?.status === "ok" && isSelected && (
         <RelaysList
           network={network}
-          mevBoost={mevBoost}
+          newMevBoost={newMevBoost}
           setNewMevBoost={setNewMevBoost}
         />
       )}
@@ -89,11 +91,11 @@ export default function MevBoost<T extends Network>({
 
 function RelaysList<T extends Network>({
   network,
-  mevBoost,
+  newMevBoost,
   setNewMevBoost
 }: {
   network: T;
-  mevBoost: StakerItemOk<T, "mev-boost">;
+  newMevBoost: StakerItemOk<T, "mev-boost">;
   setNewMevBoost: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
@@ -114,7 +116,7 @@ function RelaysList<T extends Network>({
             <Relay
               key={index}
               relay={relay}
-              mevBoost={mevBoost}
+              newMevBoost={newMevBoost}
               setNewMevBoost={setNewMevBoost}
             />
           ))}
@@ -126,17 +128,17 @@ function RelaysList<T extends Network>({
 
 function Relay<T extends Network>({
   relay,
-  mevBoost,
+  newMevBoost,
   setNewMevBoost
 }: {
   relay: RelayIface;
-  mevBoost: StakerItemOk<T, "mev-boost">;
+  newMevBoost: StakerItemOk<T, "mev-boost">;
   setNewMevBoost: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
 }) {
   const [isAdded, setIsAdded] = useState(
-    mevBoost.relays?.includes(relay.url) ? true : false
+    newMevBoost?.relays?.includes(relay.url) ? true : false
   );
 
   return (
@@ -156,16 +158,18 @@ function Relay<T extends Network>({
           onChange={() => {
             if (!isAdded) {
               setNewMevBoost({
-                ...mevBoost,
-                relays: [...(mevBoost.relays || []), relay.url]
+                ...newMevBoost,
+                relays: [...(newMevBoost?.relays || []), relay.url]
               });
-              setIsAdded(!isAdded);
+              setIsAdded(true);
             } else {
               setNewMevBoost({
-                ...mevBoost,
-                relays: mevBoost.relays?.filter(r => r !== relay.url)
+                ...newMevBoost,
+                relays: [
+                  ...(newMevBoost?.relays?.filter(r => r !== relay.url) || [])
+                ]
               });
-              setIsAdded(!isAdded);
+              setIsAdded(false);
             }
           }}
           checked={isAdded}

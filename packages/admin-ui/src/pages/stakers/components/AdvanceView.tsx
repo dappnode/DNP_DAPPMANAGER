@@ -1,95 +1,87 @@
 import React from "react";
-import { Network, StakerConfigSet } from "common";
+import { Network, StakerConfigSet, StakerItemOk } from "common";
 import { BsArrowRight } from "react-icons/bs";
-import "./advance-view.scss";
 import { prettyDnpName } from "utils/format";
-import { getDefaultRelays } from "../data";
+import { isEqual } from "lodash";
+import "./advance-view.scss";
+import { mapRelays } from "./utils";
 
 export default function AdvanceView<T extends Network>({
   currentStakerConfig,
-  newStakerConfig,
-  defaultGraffiti,
-  defaultFeeRecipient,
-  defaultCheckpointSync
+  newExecClient,
+  newConsClient,
+  newMevBoost,
+  newEnableWeb3signer
 }: {
   currentStakerConfig: StakerConfigSet<T>;
-  newStakerConfig: StakerConfigSet<T>;
-  defaultGraffiti: string;
-  defaultFeeRecipient: string;
-  defaultCheckpointSync: string;
+  newExecClient: StakerItemOk<T, "execution"> | undefined;
+  newConsClient: StakerItemOk<T, "consensus"> | undefined;
+  newMevBoost: StakerItemOk<T, "mev-boost"> | undefined;
+  newEnableWeb3signer: boolean;
 }) {
-  const consClientGraffiti = currentStakerConfig.consensusClient?.graffiti;
-  const newConstClientGraffiti =
-    newStakerConfig.consensusClient?.graffiti || defaultGraffiti;
-  const consClientFeeRecipient =
-    currentStakerConfig.consensusClient?.feeRecipient;
-  const newConstClientFeeRecipient =
-    newStakerConfig.consensusClient?.feeRecipient || defaultFeeRecipient;
-  const consClientCheckpointSync =
-    currentStakerConfig.consensusClient?.checkpointSync;
-  const newConstClientCheckpointSync =
-    newStakerConfig.consensusClient?.checkpointSync || defaultCheckpointSync;
-  const mevBoostRelays = currentStakerConfig.mevBoost?.relays?.map(
-    relayUrl =>
-      getDefaultRelays(currentStakerConfig.network).find(
-        relay => relay.url === relayUrl
-      )?.operator
-  );
-  const newMevBoostRelays = newStakerConfig.mevBoost?.relays?.map(
-    relayUrl =>
-      getDefaultRelays(currentStakerConfig.network).find(
-        relay => relay.url === relayUrl
-      )?.operator
-  );
+  const {
+    executionClient,
+    consensusClient,
+    mevBoost,
+    enableWeb3signer
+  } = currentStakerConfig;
 
   const stakerConfig = [
     {
       name: "Execution Client",
-      current: currentStakerConfig.executionClient
-        ? prettyDnpName(currentStakerConfig.executionClient.dnpName)
+      current: executionClient?.dnpName
+        ? prettyDnpName(executionClient.dnpName)
         : "-",
-      new: newStakerConfig.executionClient
-        ? prettyDnpName(newStakerConfig.executionClient.dnpName)
-        : "-"
+      new: newExecClient?.dnpName ? prettyDnpName(newExecClient?.dnpName) : "-"
     },
     {
       name: "Consensus Client",
-      current: currentStakerConfig.consensusClient
-        ? prettyDnpName(currentStakerConfig.consensusClient.dnpName)
+      current: consensusClient?.dnpName
+        ? prettyDnpName(consensusClient.dnpName)
         : "-",
-      new: newStakerConfig.consensusClient
-        ? prettyDnpName(newStakerConfig.consensusClient.dnpName)
-        : "-"
+      new: newConsClient?.dnpName ? prettyDnpName(newConsClient.dnpName) : "-"
     },
     {
       name: "Graffiti",
-      current: consClientGraffiti ? consClientGraffiti : "-",
-      new: newConstClientGraffiti ? newConstClientGraffiti : "-"
+      current: consensusClient?.graffiti ? consensusClient?.graffiti : "-",
+      new: newConsClient?.graffiti ? newConsClient?.graffiti : "-"
     },
     {
       name: "Fee Recipient",
-      current: consClientFeeRecipient ? consClientFeeRecipient : "-",
-      new: newConstClientFeeRecipient ? newConstClientFeeRecipient : "-"
+      current: consensusClient?.feeRecipient
+        ? consensusClient?.feeRecipient
+        : "-",
+      new: newConsClient?.feeRecipient ? newConsClient?.feeRecipient : "-"
     },
     {
       name: "Checkpoint Sync",
-      current: consClientCheckpointSync ? consClientCheckpointSync : "-",
-      new: newConstClientCheckpointSync ? newConstClientCheckpointSync : "-"
+      current: consensusClient?.checkpointSync
+        ? consensusClient?.checkpointSync
+        : "-",
+      new: newConsClient?.checkpointSync ? newConsClient?.checkpointSync : "-"
     },
     {
       name: "Web3 Signer",
-      current: currentStakerConfig.enableWeb3signer ? "enabled" : "disabled",
-      new: newStakerConfig.enableWeb3signer ? "enabled" : "disabled"
+      current: enableWeb3signer ? "enabled" : "disabled",
+      new: newEnableWeb3signer ? "enabled" : "disabled"
     },
     {
       name: "Mev Boost",
-      current: currentStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled",
-      new: newStakerConfig.mevBoost?.dnpName ? "enabled" : "disabled"
+      current: mevBoost?.dnpName ? "enabled" : "disabled",
+      new: newMevBoost?.dnpName ? "enabled" : "disabled"
     },
     {
       name: "Relays",
-      current: mevBoostRelays ? mevBoostRelays.join(", ") : "-",
-      new: newMevBoostRelays ? newMevBoostRelays.join(", ") : "-"
+      current: mevBoost?.relays
+        ? mapRelays(currentStakerConfig.network, mevBoost.relays)
+            .map(relay => relay.operator)
+            .join(", ")
+        : "-",
+      new: newMevBoost?.relays
+        ? mapRelays(currentStakerConfig.network, newMevBoost.relays)
+            .map(relay => relay.operator)
+            .join(", ")
+        : "-"
     }
   ];
   return (
@@ -115,7 +107,7 @@ export default function AdvanceView<T extends Network>({
           </span>
           <span className="current">
             <span>
-              {config.current !== config.new ? (
+              {!isEqual(config.current, config.new) ? (
                 <strong>{config.current}</strong>
               ) : (
                 config.current

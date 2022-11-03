@@ -20,7 +20,12 @@ import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
-import { disclaimer } from "../data";
+import {
+  defaultDappnodeGraffiti,
+  defaultMainnetCheckpointSync,
+  defaultPraterCheckpointSync,
+  disclaimer
+} from "../data";
 import Loading from "components/Loading";
 import {
   areChangesAllowed,
@@ -114,9 +119,9 @@ export default function StakerNetwork<T extends Network>({
         if (!consensusClient.checkpointSync) {
           const defaultCheckpointSync =
             network === "mainnet"
-              ? "https://checkpoint-sync.dappnode.io"
+              ? defaultMainnetCheckpointSync
               : network === "prater"
-              ? "https://checkpoint-sync-prater.dappnode.io"
+              ? defaultPraterCheckpointSync
               : "";
           setNewConsClient({
             ...consensusClient,
@@ -127,12 +132,11 @@ export default function StakerNetwork<T extends Network>({
           setDefaultCheckpointSync(consensusClient.checkpointSync);
         }
         if (!consensusClient.graffiti) {
-          const defaultGraffiti = "validating_from_DAppNode";
           setNewConsClient({
             ...consensusClient,
-            graffiti: defaultGraffiti
+            graffiti: defaultDappnodeGraffiti
           });
-          setDefaultGraffiti(defaultGraffiti);
+          setDefaultGraffiti(defaultDappnodeGraffiti);
         } else {
           setDefaultGraffiti(consensusClient.graffiti);
         }
@@ -318,6 +322,7 @@ export default function StakerNetwork<T extends Network>({
                 <MevBoost
                   network={network}
                   mevBoost={currentStakerConfigReq.data.mevBoost}
+                  newMevBoost={newMevBoost}
                   setNewMevBoost={setNewMevBoost}
                   isSelected={newMevBoost?.dnpName ? true : false}
                 />
@@ -331,16 +336,10 @@ export default function StakerNetwork<T extends Network>({
             {currentStakerConfig && (
               <AdvanceView<T>
                 currentStakerConfig={currentStakerConfig}
-                newStakerConfig={{
-                  network,
-                  executionClient: newExecClient,
-                  consensusClient: newConsClient,
-                  mevBoost: newMevBoost,
-                  enableWeb3signer: newEnableWeb3signer
-                }}
-                defaultGraffiti={defaultGraffiti}
-                defaultFeeRecipient={defaultFeeRecipient}
-                defaultCheckpointSync={defaultCheckpointSync}
+                newExecClient={newExecClient}
+                newConsClient={newConsClient}
+                newMevBoost={newMevBoost}
+                newEnableWeb3signer={newEnableWeb3signer}
               />
             )}
 
