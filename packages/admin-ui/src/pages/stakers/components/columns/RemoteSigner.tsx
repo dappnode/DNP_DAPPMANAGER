@@ -64,9 +64,13 @@ export default function RemoteSigner<T extends Network>({
               whiteSpace: "nowrap"
             }}
           >
-            <Link to={signer.metadata.links.ui}>
+            <a
+              href={signer.metadata.links.ui}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
               <FaKey /> {"  "} Upload keystores
-            </Link>
+            </a>
           </div>
         )}
 
