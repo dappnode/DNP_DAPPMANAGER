@@ -3,7 +3,6 @@ import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
 import {
   ConsensusClient,
   ExececutionClient,
-  InstalledPackageData,
   MevBoost,
   Network,
   Signer,
@@ -15,6 +14,7 @@ import { listPackages } from "../docker/list";
 import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
+  getIsRunning,
   getStakerParamsByNetwork,
   getValidatorServiceName
 } from "./utils";
@@ -57,7 +57,6 @@ export async function getStakerConfig<T extends Network>(
             const repository = await releaseFetcher.getRelease(
               execClient.dnpName
             );
-            // Print the object respository
             return {
               status: "ok",
               dnpName: repository.dnpName as ExececutionClient<T>,
@@ -188,17 +187,4 @@ export async function getStakerConfig<T extends Network>(
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);
   }
-}
-
-// Utils
-
-function getIsRunning(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  return (
-    dnpList
-      .find(dnp => dnp.dnpName === dnpName)
-      ?.containers.every(c => c.running) ?? false
-  );
 }

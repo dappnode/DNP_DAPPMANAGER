@@ -25,20 +25,21 @@ export default function RemoteSigner<T extends Network>({
     <Card
       {...props}
       className={`remote-signer ${joinCssClass({ isSelected })}`}
-      onClick={() => setEnableWeb3signer(!isSelected)}
       shadow={isSelected}
     >
-      {signer.status === "ok" ? (
-        <div className="avatar">
-          <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
-        </div>
-      ) : signer.status === "error" ? (
-        <div className="avatar">
-          <img src={errorAvatar} alt="avatar" />
-        </div>
-      ) : null}
+      <div onClick={() => setEnableWeb3signer(!isSelected)}>
+        {signer.status === "ok" ? (
+          <div className="avatar">
+            <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
+          </div>
+        ) : signer.status === "error" ? (
+          <div className="avatar">
+            <img src={errorAvatar} alt="avatar" />
+          </div>
+        ) : null}
 
-      <div className="title">{prettyDnpName(signer.dnpName)} </div>
+        <div className="title">{prettyDnpName(signer.dnpName)} </div>
+      </div>
 
       {signer.status === "ok" &&
         isSelected &&

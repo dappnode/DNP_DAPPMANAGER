@@ -111,7 +111,10 @@ export default function StakerNetwork<T extends Network>({
           executionClient?.status === "ok" ? executionClient : undefined,
         consensusClient:
           consensusClient?.status === "ok" ? consensusClient : undefined,
-        mevBoost: mevBoost?.status === "ok" ? mevBoost : undefined,
+        mevBoost:
+          mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
+            ? mevBoost
+            : undefined,
         enableWeb3signer
       });
 
@@ -321,7 +324,12 @@ export default function StakerNetwork<T extends Network>({
                   mevBoost={currentStakerConfigReq.data.mevBoost}
                   newMevBoost={newMevBoost}
                   setNewMevBoost={setNewMevBoost}
-                  isSelected={newMevBoost?.dnpName ? true : false}
+                  isSelected={
+                    currentStakerConfigReq.data.mevBoost.dnpName ===
+                    newMevBoost?.dnpName
+                      ? true
+                      : false
+                  }
                 />
               </Col>
             )}
