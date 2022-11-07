@@ -1,4 +1,11 @@
-import { Network, Routes, StakerConfigGet } from "common";
+import {
+  ConsensusClient,
+  ExececutionClient,
+  MevBoost,
+  Network,
+  Routes,
+  Signer
+} from "common";
 
 export const stakerConfig: Pick<
   Routes,
@@ -12,7 +19,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "geth.dnp.dappnode.eth",
+              dnpName: "geth.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -27,7 +34,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nethermind.dnp.dappnode.eth",
+              dnpName: "nethermind.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -42,7 +49,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "besu.public.dappnode.eth",
+              dnpName: "besu.public.dappnode.eth" as ExececutionClient<T>, 
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -57,7 +64,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "erigon.dnp.dappnode.eth",
+              dnpName: "erigon.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -74,7 +81,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm.dnp.dappnode.eth",
+              dnpName: "prysm.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -92,7 +99,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "lighthouse.dnp.dappnode.eth",
+              dnpName: "lighthouse.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -107,7 +114,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "teku.dnp.dappnode.eth",
+              dnpName: "teku.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -122,7 +129,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nimbus.dnp.dappnode.eth",
+              dnpName: "nimbus.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -141,7 +148,7 @@ export const stakerConfig: Pick<
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer.dnp.dappnode.eth",
+            dnpName: "web3signer.dnp.dappnode.eth" as Signer<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -156,7 +163,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost.dnp.dappnode.eth",
+            dnpName: "mev-boost.dnp.dappnode.eth" as MevBoost<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -169,13 +176,13 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        } as StakerConfigGet<T>;
+        };
       case "prater":
         return {
           executionClients: [
             {
               status: "ok",
-              dnpName: "goerli-geth.dnp.dappnode.eth",
+              dnpName: "goerli-geth.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -190,7 +197,9 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-nethermind.dnp.dappnode.eth",
+              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExececutionClient<
+                T
+              >,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -205,7 +214,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-besu.dnp.dappnode.eth",
+              dnpName: "goerli-besu.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -220,7 +229,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-erigon.dnp.dappnode.eth",
+              dnpName: "goerli-erigon.dnp.dappnode.eth" as ExececutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -237,7 +246,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm-prater.dnp.dappnode.eth",
+              dnpName: "prysm-prater.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -255,7 +264,9 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "lighthouse-prater.dnp.dappnode.eth",
+              dnpName: "lighthouse-prater.dnp.dappnode.eth" as ConsensusClient<
+                T
+              >,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -270,7 +281,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "teku-prater.dnp.dappnode.eth",
+              dnpName: "teku-prater.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: false,
               isRunning: false,
               isUpdated: true,
@@ -285,7 +296,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nimbus-prater.dnp.dappnode.eth",
+              dnpName: "nimbus-prater.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -304,7 +315,7 @@ export const stakerConfig: Pick<
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-prater.dnp.dappnode.eth",
+            dnpName: "web3signer-prater.dnp.dappnode.eth" as Signer<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -322,7 +333,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-goerli.dnp.dappnode.eth",
+            dnpName: "mev-boost-goerli.dnp.dappnode.eth" as MevBoost<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -340,14 +351,16 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        } as StakerConfigGet<T>;
+        };
 
       case "gnosis":
         return {
           executionClients: [
             {
               status: "ok",
-              dnpName: "nethermind-xdai.dnp.dappnode.eth",
+              dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExececutionClient<
+                T
+              >,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -364,7 +377,9 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth" as ConsensusClient<
+                T
+              >,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -382,7 +397,9 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
+              dnpName: "lighthouse-gnosis.dnp.dappnode.eth" as ConsensusClient<
+                T
+              >,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -397,7 +414,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "teku-gnosis.dnp.dappnode.eth",
+              dnpName: "teku-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -412,7 +429,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
+              dnpName: "nimbus-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -431,7 +448,7 @@ export const stakerConfig: Pick<
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-gnosis.dnp.dappnode.eth",
+            dnpName: "web3signer-gnosis.dnp.dappnode.eth" as Signer<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -446,7 +463,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-gnosis.dnp.dappnode.eth",
+            dnpName: "mev-boost-gnosis.dnp.dappnode.eth" as MevBoost<T>,
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -459,7 +476,7 @@ export const stakerConfig: Pick<
               version: "0.1.0"
             }
           }
-        } as StakerConfigGet<T>;
+        };
       default:
         throw Error(`Unknown network ${network}`);
     }
