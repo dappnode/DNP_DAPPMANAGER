@@ -22,9 +22,8 @@ import Button from "components/Button";
 import AdvanceView from "./AdvanceView";
 import {
   defaultDappnodeGraffiti,
-  defaultMainnetCheckpointSync,
-  defaultPraterCheckpointSync,
-  disclaimer
+  disclaimer,
+  getDefaultCheckpointSync
 } from "../data";
 import Loading from "components/Loading";
 import {
@@ -64,10 +63,12 @@ export default function StakerNetwork<T extends Network>({
   );
 
   // Default config
-  const [defaultGraffiti, setDefaultGraffiti] = useState<string>("");
+  const [defaultGraffiti, setDefaultGraffiti] = useState<string>(
+    defaultDappnodeGraffiti
+  );
   const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
   const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
-    ""
+    getDefaultCheckpointSync(network)
   );
   // Apply button state
   const [isApplyAllowed, setIsApplyAllowed] = useState(false);
@@ -120,33 +121,22 @@ export default function StakerNetwork<T extends Network>({
 
       // Set default consensus client: fee recipient, checkpointsync and graffiti
       if (consensusClient && consensusClient.status === "ok") {
-        if (!consensusClient.checkpointSync) {
-          const defaultCheckpointSync =
-            network === "mainnet"
-              ? defaultMainnetCheckpointSync
-              : network === "prater"
-              ? defaultPraterCheckpointSync
-              : "";
+        if (!consensusClient.checkpointSync)
           setNewConsClient({
             ...consensusClient,
             checkpointSync: defaultCheckpointSync
           });
-          setDefaultCheckpointSync(defaultCheckpointSync);
-        } else {
-          setDefaultCheckpointSync(consensusClient.checkpointSync);
-        }
-        if (!consensusClient.graffiti) {
+        else setDefaultCheckpointSync(consensusClient.checkpointSync);
+
+        if (!consensusClient.graffiti)
           setNewConsClient({
             ...consensusClient,
             graffiti: defaultDappnodeGraffiti
           });
-          setDefaultGraffiti(defaultDappnodeGraffiti);
-        } else {
-          setDefaultGraffiti(consensusClient.graffiti);
-        }
-        if (consensusClient.feeRecipient) {
+        else setDefaultGraffiti(consensusClient.graffiti);
+
+        if (consensusClient.feeRecipient)
           setDefaultFeeRecipient(consensusClient.feeRecipient);
-        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
