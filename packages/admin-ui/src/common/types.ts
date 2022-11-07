@@ -1271,13 +1271,28 @@ export type StakerItemError<T extends Network, P extends StakerType> = {
   error: string;
 } & StakerItemBasic<T, P>;
 
+/**
+ * Metadata of a staker item to be cached
+ */
+export type StakerItemMetadata = Pick<
+  Manifest,
+  | "name"
+  | "version"
+  | "upstreamRepo"
+  | "shortDescription"
+  | "avatar"
+  | "links"
+  | "chain"
+  | "warnings"
+>;
+
 export type StakerItemOk<T extends Network, P extends StakerType> = {
   status: "ok";
   avatarUrl: string;
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  metadata: Manifest;
+  metadata: StakerItemMetadata;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 

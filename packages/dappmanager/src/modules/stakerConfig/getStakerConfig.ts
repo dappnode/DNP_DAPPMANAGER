@@ -16,7 +16,8 @@ import {
   getBeaconServiceName,
   getIsRunning,
   getStakerParamsByNetwork,
-  getValidatorServiceName
+  getValidatorServiceName,
+  pickStakerItemMetadata
 } from "./utils";
 
 /**
@@ -64,7 +65,7 @@ export async function getStakerConfig<T extends Network>(
               isInstalled: getIsInstalled(repository, dnpList),
               isUpdated: getIsUpdated(repository, dnpList),
               isRunning: getIsRunning(repository, dnpList),
-              metadata: repository.metadata,
+              metadata: pickStakerItemMetadata(repository.metadata),
               isSelected: repository.dnpName === currentExecClient
             };
           } catch (error) {
@@ -107,7 +108,7 @@ export async function getStakerConfig<T extends Network>(
               isInstalled: getIsInstalled(repository, dnpList),
               isUpdated: getIsUpdated(repository, dnpList),
               isRunning: getIsRunning(repository, dnpList),
-              metadata: repository.metadata,
+              metadata: pickStakerItemMetadata(repository.metadata),
               isSelected: repository.dnpName === currentConsClient,
               graffiti,
               feeRecipient,
@@ -137,7 +138,7 @@ export async function getStakerConfig<T extends Network>(
             isInstalled: getIsInstalled(repository, dnpList),
             isUpdated: getIsUpdated(repository, dnpList),
             isRunning: signerIsRunning,
-            metadata: repository.metadata,
+            metadata: pickStakerItemMetadata(repository.metadata),
             isSelected: signerIsRunning
           });
         } catch (error) {
@@ -171,7 +172,7 @@ export async function getStakerConfig<T extends Network>(
             isInstalled,
             isUpdated: getIsUpdated(repository, dnpList),
             isRunning: getIsRunning(repository, dnpList),
-            metadata: repository.metadata,
+            metadata: pickStakerItemMetadata(repository.metadata),
             isSelected: isMevBoostSelected,
             relays
           });
