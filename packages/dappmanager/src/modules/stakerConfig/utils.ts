@@ -351,3 +351,14 @@ export async function updateMevBoostEnv<T extends Network>({
     }
   }
 }
+
+export function getIsRunning(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): boolean {
+  return (
+    dnpList
+      .find(dnp => dnp.dnpName === dnpName)
+      ?.containers.every(c => c.running) ?? false
+  );
+}

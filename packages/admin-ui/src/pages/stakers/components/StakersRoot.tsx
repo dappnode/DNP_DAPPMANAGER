@@ -16,7 +16,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
     title: string;
     component: JSX.Element;
   }[] = [
-    /*     {
+    {
       subPath: "mainnet",
       title: "Mainnet",
       component: StakerNetwork({
@@ -25,7 +25,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
           "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
       })
     },
-    {
+    /*  {
       subPath: "gnoexecutionClientsis",
       title: "Gnosis chain",
       component: StakerNetwork({

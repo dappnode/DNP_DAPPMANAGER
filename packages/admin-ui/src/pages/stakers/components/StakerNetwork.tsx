@@ -100,7 +100,8 @@ export default function StakerNetwork<T extends Network>({
         setNewExecClient(executionClient);
       if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
-      if (mevBoost && mevBoost.status === "ok") setNewMevBoost(mevBoost);
+      if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
+        setNewMevBoost(mevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
 
       // Set the current config to be displayed in advance view
@@ -110,7 +111,10 @@ export default function StakerNetwork<T extends Network>({
           executionClient?.status === "ok" ? executionClient : undefined,
         consensusClient:
           consensusClient?.status === "ok" ? consensusClient : undefined,
-        mevBoost: mevBoost?.status === "ok" ? mevBoost : undefined,
+        mevBoost:
+          mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
+            ? mevBoost
+            : undefined,
         enableWeb3signer
       });
 
@@ -312,7 +316,7 @@ export default function StakerNetwork<T extends Network>({
                 isSelected={newEnableWeb3signer}
               />
             </Col>
-            {network === "prater" && (
+            {(network === "prater" || network === "mainnet") && (
               <Col>
                 <SubTitle>Mev Boost</SubTitle>
                 <MevBoost
@@ -323,6 +327,8 @@ export default function StakerNetwork<T extends Network>({
                   isSelected={
                     currentStakerConfigReq.data.mevBoost.dnpName ===
                     newMevBoost?.dnpName
+                      ? true
+                      : false
                   }
                 />
               </Col>

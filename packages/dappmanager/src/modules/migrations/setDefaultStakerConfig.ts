@@ -25,7 +25,7 @@ import { getStakerParamsByNetwork } from "../stakerConfig/utils";
 export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
-  for (const network of [/* "mainnet", "gnosis",  */ "prater"] as Network[]) {
+  for (const network of ["mainnet", /* "gnosis",  */ "prater"] as Network[]) {
     const stakerConfig = getStakerParamsByNetwork(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
@@ -47,9 +47,22 @@ export async function setDefaultStakerConfig(): Promise<void> {
 
       if (network === "mainnet") {
         const repository = db.ethClientTarget.get();
-        if (repository === "nethermind")
-          newExexClientValue = "nethermind.public.dappnode.eth";
-        if (repository === "geth") newExexClientValue = "geth.dnp.dappnode.eth";
+        switch (repository) {
+          case "geth":
+            newExexClientValue = "geth.dnp.dappnode.eth";
+            break;
+          case "nethermind":
+            newExexClientValue = "nethermind.public.dappnode.eth";
+            break;
+          case "besu":
+            newExexClientValue = "besu.dnp.dappnode.eth";
+            break;
+          case "erigon":
+            newExexClientValue = "erigon.dnp.dappnode.eth";
+            break;
+          default:
+            break;
+        }
       }
 
       switch (network) {

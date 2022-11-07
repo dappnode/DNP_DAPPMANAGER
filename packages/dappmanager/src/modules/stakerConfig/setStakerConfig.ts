@@ -87,7 +87,7 @@ export async function setStakerConfig<T extends Network>({
       exCl => exCl.dnpName === currentExecClientPkg.dnpName
     );
     if (
-      execClient &&
+      execClient?.minVersion &&
       semver.lt(currentExecClientPkg.version, execClient.minVersion)
     )
       throw Error(
@@ -104,7 +104,7 @@ export async function setStakerConfig<T extends Network>({
       exCl => exCl.dnpName === currentConsClientPkg.dnpName
     );
     if (
-      consClient &&
+      consClient?.minVersion &&
       semver.lt(currentConsClientPkg.version, consClient.minVersion)
     )
       throw Error(
@@ -117,6 +117,7 @@ export async function setStakerConfig<T extends Network>({
   );
   // Ensure Web3signer DNP's version is valid
   if (
+    web3signer.minVersion &&
     currentWeb3signerPkg &&
     semver.lt(currentWeb3signerPkg.version, web3signer.minVersion)
   )
