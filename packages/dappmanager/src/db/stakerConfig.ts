@@ -4,16 +4,28 @@ import {
   ConsensusClientGnosis,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
-  ExecutionClientPrater
+  ExecutionClientPrater,
+  StakerItemMetadata
 } from "../types";
-import { dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
 
 // Mainnet
 
+const STAKER_ITEM_MAINNET = "staker-item-mainnet";
 const CONSENSUS_CLIENT_MAINNET = "consensus-client-mainnet";
 const EXECUTION_CLIENT_MAINNET = "execution-client-mainnet";
 const MEVBOOST_MAINNET = "mevboost-mainnet";
+
+export const stakerItemMainnet = dbCache.indexedByKey<
+  Record<string, StakerItemMetadata>,
+  string
+>({
+  rootKey: STAKER_ITEM_MAINNET,
+  getKey: target => target,
+  validate: (id, metadata) =>
+    typeof id === "string" && typeof metadata === "object"
+});
 
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientMainnet | null>(
@@ -38,9 +50,20 @@ export const mevBoostMainnet = interceptGlobalEnvOnSet(
 
 // Gnosis
 
+const STAKER_ITEM_GNOSIS = "staker-item-gnosis";
 const CONSENSUS_CLIENT_GNOSIS = "consensus-client-gnosis";
 const EXECUTION_CLIENT_GNOSIS = "execution-client-gnosis";
 const MEVBOOST_GNOSIS = "mevboost-gnosis";
+
+export const stakerItemGnosis = dbCache.indexedByKey<
+  Record<string, StakerItemMetadata>,
+  string
+>({
+  rootKey: STAKER_ITEM_GNOSIS,
+  getKey: target => target,
+  validate: (id, metadata) =>
+    typeof id === "string" && typeof metadata === "object"
+});
 
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientGnosis | null>(CONSENSUS_CLIENT_GNOSIS, null),
@@ -59,9 +82,20 @@ export const mevBoostGnosis = interceptGlobalEnvOnSet(
 
 // Prater
 
+const STAKER_ITEM_PRATER = "staker-item-prater";
 const CONSENSUS_CLIENT_PRATER = "consensus-client-prater";
 const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
+
+export const stakerItemPrater = dbCache.indexedByKey<
+  Record<string, StakerItemMetadata>,
+  string
+>({
+  rootKey: STAKER_ITEM_PRATER,
+  getKey: target => target,
+  validate: (id, metadata) =>
+    typeof id === "string" && typeof metadata === "object"
+});
 
 export const consensusClientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientPrater | null>(CONSENSUS_CLIENT_PRATER, null),
