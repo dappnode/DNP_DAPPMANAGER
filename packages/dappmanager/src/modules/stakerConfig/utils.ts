@@ -13,12 +13,15 @@ import {
   InstalledPackageData,
   InstalledPackageDataApiReturn,
   StakerItemOk,
-  MevBoost
+  MevBoost,
+  StakerItemMetadata
 } from "../../types";
 import * as db from "../../db";
 import { packageSetEnvironment } from "../../calls";
 import { logs } from "../../logs";
 import { dockerContainerStop } from "../docker";
+import { Manifest } from "@dappnode/dappnodesdk";
+import { pick } from "lodash";
 
 /**
  * Sets the staker configuration on db for a given network
@@ -361,4 +364,17 @@ export function getIsRunning(
       .find(dnp => dnp.dnpName === dnpName)
       ?.containers.every(c => c.running) ?? false
   );
+}
+
+export function pickStakerItemMetadata(manifest: Manifest): StakerItemMetadata {
+  return pick(manifest, [
+    "name",
+    "version",
+    "upstreamRepo",
+    "shortDescription",
+    "avatar",
+    "links",
+    "chain",
+    "warnings"
+  ] as const);
 }
