@@ -22,5 +22,6 @@ export const eventBus: EventBus = {
   requestPackages: emptySubscription,
   requestSystemInfo: emptySubscription,
   runEthClientInstaller: emptySubscription,
-  runNatRenewal: emptySubscription
+  runNatRenewal: emptySubscription,
+  runStakerCacheUpdate: emptySubscription
 };
