@@ -60,6 +60,8 @@ export function areChangesAllowed<T extends Network>({
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
 }): boolean {
+  if (feeRecipientError || graffitiError) return false;
+
   const {
     executionClient,
     consensusClient,
@@ -87,15 +89,20 @@ export function areChangesAllowed<T extends Network>({
     pick(newMevBoost, ["dnpName", "relays"])
   );
 
-  return (
-    !feeRecipientError &&
-    !graffitiError &&
-    (isExecAndConsSelected || isExecAndConsDeSelected) &&
-    (executionClient !== newExecClient ||
-      !isConsClientEqual ||
-      !isMevBoostEqual ||
-      enableWeb3signer !== newEnableWeb3signer)
-  );
+  // Check there is at least one change:
+  if (
+    executionClient !== newExecClient ||
+    !isConsClientEqual ||
+    !isMevBoostEqual ||
+    enableWeb3signer !== newEnableWeb3signer
+  ) {
+      // Allow if EC and CC are selected
+      if (isExecAndConsSelected) return true;
+      // Allow if no EC and no CC and no MEV boost and no web3signer
+      if (isExecAndConsDeSelected && !newEnableWeb3signer && !newMevBoost)
+        return true;
+    }
+  return false;
 }
 
 export interface RelayIface {
