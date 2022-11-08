@@ -2,7 +2,12 @@ import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { Network } from "../../types";
-import { getStakerParamsByNetwork } from "../../modules/stakerConfig/utils";
+import {
+  getStakerParamsByNetwork,
+  pickStakerItemData
+} from "../../modules/stakerConfig/utils";
+import { runOnlyOneSequentially } from "../../utils/asyncFlows";
+import { ReleaseFetcher } from "../../modules/release";
 
 function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   try {
@@ -51,13 +56,34 @@ function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   }
 }
 
+async function runStakerCacheUpdate({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<void> {
+  try {
+    logs.info(`Updating staker item cache for ${dnpName}`);
+    const releaseFetcher = new ReleaseFetcher();
+    const repository = await releaseFetcher.getRelease(dnpName);
+    const dataDnp = pickStakerItemData(repository);
+    logs.info(`Staker data: ${dataDnp}`);
+    db.stakerItemMetadata.set(dnpName, dataDnp);
+  } catch (e) {
+    logs.error("Error on staker cache update daemon", e);
+  }
+}
+
 /**
  * StakerConfig daemon.
  * Makes sure the staker config is updated when removing a package
  */
-export function startStakerConfigDaemon(): void {
+export function startStakerDaemon(): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
     // Only act when removing packages
     if (removed) runStakerConfigUpdate({ dnpNames });
+  });
+
+  eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
+    runOnlyOneSequentially(async () => runStakerCacheUpdate({ dnpName }));
   });
 }
