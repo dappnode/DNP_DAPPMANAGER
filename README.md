@@ -62,6 +62,12 @@ docker-compose logs -f
 
 ### Developing
 
+Before choosing any of the following options for development, remember to run:
+```
+yarn
+yarn generate
+```
+
 There are 3 different developing modes:
 
 1. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, to develop and test UI elements without connecting to a DAppNode or a mock server. This is a fully static site that will be deployed to Netlify on every PR to speed up the reviewing process of PRs.
