@@ -68,7 +68,7 @@ export async function getStakerConfig<T extends Network>(
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
-              metadata: pkgData,
+              data: pkgData,
               isSelected: execClient.dnpName === currentExecClient
             };
           } catch (error) {
@@ -112,7 +112,7 @@ export async function getStakerConfig<T extends Network>(
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
-              metadata: pkgData,
+              data: pkgData,
               isSelected: consClient.dnpName === currentConsClient,
               graffiti,
               feeRecipient,
