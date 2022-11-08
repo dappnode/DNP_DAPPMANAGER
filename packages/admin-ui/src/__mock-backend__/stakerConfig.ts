@@ -1,6 +1,6 @@
 import {
   ConsensusClient,
-  ExececutionClient,
+  ExecutionClient,
   MevBoost,
   Network,
   Routes,
@@ -19,7 +19,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "geth.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "geth.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -34,7 +34,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nethermind.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -49,7 +49,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "besu.public.dappnode.eth" as ExececutionClient<T>, 
+              dnpName: "besu.public.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -64,7 +64,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "erigon.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "erigon.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -182,7 +182,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "goerli-geth.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "goerli-geth.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -197,7 +197,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExececutionClient<
+              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExecutionClient<
                 T
               >,
               isInstalled: true,
@@ -214,7 +214,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-besu.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "goerli-besu.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -229,7 +229,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-erigon.dnp.dappnode.eth" as ExececutionClient<T>,
+              dnpName: "goerli-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -358,9 +358,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExececutionClient<
-                T
-              >,
+              dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,

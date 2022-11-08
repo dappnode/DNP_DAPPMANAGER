@@ -1234,7 +1234,7 @@ export type StakerItem<T extends Network, P extends StakerType> =
   | StakerItemError<T, P>;
 
 interface StakerExecution<T extends Network> {
-  dnpName: ExececutionClient<T>;
+  dnpName: ExecutionClient<T>;
 }
 
 interface StakerConsensus<T extends Network> {
@@ -1274,16 +1274,17 @@ export type StakerItemError<T extends Network, P extends StakerType> = {
 /**
  * Metadata of a staker item to be cached
  */
-export type StakerItemMetadata = Pick<
-  Manifest,
-  | "name"
-  | "version"
-  | "upstreamRepo"
-  | "shortDescription"
-  | "avatar"
-  | "links"
-  | "chain"
+export type StakerItemData = Pick<
+  PackageRelease,
+  | "dnpName"
+  | "reqVersion"
+  | "semVersion"
+  | "imageFile"
+  | "avatarFile"
+  | "metadata"
   | "warnings"
+  | "origin"
+  | "signedSafe"
 >;
 
 export type StakerItemOk<T extends Network, P extends StakerType> = {
@@ -1292,7 +1293,7 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  metadata: StakerItemMetadata;
+  metadata: StakerItemData;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 
@@ -1311,7 +1312,7 @@ export interface StakerConfigSet<T extends Network> {
   enableWeb3signer?: boolean;
 }
 
-export type ExececutionClient<T extends Network> = T extends "mainnet"
+export type ExecutionClient<T extends Network> = T extends "mainnet"
   ? ExecutionClientMainnet
   : T extends "gnosis"
   ? ExecutionClientGnosis
@@ -1345,10 +1346,10 @@ export type MevBoost<T extends Network> = T extends "mainnet"
 
 export interface StakerParamsByNetwork<T extends Network> {
   execClients: {
-    dnpName: ExececutionClient<T>;
+    dnpName: ExecutionClient<T>;
     minVersion: string;
   }[];
-  currentExecClient: ExececutionClient<T>;
+  currentExecClient: ExecutionClient<T>;
   consClients: {
     dnpName: ConsensusClient<T>;
     minVersion: string;

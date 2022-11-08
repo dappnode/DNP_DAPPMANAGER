@@ -7,21 +7,24 @@ import {
   ExecutionClientPrater,
   ConsensusClientPrater,
   StakerParamsByNetwork,
-  ExececutionClient,
+  ExecutionClient,
   ConsensusClient,
   UserSettingsAllDnps,
   InstalledPackageData,
   InstalledPackageDataApiReturn,
   StakerItemOk,
   MevBoost,
-  StakerItemMetadata
+  StakerItemData,
+  PackageRelease
 } from "../../types";
 import * as db from "../../db";
 import { packageSetEnvironment } from "../../calls";
 import { logs } from "../../logs";
 import { dockerContainerStop } from "../docker";
-import { Manifest } from "@dappnode/dappnodesdk";
 import { pick } from "lodash";
+import { Manifest } from "@dappnode/dappnodesdk";
+import { ReleaseFetcher } from "../release";
+import { eventBus } from "../../eventBus";
 
 /**
  * Sets the staker configuration on db for a given network
@@ -33,7 +36,7 @@ export function setStakerConfigOnDb<T extends Network>({
   mevBoost
 }: {
   network: T;
-  executionClient?: ExececutionClient<T>;
+  executionClient?: ExecutionClient<T>;
   consensusClient?: ConsensusClient<T>;
   mevBoost?: MevBoost<T>;
 }): void {
@@ -366,15 +369,47 @@ export function getIsRunning(
   );
 }
 
-export function pickStakerItemMetadata(manifest: Manifest): StakerItemMetadata {
+export function pickStakerManifestData(manifest: Manifest): Manifest {
   return pick(manifest, [
     "name",
     "version",
-    "upstreamRepo",
     "shortDescription",
     "avatar",
     "links",
     "chain",
     "warnings"
   ] as const);
+}
+
+export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
+  return {
+    metadata: pickStakerManifestData(pkgRelease.metadata),
+    ...pick(pkgRelease, [
+      "dnpName",
+      "reqVersion",
+      "semVersion",
+      "imageFile",
+      "avatarFile",
+      "warnings",
+      "origin",
+      "signedSafe"
+    ] as const)
+  };
+}
+
+export async function getPkgData(
+  releaseFetcher: ReleaseFetcher,
+  dnpName: string
+): Promise<StakerItemData> {
+  const cachedDnp = db.stakerItemMetadata.get(dnpName);
+  if (cachedDnp) {
+    // Update cache in the background
+    eventBus.runStakerCacheUpdate.emit({ dnpName });
+    return cachedDnp;
+  } else {
+    const repository = await releaseFetcher.getRelease(dnpName);
+    const dataDnp = pickStakerItemData(repository);
+    db.stakerItemMetadata.set(dnpName, dataDnp);
+    return dataDnp;
+  }
 }

@@ -5,7 +5,7 @@ import { startDynDnsDaemon } from "./dyndns";
 import { startEthMultiClientDaemon } from "./ethMultiClient";
 import { startNatRenewalDaemon } from "./natRenewal";
 import { startNsUpdateDaemon } from "./nsupdate";
-import { startStakerConfigDaemon } from "./stakerConfig";
+import { startStakerDaemon } from "./stakerConfig";
 import { startTelegramBotDaemon } from "./telegramBot";
 
 export function startDaemons(signal: AbortSignal): void {
@@ -15,6 +15,6 @@ export function startDaemons(signal: AbortSignal): void {
   startEthMultiClientDaemon(signal);
   startNatRenewalDaemon(signal);
   startNsUpdateDaemon(signal);
+  startStakerDaemon();
   startTelegramBotDaemon();
-  startStakerConfigDaemon();
 }
