@@ -140,7 +140,7 @@ export async function getStakerConfig<T extends Network>(
             isInstalled: getIsInstalled(pkgData, dnpList),
             isUpdated: getIsUpdated(pkgData, dnpList),
             isRunning: signerIsRunning,
-            metadata: pkgData,
+            data: pkgData,
             isSelected: signerIsRunning
           });
         } catch (error) {
@@ -174,7 +174,7 @@ export async function getStakerConfig<T extends Network>(
             isInstalled,
             isUpdated: getIsUpdated(pkgData, dnpList),
             isRunning: getIsRunning(pkgData, dnpList),
-            metadata: pkgData,
+            data: pkgData,
             isSelected: isMevBoostSelected,
             relays
           });
