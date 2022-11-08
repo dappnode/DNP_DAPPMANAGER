@@ -43,7 +43,7 @@ export function isOkSelectedInstalledAndRunning<
  *   - MEV boost
  *   - MEV boost relays
  */
-export function areChangesAllowed<T extends Network>({
+export function getChanges<T extends Network>({
   currentStakerConfig,
   feeRecipientError,
   graffitiError,
@@ -59,7 +59,14 @@ export function areChangesAllowed<T extends Network>({
   newConsClient?: StakerItemOk<T, "consensus">;
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
-}): boolean {
+}): { isAllowed: boolean; reason?: string } {
+  // Not allowed if feerecipient or graffiti are invalid
+  if (feeRecipientError || graffitiError)
+    return {
+      isAllowed: false,
+      reason: "Invalid graffiti and/or fee recipient"
+    };
+
   const {
     executionClient,
     consensusClient,
@@ -87,15 +94,37 @@ export function areChangesAllowed<T extends Network>({
     pick(newMevBoost, ["dnpName", "relays"])
   );
 
-  return (
-    !feeRecipientError &&
-    !graffitiError &&
-    (isExecAndConsSelected || isExecAndConsDeSelected) &&
-    (executionClient !== newExecClient ||
+  // Not allowed if no changes
+  if (
+    !(
+      executionClient !== newExecClient ||
       !isConsClientEqual ||
       !isMevBoostEqual ||
-      enableWeb3signer !== newEnableWeb3signer)
-  );
+      enableWeb3signer !== newEnableWeb3signer
+    )
+  )
+    return {
+      isAllowed: false,
+      reason: "No changes detected"
+    };
+
+  // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
+  if (isExecAndConsDeSelected && (newEnableWeb3signer || newMevBoost))
+    return {
+      isAllowed: false,
+      reason:
+        "MEV Boost and/or Web3Signer selected but no consensus and execution client selected"
+    };
+
+  // Not allowed if changes AND (EC or CC are deselected) AND (no signer and no mev boost)
+  if (!isExecAndConsSelected && (newEnableWeb3signer || newMevBoost))
+    return {
+      isAllowed: false,
+      reason:
+        "At least one client (either execution or consensus) must be selected"
+    };
+
+  return { isAllowed: true };
 }
 
 export interface RelayIface {

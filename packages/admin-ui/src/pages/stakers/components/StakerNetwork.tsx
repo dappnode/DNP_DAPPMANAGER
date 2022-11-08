@@ -27,12 +27,13 @@ import {
 } from "../data";
 import Loading from "components/Loading";
 import {
-  areChangesAllowed,
+  getChanges,
   isOkSelectedInstalledAndRunning,
   validateEthereumAddress,
   validateGraffiti
 } from "./utils";
 import { responseInterface } from "swr";
+import { Alert } from "react-bootstrap";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -71,7 +72,10 @@ export default function StakerNetwork<T extends Network>({
     getDefaultCheckpointSync(network)
   );
   // Apply button state
-  const [isApplyAllowed, setIsApplyAllowed] = useState(false);
+  const [changes, setChanges] = useState<{
+    isAllowed: boolean;
+    reason?: string;
+  }>({ isAllowed: false });
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet<T>
   >();
@@ -150,9 +154,9 @@ export default function StakerNetwork<T extends Network>({
   }, [newConsClient]);
 
   useEffect(() => {
-    if (currentStakerConfig) {
-      if (
-        areChangesAllowed({
+    if (currentStakerConfig)
+      setChanges(
+        getChanges({
           currentStakerConfig,
           feeRecipientError,
           graffitiError,
@@ -161,12 +165,7 @@ export default function StakerNetwork<T extends Network>({
           newEnableWeb3signer,
           newExecClient
         })
-      ) {
-        setIsApplyAllowed(true);
-      } else setIsApplyAllowed(false);
-    } else {
-      setIsApplyAllowed(false);
-    }
+      );
   }, [
     currentStakerConfig,
     feeRecipientError,
@@ -183,7 +182,7 @@ export default function StakerNetwork<T extends Network>({
   async function setNewConfig() {
     try {
       // Make sure there are changes
-      if (isApplyAllowed) {
+      if (changes) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
@@ -338,9 +337,15 @@ export default function StakerNetwork<T extends Network>({
               />
             )}
 
+            {!changes.isAllowed && changes.reason && (
+              <Alert variant="primary">
+                Can not apply changes: {changes.reason}
+              </Alert>
+            )}
+            <br />
             <Button
               variant="dappnode"
-              disabled={!isApplyAllowed || reqStatus.loading}
+              disabled={!changes.isAllowed || reqStatus.loading}
               onClick={setNewConfig}
             >
               Apply changes
