@@ -11,7 +11,7 @@ export async function pruneUserActionLogs(): Promise<void> {
     params.USER_ACTION_LOGS_DB_PATH
   ).size;
   if (currentFileSizeBytes > maxFileSizeBytes)
-    fs.truncate("/path/to/file", 0, function () {
-      console.log("done");
-    });
+    fs.truncate(params.USER_ACTION_LOGS_DB_PATH, 0, () =>
+      console.log(`truncated file ${params.userActionLogsFilename} to 0`)
+    );
 }
