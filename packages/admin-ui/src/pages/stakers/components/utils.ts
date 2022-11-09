@@ -59,12 +59,17 @@ export function getChanges<T extends Network>({
   newConsClient?: StakerItemOk<T, "consensus">;
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
-}): { isAllowed: boolean; reason?: string } {
+}): {
+  isAllowed: boolean;
+  reason?: string;
+  severity?: "warning" | "info" | "danger";
+} {
   // Not allowed if feerecipient or graffiti are invalid
   if (feeRecipientError || graffitiError)
     return {
       isAllowed: false,
-      reason: "Invalid graffiti and/or fee recipient"
+      reason: "Invalid graffiti and/or fee recipient",
+      severity: "danger"
     };
 
   const {
@@ -105,7 +110,8 @@ export function getChanges<T extends Network>({
   )
     return {
       isAllowed: false,
-      reason: "No changes detected"
+      reason: "No changes detected",
+      severity: "info"
     };
 
   // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
@@ -113,7 +119,8 @@ export function getChanges<T extends Network>({
     return {
       isAllowed: false,
       reason:
-        "MEV Boost and/or Web3Signer selected but no consensus and execution client selected"
+        "MEV Boost and/or Web3Signer selected but no consensus and execution client selected",
+      severity: "warning"
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (signer or mev boost)
@@ -121,14 +128,16 @@ export function getChanges<T extends Network>({
     return {
       isAllowed: false,
       reason:
-        "To enable web3signer and/or MEV boost, execution and consensus clients must be selected"
+        "To enable web3signer and/or MEV boost, execution and consensus clients must be selected",
+      severity: "warning"
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
   if (!isExecAndConsSelected && (!newEnableWeb3signer || !newMevBoost))
     return {
       isAllowed: false,
-      reason: "You must select at least one execution and one consensus client"
+      reason: "You must select at least one execution and one consensus client",
+      severity: "warning"
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)

@@ -75,6 +75,7 @@ export default function StakerNetwork<T extends Network>({
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
     reason?: string;
+    severity?: "warning" | "info" | "danger";
   }>({ isAllowed: false });
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet<T>
@@ -347,7 +348,7 @@ export default function StakerNetwork<T extends Network>({
 
             {!changes.isAllowed && changes.reason && (
               <>
-                <Alert variant="warning" style={{ marginTop: 10 }}>
+                <Alert variant={changes.severity} style={{ marginTop: 10 }}>
                   Cannot apply changes: <b>{changes.reason}</b>
                 </Alert>
               </>
