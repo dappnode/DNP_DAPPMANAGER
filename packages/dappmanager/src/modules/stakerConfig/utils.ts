@@ -321,7 +321,11 @@ export function getMevBoostUserSettings<T extends Network>({
     [targetMevBoost.dnpName]: {
       environment: {
         "mev-boost": {
-          ["RELAYS"]: targetMevBoost.relays?.join(",") || ""
+          ["RELAYS"]:
+            targetMevBoost.relays
+              ?.join(",")
+              .trim()
+              .replace(/(^,)|(,$)/g, "") || ""
         }
       }
     }

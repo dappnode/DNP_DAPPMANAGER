@@ -124,11 +124,18 @@ export function getChanges<T extends Network>({
         "To enable web3signer and/or MEV boost, execution and consensus clients must be selected"
     };
 
-  // Not allowed if changes AND (EC or CC are deselected) AND (no signer and no mev boost)
+  // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
   if (!isExecAndConsSelected && (!newEnableWeb3signer || !newMevBoost))
     return {
       isAllowed: false,
       reason: "You must select at least one execution and one consensus client"
+    };
+
+  // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
+  if (newMevBoost && newMevBoost.relays?.length === 0)
+    return {
+      isAllowed: false,
+      reason: "You must select at least one relay in the MEV boost"
     };
 
   return { isAllowed: true };
