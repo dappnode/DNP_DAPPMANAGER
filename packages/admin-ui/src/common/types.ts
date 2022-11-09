@@ -1190,7 +1190,7 @@ export type ConsensusClientMainnet =
   | "";
 export type ExecutionClientMainnet =
   | "geth.dnp.dappnode.eth"
-  | "besu.dnp.dappnode.eth"
+  | "besu.public.dappnode.eth"
   | "erigon.dnp.dappnode.eth"
   | "nethermind.public.dappnode.eth"
   | "";

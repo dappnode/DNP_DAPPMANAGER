@@ -55,7 +55,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
             newExexClientValue = "nethermind.public.dappnode.eth";
             break;
           case "besu":
-            newExexClientValue = "besu.dnp.dappnode.eth";
+            newExexClientValue = "besu.public.dappnode.eth";
             break;
           case "erigon":
             newExexClientValue = "erigon.dnp.dappnode.eth";
