@@ -75,7 +75,7 @@ export default function StakerNetwork<T extends Network>({
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
     reason?: string;
-    severity?: "warning" | "info" | "danger";
+    severity?: "warning" | "secondary" | "danger";
   }>({ isAllowed: false });
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet<T>

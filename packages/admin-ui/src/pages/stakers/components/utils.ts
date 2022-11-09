@@ -62,7 +62,7 @@ export function getChanges<T extends Network>({
 }): {
   isAllowed: boolean;
   reason?: string;
-  severity?: "warning" | "info" | "danger";
+  severity?: "warning" | "secondary" | "danger";
 } {
   // Not allowed if feerecipient or graffiti are invalid
   if (feeRecipientError || graffitiError)
@@ -111,7 +111,7 @@ export function getChanges<T extends Network>({
     return {
       isAllowed: false,
       reason: "No changes detected",
-      severity: "info"
+      severity: "secondary"
     };
 
   // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
