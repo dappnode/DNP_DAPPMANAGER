@@ -79,7 +79,7 @@ export function getStakerParamsByNetwork<T extends Network>(
             minVersion: ""
           },
           {
-            dnpName: "besu.dnp.dappnode.eth",
+            dnpName: "besu.public.dappnode.eth",
             minVersion: ""
           }
         ],

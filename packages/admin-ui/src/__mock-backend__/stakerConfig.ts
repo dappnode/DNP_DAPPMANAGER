@@ -42,14 +42,14 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "besu.dnp.dappnode.eth",
+              dnpName: "besu.public.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
               isSelected: false,
               avatarUrl: "",
               metadata: {
-                name: "besu.dnp.dappnode.eth",
+                name: "besu.public.dappnode.eth",
                 description: "Besu execution client",
                 shortDescription: "Besu execution client",
                 version: "0.1.0"
@@ -212,7 +212,7 @@ export const stakerConfig: Pick<
               isSelected: true,
               avatarUrl: "",
               metadata: {
-                name: "besu.dnp.dappnode.eth",
+                name: "goerli-besu.dnp.dappnode.eth",
                 description: "Besu execution client",
                 shortDescription: "Besu execution client",
                 version: "0.1.0"
