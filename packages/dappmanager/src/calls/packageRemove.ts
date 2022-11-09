@@ -87,7 +87,15 @@ export async function packageRemove({
     const containerNames = dnp.containers.map(c => c.containerName);
     await Promise.all(
       containerNames.map(async containerName => {
-        await dockerContainerStop(containerName, { timeout });
+        // Continue removing package even if container is already stopped
+        await dockerContainerStop(containerName, { timeout }).catch(e => {
+          if (
+            e.reason.includes("container already stopped") &&
+            e.statusCode === 304
+          )
+            return;
+          else throw e;
+        });
         await dockerContainerRemove(containerName, { volumes: deleteVolumes });
       })
     );
