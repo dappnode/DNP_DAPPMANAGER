@@ -2,17 +2,15 @@ import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { Network } from "../../types";
-import {
-  getStakerParamsByNetwork,
-  pickStakerItemData
-} from "../../modules/stakerConfig/utils";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
+import { pickStakerItemData } from "../../modules/stakerConfig/utils";
+import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork";
 import { ReleaseFetcher } from "../../modules/release";
+import { memoizeDebounce } from "../../utils/asyncFlows";
 
 function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
   try {
     for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
-      const stakerConfig = getStakerParamsByNetwork(network);
+      const stakerConfig = stakerParamsByNetwork(network);
 
       if (
         dnpNames.find(dnpName => dnpName === stakerConfig.currentExecClient)
@@ -62,16 +60,25 @@ async function runStakerCacheUpdate({
   dnpName: string;
 }): Promise<void> {
   try {
-    logs.info(`Updating staker item cache for ${dnpName}`);
     const releaseFetcher = new ReleaseFetcher();
     const repository = await releaseFetcher.getRelease(dnpName);
     const dataDnp = pickStakerItemData(repository);
-    logs.info(`Staker data: ${dataDnp}`);
     db.stakerItemMetadata.set(dnpName, dataDnp);
   } catch (e) {
     logs.error("Error on staker cache update daemon", e);
   }
 }
+
+// Create a cache key for memoize based on the dnpName
+const memoizeDebounceCacheUpdateResolver = ({ dnpName }: { dnpName: string }) =>
+  dnpName;
+
+const memoizeDebouncedCacheUpdate = memoizeDebounce(
+  runStakerCacheUpdate,
+  60 * 1000,
+  { maxWait: 60 * 1000, leading: true, trailing: false },
+  memoizeDebounceCacheUpdateResolver
+);
 
 /**
  * StakerConfig daemon.
@@ -84,6 +91,6 @@ export function startStakerDaemon(): void {
   });
 
   eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
-    runOnlyOneSequentially(async () => runStakerCacheUpdate({ dnpName }));
+    memoizeDebouncedCacheUpdate({ dnpName });
   });
 }
