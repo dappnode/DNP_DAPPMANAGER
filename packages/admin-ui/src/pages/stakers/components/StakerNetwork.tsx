@@ -348,7 +348,9 @@ export default function StakerNetwork<T extends Network>({
 
             {!changes.isAllowed && changes.reason && (
               <>
-                <Alert variant={changes.severity} className="bottom-alert">
+                <br />
+                <br />
+                <Alert variant={changes.severity}>
                   Cannot apply changes: <b>{changes.reason}</b>
                 </Alert>
               </>
