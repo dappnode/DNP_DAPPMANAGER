@@ -1,12 +1,15 @@
 import { packagesGet, packageInstall } from "../../calls";
 import {
+  ConsensusClient,
   ConsensusClientGnosis,
   ConsensusClientMainnet,
   ConsensusClientPrater,
+  ExecutionClient,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
+  MevBoost,
   MevBoostGnosis,
   MevBoostMainnet,
   MevBoostPrater,
@@ -16,9 +19,8 @@ import {
   UserSettingsAllDnps
 } from "../../types";
 import { logs } from "../../logs";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
 import {
-  setStakerConfigOnDb,
-  getStakerParamsByNetwork,
   getConsensusUserSettings,
   stopAllPkgContainers,
   updateConsensusEnv,
@@ -28,6 +30,7 @@ import {
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
 import semver from "semver";
+import * as db from "../../db";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -50,7 +53,7 @@ export async function setStakerConfig<T extends Network>({
     currentConsClient,
     web3signer,
     mevBoost
-  } = getStakerParamsByNetwork<T>(stakerConfig.network);
+  } = stakerParamsByNetwork<T>(stakerConfig.network);
 
   if (stakerConfig.network === "mainnet")
     currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
@@ -458,5 +461,40 @@ async function setMevBoostConfig<T extends Network>({
   else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoost, userSettings });
+  }
+}
+
+/**
+ * Sets the staker configuration on db for a given network
+ */
+function setStakerConfigOnDb<T extends Network>({
+  network,
+  executionClient,
+  consensusClient,
+  mevBoost
+}: {
+  network: T;
+  executionClient?: ExecutionClient<T>;
+  consensusClient?: ConsensusClient<T>;
+  mevBoost?: MevBoost<T>;
+}): void {
+  switch (network) {
+    case "mainnet":
+      db.executionClientMainnet.set(executionClient as ExecutionClientMainnet);
+      db.consensusClientMainnet.set(consensusClient as ConsensusClientMainnet);
+      db.mevBoostMainnet.set(mevBoost ? true : false);
+      break;
+    case "gnosis":
+      db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
+      db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
+      db.mevBoostGnosis.set(mevBoost ? true : false);
+      break;
+    case "prater":
+      db.executionClientPrater.set(executionClient as ExecutionClientPrater);
+      db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
+      db.mevBoostPrater.set(mevBoost ? true : false);
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
   }
 }

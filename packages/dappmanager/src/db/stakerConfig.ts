@@ -4,10 +4,22 @@ import {
   ConsensusClientGnosis,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
-  ExecutionClientPrater
+  ExecutionClientPrater,
+  StakerItemData
 } from "../types";
-import { dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
+
+// Cache
+
+const STAKER_ITEM_METADATA = "staker-item-metadata";
+
+export const stakerItemMetadata = dbCache.indexedByKey<StakerItemData, string>({
+  rootKey: STAKER_ITEM_METADATA,
+  getKey: target => target,
+  validate: (id, metadata) =>
+    typeof id === "string" && typeof metadata === "object"
+});
 
 // Mainnet
 

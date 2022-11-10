@@ -29,6 +29,7 @@ interface EventTypes {
   requestSystemInfo: void;
   runEthClientInstaller: void;
   runNatRenewal: void;
+  runStakerCacheUpdate: { dnpName: string };
 }
 
 const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
@@ -43,14 +44,14 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   // Events without arguments
   telegramStatusChanged: {},
   initializedDb: {},
-
   requestAutoUpdateData: {},
   requestChainData: {},
   requestDevices: {},
   requestPackages: {},
   requestSystemInfo: {},
   runEthClientInstaller: {},
-  runNatRenewal: {}
+  runNatRenewal: {},
+  runStakerCacheUpdate: {}
 };
 
 const eventEmitter = new EventEmitter();

@@ -62,7 +62,7 @@ export default function ExecutionClient<T extends Network>({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected && executionClient.metadata.shortDescription}
+          {isSelected && executionClient.data.metadata.shortDescription}
         </div>
       )}
     </Card>

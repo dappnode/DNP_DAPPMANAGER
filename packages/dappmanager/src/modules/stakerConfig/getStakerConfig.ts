@@ -2,7 +2,7 @@ import { packageGet } from "../../calls";
 import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
 import {
   ConsensusClient,
-  ExececutionClient,
+  ExecutionClient,
   MevBoost,
   Network,
   Signer,
@@ -15,9 +15,10 @@ import { ReleaseFetcher } from "../release";
 import {
   getBeaconServiceName,
   getIsRunning,
-  getStakerParamsByNetwork,
+  getPkgData,
   getValidatorServiceName
 } from "./utils";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
 
 /**
  * Fetches the current staker configuration:
@@ -44,7 +45,7 @@ export async function getStakerConfig<T extends Network>(
       web3signer,
       mevBoost,
       isMevBoostSelected
-    } = getStakerParamsByNetwork(network);
+    } = stakerParamsByNetwork(network);
 
     const dnpList = await listPackages();
 
@@ -54,23 +55,26 @@ export async function getStakerConfig<T extends Network>(
           try {
             if (!(await releaseFetcher.repoExists(execClient.dnpName)))
               throw Error(`Repository ${execClient.dnpName} does not exist`);
-            const repository = await releaseFetcher.getRelease(
+
+            const pkgData = await getPkgData(
+              releaseFetcher,
               execClient.dnpName
             );
+
             return {
               status: "ok",
-              dnpName: repository.dnpName as ExececutionClient<T>,
-              avatarUrl: fileToGatewayUrl(repository.avatarFile),
-              isInstalled: getIsInstalled(repository, dnpList),
-              isUpdated: getIsUpdated(repository, dnpList),
-              isRunning: getIsRunning(repository, dnpList),
-              metadata: repository.metadata,
-              isSelected: repository.dnpName === currentExecClient
+              dnpName: execClient.dnpName as ExecutionClient<T>,
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              isInstalled: getIsInstalled(pkgData, dnpList),
+              isUpdated: getIsUpdated(pkgData, dnpList),
+              isRunning: getIsRunning(pkgData, dnpList),
+              data: pkgData,
+              isSelected: execClient.dnpName === currentExecClient
             };
           } catch (error) {
             return {
               status: "error",
-              dnpName: execClient.dnpName as ExececutionClient<T>,
+              dnpName: execClient.dnpName as ExecutionClient<T>,
               error
             };
           }
@@ -81,19 +85,20 @@ export async function getStakerConfig<T extends Network>(
           try {
             if (!(await releaseFetcher.repoExists(consClient.dnpName)))
               throw Error(`Repository ${consClient.dnpName} does not exist`);
-            const repository = await releaseFetcher.getRelease(
+            const pkgData = await getPkgData(
+              releaseFetcher,
               consClient.dnpName
             );
-            const isInstalled = getIsInstalled(repository, dnpList);
+            const isInstalled = getIsInstalled(pkgData, dnpList);
             let graffiti, feeRecipient, checkpointSync;
             if (isInstalled) {
-              const pkgEnv = (await packageGet({ dnpName: repository.dnpName }))
+              const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
                 .userSettings?.environment;
               if (pkgEnv) {
                 const validatorService = getValidatorServiceName(
-                  repository.dnpName
+                  pkgData.dnpName
                 );
-                const beaconService = getBeaconServiceName(repository.dnpName);
+                const beaconService = getBeaconServiceName(pkgData.dnpName);
                 graffiti = pkgEnv[validatorService]["GRAFFITI"];
                 feeRecipient =
                   pkgEnv[validatorService]["FEE_RECIPIENT_ADDRESS"];
@@ -102,13 +107,13 @@ export async function getStakerConfig<T extends Network>(
             }
             return {
               status: "ok",
-              dnpName: repository.dnpName as ConsensusClient<T>,
-              avatarUrl: fileToGatewayUrl(repository.avatarFile),
-              isInstalled: getIsInstalled(repository, dnpList),
-              isUpdated: getIsUpdated(repository, dnpList),
-              isRunning: getIsRunning(repository, dnpList),
-              metadata: repository.metadata,
-              isSelected: repository.dnpName === currentConsClient,
+              dnpName: consClient.dnpName as ConsensusClient<T>,
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              isInstalled: getIsInstalled(pkgData, dnpList),
+              isUpdated: getIsUpdated(pkgData, dnpList),
+              isRunning: getIsRunning(pkgData, dnpList),
+              data: pkgData,
+              isSelected: consClient.dnpName === currentConsClient,
               graffiti,
               feeRecipient,
               checkpointSync
@@ -126,18 +131,16 @@ export async function getStakerConfig<T extends Network>(
         try {
           if (!(await releaseFetcher.repoExists(web3signer.dnpName)))
             throw Error(`Repository ${web3signer.dnpName} does not exist`);
-          const repository = await releaseFetcher.getRelease(
-            web3signer.dnpName
-          );
-          const signerIsRunning = getIsRunning(repository, dnpList);
+          const pkgData = await getPkgData(releaseFetcher, web3signer.dnpName);
+          const signerIsRunning = getIsRunning(pkgData, dnpList);
           resolve({
             status: "ok",
-            dnpName: repository.dnpName as Signer<T>,
-            avatarUrl: fileToGatewayUrl(repository.avatarFile),
-            isInstalled: getIsInstalled(repository, dnpList),
-            isUpdated: getIsUpdated(repository, dnpList),
+            dnpName: web3signer.dnpName as Signer<T>,
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+            isInstalled: getIsInstalled(pkgData, dnpList),
+            isUpdated: getIsUpdated(pkgData, dnpList),
             isRunning: signerIsRunning,
-            metadata: repository.metadata,
+            data: pkgData,
             isSelected: signerIsRunning
           });
         } catch (error) {
@@ -152,11 +155,11 @@ export async function getStakerConfig<T extends Network>(
         try {
           if (!(await releaseFetcher.repoExists(mevBoost)))
             throw Error(`Repository ${mevBoost} does not exist`);
-          const repository = await releaseFetcher.getRelease(mevBoost);
-          const isInstalled = getIsInstalled(repository, dnpList);
+          const pkgData = await getPkgData(releaseFetcher, mevBoost);
+          const isInstalled = getIsInstalled(pkgData, dnpList);
           const relays: string[] = [];
           if (isInstalled) {
-            const pkgEnv = (await packageGet({ dnpName: repository.dnpName }))
+            const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
               .userSettings?.environment;
             if (pkgEnv) {
               pkgEnv["mev-boost"]["RELAYS"]
@@ -166,12 +169,12 @@ export async function getStakerConfig<T extends Network>(
           }
           resolve({
             status: "ok",
-            dnpName: repository.dnpName as MevBoost<T>,
-            avatarUrl: fileToGatewayUrl(repository.avatarFile),
+            dnpName: mevBoost as MevBoost<T>,
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
             isInstalled,
-            isUpdated: getIsUpdated(repository, dnpList),
-            isRunning: getIsRunning(repository, dnpList),
-            metadata: repository.metadata,
+            isUpdated: getIsUpdated(pkgData, dnpList),
+            isRunning: getIsRunning(pkgData, dnpList),
+            data: pkgData,
             isSelected: isMevBoostSelected,
             relays
           });
