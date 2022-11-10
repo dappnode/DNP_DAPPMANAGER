@@ -10,7 +10,7 @@ import {
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
-import { getStakerParamsByNetwork } from "../stakerConfig/utils";
+import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork";
 
 /**
  * Sets default values for the global environment variables:
@@ -26,7 +26,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
   for (const network of ["mainnet", /* "gnosis",  */ "prater"] as Network[]) {
-    const stakerConfig = getStakerParamsByNetwork(network);
+    const stakerConfig = stakerParamsByNetwork(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
     // If the user has selected the repository full node option then use this value.

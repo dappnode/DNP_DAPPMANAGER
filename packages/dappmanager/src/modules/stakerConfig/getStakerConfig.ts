@@ -16,9 +16,9 @@ import {
   getBeaconServiceName,
   getIsRunning,
   getPkgData,
-  getStakerParamsByNetwork,
   getValidatorServiceName
 } from "./utils";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
 
 /**
  * Fetches the current staker configuration:
@@ -45,7 +45,7 @@ export async function getStakerConfig<T extends Network>(
       web3signer,
       mevBoost,
       isMevBoostSelected
-    } = getStakerParamsByNetwork(network);
+    } = stakerParamsByNetwork(network);
 
     const dnpList = await listPackages();
 
