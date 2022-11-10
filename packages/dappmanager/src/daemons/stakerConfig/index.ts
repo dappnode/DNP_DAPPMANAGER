@@ -75,8 +75,8 @@ const memoizeDebounceCacheUpdateResolver = ({ dnpName }: { dnpName: string }) =>
 
 const memoizeDebouncedCacheUpdate = memoizeDebounce(
   runStakerCacheUpdate,
-  60 * 1000,
-  { maxWait: 60 * 1000, leading: true, trailing: false },
+  60 * 1000 * 30,
+  { maxWait: 60 * 1000 * 30, leading: true, trailing: false },
   memoizeDebounceCacheUpdateResolver
 );
 
