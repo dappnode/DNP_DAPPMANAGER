@@ -75,6 +75,7 @@ export default function StakerNetwork<T extends Network>({
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
     reason?: string;
+    severity?: "warning" | "secondary" | "danger";
   }>({ isAllowed: false });
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet<T>
@@ -337,12 +338,6 @@ export default function StakerNetwork<T extends Network>({
               />
             )}
 
-            {!changes.isAllowed && changes.reason && (
-              <Alert variant="primary">
-                Can not apply changes: {changes.reason}
-              </Alert>
-            )}
-            <br />
             <Button
               variant="dappnode"
               disabled={!changes.isAllowed || reqStatus.loading}
@@ -350,6 +345,16 @@ export default function StakerNetwork<T extends Network>({
             >
               Apply changes
             </Button>
+
+            {!changes.isAllowed && changes.reason && (
+              <>
+                <br />
+                <br />
+                <Alert variant={changes.severity}>
+                  Cannot apply changes: <b>{changes.reason}</b>
+                </Alert>
+              </>
+            )}
 
             {reqStatus.error && (
               <ErrorView error={reqStatus.error} hideIcon red />

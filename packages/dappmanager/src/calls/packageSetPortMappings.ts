@@ -24,7 +24,7 @@ export async function packageSetPortMappings({
     throw Error("kwarg portMappingsByService must be defined");
 
   if (dnpName === params.dappmanagerDnpName)
-    throw Error("Can not edit DAPPAMANAGER ports");
+    throw Error("Can not edit DAPPMANAGER ports");
 
   const dnp = await listPackage({ dnpName });
 
