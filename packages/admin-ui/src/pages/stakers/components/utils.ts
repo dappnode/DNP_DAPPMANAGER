@@ -144,7 +144,8 @@ export function getChanges<T extends Network>({
   if (newMevBoost && newMevBoost.relays?.length === 0)
     return {
       isAllowed: false,
-      reason: "You must select at least one relay in the MEV boost"
+      reason: "You must select at least one relay in the MEV boost",
+      severity: "warning"
     };
 
   return { isAllowed: true };
