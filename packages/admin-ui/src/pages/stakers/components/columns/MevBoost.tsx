@@ -143,7 +143,11 @@ function Relay<T extends Network>({
 
   return (
     <tr>
-      <td>{relay.operator}</td>
+      <td>
+        {relay.docs ? (<a href={relay.docs} target="_blank" rel="noreferrer">
+          {relay.operator}
+        </a> ): <>{relay.operator}</>}
+      </td>
       <td>
         {relay.ofacCompliant === undefined ? (
           "-"
