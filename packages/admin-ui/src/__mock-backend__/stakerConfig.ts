@@ -94,7 +94,7 @@ export const stakerConfig: Pick<
                 signedSafe: true,
 
                 metadata: {
-                  name: "besu.dnp.dappnode.eth",
+                  name: "besu.public.dappnode.eth",
                   description: "Besu execution client",
                   shortDescription: "Besu execution client",
                   version: "0.1.0"
