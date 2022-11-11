@@ -137,7 +137,7 @@ export const stakerConfig: Pick<
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
-              isSelected: true,
+              isSelected: false,
               avatarUrl: "",
               data: {
                 dnpName: "package",
@@ -245,6 +245,36 @@ export const stakerConfig: Pick<
                 }
               },
               graffiti: "Validating_from_prysm-nimbus",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
+            },
+            {
+              status: "ok",
+              dnpName: "lodestar.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                metadata: {
+                  name: "lodestar.dnp.dappnode.eth",
+                  description: "Lodestar consensus client",
+                  shortDescription: "Lodestar consensus client",
+                  version: "0.1.0"
+                }
+              },
+              graffiti: "Validating_from_Lodestar",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
@@ -433,7 +463,7 @@ export const stakerConfig: Pick<
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
-              isSelected: true,
+              isSelected: false,
               avatarUrl: "",
               data: {
                 dnpName: "package",
@@ -542,7 +572,37 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-nimbus",
+              graffiti: "Validating_from_Nimbus-Prater",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
+            },
+            {
+              status: "ok",
+              dnpName: "lodestar-prater.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                metadata: {
+                  name: "lodestar.dnp.dappnode.eth",
+                  description: "Lodestar consensus client",
+                  shortDescription: "Lodestar consensus client",
+                  version: "0.1.0"
+                }
+              },
+              graffiti: "Validating_from_Lodestar-Prater",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
@@ -651,7 +711,7 @@ export const stakerConfig: Pick<
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
-              isSelected: true,
+              isSelected: false,
               avatarUrl: "",
               data: {
                 dnpName: "package",
@@ -760,7 +820,37 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-nimbus",
+              graffiti: "Validating_from_Nimbus-Gnosis",
+              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
+              checkpointSync: "https://checkpoint-sync.dappnode.io"
+            },
+            {
+              status: "ok",
+              dnpName: "lodestar-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                metadata: {
+                  name: "lodestar.dnp.dappnode.eth",
+                  description: "Lodestar consensus client",
+                  shortDescription: "Lodestar consensus client",
+                  version: "0.1.0"
+                }
+              },
+              graffiti: "Validating_from_Lodestar-Gnosis",
               feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
               checkpointSync: "https://checkpoint-sync.dappnode.io"
             }
