@@ -7,6 +7,15 @@ import {
 } from "types";
 import { isEqual, pick } from "lodash";
 
+export function subStringifyConfig(config: string): string {
+  return config.length > 35
+    ? `${config.substring(0, 10)}...${config.substring(
+        config.length - 10,
+        config.length
+      )}`
+    : config;
+}
+
 export function validateEthereumAddress(value?: string): string | null {
   if (value && !/^0x[0-9a-fA-F]{40}$/.test(value)) return "Invalid address";
   return null;
