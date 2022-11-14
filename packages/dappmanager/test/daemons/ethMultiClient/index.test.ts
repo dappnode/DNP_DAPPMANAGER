@@ -23,7 +23,7 @@ interface State {
 describe("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     let currentExecClient: ExecutionClientMainnet | null =
-      "besu.dnp.dappnode.eth";
+      "besu.public.dappnode.eth";
     let currentConsClient: ConsensusClientMainnet | null =
       "prysm.dnp.dappnode.eth";
     let currentRemote: EthClientRemote | null = EthClientRemote.on;
