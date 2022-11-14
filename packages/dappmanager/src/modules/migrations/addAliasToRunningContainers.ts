@@ -17,7 +17,7 @@ import {
 import { listContainers } from "../docker/list";
 import * as getPath from "../../utils/getPath";
 import semver from "semver";
-import { getEndpointConfig } from "../ethClient/changeEthMultiClient";
+import { ethereumClient } from "../ethClient";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -38,7 +38,9 @@ export async function addAliasToRunningContainers(): Promise<void> {
       // So this function must be before the check hasAlias()
       migrateCoreNetworkAndAliasInCompose(container, alias);
 
-      const currentEndpointConfig = await getEndpointConfig(containerName);
+      const currentEndpointConfig = await ethereumClient.getEndpointConfig(
+        containerName
+      );
       if (hasAlias(currentEndpointConfig, alias)) continue;
       const endpointConfig: Partial<Dockerode.NetworkInfo> = {
         ...currentEndpointConfig,

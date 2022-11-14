@@ -8,19 +8,18 @@ import {
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";
-import { getConsensusUserSettings } from "../stakerConfig/setStakerConfig";
-import {
-  getBeaconServiceName,
-  getValidatorServiceName
-} from "../stakerConfig/utils";
+import { getConsensusUserSettings } from "../stakerConfig/utils";
 import { packageGet } from "../../calls/packageGet";
 import { packageInstall } from "../../calls/packageInstall";
 import { packageRemove } from "../../calls/packageRemove";
 import { ComposeFileEditor } from "../compose/editor";
 import { parseServiceNetworks } from "../compose/networks";
 import params from "../../params";
-import { dockerNetworkConnect, dockerNetworkDisconnect } from "../docker";
-import { getEndpointConfig } from "../https-portal/migration";
+import {
+  dockerContainerInspect,
+  dockerNetworkConnect,
+  dockerNetworkDisconnect
+} from "../docker";
 import Dockerode from "dockerode";
 
 export class EthereumClient {
@@ -131,7 +130,7 @@ export class EthereumClient {
       )?.containerName || previousEthClientPackage.containers[0].containerName;
 
     // Remove fullnode alias from endpoint config
-    const currentEndpointConfig = await getEndpointConfig(
+    const currentEndpointConfig = await this.getEndpointConfig(
       previousEthClientContainerName
     );
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
@@ -175,12 +174,7 @@ export class EthereumClient {
           })
       );
       // Get default cons client user settings and install cons client
-      const userSettings = getConsensusUserSettings(
-        consClient,
-        {},
-        getValidatorServiceName(consClient),
-        getBeaconServiceName(consClient)
-      );
+      const userSettings = getConsensusUserSettings({ dnpName: consClient });
       await packageInstall({ name: consClient, userSettings });
     } catch (e) {
       throw Error(`Error changing eth client: ${e}`);
@@ -205,6 +199,17 @@ export class EthereumClient {
 
   // Utils
   // TODO: put private in the methods and find a way to test them
+
+  /** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
+  async getEndpointConfig(
+    containerName: string
+  ): Promise<Dockerode.NetworkInfo | null> {
+    const inspectInfo = await dockerContainerInspect(containerName);
+    return (
+      inspectInfo.NetworkSettings.Networks[params.DNP_PRIVATE_NETWORK_NAME] ??
+      null
+    );
+  }
 
   removeFullnodeAliasFromCompose(
     ethClientDnpName: string,
