@@ -37,7 +37,7 @@ export function stakerParamsByNetwork<T extends Network>(
           },
           {
             dnpName: "lighthouse.dnp.dappnode.eth",
-            minVersion: "1.0.2"
+            minVersion: "1.0.3"
           },
           {
             dnpName: "teku.dnp.dappnode.eth",
