@@ -18,6 +18,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
+import { isEqual } from "lodash";
 
 export default function Eth() {
   const ethClientTarget = useSelector(getEthClientTarget);
@@ -111,7 +112,7 @@ export default function Eth() {
         <Button
           variant="dappnode"
           onClick={changeClient}
-          disabled={!target || ethClientTarget === target}
+          disabled={!target || isEqual(ethClientTarget, target)}
         >
           Change
         </Button>
