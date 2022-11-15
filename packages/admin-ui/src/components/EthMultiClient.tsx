@@ -18,6 +18,7 @@ import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
 import { prettyDnpName } from "utils/format";
+import { dappnodeMainnetCheckpointSync } from "params";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
@@ -85,34 +86,6 @@ export function getEthClientPrettyStatus(
   return `Not available ${fallbackOn ? "(using remote)" : ""} - ${message}`;
 }
 
-const clients: EthClientData[] = [
-  {
-    title: "Remote",
-    description: "Public node API mantained by DAppNode",
-    options: "remote",
-    stats: {
-      syncTime: "Instant",
-      requirements: "No requirements",
-      trust: "Centralized trust"
-    },
-    highlight: "syncTime"
-  },
-  {
-    title: "Full node",
-    description: "Your own Ethereum node w/out 3rd parties",
-    options: {
-      execClients: [...executionClientsMainnet],
-      consClients: [...consensusClientsMainnet]
-    },
-    stats: {
-      syncTime: "Slow sync",
-      requirements: "High requirements",
-      trust: "Fully decentralized"
-    },
-    highlight: "trust"
-  }
-];
-
 interface EthClientData {
   title: string;
   description: string;
@@ -123,7 +96,7 @@ interface EthClientData {
         consClients: ConsensusClientMainnet[];
       };
   stats: EthClientDataStats;
-  highlight: keyof EthClientDataStats;
+  highlights: (keyof EthClientDataStats)[];
 }
 interface EthClientDataStats {
   syncTime: string;
@@ -141,15 +114,45 @@ interface EthClientDataStats {
 function EthMultiClients({
   target: selectedTarget,
   onTargetChange,
-  showStats
+  showStats,
+  useCheckpointSync
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
   showStats?: boolean;
+  useCheckpointSync?: boolean;
 }) {
+  const clients: EthClientData[] = [
+    {
+      title: "Remote",
+      description: "Public node API mantained by DAppNode",
+      options: "remote",
+      stats: {
+        syncTime: "Instant",
+        requirements: "No requirements",
+        trust: "Centralized trust"
+      },
+      highlights: ["syncTime", "requirements"]
+    },
+    {
+      title: "Full node",
+      description: "Your own Ethereum node w/out 3rd parties",
+      options: {
+        execClients: [...executionClientsMainnet],
+        consClients: [...consensusClientsMainnet]
+      },
+      stats: {
+        syncTime: useCheckpointSync ? "Fast sync" : "Slow sync",
+        requirements: "High requirements",
+        trust: "Fully decentralized"
+      },
+      highlights: useCheckpointSync ? ["trust", "syncTime"] : ["trust"]
+    }
+  ];
+
   return (
     <div className="eth-multi-clients">
-      {clients.map(({ title, description, options, stats, highlight }) => {
+      {clients.map(({ title, description, options, stats, highlights }) => {
         const defaultTarget: Eth2ClientTarget =
           options === "remote"
             ? options
@@ -170,7 +173,9 @@ function EthMultiClients({
               : false;
         }
         const getSvgClass = (_highlight: keyof EthClientDataStats) =>
-          joinCssClass({ active: highlight === _highlight });
+          joinCssClass({
+            active: highlights.find(highlight => highlight === _highlight)
+          });
         return (
           <Card
             key={title}
@@ -253,6 +258,33 @@ function EthMultiClients({
 }
 
 /**
+ * View and toggle using the checkpointsync
+ * This component should be used with EthMultiClients
+ */
+function EthMultiClientCheckpointSync({
+  target,
+  useCheckpointSync,
+  setUseCheckpointSync
+}: {
+  target: Eth2ClientTarget | null;
+  useCheckpointSync: boolean;
+  setUseCheckpointSync: (newUseCheckpointSync: boolean) => void;
+}) {
+  // Do not render for remote
+  if (!target || target === "remote") return null;
+
+  return (
+    <Switch
+      className="eth-multi-clients-fallback"
+      checked={useCheckpointSync}
+      onToggle={bool => setUseCheckpointSync(bool)}
+      label={`Use dappnode checkpoint sync (${dappnodeMainnetCheckpointSync}) for consensus client fast sync`}
+      id="eth-multi-clients-checkpointsync-switch"
+    />
+  );
+}
+
+/**
  * View and toggle using the fallback when using a non-remote eth multi client
  * This component should be used with EthMultiClients
  */
@@ -289,12 +321,16 @@ function EthMultiClientFallback({
 export function EthMultiClientsAndFallback({
   target,
   onTargetChange,
+  useCheckpointSync,
+  setUseCheckpointSync,
   showStats,
   fallback,
   onFallbackChange
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
+  useCheckpointSync?: boolean;
+  setUseCheckpointSync?: (newUseCheckpointSync: boolean) => void;
   showStats?: boolean;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
@@ -305,6 +341,7 @@ export function EthMultiClientsAndFallback({
         target={target}
         onTargetChange={onTargetChange}
         showStats={showStats}
+        useCheckpointSync={useCheckpointSync}
       />
 
       <EthMultiClientFallback
@@ -318,6 +355,24 @@ export function EthMultiClientsAndFallback({
           If your node is not available, you won't be able to update packages or
           access the DAppStore.
         </Alert>
+      )}
+
+      {useCheckpointSync !== undefined && setUseCheckpointSync !== undefined && (
+        <>
+          <br />
+          <br />
+          <EthMultiClientCheckpointSync
+            target={target}
+            useCheckpointSync={useCheckpointSync}
+            setUseCheckpointSync={setUseCheckpointSync}
+          />
+
+          {target && target !== "remote" && !useCheckpointSync && (
+            <Alert variant="warning">
+              It may take a while for the consensus client to sync from genesis.
+            </Alert>
+          )}
+        </>
       )}
     </div>
   );

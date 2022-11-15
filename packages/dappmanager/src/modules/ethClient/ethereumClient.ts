@@ -58,6 +58,7 @@ export class EthereumClient {
   async changeEthClient(
     nextTarget: Eth2ClientTarget,
     sync: boolean,
+    useCheckpointSync?: boolean,
     deletePrevExecClient?: boolean,
     deletePrevConsClient?: boolean
   ): Promise<void> {

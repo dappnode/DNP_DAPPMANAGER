@@ -6,10 +6,12 @@ import { ethereumClient } from "../modules/ethClient";
  */
 export async function ethClientTargetSet({
   target,
+  useCheckpointSync,
   deletePrevExecClient,
   deletePrevConsClient
 }: {
   target: Eth2ClientTarget;
+  useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
   deletePrevConsClient?: boolean;
 }): Promise<void> {
@@ -18,6 +20,7 @@ export async function ethClientTargetSet({
   await ethereumClient.changeEthClient(
     target,
     false,
+    useCheckpointSync,
     deletePrevExecClient,
     deletePrevConsClient
   );

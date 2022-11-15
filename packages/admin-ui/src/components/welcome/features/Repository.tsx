@@ -21,6 +21,7 @@ export default function Repository({
   onNext: () => void;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
+  const [useCheckpointSync, setUseCheckpointSync] = useState(true);
   const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
@@ -31,7 +32,7 @@ export default function Repository({
 
   async function changeClient() {
     if (target) {
-      api.ethClientTargetSet({ target }).catch(e => {
+      api.ethClientTargetSet({ target, useCheckpointSync }).catch(e => {
         console.error(`Error on ethClientTargetSet: ${e.stack}`);
       });
       // Only set the fallback if the user is setting a target
@@ -59,6 +60,8 @@ export default function Repository({
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        useCheckpointSync={useCheckpointSync}
+        setUseCheckpointSync={setUseCheckpointSync}
         showStats
         fallback={fallback}
         onFallbackChange={setFallback}

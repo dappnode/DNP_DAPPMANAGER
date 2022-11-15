@@ -224,6 +224,7 @@ export interface Routes {
    */
   ethClientTargetSet: (kwargs: {
     target: Eth2ClientTarget;
+    useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
     deletePrevConsClient?: boolean;
   }) => Promise<void>;

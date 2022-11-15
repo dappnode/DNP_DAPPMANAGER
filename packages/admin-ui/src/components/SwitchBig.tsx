@@ -6,7 +6,7 @@ const factor = 2;
 const height = 28 * factor;
 const width = 64 * factor;
 const fontSize = 16 * factor;
-const onColor = "#2fbcb2";
+const onColor = "#00b1f4";
 const offColor = undefined; // "#bc2f39";
 const switchLabelProps = {
   display: "flex",
