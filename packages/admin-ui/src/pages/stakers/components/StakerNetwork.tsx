@@ -34,7 +34,6 @@ import {
 } from "./utils";
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
-import { omit } from "lodash";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -214,12 +213,22 @@ export default function StakerNetwork<T extends Network>({
         setReqStatus({ loading: true });
         await withToast(
           () =>
+            // Omit metadata to be sent back to the backend
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                executionClient: omit(newExecClient, ["data"]),
-                consensusClient: omit(newConsClient, ["data"]),
-                mevBoost: omit(newMevBoost, ["data"]),
+                executionClient:
+                  newExecClient?.status === "ok"
+                    ? { ...newExecClient, data: undefined }
+                    : newExecClient,
+                consensusClient:
+                  newConsClient?.status === "ok"
+                    ? { ...newConsClient, data: undefined }
+                    : newConsClient,
+                mevBoost:
+                  newMevBoost?.status === "ok"
+                    ? { ...newMevBoost, data: undefined }
+                    : newMevBoost,
                 enableWeb3signer: newEnableWeb3signer
               }
             }),
