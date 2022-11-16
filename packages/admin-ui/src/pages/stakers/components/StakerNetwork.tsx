@@ -34,6 +34,7 @@ import {
 } from "./utils";
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
+import { omit } from "lodash";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -216,9 +217,9 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                executionClient: newExecClient,
-                consensusClient: newConsClient,
-                mevBoost: newMevBoost,
+                executionClient: omit(newExecClient, ["data"]),
+                consensusClient: omit(newConsClient, ["data"]),
+                mevBoost: omit(newMevBoost, ["data"]),
                 enableWeb3signer: newEnableWeb3signer
               }
             }),
