@@ -1279,8 +1279,6 @@ export type StakerItemData = Pick<
   | "dnpName"
   | "reqVersion"
   | "semVersion"
-  | "imageFile"
-  | "avatarFile"
   | "metadata"
   | "warnings"
   | "origin"
