@@ -1279,6 +1279,8 @@ export type StakerItemData = Pick<
   | "dnpName"
   | "reqVersion"
   | "semVersion"
+  | "imageFile"
+  | "avatarFile"
   | "metadata"
   | "warnings"
   | "origin"
@@ -1291,7 +1293,7 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  data: StakerItemData;
+  data?: StakerItemData;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 

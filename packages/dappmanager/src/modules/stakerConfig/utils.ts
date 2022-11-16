@@ -212,6 +212,8 @@ export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
       "dnpName",
       "reqVersion",
       "semVersion",
+      "imageFile",
+      "avatarFile",
       "warnings",
       "origin",
       "signedSafe"

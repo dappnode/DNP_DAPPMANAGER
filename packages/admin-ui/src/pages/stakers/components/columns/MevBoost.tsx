@@ -82,7 +82,9 @@ export default function MevBoost<T extends Network>({
 
       {mevBoost.status === "ok" && (
         <div className="description">
-          {isSelected && mevBoost.data.metadata.shortDescription}
+          {isSelected &&
+            mevBoost.data &&
+            mevBoost.data.metadata.shortDescription}
         </div>
       )}
     </Card>
@@ -144,9 +146,13 @@ function Relay<T extends Network>({
   return (
     <tr>
       <td>
-        {relay.docs ? (<a href={relay.docs} target="_blank" rel="noreferrer">
-          {relay.operator}
-        </a> ): <>{relay.operator}</>}
+        {relay.docs ? (
+          <a href={relay.docs} target="_blank" rel="noreferrer">
+            {relay.operator}
+          </a>
+        ) : (
+          <>{relay.operator}</>
+        )}
       </td>
       <td>
         {relay.ofacCompliant === undefined ? (
