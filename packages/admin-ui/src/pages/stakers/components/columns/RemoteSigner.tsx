@@ -57,7 +57,7 @@ export default function RemoteSigner<T extends Network>({
       {signer.status === "ok" &&
         isSelected &&
         signer.isInstalled &&
-        signer.data.metadata.links?.ui && (
+        signer.data?.metadata.links?.ui && (
           <div
             style={{
               alignItems: "center",
@@ -77,7 +77,7 @@ export default function RemoteSigner<T extends Network>({
 
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected && signer.data.metadata.shortDescription}
+          {isSelected && signer.data && signer.data.metadata.shortDescription}
         </div>
       )}
     </Card>

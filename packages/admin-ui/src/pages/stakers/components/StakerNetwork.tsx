@@ -213,12 +213,22 @@ export default function StakerNetwork<T extends Network>({
         setReqStatus({ loading: true });
         await withToast(
           () =>
+            // Omit metadata to be sent back to the backend
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                executionClient: newExecClient,
-                consensusClient: newConsClient,
-                mevBoost: newMevBoost,
+                executionClient:
+                  newExecClient?.status === "ok"
+                    ? { ...newExecClient, data: undefined }
+                    : newExecClient,
+                consensusClient:
+                  newConsClient?.status === "ok"
+                    ? { ...newConsClient, data: undefined }
+                    : newConsClient,
+                mevBoost:
+                  newMevBoost?.status === "ok"
+                    ? { ...newMevBoost, data: undefined }
+                    : newMevBoost,
                 enableWeb3signer: newEnableWeb3signer
               }
             }),

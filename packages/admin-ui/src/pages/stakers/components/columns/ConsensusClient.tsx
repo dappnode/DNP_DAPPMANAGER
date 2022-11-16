@@ -89,7 +89,9 @@ export default function ConsensusClient<T extends Network>({
 
       {consensusClient.status === "ok" && (
         <div className="description">
-          {isSelected && consensusClient.data.metadata.shortDescription}
+          {isSelected &&
+            consensusClient.data &&
+            consensusClient.data.metadata.shortDescription}
         </div>
       )}
       {isSelected && newConsClient && (

@@ -55,9 +55,6 @@ export async function setStakerConfig<T extends Network>({
     mevBoost
   } = stakerParamsByNetwork<T>(stakerConfig.network);
 
-  if (stakerConfig.network === "mainnet")
-    currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
-
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&

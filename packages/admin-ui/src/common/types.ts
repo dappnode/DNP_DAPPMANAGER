@@ -1293,7 +1293,7 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  data: StakerItemData;
+  data?: StakerItemData;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 
