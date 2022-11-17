@@ -19,6 +19,7 @@ services:
       - "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/"
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/etc/hostname:/etc/dappnodename:ro"
+      - "./:/app"
     environment:
       - LOG_LEVEL=info
       - ETH_MAINNET_RPC_URL_OVERRIDE=
