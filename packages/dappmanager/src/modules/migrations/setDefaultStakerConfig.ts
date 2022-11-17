@@ -6,8 +6,7 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
-  Network,
-  StakerParamsByNetwork
+  Network
 } from "../../types";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
@@ -53,17 +52,13 @@ export async function setDefaultStakerConfig(): Promise<void> {
           // Look for pkg exec client installed and running
           newExexClientValue = getClientInstalledAndRunning(
             pkgs,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stakerConfig.execClients as any,
-            "execClients"
+            stakerConfig.execClients.map(client => client.dnpName)
           );
           // Look for pkg exec client installed
           if (!newExexClientValue)
             newExexClientValue = getClientInstalled(
               pkgs,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              stakerConfig.execClients as any,
-              "execClients"
+              stakerConfig.execClients.map(client => client.dnpName)
             );
         }
       }
@@ -129,17 +124,13 @@ export async function setDefaultStakerConfig(): Promise<void> {
         // Look for cons client installed and running
         newConsClientValue = getClientInstalledAndRunning(
           pkgs,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          stakerConfig.consClients as any,
-          "consClients"
+          stakerConfig.consClients.map(client => client.dnpName)
         );
         // Look for cons client installed
         if (!newConsClientValue)
           newConsClientValue = getClientInstalled(
             pkgs,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stakerConfig.consClients as any,
-            "consClients"
+            stakerConfig.consClients.map(client => client.dnpName)
           );
       }
 
@@ -170,41 +161,25 @@ export async function setDefaultStakerConfig(): Promise<void> {
 
 function getClientInstalledAndRunning(
   pkgs: InstalledPackageDataApiReturn[],
-  clients: Pick<
-    StakerParamsByNetwork<"mainnet">,
-    "execClients" | "consClients"
-  >,
-  typeofClient: "execClients" | "consClients"
+  clients: string[]
 ): string {
-  for (const execClient of clients[typeofClient].map(
-    client => client.dnpName
-  )) {
+  for (const client of clients) {
     if (
       pkgs.find(
-        pkg =>
-          pkg.dnpName === execClient && pkg.containers.every(c => c.running)
+        pkg => pkg.dnpName === client && pkg.containers.every(c => c.running)
       )
-    ) {
-      return execClient;
-    }
+    )
+      return client;
   }
   return "";
 }
 
 function getClientInstalled(
   pkgs: InstalledPackageDataApiReturn[],
-  clients: Pick<
-    StakerParamsByNetwork<"mainnet">,
-    "execClients" | "consClients"
-  >,
-  typeofClient: "execClients" | "consClients"
-) {
-  for (const execClient of clients[typeofClient].map(
-    client => client.dnpName
-  )) {
-    if (pkgs.find(pkg => pkg.dnpName === execClient)) {
-      return execClient;
-    }
+  clients: string[]
+): string {
+  for (const client of clients) {
+    if (pkgs.find(pkg => pkg.dnpName === client)) return client;
   }
   return "";
 }
