@@ -6,13 +6,13 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
-  Network,
-  StakerParamsByNetwork
+  Network
 } from "../../types";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";
 import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork";
+import { logs } from "../../logs";
 
 /**
  * Sets default values for the global environment variables:
@@ -30,6 +30,9 @@ export async function setDefaultStakerConfig(): Promise<void> {
   for (const network of ["mainnet", /* "gnosis",  */ "prater"] as Network[]) {
     const stakerConfig = stakerParamsByNetwork(network);
 
+    logs.info("Setting default staker config for network", network);
+    logs.info("Staker config", stakerConfig);
+
     // EXECUTION_CLIENT_<NETWORK>:
     // If the user has selected the repository full node option then use this value.
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
@@ -38,9 +41,12 @@ export async function setDefaultStakerConfig(): Promise<void> {
       // Set default empty string value
       let newExexClientValue = "";
 
+      logs.info("New execution client value", newExexClientValue);
+
       if (network === "mainnet") {
         // Look for pkg ethclient target (fullnode), installed and running
         const execClientTargetDnpName = getExecClientTargetDnpName();
+        logs.info("Execution client target", execClientTargetDnpName);
         if (
           pkgs.find(
             pkg =>
@@ -49,22 +55,21 @@ export async function setDefaultStakerConfig(): Promise<void> {
           )
         ) {
           newExexClientValue = execClientTargetDnpName;
+          logs.info("New execution client value", newExexClientValue);
         } else {
           // Look for pkg exec client installed and running
           newExexClientValue = getClientInstalledAndRunning(
             pkgs,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stakerConfig.execClients as any,
-            "execClients"
+            stakerConfig.execClients.map(client => client.dnpName)
           );
+          logs.info("New execution client value", newExexClientValue);
           // Look for pkg exec client installed
           if (!newExexClientValue)
             newExexClientValue = getClientInstalled(
               pkgs,
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              stakerConfig.execClients as any,
-              "execClients"
+              stakerConfig.execClients.map(client => client.dnpName)
             );
+          logs.info("New execution client value", newExexClientValue);
         }
       }
 
@@ -96,6 +101,8 @@ export async function setDefaultStakerConfig(): Promise<void> {
       // Set default empty string value
       let newConsClientValue = "";
 
+      logs.info("New consensus client value", newConsClientValue);
+
       const web3signerPkg = pkgs.find(
         pkg => pkg.dnpName === stakerConfig.web3signer.dnpName
       );
@@ -125,22 +132,27 @@ export async function setDefaultStakerConfig(): Promise<void> {
       }
 
       // For resilience, give a value for mainnet if its still empty
+      logs.info(
+        "Setting default cons client value. Value: " + newConsClientValue
+      );
       if (network === "mainnet" && !newConsClientValue) {
         // Look for cons client installed and running
         newConsClientValue = getClientInstalledAndRunning(
           pkgs,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          stakerConfig.consClients as any,
-          "consClients"
+          stakerConfig.consClients.map(client => client.dnpName)
+        );
+        logs.info(
+          "Setting default cons client value. Value: " + newConsClientValue
         );
         // Look for cons client installed
         if (!newConsClientValue)
           newConsClientValue = getClientInstalled(
             pkgs,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            stakerConfig.consClients as any,
-            "consClients"
+            stakerConfig.consClients.map(client => client.dnpName)
           );
+        logs.info(
+          "Setting default cons client value. Value: " + newConsClientValue
+        );
       }
 
       switch (network) {
@@ -170,41 +182,25 @@ export async function setDefaultStakerConfig(): Promise<void> {
 
 function getClientInstalledAndRunning(
   pkgs: InstalledPackageDataApiReturn[],
-  clients: Pick<
-    StakerParamsByNetwork<"mainnet">,
-    "execClients" | "consClients"
-  >,
-  typeofClient: "execClients" | "consClients"
+  clients: string[]
 ): string {
-  for (const execClient of clients[typeofClient].map(
-    client => client.dnpName
-  )) {
+  for (const client of clients) {
     if (
       pkgs.find(
-        pkg =>
-          pkg.dnpName === execClient && pkg.containers.every(c => c.running)
+        pkg => pkg.dnpName === client && pkg.containers.every(c => c.running)
       )
-    ) {
-      return execClient;
-    }
+    )
+      return client;
   }
   return "";
 }
 
 function getClientInstalled(
   pkgs: InstalledPackageDataApiReturn[],
-  clients: Pick<
-    StakerParamsByNetwork<"mainnet">,
-    "execClients" | "consClients"
-  >,
-  typeofClient: "execClients" | "consClients"
-) {
-  for (const execClient of clients[typeofClient].map(
-    client => client.dnpName
-  )) {
-    if (pkgs.find(pkg => pkg.dnpName === execClient)) {
-      return execClient;
-    }
+  clients: string[]
+): string {
+  for (const client of clients) {
+    if (pkgs.find(pkg => pkg.dnpName === client)) return client;
   }
   return "";
 }
