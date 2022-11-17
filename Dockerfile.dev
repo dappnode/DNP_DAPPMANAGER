@@ -8,28 +8,9 @@ WORKDIR /app
 
 RUN apk add --no-cache python3 build-base bash
 
-# Copy and install deps first to cache
-COPY package.json yarn.lock lerna.json ./
-COPY patches patches/
 # Install lerna first
 RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
-COPY packages/admin-ui/package.json \ 
-  packages/admin-ui/
-COPY packages/dappmanager/package.json \ 
-  packages/dappmanager/
 RUN yarn
-
-# Build UI
-WORKDIR /app/packages/admin-ui/
-COPY packages/admin-ui/ .
-ENV REACT_APP_API_URL /
-RUN yarn build
-# Results in build/*
-
-WORKDIR /app/packages/dappmanager/
-COPY packages/dappmanager/ .
-RUN yarn build
-# Results in build/index.js
 
 WORKDIR /usr/src/app
 

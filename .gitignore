@@ -44,3 +44,8 @@ packages/*/yarn-debug.log*
 packages/*/yarn-error.log*
 # This project uses yarn
 packages/*/package-lock.json 
+
+# Dev links
+packages/dappmanager/dist
+packages/dappmanager/DNCORE
+packages/dappmanager/dnp_repo
