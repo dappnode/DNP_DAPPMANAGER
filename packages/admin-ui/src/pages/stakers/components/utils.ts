@@ -142,14 +142,6 @@ export function getChanges<T extends Network>({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
-  if (!isExecAndConsSelected && (!newEnableWeb3signer || !newMevBoost))
-    return {
-      isAllowed: false,
-      reason: "You must select at least one execution and one consensus client",
-      severity: "warning"
-    };
-
-  // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
   if (newMevBoost && newMevBoost.relays?.length === 0)
     return {
       isAllowed: false,
