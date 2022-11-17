@@ -5,7 +5,9 @@ import {
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
-  Network
+  InstalledPackageDataApiReturn,
+  Network,
+  StakerParamsByNetwork
 } from "../../types";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
@@ -32,36 +34,37 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // If the user has selected the repository full node option then use this value.
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
-    if (stakerConfig.currentExecClient === null) {
+    if (!stakerConfig.currentExecClient) {
       // Set default empty string value
       let newExexClientValue = "";
 
-      for (const execClient of stakerConfig.execClients.map(
-        exCl => exCl.dnpName
-      )) {
-        if (pkgs.find(pkg => pkg.dnpName === execClient)) {
-          newExexClientValue = execClient;
-          break;
-        }
-      }
-
       if (network === "mainnet") {
-        const repository = db.ethClientTarget.get();
-        switch (repository) {
-          case "geth":
-            newExexClientValue = "geth.dnp.dappnode.eth";
-            break;
-          case "nethermind":
-            newExexClientValue = "nethermind.public.dappnode.eth";
-            break;
-          case "besu":
-            newExexClientValue = "besu.public.dappnode.eth";
-            break;
-          case "erigon":
-            newExexClientValue = "erigon.dnp.dappnode.eth";
-            break;
-          default:
-            break;
+        // Look for pkg ethclient target (fullnode), installed and running
+        const execClientTargetDnpName = getExecClientTargetDnpName();
+        if (
+          pkgs.find(
+            pkg =>
+              pkg.dnpName === execClientTargetDnpName &&
+              pkg.containers.every(c => c.running)
+          )
+        ) {
+          newExexClientValue = execClientTargetDnpName;
+        } else {
+          // Look for pkg exec client installed and running
+          newExexClientValue = getClientInstalledAndRunning(
+            pkgs,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stakerConfig.execClients as any,
+            "execClients"
+          );
+          // Look for pkg exec client installed
+          if (!newExexClientValue)
+            newExexClientValue = getClientInstalled(
+              pkgs,
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              stakerConfig.execClients as any,
+              "execClients"
+            );
         }
       }
 
@@ -89,7 +92,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // CONSENSUS_CLIENT_<NETWORK>:
     // If the web3signer is installed then grab the value from its compose ENV value
     // If not web3signer then is undefined
-    if (stakerConfig.currentConsClient === null) {
+    if (!stakerConfig.currentConsClient) {
       // Set default empty string value
       let newConsClientValue = "";
 
@@ -121,6 +124,25 @@ export async function setDefaultStakerConfig(): Promise<void> {
         }
       }
 
+      // For resilience, give a value for mainnet if its still empty
+      if (network === "mainnet" && !newConsClientValue) {
+        // Look for cons client installed and running
+        newConsClientValue = getClientInstalledAndRunning(
+          pkgs,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          stakerConfig.consClients as any,
+          "consClients"
+        );
+        // Look for cons client installed
+        if (!newConsClientValue)
+          newConsClientValue = getClientInstalled(
+            pkgs,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            stakerConfig.consClients as any,
+            "consClients"
+          );
+      }
+
       switch (network) {
         case "mainnet":
           db.consensusClientMainnet.set(
@@ -141,5 +163,64 @@ export async function setDefaultStakerConfig(): Promise<void> {
           break;
       }
     }
+  }
+}
+
+// Utils
+
+function getClientInstalledAndRunning(
+  pkgs: InstalledPackageDataApiReturn[],
+  clients: Pick<
+    StakerParamsByNetwork<"mainnet">,
+    "execClients" | "consClients"
+  >,
+  typeofClient: "execClients" | "consClients"
+): string {
+  for (const execClient of clients[typeofClient].map(
+    client => client.dnpName
+  )) {
+    if (
+      pkgs.find(
+        pkg =>
+          pkg.dnpName === execClient && pkg.containers.every(c => c.running)
+      )
+    ) {
+      return execClient;
+    }
+  }
+  return "";
+}
+
+function getClientInstalled(
+  pkgs: InstalledPackageDataApiReturn[],
+  clients: Pick<
+    StakerParamsByNetwork<"mainnet">,
+    "execClients" | "consClients"
+  >,
+  typeofClient: "execClients" | "consClients"
+) {
+  for (const execClient of clients[typeofClient].map(
+    client => client.dnpName
+  )) {
+    if (pkgs.find(pkg => pkg.dnpName === execClient)) {
+      return execClient;
+    }
+  }
+  return "";
+}
+
+function getExecClientTargetDnpName(): ExecutionClientMainnet {
+  const repository = db.ethClientTarget.get();
+  switch (repository) {
+    case "geth":
+      return "geth.dnp.dappnode.eth";
+    case "nethermind":
+      return "nethermind.public.dappnode.eth";
+    case "besu":
+      return "besu.public.dappnode.eth";
+    case "erigon":
+      return "erigon.dnp.dappnode.eth";
+    default:
+      return "";
   }
 }
