@@ -8,10 +8,6 @@ WORKDIR /app
 
 RUN apk add --no-cache python3 build-base bash
 
-# Install lerna first
-RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
-RUN yarn
-
 WORKDIR /usr/src/app
 
 RUN apk add --no-cache git
@@ -23,6 +19,8 @@ RUN node getGitData /usr/src/app/.git-data.json
 RUN apk add --no-cache bind-tools docker
 
 ENV DOCKER_COMPOSE_VERSION v2.5.0
+
+ENV REACT_APP_API_URL /
 
 RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind tmux \
   # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
