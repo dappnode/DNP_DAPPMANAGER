@@ -9,6 +9,7 @@ import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterDirectory from "../../helpers/filterDirectory";
 import { rootPath } from "../../data";
+import { rootPath as stakersPath } from "../../../stakers/data";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
@@ -60,7 +61,14 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
+    // Middleware for Ethereum and Gnosis fake cards to redirect to stakers UI:
+    // - Mainnet: http://my.dappnode/#/stakers/mainnet
+    // - Gnosis: http://my.dappnode/#/stakers/gnosis
+    if (id === "ethereum.dnp.dappnode.eth")
+      routeProps.history.push(stakersPath + "/mainnet");
+    else if (id === "gnosis.dnp.dappnode.eth")
+      routeProps.history.push(stakersPath + "/gnosis");
+    else routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
