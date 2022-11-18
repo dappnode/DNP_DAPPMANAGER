@@ -48,7 +48,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "1.0.5"
           }
         ],
-        currentConsClient: db.consensusClientMainnet.get() ,
+        currentConsClient: db.consensusClientMainnet.get(),
         web3signer: {
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: "0.1.4"
@@ -65,7 +65,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: ""
           }
         ],
-        currentExecClient: db.executionClientGnosis.get() ,
+        currentExecClient: db.executionClientGnosis.get(),
         consClients: [
           {
             dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
@@ -79,9 +79,8 @@ export function stakerParamsByNetwork<T extends Network>(
             dnpName: "teku-gnosis.dnp.dappnode.eth",
             minVersion: ""
           }
-          //"nimbus-gnosis.dnp.dappnode.eth"
         ],
-        currentConsClient: db.consensusClientGnosis.get() ,
+        currentConsClient: db.consensusClientGnosis.get(),
         web3signer: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: ""
@@ -109,7 +108,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentExecClient: db.executionClientPrater.get() ,
+        currentExecClient: db.executionClientPrater.get(),
         consClients: [
           {
             dnpName: "prysm-prater.dnp.dappnode.eth",
@@ -128,7 +127,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.7"
           }
         ],
-        currentConsClient: db.consensusClientPrater.get() ,
+        currentConsClient: db.consensusClientPrater.get(),
         web3signer: {
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"
