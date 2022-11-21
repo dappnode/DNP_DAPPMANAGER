@@ -26,7 +26,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       })
     },
     {
-      subPath: "gnoexecutionClientsis",
+      subPath: "gnosis",
       title: "Gnosis chain",
       component: StakerNetwork({
         network: "gnosis",
