@@ -11,7 +11,6 @@ import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
-import { FcInfo } from "react-icons/fc";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
@@ -104,13 +103,6 @@ export default function ConsensusClient<T extends Network>({
             It is <b>not recommended</b> to use <b>Prysm</b> as a consensus
             client <b>in Gnosis</b>. Use it at your own risk or change to
             another alternative.
-            <a
-              href="https://docs.gnosischain.com/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <FcInfo />
-            </a>
           </Alert>
         )}
 
