@@ -26,7 +26,7 @@ import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork";
 export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
-  for (const network of ["mainnet", /* "gnosis",  */ "prater"] as Network[]) {
+  for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
     const stakerConfig = stakerParamsByNetwork(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
@@ -48,19 +48,24 @@ export async function setDefaultStakerConfig(): Promise<void> {
           )
         ) {
           newExexClientValue = execClientTargetDnpName;
-        } else {
-          // Look for pkg exec client installed and running
-          newExexClientValue = getClientInstalledAndRunning(
+        }
+      }
+
+      if (
+        (network === "mainnet" || network === "gnosis") &&
+        !newExexClientValue
+      ) {
+        // Look for pkg exec client installed and running
+        newExexClientValue = getClientInstalledAndRunning(
+          pkgs,
+          stakerConfig.execClients.map(client => client.dnpName)
+        );
+        // Look for pkg exec client installed
+        if (!newExexClientValue)
+          newExexClientValue = getClientInstalled(
             pkgs,
             stakerConfig.execClients.map(client => client.dnpName)
           );
-          // Look for pkg exec client installed
-          if (!newExexClientValue)
-            newExexClientValue = getClientInstalled(
-              pkgs,
-              stakerConfig.execClients.map(client => client.dnpName)
-            );
-        }
       }
 
       switch (network) {
@@ -120,7 +125,10 @@ export async function setDefaultStakerConfig(): Promise<void> {
       }
 
       // For resilience, give a value for mainnet if its still empty
-      if (network === "mainnet" && !newConsClientValue) {
+      if (
+        (network === "mainnet" || network === "gnosis") &&
+        !newConsClientValue
+      ) {
         // Look for cons client installed and running
         newConsClientValue = getClientInstalledAndRunning(
           pkgs,
