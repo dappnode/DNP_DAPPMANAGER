@@ -126,7 +126,7 @@ const stakerMainnetCard: DirectoryItemOk = {
   isFeatured: true,
   status: "ok",
   description: "Easily set-up you Ethereum node and validator",
-  avatarUrl: "/ipfs/QmTQkhh8stV2izPqDMrNWTm2HEX8uJKjd4x11WCun9ZfYE", // Ethereum image logo
+  avatarUrl: "/ipfs/QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y", // Ethereum image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {
