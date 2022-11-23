@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import Web3 from "web3";
 import { ApmVersionState } from "./types";
 import * as repoContract from "../../contracts/repository";
 import { parseApmVersionReturn, linspace } from "./apmUtils";
@@ -9,13 +9,15 @@ import { parseApmVersionReturn, linspace } from "./apmUtils";
  * @param dnpName "bitcoin.dnp.dappnode.eth"
  */
 export async function fetchApmVersionsState(
-  provider: ethers.providers.Provider,
+  web3: Web3,
   dnpName: string,
   lastVersionId = 0
 ): Promise<ApmVersionState[]> {
-  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
+  const repo = new web3.eth.Contract(repoContract.abi, dnpName);
 
-  const versionCount: number = await repo.getVersionsCount().then(parseFloat);
+  const versionCount: number = await repo.methods
+    .getVersionsCount()
+    .then(parseFloat);
 
   /**
    * Versions called by id are ordered in ascending order.
@@ -34,16 +36,14 @@ export async function fetchApmVersionsState(
   if (isNaN(lastVersionId) || lastVersionId < 0) lastVersionId = 0;
   const versionIndexes = linspace(lastVersionId + 1, versionCount);
   return await Promise.all(
-    versionIndexes.map(
-      async (i): Promise<ApmVersionState> => {
-        const versionData = await repo
-          .getByVersionId(i)
-          .then(parseApmVersionReturn);
-        return {
-          ...versionData,
-          versionId: i
-        };
-      }
-    )
+    versionIndexes.map(async (i): Promise<ApmVersionState> => {
+      const versionData = await repo.methods
+        .getByVersionId(i)
+        .then(parseApmVersionReturn);
+      return {
+        ...versionData,
+        versionId: i
+      };
+    })
   );
 }

@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import Web3 from "web3";
 import { ApmVersionMetadata } from "./types";
 import { getTimestamp } from "./apmUtils";
 
@@ -13,7 +14,7 @@ const repoAbi = [
  * resolve the domain
  */
 export async function fetchApmVersionsMetadata(
-  provider: ethers.providers.Provider,
+  web3: Web3,
   addressOrEnsName: string,
   fromBlock?: number
 ): Promise<ApmVersionMetadata[]> {
@@ -26,7 +27,7 @@ export async function fetchApmVersionsMetadata(
 
   const topic = event.topic.name;
 
-  const result = await provider.getLogs({
+  const result = await web3.eth.getPastLogs({
     address: addressOrEnsName, // or contractEnsName,
     fromBlock: fromBlock || 0,
     toBlock: "latest",
@@ -46,7 +47,7 @@ export async function fetchApmVersionsMetadata(
         // Parse tx data
         txHash: log.transactionHash,
         blockNumber: log.blockNumber,
-        timestamp: await getTimestamp(log.blockNumber, provider)
+        timestamp: await getTimestamp(log.blockNumber, web3)
       };
     })
   );

@@ -1,5 +1,5 @@
-import { ethers } from "ethers";
-import { getEthersProvider } from "../ethClient";
+import Web3 from "web3";
+import params from "../../params";
 import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata";
 import { fetchApmVersionsState } from "./fetchApmVersionsState";
 import { fetchVersion } from "./fetchVersion";
@@ -7,11 +7,9 @@ import { repoExists } from "./repoExists";
 import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types";
 
 export class Apm {
-  provider: ethers.providers.Provider | undefined = undefined;
-
-  async getProvider(): Promise<ethers.providers.Provider> {
-    if (!this.provider) this.provider = await getEthersProvider();
-    return this.provider;
+  async getProvider(): Promise<Web3> {
+    const web3 = new Web3(params.ETH_MAINNET_RPC_URL_REMOTE);
+    return web3;
   }
 
   /**

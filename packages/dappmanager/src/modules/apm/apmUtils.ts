@@ -1,4 +1,6 @@
-import { ethers } from "ethers";
+import Web3 from "web3";
+// import web3 utils
+import { toUtf8 } from "web3-utils";
 import semver from "semver";
 import { ApmRepoVersionReturn } from "./types";
 
@@ -15,7 +17,7 @@ export function parseApmVersionReturn(res: ApmRepoVersionReturn): {
     version: res.semanticVersion.join("."),
     // Second argument = true: ignore UTF8 parsing errors
     // Let downstream code identify the content hash as wrong
-    contentUri: ethers.utils.toUtf8String(res.contentURI)
+    contentUri: toUtf8(res.contentURI)
   };
 }
 
@@ -52,9 +54,10 @@ export function linspace(from: number, to: number, step = 1): number[] {
  */
 export async function getTimestamp(
   blockNumber: number | undefined,
-  provider: ethers.providers.Provider
+  web3: Web3
 ): Promise<number | undefined> {
   if (!blockNumber) return;
-  const block = await provider.getBlock(blockNumber);
+  const block = await web3.eth.getBlock(blockNumber);
+  if (typeof block.timestamp !== "number") return parseInt(block.timestamp);
   return block.timestamp;
 }

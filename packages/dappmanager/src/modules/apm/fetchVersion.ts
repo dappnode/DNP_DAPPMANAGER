@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import Web3 from "web3";
 import { ApmRepoVersionReturn, ApmVersionRaw } from "./types";
 import * as repoContract from "../../contracts/repository";
 import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils";
@@ -10,15 +10,15 @@ import semver from "semver";
  * @param version "0.2.4"
  */
 export async function fetchVersion(
-  provider: ethers.providers.Provider,
+  web3: Web3,
   dnpName: string,
   version?: string
 ): Promise<ApmVersionRaw> {
-  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
+  const repo = new web3.eth.Contract(repoContract.abi, dnpName);
 
   const res: ApmRepoVersionReturn =
     version && semver.valid(version)
-      ? await repo.getBySemanticVersion(toApmVersionArray(version))
-      : await repo.getLatest();
+      ? await repo.methods.getBySemanticVersion(toApmVersionArray(version))
+      : await repo.methods.getLatest();
   return parseApmVersionReturn(res);
 }
