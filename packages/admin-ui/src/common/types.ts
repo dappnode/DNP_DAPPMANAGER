@@ -1083,7 +1083,6 @@ export interface SystemInfo {
   // From seedPhrase: If it's not stored yet, it's an empty string
   identityAddress: string;
   // Eth multi-client configuration
-  ethClientTarget: EthClientTarget | null;
   eth2ClientTarget: Eth2ClientTarget;
   ethClientFallback: EthClientFallback;
   // Eth multi-client status (cached, may be a small delay with real status)

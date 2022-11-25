@@ -1,13 +1,14 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
 import {
+  ConsensusClientMainnet,
   EthClientStatus,
   ExecutionClientMainnet,
   executionClientsMainnet
 } from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { serializeError } from "./types";
-import { getEthClientApiUrl } from "./apiUrl";
+import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl";
 import { parseEthersSyncing } from "../../utils/ethers";
 
 /**
@@ -44,23 +45,28 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
  *       enforces that all possible states are covered
  */
 export async function getClientStatus(
-  execClientDnpName: ExecutionClientMainnet
+  execClientDnpName: ExecutionClientMainnet,
+  consClientDnpName: ConsensusClientMainnet
 ): Promise<EthClientStatus> {
   try {
     if (!executionClientsMainnet.includes(execClientDnpName))
       throw Error(
         `Unsupported execution client in mainnet '${execClientDnpName}'`
       );
-    const url = getEthClientApiUrl(execClientDnpName);
+    const execUrl = getEthExecClientApiUrl(execClientDnpName);
+    const consUrl = getEthConsClientApiUrl(consClientDnpName);
     try {
       // Provider API works? Do a single test call to check state
-      if (await isSyncing(url)) {
+      if (await isSyncing(execUrl)) {
+        // TODO: add a check that if running FULL NODE, then considered as IS_SYNCING if
+        // the execution client is running more than 1 day in terms of blocks behind the
+        // consensus client
         return { ok: false, code: "IS_SYNCING" };
       } else {
         try {
-          if (await isApmStateCorrect(url)) {
+          if (await isApmStateCorrect(execUrl)) {
             // All okay!
-            return { ok: true, url, dnpName: execClientDnpName };
+            return { ok: true, url: execUrl, dnpName: execClientDnpName };
           } else {
             // State is not correct, node is not synced but eth_syncing did not picked it up
             return { ok: false, code: "STATE_NOT_SYNCED" };
