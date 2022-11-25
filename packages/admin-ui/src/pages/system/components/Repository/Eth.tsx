@@ -25,14 +25,27 @@ export default function Eth() {
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
   const dispatch = useDispatch();
-
   const [target, setTarget] = useState<Eth2ClientTarget | null>(
     ethClientTarget || null
   );
+  const [useCheckpointSync, setUseCheckpointSync] = useState<
+    boolean | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (ethClientTarget) setTarget(ethClientTarget);
+    if (ethClientTarget) {
+      setTarget(ethClientTarget);
+    }
   }, [ethClientTarget]);
+
+  /**
+   * Only shows the checkpointsync switch if ethclient target is
+   * the fullnode and the user is changing the client.
+   */
+  useEffect(() => {
+    if (target !== "remote" && !isEqual(ethClientTarget, target))
+      setUseCheckpointSync(true);
+  }, [target, ethClientTarget]);
 
   function changeClient() {
     if (target) dispatch(changeEthClientTarget(target));
@@ -91,6 +104,7 @@ export default function Eth() {
         <div className="description">
           <strong>Execution Client:</strong>{" "}
           {prettyDnpName(ethClientTarget.execClient)}
+          <br />
           <strong>Consensu Client:</strong>{" "}
           {prettyDnpName(ethClientTarget.consClient)}
           <br />
@@ -106,6 +120,8 @@ export default function Eth() {
         onTargetChange={setTarget}
         fallback={ethClientFallback || "off"}
         onFallbackChange={changeFallback}
+        useCheckpointSync={useCheckpointSync}
+        setUseCheckpointSync={setUseCheckpointSync}
       />
 
       <div style={{ textAlign: "end" }}>

@@ -6,14 +6,18 @@ import { ethereumClient } from "../modules/ethClient";
  */
 export async function ethClientTargetSet({
   target,
-  useCheckpointSync,
-  deletePrevExecClient,
-  deletePrevConsClient
+  useCheckpointSync = false,
+  deletePrevExecClient = false,
+  deletePrevExecClientVolumes = false,
+  deletePrevConsClient = false,
+  deletePrevConsClientVolumes = false
 }: {
   target: Eth2ClientTarget;
   useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
+  deletePrevExecClientVolumes?: boolean;
   deletePrevConsClient?: boolean;
+  deletePrevConsClientVolumes?: boolean;
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
 
@@ -22,6 +26,8 @@ export async function ethClientTargetSet({
     false,
     useCheckpointSync,
     deletePrevExecClient,
-    deletePrevConsClient
+    deletePrevExecClientVolumes,
+    deletePrevConsClient,
+    deletePrevConsClientVolumes
   );
 }

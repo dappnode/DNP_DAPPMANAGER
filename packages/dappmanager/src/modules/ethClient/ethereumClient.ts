@@ -58,9 +58,11 @@ export class EthereumClient {
   async changeEthClient(
     nextTarget: Eth2ClientTarget,
     sync: boolean,
-    useCheckpointSync?: boolean,
-    deletePrevExecClient?: boolean,
-    deletePrevConsClient?: boolean
+    useCheckpointSync: boolean,
+    deletePrevExecClient: boolean,
+    deletePrevExecClientVolumes: boolean,
+    deletePrevConsClient: boolean,
+    deletePrevConsClientVolumes: boolean
   ): Promise<void> {
     const currentTarget = this.computeEthereumTarget();
     // Return if the target is the same
@@ -69,14 +71,16 @@ export class EthereumClient {
     if (currentTarget !== "remote") {
       // Remove Execution client
       if (deletePrevExecClient)
-        await packageRemove({ dnpName: currentTarget.execClient }).catch(e =>
-          logs.error(`Error removing prev exec client: ${e}`)
-        );
+        await packageRemove({
+          dnpName: currentTarget.execClient,
+          deleteVolumes: deletePrevExecClientVolumes
+        }).catch(e => logs.error(`Error removing prev exec client: ${e}`));
       // Remove Consensus client
       if (deletePrevConsClient)
-        await packageRemove({ dnpName: currentTarget.consClient }).catch(e =>
-          logs.error(`Error removing prev cons client: ${e}`)
-        );
+        await packageRemove({
+          dnpName: currentTarget.consClient,
+          deleteVolumes: deletePrevConsClientVolumes
+        }).catch(e => logs.error(`Error removing prev cons client: ${e}`));
     }
 
     if (nextTarget === "remote") {
@@ -97,8 +101,18 @@ export class EthereumClient {
       db.ethClientRemote.set(EthClientRemote.off);
       db.executionClientMainnet.set(execClient);
       db.consensusClientMainnet.set(consClient);
-      if (sync) await this.changeEthClientSync(execClient, consClient);
-      else await this.changeEthClientNotAsync(execClient, consClient);
+      if (sync)
+        await this.changeEthClientSync(
+          execClient,
+          consClient,
+          useCheckpointSync
+        );
+      else
+        await this.changeEthClientNotAsync(
+          execClient,
+          consClient,
+          useCheckpointSync
+        );
     }
   }
 
@@ -163,7 +177,8 @@ export class EthereumClient {
    */
   private async changeEthClientSync(
     execClient: ExecutionClientMainnet,
-    consClient: ConsensusClientMainnet
+    consClient: ConsensusClientMainnet,
+    useCheckpointSync?: boolean
   ): Promise<void> {
     try {
       // Install exec client and set default fullnode alias
@@ -175,7 +190,12 @@ export class EthereumClient {
           })
       );
       // Get default cons client user settings and install cons client
-      const userSettings = getConsensusUserSettings({ dnpName: consClient });
+      const userSettings = getConsensusUserSettings({
+        dnpName: consClient,
+        checkpointSync: useCheckpointSync
+          ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
+          : undefined
+      });
       await packageInstall({ name: consClient, userSettings });
     } catch (e) {
       throw Error(`Error changing eth client: ${e}`);
@@ -187,7 +207,8 @@ export class EthereumClient {
    */
   private async changeEthClientNotAsync(
     execClient: ExecutionClientMainnet,
-    consClient: ConsensusClientMainnet
+    consClient: ConsensusClientMainnet,
+    useCheckpointSync: boolean
   ): Promise<void> {
     db.ethExecClientInstallStatus.set(execClient, {
       status: "TO_INSTALL"
@@ -195,7 +216,7 @@ export class EthereumClient {
     db.ethConsClientInstallStatus.set(consClient, {
       status: "TO_INSTALL"
     });
-    eventBus.runEthClientInstaller.emit();
+    eventBus.runEthClientInstaller.emit({ useCheckpointSync });
   }
 
   // Utils

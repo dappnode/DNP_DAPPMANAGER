@@ -22,6 +22,7 @@ import {
   getLocalFallbackContentHash
 } from "../../modules/ethClient";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils";
+import { getConsensusUserSettings } from "../../modules/stakerConfig/utils";
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -73,7 +74,14 @@ export async function runEthClientInstaller(
             );
 
           try {
-            await packageInstall({ name: target });
+            if (isConsClient(target))
+              await packageInstall({
+                name: target,
+                userSettings: getConsensusUserSettings({
+                  dnpName: target
+                })
+              });
+            else await packageInstall({ name: target });
           } catch (e) {
             // When installing DAppNode for the first time, if the user selects a
             // non-remote target and disabled fallback, there must be a way to

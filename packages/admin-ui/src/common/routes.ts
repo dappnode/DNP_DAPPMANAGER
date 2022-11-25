@@ -226,7 +226,9 @@ export interface Routes {
     target: Eth2ClientTarget;
     useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
+    deletePrevExecClientVolumes?: boolean;
     deletePrevConsClient?: boolean;
+    deletePrevConsClientVolumes?: boolean;
   }) => Promise<void>;
 
   /**
