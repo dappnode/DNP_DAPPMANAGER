@@ -115,6 +115,7 @@ export const changeEthClientTarget = (
     () =>
       api.ethClientTargetSet({
         target: nextTarget,
+        sync: false,
         useCheckpointSync,
         deletePrevExecClient,
         deletePrevExecClientVolumes,
