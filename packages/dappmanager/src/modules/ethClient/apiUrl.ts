@@ -1,4 +1,5 @@
 import { getPrivateNetworkAlias } from "../../domains";
+import { getBeaconServiceName } from "../../modules/stakerConfig/utils";
 
 /**
  * Computes the JSON RPC url of an Eth execution client package from its name
@@ -34,7 +35,7 @@ export function getEthConsClientApiUrl(dnpName: string, port = 3500): string {
    */
   const domain = getPrivateNetworkAlias({
     dnpName: dnpName,
-    serviceName: dnpName
+    serviceName: getBeaconServiceName(dnpName)
   });
 
   return `http://${domain}:${port}`;

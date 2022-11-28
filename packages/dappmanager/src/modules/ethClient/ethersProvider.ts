@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
 import params from "../../params";
-import { getClientStatus } from "./clientStatus";
+import { getMultiClientStatus } from "./clientStatus";
 import { EthClientStatusError } from "../../types";
 import { emitSyncedNotification } from "./syncedNotification";
 import { ethereumClient } from ".";
@@ -38,7 +38,10 @@ export async function getEthProviderUrl(): Promise<string> {
   // Remote is selected, just return remote
   if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
 
-  const status = await getClientStatus(target.execClient, target.consClient);
+  const status = await getMultiClientStatus(
+    target.execClient,
+    target.consClient
+  );
   db.ethExecClientStatus.set(target.execClient, status);
   emitSyncedNotification(target, status);
 
