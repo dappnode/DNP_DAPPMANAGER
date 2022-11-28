@@ -2,10 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { shellSafe } from "../../testUtils";
 import fs from "fs";
-import {
-  removeFullnodeAliasFromCompose,
-  addFullnodeAliasToCompose
-} from "../../../src/modules/ethClient/changeEthMultiClient";
+import { ethereumClient } from "../../../src/modules/ethClient";
 
 // The following test will wite a compose with the alias fullnode.dappnode:
 // 1. Then will remove such aslias and test it
@@ -100,7 +97,7 @@ networks:
 
   it("Should remove alias: fullnode.dappnode", () => {
     // Edit existing compose
-    removeFullnodeAliasFromCompose(dnpName, serviceName);
+    ethereumClient.removeFullnodeAliasFromCompose(dnpName, serviceName);
 
     // Get edited compose
     const composeAfter = fs.readFileSync(
@@ -113,7 +110,7 @@ networks:
 
   it("Should add alias: fullnode.dappnode", () => {
     // Edit existing compose
-    addFullnodeAliasToCompose(dnpName, serviceName);
+    ethereumClient.addFullnodeAliasToCompose(dnpName, serviceName);
 
     // Get edited compose
     const composeAfter = fs.readFileSync(

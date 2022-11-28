@@ -1,4 +1,4 @@
-import { EthClientTargetPackage, ReleaseSignatureProtocol } from "./common";
+import { ExecutionClientMainnet, ReleaseSignatureProtocol } from "./common";
 export * from "./common";
 
 export enum FileFormat {
@@ -33,7 +33,7 @@ export type NodeArch =
   | "x64";
 
 export type EthClientSyncedNotificationStatus = {
-  target: EthClientTargetPackage;
+  execClientTarget: ExecutionClientMainnet;
   status: "AwaitingSynced" | "Synced";
 } | null;
 

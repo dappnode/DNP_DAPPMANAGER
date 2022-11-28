@@ -1,53 +1,129 @@
 import { confirm } from "components/ConfirmDialog";
 import { api } from "api";
 import { prettyDnpName, prettyVolumeName } from "utils/format";
-import { getEthClientPrettyName } from "components/EthMultiClient";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
-import { EthClientTarget } from "types";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
+import { Eth2ClientTarget } from "types";
+import { isEqual } from "lodash";
 
 // Redux Thunk actions
 
 export const changeEthClientTarget = (
-  nextTarget: EthClientTarget
+  nextTarget: Eth2ClientTarget,
+  useCheckpointSync?: boolean
 ): AppThunk => async (_, getState) => {
   const prevTarget = getEthClientTarget(getState());
 
   // Make sure the target has changed or the call will error
-  if (nextTarget === prevTarget) return;
+  if (isEqual(nextTarget, prevTarget)) return;
 
   // If the previous target is package, ask the user if deleteVolumes
-  const deletePrevEthClient =
-    prevTarget && prevTarget !== "remote"
-      ? await new Promise<boolean>(resolve =>
-          confirm({
-            title: `Remove ${getEthClientPrettyName(prevTarget)}?`,
-            text: `Do you want to keep or remove your current Ethereum client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
-            buttons: [
-              {
-                label: "Keep",
-                variant: "danger",
-                onClick: () => resolve(false)
-              },
-              {
-                label: "Remove",
-                variant: "dappnode",
-                onClick: () => resolve(true)
+  let deletePrevExecClient = false;
+  let deletePrevExecClientVolumes = false;
+  let deletePrevConsClient = false;
+  let deletePrevConsClientVolumes = false;
+  if (prevTarget && prevTarget !== "remote") {
+    if (
+      nextTarget === "remote" ||
+      nextTarget.execClient !== prevTarget.execClient
+    ) {
+      await new Promise<void>(resolve =>
+        confirm({
+          title: `Remove ${prettyDnpName(prevTarget.execClient)}?`,
+          text: `Do you want to keep or remove your current Ethereum execution client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
+          buttons: [
+            {
+              label: "Keep",
+              variant: "danger",
+              onClick: () => {
+                deletePrevExecClient = false;
+                deletePrevExecClientVolumes = false;
+                resolve();
               }
-            ]
-          })
-        )
-      : false;
+            },
+            {
+              label: "Remove without volumes",
+              variant: "warning",
+              onClick: () => {
+                deletePrevExecClient = true;
+                deletePrevExecClientVolumes = false;
+                resolve();
+              }
+            },
+            {
+              label: "Remove with volumes",
+              variant: "dappnode",
+              onClick: () => {
+                deletePrevExecClient = true;
+                deletePrevExecClientVolumes = true;
+                resolve();
+              }
+            }
+          ]
+        })
+      );
+    }
+
+    // If the previous target is package, ask the user if deleteVolumes
+    if (
+      nextTarget === "remote" ||
+      nextTarget.consClient !== prevTarget.consClient
+    ) {
+      await new Promise<void>(resolve =>
+        confirm({
+          title: `Remove ${prettyDnpName(prevTarget.consClient)}?`,
+          text: `Do you want to keep or remove your current Ethereum consensus client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
+          buttons: [
+            {
+              label: "Keep",
+              variant: "danger",
+              onClick: () => {
+                deletePrevConsClient = false;
+                deletePrevConsClientVolumes = false;
+                resolve();
+              }
+            },
+            {
+              label: "Remove without volumes",
+              variant: "warning",
+              onClick: () => {
+                deletePrevConsClient = true;
+                deletePrevConsClientVolumes = false;
+                resolve();
+              }
+            },
+            {
+              label: "Remove with volumes",
+              variant: "dappnode",
+              onClick: () => {
+                deletePrevConsClient = true;
+                deletePrevConsClientVolumes = true;
+                resolve();
+              }
+            }
+          ]
+        })
+      );
+    }
+  }
 
   await withToastNoThrow(
-    () => api.ethClientTargetSet({ target: nextTarget, deletePrevEthClient }),
+    () =>
+      api.ethClientTargetSet({
+        target: nextTarget,
+        useCheckpointSync,
+        deletePrevExecClient,
+        deletePrevExecClientVolumes,
+        deletePrevConsClient,
+        deletePrevConsClientVolumes
+      }),
     {
-      message: "Changing Eth client...",
-      onSuccess: `Changed Eth client`
+      message: "Changing Ethereum client...",
+      onSuccess: `Changed Ethereum client`
     }
   );
 };

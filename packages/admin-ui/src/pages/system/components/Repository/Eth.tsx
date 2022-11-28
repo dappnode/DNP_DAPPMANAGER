@@ -5,33 +5,47 @@ import {
   getEthClientStatus,
   getEthClientFallback
 } from "services/dappnodeStatus/selectors";
-import { EthClientTarget, EthClientFallback } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "types";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import SubTitle from "components/SubTitle";
 import {
-  getEthClientPrettyName,
   getEthClientPrettyStatus,
   EthMultiClientsAndFallback
 } from "components/EthMultiClient";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import Card from "components/Card";
+import { prettyDnpName } from "utils/format";
+import { isEqual } from "lodash";
 
 export default function Eth() {
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
   const dispatch = useDispatch();
-
-  const [target, setTarget] = useState<EthClientTarget | null>(
+  const [target, setTarget] = useState<Eth2ClientTarget | null>(
     ethClientTarget || null
   );
+  const [useCheckpointSync, setUseCheckpointSync] = useState<
+    boolean | undefined
+  >(undefined);
 
   useEffect(() => {
-    if (ethClientTarget) setTarget(ethClientTarget);
+    if (ethClientTarget) {
+      setTarget(ethClientTarget);
+    }
   }, [ethClientTarget]);
+
+  /**
+   * Only shows the checkpointsync switch if ethclient target is
+   * the fullnode and the user is changing the client.
+   */
+  useEffect(() => {
+    if (target !== "remote" && !isEqual(ethClientTarget, target))
+      setUseCheckpointSync(true);
+  }, [target, ethClientTarget]);
 
   function changeClient() {
     if (target) dispatch(changeEthClientTarget(target));
@@ -88,7 +102,11 @@ export default function Eth() {
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (
         <div className="description">
-          <strong>Client:</strong> {getEthClientPrettyName(ethClientTarget)}
+          <strong>Execution Client:</strong>{" "}
+          {prettyDnpName(ethClientTarget.execClient)}
+          <br />
+          <strong>Consensu Client:</strong>{" "}
+          {prettyDnpName(ethClientTarget.consClient)}
           <br />
           <strong>Status:</strong>{" "}
           {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
@@ -102,13 +120,15 @@ export default function Eth() {
         onTargetChange={setTarget}
         fallback={ethClientFallback || "off"}
         onFallbackChange={changeFallback}
+        useCheckpointSync={useCheckpointSync}
+        setUseCheckpointSync={setUseCheckpointSync}
       />
 
       <div style={{ textAlign: "end" }}>
         <Button
           variant="dappnode"
           onClick={changeClient}
-          disabled={!target || ethClientTarget === target}
+          disabled={!target || isEqual(ethClientTarget, target)}
         >
           Change
         </Button>

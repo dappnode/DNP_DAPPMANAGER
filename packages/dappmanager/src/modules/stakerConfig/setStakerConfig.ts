@@ -300,7 +300,7 @@ async function setConsensusClientConfig<T extends Network>({
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
-    targetConsensusClient
+    ...targetConsensusClient
   });
 
   if (targetConsensusClient.dnpName && !currentConsClient) {

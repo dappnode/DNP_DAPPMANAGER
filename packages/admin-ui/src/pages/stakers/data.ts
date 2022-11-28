@@ -1,4 +1,8 @@
 import { Network } from "common";
+import {
+  dappnodeMainnetCheckpointSync,
+  dappnodePraterCheckpointSync
+} from "params";
 
 export const rootPath = "/stakers";
 export const title = "Stakers";
@@ -6,9 +10,9 @@ export const title = "Stakers";
 export const defaultDappnodeGraffiti = "validating_from_DAppNode";
 export const getDefaultCheckpointSync = (network: Network) =>
   network === "mainnet"
-    ? "https://checkpoint-sync.dappnode.io"
+    ? dappnodeMainnetCheckpointSync
     : network === "prater"
-    ? "https://checkpoint-sync-prater.dappnode.io"
+    ? dappnodePraterCheckpointSync
     : "";
 
 export const disclaimer = `## Terms of Use - DAppNode

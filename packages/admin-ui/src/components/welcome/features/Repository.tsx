@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientTarget, EthClientFallback } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "types";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
@@ -21,7 +21,8 @@ export default function Repository({
   onNext: () => void;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
-  const [target, setTarget] = useState<EthClientTarget>("remote");
+  const [useCheckpointSync, setUseCheckpointSync] = useState(true);
+  const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
 
@@ -31,9 +32,14 @@ export default function Repository({
 
   async function changeClient() {
     if (target) {
-      api.ethClientTargetSet({ target }).catch(e => {
-        console.error(`Error on ethClientTargetSet: ${e.stack}`);
-      });
+      api
+        .ethClientTargetSet({
+          target,
+          useCheckpointSync
+        })
+        .catch(e => {
+          console.error(`Error on ethClientTargetSet: ${e.stack}`);
+        });
       // Only set the fallback if the user is setting a target
       // Otherwise, the fallback could be activated without the user wanting to
       if (fallback === "on")
@@ -59,6 +65,8 @@ export default function Repository({
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        useCheckpointSync={useCheckpointSync}
+        setUseCheckpointSync={setUseCheckpointSync}
         showStats
         fallback={fallback}
         onFallbackChange={setFallback}
