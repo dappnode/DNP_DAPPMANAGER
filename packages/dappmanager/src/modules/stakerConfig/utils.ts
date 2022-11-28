@@ -92,6 +92,8 @@ export function getConsensusUserSettings({
               },
 
               [beaconServiceName]: {
+                // Fee recipient is a mandatory vlaue (for Teku)
+                ["GRAFFITI"]: graffiti || "Validating_from_DAppNode",
                 // Checkpoint sync is an optional value
                 ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
               }
