@@ -6,6 +6,7 @@ import { ethereumClient } from "../modules/ethClient";
  */
 export async function ethClientTargetSet({
   target,
+  sync = false,
   useCheckpointSync = false,
   deletePrevExecClient = false,
   deletePrevExecClientVolumes = false,
@@ -13,6 +14,7 @@ export async function ethClientTargetSet({
   deletePrevConsClientVolumes = false
 }: {
   target: Eth2ClientTarget;
+  sync?: boolean;
   useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
   deletePrevExecClientVolumes?: boolean;
@@ -23,7 +25,7 @@ export async function ethClientTargetSet({
 
   await ethereumClient.changeEthClient(
     target,
-    false,
+    sync,
     useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
