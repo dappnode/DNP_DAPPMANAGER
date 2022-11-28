@@ -16,11 +16,13 @@ import { ComposeFileEditor } from "../compose/editor";
 import { parseServiceNetworks } from "../compose/networks";
 import params from "../../params";
 import {
+  dockerComposeUpPackage,
   dockerContainerInspect,
   dockerNetworkConnect,
   dockerNetworkDisconnect
 } from "../docker";
 import Dockerode from "dockerode";
+import { listPackageNoThrow } from "../docker/list";
 
 export class EthereumClient {
   /**
@@ -181,22 +183,53 @@ export class EthereumClient {
     useCheckpointSync?: boolean
   ): Promise<void> {
     try {
-      // Install exec client and set default fullnode alias
-      await packageInstall({ name: execClient }).then(
-        async () =>
-          await this.setDefaultEthClientFullNode({
-            dnpName: execClient,
-            removeAlias: false
-          })
-      );
-      // Get default cons client user settings and install cons client
-      const userSettings = getConsensusUserSettings({
-        dnpName: consClient,
-        checkpointSync: useCheckpointSync
-          ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
-          : undefined
+      // Install execution client and set default fullnode alias
+      const execClientPackage = await listPackageNoThrow({
+        dnpName: execClient
       });
-      await packageInstall({ name: consClient, userSettings });
+      if (!execClientPackage) {
+        await packageInstall({ name: execClient }).then(
+          async () =>
+            await this.setDefaultEthClientFullNode({
+              dnpName: execClient,
+              removeAlias: false
+            })
+        );
+      } else {
+        // Start pkg if not running
+        if (execClientPackage.containers.some(c => c.state !== "running"))
+          await dockerComposeUpPackage(
+            { dnpName: execClient },
+            {},
+            {},
+            true
+          ).then(
+            async () =>
+              await this.setDefaultEthClientFullNode({
+                dnpName: execClient,
+                removeAlias: false
+              })
+          );
+      }
+
+      // Install consensus client
+      const consClientPkg = await listPackageNoThrow({
+        dnpName: execClient
+      });
+      if (!consClientPkg) {
+        // Get default cons client user settings and install cons client
+        const userSettings = getConsensusUserSettings({
+          dnpName: consClient,
+          checkpointSync: useCheckpointSync
+            ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
+            : undefined
+        });
+        await packageInstall({ name: consClient, userSettings });
+      } else {
+        // Start pkg if not running
+        if (consClientPkg.containers.some(c => c.state !== "running"))
+          await dockerComposeUpPackage({ dnpName: consClient }, {}, {}, true);
+      }
     } catch (e) {
       throw Error(`Error changing eth client: ${e}`);
     }
