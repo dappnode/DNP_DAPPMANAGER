@@ -27,7 +27,7 @@ interface EventTypes {
   requestDevices: void;
   requestPackages: void;
   requestSystemInfo: void;
-  runEthClientInstaller: void;
+  runEthClientInstaller: { useCheckpointSync: boolean };
   runNatRenewal: void;
   runStakerCacheUpdate: { dnpName: string };
 }

@@ -17,23 +17,23 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
     component: JSX.Element;
   }[] = [
     {
-      subPath: "mainnet",
-      title: "Mainnet",
+      subPath: "ethereum",
+      title: "Ethereum",
       component: StakerNetwork({
         network: "mainnet",
         description:
           "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
       })
     },
-    /*  {
-      subPath: "gnoexecutionClientsis",
+    {
+      subPath: "gnosis",
       title: "Gnosis chain",
       component: StakerNetwork({
         network: "gnosis",
         description:
           "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
       })
-    }, */
+    },
     {
       subPath: "prater",
       title: "Prater",

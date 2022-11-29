@@ -150,6 +150,7 @@ const params = {
   ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
   ETH_MAINNET_RPC_URL_REMOTE:
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.io",
 
   // Prysm legacy specs for: prater, gnosis and mainnet
   prysmLegacySpecs: [

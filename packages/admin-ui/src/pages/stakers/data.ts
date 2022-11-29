@@ -1,4 +1,9 @@
 import { Network } from "common";
+import {
+  dappnodeMainnetCheckpointSync,
+  dappnodePraterCheckpointSync,
+  dappnodeGnosisCheckpointSync
+} from "params";
 
 export const rootPath = "/stakers";
 export const title = "Stakers";
@@ -6,29 +11,29 @@ export const title = "Stakers";
 export const defaultDappnodeGraffiti = "validating_from_DAppNode";
 export const getDefaultCheckpointSync = (network: Network) =>
   network === "mainnet"
-    ? "https://checkpoint-sync.dappnode.io"
+    ? dappnodeMainnetCheckpointSync
     : network === "prater"
-    ? "https://checkpoint-sync-prater.dappnode.io"
+    ? dappnodePraterCheckpointSync
+    : network === "gnosis"
+    ? dappnodeGnosisCheckpointSync
     : "";
 
 export const disclaimer = `## Terms of Use - DAppNode
 
 Effective as of Oct 14, 2020
 
-By downloading, accessing or using this DAppNode Package ("DNP"), you (referenced herein as “you” or the “user”) certify that you have read and agreed to the terms and conditions below (the “Terms”) which form a binding contract between you and DAppNode Association (referenced herein as “we” or “us”). If you do not agree to the Terms, do not download or use DAppNode.
+By downloading, accessing or using this DAppNode Package (“DNP”), you (referenced herein as “you” or the “user”) certify that you have read and agreed to the terms and conditions below (the “Terms”) which form a binding contract between you and DAppNode Association (referenced herein as “we” or “us”). If you do not agree to the Terms, do not download or use DAppNode nor any of the DNPs.
 
 ### About DAppNode
 
-DAppNode is Free Open Source Software ("FOSS") aimed at facilitating the use of decentralized technologies. DAppNode is developed by the DAppNode Association, a voluntary association with the purpose of empowering users to participate in decentralized networks and to help such networks become more resilient by promoting the deployment of more nodes.
+DAppNode is Free Open Source Software (“FOSS”) aimed at facilitating the use of decentralized technologies. DAppNode is developed by the DAppNode Association, a voluntary association with the purpose of empowering users to participate in decentralized networks and to help such networks become more resilient by promoting the deployment of more nodes.
 The modular structure of the DAppNode FOSS allows for the wrapping of 3rd party software with the intention of facilitating its deployment. In no way we are responsible for the misuse of such software and in no way we warrant its functionalities. We accept no responsibiity for its errors, or for the errors that the wrapping process might have introduced. Any usage of DAppNode and a DNP is strictly at your own risk.
 
 ### About this DNP
 
-This software is experimental, presented 'as is' and inherently carries risks. By installing it, you acknowledge that DAppNode Association has done its best to mitigate these risks and accept to waive any liability or responsibility for DAppNode Association in case of any shortage, discrepancy, damage, loss or destruction of any digital asset managed within this DAppNode package.
+This software is experimental, presented ‘as is’ and inherently carries risks. By installing it, you acknowledge that DAppNode Association has done its best to mitigate these risks and accept to waive any liability or responsibility for DAppNode Association in case of any shortage, discrepancy, damage, loss or destruction of any digital asset managed within this DAppNode package.
 
-This package stores private keys. Neither DAppNode Association nor the developers of this software can have access to your private keys, nor help you recover it if you lose them.
-
-You are solely responsible for keeping your private keys and password safe and to perform secure backups, as well as to restrict access to your computer and other equipment. To the extent permitted by applicable law, you agree to be responsible for all activities that have been conducted from your account. You must take all necessary steps to ensure that your private key, password, and recovery phrase remain confidential and secured.
+This package helps block proposers receive blocks from block producers to be proposed to the Ethereum network via relayers. Dappnode has no affiliation with any block producers nor relayers and is in no way responsible for the content of such blocks. The user is the sole responsible for complying with any regulations the user is subject to.
 
 This is experimental open source software released under an GPLv3 license and may contain errors and/or bugs. No guarantee or representations whatsoever is made regarding its suitability (or its use) for any purpose or regarding its compliance with any applicable laws and regulations. Use of the software is at your own risk and discretion and by using the software you acknowledge that you have read this disclaimer, understand its contents, assume all risk related thereto and hereby release, waive, discharge and covenant not to sue DAppNode Association or any officers, employees or affiliates from and for any direct or indirect liability resulting from the use of the software as permissible by applicable laws and regulations.
 
@@ -40,13 +45,13 @@ The DAppNode name, the term “DAppNode” and all related names, logos, product
 
 ### Risks of Operating DAppNode
 
-The use of DAppNode and the 3rd party software included within its different DNPs can lead to loss of money. Blockchain technologies and in particular Ethereum are still experimental systems and ETH and other cryptocurrencies remain a risky investment. You alone are responsible for your actions on DAppNode including the security of your ETH and meeting any applicable minimum system requirements.
+The use of DAppNode and the 3rd party software included within its different DNPs can lead to loss of money. Blockchain technologies and in particular Ethereum are still experimental systems and ETH and other cryptocurrencies remain a risky investment. You alone are responsible for your actions on DAppNode including the security of your cryptocurrency and meeting any applicable minimum system requirements.
 
 Use the 3rd party software included within its different DNPs might be subject to Terms and Conditions of the 3rd party. DAppNode association has done its best to include such Terms and Conditions, however we do not warrant the accuracy, completeness or usefulness of the 3rd party Terms and Conditions. Any reliance you place on such information is strictly at your own risk. We recommend consulting with the 3rd party responsible for the software for its most updated Terms and Conditions.
 
 We make no claims that DAppNode is appropriate or permitted for use in any specific jurisdiction. Access to DAppNode may not be legal by certain persons or in certain jurisdictions or countries. If you access DAppNode, you do so on your own initiative and are responsible for compliance with local laws.
 
-Some Internet plans will charge an additional amount for any excess upload bandwidth used that isn't included in the plan and may terminate your connection without warning because of overuse. We advise that you check whether your Internet connection is subjected to such limitations and monitor your bandwidth use so that you can stop DAppNode before you reach your bandwidth limit.
+Some Internet plans will charge an additional amount for any excess upload bandwidth used that isn’t included in the plan and may terminate your connection without warning because of overuse. We advise that you check whether your Internet connection is subjected to such limitations and monitor your bandwidth use so that you can stop DAppNode before you reach your bandwidth limit.
 
 ### Warranty Disclaimer
 
@@ -59,7 +64,7 @@ In no event will DAppNode Association or any of its contributors be liable, whet
 ### Indemnification
 
 To the maximum extent permitted by law, you will defend, indemnify and hold DAppNode and its contributors harmless from and against any and all claims, actions, suits, investigations, or proceedings by any third party (including any party or purported party to or beneficiary or purported beneficiary of any transaction on DAppNode), as well as any and all losses, liabilities,
-damages, costs, and expenses (including reasonable attorneys' fees) arising out of, accruing from, or in any way related to (i) your breach of the terms of this Agreement, (ii) any transaction, or the failure to occur of any transaction on DAppNode, and (iii) your negligence, fraud, or willful misconduct.
+damages, costs, and expenses (including reasonable attorneys’ fees) arising out of, accruing from, or in any way related to (i) your breach of the terms of this Agreement, (ii) any transaction, or the failure to occur of any transaction on DAppNode, and (iii) your negligence, fraud, or willful misconduct.
 
 ### Compliance with Laws and Tax Obligations
 
@@ -71,4 +76,4 @@ We reserve the right to revise these Terms, and your rights and obligations are 
 
 These Terms constitute the entire agreement between you and DAppNode Association regarding use of DAppNode FOSS and will supersede all prior agreements whether, written or oral. No usage of trade or other regular practice or method of dealing between the parties will be used to modify, interpret, supplement, or alter the terms of these Terms.
 
-If any portion of these Terms is held invalid or unenforceable, such invalidity or enforceability will not affect the other provisions of these Terms, which will remain in full force and effect, and the invalid or unenforceable portion will be given effect to the greatest extent possible. The failure of a party to require performance of any provision will not affect that party's right to require performance at any time thereafter, nor will a waiver of any breach or default of these Terms or any provision of these Terms constitute a waiver of any subsequent breach or default or a waiver of the provision itself.`;
+If any portion of these Terms is held invalid or unenforceable, such invalidity or enforceability will not affect the other provisions of these Terms, which will remain in full force and effect, and the invalid or unenforceable portion will be given effect to the greatest extent possible. The failure of a party to require performance of any provision will not affect that party’s right to require performance at any time thereafter, nor will a waiver of any breach or default of these Terms or any provision of these Terms constitute a waiver of any subsequent breach or default or a waiver of the provision itself.`;

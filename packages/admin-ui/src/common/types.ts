@@ -999,21 +999,26 @@ export enum IpfsClientTarget {
 /**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
+ * TO BE DEPRECATED
  */
 export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
 export type EthClientTarget = EthClientTargetPackage | "remote";
-export const ethClientTargets: EthClientTarget[] = [
-  "remote",
-  "geth",
-  "nethermind",
-  "besu",
-  "erigon"
-];
+export type Eth2ClientTarget =
+  | {
+      execClient: ExecutionClientMainnet;
+      consClient: ConsensusClientMainnet;
+    }
+  | "remote";
 
 /**
  * If the DAPPMANAGER should use a eth remote node in cases of error syncing
  */
 export type EthClientFallback = "on" | "off";
+
+export enum EthClientRemote {
+  on = "on",
+  off = "off"
+}
 
 export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
 
@@ -1078,7 +1083,7 @@ export interface SystemInfo {
   // From seedPhrase: If it's not stored yet, it's an empty string
   identityAddress: string;
   // Eth multi-client configuration
-  ethClientTarget: EthClientTarget | null;
+  eth2ClientTarget: Eth2ClientTarget;
   ethClientFallback: EthClientFallback;
   // Eth multi-client status (cached, may be a small delay with real status)
   // - EthClientStatus = status of the current target
@@ -1182,18 +1187,22 @@ export type Network = "mainnet" | "prater" | "gnosis";
 
 // Mainnet
 
-export type ConsensusClientMainnet =
-  | "prysm.dnp.dappnode.eth"
-  | "lighthouse.dnp.dappnode.eth"
-  | "teku.dnp.dappnode.eth"
-  | "nimbus.dnp.dappnode.eth"
-  | "";
-export type ExecutionClientMainnet =
-  | "geth.dnp.dappnode.eth"
-  | "besu.public.dappnode.eth"
-  | "erigon.dnp.dappnode.eth"
-  | "nethermind.public.dappnode.eth"
-  | "";
+export const consensusClientsMainnet = [
+  "prysm.dnp.dappnode.eth",
+  "lighthouse.dnp.dappnode.eth",
+  "teku.dnp.dappnode.eth",
+  "nimbus.dnp.dappnode.eth",
+  ""
+] as const;
+export type ConsensusClientMainnet = typeof consensusClientsMainnet[number];
+export const executionClientsMainnet = [
+  "geth.dnp.dappnode.eth",
+  "besu.public.dappnode.eth",
+  "erigon.dnp.dappnode.eth",
+  "nethermind.public.dappnode.eth",
+  ""
+] as const;
+export type ExecutionClientMainnet = typeof executionClientsMainnet[number];
 export type SignerMainnet = "web3signer.dnp.dappnode.eth" | "";
 export type MevBoostMainnet = "mev-boost.dnp.dappnode.eth" | "";
 
@@ -1294,7 +1303,7 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  data: StakerItemData;
+  data?: StakerItemData;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 
@@ -1304,7 +1313,6 @@ export interface StakerConfigGet<T extends Network> {
   web3Signer: StakerItem<T, "signer">;
   mevBoost: StakerItem<T, "mev-boost">;
 }
-
 export interface StakerConfigSet<T extends Network> {
   network: T;
   executionClient?: StakerItemOk<T, "execution">;

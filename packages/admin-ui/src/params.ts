@@ -66,6 +66,12 @@ export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
 // URLs / Links
+export const dappnodeGnosisCheckpointSync =
+         "https://checkpoint-sync-gnosis.dappnode.io";
+export const dappnodePraterCheckpointSync =
+         "https://checkpoint-sync-prater.dappnode.io";
+export const dappnodeMainnetCheckpointSync =
+         "https://checkpoint-sync.dappnode.io";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";

@@ -4,7 +4,7 @@ import { BsArrowRight } from "react-icons/bs";
 import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash";
 import "./advance-view.scss";
-import { mapRelays } from "./utils";
+import { mapRelays, subStringifyConfig } from "./utils";
 
 export default function AdvanceView<T extends Network>({
   currentStakerConfig,
@@ -108,9 +108,9 @@ export default function AdvanceView<T extends Network>({
           <span className="current">
             <span>
               {!isEqual(config.current, config.new) ? (
-                <strong>{config.current}</strong>
+                <strong>{subStringifyConfig(config.current)}</strong>
               ) : (
-                config.current
+                subStringifyConfig(config.current)
               )}
             </span>
           </span>
@@ -120,9 +120,9 @@ export default function AdvanceView<T extends Network>({
           <span className="new">
             <span>
               {config.new !== config.current ? (
-                <strong>{config.new}</strong>
+                <strong>{subStringifyConfig(config.new)}</strong>
               ) : (
-                config.new
+                subStringifyConfig(config.new)
               )}
             </span>
           </span>

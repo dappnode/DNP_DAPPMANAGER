@@ -13,7 +13,7 @@ import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
 import retry from "async-retry";
 import shell from "./utils/shell";
-import { IdentityInterface, IpfsClientTarget } from "./types";
+import { EthClientRemote, IdentityInterface, IpfsClientTarget } from "./types";
 import { logs } from "./logs";
 import { localProxyingEnableDisable } from "./calls";
 import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable";
@@ -56,6 +56,25 @@ export default async function initializeDb(): Promise<void> {
   } catch (e) {
     logs.error("Error getting ipfsClientTarget", e);
     db.ipfsClientTarget.set(IpfsClientTarget.local);
+  }
+
+  /**
+   * Eth client remote
+   */
+  try {
+    const ethClientRemote = db.ethClientRemote.get();
+    if (!ethClientRemote) {
+      logs.info(
+        "ethClientRemote not found, grabbing default value from db, key eth-client-target"
+      );
+      const ethClientTarget = db.ethClientTarget.get();
+      if (ethClientTarget && ethClientTarget === "remote")
+        db.ethClientRemote.set(EthClientRemote.on);
+      else db.ethClientRemote.set(EthClientRemote.off);
+    }
+  } catch (e) {
+    logs.error("Error setting default value for eth-client-remote", e);
+    db.ethClientRemote.set(EthClientRemote.off);
   }
 
   /**

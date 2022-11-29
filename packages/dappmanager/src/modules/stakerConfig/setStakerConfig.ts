@@ -55,9 +55,6 @@ export async function setStakerConfig<T extends Network>({
     mevBoost
   } = stakerParamsByNetwork<T>(stakerConfig.network);
 
-  if (stakerConfig.network === "mainnet")
-    currentConsClient === "lighthouse-prater.dnp.dappnode.eth";
-
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&
@@ -303,7 +300,7 @@ async function setConsensusClientConfig<T extends Network>({
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
-    targetConsensusClient
+    ...targetConsensusClient
   });
 
   if (targetConsensusClient.dnpName && !currentConsClient) {
@@ -480,19 +477,32 @@ function setStakerConfigOnDb<T extends Network>({
 }): void {
   switch (network) {
     case "mainnet":
-      db.executionClientMainnet.set(executionClient as ExecutionClientMainnet);
-      db.consensusClientMainnet.set(consensusClient as ConsensusClientMainnet);
-      db.mevBoostMainnet.set(mevBoost ? true : false);
+      if (db.executionClientMainnet.get() !== executionClient)
+        db.executionClientMainnet.set(
+          executionClient as ExecutionClientMainnet
+        );
+      if (db.consensusClientMainnet.get() !== consensusClient)
+        db.consensusClientMainnet.set(
+          consensusClient as ConsensusClientMainnet
+        );
+      if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
+        db.mevBoostMainnet.set(mevBoost ? true : false);
       break;
     case "gnosis":
-      db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
-      db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
-      db.mevBoostGnosis.set(mevBoost ? true : false);
+      if (db.executionClientGnosis.get() !== executionClient)
+        db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
+      if (db.consensusClientGnosis.get() !== consensusClient)
+        db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
+      if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
+        db.mevBoostGnosis.set(mevBoost ? true : false);
       break;
     case "prater":
-      db.executionClientPrater.set(executionClient as ExecutionClientPrater);
-      db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
-      db.mevBoostPrater.set(mevBoost ? true : false);
+      if (db.executionClientPrater.get() !== executionClient)
+        db.executionClientPrater.set(executionClient as ExecutionClientPrater);
+      if (db.consensusClientPrater.get() !== consensusClient)
+        db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
+      if (db.mevBoostPrater.get() !== Boolean(mevBoost))
+        db.mevBoostPrater.set(mevBoost ? true : false);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);

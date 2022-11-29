@@ -1,58 +1,9 @@
 import { eventBus } from "../../eventBus";
 import * as db from "../../db";
 import { logs } from "../../logs";
-import { Network } from "../../types";
 import { pickStakerItemData } from "../../modules/stakerConfig/utils";
-import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork";
 import { ReleaseFetcher } from "../../modules/release";
 import { memoizeDebounce } from "../../utils/asyncFlows";
-
-function runStakerConfigUpdate({ dnpNames }: { dnpNames: string[] }): void {
-  try {
-    for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
-      const stakerConfig = stakerParamsByNetwork(network);
-
-      if (
-        dnpNames.find(dnpName => dnpName === stakerConfig.currentExecClient)
-      ) {
-        switch (network) {
-          case "mainnet":
-            db.executionClientMainnet.set("");
-          case "gnosis":
-            db.executionClientGnosis.set("");
-          case "prater":
-            db.executionClientPrater.set("");
-        }
-      }
-
-      if (
-        dnpNames.find(dnpName => dnpName === stakerConfig.currentConsClient)
-      ) {
-        switch (network) {
-          case "mainnet":
-            db.consensusClientMainnet.set("");
-          case "gnosis":
-            db.consensusClientGnosis.set("");
-          case "prater":
-            db.consensusClientPrater.set("");
-        }
-      }
-
-      if (dnpNames.find(dnpName => dnpName === stakerConfig.mevBoost)) {
-        switch (network) {
-          case "mainnet":
-            db.mevBoostMainnet.set(false);
-          case "gnosis":
-            db.mevBoostGnosis.set(false);
-          case "prater":
-            db.mevBoostPrater.set(false);
-        }
-      }
-    }
-  } catch (e) {
-    logs.error("Error on stakerConfig interval", e);
-  }
-}
 
 async function runStakerCacheUpdate({
   dnpName
@@ -82,14 +33,9 @@ const memoizeDebouncedCacheUpdate = memoizeDebounce(
 
 /**
  * StakerConfig daemon.
- * Makes sure the staker config is updated when removing a package
+ * Makes sure the staker config cache is executed maximum 1 per 30 mins
  */
 export function startStakerDaemon(): void {
-  eventBus.packagesModified.on(({ dnpNames, removed }) => {
-    // Only act when removing packages
-    if (removed) runStakerConfigUpdate({ dnpNames });
-  });
-
   eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
     memoizeDebouncedCacheUpdate({ dnpName });
   });

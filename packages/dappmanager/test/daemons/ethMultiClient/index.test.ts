@@ -6,21 +6,31 @@ import rewiremock from "rewiremock";
 import {
   EthClientTarget,
   UserSettings,
-  InstalledPackageData
+  InstalledPackageData,
+  Eth2ClientTarget,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
+  EthClientRemote
 } from "../../../src/types";
 import { mockDnp, mockContainer } from "../../testUtils";
 import { EthClientInstallStatus } from "../../../src/modules/ethClient/types";
-import { ethClientData } from "../../../src/params";
 
 interface State {
-  target: EthClientTarget;
+  target: Eth2ClientTarget;
   status: { [target: string]: EthClientInstallStatus };
 }
 
 describe("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    const newTarget: EthClientTarget = "geth";
-    const newTargetData = ethClientData[newTarget];
+    let currentExecClient: ExecutionClientMainnet | null =
+      "besu.public.dappnode.eth";
+    let currentConsClient: ConsensusClientMainnet | null =
+      "prysm.dnp.dappnode.eth";
+    let currentRemote: EthClientRemote | null = EthClientRemote.on;
+    const newTarget: Eth2ClientTarget = {
+      execClient: "geth.dnp.dappnode.eth",
+      consClient: "lighthouse.dnp.dappnode.eth"
+    };
 
     /**
      * Mutetable state used by the mock DB
@@ -39,19 +49,47 @@ describe("daemons > ethMultiClient > runWatcher", () => {
     // Also, it will be enforced by rewiremock in case of error
     /* eslint-disable @typescript-eslint/explicit-function-return-type */
     const db = {
-      ethClientTarget: {
-        get: () => state.target,
-        set: (target: EthClientTarget) => {
-          state.target = target;
+      executionClientMainnet: {
+        get: (): ExecutionClientMainnet | null => currentExecClient,
+        set: (execClient: ExecutionClientMainnet | null) => {
+          currentExecClient = execClient;
         }
       },
-      ethClientInstallStatus: {
+      consensusClientMainnet: {
+        get: (): ConsensusClientMainnet | null => currentConsClient,
+        set: (consClient: ConsensusClientMainnet | null) => {
+          currentConsClient = consClient;
+        }
+      },
+      ethClientRemote: {
+        get: (): EthClientRemote | null => currentRemote,
+        set: (target: EthClientRemote | null) => {
+          currentRemote = target;
+        }
+      },
+      ethExecClientInstallStatus: {
         getAll: () => ({}),
-        get: (keyArg: EthClientTarget) => state.status[keyArg],
-        set: (keyArg: EthClientTarget, status: EthClientInstallStatus) => {
+        get: (keyArg: ExecutionClientMainnet) => state.status[keyArg],
+        set: (
+          keyArg: ExecutionClientMainnet,
+          status: EthClientInstallStatus
+        ) => {
           state.status[keyArg] = status;
         },
-        remove: (keyArg: EthClientTarget) => {
+        remove: (keyArg: ExecutionClientMainnet) => {
+          keyArg;
+        }
+      },
+      ethConsClientInstallStatus: {
+        getAll: () => ({}),
+        get: (keyArg: ConsensusClientMainnet) => state.status[keyArg],
+        set: (
+          keyArg: ConsensusClientMainnet,
+          status: EthClientInstallStatus
+        ) => {
+          state.status[keyArg] = status;
+        },
+        remove: (keyArg: ConsensusClientMainnet) => {
           keyArg;
         }
       },
@@ -86,7 +124,7 @@ describe("daemons > ethMultiClient > runWatcher", () => {
       return dnpList.find(d => d.dnpName === dnpName) || null;
     }
 
-    const packageInstall = sinon.mock().resolves({ message: "" });
+    const packageInstall = sinon.mock().atLeast(2).resolves({ message: "" });
     // async function packageInstall(): Promise<{ message: string }> {
     //   return { message: "" };
     // }
@@ -112,11 +150,14 @@ describe("daemons > ethMultiClient > runWatcher", () => {
     async function runClientInstallerWatcher(): Promise<void> {
       const target = state.target;
       if (target && target !== "remote") {
-        const nextStatus = await runEthClientInstaller(
-          state.target,
-          state.status[target]
-        );
-        if (nextStatus) state.status[target] = nextStatus;
+        const { execClient, consClient } = target;
+        for (const client of [consClient, execClient]) {
+          const nextStatus = await runEthClientInstaller(
+            client,
+            state.status[client]
+          );
+          if (nextStatus) state.status[client] = nextStatus;
+        }
       }
     }
 
@@ -140,23 +181,37 @@ describe("daemons > ethMultiClient > runWatcher", () => {
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: { [newTarget]: { status: "INSTALLED" } }
+        status: {
+          [newTarget.execClient]: { status: "INSTALLED" },
+          [newTarget.consClient]: { status: "INSTALLED" }
+        }
       } as State,
       "After the user selects a new target it should start installing"
     );
-    sinon.assert.calledOnce(packageInstall);
+    sinon.assert.calledTwice(packageInstall);
 
     // Simulate the package starts running after being installed
-    dnpList.push({
-      ...mockDnp,
-      dnpName: newTargetData.dnpName,
-      containers: [{ ...mockContainer, running: true }]
-    });
+    dnpList.push(
+      {
+        ...mockDnp,
+        dnpName: newTarget.execClient,
+        containers: [{ ...mockContainer, running: true }]
+      },
+      {
+        ...mockDnp,
+        dnpName: newTarget.consClient,
+        containers: [{ ...mockContainer, running: true }]
+      }
+    );
+
     await runClientInstallerWatcher();
     expect(state).to.deep.equal(
       {
         target: newTarget,
-        status: { [newTarget]: { status: "INSTALLED" } }
+        status: {
+          [newTarget.execClient]: { status: "INSTALLED" },
+          [newTarget.consClient]: { status: "INSTALLED" }
+        }
       } as State,
       "After installation, the loop does nothing"
     );

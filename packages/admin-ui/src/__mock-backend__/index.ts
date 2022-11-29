@@ -210,6 +210,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
+    eth2ClientTarget: {
+      execClient: "besu.public.dappnode.eth",
+      consClient: "lighthouse.dnp.dappnode.eth"
+    },
     ethClientFallback: "off",
     ethClientStatus: {
       ok: false,

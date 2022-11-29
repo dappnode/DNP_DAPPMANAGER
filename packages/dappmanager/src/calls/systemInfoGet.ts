@@ -2,12 +2,13 @@ import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { NewFeatureId, SystemInfo } from "../types";
+import { ethereumClient } from "../modules/ethClient";
 
 /**
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const ethClientTarget = db.ethClientTarget.get();
+  const eth2ClientTarget = ethereumClient.computeEthereumTarget();
 
   return {
     // Git version data
@@ -31,10 +32,11 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     // From seedPhrase: If it's not stored yet, it's an empty string
     identityAddress: db.identityAddress.get(),
     // Eth provider configured URL
-    ethClientTarget,
-    ethClientStatus: ethClientTarget
-      ? db.ethClientStatus.get(ethClientTarget)
-      : null,
+    eth2ClientTarget,
+    ethClientStatus:
+      eth2ClientTarget !== "remote"
+        ? db.ethExecClientStatus.get(eth2ClientTarget.execClient)
+        : null,
     ethClientFallback: db.ethClientFallback.get(),
     ethProvider: db.ethProviderUrl.get(),
     // Domain map
@@ -53,7 +55,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
 function getNewFeatureIds(): NewFeatureId[] {
   const newFeatureIds: NewFeatureId[] = [];
 
-  if (db.ethClientTarget.get()) {
+  if (db.executionClientMainnet.get() && db.consensusClientMainnet.get()) {
     // If the user does not has the fallback on and has not seen the full
     // repository view, show a specific one just asking for the fallback
     if (

@@ -21,7 +21,7 @@ export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
 
 // Sub-sub local properties
 export const getEthClientTarget = (state: RootState) =>
-  (getSystemInfo(state) || {}).ethClientTarget;
+  (getSystemInfo(state) || {}).eth2ClientTarget;
 export const getEthClientFallback = (state: RootState) =>
   (getSystemInfo(state) || {}).ethClientFallback;
 export const getEthClientStatus = (state: RootState) =>

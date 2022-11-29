@@ -1,11 +1,18 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
-import { ethClientData } from "../../params";
-import { EthClientStatus, EthClientTargetPackage } from "../../types";
+import {
+  ConsensusClientMainnet,
+  consensusClientsMainnet,
+  EthClientStatus,
+  ExecutionClientMainnet,
+  executionClientsMainnet
+} from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { serializeError } from "./types";
-import { getEthClientApiUrl } from "./apiUrl";
+import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl";
 import { parseEthersSyncing } from "../../utils/ethers";
+import { logs } from "../../logs";
+import fetch from "node-fetch";
 
 /**
  * Minimum block difference to consider a local ethereum mainnet node synced
@@ -40,40 +47,61 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
  * Note: MUST NOT have undefined as a valid return type so typescript
  *       enforces that all possible states are covered
  */
-export async function getClientStatus(
-  target: EthClientTargetPackage
+export async function getMultiClientStatus(
+  execClientDnpName: ExecutionClientMainnet,
+  consClientDnpName: ConsensusClientMainnet
 ): Promise<EthClientStatus> {
   try {
-    const clientData = ethClientData[target];
-    if (!clientData) throw Error(`Unsupported target '${target}'`);
-    const dnpName = clientData.dnpName;
-    const url = clientData.url || getEthClientApiUrl(dnpName);
+    if (!executionClientsMainnet.includes(execClientDnpName))
+      throw Error(
+        `Unsupported execution client in mainnet '${execClientDnpName}'`
+      );
+    if (!consensusClientsMainnet.includes(consClientDnpName))
+      throw Error(
+        `Unsupported consensus client in mainnet '${consClientDnpName}'`
+      );
+    const execUrl = getEthExecClientApiUrl(execClientDnpName);
+    const consUrl = getEthConsClientApiUrl(consClientDnpName);
     try {
       // Provider API works? Do a single test call to check state
-      if (await isSyncing(url)) {
+      if (await isSyncing(execUrl)) {
         return { ok: false, code: "IS_SYNCING" };
       } else {
-        try {
-          if (await isApmStateCorrect(url)) {
-            // All okay!
-            return { ok: true, url, dnpName };
-          } else {
-            // State is not correct, node is not synced but eth_syncing did not picked it up
-            return { ok: false, code: "STATE_NOT_SYNCED" };
+        const _isApmStateCorrect = await isApmStateCorrect(execUrl).catch(
+          eFromTestCall => {
+            // APM state call failed, syncing call succeeded and is not working
+            // = Likely an error related to fetching state content
+            return {
+              ok: false,
+              code: "STATE_CALL_ERROR",
+              error: serializeError(eFromTestCall)
+            };
           }
-        } catch (eFromTestCall) {
-          // APM state call failed, syncing call succeeded and is not working
-          // = Likely an error related to fetching state content
+        );
+        if (_isApmStateCorrect) {
+          // State contract is okey!!
+          if (
+            await isSyncedWithConsensus(execUrl, consUrl).catch(e => {
+              throw new Error(
+                `Error while checking if synced with consensus: ${e.message}`
+              );
+            })
+          )
+            // Consensus is okey and synced with execution!!
+            return { ok: true, url: execUrl, dnpName: execClientDnpName };
+          else return { ok: false, code: "IS_SYNCING" };
+        } else {
+          // State is not correct, node is not synced but eth_syncing did not picked it up
           return {
             ok: false,
-            code: "STATE_CALL_ERROR",
-            error: serializeError(eFromTestCall)
+            code: "STATE_NOT_SYNCED"
           };
         }
       }
-    } catch (eFromSyncing) {
+    } catch (clientError) {
       // syncing call failed, the node is not available, find out why
-      const dnp = await listPackageNoThrow({ dnpName });
+      const dnp = await listPackageNoThrow({ dnpName: clientError.client });
+
       if (dnp) {
         // DNP is installed
         if (dnp.containers[0]?.running) {
@@ -82,19 +110,26 @@ export async function getClientStatus(
           return {
             ok: false,
             code: "NOT_AVAILABLE",
-            error: serializeError(eFromSyncing)
+            error: serializeError(clientError)
           };
         } else {
-          return { ok: false, code: "NOT_RUNNING" };
+          return {
+            ok: false,
+            code: "NOT_RUNNING"
+          };
         }
       } else {
         // DNP is not installed, figure out why
-        const installStatus = db.ethClientInstallStatus.get(target);
+        const installStatus =
+          db.ethExecClientInstallStatus.get(execClientDnpName);
         if (installStatus) {
           switch (installStatus.status) {
             case "TO_INSTALL":
             case "INSTALLING":
-              return { ok: false, code: "INSTALLING" };
+              return {
+                ok: false,
+                code: "INSTALLING"
+              };
             case "INSTALLING_ERROR":
               return {
                 ok: false,
@@ -102,17 +137,30 @@ export async function getClientStatus(
                 error: installStatus.error
               };
             case "INSTALLED":
-              return { ok: false, code: "UNINSTALLED" };
+              return {
+                ok: false,
+                code: "UNINSTALLED"
+              };
             case "UNINSTALLED":
-              return { ok: false, code: "NOT_INSTALLED" };
+              return {
+                ok: false,
+                code: "NOT_INSTALLED"
+              };
           }
         } else {
-          return { ok: false, code: "NOT_INSTALLED" };
+          return {
+            ok: false,
+            code: "NOT_INSTALLED"
+          };
         }
       }
     }
   } catch (eGeneric) {
-    return { ok: false, code: "UNKNOWN_ERROR", error: eGeneric };
+    return {
+      ok: false,
+      code: "UNKNOWN_ERROR",
+      error: eGeneric
+    };
   }
 }
 
@@ -148,8 +196,7 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   // Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
   const testTxData = {
     to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-    data:
-      "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
+    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
   };
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";
@@ -158,4 +205,38 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
 
   const res = await provider.send("eth_call", [testTxData, "latest"]);
   return res === result;
+}
+
+/**
+ * Fetches the latest block from the consensus client and the execution client and
+ * compares it, if it is greater than 7200 blocks behind, it is considered not synced
+ * @param execUrl
+ * @param consUrl
+ * @returns true if synced, false if not synced
+ */
+async function isSyncedWithConsensus(
+  execUrl: string,
+  consUrl: string
+): Promise<boolean> {
+  const provider = new ethers.providers.JsonRpcProvider(execUrl);
+  const execBlockNumber = await provider.getBlockNumber();
+  const execBlockHeadersResponse = await fetch(
+    consUrl + "/eth/v2/beacon/blocks/head"
+  );
+  const consBlockHeadersResponseParsed = await execBlockHeadersResponse.json();
+  const consBlockNumber =
+    consBlockHeadersResponseParsed.data.message.body.execution_payload
+      .block_number;
+
+  if (execBlockNumber - consBlockNumber < 7200) {
+    // 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022
+    // src: https://ycharts.com/indicators/ethereum_blocks_per_day#:~:text=Ethereum%20Blocks%20Per%20Day%20is,12.10%25%20from%20one%20year%20ago.
+    // TODO: find a way to get the average blocks per day dynamicallly
+    return true;
+  } else {
+    logs.info(
+      `Execution and Consensus are too far each other. Execution client block: ${execBlockNumber}. Consensus client block: ${consBlockNumber}.`
+    );
+    return false;
+  }
 }

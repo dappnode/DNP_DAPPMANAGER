@@ -213,12 +213,22 @@ export default function StakerNetwork<T extends Network>({
         setReqStatus({ loading: true });
         await withToast(
           () =>
+            // Omit metadata to be sent back to the backend
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                executionClient: newExecClient,
-                consensusClient: newConsClient,
-                mevBoost: newMevBoost,
+                executionClient:
+                  newExecClient?.status === "ok"
+                    ? { ...newExecClient, data: undefined }
+                    : newExecClient,
+                consensusClient:
+                  newConsClient?.status === "ok"
+                    ? { ...newConsClient, data: undefined }
+                    : newConsClient,
+                mevBoost:
+                  newMevBoost?.status === "ok"
+                    ? { ...newMevBoost, data: undefined }
+                    : newMevBoost,
                 enableWeb3signer: newEnableWeb3signer
               }
             }),
@@ -254,8 +264,12 @@ export default function StakerNetwork<T extends Network>({
             (2) Choose a Consensus Layer client (+ validator) <br />
             (3) Install the web3signer, which will hold the validator keys and
             sign <br />
-            (4) Optional; delegate block-building capacities through the MEV
-            Boost network and potentially profit from MEV
+            {network !== "gnosis" && (
+              <>
+                (4) Optional; delegate block-building capacities through the MEV
+                Boost network and potentially profit from MEV
+              </>
+            )}
           </p>
           <br />
           <p>{description}</p>

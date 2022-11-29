@@ -10,6 +10,7 @@ import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { Alert } from "react-bootstrap";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
@@ -89,9 +90,22 @@ export default function ConsensusClient<T extends Network>({
 
       {consensusClient.status === "ok" && (
         <div className="description">
-          {isSelected && consensusClient.data.metadata.shortDescription}
+          {isSelected &&
+            consensusClient.data &&
+            consensusClient.data.metadata.shortDescription}
         </div>
       )}
+
+      {isSelected &&
+        consensusClient.dnpName ===
+          "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
+          <Alert variant="warning">
+            It is <b>not recommended</b> to use <b>Prysm</b> as a consensus
+            client <b>in Gnosis</b>. Use it at your own risk or change to
+            another alternative.
+          </Alert>
+        )}
+
       {isSelected && newConsClient && (
         <>
           <hr />

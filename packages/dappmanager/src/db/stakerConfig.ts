@@ -27,6 +27,11 @@ const CONSENSUS_CLIENT_MAINNET = "consensus-client-mainnet";
 const EXECUTION_CLIENT_MAINNET = "execution-client-mainnet";
 const MEVBOOST_MAINNET = "mevboost-mainnet";
 
+/**
+ * Whenever a user switches the EC and/or CC from the stakers UI then
+ * consensusClientMainnet, executionClientMainnet will change as well
+ */
+
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientMainnet | null>(
     CONSENSUS_CLIENT_MAINNET,

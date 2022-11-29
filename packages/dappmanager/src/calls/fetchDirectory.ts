@@ -1,6 +1,6 @@
 import { eventBus } from "../eventBus";
 import { getDirectory } from "../modules/directory";
-import { DirectoryItem } from "../types";
+import { DirectoryItem, DirectoryItemOk } from "../types";
 import { logs } from "../logs";
 import { listPackages } from "../modules/docker/list";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
@@ -39,40 +39,40 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   }
 
   await Promise.all(
-    directory.map(
-      async ({ name, isFeatured }, index): Promise<void> => {
-        const whitelisted = true;
-        const directoryItemBasic = { index, name, whitelisted, isFeatured };
-        try {
-          // Now resolve the last version of the package
-          const release = await releaseFetcher.getRelease(name);
-          const { metadata, avatarFile } = release;
+    directory.map(async ({ name, isFeatured }, index): Promise<void> => {
+      const whitelisted = true;
+      const directoryItemBasic = { index, name, whitelisted, isFeatured };
+      try {
+        // Now resolve the last version of the package
+        const release = await releaseFetcher.getRelease(name);
+        const { metadata, avatarFile } = release;
 
+        pushDirectoryItem({
+          ...directoryItemBasic,
+          status: "ok",
+          description: getShortDescription(metadata),
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          isInstalled: getIsInstalled(release, dnpList),
+          isUpdated: getIsUpdated(release, dnpList),
+          featuredStyle: metadata.style,
+          categories: metadata.categories || getFallBackCategories(name) || []
+        });
+      } catch (e) {
+        if (e instanceof NoImageForArchError) {
+          logs.debug(`Package ${name} is not available in current arch`);
+        } else {
+          logs.error(`Error fetching ${name} release`, e);
           pushDirectoryItem({
             ...directoryItemBasic,
-            status: "ok",
-            description: getShortDescription(metadata),
-            avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-            isInstalled: getIsInstalled(release, dnpList),
-            isUpdated: getIsUpdated(release, dnpList),
-            featuredStyle: metadata.style,
-            categories: metadata.categories || getFallBackCategories(name) || []
+            status: "error",
+            message: e.message
           });
-        } catch (e) {
-          if (e instanceof NoImageForArchError) {
-            logs.debug(`Package ${name} is not available in current arch`);
-          } else {
-            logs.error(`Error fetching ${name} release`, e);
-            pushDirectoryItem({
-              ...directoryItemBasic,
-              status: "error",
-              message: e.message
-            });
-          }
         }
       }
-    )
+    })
   );
+
+  directoryDnps.push(stakerMainnetCard, stakerGnosisCard);
 
   return directoryDnps.sort((a, b) => a.index - b.index);
 }
@@ -118,3 +118,39 @@ const fallbackCategories: { [dnpName: string]: string[] } = {
 export function getFallBackCategories(dnpName: string): string[] {
   return fallbackCategories[dnpName];
 }
+
+const stakerMainnetCard: DirectoryItemOk = {
+  index: 0,
+  name: "ethereum.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description: "Easily set-up your Ethereum node and validator",
+  avatarUrl: "/ipfs/QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y", // Ethereum image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};
+
+const stakerGnosisCard: DirectoryItemOk = {
+  index: 0,
+  name: "gnosis.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description: "Easily set-up your Gnosis Chain node and validator",
+  avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};

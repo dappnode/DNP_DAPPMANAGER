@@ -37,33 +37,75 @@ describe("modules / ethClient / emitSyncedNotification", () => {
       }
     );
 
-    emitSyncedNotification("geth", { ok: false, code: "IS_SYNCING" });
+    emitSyncedNotification(
+      {
+        execClient: "geth.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
+      },
+      { ok: false, code: "IS_SYNCING" }
+    );
     expect(notificationEmit.callCount).to.equal(
       0,
       "Should not emit when syncing"
     );
 
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(
+      {
+        execClient: "geth.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
+      },
+      { ok: true, url: "", dnpName: "" }
+    );
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should emit when sync is complete"
     );
 
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(
+      {
+        execClient: "geth.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
+      },
+      { ok: true, url: "", dnpName: "" }
+    );
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should not emit again on complete"
     );
 
-    emitSyncedNotification("geth", { ok: false, code: "IS_SYNCING" });
-    emitSyncedNotification("geth", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(
+      {
+        execClient: "geth.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
+      },
+      { ok: false, code: "IS_SYNCING" }
+    );
+    emitSyncedNotification(
+      {
+        execClient: "geth.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
+      },
+      { ok: true, url: "", dnpName: "" }
+    );
     expect(notificationEmit.callCount).to.equal(
       1,
       "Should not emit again after synced"
     );
 
-    emitSyncedNotification("nethermind", { ok: false, code: "IS_SYNCING" });
-    emitSyncedNotification("nethermind", { ok: true, url: "", dnpName: "" });
+    emitSyncedNotification(
+      {
+        execClient: "nethermind.public.dappnode.eth",
+        consClient: "nimbus.dnp.dappnode.eth"
+      },
+      { ok: false, code: "IS_SYNCING" }
+    );
+    emitSyncedNotification(
+      {
+        execClient: "nethermind.public.dappnode.eth",
+        consClient: "nimbus.dnp.dappnode.eth"
+      },
+      { ok: true, url: "", dnpName: "" }
+    );
     expect(notificationEmit.callCount).to.equal(
       2,
       "Should emit when changing target"

@@ -96,8 +96,6 @@ export async function updatePkgsWithGlobalEnvs(
     const environmentByService: { [serviceName: string]: PackageEnvs } =
       environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});
 
-    logs.info(`Setting environment: ${environmentByService}`);
-
     await packageSetEnvironment({
       dnpName: pkg.dnpName,
       environmentByService

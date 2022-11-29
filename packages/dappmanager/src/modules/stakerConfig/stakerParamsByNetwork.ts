@@ -14,44 +14,44 @@ export function stakerParamsByNetwork<T extends Network>(
         execClients: [
           {
             dnpName: "geth.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "0.1.37"
           },
           {
             dnpName: "nethermind.public.dappnode.eth",
-            minVersion: ""
+            minVersion: "1.0.27"
           },
           {
             dnpName: "erigon.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "0.1.34"
           },
           {
             dnpName: "besu.public.dappnode.eth",
-            minVersion: ""
+            minVersion: "1.2.6"
           }
         ],
-        currentExecClient: db.executionClientMainnet.get() || "",
+        currentExecClient: db.executionClientMainnet.get(),
         consClients: [
           {
             dnpName: "prysm.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "3.0.4"
           },
           {
             dnpName: "lighthouse.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "1.0.3"
           },
           {
             dnpName: "teku.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "2.0.4"
           },
           {
             dnpName: "nimbus.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "1.0.5"
           }
         ],
-        currentConsClient: db.consensusClientMainnet.get() || "",
+        currentConsClient: db.consensusClientMainnet.get(),
         web3signer: {
           dnpName: "web3signer.dnp.dappnode.eth",
-          minVersion: ""
+          minVersion: "0.1.4"
         },
         mevBoost: "mev-boost.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostMainnet.get()
@@ -62,29 +62,28 @@ export function stakerParamsByNetwork<T extends Network>(
         execClients: [
           {
             dnpName: "nethermind-xdai.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "1.0.18"
           }
         ],
-        currentExecClient: db.executionClientGnosis.get() || "",
+        currentExecClient: db.executionClientGnosis.get(),
         consClients: [
           {
             dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "2.0.0"
           },
           {
             dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "0.1.5"
           },
           {
             dnpName: "teku-gnosis.dnp.dappnode.eth",
-            minVersion: ""
+            minVersion: "0.1.5"
           }
-          //"nimbus-gnosis.dnp.dappnode.eth"
         ],
-        currentConsClient: db.consensusClientGnosis.get() || "",
+        currentConsClient: db.consensusClientGnosis.get(),
         web3signer: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
-          minVersion: ""
+          minVersion: "0.1.10"
         },
         mevBoost: "mev-boost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
@@ -109,7 +108,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentExecClient: db.executionClientPrater.get() || "",
+        currentExecClient: db.executionClientPrater.get(),
         consClients: [
           {
             dnpName: "prysm-prater.dnp.dappnode.eth",
@@ -132,7 +131,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentConsClient: db.consensusClientPrater.get() || "",
+        currentConsClient: db.consensusClientPrater.get(),
         web3signer: {
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"

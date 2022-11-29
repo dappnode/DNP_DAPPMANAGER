@@ -5,6 +5,7 @@ import {
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
+  InstalledPackageDataApiReturn,
   Network
 } from "../../types";
 import * as db from "../../db";
@@ -25,44 +26,46 @@ import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork";
 export async function setDefaultStakerConfig(): Promise<void> {
   const pkgs = await packagesGet();
 
-  for (const network of ["mainnet", /* "gnosis",  */ "prater"] as Network[]) {
+  for (const network of ["mainnet", "gnosis", "prater"] as Network[]) {
     const stakerConfig = stakerParamsByNetwork(network);
 
     // EXECUTION_CLIENT_<NETWORK>:
     // If the user has selected the repository full node option then use this value.
     // If there is no repository full node option selected and there are execution client packages installed, choose one of them based on a given priority
     // If there is no repository full node option selected and there are no execution clients packages installed then set undefined
-    if (stakerConfig.currentExecClient === null) {
+    if (!stakerConfig.currentExecClient) {
       // Set default empty string value
       let newExexClientValue = "";
 
-      for (const execClient of stakerConfig.execClients.map(
-        exCl => exCl.dnpName
-      )) {
-        if (pkgs.find(pkg => pkg.dnpName === execClient)) {
-          newExexClientValue = execClient;
-          break;
+      if (network === "mainnet") {
+        // Look for pkg ethclient target (fullnode), installed and running
+        const execClientTargetDnpName = getExecClientTargetDnpName();
+        if (
+          pkgs.find(
+            pkg =>
+              pkg.dnpName === execClientTargetDnpName &&
+              pkg.containers.every(c => c.running)
+          )
+        ) {
+          newExexClientValue = execClientTargetDnpName;
         }
       }
 
-      if (network === "mainnet") {
-        const repository = db.ethClientTarget.get();
-        switch (repository) {
-          case "geth":
-            newExexClientValue = "geth.dnp.dappnode.eth";
-            break;
-          case "nethermind":
-            newExexClientValue = "nethermind.public.dappnode.eth";
-            break;
-          case "besu":
-            newExexClientValue = "besu.public.dappnode.eth";
-            break;
-          case "erigon":
-            newExexClientValue = "erigon.dnp.dappnode.eth";
-            break;
-          default:
-            break;
-        }
+      if (
+        (network === "mainnet" || network === "gnosis") &&
+        !newExexClientValue
+      ) {
+        // Look for pkg exec client installed and running
+        newExexClientValue = getClientInstalledAndRunning(
+          pkgs,
+          stakerConfig.execClients.map(client => client.dnpName)
+        );
+        // Look for pkg exec client installed
+        if (!newExexClientValue)
+          newExexClientValue = getClientInstalled(
+            pkgs,
+            stakerConfig.execClients.map(client => client.dnpName)
+          );
       }
 
       switch (network) {
@@ -89,7 +92,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
     // CONSENSUS_CLIENT_<NETWORK>:
     // If the web3signer is installed then grab the value from its compose ENV value
     // If not web3signer then is undefined
-    if (stakerConfig.currentConsClient === null) {
+    if (!stakerConfig.currentConsClient) {
       // Set default empty string value
       let newConsClientValue = "";
 
@@ -121,6 +124,24 @@ export async function setDefaultStakerConfig(): Promise<void> {
         }
       }
 
+      // For resilience, give a value for mainnet if its still empty
+      if (
+        (network === "mainnet" || network === "gnosis") &&
+        !newConsClientValue
+      ) {
+        // Look for cons client installed and running
+        newConsClientValue = getClientInstalledAndRunning(
+          pkgs,
+          stakerConfig.consClients.map(client => client.dnpName)
+        );
+        // Look for cons client installed
+        if (!newConsClientValue)
+          newConsClientValue = getClientInstalled(
+            pkgs,
+            stakerConfig.consClients.map(client => client.dnpName)
+          );
+      }
+
       switch (network) {
         case "mainnet":
           db.consensusClientMainnet.set(
@@ -141,5 +162,48 @@ export async function setDefaultStakerConfig(): Promise<void> {
           break;
       }
     }
+  }
+}
+
+// Utils
+
+function getClientInstalledAndRunning(
+  pkgs: InstalledPackageDataApiReturn[],
+  clients: string[]
+): string {
+  for (const client of clients) {
+    if (
+      pkgs.find(
+        pkg => pkg.dnpName === client && pkg.containers.every(c => c.running)
+      )
+    )
+      return client;
+  }
+  return "";
+}
+
+function getClientInstalled(
+  pkgs: InstalledPackageDataApiReturn[],
+  clients: string[]
+): string {
+  for (const client of clients) {
+    if (pkgs.find(pkg => pkg.dnpName === client)) return client;
+  }
+  return "";
+}
+
+function getExecClientTargetDnpName(): ExecutionClientMainnet {
+  const repository = db.ethClientTarget.get();
+  switch (repository) {
+    case "geth":
+      return "geth.dnp.dappnode.eth";
+    case "nethermind":
+      return "nethermind.public.dappnode.eth";
+    case "besu":
+      return "besu.public.dappnode.eth";
+    case "erigon":
+      return "erigon.dnp.dappnode.eth";
+    default:
+      return "";
   }
 }

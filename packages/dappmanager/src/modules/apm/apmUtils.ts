@@ -5,9 +5,7 @@ import { ApmRepoVersionReturn } from "./types";
 /**
  * Parse a raw version response from an APM repo
  */
-export function parseApmVersionReturn(
-  res: ApmRepoVersionReturn
-): {
+export function parseApmVersionReturn(res: ApmRepoVersionReturn): {
   version: string;
   contentUri: string;
 } {
@@ -17,7 +15,7 @@ export function parseApmVersionReturn(
     version: res.semanticVersion.join("."),
     // Second argument = true: ignore UTF8 parsing errors
     // Let downstream code identify the content hash as wrong
-    contentUri: ethers.utils.toUtf8String(res.contentURI, true)
+    contentUri: ethers.utils.toUtf8String(res.contentURI)
   };
 }
 

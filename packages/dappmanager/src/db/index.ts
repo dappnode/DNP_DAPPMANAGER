@@ -10,6 +10,7 @@ export * from "./package";
 export * from "./registry";
 export * from "./releaseKeys";
 export * from "./secrets";
+export * from "./stakerConfig";
 export * from "./system";
 export * from "./systemFlags";
 export * from "./ui";

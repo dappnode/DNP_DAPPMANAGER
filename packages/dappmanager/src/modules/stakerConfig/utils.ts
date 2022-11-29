@@ -54,48 +54,46 @@ export async function stopAllPkgContainers(
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-export function getConsensusUserSettings<T extends Network>({
-  targetConsensusClient
+export function getConsensusUserSettings({
+  dnpName,
+  graffiti,
+  feeRecipient,
+  checkpointSync
 }: {
-  targetConsensusClient: StakerItemOk<T, "consensus">;
+  dnpName: string;
+  graffiti?: string;
+  feeRecipient?: string;
+  checkpointSync?: string;
 }): UserSettingsAllDnps {
-  const validatorServiceName = getValidatorServiceName(
-    targetConsensusClient.dnpName
-  );
-  const beaconServiceName = getBeaconServiceName(targetConsensusClient.dnpName);
+  const validatorServiceName = getValidatorServiceName(dnpName);
+  const beaconServiceName = getBeaconServiceName(dnpName);
   return {
-    [targetConsensusClient.dnpName]: {
+    [dnpName]: {
       environment:
         beaconServiceName === validatorServiceName
           ? {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                ["GRAFFITI"]: graffiti || "Validating_from_DAppNode",
                 // Fee recipient is a mandatory value
                 ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
-                  "0x0000000000000000000000000000000000000000",
+                  feeRecipient || "0x0000000000000000000000000000000000000000",
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
               }
             }
           : {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]:
-                  targetConsensusClient.graffiti || "Validating_from_DAppNode",
+                ["GRAFFITI"]: graffiti || "Validating_from_DAppNode",
                 // Fee recipient is a mandatory value
                 ["FEE_RECIPIENT_ADDRESS"]:
-                  targetConsensusClient.feeRecipient ||
-                  "0x0000000000000000000000000000000000000000"
+                  feeRecipient || "0x0000000000000000000000000000000000000000"
               },
 
               [beaconServiceName]: {
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  targetConsensusClient.checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
               }
             }
     }

@@ -1,9 +1,10 @@
 import { ethers } from "ethers";
 import * as db from "../../db";
 import params from "../../params";
-import { getClientStatus } from "./clientStatus";
+import { getMultiClientStatus } from "./clientStatus";
 import { EthClientStatusError } from "../../types";
 import { emitSyncedNotification } from "./syncedNotification";
+import { ethereumClient } from ".";
 
 export class EthProviderError extends Error {}
 
@@ -12,9 +13,7 @@ export class EthProviderError extends Error {}
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(): Promise<
-  ethers.providers.JsonRpcProvider
-> {
+export async function getEthersProvider(): Promise<ethers.providers.JsonRpcProvider> {
   const url = await getEthProviderUrl();
   // Store (just for UI / info purposes) the latest used url
   db.ethProviderUrl.set(url);
@@ -30,7 +29,7 @@ export async function getEthProviderUrl(): Promise<string> {
   if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
     return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 
-  const target = db.ethClientTarget.get();
+  const target = ethereumClient.computeEthereumTarget();
   const fallback = db.ethClientFallback.get();
 
   // Initial case where the user has not selected any client yet
@@ -39,8 +38,11 @@ export async function getEthProviderUrl(): Promise<string> {
   // Remote is selected, just return remote
   if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
 
-  const status = await getClientStatus(target);
-  db.ethClientStatus.set(target, status);
+  const status = await getMultiClientStatus(
+    target.execClient,
+    target.consClient
+  );
+  db.ethExecClientStatus.set(target.execClient, status);
   emitSyncedNotification(target, status);
 
   if (status.ok) {
