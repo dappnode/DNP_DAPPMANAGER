@@ -233,11 +233,6 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Return array of available clients to connect a wallet (i.e metmask)
-   */
-  ethClientsGet: () => Promise<EthClientWallet[]>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -706,7 +701,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   dockerEngineUpdateCheck: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
-  ethClientsGet: {},
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},

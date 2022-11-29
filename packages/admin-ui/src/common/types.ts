@@ -576,6 +576,19 @@ export interface DirectoryDnp {
   avatar?: string;
 }
 
+export interface Wallet {
+  chainId: string; // A 0x-prefixed hexadecimal string
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[];
+  iconUrls?: string[]; // Currently ignored.
+}
+
 export interface ChainData {
   dnpName: string; // "geth.dnp.dappnode.eth"
   name?: string; // Optional pretty name: "Geth"
@@ -584,6 +597,7 @@ export interface ChainData {
   message: string; // "Blocks synced: 543000 / 654000"
   help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
+  wallet?: Wallet;
 }
 
 export interface ProgressLog {
@@ -1022,13 +1036,9 @@ export enum EthClientRemote {
 
 export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
 
-export type EthClientWallet = EthClientWalletOk | EthClientStatusError;
-
 export type EthClientStatusOk =
   // All okay, client is functional
   { ok: true; url: string; dnpName: string };
-
-export type EthClientWalletOk = EthClientStatusOk & { chainId: string };
 
 export type EthClientStatusError =
   // Unexpected error

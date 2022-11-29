@@ -7,9 +7,7 @@ import { PackageUpdates } from "./PackageUpdates";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
-
 import "./dashboard.scss";
-import ConnectWallet from "./ConnectWallet";
 
 export default function Dashboard() {
   return (
@@ -20,9 +18,6 @@ export default function Dashboard() {
         <div className="dashboard-right">
           <SubTitle>Package updates</SubTitle>
           <PackageUpdates />
-
-          <SubTitle>Connect wallet</SubTitle>
-          <ConnectWallet />
         </div>
 
         <div className="dashboard-left">
