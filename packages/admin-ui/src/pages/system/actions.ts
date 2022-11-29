@@ -34,10 +34,10 @@ export const changeEthClientTarget = (
       await new Promise<void>(resolve =>
         confirm({
           title: `Remove ${prettyDnpName(prevTarget.execClient)}?`,
-          text: `Do you want to keep or remove your current Ethereum execution client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
+          text: `Do you want to remove your current Execution Layer (EL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same EL client. Keeping the volume will NOT clear space in your hard drive.`,
           buttons: [
             {
-              label: "Keep",
+              label: "Keep node running",
               variant: "danger",
               onClick: () => {
                 deletePrevExecClient = false;
@@ -46,7 +46,7 @@ export const changeEthClientTarget = (
               }
             },
             {
-              label: "Remove without volumes",
+              label: "Remove and keep volumes",
               variant: "warning",
               onClick: () => {
                 deletePrevExecClient = true;
@@ -55,7 +55,7 @@ export const changeEthClientTarget = (
               }
             },
             {
-              label: "Remove with volumes",
+              label: "Remove and delete volumes",
               variant: "dappnode",
               onClick: () => {
                 deletePrevExecClient = true;
@@ -76,10 +76,10 @@ export const changeEthClientTarget = (
       await new Promise<void>(resolve =>
         confirm({
           title: `Remove ${prettyDnpName(prevTarget.consClient)}?`,
-          text: `Do you want to keep or remove your current Ethereum consensus client? This action cannot be undone. Having more than one ETH client may cause your machine unexpedted behaviours`,
+          text: `Do you want to remove your current Consensus Layer (CL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same EL client. Keeping the volume will NOT clear space in your hard drive.`,
           buttons: [
             {
-              label: "Keep",
+              label: "Keep node running",
               variant: "danger",
               onClick: () => {
                 deletePrevConsClient = false;
@@ -88,7 +88,7 @@ export const changeEthClientTarget = (
               }
             },
             {
-              label: "Remove without volumes",
+              label: "Remove and keep volumes",
               variant: "warning",
               onClick: () => {
                 deletePrevConsClient = true;
@@ -97,7 +97,7 @@ export const changeEthClientTarget = (
               }
             },
             {
-              label: "Remove with volumes",
+              label: "Remove and delete volumes",
               variant: "dappnode",
               onClick: () => {
                 deletePrevConsClient = true;

@@ -67,9 +67,9 @@ export const adminNaclPublicKey =
 
 // URLs / Links
 export const dappnodePraterCheckpointSync =
-         "https://checkpoint-sync-prater.dappnode.io";
+  "https://checkpoint-sync-prater.dappnode.io";
 export const dappnodeMainnetCheckpointSync =
-         "https://checkpoint-sync.dappnode.io";
+  "https://checkpoint-sync.dappnode.io";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
@@ -83,6 +83,7 @@ export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
 export const docsUrl = {
+  main: "https://docs.dappnode.io",
   recoverPasswordGuide:
     "https://docs.dappnode.io/user-guide/support/troubleshooting#recover-ui-password",
   connectWifi: "https://docs.dappnode.io/user-guide/ui/access/wifi",
