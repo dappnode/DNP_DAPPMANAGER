@@ -3,11 +3,16 @@ import params from "../../params";
 import * as getPath from "../../utils/getPath";
 import { restartDappmanagerPatch } from "../installer/restartPatch";
 import { ComposeFileEditor } from "../compose/editor";
-import { dockerComposeUp, DockerComposeUpOptions } from "./compose";
+import {
+  dockerComposeDown,
+  dockerComposeUp,
+  DockerComposeUpOptions
+} from "./compose";
 import { listPackageNoThrow } from "./list";
 import { getDockerTimeoutMax } from "./utils";
 import { ContainersStatus, PackageContainer } from "../../types";
 import { InstalledPackageData } from "../../common";
+import { logs } from "../../logs";
 
 interface ComposeUpArgs {
   dnpName: string;
@@ -48,27 +53,44 @@ export async function dockerComposeUpPackage(
     serviceName => containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
-  if (
-    upAll ||
-    serviceNames.length === servicesToStart.length ||
-    dnpName === params.coreDnpName
-  ) {
-    // Run docker-compose up on all services for:
-    // - packages with all services running
-    // - core package, it must be executed always. No matter the previous status
-    await dockerComposeUp(composePath, dockerComposeUpOptions);
-  } else {
-    // If some services are not running, first create the containers
-    // then start only those that are running
-    await dockerComposeUp(composePath, {
-      ...dockerComposeUpOptions,
-      noStart: true
-    });
-    if (servicesToStart.length > 0) {
+  try {
+    if (
+      upAll ||
+      serviceNames.length === servicesToStart.length ||
+      dnpName === params.coreDnpName
+    ) {
+      // Run docker-compose up on all services for:
+      // - packages with all services running
+      // - core package, it must be executed always. No matter the previous status
+      await dockerComposeUp(composePath, dockerComposeUpOptions);
+    } else {
+      // If some services are not running, first create the containers
+      // then start only those that are running
       await dockerComposeUp(composePath, {
         ...dockerComposeUpOptions,
-        serviceNames: servicesToStart
+        noStart: true
       });
+      if (servicesToStart.length > 0) {
+        await dockerComposeUp(composePath, {
+          ...dockerComposeUpOptions,
+          serviceNames: servicesToStart
+        });
+      }
+    }
+  } catch (e) {
+    if (
+      e.message.includes(
+        "Renaming a container with the same name as its current name"
+      )
+    ) {
+      // Catch error: Error response from daemon: Renaming a container with the same name as its current name
+      // Ref: https://github.com/docker/compose/issues/6704
+      logs.info("Catch error renaming container with the same name");
+      // Do compose down and compose up
+      await dockerComposeDown(composePath);
+      await dockerComposeUp(composePath, dockerComposeUpOptions);
+    } else {
+      throw e;
     }
   }
 }
