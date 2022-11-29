@@ -143,7 +143,7 @@ const stakerGnosisCard: DirectoryItemOk = {
   whitelisted: true,
   isFeatured: true,
   status: "ok",
-  description: "Easily set-up your Gnosis chain node and validator",
+  description: "Easily set-up your Gnosis Chain node and validator",
   avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
   isInstalled: false,
   isUpdated: false,
