@@ -377,6 +377,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.serviceName": string;
   "dappnode.dnp.instanceName": string;
   "dappnode.dnp.dependencies": Dependencies;
+  "dappnode.dnp.wallet": Wallet;
   "dappnode.dnp.avatar": string;
   "dappnode.dnp.origin": string;
   "dappnode.dnp.chain": ChainDriver;
@@ -457,6 +458,7 @@ export interface PackageContainer {
   canBeFullnode?: boolean;
   isMain?: boolean;
   dockerTimeout?: number;
+  wallet?: Wallet;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -478,6 +480,7 @@ export type InstalledPackageData = Pick<
   | "chain"
   | "domainAlias"
   | "canBeFullnode"
+  | "wallet"
 > & {
   containers: PackageContainer[];
 };

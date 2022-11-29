@@ -46,6 +46,7 @@ const labelParseFns: {
   "dappnode.dnp.serviceName": parseString,
   "dappnode.dnp.instanceName": parseString,
   "dappnode.dnp.dependencies": value => parseJsonSafe(value) || {},
+  "dappnode.dnp.wallet": value => parseJsonSafe(value),
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
   "dappnode.dnp.chain": value => {
@@ -80,6 +81,7 @@ const labelStringifyFns: {
   "dappnode.dnp.serviceName": writeString,
   "dappnode.dnp.instanceName": writeString,
   "dappnode.dnp.dependencies": writeJson,
+  "dappnode.dnp.wallet": writeJson,
   "dappnode.dnp.avatar": writeString,
   "dappnode.dnp.origin": writeString,
   "dappnode.dnp.chain": value =>
