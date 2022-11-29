@@ -279,7 +279,9 @@ const params = {
   // Fullnode names
   ALLOWED_FULLNODE_DNP_NAMES: [
     "geth.dnp.dappnode.eth",
-    "parity.dnp.dappnode.eth"
+    "nethermind.public.dappnode.eth",
+    "erigon.dnp.dappnode.eth",
+    "besu.public.dappnode.eth"
   ],
   // Default fullnode alias
   FULLNODE_ALIAS: "fullnode.dappnode",
