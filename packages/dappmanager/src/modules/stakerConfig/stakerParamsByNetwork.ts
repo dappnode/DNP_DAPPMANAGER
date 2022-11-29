@@ -62,28 +62,28 @@ export function stakerParamsByNetwork<T extends Network>(
         execClients: [
           {
             dnpName: "nethermind-xdai.dnp.dappnode.eth",
-            minVersion: "1.0.17"
+            minVersion: "1.0.18"
           }
         ],
         currentExecClient: db.executionClientGnosis.get(),
         consClients: [
           {
             dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
-            minVersion: "1.0.4"
+            minVersion: "2.0.0"
           },
           {
             dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
-            minVersion: "0.1.4"
+            minVersion: "0.1.5"
           },
           {
             dnpName: "teku-gnosis.dnp.dappnode.eth",
-            minVersion: "0.1.4"
+            minVersion: "0.1.5"
           }
         ],
         currentConsClient: db.consensusClientGnosis.get(),
         web3signer: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
-          minVersion: "0.2.0"
+          minVersion: "0.1.10"
         },
         mevBoost: "mev-boost-gnosis.dnp.dappnode.eth",
         isMevBoostSelected: db.mevBoostGnosis.get()
