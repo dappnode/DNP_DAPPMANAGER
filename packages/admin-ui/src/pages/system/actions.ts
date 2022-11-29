@@ -34,7 +34,7 @@ export const changeEthClientTarget = (
       await new Promise<void>(resolve =>
         confirm({
           title: `Remove ${prettyDnpName(prevTarget.execClient)}?`,
-          text: `Do you want to remove your current Execution Layer (EL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same EL client. Keeping the volume will NOT clear space in your hard drive.`,
+          text: `Do you want to remove your current Execution Layer (EL) client? This action cannot be undone. You can keep the data volume to avoid needing to resync from scratch next time you install the same EL client. Keeping the data volume will NOT clear space in your hard drive.`,
           buttons: [
             {
               label: "Keep node running",
