@@ -55,7 +55,10 @@ export async function systemInfoGet(): Promise<SystemInfo> {
 function getNewFeatureIds(): NewFeatureId[] {
   const newFeatureIds: NewFeatureId[] = [];
 
-  if (db.ethClientTarget.get()) {
+  if (
+    db.executionClientMainnet.get() !== null &&
+    db.consensusClientMainnet.get() !== null
+  ) {
     // If the user does not has the fallback on and has not seen the full
     // repository view, show a specific one just asking for the fallback
     if (
