@@ -1,7 +1,8 @@
 import { Network } from "common";
 import {
   dappnodeMainnetCheckpointSync,
-  dappnodePraterCheckpointSync
+  dappnodePraterCheckpointSync,
+  dappnodeGnosisCheckpointSync
 } from "params";
 
 export const rootPath = "/stakers";
@@ -13,6 +14,8 @@ export const getDefaultCheckpointSync = (network: Network) =>
     ? dappnodeMainnetCheckpointSync
     : network === "prater"
     ? dappnodePraterCheckpointSync
+    : network === "gnosis"
+    ? dappnodeGnosisCheckpointSync
     : "";
 
 export const disclaimer = `## Terms of Use - DAppNode

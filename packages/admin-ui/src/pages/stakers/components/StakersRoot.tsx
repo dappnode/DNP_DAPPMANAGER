@@ -17,8 +17,8 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
     component: JSX.Element;
   }[] = [
     {
-      subPath: "mainnet",
-      title: "Mainnet",
+      subPath: "ethereum",
+      title: "Ethereum",
       component: StakerNetwork({
         network: "mainnet",
         description:
