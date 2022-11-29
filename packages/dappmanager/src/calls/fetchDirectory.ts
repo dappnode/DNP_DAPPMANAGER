@@ -125,7 +125,7 @@ const stakerMainnetCard: DirectoryItemOk = {
   whitelisted: true,
   isFeatured: true,
   status: "ok",
-  description: "Easily set-up you Ethereum node and validator",
+  description: "Easily set-up your Ethereum node and validator",
   avatarUrl: "/ipfs/QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y", // Ethereum image logo
   isInstalled: false,
   isUpdated: false,
@@ -143,7 +143,7 @@ const stakerGnosisCard: DirectoryItemOk = {
   whitelisted: true,
   isFeatured: true,
   status: "ok",
-  description: "Easily set-up you Gnosis chain node and validator",
+  description: "Easily set-up your Gnosis Chain node and validator",
   avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
   isInstalled: false,
   isUpdated: false,
