@@ -38,7 +38,8 @@ import { getConsensusUserSettings } from "../../modules/stakerConfig/utils";
  */
 export async function runEthClientInstaller(
   target: ExecutionClientMainnet | ConsensusClientMainnet | "remote",
-  status: EthClientInstallStatus | undefined
+  status: EthClientInstallStatus | undefined,
+  useCheckpointSync?: boolean
 ): Promise<EthClientInstallStatus | null> {
   // Re-check just in case, on run the installer for local target clients
   if (target === "remote") return null;
@@ -78,7 +79,10 @@ export async function runEthClientInstaller(
               await packageInstall({
                 name: target,
                 userSettings: getConsensusUserSettings({
-                  dnpName: target
+                  dnpName: target,
+                  checkpointSync: useCheckpointSync
+                    ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
+                    : undefined
                 })
               });
             else await packageInstall({ name: target });
@@ -147,55 +151,63 @@ function verifyInitialStatusIsNotInstalling(): void {
 export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
-  const runEthMultiClientTaskMemo = runOnlyOneSequentially(async () => {
-    try {
-      const execClient = db.executionClientMainnet.get();
-      const consClient = db.consensusClientMainnet.get();
+  const runEthMultiClientTaskMemo = runOnlyOneSequentially(
+    async (useCheckpointSync: boolean | undefined) => {
+      try {
+        const execClient = db.executionClientMainnet.get();
+        const consClient = db.consensusClientMainnet.get();
 
-      if (
-        db.ethClientRemote.get() === EthClientRemote.on ||
-        !execClient ||
-        !consClient
-      )
-        return; // Nothing to install
+        if (
+          db.ethClientRemote.get() === EthClientRemote.on ||
+          !execClient ||
+          !consClient
+        )
+          return; // Nothing to install
 
-      for (const client of [execClient, consClient]) {
-        if (!client) continue;
+        for (const client of [execClient, consClient]) {
+          if (!client) continue;
 
-        const prev = isExecClient(client)
-          ? db.ethExecClientInstallStatus.get(client)
-          : db.ethConsClientInstallStatus.get(client);
-        const next = await runEthClientInstaller(client, prev);
+          const prev = isExecClient(client)
+            ? db.ethExecClientInstallStatus.get(client)
+            : db.ethConsClientInstallStatus.get(client);
+          const next = await runEthClientInstaller(
+            client,
+            prev,
+            useCheckpointSync
+          );
 
-        if (!next) continue; // Package is uninstalled
-        isExecClient(client)
-          ? db.ethExecClientInstallStatus.set(execClient, next)
-          : db.ethConsClientInstallStatus.set(consClient, next);
+          if (!next) continue; // Package is uninstalled
+          isExecClient(client)
+            ? db.ethExecClientInstallStatus.set(execClient, next)
+            : db.ethConsClientInstallStatus.set(consClient, next);
 
-        if (!prev || prev.status !== next.status) {
-          // Next run MUST be defered to next event loop for prevStatus to refresh
-          setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+          if (!prev || prev.status !== next.status) {
+            // Next run MUST be defered to next event loop for prevStatus to refresh
+            setTimeout(eventBus.runEthClientInstaller.emit, 1000);
 
-          if (isExecClient(client) && next.status === "INSTALLED") {
-            // If status switched to "INSTALLED", map to fullnode.dappnode
-            // Must be done here in case the package is already installed
-            // 1. Domain for BIND package
-            db.fullnodeDomainTarget.set(execClient);
-            // 2. Add network alias for docker DNS
-            ethereumClient.setDefaultEthClientFullNode({
-              dnpName: execClient,
-              removeAlias: true
-            });
+            if (isExecClient(client) && next.status === "INSTALLED") {
+              // If status switched to "INSTALLED", map to fullnode.dappnode
+              // Must be done here in case the package is already installed
+              // 1. Domain for BIND package
+              db.fullnodeDomainTarget.set(execClient);
+              // 2. Add network alias for docker DNS
+              ethereumClient.setDefaultEthClientFullNode({
+                dnpName: execClient,
+                removeAlias: true
+              });
+            }
           }
         }
+      } catch (e) {
+        logs.error("Error on eth client installer daemon", e);
       }
-    } catch (e) {
-      logs.error("Error on eth client installer daemon", e);
     }
-  });
+  );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(runEthMultiClientTaskMemo);
+  eventBus.runEthClientInstaller.on(useCheckpointSync =>
+    runEthMultiClientTaskMemo(useCheckpointSync.useCheckpointSync)
+  );
 
   runAtMostEvery(
     async () => runEthMultiClientTaskMemo(),
