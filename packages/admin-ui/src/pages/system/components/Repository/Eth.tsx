@@ -48,7 +48,7 @@ export default function Eth() {
   }, [target, ethClientTarget]);
 
   function changeClient() {
-    if (target) dispatch(changeEthClientTarget(target));
+    if (target) dispatch(changeEthClientTarget(target, useCheckpointSync));
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
