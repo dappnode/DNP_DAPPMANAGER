@@ -302,6 +302,12 @@ const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
+    },
+    {
+      name: "Nethermind Ethereum client team",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246"
     }
   ]
 };
