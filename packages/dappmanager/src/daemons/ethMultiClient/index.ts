@@ -23,6 +23,7 @@ import {
 } from "../../modules/ethClient";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils";
 import { getConsensusUserSettings } from "../../modules/stakerConfig/utils";
+import { dockerComposeUpPackage } from "../../modules/docker";
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -48,7 +49,9 @@ export async function runEthClientInstaller(
   const dnp = await listPackageNoThrow({ dnpName: target });
 
   if (dnp) {
-    // OK: Client is already installed
+    // OK: Client is already installed, ensure it's running
+    if (dnp.containers.some(c => !c.running))
+      await dockerComposeUpPackage({ dnpName: target }, {}, {}, true);
     return { status: "INSTALLED" };
   } else {
     // Client is not installed
