@@ -81,7 +81,8 @@ const labelStringifyFns: {
   "dappnode.dnp.serviceName": writeString,
   "dappnode.dnp.instanceName": writeString,
   "dappnode.dnp.dependencies": writeJson,
-  "dappnode.dnp.wallet": writeJson,
+  "dappnode.dnp.wallet": value =>
+    writeJson(value as unknown as Record<string, unknown>),
   "dappnode.dnp.avatar": writeString,
   "dappnode.dnp.origin": writeString,
   "dappnode.dnp.chain": value =>

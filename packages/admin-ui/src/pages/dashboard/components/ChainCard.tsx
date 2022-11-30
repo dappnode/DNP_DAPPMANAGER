@@ -9,6 +9,7 @@ import { HelpTo } from "components/Help";
 import { Link } from "react-router-dom";
 import { rootPath as packagesRootPath } from "pages/packages";
 import Button from "components/Button";
+import { ethers } from "ethers";
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -54,6 +55,16 @@ function ChainCard(chain: ChainData) {
         <>
           <ProgressBar now={100} variant="success" />
           {wallet ? <ConnectWallet wallet={wallet} /> : null}
+          {dnpName === "nethermind-xdai.dnp.dappnode.eth" && (
+            <ConnectWallet
+              wallet={{
+                chainId: "0x64",
+                chainName: "Gnosis chain",
+                nativeCurrency: { name: "Gosis", symbol: "GNO", decimals: 18 },
+                rpcUrls: ["https://rpc.gnosischain.com"]
+              }}
+            />
+          )}
         </>
       )}
 
@@ -75,29 +86,33 @@ declare global {
 
 function ConnectWallet({ wallet }: { wallet: Wallet }) {
   async function walletConnect() {
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    console.log("provider: ", provider);
     try {
+      console.log("trying..");
+
       // https://eips.ethereum.org/EIPS/eip-3326
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: wallet.chainId }]
-      });
+      await provider.send("wallet_switchEthereumChain", [
+        { chainId: wallet.chainId }
+      ]);
+      console.log("failed");
     } catch (switchError) {
+      console.error(switchError);
       // This error code indicates that the chain has not been added to MetaMask.
       if (switchError.code === 4902) {
         try {
           // https://eips.ethereum.org/EIPS/eip-3085
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
+          await provider.send(
+            "wallet_addEthereumChain",
             // IMPORTANT! RPC without HTTPs is not allowed
-            // IMPORTANT! Add new chains with a default chain ID in metamask is not allowed
-            params: [
+            // IMPORTANT! Add new chains with a default chain ID in metamask is not allowed   family horn own sense negative orient tomorrow cheap recall mutual addict inmate
+            [
               {
                 chainId: wallet.chainId,
-                chainName: wallet.chainName,
                 rpcUrls: [wallet.rpcUrls]
               }
             ]
-          });
+          );
         } catch (addError) {
           // handle "add" error
           throw addError;
