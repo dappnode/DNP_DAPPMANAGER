@@ -7,4 +7,4 @@ export interface Chain {
   driverName: ChainDriver; // ethereum
 }
 
-export type ChainDataResult = Omit<ChainData, "dnpName">;
+export type ChainDataResult = Omit<ChainData, "dnpName" | "wallet">;

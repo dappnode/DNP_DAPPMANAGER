@@ -377,6 +377,7 @@ export interface ContainerLabelTypes {
   "dappnode.dnp.serviceName": string;
   "dappnode.dnp.instanceName": string;
   "dappnode.dnp.dependencies": Dependencies;
+  "dappnode.dnp.wallet": Wallet;
   "dappnode.dnp.avatar": string;
   "dappnode.dnp.origin": string;
   "dappnode.dnp.chain": ChainDriver;
@@ -457,6 +458,7 @@ export interface PackageContainer {
   canBeFullnode?: boolean;
   isMain?: boolean;
   dockerTimeout?: number;
+  wallet?: Wallet;
   // Note: environment is only accessible doing a container inspect or reading the compose
   // envs?: PackageEnvs;
 }
@@ -478,6 +480,7 @@ export type InstalledPackageData = Pick<
   | "chain"
   | "domainAlias"
   | "canBeFullnode"
+  | "wallet"
 > & {
   containers: PackageContainer[];
 };
@@ -576,6 +579,19 @@ export interface DirectoryDnp {
   avatar?: string;
 }
 
+export interface Wallet {
+  chainId: string; // A 0x-prefixed hexadecimal string
+  chainName: string;
+  nativeCurrency: {
+    name: string;
+    symbol: string; // 2-6 characters long
+    decimals: 18;
+  };
+  rpcUrls: string[];
+  blockExplorerUrls?: string[];
+  iconUrls?: string[]; // Currently ignored.
+}
+
 export interface ChainData {
   dnpName: string; // "geth.dnp.dappnode.eth"
   name?: string; // Optional pretty name: "Geth"
@@ -584,6 +600,7 @@ export interface ChainData {
   message: string; // "Blocks synced: 543000 / 654000"
   help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
+  wallet?: Wallet;
 }
 
 export interface ProgressLog {
