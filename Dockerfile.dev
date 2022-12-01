@@ -1,10 +1,8 @@
-ARG NODE_VERSION=19.2.0
-
 # Common base so it's cached
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
 #####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:${NODE_VERSION}-alpine as build-monorepo
+FROM --platform=${BUILDPLATFORM:-amd64} node:16.15.0-alpine as build-monorepo
 
 WORKDIR /app
 
