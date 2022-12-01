@@ -185,6 +185,18 @@ export const getDefaultRelays = <T extends Network>(
     case "mainnet":
       return [
         {
+          operator: "Agnostic Boost",
+          ofacCompliant: false,
+          url:
+            "https://0xa7ab7a996c8584251c8f925da3170bdfd6ebc75d50f5ddc4050a6fdc77f2a3b5fce2cc750d0865e05d7228af97d69561@agnostic-relay.net"
+        },
+        {
+          operator: "Ultra Sound",
+          ofacCompliant: false,
+          url:
+            "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
+        },
+        {
           operator: "Flashbots",
           ofacCompliant: true,
           docs: "https://boost.flashbots.net/",
@@ -231,18 +243,6 @@ export const getDefaultRelays = <T extends Network>(
           ofacCompliant: false,
           url:
             "https://0x84e78cb2ad883861c9eeeb7d1b22a8e02332637448f84144e245d20dff1eb97d7abdde96d4e7f80934e5554e11915c56@relayooor.wtf"
-        },
-        {
-          operator: "Agnostic Boost",
-          ofacCompliant: false,
-          url:
-            "https://0xa7ab7a996c8584251c8f925da3170bdfd6ebc75d50f5ddc4050a6fdc77f2a3b5fce2cc750d0865e05d7228af97d69561@agnostic-relay.net"
-        },
-        {
-          operator: "Ultra Sound",
-          ofacCompliant: false,
-          url:
-            "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
         }
       ];
     case "prater":
