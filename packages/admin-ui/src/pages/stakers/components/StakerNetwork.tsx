@@ -256,23 +256,26 @@ export default function StakerNetwork<T extends Network>({
   return (
     <>
       {currentStakerConfigReq.data ? (
-        <Card>
-          <p>
-            Set up your Proof-of-Stake validator configuration for Ethereum and
-            Ethereum-based chains. You will need to: <br />
-            (1) Choose an Execution Layer client <br />
-            (2) Choose a Consensus Layer client (+ validator) <br />
-            (3) Install the web3signer, which will hold the validator keys and
-            sign <br />
-            {network !== "gnosis" && (
-              <>
-                (4) Optional; delegate block-building capacities through the MEV
-                Boost network and potentially profit from MEV
-              </>
-            )}
-          </p>
-          <br />
-          <p>{description}</p>
+        <>
+          <Card>
+            <p>
+              Set up your Proof-of-Stake validator configuration for Ethereum
+              and Ethereum-based chains. You will need to: <br />
+              (1) Choose an Execution Layer client <br />
+              (2) Choose a Consensus Layer client (+ validator) <br />
+              (3) Install the web3signer, which will hold the validator keys and
+              sign <br />
+              {network !== "gnosis" && (
+                <>
+                  (4) Optional; delegate block-building capacities through the
+                  MEV Boost network and potentially profit from MEV
+                </>
+              )}
+            </p>
+
+            <br />
+            <p>{description}</p>
+          </Card>
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
@@ -374,7 +377,7 @@ export default function StakerNetwork<T extends Network>({
               <ErrorView error={reqStatus.error} hideIcon red />
             )}
           </div>
-        </Card>
+        </>
       ) : currentStakerConfigReq.error ? (
         <ErrorView error={currentStakerConfigReq.error} hideIcon red />
       ) : currentStakerConfigReq.isValidating ? (
