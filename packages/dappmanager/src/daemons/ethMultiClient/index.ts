@@ -208,8 +208,8 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(useCheckpointSync =>
-    runEthMultiClientTaskMemo(useCheckpointSync.useCheckpointSync)
+  eventBus.runEthClientInstaller.on(({ useCheckpointSync }) =>
+    runEthMultiClientTaskMemo(useCheckpointSync)
   );
 
   runAtMostEvery(
