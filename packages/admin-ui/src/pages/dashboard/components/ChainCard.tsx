@@ -35,7 +35,7 @@ function ChainCard(chain: ChainData) {
           <ProgressBar
             now={progress * 100}
             animated={true}
-            label={`${Math.floor(progress * 100)}%`}
+            label={`${(progress * 100).toFixed(2)}%`}
           />
         )
       ) : error ? (
