@@ -42,6 +42,7 @@ export interface HttpRoutes {
   globalEnvs: RequestHandler<{ name: string }>;
   notificationSend: RequestHandler;
   packageManifest: RequestHandler<{ dnpName: string }>;
+  metrics: RequestHandler;
   publicPackagesData: RequestHandler<{ containerName: string }>;
   sign: RequestHandler;
   upload: RequestHandler;
@@ -161,6 +162,7 @@ export function startHttpApi({
   app.get("/global-envs/:name?", routes.globalEnvs);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
   app.get("/package-manifest/:dnpName", routes.packageManifest);
+  app.get("/metrics", routes.metrics);
   app.post("/sign", routes.sign);
   app.post("/data-send", routes.dataSend);
   app.post("/notification-send", routes.notificationSend);
