@@ -10,9 +10,17 @@ import {
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { serializeError } from "./types";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl";
-import { parseEthersSyncing } from "../../utils/ethers";
+import { parseEthersBlock, parseEthersSyncing } from "../../utils/ethers";
 import { logs } from "../../logs";
 import fetch from "node-fetch";
+import params from "../../params";
+
+/**
+ * 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022
+ * src: https://ycharts.com/indicators/ethereum_blocks_per_day#:~:text=Ethereum%20Blocks%20Per%20Day%20is,12.10%25%20from%20one%20year%20ago.
+ * TODO: find a way to get the average blocks per day dynamicallly
+ */
+const ETHEREUM_BLOCKS_PER_DAY = 7200;
 
 /**
  * Minimum block difference to consider a local ethereum mainnet node synced
@@ -80,6 +88,21 @@ export async function getMultiClientStatus(
         );
         if (_isApmStateCorrect) {
           // State contract is okey!!
+
+          // Check is synced with remote execution
+          if (db.ethClientFallback.get() === "on") {
+            if (
+              await isSyncedWithRemoteExecution(execUrl).catch(e => {
+                // Do not throw error
+                logs.error(
+                  `Error while checking if synced with remote execution: ${e.message}`
+                );
+              })
+            )
+              return { ok: true, url: execUrl, dnpName: execClientDnpName };
+          }
+
+          // Check if synced with consensus
           if (
             await isSyncedWithConsensus(execUrl, consUrl).catch(e => {
               throw new Error(
@@ -87,7 +110,6 @@ export async function getMultiClientStatus(
               );
             })
           )
-            // Consensus is okey and synced with execution!!
             return { ok: true, url: execUrl, dnpName: execClientDnpName };
           else return { ok: false, code: "IS_SYNCING" };
         } else {
@@ -165,6 +187,28 @@ export async function getMultiClientStatus(
 }
 
 /**
+ * Check the latest block of the local execution client
+ * with the latest block of the remote execution client:
+ * - If the difference is smaller than ETHEREUM_BLOCKS_PER_DAY, the node is synced
+ * - If the difference is bigger than ETHEREUM_BLOCKS_PER_DAY, the node is not synced
+ */
+async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
+  const latestLocalBlock = await new ethers.providers.JsonRpcProvider(localUrl)
+    .send("eth_blockNumber", [])
+    .then(parseEthersBlock);
+
+  const latestRemoteBlock = await new ethers.providers.JsonRpcProvider(
+    params.ETH_MAINNET_RPC_URL_REMOTE
+  )
+    .send("eth_blockNumber", [])
+    .then(parseEthersBlock);
+
+  const blockDiff = latestLocalBlock - latestRemoteBlock;
+  if (blockDiff < ETHEREUM_BLOCKS_PER_DAY) return true;
+  else return false;
+}
+
+/**
  * Test if a node is synced
  * @param url "http://geth.dappnode:8545"
  */
@@ -228,10 +272,7 @@ async function isSyncedWithConsensus(
     consBlockHeadersResponseParsed.data.message.body.execution_payload
       .block_number;
 
-  if (execBlockNumber - consBlockNumber < 7200) {
-    // 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022
-    // src: https://ycharts.com/indicators/ethereum_blocks_per_day#:~:text=Ethereum%20Blocks%20Per%20Day%20is,12.10%25%20from%20one%20year%20ago.
-    // TODO: find a way to get the average blocks per day dynamicallly
+  if (execBlockNumber - consBlockNumber < ETHEREUM_BLOCKS_PER_DAY) {
     return true;
   } else {
     logs.info(

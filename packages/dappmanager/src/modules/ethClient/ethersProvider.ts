@@ -38,6 +38,10 @@ export async function getEthProviderUrl(): Promise<string> {
   // Remote is selected, just return remote
   if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
 
+  // Full node is selected, ensure client is not empty
+  if (!target.execClient) throw Error("No execution client selected yet");
+  if (!target.consClient) throw Error("No consensus client selected yet");
+
   const status = await getMultiClientStatus(
     target.execClient,
     target.consClient
