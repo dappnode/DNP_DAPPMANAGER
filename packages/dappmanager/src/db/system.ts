@@ -5,7 +5,7 @@ import { dbKeys } from "./dbUtils";
 
 export const serverName = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(dbKeys.SERVER_NAME, ""),
-  dbKeys.SERVER_NAME
+  "SERVER_NAME"
 );
 
 // Domains

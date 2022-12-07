@@ -32,7 +32,7 @@ export const consensusClientMainnet = interceptGlobalEnvOnSet(
     dbKeys.CONSENSUS_CLIENT_MAINNET,
     null
   ),
-  dbKeys.CONSENSUS_CLIENT_MAINNET
+  "CONSENSUS_CLIENT_MAINNET"
 );
 
 export const executionClientMainnet = interceptGlobalEnvOnSet(
@@ -40,12 +40,12 @@ export const executionClientMainnet = interceptGlobalEnvOnSet(
     dbKeys.EXECUTION_CLIENT_MAINNET,
     null
   ),
-  dbKeys.EXECUTION_CLIENT_MAINNET
+  "EXECUTION_CLIENT_MAINNET"
 );
 
 export const mevBoostMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(dbKeys.MEVBOOST_MAINNET, false),
-  dbKeys.MEVBOOST_MAINNET
+  "MEVBOOST_MAINNET"
 );
 
 // Gnosis
@@ -55,7 +55,8 @@ export const consensusClientGnosis = interceptGlobalEnvOnSet(
     dbKeys.CONSENSUS_CLIENT_GNOSIS,
     null
   ),
-  dbKeys.CONSENSUS_CLIENT_GNOSIS
+
+  "CONSENSUS_CLIENT_GNOSIS"
 );
 
 export const executionClientGnosis = interceptGlobalEnvOnSet(
@@ -63,12 +64,12 @@ export const executionClientGnosis = interceptGlobalEnvOnSet(
     dbKeys.EXECUTION_CLIENT_GNOSIS,
     null
   ),
-  dbKeys.EXECUTION_CLIENT_GNOSIS
+  "EXECUTION_CLIENT_GNOSIS"
 );
 
 export const mevBoostGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(dbKeys.MEVBOOST_GNOSIS, false),
-  dbKeys.MEVBOOST_GNOSIS
+  "MEVBOOST_GNOSIS"
 );
 
 // Prater
@@ -78,7 +79,7 @@ export const consensusClientPrater = interceptGlobalEnvOnSet(
     dbKeys.CONSENSUS_CLIENT_PRATER,
     null
   ),
-  dbKeys.CONSENSUS_CLIENT_PRATER
+  "CONSENSUS_CLIENT_PRATER"
 );
 
 export const executionClientPrater = interceptGlobalEnvOnSet(
@@ -86,10 +87,10 @@ export const executionClientPrater = interceptGlobalEnvOnSet(
     dbKeys.EXECUTION_CLIENT_PRATER,
     null
   ),
-  dbKeys.EXECUTION_CLIENT_PRATER
+  "EXECUTION_CLIENT_PRATER"
 );
 
 export const mevBoostPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(dbKeys.MEVBOOST_PRATER, false),
-  dbKeys.MEVBOOST_PRATER
+  "MEVBOOST_PRATER"
 );

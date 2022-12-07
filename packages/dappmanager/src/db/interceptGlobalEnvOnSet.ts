@@ -3,9 +3,7 @@ import {
   updatePkgsWithGlobalEnvs,
   writeGlobalEnvsToEnvFile
 } from "../modules/globalEnvs";
-import params from "../params";
-import * as db from "../db";
-import { DbValues } from "./dbUtils";
+import { DbKeys } from "./dbUtils";
 
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:
@@ -23,29 +21,11 @@ export function interceptGlobalEnvOnSet<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   F extends (...args: any[]) => any,
   T extends { set: F }
->(dbSetter: T, globEnvKey: DbValues): T {
+>(dbSetter: T, globEnvKey: DbKeys): T {
   return {
     ...dbSetter,
 
     set: function (globEnvValue: string): void {
-      logs.info(`The globEnvKey is ${globEnvKey}`);
-      // In the globEnvKey change the capital letter to lowercase and change the "_" to "-"
-      const globEnvKeyDnp = globEnvKey
-        .replace(params.GLOBAL_ENVS_PREFIX, "")
-        .toLowerCase()
-        .replace("_", "");
-      logs.info(`The globEnvKeyDnp is ${globEnvKeyDnp}`);
-      logs.info(`The db is ${JSON.stringify(db)}`);
-      if (globEnvKeyDnp in db) {
-        // access the value of db.globEnvKey
-        const a = db[globEnvKey as keyof typeof db];
-        logs.info(`The value of db.${globEnvKey} is ${a}`);
-      }
-
-      // Must be with prefix _DAPPNODE_GLOBAL_
-      if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
-        globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
-
       dbSetter.set(globEnvValue);
       // Update the global env file
       writeGlobalEnvsToEnvFile();

@@ -5,12 +5,12 @@ import { dbKeys } from "./dbUtils";
 
 export const publicIp = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(dbKeys.PUBLIC_IP, ""),
-  dbKeys.PUBLIC_IP
+  "PUBLIC_IP"
 );
 
 export const domain = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(dbKeys.DOMAIN, ""),
-  dbKeys.DOMAIN
+  "DOMAIN"
 );
 
 export const dyndnsIdentity = dbMain.staticKey<IdentityInterface>(
@@ -20,5 +20,5 @@ export const dyndnsIdentity = dbMain.staticKey<IdentityInterface>(
 
 export const staticIp = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(dbKeys.STATIC_IP, ""),
-  dbKeys.STATIC_IP
+  "STATIC_IP"
 );

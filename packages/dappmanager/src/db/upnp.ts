@@ -6,7 +6,7 @@ import { dbKeys } from "./dbUtils";
 
 export const upnpAvailable = interceptGlobalEnvOnSet(
   dbCache.staticKey<boolean>(dbKeys.UPNP_AVAILABLE, false),
-  dbKeys.UPNP_AVAILABLE
+  "UPNP_AVAILABLE"
 );
 
 export const upnpPortMappings = dbCache.staticKey<UpnpPortMapping[]>(

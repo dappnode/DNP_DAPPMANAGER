@@ -68,6 +68,9 @@ export async function updatePkgsWithGlobalEnvs(
   globalEnvKey: string,
   globEnvValue: string
 ): Promise<void> {
+  // Must be with prefix _DAPPNODE_GLOBAL_
+  if (!globalEnvKey.startsWith(params.GLOBAL_ENVS_PREFIX))
+    globalEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globalEnvKey}`;
   const packages = await listContainers();
 
   const pkgsWithGlobalEnv = packages.filter(
@@ -76,17 +79,32 @@ export async function updatePkgsWithGlobalEnvs(
       Object.keys(pkg.defaultEnvironment).some(key => key === globalEnvKey)
   );
 
+  logs.info(
+    `Updating ${pkgsWithGlobalEnv.length} packages with global env ${globalEnvKey}=${globEnvValue}`
+  );
+
   if (pkgsWithGlobalEnv.length === 0) return;
 
   for (const pkg of pkgsWithGlobalEnv) {
     if (pkg.dnpName === params.dappmanagerDnpName) continue;
+    logs.info(
+      `Updating package ${pkg.dnpName} with global env ${globalEnvKey}=${globEnvValue}`
+    );
     if (!pkg.defaultEnvironment) continue;
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
     const environmentsByService: { [serviceName: string]: PackageEnvs }[] = [];
     for (const service of services) {
       const serviceEnvs = service.getEnvs();
+      logs.info(
+        `Service ${service.serviceName} has envs: ${JSON.stringify(
+          serviceEnvs
+        )}`
+      );
       if (globalEnvKey in serviceEnvs) {
+        logs.info(
+          `Updating service ${service.serviceName} with global env ${globalEnvKey}=${globEnvValue}`
+        );
         environmentsByService.push({
           [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
         });

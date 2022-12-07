@@ -4,7 +4,7 @@ import { dbKeys } from "./dbUtils";
 
 export const noNatLoopback = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(dbKeys.NO_NAT_LOOPBACK, false),
-  dbKeys.NO_NAT_LOOPBACK
+  "NO_NAT_LOOPBACK"
 );
 export const doubleNat = dbMain.staticKey<boolean>(dbKeys.DOUBLE_NAT, false);
 export const alertToOpenPorts = dbMain.staticKey<boolean>(
@@ -13,7 +13,7 @@ export const alertToOpenPorts = dbMain.staticKey<boolean>(
 );
 export const internalIp = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(dbKeys.INTERNAL_IP, ""),
-  dbKeys.INTERNAL_IP
+  "INTERNAL_IP"
 );
 
 export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(

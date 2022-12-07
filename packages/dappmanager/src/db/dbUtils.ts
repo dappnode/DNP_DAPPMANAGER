@@ -95,7 +95,7 @@ export const dbKeys = {
   IS_NAT_RENEWAL_DISABLED: "is-nat-renewal-disabled",
   // vpn
   VERSION_DATA_VPN: "version-data-vpn"
-};
+} as const;
 
 export type DbKeys = keyof typeof dbKeys;
 
