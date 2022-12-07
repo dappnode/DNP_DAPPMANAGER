@@ -1,10 +1,9 @@
 import params from "../params";
 import { TrustedReleaseKey } from "../types";
 import { dbMain } from "./dbFactory";
-
-const RELEASE_KEYS_TRUSTED = "release-keys-trusted";
+import { dbKeys } from "./dbUtils";
 
 export const releaseKeysTrusted = dbMain.staticKey<TrustedReleaseKey[]>(
-  RELEASE_KEYS_TRUSTED,
+  dbKeys.RELEASE_KEYS_TRUSTED,
   params.DEFAULT_RELEASE_TRUSTED_KEYS
 );

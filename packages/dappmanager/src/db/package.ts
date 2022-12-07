@@ -1,19 +1,15 @@
 import { UpdateAvailable } from "../types";
 import { dbCache } from "./dbFactory";
 import { stripDots } from "./dbUtils";
-
-const PACKAGE_GETTING_STARTED_SHOW = "package-getting-started-show";
-const PACKAGE_INSTALL_TIME = "package-install-time";
-const PACKAGE_LATEST_KNOWN_VERSION = "package-latest-known-version";
-const PACKAGE_SENT_DATA = "package-sent-data";
+import { dbKeys } from "./dbUtils";
 
 export const packageGettingStartedShow = dbCache.indexedByKey<boolean, string>({
-  rootKey: PACKAGE_GETTING_STARTED_SHOW,
+  rootKey: dbKeys.PACKAGE_GETTING_STARTED_SHOW,
   getKey: dnpName => stripDots(dnpName)
 });
 
 export const packageInstallTime = dbCache.indexedByKey<number, string>({
-  rootKey: PACKAGE_INSTALL_TIME,
+  rootKey: dbKeys.PACKAGE_INSTALL_TIME,
   getKey: dnpName => stripDots(dnpName)
 });
 
@@ -30,7 +26,7 @@ export const packageLatestKnownVersion = dbCache.indexedByKey<
   UpdateAvailable,
   string
 >({
-  rootKey: PACKAGE_LATEST_KNOWN_VERSION,
+  rootKey: dbKeys.PACKAGE_LATEST_KNOWN_VERSION,
   // Do NOT strip dots so the packages can be indexed by dnpName doing .getAll()
   getKey: dnpName => dnpName
 });
@@ -42,6 +38,6 @@ export const packageSentData = dbCache.indexedByKey<
   Record<string, string>,
   string
 >({
-  rootKey: PACKAGE_SENT_DATA,
+  rootKey: dbKeys.PACKAGE_SENT_DATA,
   getKey: dnpName => dnpName
 });

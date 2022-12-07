@@ -1,28 +1,24 @@
 import { dbMain } from "./dbFactory";
 import { IdentityInterface } from "../types";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
-
-const PUBLIC_IP = "public-ip";
-const DOMAIN = "domain";
-const DYNDNS_IDENTITY = "dyndns-identity";
-const STATIC_IP = "static-ip";
+import { dbKeys } from "./dbUtils";
 
 export const publicIp = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string>(PUBLIC_IP, ""),
-  Object.keys({ PUBLIC_IP })[0]
+  dbMain.staticKey<string>(dbKeys.PUBLIC_IP, ""),
+  dbKeys.PUBLIC_IP
 );
 
 export const domain = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string>(DOMAIN, ""),
-  Object.keys({ DOMAIN })[0]
+  dbMain.staticKey<string>(dbKeys.DOMAIN, ""),
+  dbKeys.DOMAIN
 );
 
 export const dyndnsIdentity = dbMain.staticKey<IdentityInterface>(
-  DYNDNS_IDENTITY,
+  dbKeys.DYNDNS_IDENTITY,
   { address: "", privateKey: "", publicKey: "" }
 );
 
 export const staticIp = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string>(STATIC_IP, ""),
-  Object.keys({ STATIC_IP })[0]
+  dbMain.staticKey<string>(dbKeys.STATIC_IP, ""),
+  dbKeys.STATIC_IP
 );

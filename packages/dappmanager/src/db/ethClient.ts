@@ -10,26 +10,12 @@ import {
 } from "../types";
 import { EthClientInstallStatus } from "../modules/ethClient/types";
 import { eventBus } from "../eventBus";
-
-// User chosen properties
-const ETH_CLIENT_TARGET = "eth-client-target";
-const ETH_CLIENT_FALLBACK = "eth-client-fallback";
-const ETH_CLIENT_REMOTE = "eth-client-remote";
-// Cached status
-const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
-const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
-const ETH_CLIENT_STATUS = "eth-client-status";
-const ETH_EXEC_CLIENT_STATUS = "eth-exec-client-status";
-const ETH_CONS_CLIENT_STATUS = "eth-cons-client-status";
-const ETH_PROVIDER_URL = "eth-provider-url";
-// Cached temp status
-const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
-  "eth-client-synced-notification-status";
+import { dbKeys } from "./dbUtils";
 
 // Re-export to consider the first value (when it's not set)
 // but do not allow to set null again. Using to express intentionality
 const _ethClientTarget = interceptOnSet(
-  dbMain.staticKey<EthClientTarget | null>(ETH_CLIENT_TARGET, null)
+  dbMain.staticKey<EthClientTarget | null>(dbKeys.ETH_CLIENT_TARGET, null)
 );
 
 /**
@@ -51,11 +37,11 @@ export const ethClientTarget = {
  * - default value set at initializeDb. Deppends on the old ethClientTarget
  */
 export const ethClientRemote = interceptOnSet(
-  dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null)
+  dbMain.staticKey<EthClientRemote | null>(dbKeys.ETH_CLIENT_REMOTE, null)
 );
 
 export const ethClientFallback = interceptOnSet(
-  dbMain.staticKey<EthClientFallback>(ETH_CLIENT_FALLBACK, "off")
+  dbMain.staticKey<EthClientFallback>(dbKeys.ETH_CLIENT_FALLBACK, "off")
 );
 
 // Cached status, not critical
@@ -65,7 +51,7 @@ export const ethClientFallback = interceptOnSet(
  */
 export const ethExecClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, ExecutionClientMainnet>({
-    rootKey: ETH_EXEC_CLIENT_INSTALL_STATUS,
+    rootKey: dbKeys.ETH_EXEC_CLIENT_INSTALL_STATUS,
     getKey: target => target,
     validate: (id, installStatus) =>
       typeof id === "string" && typeof installStatus === "object"
@@ -77,7 +63,7 @@ export const ethExecClientInstallStatus = interceptOnSet(
  */
 export const ethConsClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, ConsensusClientMainnet>({
-    rootKey: ETH_CONS_CLIENT_INSTALL_STATUS,
+    rootKey: dbKeys.ETH_CONS_CLIENT_INSTALL_STATUS,
     getKey: target => target,
     validate: (id, installStatus) =>
       typeof id === "string" && typeof installStatus === "object"
@@ -89,7 +75,7 @@ export const ethConsClientInstallStatus = interceptOnSet(
  */
 export const ethExecClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, ExecutionClientMainnet>({
-    rootKey: ETH_EXEC_CLIENT_STATUS,
+    rootKey: dbKeys.ETH_EXEC_CLIENT_STATUS,
     getKey: target => target,
     validate: (id, status) =>
       typeof id === "string" && typeof status === "object"
@@ -101,7 +87,7 @@ export const ethExecClientStatus = interceptOnSet(
  */
 export const ethConsClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, ConsensusClientMainnet>({
-    rootKey: ETH_CONS_CLIENT_STATUS,
+    rootKey: dbKeys.ETH_CONS_CLIENT_STATUS,
     getKey: target => target,
     validate: (id, status) =>
       typeof id === "string" && typeof status === "object"
@@ -113,7 +99,7 @@ export const ethConsClientStatus = interceptOnSet(
  */
 export const ethClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, EthClientTarget>({
-    rootKey: ETH_CLIENT_STATUS,
+    rootKey: dbKeys.ETH_CLIENT_STATUS,
     getKey: target => target,
     validate: (id, status) =>
       typeof id === "string" && typeof status === "object"
@@ -121,7 +107,7 @@ export const ethClientStatus = interceptOnSet(
 );
 
 export const ethProviderUrl = interceptOnSet(
-  dbCache.staticKey<string>(ETH_PROVIDER_URL, "")
+  dbCache.staticKey<string>(dbKeys.ETH_PROVIDER_URL, "")
 );
 
 /**
@@ -148,6 +134,6 @@ function interceptOnSet<
  */
 export const ethClientSyncedNotificationStatus =
   dbCache.staticKey<EthClientSyncedNotificationStatus>(
-    ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
+    dbKeys.ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
     null
   );

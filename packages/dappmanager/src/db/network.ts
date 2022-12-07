@@ -1,27 +1,22 @@
 import { dbMain } from "./dbFactory";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
-
-const NO_NAT_LOOPBACK = "no-nat-loopback";
-const DOUBLE_NAT = "double-nat";
-const ALERT_TO_OPEN_PORTS = "alert-to-open-ports";
-const INTERNAL_IP = "internal-ip";
-const AVAHI_SHOULD_BE_DISABLED = "avahi-should-be-disabled";
+import { dbKeys } from "./dbUtils";
 
 export const noNatLoopback = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(NO_NAT_LOOPBACK, false),
-  Object.keys({ NO_NAT_LOOPBACK })[0]
+  dbMain.staticKey<boolean>(dbKeys.NO_NAT_LOOPBACK, false),
+  dbKeys.NO_NAT_LOOPBACK
 );
-export const doubleNat = dbMain.staticKey<boolean>(DOUBLE_NAT, false);
+export const doubleNat = dbMain.staticKey<boolean>(dbKeys.DOUBLE_NAT, false);
 export const alertToOpenPorts = dbMain.staticKey<boolean>(
-  ALERT_TO_OPEN_PORTS,
+  dbKeys.ALERT_TO_OPEN_PORTS,
   false
 );
 export const internalIp = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string>(INTERNAL_IP, ""),
-  Object.keys({ INTERNAL_IP })[0]
+  dbMain.staticKey<string>(dbKeys.INTERNAL_IP, ""),
+  dbKeys.INTERNAL_IP
 );
 
 export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(
-  AVAHI_SHOULD_BE_DISABLED,
+  dbKeys.AVAHI_SHOULD_BE_DISABLED,
   false
 );

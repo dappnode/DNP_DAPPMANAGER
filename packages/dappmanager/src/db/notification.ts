@@ -1,13 +1,11 @@
 import { dbCache } from "./dbFactory";
 import { stripDots } from "./dbUtils";
 import { PackageNotificationDb, PackageNotification } from "../types";
-
-const NOTIFICATION = "notification";
-const NOTIFICATION_LAST_EMITTED_VERSION = "notification-last-emitted-version";
+import { dbKeys } from "./dbUtils";
 
 export const notification = dbCache.indexedByKey<PackageNotificationDb, string>(
   {
-    rootKey: NOTIFICATION,
+    rootKey: dbKeys.NOTIFICATION,
     // The `update-available-${dnpName}-${newVersion}` included dots,
     // so for backwards compatibility they must be stripped
     getKey: id => stripDots(id),
@@ -26,7 +24,7 @@ export function notificationPush(id: string, n: PackageNotification): void {
  */
 export const notificationLastEmitVersion = dbCache.indexedByKey<string, string>(
   {
-    rootKey: NOTIFICATION_LAST_EMITTED_VERSION,
+    rootKey: dbKeys.NOTIFICATION_LAST_EMITTED_VERSION,
     getKey: dnpName => stripDots(dnpName),
     validate: (dnpName, lastEmittedVersion) =>
       typeof lastEmittedVersion === "string"

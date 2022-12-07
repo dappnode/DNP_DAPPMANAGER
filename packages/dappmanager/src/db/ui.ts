@@ -1,12 +1,11 @@
 import { dbMain } from "./dbFactory";
 import { NewFeatureId, NewFeatureStatus } from "../types";
-
-const NEW_FEATURE_STATUS = "new-feature-status";
+import { dbKeys } from "./dbUtils";
 
 export const newFeatureStatus = dbMain.indexedByKey<
   NewFeatureStatus,
   NewFeatureId
 >({
-  rootKey: NEW_FEATURE_STATUS,
+  rootKey: dbKeys.NEW_FEATURE_STATUS,
   getKey: featureId => featureId
 });

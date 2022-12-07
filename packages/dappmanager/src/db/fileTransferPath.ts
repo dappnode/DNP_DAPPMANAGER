@@ -1,9 +1,8 @@
 import { dbCache } from "./dbFactory";
-
-const FILE_TRANSFER_PATH = "file-transfer-path";
+import { dbKeys } from "./dbUtils";
 
 export const fileTransferPath = dbCache.indexedByKey<string, string>({
-  rootKey: FILE_TRANSFER_PATH,
+  rootKey: dbKeys.FILE_TRANSFER_PATH,
   getKey: fileId => fileId,
   validate: filePath => typeof filePath === "string"
 });

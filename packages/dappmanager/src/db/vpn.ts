@@ -1,9 +1,8 @@
 import { dbCache } from "./dbFactory";
 import { PackageVersionData } from "../types";
-
-const VERSION_DATA_VPN = "version-data-vpn";
+import { dbKeys } from "./dbUtils";
 
 export const versionDataVpn = dbCache.staticKey<PackageVersionData>(
-  VERSION_DATA_VPN,
+  dbKeys.VERSION_DATA_VPN,
   {}
 );
