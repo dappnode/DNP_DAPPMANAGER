@@ -96,3 +96,7 @@ export const dbKeys = {
   // vpn
   VERSION_DATA_VPN: "version-data-vpn"
 };
+
+export type DbKeys = keyof typeof dbKeys;
+
+export type DbValues = typeof dbKeys[DbKeys];

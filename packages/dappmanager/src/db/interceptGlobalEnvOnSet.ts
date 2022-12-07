@@ -5,6 +5,7 @@ import {
 } from "../modules/globalEnvs";
 import params from "../params";
 import * as db from "../db";
+import { DbValues } from "./dbUtils";
 
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:
@@ -16,12 +17,13 @@ import * as db from "../db";
  * Global ENVs that must be tracked:
  * ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
  * @param dbSetter
+ * @param globEnvKey The global env key to be intercepted, it is the same as the DB key value
  */
 export function interceptGlobalEnvOnSet<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   F extends (...args: any[]) => any,
   T extends { set: F }
->(dbSetter: T, globEnvKey: string): T {
+>(dbSetter: T, globEnvKey: DbValues): T {
   return {
     ...dbSetter,
 
