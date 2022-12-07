@@ -51,6 +51,7 @@ startDappmanager({
     globalEnvs: () => {},
     notificationSend: () => {},
     packageManifest: () => {},
+    metrics: () => {},
     publicPackagesData: () => {},
     sign: () => {},
     upload: () => {}
