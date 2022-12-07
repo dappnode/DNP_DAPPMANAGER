@@ -81,6 +81,7 @@
     "node-fetch": "^2.6.0",
     "node-os-utils": "^1.2.2",
     "node-telegram-bot-api": "^0.50.0",
+    "prom-client": "^14.1.0",
     "semver": "^5.5.0",
     "socket.io": "^4.5.1",
     "source-map-support": "^0.5.19",
