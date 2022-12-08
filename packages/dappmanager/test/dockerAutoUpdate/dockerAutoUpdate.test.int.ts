@@ -45,7 +45,7 @@ const inContainer = (_path: string): string =>
  * Skip until the image 'danielguerra/dind-compose' is publicly available
  * in docker hub or a legitimate mirror
  */
-describe.skip("Test a container restarting itself", function() {
+describe.skip("Test a container restarting itself", function () {
   async function cleanContainers(): Promise<void> {
     try {
       await shell(
@@ -442,7 +442,7 @@ async function runUntilExited(
 }
 
 function logWithTag(tag: string) {
-  return function(chunk: Buffer) {
+  return function (chunk: Buffer) {
     console.log(
       chunk
         .toString()

@@ -13,7 +13,7 @@ import * as db from "../db";
  *
  * MEMOIZED: Data is read from disk only once at start-up
  */
-export const getVersionData = memoize(function(): {
+export const getVersionData = memoize(function (): {
   data: PackageVersionData;
   ok: boolean;
   isNewVersion: boolean;

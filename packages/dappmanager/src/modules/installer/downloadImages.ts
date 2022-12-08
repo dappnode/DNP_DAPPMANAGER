@@ -13,7 +13,7 @@ export async function downloadImages(
   log: Log
 ): Promise<void> {
   await Promise.all(
-    packagesData.map(async function(pkg) {
+    packagesData.map(async function (pkg) {
       const { dnpName, semVersion, isCore, imageFile, imagePath } = pkg;
       log(dnpName, "Starting download...");
 

@@ -21,9 +21,8 @@ describe("dockerUpdate / parse docker engine update requirements", () => {
       architecture: "amd64",
       kernel: "5.4.0-66-generic"
     };
-    const dockerEngineUpdateRequirements = parseDockerEngineRequirements(
-      hostInfo
-    );
+    const dockerEngineUpdateRequirements =
+      parseDockerEngineRequirements(hostInfo);
     const expectedParsedRequirements = {
       updated: false,
       version: "20.10.2",
@@ -75,9 +74,8 @@ describe("dockerUpdate / parse docker engine update requirements", () => {
       architecture: "amd64",
       kernel: "5.4.0-66-generic"
     };
-    const dockerEngineUpdateRequirements = parseDockerEngineRequirements(
-      hostInfo
-    );
+    const dockerEngineUpdateRequirements =
+      parseDockerEngineRequirements(hostInfo);
     const expectedParsedRequirements = {
       updated: false,
       version: "19.03.8",
@@ -125,9 +123,8 @@ describe("dockerUpdate / parse docker compose update requirements", () => {
       dockerComposeVersion: "1.25.5",
       dockerServerVersion: "20.10.2"
     };
-    const dockerComposeUpdateRequirements = parseDockerComposeRequirements(
-      dockerVersions
-    );
+    const dockerComposeUpdateRequirements =
+      parseDockerComposeRequirements(dockerVersions);
     const expectedParsedRequirements = {
       updated: true,
       version: "1.25.5",
@@ -142,9 +139,8 @@ describe("dockerUpdate / parse docker compose update requirements", () => {
       dockerComposeVersion: "1.22.0",
       dockerServerVersion: "20.10.2"
     };
-    const dockerComposeUpdateRequirements = parseDockerComposeRequirements(
-      dockerVersions
-    );
+    const dockerComposeUpdateRequirements =
+      parseDockerComposeRequirements(dockerVersions);
     const expectedParsedRequirements = {
       updated: false,
       version: "1.22.0",

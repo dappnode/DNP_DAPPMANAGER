@@ -46,10 +46,7 @@ export default function generateKeys(): void {
     publicKey: ethers.utils.computePublicKey(identity.privateKey)
   });
 
-  const subdomain = identity.address
-    .toLowerCase()
-    .substr(2)
-    .substring(0, 16);
+  const subdomain = identity.address.toLowerCase().substr(2).substring(0, 16);
   const domain = [subdomain, dyndnsDomain].join(".");
   db.domain.set(domain);
 }

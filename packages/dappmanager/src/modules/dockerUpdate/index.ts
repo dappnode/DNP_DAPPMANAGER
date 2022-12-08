@@ -29,9 +29,7 @@ export async function updateDockerEngine(): Promise<string> {
 /**
  * Returns host info required to update docker engine.
  */
-export async function getDockerEngineUpdateCheck(): Promise<
-  DockerUpdateStatus
-> {
+export async function getDockerEngineUpdateCheck(): Promise<DockerUpdateStatus> {
   const info = await getDockerEnginehostInfo().catch(e => {
     e.message = `Error getting docker engine host info: ${e.message}`;
     throw e;
@@ -54,9 +52,7 @@ export async function updateDockerCompose(): Promise<string> {
 /**
  * Returns docker-compose version
  */
-export async function getDockerComposeUpdateCheck(): Promise<
-  DockerUpdateStatus
-> {
+export async function getDockerComposeUpdateCheck(): Promise<DockerUpdateStatus> {
   const info = await getDockerComposeVersion().catch(e => {
     e.message = `Error getting docker engine host info: ${e.message}`;
     throw e;

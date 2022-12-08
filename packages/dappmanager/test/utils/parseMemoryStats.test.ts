@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { parseMemoryStats } from "../../src/utils/parseMemoryStats";
 import osu from "node-os-utils";
 
-describe("Util: parseMemoryStats", async function() {
+describe("Util: parseMemoryStats", async function () {
   it("Should parse osu.drive.info output", () => {
     const freeOutput: osu.MemInfo = {
       totalMemMb: 15769.03,

@@ -6,9 +6,9 @@ import { zipObject, keys, values } from "lodash";
  * @param promisesObj
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function promiseAllValues<T extends { [key: string]: any }>(
-  promisesObj: { [K in keyof T]: Promise<T[K]> | undefined }
-): Promise<T> {
+export async function promiseAllValues<
+  T extends { [key: string]: any }
+>(promisesObj: { [K in keyof T]: Promise<T[K]> | undefined }): Promise<T> {
   const resolvedValues = zipObject(
     keys(promisesObj),
     await Promise.all(values(promisesObj))

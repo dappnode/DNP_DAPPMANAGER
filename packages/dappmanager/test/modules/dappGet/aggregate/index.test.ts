@@ -121,17 +121,19 @@ describe("dappGet/aggregate", () => {
     const mock = await rewiremock.around(
       () => import("../../../../src/modules/dappGet/aggregate/index"),
       mock => {
-        mock(() =>
-          import(
-            "../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps"
-          )
+        mock(
+          () =>
+            import(
+              "../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps"
+            )
         )
           .withDefault(getRelevantInstalledDnps)
           .toBeUsed();
-        mock(() =>
-          import(
-            "../../../../src/modules/dappGet/aggregate/aggregateDependencies"
-          )
+        mock(
+          () =>
+            import(
+              "../../../../src/modules/dappGet/aggregate/aggregateDependencies"
+            )
         )
           .withDefault(aggregateDependencies)
           .toBeUsed();
@@ -205,9 +207,8 @@ describe("dappGet/aggregate", () => {
     );
 
     dnpAggregateDependenciesCalls.forEach((callArgs, i) => {
-      const { name, versionRange } = aggregateDependenciesSpy.getCall(
-        i
-      ).lastArg;
+      const { name, versionRange } =
+        aggregateDependenciesSpy.getCall(i).lastArg;
       expect({ name, versionRange }).to.deep.equal(
         callArgs,
         `Wrong arguments for call ${i} to aggregateDependencies`
