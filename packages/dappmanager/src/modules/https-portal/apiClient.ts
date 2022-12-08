@@ -17,6 +17,10 @@ export interface HttpPortalEntry {
    * `"validator-prysm"`, `"internal-docker-dns-based-host"`
    */
   toHost: string;
+  /**
+   *  Should resource be exposed externally
+   */
+  isExternal?: boolean;
 }
 
 export const httpsPortalResponseSchema = {
@@ -26,7 +30,8 @@ export const httpsPortalResponseSchema = {
     required: ["from", "to"],
     properties: {
       from: { type: "string" },
-      to: { type: "string" }
+      to: { type: "string" },
+      external: { type: "boolean" }
     }
   }
 };
@@ -54,11 +59,19 @@ export class HttpsPortalApiClient {
    * GET /add?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async add({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
-    const search = querystring.encode({
-      from: fromSubdomain,
-      to: toHost
-    });
+  async add(entry: HttpPortalEntry): Promise<void> {
+    const search =
+      entry.isExternal === undefined
+        ? querystring.encode({
+            from: entry.fromSubdomain,
+            to: entry.toHost
+          })
+        : querystring.encode({
+            from: entry.fromSubdomain,
+            to: entry.toHost,
+            external: entry.isExternal
+          });
+
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
 
@@ -84,9 +97,9 @@ export class HttpsPortalApiClient {
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
-    const entries = await this.get<{ from: string; to: string }[]>(
-      urlJoin(this.baseUrl, `/?format=json`)
-    );
+    const entries = await this.get<
+      { from: string; to: string; isExternal?: boolean }[]
+    >(urlJoin(this.baseUrl, `/?format=json`));
 
     if (!ajv.validate(httpsPortalResponseSchema, entries)) {
       throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
@@ -94,7 +107,8 @@ export class HttpsPortalApiClient {
 
     return entries.map(entry => ({
       fromSubdomain: entry.from,
-      toHost: entry.to
+      toHost: entry.to,
+      isExternal: entry.isExternal
     }));
   }
 
