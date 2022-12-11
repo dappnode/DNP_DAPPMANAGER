@@ -88,27 +88,18 @@ export async function getMultiClientStatus(
         );
         if (_isApmStateCorrect) {
           // State contract is okey!!
-
-          // Check is synced with remote execution
-          if (db.ethClientFallback.get() === "on") {
-            if (
-              await isSyncedWithRemoteExecution(execUrl).catch(e => {
-                // Do not throw error
-                logs.error(
-                  `Error while checking if synced with remote execution: ${e.message}`
-                );
-              })
-            )
-              return { ok: true, url: execUrl, dnpName: execClientDnpName };
-          }
-
-          // Check if synced with consensus
+          // Check is synced with consensus and remote execution
           if (
-            await isSyncedWithConsensus(execUrl, consUrl).catch(e => {
-              throw new Error(
+            (await isSyncedWithConsensus(execUrl, consUrl).catch(e => {
+              throw Error(
                 `Error while checking if synced with consensus: ${e.message}`
               );
-            })
+            })) &&
+            (await isSyncedWithRemoteExecution(execUrl).catch(e => {
+              throw Error(
+                `Error while checking if synced with remote execution: ${e.message}`
+              );
+            }))
           )
             return { ok: true, url: execUrl, dnpName: execClientDnpName };
           else return { ok: false, code: "IS_SYNCING" };
@@ -193,6 +184,8 @@ export async function getMultiClientStatus(
  * - If the difference is bigger than ETHEREUM_BLOCKS_PER_DAY, the node is not synced
  */
 async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
+  if (db.ethClientFallback.get() === "off") return true;
+  // Check is synced with remote execution
   const latestLocalBlock = await new ethers.providers.JsonRpcProvider(localUrl)
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
