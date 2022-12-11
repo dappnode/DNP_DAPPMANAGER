@@ -96,7 +96,9 @@ export async function getMultiClientStatus(
               );
             })) &&
             (await isSyncedWithRemoteExecution(execUrl).catch(e => {
-              throw Error(
+              // Do not throw if checking remote execution fails
+              // Otherwise the fallback will be triggered and the remote node may not be available
+              logs.error(
                 `Error while checking if synced with remote execution: ${e.message}`
               );
             }))
