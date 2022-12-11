@@ -82,8 +82,8 @@ describe("dappGet integration test", () => {
               .toBeUsed();
           }
         );
-        const aggregateImport = await rewiremock.around(() =>
-          import("../../../src/modules/dappGet/aggregate")
+        const aggregateImport = await rewiremock.around(
+          () => import("../../../src/modules/dappGet/aggregate")
         );
         dappGet = dappGetImport.default;
         aggregate = aggregateImport.default;

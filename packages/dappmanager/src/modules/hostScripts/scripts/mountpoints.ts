@@ -22,7 +22,7 @@ import { runScript } from "../runScripts";
  *   will clear the cache and force a re-run
  */
 export const detectMountpoints = memoize(
-  async function(): Promise<MountpointData[]> {
+  async function (): Promise<MountpointData[]> {
     const rawMountpointsJson = await runScript("detect_fs.sh");
 
     // Everything returned by the script is a string

@@ -60,7 +60,7 @@ export class HttpsPortal {
       });
     }
 
-        // Call Http Portal API to add the mapping
+    // Call Http Portal API to add the mapping
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`

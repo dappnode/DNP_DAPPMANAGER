@@ -96,9 +96,7 @@ export async function bitcoin(
  * "[BTC_RPCUSER=dappnode BTC_RPCPASSWORD=dappnode BTC_TXINDEX=1 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
  * "[ZCASH_RPCUSER=dappnode ZCASH_RPCPASSWORD=dappnode ZCASH_RPCPORT=8342 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
  */
-export function parseCredentialsFromEnvs(
-  envsArray: string[]
-): {
+export function parseCredentialsFromEnvs(envsArray: string[]): {
   username: string;
   password: string;
   port: number | null;

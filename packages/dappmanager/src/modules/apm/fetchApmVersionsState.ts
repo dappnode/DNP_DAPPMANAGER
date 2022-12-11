@@ -34,16 +34,14 @@ export async function fetchApmVersionsState(
   if (isNaN(lastVersionId) || lastVersionId < 0) lastVersionId = 0;
   const versionIndexes = linspace(lastVersionId + 1, versionCount);
   return await Promise.all(
-    versionIndexes.map(
-      async (i): Promise<ApmVersionState> => {
-        const versionData = await repo
-          .getByVersionId(i)
-          .then(parseApmVersionReturn);
-        return {
-          ...versionData,
-          versionId: i
-        };
-      }
-    )
+    versionIndexes.map(async (i): Promise<ApmVersionState> => {
+      const versionData = await repo
+        .getByVersionId(i)
+        .then(parseApmVersionReturn);
+      return {
+        ...versionData,
+        versionId: i
+      };
+    })
   );
 }

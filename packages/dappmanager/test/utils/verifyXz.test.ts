@@ -11,7 +11,7 @@ const okFilePreCompress = okFilePath.replace(".xz", "");
 const corruptFilePath = path.join(testDir, "corrupt-file.txt.xz");
 const missingFilePath = path.join(testDir, "missing-file.txt.xz");
 
-describe("Util: verifyXz", function() {
+describe("Util: verifyXz", function () {
   before(async () => {
     await createTestDir();
     await shell(`echo "some content" > ${okFilePreCompress}`);

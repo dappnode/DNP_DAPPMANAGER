@@ -6,7 +6,7 @@ import { DockerVersionsScript, HostInfoScript } from "../../../types";
  * Updates docker compose
  */
 export const updateDockerCompose = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runScript("docker_compose_update.sh", "-- --install");
   },
   // Prevent running this script more than once
@@ -28,7 +28,7 @@ export const updateDockerCompose = memoize(
  * ```
  */
 export const getDockerEnginehostInfo = memoize(
-  async function(): Promise<HostInfoScript> {
+  async function (): Promise<HostInfoScript> {
     const hostInfo = await runScript(
       "docker_engine_update.sh",
       "-- --print-host-info"
@@ -52,7 +52,7 @@ export const getDockerEnginehostInfo = memoize(
  * Returns docker compose version
  */
 export const getDockerComposeVersion = memoize(
-  async function(): Promise<DockerVersionsScript> {
+  async function (): Promise<DockerVersionsScript> {
     const dockerVersions = await runScript(
       "docker_compose_update.sh",
       "-- --version"

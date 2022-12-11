@@ -105,9 +105,8 @@ describe("dappGet/resolve/permutations", () => {
       C: { versions: { "1.0.0": {}, "2.0.0": {} } }
     };
     const permutationsTable = permutations.getPermutationsTable(dnps);
-    const permutationsNumber = permutations.getTotalPermutations(
-      permutationsTable
-    );
+    const permutationsNumber =
+      permutations.getTotalPermutations(permutationsTable);
     const _permutations = [];
     for (let i = 0; i < permutationsNumber; i++) {
       _permutations.push(permutations.getPermutation(permutationsTable, i));

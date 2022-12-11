@@ -50,9 +50,7 @@ export function getDevicePath({
  *   mountpointPath: "/dev1/data/dappnode-volumes"
  * }
  */
-export function parseDevicePath(
-  devicePath: string
-):
+export function parseDevicePath(devicePath: string):
   | {
       mountpoint: string;
       dnpName: string;

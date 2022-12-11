@@ -50,39 +50,37 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
   // );
 
   // Append sizes after to optimize the number of calls to dockerDf and host
-  return volumes.map(
-    (vol): VolumeData => {
-      const ownershipData = parseVolumeOwnershipData(vol, containers);
+  return volumes.map((vol): VolumeData => {
+    const ownershipData = parseVolumeOwnershipData(vol, containers);
 
-      // Get the size of the volume via docker system df -v
-      const volDfData = volumesDf.find(v => v.Name === vol.Name);
-      const size = volDfData ? volDfData.UsageData.Size : undefined;
-      const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
-      // Check users for custom bind volumes
-      const isOrphan = !refCount && !ownershipData.owner;
+    // Get the size of the volume via docker system df -v
+    const volDfData = volumesDf.find(v => v.Name === vol.Name);
+    const size = volDfData ? volDfData.UsageData.Size : undefined;
+    const refCount = volDfData ? volDfData.UsageData.RefCount : undefined;
+    // Check users for custom bind volumes
+    const isOrphan = !refCount && !ownershipData.owner;
 
-      // Custom mountpoint data
-      const pathParts =
-        vol.Options && vol.Options.device
-          ? parseDevicePath(vol.Options.device)
-          : undefined;
+    // Custom mountpoint data
+    const pathParts =
+      vol.Options && vol.Options.device
+        ? parseDevicePath(vol.Options.device)
+        : undefined;
 
-      return {
-        // Real volume and owner name to call delete on
-        name: vol.Name,
-        owner: ownershipData.owner,
-        internalName: parseVolumeLabels(vol.Labels).internalName,
-        createdAt: new Date(vol.CreatedAt).getTime(),
-        size,
-        refCount,
-        isOrphan,
-        mountpoint: pathParts ? pathParts.mountpoint : "",
-        fileSystem: pathParts
-          ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
-          : undefined
-      };
-    }
-  );
+    return {
+      // Real volume and owner name to call delete on
+      name: vol.Name,
+      owner: ownershipData.owner,
+      internalName: parseVolumeLabels(vol.Labels).internalName,
+      createdAt: new Date(vol.CreatedAt).getTime(),
+      size,
+      refCount,
+      isOrphan,
+      mountpoint: pathParts ? pathParts.mountpoint : "",
+      fileSystem: pathParts
+        ? mountpoints.find(fs => fs.mountpoint === pathParts.mountpoint)
+        : undefined
+    };
+  });
 }
 
 export function parseVolumeOwnershipData(
@@ -111,9 +109,10 @@ export function parseVolumeOwnershipData(
  *   "com.docker.compose.volume": "lndconfig_backup"
  * },
  */
-function parseVolumeLabels(labels?: {
-  [labelName: string]: string;
-}): { normalizedOwnerName: string; internalName?: string } {
+function parseVolumeLabels(labels?: { [labelName: string]: string }): {
+  normalizedOwnerName: string;
+  internalName?: string;
+} {
   const project = (labels || {})["com.docker.compose.project"];
   const volume = (labels || {})["com.docker.compose.volume"];
   // Core: ".project": "dncore",

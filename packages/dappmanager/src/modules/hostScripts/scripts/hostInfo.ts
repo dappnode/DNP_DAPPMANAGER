@@ -18,7 +18,7 @@ import { runScript } from "../runScripts";
  * ```
  */
 export const getHostInfoMemoized = memoize(
-  async function(): Promise<HostInfoScript> {
+  async function (): Promise<HostInfoScript> {
     const hostInfo = await runScript("collect_host_info.sh");
     const info: HostInfoScript = JSON.parse(hostInfo);
     return {
