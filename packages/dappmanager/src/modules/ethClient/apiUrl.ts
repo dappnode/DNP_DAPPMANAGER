@@ -27,6 +27,12 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
  * @param dnpName
  */
 export function getEthConsClientApiUrl(dnpName: string, port = 3500): string {
+  //  TODO: find a proper way to get the port dynamically
+  // Lighthouse, Teku and Prysm use 3500
+  // Nimbus uses 4500 because it is a monoservice and the validator API is using that port
+  if (dnpName.includes("nimbus")) {
+    port = 4500;
+  }
   /**
    * Binded to the domain mapper module 'nsupdate'
    * ```
