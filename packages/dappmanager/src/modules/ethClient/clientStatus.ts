@@ -69,7 +69,7 @@ export async function getMultiClientStatus(
         `Unsupported consensus client in mainnet '${consClientDnpName}'`
       );
     const execUrl = getEthExecClientApiUrl(execClientDnpName);
-    const consUrl = getEthConsClientApiUrl(consClientDnpName);
+    const consUrl = await getEthConsClientApiUrl(consClientDnpName);
     try {
       // Provider API works? Do a single test call to check state
       if (await isSyncing(execUrl)) {
