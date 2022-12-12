@@ -10,12 +10,11 @@ type BubbleColor = "danger" | "warning" | "success" | "light";
 // Utilities
 
 const ProgressBarWrapper = ({ progress }: { progress: number }) => {
-  const progressPercent = Math.floor(100 * progress);
   return (
     <ProgressBar
-      now={progressPercent}
+      now={progress * 100}
       animated={true}
-      label={`${progressPercent}%`}
+      label={`${(progress * 100).toFixed(2)}%`}
     />
   );
 };
