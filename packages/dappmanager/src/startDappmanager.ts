@@ -19,6 +19,7 @@ export function startDappmanager({
   params,
   logs,
   routes,
+  counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
   methods,
@@ -31,6 +32,7 @@ export function startDappmanager({
   params: DappmanagerParams;
   logs: Logs;
   routes: HttpRoutes;
+  counterViewsMiddleware: RequestHandler;
   ethForwardMiddleware: RequestHandler;
   routesLogger: LoggerMiddleware;
   methods: Omit<Routes, keyof DeviceCalls | keyof SshCalls>;
@@ -53,6 +55,7 @@ export function startDappmanager({
     params,
     logs,
     routes,
+    counterViewsMiddleware,
     ethForwardMiddleware,
     routesLogger,
     methods: { ...methods, ...deviceCalls, ...sshCalls },

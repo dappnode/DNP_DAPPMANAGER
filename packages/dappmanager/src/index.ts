@@ -13,7 +13,7 @@ import { routesLogger, subscriptionsLogger } from "./api/logger";
 import * as routes from "./api/routes";
 import { logs } from "./logs";
 import params from "./params";
-import { getEthForwardMiddleware } from "./ethForward";
+import { getEthForwardMiddleware } from "./middlewares/ethForward";
 import { getVpnApiClient } from "./api/vpnApiClient";
 import {
   getVersionData,
@@ -36,6 +36,7 @@ const server = startDappmanager({
   params,
   logs,
   routes,
+  counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
   methods: calls,

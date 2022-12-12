@@ -153,6 +153,20 @@ register.registerMetric(
   })
 );
 
+// Views
+register.registerMetric(
+  new client.Counter({
+    name: "views",
+    help: "number of views",
+    labelNames: ["views"],
+    collect() {
+      const views = db.counterViews.get();
+      this.reset();
+      this.inc({ views: "views" }, views);
+    }
+  })
+);
+
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
   app: "dappmanager-custom-metrics"

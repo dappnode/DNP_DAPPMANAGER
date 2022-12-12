@@ -60,6 +60,7 @@ export function startHttpApi({
   params,
   logs,
   routes,
+  counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
   methods,
@@ -71,6 +72,7 @@ export function startHttpApi({
   params: HttpApiParams;
   logs: Logs;
   routes: HttpRoutes;
+  counterViewsMiddleware: express.RequestHandler;
   ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
   methods: Routes;
@@ -100,6 +102,8 @@ export function startHttpApi({
   app.use(bodyParser.json());
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
+  // Count views
+  app.use(counterViewsMiddleware);
   // Express uses "ETags" (hashes of the files requested) to know when the file changed
   app.use(express.static(path.resolve(params.UI_FILES_PATH), { maxAge: "1d" }));
 

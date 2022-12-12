@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { getEthProviderUrl } from "../modules/ethClient";
+import { getEthProviderUrl } from "../../modules/ethClient";
 import resolverAbi from "./abi/resolverAbi.json";
 import ensAbi from "./abi/ens.json";
 import { Network, Content, NotFoundError, EnsResolverError } from "./types";
