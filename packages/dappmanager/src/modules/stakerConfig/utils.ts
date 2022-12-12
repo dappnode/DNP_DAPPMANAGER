@@ -92,6 +92,9 @@ export function getConsensusUserSettings({
               },
 
               [beaconServiceName]: {
+                // Fee recipient is a mandatory vlaue (for Teku)
+                ["FEE_RECIPIENT_ADDRESS"]:
+                  feeRecipient || "0x0000000000000000000000000000000000000000",
                 // Checkpoint sync is an optional value
                 ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
               }
