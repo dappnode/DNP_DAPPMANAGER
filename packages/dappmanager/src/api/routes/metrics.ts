@@ -28,17 +28,15 @@ const register = new client.Registry();
 // IPFS node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "ipfs_node_local_or_remote",
-    help: "Ipfs node local or remote",
-    labelNames: ["ipfsNodeLocal", "ipfsNodeRemote"],
+    name: "ipfs_client_target",
+    help: "Ipfs client target",
+    labelNames: ["ipfsClientTarget"],
     collect() {
       const ipfsClientTarget = db.ipfsClientTarget.get();
       if (ipfsClientTarget === "local") {
-        this.set({ ipfsNodeLocal: "true" }, 1);
-        this.set({ ipfsNodeRemote: "false" }, 0);
+        this.set({ ipfsClientTarget: "local" }, 1);
       } else {
-        this.set({ ipfsNodeLocal: "false" }, 0);
-        this.set({ ipfsNodeRemote: "true" }, 1);
+        this.set({ ipfsClientTarget: "remote" }, 0);
       }
     }
   })
@@ -47,17 +45,15 @@ register.registerMetric(
 // Ethereum node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "eth_node_local_or_remote",
-    help: "eth node local or remote",
-    labelNames: ["ethNodeLocal", "ethNodeRemote"],
+    name: "eth_client_target",
+    help: "eth client target",
+    labelNames: ["ethClientTarget"],
     collect() {
       const ethClientRemote = db.ethClientRemote.get();
       if (ethClientRemote === "on") {
-        this.set({ ethNodeLocal: "false" }, 0);
-        this.set({ ethNodeRemote: "true" }, 1);
+        this.set({ ethClientTarget: "remote" }, 0);
       } else {
-        this.set({ ethNodeLocal: "true" }, 1);
-        this.set({ ethNodeRemote: "false" }, 0);
+        this.set({ ethClientTarget: "local" }, 1);
       }
     }
   })
@@ -66,17 +62,15 @@ register.registerMetric(
 // Ethereum fallback enabled
 register.registerMetric(
   new client.Gauge({
-    name: "eth_fallback_enabled_or_disabled",
-    help: "eth fallback enabled or disabled",
-    labelNames: ["ethFallbackEnabled", "ethFallbackDisabled"],
+    name: "eth_fallback",
+    help: "eth fallback",
+    labelNames: ["ethFallback"],
     collect() {
       const ethClientFallback = db.ethClientFallback.get();
       if (ethClientFallback === "on") {
-        this.set({ ethFallbackEnabled: "true" }, 1);
-        this.set({ ethFallbackDisabled: "false" }, 0);
+        this.set({ ethFallback: "enabled" }, 1);
       } else {
-        this.set({ ethFallbackEnabled: "false" }, 0);
-        this.set({ ethFallbackDisabled: "true" }, 1);
+        this.set({ ethFallback: "disabled" }, 0);
       }
     }
   })
@@ -146,19 +140,15 @@ register.registerMetric(
 // Auto-updates
 register.registerMetric(
   new client.Gauge({
-    name: "number_of_auto_updates_enabled_or_disabled",
-    help: "number of auto updates enabled or disabled",
-    labelNames: ["autoUpdatesEnabled", "autoUpdatesDisabled"],
+    name: "auto_updates",
+    help: "number of auto updates enabled",
+    labelNames: ["autoUpdates"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
       const autoUpdatesEnabled = Object.values(autoUpdates).filter(
         autoUpdate => autoUpdate.enabled === true
       ).length;
-      const autoUpdatesDisabled = Object.values(autoUpdates).filter(
-        autoUpdate => autoUpdate.enabled === false
-      ).length;
-      this.set({ autoUpdatesEnabled: "enabled" }, autoUpdatesEnabled);
-      this.set({ autoUpdatesDisabled: "disabled" }, autoUpdatesDisabled);
+      this.set({ autoUpdates: "enabled" }, autoUpdatesEnabled);
     }
   })
 );
