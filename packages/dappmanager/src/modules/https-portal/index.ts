@@ -34,12 +34,6 @@ export class HttpsPortal {
     const externalNetworkAlias = getExternalNetworkAlias(container);
     const aliases = [externalNetworkAlias];
 
-    // Call Http Portal API to add the mapping
-    await this.httpsPortalApiClient.add({
-      fromSubdomain: mapping.fromSubdomain,
-      toHost: `${externalNetworkAlias}:${mapping.port}`
-    });
-
     // Ensure network exists
     const networks = await dockerListNetworks();
     if (!networks.find(network => network.Name === externalNetworkName)) {
@@ -65,6 +59,12 @@ export class HttpsPortal {
         Aliases: aliases
       });
     }
+
+    // Call Http Portal API to add the mapping
+    await this.httpsPortalApiClient.add({
+      fromSubdomain: mapping.fromSubdomain,
+      toHost: `${externalNetworkAlias}:${mapping.port}`
+    });
 
     // Edit compose to persist the setting
     addNetworkAliasCompose(container, externalNetworkName, aliases);

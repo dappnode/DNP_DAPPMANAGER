@@ -9,7 +9,7 @@ import { runScript } from "../runScripts";
  * - Starts avahi daemon
  */
 export const initializeAvahiDaemon = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runScript("avahi_daemon.sh", "-- --initialize");
   },
   // Prevent running this script more than once
@@ -23,7 +23,7 @@ export const initializeAvahiDaemon = memoize(
  * - avahi daemon resolves
  */
 export const getAvahiDaemonStatus = memoize(
-  async function(): Promise<AvahiDaemonStatus> {
+  async function (): Promise<AvahiDaemonStatus> {
     const avahiDaemonStatus = await runScript("avahi_daemon.sh", "-- --status");
 
     const status: {
@@ -47,7 +47,7 @@ export const getAvahiDaemonStatus = memoize(
  * - Stop and disables avahi-daemon.service and avahi-socket.service (both necessary to fully stop avahi)
  */
 export const stopAvahiDaemon = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runScript("avahi_daemon.sh", "-- --stop");
   },
   // Prevent running this script more than once
@@ -59,7 +59,7 @@ export const stopAvahiDaemon = memoize(
  * - Start and enables avahi-daemon.service and avahi-socket.service
  */
 export const startAvahiDaemon = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runScript("avahi_daemon.sh", "-- --start");
   },
   // Prevent running this script more than once
@@ -70,7 +70,7 @@ export const startAvahiDaemon = memoize(
  * Restarts AVAHI daemon
  */
 export const restartAvahiDaemon = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runScript("avahi_daemon.sh", "-- --restart");
   },
   // Prevent running this script more than once

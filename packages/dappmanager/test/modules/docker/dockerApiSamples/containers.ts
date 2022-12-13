@@ -99,8 +99,7 @@ export const dockerApiResponseContainers: Docker.ContainerInfo[] = [
         Destination: "/etc/nginx/dhparam",
         Driver: "local",
         Mode: "",
-        Name:
-          "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
+        Name: "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
         Propagation: "",
         RW: true,
         Source: "",

@@ -14,7 +14,7 @@ export async function loadImages(
   log: Log
 ): Promise<void> {
   await Promise.all(
-    packagesData.map(async function({ dnpName, imagePath }) {
+    packagesData.map(async function ({ dnpName, imagePath }) {
       log(dnpName, "Loading image...");
       await loadImageWithProgress(imagePath, message => log(dnpName, message));
       log(dnpName, "Package Loaded");

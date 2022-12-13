@@ -31,9 +31,7 @@ export const publicPackagesData = wrapHandler<Params>(async (req, res) => {
 /**
  * Return only non-sensitive data
  */
-function getPublicPackageData(
-  container: PackageContainer
-): {
+function getPublicPackageData(container: PackageContainer): {
   name: string;
   version: string;
   state: string;

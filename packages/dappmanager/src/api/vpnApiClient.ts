@@ -32,8 +32,11 @@ type Args = any[];
 
 export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return mapValues(vpnApiRoutesData, (data, route) => (...args: Args): any =>
-    vpnRpcCall(params, route, ...args)
+  return mapValues(
+    vpnApiRoutesData,
+    (data, route) =>
+      (...args: Args): any =>
+        vpnRpcCall(params, route, ...args)
   );
 }
 
@@ -65,7 +68,7 @@ async function vpnRpcCall<R>(
   }
 
   if (!res.ok) {
-    const errorBody = (body as unknown) as Error;
+    const errorBody = body as unknown as Error;
     throw Error(`${res.status} ${res.statusText} ${errorBody.message || ""}`);
   }
 

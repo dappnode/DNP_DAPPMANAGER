@@ -8,7 +8,7 @@ export function parseAsset<T>(data: string, format: FileFormat): T {
     case FileFormat.JSON:
       return jsonParse(data);
     case FileFormat.TEXT:
-      return (data as unknown) as T;
+      return data as unknown as T;
     default:
       throw Error(`Attempting to parse unknown format ${format}`);
   }

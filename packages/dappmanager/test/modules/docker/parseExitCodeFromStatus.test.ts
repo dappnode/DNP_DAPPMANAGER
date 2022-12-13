@@ -16,7 +16,7 @@ describe("docker / parseExitCodeFromStatus", () => {
     { id: "Empty", status: "", exitCode: null },
     {
       id: "Not a string",
-      status: (undefined as unknown) as string,
+      status: undefined as unknown as string,
       exitCode: null
     }
   ];

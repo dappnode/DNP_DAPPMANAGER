@@ -59,9 +59,11 @@ const timeoutMs = 10 * 1000; // ms
  *     versions of y.dnp.dappnode.eth. Checked 256/256 possible states.'
  * }
  */
-export default function resolver(
-  dnps: DappGetDnps
-): { success: boolean; message: string; state: { [dnpName: string]: string } } {
+export default function resolver(dnps: DappGetDnps): {
+  success: boolean;
+  message: string;
+  state: { [dnpName: string]: string };
+} {
   const errors: DappGetErrors = {};
 
   const permutationsTable = getPermutationsTable(dnps);

@@ -5,7 +5,7 @@ describe("IPFS gateway proxy", () => {
   describe("Parse IPFS path", () => {
     const testCases: { id: string; url: string; hash: string | null }[] = [
       { id: "Empty string", url: "", hash: null },
-      { id: "Bad type", url: ({} as unknown) as string, hash: null },
+      { id: "Bad type", url: {} as unknown as string, hash: null },
       {
         id: "With subpath",
         url: "/ipfs/QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG/readme",

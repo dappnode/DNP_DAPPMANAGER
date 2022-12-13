@@ -11,7 +11,7 @@ import { InstalledPackageData } from "../../src/types";
 import { mockDnp, cleanTestDir, mockContainer } from "../testUtils";
 import { getMockEventBus } from "./eventBus";
 
-describe("Call function: packageRemove", function() {
+describe("Call function: packageRemove", function () {
   const dnpName = "test.dnp.dappnode.eth";
   const dockerComposePath = getPath.dockerCompose(dnpName, false);
   const dockerComposeTemplate = `

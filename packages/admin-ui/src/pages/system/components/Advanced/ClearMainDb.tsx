@@ -18,7 +18,7 @@ export function ClearMainDb() {
 
     await withToastNoThrow(() => api.cleanDb(), {
       message: "Deleting main database...",
-      onSuccess: "Deletied main database"
+      onSuccess: "Deleted main database"
     });
   }
 

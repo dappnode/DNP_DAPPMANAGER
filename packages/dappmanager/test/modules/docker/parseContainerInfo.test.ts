@@ -398,7 +398,7 @@ describe("modules / docker / parseContainerInfo", function () {
         dependencies: {},
         avatarUrl: "/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
         origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
-        chain: "ethereum" ,
+        chain: "ethereum",
         canBeFullnode: false,
         defaultEnvironment: {
           EXTRA_OPTS: "--warp-barrier 8540000",
@@ -699,7 +699,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        chain: "ethereum" ,
+        chain: "ethereum",
         canBeFullnode: false
       },
       {

@@ -10,7 +10,7 @@ import { fileDownload } from "../../src/api/routes/fileDownload";
 import { URL } from "url";
 import { MemoryWritable } from "../testStreamUtils";
 
-describe("file transfer - docker archive put, get", function() {
+describe("file transfer - docker archive put, get", function () {
   const containerName = "DAppNodeTest-file-transfer";
   const filePath = "/a/b/c/sample.json";
   const fileContent = JSON.stringify(
@@ -24,7 +24,7 @@ describe("file transfer - docker archive put, get", function() {
     await container.remove({ force: true });
   }
 
-  before("Remove previous container", async function() {
+  before("Remove previous container", async function () {
     await removeContainer().catch(() => {
       //
     });
@@ -34,7 +34,7 @@ describe("file transfer - docker archive put, get", function() {
     await removeContainer();
   });
 
-  before("Start test container", async function() {
+  before("Start test container", async function () {
     this.timeout(60 * 1000);
 
     const container = await docker.createContainer({

@@ -44,10 +44,8 @@ export async function packageRestartVolumes({
   if (!fs.existsSync(composePath))
     throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
 
-  const {
-    volumesToRemove,
-    containersToRemove
-  } = getContainersAndVolumesToRemove(dnp, volumeName, volumes);
+  const { volumesToRemove, containersToRemove } =
+    getContainersAndVolumesToRemove(dnp, volumeName, volumes);
   logs.debug({ dnpName, volumesToRemove, containersToRemove });
 
   // Skip early to prevent calling dockerComposeUp

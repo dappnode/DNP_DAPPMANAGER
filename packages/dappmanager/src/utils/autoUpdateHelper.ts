@@ -390,8 +390,11 @@ export function getDnpFeedbackMessage({
 
   const currentVersionRegistry =
     (registry[dnpName] || {})[currentVersion] || {};
-  const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[dnpName] || {};
+  const {
+    version: pendingVersion,
+    scheduledUpdate,
+    errorMessage
+  } = pending[dnpName] || {};
 
   const lastUpdatedVersion = getLastRegistryEntry(registry[dnpName] || {});
   const lastUpdatedVersionsAreInstalled =
@@ -443,8 +446,11 @@ export function getCoreFeedbackMessage(
    * Let's figure out the version of the core
    */
 
-  const { version: pendingVersion, scheduledUpdate, errorMessage } =
-    pending[coreDnpName] || {};
+  const {
+    version: pendingVersion,
+    scheduledUpdate,
+    errorMessage
+  } = pending[coreDnpName] || {};
   const lastUpdatedVersion = getLastRegistryEntry(registry[coreDnpName] || {});
   const lastUpdatedVersionsAreInstalled =
     lastUpdatedVersion.version &&
@@ -475,9 +481,7 @@ export function getCoreFeedbackMessage(
  * @param registryDnp
  * @return
  */
-export function getLastRegistryEntry(
-  registryDnp: AutoUpdateRegistryDnp
-): {
+export function getLastRegistryEntry(registryDnp: AutoUpdateRegistryDnp): {
   version: string;
   updated?: number;
   successful?: boolean;

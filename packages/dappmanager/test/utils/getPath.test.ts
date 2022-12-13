@@ -9,7 +9,7 @@ import params from "../../src/params";
 
 const { REPO_DIR } = params;
 
-describe("Util: get paths", function() {
+describe("Util: get paths", function () {
   const dnpName = "some_package.dnp.dappnode.eth";
   const version = "0.2.0";
 

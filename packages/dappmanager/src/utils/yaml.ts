@@ -9,7 +9,7 @@ export function yamlParse<T>(yamlString: string): T {
     const parsedData = yaml.safeLoad(yamlString);
     if (!parsedData || typeof parsedData === "string")
       throw Error(`returned invalid object`);
-    return (parsedData as unknown) as T;
+    return parsedData as unknown as T;
   } catch (e) {
     throw Error(`Error parsing YAML: ${e.message}`);
   }

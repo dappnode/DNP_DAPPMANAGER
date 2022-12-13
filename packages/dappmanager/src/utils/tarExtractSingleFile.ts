@@ -16,7 +16,7 @@ export async function tarExtractSingleFile(
   return new Promise((resolve, reject) => {
     let fileFound = false;
 
-    extract.on("entry", async function(header, stream, next) {
+    extract.on("entry", async function (header, stream, next) {
       if (!fileFound && header.name === targetFile && header.type === "file") {
         fileFound = true;
 
@@ -35,7 +35,7 @@ export async function tarExtractSingleFile(
       }
     });
 
-    extract.on("finish", function() {
+    extract.on("finish", function () {
       if (fileFound) resolve();
       else reject(Error(`file ${targetFile} not found in tar`));
     });
