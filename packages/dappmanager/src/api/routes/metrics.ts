@@ -81,29 +81,25 @@ register.registerMetric(
   new client.Gauge({
     name: "staker_config",
     help: "staker configuration",
-    labelNames: [
-      "executionClientMainnet",
-      "consensusClientMainnet",
-      "mevBoostMainnet",
-      "executionClientPrater",
-      "consensusClientPrater",
-      "mevBoostPrater",
-      "executionClientGnosis",
-      "consensusClientGnosis",
-      "mevBoostGnosis"
-    ],
+    labelNames: ["executionClient", "consensusClient", "mevBoost"],
     async collect() {
+      function parseClientToNumber(client: string): number {
+        // Execution clients
+        if (client.includes("besu")) return 1;
+        if (client.includes("erigon")) return 2;
+        if (client.includes("geth")) return 3;
+        if (client.includes("nethermind")) return 4;
+        // Consensus clients
+        if (client.includes("lighthouse")) return 1;
+        if (client.includes("nimbus")) return 2;
+        if (client.includes("prysm")) return 3;
+        if (client.includes("teku")) return 4;
+
+        return 0;
+      }
+
       for (const network of ["mainnet", "prater", "gnosis"] as Network[]) {
         const stakerConfig = stakerParamsByNetwork(network);
-        const executionLabel = `executionClient${network[0].toUpperCase()}${network.slice(
-          1
-        )}`;
-        const consensusLabel = `consensusClient${network[0].toUpperCase()}${network.slice(
-          1
-        )}`;
-        const mevBoostLabel = `mevBoost${network[0].toUpperCase()}${network.slice(
-          1
-        )}`;
 
         // Execution client
         if (
@@ -112,8 +108,11 @@ register.registerMetric(
             dnpName: stakerConfig.currentExecClient
           }))
         )
-          this.set({ [executionLabel]: stakerConfig.currentExecClient }, 1);
-        else this.set({ [executionLabel]: stakerConfig.currentExecClient }, 0);
+          this.set(
+            { executionClient: network },
+            parseClientToNumber(stakerConfig.currentExecClient)
+          );
+        else this.set({ executionClient: network }, 0);
 
         // Consensus client
         if (
@@ -122,16 +121,19 @@ register.registerMetric(
             dnpName: stakerConfig.currentConsClient
           }))
         )
-          this.set({ [consensusLabel]: stakerConfig.currentConsClient }, 1);
-        else this.set({ [consensusLabel]: stakerConfig.currentConsClient }, 0);
+          this.set(
+            { consensusClient: network },
+            parseClientToNumber(stakerConfig.currentConsClient)
+          );
+        else this.set({ consensusClient: network }, 0);
 
         // MEV boost
         if (
           stakerConfig.isMevBoostSelected &&
           (await listPackageNoThrow({ dnpName: stakerConfig.mevBoost }))
         )
-          this.set({ [mevBoostLabel]: stakerConfig.mevBoost }, 1);
-        else this.set({ [mevBoostLabel]: stakerConfig.mevBoost }, 0);
+          this.set({ mevBoost: network }, 1);
+        else this.set({ mevBoost: network }, 0);
       }
     }
   })
