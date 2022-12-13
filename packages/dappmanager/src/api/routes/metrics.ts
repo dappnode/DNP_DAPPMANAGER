@@ -28,15 +28,15 @@ const register = new client.Registry();
 // IPFS node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "ipfs_client_target",
-    help: "Ipfs client target",
-    labelNames: ["ipfsClientTarget"],
+    name: "ipfs_client_target_local",
+    help: "Ipfs client target local",
+    labelNames: ["ipfsClientTargetLocal"],
     collect() {
       const ipfsClientTarget = db.ipfsClientTarget.get();
       if (ipfsClientTarget === "local") {
-        this.set({ ipfsClientTarget: "local" }, 1);
+        this.set({ ipfsClientTargetLocal: "local" }, 1);
       } else {
-        this.set({ ipfsClientTarget: "remote" }, 0);
+        this.set({ ipfsClientTargetLocal: "local" }, 0);
       }
     }
   })
@@ -45,15 +45,15 @@ register.registerMetric(
 // Ethereum node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "eth_client_target",
-    help: "eth client target",
-    labelNames: ["ethClientTarget"],
+    name: "eth_client_target_local",
+    help: "eth client target local",
+    labelNames: ["ethClientTargetLocal"],
     collect() {
       const ethClientRemote = db.ethClientRemote.get();
       if (ethClientRemote === "on") {
-        this.set({ ethClientTarget: "remote" }, 0);
+        this.set({ ethClientTargetLocal: "local" }, 0);
       } else {
-        this.set({ ethClientTarget: "local" }, 1);
+        this.set({ ethClientTargetLocal: "local" }, 1);
       }
     }
   })
@@ -62,15 +62,15 @@ register.registerMetric(
 // Ethereum fallback enabled
 register.registerMetric(
   new client.Gauge({
-    name: "eth_fallback",
-    help: "eth fallback",
-    labelNames: ["ethFallback"],
+    name: "eth_fallback_enabled",
+    help: "eth fallback enabled",
+    labelNames: ["ethFallbackEnabled"],
     collect() {
       const ethClientFallback = db.ethClientFallback.get();
       if (ethClientFallback === "on") {
-        this.set({ ethFallback: "enabled" }, 1);
+        this.set({ ethFallbackEnabled: "enabled" }, 1);
       } else {
-        this.set({ ethFallback: "disabled" }, 0);
+        this.set({ ethFallbackEnabled: "enabled" }, 0);
       }
     }
   })
@@ -137,18 +137,37 @@ register.registerMetric(
   })
 );
 
-// Auto-updates
+// Auto-updates - system packages
 register.registerMetric(
   new client.Gauge({
-    name: "auto_updates",
-    help: "number of auto updates enabled",
-    labelNames: ["autoUpdates"],
+    name: "auto_updates_system_packages",
+    help: "auto updates system packages",
+    labelNames: ["autoUpdatesSystemPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      const autoUpdatesEnabled = Object.values(autoUpdates).filter(
-        autoUpdate => autoUpdate.enabled === true
-      ).length;
-      this.set({ autoUpdates: "enabled" }, autoUpdatesEnabled);
+      const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
+        ? 1
+        : 0;
+      this.set(
+        { autoUpdatesSystemPackages: "enabled" },
+        autoUpdatesSystemPackages
+      );
+    }
+  })
+);
+
+// Auto-updates - user packages
+register.registerMetric(
+  new client.Gauge({
+    name: "auto_updates_user_packages",
+    help: "auto updates user packages",
+    labelNames: ["autoUpdatesUserPackages"],
+    collect() {
+      const autoUpdates = db.autoUpdateSettings.get();
+      const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
+        ? 1
+        : 0;
+      this.set({ autoUpdatesUserPackages: "enabled" }, autoUpdatesUserPackages);
     }
   })
 );
