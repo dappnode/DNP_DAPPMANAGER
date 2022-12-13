@@ -56,6 +56,9 @@ startDappmanager({
     sign: () => {},
     upload: () => {}
   },
+  counterViewsMiddleware: (req, res, next) => {
+    next();
+  },
   ethForwardMiddleware: (req, res, next) => {
     next();
   },
