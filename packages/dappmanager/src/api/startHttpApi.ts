@@ -102,7 +102,7 @@ export function startHttpApi({
   app.use(bodyParser.json());
   app.use(bodyParser.text());
   app.use(bodyParser.urlencoded({ extended: true }));
-  // Count views
+  // Intercept UI requests. Must go before express.static
   app.use(counterViewsMiddleware);
   // Express uses "ETags" (hashes of the files requested) to know when the file changed
   app.use(express.static(path.resolve(params.UI_FILES_PATH), { maxAge: "1d" }));
