@@ -24,6 +24,7 @@ import { startDappmanager } from "./startDappmanager";
 import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
 import { executeMigrations } from "./modules/migrations";
+import { startTestApi } from "./api/startTestApi";
 
 const controller = new AbortController();
 
@@ -44,6 +45,9 @@ const server = startDappmanager({
   vpnApiClient,
   sshManager
 });
+
+// Start Test API
+if (params.TEST) startTestApi();
 
 // Execute migrations
 executeMigrations().catch(e => logs.error("Error on executeMigrations", e));

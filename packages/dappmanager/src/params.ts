@@ -84,6 +84,7 @@ const params = {
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
   IPFS_GATEWAY: "/ipfs/",
+  TEST_API_PORT: 7000,
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
   HTTP_CORS_WHITELIST: [
     "http://localhost:3000",
@@ -295,6 +296,7 @@ const params = {
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP),
+  TEST: Boolean(process.env.TEST),
 
   DEFAULT_RELEASE_TRUSTED_KEYS: [
     {
