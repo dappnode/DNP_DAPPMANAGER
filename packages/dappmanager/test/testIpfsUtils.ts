@@ -43,14 +43,14 @@ export async function setUpIpfsNode(): Promise<void> {
   );
 
   // Wait until ipfs is available
-  let isIpfsAvail = false;
+  /*let isIpfsAvail = false;
   let counter = 0;
   while (!isIpfsAvail) {
     isIpfsAvail = await isIpfsNodeAvailable();
     await sleep(1000);
     counter++;
     if (counter === 30) throw Error("Error starting up local IPFS node");
-  }
+  }*/
 
   // Get dappnode ipfs gateway ID
   const dappnodeIpfsGatewayId = await remoteIpfsApi.id().catch(e => {
