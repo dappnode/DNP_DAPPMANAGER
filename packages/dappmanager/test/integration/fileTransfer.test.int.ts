@@ -8,7 +8,7 @@ import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArch
 import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive";
 import { fileDownload } from "../../src/api/routes/fileDownload";
 import { URL } from "url";
-import { MemoryWritable } from "../testStreamUtils";
+import { MemoryWritable } from "./testStreamUtils";
 
 describe("file transfer - docker archive put, get", function () {
   const containerName = "DAppNodeTest-file-transfer";

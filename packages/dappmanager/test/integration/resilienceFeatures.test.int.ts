@@ -12,11 +12,11 @@ import {
   shellSafe
 } from "../testUtils";
 import params from "../../src/params";
-import { getDnpFromListPackages } from "../testPackageUtils";
+import { getDnpFromListPackages } from "./testPackageUtils";
 import {
   uploadManifestRelease,
   cleanInstallationArtifacts
-} from "../integrationSpecs";
+} from "./integrationSpecs";
 import { ManifestWithImage } from "../../src/types";
 
 describe("Resilience features, when things go wrong", function () {
