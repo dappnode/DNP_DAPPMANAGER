@@ -55,7 +55,7 @@ export async function setUpIpfsNode(): Promise<void> {
     counter++;
     if (counter === 30) throw Error("Error starting up local IPFS node");
   }
-  /* 
+
   // Get dappnode ipfs gateway ID
   const dappnodeIpfsGatewayId = await remoteIpfsApi.id().catch(e => {
     throw Error(
@@ -71,7 +71,7 @@ export async function setUpIpfsNode(): Promise<void> {
     } catch {
       console.warn(`Cannot connect to ${peer}`);
     }
-  } */
+  }
 }
 
 /** Set down the testing IPFS node */
