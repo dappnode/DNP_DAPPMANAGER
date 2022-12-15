@@ -82,7 +82,8 @@ export async function setDownIpfsNode(): Promise<void> {
 
 async function isIpfsNodeAvailable(): Promise<boolean> {
   try {
-    return localIpfsApi.isOnline();
+    await localIpfsApi.version();
+    return true;
   } catch (e) {
     return false;
   }
