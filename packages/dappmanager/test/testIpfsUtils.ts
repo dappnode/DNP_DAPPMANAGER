@@ -26,10 +26,11 @@ export const remoteIpfsApi: IPFSHTTPClient = create({
 
 // IPFS local node for Integration tests
 
-export const localIpfsApi: IPFSHTTPClient = create({
-  url: ipfsApiUrl,
-  timeout
-});
+export const getLocalIpfsApi = (): IPFSHTTPClient =>
+  create({
+    url: ipfsApiUrl,
+    timeout
+  });
 
 export const localIpfsGateway: IPFSHTTPClient = create({
   url: ipfsGatewayUrl,
@@ -66,6 +67,7 @@ export async function setUpIpfsNode(): Promise<void> {
   // Connect to ipfs.dappnode.io
   for (const peer of dappnodeIpfsGatewayId.addresses) {
     try {
+      const localIpfsApi = getLocalIpfsApi();
       await localIpfsApi.swarm.connect(peer);
       await localIpfsApi.bootstrap.add(peer);
     } catch {
@@ -82,7 +84,7 @@ export async function setDownIpfsNode(): Promise<void> {
 
 async function isIpfsNodeAvailable(): Promise<boolean> {
   try {
-    return localIpfsApi.isOnline();
+    return getLocalIpfsApi().isOnline();
   } catch (e) {
     return false;
   }
@@ -105,7 +107,7 @@ export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
       content: fs.readFileSync(path.join(dirPath, file))
     };
   });
-  return all(localIpfsApi.addAll(files));
+  return all(getLocalIpfsApi().addAll(files));
 }
 
 /**
@@ -114,7 +116,7 @@ export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
  */
 export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
   const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
-  const addResult = await localIpfsApi.add(content);
+  const addResult = await getLocalIpfsApi().add(content);
   return addResult.cid.toString();
 }
 
@@ -124,5 +126,5 @@ export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
 export async function ipfsAddFileFromFs(path: string): Promise<AddResult> {
   if (!fs.existsSync(path))
     throw Error(`ipfsAddFileFromFs error. Not file found at path ${path}`);
-  return await localIpfsApi.add(fs.readFileSync(path));
+  return await getLocalIpfsApi().add(fs.readFileSync(path));
 }
