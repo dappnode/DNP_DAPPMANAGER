@@ -26,16 +26,11 @@ export const remoteIpfsApi: IPFSHTTPClient = create({
 
 // IPFS local node for Integration tests
 
-export const getLocalIpfsApi = (): IPFSHTTPClient =>
+const getLocalIpfsApi = (): IPFSHTTPClient =>
   create({
     url: ipfsApiUrl,
     timeout
   });
-
-export const localIpfsGateway: IPFSHTTPClient = create({
-  url: ipfsGatewayUrl,
-  timeout
-});
 
 /**
  * Set Up an IPFS node for testing purposes on localhost.
