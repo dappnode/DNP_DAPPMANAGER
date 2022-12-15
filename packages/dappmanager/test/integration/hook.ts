@@ -1,6 +1,6 @@
 import { ipfs } from "../../src/modules/ipfs";
 import { IpfsClientTarget } from "../../src/types";
-import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "../testIpfsUtils";
+import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils";
 
 export const mochaHooks = {
   beforeAll: [

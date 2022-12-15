@@ -16,7 +16,7 @@ import {
 import {
   uploadManifestRelease,
   uploadDirectoryRelease
-} from "../integrationSpecs";
+} from "./integrationSpecs";
 import shell from "../../src/utils/shell";
 import * as validate from "../../src/utils/validate";
 import { dockerComposeUp } from "../../src/modules/docker/compose";

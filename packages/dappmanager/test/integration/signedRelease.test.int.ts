@@ -6,8 +6,8 @@ import { ReleaseFetcher } from "../../src/modules/release";
 import { getContainerName, getImageTag } from "../../src/params";
 import { ReleaseSignatureStatusCode } from "../../src/types";
 import { Manifest } from "@dappnode/dappnodesdk";
-import { uploadDirectoryRelease } from "../integrationSpecs";
-import { signRelease } from "../integrationSpecs/signRelease";
+import { uploadDirectoryRelease } from "./integrationSpecs";
+import { signRelease } from "./integrationSpecs/signRelease";
 
 // Sign the string message
 const privateKey =

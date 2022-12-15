@@ -10,9 +10,9 @@ import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
-} from "../integrationSpecs";
+} from "./integrationSpecs";
 import * as db from "../../src/db";
-import { mockImageEnvNAME } from "../integrationSpecs/mockImage";
+import { mockImageEnvNAME } from "./integrationSpecs/mockImage";
 
 /**
  * Generate mock releases in the different formats,

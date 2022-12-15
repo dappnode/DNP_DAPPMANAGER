@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import { mockManifestWithImage } from "../../testUtils";
 import { ManifestWithImage } from "../../../src/types";
-import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
-import { uploadDirectoryRelease } from "../../integrationSpecs/buildReleaseDirectory";
+import { uploadManifestRelease } from "../integrationSpecs/buildReleaseManifest";
+import { uploadDirectoryRelease } from "../integrationSpecs/buildReleaseDirectory";
 import { ipfs } from "../../../src/modules/ipfs";
 import { getManifest } from "../../../src/modules/release/getManifest";
 
