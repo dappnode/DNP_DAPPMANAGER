@@ -50,6 +50,21 @@ jobs:
       - run: yarn build
       - run: yarn test:int
 
+  end-to-end-test:
+    runs-on: dappnode
+        runs-on: ubuntu-latest
+    name: In app integration tests
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.15.0"
+      - run: yarn # Caching only saves 30s
+      - run: yarn bootstrap
+      - run: yarn generate
+      - run: yarn test:end
+
   release:
     name: Release
     runs-on: ubuntu-latest
