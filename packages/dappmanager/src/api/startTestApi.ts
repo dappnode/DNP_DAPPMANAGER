@@ -24,7 +24,7 @@ export function startTestApi(): http.Server {
             res.send(result);
           })
           .catch(e => {
-            logs.error(`Test API ERROR: ${e}`);
+            logs.error(`Test API ERROR in ${callCasted}: ${e}`);
             res.status(500).send(e);
           });
       });
