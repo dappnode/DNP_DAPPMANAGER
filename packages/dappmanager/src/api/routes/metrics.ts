@@ -170,10 +170,17 @@ register.registerMetric(
     labelNames: ["autoUpdatesUserPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
-        ? 1
-        : 0;
-      this.set({ autoUpdatesUserPackages: "enabled" }, autoUpdatesUserPackages);
+      if (autoUpdates) {
+        const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
+          ? 1
+          : 0;
+        this.set(
+          { autoUpdatesUserPackages: "enabled" },
+          autoUpdatesUserPackages
+        );
+      } else {
+        this.set({ autoUpdatesUserPackages: "enabled" }, 0);
+      }
     }
   })
 );
