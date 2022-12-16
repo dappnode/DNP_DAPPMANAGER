@@ -14,6 +14,8 @@ export const mochaHooks = {
       if (res.status !== 200) throw Error("Test API not running");
 
       // Generate schemas for all the types from the functions returns types
+
+      // Ensure the number of files inside the folder is the same as the number of functions
     }
   ],
   afterAll: [
