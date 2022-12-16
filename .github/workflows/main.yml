@@ -58,7 +58,7 @@ jobs:
       - run: yarn # Caching only saves 30s
       - run: yarn bootstrap
       - run: yarn generate
-      - run: yarn test:end
+      - run: cd ./packages/dappmanager && yarn test:end
 
   release:
     name: Release
