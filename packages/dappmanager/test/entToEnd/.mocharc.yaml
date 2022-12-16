@@ -1,0 +1,6 @@
+colors: true
+exit: true
+require:
+  - dotenv/config
+  - ts-node/register
+  - ./test/endToEnd/hook.ts
