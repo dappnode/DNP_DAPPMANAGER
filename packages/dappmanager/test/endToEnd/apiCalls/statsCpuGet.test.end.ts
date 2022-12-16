@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
-import { HostStatCpu } from "../../../src/types";
 
 describe("GET /stats/cpu", () => {
   it("Should return the cpu use percentage in string", async () => {
