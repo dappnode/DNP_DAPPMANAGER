@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const TJS = require("typescript-json-schema");
-
 const tsConfigPath = process.argv[2]; // tsconfig.json
 const baseDir = process.argv[3]; // "src/common/schemas";
 
@@ -37,7 +36,7 @@ for (const typeName of typesToSchema) {
   // Remove empty arrays of items from argument schemas
   for (const route in schema.properties) {
     const prop = schema.properties[route];
-    if (prop.type === "array" && prop.items.length === 0)
+    if (typeof prop !== "boolean" && prop.type === "array" && !prop.items)
       delete schema.properties[route];
   }
 
