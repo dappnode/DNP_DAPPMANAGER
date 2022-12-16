@@ -13,6 +13,8 @@
     "test:file": "mocha",
     "test:int": "npm run test:int:file \"./{,!(node_modules)/**}/*.test.int.ts\" ",
     "test:int:file": "mocha --config ./test/integration/.mocharc.yaml --timeout 120000",
+    "test:end": "npm run test:end:file \"./{,!(node_modules)/**}/*.end.int.ts\" ",
+    "test:end:file": "mocha --config ./test/endToEnd/.mocharc.yaml --timeout 120000",
     "test:all": "npm run test && npm run test:int",
     "lint": "eslint . --ext .ts --fix",
     "prettier": "prettier --write 'src/**/*.*' 'test/**/*.*'",
