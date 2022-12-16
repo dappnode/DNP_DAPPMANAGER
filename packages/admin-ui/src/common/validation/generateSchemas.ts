@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const TJS = require("typescript-json-schema");
+import fs from "fs";
+import path from "path";
+import * as TJS from "typescript-json-schema";
 
 const tsConfigPath = process.argv[2]; // tsconfig.json
 const baseDir = process.argv[3]; // "src/common/schemas";
@@ -14,7 +14,8 @@ const typesToSchema = [
   "SubscriptionsArguments"
 ];
 
-const getPath = typeName => path.join(baseDir, `${typeName}.schema.json`);
+const getPath = (typeName: string) =>
+  path.join(baseDir, `${typeName}.schema.json`);
 fs.mkdirSync(baseDir, { recursive: true });
 
 // Pre-generate files so compilation doesn't fail
@@ -37,7 +38,7 @@ for (const typeName of typesToSchema) {
   // Remove empty arrays of items from argument schemas
   for (const route in schema.properties) {
     const prop = schema.properties[route];
-    if (prop.type === "array" && prop.items.length === 0)
+    if (typeof prop !== "boolean" && prop.type === "array" && !prop.items)
       delete schema.properties[route];
   }
 

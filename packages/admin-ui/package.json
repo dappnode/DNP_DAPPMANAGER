@@ -4,7 +4,7 @@
   "license": "GPL-3.0",
   "scripts": {
     "start": "REACT_APP_API_TEST=true react-scripts start",
-    "generate": "cd ../.. && node packages/admin-ui/src/common/validation/generateSchemas.js packages/admin-ui/tsconfig.json packages/admin-ui/src/common/schemas/",
+    "generate": "cd ../.. && ts-node packages/admin-ui/src/common/validation/generateSchemas.ts packages/admin-ui/tsconfig.json packages/admin-ui/src/common/schemas/",
     "prebuild": "npm run generate",
     "build": "react-scripts build",
     "test": "TEST=true react-scripts test --env=jsdom --watchAll=false",
