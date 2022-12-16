@@ -148,7 +148,7 @@ register.registerMetric(
     labelNames: ["autoUpdatesSystemPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      if (!isEmpty(autoUpdates)) {
+      if (!isEmpty(autoUpdates) && "system-packages" in autoUpdates) {
         const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
           ? 1
           : 0;
@@ -171,7 +171,7 @@ register.registerMetric(
     labelNames: ["autoUpdatesUserPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      if (!isEmpty(autoUpdates)) {
+      if (!isEmpty(autoUpdates) && "my-packages" in autoUpdates) {
         const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
           ? 1
           : 0;
