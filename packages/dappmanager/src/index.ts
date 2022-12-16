@@ -25,6 +25,7 @@ import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
 import { executeMigrations } from "./modules/migrations";
 import { startTestApi } from "./api/startTestApi";
+import { getViewsCounterMiddleware } from "./middlewares/viewsCounter";
 
 const controller = new AbortController();
 
