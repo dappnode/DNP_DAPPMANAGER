@@ -4,6 +4,7 @@ import * as db from "../../db";
 import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork";
 import { Network } from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/list";
+import { isEmpty } from "lodash";
 
 /**
  * Collect the metrics:
@@ -147,7 +148,7 @@ register.registerMetric(
     labelNames: ["autoUpdatesSystemPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      if (autoUpdates) {
+      if (!isEmpty(autoUpdates)) {
         const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
           ? 1
           : 0;
@@ -170,7 +171,7 @@ register.registerMetric(
     labelNames: ["autoUpdatesUserPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      if (autoUpdates) {
+      if (!isEmpty(autoUpdates)) {
         const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
           ? 1
           : 0;
