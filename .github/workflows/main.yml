@@ -55,7 +55,6 @@ jobs:
     name: In real environment end-to-end tests
     steps:
       - uses: actions/checkout@v2
-      - run: git branch
       - run: yarn # Caching only saves 30s
       - run: yarn bootstrap
       - run: yarn generate
