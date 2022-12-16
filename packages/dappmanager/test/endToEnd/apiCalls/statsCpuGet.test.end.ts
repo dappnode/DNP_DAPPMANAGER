@@ -4,7 +4,7 @@ import { dappmanagerTestApiUrl } from "../endToEndUtils";
 
 describe("GET /stats/cpu", () => {
   it("Should return the cpu use percentage in string", async () => {
-    const response = await fetch(`${dappmanagerTestApiUrl}/stats/cpu`);
+    const response = await fetch(`${dappmanagerTestApiUrl}/statsCpuGet`);
     expect(response.status).to.equal(200);
     const body = await response.json();
     // Check the type of body is HostStatCpu
