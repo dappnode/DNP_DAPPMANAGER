@@ -147,13 +147,17 @@ register.registerMetric(
     labelNames: ["autoUpdatesSystemPackages"],
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
-      const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
-        ? 1
-        : 0;
-      this.set(
-        { autoUpdatesSystemPackages: "enabled" },
-        autoUpdatesSystemPackages
-      );
+      if (autoUpdates) {
+        const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
+          ? 1
+          : 0;
+        this.set(
+          { autoUpdatesSystemPackages: "enabled" },
+          autoUpdatesSystemPackages
+        );
+      } else {
+        this.set({ autoUpdatesSystemPackages: "enabled" }, 0);
+      }
     }
   })
 );
