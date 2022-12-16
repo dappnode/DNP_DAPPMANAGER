@@ -1,7 +1,6 @@
-import fs from "fs";
-import path from "path";
-import * as TJS from "typescript-json-schema";
-
+const fs = require("fs");
+const path = require("path");
+const TJS = require("typescript-json-schema");
 const tsConfigPath = process.argv[2]; // tsconfig.json
 const baseDir = process.argv[3]; // "src/common/schemas";
 
@@ -14,8 +13,7 @@ const typesToSchema = [
   "SubscriptionsArguments"
 ];
 
-const getPath = (typeName: string) =>
-  path.join(baseDir, `${typeName}.schema.json`);
+const getPath = typeName => path.join(baseDir, `${typeName}.schema.json`);
 fs.mkdirSync(baseDir, { recursive: true });
 
 // Pre-generate files so compilation doesn't fail
