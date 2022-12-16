@@ -51,18 +51,15 @@ jobs:
       - run: yarn test:int
 
   end-to-end-test:
-    runs-on: dappnode
+    runs-on: dappmanager
     name: In real environment end-to-end tests
     steps:
       - uses: actions/checkout@v2
-      - name: Setup node
-        uses: actions/setup-node@v1
-        with:
-          node-version: "16.15.0"
+      - run: git branch
       - run: yarn # Caching only saves 30s
       - run: yarn bootstrap
       - run: yarn generate
-      - run: yarn test:end
+      - run: cd ./packages/dappmanager && yarn test:end
 
   release:
     name: Release
