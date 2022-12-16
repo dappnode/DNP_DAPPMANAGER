@@ -31,6 +31,11 @@ export function startTestApi(): http.Server {
     }
   }
 
+  // Health check
+  app.get("/ping", (req, res) => {
+    res.send("OK");
+  });
+
   app.use((req, res) => {
     res.status(404).send("Not found");
   });
