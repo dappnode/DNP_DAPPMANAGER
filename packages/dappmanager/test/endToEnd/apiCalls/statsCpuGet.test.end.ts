@@ -1,15 +1,16 @@
 import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
+import { validateRoutesReturn } from "../../../src/common";
 
-describe("GET /stats/cpu", () => {
-  it("Should return the cpu use percentage in string", async () => {
-    const response = await fetch(`${dappmanagerTestApiUrl}/statsCpuGet`);
+const apiCallMethod = "statsCpuGet";
+
+describe(`API call ${apiCallMethod}`, () => {
+  it("Should return the cpu use percentage", async () => {
+    const response = await fetch(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
     expect(response.status).to.equal(200);
     const body = await response.json();
-    // Check the type of body is HostStatCpu
-    expect(body).to.be.an.instanceOf(Object);
-    expect(body).to.have.property("usedPercentage");
-    expect(body.usedPercentage).to.be.a("number");
+
+    validateRoutesReturn(apiCallMethod, body);
   });
 });
