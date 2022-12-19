@@ -2,8 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
 import { validateRoutesReturn } from "../../../src/common";
-
-const apiCallMethod = "statsCpuGet";
+const apiCallMethod = "backupGet";
 
 describe(`API call ${apiCallMethod}`, async () => {
   it("Should return the cpu use percentage", async () => {
