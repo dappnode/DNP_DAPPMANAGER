@@ -5,7 +5,7 @@ import { validateRoutesReturn } from "../../../src/common";
 
 const apiCallMethod = "statsCpuGet";
 
-describe(`API call ${apiCallMethod}`, () => {
+describe(`API call ${apiCallMethod}`, async () => {
   it("Should return the cpu use percentage", async () => {
     const response = await fetch(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
     expect(response.status).to.equal(200);
