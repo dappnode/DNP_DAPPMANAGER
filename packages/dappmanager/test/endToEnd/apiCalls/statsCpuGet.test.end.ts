@@ -10,7 +10,6 @@ describe(`API call ${apiCallMethod}`, () => {
     const response = await fetch(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
     expect(response.status).to.equal(200);
     const body = await response.json();
-
-    validateRoutesReturn(apiCallMethod, body);
+    expect(validateRoutesReturn(apiCallMethod, body)).to.be.ok;
   });
 });
