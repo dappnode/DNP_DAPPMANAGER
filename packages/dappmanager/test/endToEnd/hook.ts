@@ -1,6 +1,5 @@
 import fetch from "node-fetch";
 import { dappmanagerTestApiUrl } from "./endToEndUtils";
-import * as apiCalls from "../../src/calls";
 
 export const mochaHooks = {
   beforeAll: [
@@ -13,9 +12,7 @@ export const mochaHooks = {
       const res = await fetch(dappmanagerTestApiUrl + "/ping");
       if (res.status !== 200) throw Error("Test API not running");
 
-      // Generate schemas for all the types from the functions returns types
-
-      // Ensure the number of files inside the folder is the same as the number of functions
+      // TODO: Ensure the number of files inside the folder is the same as the number of functions
     }
   ],
   afterAll: [
