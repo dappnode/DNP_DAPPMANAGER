@@ -139,7 +139,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
-  dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
+  dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
 
   /**
    * Creates a new device with the provided id.
