@@ -19,7 +19,20 @@ export const mochaHooks = {
         fs.mkdirSync(testDir);
       } else fs.mkdirSync(testDir);
 
-      // TODO: Ensure the number of files inside the folder is the same as the number of functions
+      // Ensure the number of files inside the folder is the same as the number of functions
+      const numberOfApiCallsTests = fs.readdirSync(
+        __dirname + "/apiCalls"
+      ).length;
+      const numberOfApiCallFiles = fs
+        .readdirSync("./src/calls")
+        .filter(
+          item => !fs.lstatSync("./src/calls/" + item).isDirectory()
+        ).length;
+      //
+      if (numberOfApiCallsTests !== numberOfApiCallFiles)
+        throw Error(
+          `Number of API calls tests (${numberOfApiCallsTests}) does not match the number of API call files (${numberOfApiCallFiles})`
+        );
     }
   ],
   afterAll: [
