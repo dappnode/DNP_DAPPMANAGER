@@ -7,25 +7,28 @@ import { URL } from "url";
 import { PackageBackup } from "@dappnode/dappnodesdk";
 
 const apiCallMethod = "backupRestore";
+const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
 
-describe(`API call ${apiCallMethod}`, async () => {
-  it("Should Restore a previous backup of a DNP, from the dataUri provided by the user", async () => {
-    const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
+describe.skip(`API call ${apiCallMethod}`, async () => {
+  it("Should restore a previous backup of a DNP, from the dataUri provided by the user", async () => {
     const data: { dnpName: string; backup: PackageBackup[]; fileId: string } = {
       dnpName: "dappmanager.dnp.dappnode.eth",
       backup: [
         {
-          name: "test",
-          path: "/tmp/test"
+          name: "docker-compose.dappmanager.yml",
+          path: "/usr/src/app/DNCORE"
         }
       ],
       fileId: "test"
     };
-    url.searchParams.append("dnpName", data.dnpName);
-    url.searchParams.append("backup", data.backup.toString());
+
+    url.searchParams.set("dnpName", data.dnpName);
+    url.searchParams.set("backup", JSON.stringify(data.backup));
+    url.searchParams.set("fileId", data.fileId);
     const response = await fetch(url);
     expect(response.status).to.equal(200);
     const body = await response.json();
-    expect(validateRoutesReturn(apiCallMethod, body)).to.be.ok;
+    console.debug(`data: ${JSON.stringify(body, null, 6)}`);
+    expect(validateRoutesReturn(apiCallMethod, body)).to.not.throw;
   });
 });

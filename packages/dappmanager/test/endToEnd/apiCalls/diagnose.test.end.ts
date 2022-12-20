@@ -1,19 +1,17 @@
 import "mocha";
 import { expect } from "chai";
-import { dappmanagerTestApiUrl } from "../endToEndUtils";
+import { dappmanagerTestApiUrl, printData } from "../endToEndUtils";
 import { validateRoutesReturn } from "../../../src/common";
-import fetch from "node-fetch";
-import { URL } from "url";
 
-const apiCallMethod = "statsCpuGet";
+const apiCallMethod = "diagnose";
+const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
 
 describe(`API call ${apiCallMethod}`, async () => {
-  it("Should return the cpu use percentage", async () => {
-    const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
+  it("Should returns a list of checks done as a diagnose", async () => {
     const response = await fetch(url);
     expect(response.status).to.equal(200);
     const body = await response.json();
-    console.log(body);
+    printData(body);
     expect(validateRoutesReturn(apiCallMethod, body)).to.not.throw;
   });
 });
