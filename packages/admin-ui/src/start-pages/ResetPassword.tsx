@@ -37,7 +37,7 @@ export function ResetPassword({
       </div>
 
       <Alert variant="warning">
-        If you have lost your recovery token you have to directly access your
+        If you have lost your password and recovery token you have to directly access your
         machine via SSH or by connecting a keyboard and screen and follow this
         guide
         <br />
@@ -71,7 +71,7 @@ export function ResetPassword({
         </Button>
       </InputForm>
 
-      {reqStatus.result && <Ok ok msg="Reseted password"></Ok>}
+      {reqStatus.result && <Ok ok msg="Password Successfully Reset."></Ok>}
       {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
     </StandaloneContainer>
   );

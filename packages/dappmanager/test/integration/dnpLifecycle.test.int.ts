@@ -6,7 +6,7 @@ import { mapValues, pick } from "lodash";
 import * as calls from "../../src/calls";
 import params from "../../src/params";
 import { logs } from "../../src/logs";
-import { getDnpFromListPackages, getDnpState } from "../testPackageUtils";
+import { getDnpFromListPackages, getDnpState } from "./testPackageUtils";
 import {
   PortMapping,
   UserSettingsAllDnps,
@@ -31,8 +31,8 @@ import {
   dockerGetArchiveSingleFile
 } from "../../src/modules/docker/api";
 import { listContainer } from "../../src/modules/docker/list";
-import { uploadDirectoryRelease } from "../integrationSpecs";
-import { MemoryWritable } from "../testStreamUtils";
+import { uploadDirectoryRelease } from "./integrationSpecs";
+import { MemoryWritable } from "./testStreamUtils";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.

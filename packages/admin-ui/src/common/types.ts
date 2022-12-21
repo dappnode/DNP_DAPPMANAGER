@@ -365,7 +365,8 @@ export type ContainerState =
   | "running" // running A currently running container
   | "paused" // paused A container whose processes have been paused
   | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
-  | "dead"; // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
+  | "dead" // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
+  | "removing"; // removing A container that is in the process of being removed
 
 /**
  * Type mapping of a package container labels
