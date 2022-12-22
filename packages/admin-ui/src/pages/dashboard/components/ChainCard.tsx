@@ -58,7 +58,7 @@ function ChainCard(chain: ChainData) {
 
       <div className="message">
         <RenderMarkdown source={message} noMargin />
-        {peers && <RenderMarkdown source={peers?.toString()} noMargin />}
+        {peers && <RenderMarkdown source={`Peers: ${peers}`} noMargin />}
         {error ? (
           <Link to={`${packagesRootPath}/${dnpName}/logs`}>More info</Link>
         ) : null}
