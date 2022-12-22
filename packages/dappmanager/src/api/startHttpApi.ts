@@ -60,6 +60,7 @@ export function startHttpApi({
   params,
   logs,
   routes,
+  limitersMiddleware,
   counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
@@ -72,6 +73,7 @@ export function startHttpApi({
   params: HttpApiParams;
   logs: Logs;
   routes: HttpRoutes;
+  limitersMiddleware: express.RequestHandler;
   counterViewsMiddleware: express.RequestHandler;
   ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
@@ -142,8 +144,8 @@ export function startHttpApi({
     }
   });
 
-  app.post("/login-status", auth.loginAdminStatus);
-  app.post("/login", auth.loginAdmin);
+  app.post("/login-status", limitersMiddleware, auth.loginAdminStatus);
+  app.post("/login", limitersMiddleware, auth.loginAdmin);
   app.post("/logout", auth.logoutAdmin);
   app.post("/change-pass", auth.changeAdminPassword);
   app.post("/register", auth.registerAdmin);
@@ -163,13 +165,15 @@ export function startHttpApi({
   app.post("/upload", auth.onlyAdmin, routes.upload);
 
   // Open endpoints (no auth)
-  app.get("/global-envs/:name?", routes.globalEnvs);
-  app.get("/public-packages/:containerName?", routes.publicPackagesData);
-  app.get("/package-manifest/:dnpName", routes.packageManifest);
-  app.get("/metrics", routes.metrics);
-  app.post("/sign", routes.sign);
-  app.post("/data-send", routes.dataSend);
-  app.post("/notification-send", routes.notificationSend);
+  app.get("/global-envs/:name?", limitersMiddleware, routes.globalEnvs);
+  // prettier-ignore
+  app.get("/public-packages/:containerName?",limitersMiddleware, routes.publicPackagesData);
+  // prettier-ignore
+  app.get("/package-manifest/:dnpName",limitersMiddleware,routes.packageManifest);
+  app.get("/metrics", limitersMiddleware, routes.metrics);
+  app.post("/sign", limitersMiddleware, routes.sign);
+  app.post("/data-send", limitersMiddleware, routes.dataSend);
+  app.post("/notification-send", limitersMiddleware, routes.notificationSend);
 
   // Rest of RPC methods
   app.post(
