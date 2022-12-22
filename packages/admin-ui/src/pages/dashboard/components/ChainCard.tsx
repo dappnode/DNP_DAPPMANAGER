@@ -31,13 +31,16 @@ function ChainCard(chain: ChainData) {
       </div>
 
       {syncing ? (
-        typeof progress === "number" && (
+        typeof progress === "number" &&
+        (progress === 0 ? (
+          <ProgressBar now={100} animated={true} label={`Syncing`} />
+        ) : (
           <ProgressBar
             now={progress * 100}
             animated={true}
-            label={`${(progress * 100).toFixed(2)}%`}
+            label={`${(Math.floor(progress * 10000) / 100).toFixed(2)}%`}
           />
-        )
+        ))
       ) : error ? (
         <ProgressBar now={100} variant="warning" />
       ) : (
