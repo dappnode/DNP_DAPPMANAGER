@@ -87,14 +87,14 @@ export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 export const docsUrl = {
   main: "https://docs.dappnode.io",
   recoverPasswordGuide:
-    "https://docs.dappnode.io/user-guide/support/troubleshooting#recover-ui-password",
-  connectWifi: "https://docs.dappnode.io/user-guide/ui/access/wifi",
+    "https://docs.dappnode.io/user/faq/troubleshooting",
+  connectWifi: "https://docs.dappnode.io/user/guides/access/wifi",
   connectLocalProxy:
-    "https://docs.dappnode.io/user-guide/ui/access/local-proxy",
-  connectVpn: "https://docs.dappnode.io/user-guide/ui/access/vpn",
-  httpsExplanation: "https://docs.dappnode.io/user-guide/ui/system#network",
+    "https://docs.dappnode.io/user/guides/access/local",
+  connectVpn: "https://docs.dappnode.io/user/guides/access/vpn",
+  httpsExplanation: "https://docs.dappnode.io/user/product-manual/system#networkk",
   ipfsPeersExplanation:
-    "https://docs.dappnode.io/user-guide/ui/recommended-set-ups/add-ipfs-peers"
+    "https://docs.dappnode.io/user/product-manual/system#peers"
 };
 
 export const forumUrl = {
@@ -107,11 +107,9 @@ export const forumUrl = {
 };
 
 export const troubleShootMountpointsGuideUrl =
-  "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
+  "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl =
-  "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
-export const mediumTreasuryUrl =
-  "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
+  "https://docs.dappnode.io/user/faq/general";
 export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";

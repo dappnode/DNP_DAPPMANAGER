@@ -149,6 +149,7 @@ async function getContainerTargetStatus(
   }
 
   switch (container.state) {
+    case "removing":
     // Status exited means that the container has receive a signal to stop or kill the process. Deppending on
     // how the docker container handles the signal it will exit with code 0 or != 0. So it cannot be
     // determined if the container was manually and gracefully stopped or not.
