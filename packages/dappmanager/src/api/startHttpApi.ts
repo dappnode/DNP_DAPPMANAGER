@@ -96,8 +96,6 @@ export function startHttpApi({
   app.use(helmetConf());
   // Intercept decentralized website requests first
   app.use(ethForwardMiddleware);
-  // Limit requests per IP
-  app.use(limiterMiddleware);
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
@@ -152,6 +150,10 @@ export function startHttpApi({
   app.post("/change-pass", auth.changeAdminPassword);
   app.post("/register", auth.registerAdmin);
   app.post("/recover-pass", auth.recoverAdminPassword);
+
+  // Limit requests per IP for NON AUTH methods
+  // TODO: implement a more sophisticated rate limiter for auth methods
+  app.use(limiterMiddleware);
 
   // Ping - health check
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
