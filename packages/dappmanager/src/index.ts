@@ -28,7 +28,7 @@ import {
   getLimiter,
   getViewsCounterMiddleware,
   getEthForwardMiddleware
-} from "./middlewares";
+} from "./api/middlewares";
 
 const controller = new AbortController();
 

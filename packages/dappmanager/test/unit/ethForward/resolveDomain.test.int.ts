@@ -6,8 +6,8 @@ import {
   EthForwardError,
   EthForwardErrorCode,
   Location
-} from "../../../src/middlewares/ethForward/types";
-import { resolveDomain } from "../../../src/middlewares/ethForward/resolveDomain";
+} from "../../../src/api/middlewares/ethForward/types";
+import { resolveDomain } from "../../../src/api/middlewares/ethForward/resolveDomain";
 
 /**
  * The purpose of this test is to make sure it retrieves the correct content
