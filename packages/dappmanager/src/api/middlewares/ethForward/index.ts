@@ -1,5 +1,5 @@
 import express from "express";
-import params from "../../params";
+import params from "../../../params";
 import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy";
 import { ResolveDomainWithCache } from "./resolveDomain";
 
