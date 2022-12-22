@@ -1,5 +1,6 @@
 export * from "./autoUpdateSettings";
 export * from "./coreUpdate";
+export * from "./counterViews";
 export * from "./dyndns";
 export * from "./ethClient";
 export * from "./ipfsClient";

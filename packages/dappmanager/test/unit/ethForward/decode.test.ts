@@ -1,12 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { Content } from "../../../src/ethForward/types";
-
+import { Content } from "../../../src/middlewares/ethForward/types";
 import {
-  decodeContent,
   decodeContentHash,
+  decodeContent,
   decodeDnsLink
-} from "../../../src/ethForward/utils";
+} from "../../../src/middlewares/ethForward/utils";
 
 interface TestCases {
   [hash: string]: Content;

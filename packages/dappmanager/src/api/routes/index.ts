@@ -10,3 +10,4 @@ export * from "./sign";
 export * from "./upload";
 export * from "./downloadWireguardConfig";
 export * from "./notificationSend";
+export * from "./metrics";
