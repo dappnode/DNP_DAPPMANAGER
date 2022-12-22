@@ -13,7 +13,7 @@ describe(`Registry`, async () => {
       );
       const data = {
         addressOrEnsName: "dappmanager.dnp.dappnode.eth",
-        fromBlock: "latest"
+        fromBlock: 16237843
       };
       urlRegistry.searchParams.set("addressOrEnsName", data.addressOrEnsName);
       urlRegistry.searchParams.set("fromBlock", data.fromBlock.toString());
@@ -31,7 +31,7 @@ describe(`Registry`, async () => {
       const urlRegistry = new URL(`${dappmanagerTestApiUrl}/${fetchRegistry}`);
       const data = {
         addressOrEnsName: "dappmanager.dnp.dappnode.eth",
-        fromBlock: "latest"
+        fromBlock: 16237843
       };
       urlRegistry.searchParams.set("addressOrEnsName", data.addressOrEnsName);
       urlRegistry.searchParams.set("fromBlock", data.fromBlock.toString());
