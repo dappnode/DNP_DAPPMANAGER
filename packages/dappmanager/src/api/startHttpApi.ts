@@ -60,6 +60,7 @@ export function startHttpApi({
   params,
   logs,
   routes,
+  limiterMiddleware,
   counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
@@ -72,6 +73,7 @@ export function startHttpApi({
   params: HttpApiParams;
   logs: Logs;
   routes: HttpRoutes;
+  limiterMiddleware: express.RequestHandler;
   counterViewsMiddleware: express.RequestHandler;
   ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
@@ -149,6 +151,10 @@ export function startHttpApi({
   app.post("/register", auth.registerAdmin);
   app.post("/recover-pass", auth.recoverAdminPassword);
 
+  // Limit requests per IP for NON AUTH methods
+  // TODO: implement a more sophisticated rate limiter for auth methods
+  app.use(limiterMiddleware);
+
   // Ping - health check
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
 
@@ -164,27 +170,25 @@ export function startHttpApi({
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);
+  // prettier-ignore
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
-  app.get("/package-manifest/:dnpName", routes.packageManifest);
+  // prettier-ignore
+  app.get("/package-manifest/:dnpName",routes.packageManifest);
   app.get("/metrics", routes.metrics);
   app.post("/sign", routes.sign);
   app.post("/data-send", routes.dataSend);
   app.post("/notification-send", routes.notificationSend);
 
   // Rest of RPC methods
-  app.post(
-    "/rpc",
-    auth.onlyAdmin,
-    wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
-  );
+  // prettier-ignore
+  app.post("/rpc",auth.onlyAdmin,wrapHandler(async (req, res) => res.send(await rpcHandler(req.body))));
 
   // Default error handler must be the last
   // app.use(errorHandler);
 
   // Serve UI. React-router, index.html at all routes
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html"))
-  );
+  // prettier-ignore
+  app.get("*", (req, res) => res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html")));
 
   server.listen(params.HTTP_API_PORT, () =>
     logs.info(`HTTP API ${params.HTTP_API_PORT}`)
