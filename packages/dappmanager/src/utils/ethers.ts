@@ -64,15 +64,7 @@ export function parseEthersSyncing(syncing: EthSyncingReturn): EthSyncing {
 }
 /**
  * Parse an eth_blocknumber call to an ethers provider
- * Makes sure all keys are defined (cleans null values) and parses hex strings
- * @param syncing
  */
 export async function parseEthersBlock(ethBlock: string): Promise<number> {
   return parseInt(ethBlock);
-}
-
-export function parseEthersPeersCount(
-  peersCount: NetPeersCountReturn
-): NetPeersCount {
-  return parseInt(peersCount.result);
 }
