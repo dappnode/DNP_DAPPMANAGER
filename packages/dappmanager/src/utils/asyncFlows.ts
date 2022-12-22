@@ -16,7 +16,8 @@ export class ErrorAborted extends Error {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyFunction = (...args: any[]) => any;
 
-/**Combines Lodash's _.debounce with _.memoize to allow for debouncing
+/**
+ * Combines Lodash's _.debounce with _.memoize to allow for debouncing
  * based on parameters passed to the function during runtime.
  *
  * @param func The function to debounce.
