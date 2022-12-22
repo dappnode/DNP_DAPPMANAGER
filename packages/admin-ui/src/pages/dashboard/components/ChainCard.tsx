@@ -22,7 +22,16 @@ export function ChainCards() {
 }
 
 function ChainCard(chain: ChainData) {
-  const { dnpName, name, message, help, progress, error, syncing } = chain;
+  const {
+    dnpName,
+    name,
+    message,
+    help,
+    progress,
+    error,
+    syncing,
+    peers
+  } = chain;
   return (
     <Card className="chain-card">
       <div className="name">
@@ -49,6 +58,7 @@ function ChainCard(chain: ChainData) {
 
       <div className="message">
         <RenderMarkdown source={message} noMargin />
+        {peers && <RenderMarkdown source={peers?.toString()} noMargin />}
         {error ? (
           <Link to={`${packagesRootPath}/${dnpName}/logs`}>More info</Link>
         ) : null}

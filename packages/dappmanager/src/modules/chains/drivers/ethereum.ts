@@ -1,7 +1,11 @@
 import { ethers } from "ethers";
 import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
-import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
+import {
+  EthSyncing,
+  parseEthersPeersCount,
+  parseEthersSyncing
+} from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
 import { ChainDataResult } from "../types";
@@ -45,12 +49,13 @@ export async function ethereum(
   const apiUrl = `http://${containerDomain}:${port}`;
 
   const provider = new ethers.providers.JsonRpcProvider(apiUrl);
-  const [syncing, blockNumber] = await Promise.all([
+  const [syncing, peersCount, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
+    provider.send("net_peerCount", []).then(parseEthersPeersCount),
     provider.getBlockNumber()
   ]);
 
-  return parseEthereumState(syncing, blockNumber);
+  return parseEthereumState(syncing, blockNumber, peersCount);
 }
 
 /**
@@ -59,7 +64,8 @@ export async function ethereum(
  */
 export function parseEthereumState(
   syncing: EthSyncing,
-  blockNumber: number
+  blockNumber: number,
+  peersCount: number
 ): ChainDataResult {
   if (syncing) {
     const {
@@ -79,7 +85,8 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: `Synced #${blockNumber}`
+        message: `Synced #${blockNumber}`,
+        peers: peersCount
       };
 
     // Geth sync with states
@@ -92,7 +99,8 @@ export function parseEthereumState(
           `Blocks synced: ${currentBlock} / ${highestBlock}`,
           `States synced: ${pulledStates} / ${knownStates}`
         ].join("\n\n"),
-        help: gethSyncHelpUrl
+        help: gethSyncHelpUrl,
+        peers: peersCount
       };
     }
 
@@ -105,7 +113,8 @@ export function parseEthereumState(
         syncing: true,
         error: false,
         message: `Syncing snapshot: ${warpChunksProcessed} / ${warpChunksAmount}`,
-        progress: safeProgress(warpChunksProcessed / warpChunksAmount)
+        progress: safeProgress(warpChunksProcessed / warpChunksAmount),
+        peers: peersCount
       };
     }
 
@@ -114,7 +123,8 @@ export function parseEthereumState(
       syncing: true,
       error: false,
       message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
-      progress: safeProgress(currentBlock / highestBlock)
+      progress: safeProgress(currentBlock / highestBlock),
+      peers: peersCount
     };
   } else {
     if (!blockNumber || blockNumber === 0) {
@@ -129,7 +139,8 @@ export function parseEthereumState(
       return {
         syncing: false,
         error: false,
-        message: `Synced #${blockNumber}`
+        message: `Synced #${blockNumber}`,
+        peers: peersCount
       };
     }
   }
