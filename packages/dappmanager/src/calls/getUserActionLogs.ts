@@ -11,6 +11,9 @@ import { UserActionLog } from "@dappnode/common";
 export async function getUserActionLogs({
   first = 50,
   after = 0
+}: {
+  first?: number;
+  after?: number;
 }): Promise<UserActionLog[]> {
   return collapseEqualLogs(logUserAction.get().slice(after, after + first));
 }

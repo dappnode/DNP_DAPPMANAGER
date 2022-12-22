@@ -1,14 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
-import { validateRoutesReturn } from "../../../src/common";
-const apiCallMethod = "ipfsTest";
 
-describe("API call $apiCallMethod", async () => {
-  it("Should return the cpu use percentage", async () => {
-    const response = await fetch(`${dappmanagerTestApiUrl}/$apiCallMethod`);
+const apiCallMethod = "ipfsTest";
+const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
+
+describe(`API call ${apiCallMethod}`, async () => {
+  it("Attempts to cat a common IPFS hash. resolves if all OK, throws otherwise", async () => {
+    const response = await fetch(url);
     expect(response.status).to.equal(200);
-    const body = await response.json();
-    expect(validateRoutesReturn(apiCallMethod, body)).to.be.ok;
   });
 });

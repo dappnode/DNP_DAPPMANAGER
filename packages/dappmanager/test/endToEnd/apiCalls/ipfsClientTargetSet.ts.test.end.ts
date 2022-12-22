@@ -1,14 +1,32 @@
 import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
-import { validateRoutesReturn } from "../../../src/common";
-const apiCallMethod = "ipfsClientTargetSet";
+import params from "../../../src/params";
 
-describe("API call $apiCallMethod", async () => {
-  it("Should return the cpu use percentage", async () => {
-    const response = await fetch(`${dappmanagerTestApiUrl}/$apiCallMethod`);
+const apiCallMethod = "ipfsClientTargetSet";
+const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
+
+describe(`API call ${apiCallMethod}`, async () => {
+  it("Should set the ipfs client target to local", async () => {
+    const data = {
+      ipfsRepository: {
+        ipfsClientTarget: "local"
+      }
+    };
+    url.searchParams.set("ipfsRepository", JSON.stringify(data.ipfsRepository));
+    const response = await fetch(url);
     expect(response.status).to.equal(200);
-    const body = await response.json();
-    expect(validateRoutesReturn(apiCallMethod, body)).to.be.ok;
+  });
+
+  it("Should set the ipfs client target to remote", async () => {
+    const data = {
+      ipfsRepository: {
+        ipfsClientTarget: "remote",
+        ipfsGateway: params.IPFS_REMOTE
+      }
+    };
+    url.searchParams.set("ipfsRepository", JSON.stringify(data.ipfsRepository));
+    const response = await fetch(url);
+    expect(response.status).to.equal(200);
   });
 });

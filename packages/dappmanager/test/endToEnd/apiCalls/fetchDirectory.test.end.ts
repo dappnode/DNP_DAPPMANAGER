@@ -1,16 +1,17 @@
 import "mocha";
 import { expect } from "chai";
-import { dappmanagerTestApiUrl } from "../endToEndUtils";
+import { dappmanagerTestApiUrl, printData } from "../endToEndUtils";
 import { validateRoutesReturn } from "../../../src/common";
 
-const apiCallMethod = "chainDataGet";
+const apiCallMethod = "fetchDirectory";
 const url = new URL(`${dappmanagerTestApiUrl}/${apiCallMethod}`);
 
 describe(`API call ${apiCallMethod}`, async () => {
-  it("Should return the cpu use percentage", async () => {
-    const response = await fetch(`${dappmanagerTestApiUrl}/$apiCallMethod`);
+  it("Should fetches all package names in the custom dappnode directory.", async () => {
+    const response = await fetch(url);
     expect(response.status).to.equal(200);
     const body = await response.json();
-    expect(validateRoutesReturn(apiCallMethod, body)).to.be.ok;
+    printData(body);
+    expect(validateRoutesReturn(apiCallMethod, body)).to.not.throw;
   });
 });

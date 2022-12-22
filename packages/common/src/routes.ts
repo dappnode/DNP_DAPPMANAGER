@@ -277,9 +277,11 @@ export interface Routes {
   }) => Promise<UserActionLog[]>;
 
   /** HTTPs Portal: map a subdomain */
-  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
+  httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
-  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
+  httpsPortalMappingRemove(kwargs: {
+    mapping: HttpsPortalMapping;
+  }): Promise<void>;
   /** HTTPs Portal: get all mappings */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
   /** HTTPs Portal: get exposable services with metadata */
