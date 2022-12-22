@@ -1,3 +1,3 @@
-import Repository from "./components/Repository";
+import { Repository } from "./components/Repository";
 export { rootPath } from "./data";
 export const RootComponent = Repository;
