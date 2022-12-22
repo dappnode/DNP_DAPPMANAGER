@@ -3,7 +3,6 @@ import { InstalledPackageData } from "../../../common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
 import {
   EthSyncing,
-  parseEthersPeersCount,
   parseEthersSyncing
 } from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
@@ -51,7 +50,7 @@ export async function ethereum(
   const provider = new ethers.providers.JsonRpcProvider(apiUrl);
   const [syncing, peersCount, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
-    provider.send("net_peerCount", []).then(parseEthersPeersCount),
+    provider.send("net_peerCount", []).then(parseInt),
     provider.getBlockNumber()
   ]);
 
