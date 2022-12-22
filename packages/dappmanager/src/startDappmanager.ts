@@ -19,7 +19,7 @@ export function startDappmanager({
   params,
   logs,
   routes,
-  limitersMiddleware,
+  limiterMiddleware,
   counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
@@ -33,7 +33,7 @@ export function startDappmanager({
   params: DappmanagerParams;
   logs: Logs;
   routes: HttpRoutes;
-  limitersMiddleware: RequestHandler;
+  limiterMiddleware: RequestHandler;
   counterViewsMiddleware: RequestHandler;
   ethForwardMiddleware: RequestHandler;
   routesLogger: LoggerMiddleware;
@@ -57,7 +57,7 @@ export function startDappmanager({
     params,
     logs,
     routes,
-    limitersMiddleware,
+    limiterMiddleware,
     counterViewsMiddleware,
     ethForwardMiddleware,
     routesLogger,

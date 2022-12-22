@@ -40,7 +40,7 @@ const server = startDappmanager({
   params,
   logs,
   routes,
-  limitersMiddleware: getLimiter(),
+  limiterMiddleware: getLimiter(),
   counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,

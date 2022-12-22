@@ -60,7 +60,7 @@ export function startHttpApi({
   params,
   logs,
   routes,
-  limitersMiddleware,
+  limiterMiddleware,
   counterViewsMiddleware,
   ethForwardMiddleware,
   routesLogger,
@@ -73,7 +73,7 @@ export function startHttpApi({
   params: HttpApiParams;
   logs: Logs;
   routes: HttpRoutes;
-  limitersMiddleware: express.RequestHandler;
+  limiterMiddleware: express.RequestHandler;
   counterViewsMiddleware: express.RequestHandler;
   ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
@@ -96,6 +96,8 @@ export function startHttpApi({
   app.use(helmetConf());
   // Intercept decentralized website requests first
   app.use(ethForwardMiddleware);
+  // Limit requests per IP
+  app.use(limiterMiddleware);
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
@@ -144,8 +146,8 @@ export function startHttpApi({
     }
   });
 
-  app.post("/login-status", limitersMiddleware, auth.loginAdminStatus);
-  app.post("/login", limitersMiddleware, auth.loginAdmin);
+  app.post("/login-status", auth.loginAdminStatus);
+  app.post("/login", auth.loginAdmin);
   app.post("/logout", auth.logoutAdmin);
   app.post("/change-pass", auth.changeAdminPassword);
   app.post("/register", auth.registerAdmin);
@@ -165,30 +167,26 @@ export function startHttpApi({
   app.post("/upload", auth.onlyAdmin, routes.upload);
 
   // Open endpoints (no auth)
-  app.get("/global-envs/:name?", limitersMiddleware, routes.globalEnvs);
+  app.get("/global-envs/:name?", routes.globalEnvs);
   // prettier-ignore
-  app.get("/public-packages/:containerName?",limitersMiddleware, routes.publicPackagesData);
+  app.get("/public-packages/:containerName?", routes.publicPackagesData);
   // prettier-ignore
-  app.get("/package-manifest/:dnpName",limitersMiddleware,routes.packageManifest);
-  app.get("/metrics", limitersMiddleware, routes.metrics);
-  app.post("/sign", limitersMiddleware, routes.sign);
-  app.post("/data-send", limitersMiddleware, routes.dataSend);
-  app.post("/notification-send", limitersMiddleware, routes.notificationSend);
+  app.get("/package-manifest/:dnpName",routes.packageManifest);
+  app.get("/metrics", routes.metrics);
+  app.post("/sign", routes.sign);
+  app.post("/data-send", routes.dataSend);
+  app.post("/notification-send", routes.notificationSend);
 
   // Rest of RPC methods
-  app.post(
-    "/rpc",
-    auth.onlyAdmin,
-    wrapHandler(async (req, res) => res.send(await rpcHandler(req.body)))
-  );
+  // prettier-ignore
+  app.post("/rpc",auth.onlyAdmin,wrapHandler(async (req, res) => res.send(await rpcHandler(req.body))));
 
   // Default error handler must be the last
   // app.use(errorHandler);
 
   // Serve UI. React-router, index.html at all routes
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html"))
-  );
+  // prettier-ignore
+  app.get("*", (req, res) => res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html")));
 
   server.listen(params.HTTP_API_PORT, () =>
     logs.info(`HTTP API ${params.HTTP_API_PORT}`)
