@@ -29,7 +29,7 @@ const register = new client.Registry();
 // IPFS node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "ipfs_client_target_local",
+    name: "dappmanager_ipfs_client_target_local",
     help: "Ipfs client target local",
     labelNames: ["ipfsClientTargetLocal"],
     collect() {
@@ -46,7 +46,7 @@ register.registerMetric(
 // Ethereum node local or remote
 register.registerMetric(
   new client.Gauge({
-    name: "eth_client_target_local",
+    name: "dappmanager_eth_client_target_local",
     help: "eth client target local",
     labelNames: ["ethClientTargetLocal"],
     collect() {
@@ -63,7 +63,7 @@ register.registerMetric(
 // Ethereum fallback enabled
 register.registerMetric(
   new client.Gauge({
-    name: "eth_fallback_enabled",
+    name: "dappmanager_eth_fallback_enabled",
     help: "eth fallback enabled",
     labelNames: ["ethFallbackEnabled"],
     collect() {
@@ -80,7 +80,7 @@ register.registerMetric(
 // Staker config
 register.registerMetric(
   new client.Gauge({
-    name: "staker_config",
+    name: "dappmanager_staker_config",
     help: "staker configuration",
     labelNames: ["executionClient", "consensusClient", "mevBoost"],
     async collect() {
@@ -143,7 +143,7 @@ register.registerMetric(
 // Auto-updates - system packages
 register.registerMetric(
   new client.Gauge({
-    name: "auto_updates_system_packages",
+    name: "dappmanager_auto_updates_system_packages",
     help: "auto updates system packages",
     labelNames: ["autoUpdatesSystemPackages"],
     collect() {
@@ -166,7 +166,7 @@ register.registerMetric(
 // Auto-updates - user packages
 register.registerMetric(
   new client.Gauge({
-    name: "auto_updates_user_packages",
+    name: "dappmanager_auto_updates_user_packages",
     help: "auto updates user packages",
     labelNames: ["autoUpdatesUserPackages"],
     collect() {

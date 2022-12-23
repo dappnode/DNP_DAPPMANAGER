@@ -100,9 +100,7 @@
       "id": 2,
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -114,7 +112,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "eth_client_target_local{ethClientTargetLocal=\"local\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_eth_client_target_local{ethClientTargetLocal=\"local\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Ethereum Client Local (on / off)",
           "refId": "A"
@@ -173,9 +171,7 @@
       "id": 6,
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -187,7 +183,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "eth_fallback_enabled{ethFallbackEnabled=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_eth_fallback_enabled{ethFallbackEnabled=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Ethereum fallback (on / off)",
           "refId": "A"
@@ -250,9 +246,7 @@
       "id": 4,
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -264,7 +258,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "ipfs_client_target_local{instance=\"dappmanager.dappnode:80\",ipfsClientTargetLocal=\"local\"}",
+          "expr": "dappmanager_ipfs_client_target_local{instance=\"dappmanager.dappnode:80\",ipfsClientTargetLocal=\"local\"}",
           "interval": "",
           "legendFormat": "Ipfs Client Local (on / off)",
           "refId": "A"
@@ -323,9 +317,7 @@
       "id": 8,
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -337,7 +329,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "auto_updates_system_packages{autoUpdatesSystemPackages=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_auto_updates_system_packages{autoUpdatesSystemPackages=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "System packages auto-updates (on / off)",
           "refId": "A"
@@ -400,9 +392,7 @@
       "id": 10,
       "options": {
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -414,7 +404,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "auto_updates_user_packages{autoUpdatesUserPackages=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_auto_updates_user_packages{autoUpdatesUserPackages=\"enabled\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "User packages auto-updates (on / off)",
           "refId": "A"
@@ -495,7 +485,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "views{instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_views{instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Views UI (requests)",
           "refId": "A"
@@ -571,9 +561,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -584,7 +572,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "staker_config{executionClient=\"mainnet\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_staker_config{executionClient=\"mainnet\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "",
           "refId": "EC - Mainnet"
@@ -662,9 +650,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -675,7 +661,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "staker_config{consensusClient=\"mainnet\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_staker_config{consensusClient=\"mainnet\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Consensus client Prysm",
           "refId": "CC - Gnosis"
@@ -752,9 +738,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -765,7 +749,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "staker_config{executionClient=\"gnosis\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_staker_config{executionClient=\"gnosis\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Execution client nethermind",
           "refId": "EC - Gnosis"
@@ -842,9 +826,7 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": false
         },
@@ -855,7 +837,7 @@
       "targets": [
         {
           "exemplar": true,
-          "expr": "staker_config{consensusClient=\"gnosis\",instance=\"dappmanager.dappnode:80\"}",
+          "expr": "dappmanager_staker_config{consensusClient=\"gnosis\",instance=\"dappmanager.dappnode:80\"}",
           "interval": "",
           "legendFormat": "Consensus client Prysm",
           "refId": "CC - Prysm"
