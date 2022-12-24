@@ -1,14 +1,13 @@
 import "mocha";
 import { expect } from "chai";
+import { ethers } from "ethers";
 import {
   Content,
-  EthForwardErrorCode,
   EthForwardError,
+  EthForwardErrorCode,
   Location
-} from "../../../src/ethForward/types";
-
-import { resolveDomain } from "../../../src/ethForward/resolveDomain";
-import { ethers } from "ethers";
+} from "../../../src/api/middlewares/ethForward/types";
+import { resolveDomain } from "../../../src/api/middlewares/ethForward/resolveDomain";
 
 /**
  * The purpose of this test is to make sure it retrieves the correct content

@@ -107,11 +107,9 @@ export const forumUrl = {
 };
 
 export const troubleShootMountpointsGuideUrl =
-  "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
+  "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl =
-  "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
-export const mediumTreasuryUrl =
-  "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
+  "https://docs.dappnode.io/user/faq/general";
 export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";

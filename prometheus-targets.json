@@ -1,0 +1,9 @@
+[
+  {
+    "labels": {
+      "package": "dappmanager.dnp.dappnode.eth",
+      "service": "dappmanager"
+    },
+    "targets": ["dappmanager.dappnode:80"]
+  }
+]

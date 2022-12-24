@@ -1,11 +1,11 @@
 import http from "http";
 import httpProxy from "http-proxy";
 import express from "express";
-import params from "../params";
-import { EthProviderError } from "../modules/ethClient";
-import { ipfs } from "../modules/ipfs";
-import { urlJoin } from "../utils/url";
-import { logs } from "../logs";
+import params from "../../../params";
+import { EthProviderError } from "../../../modules/ethClient";
+import { ipfs } from "../../../modules/ipfs";
+import { urlJoin } from "../../../utils/url";
+import { logs } from "../../../logs";
 import * as views from "./views";
 import {
   NodeNotAvailable,
