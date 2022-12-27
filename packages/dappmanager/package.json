@@ -69,7 +69,7 @@
     "helmet": "^4.4.1",
     "http-proxy": "^1.18.0",
     "ipfs-car": "^0.7.0",
-    "ipfs-http-client": "^56.0.3",
+    "ipfs-http-client": "^59.0.0",
     "is-ip": "^3.0.0",
     "is-ipfs": "^6.0.2",
     "it-to-stream": "^1.0.0",

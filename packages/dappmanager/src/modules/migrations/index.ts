@@ -1,5 +1,5 @@
 import { setDefaultStakerConfig } from "./setDefaultStakerConfig";
-import AggregateError = require("aggregate-error");
+import AggregateError from "aggregate-error";
 import { migrateUserActionLogs } from "./migrateUserActionLogs";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers";

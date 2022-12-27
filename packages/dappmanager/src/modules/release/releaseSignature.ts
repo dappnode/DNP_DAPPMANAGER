@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { CID } from "multiformats/cid";
+import { CID } from "ipfs-http-client";
 import { base58btc } from "multiformats/bases/base58";
 import { base32 } from "multiformats/bases/base32";
 import { base64, base64url } from "multiformats/bases/base64";
@@ -12,7 +12,7 @@ import {
 } from "../../types";
 import { releaseFiles } from "../../params";
 import { ReleaseSignatureWithData } from "./types";
-import { IPFSEntry } from "../ipfs";
+import { IPFSEntry } from "ipfs-core-types/src/root";
 
 export function getReleaseSignatureStatus(
   dnpName: string,
