@@ -51,9 +51,16 @@ startDappmanager({
     globalEnvs: () => {},
     notificationSend: () => {},
     packageManifest: () => {},
+    metrics: () => {},
     publicPackagesData: () => {},
     sign: () => {},
     upload: () => {}
+  },
+  limiterMiddleware: (req, res, next) => {
+    next();
+  },
+  counterViewsMiddleware: (req, res, next) => {
+    next();
   },
   ethForwardMiddleware: (req, res, next) => {
     next();

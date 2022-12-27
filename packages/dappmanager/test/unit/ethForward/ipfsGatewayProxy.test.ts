@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseIpfsGatewayProxyReqHash } from "../../../src/ethForward";
+import { parseIpfsGatewayProxyReqHash } from "../../../src/api/middlewares/ethForward";
 
 describe("IPFS gateway proxy", () => {
   describe("Parse IPFS path", () => {

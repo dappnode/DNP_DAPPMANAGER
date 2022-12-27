@@ -13,7 +13,6 @@ import { routesLogger, subscriptionsLogger } from "./api/logger";
 import * as routes from "./api/routes";
 import { logs } from "./logs";
 import params from "./params";
-import { getEthForwardMiddleware } from "./ethForward";
 import { getVpnApiClient } from "./api/vpnApiClient";
 import {
   getVersionData,
@@ -25,6 +24,11 @@ import { copyHostServices } from "./modules/hostServices/copyHostServices";
 import { startAvahiDaemon } from "./daemons/avahi";
 import { executeMigrations } from "./modules/migrations";
 import { startTestApi } from "./api/startTestApi";
+import {
+  getLimiter,
+  getViewsCounterMiddleware,
+  getEthForwardMiddleware
+} from "./api/middlewares";
 
 const controller = new AbortController();
 
@@ -36,6 +40,8 @@ const server = startDappmanager({
   params,
   logs,
   routes,
+  limiterMiddleware: getLimiter(),
+  counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
   methods: calls,
