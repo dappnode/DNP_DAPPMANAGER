@@ -1,4 +1,4 @@
-import { uniq } from "lodash";
+import { uniq } from "lodash-es";
 import { InstalledPackageData } from "../../types";
 import { isVolumeOwner } from "../docker/volumesData";
 import { DockerVolumeListItem } from "./api";

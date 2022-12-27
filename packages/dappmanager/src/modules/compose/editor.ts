@@ -10,7 +10,7 @@ import {
   uniq,
   concat,
   omit
-} from "lodash";
+} from "lodash-es";
 import * as getPath from "../../utils/getPath";
 import { PortMapping, ContainerLabelsRaw } from "../../types";
 import {

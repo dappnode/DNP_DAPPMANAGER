@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { pick } from "lodash-es";
 import { listPackage } from "../../modules/docker/list";
 import { readManifestIfExists } from "../../modules/manifest";
 import { wrapHandler } from "../utils";

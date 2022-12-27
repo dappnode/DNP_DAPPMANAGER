@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { Subscriptions, subscriptionsData } from "../..";
 import subscriptionsArgumentsSchema from "../../schemas/SubscriptionsArguments.schema.json";
 import { Args, LoggerMiddleware } from "../types";

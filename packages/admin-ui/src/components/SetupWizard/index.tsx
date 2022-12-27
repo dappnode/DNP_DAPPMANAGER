@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import deepmerge from "deepmerge";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 // Components
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";

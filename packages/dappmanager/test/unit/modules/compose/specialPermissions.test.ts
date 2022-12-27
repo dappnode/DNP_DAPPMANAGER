@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { parseSpecialPermissions } from "../../../../src/modules/compose/specialPermissions";
 import { mockCompose } from "../../../testUtils";
 import { Compose } from "@dappnode/dappnodesdk";

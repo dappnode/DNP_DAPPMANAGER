@@ -4,7 +4,7 @@ import * as db from "../../db";
 import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork";
 import { Network } from "../../types";
 import { listPackageNoThrow } from "../../modules/docker/list";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 
 /**
  * Collect the metrics:

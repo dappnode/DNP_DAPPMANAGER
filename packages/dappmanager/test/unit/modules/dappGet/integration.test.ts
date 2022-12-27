@@ -6,7 +6,7 @@ import { InstalledPackageData } from "../../../../src/types";
 import { mockDnp } from "../../../testUtils";
 import rewiremock from "rewiremock";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers";
-import { mapValues, isEmpty } from "lodash";
+import { mapValues, isEmpty } from "lodash-es";
 import { logs } from "../../../../src/logs";
 
 // Imports for types

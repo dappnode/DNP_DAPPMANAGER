@@ -1,6 +1,5 @@
-import { uniqBy, concat } from "lodash";
-import { PortProtocol } from "../../common";
-import { PortMapping } from "../../types";
+import { uniqBy, concat } from "lodash-es";
+import { PortMapping, PortProtocol } from "../../types";
 
 /**
  * Parses a port string array from a docker-compose.yml

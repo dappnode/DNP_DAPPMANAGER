@@ -1,4 +1,4 @@
-import { pick, omit, uniq, isEmpty } from "lodash";
+import { pick, omit, uniq, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import {
   SetupWizard,

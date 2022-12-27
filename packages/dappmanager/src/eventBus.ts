@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { logs } from "./logs";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import {
   ChainData,
   InstalledPackageData,

@@ -1,5 +1,5 @@
 import React from "react";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 import Button from "components/Button";
 
 export default function TypeFilter({

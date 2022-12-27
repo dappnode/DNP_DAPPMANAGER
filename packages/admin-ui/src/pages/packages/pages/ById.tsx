@@ -2,7 +2,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";

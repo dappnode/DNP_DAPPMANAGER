@@ -1,4 +1,4 @@
-import { omit } from "lodash";
+import { omit } from "lodash-es";
 import { listPackages } from "../modules/docker/list";
 import { readManifestIfExists } from "../modules/manifest";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";

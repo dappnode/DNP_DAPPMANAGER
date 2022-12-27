@@ -1,4 +1,4 @@
-import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash";
+import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
 import params, { getImageTag, getContainerName } from "../../params";
 import { getIsCore } from "../manifest/getIsCore";
 import { cleanCompose } from "./clean";

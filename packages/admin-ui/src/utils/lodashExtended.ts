@@ -1,4 +1,4 @@
-import { transform, isEqual, isObject, isEmpty } from "lodash";
+import { transform, isEqual, isObject, isEmpty } from "lodash-es";
 
 export function difference<T>(base: T, object: T): T {
   function changes(base: any, object: any) {

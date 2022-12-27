@@ -1,4 +1,4 @@
-import { orderBy } from "lodash";
+import { orderBy } from "lodash-es";
 import { logs } from "../../logs";
 import { UserActionLog } from "../../types";
 import { isNotFoundError } from "../../utils/node";

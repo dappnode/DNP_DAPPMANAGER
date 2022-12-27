@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
-import { omit } from "lodash";
+import { omit } from "lodash-es";
 import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
 import * as calls from "../../src/calls";
 import { ManifestWithImage, RequestedDnp } from "../../src/types";

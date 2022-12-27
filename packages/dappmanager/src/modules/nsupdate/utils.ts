@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 import { PackageContainer } from "../../types";
 import params, { getContainerDomain } from "../../params";
 import {

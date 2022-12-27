@@ -1,4 +1,4 @@
-import { mapValues, isEmpty } from "lodash";
+import { mapValues, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import Ajv from "ajv";
 import {

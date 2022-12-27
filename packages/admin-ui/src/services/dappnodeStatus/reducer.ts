@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { SystemInfo, VolumeData, WifiCredentials } from "types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 

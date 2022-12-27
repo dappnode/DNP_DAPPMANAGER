@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PackageNotificationDb, PackageNotification } from "common/types";
 

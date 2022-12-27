@@ -1,4 +1,4 @@
-import { mapValues, omit } from "lodash";
+import { mapValues, omit } from "lodash-es";
 import semver from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/dappnodesdk";
 import { listPackages } from "../modules/docker/list";

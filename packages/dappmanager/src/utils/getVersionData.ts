@@ -1,5 +1,5 @@
 import fs from "fs";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import memoize from "memoizee";
 import { PackageVersionData } from "../types";
 import params from "../params";

@@ -1,4 +1,4 @@
-import { zipObject, keys, values } from "lodash";
+import { zipObject, keys, values } from "lodash-es";
 
 /**
  * Object version of Promise.all(). Resolves all values in an object
