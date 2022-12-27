@@ -1,8 +1,10 @@
 import dargs from "dargs";
 import shell from "../../../utils/shell";
+import { logs } from "../../../logs";
 
-type Args = string[];
 type Kwargs = { [flag: string]: string | number | boolean | undefined };
+
+let prevDcPath: string | undefined;
 
 function parseKwargs(kwargs?: Kwargs): string[] {
   const definedKwargs = (kwargs || {}) as Parameters<typeof dargs>[0];
@@ -15,6 +17,15 @@ async function execDockerCompose(
   kwargs?: Kwargs,
   serviceNames?: string[]
 ): Promise<string> {
+  // Add docker timeout for same dcpaths to prevent running multiple docker-compose commands
+  if (prevDcPath === dcPath) {
+    setTimeout(() => {
+      logs.info(`docker-compose ${subcommand} timeout`);
+      prevDcPath = undefined;
+    }, 1000);
+  }
+  prevDcPath = dcPath;
+
   // Usage: subcommand [options] [--scale SERVICE=NUM...] [SERVICE...]
   return shell([
     "docker-compose",
