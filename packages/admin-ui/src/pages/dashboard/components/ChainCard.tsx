@@ -22,7 +22,16 @@ export function ChainCards() {
 }
 
 function ChainCard(chain: ChainData) {
-  const { dnpName, name, message, help, progress, error, syncing } = chain;
+  const {
+    dnpName,
+    name,
+    message,
+    help,
+    progress,
+    error,
+    syncing,
+    peers
+  } = chain;
   return (
     <Card className="chain-card">
       <div className="name">
@@ -31,13 +40,16 @@ function ChainCard(chain: ChainData) {
       </div>
 
       {syncing ? (
-        typeof progress === "number" && (
+        typeof progress === "number" &&
+        (progress === 0 ? (
+          <ProgressBar now={100} animated={true} label={`Syncing`} />
+        ) : (
           <ProgressBar
             now={progress * 100}
             animated={true}
-            label={`${(progress * 100).toFixed(2)}%`}
+            label={`${(Math.floor(progress * 10000) / 100).toFixed(2)}%`}
           />
-        )
+        ))
       ) : error ? (
         <ProgressBar now={100} variant="warning" />
       ) : (
@@ -45,7 +57,11 @@ function ChainCard(chain: ChainData) {
       )}
 
       <div className="message">
-        <RenderMarkdown source={message} noMargin />
+
+        {(!syncing || (typeof progress === "number" && progress !== 0)) && (
+          <RenderMarkdown source={message} noMargin />
+        )}
+        {peers && <RenderMarkdown source={`Peers: ${peers}`} noMargin />}
         {error ? (
           <Link to={`${packagesRootPath}/${dnpName}/logs`}>More info</Link>
         ) : null}
