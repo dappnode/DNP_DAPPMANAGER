@@ -1,4 +1,4 @@
-import { ipfsApiUrl } from "pages/system/data";
+import { ipfsApiUrl } from "pages/repository/components/ipfs/data";
 import { stringIncludes } from "./strings";
 
 /**

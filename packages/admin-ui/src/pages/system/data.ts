@@ -15,8 +15,6 @@ export const subPaths = {
   staticIp: "static-ip",
   network: "network",
   update: "update",
-  // Must be "add-ipfs-peer" for backwards compatibility with the previous IFPS peer links
-  peers: "add-ipfs-peer",
   power: "power",
   profile: "profile",
   notifications: "notifications",
@@ -27,7 +25,3 @@ export const subPaths = {
 // Computed paths
 export const activateFallbackPath = `${rootPath}/${subPaths.repository}`;
 export const systemProfilePath = `${rootPath}/${subPaths.profile}`;
-
-// DAppNode data
-export const ipfsApiUrl = "http://ipfs.dappnode:5001/api/v0";
-export const ipfsGatewayUrl = "http://ipfs.dappnode:8080";

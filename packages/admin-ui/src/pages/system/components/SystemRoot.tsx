@@ -13,7 +13,6 @@ import AutoUpdates from "./AutoUpdates";
 import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
-import Peers from "./Peers";
 import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
@@ -70,11 +69,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Profile",
       subPath: subPaths.profile,
       component: Profile
-    },
-    {
-      name: "Peers",
-      subPath: subPaths.peers,
-      component: Peers
     },
     {
       name: "Security",

@@ -1,6 +1,6 @@
 import React from "react";
 import Eth from "./Eth";
-import Ipfs from "./Ipfs";
+import Ipfs from "./ipfs/Ipfs";
 import {
   NavLink,
   Redirect,
