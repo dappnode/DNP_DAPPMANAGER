@@ -1,7 +1,7 @@
-import { CID } from "multiformats/cid";
 import multicodec from "multicodec";
 import { Content } from "../types";
 import { isEmpty } from "./isEmpty";
+import { CID } from "ipfs-http-client";
 
 /**
  * Used in the CONTENTHASH_INTERFACE_ID = "0xbc1c58d1"

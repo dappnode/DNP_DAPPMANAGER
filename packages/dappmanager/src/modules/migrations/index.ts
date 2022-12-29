@@ -1,5 +1,4 @@
 import { setDefaultStakerConfig } from "./setDefaultStakerConfig";
-import AggregateError = require("aggregate-error");
 import { migrateUserActionLogs } from "./migrateUserActionLogs";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers";
@@ -86,5 +85,5 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  if (migrationErrors.length > 0) throw new AggregateError(migrationErrors);
+  if (migrationErrors.length > 0) throw new Error(migrationErrors.join("\n"));
 }
