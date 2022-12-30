@@ -16,6 +16,7 @@
     "allowSyntheticDefaultImports": true,
     "skipLibCheck": true
   },
+  "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]
 }

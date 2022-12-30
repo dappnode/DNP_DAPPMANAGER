@@ -1,0 +1,2736 @@
+{
+  "type": "object",
+  "properties": {
+    "autoUpdateSettingsEdit": {
+      "description": "Edits the auto-update settings",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "enabled": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enabled",
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "backupGet": {
+      "description": "Generates a backup of a package and sends it to the client for download.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "backup": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PackageBackup"
+              }
+            }
+          },
+          "required": [
+            "backup",
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "backupRestore": {
+      "description": "Restores a backup of a package from the dataUri provided by the user",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "backup": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PackageBackup"
+              }
+            },
+            "fileId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "backup",
+            "dnpName",
+            "fileId"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "changeIpfsTimeout": {
+      "description": "Used to test different IPFS timeout parameters live from the ADMIN UI.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "timeout": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "timeout"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "copyFileTo": {
+      "description": "Copy file to a DNP:",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "containerName": {
+              "type": "string"
+            },
+            "dataUri": {
+              "type": "string"
+            },
+            "filename": {
+              "type": "string"
+            },
+            "toPath": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "containerName",
+            "dataUri",
+            "filename",
+            "toPath"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "stakerConfigGet": {
+      "description": "Gets the staker configuration for a given network",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/Network"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "stakerConfigSet": {
+      "description": "Sets the staker configuration for a given network",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "stakerConfig": {
+              "$ref": "#/definitions/StakerConfigSet<Network>"
+            }
+          },
+          "required": [
+            "stakerConfig"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "dappnodeWebNameSet": {
+      "description": "Set the dappnodeWebNameSet",
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "deviceAdd": {
+      "description": "Creates a new device with the provided id.\nGenerates certificates and keys needed for OpenVPN.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "deviceCredentialsGet": {
+      "description": "Creates a new OpenVPN credentials file, encrypted.\nThe filename is the (16 chars short) result of hashing the generated salt in the db,\nconcatenated with the device id.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "deviceRemove": {
+      "description": "Removes the device with the provided id, if exists.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "deviceReset": {
+      "description": "Resets the device credentials with the provided id, if exists.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "deviceAdminToggle": {
+      "description": "Gives/removes admin rights to the provided device id.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "isAdmin": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "id",
+            "isAdmin"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "devicePasswordHas": {
+      "description": "Returns true if a password has been created for this device",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "devicePasswordGet": {
+      "description": "Returns the login token of this device, creating it if necessary\nIf the password has been changed and is no longer a login token, throws",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "ethClientFallbackSet": {
+      "description": "Sets if a fallback should be used",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "fallback": {
+              "$ref": "#/definitions/EthClientFallback"
+            }
+          },
+          "required": [
+            "fallback"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "ethClientTargetSet": {
+      "description": "Changes the ethereum client used to fetch package data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "target": {
+              "$ref": "#/definitions/Eth2ClientTarget"
+            },
+            "sync": {
+              "type": "boolean"
+            },
+            "useCheckpointSync": {
+              "type": "boolean"
+            },
+            "deletePrevExecClient": {
+              "type": "boolean"
+            },
+            "deletePrevExecClientVolumes": {
+              "type": "boolean"
+            },
+            "deletePrevConsClient": {
+              "type": "boolean"
+            },
+            "deletePrevConsClientVolumes": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "target"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "fetchCoreUpdateData": {
+      "description": "Return formated core update data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "string"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "fetchRegistry": {
+      "description": "Fetch registry summary",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "addressOrEnsName": {
+              "type": "string"
+            },
+            "fromBlock": {
+              "type": "number"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "fetchRegistryProgress": {
+      "description": "Fetch registry scan progress\nscanned x / y blocks",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "addressOrEnsName": {
+              "type": "string"
+            },
+            "fromBlock": {
+              "type": "number"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "fetchDnpRequest": {
+      "description": "Fetch extended info about a new DNP",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "getUserActionLogs": {
+      "description": "Returns the user action logs. This logs are stored in a different\nfile and format, and are meant to ease user support\nThe list is ordered from newest to oldest. Newest log has index = 0",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "first": {
+              "type": "number"
+            },
+            "after": {
+              "type": "number"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "httpsPortalMappingAdd": {
+      "description": "HTTPs Portal: map a subdomain",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/HttpsPortalMapping"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "httpsPortalMappingRemove": {
+      "description": "HTTPs Portal: remove an existing mapping",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/HttpsPortalMapping"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "ipfsClientTargetSet": {
+      "description": "Sets the ipfs client target: local | remote",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "ipfsRepository": {
+              "$ref": "#/definitions/IpfsRepository"
+            },
+            "deleteLocalIpfsClient": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "ipfsRepository"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "localProxyingEnableDisable": {
+      "description": "Local proxying allows to access the admin UI through dappnode.local.\nWhen disabling this feature:\n- Remove NGINX logic in HTTPs Portal to route .local domains\n- Stop exposing the port 80 to the local network\n- Stop broadcasting .local domains to mDNS",
+      "type": "array",
+      "items": [
+        {
+          "type": "boolean"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "lvmDiskSpaceExtend": {
+      "description": "LVM: extend host disk space",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "disk": {
+              "type": "string"
+            },
+            "volumeGroup": {
+              "type": "string"
+            },
+            "logicalVolume": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "disk",
+            "logicalVolume",
+            "volumeGroup"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "newFeatureStatusSet": {
+      "description": "Flag the UI welcome flow as completed",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "featureId": {
+              "$ref": "#/definitions/NewFeatureId"
+            },
+            "status": {
+              "$ref": "#/definitions/NewFeatureStatus"
+            }
+          },
+          "required": [
+            "featureId",
+            "status"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "notificationsRemove": {
+      "description": "Marks notifications as view by deleting them from the db",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "ids"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "notificationsTest": {
+      "description": "Adds a notification to be shown the UI.\nSet the notification param to null for a random notification",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "notification": {
+              "$ref": "#/definitions/PackageNotification"
+            }
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageInstall": {
+      "description": "Installs a DAppNode Package.\nResolves dependencies, downloads release assets, loads the images to docker,\nsets userSettings and starts the docker container for each package.\n\nThe logId is the requested id. It is used for the UI to track the progress\nof the installation in real time and prevent double installs\n\nOptions\n- BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies\n- BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "version": {
+              "type": "string"
+            },
+            "userSettings": {
+              "$ref": "#/definitions/UserSettingsAllDnps"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "BYPASS_RESOLVER": {
+                  "description": "Forwarded option to dappGet\nIf true, uses the dappGetBasic, which only fetches first level deps",
+                  "type": "boolean"
+                },
+                "BYPASS_CORE_RESTRICTION": {
+                  "type": "boolean"
+                },
+                "BYPASS_SIGNED_RESTRICTION": {
+                  "type": "boolean"
+                }
+              }
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageGet": {
+      "description": "Get package detail information",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageGettingStartedToggle": {
+      "description": "Toggles the visibility of a getting started block",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "show": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "dnpName",
+            "show"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageLog": {
+      "description": "Returns the logs of the docker container of a package",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "containerName": {
+              "type": "string"
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "timestamps": {
+                  "type": "boolean"
+                },
+                "tail": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "required": [
+            "containerName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageRemove": {
+      "description": "Remove a package and its data",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "deleteVolumes": {
+              "type": "boolean"
+            },
+            "timeout": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageRestart": {
+      "description": "Recreates a package containers",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "serviceNames": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageRestartVolumes": {
+      "description": "Removes a package volumes. The re-ups the package",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "volumeId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageSentDataDelete": {
+      "description": "Delete package sent data key",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageSetEnvironment": {
+      "description": "Updates the .env file of a package. If requested, also re-ups it",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "environmentByService": {
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/definitions/PackageEnvs"
+              }
+            }
+          },
+          "required": [
+            "dnpName",
+            "environmentByService"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageSetPortMappings": {
+      "description": "Updates a package port mappings",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "portMappingsByService": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/definitions/PortMapping"
+                }
+              }
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "merge": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "merge"
+              ]
+            }
+          },
+          "required": [
+            "dnpName",
+            "portMappingsByService"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packageStartStop": {
+      "description": "Stops or starts a package containers",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "dnpName": {
+              "type": "string"
+            },
+            "serviceNames": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "options": {
+              "type": "object",
+              "properties": {
+                "timeout": {
+                  "type": "number"
+                }
+              }
+            }
+          },
+          "required": [
+            "dnpName"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "passwordChange": {
+      "description": "Changes the user `dappnode`'s password in the host machine\nOnly allows it if the current password has the salt `insecur3`",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "newPassword": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "newPassword"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "portsUpnpStatusGet": {
+      "description": "Returns ports status from upnp scanning",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "portsToOpen": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PortToOpen"
+              }
+            }
+          },
+          "required": [
+            "portsToOpen"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "portsApiStatusGet": {
+      "description": "Returns ports status from API scanning",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "portsToOpen": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PortToOpen"
+              }
+            }
+          },
+          "required": [
+            "portsToOpen"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "releaseTrustedKeyAdd": {
+      "description": "Add a release key to trusted keys db",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/TrustedReleaseKey"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "releaseTrustedKeyRemove": {
+      "description": "Remove a release key from trusted keys db, by name",
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "seedPhraseSet": {
+      "description": "Receives an encrypted message containing the seed phrase of\n12 word mnemonic ethereum account. The extra layer of encryption\nslightly increases the security of the exchange while the WAMP\nmodule works over HTTP.",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "seedPhraseEncrypted": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "seedPhraseEncrypted"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "setStaticIp": {
+      "description": "Sets the static IP",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "staticIp": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "staticIp"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "telegramStatusSet": {
+      "description": "Sets the status of the telegram bot",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "telegramStatus": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "telegramStatus"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "telegramTokenSet": {
+      "description": "Sets the telegram token",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "telegramToken": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "telegramToken"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "sshPortSet": {
+      "description": "Change the SHH port on the DAppNode host",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "port": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "port"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "sshStatusSet": {
+      "description": "Disable or enable SSH on the DAppNode host",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "$ref": "#/definitions/ShhStatus"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "natRenewalEnable": {
+      "description": "Attemps to open ports using UPnP",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "enableNatRenewal": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "enableNatRenewal"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "volumeRemove": {
+      "description": "Removes a docker volume by name",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "wireguardDeviceAdd": {
+      "description": "Add a device to Wireguard DNP ENVs",
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "wireguardDeviceRemove": {
+      "description": "Remove a device from Wireguard DNP ENVs",
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "wireguardDeviceGet": {
+      "description": "Get credentials for a single Wireguard device",
+      "type": "array",
+      "items": [
+        {
+          "type": "string"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    }
+  },
+  "definitions": {
+    "PackageBackup": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "service": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "path"
+      ]
+    },
+    "Network": {
+      "description": "STAKER types",
+      "enum": [
+        "gnosis",
+        "mainnet",
+        "prater"
+      ],
+      "type": "string"
+    },
+    "StakerConfigSet<Network>": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "$ref": "#/definitions/StakerConfigSet.T"
+        },
+        "executionClient": {
+          "$ref": "#/definitions/StakerItemOk<Network,\"execution\">"
+        },
+        "consensusClient": {
+          "$ref": "#/definitions/StakerItemOk<Network,\"consensus\">"
+        },
+        "mevBoost": {
+          "$ref": "#/definitions/StakerItemOk<Network,\"mev-boost\">"
+        },
+        "enableWeb3signer": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "network"
+      ]
+    },
+    "StakerConfigSet.T": {
+      "description": "STAKER types",
+      "enum": [
+        "gnosis",
+        "mainnet",
+        "prater"
+      ],
+      "type": "string"
+    },
+    "StakerItemOk<Network,\"execution\">": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "avatarUrl": {
+              "type": "string"
+            },
+            "isInstalled": {
+              "type": "boolean"
+            },
+            "isUpdated": {
+              "type": "boolean"
+            },
+            "isRunning": {
+              "type": "boolean"
+            },
+            "data": {
+              "description": "Metadata of a staker item to be cached",
+              "$ref": "#/definitions/StakerItemData"
+            },
+            "isSelected": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "avatarUrl",
+            "isInstalled",
+            "isRunning",
+            "isSelected",
+            "isUpdated",
+            "status"
+          ]
+        },
+        {
+          "$ref": "#/definitions/StakerExecution<Network>"
+        }
+      ]
+    },
+    "StakerItemData": {
+      "description": "Metadata of a staker item to be cached",
+      "type": "object",
+      "properties": {
+        "dnpName": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "semVersion": {
+          "type": "string"
+        },
+        "reqVersion": {
+          "type": "string"
+        },
+        "imageFile": {
+          "$ref": "#/definitions/DistributedFile"
+        },
+        "avatarFile": {
+          "$ref": "#/definitions/DistributedFile"
+        },
+        "metadata": {
+          "$ref": "#/definitions/Manifest"
+        },
+        "warnings": {
+          "$ref": "#/definitions/ReleaseWarnings"
+        },
+        "signedSafe": {
+          "description": "Release is from safe origin OR has trusted signature",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "dnpName",
+        "imageFile",
+        "metadata",
+        "reqVersion",
+        "semVersion",
+        "signedSafe",
+        "warnings"
+      ]
+    },
+    "DistributedFile": {
+      "type": "object",
+      "properties": {
+        "hash": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/definitions/DistributedFileSource"
+        },
+        "size": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "hash",
+        "size",
+        "source"
+      ]
+    },
+    "DistributedFileSource": {
+      "enum": [
+        "ipfs",
+        "swarm"
+      ],
+      "type": "string"
+    },
+    "Manifest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "upstreamVersion": {
+          "type": "string"
+        },
+        "upstreamRepo": {
+          "type": "string"
+        },
+        "upstreamArg": {
+          "type": "string"
+        },
+        "shortDescription": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "author": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
+        },
+        "avatar": {
+          "type": "string"
+        },
+        "repository": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string"
+            },
+            "directory": {
+              "type": "string"
+            }
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "links": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "properties": {
+            "homepage": {
+              "type": "string"
+            },
+            "ui": {
+              "type": "string"
+            },
+            "api": {
+              "type": "string"
+            },
+            "gateway": {
+              "type": "string"
+            }
+          }
+        },
+        "bugs": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "url"
+          ]
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contributors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "type": {
+          "enum": [
+            "dncore",
+            "library",
+            "service"
+          ],
+          "type": "string"
+        },
+        "chain": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "driver": {
+                  "$ref": "#/definitions/ChainDriverType"
+                },
+                "serviceName": {
+                  "type": "string"
+                },
+                "portNumber": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "driver"
+              ]
+            },
+            {
+              "enum": [
+                "bitcoin",
+                "ethereum",
+                "ethereum-beacon-chain",
+                "ethereum2-beacon-chain-prysm",
+                "monero"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "mainService": {
+          "type": "string"
+        },
+        "dockerTimeout": {
+          "description": "\"15min\" | 3600",
+          "type": "string"
+        },
+        "dependencies": {
+          "$ref": "#/definitions/Dependencies"
+        },
+        "requirements": {
+          "type": "object",
+          "properties": {
+            "minimumDappnodeVersion": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "minimumDappnodeVersion"
+          ]
+        },
+        "globalEnvs": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "all": {
+                  "type": "boolean"
+                }
+              }
+            },
+            {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "envs": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "services": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": [
+                  "envs",
+                  "services"
+                ]
+              }
+            }
+          ]
+        },
+        "architectures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Architecture"
+          }
+        },
+        "runOrder": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "restartCommand": {
+          "type": "string"
+        },
+        "restartLaunchCommand": {
+          "type": "string"
+        },
+        "changelog": {
+          "type": "string"
+        },
+        "warnings": {
+          "type": "object",
+          "properties": {
+            "onInstall": {
+              "type": "string"
+            },
+            "onPatchUpdate": {
+              "type": "string"
+            },
+            "onMinorUpdate": {
+              "type": "string"
+            },
+            "onMajorUpdate": {
+              "type": "string"
+            },
+            "onReset": {
+              "type": "string"
+            },
+            "onRemove": {
+              "type": "string"
+            }
+          }
+        },
+        "updateAlerts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ManifestUpdateAlert"
+          }
+        },
+        "disclaimer": {
+          "type": "object",
+          "properties": {
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "message"
+          ]
+        },
+        "backup": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageBackup"
+          }
+        },
+        "gettingStarted": {
+          "type": "string"
+        },
+        "style": {
+          "type": "object",
+          "properties": {
+            "featuredBackground": {
+              "type": "string"
+            },
+            "featuredColor": {
+              "type": "string"
+            },
+            "featuredAvatarFilter": {
+              "type": "string"
+            }
+          }
+        },
+        "grafanaDashboards": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GrafanaDashboard"
+          }
+        },
+        "prometheusTargets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PrometheusTarget"
+          }
+        },
+        "setupSchema": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "title": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "default": {
+              "type": "string"
+            },
+            "enum": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "pattern": {
+              "type": "string"
+            },
+            "customErrors": {
+              "type": "object",
+              "properties": {
+                "pattern": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "properties": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "dependencies": {
+              "type": "object",
+              "additionalProperties": {}
+            },
+            "oneOf": {
+              "type": "array",
+              "items": {}
+            }
+          }
+        },
+        "setupTarget": {
+          "$ref": "#/definitions/SetupTarget"
+        },
+        "setupUiJson": {
+          "$ref": "#/definitions/SetupUiJson"
+        },
+        "exposable": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ExposableServiceManifestInfo"
+          }
+        },
+        "setupWizard": {
+          "$ref": "#/definitions/SetupWizard"
+        }
+      },
+      "required": [
+        "name",
+        "version"
+      ]
+    },
+    "ChainDriverType": {
+      "enum": [
+        "bitcoin",
+        "ethereum",
+        "ethereum-beacon-chain",
+        "ethereum2-beacon-chain-prysm",
+        "monero"
+      ],
+      "type": "string"
+    },
+    "Dependencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "Architecture": {
+      "enum": [
+        "linux/amd64",
+        "linux/arm64"
+      ],
+      "type": "string"
+    },
+    "ManifestUpdateAlert": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "from",
+        "message",
+        "to"
+      ]
+    },
+    "GrafanaDashboard": {
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string"
+        }
+      }
+    },
+    "PrometheusTarget": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "labels": {
+          "type": "object",
+          "properties": {
+            "job": {
+              "type": "string"
+            },
+            "group": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": [
+        "targets"
+      ]
+    },
+    "SetupTarget": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UserSettingTarget"
+      }
+    },
+    "UserSettingTarget": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "environment"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "service": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "portMapping"
+              ]
+            },
+            "containerPort": {
+              "type": "string"
+            },
+            "service": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "containerPort",
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "namedVolumeMountpoint"
+              ]
+            },
+            "volumeName": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type",
+            "volumeName"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "allNamedVolumesMountpoint"
+              ]
+            }
+          },
+          "required": [
+            "type"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "fileUpload"
+              ]
+            },
+            "path": {
+              "type": "string"
+            },
+            "service": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "path",
+            "type"
+          ]
+        }
+      ]
+    },
+    "SetupUiJson": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "ui:widget": {
+            "enum": [
+              "password"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "properties": {
+        "ui:order": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ExposableServiceManifestInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "serviceName": {
+          "type": "string"
+        },
+        "fromSubdomain": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        },
+        "exposeByDefault": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name",
+        "port"
+      ]
+    },
+    "SetupWizard": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string",
+          "enum": [
+            "2"
+          ]
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SetupWizardField"
+          }
+        }
+      },
+      "required": [
+        "fields",
+        "version"
+      ]
+    },
+    "SetupWizardField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "environment"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "service": {
+                  "anyOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "name",
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "portMapping"
+                  ]
+                },
+                "containerPort": {
+                  "type": "string"
+                },
+                "service": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "containerPort",
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "namedVolumeMountpoint"
+                  ]
+                },
+                "volumeName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "type",
+                "volumeName"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "allNamedVolumesMountpoint"
+                  ]
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "fileUpload"
+                  ]
+                },
+                "path": {
+                  "type": "string"
+                },
+                "service": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "path",
+                "type"
+              ]
+            }
+          ]
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "secret": {
+          "type": "boolean"
+        },
+        "pattern": {
+          "type": "string"
+        },
+        "patternErrorMessage": {
+          "type": "string"
+        },
+        "enum": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "required": {
+          "type": "boolean"
+        },
+        "if": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "default": {
+                  "type": "string"
+                },
+                "enum": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "pattern": {
+                  "type": "string"
+                },
+                "customErrors": {
+                  "type": "object",
+                  "properties": {
+                    "pattern": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "required": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "properties": {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "dependencies": {
+                  "type": "object",
+                  "additionalProperties": {}
+                },
+                "oneOf": {
+                  "type": "array",
+                  "items": {}
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "default": {
+                    "type": "string"
+                  },
+                  "enum": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "pattern": {
+                    "type": "string"
+                  },
+                  "customErrors": {
+                    "type": "object",
+                    "properties": {
+                      "pattern": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "properties": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  },
+                  "dependencies": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  },
+                  "oneOf": {
+                    "type": "array",
+                    "items": {}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      },
+      "required": [
+        "description",
+        "id",
+        "title"
+      ]
+    },
+    "ReleaseWarnings": {
+      "type": "object",
+      "properties": {
+        "coreFromForeignRegistry": {
+          "description": "If a core package does not come from the DAppNode Package APM registry",
+          "type": "boolean"
+        },
+        "requestNameMismatch": {
+          "description": "If the requested name does not match the manifest name",
+          "type": "boolean"
+        }
+      }
+    },
+    "StakerExecution<Network>": {
+      "type": "object",
+      "properties": {
+        "dnpName": {
+          "$ref": "#/definitions/ExecutionClient"
+        }
+      },
+      "required": [
+        "dnpName"
+      ]
+    },
+    "ExecutionClient": {
+      "enum": [
+        "",
+        "besu.public.dappnode.eth",
+        "erigon.dnp.dappnode.eth",
+        "geth.dnp.dappnode.eth",
+        "goerli-besu.dnp.dappnode.eth",
+        "goerli-erigon.dnp.dappnode.eth",
+        "goerli-geth.dnp.dappnode.eth",
+        "goerli-nethermind.dnp.dappnode.eth",
+        "nethermind-xdai.dnp.dappnode.eth",
+        "nethermind.public.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "StakerItemOk<Network,\"consensus\">": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "avatarUrl": {
+              "type": "string"
+            },
+            "isInstalled": {
+              "type": "boolean"
+            },
+            "isUpdated": {
+              "type": "boolean"
+            },
+            "isRunning": {
+              "type": "boolean"
+            },
+            "data": {
+              "description": "Metadata of a staker item to be cached",
+              "$ref": "#/definitions/StakerItemData"
+            },
+            "isSelected": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "avatarUrl",
+            "isInstalled",
+            "isRunning",
+            "isSelected",
+            "isUpdated",
+            "status"
+          ]
+        },
+        {
+          "$ref": "#/definitions/StakerConsensus<Network>"
+        }
+      ]
+    },
+    "StakerConsensus<Network>": {
+      "type": "object",
+      "properties": {
+        "dnpName": {
+          "$ref": "#/definitions/ConsensusClient"
+        },
+        "graffiti": {
+          "type": "string"
+        },
+        "feeRecipient": {
+          "type": "string"
+        },
+        "checkpointSync": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "dnpName"
+      ]
+    },
+    "ConsensusClient": {
+      "enum": [
+        "",
+        "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
+        "lighthouse-gnosis.dnp.dappnode.eth",
+        "lighthouse-prater.dnp.dappnode.eth",
+        "lighthouse.dnp.dappnode.eth",
+        "nimbus-gnosis.dnp.dappnode.eth",
+        "nimbus-prater.dnp.dappnode.eth",
+        "nimbus.dnp.dappnode.eth",
+        "prysm-prater.dnp.dappnode.eth",
+        "prysm.dnp.dappnode.eth",
+        "teku-gnosis.dnp.dappnode.eth",
+        "teku-prater.dnp.dappnode.eth",
+        "teku.dnp.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "StakerItemOk<Network,\"mev-boost\">": {
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "ok"
+              ]
+            },
+            "avatarUrl": {
+              "type": "string"
+            },
+            "isInstalled": {
+              "type": "boolean"
+            },
+            "isUpdated": {
+              "type": "boolean"
+            },
+            "isRunning": {
+              "type": "boolean"
+            },
+            "data": {
+              "description": "Metadata of a staker item to be cached",
+              "$ref": "#/definitions/StakerItemData"
+            },
+            "isSelected": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "avatarUrl",
+            "isInstalled",
+            "isRunning",
+            "isSelected",
+            "isUpdated",
+            "status"
+          ]
+        },
+        {
+          "$ref": "#/definitions/StakerMevBoost<Network>"
+        }
+      ]
+    },
+    "StakerMevBoost<Network>": {
+      "type": "object",
+      "properties": {
+        "dnpName": {
+          "$ref": "#/definitions/MevBoost"
+        },
+        "relays": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "dnpName"
+      ]
+    },
+    "MevBoost": {
+      "enum": [
+        "",
+        "mev-boost-gnosis.dnp.dappnode.eth",
+        "mev-boost-goerli.dnp.dappnode.eth",
+        "mev-boost.dnp.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "EthClientFallback": {
+      "description": "If the DAPPMANAGER should use a eth remote node in cases of error syncing",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "type": "string"
+    },
+    "Eth2ClientTarget": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "execClient": {
+              "$ref": "#/definitions/ExecutionClientMainnet"
+            },
+            "consClient": {
+              "$ref": "#/definitions/ConsensusClientMainnet"
+            }
+          },
+          "required": [
+            "consClient",
+            "execClient"
+          ]
+        },
+        {
+          "enum": [
+            "remote"
+          ],
+          "type": "string"
+        }
+      ]
+    },
+    "ExecutionClientMainnet": {
+      "enum": [
+        "",
+        "besu.public.dappnode.eth",
+        "erigon.dnp.dappnode.eth",
+        "geth.dnp.dappnode.eth",
+        "nethermind.public.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "ConsensusClientMainnet": {
+      "enum": [
+        "",
+        "lighthouse.dnp.dappnode.eth",
+        "nimbus.dnp.dappnode.eth",
+        "prysm.dnp.dappnode.eth",
+        "teku.dnp.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "HttpsPortalMapping": {
+      "type": "object",
+      "properties": {
+        "fromSubdomain": {
+          "type": "string"
+        },
+        "dnpName": {
+          "type": "string"
+        },
+        "serviceName": {
+          "type": "string"
+        },
+        "port": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "dnpName",
+        "fromSubdomain",
+        "port",
+        "serviceName"
+      ]
+    },
+    "IpfsRepository": {
+      "type": "object",
+      "properties": {
+        "ipfsClientTarget": {
+          "$ref": "#/definitions/IpfsClientTarget"
+        },
+        "ipfsGateway": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "ipfsClientTarget",
+        "ipfsGateway"
+      ]
+    },
+    "IpfsClientTarget": {
+      "enum": [
+        "local",
+        "remote"
+      ],
+      "type": "string"
+    },
+    "NewFeatureId": {
+      "description": "Welcome wizard / setup flow\nAvailable routes / views in the UI",
+      "enum": [
+        "change-host-password",
+        "repository",
+        "repository-fallback",
+        "system-auto-updates"
+      ],
+      "type": "string"
+    },
+    "NewFeatureStatus": {
+      "description": "UI Welcome flow status. Persists the info of which page the UI should show",
+      "enum": [
+        "pending",
+        "seen",
+        "skipped"
+      ],
+      "type": "string"
+    },
+    "PackageNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/NotificationType"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "id",
+        "title",
+        "type"
+      ]
+    },
+    "NotificationType": {
+      "enum": [
+        "danger",
+        "info",
+        "success",
+        "warning"
+      ],
+      "type": "string"
+    },
+    "UserSettingsAllDnps": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/UserSettings"
+      }
+    },
+    "UserSettings": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "portMappings": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "namedVolumeMountpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "allNamedVolumeMountpoint": {
+          "type": "string"
+        },
+        "fileUploads": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        },
+        "domainAlias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "legacyBindVolumes": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "PackageEnvs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "PortMapping": {
+      "type": "object",
+      "properties": {
+        "ephemeral": {
+          "type": "boolean"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "deletable": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "number"
+        },
+        "container": {
+          "type": "number"
+        },
+        "protocol": {
+          "$ref": "#/definitions/PortProtocol"
+        }
+      },
+      "required": [
+        "container",
+        "protocol"
+      ]
+    },
+    "PortProtocol": {
+      "enum": [
+        "TCP",
+        "UDP"
+      ],
+      "type": "string"
+    },
+    "PortToOpen": {
+      "type": "object",
+      "properties": {
+        "serviceName": {
+          "type": "string"
+        },
+        "dnpName": {
+          "type": "string"
+        },
+        "portNumber": {
+          "type": "number"
+        },
+        "protocol": {
+          "$ref": "#/definitions/PortProtocol"
+        }
+      },
+      "required": [
+        "dnpName",
+        "portNumber",
+        "protocol",
+        "serviceName"
+      ]
+    },
+    "TrustedReleaseKey": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "Metadata name to identify this key: `DAppnode association`",
+          "type": "string"
+        },
+        "signatureProtocol": {
+          "description": "TODO: Add RSA_2048, OpenPGP",
+          "type": "string",
+          "enum": [
+            "ECDSA_256"
+          ]
+        },
+        "dnpNameSuffix": {
+          "description": "`.dnp.dappnode.eth`",
+          "type": "string"
+        },
+        "key": {
+          "description": "`0x14791697260E4c9A71f18484C9f997B308e59325`",
+          "type": "string"
+        }
+      },
+      "required": [
+        "dnpNameSuffix",
+        "key",
+        "name",
+        "signatureProtocol"
+      ]
+    },
+    "ShhStatus": {
+      "enum": [
+        "disabled",
+        "enabled"
+      ],
+      "type": "string"
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

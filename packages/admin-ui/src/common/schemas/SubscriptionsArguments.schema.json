@@ -1,0 +1,1462 @@
+{
+  "type": "object",
+  "properties": {
+    "autoUpdateData": {
+      "description": "Auto-updates data",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/AutoUpdateDataView"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "devices": {
+      "description": "All VPN devices",
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VpnDevice"
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "directory": {
+      "description": "Directory updates",
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DirectoryItem"
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "packages": {
+      "description": "Installed packages updates",
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/InstalledPackageData"
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "progressLog": {
+      "description": "Installation progress logs",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/ProgressLog"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "pushNotification": {
+      "description": "Push notification from the DAPPMANAGER",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/PackageNotification"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "reloadClient": {
+      "description": "Triggers a reload on the ADMIN UI client",
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "reason": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "reason"
+          ]
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "registry": {
+      "description": "Registry updates",
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/DirectoryItem"
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "systemInfo": {
+      "description": "Relevant system params",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/SystemInfo"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "userActionLog": {
+      "description": "New user action log",
+      "type": "array",
+      "items": [
+        {
+          "$ref": "#/definitions/UserActionLog"
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    },
+    "volumes": {
+      "description": "Volume data that's expensive to fetch, from docker system df -v",
+      "type": "array",
+      "items": [
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VolumeData"
+          }
+        }
+      ],
+      "minItems": 1,
+      "maxItems": 1
+    }
+  },
+  "definitions": {
+    "AutoUpdateDataView": {
+      "description": "Full auto-update data:\n- settings: If auto-updates are enabled for a specific DNP or DNPs\n- registry: List of executed auto-updates\n- pending: Pending auto-update per DNP, can be already executed\n- dnpsToShow: Parsed data to be shown in the UI",
+      "type": "object",
+      "properties": {
+        "settings": {
+          "$ref": "#/definitions/AutoUpdateSettings"
+        },
+        "registry": {
+          "$ref": "#/definitions/AutoUpdateRegistry"
+        },
+        "pending": {
+          "$ref": "#/definitions/AutoUpdatePending"
+        },
+        "dnpsToShow": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AutoUpdateDataDnpView"
+          }
+        }
+      },
+      "required": [
+        "dnpsToShow",
+        "pending",
+        "registry",
+        "settings"
+      ]
+    },
+    "AutoUpdateSettings": {
+      "description": "Sample:\n```\nsettings = {\n  \"system-packages\": { enabled: true }\n  \"my-packages\": { enabled: true }\n  \"bitcoin.dnp.dappnode.eth\": { enabled: false }\n}\n```",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ]
+      }
+    },
+    "AutoUpdateRegistry": {
+      "description": "Sample:\n```\nregistry = {\n  \"core.dnp.dappnode.eth\": {\n    \"0.2.4\": { updated: 1563304834738, successful: true },\n    \"0.2.5\": { updated: 1563304834738, successful: false }\n  }, ...\n}\n```",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/AutoUpdateRegistryDnp"
+      }
+    },
+    "AutoUpdateRegistryDnp": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/AutoUpdateRegistryEntry"
+      }
+    },
+    "AutoUpdateRegistryEntry": {
+      "type": "object",
+      "properties": {
+        "updated": {
+          "type": "number"
+        },
+        "successful": {
+          "type": "boolean"
+        }
+      }
+    },
+    "AutoUpdatePending": {
+      "description": "Sample:\n```\npending = {\n  \"core.dnp.dappnode.eth\": {\n    version: \"0.2.4\",\n    firstSeen: 1563218436285,\n    scheduledUpdate: 1563304834738,\n    completedDelay: true\n  },\n... },\n```",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/AutoUpdatePendingEntry"
+      }
+    },
+    "AutoUpdatePendingEntry": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "firstSeen": {
+          "type": "number"
+        },
+        "scheduledUpdate": {
+          "type": "number"
+        },
+        "completedDelay": {
+          "type": "boolean"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "AutoUpdateDataDnpView": {
+      "description": "Sample:\n```\ndnpsToShow = [{\n  id: \"system-packages\",\n  displayName: \"System packages\",\n  enabled: true,\n  feedback: {\n    updated: 15363818244,\n    manuallyUpdated: true,\n    inQueue: true,\n    scheduled: 15363818244\n  }\n}, ... ]\n```",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "displayName": {
+          "type": "string"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "feedback": {
+          "$ref": "#/definitions/AutoUpdateFeedback"
+        }
+      },
+      "required": [
+        "displayName",
+        "enabled",
+        "feedback",
+        "id"
+      ]
+    },
+    "AutoUpdateFeedback": {
+      "type": "object",
+      "properties": {
+        "inQueue": {
+          "type": "boolean"
+        },
+        "manuallyUpdated": {
+          "type": "boolean"
+        },
+        "scheduled": {
+          "type": "number"
+        },
+        "updated": {
+          "type": "number"
+        },
+        "errorMessage": {
+          "type": "string"
+        }
+      }
+    },
+    "VpnDevice": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "admin": {
+              "type": "boolean",
+              "enum": [
+                false
+              ]
+            }
+          },
+          "required": [
+            "admin",
+            "id"
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "admin": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                }
+              },
+              "required": [
+                "admin",
+                "id"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "hasChangedPassword": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                }
+              },
+              "required": [
+                "hasChangedPassword"
+              ]
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "admin": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                }
+              },
+              "required": [
+                "admin",
+                "id"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "hasChangedPassword": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "password": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "hasChangedPassword",
+                "password"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "DirectoryItem": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/DirectoryItemOk"
+        },
+        {
+          "$ref": "#/definitions/DirectoryItemError"
+        }
+      ]
+    },
+    "DirectoryItemOk": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "ok"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "isInstalled": {
+          "type": "boolean"
+        },
+        "isUpdated": {
+          "type": "boolean"
+        },
+        "featuredStyle": {
+          "type": "object",
+          "properties": {
+            "featuredBackground": {
+              "type": "string"
+            },
+            "featuredColor": {
+              "type": "string"
+            },
+            "featuredAvatarFilter": {
+              "type": "string"
+            }
+          }
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "index": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "whitelisted": {
+          "type": "boolean"
+        },
+        "isFeatured": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "avatarUrl",
+        "categories",
+        "description",
+        "index",
+        "isFeatured",
+        "isInstalled",
+        "isUpdated",
+        "name",
+        "status",
+        "whitelisted"
+      ]
+    },
+    "DirectoryItemError": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "error"
+          ]
+        },
+        "message": {
+          "type": "string"
+        },
+        "index": {
+          "type": "number"
+        },
+        "name": {
+          "type": "string"
+        },
+        "whitelisted": {
+          "type": "boolean"
+        },
+        "isFeatured": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "index",
+        "isFeatured",
+        "message",
+        "name",
+        "status",
+        "whitelisted"
+      ]
+    },
+    "InstalledPackageData": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/Pick<PackageContainer,\"dnpName\"|\"instanceName\"|\"version\"|\"isDnp\"|\"isCore\"|\"dependencies\"|\"avatarUrl\"|\"origin\"|\"chain\"|\"domainAlias\"|\"canBeFullnode\">"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "containers": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PackageContainer"
+              }
+            }
+          },
+          "required": [
+            "containers"
+          ]
+        }
+      ]
+    },
+    "Pick<PackageContainer,\"dnpName\"|\"instanceName\"|\"version\"|\"isDnp\"|\"isCore\"|\"dependencies\"|\"avatarUrl\"|\"origin\"|\"chain\"|\"domainAlias\"|\"canBeFullnode\">": {
+      "type": "object",
+      "properties": {
+        "dnpName": {
+          "description": "ENS domain name of this container's package\n```\n\"mypackage.dnp.dappnode.eth\"\n```",
+          "type": "string"
+        },
+        "instanceName": {
+          "description": "Name given by the user when installing an instance of a package\n```\n\"my-package-test-instance\"\n```",
+          "type": "string"
+        },
+        "version": {
+          "description": "Semantic version of this container's package\n```\n\"0.1.0\"\n```",
+          "type": "string"
+        },
+        "isDnp": {
+          "type": "boolean"
+        },
+        "isCore": {
+          "type": "boolean"
+        },
+        "dependencies": {
+          "$ref": "#/definitions/Dependencies"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "chain": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "driver": {
+                  "$ref": "#/definitions/ChainDriverType"
+                },
+                "serviceName": {
+                  "type": "string"
+                },
+                "portNumber": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "driver"
+              ]
+            },
+            {
+              "enum": [
+                "bitcoin",
+                "ethereum",
+                "ethereum-beacon-chain",
+                "ethereum2-beacon-chain-prysm",
+                "monero"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "domainAlias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "canBeFullnode": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "avatarUrl",
+        "dependencies",
+        "dnpName",
+        "instanceName",
+        "isCore",
+        "isDnp",
+        "version"
+      ]
+    },
+    "Dependencies": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "ChainDriverType": {
+      "enum": [
+        "bitcoin",
+        "ethereum",
+        "ethereum-beacon-chain",
+        "ethereum2-beacon-chain-prysm",
+        "monero"
+      ],
+      "type": "string"
+    },
+    "PackageContainer": {
+      "type": "object",
+      "properties": {
+        "containerId": {
+          "description": "Docker container ID\n```\n\"3edc051920c61e02ff9c42cf35caf4f48f693d65f44d6652de29e9024f051405\"\n```",
+          "type": "string"
+        },
+        "containerName": {
+          "description": "Docker container name\n```\n\"DAppNodeCore-mypackage.dnp.dappnode.eth\"\n```",
+          "type": "string"
+        },
+        "dnpName": {
+          "description": "ENS domain name of this container's package\n```\n\"mypackage.dnp.dappnode.eth\"\n```",
+          "type": "string"
+        },
+        "serviceName": {
+          "description": "Docker compose service name of this container, as declared in its package docker-compose\n```\n\"frontend\"\n```",
+          "type": "string"
+        },
+        "instanceName": {
+          "description": "Name given by the user when installing an instance of a package\n```\n\"my-package-test-instance\"\n```",
+          "type": "string"
+        },
+        "version": {
+          "description": "Semantic version of this container's package\n```\n\"0.1.0\"\n```",
+          "type": "string"
+        },
+        "created": {
+          "type": "number"
+        },
+        "image": {
+          "type": "string"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "state": {
+          "$ref": "#/definitions/ContainerState"
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "exitCode": {
+          "type": [
+            "null",
+            "number"
+          ]
+        },
+        "ports": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PortMapping"
+          }
+        },
+        "volumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VolumeMapping"
+          }
+        },
+        "networks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "ip": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "ip",
+              "name"
+            ]
+          }
+        },
+        "isDnp": {
+          "type": "boolean"
+        },
+        "isCore": {
+          "type": "boolean"
+        },
+        "defaultEnvironment": {
+          "$ref": "#/definitions/PackageEnvs"
+        },
+        "defaultPorts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PortMapping"
+          }
+        },
+        "defaultVolumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VolumeMapping"
+          }
+        },
+        "dependencies": {
+          "$ref": "#/definitions/Dependencies"
+        },
+        "avatarUrl": {
+          "type": "string"
+        },
+        "origin": {
+          "type": "string"
+        },
+        "chain": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "driver": {
+                  "$ref": "#/definitions/ChainDriverType"
+                },
+                "serviceName": {
+                  "type": "string"
+                },
+                "portNumber": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "driver"
+              ]
+            },
+            {
+              "enum": [
+                "bitcoin",
+                "ethereum",
+                "ethereum-beacon-chain",
+                "ethereum2-beacon-chain-prysm",
+                "monero"
+              ],
+              "type": "string"
+            }
+          ]
+        },
+        "domainAlias": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "canBeFullnode": {
+          "type": "boolean"
+        },
+        "isMain": {
+          "type": "boolean"
+        },
+        "dockerTimeout": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "avatarUrl",
+        "containerId",
+        "containerName",
+        "created",
+        "dependencies",
+        "dnpName",
+        "exitCode",
+        "image",
+        "instanceName",
+        "isCore",
+        "isDnp",
+        "networks",
+        "ports",
+        "running",
+        "serviceName",
+        "state",
+        "version",
+        "volumes"
+      ]
+    },
+    "ContainerState": {
+      "enum": [
+        "created",
+        "dead",
+        "exited",
+        "paused",
+        "removing",
+        "restarting",
+        "running"
+      ],
+      "type": "string"
+    },
+    "PortMapping": {
+      "type": "object",
+      "properties": {
+        "ephemeral": {
+          "type": "boolean"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "deletable": {
+          "type": "boolean"
+        },
+        "host": {
+          "type": "number"
+        },
+        "container": {
+          "type": "number"
+        },
+        "protocol": {
+          "$ref": "#/definitions/PortProtocol"
+        }
+      },
+      "required": [
+        "container",
+        "protocol"
+      ]
+    },
+    "PortProtocol": {
+      "enum": [
+        "TCP",
+        "UDP"
+      ],
+      "type": "string"
+    },
+    "VolumeMapping": {
+      "type": "object",
+      "properties": {
+        "host": {
+          "type": "string"
+        },
+        "container": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "container",
+        "host"
+      ]
+    },
+    "PackageEnvs": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "ProgressLog": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "dnpName": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "clear": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "dnpName",
+        "id",
+        "message"
+      ]
+    },
+    "PackageNotification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/NotificationType"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "body",
+        "id",
+        "title",
+        "type"
+      ]
+    },
+    "NotificationType": {
+      "enum": [
+        "danger",
+        "info",
+        "success",
+        "warning"
+      ],
+      "type": "string"
+    },
+    "SystemInfo": {
+      "description": "Aggregated DAppNode system info",
+      "type": "object",
+      "properties": {
+        "versionData": {
+          "$ref": "#/definitions/PackageVersionData"
+        },
+        "versionDataVpn": {
+          "$ref": "#/definitions/PackageVersionData"
+        },
+        "ip": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "dappnodeWebName": {
+          "type": "string"
+        },
+        "staticIp": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "upnpAvailable": {
+          "type": "boolean"
+        },
+        "noNatLoopback": {
+          "type": "boolean"
+        },
+        "alertToOpenPorts": {
+          "type": "boolean"
+        },
+        "internalIp": {
+          "type": "string"
+        },
+        "publicIp": {
+          "type": "string"
+        },
+        "dappmanagerNaclPublicKey": {
+          "type": "string"
+        },
+        "identityAddress": {
+          "type": "string"
+        },
+        "eth2ClientTarget": {
+          "$ref": "#/definitions/Eth2ClientTarget"
+        },
+        "ethClientFallback": {
+          "$ref": "#/definitions/EthClientFallback"
+        },
+        "ethClientStatus": {
+          "anyOf": [
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    true
+                  ]
+                },
+                "url": {
+                  "type": "string"
+                },
+                "dnpName": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "dnpName",
+                "ok",
+                "url"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "UNKNOWN_ERROR"
+                  ]
+                },
+                "error": {
+                  "$ref": "#/definitions/ErrorSerialized"
+                }
+              },
+              "required": [
+                "code",
+                "error",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "STATE_NOT_SYNCED"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "STATE_CALL_ERROR"
+                  ]
+                },
+                "error": {
+                  "$ref": "#/definitions/ErrorSerialized"
+                }
+              },
+              "required": [
+                "code",
+                "error",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "IS_SYNCING"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_AVAILABLE"
+                  ]
+                },
+                "error": {
+                  "$ref": "#/definitions/ErrorSerialized"
+                }
+              },
+              "required": [
+                "code",
+                "error",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_RUNNING"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "NOT_INSTALLED"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "INSTALLING"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "INSTALLING_ERROR"
+                  ]
+                },
+                "error": {
+                  "$ref": "#/definitions/ErrorSerialized"
+                }
+              },
+              "required": [
+                "code",
+                "error",
+                "ok"
+              ]
+            },
+            {
+              "type": "object",
+              "properties": {
+                "ok": {
+                  "type": "boolean",
+                  "enum": [
+                    false
+                  ]
+                },
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "UNINSTALLED"
+                  ]
+                }
+              },
+              "required": [
+                "code",
+                "ok"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ethProvider": {
+          "type": "string"
+        },
+        "fullnodeDomainTarget": {
+          "type": "string"
+        },
+        "newFeatureIds": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NewFeatureId"
+          }
+        }
+      },
+      "required": [
+        "alertToOpenPorts",
+        "dappmanagerNaclPublicKey",
+        "dappnodeWebName",
+        "domain",
+        "eth2ClientTarget",
+        "ethClientFallback",
+        "ethProvider",
+        "fullnodeDomainTarget",
+        "identityAddress",
+        "internalIp",
+        "ip",
+        "name",
+        "newFeatureIds",
+        "noNatLoopback",
+        "publicIp",
+        "staticIp",
+        "upnpAvailable",
+        "versionData",
+        "versionDataVpn"
+      ]
+    },
+    "PackageVersionData": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        }
+      }
+    },
+    "Eth2ClientTarget": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "execClient": {
+              "$ref": "#/definitions/ExecutionClientMainnet"
+            },
+            "consClient": {
+              "$ref": "#/definitions/ConsensusClientMainnet"
+            }
+          },
+          "required": [
+            "consClient",
+            "execClient"
+          ]
+        },
+        {
+          "enum": [
+            "remote"
+          ],
+          "type": "string"
+        }
+      ]
+    },
+    "ExecutionClientMainnet": {
+      "enum": [
+        "",
+        "besu.public.dappnode.eth",
+        "erigon.dnp.dappnode.eth",
+        "geth.dnp.dappnode.eth",
+        "nethermind.public.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "ConsensusClientMainnet": {
+      "enum": [
+        "",
+        "lighthouse.dnp.dappnode.eth",
+        "nimbus.dnp.dappnode.eth",
+        "prysm.dnp.dappnode.eth",
+        "teku.dnp.dappnode.eth"
+      ],
+      "type": "string"
+    },
+    "EthClientFallback": {
+      "description": "If the DAPPMANAGER should use a eth remote node in cases of error syncing",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "type": "string"
+    },
+    "ErrorSerialized": {
+      "description": "Serialized errors so the can be persisted in the db, a JSON to disk",
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "stack": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "message"
+      ]
+    },
+    "NewFeatureId": {
+      "description": "Welcome wizard / setup flow\nAvailable routes / views in the UI",
+      "enum": [
+        "change-host-password",
+        "repository",
+        "repository-fallback",
+        "system-auto-updates"
+      ],
+      "type": "string"
+    },
+    "UserActionLog": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "enum": [
+            "error",
+            "info"
+          ],
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "number"
+        },
+        "event": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "args": {
+          "type": "array",
+          "items": {}
+        },
+        "result": {},
+        "stack": {
+          "type": "string"
+        },
+        "count": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "args",
+        "event",
+        "level",
+        "message",
+        "timestamp"
+      ]
+    },
+    "VolumeData": {
+      "type": "object",
+      "properties": {
+        "internalName": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "number"
+        },
+        "size": {
+          "type": "number"
+        },
+        "refCount": {
+          "type": "number"
+        },
+        "isOrphan": {
+          "type": "boolean"
+        },
+        "mountpoint": {
+          "type": "string"
+        },
+        "fileSystem": {
+          "$ref": "#/definitions/MountpointData"
+        },
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "createdAt",
+        "isOrphan",
+        "mountpoint",
+        "name"
+      ]
+    },
+    "MountpointData": {
+      "type": "object",
+      "properties": {
+        "mountpoint": {
+          "type": "string"
+        },
+        "use": {
+          "type": "string"
+        },
+        "used": {
+          "type": "number"
+        },
+        "total": {
+          "type": "number"
+        },
+        "free": {
+          "type": "number"
+        },
+        "vendor": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "free",
+        "model",
+        "mountpoint",
+        "total",
+        "use",
+        "used",
+        "vendor"
+      ]
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

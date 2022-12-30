@@ -1,8 +1,8 @@
-import Ajv from "ajv";
-import routesArgumentsSchema from "../schemas/RoutesArguments.schema.json";
-import routesReturnSchema from "../schemas/RoutesReturn.schema.json";
-import subscriptionsArgumentsSchema from "../schemas/SubscriptionsArguments.schema.json";
-import { Args } from "../transport/types";
+import Ajv, { ErrorObject } from "ajv";
+import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" assert { type: "json" };
+import routesReturnSchema from "./schemas/RoutesReturn.schema.json" assert { type: "json" };
+import subscriptionsArgumentsSchema from "./schemas/SubscriptionsArguments.schema.json" assert { type: "json" };
+import { Args } from "typescript-json-schema";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -31,7 +31,10 @@ export function validateSubscriptionsArgsFactory() {
 }
 
 function formatErrors(
-  errors: Array<Ajv.ErrorObject> | null | undefined,
+  errors:
+    | ErrorObject<string, Record<string, any>, unknown>[]
+    | null
+    | undefined,
   dataVar: string
 ): string {
   return (
