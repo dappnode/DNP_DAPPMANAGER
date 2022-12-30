@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { Routes } from "@dappnode/common";
 
 let hostPasswordIsSecureState = false;
 

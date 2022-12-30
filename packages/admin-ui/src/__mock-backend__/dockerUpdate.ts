@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { Routes } from "@dappnode/common";
 import { pause } from "./utils/pause";
 
 let dockerComposeUpdated = false;

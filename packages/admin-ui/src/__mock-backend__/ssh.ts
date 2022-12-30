@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { Routes } from "@dappnode/common";
 
 let sshPort = 22;
 let sshStatus: "enabled" | "disabled" = "enabled";

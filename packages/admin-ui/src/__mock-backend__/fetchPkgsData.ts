@@ -1,4 +1,4 @@
-import { CoreUpdateDataAvailable, Routes } from "../common";
+import { CoreUpdateDataAvailable, Routes } from "@dappnode/common";
 import { directory, registry, dnpRequests } from "./data";
 
 export const fetchPkgsData: Pick<

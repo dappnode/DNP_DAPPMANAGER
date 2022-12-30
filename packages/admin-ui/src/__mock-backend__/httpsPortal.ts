@@ -1,4 +1,8 @@
-import { ExposableServiceInfo, HttpsPortalMapping, Routes } from "../common";
+import {
+  ExposableServiceInfo,
+  HttpsPortalMapping,
+  Routes
+} from "@dappnode/common";
 
 const mappings = new Map<string, HttpsPortalMapping>();
 

@@ -1,6 +1,6 @@
-import { VolumeData, Routes } from "../common";
 import { pause } from "./utils/pause";
 import { dnpInstalled } from "./data";
+import { VolumeData, Routes } from "@dappnode/common";
 
 const volumesState = new Map<string, VolumeData>(
   getInitialVolumes().map(vol => [vol.name, vol])

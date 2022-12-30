@@ -4,7 +4,7 @@ import {
   UserSettingsAllDnps,
   SetupWizardAllDnps,
   CompatibleDnps
-} from "../../common";
+} from "@dappnode/common";
 import { sampleRequestState } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";

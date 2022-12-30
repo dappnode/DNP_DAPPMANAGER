@@ -1,6 +1,8 @@
 import { ChainDriver, Dependencies, Manifest } from "@dappnode/dappnodesdk";
-import { ExecutionClientMainnet, ReleaseSignatureProtocol } from "./common";
-export * from "./common";
+import {
+  ExecutionClientMainnet,
+  ReleaseSignatureProtocol
+} from "@dappnode/common";
 
 export enum FileFormat {
   JSON = "JSON",

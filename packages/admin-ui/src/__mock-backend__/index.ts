@@ -1,4 +1,4 @@
-import { PortProtocol, Routes, IpfsClientTarget } from "../common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { dockerUpdate } from "./dockerUpdate";
