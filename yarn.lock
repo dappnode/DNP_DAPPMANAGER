@@ -1184,6 +1184,38 @@
     timestring "^5.0.1"
     yargs "^13.2.4"
 
+"@dappnode/dappnodesdk@^0.2.69":
+  version "0.2.69"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.69.tgz#118d7621520070097ef07eeefa6b17ae4f4c50ea"
+  integrity sha512-iiV1TfUFFq+1qlxtXJNybGwwkHoQcWvSX/G+yzLVEIBssuDmCI6ofSZXCjl4Nva7CsOW1Ow2L7DDo1C9kWZmvQ==
+  dependencies:
+    "@octokit/rest" "^18.0.12"
+    ajv "^8.11.0"
+    ajv-errors "^3.0.0"
+    async-retry "^1.2.3"
+    chalk "^2.4.2"
+    cli-progress "^3.8.2"
+    dotenv "^8.2.0"
+    ethers "^5.7.2"
+    figlet "^1.2.3"
+    form-data "^3.0.0"
+    got "^10.5.5"
+    image-size "^0.8.1"
+    inquirer "^6.2.1"
+    js-yaml "^3.12.1"
+    listr "^0.14.3"
+    lodash "^4.17.20"
+    mime-types "^2.1.24"
+    moment "^2.27.0"
+    prettier "^2.1.2"
+    request "^2.88.2"
+    rimraf "^3.0.2"
+    semver "^5.6.0"
+    source-map-support "^0.5.19"
+    tar-fs "^2.0.0"
+    timestring "^5.0.1"
+    yargs "^13.2.4"
+
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"
@@ -4016,6 +4048,11 @@
   version "16.18.9"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.9.tgz#47c491cfbc10460571d766c16526748fa9ad96a1"
   integrity sha512-nhrqXYxiQ+5B/tPorWum37VgAiefi/wmfJ1QZKGKKecC8/3HqcTTJD0O+VABSPwtseMMF7NCPVT9uGgwn0YqsQ==
+
+"@types/node@^18.11.18":
+  version "18.11.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.11.18.tgz#8dfb97f0da23c2293e554c5a50d61ef134d7697f"
+  integrity sha512-DHQpWGjyQKSHj3ebjFI/wRKcqQcdR+MoFBygntYOZytCqNfkd2ZC4ARDJ2DQqhjH5p85Nnd3jhUJIXrszFX/JA==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -17973,6 +18010,11 @@ typescript@^4.7.3:
   version "4.7.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.7.3.tgz#8364b502d5257b540f9de4c40be84c98e23a129d"
   integrity sha512-WOkT3XYvrpXx4vMMqlD+8R8R37fZkjyLGlxavMc4iB8lrl8L0DeTcHbYgw/v0N/z9wAFsgBhcsF0ruoySS22mA==
+
+typescript@^4.9.4:
+  version "4.9.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.4.tgz#a2a3d2756c079abda241d75f149df9d561091e78"
+  integrity sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg==
 
 typescript@~4.8.2:
   version "4.8.4"

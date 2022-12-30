@@ -8,11 +8,13 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "strict": true,
-    // TODO: Fix in a latter PR, too many changes for now
     "useUnknownInCatchVariables": false,
     "types": ["mocha", "node"],
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]

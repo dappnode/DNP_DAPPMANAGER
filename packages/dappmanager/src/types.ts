@@ -37,10 +37,6 @@ export type EthClientSyncedNotificationStatus = {
   status: "AwaitingSynced" | "Synced";
 } | null;
 
-export interface DiskUsageThresholds {
-  [thresholdId: string]: boolean;
-}
-
 export interface RegistryNewRepoEvent {
   txHash: string;
   ensName: string;

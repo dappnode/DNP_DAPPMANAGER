@@ -1,0 +1,19 @@
+{
+  "name": "@dappnode/common",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.4",
+    "typescript-json-schema": "^0.55.0"
+  },
+  "dependencies": {
+    "@dappnode/dappnodesdk": "^0.2.69"
+  }
+}
