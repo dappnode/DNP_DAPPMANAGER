@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["es6", "DOM"],
+    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
+
     "strict": true,
     // TODO: Fix in a latter PR, too many changes for now
     "useUnknownInCatchVariables": false,
@@ -15,5 +16,6 @@
     "sourceMap": true
   },
   "include": ["src/**/*", "test/**/*"],
+  "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "exclude": ["node_modules"]
 }

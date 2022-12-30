@@ -2,4 +2,7 @@ colors: true
 exit: true
 require:
   - dotenv/config
-  - ts-node/register
+# set loader to --loader ts-node/esm
+node-option:
+  - loader=ts-node/esm
+  - experimental-specifier-resolution=node
