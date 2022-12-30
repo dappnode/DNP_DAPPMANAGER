@@ -11,7 +11,7 @@ import {
   MdPlayCircleOutline
 } from "react-icons/md";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
-import { InstalledPackageData, PackageContainer } from "types";
+import { InstalledPackageData, PackageContainer } from "@dappnode/common";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
 import { prettyDnpName, prettyFullName } from "utils/format";

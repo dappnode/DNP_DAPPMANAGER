@@ -8,7 +8,7 @@ import { withToast } from "components/toast/Toast";
 import { BsTrash } from "react-icons/bs";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { InstalledPackageDetailData } from "common";
+import { InstalledPackageDetailData } from "@dappnode/common";
 import { rootPath as packagesRootPath } from "../../data";
 import { markdownList } from "utils/markdown";
 import "./removePackage.scss";

@@ -8,7 +8,7 @@ import fileToDataUri from "utils/fileToDataUri";
 import humanFileSize from "utils/humanFileSize";
 import { prettyFullName } from "utils/format";
 import { withToast } from "components/toast/Toast";
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 
 const fileSizeWarning = 1e6;
 

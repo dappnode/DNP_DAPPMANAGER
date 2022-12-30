@@ -10,7 +10,7 @@ import { ServiceSelector } from "./ServiceSelector";
 // Utils
 import newTabProps from "utils/newTabProps";
 import { stringIncludes, stringSplit } from "utils/strings";
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 import "./logs.scss";
 
 const refreshInterval = 2 * 1000;

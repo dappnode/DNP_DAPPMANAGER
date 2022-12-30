@@ -8,7 +8,7 @@ import {
   VolumeData,
   VpnDevice,
   InstalledPackageData
-} from "./types";
+} from "@dappnode/common";
 
 export interface SubscriptionsTypes {
   /**

@@ -4,7 +4,7 @@ import {
   StakerItem,
   StakerItemOk,
   StakerType
-} from "types";
+} from "@dappnode/common";
 import { isEqual, pick } from "lodash";
 
 export function subStringifyConfig(config: string): string {

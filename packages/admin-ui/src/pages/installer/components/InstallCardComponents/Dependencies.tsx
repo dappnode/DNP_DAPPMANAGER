@@ -5,7 +5,7 @@ import SubTitle from "components/SubTitle";
 import Ok from "components/Ok";
 import DependencyList from "./DependencyList";
 import ProgressBar from "react-bootstrap/ProgressBar";
-import { CompatibleDnps, DependencyListItem } from "types";
+import { CompatibleDnps, DependencyListItem } from "@dappnode/common";
 
 interface DependenciesProps {
   noCard?: boolean;

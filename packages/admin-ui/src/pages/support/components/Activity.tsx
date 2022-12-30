@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSubscription, useApi, apiRoutes } from "api";
-import { UserActionLog } from "types";
+import { UserActionLog } from "@dappnode/common";
 // Components
 import CardList from "components/CardList";
 import ErrorView from "components/ErrorView";

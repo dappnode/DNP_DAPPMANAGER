@@ -7,7 +7,7 @@ import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { Eth2ClientTarget } from "types";
+import { Eth2ClientTarget } from "@dappnode/common";
 import { isEqual } from "lodash";
 
 // Redux Thunk actions

@@ -1,6 +1,6 @@
 import { mapValues } from "lodash";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PackageNotificationDb, PackageNotification } from "common/types";
+import { PackageNotificationDb, PackageNotification } from "@dappnode/common";
 
 export const notificationsSlice = createSlice({
   name: "notifications",

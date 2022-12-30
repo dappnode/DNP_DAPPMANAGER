@@ -1,4 +1,4 @@
-import { DirectoryItem } from "types";
+import { DirectoryItem } from "@dappnode/common";
 import { SelectedCategories } from "../types";
 
 /**

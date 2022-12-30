@@ -9,7 +9,7 @@ import {
   subscriptionsData,
   SubscriptionsTypes
 } from "common/subscriptions";
-import { Routes, routesData, ResolvedType } from "common/routes";
+import { Routes, routesData, ResolvedType } from "@dappnode/common";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";

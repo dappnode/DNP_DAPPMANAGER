@@ -4,7 +4,7 @@ import { isEqual } from "lodash";
 // Components
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
-import { UserSettingsAllDnps, SetupWizardAllDnps } from "types";
+import { UserSettingsAllDnps, SetupWizardAllDnps } from "@dappnode/common";
 import { prettyDnpName } from "utils/format";
 import { EditorAdvanced } from "./EditorAdvanced";
 import { EditorV2 } from "./EditorV2";

@@ -1,5 +1,5 @@
 import React from "react";
-import { Network, StakerConfigSet, StakerItemOk } from "common";
+import { Network, StakerConfigSet, StakerItemOk } from "@dappnode/common";
 import { BsArrowRight } from "react-icons/bs";
 import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash";

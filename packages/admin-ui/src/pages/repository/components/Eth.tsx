@@ -5,7 +5,7 @@ import {
   getEthClientStatus,
   getEthClientFallback
 } from "services/dappnodeStatus/selectors";
-import { EthClientFallback, Eth2ClientTarget } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";

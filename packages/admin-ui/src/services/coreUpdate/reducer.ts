@@ -1,6 +1,6 @@
 import { mapValues } from "lodash";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { CoreUpdateData, RequestStatus } from "common/types";
+import { CoreUpdateData, RequestStatus } from "@dappnode/common";
 
 // Service > coreUpdate
 

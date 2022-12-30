@@ -1,10 +1,9 @@
 import React, { useState } from "react";
 import {
-  ReqStatus,
   HostLogicalVolume,
   HostHardDisk,
   HostVolumeGroup
-} from "types";
+} from "@dappnode/common";
 import { api } from "api";
 import Button from "components/Button";
 import Ok from "components/Ok";
@@ -14,6 +13,7 @@ import Card from "components/Card";
 import { dappnodeVolumeGroup, dappnodeLogicalVolume, forumUrl } from "params";
 import LinkDocs from "components/LinkDocs";
 import { confirm } from "components/ConfirmDialog";
+import { ReqStatus } from "types";
 
 export default function Lvm() {
   const [manual, setManual] = useState(false);

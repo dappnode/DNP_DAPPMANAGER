@@ -3,7 +3,7 @@ import {
   getEthClientPrettyStatusError,
   getEthClientType
 } from "components/EthMultiClient";
-import { ChainData } from "types";
+import { ChainData } from "@dappnode/common";
 import { activateFallbackPath } from "pages/system/data";
 import { getDnpInstalled } from "services/dnpInstalled/selectors";
 import { wifiDnpName } from "params";

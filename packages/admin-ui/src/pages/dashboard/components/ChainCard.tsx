@@ -4,7 +4,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Card from "components/Card";
 import RenderMarkdown from "components/RenderMarkdown";
 import { prettyDnpName } from "utils/format";
-import { ChainData } from "types";
+import { ChainData } from "@dappnode/common";
 import { HelpTo } from "components/Help";
 import { Link } from "react-router-dom";
 import { rootPath as packagesRootPath } from "pages/packages";

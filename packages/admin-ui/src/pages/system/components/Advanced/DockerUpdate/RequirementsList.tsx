@@ -1,6 +1,6 @@
 import React from "react";
 import Ok from "components/Ok";
-import { UpdateRequirement } from "types";
+import { UpdateRequirement } from "@dappnode/common";
 
 export function RequirementsList({ items }: { items: UpdateRequirement[] }) {
   return (

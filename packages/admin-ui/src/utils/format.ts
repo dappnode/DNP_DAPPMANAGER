@@ -1,7 +1,7 @@
 import { capitalize, stringEndsWith } from "utils/strings";
 import { stringSplit } from "./strings";
 import prettyBytesLib from "pretty-bytes";
-import { VolumeData } from "types";
+import { VolumeData } from "@dappnode/common";
 
 export function prettyFullName({
   dnpName,
