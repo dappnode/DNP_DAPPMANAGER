@@ -585,6 +585,7 @@ export interface ChainData {
   message: string; // "Blocks synced: 543000 / 654000"
   help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
+  peers?: number; // 10
 }
 
 export interface ProgressLog {
