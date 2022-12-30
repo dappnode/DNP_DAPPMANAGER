@@ -5,7 +5,7 @@ import compression from "compression";
 import fileUpload from "express-fileupload";
 import { helmetConf } from "./helmet";
 import cors from "cors";
-import socketio from "socket.io";
+import { Socket, Server } from "socket.io";
 import path from "path";
 import { toSocketIoHandler, wrapHandler } from "./utils";
 import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
@@ -85,7 +85,7 @@ export function startHttpApi({
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
-  const io = new socketio.Server(server, { serveClient: false });
+  const io = new Server(server, { serveClient: false });
 
   // Subscriptions
   const subscriptions = subscriptionsFactory(io, subscriptionsLogger);

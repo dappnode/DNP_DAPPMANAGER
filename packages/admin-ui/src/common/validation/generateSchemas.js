@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const TJS = require("typescript-json-schema");
+import fs from "fs";
+import path from "path";
+import TJS from "typescript-json-schema";
 const tsConfigPath = process.argv[2]; // tsconfig.json
 const baseDir = process.argv[3]; // "src/common/schemas";
 

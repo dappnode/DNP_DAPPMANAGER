@@ -1,4 +1,5 @@
-const Daemon = require("monero-rpc").Daemon;
+// @ts-ignore
+import Daemon from "monero-rpc";
 import { InstalledPackageData } from "../../../types";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { ChainDataResult } from "../types";

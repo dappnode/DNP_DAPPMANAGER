@@ -1,4 +1,5 @@
-const Client = require("bitcoin-core");
+// @ts-ignore
+import Client from "bitcoin-core";
 import { InstalledPackageData } from "../../../types";
 import { dockerContainerInspect } from "../../docker";
 import { parseEnvironment } from "../../compose";

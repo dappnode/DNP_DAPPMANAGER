@@ -18,8 +18,8 @@
     "pre-commit": "lerna run pre-commit --stream"
   },
   "dependencies": {
-    "lerna": "^3.22.1",
+    "lerna": "^6.3.0",
     "patch-package": "^6.2.1",
-    "ts-node": "^10.8.1"
+    "ts-node": "^10.9.1"
   }
 }
