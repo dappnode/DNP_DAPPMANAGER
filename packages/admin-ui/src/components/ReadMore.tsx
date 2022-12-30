@@ -14,7 +14,7 @@ import "./readMore.scss";
  * Which limits the height of the component to 1px extra
  * to the height of 4 lines in default font size.
  */
-const ReadMore: React.FC = ({ children }) => {
+const ReadMore: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [readMore, setReadMore] = useState(false);
   const [showReadMore, setShowReadMore] = useState(false);
   const readMoreEl = useRef<HTMLDivElement>(null);

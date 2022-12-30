@@ -1,7 +1,12 @@
-export * from "./types";
-export * from "./routes";
+export * from "./types.js";
+export * from "./routes.js";
 
 // Schemas
 import routesArgumentsSchema from "./validation/schemas/RoutesArguments.schema.json";
 import routesReturnSchema from "./validation/schemas/RoutesReturn.schema.json";
-export { routesArgumentsSchema, routesReturnSchema };
+import subscriptionsArgumentsSchema from "./validation/schemas/SubscriptionsArguments.schema.json";
+export {
+  routesArgumentsSchema,
+  routesReturnSchema,
+  subscriptionsArgumentsSchema,
+};

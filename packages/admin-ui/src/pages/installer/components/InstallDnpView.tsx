@@ -23,13 +23,14 @@ import Card from "components/Card";
 import StatusIcon from "components/StatusIcon";
 // External
 import { rootPath as packagesRootPath } from "pages/packages/data";
-import { RequestedDnp, UserSettingsAllDnps, ProgressLogs } from "types";
+import { ProgressLogs } from "types";
 import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
 import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
+import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/common";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -199,7 +200,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const availableRoutes: {
     name: string;
     subPath: string;
-    render?: () => React.ComponentType<any> | React.ReactElement<any>;
+    render?: ((props: RouteComponentProps<{}>) => React.ReactNode) | undefined;
   }[] = [
     {
       name: "Setup",

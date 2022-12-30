@@ -4,12 +4,12 @@
     "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "moduleResolution": "node",
-    "esModuleInterop": true,
     "resolveJsonModule": true,
+    "esModuleInterop": true,
     "allowJs": true,
     "strict": true,
     "useUnknownInCatchVariables": false,
-    "types": ["mocha", "node"],
+    "types": ["node"],
     "outDir": "dist",
     "sourceMap": true,
     "declaration": true,
@@ -17,6 +17,6 @@
     "skipLibCheck": true
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
-  "include": ["src/**/*", "test/**/*"],
+  "include": ["src/**/*", "src/**/*.json", "test/**/*"],
   "exclude": ["node_modules"]
 }

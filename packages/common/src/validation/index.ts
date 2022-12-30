@@ -32,7 +32,7 @@ export function validateSubscriptionsArgsFactory() {
 
 function formatErrors(
   errors:
-    | ErrorObject<string, Record<string, any>, unknown>[]
+    | any[]
     | null
     | undefined,
   dataVar: string

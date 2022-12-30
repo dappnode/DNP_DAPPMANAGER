@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { mapValues } from "lodash";
 import { Subscriptions, subscriptionsData } from "../..";
-import subscriptionsArgumentsSchema from "@dappnode/common";
+import { subscriptionsArgumentsSchema } from "@dappnode/common";
 import { Args, LoggerMiddleware } from "../types";
 
 const ajv = new Ajv({ allErrors: true });

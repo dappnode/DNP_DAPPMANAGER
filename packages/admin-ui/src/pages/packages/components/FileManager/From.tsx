@@ -16,12 +16,13 @@ export function CopyFileFrom({
   const containerName = container.containerName;
 
   const getDownloadUrl = useCallback(
-    fromPath => apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
+    (fromPath: string) =>
+      apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
     [containerName]
   );
 
   const downloadFile = useCallback(
-    fromPath => window.open(getDownloadUrl(fromPath), "_newtab"),
+    (fromPath: string) => window.open(getDownloadUrl(fromPath), "_newtab"),
     [getDownloadUrl]
   );
 
