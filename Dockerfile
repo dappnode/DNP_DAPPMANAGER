@@ -19,7 +19,15 @@ COPY packages/admin-ui/package.json \
   packages/admin-ui/
 COPY packages/dappmanager/package.json \ 
   packages/dappmanager/
+COPY packages/common/package.json \ 
+  packages/common/
 RUN yarn bootstrap --production
+
+# Build common
+WORKDIR /app/packages/common/
+COPY packages/common/ .
+RUN yarn build
+RUN yarn generate
 
 # Build UI
 WORKDIR /app/packages/admin-ui/
@@ -32,8 +40,6 @@ WORKDIR /app/packages/dappmanager/
 COPY packages/dappmanager/ .
 RUN yarn build
 # Results in build/index.js
-
-
 
 # Compute git data
 #####################################
