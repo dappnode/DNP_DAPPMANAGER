@@ -6,7 +6,7 @@
   "scripts": {
     "start": "REACT_APP_API_TEST=true react-scripts start",
     "build": "react-scripts build",
-    "test": "TEST=true react-scripts test --env=jsdom --watchAll=false",
+    "test": "TEST=true react-scripts test --env=jsdom --watchAll=false --transformIgnorePatterns \"node_modules/(?!@codemirror)/\"",
     "test:watch": "TEST=true react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "analyze": "npx source-map-explorer build/static/js/main.*",
