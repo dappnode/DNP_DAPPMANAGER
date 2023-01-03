@@ -1,5 +1,5 @@
 const path = require("path");
-const webpack = require('webpack'); //to access built-in plugins
+const webpack = require("webpack"); //to access built-in plugins
 const { NODE_ENV = "production" } = process.env;
 module.exports = {
   entry: "./src/index.ts",
@@ -19,6 +19,12 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      {
         test: /\.ts$/,
         use: ["ts-loader"]
       },
@@ -30,9 +36,9 @@ module.exports = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      WebSocket: 'ws',
-      fetch: ['node-fetch', 'default'],
-    }),
+      WebSocket: "ws",
+      fetch: ["node-fetch", "default"]
+    })
   ],
   optimization: {
     // Minimization does not provide great disk space savings, but reduces debug capacity

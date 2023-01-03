@@ -3,16 +3,16 @@ import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash-es";
 import mitt from "mitt";
 // Transport
-import { subscriptionsFactory } from "common/transport/socketIo";
 import {
   Subscriptions,
   subscriptionsData,
   SubscriptionsTypes,
   Routes,
   routesData,
-  ResolvedType
+  ResolvedType,
+  parseRpcResponse,
+  subscriptionsFactory
 } from "@dappnode/common";
-import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";

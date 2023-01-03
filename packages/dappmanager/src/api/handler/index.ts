@@ -1,6 +1,6 @@
 import Ajv from "ajv";
+import routesArgumentsSchema from "@dappnode/common";
 import {
-  routesArgumentsSchema,
   Routes,
   LoggerMiddleware,
   RpcPayload,
