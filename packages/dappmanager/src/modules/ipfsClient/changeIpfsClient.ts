@@ -1,7 +1,7 @@
 import params from "../../params";
 import * as db from "../../db";
 import { packageRemove, packageGet, packageInstall } from "../../calls";
-import { IpfsClientTarget } from "../../types";
+import { IpfsClientTarget } from "@dappnode/common";
 import { ipfs } from "../ipfs";
 
 /**

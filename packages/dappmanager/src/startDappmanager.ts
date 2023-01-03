@@ -6,12 +6,13 @@ import {
 } from "./api/auth/adminPasswordDb";
 import { Logs } from "./logs";
 import { EventBus } from "./eventBus";
-import { LoggerMiddleware, Routes } from "./types";
+import { Routes } from "@dappnode/common";
 import { DeviceCalls } from "./calls/device";
 import { SshCalls } from "./calls/ssh";
 import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi";
 import { VpnApiClient } from "./api/vpnApiClient";
 import { SshManager } from "./modules/sshManager";
+import { LoggerMiddleware } from "./common";
 
 interface DappmanagerParams extends HttpApiParams, AdminPasswordDbParams {}
 

@@ -3,7 +3,7 @@ import {
   AutoUpdateSettings,
   AutoUpdatePending,
   AutoUpdateRegistry
-} from "../types";
+} from "@dappnode/common";
 
 export const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 const AUTO_UPDATE_REGISTRY = "auto-update-registry";

@@ -1,6 +1,6 @@
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
-import { Eth2ClientTarget, EthClientStatus } from "../../types";
+import { Eth2ClientTarget, EthClientStatus } from "@dappnode/common";
 
 /**
  * Send a notification when going from syncing to synced only once per target

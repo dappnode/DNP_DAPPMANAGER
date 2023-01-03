@@ -10,9 +10,12 @@ import {
 } from "./compose";
 import { listPackageNoThrow } from "./list";
 import { getDockerTimeoutMax } from "./utils";
-import { ContainersStatus, PackageContainer } from "../../types";
-import { InstalledPackageData } from "../../common";
 import { logs } from "../../logs";
+import {
+  ContainersStatus,
+  InstalledPackageData,
+  PackageContainer
+} from "@dappnode/common";
 
 interface ComposeUpArgs {
   dnpName: string;

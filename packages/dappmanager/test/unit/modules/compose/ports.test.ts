@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-
-import { PortProtocol } from "../../../../src/types";
+import { PortProtocol } from "@dappnode/common";
 import {
   parsePortMappings,
   stringifyPortMappings,

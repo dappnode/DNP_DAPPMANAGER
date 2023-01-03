@@ -1,5 +1,5 @@
 import upnpcCommand from "./upnpcCommand";
-import { PortProtocol } from "../../types";
+import { PortProtocol } from "@dappnode/common";
 import { UpnpPortMapping } from "./types";
 import { parseUpnpErrors } from "./upnpError";
 

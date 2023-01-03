@@ -15,7 +15,7 @@ import {
 import params from "../../../src/params";
 import rewiremock from "rewiremock";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet";
-import { InstalledPackageData } from "../../../src/types";
+import { InstalledPackageData } from "@dappnode/common";
 
 describe("Call function: autoUpdateDataGet", function () {
   this.timeout(5000);

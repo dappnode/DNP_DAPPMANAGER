@@ -1,4 +1,4 @@
-import { UpdateAvailable } from "../types";
+import { UpdateAvailable } from "@dappnode/common";
 import { dbCache } from "./dbFactory";
 import { stripDots } from "./dbUtils";
 

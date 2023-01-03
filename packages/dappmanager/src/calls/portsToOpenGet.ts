@@ -1,6 +1,6 @@
 import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen";
 import { listContainers } from "../modules/docker/list/listContainers";
-import { PackageContainer, PortToOpen } from "../common";
+import { PackageContainer, PortToOpen } from "@dappnode/common";
 
 /**
  * Returns ports to be opened

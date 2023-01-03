@@ -5,7 +5,7 @@ import {
   getAvahiDaemonStatus
 } from "../modules/hostScripts/scripts/avahiDaemon";
 import params from "../params";
-import { AvahiDaemonStatus, LocalProxyingStatus } from "../types";
+import { AvahiDaemonStatus, LocalProxyingStatus } from "@dappnode/common";
 import { packageSetEnvironment } from "./packageSetEnvironment";
 import { listPackageNoThrow } from "../modules/docker/list";
 

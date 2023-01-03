@@ -1,5 +1,5 @@
 import * as db from "../db";
-import { PackageNotificationDb } from "../types";
+import { PackageNotificationDb } from "@dappnode/common";
 
 /**
  * Returns not viewed notifications.

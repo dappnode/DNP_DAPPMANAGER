@@ -1,6 +1,6 @@
 import memoize from "memoizee";
 import { runScript } from "../runScripts";
-import { DockerVersionsScript, HostInfoScript } from "../../../types";
+import { DockerVersionsScript, HostInfoScript } from "@dappnode/common";
 
 /**
  * Updates docker compose

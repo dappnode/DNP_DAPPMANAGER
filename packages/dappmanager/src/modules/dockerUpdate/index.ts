@@ -1,4 +1,4 @@
-import { DockerUpdateStatus } from "../../types";
+import { DockerUpdateStatus } from "@dappnode/common";
 import {
   getDockerComposeVersion,
   getDockerEnginehostInfo,

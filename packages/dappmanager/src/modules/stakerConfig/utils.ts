@@ -6,7 +6,7 @@ import {
   StakerItemOk,
   StakerItemData,
   PackageRelease
-} from "../../types";
+} from "@dappnode/common";
 import * as db from "../../db";
 import { packageSetEnvironment } from "../../calls";
 import { logs } from "../../logs";

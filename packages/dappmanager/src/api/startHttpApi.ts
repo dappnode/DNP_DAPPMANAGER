@@ -14,14 +14,14 @@ import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
 import { mapSubscriptionsToEventBus } from "./subscriptions";
 import { Logs } from "../logs";
 import { EventBus } from "../eventBus";
+import { Routes } from "@dappnode/common";
 import {
-  getRpcHandler,
-  subscriptionsFactory,
-  RpcPayload,
-  RpcResponse,
   LoggerMiddleware,
-  Routes
-} from "../types";
+  subscriptionsFactory,
+  getRpcHandler,
+  RpcPayload,
+  RpcResponse
+} from "../common";
 
 export interface HttpApiParams
   extends ClientSideCookiesParams,

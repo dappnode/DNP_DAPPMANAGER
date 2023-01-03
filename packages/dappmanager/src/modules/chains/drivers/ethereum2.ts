@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { urlJoin } from "../../../utils/url";
-import { InstalledPackageData } from "../../../types";
+import { InstalledPackageData } from "@dappnode/common";
 import { ChainDataResult } from "../types";
 import { safeProgress } from "../utils";
 

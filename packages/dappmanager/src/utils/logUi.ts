@@ -1,5 +1,5 @@
 import { eventBus } from "../eventBus";
-import { ProgressLog } from "../types";
+import { ProgressLog } from "@dappnode/common";
 import { logs } from "../logs";
 
 export type Log = (dnpName: string, message: string) => void;

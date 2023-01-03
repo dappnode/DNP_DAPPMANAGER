@@ -4,7 +4,7 @@ import params from "../../../params";
 import { safeSemver } from "../utils/safeSemver";
 import aggregateDependencies from "./aggregateDependencies";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
-import { InstalledPackageData, PackageRequest } from "../../../types";
+import { PackageRequest } from "../../../types";
 import { DappGetDnps } from "../types";
 import { logs } from "../../../logs";
 import { DappGetFetcher } from "../fetch/DappGetFetcher";
@@ -14,6 +14,7 @@ import {
   ErrorDappGetNotSatisfyRange,
   ErrorDappGetNoVersions
 } from "../errors";
+import { InstalledPackageData } from "@dappnode/common";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.

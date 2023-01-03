@@ -7,7 +7,7 @@ import {
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
   Network
-} from "../../types";
+} from "@dappnode/common";
 import * as db from "../../db";
 import { packagesGet } from "../../calls";
 import { ComposeFileEditor } from "../compose/editor";

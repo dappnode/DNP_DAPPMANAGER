@@ -9,7 +9,8 @@ describe("Util: parseMemoryStats", async function () {
       totalMemMb: 15769.03,
       usedMemMb: 5313.41,
       freeMemMb: 10455.62,
-      freeMemPercentage: 66.3
+      freeMemPercentage: 66.3,
+      usedMemPercentage: 0
     };
 
     const expectedResult: ReturnType<typeof parseMemoryStats> = {

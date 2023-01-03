@@ -6,7 +6,7 @@ import { DappGetFetcherMock } from "../testHelpers";
 
 // Import for types
 import aggregateType from "../../../../../src/modules/dappGet/aggregate/index";
-import { InstalledPackageData } from "../../../../../src/types";
+import { InstalledPackageData } from "@dappnode/common";
 import { mockDnp } from "../../../../testUtils";
 import { DappGetDnps } from "../../../../../src/modules/dappGet/types";
 

@@ -11,7 +11,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
   EthClientRemote
-} from "../../../../src/types";
+} from "@dappnode/common";
 import { mockDnp, mockContainer } from "../../../testUtils";
 import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types";
 

@@ -1,11 +1,12 @@
 import resolveReleaseName from "./resolveReleaseName";
 import { getRelease } from "./getRelease";
 import { getManifest } from "./getManifest";
-import { PackageRelease, PackageRequest } from "../../types";
+import { PackageRequest } from "../../types";
 import dappGet, { DappgetOptions } from "../dappGet";
 import { Apm } from "../apm";
 import { Manifest } from "@dappnode/dappnodesdk";
 import { DappGetState } from "../dappGet/types";
+import { PackageRelease } from "@dappnode/common";
 
 export class ReleaseFetcher extends Apm {
   /**

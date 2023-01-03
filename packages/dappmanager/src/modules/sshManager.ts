@@ -1,4 +1,4 @@
-import { ShhStatus } from "../types";
+import { ShhStatus } from "@dappnode/common";
 import { ShellError } from "../utils/shell";
 
 export type ShellHost = (cmd: string) => Promise<string>;

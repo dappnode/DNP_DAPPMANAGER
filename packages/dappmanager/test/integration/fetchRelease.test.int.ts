@@ -4,7 +4,7 @@ import path from "path";
 import { omit } from "lodash";
 import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
 import * as calls from "../../src/calls";
-import { ManifestWithImage, RequestedDnp } from "../../src/types";
+import { ManifestWithImage } from "../../src/types";
 import {
   getTestMountpoint,
   clearDbs,
@@ -23,6 +23,7 @@ import { dockerComposeUp } from "../../src/modules/docker/compose";
 import { ComposeEditor } from "../../src/modules/compose/editor";
 import { writeDefaultsToLabels } from "../../src/modules/compose";
 import { getContainerName, getImageTag } from "../../src/params";
+import { RequestedDnp } from "@dappnode/common";
 
 describe("Fetch releases", () => {
   // This mountpoints have files inside created by docker with the root

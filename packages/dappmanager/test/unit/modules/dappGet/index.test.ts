@@ -4,7 +4,7 @@ import sinon from "sinon";
 import rewiremock from "rewiremock";
 // Import for types
 import dappGetType from "../../../../src/modules/dappGet";
-import { InstalledPackageData } from "../../../../src/types";
+import { InstalledPackageData } from "@dappnode/common";
 import { mockDnp } from "../../../testUtils";
 import { DappGetDnps } from "../../../../src/modules/dappGet/types";
 import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch";

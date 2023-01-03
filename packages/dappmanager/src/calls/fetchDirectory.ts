@@ -1,6 +1,6 @@
 import { eventBus } from "../eventBus";
 import { getDirectory } from "../modules/directory";
-import { DirectoryItem, DirectoryItemOk } from "../types";
+import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
 import { logs } from "../logs";
 import { listPackages } from "../modules/docker/list";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";

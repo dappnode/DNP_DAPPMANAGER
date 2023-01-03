@@ -1,7 +1,7 @@
 import * as db from "../../db";
 import { listPackageNoThrow } from "../docker/list";
 import { logs } from "../../logs";
-import { EthClientTarget } from "../../types";
+import { EthClientTarget } from "@dappnode/common";
 import { packageGet } from "../../calls";
 import { ethClientData } from "../../params";
 

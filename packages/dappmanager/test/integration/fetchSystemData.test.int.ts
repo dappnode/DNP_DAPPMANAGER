@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import * as calls from "../../src/calls";
 import { logs } from "../../src/logs";
-import { AutoUpdateSettings } from "../../src/types";
+import { AutoUpdateSettings } from "@dappnode/common";
 import { MY_PACKAGES, SYSTEM_PACKAGES } from "../../src/utils/autoUpdateHelper";
 import { clearDbs } from "../testUtils";
 

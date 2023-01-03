@@ -1,4 +1,4 @@
-import { Eth2ClientTarget } from "../types";
+import { Eth2ClientTarget } from "@dappnode/common";
 import { ethereumClient } from "../modules/ethClient";
 
 /**

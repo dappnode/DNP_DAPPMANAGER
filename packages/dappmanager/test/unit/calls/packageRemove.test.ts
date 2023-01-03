@@ -7,7 +7,7 @@ import * as validate from "../../../src/utils/validate";
 import rewiremock from "rewiremock";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove";
-import { InstalledPackageData } from "../../../src/types";
+import { InstalledPackageData } from "@dappnode/common";
 import { mockDnp, cleanTestDir, mockContainer } from "../../testUtils";
 import { getMockEventBus } from "./eventBus";
 

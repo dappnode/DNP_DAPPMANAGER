@@ -6,7 +6,7 @@ import {
   EthClientStatus,
   ExecutionClientMainnet,
   executionClientsMainnet
-} from "../../types";
+} from "@dappnode/common";
 import { listPackageNoThrow } from "../../modules/docker/list";
 import { serializeError } from "./types";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl";

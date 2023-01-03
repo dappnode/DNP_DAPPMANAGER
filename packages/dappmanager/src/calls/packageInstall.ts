@@ -4,7 +4,7 @@ import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePath
 import { getLogUi, logUiClear } from "../utils/logUi";
 import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
 import { ReleaseFetcher } from "../modules/release";
-import { PackageRequest, Routes } from "../types";
+import { PackageRequest } from "../types";
 import {
   downloadImages,
   loadImages,
@@ -21,6 +21,7 @@ import {
   ensureEth2MigrationRequirements,
   isPrysmLegacy
 } from "../modules/installer/ensureEth2MigrationRequirements";
+import { Routes } from "@dappnode/common";
 
 /**
  * Installs a DAppNode Package.

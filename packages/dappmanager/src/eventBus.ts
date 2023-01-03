@@ -8,7 +8,7 @@ import {
   UserActionLog,
   PackageNotification,
   DirectoryItem
-} from "./types";
+} from "@dappnode/common";
 
 interface EventTypes {
   chainData: ChainData[];

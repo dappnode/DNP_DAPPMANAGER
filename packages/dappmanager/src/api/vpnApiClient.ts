@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { mapValues } from "lodash";
-import { parseRpcResponse } from "../common";
-import { PackageVersionData } from "../types";
+import { RpcResponse, parseRpcResponse } from "../common";
+import { PackageVersionData } from "@dappnode/common";
 
 export interface VpnApiClient {
   addDevice: (kwargs: { id: string }) => Promise<void>;
@@ -58,7 +58,7 @@ async function vpnRpcCall<R>(
 
   // If body is not JSON log it to get info about the error. Express may respond with HTML
   const bodyText = await res.text();
-  let body: R;
+  let body: RpcResponse<R>;
   try {
     body = JSON.parse(bodyText);
   } catch (e) {

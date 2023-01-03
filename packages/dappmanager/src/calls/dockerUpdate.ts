@@ -4,7 +4,7 @@ import {
   getDockerComposeUpdateCheck,
   getDockerEngineUpdateCheck
 } from "../modules/dockerUpdate";
-import { DockerUpdateStatus } from "../types";
+import { DockerUpdateStatus } from "@dappnode/common";
 
 /**
  * Updates docker engine

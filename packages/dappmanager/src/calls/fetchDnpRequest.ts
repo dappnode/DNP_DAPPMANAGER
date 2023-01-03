@@ -13,13 +13,13 @@ import { parseSpecialPermissions } from "../modules/compose/specialPermissions";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
-  CompatibleDnps,
-  PackageRelease,
-  SetupWizardAllDnps,
   SpecialPermissionAllDnps,
-  InstalledPackageData
-} from "../types";
-import { ReleaseSignatureStatusCode } from "../common";
+  SetupWizardAllDnps,
+  PackageRelease,
+  CompatibleDnps,
+  InstalledPackageData,
+  ReleaseSignatureStatusCode
+} from "@dappnode/common";
 
 export async function fetchDnpRequest({
   id

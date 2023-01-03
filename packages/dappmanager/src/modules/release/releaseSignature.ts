@@ -3,16 +3,16 @@ import { CID } from "multiformats/cid";
 import { base58btc } from "multiformats/bases/base58";
 import { base32 } from "multiformats/bases/base32";
 import { base64, base64url } from "multiformats/bases/base64";
-import {
-  ReleaseSignature,
-  ReleaseSignatureProtocol,
-  TrustedReleaseKey,
-  ReleaseSignatureStatus,
-  ReleaseSignatureStatusCode
-} from "../../types";
+import { ReleaseSignature } from "../../types";
 import { releaseFiles } from "../../params";
 import { ReleaseSignatureWithData } from "./types";
 import { IPFSEntry } from "../ipfs";
+import {
+  TrustedReleaseKey,
+  ReleaseSignatureStatus,
+  ReleaseSignatureStatusCode,
+  ReleaseSignatureProtocol
+} from "@dappnode/common";
 
 export function getReleaseSignatureStatus(
   dnpName: string,

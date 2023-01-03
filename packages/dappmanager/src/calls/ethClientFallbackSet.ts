@@ -1,5 +1,5 @@
 import * as db from "../db";
-import { EthClientFallback } from "../types";
+import { EthClientFallback } from "@dappnode/common";
 
 /**
  * Sets if a fallback should be used

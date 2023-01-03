@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { AvahiDaemonStatus } from "../../../types";
+import { AvahiDaemonStatus } from "@dappnode/common";
 import { runScript } from "../runScripts";
 
 /**

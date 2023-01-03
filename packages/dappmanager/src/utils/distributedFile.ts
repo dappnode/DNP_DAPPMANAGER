@@ -1,4 +1,4 @@
-import { DistributedFile } from "../types";
+import { DistributedFile } from "@dappnode/common";
 import params from "../params";
 
 /**

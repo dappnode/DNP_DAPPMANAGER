@@ -10,7 +10,7 @@ import {
   PackageRelease,
   InstallPackageData,
   ContainersStatus
-} from "../../types";
+} from "@dappnode/common";
 import { listPackages } from "../docker/list";
 
 interface GetInstallerPackageDataArg {

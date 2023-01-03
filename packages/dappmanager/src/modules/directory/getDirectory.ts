@@ -1,6 +1,6 @@
 import { isEnsDomain } from "../../utils/validate";
 import { ethers } from "ethers";
-import { DirectoryDnp, DirectoryDnpStatus } from "../../types";
+import { DirectoryDnp, DirectoryDnpStatus } from "@dappnode/common";
 import * as directoryContract from "../../contracts/directory";
 import { logs } from "../../logs";
 import { notUndefined } from "../../utils/typingHelpers";

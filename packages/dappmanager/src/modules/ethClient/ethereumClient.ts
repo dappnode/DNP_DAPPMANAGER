@@ -4,7 +4,7 @@ import {
   Eth2ClientTarget,
   EthClientRemote,
   ExecutionClientMainnet
-} from "../../common";
+} from "@dappnode/common";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";

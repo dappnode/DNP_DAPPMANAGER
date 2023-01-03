@@ -1,5 +1,5 @@
 const Daemon = require("monero-rpc").Daemon;
-import { InstalledPackageData } from "../../../types";
+import { InstalledPackageData } from "@dappnode/common";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { ChainDataResult } from "../types";
 

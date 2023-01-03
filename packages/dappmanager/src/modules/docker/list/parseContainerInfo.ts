@@ -4,7 +4,7 @@ import {
   PackageContainer,
   VolumeMapping,
   ContainerState
-} from "../../../types";
+} from "@dappnode/common";
 import {
   parseEnvironment,
   parsePortMappings,

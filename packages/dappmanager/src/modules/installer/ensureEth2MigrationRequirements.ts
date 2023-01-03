@@ -1,4 +1,4 @@
-import { InstallPackageData } from "../../types";
+import { InstallPackageData } from "@dappnode/common";
 import semver from "semver";
 import params from "../../params";
 import { listPackageNoThrow } from "../docker/list";

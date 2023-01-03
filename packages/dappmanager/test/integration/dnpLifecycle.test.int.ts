@@ -13,7 +13,7 @@ import {
   PackageContainer,
   InstalledPackageData,
   PortProtocol
-} from "../../src/types";
+} from "@dappnode/common";
 import {
   clearDbs,
   getTestMountpoint,

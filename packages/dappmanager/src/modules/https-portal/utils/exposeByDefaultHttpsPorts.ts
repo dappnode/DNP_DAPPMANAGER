@@ -1,6 +1,6 @@
 import { Log } from "../../../utils/logUi";
 import { httpsPortal } from "../../../calls";
-import { InstallPackageData, HttpsPortalMapping } from "../../../types";
+import { InstallPackageData, HttpsPortalMapping } from "@dappnode/common";
 import { prettyDnpName } from "../../../utils/format";
 import { isRunningHttps } from "./isRunningHttps";
 

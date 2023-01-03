@@ -1,5 +1,5 @@
 import { listContainers as dockerApiListContainers } from "../api";
-import { PackageContainer } from "../../../types";
+import { PackageContainer } from "@dappnode/common";
 import { parseContainerInfo } from "./parseContainerInfo";
 
 /**

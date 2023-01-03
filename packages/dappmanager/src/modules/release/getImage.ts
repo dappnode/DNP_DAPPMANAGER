@@ -3,7 +3,7 @@ import { isAbsolute } from "path";
 import * as validate from "../../utils/validate";
 import verifyXz from "../../utils/verifyXz";
 import downloadImage from "./ipfs/downloadImage";
-import { DistributedFile } from "../../types";
+import { DistributedFile } from "@dappnode/common";
 import { getImageTag } from "../../params";
 import { dockerImageManifest } from "../docker/cli";
 

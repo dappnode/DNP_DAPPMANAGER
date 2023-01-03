@@ -13,10 +13,11 @@ import ping from "./utils/ping";
 import { pause } from "./utils/asyncFlows";
 import retry from "async-retry";
 import shell from "./utils/shell";
-import { EthClientRemote, IdentityInterface, IpfsClientTarget } from "./types";
+import { IdentityInterface } from "./types";
 import { logs } from "./logs";
 import { localProxyingEnableDisable } from "./calls";
 import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable";
+import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);

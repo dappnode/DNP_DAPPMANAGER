@@ -1,7 +1,7 @@
 import * as db from "../../db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate";
-import { PackageRelease, ReleaseSignatureStatusCode } from "../../types";
+import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
 import { getIsCore } from "../manifest/getIsCore";
 import { parseMetadataFromManifest } from "../manifest";
 import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefaults";

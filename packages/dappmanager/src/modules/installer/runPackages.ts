@@ -4,7 +4,7 @@ import { dockerComposeUp } from "../docker/compose";
 import { restartDappmanagerPatch } from "./restartPatch";
 import { Log } from "../../utils/logUi";
 import { copyFileTo } from "../../calls/copyFileTo";
-import { InstallPackageData } from "../../types";
+import { InstallPackageData } from "@dappnode/common";
 import { logs } from "../../logs";
 import { dockerComposeUpPackage } from "../docker";
 import { packageToInstallHasPid } from "../../utils/pid";

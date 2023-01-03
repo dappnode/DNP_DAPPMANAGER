@@ -4,7 +4,7 @@ import {
   parseVolumeOwnershipData,
   normalizeProjectName
 } from "../../../../src/modules/docker/volumesData";
-import { PackageContainer, VolumeOwnershipData } from "../../../../src/types";
+import { PackageContainer, VolumeOwnershipData } from "@dappnode/common";
 
 describe("docker > volumes data", () => {
   describe("normalizeProjectName", () => {

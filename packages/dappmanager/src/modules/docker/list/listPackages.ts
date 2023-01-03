@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "../../../types";
+import { InstalledPackageData } from "@dappnode/common";
 import { listContainers } from "./listContainers";
 import { groupPackagesFromContainers } from "./parsePackageFromContainer";
 

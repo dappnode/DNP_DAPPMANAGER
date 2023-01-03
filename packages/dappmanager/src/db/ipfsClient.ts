@@ -1,5 +1,5 @@
 import { dbMain } from "./dbFactory";
-import { IpfsClientTarget } from "../types";
+import { IpfsClientTarget } from "@dappnode/common";
 import params from "../params";
 
 // User chosen properties

@@ -4,7 +4,7 @@ import { ComposeEditor } from "../../src/modules/compose/editor";
 import { ipfs } from "../../src/modules/ipfs";
 import { ReleaseFetcher } from "../../src/modules/release";
 import { getContainerName, getImageTag } from "../../src/params";
-import { ReleaseSignatureStatusCode } from "../../src/types";
+import { ReleaseSignatureStatusCode } from "@dappnode/common";
 import { Manifest } from "@dappnode/dappnodesdk";
 import { uploadDirectoryRelease } from "./integrationSpecs";
 import { signRelease } from "./integrationSpecs/signRelease";

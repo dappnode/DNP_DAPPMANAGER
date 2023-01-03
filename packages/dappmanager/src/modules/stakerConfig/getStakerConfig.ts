@@ -8,7 +8,7 @@ import {
   Signer,
   StakerConfigGet,
   StakerItem
-} from "../../types";
+} from "@dappnode/common";
 import { fileToGatewayUrl } from "../../utils/distributedFile";
 import { listPackages } from "../docker/list";
 import { ReleaseFetcher } from "../release";
@@ -102,7 +102,7 @@ export async function getStakerConfig<T extends Network>(
                 graffiti = pkgEnv[validatorService]["GRAFFITI"];
                 feeRecipient =
                   pkgEnv[validatorService]["FEE_RECIPIENT_ADDRESS"];
-                  pkgEnv[beaconService]["FEE_RECIPIENT_ADDRESS"];
+                pkgEnv[beaconService]["FEE_RECIPIENT_ADDRESS"];
                 checkpointSync = pkgEnv[beaconService]["CHECKPOINT_SYNC_URL"];
               }
             }

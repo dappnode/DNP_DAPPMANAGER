@@ -1,4 +1,4 @@
-import { InstallPackageData } from "../../types";
+import { InstallPackageData } from "@dappnode/common";
 import { Log } from "../../utils/logUi";
 import { loadImage } from "../docker/api";
 import { dockerImageManifest } from "../docker/cli";

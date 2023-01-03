@@ -11,7 +11,7 @@ import {
   AutoUpdatePendingEntry,
   AutoUpdatePending,
   AutoUpdateFeedback
-} from "../types";
+} from "@dappnode/common";
 
 // Groups of packages keys
 export const MY_PACKAGES = "my-packages";

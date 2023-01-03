@@ -1,7 +1,7 @@
 import fs from "fs";
 import params from "../../params";
 import { Log } from "../../utils/logUi";
-import { InstallPackageDataPaths } from "../../types";
+import { InstallPackageDataPaths } from "@dappnode/common";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";
 import { dockerComposeRm, dockerComposeUpPackage } from "../docker";

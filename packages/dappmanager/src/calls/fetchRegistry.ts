@@ -5,7 +5,11 @@ import { eventBus } from "../eventBus";
 import { throttle } from "lodash";
 import { NoImageForArchError } from "../modules/release/errors";
 import { logs } from "../logs";
-import { DirectoryItem, DirectoryDnp, RegistryScanProgress } from "../types";
+import {
+  DirectoryItem,
+  DirectoryDnp,
+  RegistryScanProgress
+} from "@dappnode/common";
 import { fileToGatewayUrl } from "../utils/distributedFile";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { getShortDescription, getFallBackCategories } from "./fetchDirectory";

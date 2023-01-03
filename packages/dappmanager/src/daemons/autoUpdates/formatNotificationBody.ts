@@ -1,4 +1,4 @@
-import { CoreUpdateDataAvailable } from "../../common";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   adminUiInstallPackageUrl,
   adminUiUpdateCoreUrl

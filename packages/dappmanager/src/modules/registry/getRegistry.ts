@@ -1,8 +1,9 @@
-import { DirectoryDnp, RegistryNewRepoEvent } from "../../types";
+import { RegistryNewRepoEvent } from "../../types";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry";
 import * as db from "../../db";
 import { wrapError } from "../../utils/wrapError";
+import { DirectoryDnp } from "@dappnode/common";
 
 // Topic name
 const eventNewRepo = "NewRepo";

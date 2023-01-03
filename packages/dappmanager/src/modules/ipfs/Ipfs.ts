@@ -10,7 +10,7 @@ import {
 import { IpfsCatOptions, IPFSPath } from "./types";
 import { handleIpfsError } from "./utils";
 import { catCarReaderToMemory, catString } from "./writeFileToMemory";
-import { IpfsClientTarget } from "../../common";
+import { IpfsClientTarget } from "@dappnode/common";
 import { dagGet, ls } from "./list";
 
 export class Ipfs {

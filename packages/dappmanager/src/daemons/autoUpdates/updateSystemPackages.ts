@@ -9,7 +9,7 @@ import {
 import { packageInstall } from "../../calls";
 import { logs } from "../../logs";
 import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
-import { CoreUpdateDataAvailable } from "../../types";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
 import { sendUpdateSystemNotificationMaybe } from "./sendUpdateNotification";
 
 const coreDnpName = params.coreDnpName;

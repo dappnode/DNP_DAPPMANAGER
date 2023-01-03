@@ -1,4 +1,4 @@
-import { PackageContainer } from "../../../types";
+import { PackageContainer } from "@dappnode/common";
 import { ComposeFileEditor } from "../../compose/editor";
 
 export function removeNetworkAliasCompose(

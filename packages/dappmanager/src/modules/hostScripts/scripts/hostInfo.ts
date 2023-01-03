@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { HostInfoScript } from "../../../types";
+import { HostInfoScript } from "@dappnode/common";
 import { runScript } from "../runScripts";
 
 /**

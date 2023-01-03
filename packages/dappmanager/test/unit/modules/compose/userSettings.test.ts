@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { pick } from "lodash";
 import { Compose, ComposeService } from "@dappnode/dappnodesdk";
-import { UserSettings } from "../../../../src/types";
+import { UserSettings } from "@dappnode/common";
 
 import {
   parseUserSettings,

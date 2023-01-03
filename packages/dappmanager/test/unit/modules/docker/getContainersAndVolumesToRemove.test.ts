@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { getContainersAndVolumesToRemove } from "../../../../src/modules/docker";
 import { DockerVolumeListItem } from "../../../../src/modules/docker/api";
 import { normalizeProjectName } from "../../../../src/modules/docker/volumesData";
-import { InstalledPackageData } from "../../../../src/types";
+import { InstalledPackageData } from "@dappnode/common";
 import { mockContainer, mockDnp, mockVolume } from "../../../testUtils";
 
 describe("docker / getContainersAndVolumesToRemove", () => {

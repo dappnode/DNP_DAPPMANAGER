@@ -1,5 +1,5 @@
 import { changeIpfsClient } from "../modules/ipfsClient";
-import { IpfsRepository } from "../types";
+import { IpfsRepository } from "@dappnode/common";
 
 /**
  * Changes the IPFS client

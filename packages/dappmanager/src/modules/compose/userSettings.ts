@@ -8,7 +8,7 @@ import {
   parseDevicePathMountpoint,
   getDevicePath
 } from "./index";
-import { PortMapping, UserSettings, VolumeMapping } from "../../types";
+import { PortMapping, UserSettings, VolumeMapping } from "@dappnode/common";
 import { Compose } from "@dappnode/dappnodesdk";
 import { cleanCompose, isOmitable } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";

@@ -7,7 +7,7 @@ import {
   getNsupdateTxts
 } from "../../../../src/modules/nsupdate/utils";
 import { mockContainer } from "../../../testUtils";
-import { PackageContainer } from "../../../../src/types";
+import { PackageContainer } from "@dappnode/common";
 
 describe("modules > nsupdate", () => {
   describe("getMyDotEthdomain", () => {
