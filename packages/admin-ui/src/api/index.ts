@@ -7,9 +7,11 @@ import { subscriptionsFactory } from "common/transport/socketIo";
 import {
   Subscriptions,
   subscriptionsData,
-  SubscriptionsTypes
-} from "common/subscriptions";
-import { Routes, routesData, ResolvedType } from "@dappnode/common";
+  SubscriptionsTypes,
+  Routes,
+  routesData,
+  ResolvedType
+} from "@dappnode/common";
 import { parseRpcResponse } from "common/transport/jsonRpc";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
