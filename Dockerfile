@@ -26,8 +26,8 @@ RUN yarn bootstrap --production
 # Build common
 WORKDIR /app/packages/common/
 COPY packages/common/ .
-RUN yarn build
 RUN yarn generate
+RUN yarn build
 
 # Build UI
 WORKDIR /app/packages/admin-ui/
@@ -53,15 +53,11 @@ COPY dappnode_package.json .
 COPY docker/getGitData.js .
 RUN node getGitData /usr/src/app/.git-data.json
 
-
-
 # Build binaries
 #####################################
 FROM node:${NODE_VERSION}-alpine as build-binaries
 
 RUN apk add --no-cache bind-tools docker
-
-
 
 # Final layer
 #####################################
