@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { findEntries } from "../../../../src/modules/release/ipfs/findEntries";
 import {
   releaseFilesToDownload,

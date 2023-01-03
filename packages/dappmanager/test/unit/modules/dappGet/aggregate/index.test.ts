@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock } from "../testHelpers";
 
 // Import for types

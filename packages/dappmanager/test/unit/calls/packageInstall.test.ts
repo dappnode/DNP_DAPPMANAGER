@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { PackageRelease } from "@dappnode/common";
 import { getMockEventBus } from "./eventBus";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall";
 import { DappGetState } from "../../../src/modules/dappGet/types";

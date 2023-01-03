@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { flatten, uniqBy, orderBy } from "lodash";
+import { flatten, uniqBy, orderBy } from "lodash-es";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 import { api } from "api";
 import { BsTrash } from "react-icons/bs";

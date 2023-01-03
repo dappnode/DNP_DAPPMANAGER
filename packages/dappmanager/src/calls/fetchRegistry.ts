@@ -2,7 +2,7 @@ import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
 import { listPackages } from "../modules/docker/list";
 import { eventBus } from "../eventBus";
-import { throttle } from "lodash";
+import { throttle } from "lodash-es";
 import { NoImageForArchError } from "../modules/release/errors";
 import { logs } from "../logs";
 import {

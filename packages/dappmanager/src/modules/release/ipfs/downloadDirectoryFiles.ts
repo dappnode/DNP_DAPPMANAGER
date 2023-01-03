@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { ReleaseSignature } from "../../../types";
 import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import { findEntries } from "./findEntries";

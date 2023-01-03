@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import useSWR, { responseInterface } from "swr";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import mitt from "mitt";
 // Transport
 import { subscriptionsFactory } from "common/transport/socketIo";

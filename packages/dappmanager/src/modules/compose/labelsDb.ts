@@ -8,7 +8,7 @@ import {
   chainDriversTypes,
   Dependencies
 } from "@dappnode/dappnodesdk";
-import { pick, omitBy, mapValues } from "lodash";
+import { pick, omitBy, mapValues } from "lodash-es";
 
 /**
  * This module ensures that data stored in a DNP's container labels

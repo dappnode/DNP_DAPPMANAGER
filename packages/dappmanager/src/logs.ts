@@ -1,4 +1,5 @@
 import path from "path";
+import { fileURLToPath } from "url";
 import stackTrace from "stack-trace";
 // "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
 import "source-map-support/register";
@@ -17,7 +18,8 @@ export type Logs = {
 // Instead of { b: { d: [ Object ] } }
 inspect.defaultOptions.depth = null;
 
-const rootDir = __dirname;
+const __filename = fileURLToPath(import.meta.url);
+const rootDir = path.dirname(__filename);
 const logDebug = /debug/i.test(process.env.LOG_LEVEL || "");
 
 // Not adding color codes since it makes it harder to read as plain text

@@ -1,5 +1,5 @@
 import React from "react";
-import { orderBy, isEmpty } from "lodash";
+import { orderBy, isEmpty } from "lodash-es";
 // Components
 import Input from "components/Input";
 import { UserSettingsAllDnps } from "@dappnode/common";

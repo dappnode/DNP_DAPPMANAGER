@@ -1,5 +1,5 @@
 import { PortMapping, PortProtocol } from "@dappnode/common";
-import { uniqBy, concat } from "lodash";
+import { uniqBy, concat } from "lodash-es";
 
 /**
  * Parses a port string array from a docker-compose.yml

@@ -2,7 +2,7 @@ import fs from "fs";
 import pathUtil from "path";
 import semver from "semver";
 import { PackageRequest } from "../types";
-const isIPFS = require("is-ipfs");
+import isIPFS from "is-ipfs";
 import { logs } from "../logs";
 
 const supportedDomains = ["eth"];

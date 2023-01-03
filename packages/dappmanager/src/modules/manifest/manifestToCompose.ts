@@ -1,4 +1,4 @@
-import { pick } from "lodash";
+import { pick } from "lodash-es";
 import { parseVolumeMappings } from "../compose/volumes";
 import { parseEnvironment } from "../compose/environment";
 import params, { getContainerName, getImageTag } from "../../params";

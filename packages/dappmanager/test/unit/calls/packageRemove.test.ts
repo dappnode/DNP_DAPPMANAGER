@@ -4,7 +4,7 @@ import sinon from "sinon";
 import fs from "fs";
 import * as getPath from "../../../src/utils/getPath";
 import * as validate from "../../../src/utils/validate";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove";
 import { InstalledPackageData } from "@dappnode/common";

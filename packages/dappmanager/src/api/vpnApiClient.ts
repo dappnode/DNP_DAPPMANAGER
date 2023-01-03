@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { RpcResponse, parseRpcResponse } from "../common";
 import { PackageVersionData } from "@dappnode/common";
 

@@ -3,7 +3,7 @@ import params from "../params";
 import { listPackage } from "../modules/docker/list";
 import { ComposeFileEditor } from "../modules/compose/editor";
 import { PortMapping } from "@dappnode/common";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { getContainersStatus, dockerComposeUpPackage } from "../modules/docker";
 import { packageInstalledHasPid } from "../utils/pid";
 

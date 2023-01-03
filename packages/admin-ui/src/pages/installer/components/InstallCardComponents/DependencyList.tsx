@@ -1,5 +1,5 @@
 import React from "react";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 import Badge from "react-bootstrap/Badge";
 import computeSemverUpdateType from "utils/computeSemverUpdateType";
 import RenderMarkdown from "components/RenderMarkdown";

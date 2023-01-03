@@ -1,5 +1,5 @@
 import { dbCache } from "./dbFactory";
-import { pick } from "lodash";
+import { pick } from "lodash-es";
 import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
 
 const CORE_UPDATE_PACKAGES_DATA = "core-update-packages-data";

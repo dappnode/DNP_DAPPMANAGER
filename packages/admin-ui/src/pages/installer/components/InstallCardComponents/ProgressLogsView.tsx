@@ -1,5 +1,5 @@
 import React from "react";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 import { prettyDnpName } from "utils/format";
 // Components
 import ProgressBar from "react-bootstrap/ProgressBar";

@@ -8,7 +8,7 @@ import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
 import { Eth2ClientTarget } from "@dappnode/common";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 
 // Redux Thunk actions
 

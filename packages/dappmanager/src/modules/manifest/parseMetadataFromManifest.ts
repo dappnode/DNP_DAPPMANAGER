@@ -1,4 +1,4 @@
-import { omit } from "lodash";
+import { omit } from "lodash-es";
 import { setupWizard1To2 } from "../setupWizard/setupWizard1To2";
 import { ManifestWithImage } from "../../types";
 import { Manifest } from "@dappnode/dappnodesdk";

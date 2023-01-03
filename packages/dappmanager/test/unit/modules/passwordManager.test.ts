@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function getPasswordManager(

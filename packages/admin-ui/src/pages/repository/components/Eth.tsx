@@ -18,7 +18,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 
 export default function Eth() {
   const ethClientTarget = useSelector(getEthClientTarget);

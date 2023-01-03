@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ethers } from "ethers";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { ipfs } from "../../../src/modules/ipfs";
 import shell from "../../../src/utils/shell";
 import { yamlDump } from "../../../src/utils/yaml";

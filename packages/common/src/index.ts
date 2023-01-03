@@ -3,9 +3,9 @@ export * from "./routes.js";
 export * from "./subscriptions.js";
 
 // Schemas
-import routesArgumentsSchema from "./validation/schemas/RoutesArguments.schema.json";
-import routesReturnSchema from "./validation/schemas/RoutesReturn.schema.json";
-import subscriptionsArgumentsSchema from "./validation/schemas/SubscriptionsArguments.schema.json";
+import routesArgumentsSchema from "./validation/schemas/RoutesArguments.schema.json" assert { type: "json" };
+import routesReturnSchema from "./validation/schemas/RoutesReturn.schema.json" assert { type: "json" };
+import subscriptionsArgumentsSchema from "./validation/schemas/SubscriptionsArguments.schema.json" assert { type: "json" };
 export {
   routesArgumentsSchema,
   routesReturnSchema,

@@ -13,7 +13,7 @@ import {
   flagCompletedUpdate
 } from "../../../src/utils/autoUpdateHelper";
 import params from "../../../src/params";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet";
 import { InstalledPackageData } from "@dappnode/common";
 

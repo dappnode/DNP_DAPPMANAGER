@@ -8,7 +8,7 @@ import {
   withRouter,
   RouteComponentProps
 } from "react-router-dom";
-import { isEmpty, throttle } from "lodash";
+import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
 import { prettyDnpName, isDnpVerified } from "utils/format";
 // This module

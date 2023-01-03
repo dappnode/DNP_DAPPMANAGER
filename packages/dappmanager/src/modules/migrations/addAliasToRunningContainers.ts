@@ -1,6 +1,6 @@
 import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
 import Dockerode from "dockerode";
-import { uniq } from "lodash";
+import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { getPrivateNetworkAlias } from "../../domains";
 import { logs } from "../../logs";

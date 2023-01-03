@@ -1,4 +1,4 @@
-import { keyBy } from "lodash";
+import { keyBy } from "lodash-es";
 import { createReducer } from "@reduxjs/toolkit";
 import { setDnpRegistry, updateDnpRegistry, updateStatus } from "./actions";
 import { DirectoryItem, RequestStatus } from "@dappnode/common";

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { mapKeys } from "lodash";
+import { mapKeys } from "lodash-es";
 import * as db from "../db";
 import params from "../params";
 import { stringifyEnvironment } from "../modules/compose";

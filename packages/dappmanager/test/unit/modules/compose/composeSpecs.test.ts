@@ -10,7 +10,10 @@ import {
   verifyCompose
 } from "../../../../src/modules/compose";
 import { isNotFoundError } from "../../../../src/utils/node";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const specsDir = path.join(__dirname, "../releaseSpecs");
 
 const paths = {

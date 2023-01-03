@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import {
   subscriptionsArgumentsSchema,
   Subscriptions,

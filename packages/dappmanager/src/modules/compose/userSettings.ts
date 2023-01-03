@@ -1,5 +1,5 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject } from "lodash";
+import { mapValues, pick, omitBy, isObject } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,

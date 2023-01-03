@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { CoreUpdateData, RequestStatus } from "@dappnode/common";
 

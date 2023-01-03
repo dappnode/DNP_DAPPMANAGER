@@ -5,7 +5,7 @@ import { logs } from "../logs";
 import { listPackages } from "../modules/docker/list";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
 import { fileToGatewayUrl } from "../utils/distributedFile";
-import { throttle } from "lodash";
+import { throttle } from "lodash-es";
 import { getEthersProvider } from "../modules/ethClient";
 import { ReleaseFetcher } from "../modules/release";
 import { NoImageForArchError } from "../modules/release/errors";
