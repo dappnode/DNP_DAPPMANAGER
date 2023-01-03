@@ -1,7 +1,6 @@
 import Ajv from "ajv";
-import { routesArgumentsSchema } from "@dappnode/common";
+import { routesArgumentsSchema, Routes } from "@dappnode/common";
 import { LoggerMiddleware, RpcPayload, RpcResponse } from "../types";
-import { Routes } from "@dappnode/common";
 
 const ajv = new Ajv({ allErrors: true });
 

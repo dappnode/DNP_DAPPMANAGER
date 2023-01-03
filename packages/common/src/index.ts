@@ -1,5 +1,6 @@
 export * from "./types.js";
 export * from "./routes.js";
+export * from "./subscriptions.js";
 
 // Schemas
 import routesArgumentsSchema from "./validation/schemas/RoutesArguments.schema.json";

@@ -1,5 +1,3 @@
-export * from "./subscriptions";
-
 // Transport
 export * from "./transport/jsonRpc";
 export * from "./transport/socketIo";

@@ -1,14 +1,14 @@
 import {
   AutoUpdateDataView,
   DirectoryItem,
-  ProgressLog,
+  InstalledPackageData,
   PackageNotification,
+  ProgressLog,
   SystemInfo,
   UserActionLog,
   VolumeData,
   VpnDevice,
-  InstalledPackageData
-} from "@dappnode/common";
+} from "./types";
 
 export interface SubscriptionsTypes {
   /**
@@ -104,7 +104,7 @@ export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
   registry: {},
   systemInfo: {},
   userActionLog: {},
-  volumes: {}
+  volumes: {},
 };
 
 // DO NOT REMOVE
