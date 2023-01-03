@@ -1,11 +1,8 @@
 import Ajv from "ajv";
 import { mapValues } from "lodash-es";
-import {
-  subscriptionsArgumentsSchema,
-  Subscriptions,
-  subscriptionsData
-} from "@dappnode/common";
-import { Args, LoggerMiddleware } from "../types";
+import { Args, LoggerMiddleware } from "../../types";
+import { Subscriptions, subscriptionsData } from "../../subscriptions";
+import { subscriptionsArgumentsSchema } from "../..";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -75,7 +72,7 @@ export function subscriptionsFactory(
             if (onError) onError(`on - ${route}`, e, args);
           }
         });
-      }
+      },
     };
   });
 }

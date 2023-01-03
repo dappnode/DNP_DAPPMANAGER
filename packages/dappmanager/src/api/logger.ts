@@ -1,8 +1,13 @@
 import { EthProviderError } from "../modules/ethClient";
 import * as logUserAction from "../logUserAction";
-import { LoggerMiddleware, Args, Result } from "../common";
 import { logs } from "../logs";
-import { routesData, Routes } from "@dappnode/common";
+import {
+  routesData,
+  Routes,
+  LoggerMiddleware,
+  Args,
+  Result
+} from "@dappnode/common";
 
 export const routesLogger: LoggerMiddleware = {
   onCall: (route: string, args: Args = []): void => {

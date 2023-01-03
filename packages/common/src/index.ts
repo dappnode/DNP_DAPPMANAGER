@@ -1,6 +1,8 @@
 export * from "./types.js";
 export * from "./routes.js";
 export * from "./subscriptions.js";
+export * from "./transport/jsonRpc"
+export * from "./transport/socketIo"
 
 // Schemas
 import routesArgumentsSchema from "./validation/schemas/RoutesArguments.schema.json" assert { type: "json" };
