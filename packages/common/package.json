@@ -23,6 +23,7 @@
     "typescript-json-schema": "^0.55.0"
   },
   "dependencies": {
-    "@dappnode/dappnodesdk": "^0.2.69"
+    "@dappnode/dappnodesdk": "^0.2.69",
+    "@types/node": "^18.11.18"
   }
 }
