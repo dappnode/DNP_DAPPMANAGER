@@ -13,7 +13,7 @@
     "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive --ignore-optional",
     "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
-    "mock-standalone": "lerna run mock-standalone --stream",
+    "mock-standalone:build": "lerna run mock-standalone:build --stream",
     "build": "lerna run build --stream",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
