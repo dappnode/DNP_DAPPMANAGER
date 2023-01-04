@@ -10,16 +10,17 @@
     ]
   },
   "scripts": {
+    "build:types": "lerna run build:types --stream",
     "generate": "lerna run generate --stream",
     "mock-standalone:build": "lerna run mock-standalone:build --stream",
-    "build": "lerna run build --stream",
+    "build": "lerna run build --include-dependencies --stream",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "test:int": "lerna run test:int --stream",
     "pre-commit": "lerna run pre-commit --stream"
   },
   "dependencies": {
-    "lerna": "^3.22.1",
+    "lerna": "^6.3.0",
     "patch-package": "^6.2.1",
     "ts-node": "^10.8.1"
   }

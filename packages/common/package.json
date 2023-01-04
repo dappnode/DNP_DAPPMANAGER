@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:types": "tsc",
     "generate": "ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
     "dev": "tsc -w"
   },

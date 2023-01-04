@@ -32,6 +32,7 @@ jobs:
           node-version: "16.15.0"
       - run: yarn
       - run: yarn generate
+      - run: yarn build:types
       - run: yarn test
       - run: yarn lint
       - run: yarn server-mock:check-types
