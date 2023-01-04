@@ -42,4 +42,8 @@ for (const typeName of typesToSchema) {
   }
 
   fs.writeFileSync(getPath(typeName), JSON.stringify(schema, null, 2));
+
+  // Transpile schema to TypeScript
+  const tsPath = getPath(typeName).replace(/\.json$/, ".ts");
+  fs.writeFileSync(tsPath, `export default ${JSON.stringify(schema)};`);
 }

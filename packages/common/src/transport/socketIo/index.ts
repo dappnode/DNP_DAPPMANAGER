@@ -1,7 +1,7 @@
 import Ajv from "ajv";
 import { mapValues } from "lodash-es";
 import { Args, LoggerMiddleware } from "../../types";
-import { Subscriptions, subscriptionsData } from "../../subscriptions";
+import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
 
 const ajv = new Ajv({ allErrors: true });
 
