@@ -13,13 +13,19 @@ const typesToSchema = [
   "SubscriptionsArguments",
 ];
 
-const getPath = (typeName: string) =>
+const getTsPath = (typeName: string) => {
+  const firstLetter = typeName[0].toLowerCase();
+  const rest = typeName.slice(1);
+  return path.join(baseDir, `${firstLetter}${rest}.schema.ts`);
+};
+
+const getJsonPath = (typeName: string) =>
   path.join(baseDir, `${typeName}.schema.json`);
 fs.mkdirSync(baseDir, { recursive: true });
 
 // Pre-generate files so compilation doesn't fail
 for (const typeName of typesToSchema) {
-  fs.writeFileSync(getPath(typeName), "{}");
+  fs.writeFileSync(getJsonPath(typeName), "{}");
 }
 
 // Compile types to schemas
@@ -41,9 +47,9 @@ for (const typeName of typesToSchema) {
       delete schema.properties[route];
   }
 
-  fs.writeFileSync(getPath(typeName), JSON.stringify(schema, null, 2));
-
-  // Transpile schema to TypeScript
-  const tsPath = getPath(typeName).replace(/\.json$/, ".ts");
-  fs.writeFileSync(tsPath, `export default ${JSON.stringify(schema)};`);
+  fs.writeFileSync(getJsonPath(typeName), JSON.stringify(schema, null, 2));
+  fs.writeFileSync(
+    getTsPath(typeName),
+    `export default ${JSON.stringify(schema)};`
+  );
 }
