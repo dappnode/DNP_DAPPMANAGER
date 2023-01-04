@@ -21,7 +21,7 @@ COPY packages/dappmanager/package.json \
   packages/dappmanager/
 COPY packages/common/package.json \ 
   packages/common/
-RUN yarn bootstrap --production
+RUN yarn install --production
 
 # Build common
 WORKDIR /app/packages/common/

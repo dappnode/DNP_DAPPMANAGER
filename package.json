@@ -10,8 +10,6 @@
     ]
   },
   "scripts": {
-    "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive --ignore-optional",
-    "postbootstrap": "CI=true patch-package",
     "generate": "lerna run generate --stream",
     "mock-standalone:build": "lerna run mock-standalone:build --stream",
     "build": "lerna run build --stream",
