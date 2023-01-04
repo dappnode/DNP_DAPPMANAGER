@@ -16,7 +16,8 @@ jobs:
       # Install dependencies
       - run: yarn install
       # Generate schemas
-      - run: yarn generate
+      - run: yarn generate && yarn build
+        working-directory: packages/common
       # Build
       - run: yarn mock-standalone:build
       # Deploy
