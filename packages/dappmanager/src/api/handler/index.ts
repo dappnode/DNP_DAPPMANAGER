@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import routesArgumentsSchema from "@dappnode/common";
+import { routesArgumentsSchema } from "@dappnode/common";
 import {
   Routes,
   LoggerMiddleware,
