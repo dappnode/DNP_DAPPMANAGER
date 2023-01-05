@@ -35,9 +35,12 @@ export async function ethereum2(
   const apiUrl = `http://${containerDomain}:${port}`;
 
   try {
-    const nodeSyncing = await fetchNodeSyncingStatus(apiUrl);
+    const [nodeSyncing, peersCount] = await Promise.all([
+      fetchNodeSyncingStatus(apiUrl),
+      fetchNodePeersCount(apiUrl).then(parseNodePeersCount)
+    ]);
 
-    return parseNodeSyncingResponse(nodeSyncing);
+    return parseNodeSyncingResponse(nodeSyncing, peersCount);
   } catch (e) {
     // Retuturn error if cant fetch
     return {
@@ -48,11 +51,17 @@ export async function ethereum2(
   }
 }
 
+function parseNodePeersCount(peersCount: NodePeersCount): number {
+  if (!peersCount || !peersCount.data) return 0;
+  return parseInt(peersCount.data.connected);
+}
+
 /**
  * Parses the response from the beacon node to describe if it's currently syncing or not, and if it is, what block it is up to.
  */
 export function parseNodeSyncingResponse(
-  nodeSyncing: NodeSyncing
+  nodeSyncing: NodeSyncing,
+  peersCount: number
 ): ChainDataResult {
   const MIN_SLOT_DIFF_SYNC = 60;
   // Return error if no data
@@ -75,7 +84,8 @@ export function parseNodeSyncingResponse(
     return {
       syncing: false,
       error: false,
-      message: `Synced #${headSlot}`
+      message: `Synced #${headSlot}`,
+      peers: peersCount
     };
   } else {
     // Return syncing state
@@ -83,7 +93,8 @@ export function parseNodeSyncingResponse(
       syncing: is_syncing,
       message: `Blocks synced ${headSlot} / ${highestBlock}`,
       progress: progress,
-      error: false
+      error: false,
+      peers: peersCount
     };
   }
 }
@@ -94,6 +105,16 @@ export function parseNodeSyncingResponse(
  */
 async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
   return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then(res =>
+    res.json()
+  );
+}
+
+/**
+ * Requests the beacon node to describe the number of peers it is connected to.
+ * https://ethereum.github.io/beacon-APIs/#/Node/getPeerCount
+ */
+async function fetchNodePeersCount(baseUrl: string): Promise<NodePeersCount> {
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/peer_count")).then(res =>
     res.json()
   );
 }
@@ -125,6 +146,28 @@ interface NodeSyncing {
     head_slot: string;
     sync_distance: string;
     is_syncing: boolean;
+  };
+}
+
+/**
+ * Request successful:
+ * ```
+ *  {
+ *   "data": {
+ *     "disconnected": "12",
+ *     "connecting": "34",
+ *     "connected": "56",
+ *     "disconnecting": "5"
+ *   }
+ * }
+ * ```
+ */
+interface NodePeersCount {
+  data: {
+    disconnected: string;
+    connecting: string;
+    connected: string;
+    disconnecting: string;
   };
 }
 
