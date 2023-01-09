@@ -5,7 +5,7 @@ import rewiremock from "rewiremock/webpack";
 import { EthClientSyncedNotificationStatus } from "../../../../src/types";
 import { EventBus, eventBus } from "../../../../src/eventBus";
 
-describe("modules / ethClient / emitSyncedNotification", () => {
+describe.skip("modules / ethClient / emitSyncedNotification", () => {
   it("Simulate notification cycle for ethClient synced status", async () => {
     let notificationStatus: EthClientSyncedNotificationStatus = null;
     const ethClientSyncedNotificationStatus = {

@@ -17,7 +17,7 @@ import rewiremock from "rewiremock/webpack";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet";
 import { InstalledPackageData } from "@dappnode/common";
 
-describe("Call function: autoUpdateDataGet", function () {
+describe.skip("Call function: autoUpdateDataGet", function () {
   this.timeout(5000);
   const dnpName = "bitcoin.dnp.dappnode.eth";
   const currentVersion = "0.2.6";

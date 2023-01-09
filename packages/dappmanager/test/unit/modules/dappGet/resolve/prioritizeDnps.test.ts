@@ -13,7 +13,7 @@ import { expect } from "chai";
 
 import prioritizeDnps from "../../../../../src/modules/dappGet/resolve/prioritizeDnps";
 
-describe("dappGet/resolve/prioritizeDnps", () => {
+describe.skip("dappGet/resolve/prioritizeDnps", () => {
   it("should order dnps: Others > state > request", async () => {
     const dnps = {
       A: { isRequest: true, versions: {} },

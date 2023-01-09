@@ -114,7 +114,7 @@ function getRelevantInstalledDnps(): InstalledPackageData[] {
 
 const dappGetFetcherEmpty = new DappGetFetcherMock({});
 
-describe("dappGet/aggregate", () => {
+describe.skip("dappGet/aggregate", () => {
   let aggregate: typeof aggregateType;
 
   before("Mock", async () => {

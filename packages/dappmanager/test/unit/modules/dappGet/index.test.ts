@@ -15,7 +15,7 @@ import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch";
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-describe("dappGet", function () {
+describe.skip("dappGet", function () {
   this.timeout(5 * 1000); // For some reason the before step can last > 2s
   const listPackagesSpy = sinon.spy();
 

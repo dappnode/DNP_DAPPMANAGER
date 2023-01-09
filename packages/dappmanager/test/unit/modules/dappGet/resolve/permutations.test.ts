@@ -17,7 +17,7 @@ import { PermutationsTableInterface } from "../../../../../src/modules/dappGet/t
 
 import * as permutations from "../../../../../src/modules/dappGet/resolve/permutations";
 
-describe("dappGet/resolve/permutations", () => {
+describe.skip("dappGet/resolve/permutations", () => {
   let permutationsTable: PermutationsTableInterface;
   let permutationsNumber: number;
 

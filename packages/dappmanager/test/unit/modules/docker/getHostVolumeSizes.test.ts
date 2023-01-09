@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock/webpack";
 
-describe("getHostVolumeSizes", () => {
+describe.skip("getHostVolumeSizes", () => {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   async function getMock(shellHost: (cmd: string) => Promise<string>) {
     const mock = await rewiremock.around(

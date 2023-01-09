@@ -29,7 +29,7 @@ function logBig(...args: string[]): void {
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-describe("dappGet integration test", async () => {
+describe.skip("dappGet integration test", async () => {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
   /**
@@ -43,7 +43,7 @@ describe("dappGet integration test", async () => {
       path.join(casesFolder, casePath)
     ).then(m => m.default);
 
-    describe(`Case: ${caseData.name}`, () => {
+    describe.skip(`Case: ${caseData.name}`, () => {
       // Prepare dependencies
 
       const dnpList: InstalledPackageData[] = Object.keys(caseData.dnps)

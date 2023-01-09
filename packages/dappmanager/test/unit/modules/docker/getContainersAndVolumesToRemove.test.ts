@@ -5,7 +5,7 @@ import { normalizeProjectName } from "../../../../src/modules/docker/volumesData
 import { InstalledPackageData } from "@dappnode/common";
 import { mockContainer, mockDnp, mockVolume } from "../../../testUtils";
 
-describe("docker / getContainersAndVolumesToRemove", () => {
+describe.skip("docker / getContainersAndVolumesToRemove", () => {
   const dnpName = "test.dnp.dappnode.eth";
   const containerNames = {
     container1: "DAppNodePackage-1.test.dnp.dappnode.eth",

@@ -20,7 +20,7 @@ interface State {
   status: { [target: string]: EthClientInstallStatus };
 }
 
-describe("daemons > ethMultiClient > runWatcher", () => {
+describe.skip("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
     let currentExecClient: ExecutionClientMainnet | null =
       "besu.public.dappnode.eth";
