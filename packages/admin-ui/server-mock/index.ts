@@ -1,7 +1,7 @@
 import path from "path";
 import { calls } from "../src/__mock-backend__";
 import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
-import { LoggerMiddleware } from "../src/common/transport/types";
+import { LoggerMiddleware } from "@dappnode/common";
 import { MockVpnApiClient } from "./mockVpnClient";
 import { eventBus } from "./eventBus";
 import { MockSshManager } from "./mockSshManager";
