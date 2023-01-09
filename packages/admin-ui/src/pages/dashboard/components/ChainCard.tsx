@@ -57,8 +57,9 @@ function ChainCard(chain: ChainData) {
       )}
 
       <div className="message">
-
-        {(!syncing || (typeof progress === "number" && progress !== 0)) && (
+        {(dnpName === "repository-source" ||
+          !syncing ||
+          (typeof progress === "number" && progress !== 0)) && (
           <RenderMarkdown source={message} noMargin />
         )}
         {peers && <RenderMarkdown source={`Peers: ${peers}`} noMargin />}
