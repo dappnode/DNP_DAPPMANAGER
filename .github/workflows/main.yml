@@ -49,6 +49,7 @@ jobs:
           node-version: "16.15.0"
       - run: yarn # Caching only saves 30s
       - run: yarn generate
+      - run: yarn build:types
       - run: yarn test:int
 
   release:
