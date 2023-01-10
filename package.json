@@ -17,11 +17,13 @@
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "test:int": "lerna run test:int --stream",
-    "pre-commit": "lerna run pre-commit --stream"
+    "pre-commit": "lerna run pre-commit --stream",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "lerna": "^6.3.0",
-    "patch-package": "^6.2.1",
+    "patch-package": "^6.5.1",
+    "postinstall-postinstall": "^2.1.0",
     "ts-node": "^10.8.1"
   }
 }
