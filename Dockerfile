@@ -27,15 +27,17 @@ RUN yarn install --production
 WORKDIR /app/packages/common/
 COPY packages/common/ .
 RUN yarn generate
-RUN yarn build
+RUN yarn build 
+# Results in dist/*
 
-# Build UI
+# Build admin-ui
 WORKDIR /app/packages/admin-ui/
 COPY packages/admin-ui/ .
 ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
 
+# Build DAPPMANAGER
 WORKDIR /app/packages/dappmanager/
 COPY packages/dappmanager/ .
 RUN yarn build

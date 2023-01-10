@@ -20,6 +20,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/common": "^0.1.0",
     "@dappnode/dappnodesdk": "^0.2.68",
     "@ipld/car": "^3.1.16",
     "@types/async": "^3.0.1",
