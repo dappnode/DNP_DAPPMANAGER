@@ -1,4 +1,4 @@
-ARG NODE_VERSION=18.12.1
+ARG NODE_VERSION=19.2.0
 
 # Common base so it's cached
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
