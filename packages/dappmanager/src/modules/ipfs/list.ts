@@ -2,7 +2,7 @@ import { IPFSEntry } from "ipfs-core-types/src/root";
 import { IpfsInstance, IpfsDagGet } from "./types";
 import { sanitizeIpfsPath } from "./utils";
 import path from "path";
-import { CID } from "multiformats";
+import { CID } from "ipfs-http-client";
 
 /**
  * LOCAL
