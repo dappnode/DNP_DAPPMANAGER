@@ -1,7 +1,7 @@
 import path from "path";
 import { Compose } from "@dappnode/dappnodesdk";
 import { logs } from "../../logs";
-import { uniq } from "lodash";
+import { uniq } from "lodash-es";
 import { shellHost } from "../../utils/shell";
 
 /**

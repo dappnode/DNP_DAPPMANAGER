@@ -1,5 +1,5 @@
 import path from "path";
-import { VolumeMapping } from "../../types";
+import { VolumeMapping } from "@dappnode/common";
 
 /**
  * Normalizes volume paths, removes trailing slash

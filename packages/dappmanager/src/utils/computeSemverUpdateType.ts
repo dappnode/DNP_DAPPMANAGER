@@ -1,5 +1,5 @@
 import semver from "semver";
-import { UpdateType } from "../types";
+import { UpdateType } from "@dappnode/common";
 
 /**
  * Compute the release type: major, minor, patch

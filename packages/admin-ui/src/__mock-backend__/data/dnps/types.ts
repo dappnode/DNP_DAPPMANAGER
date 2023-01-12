@@ -5,9 +5,7 @@ import {
   InstalledPackageDetailData,
   PackageContainer,
   RequestedDnp
-} from "../../../common";
-
-export { PortProtocol } from "../../../common";
+} from "@dappnode/common";
 
 export interface MockDnp {
   metadata: Manifest;

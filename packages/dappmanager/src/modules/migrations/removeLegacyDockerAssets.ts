@@ -8,7 +8,7 @@ import {
 import { listPackages } from "../docker/list";
 import * as getPath from "../../utils/getPath";
 import fs from "fs";
-import { InstalledPackageData } from "../../common";
+import { InstalledPackageData } from "@dappnode/common";
 import { isNotFoundError } from "../../utils/node";
 import { parseEnvironment } from "../compose";
 import { ComposeFileEditor } from "../compose/editor";

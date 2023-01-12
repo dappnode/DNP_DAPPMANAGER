@@ -4,7 +4,7 @@ import { eventBus } from "../eventBus";
 import params from "../params";
 import { getServicesSharingPid } from "../utils/pid";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import { PackageContainer } from "../common";
+import { PackageContainer } from "@dappnode/common";
 
 const dnpsAllowedToStop = [
   params.ipfsDnpName,

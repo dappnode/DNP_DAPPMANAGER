@@ -1,5 +1,5 @@
 import { Dependencies } from "@dappnode/dappnodesdk";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 
 /**
  * WARNING: manifest's dependencies is an external uncontrolled input, verify

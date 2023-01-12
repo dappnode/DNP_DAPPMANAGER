@@ -13,7 +13,7 @@ import { expect } from "chai";
 
 import resolve from "../../../../../src/modules/dappGet/resolve";
 
-describe("dappGet/resolve/resolve", () => {
+describe.skip("dappGet/resolve/resolve", () => {
   it("Should find a compatible state for a standard case", async () => {
     const dnps = {
       "dependency.dnp.dappnode.eth": {

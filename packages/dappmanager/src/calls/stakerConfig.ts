@@ -1,6 +1,6 @@
 import { getStakerConfig } from "../modules/stakerConfig/getStakerConfig";
 import { setStakerConfig } from "../modules/stakerConfig/setStakerConfig";
-import { Network, StakerConfigGet, StakerConfigSet } from "../types";
+import { Network, StakerConfigGet, StakerConfigSet } from "@dappnode/common";
 
 /**
  * Sets the staker configuration: execution and consensus clients, remote signer,

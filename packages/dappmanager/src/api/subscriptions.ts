@@ -1,5 +1,5 @@
 import { EventBus } from "../eventBus";
-import { Subscriptions, Routes } from "../common";
+import { Routes, Subscriptions } from "@dappnode/common";
 
 export function mapSubscriptionsToEventBus(
   subscriptions: Subscriptions,

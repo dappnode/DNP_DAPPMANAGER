@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { MountpointData } from "../../../types";
+import { MountpointData } from "@dappnode/common";
 import { runScript } from "../runScripts";
 
 /**

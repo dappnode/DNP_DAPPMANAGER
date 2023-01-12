@@ -6,7 +6,7 @@ import {
 } from "./api/auth/adminPasswordDb";
 import { Logs } from "./logs";
 import { EventBus } from "./eventBus";
-import { LoggerMiddleware, Routes } from "./types";
+import { LoggerMiddleware, Routes } from "@dappnode/common";
 import { DeviceCalls } from "./calls/device";
 import { SshCalls } from "./calls/ssh";
 import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi";

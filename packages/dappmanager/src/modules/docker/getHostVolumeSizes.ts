@@ -1,4 +1,4 @@
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 import { shellHost } from "../../utils/shell";
 import { parseDuOutput } from "../../utils/unix";
 import { parseDevicePath } from "../compose";

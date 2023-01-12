@@ -7,7 +7,7 @@ import { listPackage } from "../modules/docker/list";
 import { restartDappmanagerPatch } from "../modules/installer/restartPatch";
 import { getServicesSharingPid } from "../utils/pid";
 import { ComposeFileEditor } from "../modules/compose/editor";
-import { PackageContainer } from "../types";
+import { PackageContainer } from "@dappnode/common";
 
 /**
  * Recreates a package containers

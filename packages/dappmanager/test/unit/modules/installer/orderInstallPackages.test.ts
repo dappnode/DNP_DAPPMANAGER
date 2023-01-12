@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { InstallPackageData } from "../../../../src/types";
+import { InstallPackageData } from "@dappnode/common";
 import { mockPackageData } from "../../../testUtils";
 
 import orderInstallPackages from "../../../../src/modules/installer/orderInstallPackages";

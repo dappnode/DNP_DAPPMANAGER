@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import sinon from "sinon";
 import { eventBus, EventBus } from "../../../src/eventBus";
 

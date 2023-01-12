@@ -4,8 +4,8 @@ import {
   StakerItem,
   StakerItemOk,
   StakerType
-} from "types";
-import { isEqual, pick } from "lodash";
+} from "@dappnode/common";
+import { isEqual, pick } from "lodash-es";
 
 export function subStringifyConfig(config: string): string {
   return config.length > 35

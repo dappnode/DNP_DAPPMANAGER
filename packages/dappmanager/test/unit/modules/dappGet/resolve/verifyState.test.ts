@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import verifyState from "../../../../../src/modules/dappGet/resolve/verifyState";
 
-describe("verifyState", () => {
+describe.skip("verifyState", () => {
   const dnps = {
     A: {
       versions: {

@@ -1,7 +1,7 @@
 import * as db from "../db";
 import { getVersionData } from "../utils/getVersionData";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
-import { NewFeatureId, SystemInfo } from "../types";
+import { NewFeatureId, SystemInfo } from "@dappnode/common";
 import { ethereumClient } from "../modules/ethClient";
 
 /**

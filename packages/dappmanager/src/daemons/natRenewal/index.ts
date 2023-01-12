@@ -10,7 +10,7 @@ import {
   runAtMostEveryIntervals,
   runOnlyOneSequentially
 } from "../../utils/asyncFlows";
-import { PackagePort } from "../../types";
+import { PackagePort } from "@dappnode/common";
 import { logs } from "../../logs";
 import { listContainers } from "../../modules/docker/list";
 

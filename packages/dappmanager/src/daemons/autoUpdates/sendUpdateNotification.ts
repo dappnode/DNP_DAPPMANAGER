@@ -4,7 +4,7 @@ import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";
 import { prettyDnpName } from "../../utils/format";
-import { CoreUpdateDataAvailable } from "../../types";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   isCoreUpdateEnabled,
   isDnpUpdateEnabled

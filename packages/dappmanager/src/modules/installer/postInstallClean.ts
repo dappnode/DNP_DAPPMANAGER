@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as db from "../../db";
-import { InstallPackageDataPaths } from "../../types";
+import { InstallPackageDataPaths } from "@dappnode/common";
 import { Log } from "../../utils/logUi";
 import { logs } from "../../logs";
 import { isNotFoundError } from "../../utils/node";

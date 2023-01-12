@@ -1,5 +1,5 @@
 import { RootState } from "rootReducer";
-import { mapValues, pickBy } from "lodash";
+import { mapValues, pickBy } from "lodash-es";
 import { ProgressLogsByDnp, ProgressLogs } from "types";
 
 // Service > isInstallingLogs

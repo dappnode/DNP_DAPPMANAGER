@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { sortDirectoryItems } from "../../../../src/modules/directory";
-import { DirectoryDnp } from "../../../../src/types";
+import { DirectoryDnp } from "@dappnode/common";
 
 describe("getDirectory", () => {
   it("Should order directory packages", () => {

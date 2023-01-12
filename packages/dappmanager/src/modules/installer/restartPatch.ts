@@ -7,7 +7,6 @@ import shell from "../../utils/shell";
 import { pause } from "../../utils/asyncFlows";
 import params from "../../params";
 import { logs } from "../../logs";
-import { InstallPackageData } from "../../types";
 import Dockerode from "dockerode";
 import {
   dockerContainerInspect,
@@ -20,7 +19,7 @@ import { postInstallClean } from "./postInstallClean";
 import { afterInstall } from "./afterInstall";
 import { flagPackagesAreInstalling } from "./packageIsInstalling";
 import { ComposeEditor } from "../compose/editor";
-import { InstallPackageDataPaths } from "../../common";
+import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;

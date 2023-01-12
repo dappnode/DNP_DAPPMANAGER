@@ -4,7 +4,7 @@ import {
   HostInfoScript,
   UpdateRequirement,
   DockerUpdateStatus
-} from "../../types";
+} from "@dappnode/common";
 import { sanitizeVersion } from "../../utils/sanitizeVersion";
 import {
   supportedOs,

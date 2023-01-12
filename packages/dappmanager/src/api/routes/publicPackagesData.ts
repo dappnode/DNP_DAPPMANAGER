@@ -2,7 +2,7 @@ import {
   listContainers,
   listContainerNoThrow
 } from "../../modules/docker/list";
-import { PackageContainer } from "../../types";
+import { PackageContainer } from "@dappnode/common";
 import { wrapHandler } from "../utils";
 
 interface Params {

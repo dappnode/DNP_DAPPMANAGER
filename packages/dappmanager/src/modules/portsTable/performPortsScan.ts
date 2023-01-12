@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import params from "../../params";
 import Ajv from "ajv";
-import { PackagePort } from "../../common";
+import { PackagePort } from "@dappnode/common";
 import { logs } from "../../logs";
 import { checkPortsResponseSchema } from "./schema";
 

@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import Card from "components/Card";
 import { CopyFileTo } from "./To";
 import { CopyFileFrom } from "./From";
-import { PackageContainer } from "common";
+import { PackageContainer } from "@dappnode/common";
 import { ServiceSelector } from "../ServiceSelector";
 import SubTitle from "components/SubTitle";
 

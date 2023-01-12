@@ -1,6 +1,6 @@
 import { eventBus } from "./eventBus";
 import params from "./params";
-import { UserActionLog } from "./types";
+import { UserActionLog } from "@dappnode/common";
 import { logSafeObjects } from "./utils/logs";
 import { JsonFileDb } from "./utils/fileDb";
 import { logs } from "./logs";

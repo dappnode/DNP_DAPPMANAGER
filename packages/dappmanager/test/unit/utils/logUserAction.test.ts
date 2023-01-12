@@ -1,5 +1,5 @@
 import * as logUserAction from "../../../src/logUserAction";
-import { UserActionLog } from "../../../src/types";
+import { UserActionLog } from "@dappnode/common";
 import "mocha";
 import { expect } from "chai";
 

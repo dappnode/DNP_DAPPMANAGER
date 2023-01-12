@@ -1,4 +1,4 @@
-import { Network } from "common";
+import { Network } from "@dappnode/common";
 import {
   dappnodeMainnetCheckpointSync,
   dappnodePraterCheckpointSync,

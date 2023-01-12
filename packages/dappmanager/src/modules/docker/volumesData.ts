@@ -1,7 +1,11 @@
 import { dockerDf, dockerVolumesList } from "./api";
 import { listContainers } from "./list";
 import { parseDevicePath } from "../compose";
-import { VolumeData, VolumeOwnershipData, PackageContainer } from "../../types";
+import {
+  VolumeData,
+  VolumeOwnershipData,
+  PackageContainer
+} from "@dappnode/common";
 import { detectMountpoints } from "../hostScripts";
 
 /**

@@ -1,7 +1,7 @@
 import * as db from "../db";
 import params from "../params";
 import { eventBus } from "../eventBus";
-import { pick, omit } from "lodash";
+import { pick, omit } from "lodash-es";
 import { isVersionIdUpdated } from "./coreVersionId";
 import {
   AutoUpdateSettings,
@@ -11,7 +11,7 @@ import {
   AutoUpdatePendingEntry,
   AutoUpdatePending,
   AutoUpdateFeedback
-} from "../types";
+} from "@dappnode/common";
 
 // Groups of packages keys
 export const MY_PACKAGES = "my-packages";

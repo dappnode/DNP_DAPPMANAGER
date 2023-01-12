@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6", "DOM"],
-    "module": "commonjs",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "module": "ESNext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
@@ -14,6 +14,7 @@
     "outDir": "dist",
     "sourceMap": true
   },
+  "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "include": ["src/**/*", "test/**/*"],
   "exclude": ["node_modules"]
 }

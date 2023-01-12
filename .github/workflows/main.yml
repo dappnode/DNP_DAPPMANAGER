@@ -31,8 +31,8 @@ jobs:
         with:
           node-version: "16.15.0"
       - run: yarn
-      - run: yarn bootstrap
       - run: yarn generate
+      - run: yarn build:types
       - run: yarn test
       - run: yarn lint
       - run: yarn server-mock:check-types
@@ -48,8 +48,8 @@ jobs:
         with:
           node-version: "16.15.0"
       - run: yarn # Caching only saves 30s
-      - run: yarn bootstrap
       - run: yarn generate
+      - run: yarn build:types
       - run: yarn test:int
 
   release:

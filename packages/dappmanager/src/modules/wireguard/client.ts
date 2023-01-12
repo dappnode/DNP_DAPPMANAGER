@@ -3,7 +3,7 @@ import { urlJoin } from "../../utils/url";
 import params from "../../params";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment";
 import { ComposeFileEditor } from "../compose/editor";
-import { WireguardDeviceCredentials } from "../../types";
+import { WireguardDeviceCredentials } from "@dappnode/common";
 
 const {
   WIREGUARD_API_URL,

@@ -19,21 +19,29 @@ COPY packages/admin-ui/package.json \
   packages/admin-ui/
 COPY packages/dappmanager/package.json \ 
   packages/dappmanager/
-RUN yarn bootstrap --production
+COPY packages/common/package.json \ 
+  packages/common/
+RUN yarn install --production
 
-# Build UI
+# Build common
+WORKDIR /app/packages/common/
+COPY packages/common/ .
+RUN yarn generate
+RUN yarn build 
+# Results in dist/*
+
+# Build admin-ui
 WORKDIR /app/packages/admin-ui/
 COPY packages/admin-ui/ .
 ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
 
+# Build DAPPMANAGER
 WORKDIR /app/packages/dappmanager/
 COPY packages/dappmanager/ .
 RUN yarn build
 # Results in build/index.js
-
-
 
 # Compute git data
 #####################################
@@ -47,15 +55,11 @@ COPY dappnode_package.json .
 COPY docker/getGitData.js .
 RUN node getGitData /usr/src/app/.git-data.json
 
-
-
 # Build binaries
 #####################################
 FROM node:${NODE_VERSION}-alpine as build-binaries
 
 RUN apk add --no-cache bind-tools docker
-
-
 
 # Final layer
 #####################################

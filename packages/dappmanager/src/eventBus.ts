@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
 import { logs } from "./logs";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import {
   ChainData,
   InstalledPackageData,
@@ -8,7 +8,7 @@ import {
   UserActionLog,
   PackageNotification,
   DirectoryItem
-} from "./types";
+} from "@dappnode/common";
 
 interface EventTypes {
   chainData: ChainData[];

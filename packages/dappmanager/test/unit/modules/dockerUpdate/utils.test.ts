@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { DockerVersionsScript, HostInfoScript } from "../../../../src/common";
+import { DockerVersionsScript, HostInfoScript } from "@dappnode/common";
 import {
   supportedDebianReleases,
   supportedOs,

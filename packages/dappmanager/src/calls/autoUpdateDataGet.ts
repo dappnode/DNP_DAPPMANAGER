@@ -2,8 +2,11 @@ import semver from "semver";
 import { listPackages } from "../modules/docker/list";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { prettyDnpName } from "../utils/format";
-import { AutoUpdateDataDnpView, InstalledPackageData } from "../types";
-import { AutoUpdateDataView } from "../types";
+import {
+  AutoUpdateDataView,
+  AutoUpdateDataDnpView,
+  InstalledPackageData
+} from "@dappnode/common";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 

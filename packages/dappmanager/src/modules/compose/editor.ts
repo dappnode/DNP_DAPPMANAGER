@@ -10,9 +10,9 @@ import {
   uniq,
   concat,
   omit
-} from "lodash";
+} from "lodash-es";
 import * as getPath from "../../utils/getPath";
-import { PortMapping, ContainerLabelsRaw } from "../../types";
+import { ContainerLabelsRaw } from "../../types";
 import {
   Compose,
   ComposeService,
@@ -33,7 +33,7 @@ import {
 } from "./environment";
 import { parseServiceNetworks } from "./networks";
 import { verifyCompose } from "./verify";
-import { UserSettings } from "../../types";
+import { PortMapping, UserSettings } from "@dappnode/common";
 import { parseUserSettings, applyUserSettings } from "./userSettings";
 import { isNotFoundError } from "../../utils/node";
 import { yamlDump, yamlParse } from "../../utils/yaml";

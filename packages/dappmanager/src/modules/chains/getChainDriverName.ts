@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "../../common";
+import { InstalledPackageData } from "@dappnode/common";
 import { ChainDriver } from "@dappnode/dappnodesdk";
 
 /**

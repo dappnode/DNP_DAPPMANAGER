@@ -1,9 +1,6 @@
 import { Compose } from "@dappnode/dappnodesdk";
-import {
-  InstallPackageData,
-  ComposeServicesSharingPid,
-  PackageContainer
-} from "../types";
+import { ComposeServicesSharingPid } from "../types";
+import { InstallPackageData, PackageContainer } from "@dappnode/common";
 
 /**
  * Check if a package that will be installed/updated

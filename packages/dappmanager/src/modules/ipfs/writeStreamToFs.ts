@@ -4,7 +4,8 @@ import { TimeoutErrorKy, IpfsInstance } from "./types";
 import { getContentFromGateway } from "./getContentFromGateway";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
-const toStream = require("it-to-stream");
+// @ts-ignore
+import toStream from "it-to-stream";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;

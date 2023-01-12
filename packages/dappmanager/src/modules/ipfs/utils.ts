@@ -1,7 +1,8 @@
 import { IPFSEntry, IPFSPath } from "./types";
-import { IpfsFileResult, IpfsClientTarget } from "../../types";
+import { IpfsFileResult } from "../../types";
 import * as db from "../../db";
 import params from "../../params";
+import { IpfsClientTarget } from "@dappnode/common";
 
 /**
  * ky specific timeout errors https://github.com/sindresorhus/ky/blob/2f37c3f999efb36db9108893b8b3d4b3a7f5ec45/index.js#L127-L132

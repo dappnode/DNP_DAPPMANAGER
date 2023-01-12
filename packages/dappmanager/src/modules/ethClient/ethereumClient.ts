@@ -1,10 +1,10 @@
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import {
   ConsensusClientMainnet,
   Eth2ClientTarget,
   EthClientRemote,
   ExecutionClientMainnet
-} from "../../common";
+} from "@dappnode/common";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
 import { logs } from "../../logs";

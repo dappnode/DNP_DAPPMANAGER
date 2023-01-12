@@ -8,11 +8,11 @@ import {
   getReleaseSignatureStatus
 } from "../../../../src/modules/release/releaseSignature";
 import { IPFSEntry } from "../../../../src/modules/ipfs";
+import { ReleaseSignature } from "../../../../src/types";
 import {
-  ReleaseSignature,
-  TrustedReleaseKey,
-  ReleaseSignatureStatusCode
-} from "../../../../src/types";
+  ReleaseSignatureStatusCode,
+  TrustedReleaseKey
+} from "@dappnode/common";
 
 describe("modules / release / verifyReleaseSignature", () => {
   const files: IPFSEntry[] = [

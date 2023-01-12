@@ -18,7 +18,7 @@ import { StateBadge } from "pages/packages/components/StateBadge";
 import { MdWifi } from "react-icons/md";
 import { parseContainerState } from "pages/packages/components/StateBadge/utils";
 import Alert from "react-bootstrap/esm/Alert";
-import { LocalProxyingStatus } from "common";
+import { LocalProxyingStatus } from "@dappnode/common";
 import { NavLink } from "react-router-dom";
 import LinkDocs from "components/LinkDocs";
 

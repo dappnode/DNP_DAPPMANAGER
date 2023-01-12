@@ -15,7 +15,7 @@ import {
   ConsensusClientMainnet,
   EthClientRemote,
   ExecutionClientMainnet
-} from "../../types";
+} from "@dappnode/common";
 import {
   ethereumClient,
   EthProviderError,

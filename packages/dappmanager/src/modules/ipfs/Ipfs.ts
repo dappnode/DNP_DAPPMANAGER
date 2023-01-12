@@ -1,5 +1,4 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
-import { IPFSEntry } from "ipfs-core-types/src/root";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import {
@@ -7,10 +6,10 @@ import {
   catStreamToFs,
   writeCarToFs
 } from "./writeStreamToFs";
-import { IpfsCatOptions, IPFSPath } from "./types";
+import { IpfsCatOptions, IPFSEntry, IPFSPath } from "./types";
 import { handleIpfsError } from "./utils";
 import { catCarReaderToMemory, catString } from "./writeFileToMemory";
-import { IpfsClientTarget } from "../../common";
+import { IpfsClientTarget } from "@dappnode/common";
 import { dagGet, ls } from "./list";
 
 export class Ipfs {

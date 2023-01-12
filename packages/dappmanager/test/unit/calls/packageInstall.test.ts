@@ -1,15 +1,16 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { PackageRequest, PackageRelease } from "../../../src/types";
+import { PackageRelease } from "@dappnode/common";
 import { getMockEventBus } from "./eventBus";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall";
 import { DappGetState } from "../../../src/modules/dappGet/types";
 import { mockManifest, mockRelease } from "../../testUtils";
 import { ReleaseFetcher } from "../../../src/modules/release";
 import { Manifest } from "@dappnode/dappnodesdk";
+import { PackageRequest } from "../../../src/types";
 
 describe.skip("Call function: packageInstall", function () {
   // Pkg data

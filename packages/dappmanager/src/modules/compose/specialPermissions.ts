@@ -1,4 +1,4 @@
-import { SpecialPermission } from "../../types";
+import { SpecialPermission } from "@dappnode/common";
 import { Compose } from "@dappnode/dappnodesdk";
 
 /**

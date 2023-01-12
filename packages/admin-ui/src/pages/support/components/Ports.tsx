@@ -1,5 +1,4 @@
 import React from "react";
-
 import Loading from "../../../components/Loading";
 import ErrorView from "../../../components/ErrorView";
 import Ok from "components/Ok";

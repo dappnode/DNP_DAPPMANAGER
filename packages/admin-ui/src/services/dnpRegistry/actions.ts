@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { api } from "api";
-import { DirectoryItem, RequestStatus } from "types";
+import { DirectoryItem, RequestStatus } from "@dappnode/common";
 import { AppThunk } from "store";
 
 // Service > dnpRegistry

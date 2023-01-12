@@ -6,7 +6,7 @@ import Card from "components/Card";
 import RenderMarkdown from "components/RenderMarkdown";
 import { formatTopicBody, formatTopicUrl } from "../formaters/discourseTopic";
 import { topicBaseUrl, dappnodeForumUrl } from "params";
-import { PackageVersionData, HostDiagnoseItem } from "common/types";
+import { PackageVersionData, HostDiagnoseItem } from "@dappnode/common";
 import Ok from "components/Ok";
 import { FaDiscourse } from "react-icons/fa";
 import { MdChevronRight } from "react-icons/md";

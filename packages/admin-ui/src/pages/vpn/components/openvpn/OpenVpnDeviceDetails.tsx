@@ -18,8 +18,8 @@ import Title from "components/Title";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
 import { GoClippy } from "react-icons/go";
-import { VpnDeviceCredentials } from "types";
 import { urlJoin } from "utils/url";
+import { VpnDeviceCredentials } from "@dappnode/common";
 
 function OpenVpnDeviceDetailsLoaded({
   device

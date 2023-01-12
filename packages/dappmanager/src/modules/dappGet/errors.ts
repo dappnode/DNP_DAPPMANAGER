@@ -1,4 +1,4 @@
-import { PackageRequest } from "../../common";
+import { PackageRequest } from "../../types";
 
 export class DappGetError extends Error {}
 

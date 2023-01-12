@@ -7,7 +7,7 @@ import {
   VpnDeviceCredentials,
   VpnDevice,
   VpnDeviceAdminPassword
-} from "../../types";
+} from "@dappnode/common";
 
 // Temporal solution until eventBus is properly typed
 interface EventBusDevices {

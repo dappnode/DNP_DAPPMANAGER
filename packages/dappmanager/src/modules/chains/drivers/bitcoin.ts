@@ -1,5 +1,6 @@
-const Client = require("bitcoin-core");
-import { InstalledPackageData } from "../../../types";
+// @ts-ignore
+import Client from "bitcoin-core";
+import { InstalledPackageData } from "@dappnode/common";
 import { dockerContainerInspect } from "../../docker";
 import { parseEnvironment } from "../../compose";
 import { getPrivateNetworkAlias } from "../../../domains";

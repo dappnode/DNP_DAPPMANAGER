@@ -1,6 +1,6 @@
 import Dockerode from "dockerode";
 import stripAnsi from "strip-ansi";
-import { PortMapping, PortProtocol } from "../../types";
+import { PortMapping, PortProtocol } from "@dappnode/common";
 import { isPortMappingDeletable } from "./list/isPortMappingDeletable";
 
 /**

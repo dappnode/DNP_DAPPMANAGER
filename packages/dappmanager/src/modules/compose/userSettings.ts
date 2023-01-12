@@ -1,5 +1,5 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject } from "lodash";
+import { mapValues, pick, omitBy, isObject } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
@@ -8,7 +8,7 @@ import {
   parseDevicePathMountpoint,
   getDevicePath
 } from "./index";
-import { PortMapping, UserSettings, VolumeMapping } from "../../types";
+import { PortMapping, UserSettings, VolumeMapping } from "@dappnode/common";
 import { Compose } from "@dappnode/dappnodesdk";
 import { cleanCompose, isOmitable } from "./clean";
 import { stringifyVolumeMappings } from "./volumes";

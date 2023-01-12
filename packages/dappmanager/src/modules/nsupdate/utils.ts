@@ -1,5 +1,5 @@
-import { isEmpty } from "lodash";
-import { PackageContainer } from "../../types";
+import { isEmpty } from "lodash-es";
+import { PackageContainer } from "@dappnode/common";
 import params, { getContainerDomain } from "../../params";
 import {
   getPrivateNetworkAlias,

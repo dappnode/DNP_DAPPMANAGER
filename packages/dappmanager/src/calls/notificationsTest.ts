@@ -1,6 +1,5 @@
 import { eventBus } from "../eventBus";
-import { PackageNotification, NotificationType } from "../types";
-
+import { PackageNotification, NotificationType } from "@dappnode/common";
 /**
  * Adds a notification to be shown the UI.
  * Set the notification param to null (or send none) to generate

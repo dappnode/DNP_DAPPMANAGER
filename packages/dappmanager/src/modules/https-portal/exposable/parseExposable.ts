@@ -2,7 +2,7 @@ import {
   ExposableServiceInfo,
   ExposableServiceManifestInfo,
   InstalledPackageData
-} from "../../../types";
+} from "@dappnode/common";
 import { getPublicSubdomain, stripBadDomainChars } from "../../../domains";
 
 /**

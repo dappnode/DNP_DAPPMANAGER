@@ -1,5 +1,5 @@
 import params from "../params";
-import { HttpsPortalMapping, ExposableServiceMapping } from "../types";
+import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/common";
 import {
   HttpsPortal,
   HttpsPortalApiClient,

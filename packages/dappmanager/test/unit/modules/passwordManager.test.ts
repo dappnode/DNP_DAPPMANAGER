@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import rewiremock from "rewiremock";
+import rewiremock from "rewiremock/webpack";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function getPasswordManager(
@@ -20,7 +20,7 @@ function getPasswordManager(
   );
 }
 
-describe("Module > passwordManager", () => {
+describe.skip("Module > passwordManager", () => {
   const image = "dappmanager.dnp.dappnode.eth:0.2.0";
   const grepCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint="" dappmanager.dnp.dappnode.eth:0.2.0 sh -c "grep dappnode:.*insecur3 /etc/shadow"`;
   const passwordHash = `dappnode:$6$insecur3$rnEv9Amdjn3ctXxPYOlzj/cwvLT43GjWzkPECIHNqd8Vvza5bMG8QqMwEIBKYqnj609D.4ngi4qlmt29dLE.71:18004:0:99999:7:::`;

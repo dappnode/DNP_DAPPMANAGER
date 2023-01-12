@@ -1,5 +1,5 @@
 import TelegramBot from "node-telegram-bot-api";
-import { uniq } from "lodash";
+import { uniq } from "lodash-es";
 import * as db from "../../db";
 import { logs } from "../../logs";
 import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";

@@ -1,5 +1,5 @@
 import fs from "fs";
-const dataUriToBuffer = require("data-uri-to-buffer");
+import dataUriToBuffer from "data-uri-to-buffer";
 
 /**
  * Converts a data URI feeded from the server to a downloadable blob

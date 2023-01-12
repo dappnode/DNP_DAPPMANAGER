@@ -4,7 +4,7 @@ import {
   getTotalPermutations,
   getPermutation
 } from "./permutations";
-import { pickBy, mapValues } from "lodash";
+import { pickBy, mapValues } from "lodash-es";
 import generateErrorMessage from "./generateErrorMessage";
 import { DappGetDnps, DappGetErrors } from "../types";
 import { logs } from "../../../logs";

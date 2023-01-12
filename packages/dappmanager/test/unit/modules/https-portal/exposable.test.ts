@@ -4,7 +4,7 @@ import {
   ExposableServiceInfo,
   ExposableServiceManifestInfo,
   InstalledPackageData
-} from "../../../../src/types";
+} from "@dappnode/common";
 import { mockContainer, mockDnp } from "../../../testUtils";
 
 describe("modules / https-portal / exposable", () => {

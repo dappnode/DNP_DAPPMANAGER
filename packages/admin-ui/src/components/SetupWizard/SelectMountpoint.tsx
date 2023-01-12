@@ -6,10 +6,10 @@ import Button from "components/Button";
 import { prettyBytes } from "utils/format";
 import { MdHome, MdRefresh } from "react-icons/md";
 import { joinCssClass } from "utils/css";
-import { MountpointData } from "types";
 import newTabProps from "utils/newTabProps";
 import { troubleShootMountpointsGuideUrl } from "params";
 import "./selectMountpoint.scss";
+import { MountpointData } from "@dappnode/common";
 
 function renderMountpointDataSummary({
   mountpoint,
@@ -201,7 +201,7 @@ export default function SelectMountpoint({
 
       {mountpointsRequest.error && (
         <div className="change-mountpoint-error">
-          Error detecting mountpoints: {mountpointsRequest.error}
+          Error detecting mountpoints: {mountpointsRequest.error.message}
         </div>
       )}
     </>

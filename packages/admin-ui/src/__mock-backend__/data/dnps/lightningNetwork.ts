@@ -1,5 +1,6 @@
+import { PortProtocol } from "@dappnode/common";
 import { bitcoin } from "./bitcoin";
-import { MockDnp, PortProtocol } from "./types";
+import { MockDnp } from "./types";
 
 const dnpName = "lightning-network.dnp.dappnode.eth";
 const serviceName = dnpName;

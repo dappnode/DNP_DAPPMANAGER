@@ -17,7 +17,7 @@ import {
   StakerConfigSet,
   StakerItemOk,
   UserSettingsAllDnps
-} from "../../types";
+} from "@dappnode/common";
 import { logs } from "../../logs";
 import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
 import {

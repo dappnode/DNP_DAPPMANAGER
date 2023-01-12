@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import * as calls from "../../src/calls";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
 import params from "../../src/params";
 import shell from "../../src/utils/shell";
-import { TrustedReleaseKey } from "../../src/types";
+import { TrustedReleaseKey } from "@dappnode/common";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,

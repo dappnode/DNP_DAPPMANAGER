@@ -1,6 +1,6 @@
 import memoize from "memoizee";
 import { getChainsData } from "../modules/chains";
-import { ChainData } from "../types";
+import { ChainData } from "@dappnode/common";
 
 // Memoize this call since multiple UIs could be requesting it at once
 // and the info doesn't change often and might be expensive to fetch

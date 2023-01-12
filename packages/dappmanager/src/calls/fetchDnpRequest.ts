@@ -1,4 +1,4 @@
-import { mapValues, omit } from "lodash";
+import { mapValues, omit } from "lodash-es";
 import semver from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/dappnodesdk";
 import { listPackages } from "../modules/docker/list";
@@ -13,13 +13,13 @@ import { parseSpecialPermissions } from "../modules/compose/specialPermissions";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
-  CompatibleDnps,
-  PackageRelease,
-  SetupWizardAllDnps,
   SpecialPermissionAllDnps,
-  InstalledPackageData
-} from "../types";
-import { ReleaseSignatureStatusCode } from "../common";
+  SetupWizardAllDnps,
+  PackageRelease,
+  CompatibleDnps,
+  InstalledPackageData,
+  ReleaseSignatureStatusCode
+} from "@dappnode/common";
 
 export async function fetchDnpRequest({
   id

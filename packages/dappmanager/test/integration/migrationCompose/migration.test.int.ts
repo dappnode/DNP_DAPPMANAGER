@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import fs from "fs";
-import { PackageContainer } from "../../../src/common";
+import { PackageContainer } from "@dappnode/common";
 import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers";
 import params from "../../../src/params";
 import { mockContainer, shellSafe } from "../../testUtils";

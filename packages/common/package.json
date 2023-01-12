@@ -1,0 +1,30 @@
+{
+  "name": "@dappnode/common",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build:types": "tsc",
+    "generate": "ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
+    "dev": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.18",
+    "typescript": "^4.9.4",
+    "typescript-json-schema": "^0.55.0"
+  },
+  "dependencies": {
+    "@dappnode/dappnodesdk": "^0.2.69",
+    "@types/node": "^18.11.18"
+  }
+}

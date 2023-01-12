@@ -1,10 +1,7 @@
 import { ethers } from "ethers";
-import { InstalledPackageData } from "../../../common";
+import { InstalledPackageData } from "@dappnode/common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
-import {
-  EthSyncing,
-  parseEthersSyncing
-} from "../../../utils/ethers";
+import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
 import { getPrivateNetworkAlias } from "../../../domains";
 import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
 import { ChainDataResult } from "../types";

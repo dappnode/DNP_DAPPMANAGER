@@ -15,6 +15,7 @@ interface InputFormFieldProps extends InputProps {
 
 interface InputFormProps {
   fields: InputFormFieldProps[];
+  children?: React.ReactNode;
   childrenBefore?: React.ReactNode;
 }
 

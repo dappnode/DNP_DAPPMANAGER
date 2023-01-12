@@ -6,12 +6,12 @@ import {
   StakerItemOk,
   StakerItemData,
   PackageRelease
-} from "../../types";
+} from "@dappnode/common";
 import * as db from "../../db";
 import { packageSetEnvironment } from "../../calls";
 import { logs } from "../../logs";
 import { dockerContainerStop } from "../docker";
-import { pick } from "lodash";
+import { pick } from "lodash-es";
 import { Manifest } from "@dappnode/dappnodesdk";
 import { ReleaseFetcher } from "../release";
 import { eventBus } from "../../eventBus";

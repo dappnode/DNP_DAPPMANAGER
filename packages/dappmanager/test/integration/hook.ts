@@ -1,5 +1,5 @@
 import { ipfs } from "../../src/modules/ipfs";
-import { IpfsClientTarget } from "../../src/types";
+import { IpfsClientTarget } from "@dappnode/common";
 import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils";
 
 export const mochaHooks = {

@@ -1,5 +1,4 @@
-import { PackageNotification } from "../../common";
-import { NotificationType } from "../../types";
+import { NotificationType, PackageNotification } from "@dappnode/common";
 import { bold } from "./markdown";
 
 // TELEGRAM DAPPNODE NOTIFICATIONS MESSAGES

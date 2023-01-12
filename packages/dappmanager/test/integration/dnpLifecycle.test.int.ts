@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import { Compose, Manifest, PackageEnvs } from "@dappnode/dappnodesdk";
-import { mapValues, pick } from "lodash";
+import { mapValues, pick } from "lodash-es";
 import * as calls from "../../src/calls";
 import params from "../../src/params";
 import { logs } from "../../src/logs";
@@ -13,7 +13,7 @@ import {
   PackageContainer,
   InstalledPackageData,
   PortProtocol
-} from "../../src/types";
+} from "@dappnode/common";
 import {
   clearDbs,
   getTestMountpoint,

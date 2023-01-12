@@ -6,7 +6,7 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   StakerItemData
-} from "../types";
+} from "@dappnode/common";
 import { dbCache, dbMain } from "./dbFactory";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
 

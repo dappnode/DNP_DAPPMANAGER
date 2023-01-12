@@ -1,15 +1,13 @@
 import memoize from "memoizee";
 import { runScript } from "../runScripts";
 import {
-  HostVolumeGroup,
-  HostLogicalVolume,
+  HostHardDisk,
   HostHardDisksReport,
-  HostHardDisk
-} from "../../../types";
-import {
+  HostVolumeGroup,
   HostVolumeGroupReport,
+  HostLogicalVolume,
   HostLogicalVolumeReport
-} from "../../../common";
+} from "@dappnode/common";
 
 /**
  * Returns host hard disks detected

@@ -1,10 +1,7 @@
 import path from "path";
-import {
-  Architecture,
-  EthClientTargetPackage,
-  UserSettings,
-  FileFormat
-} from "./types";
+import { FileFormat } from "./types";
+import { Architecture } from "@dappnode/dappnodesdk";
+import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 

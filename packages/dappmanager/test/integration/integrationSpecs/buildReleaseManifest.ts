@@ -1,4 +1,4 @@
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import { ipfs } from "../../../src/modules/ipfs";
 import { parseManifest } from "../../../src/modules/manifest";
 import { ManifestWithImage } from "../../../src/types";

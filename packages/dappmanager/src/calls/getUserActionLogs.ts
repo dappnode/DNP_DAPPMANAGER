@@ -1,5 +1,5 @@
 import * as logUserAction from "../logUserAction";
-import { UserActionLog } from "../types";
+import { UserActionLog } from "@dappnode/common";
 
 /**
  * Returns the user action logs. This logs are stored in a different

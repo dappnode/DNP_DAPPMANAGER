@@ -1,6 +1,6 @@
 import { dbCache } from "./dbFactory";
 import { stripDots } from "./dbUtils";
-import { PackageNotificationDb, PackageNotification } from "../types";
+import { PackageNotificationDb, PackageNotification } from "@dappnode/common";
 
 const NOTIFICATION = "notification";
 const NOTIFICATION_LAST_EMITTED_VERSION = "notification-last-emitted-version";

@@ -11,8 +11,8 @@ import ChangeHostPassword from "./features/ChangeHostPassword";
 import Repository from "./features/Repository";
 import RepositoryFallback from "./features/RepositoryFallback";
 // Utils
-import { isEqual } from "lodash";
-import { NewFeatureId } from "types";
+import { isEqual } from "lodash-es";
+import { NewFeatureId } from "@dappnode/common";
 // styles
 import "./welcome.scss";
 

@@ -1,6 +1,6 @@
 import { dbCache } from "./dbFactory";
 import { UpnpPortMapping } from "../modules/upnpc/types";
-import { PackagePort } from "../types";
+import { PackagePort } from "@dappnode/common";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
 
 const UPNP_AVAILABLE = "upnp-available";

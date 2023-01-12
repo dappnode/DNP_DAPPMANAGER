@@ -1,6 +1,6 @@
 import semver from "semver";
 import params from "../params";
-import { CoreUpdateData, PackageRelease } from "../types";
+import { CoreUpdateData, PackageRelease } from "@dappnode/common";
 import { ReleaseFetcher } from "../modules/release";
 import { listPackages } from "../modules/docker/list";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType";

@@ -1,5 +1,5 @@
 import * as db from "../../db";
-import { Network, StakerParamsByNetwork } from "../../types";
+import { Network, StakerParamsByNetwork } from "@dappnode/common";
 
 /**
  * Get the current staker config (execution and consensus clients selected) as well as

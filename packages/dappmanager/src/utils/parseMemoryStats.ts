@@ -1,4 +1,4 @@
-import { HostStatMemory } from "../types";
+import { HostStatMemory } from "@dappnode/common";
 import { toBytes } from "./toBytes";
 import osu from "node-os-utils";
 

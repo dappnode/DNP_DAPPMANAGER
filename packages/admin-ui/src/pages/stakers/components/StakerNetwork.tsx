@@ -6,11 +6,10 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {
   Network,
-  ReqStatus,
   StakerConfigGet,
   StakerConfigSet,
   StakerItemOk
-} from "types";
+} from "@dappnode/common";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -34,6 +33,7 @@ import {
 } from "./utils";
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
+import { ReqStatus } from "types";
 
 export default function StakerNetwork<T extends Network>({
   network,

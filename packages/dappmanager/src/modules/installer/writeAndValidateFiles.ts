@@ -1,7 +1,7 @@
 import fs from "fs";
 import { Log } from "../../utils/logUi";
 import * as validate from "../../utils/validate";
-import { InstallPackageData } from "../../types";
+import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "../docker/compose";
 import { ComposeEditor } from "../compose/editor";
 import { writeManifest } from "../manifest/manifestFile";
