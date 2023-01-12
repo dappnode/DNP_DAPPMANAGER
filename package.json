@@ -18,12 +18,18 @@
     "lint": "lerna run lint --stream",
     "test:int": "lerna run test:int --stream",
     "pre-commit": "lerna run pre-commit --stream",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "clean": "yarn run clean:libraries && yarn run clean:build",
+    "clean:libraries": "rimraf node_modules && rimraf packages/**/node_modules",
+    "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
   "dependencies": {
     "lerna": "^6.3.0",
     "patch-package": "^6.5.1",
     "postinstall-postinstall": "^2.1.0",
     "ts-node": "^10.8.1"
+  },
+  "devDependencies": {
+    "rimraf": "^3.0.2"
   }
 }
