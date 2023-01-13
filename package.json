@@ -22,10 +22,12 @@
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
+  "dependencies": {
+    "patch-package": "^6.5.1",
+    "postinstall-postinstall": "^2.1.0"
+  },
   "devDependencies": {
     "lerna": "^6.3.0",
-    "patch-package": "^6.5.1",
-    "postinstall-postinstall": "^2.1.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.1"
   }
