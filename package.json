@@ -17,6 +17,7 @@
     "pre-commit": "lerna run pre-commit --stream",
     "mock-standalone:build": "lerna run mock-standalone:build --stream",
     "postinstall": "patch-package",
+    "generate": "lerna run generate --stream",
     "clean": "yarn run clean:build && yarn run clean:libraries",
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
