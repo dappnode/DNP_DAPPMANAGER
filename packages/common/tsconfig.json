@@ -17,6 +17,6 @@
     "skipLibCheck": true
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
-  "include": ["src/**/*", "src/**/*.json", "test/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "src/**/*.json"],
+  "exclude": ["node_modules", "test/**/*"]
 }

@@ -20,6 +20,6 @@
       "@dappnode/common": ["../../common/src"]
     }
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*"]
 }
