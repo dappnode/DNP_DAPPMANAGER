@@ -10,11 +10,11 @@
     "strict": true,
     // TODO: Fix in a latter PR, too many changes for now
     "useUnknownInCatchVariables": false,
-    "types": ["mocha", "node"],
+    "types": ["node"],
     "outDir": "dist",
     "sourceMap": true
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "test/**/*"]
 }
