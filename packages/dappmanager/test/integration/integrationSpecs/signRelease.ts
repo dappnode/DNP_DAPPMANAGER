@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { CID } from "ipfs-http-client";
-import sortBy from "lodash/sortBy";
+import { sortBy } from "lodash-es";
 import { Ipfs } from "../../../src/modules/ipfs/Ipfs";
 import { serializeIpfsDirectory } from "../../../src/modules/release/releaseSignature";
 import { ReleaseSignature } from "../../../src/types";
