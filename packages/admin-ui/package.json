@@ -67,6 +67,7 @@
     "typescript": "^4.7.3"
   },
   "devDependencies": {
+    "@types/jest": "^24.9.1",
     "nodemon": "^2.0.4",
     "prettier": "^1.16.4"
   },
