@@ -73,7 +73,6 @@
     "ipfs-http-client": "^59.0.0",
     "is-ip": "^3.0.0",
     "is-ipfs": "^6.0.2",
-    "it-to-stream": "^1.0.0",
     "js-yaml": "^3.11.0",
     "lodash-es": "^4.17.21",
     "memoizee": "^0.4.14",
