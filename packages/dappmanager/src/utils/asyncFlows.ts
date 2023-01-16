@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import async from "async";
 import memoize from "memoizee";
 import { logs } from "../logs";

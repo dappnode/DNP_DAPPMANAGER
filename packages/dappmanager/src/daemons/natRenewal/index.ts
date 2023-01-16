@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import * as upnpc from "../../modules/upnpc";
 import { eventBus } from "../../eventBus";
 import params from "../../params";

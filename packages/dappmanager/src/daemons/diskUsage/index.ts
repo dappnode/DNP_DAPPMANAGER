@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import * as db from "../../db";
 import shellExec from "../../utils/shell";
 import params from "../../params";

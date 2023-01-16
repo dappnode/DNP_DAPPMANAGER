@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import { startAutoUpdatesDaemon } from "./autoUpdates";
 import { startDiskUsageDaemon } from "./diskUsage";
 import { startDynDnsDaemon } from "./dyndns";

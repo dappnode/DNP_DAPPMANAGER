@@ -1,4 +1,3 @@
-import { AbortController } from "abort-controller";
 import * as db from "./db";
 import { eventBus } from "./eventBus";
 import initializeDb from "./initializeDb";

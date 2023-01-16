@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import { eventBus } from "../../eventBus";
 import params from "../../params";
 import * as db from "../../db";

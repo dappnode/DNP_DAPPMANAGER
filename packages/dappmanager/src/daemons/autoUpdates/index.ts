@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import params from "../../params";
 import { eventBus } from "../../eventBus";
 import { ReleaseFetcher } from "../../modules/release";

@@ -19,7 +19,8 @@ export default {
   mode: NODE_ENV,
   output: {
     path: paths.build,
-    filename: "index.js"
+    filename: "index.js",
+    publicPath: ""
   },
   // externals: [/node_modules/, "bufferutil", "utf-8-validate"],
   externalsPresets: { node: true },

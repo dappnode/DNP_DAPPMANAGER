@@ -1,4 +1,3 @@
-import { AbortSignal } from "abort-controller";
 import retry from "async-retry";
 import { eventBus } from "../../eventBus";
 import * as db from "../../db";
