@@ -1,4 +1,4 @@
-import semver from "semver";
+import { valid, lte } from "semver";
 import params from "../../params";
 import * as db from "../../db";
 import { eventBus } from "../../eventBus";
@@ -30,8 +30,8 @@ export async function sendUpdatePackageNotificationMaybe(
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (
     lastEmittedVersion &&
-    semver.valid(lastEmittedVersion) &&
-    semver.lte(newVersion, lastEmittedVersion)
+    valid(lastEmittedVersion) &&
+    lte(newVersion, lastEmittedVersion)
   )
     return; // Already emitted update available for this version
 
@@ -68,8 +68,8 @@ export async function sendUpdateSystemNotificationMaybe(
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (
     lastEmittedVersion &&
-    semver.valid(lastEmittedVersion) &&
-    semver.lte(newVersion, lastEmittedVersion)
+    valid(lastEmittedVersion) &&
+    lte(newVersion, lastEmittedVersion)
   )
     return; // Already emitted update available for this version
 

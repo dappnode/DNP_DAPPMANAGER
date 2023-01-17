@@ -1,4 +1,4 @@
-import semver from "semver";
+import { valid, lt } from "semver";
 import { imagesList, imageRemove } from "./api";
 
 /**
@@ -22,9 +22,9 @@ export async function dockerCleanOldImages(
           (imageName === dnpName ||
             // Get multi-service images, but not mix `goerli-geth` with `goerli` for example
             imageName.endsWith("." + dnpName)) &&
-          semver.valid(imageVersion) &&
-          semver.valid(version) &&
-          semver.lt(imageVersion, version)
+          valid(imageVersion) &&
+          valid(version) &&
+          lt(imageVersion, version)
         );
       })
   );

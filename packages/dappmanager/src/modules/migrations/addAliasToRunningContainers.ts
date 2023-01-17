@@ -16,7 +16,7 @@ import {
 } from "../docker";
 import { listContainers } from "../docker/list";
 import * as getPath from "../../utils/getPath";
-import semver from "semver";
+import { gte } from "semver";
 import { ethereumClient } from "../ethClient";
 
 /** Alias for code succinctness */
@@ -154,7 +154,7 @@ function isComposeNetworkAndAliasMigrated(
   if (
     composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check property name is defined
     composeNetwork?.external && // Check is external network
-    semver.gte(
+    gte(
       parseComposeSemver(composeVersion),
       parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5

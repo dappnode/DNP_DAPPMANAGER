@@ -1,4 +1,4 @@
-import semver from "semver";
+import { gte } from "semver";
 
 /**
  * Compute version id:
@@ -45,6 +45,6 @@ export function isVersionIdUpdated(
   const versionIdDnps = parseCoreVersionId(coreVersionId);
   return versionIdDnps.every(versionIdDnp => {
     const currentVersion = currentVersions.get(versionIdDnp.dnpName);
-    return currentVersion && semver.gte(currentVersion, versionIdDnp.version);
+    return currentVersion && gte(currentVersion, versionIdDnp.version);
   });
 }

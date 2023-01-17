@@ -29,7 +29,7 @@ import {
 } from "./utils";
 import { listPackageNoThrow } from "../docker/list/listPackages";
 import { dockerComposeUpPackage } from "../docker";
-import semver from "semver";
+import { lt } from "semver";
 import * as db from "../../db";
 
 /**
@@ -88,7 +88,7 @@ export async function setStakerConfig<T extends Network>({
     );
     if (
       execClient?.minVersion &&
-      semver.lt(currentExecClientPkg.version, execClient.minVersion)
+      lt(currentExecClientPkg.version, execClient.minVersion)
     )
       throw Error(
         `Execution client ${currentExecClientPkg.dnpName} version ${currentExecClientPkg.version} is lower than the minimum version ${execClient.minVersion} required to work with the stakers UI. Update it to continue.`
@@ -105,7 +105,7 @@ export async function setStakerConfig<T extends Network>({
     );
     if (
       consClient?.minVersion &&
-      semver.lt(currentConsClientPkg.version, consClient.minVersion)
+      lt(currentConsClientPkg.version, consClient.minVersion)
     )
       throw Error(
         `Consensus client ${currentConsClientPkg.dnpName} version ${currentConsClientPkg.version} is lower than the minimum version ${consClient.minVersion} required to work with the stakers UI. Update it to continue.`
@@ -119,7 +119,7 @@ export async function setStakerConfig<T extends Network>({
   if (
     web3signer.minVersion &&
     currentWeb3signerPkg &&
-    semver.lt(currentWeb3signerPkg.version, web3signer.minVersion)
+    lt(currentWeb3signerPkg.version, web3signer.minVersion)
   )
     throw Error(
       `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${web3signer.minVersion} required to work with the stakers UI. Update it to continue.`

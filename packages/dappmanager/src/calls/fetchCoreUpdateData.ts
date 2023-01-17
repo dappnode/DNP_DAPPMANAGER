@@ -1,4 +1,4 @@
-import semver from "semver";
+import { valid, satisfies } from "semver";
 import params from "../params";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
 import { ReleaseFetcher } from "../modules/release";
@@ -110,12 +110,12 @@ export async function getCoreUpdateData(
   const to = coreManifest.version;
   const updateAlerts = (coreManifest.updateAlerts || []).filter(
     updateAlert =>
-      semver.valid(from) &&
-      semver.valid(to) &&
+      valid(from) &&
+      valid(to) &&
       updateAlert.message &&
       updateAlert.from &&
-      semver.satisfies(from, updateAlert.from) &&
-      semver.satisfies(to, updateAlert.to || "*")
+      satisfies(from, updateAlert.from) &&
+      satisfies(to, updateAlert.to || "*")
   );
 
   // versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"

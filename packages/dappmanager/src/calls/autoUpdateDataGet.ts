@@ -1,4 +1,4 @@
-import semver from "semver";
+import { valid, gt } from "semver";
 import { listPackages } from "../modules/docker/list";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper";
 import { prettyDnpName } from "../utils/format";
@@ -54,9 +54,9 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
         dnp.isDnp &&
         !dnp.isCore &&
         // Ignore wierd versions
-        semver.valid(dnp.version) &&
+        valid(dnp.version) &&
         // Ensure there are no duplicates
-        (!storedVersion || semver.gt(storedVersion, dnp.version))
+        (!storedVersion || gt(storedVersion, dnp.version))
       )
         singleDnpsToShow.push(dnp);
     }

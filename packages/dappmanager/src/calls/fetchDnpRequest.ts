@@ -1,5 +1,5 @@
 import { mapValues, omit } from "lodash-es";
-import semver from "semver";
+import { valid, gt } from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/dappnodesdk";
 import { listPackages } from "../modules/docker/list";
 import params from "../params";
@@ -165,9 +165,9 @@ function getRequiresCoreUpdate(
     : "";
   return Boolean(
     metadata.requirements &&
-      semver.valid(minDnVersion) &&
-      semver.valid(coreVersion) &&
-      semver.gt(minDnVersion, coreVersion)
+      valid(minDnVersion) &&
+      valid(coreVersion) &&
+      gt(minDnVersion, coreVersion)
   );
 }
 

@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { ApmRepoVersionReturn, ApmVersionRaw } from "./types";
 import * as repoContract from "../../contracts/repository";
 import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils";
-import semver from "semver";
+import { valid } from "semver";
 
 /**
  * Fetch a specific version of an APM repo
@@ -17,7 +17,7 @@ export async function fetchVersion(
   const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
 
   const res: ApmRepoVersionReturn =
-    version && semver.valid(version)
+    version && valid(version)
       ? await repo.getBySemanticVersion(toApmVersionArray(version))
       : await repo.getLatest();
   return parseApmVersionReturn(res);

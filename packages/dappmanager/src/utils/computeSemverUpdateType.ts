@@ -1,4 +1,4 @@
-import semver from "semver";
+import { lt, valid, major, minor, patch, coerce } from "semver";
 import { UpdateType } from "@dappnode/common";
 
 /**
@@ -11,19 +11,19 @@ export default function computeSemverUpdateType(
   from: string,
   to: string
 ): UpdateType {
-  if (!semver.valid(from) || !semver.valid(to)) return null;
+  if (!valid(from) || !valid(to)) return null;
 
   // Make sure there are no downgrades
-  if (semver.lt(to, from)) return null;
+  if (lt(to, from)) return null;
 
   // Remove wierd stuff: 10000000000000000.4.7.4 becomes 4.7.4
   // If not valid, abort
-  const fromValid = semver.valid(semver.coerce(from) || "");
-  const toValid = semver.valid(semver.coerce(to) || "");
+  const fromValid = valid(coerce(from) || "");
+  const toValid = valid(coerce(to) || "");
   if (!toValid || !fromValid) return null;
 
-  if (semver.major(fromValid) !== semver.major(toValid)) return "major";
-  if (semver.minor(fromValid) !== semver.minor(toValid)) return "minor";
-  if (semver.patch(fromValid) !== semver.patch(toValid)) return "patch";
+  if (major(fromValid) !== major(toValid)) return "major";
+  if (minor(fromValid) !== minor(toValid)) return "minor";
+  if (patch(fromValid) !== patch(toValid)) return "patch";
   return null;
 }

@@ -1,4 +1,4 @@
-import semver from "semver";
+import { valid, lte } from "semver";
 import params from "../../params";
 import { listPackages } from "../../modules/docker/list";
 import { eventBus } from "../../eventBus";
@@ -32,7 +32,7 @@ export async function checkNewPackagesVersion(
       // - non-valid versions (semver.lte will throw)
       if (
         !dnpName ||
-        !semver.valid(currentVersion) ||
+        !valid(currentVersion) ||
         params.corePackagesNotAutoupdatable.includes(dnpName)
       ) {
         continue;
@@ -50,7 +50,7 @@ export async function checkNewPackagesVersion(
       );
 
       // This version is not an update
-      if (semver.lte(newVersion, currentVersion)) {
+      if (lte(newVersion, currentVersion)) {
         continue;
       }
 

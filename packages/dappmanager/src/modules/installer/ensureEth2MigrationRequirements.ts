@@ -1,5 +1,5 @@
 import { InstallPackageData } from "@dappnode/common";
-import semver from "semver";
+import { lt, lte, valid, gt } from "semver";
 import params from "../../params";
 import { listPackageNoThrow } from "../docker/list";
 
@@ -14,12 +14,12 @@ interface PrysmLegacySpec {
  * Returns if it is Prysm legacy
  */
 export function isPrysmLegacy(dnpName: string, dnpVersion: string): boolean {
-  const dnpVersionParsed = semver.valid(dnpVersion);
+  const dnpVersionParsed = valid(dnpVersion);
   if (!dnpVersionParsed) return false;
   return params.prysmLegacySpecs.some(
     clientPkg =>
       clientPkg.prysmDnpName === dnpName &&
-      semver.lt(dnpVersionParsed, clientPkg.prysmVersion)
+      lt(dnpVersionParsed, clientPkg.prysmVersion)
   );
 }
 
@@ -44,12 +44,12 @@ export async function ensureEth2MigrationRequirements(
       const prysmVersion = prysmLegacyVersions.get(pkg.dnpName);
 
       // not allow to install Prysm Legacy
-      if (prysmVersion && semver.lte(pkg.semVersion, prysmVersion))
+      if (prysmVersion && lte(pkg.semVersion, prysmVersion))
         throw Error(
           `${pkg.dnpName}:${pkg.semVersion} is a legacy validator client, install a more recent version with remote signer support`
         );
       // bypass if it is a Prysm update that installs web3signer
-      if (prysmVersion && semver.gt(pkg.semVersion, prysmVersion)) return;
+      if (prysmVersion && gt(pkg.semVersion, prysmVersion)) return;
 
       await Promise.all(
         params.prysmLegacySpecs.map(async prysmLegacySpec => {
@@ -79,7 +79,7 @@ export async function ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled(
     const prysmPkg = await listPackageNoThrow({
       dnpName: prysmLegacySpec.prysmDnpName
     });
-    if (prysmPkg && semver.lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
+    if (prysmPkg && lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
       throw Error(
         `Not allowed to install ${prysmLegacySpec.web3signerDnpName} having Prysm legacy client installed ${prysmPkg.dnpName}:${prysmPkg.version}. Update it or remove it`
       );
@@ -95,7 +95,7 @@ export async function ensureNotInstallOtherClientIfPrysmLegacyIsInstalled(
       dnpName: prysmLegacySpec.prysmDnpName
     });
 
-    if (prysmPkg && semver.lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
+    if (prysmPkg && lte(prysmPkg.version, prysmLegacySpec.prysmVersion))
       throw Error(
         `Not allowed to install client ${pkg.dnpName} having Prysm legacy client installed: ${prysmPkg.dnpName}:${prysmPkg.version}. Update it or remove it`
       );
