@@ -1,4 +1,4 @@
-import { ipfs } from "../../src/modules/ipfs.js";
+import { ipfs } from "../../src/modules/ipfs/index.js";
 import { IpfsClientTarget } from "@dappnode/common";
 import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils.js";
 
