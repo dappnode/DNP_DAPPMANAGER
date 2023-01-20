@@ -3,7 +3,7 @@ import { expect } from "chai";
 import path from "path";
 import { Compose, Manifest, PackageEnvs } from "@dappnode/dappnodesdk";
 import { mapValues, pick } from "lodash-es";
-import * as calls from "../../src/calls.js";
+import * as calls from "../../src/calls/index.js";
 import params from "../../src/params.js";
 import { logs } from "../../src/logs.js";
 import { getDnpFromListPackages, getDnpState } from "./testPackageUtils.js";
@@ -25,13 +25,13 @@ import {
 import {
   stringifyPortMappings,
   parseEnvironment
-} from "../../src/modules/compose.js";
+} from "../../src/modules/compose/index.js";
 import {
   dockerContainerInspect,
   dockerGetArchiveSingleFile
-} from "../../src/modules/docker/api.js";
-import { listContainer } from "../../src/modules/docker/list.js";
-import { uploadDirectoryRelease } from "./integrationSpecs.js";
+} from "../../src/modules/docker/api/index.js";
+import { listContainer } from "../../src/modules/docker/list/index.js";
+import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { MemoryWritable } from "./testStreamUtils.js";
 
 // This mountpoints have files inside created by docker with the root

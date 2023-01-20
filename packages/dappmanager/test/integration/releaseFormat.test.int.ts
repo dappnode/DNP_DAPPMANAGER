@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import * as calls from "../../src/calls.js";
+import * as calls from "../../src/calls/index.js";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils.js";
 import params from "../../src/params.js";
 import shell from "../../src/utils/shell.js";
@@ -10,8 +10,8 @@ import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
-} from "./integrationSpecs.js";
-import * as db from "../../src/db.js";
+} from "./integrationSpecs/index.js";
+import * as db from "../../src/db/index.js";
 import { mockImageEnvNAME } from "./integrationSpecs/mockImage.js";
 
 /**

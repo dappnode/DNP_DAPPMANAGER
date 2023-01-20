@@ -3,11 +3,11 @@ import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
 // Import for types
-import dappGetType from "../../../../src/modules/dappGet.js";
+import dappGetType from "../../../../src/modules/dappGet/index.js";
 import { InstalledPackageData } from "@dappnode/common";
 import { mockDnp } from "../../../testUtils.js";
 import { DappGetDnps } from "../../../../src/modules/dappGet/types.js";
-import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch.js";
+import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch/index.js";
 
 /* eslint-disable max-len */
 

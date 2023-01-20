@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { shellSafe } from "../../../testUtils.js";
 import fs from "fs";
-import { ethereumClient } from "../../../../src/modules/ethClient.js";
+import { ethereumClient } from "../../../../src/modules/ethClient/index.js";
 
 // The following test will wite a compose with the alias fullnode.dappnode:
 // 1. Then will remove such aslias and test it

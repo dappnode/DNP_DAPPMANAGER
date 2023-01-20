@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import * as getPath from "../../src/utils/getPath.js";
-import * as calls from "../../src/calls.js";
+import * as calls from "../../src/calls/index.js";
 import {
   createTestDir,
   mockManifestWithImage,
@@ -16,7 +16,7 @@ import { getDnpFromListPackages } from "./testPackageUtils.js";
 import {
   uploadManifestRelease,
   cleanInstallationArtifacts
-} from "./integrationSpecs.js";
+} from "./integrationSpecs/index.js";
 import { ManifestWithImage } from "../../src/types.js";
 
 describe("Resilience features, when things go wrong", function () {

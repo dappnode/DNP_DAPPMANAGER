@@ -8,7 +8,7 @@ import {
   setDappnodeComposeDefaults,
   validateCompose,
   verifyCompose
-} from "../../../../src/modules/compose.js";
+} from "../../../../src/modules/compose/index.js";
 import { isNotFoundError } from "../../../../src/utils/node.js";
 import { fileURLToPath } from "url";
 

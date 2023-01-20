@@ -2,12 +2,11 @@ import "mocha";
 import { CID } from "ipfs-http-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
-
 import {
   serializeIpfsDirectory,
   getReleaseSignatureStatus
 } from "../../../../src/modules/release/releaseSignature.js";
-import { IPFSEntry } from "../../../../src/modules/ipfs.js";
+import { IPFSEntry } from "../../../../src/modules/ipfs/index.js";
 import { ReleaseSignature } from "../../../../src/types.js";
 import {
   ReleaseSignatureStatusCode,

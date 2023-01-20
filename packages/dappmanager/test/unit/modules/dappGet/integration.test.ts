@@ -9,10 +9,9 @@ import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";
 import { mapValues, isEmpty } from "lodash-es";
 import { logs } from "../../../../src/logs.js";
 import { fileURLToPath } from "url";
-
 // Imports for types
-import dappGetType from "../../../../src/modules/dappGet.js";
-import aggregateType from "../../../../src/modules/dappGet/aggregate.js";
+import dappGetType from "../../../../src/modules/dappGet/index.js";
+import aggregateType from "../../../../src/modules/dappGet/aggregate/index.js";
 
 /* eslint-disable no-console */
 

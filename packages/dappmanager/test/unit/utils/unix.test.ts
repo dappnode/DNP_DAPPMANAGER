@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-
 import { parseDuOutput, DuResult } from "../../../src/utils/unix.js";
 
 describe("utils > unix", () => {

@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { mockCompose } from "../../../testUtils.js";
 import { Compose } from "@dappnode/dappnodesdk";
-import { validateCompose } from "../../../../src/modules/compose.js";
+import { validateCompose } from "../../../../src/modules/compose/index.js";
 
 describe("validateCompose", () => {
   it("Should validate a valid compose", () => {

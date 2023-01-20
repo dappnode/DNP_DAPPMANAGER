@@ -5,7 +5,7 @@ import {
   decodeContentHash,
   decodeContent,
   decodeDnsLink
-} from "../../../src/api/middlewares/ethForward/utils.js";
+} from "../../../src/api/middlewares/ethForward/utils/index.js";
 
 interface TestCases {
   [hash: string]: Content;

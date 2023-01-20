@@ -10,8 +10,8 @@ import { testDir, cleanTestDir, createTestDir } from "../../testUtils.js";
 import {
   listContainer,
   listContainers
-} from "../../../src/modules/docker/list.js";
-import { dockerContainerInspect } from "../../../src/modules/docker/api.js";
+} from "../../../src/modules/docker/list/index.js";
+import { dockerContainerInspect } from "../../../src/modules/docker/api/index.js";
 import { ComposeEditor } from "../../../src/modules/compose/editor.js";
 
 /**

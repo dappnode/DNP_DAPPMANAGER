@@ -1,7 +1,7 @@
 import "mocha";
 import { safeSemver } from "../../../../src/modules/dappGet/utils/safeSemver.js";
 import { PackageRequest } from "../../../../src/types.js";
-import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch.js";
+import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch/index.js";
 import {
   DappGetState,
   DappGetDnps

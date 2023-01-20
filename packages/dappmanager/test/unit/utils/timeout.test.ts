@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-
 import { parseTimeoutSeconds } from "../../../src/utils/timeout.js";
 
 describe("Util: timeout", () => {

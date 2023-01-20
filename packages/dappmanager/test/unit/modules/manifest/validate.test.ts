@@ -3,11 +3,10 @@ import { expect } from "chai";
 import { mockManifest, mockManifestWithImage } from "../../../testUtils.js";
 import { ManifestWithImage } from "../../../../src/types.js";
 import { Manifest } from "@dappnode/dappnodesdk";
-
 import {
   validateManifestBasic,
   validateManifestWithImage
-} from "../../../../src/modules/manifest.js";
+} from "../../../../src/modules/manifest/index.js";
 
 describe("validateManifestBasic", () => {
   it("Should validate a valid manifest", () => {

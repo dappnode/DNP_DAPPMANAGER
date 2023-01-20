@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
 import shell from "../src/utils/shell.js";
-import { clearCacheDb, clearMainDb } from "../src/db.js";
+import { clearCacheDb, clearMainDb } from "../src/db/index.js";
 import { ManifestWithImage } from "../src/types.js";
-import { DockerApiSystemDfReturn } from "../src/modules/docker/api.js";
+import { DockerApiSystemDfReturn } from "../src/modules/docker/api/index.js";
 import params from "../src/params.js";
 import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import {

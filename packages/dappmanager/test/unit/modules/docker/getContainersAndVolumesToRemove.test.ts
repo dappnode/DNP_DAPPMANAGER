@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { getContainersAndVolumesToRemove } from "../../../../src/modules/docker.js";
-import { DockerVolumeListItem } from "../../../../src/modules/docker/api.js";
+import { getContainersAndVolumesToRemove } from "../../../../src/modules/docker/index.js";
+import { DockerVolumeListItem } from "../../../../src/modules/docker/api/index.js";
 import { normalizeProjectName } from "../../../../src/modules/docker/volumesData.js";
 import { InstalledPackageData } from "@dappnode/common";
 import { mockContainer, mockDnp, mockVolume } from "../../../testUtils.js";

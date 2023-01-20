@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
-
 import aggregateDependencies from "../../../../../src/modules/dappGet/aggregate/aggregateDependencies.js";
 
 /**

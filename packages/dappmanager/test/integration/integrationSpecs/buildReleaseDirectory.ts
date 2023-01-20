@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { ethers } from "ethers";
 import { mapValues } from "lodash-es";
-import { ipfs } from "../../../src/modules/ipfs.js";
+import { ipfs } from "../../../src/modules/ipfs/index.js";
 import shell from "../../../src/utils/shell.js";
 import { yamlDump } from "../../../src/utils/yaml.js";
 import { getContainerName, getImageTag } from "../../../src/params.js";

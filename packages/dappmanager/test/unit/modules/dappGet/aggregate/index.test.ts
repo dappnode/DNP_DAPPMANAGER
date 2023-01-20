@@ -3,7 +3,6 @@ import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock } from "../testHelpers.js";
-
 // Import for types
 import aggregateType from "../../../../../src/modules/dappGet/aggregate/index.js";
 import { InstalledPackageData } from "@dappnode/common";

@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-
 import shell from "../../../src/utils/shell.js";
 
 describe("Util: shell", () => {

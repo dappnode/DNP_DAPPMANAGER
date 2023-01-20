@@ -4,7 +4,7 @@ import { mockManifestWithImage } from "../../testUtils.js";
 import { ManifestWithImage } from "../../../src/types.js";
 import { uploadManifestRelease } from "../integrationSpecs/buildReleaseManifest.js";
 import { uploadDirectoryRelease } from "../integrationSpecs/buildReleaseDirectory.js";
-import { ipfs } from "../../../src/modules/ipfs.js";
+import { ipfs } from "../../../src/modules/ipfs/index.js";
 import { getManifest } from "../../../src/modules/release/getManifest.js";
 
 describe("IPFS remote", function () {

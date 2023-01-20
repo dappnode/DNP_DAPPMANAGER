@@ -1,9 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-import * as calls from "../../../src/calls.js";
-import * as db from "../../../src/db.js";
-import { getRegistryOnRange } from "../../../src/modules/registry.js";
+import * as calls from "../../../src/calls/index.js";
+import * as db from "../../../src/db/index.js";
+import { getRegistryOnRange } from "../../../src/modules/registry/index.js";
 import { clearDbs } from "../../testUtils.js";
 import { RegistryNewRepoEvent } from "../../../src/types.js";
 

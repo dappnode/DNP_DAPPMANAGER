@@ -8,7 +8,7 @@ import rewiremock from "rewiremock/webpack";
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall.js";
 import { DappGetState } from "../../../src/modules/dappGet/types.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
-import { ReleaseFetcher } from "../../../src/modules/release.js";
+import { ReleaseFetcher } from "../../../src/modules/release/index.js";
 import { Manifest } from "@dappnode/dappnodesdk";
 import { PackageRequest } from "../../../src/types.js";
 
