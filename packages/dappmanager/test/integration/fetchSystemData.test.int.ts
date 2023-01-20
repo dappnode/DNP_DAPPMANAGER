@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../../src/calls.js";
+import * as calls from "../../src/calls/index.js";
 import { logs } from "../../src/logs.js";
 import { AutoUpdateSettings } from "@dappnode/common";
 import {
