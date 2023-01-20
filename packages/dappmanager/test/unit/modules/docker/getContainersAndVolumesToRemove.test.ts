@@ -1,9 +1,9 @@
 import { expect } from "chai";
-import { getContainersAndVolumesToRemove } from "../../../../src/modules/docker";
-import { DockerVolumeListItem } from "../../../../src/modules/docker/api";
-import { normalizeProjectName } from "../../../../src/modules/docker/volumesData";
+import { getContainersAndVolumesToRemove } from "../../../../src/modules/docker.js";
+import { DockerVolumeListItem } from "../../../../src/modules/docker/api.js";
+import { normalizeProjectName } from "../../../../src/modules/docker/volumesData.js";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockContainer, mockDnp, mockVolume } from "../../../testUtils";
+import { mockContainer, mockDnp, mockVolume } from "../../../testUtils.js";
 
 describe.skip("docker / getContainersAndVolumesToRemove", () => {
   const dnpName = "test.dnp.dappnode.eth";

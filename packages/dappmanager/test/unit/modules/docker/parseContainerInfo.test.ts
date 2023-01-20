@@ -4,8 +4,8 @@ import { PackageContainer, PortProtocol } from "@dappnode/common";
 import {
   parseContainerInfo,
   parseDnpNameFromContainerName
-} from "../../../../src/modules/docker/list/parseContainerInfo";
-import { dockerApiResponseContainers } from "./dockerApiSamples/containers";
+} from "../../../../src/modules/docker/list/parseContainerInfo.js";
+import { dockerApiResponseContainers } from "./dockerApiSamples/containers.js";
 
 describe("modules / docker / parseDnpNameFromContainerName", () => {
   const testCases = {

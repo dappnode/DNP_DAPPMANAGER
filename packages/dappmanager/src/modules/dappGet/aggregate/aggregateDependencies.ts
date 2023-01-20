@@ -1,8 +1,8 @@
-import { hasVersion, setVersion } from "../utils/dnpUtils";
-import { sanitizeVersions } from "../utils/sanitizeVersions";
-import { sanitizeDependencies } from "../utils/sanitizeDependencies";
-import { DappGetDnps } from "../types";
-import { DappGetFetcher } from "../fetch";
+import { hasVersion, setVersion } from "../utils/dnpUtils.js";
+import { sanitizeVersions } from "../utils/sanitizeVersions.js";
+import { sanitizeDependencies } from "../utils/sanitizeDependencies.js";
+import { DappGetDnps } from "../types.js";
+import { DappGetFetcher } from "../fetch/index.js";
 
 /**
  * The goal of this function is to recursively aggregate all dependencies

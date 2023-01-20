@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import params from "../../params";
-import * as db from "../../db";
-import { logs } from "../../logs";
-import { wrapHandler } from "../utils";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
+import { wrapHandler } from "../utils.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 

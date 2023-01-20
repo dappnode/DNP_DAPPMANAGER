@@ -1,6 +1,6 @@
-import { safeSemver } from "../utils/safeSemver";
-import { getVersionsFromDnp } from "../utils/dnpUtils";
-import { DappGetDnp } from "../types";
+import { safeSemver } from "../utils/safeSemver.js";
+import { getVersionsFromDnp } from "../utils/dnpUtils.js";
+import { DappGetDnp } from "../types.js";
 
 /**
  * Prioritizes the versions array according to this rules

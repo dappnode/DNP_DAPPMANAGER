@@ -1,4 +1,4 @@
-import { changeIpfsClient } from "../modules/ipfsClient";
+import { changeIpfsClient } from "../modules/ipfsClient/index.js";
 import { IpfsRepository } from "@dappnode/common";
 
 /**

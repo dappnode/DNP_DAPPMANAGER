@@ -1,7 +1,7 @@
 import { CID } from "multiformats/cid";
 import multicodec from "multicodec";
-import { Content } from "../types";
-import { isEmpty } from "./isEmpty";
+import { Content } from "../types.js";
+import { isEmpty } from "./isEmpty.js";
 
 /**
  * Used in the CONTENTHASH_INTERFACE_ID = "0xbc1c58d1"

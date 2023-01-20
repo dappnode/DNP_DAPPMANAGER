@@ -1,6 +1,6 @@
 import { Dependencies } from "@dappnode/dappnodesdk";
 import { validRange, satisfies, valid } from "semver";
-import { ReleaseFetcher } from "../../release";
+import { ReleaseFetcher } from "../../release/index.js";
 
 export class DappGetFetcher {
   private releaseFetcher: ReleaseFetcher;

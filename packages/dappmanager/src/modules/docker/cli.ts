@@ -1,4 +1,4 @@
-import shell from "../../utils/shell";
+import shell from "../../utils/shell.js";
 
 interface ImageManifest {
   Config: string; // "f949e7d76d63befffc8eec2cbf8a6f509780f96fb3bacbdc24068d594a77f043.json"

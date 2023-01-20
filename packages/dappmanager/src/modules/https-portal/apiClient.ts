@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import Ajv from "ajv";
 import querystring from "querystring";
-import { urlJoin } from "../../utils/url";
+import { urlJoin } from "../../utils/url.js";
 
 const ajv = new Ajv({ allErrors: true });
 

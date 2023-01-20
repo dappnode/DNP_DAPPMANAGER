@@ -1,7 +1,7 @@
-import { dbCache, dbMain } from "./dbFactory";
-import { EthClientSyncedNotificationStatus } from "../types";
-import { EthClientInstallStatus } from "../modules/ethClient/types";
-import { eventBus } from "../eventBus";
+import { dbCache, dbMain } from "./dbFactory.js";
+import { EthClientSyncedNotificationStatus } from "../types.js";
+import { EthClientInstallStatus } from "../modules/ethClient/types.js";
+import { eventBus } from "../eventBus.js";
 import {
   EthClientTarget,
   EthClientRemote,

@@ -5,9 +5,9 @@ import {
   getDockerTimeoutMax,
   ensureUniquePortsFromDockerApi,
   stripDockerApiLogsHeaderAndAnsi
-} from "../../../../src/modules/docker/utils";
+} from "../../../../src/modules/docker/utils.js";
 import { PackageContainer } from "@dappnode/common";
-import { mockContainer } from "../../../testUtils";
+import { mockContainer } from "../../../testUtils.js";
 import Dockerode from "dockerode";
 
 describe("docker API > utils", () => {

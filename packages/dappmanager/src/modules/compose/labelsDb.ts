@@ -1,5 +1,5 @@
-import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types";
-import { stringifyEnvironment } from "./environment";
+import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types.js";
+import { stringifyEnvironment } from "./environment.js";
 import {
   ComposeService,
   ChainDriver,

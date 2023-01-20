@@ -1,6 +1,6 @@
 import { InstalledPackageData } from "@dappnode/common";
-import { listContainers } from "./listContainers";
-import { groupPackagesFromContainers } from "./parsePackageFromContainer";
+import { listContainers } from "./listContainers.js";
+import { groupPackagesFromContainers } from "./parsePackageFromContainer.js";
 
 /**
  * Return containers grouped by parent package. Necessary for multi-service packages

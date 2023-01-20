@@ -1,11 +1,11 @@
 import "mocha";
-import { safeSemver } from "../../../../src/modules/dappGet/utils/safeSemver";
-import { PackageRequest } from "../../../../src/types";
-import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch";
+import { safeSemver } from "../../../../src/modules/dappGet/utils/safeSemver.js";
+import { PackageRequest } from "../../../../src/types.js";
+import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch.js";
 import {
   DappGetState,
   DappGetDnps
-} from "../../../../src/modules/dappGet/types";
+} from "../../../../src/modules/dappGet/types.js";
 import { Dependencies } from "@dappnode/dappnodesdk";
 
 export interface DappgetTestCase {

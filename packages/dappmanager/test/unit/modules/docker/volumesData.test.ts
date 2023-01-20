@@ -3,7 +3,7 @@ import { expect } from "chai";
 import {
   parseVolumeOwnershipData,
   normalizeProjectName
-} from "../../../../src/modules/docker/volumesData";
+} from "../../../../src/modules/docker/volumesData.js";
 import { PackageContainer, VolumeOwnershipData } from "@dappnode/common";
 
 describe("docker > volumes data", () => {

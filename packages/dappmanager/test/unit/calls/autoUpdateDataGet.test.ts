@@ -5,16 +5,16 @@ import {
   cleanTestDir,
   mockDnp,
   clearDbs
-} from "../../testUtils";
+} from "../../testUtils.js";
 import {
   editDnpSetting,
   editCoreSetting,
   isUpdateDelayCompleted,
   flagCompletedUpdate
-} from "../../../src/utils/autoUpdateHelper";
-import params from "../../../src/params";
+} from "../../../src/utils/autoUpdateHelper.js";
+import params from "../../../src/params.js";
 import rewiremock from "rewiremock/webpack";
-import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet";
+import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";
 import { InstalledPackageData } from "@dappnode/common";
 
 describe.skip("Call function: autoUpdateDataGet", function () {

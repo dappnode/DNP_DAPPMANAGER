@@ -1,6 +1,6 @@
-import { ipfs } from "../../src/modules/ipfs";
+import { ipfs } from "../../src/modules/ipfs.js";
 import { IpfsClientTarget } from "@dappnode/common";
-import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils";
+import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils.js";
 
 export const mochaHooks = {
   beforeAll: [

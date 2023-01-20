@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseMemoryStats } from "../../../src/utils/parseMemoryStats";
+import { parseMemoryStats } from "../../../src/utils/parseMemoryStats.js";
 import osu from "node-os-utils";
 
 describe("Util: parseMemoryStats", async function () {

@@ -1,5 +1,5 @@
 import { valid, validRange, satisfies, compare, rcompare } from "semver";
-import { isIpfsHash } from "../../../utils/validate";
+import { isIpfsHash } from "../../../utils/validate.js";
 
 /**
  * semver comparision functions semver.compare and semver.rcompare

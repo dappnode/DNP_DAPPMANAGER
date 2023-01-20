@@ -1,5 +1,5 @@
 import { valid, lt } from "semver";
-import { imagesList, imageRemove } from "./api";
+import { imagesList, imageRemove } from "./api/index.js";
 
 /**
  * Clean old semver tagged images for DNP `name` expect tag `version`.

@@ -6,7 +6,7 @@ import {
   stringifyPortMappings,
   mergePortMappings,
   mergePortArrays
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose.js";
 
 describe("portMappings: parse, stringify and merge", () => {
   it("should parse and stringify port mappings", () => {

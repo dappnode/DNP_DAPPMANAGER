@@ -1,6 +1,6 @@
-import { open } from "./open";
-import { close } from "./close";
-import { list } from "./list";
+import { open } from "./open.js";
+import { close } from "./close.js";
+import { list } from "./list.js";
 
 // upnpc - interact with an external UPnP Internet Gateway Device
 //

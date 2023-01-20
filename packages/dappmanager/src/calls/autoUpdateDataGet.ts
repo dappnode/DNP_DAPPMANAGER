@@ -1,7 +1,7 @@
 import { valid, gt } from "semver";
-import { listPackages } from "../modules/docker/list";
-import * as autoUpdateHelper from "../utils/autoUpdateHelper";
-import { prettyDnpName } from "../utils/format";
+import { listPackages } from "../modules/docker/list/index.js";
+import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
+import { prettyDnpName } from "../utils/format.js";
 import {
   AutoUpdateDataView,
   AutoUpdateDataDnpView,

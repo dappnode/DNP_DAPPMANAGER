@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { getRandomAlphanumericToken } from "../../../src/utils/token";
+import { getRandomAlphanumericToken } from "../../../src/utils/token.js";
 
 describe("utils / token", () => {
   describe("getRandomAlphanumericToken", () => {

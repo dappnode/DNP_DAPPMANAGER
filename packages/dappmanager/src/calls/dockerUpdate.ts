@@ -3,7 +3,7 @@ import {
   updateDockerEngine,
   getDockerComposeUpdateCheck,
   getDockerEngineUpdateCheck
-} from "../modules/dockerUpdate";
+} from "../modules/dockerUpdate/index.js";
 import { DockerUpdateStatus } from "@dappnode/common";
 
 /**

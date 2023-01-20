@@ -1,18 +1,18 @@
 import { valid, lte } from "semver";
-import params from "../../params";
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import { ReleaseFetcher } from "../../modules/release";
-import { prettyDnpName } from "../../utils/format";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import { ReleaseFetcher } from "../../modules/release/index.js";
+import { prettyDnpName } from "../../utils/format.js";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   isCoreUpdateEnabled,
   isDnpUpdateEnabled
-} from "../../utils/autoUpdateHelper";
+} from "../../utils/autoUpdateHelper.js";
 import {
   formatPackageUpdateNotification,
   formatSystemUpdateNotification
-} from "./formatNotificationBody";
+} from "./formatNotificationBody.js";
 
 export async function sendUpdatePackageNotificationMaybe(
   releaseFetcher: ReleaseFetcher,

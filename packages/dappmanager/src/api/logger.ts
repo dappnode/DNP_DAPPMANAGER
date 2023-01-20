@@ -1,6 +1,6 @@
-import { EthProviderError } from "../modules/ethClient";
-import * as logUserAction from "../logUserAction";
-import { logs } from "../logs";
+import { EthProviderError } from "../modules/ethClient/index.js";
+import * as logUserAction from "../logUserAction.js";
+import { logs } from "../logs.js";
 import {
   routesData,
   Routes,

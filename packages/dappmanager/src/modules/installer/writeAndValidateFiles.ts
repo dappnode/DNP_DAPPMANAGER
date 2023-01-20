@@ -1,11 +1,11 @@
 import fs from "fs";
-import { Log } from "../../utils/logUi";
-import * as validate from "../../utils/validate";
+import { Log } from "../../utils/logUi.js";
+import * as validate from "../../utils/validate.js";
 import { InstallPackageData } from "@dappnode/common";
-import { dockerComposeConfig } from "../docker/compose";
-import { ComposeEditor } from "../compose/editor";
-import { writeManifest } from "../manifest/manifestFile";
-import { isNotFoundError } from "../../utils/node";
+import { dockerComposeConfig } from "../docker/compose/index.js";
+import { ComposeEditor } from "../compose/editor.js";
+import { writeManifest } from "../manifest/manifestFile.js";
+import { isNotFoundError } from "../../utils/node.js";
 
 /**
  * Write the new compose and test it with config

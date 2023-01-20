@@ -1,5 +1,5 @@
 import dargs from "dargs";
-import shell from "../../../utils/shell";
+import shell from "../../../utils/shell.js";
 
 type Args = string[];
 type Kwargs = { [flag: string]: string | number | boolean | undefined };

@@ -1,5 +1,5 @@
 import path from "path";
-import { FileFormat } from "./types";
+import { FileFormat } from "./types.js";
 import { Architecture } from "@dappnode/dappnodesdk";
 import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
 

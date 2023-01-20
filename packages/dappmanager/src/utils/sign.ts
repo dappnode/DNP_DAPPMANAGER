@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import params from "../params";
+import params from "../params.js";
 
 export function prepareMessageFromPackage({
   packageEnsName,

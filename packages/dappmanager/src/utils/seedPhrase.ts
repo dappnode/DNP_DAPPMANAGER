@@ -1,6 +1,6 @@
 import fs from "fs";
-import params from "../params";
-import * as db from "../db";
+import params from "../params.js";
+import * as db from "../db/index.js";
 import { utils as ethersUtils } from "ethers";
 
 const privateKeyPath = params.PRIVATE_KEY_PATH;

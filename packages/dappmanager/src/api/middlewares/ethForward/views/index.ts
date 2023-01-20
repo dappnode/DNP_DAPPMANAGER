@@ -1,6 +1,6 @@
-import { base } from "./base";
-import { NotFoundError } from "../types";
-import params from "../../../../params";
+import { base } from "./base.js";
+import { NotFoundError } from "../types.js";
+import params from "../../../../params.js";
 
 const adminUiUrl = `http://my.dappnode/`;
 const adminUiInstallUrl = `${adminUiUrl}#/installer`;

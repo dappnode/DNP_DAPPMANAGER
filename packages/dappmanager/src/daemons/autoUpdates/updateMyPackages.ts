@@ -1,18 +1,18 @@
 import { valid, lte } from "semver";
-import params from "../../params";
-import { listPackages } from "../../modules/docker/list";
-import { eventBus } from "../../eventBus";
-import { ReleaseFetcher } from "../../modules/release";
-import { packageInstall } from "../../calls";
-import { logs } from "../../logs";
-import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification";
-import computeSemverUpdateType from "../../utils/computeSemverUpdateType";
+import params from "../../params.js";
+import { listPackages } from "../../modules/docker/list/index.js";
+import { eventBus } from "../../eventBus.js";
+import { ReleaseFetcher } from "../../modules/release/index.js";
+import { packageInstall } from "../../calls/index.js";
+import { logs } from "../../logs.js";
+import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification.js";
+import computeSemverUpdateType from "../../utils/computeSemverUpdateType.js";
 import {
   isDnpUpdateEnabled,
   isUpdateDelayCompleted,
   flagCompletedUpdate,
   flagErrorUpdate
-} from "../../utils/autoUpdateHelper";
+} from "../../utils/autoUpdateHelper.js";
 
 /**
  * For all installed non-core DAppNode packages, check their latest version

@@ -4,11 +4,11 @@ import {
   supportedDebianReleases,
   supportedOs,
   targetDockerComposeVersion
-} from "../../../../src/modules/dockerUpdate/params";
+} from "../../../../src/modules/dockerUpdate/params.js";
 import {
   parseDockerComposeRequirements,
   parseDockerEngineRequirements
-} from "../../../../src/modules/dockerUpdate/utils";
+} from "../../../../src/modules/dockerUpdate/utils.js";
 
 describe("dockerUpdate / parse docker engine update requirements", () => {
   it("Should not allow docker engine update", () => {

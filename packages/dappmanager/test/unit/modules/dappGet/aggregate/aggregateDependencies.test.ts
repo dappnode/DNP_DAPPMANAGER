@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { DappGetFetcherMock, MockDnps } from "../testHelpers";
+import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
 
-import aggregateDependencies from "../../../../../src/modules/dappGet/aggregate/aggregateDependencies";
+import aggregateDependencies from "../../../../../src/modules/dappGet/aggregate/aggregateDependencies.js";
 
 /**
  * Purpose of the test. Make sure it is able recursively fetch a DNP's dependencies

@@ -5,7 +5,7 @@ import {
   getDevicePath,
   parseDevicePath,
   parseDevicePathMountpoint
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose.js";
 
 const pathParts = {
   mountpoint: "/dev1/data",

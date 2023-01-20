@@ -1,5 +1,5 @@
 import { HostStatMemory } from "@dappnode/common";
-import { toBytes } from "./toBytes";
+import { toBytes } from "./toBytes.js";
 import osu from "node-os-utils";
 
 /**

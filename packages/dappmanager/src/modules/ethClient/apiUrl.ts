@@ -1,6 +1,6 @@
-import { getPrivateNetworkAlias } from "../../domains";
-import { getBeaconServiceName } from "../../modules/stakerConfig/utils";
-import { listPackageNoThrow } from "../docker/list";
+import { getPrivateNetworkAlias } from "../../domains.js";
+import { getBeaconServiceName } from "../../modules/stakerConfig/utils.js";
+import { listPackageNoThrow } from "../docker/list/index.js";
 
 /**
  * Computes the JSON RPC url of an Eth execution client package from its name

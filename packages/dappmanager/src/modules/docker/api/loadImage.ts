@@ -1,4 +1,4 @@
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 /**
  * Load .tar.xz image sending it to the docker daemon

@@ -1,10 +1,10 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { TimeoutErrorKy, IpfsInstance } from "./types";
-import { getContentFromGateway } from "./getContentFromGateway";
+import { TimeoutErrorKy, IpfsInstance } from "./types.js";
+import { getContentFromGateway } from "./getContentFromGateway.js";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
-import { logs } from "../../logs";
+import { logs } from "../../logs.js";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;

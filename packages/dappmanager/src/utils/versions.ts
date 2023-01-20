@@ -1,5 +1,5 @@
 import { valid, gt } from "semver";
-import { isIpfsHash } from "./validate";
+import { isIpfsHash } from "./validate.js";
 
 /*
  * Wrapper for the semver library. In the DAPPMANAGER versions can be:

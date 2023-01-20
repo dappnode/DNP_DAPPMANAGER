@@ -1,9 +1,9 @@
-import { isEnsDomain } from "../../utils/validate";
+import { isEnsDomain } from "../../utils/validate.js";
 import { ethers } from "ethers";
 import { DirectoryDnp, DirectoryDnpStatus } from "@dappnode/common";
-import * as directoryContract from "../../contracts/directory";
-import { logs } from "../../logs";
-import { notUndefined } from "../../utils/typingHelpers";
+import * as directoryContract from "../../contracts/directory.js";
+import { logs } from "../../logs.js";
+import { notUndefined } from "../../utils/typingHelpers.js";
 
 // Contract parameters
 const DAppNodePackageStatus: DirectoryDnpStatus[] = [

@@ -1,5 +1,5 @@
-import { dbCache } from "./dbFactory";
-import { stripDots } from "./dbUtils";
+import { dbCache } from "./dbFactory.js";
+import { stripDots } from "./dbUtils.js";
 import { PackageNotificationDb, PackageNotification } from "@dappnode/common";
 
 const NOTIFICATION = "notification";

@@ -1,10 +1,10 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
-import params, { getImageTag, getContainerName } from "../../params";
-import { getIsCore } from "../manifest/getIsCore";
-import { cleanCompose } from "./clean";
-import { parseEnvironment } from "./environment";
-import { parseServiceNetworks } from "./networks";
-import { getPrivateNetworkAliases } from "../../domains";
+import params, { getImageTag, getContainerName } from "../../params.js";
+import { getIsCore } from "../manifest/getIsCore.js";
+import { cleanCompose } from "./clean.js";
+import { parseEnvironment } from "./environment.js";
+import { parseServiceNetworks } from "./networks.js";
+import { getPrivateNetworkAliases } from "../../domains.js";
 import {
   Manifest,
   Compose,

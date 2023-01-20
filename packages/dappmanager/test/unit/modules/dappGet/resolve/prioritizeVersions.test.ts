@@ -11,7 +11,7 @@ import { expect } from "chai";
  * + Prioritize not installing new packages, first version = null.
  */
 
-import prioritizeVersions from "../../../../../src/modules/dappGet/resolve/prioritizeVersions";
+import prioritizeVersions from "../../../../../src/modules/dappGet/resolve/prioritizeVersions.js";
 
 describe.skip("dappGet/resolve/prioritizeVersions", () => {
   it("should order versions: requested DNP. Prioritize newer versions", async () => {

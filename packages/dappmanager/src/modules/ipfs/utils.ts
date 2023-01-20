@@ -1,7 +1,7 @@
-import { IPFSEntry, IPFSPath } from "./types";
-import { IpfsFileResult } from "../../types";
-import * as db from "../../db";
-import params from "../../params";
+import { IPFSEntry, IPFSPath } from "./types.js";
+import { IpfsFileResult } from "../../types.js";
+import * as db from "../../db/index.js";
+import params from "../../params.js";
 import { IpfsClientTarget } from "@dappnode/common";
 
 /**

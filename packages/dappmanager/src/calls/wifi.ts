@@ -1,8 +1,8 @@
-import { ComposeFileEditor } from "../modules/compose/editor";
-import { logContainer } from "../modules/docker/api";
-import { listContainer } from "../modules/docker/list";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { logContainer } from "../modules/docker/api/index.js";
+import { listContainer } from "../modules/docker/list/index.js";
 import { CurrentWifiCredentials, WifiReport } from "@dappnode/common";
-import params from "../params";
+import params from "../params.js";
 
 /**
  * Return wifi report

@@ -1,4 +1,4 @@
-import { packagesGet, packageInstall } from "../../calls";
+import { packagesGet, packageInstall } from "../../calls/index.js";
 import {
   ConsensusClient,
   ConsensusClientGnosis,
@@ -18,19 +18,19 @@ import {
   StakerItemOk,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { logs } from "../../logs";
-import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
+import { logs } from "../../logs.js";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
   updateConsensusEnv,
   getMevBoostUserSettings,
   updateMevBoostEnv
-} from "./utils";
-import { listPackageNoThrow } from "../docker/list/listPackages";
-import { dockerComposeUpPackage } from "../docker";
+} from "./utils.js";
+import { listPackageNoThrow } from "../docker/list/listPackages.js";
+import { dockerComposeUpPackage } from "../docker/index.js";
 import { lt } from "semver";
-import * as db from "../../db";
+import * as db from "../../db/index.js";
 
 /**
  *  Sets a new staker configuration based on user selection:

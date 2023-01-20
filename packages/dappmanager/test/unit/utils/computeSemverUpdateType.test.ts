@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 
-import computeSemverUpdateType from "../../../src/utils/computeSemverUpdateType";
+import computeSemverUpdateType from "../../../src/utils/computeSemverUpdateType.js";
 
 describe("Util: computeSemverUpdateType", () => {
   it("Should flag update types correctly", async () => {

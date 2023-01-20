@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseExitCodeFromStatus } from "../../../../src/modules/docker/list/parseExitCodeFromStatus";
+import { parseExitCodeFromStatus } from "../../../../src/modules/docker/list/parseExitCodeFromStatus.js";
 
 describe("docker / parseExitCodeFromStatus", () => {
   const testCases: {

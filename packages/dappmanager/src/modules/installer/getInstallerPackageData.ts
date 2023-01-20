@@ -1,9 +1,9 @@
 import deepmerge from "deepmerge";
-import * as getPath from "../../utils/getPath";
-import orderInstallPackages from "./orderInstallPackages";
-import { ComposeEditor, ComposeFileEditor } from "../compose/editor";
-import { getContainersStatus } from "../docker";
-import { parseTimeoutSeconds } from "../../utils/timeout";
+import * as getPath from "../../utils/getPath.js";
+import orderInstallPackages from "./orderInstallPackages.js";
+import { ComposeEditor, ComposeFileEditor } from "../compose/editor.js";
+import { getContainersStatus } from "../docker/index.js";
+import { parseTimeoutSeconds } from "../../utils/timeout.js";
 import {
   UserSettingsAllDnps,
   UserSettings,
@@ -11,7 +11,7 @@ import {
   InstallPackageData,
   ContainersStatus
 } from "@dappnode/common";
-import { listPackages } from "../docker/list";
+import { listPackages } from "../docker/list/index.js";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];

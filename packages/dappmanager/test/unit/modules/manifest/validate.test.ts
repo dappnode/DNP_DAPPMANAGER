@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import { mockManifest, mockManifestWithImage } from "../../../testUtils";
-import { ManifestWithImage } from "../../../../src/types";
+import { mockManifest, mockManifestWithImage } from "../../../testUtils.js";
+import { ManifestWithImage } from "../../../../src/types.js";
 import { Manifest } from "@dappnode/dappnodesdk";
 
 import {
   validateManifestBasic,
   validateManifestWithImage
-} from "../../../../src/modules/manifest";
+} from "../../../../src/modules/manifest.js";
 
 describe("validateManifestBasic", () => {
   it("Should validate a valid manifest", () => {

@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 
-import { prettyDnpName } from "../../../src/utils/format";
+import { prettyDnpName } from "../../../src/utils/format.js";
 
 describe("Util / format", () => {
   describe("prettyDnpName", () => {

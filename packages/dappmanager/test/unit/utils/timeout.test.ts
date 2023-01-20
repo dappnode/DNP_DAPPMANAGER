@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 
-import { parseTimeoutSeconds } from "../../../src/utils/timeout";
+import { parseTimeoutSeconds } from "../../../src/utils/timeout.js";
 
 describe("Util: timeout", () => {
   it("It should parse string parameter to number", () => {

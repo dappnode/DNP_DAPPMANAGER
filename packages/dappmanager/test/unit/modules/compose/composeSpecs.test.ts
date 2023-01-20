@@ -3,13 +3,13 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 import { Manifest, Compose } from "@dappnode/dappnodesdk";
-import { yamlParse, yamlDump } from "../../../../src/utils/yaml";
+import { yamlParse, yamlDump } from "../../../../src/utils/yaml.js";
 import {
   setDappnodeComposeDefaults,
   validateCompose,
   verifyCompose
-} from "../../../../src/modules/compose";
-import { isNotFoundError } from "../../../../src/utils/node";
+} from "../../../../src/modules/compose.js";
+import { isNotFoundError } from "../../../../src/utils/node.js";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);

@@ -5,14 +5,14 @@ import {
   UpdateRequirement,
   DockerUpdateStatus
 } from "@dappnode/common";
-import { sanitizeVersion } from "../../utils/sanitizeVersion";
+import { sanitizeVersion } from "../../utils/sanitizeVersion.js";
 import {
   supportedOs,
   supportedArchs,
   supportedDebianReleases,
   targetDockerEngineVersions,
   targetDockerComposeVersion
-} from "./params";
+} from "./params.js";
 
 // Docker engine
 

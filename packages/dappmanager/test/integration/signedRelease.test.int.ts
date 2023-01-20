@@ -1,13 +1,13 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { ComposeEditor } from "../../src/modules/compose/editor";
-import { ipfs } from "../../src/modules/ipfs";
-import { ReleaseFetcher } from "../../src/modules/release";
-import { getContainerName, getImageTag } from "../../src/params";
+import { ComposeEditor } from "../../src/modules/compose/editor.js";
+import { ipfs } from "../../src/modules/ipfs.js";
+import { ReleaseFetcher } from "../../src/modules/release.js";
+import { getContainerName, getImageTag } from "../../src/params.js";
 import { ReleaseSignatureStatusCode } from "@dappnode/common";
 import { Manifest } from "@dappnode/dappnodesdk";
-import { uploadDirectoryRelease } from "./integrationSpecs";
-import { signRelease } from "./integrationSpecs/signRelease";
+import { uploadDirectoryRelease } from "./integrationSpecs.js";
+import { signRelease } from "./integrationSpecs/signRelease.js";
 
 // Sign the string message
 const privateKey =

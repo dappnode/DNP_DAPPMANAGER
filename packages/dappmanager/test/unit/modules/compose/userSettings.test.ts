@@ -7,7 +7,7 @@ import { UserSettings } from "@dappnode/common";
 import {
   parseUserSettings,
   applyUserSettings
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose.js";
 
 const bitcoinVolumeName = "bitcoin_data";
 const bitcoinVolumeNameNew = "bitcoin_new_data";

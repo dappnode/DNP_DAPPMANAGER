@@ -4,7 +4,7 @@ import { expect } from "chai";
 import {
   parseContentHashFile,
   loadContentHashes
-} from "../../../../src/modules/ethClient";
+} from "../../../../src/modules/ethClient.js";
 
 describe("apm > localFallbackVersions", () => {
   describe("parseContentHashFile", () => {

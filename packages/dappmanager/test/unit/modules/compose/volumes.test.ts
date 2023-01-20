@@ -6,7 +6,7 @@ import {
   parseVolumeMappings,
   stringifyVolumeMappings,
   normalizeVolumePath
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose.js";
 
 describe("volumeMappings: parse, stringify and merge", () => {
   it("should parse and stringify volume mappings", () => {

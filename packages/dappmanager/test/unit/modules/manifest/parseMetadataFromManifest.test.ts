@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { Manifest } from "@dappnode/dappnodesdk";
 
-import { parseMetadataFromManifest } from "../../../../src/modules/manifest";
+import { parseMetadataFromManifest } from "../../../../src/modules/manifest.js";
 
 describe("parseMetadataFromManifest", () => {
   it("Should parse metadata from a manifest", () => {

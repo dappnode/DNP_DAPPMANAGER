@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 // Result is cached for 15s + it only ran once at a time (like runOnlyOneReturnToAll)
 const dockerDfMemo = memoize(() => docker.df(), {

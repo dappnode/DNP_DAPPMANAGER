@@ -1,4 +1,4 @@
-import { dbMain } from "./dbFactory";
+import { dbMain } from "./dbFactory.js";
 
 const IMPORTED_INSTALLATION_STATIC_IP = "imported-installation-staticIp";
 const IS_VPN_DB_MIGRATED = "is-vpn-db-migrated";

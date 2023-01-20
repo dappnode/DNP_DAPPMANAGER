@@ -5,8 +5,8 @@ import {
   getMyDotEthdomain,
   getDotDappnodeDomain,
   getNsupdateTxts
-} from "../../../../src/modules/nsupdate/utils";
-import { mockContainer } from "../../../testUtils";
+} from "../../../../src/modules/nsupdate/utils.js";
+import { mockContainer } from "../../../testUtils.js";
 import { PackageContainer } from "@dappnode/common";
 
 describe("modules > nsupdate", () => {

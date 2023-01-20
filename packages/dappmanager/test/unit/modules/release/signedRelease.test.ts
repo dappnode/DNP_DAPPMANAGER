@@ -6,9 +6,9 @@ import { expect } from "chai";
 import {
   serializeIpfsDirectory,
   getReleaseSignatureStatus
-} from "../../../../src/modules/release/releaseSignature";
-import { IPFSEntry } from "../../../../src/modules/ipfs";
-import { ReleaseSignature } from "../../../../src/types";
+} from "../../../../src/modules/release/releaseSignature.js";
+import { IPFSEntry } from "../../../../src/modules/ipfs.js";
+import { ReleaseSignature } from "../../../../src/types.js";
 import {
   ReleaseSignatureStatusCode,
   TrustedReleaseKey

@@ -1,13 +1,13 @@
 import fs from "fs";
 import { mapKeys } from "lodash-es";
-import * as db from "../db";
-import params from "../params";
-import { stringifyEnvironment } from "../modules/compose";
+import * as db from "../db/index.js";
+import params from "../params.js";
+import { stringifyEnvironment } from "../modules/compose/index.js";
 import { PackageEnvs } from "@dappnode/dappnodesdk";
-import { packageSetEnvironment } from "../calls/packageSetEnvironment";
-import { logs } from "../logs";
-import { ComposeFileEditor } from "./compose/editor";
-import { listContainers } from "./docker/list";
+import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
+import { logs } from "../logs.js";
+import { ComposeFileEditor } from "./compose/editor.js";
+import { listContainers } from "./docker/list/index.js";
 
 type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
 type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];

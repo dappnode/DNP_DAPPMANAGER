@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import { findEntries } from "../../../../src/modules/release/ipfs/findEntries";
+import { findEntries } from "../../../../src/modules/release/ipfs/findEntries.js";
 import {
   releaseFilesToDownload,
   DirectoryFiles
-} from "../../../../src/modules/release/ipfs/params";
-import { IpfsFileResult } from "../../../../src/types";
+} from "../../../../src/modules/release/ipfs/params.js";
+import { IpfsFileResult } from "../../../../src/types.js";
 
 describe("validateTarImage", () => {
   it("Should find all release entries", () => {

@@ -3,7 +3,7 @@ import {
   getHostVolumeGroups,
   getHostLogicalVolumes,
   extendHostDiskSpace
-} from "../modules/hostScripts/scripts/lvm";
+} from "../modules/hostScripts/scripts/lvm.js";
 import {
   HostHardDisk,
   HostVolumeGroup,

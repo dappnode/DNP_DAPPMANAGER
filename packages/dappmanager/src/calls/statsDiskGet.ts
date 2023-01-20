@@ -1,5 +1,5 @@
 import { HostStatDisk } from "@dappnode/common";
-import shell from "../utils/shell";
+import shell from "../utils/shell.js";
 
 /**
  * Returns the disk statistics (used, available, etc)

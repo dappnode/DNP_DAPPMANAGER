@@ -1,4 +1,4 @@
-import { releaseFiles } from "../../../params";
+import { releaseFiles } from "../../../params.js";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 
 /**

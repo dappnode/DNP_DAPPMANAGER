@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-import * as calls from "../../../src/calls";
-import * as db from "../../../src/db";
-import { getRegistryOnRange } from "../../../src/modules/registry";
-import { clearDbs } from "../../testUtils";
-import { RegistryNewRepoEvent } from "../../../src/types";
+import * as calls from "../../../src/calls.js";
+import * as db from "../../../src/db.js";
+import { getRegistryOnRange } from "../../../src/modules/registry.js";
+import { clearDbs } from "../../testUtils.js";
+import { RegistryNewRepoEvent } from "../../../src/types.js";
 
 describe.skip("APM Registry", () => {
   before("Clear DBs and set remote", async () => {

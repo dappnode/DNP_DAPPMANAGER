@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { formatNotification } from "../../../../src/daemons/telegramBot/formatNotification";
+import { formatNotification } from "../../../../src/daemons/telegramBot/formatNotification.js";
 import { PackageNotification } from "@dappnode/common";
 
 describe("daemons > telegramBot > formatNotification", () => {

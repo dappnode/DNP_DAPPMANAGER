@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import params from "../../../src/params";
-import { getCoreVersionId } from "../../../src/utils/coreVersionId";
+import params from "../../../src/params.js";
+import { getCoreVersionId } from "../../../src/utils/coreVersionId.js";
 
 const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
 const coreDnpName = params.coreDnpName;
@@ -28,8 +28,8 @@ import {
   getCoreFeedbackMessage,
   // Utils
   getLastRegistryEntry
-} from "../../../src/utils/autoUpdateHelper";
-import { clearDbs, createTestDir } from "../../testUtils";
+} from "../../../src/utils/autoUpdateHelper.js";
+import { clearDbs, createTestDir } from "../../testUtils.js";
 
 const dnpName = "bitcoin.dnp.dappnode.eth";
 

@@ -1,17 +1,17 @@
-import params from "../../params";
-import { eventBus } from "../../eventBus";
-import { ReleaseFetcher } from "../../modules/release";
-import { EthProviderError } from "../../modules/ethClient";
-import { listPackages } from "../../modules/docker/list";
+import params from "../../params.js";
+import { eventBus } from "../../eventBus.js";
+import { ReleaseFetcher } from "../../modules/release/index.js";
+import { EthProviderError } from "../../modules/ethClient/index.js";
+import { listPackages } from "../../modules/docker/list/index.js";
 import {
   clearPendingUpdates,
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
-} from "../../utils/autoUpdateHelper";
-import { runAtMostEvery } from "../../utils/asyncFlows";
-import { logs } from "../../logs";
-import { checkNewPackagesVersion } from "./updateMyPackages";
-import { checkSystemPackagesVersion } from "./updateSystemPackages";
+} from "../../utils/autoUpdateHelper.js";
+import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import { logs } from "../../logs.js";
+import { checkNewPackagesVersion } from "./updateMyPackages.js";
+import { checkSystemPackagesVersion } from "./updateSystemPackages.js";
 
 /**
  * Auto-update:

@@ -1,7 +1,7 @@
 import path from "path";
 import { promisify } from "util";
 import { Writable, pipeline } from "stream";
-import { dockerGetArchive, dockerGetArchiveSingleFile } from "./api";
+import { dockerGetArchive, dockerGetArchiveSingleFile } from "./api/index.js";
 
 /**
  * Returns a tar or a file based on the path extension

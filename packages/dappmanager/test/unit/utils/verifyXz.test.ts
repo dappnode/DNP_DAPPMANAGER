@@ -1,10 +1,10 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../../src/utils/shell";
+import shell from "../../../src/utils/shell.js";
 import path from "path";
-import { createTestDir, cleanTestDir, testDir } from "../../testUtils";
+import { createTestDir, cleanTestDir, testDir } from "../../testUtils.js";
 
-import verifyXz from "../../../src/utils/verifyXz";
+import verifyXz from "../../../src/utils/verifyXz.js";
 
 const okFilePath = path.join(testDir, "ok-file.txt.xz");
 const okFilePreCompress = okFilePath.replace(".xz", "");

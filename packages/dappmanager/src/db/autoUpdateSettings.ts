@@ -1,4 +1,4 @@
-import { dbCache, dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory.js";
 import {
   AutoUpdateSettings,
   AutoUpdatePending,

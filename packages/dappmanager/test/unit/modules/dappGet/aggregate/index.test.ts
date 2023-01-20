@@ -2,13 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
-import { DappGetFetcherMock } from "../testHelpers";
+import { DappGetFetcherMock } from "../testHelpers.js";
 
 // Import for types
-import aggregateType from "../../../../../src/modules/dappGet/aggregate/index";
+import aggregateType from "../../../../../src/modules/dappGet/aggregate/index.js";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp } from "../../../../testUtils";
-import { DappGetDnps } from "../../../../../src/modules/dappGet/types";
+import { mockDnp } from "../../../../testUtils.js";
+import { DappGetDnps } from "../../../../../src/modules/dappGet/types.js";
 
 /**
  * Purpose of the test. Make sure aggregate fetches all necessary DNPs and info

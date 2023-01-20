@@ -1,12 +1,12 @@
 import { valid, satisfies } from "semver";
-import params from "../params";
+import params from "../params.js";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
-import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/list";
-import computeSemverUpdateType from "../utils/computeSemverUpdateType";
-import { getCoreVersionId } from "../utils/coreVersionId";
-import { ErrorDappGetDowngrade } from "../modules/dappGet/errors";
-import { logs } from "../logs";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import computeSemverUpdateType from "../utils/computeSemverUpdateType.js";
+import { getCoreVersionId } from "../utils/coreVersionId.js";
+import { ErrorDappGetDowngrade } from "../modules/dappGet/errors.js";
+import { logs } from "../logs.js";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";

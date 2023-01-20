@@ -1,6 +1,6 @@
-import { safeSemver } from "../utils/safeSemver";
-import { hasVersion, getDependencies, toReq } from "../utils/dnpUtils";
-import { StateInternalInterface, DappGetDnps } from "../types";
+import { safeSemver } from "../utils/safeSemver.js";
+import { hasVersion, getDependencies, toReq } from "../utils/dnpUtils.js";
+import { StateInternalInterface, DappGetDnps } from "../types.js";
 
 /**
  * Checks if a specific combination of DNP versions is valid

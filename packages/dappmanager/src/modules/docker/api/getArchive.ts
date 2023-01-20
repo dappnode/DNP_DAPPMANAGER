@@ -1,7 +1,7 @@
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 import path from "path";
 import { Writable } from "stream";
-import { tarExtractSingleFile } from "../../../utils/tarExtractSingleFile";
+import { tarExtractSingleFile } from "../../../utils/tarExtractSingleFile.js";
 
 /**
  * Get a tar archive of a resource in the filesystem of container id.

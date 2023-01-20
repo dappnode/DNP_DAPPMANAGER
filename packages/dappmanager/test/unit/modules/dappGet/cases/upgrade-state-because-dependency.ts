@@ -1,4 +1,4 @@
-import { DappgetTestCase } from "../testHelpers";
+import { DappgetTestCase } from "../testHelpers.js";
 
 const caseData: DappgetTestCase = {
   name: "upgrade state package because of a dependency",

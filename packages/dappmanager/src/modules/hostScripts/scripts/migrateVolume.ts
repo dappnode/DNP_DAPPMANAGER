@@ -1,4 +1,4 @@
-import { runScript } from "../runScripts";
+import { runScript } from "../runScripts.js";
 
 /**
  * Dangerously move a docker volume in the host docker root dir

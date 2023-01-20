@@ -1,8 +1,8 @@
 import path from "path";
 import { Compose } from "@dappnode/dappnodesdk";
-import { logs } from "../../logs";
+import { logs } from "../../logs.js";
 import { uniq } from "lodash-es";
-import { shellHost } from "../../utils/shell";
+import { shellHost } from "../../utils/shell.js";
 
 /**
  * Create custom volume device path if any

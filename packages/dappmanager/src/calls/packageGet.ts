@@ -1,14 +1,14 @@
 import { omit } from "lodash-es";
-import { listPackages } from "../modules/docker/list";
-import { readManifestIfExists } from "../modules/manifest";
-import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
-import * as db from "../db";
+import { listPackages } from "../modules/docker/list/index.js";
+import { readManifestIfExists } from "../modules/manifest/index.js";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
+import * as db from "../db/index.js";
 import { InstalledPackageDetailData } from "@dappnode/common";
-import { logs } from "../logs";
-import { ComposeFileEditor } from "../modules/compose/editor";
-import { getVolumesOwnershipData } from "../modules/docker/volumesData";
-import { sortPackages } from "./packagesGet";
-import params from "../params";
+import { logs } from "../logs.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { getVolumesOwnershipData } from "../modules/docker/volumesData.js";
+import { sortPackages } from "./packagesGet.js";
+import params from "../params.js";
 
 /**
  * Get package detail information

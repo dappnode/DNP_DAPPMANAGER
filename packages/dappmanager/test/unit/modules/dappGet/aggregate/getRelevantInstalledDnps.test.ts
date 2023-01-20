@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import { valid } from "semver";
-import { mockDnp, mockContainer } from "../../../../testUtils";
-import getRelevantInstalledDnps from "../../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps";
+import { mockDnp, mockContainer } from "../../../../testUtils.js";
+import getRelevantInstalledDnps from "../../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps.js";
 import { InstalledPackageData } from "@dappnode/common";
 
 /**

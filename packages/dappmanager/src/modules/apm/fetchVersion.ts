@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import { ApmRepoVersionReturn, ApmVersionRaw } from "./types";
-import * as repoContract from "../../contracts/repository";
-import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils";
+import { ApmRepoVersionReturn, ApmVersionRaw } from "./types.js";
+import * as repoContract from "../../contracts/repository.js";
+import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils.js";
 import { valid } from "semver";
 
 /**

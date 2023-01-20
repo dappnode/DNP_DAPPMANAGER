@@ -1,14 +1,14 @@
 import { ethers } from "ethers";
-import { getEthProviderUrl } from "../../../modules/ethClient";
+import { getEthProviderUrl } from "../../../modules/ethClient/index.js";
 import resolverAbi from "./abi/resolverAbi.json" assert { type: "json" };
 import ensAbi from "./abi/ens.json" assert { type: "json" };
-import { Network, Content, NotFoundError, EnsResolverError } from "./types";
+import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
 import {
   decodeContentHash,
   isEmpty,
   decodeDnsLink,
   decodeContent
-} from "./utils";
+} from "./utils/index.js";
 import memoize from "memoizee";
 
 const providerUrlCacheMs = 60 * 1000;

@@ -1,11 +1,11 @@
 import fs from "fs";
 import path from "path";
-import * as db from "../../db";
+import * as db from "../../db/index.js";
 import { InstallPackageDataPaths } from "@dappnode/common";
-import { Log } from "../../utils/logUi";
-import { logs } from "../../logs";
-import { isNotFoundError } from "../../utils/node";
-import { dockerCleanOldImages } from "../docker/cleanOldImages";
+import { Log } from "../../utils/logUi.js";
+import { logs } from "../../logs.js";
+import { isNotFoundError } from "../../utils/node.js";
+import { dockerCleanOldImages } from "../docker/cleanOldImages.js";
 
 /**
  * [Post install clean] After a successful install, clean backup files

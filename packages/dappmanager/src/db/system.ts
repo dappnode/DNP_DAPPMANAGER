@@ -1,6 +1,6 @@
-import { dbCache, dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory.js";
 import { PackageVersionData } from "@dappnode/common";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
+import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";

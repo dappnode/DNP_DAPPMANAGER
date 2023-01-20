@@ -1,6 +1,6 @@
-import { listContainers as dockerApiListContainers } from "../api";
+import { listContainers as dockerApiListContainers } from "../api/index.js";
 import { PackageContainer } from "@dappnode/common";
-import { parseContainerInfo } from "./parseContainerInfo";
+import { parseContainerInfo } from "./parseContainerInfo.js";
 
 /**
  * Returns the list of containers

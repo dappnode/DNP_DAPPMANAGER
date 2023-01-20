@@ -1,16 +1,16 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
-import * as db from "../../db";
-import { logs } from "../../logs";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
 import {
   CatStreamToFsArgs,
   catStreamToFs,
   writeCarToFs
-} from "./writeStreamToFs";
-import { IpfsCatOptions, IPFSEntry, IPFSPath } from "./types";
-import { handleIpfsError } from "./utils";
-import { catCarReaderToMemory, catString } from "./writeFileToMemory";
+} from "./writeStreamToFs.js";
+import { IpfsCatOptions, IPFSEntry, IPFSPath } from "./types.js";
+import { handleIpfsError } from "./utils.js";
+import { catCarReaderToMemory, catString } from "./writeFileToMemory.js";
 import { IpfsClientTarget } from "@dappnode/common";
-import { dagGet, ls } from "./list";
+import { dagGet, ls } from "./list.js";
 
 export class Ipfs {
   ipfs: IPFSHTTPClient;

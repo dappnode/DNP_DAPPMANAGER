@@ -3,15 +3,15 @@ import { RequestHandler } from "express";
 import {
   AdminPasswordDb,
   AdminPasswordDbParams
-} from "./api/auth/adminPasswordDb";
-import { Logs } from "./logs";
-import { EventBus } from "./eventBus";
+} from "./api/auth/adminPasswordDb.js";
+import { Logs } from "./logs.js";
+import { EventBus } from "./eventBus.js";
 import { LoggerMiddleware, Routes } from "@dappnode/common";
-import { DeviceCalls } from "./calls/device";
-import { SshCalls } from "./calls/ssh";
-import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi";
-import { VpnApiClient } from "./api/vpnApiClient";
-import { SshManager } from "./modules/sshManager";
+import { DeviceCalls } from "./calls/device/index.js";
+import { SshCalls } from "./calls/ssh/index.js";
+import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi.js";
+import { VpnApiClient } from "./api/vpnApiClient.js";
+import { SshManager } from "./modules/sshManager.js";
 
 interface DappmanagerParams extends HttpApiParams, AdminPasswordDbParams {}
 

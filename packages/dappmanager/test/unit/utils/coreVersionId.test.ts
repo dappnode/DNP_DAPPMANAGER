@@ -4,7 +4,7 @@ import {
   getCoreVersionId,
   parseCoreVersionId,
   isVersionIdUpdated
-} from "../../../src/utils/coreVersionId";
+} from "../../../src/utils/coreVersionId.js";
 
 describe("Util: coreVersionId", () => {
   describe("Normal cases", () => {
