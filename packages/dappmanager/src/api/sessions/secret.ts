@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { PlainTextFileDb } from "../../utils/fileDb";
+import { PlainTextFileDb } from "../../utils/fileDb.js";
 
 export class SessionsSecretDb {
   private filedb: PlainTextFileDb;

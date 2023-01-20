@@ -1,8 +1,7 @@
 import Ajv from "ajv";
-import { mapValues } from "lodash";
-import { Subscriptions, subscriptionsData } from "../..";
-import subscriptionsArgumentsSchema from "../../schemas/SubscriptionsArguments.schema.json";
-import { Args, LoggerMiddleware } from "../types";
+import { mapValues } from "lodash-es";
+import { Args, LoggerMiddleware } from "../../types";
+import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -41,6 +40,7 @@ interface SocketIsh {
  */
 export function subscriptionsFactory(
   io: SocketIsh,
+  subscriptionsArgumentsSchema: any,
   loggerMiddleware?: LoggerMiddleware
 ): Subscriptions {
   const { onCall, onError } = loggerMiddleware || {};
@@ -72,7 +72,7 @@ export function subscriptionsFactory(
             if (onError) onError(`on - ${route}`, e, args);
           }
         });
-      }
+      },
     };
   });
 }

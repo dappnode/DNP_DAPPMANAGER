@@ -1,18 +1,18 @@
-import semver from "semver";
-import params from "../../params";
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import { ReleaseFetcher } from "../../modules/release";
-import { prettyDnpName } from "../../utils/format";
-import { CoreUpdateDataAvailable } from "../../types";
+import { valid, lte } from "semver";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import { ReleaseFetcher } from "../../modules/release/index.js";
+import { prettyDnpName } from "../../utils/format.js";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   isCoreUpdateEnabled,
   isDnpUpdateEnabled
-} from "../../utils/autoUpdateHelper";
+} from "../../utils/autoUpdateHelper.js";
 import {
   formatPackageUpdateNotification,
   formatSystemUpdateNotification
-} from "./formatNotificationBody";
+} from "./formatNotificationBody.js";
 
 export async function sendUpdatePackageNotificationMaybe(
   releaseFetcher: ReleaseFetcher,
@@ -30,8 +30,8 @@ export async function sendUpdatePackageNotificationMaybe(
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (
     lastEmittedVersion &&
-    semver.valid(lastEmittedVersion) &&
-    semver.lte(newVersion, lastEmittedVersion)
+    valid(lastEmittedVersion) &&
+    lte(newVersion, lastEmittedVersion)
   )
     return; // Already emitted update available for this version
 
@@ -68,8 +68,8 @@ export async function sendUpdateSystemNotificationMaybe(
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (
     lastEmittedVersion &&
-    semver.valid(lastEmittedVersion) &&
-    semver.lte(newVersion, lastEmittedVersion)
+    valid(lastEmittedVersion) &&
+    lte(newVersion, lastEmittedVersion)
   )
     return; // Already emitted update available for this version
 

@@ -1,9 +1,9 @@
-import * as db from "../../db";
-import { listPackageNoThrow } from "../docker/list";
-import { logs } from "../../logs";
-import { EthClientTarget } from "../../types";
-import { packageGet } from "../../calls";
-import { ethClientData } from "../../params";
+import * as db from "../../db/index.js";
+import { listPackageNoThrow } from "../docker/list/index.js";
+import { logs } from "../../logs.js";
+import { EthClientTarget } from "@dappnode/common";
+import { packageGet } from "../../calls/index.js";
+import { ethClientData } from "../../params.js";
 
 /**
  * Switches ethClientTarget in the following preference order: geth > nethermind > remote

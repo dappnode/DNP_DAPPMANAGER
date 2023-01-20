@@ -1,13 +1,13 @@
 import "mocha";
 import fs from "fs";
 import { expect } from "chai";
-import { mockPackageData, shellSafe } from "../testUtils";
+import { mockPackageData, shellSafe } from "../testUtils.js";
 import {
   packageToInstallHasPid,
   getServicesSharingPid
-} from "../../src/utils/pid";
-import { ComposeFileEditor } from "../../src/modules/compose/editor";
-import { ComposeServicesSharingPid } from "../../src/types";
+} from "../../src/utils/pid.js";
+import { ComposeFileEditor } from "../../src/modules/compose/editor.js";
+import { ComposeServicesSharingPid } from "../../src/types.js";
 
 describe("Module > compose > pid", () => {
   // Example package

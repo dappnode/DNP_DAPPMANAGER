@@ -1,7 +1,7 @@
 import express from "express";
 import cookieSession from "cookie-session";
-import { SessionData, SessionsManager } from "./interface";
-import { SessionsSecretDb } from "./secret";
+import { SessionData, SessionsManager } from "./interface.js";
+import { SessionsSecretDb } from "./secret.js";
 
 export interface ClientSideCookiesParams {
   SESSIONS_SECRET_FILE: string;

@@ -13,10 +13,11 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
+import { ReqStatus } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 import Button from "components/Button";
+import { ExposableServiceInfo, HttpsPortalMapping } from "@dappnode/common";
 
 export function HttpsMappings() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});

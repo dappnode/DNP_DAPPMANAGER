@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-
-import * as versions from "../../../src/utils/versions";
+import * as versions from "../../../src/utils/versions.js";
 
 describe("Util: versions", () => {
   describe(".isHigher", () => {

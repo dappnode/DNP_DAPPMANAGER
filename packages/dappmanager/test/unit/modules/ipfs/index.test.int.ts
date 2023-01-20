@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { expect } from "chai";
-import { ipfs } from "../../../../src/modules/ipfs";
-import { cleanTestDir, testDir } from "../../../testUtils";
-import { ipfsAddAll } from "../../../integration/testIpfsUtils";
+import { ipfs } from "../../../../src/modules/ipfs/index.js";
+import { cleanTestDir, testDir } from "../../../testUtils.js";
+import { ipfsAddAll } from "../../../integration/testIpfsUtils.js";
 
 describe("ipfs / integration test", function () {
   this.timeout(60 * 1000);

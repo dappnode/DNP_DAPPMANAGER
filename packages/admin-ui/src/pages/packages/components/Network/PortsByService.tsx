@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api, useApi } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
-import { PortMapping } from "types";
 // Components
 import Button from "components/Button";
 import Input from "components/Input";
@@ -11,7 +10,11 @@ import { prettyDnpName } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./network.scss";
-import { InstalledPackageData, PortProtocol } from "common";
+import {
+  InstalledPackageData,
+  PortMapping,
+  PortProtocol
+} from "@dappnode/common";
 
 const maxPortNumber = 32768 - 1;
 const maxEphemeralPortNumber = 65535;

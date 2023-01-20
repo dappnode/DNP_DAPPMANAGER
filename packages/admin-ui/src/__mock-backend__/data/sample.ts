@@ -3,7 +3,7 @@ import {
   RequestedDnp,
   InstalledPackageDetailData,
   PackageContainer
-} from "../../common";
+} from "@dappnode/common";
 
 const dnpName = "test.dnp.dappnode.eth";
 export const sampleRequestState: RequestedDnp = {

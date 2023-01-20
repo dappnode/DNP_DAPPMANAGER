@@ -94,7 +94,9 @@ const Input: React.FC<InputProps & React.HTMLAttributes<HTMLInputElement>> = ({
  * If children is plain text wrapper it with InputGroupText
  * Otherwise return children as-is. Use React.Fragment due to Typescript
  */
-const InputPrepend: React.FC = ({ children }) => (
+const InputPrepend: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => (
   <InputGroup.Prepend>
     {typeof children === "string" ? (
       <InputGroup.Text>{children}</InputGroup.Text>
@@ -104,7 +106,7 @@ const InputPrepend: React.FC = ({ children }) => (
   </InputGroup.Prepend>
 );
 
-const InputAppend: React.FC = ({ children }) => (
+const InputAppend: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <InputGroup.Append>
     {typeof children === "string" ? (
       <InputGroup.Text>{children}</InputGroup.Text>

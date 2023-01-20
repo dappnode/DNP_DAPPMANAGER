@@ -4,15 +4,15 @@ import assert from "assert";
 import fs from "fs";
 import retry from "async-retry";
 import path from "path";
-import shell from "../../../src/utils/shell";
+import shell from "../../../src/utils/shell.js";
 import child from "child_process";
-import { testDir, cleanTestDir, createTestDir } from "../../testUtils";
+import { testDir, cleanTestDir, createTestDir } from "../../testUtils.js";
 import {
   listContainer,
   listContainers
-} from "../../../src/modules/docker/list";
-import { dockerContainerInspect } from "../../../src/modules/docker/api";
-import { ComposeEditor } from "../../../src/modules/compose/editor";
+} from "../../../src/modules/docker/list/index.js";
+import { dockerContainerInspect } from "../../../src/modules/docker/api/index.js";
+import { ComposeEditor } from "../../../src/modules/compose/editor.js";
 
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,

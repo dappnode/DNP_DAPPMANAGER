@@ -1,5 +1,5 @@
-import shell from "../utils/shell";
-import getDappmanagerImage from "../utils/getDappmanagerImage";
+import shell from "../utils/shell.js";
+import getDappmanagerImage from "../utils/getDappmanagerImage.js";
 
 const baseCommand = `docker run --rm -v /run/dbus/system_bus_socket:/run/dbus/system_bus_socket --privileged --entrypoint=""`;
 

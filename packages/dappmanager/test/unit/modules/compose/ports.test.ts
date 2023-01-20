@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-
-import { PortProtocol } from "../../../../src/types";
+import { PortProtocol } from "@dappnode/common";
 import {
   parsePortMappings,
   stringifyPortMappings,
   mergePortMappings,
   mergePortArrays
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose/index.js";
 
 describe("portMappings: parse, stringify and merge", () => {
   it("should parse and stringify port mappings", () => {

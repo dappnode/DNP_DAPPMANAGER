@@ -1,29 +1,28 @@
-import { AbortSignal } from "abort-controller";
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import params from "../../params";
-import { packageInstall } from "../../calls";
-import { listPackageNoThrow } from "../../modules/docker/list";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import { runAtMostEvery } from "../../utils/asyncFlows";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import params from "../../params.js";
+import { packageInstall } from "../../calls/index.js";
+import { listPackageNoThrow } from "../../modules/docker/list/index.js";
+import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
+import { runAtMostEvery } from "../../utils/asyncFlows.js";
 import {
   EthClientInstallStatus,
   serializeError
-} from "../../modules/ethClient/types";
-import { logs } from "../../logs";
+} from "../../modules/ethClient/types.js";
+import { logs } from "../../logs.js";
 import {
   ConsensusClientMainnet,
   EthClientRemote,
   ExecutionClientMainnet
-} from "../../types";
+} from "@dappnode/common";
 import {
   ethereumClient,
   EthProviderError,
   getLocalFallbackContentHash
-} from "../../modules/ethClient";
-import { isExecClient, isConsClient } from "../../modules/ethClient/utils";
-import { getConsensusUserSettings } from "../../modules/stakerConfig/utils";
-import { dockerComposeUpPackage } from "../../modules/docker";
+} from "../../modules/ethClient/index.js";
+import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
+import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
+import { dockerComposeUpPackage } from "../../modules/docker/index.js";
 
 /**
  * Check status of the Ethereum client and do next actions

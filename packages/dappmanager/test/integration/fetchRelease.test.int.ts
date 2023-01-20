@@ -1,10 +1,10 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
-import { omit } from "lodash";
+import { omit } from "lodash-es";
 import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
-import * as calls from "../../src/calls";
-import { ManifestWithImage, RequestedDnp } from "../../src/types";
+import * as calls from "../../src/calls/index.js";
+import { ManifestWithImage } from "../../src/types.js";
 import {
   getTestMountpoint,
   clearDbs,
@@ -12,17 +12,18 @@ import {
   cleanRepos,
   cleanContainers,
   shellSafe
-} from "../testUtils";
+} from "../testUtils.js";
 import {
   uploadManifestRelease,
   uploadDirectoryRelease
-} from "./integrationSpecs";
-import shell from "../../src/utils/shell";
-import * as validate from "../../src/utils/validate";
-import { dockerComposeUp } from "../../src/modules/docker/compose";
-import { ComposeEditor } from "../../src/modules/compose/editor";
-import { writeDefaultsToLabels } from "../../src/modules/compose";
-import { getContainerName, getImageTag } from "../../src/params";
+} from "./integrationSpecs/index.js";
+import shell from "../../src/utils/shell.js";
+import * as validate from "../../src/utils/validate.js";
+import { dockerComposeUp } from "../../src/modules/docker/compose/index.js";
+import { ComposeEditor } from "../../src/modules/compose/editor.js";
+import { writeDefaultsToLabels } from "../../src/modules/compose/index.js";
+import { getContainerName, getImageTag } from "../../src/params.js";
+import { RequestedDnp } from "@dappnode/common";
 
 describe("Fetch releases", () => {
   // This mountpoints have files inside created by docker with the root

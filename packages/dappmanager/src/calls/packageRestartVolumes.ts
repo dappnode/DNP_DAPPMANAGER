@@ -1,19 +1,19 @@
 import fs from "fs";
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import { eventBus } from "../eventBus";
-import params from "../params";
-import { logs } from "../logs";
-import * as getPath from "../utils/getPath";
+import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
+import { logs } from "../logs.js";
+import * as getPath from "../utils/getPath.js";
 import {
   dockerContainerRemove,
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
   getContainersAndVolumesToRemove
-} from "../modules/docker";
-import { listPackage } from "../modules/docker/list";
-import { packageInstalledHasPid } from "../utils/pid";
-import { ComposeFileEditor } from "../modules/compose/editor";
+} from "../modules/docker/index.js";
+import { listPackage } from "../modules/docker/list/index.js";
+import { packageInstalledHasPid } from "../utils/pid.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
 
 /**
  * Removes a package volumes. The re-ups the package

@@ -1,19 +1,20 @@
-import semver from "semver";
-import params from "../../../params";
+import { valid, lt } from "semver";
+import params from "../../../params.js";
 // Internal
-import { safeSemver } from "../utils/safeSemver";
-import aggregateDependencies from "./aggregateDependencies";
-import getRelevantInstalledDnps from "./getRelevantInstalledDnps";
-import { InstalledPackageData, PackageRequest } from "../../../types";
-import { DappGetDnps } from "../types";
-import { logs } from "../../../logs";
-import { DappGetFetcher } from "../fetch/DappGetFetcher";
-import { setVersion } from "../utils/dnpUtils";
+import { safeSemver } from "../utils/safeSemver.js";
+import aggregateDependencies from "./aggregateDependencies.js";
+import getRelevantInstalledDnps from "./getRelevantInstalledDnps.js";
+import { PackageRequest } from "../../../types.js";
+import { DappGetDnps } from "../types.js";
+import { logs } from "../../../logs.js";
+import { DappGetFetcher } from "../fetch/DappGetFetcher.js";
+import { setVersion } from "../utils/dnpUtils.js";
 import {
   ErrorDappGetDowngrade,
   ErrorDappGetNotSatisfyRange,
   ErrorDappGetNoVersions
-} from "../errors";
+} from "../errors.js";
+import { InstalledPackageData } from "@dappnode/common";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -87,7 +88,7 @@ export default async function aggregate({
     // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
     // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
     installedDnps: dnpList.filter(
-      dnp => semver.valid(dnp.version) && dnp.dnpName !== params.coreDnpName
+      dnp => valid(dnp.version) && dnp.dnpName !== params.coreDnpName
     )
   });
   // Add relevant installed dnps and their dependencies to the dnps object
@@ -138,10 +139,10 @@ export default async function aggregate({
       for (const version in dnps[dnpName].versions) {
         if (
           // Exclusively apply this condition to semver versions.
-          semver.valid(version) &&
-          semver.valid(dnpVersion) &&
+          valid(version) &&
+          valid(dnpVersion) &&
           // If the new version = "version" is strictly less than the current version "dnpVersion", ignore
-          semver.lt(version, dnpVersion)
+          lt(version, dnpVersion)
         )
           delete dnps[dnpName].versions[version];
       }

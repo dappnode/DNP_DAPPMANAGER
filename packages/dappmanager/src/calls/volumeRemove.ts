@@ -1,5 +1,5 @@
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import { eventBus } from "../eventBus";
+import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
+import { eventBus } from "../eventBus.js";
 
 /**
  * Removes a docker volume by name

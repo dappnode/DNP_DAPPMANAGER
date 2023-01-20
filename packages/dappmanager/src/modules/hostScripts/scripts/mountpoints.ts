@@ -1,6 +1,6 @@
 import memoize from "memoizee";
-import { MountpointData } from "../../../types";
-import { runScript } from "../runScripts";
+import { MountpointData } from "@dappnode/common";
+import { runScript } from "../runScripts.js";
 
 /**
  * Detects mountpoints in the host

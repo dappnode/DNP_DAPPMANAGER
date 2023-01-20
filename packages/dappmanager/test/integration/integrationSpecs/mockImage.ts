@@ -1,10 +1,13 @@
 import path from "path";
-import { testDir } from "../../testUtils";
-import shell from "../../../src/utils/shell";
-import * as validate from "../../../src/utils/validate";
-import { getImageTag } from "../../../src/params";
+import { testDir } from "../../testUtils.js";
+import shell from "../../../src/utils/shell.js";
+import * as validate from "../../../src/utils/validate.js";
+import { getImageTag } from "../../../src/params.js";
+import { fileURLToPath } from "url";
 
-const dockerContextPath = path.resolve(__dirname);
+const dockerContextPath = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url))
+);
 const imageTag = "mocktest-dappnode-test-image:0.0.0";
 
 export const mockImageEnvNAME = "NAME";

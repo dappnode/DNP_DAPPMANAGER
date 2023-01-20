@@ -1,5 +1,8 @@
-import { ExecutionClientMainnet, ReleaseSignatureProtocol } from "./common";
-export * from "./common";
+import { ChainDriver, Dependencies, Manifest } from "@dappnode/dappnodesdk";
+import {
+  ExecutionClientMainnet,
+  ReleaseSignatureProtocol
+} from "@dappnode/common";
 
 export enum FileFormat {
   JSON = "JSON",
@@ -37,10 +40,6 @@ export type EthClientSyncedNotificationStatus = {
   status: "AwaitingSynced" | "Synced";
 } | null;
 
-export interface DiskUsageThresholds {
-  [thresholdId: string]: boolean;
-}
-
 export interface RegistryNewRepoEvent {
   txHash: string;
   ensName: string;
@@ -68,4 +67,67 @@ export interface ReleaseSignature {
    * ```
    */
   signature: string;
+}
+
+/**
+ * Type mapping of a package container labels
+ * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
+ */
+export interface ContainerLabelTypes {
+  "dappnode.dnp.dnpName": string;
+  "dappnode.dnp.version": string;
+  "dappnode.dnp.serviceName": string;
+  "dappnode.dnp.instanceName": string;
+  "dappnode.dnp.dependencies": Dependencies;
+  "dappnode.dnp.avatar": string;
+  "dappnode.dnp.origin": string;
+  "dappnode.dnp.chain": ChainDriver;
+  "dappnode.dnp.isCore": boolean;
+  "dappnode.dnp.isMain": boolean;
+  "dappnode.dnp.dockerTimeout": number;
+  "dappnode.dnp.default.environment": string[];
+  "dappnode.dnp.default.ports": string[];
+  "dappnode.dnp.default.volumes": string[];
+}
+
+interface ManifestImage {
+  hash: string;
+  size: number;
+  path: string;
+  volumes?: string[];
+  ports?: string[];
+  environment?: string[];
+  /** FORBIDDEN FEATURE */
+  external_vol?: string[];
+  restart?: string;
+  privileged?: boolean;
+  cap_add?: string[];
+  cap_drop?: string[];
+  devices?: string[];
+  subnet?: string;
+  ipv4_address?: string;
+  network_mode?: string;
+  command?: string;
+  labels?: string[];
+}
+
+export interface ManifestWithImage extends Manifest {
+  image: ManifestImage;
+}
+
+export interface PackageRequest {
+  name: string;
+  ver: string;
+  req?: string;
+}
+
+export interface ApmVersion {
+  version: string;
+  contentUri: string;
+}
+
+export interface IdentityInterface {
+  address: string;
+  privateKey: string;
+  publicKey: string;
 }

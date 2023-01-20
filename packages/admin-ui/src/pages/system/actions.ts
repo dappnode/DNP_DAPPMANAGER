@@ -7,8 +7,8 @@ import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { Eth2ClientTarget } from "types";
-import { isEqual } from "lodash";
+import { Eth2ClientTarget } from "@dappnode/common";
+import { isEqual } from "lodash-es";
 
 // Redux Thunk actions
 
@@ -76,7 +76,7 @@ export const changeEthClientTarget = (
       await new Promise<void>(resolve =>
         confirm({
           title: `Remove ${prettyDnpName(prevTarget.consClient)}?`,
-          text: `Do you want to remove your current Consensus Layer (CL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same EL client. Keeping the volume will NOT clear space in your hard drive.`,
+          text: `Do you want to remove your current Consensus Layer (CL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same CL client. Keeping the volume will NOT clear space in your hard drive.`,
           buttons: [
             {
               label: "Keep node running",

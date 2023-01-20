@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import * as getPath from "../../src/utils/getPath";
-import * as calls from "../../src/calls";
+import * as getPath from "../../src/utils/getPath.js";
+import * as calls from "../../src/calls/index.js";
 import {
   createTestDir,
   mockManifestWithImage,
@@ -10,14 +10,14 @@ import {
   cleanRepos,
   cleanContainers,
   shellSafe
-} from "../testUtils";
-import params from "../../src/params";
-import { getDnpFromListPackages } from "./testPackageUtils";
+} from "../testUtils.js";
+import params from "../../src/params.js";
+import { getDnpFromListPackages } from "./testPackageUtils.js";
 import {
   uploadManifestRelease,
   cleanInstallationArtifacts
-} from "./integrationSpecs";
-import { ManifestWithImage } from "../../src/types";
+} from "./integrationSpecs/index.js";
+import { ManifestWithImage } from "../../src/types.js";
 
 describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";

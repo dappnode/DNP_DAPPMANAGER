@@ -1,6 +1,6 @@
-import { eventBus } from "../eventBus";
-import { ProgressLog } from "../types";
-import { logs } from "../logs";
+import { eventBus } from "../eventBus.js";
+import { ProgressLog } from "@dappnode/common";
+import { logs } from "../logs.js";
 
 export type Log = (dnpName: string, message: string) => void;
 

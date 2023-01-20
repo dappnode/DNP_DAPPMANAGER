@@ -1,9 +1,9 @@
 import fs from "fs";
 import pathUtil from "path";
-import semver from "semver";
-import { PackageRequest } from "../types";
-const isIPFS = require("is-ipfs");
-import { logs } from "../logs";
+import { valid, validRange } from "semver";
+import { PackageRequest } from "../types.js";
+import * as isIPFS from "is-ipfs";
+import { logs } from "../logs.js";
 
 const supportedDomains = ["eth"];
 
@@ -60,7 +60,7 @@ export function isIpfsRequest(req: PackageRequest): boolean {
  * @param version
  */
 export function isSemver(version: string): boolean {
-  return Boolean(semver.valid(version));
+  return Boolean(valid(version));
 }
 
 /**
@@ -68,7 +68,7 @@ export function isSemver(version: string): boolean {
  * @param version
  */
 export function isSemverRange(version: string): boolean {
-  return Boolean(semver.validRange(version));
+  return Boolean(validRange(version));
 }
 
 export function path(filePath: string): string {

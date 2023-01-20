@@ -1,4 +1,4 @@
-import { hostUpdate } from "../modules/hostScripts/scripts/hostUpdate";
+import { hostUpdate } from "../modules/hostScripts/scripts/hostUpdate.js";
 
 export async function runHostUpdates(): Promise<string> {
   try {

@@ -10,7 +10,6 @@ import {
 // Components
 import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
-import Repository from "./Repository";
 import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
@@ -55,11 +54,6 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Auto updates",
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
-    },
-    {
-      name: "Repository",
-      subPath: subPaths.repository,
-      component: Repository
     },
     {
       name: "Network",

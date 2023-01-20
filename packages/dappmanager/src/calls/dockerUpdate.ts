@@ -3,8 +3,8 @@ import {
   updateDockerEngine,
   getDockerComposeUpdateCheck,
   getDockerEngineUpdateCheck
-} from "../modules/dockerUpdate";
-import { DockerUpdateStatus } from "../types";
+} from "../modules/dockerUpdate/index.js";
+import { DockerUpdateStatus } from "@dappnode/common";
 
 /**
  * Updates docker engine

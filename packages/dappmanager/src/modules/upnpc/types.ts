@@ -1,4 +1,4 @@
-import { PortProtocol } from "../../types";
+import { PortProtocol } from "@dappnode/common";
 
 export interface UpnpPortMapping {
   protocol: PortProtocol;

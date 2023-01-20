@@ -1,4 +1,4 @@
-import { ExposableServiceInfo } from "../../../types";
+import { ExposableServiceInfo } from "@dappnode/common";
 
 export const exposablePredefined: {
   [dnpName: string]: ExposableServiceInfo[];

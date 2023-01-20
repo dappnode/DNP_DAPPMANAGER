@@ -1,5 +1,5 @@
 import Dockerode from "dockerode";
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 /**
  * Connect a container to a network

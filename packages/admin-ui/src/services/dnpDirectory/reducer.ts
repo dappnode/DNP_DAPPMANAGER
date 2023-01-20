@@ -1,7 +1,7 @@
-import { keyBy } from "lodash";
+import { keyBy } from "lodash-es";
 import { createReducer } from "@reduxjs/toolkit";
 import { setDnpDirectory, updateDnpDirectory, updateStatus } from "./actions";
-import { DirectoryItem, RequestStatus } from "common/types";
+import { DirectoryItem, RequestStatus } from "@dappnode/common";
 
 // Service > dnpDirectory
 

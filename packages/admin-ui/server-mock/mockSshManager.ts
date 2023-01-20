@@ -1,6 +1,6 @@
 import { SshManager } from "@dappnode/dappmanager/src/modules/sshManager";
-import { ShhStatus } from "../src/types";
 import { pause } from "./utils";
+import { ShhStatus } from "@dappnode/common";
 
 async function shellHostDelay() {
   await pause(1000 + 1000 * Math.random());

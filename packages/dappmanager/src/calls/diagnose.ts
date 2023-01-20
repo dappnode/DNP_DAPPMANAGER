@@ -1,5 +1,5 @@
-import { getHostInfoMemoized } from "../modules/hostScripts/scripts/hostInfo";
-import { HostDiagnoseItem } from "../common";
+import { getHostInfoMemoized } from "../modules/hostScripts/scripts/hostInfo.js";
+import { HostDiagnoseItem } from "@dappnode/common";
 
 /**
  * Returns a list of checks done as a diagnose

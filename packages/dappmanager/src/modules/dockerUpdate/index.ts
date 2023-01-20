@@ -1,14 +1,14 @@
-import { DockerUpdateStatus } from "../../types";
+import { DockerUpdateStatus } from "@dappnode/common";
 import {
   getDockerComposeVersion,
   getDockerEnginehostInfo,
   updateDockerCompose as updateDockerComposeScript
-} from "../hostScripts";
-import { updateDockerEngine as updateDockerEngineService } from "../hostServices";
+} from "../hostScripts/index.js";
+import { updateDockerEngine as updateDockerEngineService } from "../hostServices/index.js";
 import {
   parseDockerComposeRequirements,
   parseDockerEngineRequirements
-} from "./utils";
+} from "./utils.js";
 
 // Docker engine
 

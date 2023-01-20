@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DockerUpdateStatus, ReqStatus } from "types";
+import { DockerUpdateStatus } from "@dappnode/common";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
 import Button from "components/Button";
@@ -8,6 +8,7 @@ import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 import Alert from "react-bootstrap/esm/Alert";
 import { RequirementsList } from "./RequirementsList";
+import { ReqStatus } from "types";
 
 export function UpdateDockerCompose() {
   const [checkReq, setCheckReq] = useState<ReqStatus<DockerUpdateStatus>>({});

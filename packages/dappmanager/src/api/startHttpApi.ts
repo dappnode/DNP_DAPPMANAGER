@@ -3,25 +3,31 @@ import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import { helmetConf } from "./helmet";
+import { helmetConf } from "./helmet.js";
 import cors from "cors";
-import socketio from "socket.io";
+import { Socket, Server } from "socket.io";
 import path from "path";
-import { toSocketIoHandler, wrapHandler } from "./utils";
-import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
-import { AdminPasswordDb } from "./auth/adminPasswordDb";
-import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
-import { mapSubscriptionsToEventBus } from "./subscriptions";
-import { Logs } from "../logs";
-import { EventBus } from "../eventBus";
+import { toSocketIoHandler, wrapHandler } from "./utils.js";
 import {
-  getRpcHandler,
-  subscriptionsFactory,
+  AuthPasswordSession,
+  AuthPasswordSessionParams
+} from "./auth/index.js";
+import { AdminPasswordDb } from "./auth/adminPasswordDb.js";
+import {
+  ClientSideCookies,
+  ClientSideCookiesParams
+} from "./sessions/index.js";
+import { mapSubscriptionsToEventBus } from "./subscriptions.js";
+import { Logs } from "../logs.js";
+import { EventBus } from "../eventBus.js";
+import {
+  Routes,
   RpcPayload,
   RpcResponse,
   LoggerMiddleware,
-  Routes
-} from "../types";
+  subscriptionsFactory
+} from "@dappnode/common";
+import { getRpcHandler } from "./handler/index.js";
 
 export interface HttpApiParams
   extends ClientSideCookiesParams,
@@ -85,7 +91,7 @@ export function startHttpApi({
 }): http.Server {
   const app = express();
   const server = new http.Server(app);
-  const io = new socketio.Server(server, { serveClient: false });
+  const io = new Server(server, { serveClient: false });
 
   // Subscriptions
   const subscriptions = subscriptionsFactory(io, subscriptionsLogger);

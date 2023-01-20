@@ -1,5 +1,5 @@
 import { RootState } from "rootReducer";
-import { InstalledPackageData } from "types";
+import { InstalledPackageData } from "@dappnode/common";
 
 // Service > dnpInstalled
 

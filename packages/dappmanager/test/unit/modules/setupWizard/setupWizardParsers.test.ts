@@ -8,10 +8,13 @@ import {
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import { yamlParse, yamlDump } from "../../../../src/utils/yaml";
-import { setupWizard1To2 } from "../../../../src/modules/setupWizard/setupWizard1To2";
-import { isNotFoundError } from "../../../../src/utils/node";
+import { yamlParse, yamlDump } from "../../../../src/utils/yaml.js";
+import { setupWizard1To2 } from "../../../../src/modules/setupWizard/setupWizard1To2.js";
+import { isNotFoundError } from "../../../../src/utils/node.js";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const specsDir = path.join(__dirname, "../setupWizardSpecs");
 
 const paths = {

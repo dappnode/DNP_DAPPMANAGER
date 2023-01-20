@@ -1,8 +1,12 @@
-import { dockerDf, dockerVolumesList } from "./api";
-import { listContainers } from "./list";
-import { parseDevicePath } from "../compose";
-import { VolumeData, VolumeOwnershipData, PackageContainer } from "../../types";
-import { detectMountpoints } from "../hostScripts";
+import { dockerDf, dockerVolumesList } from "./api/index.js";
+import { listContainers } from "./list/index.js";
+import { parseDevicePath } from "../compose/index.js";
+import {
+  VolumeData,
+  VolumeOwnershipData,
+  PackageContainer
+} from "@dappnode/common";
+import { detectMountpoints } from "../hostScripts/index.js";
 
 /**
  * Normalizes a docker-compose project name 

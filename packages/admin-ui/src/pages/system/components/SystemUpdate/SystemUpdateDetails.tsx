@@ -11,7 +11,7 @@ import Card from "components/Card";
 import Button from "components/Button";
 // Icons
 import { FaArrowRight } from "react-icons/fa";
-import { DependencyListItem } from "common";
+import { DependencyListItem } from "@dappnode/common";
 
 export default function SystemUpdateDetails() {
   const coreUpdateData = useSelector(getCoreUpdateData);

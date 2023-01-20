@@ -1,10 +1,10 @@
-import prioritizeVersions from "./prioritizeVersions";
-import prioritizeDnps from "./prioritizeDnps";
+import prioritizeVersions from "./prioritizeVersions.js";
+import prioritizeDnps from "./prioritizeDnps.js";
 import {
   DappGetDnps,
   PermutationsTableInterface,
   PermutationInterface
-} from "../types";
+} from "../types.js";
 
 /**
  * Computes key parameters to construct all version permutations

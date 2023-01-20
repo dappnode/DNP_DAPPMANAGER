@@ -1,10 +1,10 @@
 import "mocha";
 import { expect } from "chai";
-import { ManifestWithImage } from "../../../../src/types";
+import { ManifestWithImage } from "../../../../src/types.js";
 import { Compose } from "@dappnode/dappnodesdk";
-import { mockManifestWithImage, mockCompose } from "../../../testUtils";
-import { manifestToCompose } from "../../../../src/modules/manifest";
-import { ComposeEditor } from "../../../../src/modules/compose/editor";
+import { mockManifestWithImage, mockCompose } from "../../../testUtils.js";
+import { manifestToCompose } from "../../../../src/modules/manifest/index.js";
+import { ComposeEditor } from "../../../../src/modules/compose/editor.js";
 
 describe("manifestToCompose", () => {
   const dnpName = "mock-dnp.dappnode.eth";

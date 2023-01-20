@@ -1,5 +1,5 @@
-import { Content } from "../types";
-import { isEmpty } from "./isEmpty";
+import { Content } from "../types.js";
+import { isEmpty } from "./isEmpty.js";
 
 /**
  * Used in the CONTENT_INTERFACE_ID = "0xd8389dc5";

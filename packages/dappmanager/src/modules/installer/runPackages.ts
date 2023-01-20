@@ -1,15 +1,15 @@
 import path from "path";
-import params from "../../params";
-import { dockerComposeUp } from "../docker/compose";
-import { restartDappmanagerPatch } from "./restartPatch";
-import { Log } from "../../utils/logUi";
-import { copyFileTo } from "../../calls/copyFileTo";
-import { InstallPackageData } from "../../types";
-import { logs } from "../../logs";
-import { dockerComposeUpPackage } from "../docker";
-import { packageToInstallHasPid } from "../../utils/pid";
-import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork";
-import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts";
+import params from "../../params.js";
+import { dockerComposeUp } from "../docker/compose/index.js";
+import { restartDappmanagerPatch } from "./restartPatch.js";
+import { Log } from "../../utils/logUi.js";
+import { copyFileTo } from "../../calls/copyFileTo.js";
+import { InstallPackageData } from "@dappnode/common";
+import { logs } from "../../logs.js";
+import { dockerComposeUpPackage } from "../docker/index.js";
+import { packageToInstallHasPid } from "../../utils/pid.js";
+import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";
+import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts.js";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 

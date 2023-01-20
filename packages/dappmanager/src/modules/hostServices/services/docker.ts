@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { runService } from "../runService";
+import { runService } from "../runService.js";
 
 /**
  * Updates docker engine:

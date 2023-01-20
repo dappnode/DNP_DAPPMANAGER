@@ -6,9 +6,9 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   StakerItemData
-} from "../types";
-import { dbCache, dbMain } from "./dbFactory";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
+} from "@dappnode/common";
+import { dbCache, dbMain } from "./dbFactory.js";
+import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
 
 // Cache
 

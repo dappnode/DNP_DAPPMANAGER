@@ -1,11 +1,11 @@
-import { PackageContainer } from "../../common";
-import * as db from "../../db";
-import { listContainers } from "../../modules/docker/list";
+import { PackageContainer } from "@dappnode/common";
+import * as db from "../../db/index.js";
+import { listContainers } from "../../modules/docker/list/index.js";
 import {
   signDataFromPackage,
   getAddressFromPrivateKey
-} from "../../utils/sign";
-import { HttpError, wrapHandler } from "../utils";
+} from "../../utils/sign.js";
+import { HttpError, wrapHandler } from "../utils.js";
 
 type Params = Record<string, unknown>;
 

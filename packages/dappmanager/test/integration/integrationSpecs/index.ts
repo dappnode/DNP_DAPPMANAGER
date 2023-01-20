@@ -1,3 +1,3 @@
-export * from "./buildReleaseDirectory";
-export * from "./buildReleaseManifest";
-export * from "./testReleaseUtils";
+export * from "./buildReleaseDirectory.js";
+export * from "./buildReleaseManifest.js";
+export * from "./testReleaseUtils.js";

@@ -1,16 +1,23 @@
-import { getEthersProvider } from "../modules/ethClient";
-import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/list";
-import { eventBus } from "../eventBus";
-import { throttle } from "lodash";
-import { NoImageForArchError } from "../modules/release/errors";
-import { logs } from "../logs";
-import { DirectoryItem, DirectoryDnp, RegistryScanProgress } from "../types";
-import { fileToGatewayUrl } from "../utils/distributedFile";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
-import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
-import { getRegistry } from "../modules/registry";
-import * as db from "../db";
+import { getEthersProvider } from "../modules/ethClient/index.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import { eventBus } from "../eventBus.js";
+import { throttle } from "lodash-es";
+import { NoImageForArchError } from "../modules/release/errors.js";
+import { logs } from "../logs.js";
+import {
+  DirectoryItem,
+  DirectoryDnp,
+  RegistryScanProgress
+} from "@dappnode/common";
+import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
+import {
+  getShortDescription,
+  getFallBackCategories
+} from "./fetchDirectory.js";
+import { getRegistry } from "../modules/registry/index.js";
+import * as db from "../db/index.js";
 
 const defaultEnsName = "public.dappnode.eth";
 const minDeployBlock = 6312046;

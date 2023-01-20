@@ -1,8 +1,7 @@
-import { AbortSignal } from "abort-controller";
 import async from "async";
 import memoize from "memoizee";
-import { logs } from "../logs";
-import _ from "lodash";
+import { logs } from "../logs.js";
+import _ from "lodash-es";
 
 /**
  * Throw this error when an upstream abort signal aborts

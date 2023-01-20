@@ -1,5 +1,5 @@
 import React from "react";
-import { InstalledPackageData } from "types";
+import { InstalledPackageData } from "@dappnode/common";
 import { StateBadgeContainer } from "./StateBadgeContainer";
 import { allContainersHaveSameVariant, parseContainerState } from "./utils";
 import "./stateBadge.scss";

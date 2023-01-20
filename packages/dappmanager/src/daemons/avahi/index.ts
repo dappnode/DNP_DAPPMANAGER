@@ -1,6 +1,6 @@
-import * as db from "../../db";
-import { logs } from "../../logs";
-import { initializeAvahiDaemon } from "../../modules/hostScripts/scripts/avahiDaemon";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
+import { initializeAvahiDaemon } from "../../modules/hostScripts/scripts/avahiDaemon.js";
 
 export async function startAvahiDaemon(): Promise<void> {
   try {

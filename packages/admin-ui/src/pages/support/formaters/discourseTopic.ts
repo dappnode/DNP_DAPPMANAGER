@@ -1,4 +1,4 @@
-import { PackageVersionData, HostDiagnoseItem } from "types";
+import { PackageVersionData, HostDiagnoseItem } from "@dappnode/common";
 import { topicBaseUrl } from "params";
 
 /**

@@ -1,10 +1,10 @@
 import { ethers } from "ethers";
-import { getEthersProvider } from "../ethClient";
-import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata";
-import { fetchApmVersionsState } from "./fetchApmVersionsState";
-import { fetchVersion } from "./fetchVersion";
-import { repoExists } from "./repoExists";
-import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types";
+import { getEthersProvider } from "../ethClient/index.js";
+import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata.js";
+import { fetchApmVersionsState } from "./fetchApmVersionsState.js";
+import { fetchVersion } from "./fetchVersion.js";
+import { repoExists } from "./repoExists.js";
+import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types.js";
 
 export class Apm {
   provider: ethers.providers.Provider | undefined = undefined;

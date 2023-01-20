@@ -1,4 +1,4 @@
-import { LocalProxyingStatus, Routes } from "../common";
+import { LocalProxyingStatus, Routes } from "@dappnode/common";
 import { pause } from "./utils/pause";
 
 const localProxyingStatusON: LocalProxyingStatus = "running";

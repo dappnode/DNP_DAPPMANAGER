@@ -1,5 +1,5 @@
 import { RootState } from "rootReducer";
-import { orderBy } from "lodash";
+import { orderBy } from "lodash-es";
 
 // Service > dnpDirectory
 

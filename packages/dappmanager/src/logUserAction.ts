@@ -1,9 +1,9 @@
-import { eventBus } from "./eventBus";
-import params from "./params";
-import { UserActionLog } from "./types";
-import { logSafeObjects } from "./utils/logs";
-import { JsonFileDb } from "./utils/fileDb";
-import { logs } from "./logs";
+import { eventBus } from "./eventBus.js";
+import params from "./params.js";
+import { UserActionLog } from "@dappnode/common";
+import { logSafeObjects } from "./utils/logs.js";
+import { JsonFileDb } from "./utils/fileDb.js";
+import { logs } from "./logs.js";
 
 /**
  * Max number of logs to prevent the log file from growing too big

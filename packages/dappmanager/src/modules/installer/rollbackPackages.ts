@@ -1,10 +1,10 @@
 import fs from "fs";
-import params from "../../params";
-import { Log } from "../../utils/logUi";
-import { InstallPackageDataPaths } from "../../types";
-import { logs } from "../../logs";
-import { isNotFoundError } from "../../utils/node";
-import { dockerComposeRm, dockerComposeUpPackage } from "../docker";
+import params from "../../params.js";
+import { Log } from "../../utils/logUi.js";
+import { InstallPackageDataPaths } from "@dappnode/common";
+import { logs } from "../../logs.js";
+import { isNotFoundError } from "../../utils/node.js";
+import { dockerComposeRm, dockerComposeUpPackage } from "../docker/index.js";
 
 /**
  * [Rollback] Stop all new packages with the new compose

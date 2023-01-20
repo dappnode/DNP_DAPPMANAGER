@@ -3,6 +3,7 @@ import React from "react";
 interface TitleProps {
   title: string;
   subtitle?: string;
+  children?: React.ReactNode;
 }
 
 const Title: React.FC<TitleProps> = ({ title, subtitle, children }) => {

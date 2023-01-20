@@ -1,7 +1,7 @@
-import { InstallPackageData } from "../../types";
-import { Log } from "../../utils/logUi";
-import { loadImage } from "../docker/api";
-import { dockerImageManifest } from "../docker/cli";
+import { InstallPackageData } from "@dappnode/common";
+import { Log } from "../../utils/logUi.js";
+import { loadImage } from "../docker/api/index.js";
+import { dockerImageManifest } from "../docker/cli.js";
 
 /**
  * Load the docker image .tar.xz. file of each package

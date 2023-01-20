@@ -1,8 +1,8 @@
-import * as db from "../db";
-import { getVersionData } from "../utils/getVersionData";
-import * as autoUpdateHelper from "../utils/autoUpdateHelper";
-import { NewFeatureId, SystemInfo } from "../types";
-import { ethereumClient } from "../modules/ethClient";
+import * as db from "../db/index.js";
+import { getVersionData } from "../utils/getVersionData.js";
+import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
+import { NewFeatureId, SystemInfo } from "@dappnode/common";
+import { ethereumClient } from "../modules/ethClient/index.js";
 
 /**
  * Returns the current DAppNode system info

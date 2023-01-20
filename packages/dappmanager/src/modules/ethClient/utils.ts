@@ -3,8 +3,7 @@ import {
   consensusClientsMainnet,
   ExecutionClientMainnet,
   executionClientsMainnet
-} from "../../types";
-
+} from "@dappnode/common";
 export const isExecClient = (
   client: string
 ): client is ExecutionClientMainnet =>

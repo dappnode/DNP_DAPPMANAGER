@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import { flatten, uniqBy, orderBy } from "lodash";
+import { flatten, uniqBy, orderBy } from "lodash-es";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 import { api } from "api";
 import { BsTrash } from "react-icons/bs";
@@ -8,7 +8,7 @@ import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import { prettyVolumeName, prettyBytes, prettyDnpName } from "utils/format";
-import { InstalledPackageDetailData } from "common";
+import { InstalledPackageDetailData } from "@dappnode/common";
 import "./volumesList.scss";
 
 interface WarningItem {
@@ -103,7 +103,9 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
             {showAll ? <BsChevronContract /> : <BsChevronExpand />}
           </span>
         </span>
-        <span>{isTotalVolumeSizeIllDefined ? "-" : prettyBytes(totalVolumeSize)}</span>
+        <span>
+          {isTotalVolumeSizeIllDefined ? "-" : prettyBytes(totalVolumeSize)}
+        </span>
 
         <BsTrash
           className="trash-icon"

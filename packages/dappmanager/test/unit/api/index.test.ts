@@ -1,8 +1,8 @@
-import { startHttpApi } from "../../../src/api/startHttpApi";
+import { startHttpApi } from "../../../src/api/startHttpApi.js";
 import fetch, { Response } from "node-fetch";
 import http from "http";
 import { expect } from "chai";
-import { urlJoin } from "../../../src/utils/url";
+import { urlJoin } from "../../../src/utils/url.js";
 import { io } from "socket.io-client";
 
 interface RequestRes {

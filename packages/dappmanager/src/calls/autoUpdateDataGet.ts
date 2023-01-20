@@ -1,9 +1,12 @@
-import semver from "semver";
-import { listPackages } from "../modules/docker/list";
-import * as autoUpdateHelper from "../utils/autoUpdateHelper";
-import { prettyDnpName } from "../utils/format";
-import { AutoUpdateDataDnpView, InstalledPackageData } from "../types";
-import { AutoUpdateDataView } from "../types";
+import { valid, gt } from "semver";
+import { listPackages } from "../modules/docker/list/index.js";
+import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
+import { prettyDnpName } from "../utils/format.js";
+import {
+  AutoUpdateDataView,
+  AutoUpdateDataDnpView,
+  InstalledPackageData
+} from "@dappnode/common";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateHelper;
 
@@ -51,9 +54,9 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
         dnp.isDnp &&
         !dnp.isCore &&
         // Ignore wierd versions
-        semver.valid(dnp.version) &&
+        valid(dnp.version) &&
         // Ensure there are no duplicates
-        (!storedVersion || semver.gt(storedVersion, dnp.version))
+        (!storedVersion || gt(storedVersion, dnp.version))
       )
         singleDnpsToShow.push(dnp);
     }

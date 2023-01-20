@@ -1,4 +1,4 @@
-import { ChainData } from "../../types";
+import { ChainData } from "@dappnode/common";
 import { ChainDriver } from "@dappnode/dappnodesdk";
 
 export interface Chain {

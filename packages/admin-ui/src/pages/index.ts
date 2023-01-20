@@ -8,6 +8,7 @@ import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
 import * as stakers from "./stakers";
+import * as repository from "./repository";
 
 export const pages = {
   dashboard,
@@ -19,7 +20,8 @@ export const pages = {
   sdk,
   support,
   community,
-  system
+  system,
+  repository
 };
 
 export const defaultPage = dashboard;

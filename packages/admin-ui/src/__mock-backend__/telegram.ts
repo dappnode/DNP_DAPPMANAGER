@@ -1,4 +1,4 @@
-import { Routes } from "../common";
+import { Routes } from "@dappnode/common";
 
 let isEnabled = false;
 let token: string | null = null;

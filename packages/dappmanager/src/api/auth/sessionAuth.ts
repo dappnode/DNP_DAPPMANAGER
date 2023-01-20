@@ -1,9 +1,9 @@
 import { Request } from "express";
-import { PlainTextFileDb } from "../../utils/fileDb";
-import { getRandomAlphanumericToken } from "../../utils/token";
-import { wrapHandler } from "../utils";
-import { SessionData, SessionsManager } from "../sessions";
-import { LoginStatusReturn } from "../../types";
+import { PlainTextFileDb } from "../../utils/fileDb.js";
+import { getRandomAlphanumericToken } from "../../utils/token.js";
+import { wrapHandler } from "../utils.js";
+import { SessionData, SessionsManager } from "../sessions/index.js";
+import { LoginStatusReturn } from "@dappnode/common";
 import {
   AlreadyRegisteredError,
   MissingCredentialsError,
@@ -11,8 +11,8 @@ import {
   NotLoggedInNoCookieError,
   NotRegisteredError,
   WrongCredentialsError
-} from "./errors";
-import { AdminPasswordDb } from "./adminPasswordDb";
+} from "./errors.js";
+import { AdminPasswordDb } from "./adminPasswordDb.js";
 
 // Password & sessions auth
 // ========================

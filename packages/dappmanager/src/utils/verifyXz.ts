@@ -1,4 +1,4 @@
-import shell from "./shell";
+import shell from "./shell.js";
 
 /**
  * Verify a compressed .xz file

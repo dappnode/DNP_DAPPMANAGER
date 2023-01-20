@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseDfPB1Output } from "../../../src/calls/statsDiskGet";
+import { parseDfPB1Output } from "../../../src/calls/statsDiskGet.js";
 
 describe("calls / statsDiskGet", () => {
   describe("parseDfPB1Output", () => {

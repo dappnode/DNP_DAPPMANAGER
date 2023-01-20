@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import { ApmVersionMetadata } from "./types";
-import { getTimestamp } from "./apmUtils";
+import { ApmVersionMetadata } from "./types.js";
+import { getTimestamp } from "./apmUtils.js";
 
 const repoAbi = [
   "event NewVersion(uint256 versionId, uint16[3] semanticVersion)"

@@ -1,4 +1,4 @@
-import { applyRecursivelyToStringValues } from "./objects";
+import { applyRecursivelyToStringValues } from "./objects.js";
 
 const secretKeyRegex = /(password|passphrase|secret|private)/i;
 export const maxLength = 100;

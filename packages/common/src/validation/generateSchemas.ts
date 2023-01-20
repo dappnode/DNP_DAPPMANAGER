@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const TJS = require("typescript-json-schema");
+import fs from "fs";
+import path from "path";
+import TJS from "typescript-json-schema";
 const tsConfigPath = process.argv[2]; // tsconfig.json
 const baseDir = process.argv[3]; // "src/common/schemas";
 
@@ -10,15 +10,22 @@ if (!tsConfigPath || !baseDir)
 const typesToSchema = [
   "RoutesArguments",
   "RoutesReturn",
-  "SubscriptionsArguments"
+  "SubscriptionsArguments",
 ];
 
-const getPath = typeName => path.join(baseDir, `${typeName}.schema.json`);
+const getTsPath = (typeName: string) => {
+  const firstLetter = typeName[0].toLowerCase();
+  const rest = typeName.slice(1);
+  return path.join(baseDir, `${firstLetter}${rest}.schema.ts`);
+};
+
+const getJsonPath = (typeName: string) =>
+  path.join(baseDir, `${typeName}.schema.json`);
 fs.mkdirSync(baseDir, { recursive: true });
 
 // Pre-generate files so compilation doesn't fail
 for (const typeName of typesToSchema) {
-  fs.writeFileSync(getPath(typeName), "{}");
+  fs.writeFileSync(getJsonPath(typeName), "{}");
 }
 
 // Compile types to schemas
@@ -27,7 +34,7 @@ for (const typeName of typesToSchema) {
   /* eslint-disable-next-line no-console */
   console.log(`Generating .schema.json of ${typeName}`);
   const schema = TJS.generateSchema(program, typeName, {
-    required: true
+    required: true,
   });
   if (!schema) throw Error(`Error generating ${typeName} schema`);
 
@@ -40,5 +47,9 @@ for (const typeName of typesToSchema) {
       delete schema.properties[route];
   }
 
-  fs.writeFileSync(getPath(typeName), JSON.stringify(schema, null, 2));
+  fs.writeFileSync(getJsonPath(typeName), JSON.stringify(schema, null, 2));
+  fs.writeFileSync(
+    getTsPath(typeName),
+    `export default ${JSON.stringify(schema)};`
+  );
 }

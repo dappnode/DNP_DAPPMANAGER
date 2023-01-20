@@ -1,4 +1,4 @@
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 /**
  * Get information about files in a container

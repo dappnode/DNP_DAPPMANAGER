@@ -1,9 +1,9 @@
 import "mocha";
 import { expect } from "chai";
 
-import { parseEthersSyncing } from "../../../../src/utils/ethers";
-import { parseEthereumState } from "../../../../src/modules/chains/drivers/ethereum";
-import { ChainDataResult } from "../../../../src/modules/chains/types";
+import { parseEthersSyncing } from "../../../../src/utils/ethers.js";
+import { parseEthereumState } from "../../../../src/modules/chains/drivers/ethereum.js";
+import { ChainDataResult } from "../../../../src/modules/chains/types.js";
 
 describe("Watchers > chains > ethereum", () => {
   describe("parseEthereumState", () => {
@@ -19,19 +19,21 @@ describe("Watchers > chains > ethereum", () => {
       };
       const blockNumber = 0;
 
-      const expecteChainData: ChainDataResult = {
+      const expectedChainData: ChainDataResult = {
         syncing: true,
         error: false,
         message: "Syncing snapshot: 4383 / 4515",
-        progress: 0.9707641196013289
+        progress: 0.9707641196013289,
+        peers: 23
       };
 
       const chainData = parseEthereumState(
         parseEthersSyncing(syncing),
-        blockNumber
+        blockNumber,
+        23
       );
 
-      expect(chainData).to.deep.equal(expecteChainData);
+      expect(chainData).to.deep.equal(expectedChainData);
     });
 
     it("Should parse an OpenEthereum state when syncing from blocks", () => {
@@ -49,12 +51,14 @@ describe("Watchers > chains > ethereum", () => {
         syncing: true,
         error: false,
         message: "Blocks synced: 9730183 / 9798498",
-        progress: 0.9930280130689418
+        progress: 0.9930280130689418,
+        peers: 23
       };
 
       const chainData = parseEthereumState(
         parseEthersSyncing(syncing),
-        blockNumber
+        blockNumber,
+        23
       );
 
       expect(chainData).to.deep.equal(expecteChainData);

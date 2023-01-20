@@ -1,8 +1,7 @@
-import { dockerVolumeRemove } from "./api";
-import { dockerVolumeInspect } from "./api";
-import { shellHost } from "../../utils/shell";
-import params from "../../params";
-import { logs } from "../../logs";
+import { dockerVolumeRemove, dockerVolumeInspect } from "./api/index.js";
+import { shellHost } from "../../utils/shell.js";
+import params from "../../params.js";
+import { logs } from "../../logs.js";
 
 /**
  * Check if the volume is a different device / mountpoint as a bind

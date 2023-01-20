@@ -11,7 +11,7 @@ import {
   TrustedReleaseKey,
   ReleaseSignatureProtocol,
   releaseSignatureProtocols
-} from "common";
+} from "@dappnode/common";
 import "./releaseTrustedKeysEditor.scss";
 import { MdClose } from "react-icons/md";
 

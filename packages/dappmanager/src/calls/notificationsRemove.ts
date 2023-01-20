@@ -1,4 +1,4 @@
-import * as db from "../db";
+import * as db from "../db/index.js";
 
 /**
  * Marks notifications as view by deleting them from the db

@@ -1,5 +1,4 @@
 import { store } from "../store";
-import { Subscriptions } from "../common/subscriptions";
 // Actions to push received content
 import { pushNotification } from "services/notifications/actions";
 import {
@@ -10,6 +9,7 @@ import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
 import { updateDnpDirectory } from "services/dnpDirectory/actions";
 import { updateDnpRegistry } from "services/dnpRegistry/actions";
+import { Subscriptions } from "@dappnode/common";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
   subscriptions.directory.on(directoryDnps => {

@@ -1,5 +1,5 @@
-import * as db from "../db";
-import { IpfsRepository } from "../common";
+import * as db from "../db/index.js";
+import { IpfsRepository } from "@dappnode/common";
 
 export async function ipfsClientTargetGet(): Promise<IpfsRepository> {
   return {

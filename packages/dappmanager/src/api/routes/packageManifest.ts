@@ -1,7 +1,7 @@
-import { pick } from "lodash";
-import { listPackage } from "../../modules/docker/list";
-import { readManifestIfExists } from "../../modules/manifest";
-import { wrapHandler } from "../utils";
+import { pick } from "lodash-es";
+import { listPackage } from "../../modules/docker/list/index.js";
+import { readManifestIfExists } from "../../modules/manifest/index.js";
+import { wrapHandler } from "../utils.js";
 
 interface Params {
   dnpName: string;

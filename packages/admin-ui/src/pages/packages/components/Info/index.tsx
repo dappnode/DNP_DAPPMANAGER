@@ -8,7 +8,7 @@ import { MdClose } from "react-icons/md";
 // This
 import { Links } from "./Links";
 import newTabProps from "utils/newTabProps";
-import { InstalledPackageDetailData } from "types";
+import { InstalledPackageDetailData } from "@dappnode/common";
 import { Manifest } from "@dappnode/dappnodesdk";
 import { ipfsGatewayUrl } from "pages/system/data";
 import { RemovePackage } from "./RemovePackage";

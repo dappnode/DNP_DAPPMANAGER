@@ -4,11 +4,11 @@ import {
   UserSettingsAllDnps,
   SetupWizardAllDnps,
   CompatibleDnps
-} from "../../common";
+} from "@dappnode/common";
 import { sampleRequestState } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 
 function getRequestDnp(dnp: MockDnp): RequestedDnp {
   const settings: UserSettingsAllDnps = {};

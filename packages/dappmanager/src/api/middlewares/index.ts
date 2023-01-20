@@ -1,3 +1,3 @@
-export { getLimiter } from "./requestLimit";
-export { getViewsCounterMiddleware } from "./viewsCounter";
-export { getEthForwardMiddleware } from "./ethForward";
+export { getLimiter } from "./requestLimit/index.js";
+export { getViewsCounterMiddleware } from "./viewsCounter/index.js";
+export { getEthForwardMiddleware } from "./ethForward/index.js";

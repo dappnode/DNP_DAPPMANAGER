@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import { ApmVersionState } from "./types";
-import * as repoContract from "../../contracts/repository";
-import { parseApmVersionReturn, linspace } from "./apmUtils";
+import { ApmVersionState } from "./types.js";
+import * as repoContract from "../../contracts/repository.js";
+import { parseApmVersionReturn, linspace } from "./apmUtils.js";
 
 /**
  * Fetch all versions of an APM repo

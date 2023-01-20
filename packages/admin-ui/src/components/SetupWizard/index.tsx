@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import deepmerge from "deepmerge";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 // Components
 import Card from "components/Card";
 import Alert from "react-bootstrap/Alert";
-import { UserSettingsAllDnps, SetupWizardAllDnps } from "types";
+import { UserSettingsAllDnps, SetupWizardAllDnps } from "@dappnode/common";
 import { prettyDnpName } from "utils/format";
 import { EditorAdvanced } from "./EditorAdvanced";
 import { EditorV2 } from "./EditorV2";

@@ -1,10 +1,10 @@
-import { Apm } from "../apm";
+import { Apm } from "../apm/index.js";
 import {
   isIpfsHash,
   isEnsDomain,
   isSemver,
   isSemverRange
-} from "../../utils/validate";
+} from "../../utils/validate.js";
 
 export default async function resolveReleaseName(
   apm: Apm,

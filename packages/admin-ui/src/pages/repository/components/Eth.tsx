@@ -5,7 +5,7 @@ import {
   getEthClientStatus,
   getEthClientFallback
 } from "services/dappnodeStatus/selectors";
-import { EthClientFallback, Eth2ClientTarget } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
@@ -18,7 +18,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 
 export default function Eth() {
   const ethClientTarget = useSelector(getEthClientTarget);

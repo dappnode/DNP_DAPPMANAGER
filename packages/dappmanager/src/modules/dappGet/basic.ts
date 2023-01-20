@@ -1,10 +1,10 @@
-import { listPackages } from "../docker/list";
+import { listPackages } from "../docker/list/index.js";
 // Internal
-import { PackageRequest } from "../../types";
-import shouldUpdate from "./utils/shouldUpdate";
-import { logs } from "../../logs";
-import { DappGetResult, DappGetState } from "./types";
-import { DappGetFetcher } from "./fetch";
+import { PackageRequest } from "../../types.js";
+import shouldUpdate from "./utils/shouldUpdate.js";
+import { logs } from "../../logs.js";
+import { DappGetResult, DappGetState } from "./types.js";
+import { DappGetFetcher } from "./fetch/index.js";
 
 /**
  * Simple version of `dappGet`, since its resolver may cause errors.

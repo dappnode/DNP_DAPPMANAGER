@@ -1,6 +1,6 @@
 import React from "react";
 
-const CardList: React.FC<{ className?: string }> = ({
+const CardList: React.FC<{ children: React.ReactNode; className?: string }> = ({
   children,
   className = "",
   ...props

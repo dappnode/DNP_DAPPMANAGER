@@ -1,8 +1,8 @@
-import { Log } from "../../../utils/logUi";
-import { httpsPortal } from "../../../calls";
-import { InstallPackageData, HttpsPortalMapping } from "../../../types";
-import { prettyDnpName } from "../../../utils/format";
-import { isRunningHttps } from "./isRunningHttps";
+import { Log } from "../../../utils/logUi.js";
+import { httpsPortal } from "../../../calls/index.js";
+import { InstallPackageData, HttpsPortalMapping } from "@dappnode/common";
+import { prettyDnpName } from "../../../utils/format.js";
+import { isRunningHttps } from "./isRunningHttps.js";
 
 /**
  * Expose default HTTPS ports on installation defined in the manifest - exposable

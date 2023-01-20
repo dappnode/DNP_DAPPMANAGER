@@ -1,18 +1,18 @@
-import * as db from "../../db";
-import { downloadReleaseIpfs } from "./ipfs/downloadRelease";
-import { isEnsDomain, isIpfsHash } from "../../utils/validate";
-import { PackageRelease, ReleaseSignatureStatusCode } from "../../types";
-import { getIsCore } from "../manifest/getIsCore";
-import { parseMetadataFromManifest } from "../manifest";
-import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefaults";
-import { ComposeEditor } from "../compose/editor";
-import { writeMetadataToLabels } from "../compose";
-import { fileToMultiaddress } from "../../utils/distributedFile";
-import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies";
-import { parseTimeoutSeconds } from "../../utils/timeout";
-import { ReleaseDownloadedContents } from "./types";
-import { getReleaseSignatureStatus } from "./releaseSignature";
-import params from "../../params";
+import * as db from "../../db/index.js";
+import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
+import { isEnsDomain, isIpfsHash } from "../../utils/validate.js";
+import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
+import { getIsCore } from "../manifest/getIsCore.js";
+import { parseMetadataFromManifest } from "../manifest/index.js";
+import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefaults.js";
+import { ComposeEditor } from "../compose/editor.js";
+import { writeMetadataToLabels } from "../compose/index.js";
+import { fileToMultiaddress } from "../../utils/distributedFile.js";
+import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies.js";
+import { parseTimeoutSeconds } from "../../utils/timeout.js";
+import { ReleaseDownloadedContents } from "./types.js";
+import { getReleaseSignatureStatus } from "./releaseSignature.js";
+import params from "../../params.js";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

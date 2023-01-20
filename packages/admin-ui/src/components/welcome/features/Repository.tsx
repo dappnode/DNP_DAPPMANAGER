@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientFallback, Eth2ClientTarget } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";

@@ -1,34 +1,33 @@
-import { AbortController } from "abort-controller";
-import * as db from "./db";
-import { eventBus } from "./eventBus";
-import initializeDb from "./initializeDb";
-import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
-import { generateKeyPair } from "./utils/publickeyEncryption";
-import { copyHostScripts } from "./modules/hostScripts";
-import { postRestartPatch } from "./modules/installer/restartPatch";
-import { startDaemons } from "./daemons";
-import { SshManager } from "./modules/sshManager";
-import * as calls from "./calls";
-import { routesLogger, subscriptionsLogger } from "./api/logger";
-import * as routes from "./api/routes";
-import { logs } from "./logs";
-import params from "./params";
-import { getVpnApiClient } from "./api/vpnApiClient";
+import * as db from "./db/index.js";
+import { eventBus } from "./eventBus.js";
+import initializeDb from "./initializeDb.js";
+import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
+import { generateKeyPair } from "./utils/publickeyEncryption.js";
+import { copyHostScripts } from "./modules/hostScripts/index.js";
+import { postRestartPatch } from "./modules/installer/restartPatch.js";
+import { startDaemons } from "./daemons/index.js";
+import { SshManager } from "./modules/sshManager.js";
+import * as calls from "./calls/index.js";
+import { routesLogger, subscriptionsLogger } from "./api/logger.js";
+import * as routes from "./api/routes/index.js";
+import { logs } from "./logs.js";
+import params from "./params.js";
+import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {
   getVersionData,
   isNewDappmanagerVersion
-} from "./utils/getVersionData";
-import { shellHost } from "./utils/shell";
-import { startDappmanager } from "./startDappmanager";
-import { copyHostServices } from "./modules/hostServices/copyHostServices";
-import { startAvahiDaemon } from "./daemons/avahi";
-import { executeMigrations } from "./modules/migrations";
-import { startTestApi } from "./api/startTestApi";
+} from "./utils/getVersionData.js";
+import { shellHost } from "./utils/shell.js";
+import { startDappmanager } from "./startDappmanager.js";
+import { copyHostServices } from "./modules/hostServices/copyHostServices.js";
+import { startAvahiDaemon } from "./daemons/avahi/index.js";
+import { executeMigrations } from "./modules/migrations/index.js";
+import { startTestApi } from "./api/startTestApi.js";
 import {
   getLimiter,
   getViewsCounterMiddleware,
   getEthForwardMiddleware
-} from "./api/middlewares";
+} from "./api/middlewares/index.js";
 
 const controller = new AbortController();
 

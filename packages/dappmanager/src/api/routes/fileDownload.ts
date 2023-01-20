@@ -1,9 +1,9 @@
-import { wrapHandlerHtml } from "../utils";
-import { dockerInfoArchive } from "../../modules/docker";
+import { wrapHandlerHtml } from "../utils.js";
+import { dockerInfoArchive } from "../../modules/docker/index.js";
 import {
   dockerGetFileOrDirBasedOnExtension,
   dockerGetPathType
-} from "../../modules/docker/fileTransfer";
+} from "../../modules/docker/fileTransfer.js";
 
 interface Params {
   containerName: string;

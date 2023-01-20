@@ -1,28 +1,28 @@
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import {
   ConsensusClientMainnet,
   Eth2ClientTarget,
   EthClientRemote,
   ExecutionClientMainnet
-} from "../../common";
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import { logs } from "../../logs";
-import { getConsensusUserSettings } from "../stakerConfig/utils";
-import { packageGet } from "../../calls/packageGet";
-import { packageInstall } from "../../calls/packageInstall";
-import { packageRemove } from "../../calls/packageRemove";
-import { ComposeFileEditor } from "../compose/editor";
-import { parseServiceNetworks } from "../compose/networks";
-import params from "../../params";
+} from "@dappnode/common";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import { logs } from "../../logs.js";
+import { getConsensusUserSettings } from "../stakerConfig/utils.js";
+import { packageGet } from "../../calls/packageGet.js";
+import { packageInstall } from "../../calls/packageInstall.js";
+import { packageRemove } from "../../calls/packageRemove.js";
+import { ComposeFileEditor } from "../compose/editor.js";
+import { parseServiceNetworks } from "../compose/networks.js";
+import params from "../../params.js";
 import {
   dockerComposeUpPackage,
   dockerContainerInspect,
   dockerNetworkConnect,
   dockerNetworkDisconnect
-} from "../docker";
+} from "../docker/index.js";
 import Dockerode from "dockerode";
-import { listPackageNoThrow } from "../docker/list";
+import { listPackageNoThrow } from "../docker/list/index.js";
 
 export class EthereumClient {
   /**

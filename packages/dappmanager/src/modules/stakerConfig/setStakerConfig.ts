@@ -1,4 +1,4 @@
-import { packagesGet, packageInstall } from "../../calls";
+import { packagesGet, packageInstall } from "../../calls/index.js";
 import {
   ConsensusClient,
   ConsensusClientGnosis,
@@ -17,20 +17,20 @@ import {
   StakerConfigSet,
   StakerItemOk,
   UserSettingsAllDnps
-} from "../../types";
-import { logs } from "../../logs";
-import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
+} from "@dappnode/common";
+import { logs } from "../../logs.js";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
   updateConsensusEnv,
   getMevBoostUserSettings,
   updateMevBoostEnv
-} from "./utils";
-import { listPackageNoThrow } from "../docker/list/listPackages";
-import { dockerComposeUpPackage } from "../docker";
-import semver from "semver";
-import * as db from "../../db";
+} from "./utils.js";
+import { listPackageNoThrow } from "../docker/list/listPackages.js";
+import { dockerComposeUpPackage } from "../docker/index.js";
+import { lt } from "semver";
+import * as db from "../../db/index.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -88,7 +88,7 @@ export async function setStakerConfig<T extends Network>({
     );
     if (
       execClient?.minVersion &&
-      semver.lt(currentExecClientPkg.version, execClient.minVersion)
+      lt(currentExecClientPkg.version, execClient.minVersion)
     )
       throw Error(
         `Execution client ${currentExecClientPkg.dnpName} version ${currentExecClientPkg.version} is lower than the minimum version ${execClient.minVersion} required to work with the stakers UI. Update it to continue.`
@@ -105,7 +105,7 @@ export async function setStakerConfig<T extends Network>({
     );
     if (
       consClient?.minVersion &&
-      semver.lt(currentConsClientPkg.version, consClient.minVersion)
+      lt(currentConsClientPkg.version, consClient.minVersion)
     )
       throw Error(
         `Consensus client ${currentConsClientPkg.dnpName} version ${currentConsClientPkg.version} is lower than the minimum version ${consClient.minVersion} required to work with the stakers UI. Update it to continue.`
@@ -119,7 +119,7 @@ export async function setStakerConfig<T extends Network>({
   if (
     web3signer.minVersion &&
     currentWeb3signerPkg &&
-    semver.lt(currentWeb3signerPkg.version, web3signer.minVersion)
+    lt(currentWeb3signerPkg.version, web3signer.minVersion)
   )
     throw Error(
       `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${web3signer.minVersion} required to work with the stakers UI. Update it to continue.`

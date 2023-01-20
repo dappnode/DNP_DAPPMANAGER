@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import { createTestDir, cleanTestDir } from "../../../testUtils";
-import * as getPath from "../../../../src/utils/getPath";
-import * as validate from "../../../../src/utils/validate";
-import { yamlDump } from "../../../../src/utils/yaml";
-import { migrateLegacyEnvFile } from "../../../../src/modules/migrations/removeLegacyDockerAssets";
+import { createTestDir, cleanTestDir } from "../../../testUtils.js";
+import * as getPath from "../../../../src/utils/getPath.js";
+import * as validate from "../../../../src/utils/validate.js";
+import { yamlDump } from "../../../../src/utils/yaml.js";
+import { migrateLegacyEnvFile } from "../../../../src/modules/migrations/removeLegacyDockerAssets.js";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {

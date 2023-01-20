@@ -1,5 +1,5 @@
 import fs from "fs";
-import params from "../../params";
+import params from "../../params.js";
 
 /**
  * Prune the userActionLogs.json file if the current size

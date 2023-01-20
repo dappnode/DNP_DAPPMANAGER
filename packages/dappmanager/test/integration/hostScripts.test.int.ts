@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../src/utils/shell";
+import shell from "../../src/utils/shell.js";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 

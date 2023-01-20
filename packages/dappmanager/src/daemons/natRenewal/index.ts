@@ -1,18 +1,17 @@
-import { AbortSignal } from "abort-controller";
-import * as upnpc from "../../modules/upnpc";
-import { eventBus } from "../../eventBus";
-import params from "../../params";
-import * as db from "../../db";
-import getPortsToOpen from "./getPortsToOpen";
-import getLocalIp from "../../utils/getLocalIp";
+import * as upnpc from "../../modules/upnpc/index.js";
+import { eventBus } from "../../eventBus.js";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import getPortsToOpen from "./getPortsToOpen.js";
+import getLocalIp from "../../utils/getLocalIp.js";
 // Utils
 import {
   runAtMostEveryIntervals,
   runOnlyOneSequentially
-} from "../../utils/asyncFlows";
-import { PackagePort } from "../../types";
-import { logs } from "../../logs";
-import { listContainers } from "../../modules/docker/list";
+} from "../../utils/asyncFlows.js";
+import { PackagePort } from "@dappnode/common";
+import { logs } from "../../logs.js";
+import { listContainers } from "../../modules/docker/list/index.js";
 
 let isFirstRunGlobal = true;
 async function natRenewal(): Promise<void> {

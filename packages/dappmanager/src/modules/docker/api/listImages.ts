@@ -1,5 +1,5 @@
 import Dockerode from "dockerode";
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 /**
  * List docker images

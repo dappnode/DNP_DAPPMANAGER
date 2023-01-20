@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { create, IPFSHTTPClient } from "ipfs-http-client";
 import { AddResult } from "ipfs-core-types/src/root";
-import { sleep } from "../../src/utils/asyncFlows";
+import { sleep } from "../../src/utils/asyncFlows.js";
 import all from "it-all";
-import shell from "../../src/utils/shell";
+import shell from "../../src/utils/shell.js";
 import { Manifest } from "@dappnode/dappnodesdk";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";

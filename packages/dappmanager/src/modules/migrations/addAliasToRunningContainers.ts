@@ -1,23 +1,23 @@
 import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
 import Dockerode from "dockerode";
-import { uniq } from "lodash";
-import { PackageContainer } from "../../common";
-import { getPrivateNetworkAlias } from "../../domains";
-import { logs } from "../../logs";
-import params from "../../params";
-import { parseComposeSemver } from "../../utils/sanitizeVersion";
-import shell from "../../utils/shell";
-import { ComposeFileEditor } from "../compose/editor";
-import { parseServiceNetworks } from "../compose/networks";
+import { uniq } from "lodash-es";
+import { PackageContainer } from "@dappnode/common";
+import { getPrivateNetworkAlias } from "../../domains.js";
+import { logs } from "../../logs.js";
+import params from "../../params.js";
+import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
+import shell from "../../utils/shell.js";
+import { ComposeFileEditor } from "../compose/editor.js";
+import { parseServiceNetworks } from "../compose/networks.js";
 import {
   dockerComposeUp,
   dockerNetworkDisconnect,
   dockerNetworkConnect
-} from "../docker";
-import { listContainers } from "../docker/list";
-import * as getPath from "../../utils/getPath";
-import semver from "semver";
-import { ethereumClient } from "../ethClient";
+} from "../docker/index.js";
+import { listContainers } from "../docker/list/index.js";
+import * as getPath from "../../utils/getPath.js";
+import { gte } from "semver";
+import { ethereumClient } from "../ethClient/index.js";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -154,7 +154,7 @@ function isComposeNetworkAndAliasMigrated(
   if (
     composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check property name is defined
     composeNetwork?.external && // Check is external network
-    semver.gte(
+    gte(
       parseComposeSemver(composeVersion),
       parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5

@@ -1,7 +1,7 @@
-import shell from "./shell";
+import shell from "./shell.js";
 import isIp from "is-ip";
-import { logs } from "../logs";
-import getDappmanagerImage from "./getDappmanagerImage";
+import { logs } from "../logs.js";
+import getDappmanagerImage from "./getDappmanagerImage.js";
 
 export default async function getLocalIp(options?: {
   silent: boolean;

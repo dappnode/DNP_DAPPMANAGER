@@ -1,12 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { VolumeMapping } from "../../../../src/types";
-
+import { VolumeMapping } from "@dappnode/common";
 import {
   parseVolumeMappings,
   stringifyVolumeMappings,
   normalizeVolumePath
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose/index.js";
 
 describe("volumeMappings: parse, stringify and merge", () => {
   it("should parse and stringify volume mappings", () => {

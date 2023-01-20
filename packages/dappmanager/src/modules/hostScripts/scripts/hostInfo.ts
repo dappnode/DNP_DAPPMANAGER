@@ -1,6 +1,6 @@
 import memoize from "memoizee";
-import { HostInfoScript } from "../../../types";
-import { runScript } from "../runScripts";
+import { HostInfoScript } from "@dappnode/common";
+import { runScript } from "../runScripts.js";
 
 /**
  * Collects host info

@@ -4,7 +4,7 @@ import { expect } from "chai";
 import {
   parseEnvironment,
   stringifyEnvironment
-} from "../../../../src/modules/compose";
+} from "../../../../src/modules/compose/index.js";
 
 describe("environment: parse, stringify", () => {
   const envsArray = ["NAME=VALUE", "NOVAL", "COMPLEX=D=D=D  = 2"];

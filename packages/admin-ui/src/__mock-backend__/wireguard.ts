@@ -1,4 +1,4 @@
-import { Routes } from "../../src/common";
+import { Routes } from "@dappnode/common";
 
 const initialDevices = [
   "dappnode_admin",

@@ -1,4 +1,4 @@
-import { HttpError } from "../utils";
+import { HttpError } from "../utils.js";
 
 const ERROR_NOT_ADMIN_IP = "NOT_ADMIN_IP";
 const ERROR_NOT_REGISTERED = "NOT_REGISTERED";

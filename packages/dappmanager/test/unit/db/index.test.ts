@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { beforeAndAfter, createTestDir, testDir } from "../../testUtils";
-import { dbFactory } from "../../../src/db/dbFactory";
+import { beforeAndAfter, createTestDir, testDir } from "../../testUtils.js";
+import { dbFactory } from "../../../src/db/dbFactory.js";
 import { expect } from "chai";
 
 describe("db", () => {

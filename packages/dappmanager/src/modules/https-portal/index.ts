@@ -3,17 +3,17 @@ import {
   dockerListNetworks,
   dockerNetworkConnect,
   dockerNetworkDisconnect
-} from "../docker";
-import { listContainers } from "../docker/list";
-import params from "../../params";
-import { getExternalNetworkAlias } from "../../domains";
-import { PackageContainer, HttpsPortalMapping } from "../../types";
-import { HttpsPortalApiClient } from "./apiClient";
-import { ComposeEditor } from "../compose/editor";
-import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose";
-import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose";
+} from "../docker/index.js";
+import { listContainers } from "../docker/list/index.js";
+import params from "../../params.js";
+import { getExternalNetworkAlias } from "../../domains.js";
+import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
+import { HttpsPortalApiClient } from "./apiClient.js";
+import { ComposeEditor } from "../compose/editor.js";
+import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose.js";
+import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose.js";
 export { HttpsPortalApiClient };
-export { getExposableServices } from "./exposable";
+export { getExposableServices } from "./exposable/index.js";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 

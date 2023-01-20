@@ -1,12 +1,11 @@
-import { AbortSignal } from "abort-controller";
 import retry from "async-retry";
-import { eventBus } from "../../eventBus";
-import * as db from "../../db";
-import params from "../../params";
-import { listContainers } from "../../modules/docker/list";
-import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate";
-import { runAtMostEveryIntervals } from "../../utils/asyncFlows";
-import { logs } from "../../logs";
+import { eventBus } from "../../eventBus.js";
+import * as db from "../../db/index.js";
+import params from "../../params.js";
+import { listContainers } from "../../modules/docker/list/index.js";
+import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
+import { runAtMostEveryIntervals } from "../../utils/asyncFlows.js";
+import { logs } from "../../logs.js";
 
 const nsupdateInterval = params.NSUPDATE_DAEMON_INTERVAL || 60 * 60 * 1000;
 let firstRun = true;
