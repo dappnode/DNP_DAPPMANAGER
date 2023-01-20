@@ -2,7 +2,7 @@ import fs from "fs";
 import pathUtil from "path";
 import { valid, validRange } from "semver";
 import { PackageRequest } from "../types";
-import isIPFS from "is-ipfs";
+import * as isIPFS from "is-ipfs";
 import { logs } from "../logs";
 
 const supportedDomains = ["eth"];
