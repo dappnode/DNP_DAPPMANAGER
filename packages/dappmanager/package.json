@@ -81,7 +81,6 @@
     "multiformats": "^11.0.1",
     "multihashes": "^4.0.3",
     "node-fetch": "^2.6.0",
-    "node-loader": "^2.0.0",
     "node-os-utils": "^1.2.2",
     "node-telegram-bot-api": "^0.50.0",
     "prom-client": "^14.1.0",
@@ -93,9 +92,7 @@
     "tar-stream": "^2.1.4",
     "timestring": "^6.0.0",
     "tweetnacl": "^1.0.1",
-    "tweetnacl-util": "^0.15.0",
-    "typescript": "^4.7.3",
-    "webpack-node-externals": "^3.0.0"
+    "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.30.0",
@@ -109,6 +106,7 @@
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
     "socket.io-client": "^4.5.1",
-    "ts-node": "^10.8.1"
+    "ts-node": "^10.8.1",
+    "typescript": "^4.7.3"
   }
 }

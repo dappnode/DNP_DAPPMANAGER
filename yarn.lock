@@ -12555,13 +12555,6 @@ node-libs-browser@^2.1.0:
     util "^0.11.0"
     vm-browserify "^1.0.1"
 
-node-loader@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/node-loader/-/node-loader-2.0.0.tgz#9109a6d828703fd3e0aa03c1baec12a798071562"
-  integrity sha512-I5VN34NO4/5UYJaUBtkrODPWxbobrE4hgDqPrjB25yPkonFhCmZ146vTH+Zg417E9Iwoh1l/MbRs1apc5J295Q==
-  dependencies:
-    loader-utils "^2.0.0"
-
 node-os-utils@^1.2.2:
   version "1.3.7"
   resolved "https://registry.yarnpkg.com/node-os-utils/-/node-os-utils-1.3.7.tgz#77cc341ae39584e12d3aadf6046fe420ff4c9340"
@@ -17362,11 +17355,6 @@ webpack-manifest-plugin@^4.0.2:
   dependencies:
     tapable "^2.0.0"
     webpack-sources "^2.2.0"
-
-webpack-node-externals@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/webpack-node-externals/-/webpack-node-externals-3.0.0.tgz#1a3407c158d547a9feb4229a9e3385b7b60c9917"
-  integrity sha512-LnL6Z3GGDPht/AigwRh2dvL9PQPFQ8skEpVrWZXLWBYmqcaojHNN0onvHzie6rq7EWKrrBfPYqNEzTJgiwEQDQ==
 
 webpack-sources@^1.4.3:
   version "1.4.3"

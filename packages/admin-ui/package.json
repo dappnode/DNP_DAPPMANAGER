@@ -63,13 +63,13 @@
     "styled-components": "^4.2.0",
     "swr": "^0.2.0",
     "tweetnacl": "^1.0.1",
-    "tweetnacl-util": "^0.15.0",
-    "typescript": "^4.7.3"
+    "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
     "@types/jest": "^24.9.1",
     "nodemon": "^2.0.4",
-    "prettier": "^1.16.4"
+    "prettier": "^1.16.4",
+    "typescript": "^4.7.3"
   },
   "browserslist": {
     "production": [
