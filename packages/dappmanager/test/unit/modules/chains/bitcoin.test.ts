@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 
-import { parseCredentialsFromEnvs } from "../../../../src/modules/chains/drivers/bitcoin";
+import { parseCredentialsFromEnvs } from "../../../../src/modules/chains/drivers/bitcoin.js";
 
 describe("Watchers > chains > bitcoin", () => {
   describe("parseCredentialsFromEnvs", () => {

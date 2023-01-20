@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import params from "../../../src/params";
+import params from "../../../src/params.js";
 
 import {
   generateKeyPair,
   encrypt,
   decrypt
-} from "../../../src/utils/publickeyEncryption";
+} from "../../../src/utils/publickeyEncryption.js";
 
 describe("Util > publickeyEncryption", () => {
   it("Should encrypt and decrypt a payload", () => {

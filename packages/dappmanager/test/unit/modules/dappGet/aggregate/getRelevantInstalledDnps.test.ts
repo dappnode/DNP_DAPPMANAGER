@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import semver from "semver";
-import { mockDnp, mockContainer } from "../../../../testUtils";
-import getRelevantInstalledDnps from "../../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps";
+import { valid } from "semver";
+import { mockDnp, mockContainer } from "../../../../testUtils.js";
+import getRelevantInstalledDnps from "../../../../../src/modules/dappGet/aggregate/getRelevantInstalledDnps.js";
 import { InstalledPackageData } from "@dappnode/common";
 
 /**
@@ -111,7 +111,7 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
 
     const relevantInstalledDnps = getRelevantInstalledDnps({
       requestedDnps: ["nginx-proxy.dnp.dappnode.eth"],
-      installedDnps: dnpList.filter(pkg => semver.valid(pkg.version))
+      installedDnps: dnpList.filter(pkg => valid(pkg.version))
     });
 
     expect(relevantInstalledDnps).to.deep.equal(expectedRelevantInstalledDnps);

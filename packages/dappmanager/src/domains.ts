@@ -1,4 +1,4 @@
-import params, { getContainerDomain } from "./params";
+import params, { getContainerDomain } from "./params.js";
 
 export function stripCharacters(s: string): string {
   return s.replace(RegExp("_", "g"), "");

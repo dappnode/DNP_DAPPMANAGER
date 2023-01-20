@@ -1,9 +1,9 @@
-import { eventBus } from "../../eventBus";
-import * as db from "../../db";
-import { logs } from "../../logs";
-import { pickStakerItemData } from "../../modules/stakerConfig/utils";
-import { ReleaseFetcher } from "../../modules/release";
-import { memoizeDebounce } from "../../utils/asyncFlows";
+import { eventBus } from "../../eventBus.js";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
+import { pickStakerItemData } from "../../modules/stakerConfig/utils.js";
+import { ReleaseFetcher } from "../../modules/release/index.js";
+import { memoizeDebounce } from "../../utils/asyncFlows.js";
 
 async function runStakerCacheUpdate({
   dnpName

@@ -1,10 +1,10 @@
 import { orderBy } from "lodash-es";
-import { logs } from "../../logs";
+import { logs } from "../../logs.js";
 import { UserActionLog } from "@dappnode/common";
-import { isNotFoundError } from "../../utils/node";
-import params from "../../params";
+import { isNotFoundError } from "../../utils/node.js";
+import params from "../../params.js";
 import fs from "fs";
-import { get, set } from "../../logUserAction";
+import { get, set } from "../../logUserAction.js";
 
 /**
  * Migrate winston .log JSON file to a lowdb

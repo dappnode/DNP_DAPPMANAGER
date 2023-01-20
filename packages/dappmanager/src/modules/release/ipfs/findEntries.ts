@@ -1,5 +1,5 @@
-import { releaseFiles } from "../../../params";
-import { FileConfig, IPFSEntryName } from "../types";
+import { releaseFiles } from "../../../params.js";
+import { FileConfig, IPFSEntryName } from "../types.js";
 
 type ReleaseFiles = typeof releaseFiles;
 

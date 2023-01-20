@@ -1,5 +1,5 @@
-import { getStakerConfig } from "../modules/stakerConfig/getStakerConfig";
-import { setStakerConfig } from "../modules/stakerConfig/setStakerConfig";
+import { getStakerConfig } from "../modules/stakerConfig/getStakerConfig.js";
+import { setStakerConfig } from "../modules/stakerConfig/setStakerConfig.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "@dappnode/common";
 
 /**

@@ -1,7 +1,7 @@
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import { HttpError, wrapHandler } from "../utils";
-import { getDnpFromIp } from "./sign";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import { HttpError, wrapHandler } from "../utils.js";
+import { getDnpFromIp } from "./sign.js";
 
 const MAX_LENGTH = 512;
 const MAX_KEYS = 20;

@@ -1,4 +1,4 @@
-import { getVolumeSystemData } from "../modules/docker/volumesData";
+import { getVolumeSystemData } from "../modules/docker/volumesData.js";
 import { VolumeData } from "@dappnode/common";
 
 /**

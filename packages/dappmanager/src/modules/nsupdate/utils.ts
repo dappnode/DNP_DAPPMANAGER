@@ -1,11 +1,11 @@
 import { isEmpty } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import params, { getContainerDomain } from "../../params";
+import params, { getContainerDomain } from "../../params.js";
 import {
   getPrivateNetworkAlias,
   stripCharacters,
   ContainerNames
-} from "../../domains";
+} from "../../domains.js";
 
 const TTL = 60;
 const ethZone = "eth.";

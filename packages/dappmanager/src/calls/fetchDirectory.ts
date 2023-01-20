@@ -1,14 +1,14 @@
-import { eventBus } from "../eventBus";
-import { getDirectory } from "../modules/directory";
+import { eventBus } from "../eventBus.js";
+import { getDirectory } from "../modules/directory/index.js";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
-import { logs } from "../logs";
-import { listPackages } from "../modules/docker/list";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
-import { fileToGatewayUrl } from "../utils/distributedFile";
+import { logs } from "../logs.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
+import { fileToGatewayUrl } from "../utils/distributedFile.js";
 import { throttle } from "lodash-es";
-import { getEthersProvider } from "../modules/ethClient";
-import { ReleaseFetcher } from "../modules/release";
-import { NoImageForArchError } from "../modules/release/errors";
+import { getEthersProvider } from "../modules/ethClient/index.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { NoImageForArchError } from "../modules/release/errors.js";
 
 const loadThrottle = 500; // 0.5 seconds
 

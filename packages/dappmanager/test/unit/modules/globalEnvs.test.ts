@@ -1,13 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import { createTestDir, cleanTestDir } from "../../testUtils";
+import { createTestDir, cleanTestDir } from "../../testUtils.js";
 import {
   createGlobalEnvsEnvFile,
   globalEnvsFilePath,
   computeGlobalEnvsFromDb,
   writeGlobalEnvsToEnvFile
-} from "../../../src/modules/globalEnvs";
+} from "../../../src/modules/globalEnvs.js";
 
 describe("Module > globalEnvs", function () {
   beforeEach(async () => {

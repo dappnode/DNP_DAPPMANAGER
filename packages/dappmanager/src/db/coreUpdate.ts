@@ -1,4 +1,4 @@
-import { dbCache } from "./dbFactory";
+import { dbCache } from "./dbFactory.js";
 import { pick } from "lodash-es";
 import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
 

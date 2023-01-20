@@ -1,4 +1,4 @@
-import { SshManager } from "../../modules/sshManager";
+import { SshManager } from "../../modules/sshManager.js";
 import { ShhStatus } from "@dappnode/common";
 
 // ### TODO: Review this numbers

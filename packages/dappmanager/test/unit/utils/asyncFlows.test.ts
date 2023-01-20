@@ -4,7 +4,7 @@ import {
   runOnlyOneSequentially,
   runOnlyOneReturnToAll,
   pause
-} from "../../../src/utils/asyncFlows";
+} from "../../../src/utils/asyncFlows.js";
 
 describe("Util: asyncFlows", () => {
   describe("runOnlyOneSequentially", () => {

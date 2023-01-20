@@ -1,11 +1,11 @@
 import { pick } from "lodash-es";
-import { parseVolumeMappings } from "../compose/volumes";
-import { parseEnvironment } from "../compose/environment";
-import params, { getContainerName, getImageTag } from "../../params";
-import { ManifestWithImage } from "../../types";
+import { parseVolumeMappings } from "../compose/volumes.js";
+import { parseEnvironment } from "../compose/environment.js";
+import params, { getContainerName, getImageTag } from "../../params.js";
+import { ManifestWithImage } from "../../types.js";
 import { Compose, ComposeVolumes } from "@dappnode/dappnodesdk";
-import { getIsCore } from "./getIsCore";
-import { cleanCompose } from "../compose/clean";
+import { getIsCore } from "./getIsCore.js";
+import { cleanCompose } from "../compose/clean.js";
 
 /**
  * Legacy function to convert a manifest into a compose

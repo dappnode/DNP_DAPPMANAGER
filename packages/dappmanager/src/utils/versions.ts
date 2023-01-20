@@ -1,5 +1,5 @@
-import semver from "semver";
-import { isIpfsHash } from "./validate";
+import { valid, gt } from "semver";
+import { isIpfsHash } from "./validate.js";
 
 /*
  * Wrapper for the semver library. In the DAPPMANAGER versions can be:
@@ -17,10 +17,10 @@ export function isHigher(v1: string, v2: string): boolean {
   if (v1 && isIpfsHash(v1)) v1 = ipfs;
   if (v2 && isIpfsHash(v2)) v2 = ipfs;
   // if v1 and v2 are undefined they are latest
-  if (!semver.valid(v1)) v1 = latest;
-  if (!semver.valid(v2)) v2 = latest;
+  if (!valid(v1)) v1 = latest;
+  if (!valid(v2)) v2 = latest;
   // checking if v1 > v2
-  return semver.gt(v1, v2);
+  return gt(v1, v2);
 }
 
 export function highestVersion(v1: string, v2: string): string {
@@ -33,12 +33,12 @@ export function highestVersion(v1: string, v2: string): string {
   if (v1 == "latest" || v2 == "latest") return "latest";
 
   // Compare semantic versions
-  if (!semver.valid(v1) || !semver.valid(v2)) {
+  if (!valid(v1) || !valid(v2)) {
     throw new Error(
       `Attempting to compare invalid versions, version1: ${v1} version2: ${v2}`
     );
   }
-  if (semver.gt(v1, v2)) {
+  if (gt(v1, v2)) {
     return v1;
   } else {
     return v2;

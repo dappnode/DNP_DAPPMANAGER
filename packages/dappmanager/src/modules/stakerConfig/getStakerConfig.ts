@@ -1,5 +1,5 @@
-import { packageGet } from "../../calls";
-import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest";
+import { packageGet } from "../../calls/index.js";
+import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest.js";
 import {
   ConsensusClient,
   ExecutionClient,
@@ -9,16 +9,16 @@ import {
   StakerConfigGet,
   StakerItem
 } from "@dappnode/common";
-import { fileToGatewayUrl } from "../../utils/distributedFile";
-import { listPackages } from "../docker/list";
-import { ReleaseFetcher } from "../release";
+import { fileToGatewayUrl } from "../../utils/distributedFile.js";
+import { listPackages } from "../docker/list/index.js";
+import { ReleaseFetcher } from "../release/index.js";
 import {
   getBeaconServiceName,
   getIsRunning,
   getPkgData,
   getValidatorServiceName
-} from "./utils";
-import { stakerParamsByNetwork } from "./stakerParamsByNetwork";
+} from "./utils.js";
+import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 
 /**
  * Fetches the current staker configuration:

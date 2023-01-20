@@ -1,24 +1,24 @@
 import fs from "fs";
 import path from "path";
-import * as getPath from "../../utils/getPath";
-import * as validate from "../../utils/validate";
-import * as db from "../../db";
-import shell from "../../utils/shell";
-import { pause } from "../../utils/asyncFlows";
-import params from "../../params";
-import { logs } from "../../logs";
+import * as getPath from "../../utils/getPath.js";
+import * as validate from "../../utils/validate.js";
+import * as db from "../../db/index.js";
+import shell from "../../utils/shell.js";
+import { pause } from "../../utils/asyncFlows.js";
+import params from "../../params.js";
+import { logs } from "../../logs.js";
 import Dockerode from "dockerode";
 import {
   dockerContainerInspect,
   logContainer,
   dockerContainerRemove
-} from "../docker/api";
-import { getLogUi } from "../../utils/logUi";
-import { rollbackPackages } from "./rollbackPackages";
-import { postInstallClean } from "./postInstallClean";
-import { afterInstall } from "./afterInstall";
-import { flagPackagesAreInstalling } from "./packageIsInstalling";
-import { ComposeEditor } from "../compose/editor";
+} from "../docker/api/index.js";
+import { getLogUi } from "../../utils/logUi.js";
+import { rollbackPackages } from "./rollbackPackages.js";
+import { postInstallClean } from "./postInstallClean.js";
+import { afterInstall } from "./afterInstall.js";
+import { flagPackagesAreInstalling } from "./packageIsInstalling.js";
+import { ComposeEditor } from "../compose/editor.js";
 import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
 
 const restartId = params.restartDnpName;

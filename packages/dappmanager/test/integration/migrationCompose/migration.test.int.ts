@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/common";
-import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers";
-import params from "../../../src/params";
-import { mockContainer, shellSafe } from "../../testUtils";
+import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
+import params from "../../../src/params.js";
+import { mockContainer, shellSafe } from "../../testUtils.js";
 
 describe("Migration", () => {
   const container: PackageContainer = {

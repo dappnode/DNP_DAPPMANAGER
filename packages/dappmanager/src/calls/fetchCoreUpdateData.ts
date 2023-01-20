@@ -1,12 +1,12 @@
-import semver from "semver";
-import params from "../params";
+import { valid, satisfies } from "semver";
+import params from "../params.js";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
-import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/list";
-import computeSemverUpdateType from "../utils/computeSemverUpdateType";
-import { getCoreVersionId } from "../utils/coreVersionId";
-import { ErrorDappGetDowngrade } from "../modules/dappGet/errors";
-import { logs } from "../logs";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import computeSemverUpdateType from "../utils/computeSemverUpdateType.js";
+import { getCoreVersionId } from "../utils/coreVersionId.js";
+import { ErrorDappGetDowngrade } from "../modules/dappGet/errors.js";
+import { logs } from "../logs.js";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";
@@ -110,12 +110,12 @@ export async function getCoreUpdateData(
   const to = coreManifest.version;
   const updateAlerts = (coreManifest.updateAlerts || []).filter(
     updateAlert =>
-      semver.valid(from) &&
-      semver.valid(to) &&
+      valid(from) &&
+      valid(to) &&
       updateAlert.message &&
       updateAlert.from &&
-      semver.satisfies(from, updateAlert.from) &&
-      semver.satisfies(to, updateAlert.to || "*")
+      satisfies(from, updateAlert.from) &&
+      satisfies(to, updateAlert.to || "*")
   );
 
   // versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"

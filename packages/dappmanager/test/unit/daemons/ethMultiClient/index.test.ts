@@ -12,8 +12,8 @@ import {
   ConsensusClientMainnet,
   EthClientRemote
 } from "@dappnode/common";
-import { mockDnp, mockContainer } from "../../../testUtils";
-import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types";
+import { mockDnp, mockContainer } from "../../../testUtils.js";
+import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types.js";
 
 interface State {
   target: Eth2ClientTarget;

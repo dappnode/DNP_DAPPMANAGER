@@ -1,7 +1,7 @@
-import * as db from "../db";
-import * as dyndns from "../modules/dyndns";
-import { eventBus } from "../eventBus";
-import { logs } from "../logs";
+import * as db from "../db/index.js";
+import * as dyndns from "../modules/dyndns/index.js";
+import { eventBus } from "../eventBus.js";
+import { logs } from "../logs.js";
 
 /**
  * Sets the static IP

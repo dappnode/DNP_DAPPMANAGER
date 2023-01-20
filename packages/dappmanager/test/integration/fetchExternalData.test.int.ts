@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../../src/calls";
-import { clearDbs } from "../testUtils";
+import * as calls from "../../src/calls/index.js";
+import { clearDbs } from "../testUtils.js";
 
 describe("Fetch external data", () => {
   before("Clear DBs and set remote", async () => {

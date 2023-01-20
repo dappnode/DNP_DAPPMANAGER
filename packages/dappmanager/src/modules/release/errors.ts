@@ -1,4 +1,4 @@
-import { NodeArch } from "../../types";
+import { NodeArch } from "../../types.js";
 
 export class NoImageForArchError extends Error {
   constructor(architecture: NodeArch, message?: string) {

@@ -1,5 +1,5 @@
-import { list } from "./list";
-import { UpnpError, UPnPErrors } from "./upnpError";
+import { list } from "./list.js";
+import { UpnpError, UPnPErrors } from "./upnpError.js";
 
 export async function isUpnpAvailable(): Promise<boolean> {
   try {

@@ -1,6 +1,6 @@
 import path from "path";
-import params from "../../params";
-import { shellHost } from "../../utils/shell";
+import params from "../../params.js";
+import { shellHost } from "../../utils/shell.js";
 
 const hostSystemdDir = params.HOST_SYSTEMD_DIR_FROM_HOST;
 const hostServicesDir = params.HOST_SERVICES_DIR_FROM_HOST;

@@ -1,8 +1,8 @@
 import { ethers } from "ethers";
-import params from "../../params";
+import params from "../../params.js";
 import fetch from "node-fetch";
-import * as db from "../../db";
-import { logs } from "../../logs";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
 
 const dyndnsHost = params.DYNDNS_HOST;
 

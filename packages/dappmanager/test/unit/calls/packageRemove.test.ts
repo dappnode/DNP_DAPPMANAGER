@@ -2,14 +2,14 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
-import * as getPath from "../../../src/utils/getPath";
-import * as validate from "../../../src/utils/validate";
+import * as getPath from "../../../src/utils/getPath.js";
+import * as validate from "../../../src/utils/validate.js";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
-import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove";
+import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove.js";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp, cleanTestDir, mockContainer } from "../../testUtils";
-import { getMockEventBus } from "./eventBus";
+import { mockDnp, cleanTestDir, mockContainer } from "../../testUtils.js";
+import { getMockEventBus } from "./eventBus.js";
 
 describe.skip("Call function: packageRemove", function () {
   const dnpName = "test.dnp.dappnode.eth";

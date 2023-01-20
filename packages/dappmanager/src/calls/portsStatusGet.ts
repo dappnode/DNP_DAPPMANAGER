@@ -1,12 +1,12 @@
-import * as db from "../db";
-import * as upnpc from "../modules/upnpc";
-import { performPortsScan } from "../modules/portsTable/performPortsScan";
+import * as db from "../db/index.js";
+import * as upnpc from "../modules/upnpc/index.js";
+import { performPortsScan } from "../modules/portsTable/performPortsScan.js";
 import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus
 } from "@dappnode/common";
-import { UpnpPortMapping } from "../modules/upnpc/types";
+import { UpnpPortMapping } from "../modules/upnpc/types.js";
 
 /**
  * API call that returns the ports status to be displayed in the ports table

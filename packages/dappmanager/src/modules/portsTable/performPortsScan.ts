@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
-import params from "../../params";
+import params from "../../params.js";
 import Ajv from "ajv";
 import { PackagePort } from "@dappnode/common";
-import { logs } from "../../logs";
-import { checkPortsResponseSchema } from "./schema";
+import { logs } from "../../logs.js";
+import { checkPortsResponseSchema } from "./schema.js";
 
 interface PortScanResponse {
   tcpPorts: PortScanResult[];

@@ -1,6 +1,6 @@
 import { mapValues } from "lodash-es";
 import sinon from "sinon";
-import { eventBus, EventBus } from "../../../src/eventBus";
+import { eventBus, EventBus } from "../../../src/eventBus.js";
 
 export function getMockEventBus(): {
   [K in keyof EventBus]: { emit: sinon.SinonStub; on: sinon.SinonStub };

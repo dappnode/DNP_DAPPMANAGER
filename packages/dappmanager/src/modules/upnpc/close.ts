@@ -1,4 +1,4 @@
-import upnpcCommand from "./upnpcCommand";
+import upnpcCommand from "./upnpcCommand.js";
 import { PackagePort } from "@dappnode/common";
 
 /**

@@ -2,8 +2,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import stackTrace from "stack-trace";
 // "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
-import "source-map-support/register";
-import { logSafeObjects } from "./utils/logs";
+import "source-map-support/register.js";
+import { logSafeObjects } from "./utils/logs.js";
 import { inspect } from "util";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

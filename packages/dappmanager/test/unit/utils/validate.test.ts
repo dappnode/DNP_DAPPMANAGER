@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { mockHash } from "../../testUtils";
-import { isIpfsHash, isSemverRange } from "../../../src/utils/validate";
+import { mockHash } from "../../testUtils.js";
+import { isIpfsHash, isSemverRange } from "../../../src/utils/validate.js";
 
 describe("Util > validate", () => {
   describe("isIpfsHash", () => {

@@ -11,7 +11,7 @@ import { expect } from "chai";
  * + Prioritize not installing new packages, first version = null.
  */
 
-import resolve from "../../../../../src/modules/dappGet/resolve";
+import resolve from "../../../../../src/modules/dappGet/resolve/index.js";
 
 describe.skip("dappGet/resolve/resolve", () => {
   it("Should find a compatible state for a standard case", async () => {

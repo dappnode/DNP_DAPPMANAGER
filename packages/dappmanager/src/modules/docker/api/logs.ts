@@ -1,5 +1,5 @@
-import { docker } from "./docker";
-import { stripDockerApiLogsHeaderAndAnsi } from "../utils";
+import { docker } from "./docker.js";
+import { stripDockerApiLogsHeaderAndAnsi } from "../utils.js";
 
 /**
  * Returns container's logs as a string with escape codes

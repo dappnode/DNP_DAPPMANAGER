@@ -1,6 +1,6 @@
-import { changePassword } from "../modules/passwordManager";
+import { changePassword } from "../modules/passwordManager.js";
 // External calls
-import { passwordIsSecure } from "./passwordIsSecure";
+import { passwordIsSecure } from "./passwordIsSecure.js";
 
 /**
  * Changes the user `dappnode`'s password in the host machine

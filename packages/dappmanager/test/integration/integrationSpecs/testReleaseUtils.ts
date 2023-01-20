@@ -1,5 +1,5 @@
-import { cleanRepos } from "../../testUtils";
-import shell from "../../../src/utils/shell";
+import { cleanRepos } from "../../testUtils.js";
+import shell from "../../../src/utils/shell.js";
 
 export async function cleanInstallationArtifacts(
   partialContainerName: string

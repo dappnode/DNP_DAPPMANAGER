@@ -1,10 +1,10 @@
-import params from "../params";
+import params from "../params.js";
 import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/common";
 import {
   HttpsPortal,
   HttpsPortalApiClient,
   getExposableServices
-} from "../modules/https-portal";
+} from "../modules/https-portal/index.js";
 
 const httpsPortalApiClient = new HttpsPortalApiClient(
   params.HTTPS_PORTAL_API_URL

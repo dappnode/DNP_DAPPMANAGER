@@ -3,16 +3,15 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp } from "../../../testUtils";
+import { mockDnp } from "../../../testUtils.js";
 import rewiremock from "rewiremock/webpack";
-import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers";
+import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";
 import { mapValues, isEmpty } from "lodash-es";
-import { logs } from "../../../../src/logs";
+import { logs } from "../../../../src/logs.js";
 import { fileURLToPath } from "url";
-
 // Imports for types
-import dappGetType from "../../../../src/modules/dappGet";
-import aggregateType from "../../../../src/modules/dappGet/aggregate";
+import dappGetType from "../../../../src/modules/dappGet/index.js";
+import aggregateType from "../../../../src/modules/dappGet/aggregate/index.js";
 
 /* eslint-disable no-console */
 

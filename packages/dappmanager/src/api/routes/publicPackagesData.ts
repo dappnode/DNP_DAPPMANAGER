@@ -1,9 +1,9 @@
 import {
   listContainers,
   listContainerNoThrow
-} from "../../modules/docker/list";
+} from "../../modules/docker/list/index.js";
 import { PackageContainer } from "@dappnode/common";
-import { wrapHandler } from "../utils";
+import { wrapHandler } from "../utils.js";
 
 interface Params {
   containerName: string;

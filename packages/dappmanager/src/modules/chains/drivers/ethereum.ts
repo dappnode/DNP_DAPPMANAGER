@@ -1,11 +1,11 @@
 import { ethers } from "ethers";
 import { InstalledPackageData } from "@dappnode/common";
-import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks";
-import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers";
-import { getPrivateNetworkAlias } from "../../../domains";
+import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
+import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers.js";
+import { getPrivateNetworkAlias } from "../../../domains.js";
 import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
-import { ChainDataResult } from "../types";
-import { safeProgress } from "../utils";
+import { ChainDataResult } from "../types.js";
+import { safeProgress } from "../utils.js";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
 const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;

@@ -3,17 +3,23 @@ import express, { RequestHandler } from "express";
 import bodyParser from "body-parser";
 import compression from "compression";
 import fileUpload from "express-fileupload";
-import { helmetConf } from "./helmet";
+import { helmetConf } from "./helmet.js";
 import cors from "cors";
 import { Socket, Server } from "socket.io";
 import path from "path";
-import { toSocketIoHandler, wrapHandler } from "./utils";
-import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth";
-import { AdminPasswordDb } from "./auth/adminPasswordDb";
-import { ClientSideCookies, ClientSideCookiesParams } from "./sessions";
-import { mapSubscriptionsToEventBus } from "./subscriptions";
-import { Logs } from "../logs";
-import { EventBus } from "../eventBus";
+import { toSocketIoHandler, wrapHandler } from "./utils.js";
+import {
+  AuthPasswordSession,
+  AuthPasswordSessionParams
+} from "./auth/index.js";
+import { AdminPasswordDb } from "./auth/adminPasswordDb.js";
+import {
+  ClientSideCookies,
+  ClientSideCookiesParams
+} from "./sessions/index.js";
+import { mapSubscriptionsToEventBus } from "./subscriptions.js";
+import { Logs } from "../logs.js";
+import { EventBus } from "../eventBus.js";
 import {
   Routes,
   RpcPayload,
@@ -21,7 +27,7 @@ import {
   LoggerMiddleware,
   subscriptionsFactory
 } from "@dappnode/common";
-import { getRpcHandler } from "./handler";
+import { getRpcHandler } from "./handler/index.js";
 
 export interface HttpApiParams
   extends ClientSideCookiesParams,

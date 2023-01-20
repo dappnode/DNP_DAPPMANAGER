@@ -1,10 +1,13 @@
 import TelegramBot from "node-telegram-bot-api";
 import { uniq } from "lodash-es";
-import * as db from "../../db";
-import { logs } from "../../logs";
-import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage";
-import { bold } from "./markdown";
-import { editCoreSetting, editDnpSetting } from "../../utils/autoUpdateHelper";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
+import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage.js";
+import { bold } from "./markdown.js";
+import {
+  editCoreSetting,
+  editDnpSetting
+} from "../../utils/autoUpdateHelper.js";
 
 // Note: Telegram commands MUST NOT contain "-", only "_"
 export const enableAutoUpdatesCmd = "/enable_auto_updates";

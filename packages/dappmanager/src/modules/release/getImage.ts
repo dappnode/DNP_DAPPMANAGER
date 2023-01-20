@@ -1,11 +1,11 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import * as validate from "../../utils/validate";
-import verifyXz from "../../utils/verifyXz";
-import downloadImage from "./ipfs/downloadImage";
+import * as validate from "../../utils/validate.js";
+import verifyXz from "../../utils/verifyXz.js";
+import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
-import { getImageTag } from "../../params";
-import { dockerImageManifest } from "../docker/cli";
+import { getImageTag } from "../../params.js";
+import { dockerImageManifest } from "../docker/cli.js";
 
 export default async function getImage(
   imageFile: DistributedFile,

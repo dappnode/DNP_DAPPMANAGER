@@ -1,10 +1,13 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../../src/calls";
-import { logs } from "../../src/logs";
+import * as calls from "../../src/calls/index.js";
+import { logs } from "../../src/logs.js";
 import { AutoUpdateSettings } from "@dappnode/common";
-import { MY_PACKAGES, SYSTEM_PACKAGES } from "../../src/utils/autoUpdateHelper";
-import { clearDbs } from "../testUtils";
+import {
+  MY_PACKAGES,
+  SYSTEM_PACKAGES
+} from "../../src/utils/autoUpdateHelper.js";
+import { clearDbs } from "../testUtils.js";
 
 describe("Auto update data", () => {
   before(async () => {

@@ -1,1 +1,1 @@
-export * from "./getDirectory";
+export * from "./getDirectory.js";

@@ -1,12 +1,11 @@
-import { AbortSignal } from "abort-controller";
-import { startAutoUpdatesDaemon } from "./autoUpdates";
-import { startDiskUsageDaemon } from "./diskUsage";
-import { startDynDnsDaemon } from "./dyndns";
-import { startEthMultiClientDaemon } from "./ethMultiClient";
-import { startNatRenewalDaemon } from "./natRenewal";
-import { startNsUpdateDaemon } from "./nsupdate";
-import { startStakerDaemon } from "./stakerConfig";
-import { startTelegramBotDaemon } from "./telegramBot";
+import { startAutoUpdatesDaemon } from "./autoUpdates/index.js";
+import { startDiskUsageDaemon } from "./diskUsage/index.js";
+import { startDynDnsDaemon } from "./dyndns/index.js";
+import { startEthMultiClientDaemon } from "./ethMultiClient/index.js";
+import { startNatRenewalDaemon } from "./natRenewal/index.js";
+import { startNsUpdateDaemon } from "./nsupdate/index.js";
+import { startStakerDaemon } from "./stakerConfig/index.js";
+import { startTelegramBotDaemon } from "./telegramBot/index.js";
 
 export function startDaemons(signal: AbortSignal): void {
   startAutoUpdatesDaemon(signal);

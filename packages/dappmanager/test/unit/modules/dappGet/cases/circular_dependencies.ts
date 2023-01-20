@@ -1,4 +1,4 @@
-import { DappgetTestCase } from "../testHelpers";
+import { DappgetTestCase } from "../testHelpers.js";
 
 /**
  * Case: Deal with circular dependencies.

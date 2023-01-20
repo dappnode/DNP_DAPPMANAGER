@@ -7,12 +7,12 @@ import {
   parseVolumeMappings,
   parseDevicePathMountpoint,
   getDevicePath
-} from "./index";
+} from "./index.js";
 import { PortMapping, UserSettings, VolumeMapping } from "@dappnode/common";
 import { Compose } from "@dappnode/dappnodesdk";
-import { cleanCompose, isOmitable } from "./clean";
-import { stringifyVolumeMappings } from "./volumes";
-import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb";
+import { cleanCompose, isOmitable } from "./clean.js";
+import { stringifyVolumeMappings } from "./volumes.js";
+import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
 
 /**
  * To be backwards compatible with older versions that do not store

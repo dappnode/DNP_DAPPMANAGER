@@ -1,9 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import { InstallPackageData } from "@dappnode/common";
-import { mockPackageData } from "../../../testUtils";
-
-import orderInstallPackages from "../../../../src/modules/installer/orderInstallPackages";
+import { mockPackageData } from "../../../testUtils.js";
+import orderInstallPackages from "../../../../src/modules/installer/orderInstallPackages.js";
 
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {

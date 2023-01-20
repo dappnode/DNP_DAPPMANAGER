@@ -1,17 +1,17 @@
-import { logs } from "../../logs";
-import shell from "../../utils/shell";
+import { logs } from "../../logs.js";
+import shell from "../../utils/shell.js";
 import {
   dockerVolumesList,
   dockerVolumeRemove,
   dockerContainerRemove
-} from "../docker";
-import { listPackages } from "../docker/list";
-import * as getPath from "../../utils/getPath";
+} from "../docker/index.js";
+import { listPackages } from "../docker/list/index.js";
+import * as getPath from "../../utils/getPath.js";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";
-import { isNotFoundError } from "../../utils/node";
-import { parseEnvironment } from "../compose";
-import { ComposeFileEditor } from "../compose/editor";
+import { isNotFoundError } from "../../utils/node.js";
+import { parseEnvironment } from "../compose/index.js";
+import { ComposeFileEditor } from "../compose/editor.js";
 
 const volumesToRemove = [
   // After core version 0.2.30 there will be an orphan volume of the

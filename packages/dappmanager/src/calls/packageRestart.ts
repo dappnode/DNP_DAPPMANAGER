@@ -1,12 +1,12 @@
 import fs from "fs";
-import params from "../params";
-import { eventBus } from "../eventBus";
-import * as getPath from "../utils/getPath";
-import { dockerContainerRestart } from "../modules/docker";
-import { listPackage } from "../modules/docker/list";
-import { restartDappmanagerPatch } from "../modules/installer/restartPatch";
-import { getServicesSharingPid } from "../utils/pid";
-import { ComposeFileEditor } from "../modules/compose/editor";
+import params from "../params.js";
+import { eventBus } from "../eventBus.js";
+import * as getPath from "../utils/getPath.js";
+import { dockerContainerRestart } from "../modules/docker/index.js";
+import { listPackage } from "../modules/docker/list/index.js";
+import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
+import { getServicesSharingPid } from "../utils/pid.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { PackageContainer } from "@dappnode/common";
 
 /**

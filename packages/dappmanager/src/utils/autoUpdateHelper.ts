@@ -1,8 +1,8 @@
-import * as db from "../db";
-import params from "../params";
-import { eventBus } from "../eventBus";
+import * as db from "../db/index.js";
+import params from "../params.js";
+import { eventBus } from "../eventBus.js";
 import { pick, omit } from "lodash-es";
-import { isVersionIdUpdated } from "./coreVersionId";
+import { isVersionIdUpdated } from "./coreVersionId.js";
 import {
   AutoUpdateSettings,
   AutoUpdateRegistryEntry,

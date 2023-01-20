@@ -1,18 +1,18 @@
-import semver from "semver";
+import { gte, clean, eq } from "semver";
 import {
   DockerVersionsScript,
   HostInfoScript,
   UpdateRequirement,
   DockerUpdateStatus
 } from "@dappnode/common";
-import { sanitizeVersion } from "../../utils/sanitizeVersion";
+import { sanitizeVersion } from "../../utils/sanitizeVersion.js";
 import {
   supportedOs,
   supportedArchs,
   supportedDebianReleases,
   targetDockerEngineVersions,
   targetDockerComposeVersion
-} from "./params";
+} from "./params.js";
 
 // Docker engine
 
@@ -39,13 +39,12 @@ export function parseDockerEngineRequirements(
   const targetDockerVersion =
     debianRelease && targetDockerEngineVersions[debianRelease];
   const isDockerUpdated =
-    targetDockerVersion &&
-    semver.gte(dockerServerVersionCleaned, targetDockerVersion);
-  const isDockerEngineVersionsSync = semver.eq(
+    targetDockerVersion && gte(dockerServerVersionCleaned, targetDockerVersion);
+  const isDockerEngineVersionsSync = eq(
     dockerServerVersionCleaned,
     dockerCliVersionCleaned
   );
-  const isComposeUpdated = semver.gte(
+  const isComposeUpdated = gte(
     dockerComposeVersion,
     targetDockerComposeVersion
   );
@@ -107,14 +106,14 @@ export function parseDockerComposeRequirements(
 ): DockerUpdateStatus {
   const { dockerComposeVersion } = info;
 
-  const dockerComposeVersionCleaned = semver.clean(dockerComposeVersion, {
+  const dockerComposeVersionCleaned = clean(dockerComposeVersion, {
     loose: true
   });
 
   if (!dockerComposeVersionCleaned)
     throw Error("Docker compose version not allowed by semver");
 
-  const isComposeUpdated = semver.gte(
+  const isComposeUpdated = gte(
     dockerComposeVersionCleaned,
     targetDockerComposeVersion
   );

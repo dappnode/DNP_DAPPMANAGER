@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { runScript } from "../runScripts";
+import { runScript } from "../runScripts.js";
 
 export const hostUpdate = memoize(
   async function (): Promise<string> {

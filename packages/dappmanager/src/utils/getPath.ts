@@ -1,7 +1,7 @@
 import fs from "fs";
 import { omit } from "lodash-es";
 import path from "path";
-import params from "../params";
+import params from "../params.js";
 
 /*
  * Generates file paths given a set of parameters. This tool helps

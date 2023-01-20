@@ -1,5 +1,5 @@
-import { eventBus } from "../../eventBus";
-import { flagPackagesAreNotInstalling } from "./packageIsInstalling";
+import { eventBus } from "../../eventBus.js";
+import { flagPackagesAreNotInstalling } from "./packageIsInstalling.js";
 
 /**
  * Bundle event emits that must be called on a successful and failed install

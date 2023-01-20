@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseCloseOutput } from "../../../../src/modules/upnpc/close";
+import { parseCloseOutput } from "../../../../src/modules/upnpc/close.js";
 
 describe("upnpn: parseCloseOutput", () => {
   const terminalOutputSuccess = `upnpc : miniupnpc library test client, version 2.0.

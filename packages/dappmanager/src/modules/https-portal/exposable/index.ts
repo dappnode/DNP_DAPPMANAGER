@@ -1,9 +1,9 @@
 import memoizee from "memoizee";
 import { ExposableServiceInfo, InstalledPackageData } from "@dappnode/common";
-import { listPackages } from "../../docker/list";
-import { readManifestIfExists } from "../../manifest";
-import { exposablePredefined } from "./predefined";
-import { parseExposableServiceManifest } from "./parseExposable";
+import { listPackages } from "../../docker/list/index.js";
+import { readManifestIfExists } from "../../manifest/index.js";
+import { exposablePredefined } from "./predefined.js";
+import { parseExposableServiceManifest } from "./parseExposable.js";
 
 /**
  * Cache results for 1 hour, 50 max by dnpName + version. Prevent reading from disk too often

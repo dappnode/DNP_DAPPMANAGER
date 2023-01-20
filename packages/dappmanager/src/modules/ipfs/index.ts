@@ -1,5 +1,5 @@
-import { Ipfs } from "./Ipfs";
-import { getIpfsUrl } from "./utils";
-export * from "./types";
+import { Ipfs } from "./Ipfs.js";
+import { getIpfsUrl } from "./utils.js";
+export * from "./types.js";
 
 export const ipfs = new Ipfs(getIpfsUrl());

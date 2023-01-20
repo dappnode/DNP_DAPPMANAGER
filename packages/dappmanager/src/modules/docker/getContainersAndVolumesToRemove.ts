@@ -1,7 +1,7 @@
 import { uniq } from "lodash-es";
 import { InstalledPackageData } from "@dappnode/common";
-import { isVolumeOwner } from "../docker/volumesData";
-import { DockerVolumeListItem } from "./api";
+import { isVolumeOwner } from "../docker/volumesData.js";
+import { DockerVolumeListItem } from "./api/index.js";
 
 /**
  * Util: Remove all package volumes => compute list of packages and volumes to remove

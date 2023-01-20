@@ -3,12 +3,12 @@ import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
-import { docker } from "../../src/modules/docker/api/docker";
-import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArchive";
-import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive";
-import { fileDownload } from "../../src/api/routes/fileDownload";
+import { docker } from "../../src/modules/docker/api/docker.js";
+import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArchive.js";
+import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive.js";
+import { fileDownload } from "../../src/api/routes/fileDownload.js";
 import { URL } from "url";
-import { MemoryWritable } from "./testStreamUtils";
+import { MemoryWritable } from "./testStreamUtils.js";
 
 describe("file transfer - docker archive put, get", function () {
   const containerName = "DAppNodeTest-file-transfer";

@@ -1,7 +1,7 @@
 import express from "express";
-import params from "../../../params";
-import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy";
-import { ResolveDomainWithCache } from "./resolveDomain";
+import params from "../../../params.js";
+import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
+import { ResolveDomainWithCache } from "./resolveDomain.js";
 
 export function getEthForwardMiddleware(): express.RequestHandler {
   // Create a domain resolver with cache

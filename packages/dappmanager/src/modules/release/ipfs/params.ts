@@ -7,10 +7,10 @@ import {
   SetupUiJson,
   Manifest
 } from "@dappnode/dappnodesdk";
-import { ReleaseSignature } from "../../../types";
-import { releaseFiles } from "../../../params";
-import { validateManifestBasic } from "../../manifest";
-import { validateCompose } from "../../compose";
+import { ReleaseSignature } from "../../../types.js";
+import { releaseFiles } from "../../../params.js";
+import { validateManifestBasic } from "../../manifest/index.js";
+import { validateCompose } from "../../compose/index.js";
 import { Compose } from "@dappnode/dappnodesdk";
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets

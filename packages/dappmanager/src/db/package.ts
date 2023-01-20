@@ -1,6 +1,6 @@
 import { UpdateAvailable } from "@dappnode/common";
-import { dbCache } from "./dbFactory";
-import { stripDots } from "./dbUtils";
+import { dbCache } from "./dbFactory.js";
+import { stripDots } from "./dbUtils.js";
 
 const PACKAGE_GETTING_STARTED_SHOW = "package-getting-started-show";
 const PACKAGE_INSTALL_TIME = "package-install-time";

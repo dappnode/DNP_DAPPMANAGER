@@ -2,10 +2,10 @@ import { ethers } from "ethers";
 import { base58btc } from "multiformats/bases/base58";
 import { base32 } from "multiformats/bases/base32";
 import { base64, base64url } from "multiformats/bases/base64";
-import { ReleaseSignature } from "../../types";
-import { releaseFiles } from "../../params";
-import { ReleaseSignatureWithData } from "./types";
-import { IPFSEntry } from "../ipfs";
+import { ReleaseSignature } from "../../types.js";
+import { releaseFiles } from "../../params.js";
+import { ReleaseSignatureWithData } from "./types.js";
+import { IPFSEntry } from "../ipfs/index.js";
 import {
   TrustedReleaseKey,
   ReleaseSignatureStatus,

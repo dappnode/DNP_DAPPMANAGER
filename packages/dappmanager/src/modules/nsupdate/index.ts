@@ -1,2 +1,2 @@
-export * from "./execNsupdate";
-export * from "./utils";
+export * from "./execNsupdate.js";
+export * from "./utils.js";

@@ -1,14 +1,14 @@
-import { httpsPortal } from "../../../calls";
+import { httpsPortal } from "../../../calls/index.js";
 import { InstallPackageData } from "@dappnode/common";
-import { getExternalNetworkAlias } from "../../../domains";
-import params from "../../../params";
+import { getExternalNetworkAlias } from "../../../domains.js";
+import params from "../../../params.js";
 import {
   dockerListNetworks,
   dockerCreateNetwork,
   dockerNetworkConnect
-} from "../../docker";
-import { listPackageNoThrow } from "../../docker/list";
-import { isRunningHttps } from "./isRunningHttps";
+} from "../../docker/index.js";
+import { listPackageNoThrow } from "../../docker/list/index.js";
+import { isRunningHttps } from "./isRunningHttps.js";
 
 /**
  * Connect to dnpublic_network with an alias if:

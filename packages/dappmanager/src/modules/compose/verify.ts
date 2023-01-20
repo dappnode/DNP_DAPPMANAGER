@@ -1,7 +1,7 @@
-import { maxPortNumber } from "../../params";
+import { maxPortNumber } from "../../params.js";
 import { Compose } from "@dappnode/dappnodesdk";
-import { applyRecursivelyToStringValues } from "../../utils/objects";
-import { parsePortMappings } from "./ports";
+import { applyRecursivelyToStringValues } from "../../utils/objects.js";
+import { parsePortMappings } from "./ports.js";
 
 export function verifyCompose(compose: Compose): void {
   for (const serviceName in compose.services) {

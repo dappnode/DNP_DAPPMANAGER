@@ -1,5 +1,5 @@
 import { WireguardDeviceCredentials } from "@dappnode/common";
-import { WireguardClient } from "../modules/wireguard/client";
+import { WireguardClient } from "../modules/wireguard/client.js";
 
 const wireguardClient = new WireguardClient();
 

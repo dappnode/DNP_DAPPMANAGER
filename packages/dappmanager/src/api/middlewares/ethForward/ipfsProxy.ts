@@ -1,19 +1,19 @@
 import http from "http";
 import httpProxy from "http-proxy";
 import express from "express";
-import params from "../../../params";
-import { EthProviderError } from "../../../modules/ethClient";
-import { ipfs } from "../../../modules/ipfs";
-import { urlJoin } from "../../../utils/url";
-import { logs } from "../../../logs";
-import * as views from "./views";
+import params from "../../../params.js";
+import { EthProviderError } from "../../../modules/ethClient/index.js";
+import { ipfs } from "../../../modules/ipfs/index.js";
+import { urlJoin } from "../../../utils/url.js";
+import { logs } from "../../../logs.js";
+import * as views from "./views/index.js";
 import {
   NodeNotAvailable,
   ProxyError,
   EnsResolverError,
   NotFoundError,
   Content
-} from "./types";
+} from "./types.js";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",

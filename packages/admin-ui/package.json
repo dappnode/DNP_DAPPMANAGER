@@ -40,7 +40,7 @@
     "clipboard": "^2.0.1",
     "deepmerge": "^2.1.1",
     "ethereum-blockies-base64": "^1.0.2",
-    "is-ipfs": "^0.6.0",
+    "is-ipfs": "^8.0.1",
     "lodash-es": "^4.17.21",
     "mitt": "^2.1.0",
     "pretty-bytes": "^5.3.0",
@@ -58,18 +58,18 @@
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
     "sass": "^1.49.7",
-    "semver": "^5.5.0",
+    "semver": "^7.3.8",
     "socket.io-client": "^4.5.1",
     "styled-components": "^4.2.0",
     "swr": "^0.2.0",
     "tweetnacl": "^1.0.1",
-    "tweetnacl-util": "^0.15.0",
-    "typescript": "^4.7.3"
+    "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
     "@types/jest": "^24.9.1",
     "nodemon": "^2.0.4",
-    "prettier": "^1.16.4"
+    "prettier": "^1.16.4",
+    "typescript": "^4.7.3"
   },
   "browserslist": {
     "production": [

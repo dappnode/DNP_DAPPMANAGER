@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import semver from "semver";
-import { ApmRepoVersionReturn } from "./types";
+import { parse } from "semver";
+import { ApmRepoVersionReturn } from "./types.js";
 
 /**
  * Parse a raw version response from an APM repo
@@ -24,7 +24,7 @@ export function parseApmVersionReturn(res: ApmRepoVersionReturn): {
  * @param version "0.2.4"
  */
 export function toApmVersionArray(version: string): [number, number, number] {
-  const semverObj = semver.parse(version);
+  const semverObj = parse(version);
   if (!semverObj) throw Error(`Invalid semver ${version}`);
   return [semverObj.major, semverObj.minor, semverObj.patch];
 }

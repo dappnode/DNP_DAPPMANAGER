@@ -19,24 +19,32 @@ export default {
   mode: NODE_ENV,
   output: {
     path: paths.build,
-    filename: "index.js"
+    filename: "index.js",
+    publicPath: ""
   },
   // externals: [/node_modules/, "bufferutil", "utf-8-validate"],
   externalsPresets: { node: true },
   externals: [nodeExternals()],
   resolve: {
+    modules: [paths.src, "node_modules"],
     extensions: [".ts", ".js"],
+    extensionAlias: {
+      ".js": [".ts", ".js"],
+      ".cjs": [".cts", ".cjs"],
+      ".mjs": [".mts", ".mjs"]
+    },
     fallback: {
       electron: false
     }
   },
+  stats: {
+    errors: true,
+    errorDetails: true
+  },
   module: {
     rules: [
       {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false
-        }
+        test: /\.m?js/
       },
       {
         test: /\.ts$/,

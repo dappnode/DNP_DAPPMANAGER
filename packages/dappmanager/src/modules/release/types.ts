@@ -1,6 +1,6 @@
 import { DistributedFile } from "@dappnode/common";
-import { ReleaseSignature } from "../../types";
-import { FileFormat } from "../../types";
+import { ReleaseSignature } from "../../types.js";
+import { FileFormat } from "../../types.js";
 import { Manifest, Compose } from "@dappnode/dappnodesdk";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 

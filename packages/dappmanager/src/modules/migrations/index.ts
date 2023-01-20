@@ -1,9 +1,9 @@
-import { setDefaultStakerConfig } from "./setDefaultStakerConfig";
-import { migrateUserActionLogs } from "./migrateUserActionLogs";
-import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets";
-import { addAliasToRunningContainers } from "./addAliasToRunningContainers";
-import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight";
-import { pruneUserActionLogs } from "./pruneUserActionLogs";
+import { setDefaultStakerConfig } from "./setDefaultStakerConfig.js";
+import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
+import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
+import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
+import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight.js";
+import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 
 export class MigrationError extends Error {
   migration: string;

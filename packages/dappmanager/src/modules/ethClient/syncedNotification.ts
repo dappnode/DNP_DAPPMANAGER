@@ -1,5 +1,5 @@
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
 import { Eth2ClientTarget, EthClientStatus } from "@dappnode/common";
 
 /**

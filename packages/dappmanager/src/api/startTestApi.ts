@@ -1,9 +1,9 @@
-import * as api from "../calls";
+import * as api from "../calls/index.js";
 import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
-import params from "../params";
-import { logs } from "../logs";
+import params from "../params.js";
+import { logs } from "../logs.js";
 
 export function startTestApi(): http.Server {
   const app = express();

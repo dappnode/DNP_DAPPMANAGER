@@ -11,8 +11,8 @@ import {
   concat,
   omit
 } from "lodash-es";
-import * as getPath from "../../utils/getPath";
-import { ContainerLabelsRaw } from "../../types";
+import * as getPath from "../../utils/getPath.js";
+import { ContainerLabelsRaw } from "../../types.js";
 import {
   Compose,
   ComposeService,
@@ -25,20 +25,23 @@ import {
   stringifyPortMappings,
   parsePortMappings,
   mergePortMappings
-} from "./ports";
+} from "./ports.js";
 import {
   parseEnvironment,
   mergeEnvs,
   stringifyEnvironment
-} from "./environment";
-import { parseServiceNetworks } from "./networks";
-import { verifyCompose } from "./verify";
+} from "./environment.js";
+import { parseServiceNetworks } from "./networks.js";
+import { verifyCompose } from "./verify.js";
 import { PortMapping, UserSettings } from "@dappnode/common";
-import { parseUserSettings, applyUserSettings } from "./userSettings";
-import { isNotFoundError } from "../../utils/node";
-import { yamlDump, yamlParse } from "../../utils/yaml";
-import { computeGlobalEnvsFromDb, getGlobalEnvsFilePath } from "../globalEnvs";
-import params from "../../params";
+import { parseUserSettings, applyUserSettings } from "./userSettings.js";
+import { isNotFoundError } from "../../utils/node.js";
+import { yamlDump, yamlParse } from "../../utils/yaml.js";
+import {
+  computeGlobalEnvsFromDb,
+  getGlobalEnvsFilePath
+} from "../globalEnvs.js";
+import params from "../../params.js";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;

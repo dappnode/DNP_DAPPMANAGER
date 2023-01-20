@@ -1,25 +1,28 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs } from "../../ipfs";
+import { ipfs } from "../../ipfs/index.js";
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { manifestToCompose, validateManifestWithImage } from "../../manifest";
-import { ManifestWithImage, NodeArch } from "../../../types";
-import { NoImageForArchError } from "../errors";
-import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
-import { getImageByArch } from "./getImageByArch";
-import { findEntries } from "./findEntries";
-import { releaseFiles } from "../../../params";
-import { downloadAssetRequired } from "./downloadAssets";
-import { isDirectoryRelease } from "./isDirectoryRelease";
-import { serializeIpfsDirectory } from "../releaseSignature";
-import { ReleaseDownloadedContents } from "../types";
+import {
+  manifestToCompose,
+  validateManifestWithImage
+} from "../../manifest/index.js";
+import { ManifestWithImage, NodeArch } from "../../../types.js";
+import { NoImageForArchError } from "../errors.js";
+import { downloadDirectoryFiles } from "./downloadDirectoryFiles.js";
+import { getImageByArch } from "./getImageByArch.js";
+import { findEntries } from "./findEntries.js";
+import { releaseFiles } from "../../../params.js";
+import { downloadAssetRequired } from "./downloadAssets.js";
+import { isDirectoryRelease } from "./isDirectoryRelease.js";
+import { serializeIpfsDirectory } from "../releaseSignature.js";
+import { ReleaseDownloadedContents } from "../types.js";
 import {
   Manifest,
   validateDappnodeCompose,
   validateManifestSchema,
   validateSetupWizardSchema
 } from "@dappnode/dappnodesdk";
-import { getIsCore } from "../../manifest/getIsCore";
+import { getIsCore } from "../../manifest/getIsCore.js";
 import { DistributedFile } from "@dappnode/common";
 
 const source = "ipfs" as const;

@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import { parseSpecialPermissions } from "../../../../src/modules/compose/specialPermissions";
-import { mockCompose } from "../../../testUtils";
+import { parseSpecialPermissions } from "../../../../src/modules/compose/specialPermissions.js";
+import { mockCompose } from "../../../testUtils.js";
 import { Compose } from "@dappnode/dappnodesdk";
 
 describe("Modules > compose", () => {

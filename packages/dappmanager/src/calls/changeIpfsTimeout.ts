@@ -1,4 +1,4 @@
-import params from "../params";
+import params from "../params.js";
 
 /**
  * Used to test different IPFS timeout parameters live from the ADMIN UI.

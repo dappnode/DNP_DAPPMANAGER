@@ -1,6 +1,6 @@
 import { expect } from "chai";
-import { parseServiceNetworks } from "../../../../src/modules/compose/networks";
-import { ComposeEditor } from "../../../../src/modules/compose/editor";
+import { parseServiceNetworks } from "../../../../src/modules/compose/networks.js";
+import { ComposeEditor } from "../../../../src/modules/compose/editor.js";
 
 describe("modules / compose / networks", () => {
   describe("parseServiceNetworks", () => {

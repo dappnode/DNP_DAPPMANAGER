@@ -1,10 +1,10 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
-import params, { getImageTag, getContainerName } from "../../params";
-import { getIsCore } from "../manifest/getIsCore";
-import { cleanCompose } from "./clean";
-import { parseEnvironment } from "./environment";
-import { parseServiceNetworks } from "./networks";
-import { getPrivateNetworkAliases } from "../../domains";
+import params, { getImageTag, getContainerName } from "../../params.js";
+import { getIsCore } from "../manifest/getIsCore.js";
+import { cleanCompose } from "./clean.js";
+import { parseEnvironment } from "./environment.js";
+import { parseServiceNetworks } from "./networks.js";
+import { getPrivateNetworkAliases } from "../../domains.js";
 import {
   Manifest,
   Compose,
@@ -13,7 +13,7 @@ import {
   ComposeNetworks,
   composeSafeKeys
 } from "@dappnode/dappnodesdk";
-import semver from "semver";
+import { lt } from "semver";
 
 /**
  * Returns the compose file for the given manifest
@@ -78,9 +78,7 @@ export function setDappnodeComposeDefaults(
  * https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
  */
 function ensureMinimumComposeVersion(composeFileVersion: string): string {
-  if (
-    semver.lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0")
-  )
+  if (lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0"))
     composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
 
   return composeFileVersion;

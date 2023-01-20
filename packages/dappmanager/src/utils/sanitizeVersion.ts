@@ -1,11 +1,11 @@
-import semver from "semver";
+import { clean } from "semver";
 
 /**
  * Return a version with low level of constraints that can be used by semver
  * Or throw an error if cannot be cleaned
  */
 export function sanitizeVersion(version: string): string {
-  const sanitizedVersion = semver.clean(version, {
+  const sanitizedVersion = clean(version, {
     loose: true
   });
   if (!sanitizedVersion)

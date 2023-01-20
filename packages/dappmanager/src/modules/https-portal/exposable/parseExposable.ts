@@ -3,7 +3,7 @@ import {
   ExposableServiceManifestInfo,
   InstalledPackageData
 } from "@dappnode/common";
-import { getPublicSubdomain, stripBadDomainChars } from "../../../domains";
+import { getPublicSubdomain, stripBadDomainChars } from "../../../domains.js";
 
 /**
  * Parse unsafe manifest.exposable property
