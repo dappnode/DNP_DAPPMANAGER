@@ -1,8 +1,11 @@
-import { UpdateAvailable } from "../common";
-import * as db from "../db";
-import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
-import { listPackages } from "../modules/docker/list";
-import { InstalledPackageData, InstalledPackageDataApiReturn } from "../types";
+import * as db from "../db/index.js";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import {
+  InstalledPackageData,
+  InstalledPackageDataApiReturn,
+  UpdateAvailable
+} from "@dappnode/common";
 
 /**
  * Returns the list of current containers associated to packages

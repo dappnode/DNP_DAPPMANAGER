@@ -6,9 +6,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: packages/admin-ui/
 
     steps:
       - uses: actions/checkout@v2
@@ -19,7 +16,7 @@ jobs:
       # Install dependencies
       - run: yarn install
       # Generate schemas
-      - run: yarn generate
+      - run: yarn build
       # Build
       - run: yarn mock-standalone:build
       # Deploy

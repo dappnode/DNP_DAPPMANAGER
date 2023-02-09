@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { ContainerLabelsRaw } from "../../../../src/types";
-import { readContainerLabels } from "../../../../src/modules/compose";
+import { ContainerLabelsRaw } from "../../../../src/types.js";
+import { readContainerLabels } from "../../../../src/modules/compose/index.js";
 
 describe("Parse and validate manifest labels to be used in the compose", () => {
   it("should parse and validate driver as a string", () => {

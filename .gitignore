@@ -23,7 +23,7 @@ packages/*/test_mountpoints_*/*
 .temp-transfer
 
 # Built schemas
-packages/*/src/common/schemas
+packages/common/src/validation/schemas
 
 # Version data file
 .version.json

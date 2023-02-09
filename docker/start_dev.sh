@@ -10,6 +10,9 @@ rm -rf node_modules
 yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
 yarn
 
+# Build common
+cd /app/packages/common/ && rm -rf node_modules && yarn && yarn generate && yarn build
+
 # Build admin-ui
 cd /app/packages/admin-ui/ && rm -rf node_modules && yarn && yarn build
 

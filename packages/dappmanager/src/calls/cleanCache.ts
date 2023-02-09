@@ -1,7 +1,7 @@
-import params from "../params";
-import { clearCacheDb } from "../db";
+import params from "../params.js";
+import { clearCacheDb } from "../db/index.js";
 // Utils
-import shell from "../utils/shell";
+import shell from "../utils/shell.js";
 
 /**
  * Cleans the cache files of the DAPPMANAGER:

@@ -1,5 +1,5 @@
 import React from "react";
-import { InstalledPackageData } from "types";
+import { InstalledPackageData } from "@dappnode/common";
 import {
   allContainersHaveSameVariant,
   BadgeVariant,

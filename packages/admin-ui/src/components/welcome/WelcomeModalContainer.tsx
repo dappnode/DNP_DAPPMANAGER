@@ -16,6 +16,7 @@ type FadeStatus = "null" | "opacity-0" | "opacity-1";
  * so the animation is important to soften it's flashy behaviour
  */
 const WelcomeModalContainer: React.FC<{
+  children?: React.ReactNode;
   show: boolean;
 }> = ({ show, children }) => {
   const [status, setStatus] = useState<FadeStatus>("null");

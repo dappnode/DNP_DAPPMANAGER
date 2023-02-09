@@ -1,5 +1,5 @@
-import { PackageContainer } from "../../../types";
-import { ComposeFileEditor } from "../../compose/editor";
+import { PackageContainer } from "@dappnode/common";
+import { ComposeFileEditor } from "../../compose/editor.js";
 
 export function addNetworkAliasCompose(
   container: PackageContainer,

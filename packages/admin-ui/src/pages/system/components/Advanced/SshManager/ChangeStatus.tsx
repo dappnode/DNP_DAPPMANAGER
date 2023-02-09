@@ -5,9 +5,10 @@ import ErrorView from "components/ErrorView";
 import Input from "components/Input";
 import Ok from "components/Ok";
 import { confirm } from "components/ConfirmDialog";
-import { ReqStatus, ShhStatus } from "types";
+import { ReqStatus } from "types";
 import "./sshManager.scss";
 import { withToast } from "components/toast/Toast";
+import { ShhStatus } from "@dappnode/common";
 
 export function SshManagerChangeStatus() {
   const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});

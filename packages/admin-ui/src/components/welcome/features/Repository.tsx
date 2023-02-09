@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientFallback, Eth2ClientTarget } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
@@ -55,10 +55,9 @@ export default function Repository({
       <div className="header">
         <div className="title">Repository Source</div>
         <div className="description">
-          DAppNode uses smart contracts to access a decentralized respository of
-          DApps
+          Dappnode uses smart contracts on the Ethereum Blockchain to provide access a decentralized respository of Official Dappnode Packages (DNPs) and publicly DApp Packages.
           <br />
-          Choose to connect to a remote network or use your own local node
+          Choose to connect to a remote Ethereum Node or choose to use your own locally run Ethereum Node
         </div>
       </div>
 

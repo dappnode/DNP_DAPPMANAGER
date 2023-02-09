@@ -11,10 +11,10 @@ function parseVariant(value: number) {
   return "success";
 }
 
-const StatsCardContainer: React.FunctionComponent<{ title: string }> = ({
-  children,
-  title
-}) => {
+const StatsCardContainer: React.FunctionComponent<{
+  children: React.ReactNode;
+  title: string;
+}> = ({ children, title }) => {
   return (
     <Card className="stats-card">
       <div className="header">

@@ -5,7 +5,7 @@ module.exports = {
   ],
   // "extends": ["plugin:prettier/recommended","eslint:recommended"],
   parserOptions: {
-    ecmaVersion: 2018,
+    ecmaVersion: 2022,
     sourceType: "module" // Allows for the use of imports
   },
   env: {
@@ -13,6 +13,11 @@ module.exports = {
     mocha: true,
     es6: true
   },
+  ignorePatterns: [
+    "src/modules/chains/drivers/bitcoin.ts",
+    "src/modules/chains/drivers/monero.ts",
+    "src/modules/ipfs/writeStreamToFs.ts"
+  ],
   rules: {
     "max-len": ["error", 1000],
     // ##### Some libraries do not have typings and the compiler does not understand .d.ts files

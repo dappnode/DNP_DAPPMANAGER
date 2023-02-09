@@ -4,9 +4,9 @@ import {
   ensureEth2MigrationRequirements,
   ensureNotInstallOtherClientIfPrysmLegacyIsInstalled,
   ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled
-} from "../../src/modules/installer/ensureEth2MigrationRequirements";
-import { mockPackageData, shellSafe } from "../testUtils";
-import params from "../../src/params";
+} from "../../src/modules/installer/ensureEth2MigrationRequirements.js";
+import { mockPackageData, shellSafe } from "../testUtils.js";
+import params from "../../src/params.js";
 
 describe("ensureEth2MigrationRequirements", () => {
   const networkName = "dncore_network";

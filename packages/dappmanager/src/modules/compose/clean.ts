@@ -1,4 +1,4 @@
-import { mapValues, omitBy, isObject, isEmpty, pick } from "lodash";
+import { mapValues, omitBy, isObject, isEmpty, pick } from "lodash-es";
 import { Compose } from "@dappnode/dappnodesdk";
 
 /**

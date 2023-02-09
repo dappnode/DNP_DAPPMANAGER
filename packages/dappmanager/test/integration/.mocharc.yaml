@@ -1,6 +1,9 @@
 colors: true
 exit: true
+extension: [ts]
 require:
   - dotenv/config
-  - ts-node/register
   - ./test/integration/hook.ts
+node-option:
+  - experimental-specifier-resolution=node
+  - loader=ts-node/esm

@@ -1,6 +1,7 @@
-import { mapValues } from "lodash";
-import { SystemInfo, VolumeData, WifiCredentials } from "types";
+import { mapValues } from "lodash-es";
+import { SystemInfo, VolumeData } from "@dappnode/common";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { WifiCredentials } from "types";
 
 // Service > dappnodeStatus
 

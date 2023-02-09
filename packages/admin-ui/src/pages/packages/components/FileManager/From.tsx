@@ -3,7 +3,7 @@ import { apiRoutes } from "api";
 import Input from "components/Input";
 import Button from "components/Button";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 
 export function CopyFileFrom({
   container,
@@ -16,12 +16,13 @@ export function CopyFileFrom({
   const containerName = container.containerName;
 
   const getDownloadUrl = useCallback(
-    fromPath => apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
+    (fromPath: string) =>
+      apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
     [containerName]
   );
 
   const downloadFile = useCallback(
-    fromPath => window.open(getDownloadUrl(fromPath), "_newtab"),
+    (fromPath: string) => window.open(getDownloadUrl(fromPath), "_newtab"),
     [getDownloadUrl]
   );
 

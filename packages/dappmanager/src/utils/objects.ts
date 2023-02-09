@@ -1,4 +1,4 @@
-import { mapValues, isObject } from "lodash";
+import { mapValues, isObject } from "lodash-es";
 
 // Generic object, requires use of any
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

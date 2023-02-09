@@ -1,8 +1,12 @@
-import params from "../../params";
-import * as db from "../../db";
-import { packageRemove, packageGet, packageInstall } from "../../calls";
-import { IpfsClientTarget } from "../../types";
-import { ipfs } from "../ipfs";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import {
+  packageRemove,
+  packageGet,
+  packageInstall
+} from "../../calls/index.js";
+import { IpfsClientTarget } from "@dappnode/common";
+import { ipfs } from "../ipfs/index.js";
 
 /**
  * Changes IPFS client from remote to local and viceversa.

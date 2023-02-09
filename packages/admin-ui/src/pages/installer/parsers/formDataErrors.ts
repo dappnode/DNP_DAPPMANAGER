@@ -1,4 +1,4 @@
-import { UserSettingsAllDnps, SetupWizardAllDnps } from "types";
+import { UserSettingsAllDnps, SetupWizardAllDnps } from "@dappnode/common";
 import { SetupWizardFormDataReturn } from "../types";
 
 type SetupWizardErrorType = "empty" | "pattern" | "enum";

@@ -1,10 +1,10 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { TimeoutErrorKy, IpfsInstance } from "./types";
-import { getContentFromGateway } from "./getContentFromGateway";
+import { TimeoutErrorKy, IpfsInstance } from "./types.js";
+import { getContentFromGateway } from "./getContentFromGateway.js";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
-const toStream = require("it-to-stream");
+import { logs } from "../../logs.js";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;
@@ -18,13 +18,14 @@ export interface CatStreamToFsArgs {
 }
 
 async function readableStream(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readable: any,
+  readable: AsyncIterable<Uint8Array>,
   { path, timeout, fileSize, progress }: CatStreamToFsArgs
 ): Promise<void> {
-  return new Promise((resolve, reject): void => {
+  return new Promise(async (resolve, reject): Promise<void> => {
     if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
       reject(Error(`Invalid path: "${path}"`));
+
+    let asyncIterableArray: Uint8Array[] = [];
 
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
@@ -43,9 +44,10 @@ async function readableStream(
     const round = (n: number): number =>
       resolution * Math.round((100 * n) / resolution);
 
-    const onData = (chunk: Buffer): void => {
+    const onData = (chunk: Uint8Array): void => {
       clearTimeout(timeoutToCancel);
       totalData += chunk.length;
+      asyncIterableArray.push(chunk);
       if (progress && fileSize) {
         const currentProgress = round(totalData / fileSize);
         if (currentProgress !== previousProgress) {
@@ -60,14 +62,15 @@ async function readableStream(
       resolve();
     };
 
-    const readStream = readable
-      .on("data", onData)
-      .on("error", onError("ReadableStream"));
-    const writeStream = fs
-      .createWriteStream(path)
-      .on("finish", onFinish)
-      .on("error", onError("WriteStream"));
-    readStream.pipe(writeStream);
+    try {
+      for await (const chunk of readable) onData(chunk);
+      fs.writeFileSync(path, Buffer.concat(asyncIterableArray), {
+        encoding: "binary"
+      });
+      onFinish();
+    } catch (e) {
+      onError("Error writing to fs")(e);
+    }
   });
 }
 
@@ -87,13 +90,7 @@ export async function catStreamToFs(
   args: CatStreamToFsArgs,
   ipfs: IpfsInstance
 ): Promise<void> {
-  // IPFS native timeout will interrupt a working but slow stream
-  // Use a max higher timeout that the one to check availability
-  const readable = toStream.readable(
-    ipfs.cat(args.hash, { timeout: timeoutMaxDownloadTime })
-  );
-
-  await readableStream(readable, args);
+  await readableStream(ipfs.cat(args.hash), args);
 }
 
 /**
@@ -107,9 +104,7 @@ export async function writeCarToFs(
   const content = await getContentFromGateway(ipfs, args.hash);
   const fileIterable = await unpackFileFromCarReader(content.carReader);
 
-  const readable = toStream.readable(fileIterable);
-
-  await readableStream(readable, args);
+  await readableStream(fileIterable, args);
 }
 
 async function unpackFileFromCarReader(

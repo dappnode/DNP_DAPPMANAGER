@@ -1,13 +1,13 @@
 import {
   AdminPasswordDb,
   AdminPasswordDbError
-} from "../../api/auth/adminPasswordDb";
-import { VpnApiClient } from "../../api/vpnApiClient";
+} from "../../api/auth/adminPasswordDb.js";
+import { VpnApiClient } from "../../api/vpnApiClient.js";
 import {
   VpnDeviceCredentials,
   VpnDevice,
   VpnDeviceAdminPassword
-} from "../../types";
+} from "@dappnode/common";
 
 // Temporal solution until eventBus is properly typed
 interface EventBusDevices {

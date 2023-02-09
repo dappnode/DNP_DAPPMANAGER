@@ -1,6 +1,6 @@
 import memoize from "memoizee";
-import { AvahiDaemonStatus } from "../../../types";
-import { runScript } from "../runScripts";
+import { AvahiDaemonStatus } from "@dappnode/common";
+import { runScript } from "../runScripts.js";
 
 /**
  * Initializes AVAHI daemon:

@@ -1,5 +1,5 @@
-import { intersection } from "lodash";
-import { InstalledPackageData } from "../../../types";
+import { intersection } from "lodash-es";
+import { InstalledPackageData } from "@dappnode/common";
 
 /**
  * @param requestedDnps = [

@@ -7,7 +7,7 @@ import {
   SetupWizard as SetupWizardType,
   PackageEnvs
 } from "@dappnode/dappnodesdk";
-import { UserSettingsAllDnps, UserSettings } from "types";
+import { UserSettingsAllDnps, UserSettings } from "@dappnode/common";
 import { difference } from "utils/lodashExtended";
 
 export function Config({

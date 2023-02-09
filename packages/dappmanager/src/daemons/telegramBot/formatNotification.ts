@@ -1,6 +1,5 @@
-import { PackageNotification } from "../../common";
-import { NotificationType } from "../../types";
-import { bold } from "./markdown";
+import { NotificationType, PackageNotification } from "@dappnode/common";
+import { bold } from "./markdown.js";
 
 // TELEGRAM DAPPNODE NOTIFICATIONS MESSAGES
 // In this file are the functions related to build DAppNode notification messages

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RouteComponentProps, NavLink } from "react-router-dom";
-import { throttle, isEmpty } from "lodash";
+import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
 import isIpfsHash from "utils/isIpfsHash";

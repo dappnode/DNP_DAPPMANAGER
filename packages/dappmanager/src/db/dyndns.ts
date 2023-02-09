@@ -1,6 +1,6 @@
-import { dbMain } from "./dbFactory";
-import { IdentityInterface } from "../types";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet";
+import { dbMain } from "./dbFactory.js";
+import { IdentityInterface } from "../types.js";
+import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
 
 const PUBLIC_IP = "public-ip";
 const DOMAIN = "domain";

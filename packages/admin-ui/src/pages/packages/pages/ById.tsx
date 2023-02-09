@@ -2,7 +2,7 @@ import React from "react";
 import { RouteComponentProps } from "react-router-dom";
 import { Switch, Route, NavLink, Redirect } from "react-router-dom";
 import { useApi } from "api";
-import { isEmpty } from "lodash";
+import { isEmpty } from "lodash-es";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";
@@ -64,7 +64,7 @@ export const PackageById: React.FC<RouteComponentProps<{
   const availableRoutes: {
     name: string;
     subPath: string;
-    render: () => React.ComponentType<any> | React.ReactElement<any>;
+    render: () => JSX.Element;
   }[] = [
     {
       name: "Info",

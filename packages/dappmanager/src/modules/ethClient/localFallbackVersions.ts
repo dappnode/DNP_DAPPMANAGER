@@ -1,6 +1,6 @@
 import fs from "fs";
-import params from "../../params";
-import { isNotFoundError } from "../../utils/node";
+import params from "../../params.js";
+import { isNotFoundError } from "../../utils/node.js";
 
 /**
  * contentHashes = {

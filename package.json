@@ -1,25 +1,35 @@
 {
-  "name": "@dappnode/dappmanager",
+  "name": "@dappnode/dappnode",
+  "type": "module",
   "version": "1.0.0",
   "private": true,
   "repository": "git@github.com:dappnode/DNP_DAPPMANAGER.git",
   "license": "GPL-3.0",
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "scripts": {
-    "bootstrap": "lerna bootstrap -- --frozen-lockfile --non-interactive --ignore-optional",
-    "postbootstrap": "CI=true patch-package",
-    "generate": "lerna run generate --stream",
-    "build": "lerna run build --stream",
+    "build": "lerna run build --include-dependencies --stream",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
     "test:int": "lerna run test:int --stream",
-    "pre-commit": "lerna run pre-commit --stream"
+    "pre-commit": "lerna run pre-commit --stream",
+    "mock-standalone:build": "lerna run mock-standalone:build --stream",
+    "postinstall": "patch-package",
+    "generate": "lerna run generate --stream",
+    "clean": "yarn run clean:build && yarn run clean:libraries",
+    "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
+    "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
   "dependencies": {
-    "lerna": "^3.22.1",
-    "patch-package": "^6.2.1",
+    "patch-package": "^6.5.1",
+    "postinstall-postinstall": "^2.1.0"
+  },
+  "devDependencies": {
+    "lerna": "^6.3.0",
+    "rimraf": "^3.0.2",
     "ts-node": "^10.8.1"
   }
 }

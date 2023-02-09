@@ -7,11 +7,11 @@ import {
   ExecutionClientPrater,
   InstalledPackageDataApiReturn,
   Network
-} from "../../types";
-import * as db from "../../db";
-import { packagesGet } from "../../calls";
-import { ComposeFileEditor } from "../compose/editor";
-import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork";
+} from "@dappnode/common";
+import * as db from "../../db/index.js";
+import { packagesGet } from "../../calls/index.js";
+import { ComposeFileEditor } from "../compose/editor.js";
+import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork.js";
 
 /**
  * Sets default values for the global environment variables:

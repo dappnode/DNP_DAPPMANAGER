@@ -1,6 +1,6 @@
-import params from "../params";
-import { TrustedReleaseKey } from "../types";
-import { dbMain } from "./dbFactory";
+import params from "../params.js";
+import { TrustedReleaseKey } from "@dappnode/common";
+import { dbMain } from "./dbFactory.js";
 
 const RELEASE_KEYS_TRUSTED = "release-keys-trusted";
 

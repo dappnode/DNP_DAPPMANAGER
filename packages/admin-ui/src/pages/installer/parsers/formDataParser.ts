@@ -1,14 +1,14 @@
-import { mapValues, isEmpty } from "lodash";
+import { mapValues, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import Ajv from "ajv";
 import {
   UserSettingsAllDnps,
   UserSettings,
-  SetupTargetAllDnps,
   SetupWizardAllDnps
-} from "types";
+} from "@dappnode/common";
 import { SetupWizardFormDataReturn } from "../types";
 import { SetupSchema } from "@dappnode/dappnodesdk";
+import { SetupTargetAllDnps } from "types";
 
 const ajv = new Ajv({ allErrors: true });
 

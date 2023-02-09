@@ -1,9 +1,9 @@
 import fs from "fs";
-import { isEqual } from "lodash";
+import { isEqual } from "lodash-es";
 import memoize from "memoizee";
-import { PackageVersionData } from "../types";
-import params from "../params";
-import * as db from "../db";
+import { PackageVersionData } from "@dappnode/common";
+import params from "../params.js";
+import * as db from "../db/index.js";
 
 /**
  * For debugging, print current version, branch and commit

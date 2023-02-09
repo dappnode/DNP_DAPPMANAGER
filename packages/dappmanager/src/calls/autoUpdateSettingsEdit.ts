@@ -3,7 +3,7 @@ import {
   SYSTEM_PACKAGES, // "system-packages"
   editDnpSetting,
   editCoreSetting
-} from "../utils/autoUpdateHelper";
+} from "../utils/autoUpdateHelper.js";
 
 /**
  * Edits the auto-update settings

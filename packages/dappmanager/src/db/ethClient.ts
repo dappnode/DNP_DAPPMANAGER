@@ -1,15 +1,15 @@
-import { dbCache, dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory.js";
+import { EthClientSyncedNotificationStatus } from "../types.js";
+import { EthClientInstallStatus } from "../modules/ethClient/types.js";
+import { eventBus } from "../eventBus.js";
 import {
   EthClientTarget,
-  EthClientFallback,
-  EthClientStatus,
-  EthClientSyncedNotificationStatus,
   EthClientRemote,
+  EthClientFallback,
   ExecutionClientMainnet,
-  ConsensusClientMainnet
-} from "../types";
-import { EthClientInstallStatus } from "../modules/ethClient/types";
-import { eventBus } from "../eventBus";
+  ConsensusClientMainnet,
+  EthClientStatus
+} from "@dappnode/common";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";

@@ -1,6 +1,6 @@
 import isIp from "is-ip";
-import upnpcCommand from "./upnpcCommand";
-import { parseUpnpErrors } from "./upnpError";
+import upnpcCommand from "./upnpcCommand.js";
+import { parseUpnpErrors } from "./upnpError.js";
 
 export default async function getExternalIp(): Promise<string> {
   try {

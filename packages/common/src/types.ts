@@ -9,20 +9,19 @@ import {
   ManifestUpdateAlert,
   PackageBackup,
   Dependencies,
-  PackageEnvs
+  PackageEnvs,
 } from "@dappnode/dappnodesdk";
 
-// Aliases
+/**
+ * Take into account the following tags to document the new types inside this file
+ * @see https://tsdoc.org/pages/tags/deprecated/
+ */
 
-export type DnpName = string;
-
-// AUTH, SESSION types
-export interface LoginStatusReturn {
-  username: string;
-  isAdmin: boolean;
-}
-
-// HTTPS portal mappings
+/**
+ * =====================
+ * HTTPS portal mappings
+ * =====================
+ */
 
 export interface HttpsPortalMapping {
   fromSubdomain: string;
@@ -51,7 +50,21 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
   exposed: boolean;
 }
 
-// Wifi
+/**
+ * ============
+ * AUTH session
+ * ============
+ */
+export interface LoginStatusReturn {
+  username: string;
+  isAdmin: boolean;
+}
+
+/**
+ * ====
+ * WIFI
+ * ====
+ */
 
 export interface WifiReport {
   info: string;
@@ -66,7 +79,11 @@ export interface CurrentWifiCredentials {
   password: string;
 }
 
-// Wireguard
+/**
+ * =========
+ * WIREGUARD
+ * =========
+ */
 
 export interface WireguardDeviceCredentials {
   /**
@@ -88,11 +105,19 @@ export interface WireguardDeviceCredentials {
   configLocal: string;
 }
 
-// SSH types
+/**
+ * ===
+ * SSH
+ * ===
+ */
 
 export type ShhStatus = "enabled" | "disabled";
 
-// Device types
+/**
+ * =======
+ * DEVICES
+ * =======
+ */
 
 export type VpnDeviceAdminPassword =
   | { hasChangedPassword: true }
@@ -106,15 +131,10 @@ export type VpnDeviceCredentials = VpnDevice & {
   url: string;
 };
 
-// Do not re-export variables since it will conflict with DNP_ADMIN's rule of 'isolatedModules'
-
-// ==============
-// ==============
-// ADMIN
-// ==============
-// ==============
-
 /**
+ * ==========================
+ * SMART CONTRACT - DIRECTORY
+ * ==========================
  * [NOTE] Items MUST be ordered by the directory order
  * - featured #0
  * - featured #1
@@ -127,7 +147,10 @@ export type VpnDeviceCredentials = VpnDevice & {
  * [NOTE] Search result will never show up in the directory listing,
  * they will appear in a future dropdown under the searchbar
  */
-// Information immediatelly available in the directory smart contract
+
+/**
+ * Information immediatelly available in the directory smart contract
+ */
 interface DirectoryItemBasic {
   index: number;
   name: string;
@@ -155,6 +178,24 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
+export type DirectoryDnpStatus = "Deleted" | "Active" | "Developing";
+
+export interface DirectoryDnp {
+  name: string;
+  statusName: DirectoryDnpStatus;
+  position: number;
+  isFeatured: boolean;
+  featuredIndex: number;
+  manifest?: Manifest;
+  avatar?: string;
+}
+
+/**
+ * =========================
+ * SMART CONTRACT - REGISTRY
+ * =========================
+ */
+
 export interface RegistryScanProgress {
   lastFetchedBlock: number;
   latestBlock: number;
@@ -166,24 +207,15 @@ export interface RequestStatus {
   success?: boolean;
 }
 
-export interface SetupWizardAllDnps {
-  [dnpName: string]: SetupWizard;
-}
+/**
+ * ================
+ * DOCKER - COMPOSE
+ * ================
+ */
 
-export interface SetupSchemaAllDnps {
-  [dnpName: string]: SetupSchema;
-}
-
-export interface SetupTargetAllDnps {
-  [dnpName: string]: SetupTarget;
-}
-
-export interface SetupUiJsonAllDnps {
-  [dnpName: string]: SetupUiJson;
-}
-
-// Settings must include the previous user settings
-
+/**
+ * User settings in compose file
+ */
 export interface UserSettings {
   environment?: {
     [serviceName: string]: {
@@ -233,14 +265,15 @@ export interface UserSettings {
   };
 }
 
-export interface UserSettingsAllDnps {
-  [dnpName: string]: UserSettings;
-}
+/**
+ * =========
+ * INSTALLER
+ * =========
+ */
 
-export interface DisclaimerAllDnps {
-  [dnpName: string]: string;
-}
-
+/**
+ * CompatibleDnps is a map of DNP names to the versions that are compatible
+ */
 export interface CompatibleDnps {
   [dnpName: string]: { from?: string; to: string };
   // "bitcoin.dnp.dappnode.eth": { from: "0.2.5"; to: "0.2.6" };
@@ -282,25 +315,25 @@ export interface RequestedDnp {
   signedSafeAll: boolean;
 }
 
-// Installing types
-
-export interface ProgressLogs {
-  [dnpName: string]: string;
+export interface UserSettingsAllDnps {
+  [dnpName: string]: UserSettings;
 }
 
-export interface ProgressLogsByDnp {
-  [dnpName: string]: ProgressLogs;
+export type DnpName = string;
+
+export interface SetupWizardAllDnps {
+  [dnpName: string]: SetupWizard;
 }
 
-// ==============
-// ==============
-// DAPPMANAGER
-// ==============
-// ==============
+/**
+ * =====
+ * PORTS
+ * =====
+ */
 
 export enum PortProtocol {
   UDP = "UDP",
-  TCP = "TCP"
+  TCP = "TCP",
 }
 
 interface BasicPortMapping {
@@ -353,11 +386,73 @@ export type ApiStatus =
 // unknown => port not found. not-available => UPnP disabled or not recognized
 export type UpnpStatus = "open" | "closed";
 
+/**
+ * =======
+ * VOLUMES
+ * =======
+ */
+
 export interface VolumeMapping {
   host: string; // path
   container: string; // dest
   name?: string;
 }
+
+// An array of mountpoints MUST include one with the host (mountpoint = "")
+export interface MountpointData {
+  mountpoint: string; // "/media/usb0", mountpoint = "" means host (default)
+  use: string; // "89%"
+  used: number; // 198642520
+  total: number; // 235782040
+  free: number; // 25092776
+  vendor: string; // "ATA", "SanDisk"
+  model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
+}
+
+export interface HostVolumeGroupReport {
+  report: {
+    vg: HostVolumeGroup[];
+  }[];
+}
+
+export interface HostVolumeGroup {
+  vg_name: string;
+  vg_size: string;
+}
+
+export interface HostLogicalVolumeReport {
+  report: {
+    lv: HostLogicalVolume[];
+  }[];
+}
+
+export interface HostLogicalVolume {
+  lv_name: string;
+  vg_name: string;
+  lv_size: string;
+}
+
+export interface VolumeOwnershipData {
+  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
+  owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
+}
+
+export interface VolumeData extends VolumeOwnershipData {
+  internalName?: string; // "data", Volume name as referenced inside the compose
+  createdAt: number; // 1569346006000,
+  size?: number; // 161254123,
+  refCount?: number; // 2
+  isOrphan: boolean; // if no container is using it
+  mountpoint: string; // "/dev1/data",
+  // Mountpoint extended data
+  fileSystem?: MountpointData;
+}
+
+/**
+ * =========
+ * CONTAINER
+ * =========
+ */
 
 export type ContainerState =
   | "created" // created A container that has been created(e.g.with docker create) but not started
@@ -368,26 +463,20 @@ export type ContainerState =
   | "dead" // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
   | "removing"; // removing A container that is in the process of being removed
 
-/**
- * Type mapping of a package container labels
- * NOTE: Treat as unsafe input, labels may not exist or have wrong formatting
- */
-export interface ContainerLabelTypes {
-  "dappnode.dnp.dnpName": string;
-  "dappnode.dnp.version": string;
-  "dappnode.dnp.serviceName": string;
-  "dappnode.dnp.instanceName": string;
-  "dappnode.dnp.dependencies": Dependencies;
-  "dappnode.dnp.avatar": string;
-  "dappnode.dnp.origin": string;
-  "dappnode.dnp.chain": ChainDriver;
-  "dappnode.dnp.isCore": boolean;
-  "dappnode.dnp.isMain": boolean;
-  "dappnode.dnp.dockerTimeout": number;
-  "dappnode.dnp.default.environment": string[];
-  "dappnode.dnp.default.ports": string[];
-  "dappnode.dnp.default.volumes": string[];
+export interface ContainersStatus {
+  [serviceName: string]: ContainerStatus;
 }
+
+export interface ContainerStatus {
+  targetStatus: "stopped" | "running";
+  dockerTimeout: number | undefined;
+}
+
+/**
+ * ========
+ * PACKAGES
+ * ========
+ */
 
 export interface PackageContainer {
   /**
@@ -504,32 +593,6 @@ export interface InstalledPackageDetailData extends InstalledPackageData {
   /** Arbitrary data sent by the package */
   packageSentData: Record<string, string>;
 }
-
-interface ManifestImage {
-  hash: string;
-  size: number;
-  path: string;
-  volumes?: string[];
-  ports?: string[];
-  environment?: string[];
-  /** FORBIDDEN FEATURE */
-  external_vol?: string[];
-  restart?: string;
-  privileged?: boolean;
-  cap_add?: string[];
-  cap_drop?: string[];
-  devices?: string[];
-  subnet?: string;
-  ipv4_address?: string;
-  network_mode?: string;
-  command?: string;
-  labels?: string[];
-}
-
-export interface ManifestWithImage extends Manifest {
-  image: ManifestImage;
-}
-
 export interface PackagePort {
   portNumber: number;
   protocol: PortProtocol;
@@ -540,16 +603,11 @@ export interface PortToOpen extends PackagePort {
   dnpName: string;
 }
 
-export interface PackageRequest {
-  name: string;
-  ver: string;
-  req?: string;
-}
-
-export interface DappnodeParams {
-  DNCORE_DIR: string;
-  REPO_DIR: string;
-}
+/**
+ * =============
+ * NOTIFICATIONS
+ * =============
+ */
 
 export type NotificationType = "danger" | "warning" | "success" | "info";
 export interface PackageNotification {
@@ -565,18 +623,6 @@ export interface PackageNotificationDb extends PackageNotification {
 
 export type UpdateType = "major" | "minor" | "patch" | null;
 
-export type DirectoryDnpStatus = "Deleted" | "Active" | "Developing";
-
-export interface DirectoryDnp {
-  name: string;
-  statusName: DirectoryDnpStatus;
-  position: number;
-  isFeatured: boolean;
-  featuredIndex: number;
-  manifest?: Manifest;
-  avatar?: string;
-}
-
 export interface ChainData {
   dnpName: string; // "geth.dnp.dappnode.eth"
   name?: string; // Optional pretty name: "Geth"
@@ -587,6 +633,17 @@ export interface ChainData {
   progress?: number; // 0.83027522935
   peers?: number; // 10
 }
+
+/**
+ * UI Welcome flow status. Persists the info of which page the UI should show
+ */
+export type NewFeatureStatus = "pending" | "seen" | "skipped";
+
+/**
+ * ====
+ * LOGS
+ * ====
+ */
 
 export interface ProgressLog {
   id: string; // "ln.dnp.dappnode.eth@/ipfs/Qmabcdf", overall log id(to bundle multiple logs)
@@ -608,7 +665,9 @@ export interface UserActionLog {
 }
 
 /**
- * Auto-update helper types
+ * ===========
+ * AUTO UPDATE
+ * ===========
  */
 
 /**
@@ -719,7 +778,9 @@ export interface AutoUpdateDataView {
 }
 
 /**
- * For fetch core update data
+ * ===========
+ * CORE UPDATE
+ * ===========
  */
 
 export interface DependencyListItem {
@@ -749,179 +810,21 @@ export type CoreUpdateData =
  * Releases types
  */
 
-export interface ApmVersion {
-  version: string;
-  contentUri: string;
-}
-
 export interface PackageVersionData {
   version?: string;
   branch?: string;
   commit?: string;
 }
 
+/**
+ * ===========
+ * HOST - DATA
+ * ===========
+ */
+
 export interface HostDiagnoseItem {
   name: string;
   data: string;
-}
-
-export type DistributedFileSource = "ipfs" | "swarm";
-export interface DistributedFile {
-  hash: string;
-  source: DistributedFileSource;
-  size: number;
-}
-
-export interface ReleaseWarnings {
-  /**
-   * If a core package does not come from the DAppNode Package APM registry
-   */
-  coreFromForeignRegistry?: boolean;
-  /**
-   * If the requested name does not match the manifest name
-   */
-  requestNameMismatch?: boolean;
-}
-
-export interface SpecialPermission {
-  name: string; // "Short description",
-  details: string; // "Long description of the capabilitites"
-  serviceName?: string; // Extra data
-}
-
-export interface SpecialPermissionAllDnps {
-  [dnpName: string]: SpecialPermission[];
-}
-
-export interface PackageRelease {
-  dnpName: string;
-  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
-  semVersion: string; // Always a semver: "0.2.3"
-  // File info for downloads
-  imageFile: DistributedFile;
-  avatarFile?: DistributedFile;
-  // Data for release processing
-  metadata: Manifest;
-  compose: Compose;
-  // Aditional
-  warnings: ReleaseWarnings;
-  origin?: string;
-  isCore: boolean;
-  // Signed release
-  /** Release is from safe origin OR has trusted signature */
-  signedSafe: boolean;
-  signatureStatus: ReleaseSignatureStatus;
-}
-
-export enum ReleaseSignatureStatusCode {
-  notSigned = "notSigned",
-  signedByKnownKey = "signedByKnownKey",
-  signedByUnknownKey = "signedByUnknownKey"
-}
-
-export type ReleaseSignatureStatus =
-  | { status: ReleaseSignatureStatusCode.notSigned }
-  | { status: ReleaseSignatureStatusCode.signedByKnownKey; keyName: string }
-  | {
-      status: ReleaseSignatureStatusCode.signedByUnknownKey;
-      signatureProtocol: string;
-      key: string;
-    };
-
-export type InstallPackageDataPaths = Pick<
-  InstallPackageData,
-  | "dnpName"
-  | "semVersion"
-  | "composePath"
-  | "composeBackupPath"
-  | "manifestPath"
-  | "manifestBackupPath"
-  | "imagePath"
-  | "isUpdate"
-  | "dockerTimeout"
-  | "containersStatus"
->;
-
-export interface InstallPackageData extends PackageRelease {
-  isUpdate: boolean;
-  // Paths
-  imagePath: string;
-  composePath: string;
-  composeBackupPath: string;
-  manifestPath: string;
-  manifestBackupPath: string;
-  // Data to write
-  compose: Compose;
-  // User settings to be applied after running
-  fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
-  dockerTimeout: number | undefined;
-  containersStatus: ContainersStatus;
-}
-
-export interface ContainersStatus {
-  [serviceName: string]: ContainerStatus;
-}
-
-export interface ContainerStatus {
-  targetStatus: "stopped" | "running";
-  dockerTimeout: number | undefined;
-}
-
-// Must be in-sync with SDK types
-export type Architecture = "linux/amd64" | "linux/arm64";
-export const architectures: Architecture[] = ["linux/amd64", "linux/arm64"];
-export const defaultArch = "linux/amd64";
-
-export interface PackageReleaseImageData {
-  // Mergable properties (editable)
-  volumes?: string[];
-  ports?: string[];
-  environment?: string[];
-  // Non-mergable properties
-  restart?: string;
-  privileged?: boolean;
-  cap_add?: string[];
-  cap_drop?: string[];
-  devices?: string[];
-  subnet?: string;
-  ipv4_address?: string;
-  network_mode?: string;
-  command?: string;
-  labels?: string[];
-}
-
-// An array of mountpoints MUST include one with the host (mountpoint = "")
-export interface MountpointData {
-  mountpoint: string; // "/media/usb0", mountpoint = "" means host (default)
-  use: string; // "89%"
-  used: number; // 198642520
-  total: number; // 235782040
-  free: number; // 25092776
-  vendor: string; // "ATA", "SanDisk"
-  model: string; // "CT500MX500SSD4", "Ultra_USB_3.0"
-}
-
-export interface HostVolumeGroupReport {
-  report: {
-    vg: HostVolumeGroup[];
-  }[];
-}
-
-export interface HostVolumeGroup {
-  vg_name: string;
-  vg_size: string;
-}
-
-export interface HostLogicalVolumeReport {
-  report: {
-    lv: HostLogicalVolume[];
-  }[];
-}
-
-export interface HostLogicalVolume {
-  lv_name: string;
-  vg_name: string;
-  lv_size: string;
 }
 
 export interface HostHardDisksReport {
@@ -970,94 +873,6 @@ export interface UpdateRequirement {
   title: string;
   isFulFilled: boolean;
   message: string;
-}
-
-export interface VolumeOwnershipData {
-  name: string; // "gethdnpdappnodeeth_geth", Actual name to call delete on
-  owner?: string; // "geth.dnp.dappnode.eth", Actual name of the owner
-}
-
-export interface VolumeData extends VolumeOwnershipData {
-  internalName?: string; // "data", Volume name as referenced inside the compose
-  createdAt: number; // 1569346006000,
-  size?: number; // 161254123,
-  refCount?: number; // 2
-  isOrphan: boolean; // if no container is using it
-  mountpoint: string; // "/dev1/data",
-  // Mountpoint extended data
-  fileSystem?: MountpointData;
-}
-
-export interface IpfsRepository {
-  ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
-}
-
-export enum IpfsClientTarget {
-  local = "local",
-  remote = "remote"
-}
-
-/**
- * Eth provider / client types
- * Manage the Ethereum multi-client setup
- * TO BE DEPRECATED
- */
-export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
-export type EthClientTarget = EthClientTargetPackage | "remote";
-export type Eth2ClientTarget =
-  | {
-      execClient: ExecutionClientMainnet;
-      consClient: ConsensusClientMainnet;
-    }
-  | "remote";
-
-/**
- * If the DAPPMANAGER should use a eth remote node in cases of error syncing
- */
-export type EthClientFallback = "on" | "off";
-
-export enum EthClientRemote {
-  on = "on",
-  off = "off"
-}
-
-export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
-
-export type EthClientStatusOk =
-  // All okay, client is functional
-  { ok: true; url: string; dnpName: string };
-
-export type EthClientStatusError =
-  // Unexpected error
-  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
-  // State is not correct, node is not synced but eth_syncing did not picked it up
-  | { ok: false; code: "STATE_NOT_SYNCED" }
-  // APM state call failed, syncing call succeeded and is not working
-  // = Likely an error related to fetching state content
-  | { ok: false; code: "STATE_CALL_ERROR"; error: ErrorSerialized }
-  // State call failed and eth_syncing returned true
-  | { ok: false; code: "IS_SYNCING" }
-  // syncing call failed, but the client is running
-  // ???, a connection error?
-  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
-  // NOT Expected: Package's container is not running
-  | { ok: false; code: "NOT_RUNNING" }
-  // Package's container does not exist in docker ps -a, and there's no clear reason why
-  | { ok: false; code: "NOT_INSTALLED" }
-  // Expected: Package is installing or pending to be installed
-  | { ok: false; code: "INSTALLING" }
-  // Expected: Package is installing but an error happened
-  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
-  // NOT Expected: Package should be installed but it is not
-  | { ok: false; code: "UNINSTALLED" };
-
-/**
- * Serialized errors so the can be persisted in the db, a JSON to disk
- */
-export interface ErrorSerialized {
-  message: string;
-  stack?: string;
 }
 
 /**
@@ -1135,6 +950,174 @@ export interface LocalIpResponse {
 }
 
 /**
+ * ====
+ * IPFS
+ * ====
+ */
+
+export type DistributedFileSource = "ipfs" | "swarm";
+export interface DistributedFile {
+  hash: string;
+  source: DistributedFileSource;
+  size: number;
+}
+
+export interface IpfsRepository {
+  ipfsClientTarget: IpfsClientTarget;
+  ipfsGateway: string;
+}
+
+export enum IpfsClientTarget {
+  local = "local",
+  remote = "remote",
+}
+
+/**
+ * ========
+ * PACKAGES
+ * ========
+ */
+
+interface ReleaseWarnings {
+  /**
+   * If a core package does not come from the DAppNode Package APM registry
+   */
+  coreFromForeignRegistry?: boolean;
+  /**
+   * If the requested name does not match the manifest name
+   */
+  requestNameMismatch?: boolean;
+}
+
+export interface SpecialPermission {
+  name: string; // "Short description",
+  details: string; // "Long description of the capabilitites"
+  serviceName?: string; // Extra data
+}
+
+export interface SpecialPermissionAllDnps {
+  [dnpName: string]: SpecialPermission[];
+}
+
+export interface PackageRelease {
+  dnpName: string;
+  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
+  semVersion: string; // Always a semver: "0.2.3"
+  // File info for downloads
+  imageFile: DistributedFile;
+  avatarFile?: DistributedFile;
+  // Data for release processing
+  metadata: Manifest;
+  compose: Compose;
+  // Aditional
+  warnings: ReleaseWarnings;
+  origin?: string;
+  isCore: boolean;
+  // Signed release
+  /** Release is from safe origin OR has trusted signature */
+  signedSafe: boolean;
+  signatureStatus: ReleaseSignatureStatus;
+}
+
+export type InstallPackageDataPaths = Pick<
+  InstallPackageData,
+  | "dnpName"
+  | "semVersion"
+  | "composePath"
+  | "composeBackupPath"
+  | "manifestPath"
+  | "manifestBackupPath"
+  | "imagePath"
+  | "isUpdate"
+  | "dockerTimeout"
+  | "containersStatus"
+>;
+
+export interface InstallPackageData extends PackageRelease {
+  isUpdate: boolean;
+  // Paths
+  imagePath: string;
+  composePath: string;
+  composeBackupPath: string;
+  manifestPath: string;
+  manifestBackupPath: string;
+  // Data to write
+  compose: Compose;
+  // User settings to be applied after running
+  fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
+  dockerTimeout: number | undefined;
+  containersStatus: ContainersStatus;
+}
+
+/**
+ * ===================
+ * REPOSITORY ETHEREUM
+ * ===================
+ */
+
+/**
+ * Eth provider / client types
+ * Manage the Ethereum multi-client setup
+ * TO BE DEPRECATED
+ */
+export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
+export type EthClientTarget = EthClientTargetPackage | "remote";
+export type Eth2ClientTarget =
+  | {
+      execClient: ExecutionClientMainnet;
+      consClient: ConsensusClientMainnet;
+    }
+  | "remote";
+
+/**
+ * If the DAPPMANAGER should use a eth remote node in cases of error syncing
+ */
+export type EthClientFallback = "on" | "off";
+
+export enum EthClientRemote {
+  on = "on",
+  off = "off",
+}
+
+export type EthClientStatus = EthClientStatusOk | EthClientStatusError;
+
+export type EthClientStatusOk =
+  // All okay, client is functional
+  { ok: true; url: string; dnpName: string };
+
+export type EthClientStatusError =
+  // Unexpected error
+  | { ok: false; code: "UNKNOWN_ERROR"; error: ErrorSerialized }
+  // State is not correct, node is not synced but eth_syncing did not picked it up
+  | { ok: false; code: "STATE_NOT_SYNCED" }
+  // APM state call failed, syncing call succeeded and is not working
+  // = Likely an error related to fetching state content
+  | { ok: false; code: "STATE_CALL_ERROR"; error: ErrorSerialized }
+  // State call failed and eth_syncing returned true
+  | { ok: false; code: "IS_SYNCING" }
+  // syncing call failed, but the client is running
+  // ???, a connection error?
+  | { ok: false; code: "NOT_AVAILABLE"; error: ErrorSerialized }
+  // NOT Expected: Package's container is not running
+  | { ok: false; code: "NOT_RUNNING" }
+  // Package's container does not exist in docker ps -a, and there's no clear reason why
+  | { ok: false; code: "NOT_INSTALLED" }
+  // Expected: Package is installing or pending to be installed
+  | { ok: false; code: "INSTALLING" }
+  // Expected: Package is installing but an error happened
+  | { ok: false; code: "INSTALLING_ERROR"; error: ErrorSerialized }
+  // NOT Expected: Package should be installed but it is not
+  | { ok: false; code: "UNINSTALLED" };
+
+/**
+ * Serialized errors so the can be persisted in the db, a JSON to disk
+ */
+export interface ErrorSerialized {
+  message: string;
+  stack?: string;
+}
+
+/**
  * Welcome wizard / setup flow
  * Available routes / views in the UI
  */
@@ -1145,30 +1128,31 @@ export type NewFeatureId =
   | "change-host-password";
 
 /**
- * UI Welcome flow status. Persists the info of which page the UI should show
- */
-export type NewFeatureStatus = "pending" | "seen" | "skipped";
-
-/**
- * HTTP Response
+ * ==========
+ * SIGNATURES
+ * ==========
  */
 
-export interface HttpResponseInterface {
-  data: any;
-  statusCode: number;
+export enum ReleaseSignatureStatusCode {
+  notSigned = "notSigned",
+  signedByKnownKey = "signedByKnownKey",
+  signedByUnknownKey = "signedByUnknownKey",
 }
 
-export interface IdentityInterface {
-  address: string;
-  privateKey: string;
-  publicKey: string;
-}
+export type ReleaseSignatureStatus =
+  | { status: ReleaseSignatureStatusCode.notSigned }
+  | { status: ReleaseSignatureStatusCode.signedByKnownKey; keyName: string }
+  | {
+      status: ReleaseSignatureStatusCode.signedByUnknownKey;
+      signatureProtocol: string;
+      key: string;
+    };
 
 /** TODO: Add RSA_2048, OpenPGP */
 export type ReleaseSignatureProtocol = "ECDSA_256";
 // NOTE: Must list all available protocols to be shown in the UI select component
 export const releaseSignatureProtocols: ReleaseSignatureProtocol[] = [
-  "ECDSA_256"
+  "ECDSA_256",
 ];
 
 export interface TrustedReleaseKey {
@@ -1182,7 +1166,9 @@ export interface TrustedReleaseKey {
 }
 
 /**
- * STAKER types
+ * =======
+ * STAKERS
+ * =======
  */
 
 export type Network = "mainnet" | "prater" | "gnosis";
@@ -1194,7 +1180,7 @@ export const consensusClientsMainnet = [
   "lighthouse.dnp.dappnode.eth",
   "teku.dnp.dappnode.eth",
   "nimbus.dnp.dappnode.eth",
-  ""
+  "",
 ] as const;
 export type ConsensusClientMainnet = typeof consensusClientsMainnet[number];
 export const executionClientsMainnet = [
@@ -1202,7 +1188,7 @@ export const executionClientsMainnet = [
   "besu.public.dappnode.eth",
   "erigon.dnp.dappnode.eth",
   "nethermind.public.dappnode.eth",
-  ""
+  "",
 ] as const;
 export type ExecutionClientMainnet = typeof executionClientsMainnet[number];
 export type SignerMainnet = "web3signer.dnp.dappnode.eth" | "";
@@ -1371,4 +1357,28 @@ export interface StakerParamsByNetwork<T extends Network> {
   };
   mevBoost: MevBoost<T>;
   isMevBoostSelected: boolean;
+}
+
+/**
+ * =======
+ * HANDLER
+ * =======
+ */
+
+export interface RpcPayload {
+  method: string;
+  params: Args;
+}
+
+export type Args = any[];
+export type Result = any | void;
+export interface LoggerMiddleware {
+  onCall?: (route: string, args?: Args) => void;
+  onSuccess?: (route: string, result: Result, args?: Args) => void;
+  onError?: (route: string, error: Error, args?: Args) => void;
+}
+
+export interface RpcResponse<R = any> {
+  result?: R;
+  error?: { code: number; message: string; data?: any };
 }

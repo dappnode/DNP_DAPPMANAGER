@@ -1,4 +1,4 @@
-import { DappGetErrors } from "../types";
+import { DappGetErrors } from "../types.js";
 
 /**
  * Formats an error message

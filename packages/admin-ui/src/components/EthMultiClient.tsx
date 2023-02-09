@@ -12,7 +12,7 @@ import {
   ConsensusClientMainnet,
   executionClientsMainnet,
   consensusClientsMainnet
-} from "types";
+} from "@dappnode/common";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";

@@ -2,17 +2,16 @@ import "mocha";
 import { CID } from "ipfs-http-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
-
 import {
   serializeIpfsDirectory,
   getReleaseSignatureStatus
-} from "../../../../src/modules/release/releaseSignature";
-import { IPFSEntry } from "../../../../src/modules/ipfs";
+} from "../../../../src/modules/release/releaseSignature.js";
+import { IPFSEntry } from "../../../../src/modules/ipfs/index.js";
+import { ReleaseSignature } from "../../../../src/types.js";
 import {
-  ReleaseSignature,
-  TrustedReleaseKey,
-  ReleaseSignatureStatusCode
-} from "../../../../src/types";
+  ReleaseSignatureStatusCode,
+  TrustedReleaseKey
+} from "@dappnode/common";
 
 describe("modules / release / verifyReleaseSignature", () => {
   const files: IPFSEntry[] = [

@@ -1,7 +1,7 @@
-import upnpcCommand from "./upnpcCommand";
-import { PortProtocol } from "../../types";
-import { UpnpPortMapping } from "./types";
-import { parseUpnpErrors } from "./upnpError";
+import upnpcCommand from "./upnpcCommand.js";
+import { PortProtocol } from "@dappnode/common";
+import { UpnpPortMapping } from "./types.js";
+import { parseUpnpErrors } from "./upnpError.js";
 
 /**
  * Lists current port mapping for DAppNode

@@ -5,7 +5,7 @@ import {
   Manifest,
   validateDappnodeCompose
 } from "@dappnode/dappnodesdk";
-import { setDappnodeComposeDefaults } from "../../../../src/modules/compose/setDappnodeComposeDefaults";
+import { setDappnodeComposeDefaults } from "../../../../src/modules/compose/setDappnodeComposeDefaults.js";
 
 describe("setDappnodeComposeDefaults", () => {
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {

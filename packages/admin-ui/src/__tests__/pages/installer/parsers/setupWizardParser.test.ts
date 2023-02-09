@@ -3,8 +3,9 @@ import {
   userSettingsToFormData
 } from "pages/installer/parsers/formDataParser";
 import { SetupWizardFormDataReturn } from "pages/installer/types";
-import { UserSettingsAllDnps, SetupTargetAllDnps } from "types";
+import { UserSettingsAllDnps } from "@dappnode/common";
 import deepmerge from "deepmerge";
+import { SetupTargetAllDnps } from "types";
 
 const dnpName = "lightning-network.dnp.dappnode.eth";
 const depName = "bitcoin.dnp.dappnode.eth";

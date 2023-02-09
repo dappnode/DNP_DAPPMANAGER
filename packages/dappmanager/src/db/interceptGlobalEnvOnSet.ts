@@ -1,9 +1,9 @@
-import { logs } from "../logs";
+import { logs } from "../logs.js";
 import {
   updatePkgsWithGlobalEnvs,
   writeGlobalEnvsToEnvFile
-} from "../modules/globalEnvs";
-import params from "../params";
+} from "../modules/globalEnvs.js";
+import params from "../params.js";
 
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:

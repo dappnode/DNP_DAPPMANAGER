@@ -1,13 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-
 import {
   getMyDotEthdomain,
   getDotDappnodeDomain,
   getNsupdateTxts
-} from "../../../../src/modules/nsupdate/utils";
-import { mockContainer } from "../../../testUtils";
-import { PackageContainer } from "../../../../src/types";
+} from "../../../../src/modules/nsupdate/utils.js";
+import { mockContainer } from "../../../testUtils.js";
+import { PackageContainer } from "@dappnode/common";
 
 describe("modules > nsupdate", () => {
   describe("getMyDotEthdomain", () => {

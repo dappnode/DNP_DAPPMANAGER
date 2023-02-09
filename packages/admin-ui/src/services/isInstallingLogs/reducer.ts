@@ -1,4 +1,4 @@
-import { omit, omitBy } from "lodash";
+import { omit, omitBy } from "lodash-es";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { stripVersion } from "./utils";
 

@@ -1,5 +1,5 @@
-import { FileFormat } from "../../../types";
-import { yamlParse } from "../../../utils/yaml";
+import { FileFormat } from "../../../types.js";
+import { yamlParse } from "../../../utils/yaml.js";
 
 export function parseAsset<T>(data: string, format: FileFormat): T {
   switch (format) {

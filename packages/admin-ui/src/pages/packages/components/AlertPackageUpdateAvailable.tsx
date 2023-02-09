@@ -5,7 +5,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import { prettyDnpName } from "utils/format";
 import { urlJoin } from "utils/url";
-import { UpdateAvailable } from "types";
+import { UpdateAvailable } from "@dappnode/common";
 
 export function AlertPackageUpdateAvailable({
   dnpName,

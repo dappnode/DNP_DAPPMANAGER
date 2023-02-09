@@ -1,7 +1,7 @@
 import Dockerode from "dockerode";
 import stripAnsi from "strip-ansi";
-import { PortMapping, PortProtocol } from "../../types";
-import { isPortMappingDeletable } from "./list/isPortMappingDeletable";
+import { PortMapping, PortProtocol } from "@dappnode/common";
+import { isPortMappingDeletable } from "./list/isPortMappingDeletable.js";
 
 /**
  * When fetching logs from the API, each line is prefixed by a Header

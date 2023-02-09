@@ -5,7 +5,7 @@ import {
   prepareMessageFromPackage,
   signDataFromPackage,
   hashMessage
-} from "../../../src/utils/sign";
+} from "../../../src/utils/sign.js";
 
 describe("Util / sign", () => {
   describe("prepareMessageFromPackage", () => {

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { getPrivateNetworkAlias, ContainerNames } from "../../src/domains";
+import { getPrivateNetworkAlias, ContainerNames } from "../../src/domains.js";
 
 describe("domains", () => {
   describe("getPrivateNetworkAlias", () => {

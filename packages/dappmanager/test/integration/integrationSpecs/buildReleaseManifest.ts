@@ -1,9 +1,9 @@
-import { isEqual } from "lodash";
-import { ipfs } from "../../../src/modules/ipfs";
-import { parseManifest } from "../../../src/modules/manifest";
-import { ManifestWithImage } from "../../../src/types";
-import { ipfsAddManifest, ipfsAddFileFromFs } from "../testIpfsUtils";
-import { saveNewImageToDisk } from "./mockImage";
+import { isEqual } from "lodash-es";
+import { ipfs } from "../../../src/modules/ipfs/index.js";
+import { parseManifest } from "../../../src/modules/manifest/index.js";
+import { ManifestWithImage } from "../../../src/types.js";
+import { ipfsAddManifest, ipfsAddFileFromFs } from "../testIpfsUtils.js";
+import { saveNewImageToDisk } from "./mockImage.js";
 
 /**
  * Release type: `Manifest-type`

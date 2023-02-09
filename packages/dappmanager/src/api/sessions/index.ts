@@ -1,2 +1,2 @@
-export * from "./interface";
-export * from "./clientSideCookies";
+export * from "./interface.js";
+export * from "./clientSideCookies.js";

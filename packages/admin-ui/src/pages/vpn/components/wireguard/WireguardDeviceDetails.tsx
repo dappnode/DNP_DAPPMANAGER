@@ -17,7 +17,7 @@ import { apiRoutes } from "api";
 import { FiDownload } from "react-icons/fi";
 import { GoClippy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
-import { WireguardDeviceCredentials } from "types";
+import { WireguardDeviceCredentials } from "@dappnode/common";
 // Utils
 import { urlJoin } from "utils/url";
 

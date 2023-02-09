@@ -1,5 +1,5 @@
-import { dbCache } from "./dbFactory";
-import { RegistryNewRepoEvent } from "../types";
+import { dbCache } from "./dbFactory.js";
+import { RegistryNewRepoEvent } from "../types.js";
 
 const REGISTRY_EVENTS = "registry-events";
 const REGISTRY_LAST_FETCHED_BLOCK = "registry-last-fetched-block";

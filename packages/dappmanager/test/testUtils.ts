@@ -1,19 +1,19 @@
 import path from "path";
 import fs from "fs";
-import shell from "../src/utils/shell";
-import { clearCacheDb, clearMainDb } from "../src/db";
+import shell from "../src/utils/shell.js";
+import { clearCacheDb, clearMainDb } from "../src/db/index.js";
+import { ManifestWithImage } from "../src/types.js";
+import { DockerApiSystemDfReturn } from "../src/modules/docker/api/index.js";
+import params from "../src/params.js";
+import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import {
   PackageContainer,
+  InstalledPackageData,
   VolumeMapping,
   PackageRelease,
-  ManifestWithImage,
-  InstallPackageData,
-  InstalledPackageData,
-  ReleaseSignatureStatusCode
-} from "../src/types";
-import { DockerApiSystemDfReturn } from "../src/modules/docker/api";
-import params from "../src/params";
-import { Compose, Manifest } from "@dappnode/dappnodesdk";
+  ReleaseSignatureStatusCode,
+  InstallPackageData
+} from "@dappnode/common";
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";

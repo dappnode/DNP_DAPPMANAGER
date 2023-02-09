@@ -3,11 +3,11 @@ import { expect } from "chai";
 import {
   ComposeFileEditor,
   ComposeServiceEditor
-} from "../../../../../src/modules/compose/editor";
-import params from "../../../../../src/params";
-import { shellSafe } from "../../../../testUtils";
+} from "../../../../../src/modules/compose/editor.js";
+import params from "../../../../../src/params.js";
+import { shellSafe } from "../../../../testUtils.js";
 import fs from "fs";
-import { parseServiceNetworks } from "../../../../../src/modules/compose/networks";
+import { parseServiceNetworks } from "../../../../../src/modules/compose/networks.js";
 import { ComposeServiceNetwork } from "@dappnode/dappnodesdk";
 
 describe("compose service editor", () => {

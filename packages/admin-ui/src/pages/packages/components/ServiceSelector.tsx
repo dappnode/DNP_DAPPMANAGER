@@ -1,6 +1,6 @@
 import React from "react";
 import Select from "components/Select";
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 
 export function ServiceSelector({
   serviceName,

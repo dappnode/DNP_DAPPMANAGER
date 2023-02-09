@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 
-import { logSafeObjects, maxLength } from "../../../src/utils/logs";
+import { logSafeObjects, maxLength } from "../../../src/utils/logs.js";
 
 describe("Util: logs", () => {
   it("Should trim a first level base64 string", () => {

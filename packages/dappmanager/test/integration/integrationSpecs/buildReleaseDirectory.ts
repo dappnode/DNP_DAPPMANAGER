@@ -1,22 +1,22 @@
 import fs from "fs";
 import path from "path";
 import { ethers } from "ethers";
-import { mapValues } from "lodash";
-import { ipfs } from "../../../src/modules/ipfs";
-import shell from "../../../src/utils/shell";
-import { yamlDump } from "../../../src/utils/yaml";
-import { getContainerName, getImageTag } from "../../../src/params";
+import { mapValues } from "lodash-es";
+import { ipfs } from "../../../src/modules/ipfs/index.js";
+import shell from "../../../src/utils/shell.js";
+import { yamlDump } from "../../../src/utils/yaml.js";
+import { getContainerName, getImageTag } from "../../../src/params.js";
 import {
   Manifest,
   Compose,
   SetupWizard,
   ComposeService
 } from "@dappnode/dappnodesdk";
-import { testDir, manifestFileName, composeFileName } from "../../testUtils";
-import { ipfsAddAll } from "../testIpfsUtils";
-import { saveNewImageToDisk } from "./mockImage";
-import { saveMockAvatarTo } from "./mockAvatar";
-import { signRelease } from "./signRelease";
+import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
+import { ipfsAddAll } from "../testIpfsUtils.js";
+import { saveNewImageToDisk } from "./mockImage.js";
+import { saveMockAvatarTo } from "./mockAvatar.js";
+import { signRelease } from "./signRelease.js";
 
 // Helper type to prevent having to write valid container_name, image per service
 type ComposeUncomplete = Omit<Compose, "services"> & {

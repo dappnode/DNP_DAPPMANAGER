@@ -1,11 +1,11 @@
 import { expect } from "chai";
-import { parseExposableServiceManifest } from "../../../../src/modules/https-portal/exposable/parseExposable";
+import { parseExposableServiceManifest } from "../../../../src/modules/https-portal/exposable/parseExposable.js";
 import {
   ExposableServiceInfo,
   ExposableServiceManifestInfo,
   InstalledPackageData
-} from "../../../../src/types";
-import { mockContainer, mockDnp } from "../../../testUtils";
+} from "@dappnode/common";
+import { mockContainer, mockDnp } from "../../../testUtils.js";
 
 describe("modules / https-portal / exposable", () => {
   it("Should parse manifest.exposable", () => {

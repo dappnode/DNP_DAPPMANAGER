@@ -1,18 +1,21 @@
 import fs from "fs";
-import params from "../../params";
-import * as getPath from "../../utils/getPath";
-import { restartDappmanagerPatch } from "../installer/restartPatch";
-import { ComposeFileEditor } from "../compose/editor";
+import params from "../../params.js";
+import * as getPath from "../../utils/getPath.js";
+import { restartDappmanagerPatch } from "../installer/restartPatch.js";
+import { ComposeFileEditor } from "../compose/editor.js";
 import {
   dockerComposeDown,
   dockerComposeUp,
   DockerComposeUpOptions
-} from "./compose";
-import { listPackageNoThrow } from "./list";
-import { getDockerTimeoutMax } from "./utils";
-import { ContainersStatus, PackageContainer } from "../../types";
-import { InstalledPackageData } from "../../common";
-import { logs } from "../../logs";
+} from "./compose/index.js";
+import { listPackageNoThrow } from "./list/index.js";
+import { getDockerTimeoutMax } from "./utils.js";
+import { logs } from "../../logs.js";
+import {
+  ContainersStatus,
+  InstalledPackageData,
+  PackageContainer
+} from "@dappnode/common";
 
 interface ComposeUpArgs {
   dnpName: string;

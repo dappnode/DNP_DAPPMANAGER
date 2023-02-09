@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { getVolumes } from "services/dappnodeStatus/selectors";
 import { DataList } from "./DataList";
 import { prettyVolumeName, prettyBytes } from "utils/format";
-import { VolumeMapping } from "types";
+import { VolumeMapping } from "@dappnode/common";
 
 export function Vols({
   dnpName,

@@ -1,10 +1,10 @@
 import fetch from "node-fetch";
 import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
-import { getPrivateNetworkAlias } from "../../../domains";
-import { urlJoin } from "../../../utils/url";
-import { InstalledPackageData } from "../../../types";
-import { ChainDataResult } from "../types";
-import { safeProgress } from "../utils";
+import { getPrivateNetworkAlias } from "../../../domains.js";
+import { urlJoin } from "../../../utils/url.js";
+import { InstalledPackageData } from "@dappnode/common";
+import { ChainDataResult } from "../types.js";
+import { safeProgress } from "../utils.js";
 
 /**
  * Returns a chain data object for an Ethereum 2.0 Prysm beacon chain node

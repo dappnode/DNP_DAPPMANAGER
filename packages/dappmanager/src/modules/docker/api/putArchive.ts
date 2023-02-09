@@ -1,4 +1,4 @@
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 import tar from "tar-stream";
 
 /**

@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import { ipfs } from "../../ipfs";
+import { ipfs } from "../../ipfs/index.js";
 
 /**
  * Handles the download of a DNP .xz image.

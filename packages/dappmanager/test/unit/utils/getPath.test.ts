@@ -4,8 +4,8 @@ import path from "path";
 
 chai.should();
 
-import * as getPath from "../../../src/utils/getPath";
-import params from "../../../src/params";
+import * as getPath from "../../../src/utils/getPath.js";
+import params from "../../../src/params.js";
 
 const { REPO_DIR } = params;
 

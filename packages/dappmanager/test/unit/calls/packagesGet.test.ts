@@ -1,7 +1,7 @@
 import { expect } from "chai";
-import { sortPackages } from "../../../src/calls/packagesGet";
-import { InstalledPackageData } from "../../../src/types";
-import { mockContainer, mockDnp } from "../../testUtils";
+import { sortPackages } from "../../../src/calls/packagesGet.js";
+import { InstalledPackageData } from "@dappnode/common";
+import { mockContainer, mockDnp } from "../../testUtils.js";
 
 describe("sortPackages for UI display", () => {
   it("Should sort packages", () => {

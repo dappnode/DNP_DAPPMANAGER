@@ -1,4 +1,4 @@
-import { DappGetDnps, DappGetDnp } from "../types";
+import { DappGetDnps, DappGetDnp } from "../types.js";
 
 interface PrioritizeDnpReturn extends DappGetDnp {
   name: string;

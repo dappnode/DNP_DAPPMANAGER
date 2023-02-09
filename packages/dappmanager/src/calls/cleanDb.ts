@@ -1,4 +1,4 @@
-import { clearMainDb } from "../db";
+import { clearMainDb } from "../db/index.js";
 
 /**
  * Cleans the database content

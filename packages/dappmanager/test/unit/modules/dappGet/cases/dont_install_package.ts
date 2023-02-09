@@ -1,4 +1,4 @@
-import { DappgetTestCase } from "../testHelpers";
+import { DappgetTestCase } from "../testHelpers.js";
 
 /**
  * Case: Don't install a package if not necessary

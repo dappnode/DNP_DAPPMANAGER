@@ -1,7 +1,7 @@
 import fs from "fs";
-import * as db from "../../db";
-import { logs } from "../../logs";
-import { wrapHandlerHtml } from "../utils";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
+import { wrapHandlerHtml } from "../utils.js";
 
 interface Params {
   fileId: string;

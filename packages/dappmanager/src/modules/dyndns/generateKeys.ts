@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import params from "../../params";
-import * as db from "../../db";
-import { logs } from "../../logs";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
 
 const corruptedPrivateKeyMessage = `
 

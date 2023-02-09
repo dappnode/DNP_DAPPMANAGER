@@ -1,14 +1,14 @@
-import { listPackages } from "../docker/list";
+import { listPackages } from "../docker/list/index.js";
 // Internal
-import { PackageRequest } from "../../types";
-import dappGetBasic from "./basic";
-import aggregate from "./aggregate";
-import { DappGetFetcher } from "./fetch";
+import { PackageRequest } from "../../types.js";
+import dappGetBasic from "./basic.js";
+import aggregate from "./aggregate/index.js";
+import { DappGetFetcher } from "./fetch/index.js";
 
-import resolve from "./resolve";
-import shouldUpdate from "./utils/shouldUpdate";
-import { logs } from "../../logs";
-import { DappGetResult, DappGetDnps, DappGetState } from "./types";
+import resolve from "./resolve/index.js";
+import shouldUpdate from "./utils/shouldUpdate.js";
+import { logs } from "../../logs.js";
+import { DappGetResult, DappGetDnps, DappGetState } from "./types.js";
 
 export interface DappgetOptions {
   BYPASS_RESOLVER?: boolean;

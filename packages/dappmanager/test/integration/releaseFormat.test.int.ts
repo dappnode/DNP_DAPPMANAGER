@@ -1,18 +1,18 @@
 import "mocha";
 import { expect } from "chai";
-import { mapValues } from "lodash";
-import * as calls from "../../src/calls";
-import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils";
-import params from "../../src/params";
-import shell from "../../src/utils/shell";
-import { TrustedReleaseKey } from "../../src/types";
+import { mapValues } from "lodash-es";
+import * as calls from "../../src/calls/index.js";
+import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils.js";
+import params from "../../src/params.js";
+import shell from "../../src/utils/shell.js";
+import { TrustedReleaseKey } from "@dappnode/common";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,
   uploadManifestRelease
-} from "./integrationSpecs";
-import * as db from "../../src/db";
-import { mockImageEnvNAME } from "./integrationSpecs/mockImage";
+} from "./integrationSpecs/index.js";
+import * as db from "../../src/db/index.js";
+import { mockImageEnvNAME } from "./integrationSpecs/mockImage.js";
 
 /**
  * Generate mock releases in the different formats,

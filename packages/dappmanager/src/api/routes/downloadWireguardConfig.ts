@@ -1,5 +1,5 @@
-import * as calls from "../../calls";
-import { wrapHandlerHtml } from "../utils";
+import * as calls from "../../calls/index.js";
+import { wrapHandlerHtml } from "../utils.js";
 
 interface Params {
   device: string;

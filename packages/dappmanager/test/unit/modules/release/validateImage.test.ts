@@ -2,9 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import fs from "fs";
-import { testDir, createTestDir, cleanTestDir } from "../../../testUtils";
-
-import { validateTarImage } from "../../../../src/modules/release/getImage";
+import { testDir, createTestDir, cleanTestDir } from "../../../testUtils.js";
+import { validateTarImage } from "../../../../src/modules/release/getImage.js";
 
 describe("validateTarImage", () => {
   before(async () => {

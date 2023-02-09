@@ -1,5 +1,5 @@
 import { Emitter } from "mitt";
-import { RpcPayload, RpcResponse } from "common/transport/types";
+import { RpcPayload, RpcResponse } from "@dappnode/common";
 
 export type LoginStatus =
   | { status: "logged-in"; username: string }

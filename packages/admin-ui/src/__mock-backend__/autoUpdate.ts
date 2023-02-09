@@ -1,4 +1,4 @@
-import { AutoUpdateDataView, Routes } from "../../src/common";
+import { AutoUpdateDataView, Routes } from "@dappnode/common";
 import { pause } from "./utils/pause";
 
 export const autoUpdate: Pick<

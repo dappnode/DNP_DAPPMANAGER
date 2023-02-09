@@ -1,5 +1,5 @@
-import params from "../../../params";
-import { listPackageNoThrow } from "../../docker/list/listPackages";
+import params from "../../../params.js";
+import { listPackageNoThrow } from "../../docker/list/listPackages.js";
 
 /**
  * Returns true if HTTPS package installed and running, otherwise return false

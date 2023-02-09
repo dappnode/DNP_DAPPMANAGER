@@ -6,6 +6,7 @@ import "./standaloneContainer.scss";
 export const StandaloneContainer: React.FC<{
   TopIcon: IconType;
   title: string;
+  children: React.ReactNode;
 }> = ({ TopIcon, title, children }) => (
   <div className="standalone-container">
     <div className="toplogo">

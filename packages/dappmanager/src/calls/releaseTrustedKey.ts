@@ -1,5 +1,5 @@
-import * as db from "../db";
-import { TrustedReleaseKey, releaseSignatureProtocols } from "../types";
+import * as db from "../db/index.js";
+import { TrustedReleaseKey, releaseSignatureProtocols } from "@dappnode/common";
 
 /**
  * Add a release key to trusted keys db

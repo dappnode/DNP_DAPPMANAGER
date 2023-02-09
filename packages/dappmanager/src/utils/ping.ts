@@ -1,4 +1,4 @@
-import shell from "./shell";
+import shell from "./shell.js";
 
 const count = 5;
 const max = 3;
