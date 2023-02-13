@@ -160,7 +160,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku-prater.dnp.dappnode.eth",
         "lighthouse-prater.dnp.dappnode.eth",
-        "nimbus-prater.dnp.dappnode.eth"
+        "nimbus-prater.dnp.dappnode.eth",
+        "lodestar-prater.dnp.dappnode.eth"
       ]
     },
     // v0.2.51
@@ -171,7 +172,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku-gnosis.dnp.dappnode.eth",
         "lighthouse-gnosis.dnp.dappnode.eth",
-        "nimbus-gnosis.dnp.dappnode.eth"
+        "nimbus-gnosis.dnp.dappnode.eth",
+        "lodestar-gnosis.dnp.dappnode.eth"
       ]
     },
     // v0.2.52
@@ -182,7 +184,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku.dnp.dappnode.eth",
         "lighthouse.dnp.dappnode.eth",
-        "nimbus.dnp.dappnode.eth"
+        "nimbus.dnp.dappnode.eth",
+        "lodestar.dnp.dappnode.eth"
       ]
     }
   ],

@@ -19,7 +19,7 @@ import { eventBus } from "../../eventBus.js";
 /**
  * Get the validator service name.
  * - Nimbus package is monoservice (beacon-validator)
- * - Prysm, Teku, Lighthouse are multiservice (beacon, validator)
+ * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
  */
 export function getValidatorServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
@@ -28,7 +28,7 @@ export function getValidatorServiceName(dnpName: string): string {
 /**
  * Get the beacon service name
  * - Nimbus package is monoservice (beacon-validator)
- * - Prysm, Teku, Lighthouse are multiservice (beacon, validator)
+ * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
  */
 export function getBeaconServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain";
