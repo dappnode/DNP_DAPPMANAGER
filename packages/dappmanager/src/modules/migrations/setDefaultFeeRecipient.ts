@@ -1,6 +1,6 @@
 import { ConsensusClient, Network } from "@dappnode/common";
 import * as db from "../../db/index.js";
-import { packageGet } from "../../calls";
+import { packageGet } from "../../calls/index.js";
 import { listPackageNoThrow } from "../docker/list/listPackages.js";
 import { getValidatorServiceName } from "../stakerConfig/utils.js";
 
