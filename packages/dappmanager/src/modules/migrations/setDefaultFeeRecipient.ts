@@ -41,10 +41,9 @@ export async function setDefaultFeeRecipient(): Promise<void> {
       getValidatorServiceName(consensusClientDnpName)
     ][envVarName];
 
-    if (!envVarValue) continue;
-
-    if (network === "prater") db.feeRecipientPrater.set(envVarValue);
-    if (network === "gnosis") db.feeRecipientGnosis.set(envVarValue);
-    if (network === "mainnet") db.feeRecipientMainnet.set(envVarValue);
+    // Set default fee recipient, if no default value, set empty string to avoid triggereing this migration again
+    if (network === "prater") db.feeRecipientPrater.set(envVarValue || "");
+    if (network === "gnosis") db.feeRecipientGnosis.set(envVarValue || "");
+    if (network === "mainnet") db.feeRecipientMainnet.set(envVarValue || "");
   }
 }
