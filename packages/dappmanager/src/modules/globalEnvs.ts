@@ -45,12 +45,15 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_MAINNET`]: db.consensusClientMainnet.get(),
     [`${prefix}EXECUTION_CLIENT_MAINNET`]: db.executionClientMainnet.get(),
     [`${prefix}MEVBOOST_MAINNET`]: db.mevBoostMainnet.get(),
+    [`${prefix}FEE_RECIPIENT_MAINNET`]: db.feeRecipientMainnet.get(),
     [`${prefix}CONSENSUS_CLIENT_GNOSIS`]: db.consensusClientGnosis.get(),
     [`${prefix}EXECUTION_CLIENT_GNOSIS`]: db.executionClientGnosis.get(),
     [`${prefix}MEVBOOST_GNOSIS`]: db.mevBoostGnosis.get(),
+    [`${prefix}FEE_RECIPIENT_GNOSIS`]: db.feeRecipientGnosis.get(),
     [`${prefix}CONSENSUS_CLIENT_PRATER`]: db.consensusClientPrater.get(),
     [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get(),
-    [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get()
+    [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get(),
+    [`${prefix}FEE_RECIPIENT_PRATER`]: db.feeRecipientPrater.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }

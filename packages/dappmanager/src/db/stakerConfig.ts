@@ -26,6 +26,7 @@ export const stakerItemMetadata = dbCache.indexedByKey<StakerItemData, string>({
 const CONSENSUS_CLIENT_MAINNET = "consensus-client-mainnet";
 const EXECUTION_CLIENT_MAINNET = "execution-client-mainnet";
 const MEVBOOST_MAINNET = "mevboost-mainnet";
+const FEE_RECIPIENT_MAINNET = "fee-recipient-mainnet";
 
 /**
  * Whenever a user switches the EC and/or CC from the stakers UI then
@@ -53,11 +54,17 @@ export const mevBoostMainnet = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_MAINNET })[0]
 );
 
+export const feeRecipientMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | null>(FEE_RECIPIENT_MAINNET, null),
+  Object.keys({ FEE_RECIPIENT_MAINNET })[0]
+);
+
 // Gnosis
 
 const CONSENSUS_CLIENT_GNOSIS = "consensus-client-gnosis";
 const EXECUTION_CLIENT_GNOSIS = "execution-client-gnosis";
 const MEVBOOST_GNOSIS = "mevboost-gnosis";
+const FEE_RECIPIENT_GNOSIS = "fee-recipient-gnosis";
 
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientGnosis | null>(CONSENSUS_CLIENT_GNOSIS, null),
@@ -74,11 +81,17 @@ export const mevBoostGnosis = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_GNOSIS })[0]
 );
 
+export const feeRecipientGnosis = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | null>(FEE_RECIPIENT_GNOSIS, null),
+  Object.keys({ FEE_RECIPIENT_GNOSIS })[0]
+);
+
 // Prater
 
 const CONSENSUS_CLIENT_PRATER = "consensus-client-prater";
 const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
+const FEE_RECIPIENT_PRATER = "fee-recipient-prater";
 
 export const consensusClientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<ConsensusClientPrater | null>(CONSENSUS_CLIENT_PRATER, null),
@@ -93,4 +106,9 @@ export const executionClientPrater = interceptGlobalEnvOnSet(
 export const mevBoostPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_PRATER, false),
   Object.keys({ MEVBOOST_PRATER })[0]
+);
+
+export const feeRecipientPrater = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | null>(FEE_RECIPIENT_PRATER, null),
+  Object.keys({ FEE_RECIPIENT_PRATER })[0]
 );
