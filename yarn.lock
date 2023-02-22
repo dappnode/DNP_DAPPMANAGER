@@ -1238,10 +1238,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
   integrity sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==
 
-"@dappnode/dappnodesdk@^0.2.68", "@dappnode/dappnodesdk@^0.2.69":
-  version "0.2.69"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.69.tgz#118d7621520070097ef07eeefa6b17ae4f4c50ea"
-  integrity sha512-iiV1TfUFFq+1qlxtXJNybGwwkHoQcWvSX/G+yzLVEIBssuDmCI6ofSZXCjl4Nva7CsOW1Ow2L7DDo1C9kWZmvQ==
+"@dappnode/dappnodesdk@^0.2.71":
+  version "0.2.71"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.71.tgz#2d65bc3a088ee8a80da774a70d80707c4a237bc7"
+  integrity sha512-bfk3EWM8hwx7PZWFF73Gqpd4pJioHRC66Urt6ZEYOL9RdBuNxe79ZjNr8taS8mabz3I46Fj1faaQXNPjY0ylwA==
   dependencies:
     "@octokit/rest" "^18.0.12"
     ajv "^8.11.0"
