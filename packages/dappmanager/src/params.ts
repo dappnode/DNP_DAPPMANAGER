@@ -316,6 +316,12 @@ const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xbD404c6f101833b45fF45b80bEfBd17816376246"
+    },
+    {
+      name: "Lodestar Ethereum consensus client team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x9D055dd23de15114EC95921208c741873eDE8558"
     }
   ]
 };
