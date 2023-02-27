@@ -128,7 +128,10 @@ export async function setStakerConfig<T extends Network>({
     );
 
   // If consensus client is lodestar, check that all the execution client and signer versions
-  if (stakerConfig.consensusClient?.dnpName.includes("lodestar")) {
+  if (
+    stakerConfig.executionClient &&
+    stakerConfig.consensusClient?.dnpName.includes("lodestar")
+  ) {
     checkLodestarMinVersions(
       stakerConfig.consensusClient.dnpName,
       stakerConfig.executionClient,
@@ -523,14 +526,10 @@ function setStakerConfigOnDb<T extends Network>({
 
 function checkLodestarMinVersions(
   lodestarDnpName: string,
-  selectedExecClient: StakerItemOk<Network, "execution"> | undefined,
+  selectedExecClient: StakerItemOk<Network, "execution">,
   isSignerSelected: boolean | undefined,
   web3signerPkg: InstalledPackageDataApiReturn | undefined
 ): void {
-  if (!selectedExecClient) {
-    throw Error(`Execution client is not selected.`);
-  }
-
   const lodestarMinVersions =
     params.lodestarStakersMinimumVersions[lodestarDnpName];
 
