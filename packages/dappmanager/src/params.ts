@@ -2,10 +2,8 @@ import path from "path";
 import { FileFormat } from "./types.js";
 import { Architecture } from "@dappnode/dappnodesdk";
 import {
-  DnpName,
   EthClientTargetPackage,
-  UserSettings
-} from "@dappnode/common";
+  UserSettings} from "@dappnode/common";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -33,30 +31,6 @@ if (process.env.TEST) {
 
 /** Absolute global ENVs .env file from DAPPMANAGER containers */
 const GLOBAL_ENVS_PATH = path.join(DNCORE_DIR, GLOBAL_ENVS_FILE_NAME);
-
-//Lodestar minimum versions
-const lodestarStakersMinimumVersions: {
-  [key: DnpName]: { [key: DnpName]: string };
-} = {
-  "lodestar-prater.dnp.dappnode.eth": {
-    "goerli-nethermind.dnp.dappnode.eth": "1.0.8",
-    "goerli-geth.dnp.dappnode.eth": "0.4.27",
-    "goerli-erigon.dnp.dappnode.eth": "0.1.4",
-    "goerli-besu.public.dappnode.eth": "0.1.1", //TODO: Release new version with lodestar JWT
-    "web3signer-prater.dnp.dappnode.eth": "0.1.17"
-  },
-  "lodestar-gnosis.dnp.dappnode.eth": {
-    "nethermind-xdai.dnp.dappnode.eth": "1.0.25",
-    "web3signer-gnosis.dnp.dappnode.eth": "0.1.12"
-  },
-  "lodestar.dnp.dappnode.eth": {
-    "nethermind.dnp.dappnode.eth": "1.0.32",
-    "geth.dnp.dappnode.eth": "0.1.37",
-    "erigon.dnp.dappnode.eth": "0.1.37",
-    "besu.public.dappnode.eth": "1.2.7", //TODO: Release new version with lodestar JWT
-    "web3signer.dnp.dappnode.eth": "0.1.6"
-  }
-};
 
 const params = {
   // File paths
@@ -217,8 +191,6 @@ const params = {
       ]
     }
   ],
-
-  lodestarStakersMinimumVersions,
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
