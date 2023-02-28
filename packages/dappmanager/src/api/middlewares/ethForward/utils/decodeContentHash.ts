@@ -1,4 +1,4 @@
-import { CID } from "multiformats/cid";
+import { CID } from "multiformats";
 import multicodec from "multicodec";
 import { Content } from "../types.js";
 import { isEmpty } from "./isEmpty.js";

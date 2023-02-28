@@ -1,7 +1,5 @@
 import path from "path";
-import webpack from "webpack";
 import { fileURLToPath } from "url";
-import nodeExternals from "webpack-node-externals";
 
 const { NODE_ENV = "production" } = process.env;
 
@@ -24,9 +22,9 @@ export default {
   },
   // externals: [/node_modules/, "bufferutil", "utf-8-validate"],
   externalsPresets: { node: true },
-  externals: [nodeExternals()],
+  target: "node18.13",
+  // externals: [nodeExternals()],
   resolve: {
-    modules: [paths.src, "node_modules"],
     extensions: [".ts", ".js"],
     extensionAlias: {
       ".js": [".ts", ".js"],
@@ -44,11 +42,9 @@ export default {
   module: {
     rules: [
       {
-        test: /\.m?js/
-      },
-      {
-        test: /\.ts$/,
-        use: ["ts-loader"]
+        test: /\.([cm]?ts|tsx)$/,
+        loader: "ts-loader",
+        options: { allowTsInNodeModules: true }
       },
       {
         test: /\.node$/,
@@ -56,12 +52,7 @@ export default {
       }
     ]
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      WebSocket: "ws",
-      fetch: ["node-fetch", "default"]
-    })
-  ],
+
   optimization: {
     // Minimization does not provide great disk space savings, but reduces debug capacity
     minimize: false

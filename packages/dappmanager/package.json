@@ -7,6 +7,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon -w src -e js,ts,json --require dotenv/config -x ts-node src/index.ts",
     "build": "tsc -p tsconfig.json",
+    "build:webpack": "webpack",
     "watch-ts": "tsc -w",
     "file": "node",
     "test": "npm run test:file \"./{,!(node_modules)/**}/*.test.ts\" ",
@@ -101,12 +102,16 @@
     "dotenv": "^8.2.0",
     "eslint": "^7.32.0",
     "mocha": "^10.2.0",
+    "node-loader": "^2.0.0",
     "nodemon": "^2.0.6",
     "prettier": "^2.3.2",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
     "socket.io-client": "^4.5.1",
+    "ts-loader": "^9.4.2",
     "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "typescript": "^4.7.3",
+    "webpack": "^5.75.0",
+    "webpack-cli": "^5.0.1"
   }
 }
