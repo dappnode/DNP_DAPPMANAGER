@@ -59,7 +59,7 @@ export default function LaunchpadValidators<T extends Network>({
       component: (
         <ExecutionClientsSelect
           executionClients={stakerConfig.executionClients}
-          setNewExecClient={setExecutionClient}
+          setNewExecClient={setNewExecClient}
           newExecClient={newExecClient}
         />
       )
@@ -71,6 +71,8 @@ export default function LaunchpadValidators<T extends Network>({
       component: (
         <ConsensusClientSelect
           consensusClients={stakerConfig.consensusClients}
+          setNewConsClient={setNewConsClient}
+          newConsClient={newConsClient}
         />
       )
     },
