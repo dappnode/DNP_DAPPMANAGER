@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import {
   Network,
   StakerConfigGet,
+  StakerConfigGetOk,
   StakerConfigSet,
   StakerItemOk
 } from "@dappnode/common";
@@ -34,6 +35,8 @@ import {
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import { ReqStatus } from "types";
+import "./staker-network.scss";
+import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -42,6 +45,9 @@ export default function StakerNetwork<T extends Network>({
   network: T;
   description: string;
 }) {
+  // Launchpad
+  const [showLaunchpadValidators, setShowLaunchpadValidators] = useState(false);
+  const [allStakerItemsOk, setAllStakerItemsOk] = useState<boolean>(false);
   // Error
   const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
     null
@@ -143,6 +149,14 @@ export default function StakerNetwork<T extends Network>({
         if (consensusClient.feeRecipient)
           setDefaultFeeRecipient(consensusClient.feeRecipient);
       }
+
+      // set allStakerItemsOk
+      setAllStakerItemsOk(
+        executionClients.every(ec => ec.status === "ok") &&
+          consensusClients.every(cc => cc.status === "ok") &&
+          mevBoost.status === "ok" &&
+          web3Signer.status === "ok"
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStakerConfigReq.data]);
@@ -257,6 +271,19 @@ export default function StakerNetwork<T extends Network>({
     <>
       {currentStakerConfigReq.data ? (
         <Card>
+          <div className="launchpad-buttons">
+            <Button
+              disabled={!allStakerItemsOk}
+              onClick={() =>
+                setShowLaunchpadValidators(!showLaunchpadValidators)
+              }
+              variant="dappnode"
+            >
+              I am a validator
+            </Button>
+            <Button variant="dappnode"> I want to become a validator</Button>
+          </div>
+          <br />
           <p>
             Set up your Proof-of-Stake validator configuration for Ethereum and
             Ethereum-based chains. You will need to: <br />
@@ -374,6 +401,18 @@ export default function StakerNetwork<T extends Network>({
               <ErrorView error={reqStatus.error} hideIcon red />
             )}
           </div>
+
+          {showLaunchpadValidators && allStakerItemsOk && (
+            <LaunchpadValidators
+              stakerConfig={
+                (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<T>
+              }
+              setNewExecClient={setNewExecClient}
+              setNewConsClient={setNewConsClient}
+              newExecClient={newExecClient}
+              newConsClient={newConsClient}
+            />
+          )}
         </Card>
       ) : currentStakerConfigReq.error ? (
         <ErrorView error={currentStakerConfigReq.error} hideIcon red />
