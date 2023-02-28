@@ -35,8 +35,8 @@ import {
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import { ReqStatus } from "types";
-import "./staker-network.scss";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
+import { FaEthereum } from "react-icons/fa";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -271,19 +271,6 @@ export default function StakerNetwork<T extends Network>({
     <>
       {currentStakerConfigReq.data ? (
         <Card>
-          <div className="launchpad-buttons">
-            <Button
-              disabled={!allStakerItemsOk}
-              onClick={() =>
-                setShowLaunchpadValidators(!showLaunchpadValidators)
-              }
-              variant="dappnode"
-            >
-              I am a validator
-            </Button>
-            <Button variant="dappnode"> I want to become a validator</Button>
-          </div>
-          <br />
           <p>
             Set up your Proof-of-Stake validator configuration for Ethereum and
             Ethereum-based chains. You will need to: <br />
@@ -300,6 +287,14 @@ export default function StakerNetwork<T extends Network>({
           </p>
           <br />
           <p>{description}</p>
+          <hr />
+          <Button
+            disabled={!allStakerItemsOk}
+            onClick={() => setShowLaunchpadValidators(!showLaunchpadValidators)}
+            variant="dappnode"
+          >
+            <FaEthereum /> Staking Launchpad
+          </Button>
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
@@ -404,13 +399,22 @@ export default function StakerNetwork<T extends Network>({
 
           {showLaunchpadValidators && allStakerItemsOk && (
             <LaunchpadValidators
+              network={network}
               stakerConfig={
                 (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<T>
               }
+              setShowLaunchpadValidators={setShowLaunchpadValidators}
               setNewExecClient={setNewExecClient}
               setNewConsClient={setNewConsClient}
+              setNewMevBoost={setNewMevBoost}
               newExecClient={newExecClient}
               newConsClient={newConsClient}
+              newMevBoost={newMevBoost}
+              feeRecipientError={feeRecipientError}
+              graffitiError={graffitiError}
+              defaultGraffiti={defaultGraffiti}
+              defaultFeeRecipient={defaultFeeRecipient}
+              defaultCheckpointSync={defaultCheckpointSync}
             />
           )}
         </Card>

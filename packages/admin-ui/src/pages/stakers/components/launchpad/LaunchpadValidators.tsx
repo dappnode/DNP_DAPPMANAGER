@@ -2,19 +2,31 @@ import React, { useState } from "react";
 import "./launchpad-validators.scss";
 import Button from "components/Button";
 import { Network, StakerItemOk } from "@dappnode/common";
-import ExecutionClientsSelect from "./options/ExecutionClientsSelect";
 import { StakerConfigGetOk } from "@dappnode/common";
-import ConsensusClientSelect from "./options/ConsensusClientSelect";
-import MevBoostSelect from "./options/MevBoostSelect";
+import MevBoost from "../columns/MevBoost";
+import ExecutionClient from "../columns/ExecutionClient";
+import ConsensusClient from "../columns/ConsensusClient";
+import { VscChromeClose } from "react-icons/vsc";
 
 export default function LaunchpadValidators<T extends Network>({
+  network,
   stakerConfig,
+  setShowLaunchpadValidators,
   setNewExecClient,
   newExecClient,
   setNewConsClient,
-  newConsClient
+  newConsClient,
+  setNewMevBoost,
+  newMevBoost,
+  feeRecipientError,
+  graffitiError,
+  defaultGraffiti,
+  defaultFeeRecipient,
+  defaultCheckpointSync
 }: {
+  network: T;
   stakerConfig: StakerConfigGetOk<T>;
+  setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;
@@ -23,26 +35,20 @@ export default function LaunchpadValidators<T extends Network>({
     React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
   newConsClient?: StakerItemOk<T, "consensus">;
+  newMevBoost: StakerItemOk<T, "mev-boost"> | undefined;
+  setNewMevBoost: React.Dispatch<
+    React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
+  >;
+  feeRecipientError: string | null;
+  graffitiError: string | null;
+  defaultGraffiti: string;
+  defaultFeeRecipient: string;
+  defaultCheckpointSync: string;
 }) {
-  // Execution client
-  const [executionClient, setExecutionClient] = useState<
-    StakerItemOk<T, "execution">
-  >();
-  // Consensus client
-  const [consensusClient, setConsensusClient] = useState<
-    StakerItemOk<T, "consensus">
-  >();
-  // Default fee recipient
-  //const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>();
-  // MEV boost relays
-  const [mevBoost, setNewMevBoost] = useState<StakerItemOk<T, "mev-boost">>();
-
   const [stepIndex, setStepIndex] = useState(0);
-
   const handleNextStep = () => {
     setStepIndex(prevIndex => prevIndex + 1);
   };
-
   const handlePrevStep = () => {
     setStepIndex(prevIndex => prevIndex - 1);
   };
@@ -53,15 +59,40 @@ export default function LaunchpadValidators<T extends Network>({
     component: JSX.Element;
   }[] = [
     {
+      title: "Create the validator keystores and do the deposit",
+      description: `To become a ${network.toUpperCase()} validator and participate in the network's Proof of Stake (PoS) consensus mechanism, you will need to create a validator keystore file and make a deposit of at least 32 ETH`,
+      component: (
+        <Button
+          variant="dappnode"
+          onClick={() => {
+            window.open(
+              network === "mainnet"
+                ? "https://launchpad.ethereum.org/"
+                : network === "prater"
+                ? "https://goerli.launchpad.ethereum.org/"
+                : "https://launchpad.gnosis.gateway.fm/"
+            );
+          }}
+        >
+          {network.toUpperCase()} Launchpad
+        </Button>
+      )
+    },
+    {
       title: "Select the Execution Client",
       description:
         "Select the execution client you want to use to run the validator node. The execution client is the software that executes the Ethereum 2.0 consensus protocol.",
       component: (
-        <ExecutionClientsSelect
-          executionClients={stakerConfig.executionClients}
-          setNewExecClient={setNewExecClient}
-          newExecClient={newExecClient}
-        />
+        <>
+          {stakerConfig.executionClients.map((executionClient, i) => (
+            <ExecutionClient<T>
+              key={i}
+              executionClient={executionClient}
+              setNewExecClient={setNewExecClient}
+              isSelected={executionClient.dnpName === newExecClient?.dnpName}
+            />
+          ))}
+        </>
       )
     },
     {
@@ -69,11 +100,22 @@ export default function LaunchpadValidators<T extends Network>({
       description:
         "Select the consensus client you want to use to run the validator node. The consensus client is the software that manages the validator keys and signs blocks.",
       component: (
-        <ConsensusClientSelect
-          consensusClients={stakerConfig.consensusClients}
-          setNewConsClient={setNewConsClient}
-          newConsClient={newConsClient}
-        />
+        <>
+          {stakerConfig.consensusClients.map((consensusClient, i) => (
+            <ConsensusClient<T>
+              key={i}
+              consensusClient={consensusClient}
+              setNewConsClient={setNewConsClient}
+              newConsClient={newConsClient}
+              isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+              graffitiError={graffitiError}
+              feeRecipientError={feeRecipientError}
+              defaultGraffiti={defaultGraffiti}
+              defaultFeeRecipient={defaultFeeRecipient}
+              defaultCheckpointSync={defaultCheckpointSync}
+            />
+          ))}
+        </>
       )
     },
     /**{
@@ -83,25 +125,45 @@ export default function LaunchpadValidators<T extends Network>({
       component: <></>
     },*/
     {
-      title: "Select the MEV boost relays",
+      title: "Enable MEV boost and select its relays",
       description:
         "Select the MEV boost relays you want to use to run the validator node. The MEV boost relays are the software that executes the Ethereum 2.0 consensus protocol.",
-      component: <MevBoostSelect mevBoost={stakerConfig.mevBoost} />
+      component: (
+        <MevBoost
+          network={network}
+          mevBoost={stakerConfig.mevBoost}
+          newMevBoost={newMevBoost}
+          setNewMevBoost={setNewMevBoost}
+          isSelected={stakerConfig.mevBoost.dnpName === newMevBoost?.dnpName}
+        />
+      )
+    },
+    {
+      title: "Launch the validator node",
+      description: "",
+      component: <></>
     }
   ];
 
   const currentStep = steps[stepIndex];
 
   return (
-    <div className="welcome-container opacity-1">
-      <div className="welcome">
-        <>
-          <div className="header">
-            <div className="title">{currentStep.title}</div>
-            <div className="description">{currentStep.description}</div>
-          </div>
-        </>
-        <>{currentStep.component}</>
+    <div className="stakers-launchpad-container opacity-1">
+      <div className="launchpad">
+        <div className="top-button">
+          <Button
+            onClick={() => setShowLaunchpadValidators(false)}
+            variant="danger"
+          >
+            <VscChromeClose />
+          </Button>
+        </div>
+        <div className="header">
+          <div className="title">{currentStep.title}</div>
+          <div className="description">{currentStep.description}</div>
+        </div>
+
+        <div className="content">{currentStep.component}</div>
 
         <div className="bottom-buttons">
           {stepIndex !== 0 && (

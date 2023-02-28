@@ -1,4 +1,4 @@
-.welcome-container {
+.stakers-launchpad-container {
   // Fade in animation
   opacity: 0;
   transition: opacity ease 0.3s;
@@ -23,7 +23,7 @@
   overflow: hidden;
 }
 
-.welcome {
+.launchpad {
   padding: var(--default-spacing);
   padding-bottom: 0;
   border-radius: 0.5rem;
@@ -64,6 +64,14 @@
       max-width: 40rem;
       margin: auto;
     }
+  }
+
+  .content {
+    text-align: center;
+  }
+
+  .top-button {
+    margin-left: auto;
   }
 
   .bottom-buttons {
