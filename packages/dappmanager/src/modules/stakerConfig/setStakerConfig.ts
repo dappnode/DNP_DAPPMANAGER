@@ -4,7 +4,6 @@ import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,
   ConsensusClientPrater,
-  DnpName,
   ExecutionClient,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
@@ -15,6 +14,7 @@ import {
   MevBoostMainnet,
   MevBoostPrater,
   Network,
+  Signer,
   StakerConfigSet,
   StakerItemOk,
   UserSettingsAllDnps
@@ -32,7 +32,7 @@ import { listPackageNoThrow } from "../docker/list/listPackages.js";
 import { dockerComposeUpPackage } from "../docker/index.js";
 import { lt } from "semver";
 import * as db from "../../db/index.js";
-import params from "../../params.js";
+import { lodestarStakersMinimumVersions } from "./params.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -133,10 +133,11 @@ export async function setStakerConfig<T extends Network>({
     stakerConfig.consensusClient?.dnpName.includes("lodestar")
   ) {
     checkLodestarMinVersions(
-      stakerConfig.consensusClient.dnpName,
+      stakerConfig.network,
       stakerConfig.executionClient,
       stakerConfig.enableWeb3signer,
-      currentWeb3signerPkg
+      web3signer?.dnpName,
+      currentWeb3signerPkg?.version
     );
   }
 
@@ -525,64 +526,51 @@ function setStakerConfigOnDb<T extends Network>({
 }
 
 function checkLodestarMinVersions(
-  lodestarDnpName: string,
+  network: Network,
   selectedExecClient: StakerItemOk<Network, "execution">,
   isSignerSelected: boolean | undefined,
-  web3signerPkg: InstalledPackageDataApiReturn | undefined
+  web3signerDnpName: Signer<Network> | undefined,
+  web3signerVersion: string | undefined
 ): void {
-  const lodestarMinVersions =
-    params.lodestarStakersMinimumVersions[lodestarDnpName];
+  const lodestarMinVersions = lodestarStakersMinimumVersions[network];
 
   if (!lodestarMinVersions) {
-    throw Error(
-      `Lodestar ${lodestarDnpName} minimum versions are not defined.`
-    );
+    throw Error(`Lodestar ${network} minimum versions are not defined.`);
   }
 
   const selectedExecClientVersion = selectedExecClient.data?.metadata.version;
 
   //Throw error if execution client version cannot be fetched
-  if (selectedExecClientVersion === undefined) {
+  if (!selectedExecClientVersion || selectedExecClient.dnpName === "") {
     throw Error(
       `Execution client ${selectedExecClient.dnpName} version could not be fetched.`
     );
   }
 
-  checkStakersItemLodestarCompatibility({
-    version: selectedExecClientVersion,
-    minVersion: lodestarMinVersions[selectedExecClient.dnpName],
-    dnpName: selectedExecClient.dnpName
-  });
-
-  if (!isSignerSelected || !web3signerPkg) return;
-
-  const selectedSignerVersion = web3signerPkg.version;
-
-  if (!selectedSignerVersion) {
+  if (
+    lt(
+      selectedExecClientVersion,
+      lodestarMinVersions[selectedExecClient.dnpName]
+    )
+  ) {
     throw Error(
-      `Signer ${web3signerPkg.dnpName} version could not be fetched.`
+      `Execution client ${
+        selectedExecClient.dnpName
+      } version ${selectedExecClientVersion} is not compatible with Lodestar. Minimum version required: ${
+        lodestarMinVersions[selectedExecClient.dnpName]
+      }`
     );
   }
 
-  checkStakersItemLodestarCompatibility({
-    version: selectedSignerVersion,
-    minVersion: lodestarMinVersions[web3signerPkg.dnpName],
-    dnpName: web3signerPkg.dnpName
-  });
-}
+  if (!isSignerSelected || !web3signerDnpName) return;
 
-function checkStakersItemLodestarCompatibility({
-  version,
-  minVersion,
-  dnpName
-}: {
-  version: string;
-  minVersion: string;
-  dnpName: DnpName;
-}): void {
-  if (lt(version, minVersion)) {
+  if (!web3signerVersion) {
+    throw Error(`Signer ${web3signerDnpName} version could not be fetched.`);
+  }
+
+  if (lt(web3signerVersion, lodestarMinVersions[web3signerDnpName])) {
     throw Error(
-      `${dnpName} version ${version} is not compatible with Lodestar. Minimum version required: ${minVersion}`
+      `Signer ${selectedExecClient.dnpName} version ${web3signerVersion} is not compatible with Lodestar. Minimum version required: ${lodestarMinVersions[web3signerDnpName]}`
     );
   }
 }
