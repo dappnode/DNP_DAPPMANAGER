@@ -2,9 +2,9 @@
   display: flex;
   flex-direction: column;
 
-  /* Spacer
-   ======
-   To generate a responsive design with flexbox 
+  /* 
+   * Spacer
+   * To generate a responsive design with flexbox 
   */
   > .spacer {
     flex: auto;
@@ -23,8 +23,10 @@
   }
 }
 
-/* Sidenav-item
-   ============
+/* 
+ * ============
+ * Sidenav-item
+ * ============
  */
 
 /* Remember specificity order rules to override bootstrap */
@@ -66,32 +68,47 @@
   }
 }
 
-/* Responsive */
-@media only screen and (max-width: 40rem) {
-  .sidenav-item {
-    border: 0;
-  }
+/* 
+ * Funded-by
+ */
 
-  #sidebar .sidebar-media-footer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
+.funded-by-text {
+  opacity: 0.3;
+  text-align: center;
+}
+/* Controls the layout of the logos, all in one row with equal spacing */
+.funded-by-logos {
+  --spacing: 0.7rem;
+  display: grid;
+  grid-auto-columns: auto;
+  grid-auto-flow: column;
+  /* Auto-space the items only in-between, hard to achieve with flex */
+  grid-gap: var(--spacing);
+  padding: var(--spacing);
+}
+.funded-by-logo {
+  opacity: 0.15;
+  transition: opacity 500ms ease;
+  &:hover {
+    opacity: 0.5;
   }
 }
 
-/* Responsive */
+/* If the screen width is less or equal than 640 then display the funded by in flex columnd direction */
 @media only screen and (max-width: 40rem) {
-  .sidenav-item {
-    border: 0;
-  }
-
-  #sidebar .sidebar-media-footer {
-    display: grid;
+  .funded-by-logos {
     grid-template-columns: repeat(2, 1fr);
+    grid-auto-flow: row;
+    align-items: center;
   }
-}
+  .funded-by-text {
+    font-size: 8px;
+  }
+  .funded-by-logo {
+    max-width: 60%;
+    max-height: 60%;
+  }
 
-/* Responsive */
-@media only screen and (max-width: 40rem) {
   .sidenav-item {
     border: 0;
   }
