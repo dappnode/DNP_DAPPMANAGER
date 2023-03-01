@@ -124,6 +124,13 @@ export default function Eth() {
         setUseCheckpointSync={setUseCheckpointSync}
       />
 
+      {!isEqual(ethClientTarget, target) && target !== "remote" && (
+        <Alert variant="warning">
+          Be careful! Changing the full node clients will change your staker
+          clients, too.
+        </Alert>
+      )}
+
       <div style={{ textAlign: "end" }}>
         <Button
           variant="dappnode"
