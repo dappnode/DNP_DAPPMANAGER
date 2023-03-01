@@ -21,11 +21,6 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       </NavLink>
 
       <div className="nav">
-        {screenWidth > 640 && (
-          <div className="sidenav-item">
-            <div className="subheader">ADMIN UI</div>
-          </div>
-        )}
         {sidenavItems.map(item => (
           <NavLink
             key={item.name}
