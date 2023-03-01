@@ -105,7 +105,7 @@ export default function Eth() {
           <strong>Execution Client:</strong>{" "}
           {prettyDnpName(ethClientTarget.execClient)}
           <br />
-          <strong>Consensu Client:</strong>{" "}
+          <strong>Consensus Client:</strong>{" "}
           {prettyDnpName(ethClientTarget.consClient)}
           <br />
           <strong>Status:</strong>{" "}
