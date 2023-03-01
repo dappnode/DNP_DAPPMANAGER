@@ -194,36 +194,43 @@ export default function StakerNetwork<T extends Network>({
   /**
    * Set new staker config
    */
-  async function setNewConfig() {
+  async function setNewConfig(isLaunchpad: boolean) {
     try {
       // Make sure there are changes
       if (changes) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
-        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-          confirm({
-            title: `Staker configuration`,
-            text:
-              "Are you sure you want to implement this staker configuration?",
-            buttons: [
-              {
-                label: "Continue",
-                onClick: () => resolve(true)
-              }
-            ]
-          });
-        });
-        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-          confirm({
-            title: `Disclaimer`,
-            text: disclaimer,
-            buttons: [
-              {
-                label: "Continue",
-                onClick: () => resolve(true)
-              }
-            ]
-          });
-        });
+        if (!isLaunchpad) {
+          await new Promise(
+            (resolve: (confirmOnSetConfig: boolean) => void) => {
+              confirm({
+                title: `Staker configuration`,
+                text:
+                  "Are you sure you want to implement this staker configuration?",
+                buttons: [
+                  {
+                    label: "Continue",
+                    onClick: () => resolve(true)
+                  }
+                ]
+              });
+            }
+          );
+          await new Promise(
+            (resolve: (confirmOnSetConfig: boolean) => void) => {
+              confirm({
+                title: `Disclaimer`,
+                text: disclaimer,
+                buttons: [
+                  {
+                    label: "Continue",
+                    onClick: () => resolve(true)
+                  }
+                ]
+              });
+            }
+          );
+        }
+
         setReqStatus({ loading: true });
         await withToast(
           () =>
@@ -243,7 +250,7 @@ export default function StakerNetwork<T extends Network>({
                   newMevBoost?.status === "ok"
                     ? { ...newMevBoost, data: undefined }
                     : newMevBoost,
-                enableWeb3signer: newEnableWeb3signer
+                enableWeb3signer: isLaunchpad ? true : newEnableWeb3signer
               }
             }),
           {
@@ -290,7 +297,7 @@ export default function StakerNetwork<T extends Network>({
           <hr />
           <Button
             disabled={!allStakerItemsOk}
-            onClick={() => setShowLaunchpadValidators(!showLaunchpadValidators)}
+            onClick={() => setShowLaunchpadValidators(true)}
             variant="dappnode"
           >
             <FaEthereum /> Staking Launchpad
@@ -377,7 +384,7 @@ export default function StakerNetwork<T extends Network>({
             <Button
               variant="dappnode"
               disabled={!changes.isAllowed || reqStatus.loading}
-              onClick={setNewConfig}
+              onClick={() => setNewConfig(false)}
             >
               Apply changes
             </Button>
@@ -403,6 +410,7 @@ export default function StakerNetwork<T extends Network>({
               stakerConfig={
                 (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<T>
               }
+              setNewConfig={setNewConfig}
               setShowLaunchpadValidators={setShowLaunchpadValidators}
               setNewExecClient={setNewExecClient}
               setNewConsClient={setNewConsClient}

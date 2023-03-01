@@ -68,10 +68,31 @@
 
   .content {
     text-align: center;
-  }
 
-  .top-button {
-    margin-left: auto;
+    .launchpad-summary {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      > * {
+        margin: 0 2rem;
+        // Do not allow the child elements to be clickable
+        pointer-events: none;
+      }
+    }
+    .launchpad-terms {
+      overflow-y: auto;
+      max-height: 30rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .launchpad-execution,
+    .launchpad-consensus {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-gap: 1rem;
+    }
   }
 
   .bottom-buttons {
@@ -82,8 +103,11 @@
     .next {
       float: right;
     }
-    .back {
+    .left-buttons {
       float: left;
+      .back {
+        margin-right: 1rem;
+      }
     }
 
     // In very small screens, make sure the buttons don't clip to the bottom
@@ -97,49 +121,5 @@
   // Helps automatically place
   .space-between-placeholder {
     margin: 0 !important;
-  }
-
-  // Deprecated horizontal slideshow
-
-  .nav-buttons {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-
-    .dots {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 1rem;
-      .dot {
-        margin: 0 0.75rem;
-        height: 1rem;
-        width: 1rem;
-        border-radius: 50%;
-        background-color: #bcbcbc;
-        &.active {
-          background-color: var(--dappnode-color);
-        }
-      }
-    }
-
-    button {
-      border-radius: 100%;
-      padding: 0.5rem;
-      border: var(--border-style);
-
-      svg {
-        font-size: 2rem;
-      }
-    }
-  }
-
-  .big-centered-button {
-    align-self: baseline;
-    justify-self: center;
-    min-width: 10rem;
-    font-size: 1rem; // Keep sizes stable
-    // Give some bottom space to the button
-    margin-bottom: 3rem;
   }
 }

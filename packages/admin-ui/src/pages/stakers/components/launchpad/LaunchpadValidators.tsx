@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./launchpad-validators.scss";
 import Button from "components/Button";
 import { Network, StakerItemOk } from "@dappnode/common";
 import { StakerConfigGetOk } from "@dappnode/common";
-import MevBoost from "../columns/MevBoost";
-import ExecutionClient from "../columns/ExecutionClient";
-import ConsensusClient from "../columns/ConsensusClient";
-import { VscChromeClose } from "react-icons/vsc";
+import { launchpadSteps } from "./LaunchpadSteps";
 
 export default function LaunchpadValidators<T extends Network>({
   network,
   stakerConfig,
+  setNewConfig,
   setShowLaunchpadValidators,
   setNewExecClient,
   newExecClient,
@@ -26,6 +24,7 @@ export default function LaunchpadValidators<T extends Network>({
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
+  setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
@@ -46,6 +45,7 @@ export default function LaunchpadValidators<T extends Network>({
   defaultCheckpointSync: string;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
+  const [nextEnabled, setNextEnabled] = useState(false);
   const handleNextStep = () => {
     setStepIndex(prevIndex => prevIndex + 1);
   };
@@ -53,111 +53,34 @@ export default function LaunchpadValidators<T extends Network>({
     setStepIndex(prevIndex => prevIndex - 1);
   };
 
-  const steps: {
-    title: string;
-    description: string;
-    component: JSX.Element;
-  }[] = [
-    {
-      title: "Create the validator keystores and do the deposit",
-      description: `To become a ${network.toUpperCase()} validator and participate in the network's Proof of Stake (PoS) consensus mechanism, you will need to create a validator keystore file and make a deposit of at least 32 ETH`,
-      component: (
-        <Button
-          variant="dappnode"
-          onClick={() => {
-            window.open(
-              network === "mainnet"
-                ? "https://launchpad.ethereum.org/"
-                : network === "prater"
-                ? "https://goerli.launchpad.ethereum.org/"
-                : "https://launchpad.gnosis.gateway.fm/"
-            );
-          }}
-        >
-          {network.toUpperCase()} Launchpad
-        </Button>
-      )
-    },
-    {
-      title: "Select the Execution Client",
-      description:
-        "Select the execution client you want to use to run the validator node. The execution client is the software that executes the Ethereum 2.0 consensus protocol.",
-      component: (
-        <>
-          {stakerConfig.executionClients.map((executionClient, i) => (
-            <ExecutionClient<T>
-              key={i}
-              executionClient={executionClient}
-              setNewExecClient={setNewExecClient}
-              isSelected={executionClient.dnpName === newExecClient?.dnpName}
-            />
-          ))}
-        </>
-      )
-    },
-    {
-      title: "Select the Consensus Client",
-      description:
-        "Select the consensus client you want to use to run the validator node. The consensus client is the software that manages the validator keys and signs blocks.",
-      component: (
-        <>
-          {stakerConfig.consensusClients.map((consensusClient, i) => (
-            <ConsensusClient<T>
-              key={i}
-              consensusClient={consensusClient}
-              setNewConsClient={setNewConsClient}
-              newConsClient={newConsClient}
-              isSelected={consensusClient.dnpName === newConsClient?.dnpName}
-              graffitiError={graffitiError}
-              feeRecipientError={feeRecipientError}
-              defaultGraffiti={defaultGraffiti}
-              defaultFeeRecipient={defaultFeeRecipient}
-              defaultCheckpointSync={defaultCheckpointSync}
-            />
-          ))}
-        </>
-      )
-    },
-    /**{
-      title: "Set the default Fee Recipient",
-      description:
-        "Set the default fee recipient for the validator(s). The fee recipient is the address that will receive the validator's fees. You can change it at any time.",
-      component: <></>
-    },*/
-    {
-      title: "Enable MEV boost and select its relays",
-      description:
-        "Select the MEV boost relays you want to use to run the validator node. The MEV boost relays are the software that executes the Ethereum 2.0 consensus protocol.",
-      component: (
-        <MevBoost
-          network={network}
-          mevBoost={stakerConfig.mevBoost}
-          newMevBoost={newMevBoost}
-          setNewMevBoost={setNewMevBoost}
-          isSelected={stakerConfig.mevBoost.dnpName === newMevBoost?.dnpName}
-        />
-      )
-    },
-    {
-      title: "Launch the validator node",
-      description: "",
-      component: <></>
-    }
-  ];
+  useEffect(() => {
+    if (newExecClient && newConsClient) setNextEnabled(true);
+    else setNextEnabled(false);
+  }, [newExecClient, newConsClient]);
+
+  const steps = launchpadSteps<T>({
+    network,
+    stakerConfig,
+    setNewConfig,
+    setShowLaunchpadValidators,
+    setNewExecClient,
+    newExecClient,
+    setNewConsClient,
+    newConsClient,
+    setNewMevBoost,
+    newMevBoost,
+    feeRecipientError,
+    graffitiError,
+    defaultGraffiti,
+    defaultFeeRecipient,
+    defaultCheckpointSync
+  });
 
   const currentStep = steps[stepIndex];
 
   return (
     <div className="stakers-launchpad-container opacity-1">
       <div className="launchpad">
-        <div className="top-button">
-          <Button
-            onClick={() => setShowLaunchpadValidators(false)}
-            variant="danger"
-          >
-            <VscChromeClose />
-          </Button>
-        </div>
         <div className="header">
           <div className="title">{currentStep.title}</div>
           <div className="description">{currentStep.description}</div>
@@ -166,18 +89,28 @@ export default function LaunchpadValidators<T extends Network>({
         <div className="content">{currentStep.component}</div>
 
         <div className="bottom-buttons">
-          {stepIndex !== 0 && (
+          <div className="left-buttons">
+            {stepIndex !== 0 && (
+              <Button
+                onClick={handlePrevStep}
+                variant="outline-secondary"
+                className="back"
+              >
+                Back
+              </Button>
+            )}
             <Button
-              onClick={handlePrevStep}
+              onClick={() => setShowLaunchpadValidators(false)}
               variant="outline-secondary"
-              className="back"
             >
-              Back
+              Cancel
             </Button>
-          )}
+          </div>
+
           {stepIndex !== steps.length - 1 && (
             <Button
               onClick={handleNextStep}
+              disabled={!nextEnabled}
               variant="dappnode"
               className="next"
             >
