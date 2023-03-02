@@ -30,6 +30,7 @@ export const packages: Pick<
   | "packageSetEnvironment"
   | "packageSetPortMappings"
   | "packageStartStop"
+  | "packageStop"
   | "packagesGet"
 > = {
   packageGet: async ({ dnpName }) => {
@@ -146,6 +147,24 @@ export const packages: Pick<
               ...container,
               running: !container.running,
               state: container.running ? "exited" : "running"
+            }
+          : container
+      )
+    }));
+  },
+
+  packageStop: async ({ dnpName, serviceNames }) => {
+    await pause(pkgRestartMs);
+    const dnp = packagesState.get(dnpName);
+    if (!dnp) throw Error(`dnpName ${dnpName} not found`);
+
+    update(dnp.dnpName, d => ({
+      containers: d.containers.map(container =>
+        !serviceNames || serviceNames?.includes(container.serviceName)
+          ? {
+              ...container,
+              running: false,
+              state: "exited"
             }
           : container
       )

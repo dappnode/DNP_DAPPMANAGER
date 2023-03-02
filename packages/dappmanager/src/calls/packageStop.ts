@@ -1,0 +1,85 @@
+import { listPackage } from "../modules/docker/list/index.js";
+import { dockerContainerStop } from "../modules/docker/index.js";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
+import { getServicesSharingPid } from "../utils/pid.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { PackageContainer } from "@dappnode/common";
+
+const dnpsAllowedToStop = [
+  params.ipfsDnpName,
+  params.wifiDnpName,
+  params.HTTPS_PORTAL_DNPNAME
+];
+
+/**
+ * Stops or starts a package containers
+ * @param timeout seconds to stop the package
+ */
+export async function packageStop({
+  dnpName,
+  serviceNames
+}: {
+  dnpName: string;
+  serviceNames?: string[];
+}): Promise<void> {
+  if (!dnpName) throw Error("kwarg containerName must be defined");
+
+  const dnp = await listPackage({ dnpName });
+  const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
+
+  if (dnp.isCore || dnp.dnpName === params.dappmanagerDnpName) {
+    if (dnpsAllowedToStop.includes(dnp.dnpName)) {
+      // whitelisted, ok to stop
+    } else {
+      throw Error("Core packages cannot be stopped");
+    }
+  }
+
+  const targetContainers = dnp.containers.filter(
+    c => !serviceNames || serviceNames.includes(c.serviceName)
+  );
+
+  if (targetContainers.length === 0) {
+    const queryId = [dnpName, ...(serviceNames || [])].join(", ");
+    throw Error(`No targetContainers found for ${queryId}`);
+  }
+
+  //Only leave the containers that are running
+  const runningTargetContainers = targetContainers.filter(c => c.running);
+
+  const servicesSharingPid = getServicesSharingPid(
+    compose,
+    runningTargetContainers
+  );
+
+  if (servicesSharingPid) {
+    const targetContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.targetPidServices.includes(c.serviceName)
+    );
+    const dependantContainersPid = dnp.containers.filter(c =>
+      servicesSharingPid.dependantPidServices.includes(c.serviceName)
+    );
+
+    // First stop dependatPid containers (pid must exist), second stop targetPid containers
+    await containersStop(dependantContainersPid);
+    await containersStop(targetContainersPid);
+  } else {
+    await containersStop(runningTargetContainers);
+  }
+
+  // Emit packages update
+  eventBus.requestPackages.emit();
+}
+
+// Utils
+
+async function containersStop(
+  targetContainers: PackageContainer[]
+): Promise<void> {
+  await Promise.all(
+    targetContainers.map(async c =>
+      dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
+    )
+  );
+}

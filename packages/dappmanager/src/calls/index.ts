@@ -42,6 +42,7 @@ export { packageSentDataDelete } from "./packageSentDataDelete.js";
 export { packageSetEnvironment } from "./packageSetEnvironment.js";
 export { packageSetPortMappings } from "./packageSetPortMappings.js";
 export { packageStartStop } from "./packageStartStop.js";
+export { packageStop } from "./packageStop.js";
 export { packageGettingStartedToggle } from "./packageGettingStartedToggle.js";
 export { passwordChange } from "./passwordChange.js";
 export { passwordIsSecure } from "./passwordIsSecure.js";

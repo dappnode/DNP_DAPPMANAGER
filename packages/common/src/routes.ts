@@ -44,7 +44,8 @@ import {
   Network,
   StakerConfigSet,
   StakerConfigGet,
-  Eth2ClientTarget
+  Eth2ClientTarget,
+  EthClientStatusToSet,
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -226,10 +227,8 @@ export interface Routes {
     target: Eth2ClientTarget;
     sync?: boolean;
     useCheckpointSync?: boolean;
-    deletePrevExecClient?: boolean;
-    deletePrevExecClientVolumes?: boolean;
-    deletePrevConsClient?: boolean;
-    deletePrevConsClientVolumes?: boolean;
+    prevExecClientStatus?: EthClientStatusToSet;
+    prevConsClientStatus?: EthClientStatusToSet;
   }) => Promise<void>;
 
   /**
@@ -496,6 +495,16 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Stops a package containers
+   * @param timeout seconds to stop the package
+   */
+  packageStop: (kwargs: {
+    dnpName: string;
+    serviceNames?: string[];
+    options?: { timeout?: number };
+  }) => Promise<void>;
+
+  /**
    * Changes the user `dappnode`'s password in the host machine
    * Only allows it if the current password has the salt `insecur3`
    */
@@ -738,6 +747,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   packageSetEnvironment: { log: true },
   packageSetPortMappings: { log: true },
   packageStartStop: { log: true },
+  packageStop: { log: true },
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
@@ -773,7 +783,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
 };
 
 // DO NOT REMOVE
