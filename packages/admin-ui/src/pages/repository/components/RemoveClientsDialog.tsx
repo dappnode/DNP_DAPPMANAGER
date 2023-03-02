@@ -1,102 +1,115 @@
 import { Eth2ClientTarget } from "@dappnode/common";
-import { isEqual } from "lodash-es";
-import { useSelector } from "react-redux";
-import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { EthClientStatusToSet } from "../types";
-import { useState } from "react";
 import React from "react";
 import Button from "components/Button";
+import { changeEthClientTarget } from "pages/system/actions";
+import { Alert, ButtonGroup, Modal } from "react-bootstrap";
+import { prettyDnpName } from "utils/format";
 
 export default function RemoveClientsDialog({
   nextTarget,
   useCheckpointSync,
-  setRemoveClientsDialogShown
+  prevExecClientStatus,
+  prevConsClientStatus,
+  prevTarget,
+  removeClientsDialogShown,
+  setRemoveClientsDialogShown,
+  setPrevExecClientStatus,
+  setPrevConsClientStatus
 }: {
   nextTarget: Eth2ClientTarget;
   useCheckpointSync?: boolean;
+  prevExecClientStatus: EthClientStatusToSet;
+  prevConsClientStatus: EthClientStatusToSet;
+  prevTarget: Exclude<Eth2ClientTarget, "remote">;
+  removeClientsDialogShown: boolean;
   setRemoveClientsDialogShown: (removeClientsDialog: boolean) => void;
+  setPrevExecClientStatus: (clientStatus: EthClientStatusToSet) => void;
+  setPrevConsClientStatus: (clientStatus: EthClientStatusToSet) => void;
 }) {
-  //TODO: Is "running" the best status to set as default?
-  const [prevExecClientStatus, setPrevExecClientStatus] = useState<
-    EthClientStatusToSet
-  >("running");
-
-  const [prevConsClientStatus, setPrevConsClientStatus] = useState<
-    EthClientStatusToSet
-  >("running");
-
-  //Get prevTarget from redux (AppThunk async getState)
-  const prevTarget = useSelector(getEthClientTarget);
-
-  // Make sure the target has changed or the call will error
-  if (isEqual(nextTarget, prevTarget)) return;
-
-  if (prevTarget === "remote") return;
-
   return (
-    <>
-      <div className="remove-clients-dialog-container opacity-1">
-        <div className="header">
-          <div className="title">Remove previous client(s)?</div>
-          <div className="description">
-            Do you want to remove the previous client(s)? If you want to switch
-            back to the previous client(s) in the future, you could select
-            'Stop' instead to reduce sync time, but you won't save any disk
-            space.
-            {nextTarget === "remote" && (
-              <>
-                <br />
+    <Modal
+      show={removeClientsDialogShown}
+      onHide={() => setRemoveClientsDialogShown(false)}
+      //backdropClassName="modal-backdrop-dark"
+    >
+      <Modal.Header>
+        <Modal.Title>Remove previous client(s)?</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="description">
+          Do you want to remove the previous client(s)? If you want to switch
+          back to the previous client(s) in the future, you could select{" "}
+          <b>Stop</b> instead to reduce sync time, but you won't save any disk
+          space.
+          {nextTarget === "remote" && (
+            <>
+              <br />
+              <br />
+              <Alert variant="warning">
                 If you are validating or if you want to keep your full node
-                active, you should select 'Keep running'.
-              </>
-            )}
-          </div>
+                active, you should select <b>Keep running</b>.
+              </Alert>
+            </>
+          )}
         </div>
 
         <div className="content">
           {(nextTarget === "remote" ||
             prevTarget?.execClient !== nextTarget.execClient) && (
             <div className="client">
-              <div className="client-name">{prevTarget?.execClient}</div>
-              <Toggle
-                clientStatus={prevExecClientStatus}
-                setClientStatus={setPrevExecClientStatus}
-                canKeepRunning={nextTarget === "remote"}
-              />
+              <div
+                className="client-name"
+                style={{ fontWeight: "bold", fontSize: "large" }}
+              >
+                {prettyDnpName(prevTarget?.execClient)}
+              </div>
+              <div style={{ marginLeft: "auto" }}>
+                <Toggle
+                  clientStatus={prevExecClientStatus}
+                  setClientStatus={setPrevExecClientStatus}
+                  canKeepRunning={nextTarget === "remote"}
+                />
+              </div>
             </div>
           )}
 
           {(nextTarget === "remote" ||
             prevTarget?.consClient !== nextTarget.consClient) && (
-            <div className="client">
-              <div className="client-name">{prevTarget?.consClient}</div>
-              <Toggle
-                clientStatus={prevConsClientStatus}
-                setClientStatus={setPrevConsClientStatus}
-                canKeepRunning={nextTarget === "remote"}
-              />
-            </div>
+            <>
+              <br />
+              <div className="client">
+                <div
+                  className="client-name"
+                  style={{ fontWeight: "bold", fontSize: "large" }}
+                >
+                  {prettyDnpName(prevTarget?.consClient)}
+                </div>
+                <Toggle
+                  clientStatus={prevConsClientStatus}
+                  setClientStatus={setPrevConsClientStatus}
+                  canKeepRunning={nextTarget === "remote"}
+                />
+              </div>
+            </>
           )}
         </div>
-
-        <div className="bottom-buttons">
-          <div className="left-buttons">
-            <Button
-              onClick={() => setRemoveClientsDialogShown(false)}
-              variant="outline-secondary"
-            >
-              Cancel
-            </Button>
-          </div>
-          <Button
-            onClick={() => console.log("TODO")} // TODO: Perform actions depending on the selected options
-            variant="dappnode"
-          >
-            Apply
-          </Button>
-        </div>
-      </div>
-    </>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          variant="outline-secondary"
+          onClick={() => setRemoveClientsDialogShown(false)}
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="dappnode"
+          onClick={() => changeEthClientTarget(nextTarget, useCheckpointSync)}
+        >
+          Apply
+        </Button>
+      </Modal.Footer>
+    </Modal>
   );
 }
 
@@ -114,34 +127,32 @@ function Toggle({
   };
 
   return (
-    <div>
-      <label
-        style={{
-          backgroundColor: clientStatus === "stopped" ? "green" : "white"
-        }}
-        onClick={() => handleOptionClick("stopped")}
-      >
-        Stop
-      </label>
-      <label
-        style={{
-          backgroundColor: clientStatus === "removed" ? "green" : "white"
-        }}
+    <ButtonGroup className="toggle">
+      <Button
+        variant={clientStatus === "removed" ? "secondary" : "outline-secondary"}
         onClick={() => handleOptionClick("removed")}
+        className="toggle-btn"
       >
         Remove
-      </label>
-
+      </Button>
+      <Button
+        variant={clientStatus === "stopped" ? "secondary" : "outline-secondary"}
+        onClick={() => handleOptionClick("stopped")}
+        className="toggle-btn"
+      >
+        Stop
+      </Button>
       {canKeepRunning && (
-        <label
-          style={{
-            backgroundColor: clientStatus === "running" ? "green" : "white"
-          }}
+        <Button
+          variant={
+            clientStatus === "running" ? "secondary" : "outline-secondary"
+          }
           onClick={() => handleOptionClick("running")}
+          className="toggle-btn"
         >
           Keep running
-        </label>
+        </Button>
       )}
-    </div>
+    </ButtonGroup>
   );
 }

@@ -19,36 +19,54 @@ import Button from "components/Button";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash-es";
+import RemoveClientsDialog from "./RemoveClientsDialog";
+import { EthClientStatusToSet } from "../types";
 
 export default function Eth() {
-  const ethClientTarget = useSelector(getEthClientTarget);
+  const currentEthClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
   const dispatch = useDispatch();
-  const [target, setTarget] = useState<Eth2ClientTarget | null>(
-    ethClientTarget || null
+  const [newTarget, setNewTarget] = useState<Eth2ClientTarget | null>(
+    currentEthClientTarget || null
   );
   const [useCheckpointSync, setUseCheckpointSync] = useState<
     boolean | undefined
   >(undefined);
+  const [removeClientsDialogShown, setRemoveClientsDialogShown] = useState(
+    false
+  );
+  const [prevExecClientStatus, setPrevExecClientStatus] = useState<
+    EthClientStatusToSet
+  >("removed");
+
+  const [prevConsClientStatus, setPrevConsClientStatus] = useState<
+    EthClientStatusToSet
+  >("removed");
 
   useEffect(() => {
-    if (ethClientTarget) {
-      setTarget(ethClientTarget);
+    if (currentEthClientTarget) {
+      setNewTarget(currentEthClientTarget);
     }
-  }, [ethClientTarget]);
+  }, [currentEthClientTarget]);
 
   /**
    * Only shows the checkpointsync switch if ethclient target is
    * the fullnode and the user is changing the client.
    */
   useEffect(() => {
-    if (target !== "remote" && !isEqual(ethClientTarget, target))
+    if (newTarget !== "remote" && !isEqual(currentEthClientTarget, newTarget))
       setUseCheckpointSync(true);
-  }, [target, ethClientTarget]);
+  }, [newTarget, currentEthClientTarget]);
 
   function changeClient() {
-    if (target) dispatch(changeEthClientTarget(target, useCheckpointSync));
+    if (newTarget && !isEqual(newTarget, currentEthClientTarget)) {
+      if (currentEthClientTarget === "remote") {
+        dispatch(changeEthClientTarget(newTarget, useCheckpointSync));
+      } else {
+        setRemoveClientsDialogShown(true); // changeEthClientTarget() called from RemoveClientsDialog
+      }
+    }
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
@@ -94,52 +112,72 @@ export default function Eth() {
       }
   }
   return (
-    <Card className="dappnode-identity">
-      <SubTitle>Ethereum</SubTitle>
-      <div>
-        DAppNode uses smart contracts to access a decentralized respository of
-        DApps. Choose to connect to a remote network or use your own local node
-      </div>
-      {ethClientTarget && ethClientTarget !== "remote" && (
-        <div className="description">
-          <strong>Execution Client:</strong>{" "}
-          {prettyDnpName(ethClientTarget.execClient)}
-          <br />
-          <strong>Consensus Client:</strong>{" "}
-          {prettyDnpName(ethClientTarget.consClient)}
-          <br />
-          <strong>Status:</strong>{" "}
-          {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
+    <>
+      <Card className="dappnode-identity">
+        <SubTitle>Ethereum</SubTitle>
+        <div>
+          DAppNode uses smart contracts to access a decentralized respository of
+          DApps. Choose to connect to a remote network or use your own local
+          node
         </div>
-      )}
+        {currentEthClientTarget && currentEthClientTarget !== "remote" && (
+          <div className="description">
+            <strong>Execution Client:</strong>{" "}
+            {prettyDnpName(currentEthClientTarget.execClient)}
+            <br />
+            <strong>Consensus Client:</strong>{" "}
+            {prettyDnpName(currentEthClientTarget.consClient)}
+            <br />
+            <strong>Status:</strong>{" "}
+            {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
+          </div>
+        )}
 
-      {renderEthMultiClientWarning()}
+        {renderEthMultiClientWarning()}
 
-      <EthMultiClientsAndFallback
-        target={target}
-        onTargetChange={setTarget}
-        fallback={ethClientFallback || "off"}
-        onFallbackChange={changeFallback}
-        useCheckpointSync={useCheckpointSync}
-        setUseCheckpointSync={setUseCheckpointSync}
-      />
+        <EthMultiClientsAndFallback
+          target={newTarget}
+          onTargetChange={setNewTarget}
+          fallback={ethClientFallback || "off"}
+          onFallbackChange={changeFallback}
+          useCheckpointSync={useCheckpointSync}
+          setUseCheckpointSync={setUseCheckpointSync}
+        />
 
-      {!isEqual(ethClientTarget, target) && target !== "remote" && (
-        <Alert variant="warning">
-          Be careful! Changing the full node clients will change your staker
-          clients, too.
-        </Alert>
-      )}
+        {!isEqual(currentEthClientTarget, newTarget) &&
+          newTarget !== "remote" && (
+            <Alert variant="warning">
+              Be careful! Changing the full node clients will change your staker
+              clients, too.
+            </Alert>
+          )}
 
-      <div style={{ textAlign: "end" }}>
-        <Button
-          variant="dappnode"
-          onClick={changeClient}
-          disabled={!target || isEqual(ethClientTarget, target)}
-        >
-          Change
-        </Button>
-      </div>
-    </Card>
+        <div style={{ textAlign: "end" }}>
+          <Button
+            variant="dappnode"
+            onClick={changeClient}
+            disabled={!newTarget || isEqual(currentEthClientTarget, newTarget)}
+          >
+            Change
+          </Button>
+        </div>
+      </Card>
+
+      {newTarget &&
+        currentEthClientTarget &&
+        currentEthClientTarget !== "remote" && (
+          <RemoveClientsDialog
+            nextTarget={newTarget}
+            useCheckpointSync
+            prevExecClientStatus={prevExecClientStatus}
+            prevConsClientStatus={prevConsClientStatus}
+            prevTarget={currentEthClientTarget}
+            removeClientsDialogShown={removeClientsDialogShown}
+            setRemoveClientsDialogShown={setRemoveClientsDialogShown}
+            setPrevExecClientStatus={setPrevExecClientStatus}
+            setPrevConsClientStatus={setPrevConsClientStatus}
+          />
+        )}
+    </>
   );
 }
