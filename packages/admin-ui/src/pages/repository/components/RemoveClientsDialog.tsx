@@ -107,7 +107,9 @@ export default function RemoveClientsDialog({
         </Button>
         <Button
           variant="dappnode"
-          onClick={() =>
+          onClick={() => {
+            setRemoveClientsDialogShown(false);
+
             dispatch(
               changeEthClientTarget(
                 nextTarget,
@@ -115,8 +117,8 @@ export default function RemoveClientsDialog({
                 prevConsClientStatus,
                 useCheckpointSync
               )
-            )
-          }
+            );
+          }}
         >
           Apply
         </Button>
