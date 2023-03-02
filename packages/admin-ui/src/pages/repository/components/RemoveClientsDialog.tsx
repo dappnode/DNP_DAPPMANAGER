@@ -2,7 +2,7 @@ import { Eth2ClientTarget, EthClientStatusToSet } from "@dappnode/common";
 import React from "react";
 import Button from "components/Button";
 import { changeEthClientTarget } from "pages/system/actions";
-import { Alert, ButtonGroup, Modal } from "react-bootstrap";
+import { Alert, Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { prettyDnpName } from "utils/format";
 import { useDispatch } from "react-redux";
 
@@ -65,8 +65,8 @@ export default function RemoveClientsDialog({
               >
                 {prettyDnpName(prevTarget?.execClient)}
               </div>
-              <div style={{ marginLeft: "auto" }}>
-                <Toggle
+              <div className="dropdown-container">
+                <ClientStatusDropdown
                   clientStatus={prevExecClientStatus}
                   setClientStatus={setPrevExecClientStatus}
                   canKeepRunning={nextTarget === "remote"}
@@ -86,11 +86,13 @@ export default function RemoveClientsDialog({
                 >
                   {prettyDnpName(prevTarget?.consClient)}
                 </div>
-                <Toggle
-                  clientStatus={prevConsClientStatus}
-                  setClientStatus={setPrevConsClientStatus}
-                  canKeepRunning={nextTarget === "remote"}
-                />
+                <div className="dropdown-container">
+                  <ClientStatusDropdown
+                    clientStatus={prevConsClientStatus}
+                    setClientStatus={setPrevConsClientStatus}
+                    canKeepRunning={nextTarget === "remote"}
+                  />
+                </div>
               </div>
             </>
           )}
@@ -123,7 +125,7 @@ export default function RemoveClientsDialog({
   );
 }
 
-function Toggle({
+function ClientStatusDropdown({
   clientStatus,
   setClientStatus,
   canKeepRunning
@@ -136,33 +138,40 @@ function Toggle({
     setClientStatus(option);
   };
 
+  const dropdownTitle = (
+    <>
+      {clientStatus === "removed" && "Remove"}
+      {clientStatus === "stopped" && "Stop"}
+      {clientStatus === "running" && "Keep running"}
+    </>
+  );
+
   return (
-    <ButtonGroup className="toggle">
-      <Button
-        variant={clientStatus === "removed" ? "secondary" : "outline-secondary"}
+    <DropdownButton
+      title={dropdownTitle}
+      variant="outline-secondary"
+      className="toggle"
+    >
+      <Dropdown.Item
+        active={clientStatus === "removed"}
         onClick={() => handleOptionClick("removed")}
-        className="toggle-btn"
       >
         Remove
-      </Button>
-      <Button
-        variant={clientStatus === "stopped" ? "secondary" : "outline-secondary"}
+      </Dropdown.Item>
+      <Dropdown.Item
+        active={clientStatus === "stopped"}
         onClick={() => handleOptionClick("stopped")}
-        className="toggle-btn"
       >
         Stop
-      </Button>
+      </Dropdown.Item>
       {canKeepRunning && (
-        <Button
-          variant={
-            clientStatus === "running" ? "secondary" : "outline-secondary"
-          }
+        <Dropdown.Item
+          active={clientStatus === "running"}
           onClick={() => handleOptionClick("running")}
-          className="toggle-btn"
         >
           Keep running
-        </Button>
+        </Dropdown.Item>
       )}
-    </ButtonGroup>
+    </DropdownButton>
   );
 }
