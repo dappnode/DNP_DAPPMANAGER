@@ -7,10 +7,15 @@ import { useState } from "react";
 import React from "react";
 import Button from "components/Button";
 
-export default function RemoveClientsDialog(
-  nextTarget: Eth2ClientTarget,
-  useCheckpointSync?: boolean
-) {
+export default function RemoveClientsDialog({
+  nextTarget,
+  useCheckpointSync,
+  setRemoveClientsDialogShown
+}: {
+  nextTarget: Eth2ClientTarget;
+  useCheckpointSync?: boolean;
+  setRemoveClientsDialogShown: (removeClientsDialog: boolean) => void;
+}) {
   //TODO: Is "running" the best status to set as default?
   const [prevExecClientStatus, setPrevExecClientStatus] = useState<
     EthClientStatusToSet
@@ -52,7 +57,7 @@ export default function RemoveClientsDialog(
           {(nextTarget === "remote" ||
             prevTarget?.execClient !== nextTarget.execClient) && (
             <div className="client">
-              <div className="client-name"></div>
+              <div className="client-name">{prevTarget?.execClient}</div>
               <Toggle
                 clientStatus={prevExecClientStatus}
                 setClientStatus={setPrevExecClientStatus}
@@ -64,7 +69,7 @@ export default function RemoveClientsDialog(
           {(nextTarget === "remote" ||
             prevTarget?.consClient !== nextTarget.consClient) && (
             <div className="client">
-              <div className="client-name">Consensus client</div>
+              <div className="client-name">{prevTarget?.consClient}</div>
               <Toggle
                 clientStatus={prevConsClientStatus}
                 setClientStatus={setPrevConsClientStatus}
@@ -75,6 +80,14 @@ export default function RemoveClientsDialog(
         </div>
 
         <div className="bottom-buttons">
+          <div className="left-buttons">
+            <Button
+              onClick={() => setRemoveClientsDialogShown(false)}
+              variant="outline-secondary"
+            >
+              Cancel
+            </Button>
+          </div>
           <Button
             onClick={() => console.log("TODO")} // TODO: Perform actions depending on the selected options
             variant="dappnode"
