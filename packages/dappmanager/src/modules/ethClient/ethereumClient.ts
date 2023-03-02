@@ -3,6 +3,7 @@ import {
   ConsensusClientMainnet,
   Eth2ClientTarget,
   EthClientRemote,
+  EthClientStatusToSet,
   ExecutionClientMainnet
 } from "@dappnode/common";
 import * as db from "../../db/index.js";
@@ -11,6 +12,7 @@ import { logs } from "../../logs.js";
 import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
+import { packageStop } from "../../calls/packageStop.js";
 import { packageRemove } from "../../calls/packageRemove.js";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { parseServiceNetworks } from "../compose/networks.js";
@@ -61,10 +63,8 @@ export class EthereumClient {
     nextTarget: Eth2ClientTarget,
     sync: boolean,
     useCheckpointSync: boolean,
-    deletePrevExecClient: boolean,
-    deletePrevExecClientVolumes: boolean,
-    deletePrevConsClient: boolean,
-    deletePrevConsClientVolumes: boolean
+    prevExecClientStatus: EthClientStatusToSet,
+    prevConsClientStatus: EthClientStatusToSet
   ): Promise<void> {
     const currentTarget = this.computeEthereumTarget();
     // Return if the target is the same
@@ -72,23 +72,34 @@ export class EthereumClient {
     // Remove clients if currentTarge is !== remote
     if (currentTarget !== "remote") {
       // Remove Execution client
-      if (deletePrevExecClient)
+      if (prevExecClientStatus === "removed") {
         await packageRemove({
           dnpName: currentTarget.execClient,
-          deleteVolumes: deletePrevExecClientVolumes
+          deleteVolumes: true
         }).catch(e => logs.error(`Error removing prev exec client: ${e}`));
+      } else if (prevExecClientStatus === "stopped") {
+        await packageStop({
+          dnpName: currentTarget.execClient
+        });
+      }
+
       // Remove Consensus client
-      if (deletePrevConsClient)
+      if (prevConsClientStatus === "removed") {
         await packageRemove({
           dnpName: currentTarget.consClient,
-          deleteVolumes: deletePrevConsClientVolumes
+          deleteVolumes: true
         }).catch(e => logs.error(`Error removing prev cons client: ${e}`));
+      } else if (prevExecClientStatus === "stopped") {
+        await packageStop({
+          dnpName: currentTarget.execClient
+        });
+      }
     }
 
     if (nextTarget === "remote") {
       db.ethClientRemote.set(EthClientRemote.on);
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
-      if (!deletePrevExecClient && currentTarget !== "remote")
+      if (prevExecClientStatus !== "running" && currentTarget !== "remote")
         await this.setDefaultEthClientFullNode({
           dnpName: currentTarget.execClient,
           removeAlias: true

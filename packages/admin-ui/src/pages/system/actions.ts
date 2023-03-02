@@ -4,123 +4,26 @@ import { prettyDnpName, prettyVolumeName } from "utils/format";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
-import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { Eth2ClientTarget } from "@dappnode/common";
-import { isEqual } from "lodash-es";
+import { Eth2ClientTarget, EthClientStatusToSet } from "@dappnode/common";
 
 // Redux Thunk actions
 
 export const changeEthClientTarget = (
   nextTarget: Eth2ClientTarget,
+  prevExecClientStatus: EthClientStatusToSet,
+  prevConsClientStatus: EthClientStatusToSet,
   useCheckpointSync?: boolean
 ): AppThunk => async (_, getState) => {
-  const prevTarget = getEthClientTarget(getState());
-
-  // Make sure the target has changed or the call will error
-  if (isEqual(nextTarget, prevTarget)) return;
-
-  // If the previous target is package, ask the user if deleteVolumes
-  let deletePrevExecClient = false;
-  let deletePrevExecClientVolumes = false;
-  let deletePrevConsClient = false;
-  let deletePrevConsClientVolumes = false;
-  if (prevTarget && prevTarget !== "remote") {
-    if (
-      nextTarget === "remote" ||
-      nextTarget.execClient !== prevTarget.execClient
-    ) {
-      await new Promise<void>(resolve =>
-        confirm({
-          title: `Remove ${prettyDnpName(prevTarget.execClient)}?`,
-          text: `Do you want to remove your current Execution Layer (EL) client? This action cannot be undone. You can keep the data volume to avoid needing to resync from scratch next time you install the same EL client. Keeping the data volume will NOT clear space in your hard drive.`,
-          buttons: [
-            {
-              label: "Keep node running",
-              variant: "danger",
-              onClick: () => {
-                deletePrevExecClient = false;
-                deletePrevExecClientVolumes = false;
-                resolve();
-              }
-            },
-            {
-              label: "Remove and keep volumes",
-              variant: "warning",
-              onClick: () => {
-                deletePrevExecClient = true;
-                deletePrevExecClientVolumes = false;
-                resolve();
-              }
-            },
-            {
-              label: "Remove and delete volumes",
-              variant: "dappnode",
-              onClick: () => {
-                deletePrevExecClient = true;
-                deletePrevExecClientVolumes = true;
-                resolve();
-              }
-            }
-          ]
-        })
-      );
-    }
-
-    // If the previous target is package, ask the user if deleteVolumes
-    if (
-      nextTarget === "remote" ||
-      nextTarget.consClient !== prevTarget.consClient
-    ) {
-      await new Promise<void>(resolve =>
-        confirm({
-          title: `Remove ${prettyDnpName(prevTarget.consClient)}?`,
-          text: `Do you want to remove your current Consensus Layer (CL) client? This action cannot be undone. You can keep the volume data to avoid resyncing from scratch next time you install the same CL client. Keeping the volume will NOT clear space in your hard drive.`,
-          buttons: [
-            {
-              label: "Keep node running",
-              variant: "danger",
-              onClick: () => {
-                deletePrevConsClient = false;
-                deletePrevConsClientVolumes = false;
-                resolve();
-              }
-            },
-            {
-              label: "Remove and keep volumes",
-              variant: "warning",
-              onClick: () => {
-                deletePrevConsClient = true;
-                deletePrevConsClientVolumes = false;
-                resolve();
-              }
-            },
-            {
-              label: "Remove and delete volumes",
-              variant: "dappnode",
-              onClick: () => {
-                deletePrevConsClient = true;
-                deletePrevConsClientVolumes = true;
-                resolve();
-              }
-            }
-          ]
-        })
-      );
-    }
-  }
-
   await withToastNoThrow(
     () =>
       api.ethClientTargetSet({
         target: nextTarget,
         sync: false,
         useCheckpointSync,
-        deletePrevExecClient,
-        deletePrevExecClientVolumes,
-        deletePrevConsClient,
-        deletePrevConsClientVolumes
+        prevExecClientStatus,
+        prevConsClientStatus
       }),
     {
       message: "Changing Ethereum client...",

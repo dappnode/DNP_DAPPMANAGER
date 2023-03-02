@@ -1,10 +1,10 @@
-import { Eth2ClientTarget } from "@dappnode/common";
-import { EthClientStatusToSet } from "../types";
+import { Eth2ClientTarget, EthClientStatusToSet } from "@dappnode/common";
 import React from "react";
 import Button from "components/Button";
 import { changeEthClientTarget } from "pages/system/actions";
 import { Alert, ButtonGroup, Modal } from "react-bootstrap";
 import { prettyDnpName } from "utils/format";
+import { useDispatch } from "react-redux";
 
 export default function RemoveClientsDialog({
   nextTarget,
@@ -27,11 +27,12 @@ export default function RemoveClientsDialog({
   setPrevExecClientStatus: (clientStatus: EthClientStatusToSet) => void;
   setPrevConsClientStatus: (clientStatus: EthClientStatusToSet) => void;
 }) {
+  const dispatch = useDispatch();
+
   return (
     <Modal
       show={removeClientsDialogShown}
       onHide={() => setRemoveClientsDialogShown(false)}
-      //backdropClassName="modal-backdrop-dark"
     >
       <Modal.Header>
         <Modal.Title>Remove previous client(s)?</Modal.Title>
@@ -104,7 +105,16 @@ export default function RemoveClientsDialog({
         </Button>
         <Button
           variant="dappnode"
-          onClick={() => changeEthClientTarget(nextTarget, useCheckpointSync)}
+          onClick={() =>
+            dispatch(
+              changeEthClientTarget(
+                nextTarget,
+                prevExecClientStatus,
+                prevConsClientStatus,
+                useCheckpointSync
+              )
+            )
+          }
         >
           Apply
         </Button>

@@ -1127,6 +1127,8 @@ export type NewFeatureId =
   | "system-auto-updates"
   | "change-host-password";
 
+export type EthClientStatusToSet = "removed" | "running" | "stopped";
+
 /**
  * ==========
  * SIGNATURES

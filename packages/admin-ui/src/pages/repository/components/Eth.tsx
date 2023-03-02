@@ -5,7 +5,11 @@ import {
   getEthClientStatus,
   getEthClientFallback
 } from "services/dappnodeStatus/selectors";
-import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
+import {
+  EthClientFallback,
+  Eth2ClientTarget,
+  EthClientStatusToSet
+} from "@dappnode/common";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
@@ -20,7 +24,6 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash-es";
 import RemoveClientsDialog from "./RemoveClientsDialog";
-import { EthClientStatusToSet } from "../types";
 
 export default function Eth() {
   const currentEthClientTarget = useSelector(getEthClientTarget);
@@ -62,7 +65,14 @@ export default function Eth() {
   function changeClient() {
     if (newTarget && !isEqual(newTarget, currentEthClientTarget)) {
       if (currentEthClientTarget === "remote") {
-        dispatch(changeEthClientTarget(newTarget, useCheckpointSync));
+        dispatch(
+          changeEthClientTarget(
+            newTarget,
+            prevExecClientStatus,
+            prevConsClientStatus,
+            useCheckpointSync
+          )
+        );
       } else {
         setRemoveClientsDialogShown(true); // changeEthClientTarget() called from RemoveClientsDialog
       }

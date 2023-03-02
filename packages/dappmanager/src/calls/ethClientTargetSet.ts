@@ -1,4 +1,4 @@
-import { Eth2ClientTarget } from "@dappnode/common";
+import { Eth2ClientTarget, EthClientStatusToSet } from "@dappnode/common";
 import { ethereumClient } from "../modules/ethClient/index.js";
 
 /**
@@ -8,18 +8,14 @@ export async function ethClientTargetSet({
   target,
   sync = false,
   useCheckpointSync = false,
-  deletePrevExecClient = false,
-  deletePrevExecClientVolumes = false,
-  deletePrevConsClient = false,
-  deletePrevConsClientVolumes = false
+  prevExecClientStatus = "running",
+  prevConsClientStatus = "running"
 }: {
   target: Eth2ClientTarget;
   sync?: boolean;
   useCheckpointSync?: boolean;
-  deletePrevExecClient?: boolean;
-  deletePrevExecClientVolumes?: boolean;
-  deletePrevConsClient?: boolean;
-  deletePrevConsClientVolumes?: boolean;
+  prevExecClientStatus?: EthClientStatusToSet;
+  prevConsClientStatus?: EthClientStatusToSet;
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
 
@@ -27,9 +23,7 @@ export async function ethClientTargetSet({
     target,
     sync,
     useCheckpointSync,
-    deletePrevExecClient,
-    deletePrevExecClientVolumes,
-    deletePrevConsClient,
-    deletePrevConsClientVolumes
+    prevExecClientStatus,
+    prevConsClientStatus
   );
 }
