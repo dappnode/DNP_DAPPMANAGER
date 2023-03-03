@@ -35,6 +35,8 @@ import {
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import { ReqStatus } from "types";
+import "./columns.scss";
+import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
 
@@ -45,6 +47,8 @@ export default function StakerNetwork<T extends Network>({
   network: T;
   description: string;
 }) {
+  // Context
+  const { theme } = React.useContext(ThemeContext);
   // Launchpad
   const [showLaunchpadValidators, setShowLaunchpadValidators] = useState(false);
   const [allStakerItemsOk, setAllStakerItemsOk] = useState<boolean>(false);
@@ -275,7 +279,7 @@ export default function StakerNetwork<T extends Network>({
   }
 
   return (
-    <>
+    <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
       {currentStakerConfigReq.data ? (
         <Card>
           <p>
@@ -433,6 +437,6 @@ export default function StakerNetwork<T extends Network>({
       ) : (
         <ErrorView error={"No data"} hideIcon red />
       )}
-    </>
+    </div>
   );
 }

@@ -8,7 +8,32 @@
   --dappnode-links-color: #00b1f4;
   --dappnode-links-darker-color: #007dfc;
   --dappnode-complimentary-color: #bc2f39;
+  // Border colors
   --border-color: #e5e5e5;
+  --color-light-border: #e5e5e5;
+  --color-dark-border: #616161;
+  --border-style-light: var(--border-size) solid var(--color-light-border);
+  --border-style-dark: var(--border-size) solid var(--color-dark-border);
+
+  // LIGHT mode
+  --color-light-background-sidebar-topbar: white; // Used by sidebar and topbar
+  --color-light-background-main: #f7f9f9; // Used by main
+
+  // DARK mode
+  --color-dark-background-sidebar: #212121; // Used by sidebar
+  --color-dark-background-topbar: #313131; // Used by topbar
+  --color-dark-background-main: #313131; // Used by main
+  --color-dark-maintext: #ffffff; // Used by main
+  --color-dark-secondarytext: #dddddd; // Used by main
+  --color-dark-tertiarytext: #cccccc; // Used by main
+  --color-dark-quaternarytext: #c1c1c1; // Used by main
+  --color-dark-card: #414141; // Used by cards
+  --color-dark-card-hover: #6a6a6a; // Used by cards
+
+  // Buttons
+  --dappnode-white-color: #fff; // Used by buttons
+
+  // Alert colors
   /* Danger color from the complimentary color of #2fbcb2 (dappnode-color) */
   /* Warning color from From https://www.colorcombos.com/color-schemes/429/ColorCombo429.html */
   --danger-color: var(--dappnode-complimentary-color);
@@ -119,14 +144,16 @@
 
 /* Toast variations, now they match the bootstrap color scheme */
 
-.Toastify__toast--success {
-  background: var(--success-color);
+.Toastify__toast--success,
+.Toastify__toast--default {
+  background: var(--success-color) !important;
+  color: var(--color-dark-maintext) !important;
 }
 .Toastify__toast--warning {
-  background: var(--warning-color);
+  background: var(--warning-color) !important;
 }
 .Toastify__toast--error {
-  background: var(--danger-color);
+  background: var(--danger-color) !important;
 }
 
 /* Edit bootstrap styles */

@@ -7,6 +7,22 @@
   margin-top: 15px;
 }
 
+.stakers-dark {
+  .consensus-client,
+  .execution-client,
+  .mev-boost,
+  .remote-signer {
+    .title {
+      color: var(--color-dark-maintext) !important;
+    }
+    &.isSelected {
+      .title {
+        color: var(--dappnode-color) !important;
+      }
+    }
+  }
+}
+
 .consensus-client,
 .execution-client,
 .mev-boost,
@@ -30,12 +46,11 @@
   > *:not(:last-child) {
     margin-bottom: 1rem;
   }
-
   // Button feel
   &:hover:not(.isSelected) {
+    cursor: pointer;
     border-color: rgb(218, 218, 218);
     background-color: rgb(218, 218, 218);
-    cursor: pointer;
   }
   &.isSelected {
     border-color: var(--dappnode-color);

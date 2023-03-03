@@ -51,7 +51,6 @@ export default function DappnodeIdentity() {
 
   const Icon = () => (
     <React.Fragment>
-      <span className="dappnode-name svg-text mr-2">{name}</span>
       {seed ? (
         <img src={makeBlockie(seed)} className="blockies-icon" alt="icon" />
       ) : (
