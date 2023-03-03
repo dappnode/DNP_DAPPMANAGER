@@ -2,7 +2,6 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import "./columns.scss";
 import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";

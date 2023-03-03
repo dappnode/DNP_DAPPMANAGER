@@ -34,6 +34,8 @@ import {
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import { ReqStatus } from "types";
+import "./columns.scss";
+import { ThemeContext } from "App";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -42,6 +44,8 @@ export default function StakerNetwork<T extends Network>({
   network: T;
   description: string;
 }) {
+  // Context
+  const { theme } = React.useContext(ThemeContext);
   // Error
   const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
     null
@@ -254,7 +258,7 @@ export default function StakerNetwork<T extends Network>({
   }
 
   return (
-    <>
+    <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
       {currentStakerConfigReq.data ? (
         <>
           <Card>
@@ -385,6 +389,6 @@ export default function StakerNetwork<T extends Network>({
       ) : (
         <ErrorView error={"No data"} hideIcon red />
       )}
-    </>
+    </div>
   );
 }
