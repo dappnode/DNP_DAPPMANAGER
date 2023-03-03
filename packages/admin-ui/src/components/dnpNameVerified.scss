@@ -24,7 +24,6 @@
   }
   .verified-badge {
     font-size: 85%;
-    // align-self: end;  // #### Not sure this is necessary
-    color: var(--dappnode-color);
+    color: var(--dappnode-color) !important;
   }
 }
