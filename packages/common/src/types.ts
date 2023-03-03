@@ -1301,6 +1301,13 @@ export interface StakerConfigGet<T extends Network> {
   web3Signer: StakerItem<T, "signer">;
   mevBoost: StakerItem<T, "mev-boost">;
 }
+
+export interface StakerConfigGetOk<T extends Network> {
+  executionClients: StakerItemOk<T, "execution">[];
+  consensusClients: StakerItemOk<T, "consensus">[];
+  web3signer: StakerItemOk<T, "signer">;
+  mevBoost: StakerItemOk<T, "mev-boost">;
+}
 export interface StakerConfigSet<T extends Network> {
   network: T;
   executionClient?: StakerItemOk<T, "execution">;

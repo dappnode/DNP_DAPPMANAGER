@@ -4,7 +4,6 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import "./columns.scss";
 import { Network, StakerItem } from "@dappnode/common";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";

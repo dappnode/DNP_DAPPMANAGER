@@ -3,7 +3,6 @@ import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
-import "./columns.scss";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -157,7 +156,7 @@ function Relay<T extends Network>({
         {relay.ofacCompliant === undefined ? (
           "-"
         ) : relay.ofacCompliant ? (
-          <MdCheck color="#1ccec0" />
+          <MdCheck color="#00b1f4" />
         ) : (
           <MdClose color="#ff0000" />
         )}
