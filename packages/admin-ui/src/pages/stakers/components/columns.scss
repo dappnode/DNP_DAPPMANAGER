@@ -15,6 +15,11 @@
     .title {
       color: var(--color-dark-maintext) !important;
     }
+    &.isSelected {
+      .title {
+        color: var(--dappnode-color) !important;
+      }
+    }
   }
 }
 
