@@ -63,10 +63,6 @@
       color: var(--color-dark-maintext);
     }
 
-    .status-badge {
-      color: #4d4d4d;
-    }
-
     // ====================
     // Bootstrap components
     // ====================
@@ -113,8 +109,16 @@
   #topbar {
     background-color: var(--color-dark-background-topbar);
     .tn-dropdown .tn-dropdown-toggle {
-      color: var(--dappnode-strong-main-color) !important;
+      color: var(--color-dark-maintext);
       opacity: 1;
+    }
+    .tn-dropdown {
+      > .menu {
+        &.show {
+          background-color: var(--color-dark-card);
+          color: var(--color-dark-maintext);
+        }
+      }
     }
   }
   .body {
