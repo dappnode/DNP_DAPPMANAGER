@@ -33,9 +33,7 @@ export default function Eth() {
   const [newTarget, setNewTarget] = useState<Eth2ClientTarget | null>(
     currentEthClientTarget || null
   );
-  const [useCheckpointSync, setUseCheckpointSync] = useState<
-    boolean | undefined
-  >(undefined);
+  const [useCheckpointSync, setUseCheckpointSync] = useState<boolean>(true); // TODO: Check this
   const [removeClientsDialogShown, setRemoveClientsDialogShown] = useState(
     false
   );
