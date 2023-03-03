@@ -15,7 +15,7 @@ export const changeEthClientTarget = (
   prevExecClientStatus: EthClientStatusToSet,
   prevConsClientStatus: EthClientStatusToSet,
   useCheckpointSync?: boolean
-): AppThunk => async (_, getState) => {
+): AppThunk => async dispatch => {
   await withToastNoThrow(
     () =>
       api.ethClientTargetSet({

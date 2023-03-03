@@ -39,11 +39,11 @@ export default function Eth() {
   );
   const [prevExecClientStatus, setPrevExecClientStatus] = useState<
     EthClientStatusToSet
-  >("removed");
+  >("running");
 
   const [prevConsClientStatus, setPrevConsClientStatus] = useState<
     EthClientStatusToSet
-  >("removed");
+  >("running");
 
   useEffect(() => {
     if (currentEthClientTarget) {

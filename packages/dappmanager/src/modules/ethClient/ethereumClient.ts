@@ -69,6 +69,7 @@ export class EthereumClient {
     const currentTarget = this.computeEthereumTarget();
     // Return if the target is the same
     if (isEqual(nextTarget, currentTarget)) return;
+
     // Remove clients if currentTarge is !== remote
     if (currentTarget !== "remote") {
       // Remove Execution client
@@ -80,7 +81,7 @@ export class EthereumClient {
       } else if (prevExecClientStatus === "stopped") {
         await packageStop({
           dnpName: currentTarget.execClient
-        });
+        }).catch(e => logs.error(`Error stopping prev exec client: ${e}`));
       }
 
       // Remove Consensus client
@@ -89,10 +90,10 @@ export class EthereumClient {
           dnpName: currentTarget.consClient,
           deleteVolumes: true
         }).catch(e => logs.error(`Error removing prev cons client: ${e}`));
-      } else if (prevExecClientStatus === "stopped") {
+      } else if (prevConsClientStatus === "stopped") {
         await packageStop({
-          dnpName: currentTarget.execClient
-        });
+          dnpName: currentTarget.consClient
+        }).catch(e => logs.error(`Error stopping prev cons client: ${e}`));
       }
     }
 
