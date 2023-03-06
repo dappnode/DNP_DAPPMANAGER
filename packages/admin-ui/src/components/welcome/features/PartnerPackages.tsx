@@ -1,5 +1,6 @@
 import { PartnerExtraPackage } from "@dappnode/common";
-import React, { useState } from "react";
+import { api } from "api";
+import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
 
 /**
@@ -16,6 +17,16 @@ export default function PartnerPackages({
   const [partnerPackages, setPartnerPackages] = useState<PartnerExtraPackage[]>(
     []
   );
+
+  // Call partnerExtraPkgsGet() on mount
+  useEffect(() => {
+    async function fetchPartnerPackages(){
+      setPartnerPackages(await api.partnerExtraPkgsGet());
+    }
+
+    fetchPartnerPackages();
+
+  }, []);
 
   async function install() {
     // Move ahead
@@ -36,10 +47,7 @@ export default function PartnerPackages({
 
       {/* TODO: Show partner packages in list like packages page */}
 
-      <BottomButtons
-        onBack={onBack}
-        onNext={install}
-      />
+      <BottomButtons onBack={onBack} onNext={install} />
     </>
   );
 }

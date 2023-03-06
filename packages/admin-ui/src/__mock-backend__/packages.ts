@@ -31,6 +31,7 @@ export const packages: Pick<
   | "packageSetPortMappings"
   | "packageStartStop"
   | "packagesGet"
+  | "partnerExtraPkgsGet"
 > = {
   packageGet: async ({ dnpName }) => {
     const dnp = packagesState.get(dnpName);
@@ -152,5 +153,9 @@ export const packages: Pick<
     }));
   },
 
-  packagesGet: async () => Array.from(packagesState.values())
+  packagesGet: async () => Array.from(packagesState.values()),
+
+  partnerExtraPkgsGet: async () => {
+    throw Error(`Not implemented`); // TODO: Implement
+  }
 };

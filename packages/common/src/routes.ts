@@ -44,7 +44,8 @@ import {
   Network,
   StakerConfigSet,
   StakerConfigGet,
-  Eth2ClientTarget
+  Eth2ClientTarget,
+  PartnerExtraPackage,
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -496,6 +497,12 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Return the list of partner packages to be installed during onboarding
+   * @returns Array of partner packages
+   */
+  partnerExtraPkgsGet: () => Promise<PartnerExtraPackage[]>;
+
+  /**
    * Changes the user `dappnode`'s password in the host machine
    * Only allows it if the current password has the salt `insecur3`
    */
@@ -738,6 +745,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   packageSetEnvironment: { log: true },
   packageSetPortMappings: { log: true },
   packageStartStop: { log: true },
+  partnerExtraPkgsGet: { log: true },
   passwordChange: { log: true },
   passwordIsSecure: {},
   poweroffHost: { log: true },
@@ -773,7 +781,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
 };
 
 // DO NOT REMOVE
