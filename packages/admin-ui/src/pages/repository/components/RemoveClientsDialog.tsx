@@ -2,7 +2,7 @@ import { Eth2ClientTarget, EthClientStatusToSet } from "@dappnode/common";
 import React from "react";
 import Button from "components/Button";
 import { changeEthClientTarget } from "pages/system/actions";
-import { Alert, Dropdown, DropdownButton, Modal } from "react-bootstrap";
+import { Alert, ButtonGroup, Modal } from "react-bootstrap";
 import { prettyDnpName } from "utils/format";
 import { useDispatch } from "react-redux";
 
@@ -41,8 +41,8 @@ export default function RemoveClientsDialog({
         <div className="description">
           Do you want to remove the previous client(s)? If you want to switch
           back to the previous client(s) in the future, you could select{" "}
-          <b>Stop</b> instead to reduce sync time, but you won't save any disk
-          space.
+          <b>Stop</b> to reduce sync time, but you won't save any disk
+          space. Choosing <b>Remove</b> will probably free a lot of disk space.
           {nextTarget === "remote" && (
             <>
               <br />
@@ -55,7 +55,16 @@ export default function RemoveClientsDialog({
           )}
         </div>
 
-        <div className="content">
+        <div
+          className="content"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            marginTop: "1rem"
+          }}
+        >
           {(nextTarget === "remote" ||
             prevTarget?.execClient !== nextTarget.execClient) && (
             <div className="client">
@@ -66,7 +75,7 @@ export default function RemoveClientsDialog({
                 {prettyDnpName(prevTarget?.execClient)}
               </div>
               <div className="dropdown-container">
-                <ClientStatusDropdown
+                <Toggle
                   clientStatus={prevExecClientStatus}
                   setClientStatus={setPrevExecClientStatus}
                   canKeepRunning={nextTarget === "remote"}
@@ -78,16 +87,19 @@ export default function RemoveClientsDialog({
           {(nextTarget === "remote" ||
             prevTarget?.consClient !== nextTarget.consClient) && (
             <>
-              <br />
               <div className="client">
                 <div
                   className="client-name"
-                  style={{ fontWeight: "bold", fontSize: "large" }}
+                  style={{
+                    fontWeight: "bold",
+                    fontSize: "large",
+                    marginTop: "1rem"
+                  }}
                 >
                   {prettyDnpName(prevTarget?.consClient)}
                 </div>
                 <div className="dropdown-container">
-                  <ClientStatusDropdown
+                  <Toggle
                     clientStatus={prevConsClientStatus}
                     setClientStatus={setPrevConsClientStatus}
                     canKeepRunning={nextTarget === "remote"}
@@ -127,7 +139,7 @@ export default function RemoveClientsDialog({
   );
 }
 
-function ClientStatusDropdown({
+function Toggle({
   clientStatus,
   setClientStatus,
   canKeepRunning
@@ -140,40 +152,33 @@ function ClientStatusDropdown({
     setClientStatus(option);
   };
 
-  const dropdownTitle = (
-    <>
-      {clientStatus === "removed" && "Remove"}
-      {clientStatus === "stopped" && "Stop"}
-      {clientStatus === "running" && "Keep running"}
-    </>
-  );
-
   return (
-    <DropdownButton
-      title={dropdownTitle}
-      variant="outline-secondary"
-      className="toggle"
-    >
-      <Dropdown.Item
-        active={clientStatus === "removed"}
+    <ButtonGroup className="toggle">
+      <Button
+        variant={clientStatus === "removed" ? "secondary" : "outline-secondary"}
         onClick={() => handleOptionClick("removed")}
+        className="toggle-btn"
       >
         Remove
-      </Dropdown.Item>
-      <Dropdown.Item
-        active={clientStatus === "stopped"}
+      </Button>
+      <Button
+        variant={clientStatus === "stopped" ? "secondary" : "outline-secondary"}
         onClick={() => handleOptionClick("stopped")}
+        className="toggle-btn"
       >
         Stop
-      </Dropdown.Item>
+      </Button>
       {canKeepRunning && (
-        <Dropdown.Item
-          active={clientStatus === "running"}
+        <Button
+          variant={
+            clientStatus === "running" ? "secondary" : "outline-secondary"
+          }
           onClick={() => handleOptionClick("running")}
+          className="toggle-btn"
         >
           Keep running
-        </Dropdown.Item>
+        </Button>
       )}
-    </DropdownButton>
+    </ButtonGroup>
   );
 }
