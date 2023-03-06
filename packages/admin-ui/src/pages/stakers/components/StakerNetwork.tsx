@@ -298,14 +298,19 @@ export default function StakerNetwork<T extends Network>({
           </p>
           <br />
           <p>{description}</p>
-          <hr />
-          <Button
-            disabled={!allStakerItemsOk}
-            onClick={() => setShowLaunchpadValidators(true)}
-            variant="dappnode"
-          >
-            <FaEthereum /> Staking Launchpad
-          </Button>
+          {network === "prater" && (
+            <>
+              <hr />
+              <Button
+                disabled={!allStakerItemsOk}
+                onClick={() => setShowLaunchpadValidators(true)}
+                variant="dappnode"
+              >
+                <FaEthereum /> Staking Launchpad
+              </Button>
+            </>
+          )}
+
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
