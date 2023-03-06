@@ -1390,3 +1390,16 @@ export interface RpcResponse<R = any> {
   result?: R;
   error?: { code: number; message: string; data?: any };
 }
+
+/**
+ * ======================
+ * PARTNER EXTRA PACKAGES
+ * ======================
+ */
+
+export interface PartnerExtraPackage {
+  title: string;
+  description: string;
+  ipfs: string;
+  needsUserInput: boolean;
+}
