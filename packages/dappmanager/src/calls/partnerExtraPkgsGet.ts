@@ -16,6 +16,8 @@ export async function partnerExtraPkgsGet(): Promise<PartnerExtraPackage[]> {
 
     // TODO: If the file does not match the PartnerExtraPackages type, throw an error
 
+    // TODO: Add the avatarUrl to the extra packages
+
     return extraPackages;
   } catch (e) {
     //If the file does not exist, there are no extra packages

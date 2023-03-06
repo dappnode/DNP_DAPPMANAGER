@@ -1402,4 +1402,6 @@ export interface PartnerExtraPackage {
   description: string;
   ipfs: string;
   needsUserInput: boolean;
+  avatarUrl?: string;
+  selectedToInstall?: boolean;
 }
