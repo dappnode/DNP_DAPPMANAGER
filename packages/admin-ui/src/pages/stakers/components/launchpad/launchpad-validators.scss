@@ -30,7 +30,6 @@
   border: var(--border-style);
   background: #fefefe;
   box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
-  color: #666;
 
   /* Sizing */
   overflow-y: auto;
@@ -57,10 +56,11 @@
       font-weight: bold;
       font-size: 2rem; // Titles must be big enough in 100% zoom
       transition: color 0.15s;
+      color: #666 !important;
     }
     .description {
       font-size: 1rem; // Keep sizes stable
-      color: var(--light-text-color);
+      color: var(--light-text-color) !important;
       max-width: 40rem;
       margin: auto;
     }
@@ -68,6 +68,15 @@
 
   .content {
     text-align: center;
+
+    .title,
+    .description {
+      color: #212529 !important;
+    }
+
+    .card {
+      background-color: inherit !important;
+    }
 
     .launchpad-summary {
       display: flex;
@@ -85,6 +94,12 @@
       max-height: 30rem;
       margin-bottom: 2rem;
       text-align: left;
+      .markdown-render {
+        color: #666 !important;
+        p {
+          color: #666 !important;
+        }
+      }
     }
 
     .launchpad-execution,
