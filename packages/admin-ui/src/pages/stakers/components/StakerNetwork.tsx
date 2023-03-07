@@ -60,6 +60,7 @@ export default function StakerNetwork<T extends Network>({
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
+  const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newExecClient, setNewExecClient] = useState<
     StakerItemOk<T, "execution">
   >();
@@ -77,7 +78,6 @@ export default function StakerNetwork<T extends Network>({
   const [defaultGraffiti, setDefaultGraffiti] = useState<string>(
     defaultDappnodeGraffiti
   );
-  const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
   const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
     getDefaultCheckpointSync(network)
   );
@@ -101,7 +101,8 @@ export default function StakerNetwork<T extends Network>({
         executionClients,
         consensusClients,
         mevBoost,
-        web3Signer
+        web3Signer,
+        feeRecipient
       } = currentStakerConfigReq.data;
 
       const executionClient = executionClients.find(ec =>
@@ -119,6 +120,7 @@ export default function StakerNetwork<T extends Network>({
       if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
         setNewMevBoost(mevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
+      if (feeRecipient) setNewFeeRecipient(feeRecipient);
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
@@ -149,9 +151,6 @@ export default function StakerNetwork<T extends Network>({
             graffiti: defaultDappnodeGraffiti
           });
         else setDefaultGraffiti(consensusClient.graffiti);
-
-        if (consensusClient.feeRecipient)
-          setDefaultFeeRecipient(consensusClient.feeRecipient);
       }
 
       // set allStakerItemsOk
@@ -166,10 +165,13 @@ export default function StakerNetwork<T extends Network>({
   }, [currentStakerConfigReq.data]);
 
   useEffect(() => {
-    if (newConsClient) {
-      setFeeRecipientError(validateEthereumAddress(newConsClient.feeRecipient));
+    if (newFeeRecipient)
+      setFeeRecipientError(validateEthereumAddress(newFeeRecipient));
+  }, [newFeeRecipient]);
+
+  useEffect(() => {
+    if (newConsClient)
       setGraffitiError(validateGraffiti(newConsClient.graffiti));
-    }
   }, [newConsClient]);
 
   useEffect(() => {
@@ -328,9 +330,7 @@ export default function StakerNetwork<T extends Network>({
                       consensusClient.dnpName === newConsClient?.dnpName
                     }
                     graffitiError={graffitiError}
-                    feeRecipientError={feeRecipientError}
                     defaultGraffiti={defaultGraffiti}
-                    defaultFeeRecipient={defaultFeeRecipient}
                     defaultCheckpointSync={defaultCheckpointSync}
                   />
                 )
@@ -419,6 +419,8 @@ export default function StakerNetwork<T extends Network>({
               }
               setNewConfig={setNewConfig}
               setShowLaunchpadValidators={setShowLaunchpadValidators}
+              setNewFeeRecipient={setNewFeeRecipient}
+              newFeeRecipient={newFeeRecipient}
               setNewExecClient={setNewExecClient}
               setNewConsClient={setNewConsClient}
               setNewMevBoost={setNewMevBoost}
@@ -428,7 +430,6 @@ export default function StakerNetwork<T extends Network>({
               feeRecipientError={feeRecipientError}
               graffitiError={graffitiError}
               defaultGraffiti={defaultGraffiti}
-              defaultFeeRecipient={defaultFeeRecipient}
               defaultCheckpointSync={defaultCheckpointSync}
             />
           )}

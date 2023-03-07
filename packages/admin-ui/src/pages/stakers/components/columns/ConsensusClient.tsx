@@ -16,10 +16,8 @@ export default function ConsensusClient<T extends Network>({
   setNewConsClient,
   newConsClient,
   isSelected,
-  feeRecipientError,
   graffitiError,
   defaultGraffiti,
-  defaultFeeRecipient,
   defaultCheckpointSync,
   ...props
 }: {
@@ -29,10 +27,8 @@ export default function ConsensusClient<T extends Network>({
   >;
   newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
-  feeRecipientError: string | null;
   graffitiError: string | null;
   defaultGraffiti: string;
-  defaultFeeRecipient: string;
   defaultCheckpointSync: string;
 }) {
   return (
@@ -50,8 +46,6 @@ export default function ConsensusClient<T extends Network>({
                   setNewConsClient({
                     ...consensusClient,
                     graffiti: consensusClient.graffiti || defaultGraffiti,
-                    feeRecipient:
-                      consensusClient.feeRecipient || defaultFeeRecipient,
                     checkpointSync:
                       consensusClient.checkpointSync || defaultCheckpointSync
                   })
@@ -110,17 +104,6 @@ export default function ConsensusClient<T extends Network>({
           <hr />
           <InputForm
             fields={[
-              {
-                label: "Fee recipient address",
-                labelId: "fee-recipient-address",
-                name: "fee-recipient-address",
-                autoComplete: "fee-recipient-address",
-                secret: false,
-                value: newConsClient.feeRecipient || "",
-                onValueChange: (value: string) =>
-                  setNewConsClient({ ...newConsClient, feeRecipient: value }),
-                error: feeRecipientError
-              },
               {
                 label: "Graffiti",
                 labelId: "graffiti",

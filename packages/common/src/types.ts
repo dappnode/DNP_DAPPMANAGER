@@ -1238,7 +1238,6 @@ interface StakerExecution<T extends Network> {
 interface StakerConsensus<T extends Network> {
   dnpName: ConsensusClient<T>;
   graffiti?: string;
-  feeRecipient?: string;
   checkpointSync?: string;
 }
 
@@ -1300,6 +1299,7 @@ export interface StakerConfigGet<T extends Network> {
   consensusClients: StakerItem<T, "consensus">[];
   web3Signer: StakerItem<T, "signer">;
   mevBoost: StakerItem<T, "mev-boost">;
+  feeRecipient: string;
 }
 
 export interface StakerConfigGetOk<T extends Network> {

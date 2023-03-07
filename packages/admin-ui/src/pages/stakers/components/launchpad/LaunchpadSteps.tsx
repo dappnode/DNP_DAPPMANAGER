@@ -21,7 +21,6 @@ export const launchpadSteps = <T extends Network>({
   feeRecipientError,
   graffitiError,
   defaultGraffiti,
-  defaultFeeRecipient,
   defaultCheckpointSync
 }: {
   network: T;
@@ -43,7 +42,6 @@ export const launchpadSteps = <T extends Network>({
   feeRecipientError: string | null;
   graffitiError: string | null;
   defaultGraffiti: string;
-  defaultFeeRecipient: string;
   defaultCheckpointSync: string;
 }) => [
   {
@@ -97,9 +95,7 @@ export const launchpadSteps = <T extends Network>({
             newConsClient={newConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
             graffitiError={graffitiError}
-            feeRecipientError={feeRecipientError}
             defaultGraffiti={defaultGraffiti}
-            defaultFeeRecipient={defaultFeeRecipient}
             defaultCheckpointSync={defaultCheckpointSync}
           />
         ))}
@@ -145,9 +141,7 @@ export const launchpadSteps = <T extends Network>({
             newConsClient={newConsClient}
             isSelected={true}
             graffitiError={graffitiError}
-            feeRecipientError={feeRecipientError}
             defaultGraffiti={defaultGraffiti}
-            defaultFeeRecipient={defaultFeeRecipient}
             defaultCheckpointSync={defaultCheckpointSync}
           />
         )}
