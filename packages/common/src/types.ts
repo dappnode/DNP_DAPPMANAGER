@@ -11,6 +11,7 @@ import {
   Dependencies,
   PackageEnvs,
 } from "@dappnode/dappnodesdk";
+import { build } from "@dappnode/dappnodesdk/dist/commands/build";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -1314,6 +1315,7 @@ export interface StakerConfigSet<T extends Network> {
   consensusClient?: StakerItemOk<T, "consensus">;
   mevBoost?: StakerItemOk<T, "mev-boost">;
   enableWeb3signer?: boolean;
+  feeRecipient?: string;
 }
 
 export type ExecutionClient<T extends Network> = T extends "mainnet"
@@ -1365,6 +1367,7 @@ export interface StakerParamsByNetwork<T extends Network> {
   };
   mevBoost: MevBoost<T>;
   isMevBoostSelected: boolean;
+  feeRecipient: string;
 }
 
 /**

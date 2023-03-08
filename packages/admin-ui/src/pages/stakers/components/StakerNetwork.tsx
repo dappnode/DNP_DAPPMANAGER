@@ -39,6 +39,7 @@ import "./columns.scss";
 import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
+import { InputForm } from "components/InputForm";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -133,7 +134,8 @@ export default function StakerNetwork<T extends Network>({
           mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
             ? mevBoost
             : undefined,
-        enableWeb3signer
+        enableWeb3signer,
+        feeRecipient
       });
 
       // Set default consensus client: fee recipient, checkpointsync and graffiti
@@ -184,7 +186,8 @@ export default function StakerNetwork<T extends Network>({
           newConsClient,
           newMevBoost,
           newEnableWeb3signer,
-          newExecClient
+          newExecClient,
+          newFeeRecipient
         })
       );
   }, [
@@ -194,7 +197,8 @@ export default function StakerNetwork<T extends Network>({
     newConsClient,
     newMevBoost,
     newEnableWeb3signer,
-    newExecClient
+    newExecClient,
+    newFeeRecipient
   ]);
 
   /**
@@ -299,6 +303,23 @@ export default function StakerNetwork<T extends Network>({
             )}
           </p>
           <br />
+
+          <p>{description}</p>
+          <InputForm
+            fields={[
+              {
+                label: `Default Fee Recipient`,
+                labelId: "new-feeRecipient",
+                name: "new-fee-recipient",
+                autoComplete: "new-feeRecipient",
+                value: newFeeRecipient || "",
+                onValueChange: setNewFeeRecipient,
+                error: feeRecipientError,
+                placeholder:
+                  "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
+              }
+            ]}
+          />
 
           <Row className="staker-network">
             <Col>

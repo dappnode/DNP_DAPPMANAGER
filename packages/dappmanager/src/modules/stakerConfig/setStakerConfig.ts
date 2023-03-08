@@ -143,7 +143,8 @@ export async function setStakerConfig<T extends Network>({
       network: stakerConfig.network,
       executionClient: currentExecClient,
       consensusClient: stakerConfig.consensusClient?.dnpName,
-      mevBoost: stakerConfig.mevBoost?.dnpName
+      mevBoost: stakerConfig.mevBoost?.dnpName,
+      feeRecipient: stakerConfig.feeRecipient
     });
     throw e;
   });
@@ -160,7 +161,8 @@ export async function setStakerConfig<T extends Network>({
         ...stakerConfig,
         executionClient: currentExecClient,
         consensusClient: currentConsClient,
-        mevBoost: stakerConfig.mevBoost?.dnpName
+        mevBoost: stakerConfig.mevBoost?.dnpName,
+        feeRecipient: stakerConfig.feeRecipient
       });
       throw e;
     });
@@ -176,7 +178,8 @@ export async function setStakerConfig<T extends Network>({
       ...stakerConfig,
       executionClient: currentExecClient,
       consensusClient: currentConsClient,
-      mevBoost: stakerConfig.mevBoost?.dnpName
+      mevBoost: stakerConfig.mevBoost?.dnpName,
+      feeRecipient: stakerConfig.feeRecipient
     });
     throw e;
   });
@@ -186,7 +189,8 @@ export async function setStakerConfig<T extends Network>({
     network: stakerConfig.network,
     executionClient: stakerConfig.executionClient?.dnpName,
     consensusClient: stakerConfig.consensusClient?.dnpName,
-    mevBoost: stakerConfig.mevBoost?.dnpName
+    mevBoost: stakerConfig.mevBoost?.dnpName,
+    feeRecipient: stakerConfig.feeRecipient
   });
 }
 
@@ -468,12 +472,14 @@ function setStakerConfigOnDb<T extends Network>({
   network,
   executionClient,
   consensusClient,
-  mevBoost
+  mevBoost,
+  feeRecipient
 }: {
   network: T;
   executionClient?: ExecutionClient<T>;
   consensusClient?: ConsensusClient<T>;
   mevBoost?: MevBoost<T>;
+  feeRecipient?: string;
 }): void {
   switch (network) {
     case "mainnet":
@@ -487,6 +493,11 @@ function setStakerConfigOnDb<T extends Network>({
         );
       if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
         db.mevBoostMainnet.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientMainnet.get() !== feeRecipient
+      )
+        db.feeRecipientMainnet.set(feeRecipient);
       break;
     case "gnosis":
       if (db.executionClientGnosis.get() !== executionClient)
@@ -495,6 +506,11 @@ function setStakerConfigOnDb<T extends Network>({
         db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
       if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
         db.mevBoostGnosis.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientGnosis.get() !== feeRecipient
+      )
+        db.feeRecipientGnosis.set(feeRecipient);
       break;
     case "prater":
       if (db.executionClientPrater.get() !== executionClient)
@@ -503,6 +519,11 @@ function setStakerConfigOnDb<T extends Network>({
         db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
       if (db.mevBoostPrater.get() !== Boolean(mevBoost))
         db.mevBoostPrater.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientPrater.get() !== feeRecipient
+      )
+        db.feeRecipientPrater.set(feeRecipient);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);

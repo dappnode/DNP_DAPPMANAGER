@@ -59,7 +59,8 @@ export function getChanges<T extends Network>({
   newConsClient,
   newMevBoost,
   newEnableWeb3signer,
-  newExecClient
+  newExecClient,
+  newFeeRecipient
 }: {
   currentStakerConfig: StakerConfigSet<T>;
   feeRecipientError: string | null;
@@ -68,6 +69,7 @@ export function getChanges<T extends Network>({
   newConsClient?: StakerItemOk<T, "consensus">;
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
+  newFeeRecipient?: string;
 }): {
   isAllowed: boolean;
   reason?: string;
@@ -85,23 +87,14 @@ export function getChanges<T extends Network>({
     executionClient,
     consensusClient,
     mevBoost,
-    enableWeb3signer
+    enableWeb3signer,
+    feeRecipient
   } = currentStakerConfig;
   const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
   const isConsClientEqual = isEqual(
-    pick(consensusClient, [
-      "checkpointSync",
-      "dnpName",
-      "feeRecipient",
-      "graffiti"
-    ]),
-    pick(newConsClient, [
-      "checkpointSync",
-      "dnpName",
-      "feeRecipient",
-      "graffiti"
-    ])
+    pick(consensusClient, ["checkpointSync", "dnpName", "graffiti"]),
+    pick(newConsClient, ["checkpointSync", "dnpName", "graffiti"])
   );
   const isMevBoostEqual = isEqual(
     pick(mevBoost, ["dnpName", "relays"]),
@@ -114,13 +107,22 @@ export function getChanges<T extends Network>({
       executionClient !== newExecClient ||
       !isConsClientEqual ||
       !isMevBoostEqual ||
-      enableWeb3signer !== newEnableWeb3signer
+      enableWeb3signer !== newEnableWeb3signer ||
+      feeRecipient !== newFeeRecipient
     )
   )
     return {
       isAllowed: false,
       reason: "No changes detected",
       severity: "secondary"
+    };
+
+  // Not allowed if no fee recipient
+  if (!newFeeRecipient)
+    return {
+      isAllowed: false,
+      reason: "A fee recipient must be set",
+      severity: "warning"
     };
 
   // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
