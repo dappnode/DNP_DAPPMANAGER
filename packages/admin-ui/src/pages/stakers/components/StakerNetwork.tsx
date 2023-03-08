@@ -297,19 +297,6 @@ export default function StakerNetwork<T extends Network>({
             )}
           </p>
           <br />
-          <p>{description}</p>
-          {network === "prater" && (
-            <>
-              <hr />
-              <Button
-                disabled={!allStakerItemsOk}
-                onClick={() => setShowLaunchpadValidators(true)}
-                variant="dappnode"
-              >
-                <FaEthereum /> Staking Launchpad
-              </Button>
-            </>
-          )}
 
           <Row className="staker-network">
             <Col>
@@ -390,13 +377,24 @@ export default function StakerNetwork<T extends Network>({
               />
             )}
 
-            <Button
-              variant="dappnode"
-              disabled={!changes.isAllowed || reqStatus.loading}
-              onClick={() => setNewConfig(false)}
-            >
-              Apply changes
-            </Button>
+            <div className="staker-buttons">
+              <Button
+                variant="dappnode"
+                disabled={!changes.isAllowed || reqStatus.loading}
+                onClick={() => setNewConfig(false)}
+              >
+                Apply changes
+              </Button>
+              {network === "prater" && (
+                <Button
+                  disabled={!allStakerItemsOk}
+                  onClick={() => setShowLaunchpadValidators(true)}
+                  variant="dappnode"
+                >
+                  <FaEthereum /> Step by step setup
+                </Button>
+              )}
+            </div>
 
             {!changes.isAllowed && changes.reason && (
               <>

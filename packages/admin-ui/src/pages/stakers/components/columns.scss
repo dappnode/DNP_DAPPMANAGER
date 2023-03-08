@@ -7,6 +7,11 @@
   margin-top: 15px;
 }
 
+.staker-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
 .stakers-dark {
   .consensus-client,
   .execution-client,
