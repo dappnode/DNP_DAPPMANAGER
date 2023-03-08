@@ -43,7 +43,7 @@ const params = {
   // lowdb requires an absolute path
   DB_MAIN_PATH: path.resolve(DNCORE_DIR, "maindb.json"),
   DB_CACHE_PATH: path.resolve(DNCORE_DIR, "dappmanagerdb.json"),
-  EXTRA_PKGS_PATH: path.join(DNCORE_DIR, "extra-pkgs.json"),
+  EXTRA_PKGS_PATH: path.join(DNCORE_DIR, "extra_pkgs.json"),
 
   // File with sole purpose of handling admin password hash. Must be deletable
   ADMIN_RECOVERY_FILE: path.join(DNCORE_DIR, "admin-recovery-token.txt"),
