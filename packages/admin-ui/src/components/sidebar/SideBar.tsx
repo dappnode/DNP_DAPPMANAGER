@@ -2,6 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { sidenavItems, fundedBy } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
+import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
 import { ThemeContext } from "../../App";
 import "./sidebar.scss";
@@ -16,7 +17,13 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       <NavLink to={"/"}>
         <img
           className="sidebar-logo header"
-          src={screenWidth > 640 ? logoWide : logomin}
+          src={
+            screenWidth > 640
+              ? theme === "dark"
+                ? logoWideDark
+                : logoWide
+              : logomin
+          }
           alt="logo"
         />
       </NavLink>
