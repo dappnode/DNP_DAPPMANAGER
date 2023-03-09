@@ -83,6 +83,7 @@
     // INPUTS
     input[type="text"],
     input[type="number"],
+    input[type="password"],
     input.custom-file-input,
     select {
       background-color: #605f5fd6;
@@ -92,6 +93,7 @@
         color: rgba(255, 255, 255, 0.85);
       }
     }
+    a.btn-outline-secondary,
     button.btn-outline-secondary {
       border-color: var(--color-dark-quaternarytext);
       color: white;
@@ -101,6 +103,10 @@
       background-color: #4b4a4a;
       border: none;
       color: #d9d6d6;
+    }
+
+    .copiable-input {
+      border: #ced4da !important;
     }
 
     // CARDS
