@@ -58,6 +58,9 @@
     }
 
     // Custom
+    .status-badge.ok {
+      background-color: var(--color-dark-card-hover);
+    }
 
     .horizontal-navbar .item.active {
       color: var(--color-dark-maintext);
