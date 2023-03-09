@@ -78,8 +78,26 @@
     }
 
     // INPUTS
+    input[type="text"],
+    input[type="number"],
+    input.custom-file-input,
+    select {
+      background-color: #605f5fd6;
+      color: white;
+      border: none;
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+    button.btn-outline-secondary {
+      border-color: var(--color-dark-quaternarytext);
+      color: white;
+    }
+
     .input-group-text {
-      color: #495057; // same color as react bootstrap component
+      background-color: #4b4a4a;
+      border: none;
+      color: #d9d6d6;
     }
 
     // CARDS
