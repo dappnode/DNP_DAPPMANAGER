@@ -151,6 +151,7 @@
         &.show {
           background-color: var(--color-dark-card);
           color: var(--color-dark-maintext);
+          box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
         }
       }
     }
