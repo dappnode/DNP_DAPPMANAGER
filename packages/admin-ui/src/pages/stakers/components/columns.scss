@@ -17,6 +17,8 @@
   .execution-client,
   .mev-boost,
   .remote-signer {
+    border: 2px solid rgba(40, 40, 40, 0.5);
+    border-bottom: 6px solid rgba(40, 40, 40, 0.75);
     .title {
       color: var(--color-dark-maintext) !important;
     }
@@ -24,9 +26,9 @@
       .title {
         color: var(--dappnode-color) !important;
       }
+      border: 2px solid rgba(40, 40, 40, 0.5) !important;
+      border-bottom: 6px solid var(--dappnode-color) !important;
     }
-    border: 2px solid rgba(40, 40, 40, 0.5);
-    border-bottom: 6px solid rgba(40, 40, 40, 0.75);
   }
 }
 
