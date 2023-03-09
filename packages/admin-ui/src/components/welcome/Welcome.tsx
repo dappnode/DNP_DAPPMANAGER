@@ -15,6 +15,7 @@ import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/common";
 // styles
 import "./welcome.scss";
+import PartnerPackages from "./features/PartnerPackages";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -44,6 +45,8 @@ function getRouteIdComponent(
       return (props: RouteProps) => <Repository {...props} />;
     case "repository-fallback":
       return (props: RouteProps) => <RepositoryFallback {...props} />;
+    case "partner-packages":
+      return (props: RouteProps) => <PartnerPackages {...props} />;
     default:
       return undefined;
   }

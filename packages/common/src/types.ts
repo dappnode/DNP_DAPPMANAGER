@@ -1125,7 +1125,8 @@ export type NewFeatureId =
   | "repository"
   | "repository-fallback"
   | "system-auto-updates"
-  | "change-host-password";
+  | "change-host-password"
+  | "partner-packages";
 
 /**
  * ==========
