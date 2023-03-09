@@ -120,6 +120,13 @@
         background-color: var(--color-dark-card-hover);
       }
     }
+
+    // ACTIVITY LOGS
+    .list-group-item-action {
+      &:hover:not(.selected) {
+        background-color: var(--color-dark-card-hover) !important;
+      }
+    }
   }
   #sidebar {
     background-color: var(--color-dark-background-sidebar);
