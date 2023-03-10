@@ -80,6 +80,11 @@
       }
     }
 
+    .alert-secondary {
+      background-color: var(--color-dark-card-hover) !important;
+      border-color: var(--color-dark-secondarytext);
+    }
+
     // INPUTS
     input[type="text"],
     input[type="number"],
