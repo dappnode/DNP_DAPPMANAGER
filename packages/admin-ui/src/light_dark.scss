@@ -85,6 +85,11 @@
       border-color: var(--color-dark-secondarytext);
     }
 
+    .alert-info {
+      background-color: rgba(0, 177, 244, 0.4);
+      border-color: var(--color-dark-secondarytext);
+    }
+
     // INPUTS
     input[type="text"],
     input[type="number"],
