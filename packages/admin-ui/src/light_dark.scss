@@ -36,6 +36,28 @@
   background-color: var(--color-dark-background-main);
 }
 #dark {
+  .stakers-launchpad-container {
+    background: rgba(0, 0, 0, 0.7) !important;
+
+    .launchpad {
+      background-color: var(--color-dark-background-main);
+    }
+
+    .launchpad-terms {
+      color: var(--color-dark-secondarytext);
+    }
+
+    .title,
+    .description {
+      color: var(--color-dark-tertiarytext) !important;
+    }
+
+    button.btn-outline-secondary {
+      border-color: var(--color-dark-quaternarytext);
+      color: white;
+    }
+  }
+
   #main {
     background-color: var(--color-dark-background-main);
 
@@ -58,6 +80,9 @@
     }
 
     // Custom
+    .status-badge.ok {
+      background-color: var(--color-dark-card-hover);
+    }
 
     .horizontal-navbar .item.active {
       color: var(--color-dark-maintext);
@@ -77,9 +102,44 @@
       }
     }
 
+    .alert-secondary {
+      background-color: var(--color-dark-card-hover) !important;
+      border-color: var(--color-dark-secondarytext);
+    }
+
+    .alert-info {
+      background-color: rgba(0, 177, 244, 0.4);
+      border-color: var(--color-dark-secondarytext);
+    }
+
     // INPUTS
+    input[type="text"],
+    input[type="number"],
+    input[type="password"],
+    input.custom-file-input,
+    label.custom-file-label,
+    select {
+      background-color: #605f5fd6;
+      color: white;
+      border: none;
+      &::placeholder {
+        color: rgba(255, 255, 255, 0.85);
+      }
+    }
+    a.btn-outline-secondary,
+    button.btn-outline-secondary {
+      border-color: var(--color-dark-quaternarytext);
+      color: white;
+    }
+
     .input-group-text {
-      color: #495057; // same color as react bootstrap component
+      background-color: #4b4a4a;
+      border: none;
+      color: #d9d6d6;
+    }
+
+    .copiable-input {
+      border: 1px solid #ced4da !important;
     }
 
     // CARDS
@@ -91,6 +151,13 @@
       &:hover:not(.selected) {
         border-color: var(--color-dark-card-hover);
         background-color: var(--color-dark-card-hover);
+      }
+    }
+
+    // ACTIVITY LOGS
+    .list-group-item-action {
+      &:hover:not(.selected) {
+        background-color: var(--color-dark-card-hover) !important;
       }
     }
   }
@@ -117,11 +184,34 @@
         &.show {
           background-color: var(--color-dark-card);
           color: var(--color-dark-maintext);
+          box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
         }
       }
     }
   }
   .body {
     background-color: var(--color-dark-background-main);
+  }
+}
+
+#dark-dialog {
+  // DIALOGS
+  .confirm-dialog-root {
+    background: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .dialog {
+    background-color: var(--color-dark-background-main);
+  }
+
+  h3,
+  .text {
+    color: var(--color-dark-tertiarytext);
+  }
+
+  a.btn-outline-secondary,
+  button.btn-outline-secondary {
+    border-color: var(--color-dark-quaternarytext);
+    color: white;
   }
 }
