@@ -26,11 +26,21 @@ function MainApp({ username }: { username: string }) {
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  const storedTheme = localStorage.getItem("theme");
+  const initialTheme = (storedTheme === "light" || storedTheme === "dark")
+    ? storedTheme
+    : "light";
+
+  const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
 
   const toggleTheme = () => {
     setTheme(curr => (curr === "light" ? "dark" : "light"));
   };
+
+  useEffect(() => {
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
