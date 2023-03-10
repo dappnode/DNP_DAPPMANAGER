@@ -36,6 +36,28 @@
   background-color: var(--color-dark-background-main);
 }
 #dark {
+  .stakers-launchpad-container {
+    background: rgba(0, 0, 0, 0.7) !important;
+
+    .launchpad {
+      background-color: var(--color-dark-background-main);
+    }
+
+    .launchpad-terms {
+      color: var(--color-dark-secondarytext);
+    }
+
+    .title,
+    .description {
+      color: var(--color-dark-tertiarytext) !important;
+    }
+
+    button.btn-outline-secondary {
+      border-color: var(--color-dark-quaternarytext);
+      color: white;
+    }
+  }
+
   #main {
     background-color: var(--color-dark-background-main);
 
@@ -169,5 +191,27 @@
   }
   .body {
     background-color: var(--color-dark-background-main);
+  }
+}
+
+#dark-dialog {
+  // DIALOGS
+  .confirm-dialog-root {
+    background: rgba(0, 0, 0, 0.7) !important;
+  }
+
+  .dialog {
+    background-color: var(--color-dark-background-main);
+  }
+
+  h3,
+  .text {
+    color: var(--color-dark-tertiarytext);
+  }
+
+  a.btn-outline-secondary,
+  button.btn-outline-secondary {
+    border-color: var(--color-dark-quaternarytext);
+    color: white;
   }
 }

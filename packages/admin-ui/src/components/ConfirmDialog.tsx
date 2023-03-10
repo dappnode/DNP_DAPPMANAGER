@@ -118,9 +118,12 @@ function Modal({
 // the root-modal DOM node will be reused
 let root: Element;
 export function confirm(props: ConfirmDialogProps) {
+  const theme = localStorage.getItem("theme") || "light";
+
   if (!root) {
     // Create the root-modal element
     root = document.createElement("div");
+    root.setAttribute("id", theme + "-dialog");
     document.body.appendChild(root);
   }
   // render (or re-render) and mount the dialog
