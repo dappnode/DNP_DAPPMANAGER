@@ -28,9 +28,8 @@ function MainApp({ username }: { username: string }) {
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
 
   const storedTheme = localStorage.getItem("theme");
-  const initialTheme = (storedTheme === "light" || storedTheme === "dark")
-    ? storedTheme
-    : "light";
+  const initialTheme =
+    storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
   const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
 
