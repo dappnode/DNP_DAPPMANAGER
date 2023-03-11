@@ -25,7 +25,7 @@ const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersion<"mai
     "geth.dnp.dappnode.eth": "0.1.38", // Needs publishment
     "erigon.dnp.dappnode.eth": "0.1.37",
     "besu.public.dappnode.eth": "1.2.7", // Needs publishment
-    "web3signer.dnp.dappnode.eth": "0.1.6" // Needs publishment
+    "web3signer.dnp.dappnode.eth": "0.1.7" // Needs publishment
   };
 
 export const lodestarStakersMinimumVersions: LodestarStakersMinimumVersions<Network> =
