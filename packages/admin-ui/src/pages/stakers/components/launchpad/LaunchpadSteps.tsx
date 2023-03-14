@@ -196,7 +196,7 @@ export const launchpadSteps = <T extends Network>({
         </div>
         <Button
           variant="dappnode"
-          disabled={!newExecClient || !newConsClient}
+          disabled={!newExecClient || !newConsClient || !newFeeRecipient}
           onClick={() => {
             setNewConfig(true);
             setShowLaunchpadValidators(false);
