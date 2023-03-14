@@ -7,6 +7,7 @@ import { Network, StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
 import { InputForm } from "components/InputForm";
+import Input from "components/Input";
 
 export const launchpadSteps = <T extends Network>({
   network,
@@ -149,20 +150,10 @@ export const launchpadSteps = <T extends Network>({
     component: (
       <div className="launchpad-summary">
         {newFeeRecipient && (
-          <InputForm
-            fields={[
-              {
-                label: `Default Fee Recipient`,
-                labelId: "new-feeRecipient",
-                name: "new-fee-recipient",
-                autoComplete: "new-feeRecipient",
-                value: newFeeRecipient || "",
-                onValueChange: setNewFeeRecipient,
-                error: feeRecipientError,
-                placeholder:
-                  "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-              }
-            ]}
+          <Input
+            aria-disabled={true}
+            value={newFeeRecipient}
+            onValueChange={() => {}}
           />
         )}
         {newExecClient && (

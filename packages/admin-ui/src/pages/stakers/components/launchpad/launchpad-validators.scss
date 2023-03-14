@@ -80,11 +80,11 @@
 
     .launchpad-summary {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       justify-content: space-between;
       margin-bottom: 1rem;
       > * {
-        margin: 0 2rem;
+        margin: 1rem;
         // Do not allow the child elements to be clickable
         pointer-events: none;
       }
