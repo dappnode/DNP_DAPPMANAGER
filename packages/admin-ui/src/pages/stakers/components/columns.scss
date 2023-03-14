@@ -7,6 +7,35 @@
   margin-top: 15px;
 }
 
+.staker-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stakers-dark {
+  .consensus-client,
+  .execution-client,
+  .mev-boost,
+  .remote-signer {
+    border: 2px solid rgba(40, 40, 40, 0.5);
+    border-bottom: 6px solid rgba(40, 40, 40, 0.75);
+    .title {
+      color: var(--color-dark-maintext) !important;
+    }
+    &.isSelected {
+      .title {
+        color: var(--dappnode-color) !important;
+      }
+      border: 2px solid rgba(40, 40, 40, 0.5) !important;
+      border-bottom: 6px solid var(--dappnode-color) !important;
+    }
+    &:hover:not(.isSelected) {
+      cursor: pointer;
+      background-color: rgb(85, 85, 85);
+    }
+  }
+}
+
 .consensus-client,
 .execution-client,
 .mev-boost,
@@ -30,12 +59,11 @@
   > *:not(:last-child) {
     margin-bottom: 1rem;
   }
-
   // Button feel
   &:hover:not(.isSelected) {
+    cursor: pointer;
     border-color: rgb(218, 218, 218);
     background-color: rgb(218, 218, 218);
-    cursor: pointer;
   }
   &.isSelected {
     border-color: var(--dappnode-color);

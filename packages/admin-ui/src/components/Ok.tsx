@@ -25,7 +25,7 @@ const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
     <span className="ok-indicator" {...props}>
       <span className="icon-container">
         {ok ? (
-          <MdCheck color="#1ccec0" />
+          <MdCheck color="#00b1f4" /> // --dappnode-strong-main-color
         ) : loading ? (
           <div className="lds-ring">
             <div />
@@ -33,7 +33,7 @@ const Ok: React.FC<OkProps & React.HTMLAttributes<HTMLDivElement>> = ({
             <div />
           </div>
         ) : unknown ? (
-          <MdHelpOutline />
+          <MdHelpOutline color="#00b1f4" /> // --dappnode-strong-main-color
         ) : warning ? (
           <MdWarning color="#ffff66" />
         ) : (

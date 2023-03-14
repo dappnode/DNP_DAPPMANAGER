@@ -13,7 +13,11 @@
 .links-icon {
   font-size: 1.2rem;
   margin-right: 4px;
-  color: var(--dappnode-color);
+  color: var(--dappnode-color) !important;
+}
+
+.links-name {
+  color: var(--dappnode-color) !important;
 }
 
 .links-url {
