@@ -6,12 +6,15 @@ import MevBoost from "../columns/MevBoost";
 import { Network, StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
+import { InputForm } from "components/InputForm";
 
 export const launchpadSteps = <T extends Network>({
   network,
   stakerConfig,
   setNewConfig,
   setShowLaunchpadValidators,
+  setNewFeeRecipient,
+  newFeeRecipient,
   setNewExecClient,
   newExecClient,
   setNewConsClient,
@@ -27,6 +30,8 @@ export const launchpadSteps = <T extends Network>({
   stakerConfig: StakerConfigGetOk<T>;
   setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
+  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string | undefined>>;
+  newFeeRecipient?: string;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;
@@ -102,12 +107,28 @@ export const launchpadSteps = <T extends Network>({
       </div>
     )
   },
-  /**{
-      title: "Set the default Fee Recipient",
-      description:
-        "Set the default fee recipient for the validator(s). The fee recipient is the address that will receive the validator's fees. You can change it at any time.",
-      component: <></>
-    },*/
+  {
+    title: "Set the default Fee Recipient",
+    description:
+      "Set the default fee recipient for the validator(s). The fee recipient is the address that will receive the validator's fees. You can change it at any time.",
+    component: (
+      <InputForm
+        fields={[
+          {
+            label: `Default Fee Recipient`,
+            labelId: "new-feeRecipient",
+            name: "new-fee-recipient",
+            autoComplete: "new-feeRecipient",
+            value: newFeeRecipient || "",
+            onValueChange: setNewFeeRecipient,
+            error: feeRecipientError,
+            placeholder:
+              "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
+          }
+        ]}
+      />
+    )
+  },
   {
     title: "Enable MEV boost and select its relays",
     description:
@@ -127,6 +148,23 @@ export const launchpadSteps = <T extends Network>({
     description: `This is a summary of the staker configuration you have selected. If you are happy with it, click on the "next" button.`,
     component: (
       <div className="launchpad-summary">
+        {newFeeRecipient && (
+          <InputForm
+            fields={[
+              {
+                label: `Default Fee Recipient`,
+                labelId: "new-feeRecipient",
+                name: "new-fee-recipient",
+                autoComplete: "new-feeRecipient",
+                value: newFeeRecipient || "",
+                onValueChange: setNewFeeRecipient,
+                error: feeRecipientError,
+                placeholder:
+                  "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
+              }
+            ]}
+          />
+        )}
         {newExecClient && (
           <ExecutionClient<T>
             executionClient={newExecClient}

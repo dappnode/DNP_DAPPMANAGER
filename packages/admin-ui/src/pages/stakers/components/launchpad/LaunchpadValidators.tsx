@@ -65,6 +65,8 @@ export default function LaunchpadValidators<T extends Network>({
     stakerConfig,
     setNewConfig,
     setShowLaunchpadValidators,
+    setNewFeeRecipient,
+    newFeeRecipient,
     setNewExecClient,
     newExecClient,
     setNewConsClient,
