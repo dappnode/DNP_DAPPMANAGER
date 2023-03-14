@@ -56,9 +56,15 @@ export default function LaunchpadValidators<T extends Network>({
   };
 
   useEffect(() => {
-    if (newExecClient && newConsClient) setNextEnabled(true);
+    if (
+      newExecClient &&
+      newConsClient &&
+      newFeeRecipient &&
+      !Boolean(feeRecipientError)
+    )
+      setNextEnabled(true);
     else setNextEnabled(false);
-  }, [newExecClient, newConsClient]);
+  }, [newExecClient, newConsClient, newFeeRecipient, feeRecipientError]);
 
   const steps = launchpadSteps<T>({
     network,
