@@ -27,13 +27,13 @@ import {
   validateEthereumAddress
 } from "./utils";
 import { responseInterface } from "swr";
-import { Alert } from "react-bootstrap";
+import { Alert, Form } from "react-bootstrap";
 import { ReqStatus } from "types";
 import "./columns.scss";
 import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
-import { InputForm } from "components/InputForm";
+import Input from "components/Input";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -274,21 +274,21 @@ export default function StakerNetwork<T extends Network>({
           <br />
 
           <p>{description}</p>
-          <InputForm
-            fields={[
-              {
-                label: `Default Fee Recipient`,
-                labelId: "new-feeRecipient",
-                name: "new-fee-recipient",
-                autoComplete: "new-feeRecipient",
-                value: newFeeRecipient || "",
-                onValueChange: setNewFeeRecipient,
-                error: feeRecipientError,
-                placeholder:
-                  "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-              }
-            ]}
-          />
+
+          <>
+            <Input
+              value={newFeeRecipient || ""}
+              onValueChange={setNewFeeRecipient}
+              isInvalid={Boolean(feeRecipientError)}
+              prepend="Default Fee Recipient"
+              placeholder="Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
+            />
+            {newFeeRecipient && feeRecipientError && (
+              <Form.Text className="text-danger" as="span">
+                {feeRecipientError}
+              </Form.Text>
+            )}
+          </>
 
           <Row className="staker-network">
             <Col>
