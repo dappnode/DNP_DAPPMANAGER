@@ -56,17 +56,16 @@ export async function stopAllPkgContainers(
  */
 export function getConsensusUserSettings({
   dnpName,
-  graffiti,
-  feeRecipient,
-  checkpointSync
+  network,
+  useCheckpointSync
 }: {
   dnpName: string;
-  graffiti?: string;
-  feeRecipient?: string;
-  checkpointSync?: string;
+  network: Network;
+  useCheckpointSync?: boolean;
 }): UserSettingsAllDnps {
   const validatorServiceName = getValidatorServiceName(dnpName);
   const beaconServiceName = getBeaconServiceName(dnpName);
+  const defaultDappnodeGraffiti = "validating_from_DAppNode";
   return {
     [dnpName]: {
       environment:
@@ -74,56 +73,59 @@ export function getConsensusUserSettings({
           ? {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]: graffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  feeRecipient || "0x0000000000000000000000000000000000000000",
+                ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
+                  ? getDefaultCheckpointSync(network)
+                  : ""
               }
             }
           : {
               [validatorServiceName]: {
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]: graffiti || "Validating_from_DAppNode",
-                // Fee recipient is a mandatory value
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  feeRecipient || "0x0000000000000000000000000000000000000000"
+                ["GRAFFITI"]: defaultDappnodeGraffiti
               },
 
               [beaconServiceName]: {
-                // Fee recipient is a mandatory vlaue (for Teku)
-                ["FEE_RECIPIENT_ADDRESS"]:
-                  feeRecipient || "0x0000000000000000000000000000000000000000",
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: checkpointSync || ""
+                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
+                  ? getDefaultCheckpointSync(network)
+                  : ""
               }
             }
     }
   };
 }
 
+export const getDefaultCheckpointSync = (network: Network): string =>
+  network === "mainnet"
+    ? "https://checkpoint-sync.dappnode.io"
+    : network === "prater"
+    ? "https://checkpoint-sync-prater.dappnode.io"
+    : network === "gnosis"
+    ? "https://checkpoint-sync-gnosis.dappnode.io"
+    : "";
+
 /**
- * Update environemnt variables for the consensus client
- * only if graffiti, or checkpoint sync are set
+ * Sets checkpointsync url to the default or empty string
  */
-export async function updateConsensusEnv<T extends Network>({
+export async function setUseCheckpointSync<T extends Network>({
   targetConsensusClient,
   userSettings
 }: {
   targetConsensusClient: StakerItemOk<T, "consensus">;
   userSettings: UserSettingsAllDnps;
 }): Promise<void> {
-  if (targetConsensusClient.graffiti || targetConsensusClient.checkpointSync) {
-    const serviceEnv = userSettings[targetConsensusClient.dnpName].environment;
+  const checkpointSyncKey = "CHECKPOINT_SYNC_URL";
+  const pkgEnv = userSettings[targetConsensusClient.dnpName].environment;
 
-    if (serviceEnv) {
-      logs.info("Updating environment for " + targetConsensusClient.dnpName);
-      await packageSetEnvironment({
-        dnpName: targetConsensusClient.dnpName,
-        environmentByService: serviceEnv
-      });
-    }
+  if (pkgEnv && checkpointSyncKey in pkgEnv) {
+    const checkpointSync = pick(pkgEnv, checkpointSyncKey);
+    logs.info("Updating environment for " + targetConsensusClient.dnpName);
+    await packageSetEnvironment({
+      dnpName: targetConsensusClient.dnpName,
+      environmentByService: checkpointSync
+    });
   }
 }
 

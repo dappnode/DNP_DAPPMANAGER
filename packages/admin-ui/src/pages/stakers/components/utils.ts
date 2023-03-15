@@ -21,13 +21,6 @@ export function validateEthereumAddress(value?: string): string | null {
   return null;
 }
 
-export function validateGraffiti(value?: string): string | null {
-  // It must be not more than 32 characters long
-  if (value && value.length > 32)
-    return "Graffiti must be less than 32 characters";
-  return null;
-}
-
 export function isOkSelectedInstalledAndRunning<
   T extends Network,
   P extends StakerType
@@ -55,7 +48,6 @@ export function isOkSelectedInstalledAndRunning<
 export function getChanges<T extends Network>({
   currentStakerConfig,
   feeRecipientError,
-  graffitiError,
   newConsClient,
   newMevBoost,
   newEnableWeb3signer,
@@ -64,7 +56,6 @@ export function getChanges<T extends Network>({
 }: {
   currentStakerConfig: StakerConfigSet<T>;
   feeRecipientError: string | null;
-  graffitiError: string | null;
   newExecClient: StakerItemOk<T, "execution"> | undefined;
   newConsClient?: StakerItemOk<T, "consensus">;
   newMevBoost?: StakerItemOk<T, "mev-boost">;
@@ -76,10 +67,10 @@ export function getChanges<T extends Network>({
   severity?: "warning" | "secondary" | "danger";
 } {
   // Not allowed if feerecipient or graffiti are invalid
-  if (feeRecipientError || graffitiError)
+  if (feeRecipientError)
     return {
       isAllowed: false,
-      reason: "Invalid graffiti and/or fee recipient",
+      reason: "Invalid fee recipient",
       severity: "danger"
     };
 

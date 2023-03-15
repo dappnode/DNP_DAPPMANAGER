@@ -1,23 +1,5 @@
-import { Network } from "@dappnode/common";
-import {
-  dappnodeMainnetCheckpointSync,
-  dappnodePraterCheckpointSync,
-  dappnodeGnosisCheckpointSync
-} from "params";
-
 export const rootPath = "/stakers";
 export const title = "Stakers";
-
-export const defaultDappnodeGraffiti = "validating_from_DAppNode";
-export const getDefaultCheckpointSync = (network: Network) =>
-  network === "mainnet"
-    ? dappnodeMainnetCheckpointSync
-    : network === "prater"
-    ? dappnodePraterCheckpointSync
-    : network === "gnosis"
-    ? dappnodeGnosisCheckpointSync
-    : "";
-
 export const disclaimer = `## Terms of Use - DAppNode
 
 Effective as of Oct 14, 2020

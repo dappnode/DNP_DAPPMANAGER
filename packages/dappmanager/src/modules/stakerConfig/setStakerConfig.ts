@@ -23,7 +23,7 @@ import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
-  updateConsensusEnv,
+  setUseCheckpointSync,
   getMevBoostUserSettings,
   updateMevBoostEnv
 } from "./utils.js";
@@ -134,6 +134,7 @@ export async function setStakerConfig<T extends Network>({
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
+    network: stakerConfig.network,
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
@@ -275,10 +276,12 @@ async function setExecutionClientConfig<T extends Network>({
 }
 
 async function setConsensusClientConfig<T extends Network>({
+  network,
   currentConsClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
+  network: Network;
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
@@ -304,7 +307,9 @@ async function setConsensusClientConfig<T extends Network>({
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
-    ...targetConsensusClient
+    dnpName: targetConsensusClient.dnpName,
+    network,
+    useCheckpointSync: targetConsensusClient.useCheckpointSync
   });
 
   if (targetConsensusClient.dnpName && !currentConsClient) {
@@ -319,7 +324,7 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
         userSettings
       });
@@ -340,7 +345,7 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
         userSettings
       });
@@ -367,7 +372,7 @@ async function setConsensusClientConfig<T extends Network>({
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
         userSettings
       });

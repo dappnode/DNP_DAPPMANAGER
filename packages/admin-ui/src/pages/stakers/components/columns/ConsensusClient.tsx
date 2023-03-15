@@ -1,7 +1,6 @@
 import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
-import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
 import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
@@ -16,9 +15,8 @@ export default function ConsensusClient<T extends Network>({
   setNewConsClient,
   newConsClient,
   isSelected,
-  graffitiError,
-  defaultGraffiti,
-  defaultCheckpointSync,
+  newUseCheckpointSync,
+  setNewUseCheckpointSync,
   ...props
 }: {
   consensusClient: StakerItem<T, "consensus">;
@@ -27,9 +25,8 @@ export default function ConsensusClient<T extends Network>({
   >;
   newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
-  graffitiError: string | null;
-  defaultGraffiti: string;
-  defaultCheckpointSync: string;
+  newUseCheckpointSync: boolean;
+  setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <Card
@@ -44,10 +41,7 @@ export default function ConsensusClient<T extends Network>({
               ? () => setNewConsClient(undefined)
               : () =>
                   setNewConsClient({
-                    ...consensusClient,
-                    graffiti: consensusClient.graffiti || defaultGraffiti,
-                    checkpointSync:
-                      consensusClient.checkpointSync || defaultCheckpointSync
+                    ...consensusClient
                   })
             : undefined
         }
@@ -98,41 +92,6 @@ export default function ConsensusClient<T extends Network>({
             another alternative.
           </Alert>
         )}
-
-      {isSelected && newConsClient && (
-        <>
-          <hr />
-          <InputForm
-            fields={[
-              {
-                label: "Graffiti",
-                labelId: "graffiti",
-                name: "graffiti",
-                autoComplete: "validating_from_DAppNode",
-                secret: false,
-                value: newConsClient.graffiti || "",
-                onValueChange: (value: string) =>
-                  setNewConsClient({ ...newConsClient, graffiti: value }),
-                error: graffitiError
-              },
-              {
-                label: "Checkpoint sync",
-                labelId: "checkpoint-sync",
-                name: "checkpoint-sync",
-                autoComplete: "checkpoint-sync",
-                secret: false,
-                value: newConsClient.checkpointSync || "",
-                onValueChange: (value: string) =>
-                  setNewConsClient({
-                    ...newConsClient,
-                    checkpointSync: value
-                  }),
-                error: null
-              }
-            ]}
-          />
-        </>
-      )}
     </Card>
   );
 }

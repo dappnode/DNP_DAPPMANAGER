@@ -12,12 +12,7 @@ import {
 import { fileToGatewayUrl } from "../../utils/distributedFile.js";
 import { listPackages } from "../docker/list/index.js";
 import { ReleaseFetcher } from "../release/index.js";
-import {
-  getBeaconServiceName,
-  getIsRunning,
-  getPkgData,
-  getValidatorServiceName
-} from "./utils.js";
+import { getBeaconServiceName, getIsRunning, getPkgData } from "./utils.js";
 import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 
 /**
@@ -91,18 +86,17 @@ export async function getStakerConfig<T extends Network>(
               consClient.dnpName
             );
             const isInstalled = getIsInstalled(pkgData, dnpList);
-            let graffiti, checkpointSync;
+            let useCheckpointSync = false;
             if (isInstalled) {
               const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
                 .userSettings?.environment;
-              if (pkgEnv) {
-                graffiti =
-                  pkgEnv[getValidatorServiceName(pkgData.dnpName)]["GRAFFITI"];
-                checkpointSync =
-                  pkgEnv[getBeaconServiceName(pkgData.dnpName)][
-                    "CHECKPOINT_SYNC_URL"
-                  ];
-              }
+              if (
+                pkgEnv &&
+                pkgEnv[getBeaconServiceName(pkgData.dnpName)][
+                  "CHECKPOINT_SYNC_URL"
+                ]
+              )
+                useCheckpointSync = true;
             }
             return {
               status: "ok",
@@ -113,8 +107,7 @@ export async function getStakerConfig<T extends Network>(
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
               isSelected: consClient.dnpName === currentConsClient,
-              graffiti,
-              checkpointSync
+              useCheckpointSync
             };
           } catch (error) {
             return {
