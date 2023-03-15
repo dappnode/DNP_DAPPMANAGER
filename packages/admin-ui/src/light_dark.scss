@@ -94,22 +94,24 @@
 
     // ALERTS
     .alert:not(a) {
-      color: #000000;
+      color: #ffffff;
 
       p,
       strong {
-        color: #000000;
+        color: #ffffff;
       }
     }
 
     .alert-secondary {
       background-color: var(--color-dark-card-hover) !important;
       border-color: var(--color-dark-secondarytext);
+      color:#ffffff
     }
 
     .alert-info {
       background-color: rgba(0, 177, 244, 0.4);
       border-color: var(--color-dark-secondarytext);
+      color:#ffffff
     }
 
     // INPUTS
