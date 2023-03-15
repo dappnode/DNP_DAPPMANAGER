@@ -47,13 +47,6 @@ export default function AdvanceView<T extends Network>({
       new: newConsClient?.graffiti ? newConsClient?.graffiti : "-"
     },
     {
-      name: "Fee Recipient",
-      current: consensusClient?.feeRecipient
-        ? consensusClient?.feeRecipient
-        : "-",
-      new: newConsClient?.feeRecipient ? newConsClient?.feeRecipient : "-"
-    },
-    {
       name: "Checkpoint Sync",
       current: consensusClient?.checkpointSync
         ? consensusClient?.checkpointSync

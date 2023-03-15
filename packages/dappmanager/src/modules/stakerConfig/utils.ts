@@ -105,7 +105,7 @@ export function getConsensusUserSettings({
 
 /**
  * Update environemnt variables for the consensus client
- * only if graffiti, fee recipient or checkpoint sync are set
+ * only if graffiti, or checkpoint sync are set
  */
 export async function updateConsensusEnv<T extends Network>({
   targetConsensusClient,
@@ -114,11 +114,7 @@ export async function updateConsensusEnv<T extends Network>({
   targetConsensusClient: StakerItemOk<T, "consensus">;
   userSettings: UserSettingsAllDnps;
 }): Promise<void> {
-  if (
-    targetConsensusClient.graffiti ||
-    targetConsensusClient.feeRecipient ||
-    targetConsensusClient.checkpointSync
-  ) {
+  if (targetConsensusClient.graffiti || targetConsensusClient.checkpointSync) {
     const serviceEnv = userSettings[targetConsensusClient.dnpName].environment;
 
     if (serviceEnv) {

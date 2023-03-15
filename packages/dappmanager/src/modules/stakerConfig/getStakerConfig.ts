@@ -44,7 +44,8 @@ export async function getStakerConfig<T extends Network>(
       currentConsClient,
       web3signer,
       mevBoost,
-      isMevBoostSelected
+      isMevBoostSelected,
+      feeRecipient
     } = stakerParamsByNetwork(network);
 
     const dnpList = await listPackages();
@@ -90,20 +91,17 @@ export async function getStakerConfig<T extends Network>(
               consClient.dnpName
             );
             const isInstalled = getIsInstalled(pkgData, dnpList);
-            let graffiti, feeRecipient, checkpointSync;
+            let graffiti, checkpointSync;
             if (isInstalled) {
               const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
                 .userSettings?.environment;
               if (pkgEnv) {
-                const validatorService = getValidatorServiceName(
-                  pkgData.dnpName
-                );
-                const beaconService = getBeaconServiceName(pkgData.dnpName);
-                graffiti = pkgEnv[validatorService]["GRAFFITI"];
-                feeRecipient =
-                  pkgEnv[validatorService]["FEE_RECIPIENT_ADDRESS"];
-                pkgEnv[beaconService]["FEE_RECIPIENT_ADDRESS"];
-                checkpointSync = pkgEnv[beaconService]["CHECKPOINT_SYNC_URL"];
+                graffiti =
+                  pkgEnv[getValidatorServiceName(pkgData.dnpName)]["GRAFFITI"];
+                checkpointSync =
+                  pkgEnv[getBeaconServiceName(pkgData.dnpName)][
+                    "CHECKPOINT_SYNC_URL"
+                  ];
               }
             }
             return {
@@ -116,7 +114,6 @@ export async function getStakerConfig<T extends Network>(
               data: pkgData,
               isSelected: consClient.dnpName === currentConsClient,
               graffiti,
-              feeRecipient,
               checkpointSync
             };
           } catch (error) {
@@ -186,7 +183,8 @@ export async function getStakerConfig<T extends Network>(
             error
           });
         }
-      })
+      }),
+      feeRecipient
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);
