@@ -9,6 +9,7 @@ import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
+import Switch from "components/Switch";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
@@ -62,26 +63,31 @@ export default function ConsensusClient<T extends Network>({
         <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
       </div>
 
-      {consensusClient.status === "ok" &&
-        isSelected &&
-        consensusClient.isInstalled &&
-        !consensusClient.isUpdated && (
+      {consensusClient.status === "ok" && isSelected ? (
+        <>
+          {consensusClient.isInstalled && !consensusClient.isUpdated && (
+            <>
+              <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
+                <Button variant="dappnode">UPDATE</Button>
+              </Link>
+              <br />
+              <br />
+            </>
+          )}
           <>
-            <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
-            <br />
-            <br />
+            {consensusClient.data && (
+              <div className="description">
+                {consensusClient.data.metadata.shortDescription}
+              </div>
+            )}
+            <Switch
+              checked={newUseCheckpointSync}
+              onToggle={setNewUseCheckpointSync}
+              label={"Use checksync"}
+            />
           </>
-        )}
-
-      {consensusClient.status === "ok" && (
-        <div className="description">
-          {isSelected &&
-            consensusClient.data &&
-            consensusClient.data.metadata.shortDescription}
-        </div>
-      )}
+        </>
+      ) : null}
 
       {isSelected &&
         consensusClient.dnpName ===
