@@ -51,8 +51,7 @@ export function getChanges<T extends Network>({
   newMevBoost,
   newEnableWeb3signer,
   newExecClient,
-  newFeeRecipient,
-  newUseCheckpointSync
+  newFeeRecipient
 }: {
   currentStakerConfig: StakerConfigSet<T>;
   feeRecipientError: string | null;
@@ -61,7 +60,6 @@ export function getChanges<T extends Network>({
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
   newFeeRecipient?: string;
-  newUseCheckpointSync?: boolean;
 }): {
   isAllowed: boolean;
   reason?: string;
@@ -92,7 +90,7 @@ export function getChanges<T extends Network>({
     mevBoost?.dnpName === newMevBoost?.dnpName &&
     newMevBoost?.relays?.length === mevBoost?.relays?.length &&
     currentStakerConfig.consensusClient?.useCheckpointSync ===
-      newUseCheckpointSync &&
+      newConsClient?.useCheckpointSync &&
     enableWeb3signer === newEnableWeb3signer &&
     feeRecipient === newFeeRecipient
   )

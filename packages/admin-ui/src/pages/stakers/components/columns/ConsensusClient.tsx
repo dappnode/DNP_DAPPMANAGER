@@ -16,8 +16,6 @@ export default function ConsensusClient<T extends Network>({
   setNewConsClient,
   newConsClient,
   isSelected,
-  newUseCheckpointSync,
-  setNewUseCheckpointSync,
   ...props
 }: {
   consensusClient: StakerItem<T, "consensus">;
@@ -26,8 +24,6 @@ export default function ConsensusClient<T extends Network>({
   >;
   newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
-  newUseCheckpointSync: boolean;
-  setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <Card
@@ -82,8 +78,13 @@ export default function ConsensusClient<T extends Network>({
               </div>
             )}
             <Switch
-              checked={newUseCheckpointSync}
-              onToggle={setNewUseCheckpointSync}
+              checked={consensusClient.useCheckpointSync || false}
+              onToggle={() =>
+                setNewConsClient({
+                  ...consensusClient,
+                  useCheckpointSync: !consensusClient.useCheckpointSync
+                })
+              }
               label={"Use checksync"}
             />
           </>

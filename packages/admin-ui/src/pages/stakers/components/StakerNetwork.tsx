@@ -54,9 +54,6 @@ export default function StakerNetwork<T extends Network>({
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
-  const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
-    false
-  );
   const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newExecClient, setNewExecClient] = useState<
     StakerItemOk<T, "execution">
@@ -105,12 +102,9 @@ export default function StakerNetwork<T extends Network>({
 
       if (executionClient && executionClient.status === "ok")
         setNewExecClient(executionClient);
-      if (consensusClient && consensusClient.status === "ok") {
+      if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
-        consensusClient.useCheckpointSync
-          ? setNewUseCheckpointSync(true)
-          : setNewUseCheckpointSync(false);
-      }
+
       if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
         setNewMevBoost(mevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
@@ -157,8 +151,7 @@ export default function StakerNetwork<T extends Network>({
           newMevBoost,
           newEnableWeb3signer,
           newExecClient,
-          newFeeRecipient,
-          newUseCheckpointSync
+          newFeeRecipient
         })
       );
   }, [
@@ -168,8 +161,7 @@ export default function StakerNetwork<T extends Network>({
     newMevBoost,
     newEnableWeb3signer,
     newExecClient,
-    newFeeRecipient,
-    newUseCheckpointSync
+    newFeeRecipient
   ]);
 
   /**
@@ -321,8 +313,6 @@ export default function StakerNetwork<T extends Network>({
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
                     }
-                    newUseCheckpointSync={newUseCheckpointSync}
-                    setNewUseCheckpointSync={setNewUseCheckpointSync}
                   />
                 )
               )}
@@ -409,8 +399,6 @@ export default function StakerNetwork<T extends Network>({
               newConsClient={newConsClient}
               newMevBoost={newMevBoost}
               feeRecipientError={feeRecipientError}
-              newUseCheckpointSync={newUseCheckpointSync}
-              setNewUseCheckpointSync={setNewUseCheckpointSync}
             />
           )}
         </Card>
