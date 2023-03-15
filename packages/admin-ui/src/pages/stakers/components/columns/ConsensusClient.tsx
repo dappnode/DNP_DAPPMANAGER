@@ -78,6 +78,7 @@ export default function ConsensusClient<T extends Network>({
             {consensusClient.data && (
               <div className="description">
                 {consensusClient.data.metadata.shortDescription}
+                <hr />
               </div>
             )}
             <Switch

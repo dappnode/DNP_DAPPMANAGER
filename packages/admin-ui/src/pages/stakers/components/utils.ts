@@ -5,7 +5,6 @@ import {
   StakerItemOk,
   StakerType
 } from "@dappnode/common";
-import { isEqual, pick } from "lodash-es";
 
 export function subStringifyConfig(config: string): string {
   return config.length > 35
@@ -52,7 +51,8 @@ export function getChanges<T extends Network>({
   newMevBoost,
   newEnableWeb3signer,
   newExecClient,
-  newFeeRecipient
+  newFeeRecipient,
+  newUseCheckpointSync
 }: {
   currentStakerConfig: StakerConfigSet<T>;
   feeRecipientError: string | null;
@@ -61,12 +61,13 @@ export function getChanges<T extends Network>({
   newMevBoost?: StakerItemOk<T, "mev-boost">;
   newEnableWeb3signer: boolean;
   newFeeRecipient?: string;
+  newUseCheckpointSync?: boolean;
 }): {
   isAllowed: boolean;
   reason?: string;
   severity?: "warning" | "secondary" | "danger";
 } {
-  // Not allowed if feerecipient or graffiti are invalid
+  // Not allowed if feerecipient is invalid
   if (feeRecipientError)
     return {
       isAllowed: false,
@@ -83,24 +84,17 @@ export function getChanges<T extends Network>({
   } = currentStakerConfig;
   const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
-  const isConsClientEqual = isEqual(
-    pick(consensusClient, ["checkpointSync", "dnpName", "graffiti"]),
-    pick(newConsClient, ["checkpointSync", "dnpName", "graffiti"])
-  );
-  const isMevBoostEqual = isEqual(
-    pick(mevBoost, ["dnpName", "relays"]),
-    pick(newMevBoost, ["dnpName", "relays"])
-  );
 
   // Not allowed if no changes
   if (
-    !(
-      executionClient !== newExecClient ||
-      !isConsClientEqual ||
-      !isMevBoostEqual ||
-      enableWeb3signer !== newEnableWeb3signer ||
-      feeRecipient !== newFeeRecipient
-    )
+    executionClient?.dnpName === newExecClient?.dnpName &&
+    consensusClient?.dnpName === newConsClient?.dnpName &&
+    mevBoost?.dnpName === newMevBoost?.dnpName &&
+    newMevBoost?.relays?.length === mevBoost?.relays?.length &&
+    currentStakerConfig.consensusClient?.useCheckpointSync ===
+      newUseCheckpointSync &&
+    enableWeb3signer === newEnableWeb3signer &&
+    feeRecipient === newFeeRecipient
   )
     return {
       isAllowed: false,

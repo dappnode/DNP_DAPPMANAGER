@@ -157,7 +157,8 @@ export default function StakerNetwork<T extends Network>({
           newMevBoost,
           newEnableWeb3signer,
           newExecClient,
-          newFeeRecipient
+          newFeeRecipient,
+          newUseCheckpointSync
         })
       );
   }, [
@@ -167,7 +168,8 @@ export default function StakerNetwork<T extends Network>({
     newMevBoost,
     newEnableWeb3signer,
     newExecClient,
-    newFeeRecipient
+    newFeeRecipient,
+    newUseCheckpointSync
   ]);
 
   /**
