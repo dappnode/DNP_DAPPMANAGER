@@ -74,7 +74,11 @@ function MainApp({ username }: { username: string }) {
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
         <div className="body" id={theme}>
           <SideBar screenWidth={screenWidth} />
-          <TopBar username={username} toggleTheme={toggleTheme} />
+          <TopBar
+            username={username}
+            toggleUsage={toggleUsage}
+            toggleTheme={toggleTheme}
+          />
           <div id="main">
             <ErrorBoundary>
               <NotificationsMain />

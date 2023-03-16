@@ -109,6 +109,16 @@
   }
 }
 
+.beta {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+}
+
 .tn-dropdown-toggle {
   /* flex automatically centers the toggle icons */
   display: flex;
