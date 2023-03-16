@@ -19,6 +19,16 @@
 
 /* Sidenav toggler */
 
+.beta {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 16px;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: row;
+}
+
 .sidenav-toggler {
   font-size: 30px;
   background: none;
