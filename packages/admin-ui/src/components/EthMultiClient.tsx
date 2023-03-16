@@ -18,7 +18,6 @@ import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
 import { prettyDnpName } from "utils/format";
-import { dappnodeMainnetCheckpointSync } from "params";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
@@ -278,7 +277,7 @@ function EthMultiClientCheckpointSync({
       className="eth-multi-clients-fallback"
       checked={useCheckpointSync}
       onToggle={bool => setUseCheckpointSync(bool)}
-      label={`Use dappnode checkpoint sync (${dappnodeMainnetCheckpointSync}) for consensus client fast sync`}
+      label={`Use dappnode checkpoint sync (https://checkpoint-sync.dappnode.io) for consensus client fast sync`}
       id="eth-multi-clients-checkpointsync-switch"
     />
   );

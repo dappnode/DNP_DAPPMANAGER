@@ -220,9 +220,8 @@ export class EthereumClient {
         // Get default cons client user settings and install cons client
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
-          checkpointSync: useCheckpointSync
-            ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
-            : undefined
+          network: "mainnet",
+          useCheckpointSync
         });
         await packageInstall({ name: consClient, userSettings });
       } else {

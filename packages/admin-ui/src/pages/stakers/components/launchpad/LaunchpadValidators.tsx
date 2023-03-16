@@ -18,10 +18,7 @@ export default function LaunchpadValidators<T extends Network>({
   newConsClient,
   setNewMevBoost,
   newMevBoost,
-  feeRecipientError,
-  graffitiError,
-  defaultGraffiti,
-  defaultCheckpointSync
+  feeRecipientError
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
@@ -42,9 +39,6 @@ export default function LaunchpadValidators<T extends Network>({
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
   feeRecipientError: string | null;
-  graffitiError: string | null;
-  defaultGraffiti: string;
-  defaultCheckpointSync: string;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [nextEnabled, setNextEnabled] = useState(false);
@@ -79,10 +73,7 @@ export default function LaunchpadValidators<T extends Network>({
     newConsClient,
     setNewMevBoost,
     newMevBoost,
-    feeRecipientError,
-    graffitiError,
-    defaultGraffiti,
-    defaultCheckpointSync
+    feeRecipientError
   });
 
   const currentStep = steps[stepIndex];

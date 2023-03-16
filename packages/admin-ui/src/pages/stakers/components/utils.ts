@@ -5,7 +5,6 @@ import {
   StakerItemOk,
   StakerType
 } from "@dappnode/common";
-import { isEqual, pick } from "lodash-es";
 
 export function subStringifyConfig(config: string): string {
   return config.length > 35
@@ -18,13 +17,6 @@ export function subStringifyConfig(config: string): string {
 
 export function validateEthereumAddress(value?: string): string | null {
   if (value && !/^0x[0-9a-fA-F]{40}$/.test(value)) return "Invalid address";
-  return null;
-}
-
-export function validateGraffiti(value?: string): string | null {
-  // It must be not more than 32 characters long
-  if (value && value.length > 32)
-    return "Graffiti must be less than 32 characters";
   return null;
 }
 
@@ -55,7 +47,6 @@ export function isOkSelectedInstalledAndRunning<
 export function getChanges<T extends Network>({
   currentStakerConfig,
   feeRecipientError,
-  graffitiError,
   newConsClient,
   newMevBoost,
   newEnableWeb3signer,
@@ -64,7 +55,6 @@ export function getChanges<T extends Network>({
 }: {
   currentStakerConfig: StakerConfigSet<T>;
   feeRecipientError: string | null;
-  graffitiError: string | null;
   newExecClient: StakerItemOk<T, "execution"> | undefined;
   newConsClient?: StakerItemOk<T, "consensus">;
   newMevBoost?: StakerItemOk<T, "mev-boost">;
@@ -75,11 +65,11 @@ export function getChanges<T extends Network>({
   reason?: string;
   severity?: "warning" | "secondary" | "danger";
 } {
-  // Not allowed if feerecipient or graffiti are invalid
-  if (feeRecipientError || graffitiError)
+  // Not allowed if feerecipient is invalid
+  if (feeRecipientError)
     return {
       isAllowed: false,
-      reason: "Invalid graffiti and/or fee recipient",
+      reason: "Invalid fee recipient",
       severity: "danger"
     };
 
@@ -92,24 +82,17 @@ export function getChanges<T extends Network>({
   } = currentStakerConfig;
   const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
-  const isConsClientEqual = isEqual(
-    pick(consensusClient, ["checkpointSync", "dnpName", "graffiti"]),
-    pick(newConsClient, ["checkpointSync", "dnpName", "graffiti"])
-  );
-  const isMevBoostEqual = isEqual(
-    pick(mevBoost, ["dnpName", "relays"]),
-    pick(newMevBoost, ["dnpName", "relays"])
-  );
 
   // Not allowed if no changes
   if (
-    !(
-      executionClient !== newExecClient ||
-      !isConsClientEqual ||
-      !isMevBoostEqual ||
-      enableWeb3signer !== newEnableWeb3signer ||
-      feeRecipient !== newFeeRecipient
-    )
+    executionClient?.dnpName === newExecClient?.dnpName &&
+    consensusClient?.dnpName === newConsClient?.dnpName &&
+    mevBoost?.dnpName === newMevBoost?.dnpName &&
+    newMevBoost?.relays?.length === mevBoost?.relays?.length &&
+    currentStakerConfig.consensusClient?.useCheckpointSync ===
+      newConsClient?.useCheckpointSync &&
+    enableWeb3signer === newEnableWeb3signer &&
+    feeRecipient === newFeeRecipient
   )
     return {
       isAllowed: false,

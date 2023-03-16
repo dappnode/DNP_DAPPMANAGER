@@ -1238,8 +1238,7 @@ interface StakerExecution<T extends Network> {
 
 interface StakerConsensus<T extends Network> {
   dnpName: ConsensusClient<T>;
-  graffiti?: string;
-  checkpointSync?: string;
+  useCheckpointSync?: boolean;
 }
 
 interface StakerSigner<T extends Network> {
