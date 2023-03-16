@@ -111,22 +111,24 @@ export const getDefaultCheckpointSync = (network: Network): string =>
  */
 export async function setUseCheckpointSync<T extends Network>({
   targetConsensusClient,
-  userSettings
+  network
 }: {
   targetConsensusClient: StakerItemOk<T, "consensus">;
-  userSettings: UserSettingsAllDnps;
+  network: Network;
 }): Promise<void> {
-  const checkpointSyncKey = "CHECKPOINT_SYNC_URL";
-  const pkgEnv = userSettings[targetConsensusClient.dnpName].environment;
+  const environmentByService = {
+    [getBeaconServiceName(targetConsensusClient.dnpName)]: {
+      ["CHECKPOINT_SYNC_URL"]: targetConsensusClient.useCheckpointSync
+        ? getDefaultCheckpointSync(network)
+        : ""
+    }
+  };
 
-  if (pkgEnv && checkpointSyncKey in pkgEnv) {
-    const checkpointSync = pick(pkgEnv, checkpointSyncKey);
-    logs.info("Updating environment for " + targetConsensusClient.dnpName);
-    await packageSetEnvironment({
-      dnpName: targetConsensusClient.dnpName,
-      environmentByService: checkpointSync
-    });
-  }
+  logs.info("Updating environment for " + targetConsensusClient.dnpName);
+  await packageSetEnvironment({
+    dnpName: targetConsensusClient.dnpName,
+    environmentByService
+  });
 }
 
 /**

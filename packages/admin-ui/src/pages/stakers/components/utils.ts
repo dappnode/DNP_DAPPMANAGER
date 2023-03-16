@@ -83,6 +83,12 @@ export function getChanges<T extends Network>({
   const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
 
+  console.log(
+    "current checkpointsync",
+    currentStakerConfig.consensusClient?.useCheckpointSync
+  );
+  console.log("new checkpointsync", newConsClient?.useCheckpointSync);
+
   // Not allowed if no changes
   if (
     executionClient?.dnpName === newExecClient?.dnpName &&

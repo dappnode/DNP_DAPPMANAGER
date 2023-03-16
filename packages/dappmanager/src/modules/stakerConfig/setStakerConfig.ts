@@ -326,7 +326,7 @@ async function setConsensusClientConfig<T extends Network>({
       // Update env if needed
       await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -347,7 +347,7 @@ async function setConsensusClientConfig<T extends Network>({
       // Update env if needed
       await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start package
       await dockerComposeUpPackage(
@@ -374,7 +374,7 @@ async function setConsensusClientConfig<T extends Network>({
       // Update env if needed
       await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start new client
       await dockerComposeUpPackage(

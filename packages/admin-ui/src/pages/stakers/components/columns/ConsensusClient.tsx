@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -25,6 +25,17 @@ export default function ConsensusClient<T extends Network>({
   newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
 }) {
+  const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
+    consensusClient.useCheckpointSync || false
+  );
+  useEffect(() => {
+    if (consensusClient.status === "ok")
+      setNewConsClient({
+        ...consensusClient,
+        useCheckpointSync: newUseCheckpointSync
+      });
+  }, [consensusClient, newUseCheckpointSync, setNewConsClient]);
+
   return (
     <Card
       {...props}
@@ -77,16 +88,13 @@ export default function ConsensusClient<T extends Network>({
                 <hr />
               </div>
             )}
-            <Switch
-              checked={consensusClient.useCheckpointSync || false}
-              onToggle={() =>
-                setNewConsClient({
-                  ...consensusClient,
-                  useCheckpointSync: !consensusClient.useCheckpointSync
-                })
-              }
-              label={"Use checksync"}
-            />
+            {consensusClient.useCheckpointSync !== undefined && (
+              <Switch
+                checked={newUseCheckpointSync}
+                onToggle={() => setNewUseCheckpointSync(!newUseCheckpointSync)}
+                label={"Use checksync"}
+              />
+            )}
           </>
         </>
       ) : null}
