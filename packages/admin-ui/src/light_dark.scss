@@ -177,7 +177,10 @@
   }
   #topbar {
     background-color: var(--color-dark-background-topbar);
-    .tn-dropdown .tn-dropdown-toggle {
+    .tn-dropdown .tn-dropdown-toggle,
+    p,
+    span,
+    div {
       color: var(--color-dark-maintext);
       opacity: 1;
     }

@@ -3,27 +3,37 @@ import { FaSun } from "react-icons/fa";
 import React from "react";
 import "./dropdown.scss";
 import { ThemeContext } from "App";
+import Tooltip from "react-bootstrap/Tooltip";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 export default function ThemeSwitch({
   toggleTheme
 }: {
   toggleTheme: () => void;
 }) {
-  // get context provider
   const { theme } = React.useContext(ThemeContext);
   return (
     <div className="tn-dropdown">
-      <button
-        style={{ border: "none", background: "none" }}
-        className="tn-dropdown-toggle"
-        onClick={toggleTheme}
+      <OverlayTrigger
+        placement={"bottom"}
+        overlay={
+          <Tooltip id={`tooltip-theme`}>
+            Display {theme === "light" ? "dark mode" : "light mode"}
+          </Tooltip>
+        }
       >
-        {theme === "light" ? (
-          <BsMoon style={{ fontSize: "larger" }} />
-        ) : (
-          <FaSun style={{ fontSize: "larger" }} />
-        )}
-      </button>
+        <button
+          style={{ border: "none", background: "none" }}
+          className="tn-dropdown-toggle"
+          onClick={toggleTheme}
+        >
+          {theme === "light" ? (
+            <BsMoon style={{ fontSize: "larger" }} />
+          ) : (
+            <FaSun style={{ fontSize: "larger" }} />
+          )}
+        </button>
+      </OverlayTrigger>
     </div>
   );
 }

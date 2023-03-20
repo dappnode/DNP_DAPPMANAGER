@@ -54,7 +54,29 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
-export const sidenavItems: {
+export const advancedItems: {
+  name: string;
+  href: string;
+  icon: (props: any) => JSX.Element;
+}[] = [
+  {
+    name: "Community",
+    href: communityRootPath,
+    icon: MdPeople
+  },
+  {
+    name: "Sdk",
+    href: sdkRootPath,
+    icon: MdBuild
+  },
+  {
+    name: "Support",
+    href: supportRootPath,
+    icon: MdHelp
+  }
+];
+
+export const basicItems: {
   name: string;
   href: string;
   icon: (props: any) => JSX.Element;
@@ -98,20 +120,5 @@ export const sidenavItems: {
     name: "System",
     href: systemRootPath,
     icon: MdSettings
-  },
-  {
-    name: "Community",
-    href: communityRootPath,
-    icon: MdPeople
-  },
-  {
-    name: "Sdk",
-    href: sdkRootPath,
-    icon: MdBuild
-  },
-  {
-    name: "Support",
-    href: supportRootPath,
-    icon: MdHelp
   }
 ];
