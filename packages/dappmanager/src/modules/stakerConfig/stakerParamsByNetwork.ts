@@ -79,6 +79,10 @@ export function stakerParamsByNetwork<T extends Network>(
           {
             dnpName: "teku-gnosis.dnp.dappnode.eth",
             minVersion: "0.1.5"
+          },
+          {
+            dnpName: "lodestar-gnosis.dnp.dappnode.eth",
+            minVersion: "0.1.0"
           }
         ],
         currentConsClient: db.consensusClientGnosis.get(),
