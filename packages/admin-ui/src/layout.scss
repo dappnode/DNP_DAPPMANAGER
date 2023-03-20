@@ -1,15 +1,14 @@
 :root {
-  --sidebar-breakpoint: 40rem;
+  // widths
   --sidenav-width: 12.5rem;
-  --transition-time: 0.25s;
+  --sidenav-collapsed-width: 4.75rem;
   --topbar-height: 3.5rem;
+  // Borders and padding
   --container-padding: 1.5rem;
-  --color-white: white;
-  --color-border: #e5e5e5;
-  --color-background: #f7f9f9;
   --border-size: 0.08rem;
-  --border-style: var(--border-size) solid var(--color-border);
   --default-spacing: 1.25rem;
+  // time
+  --transition-time: 0.25s;
 }
 /* MUST ONLY defined z-index properties here 
    Variable definitions are ordered from front to back
@@ -35,27 +34,11 @@ body {
 
 html,
 body,
+.body,
 #root {
   margin: 0;
   padding: 0;
   height: 100%;
-}
-
-/*****
-  BODY
-  ****
-  Body is the main app container. 
-  It will always have a fix height of the entire screen
-  and only the main content area is scrollable 
-*/
-.body {
-  /* ### Todo: Substract the topbar height to prevent showing scrollbar when not necessary */
-  /* min-height: calc(100vh - var(--topbar-height)); */
-  background-color: var(--color-background);
-}
-html,
-body {
-  background-color: var(--color-background);
 }
 
 /********
@@ -65,6 +48,7 @@ body {
   The responsiveness is controlled by making the width = 0 
 */
 #sidebar {
+  align-items: center;
   /* Basic sizing */
   position: fixed;
   top: 0;
@@ -79,10 +63,6 @@ body {
   overflow-x: hidden;
   /* While the sidenav is collapsing, make sure the content stays straight */
   white-space: nowrap;
-  /* Colors */
-  background-color: var(--color-white);
-  border-right: var(--border-style);
-  box-shadow: rgba(0, 0, 0, 0.1) 1px 0px 15px;
   /* place sidebar on top of the header and content */
   z-index: var(--z-index-sidebar);
 
@@ -97,10 +77,12 @@ body {
     flex: 0 1 auto;
     overflow: hidden;
   }
-}
 
-.sidebar-logo {
-  width: calc(0.7 * var(--sidenav-width));
+  .sidebar-logo {
+    padding-top: 1rem;
+    padding-bottom: 0.5rem;
+    width: calc(0.7 * var(--sidenav-width));
+  }
 }
 
 /* SIDEBAR > NAV */
@@ -116,7 +98,7 @@ body {
   /* SIDEBAR > TOP */
   &.top {
     height: var(--topbar-height);
-    border-bottom: var(--border-style);
+    border-bottom: var(--border-style-light);
     /* Prevent the item from shrinking */
     flex-shrink: 0;
   }
@@ -136,58 +118,25 @@ body {
   }
 }
 
-/* Styles below apply when screen width big */
-@media (min-width: 40rem) {
-  .sidenav-toggler {
-    display: none;
-  }
-}
-
 /*******
   TOPBAR
   ******
   The topbar will always be visible and fixed on the top of the screen
 */
 #topbar {
+  z-index: 1000;
   position: fixed;
+  border-bottom-left-radius: 0.5rem;
+  border-width: 0;
   top: 0;
-  left: 0;
   right: 0;
   height: var(--topbar-height);
-  /* Postion left and right divs on each side + security gap margin */
-  display: grid;
-  grid-template-columns: auto auto;
+  display: flex;
+  align-items: center;
   grid-gap: 1em;
-  /* Colors */
-  background-color: var(--color-white);
-  border-bottom: var(--border-style);
   padding: 0 var(--container-padding);
-  /* place topbar between the sidebar (2) and the main (0) */
-  z-index: var(--z-index-topbar);
-
-  .right,
-  .left {
-    display: flex;
-    align-items: center;
-  }
-
-  /* Align right to the right so the position does not change when the left div is not there */
-  .right {
-    --icon-size: 1.5rem;
-    flex: auto;
-    display: grid;
-    /* Create as much columns as necessary aligned center vertically and justified to the right */
-    grid-template-columns:
-      minmax(var(--icon-size), min-content)
-      min-content
-      minmax(var(--icon-size), min-content)
-      minmax(var(--icon-size), min-content);
-
-    grid-auto-flow: column;
-    place-content: center end;
-    /* Auto-space the items only in-between, hard to achieve with flex */
-    grid-gap: 1rem;
-  }
+  grid-auto-flow: column;
+  place-content: center end;
 }
 
 /*****
@@ -197,10 +146,8 @@ body {
   Overflow on the y axis is expected and will be scrollable
 */
 #main {
-  position: relative;
-  margin-top: var(--topbar-height);
+  padding-top: var(--topbar-height) !important;
   margin-left: var(--sidenav-width);
-  background-color: var(--color-background);
   padding: var(--container-padding);
 
   > div {
@@ -216,17 +163,22 @@ body {
   node's scroll position was reseted.
 */
 #main,
-#topbar {
+#topbar,
+#sidebar {
   transition: margin-left var(--transition-time);
 }
 @media only screen and (max-width: 40rem) {
-  #sidebar.collapsed {
-    width: 0;
+  #sidebar {
+    transition: width var(--transition-time);
+    width: var(--sidenav-collapsed-width);
     border-right-width: 0;
+
+    .sidebar-logo {
+      width: calc(0.2 * var(--sidenav-width));
+    }
   }
-  #main,
-  #topbar {
-    margin-left: 0;
+  #main {
+    margin-left: var(--sidenav-collapsed-width);
   }
 }
 

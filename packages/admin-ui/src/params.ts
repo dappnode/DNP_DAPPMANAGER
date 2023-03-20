@@ -66,12 +66,6 @@ export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
 // URLs / Links
-export const dappnodeGnosisCheckpointSync =
-         "https://checkpoint-sync-gnosis.dappnode.io";
-export const dappnodePraterCheckpointSync =
-  "https://checkpoint-sync-prater.dappnode.io";
-export const dappnodeMainnetCheckpointSync =
-  "https://checkpoint-sync.dappnode.io";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
@@ -86,13 +80,12 @@ export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
 export const docsUrl = {
   main: "https://docs.dappnode.io",
-  recoverPasswordGuide:
-    "https://docs.dappnode.io/user/faq/troubleshooting",
+  recoverPasswordGuide: "https://docs.dappnode.io/user/faq/troubleshooting",
   connectWifi: "https://docs.dappnode.io/user/guides/access/wifi",
-  connectLocalProxy:
-    "https://docs.dappnode.io/user/guides/access/local",
+  connectLocalProxy: "https://docs.dappnode.io/user/guides/access/local",
   connectVpn: "https://docs.dappnode.io/user/guides/access/vpn",
-  httpsExplanation: "https://docs.dappnode.io/user/product-manual/system#networkk",
+  httpsExplanation:
+    "https://docs.dappnode.io/user/product-manual/system#networkk",
   ipfsPeersExplanation:
     "https://docs.dappnode.io/user/product-manual/system#peers"
 };
@@ -108,8 +101,7 @@ export const forumUrl = {
 
 export const troubleShootMountpointsGuideUrl =
   "https://docs.dappnode.io/developers/package-dev/wizard#target";
-export const dappnodeUserGuideUrl =
-  "https://docs.dappnode.io/user/faq/general";
+export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
 export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";

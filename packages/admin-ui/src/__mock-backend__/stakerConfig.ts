@@ -158,9 +158,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-mainnet",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: true
             },
             {
               status: "ok",
@@ -244,9 +242,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: false
             },
             {
               status: "ok",
@@ -274,9 +270,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_Lodestar",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: false
             }
           ],
           web3Signer: {
@@ -337,7 +331,8 @@ export const stakerConfig: Pick<
                 version: "0.1.},0"
               }
             }
-          }
+          },
+          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
 
       case "prater":
@@ -484,9 +479,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-prater",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync-prater.dappnode.io"
+              useCheckpointSync: true
             },
             {
               status: "ok",
@@ -572,9 +565,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: false
             }
           ],
           web3Signer: {
@@ -638,7 +629,8 @@ export const stakerConfig: Pick<
                 version: "0.1.},0"
               }
             }
-          }
+          },
+          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
       case "gnosis":
         return {
@@ -702,9 +694,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-mainnet",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: true
             },
             {
               status: "ok",
@@ -790,9 +780,7 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              graffiti: "Validating_from_prysm-nimbus",
-              feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F",
-              checkpointSync: "https://checkpoint-sync.dappnode.io"
+              useCheckpointSync: false
             }
           ],
           web3Signer: {
@@ -853,7 +841,8 @@ export const stakerConfig: Pick<
                 version: "0.1.},0"
               }
             }
-          }
+          },
+          feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
       default:
         throw Error(`Unknown network ${network}`);

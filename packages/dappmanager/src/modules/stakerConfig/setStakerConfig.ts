@@ -23,7 +23,7 @@ import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
-  updateConsensusEnv,
+  setUseCheckpointSync,
   getMevBoostUserSettings,
   updateMevBoostEnv
 } from "./utils.js";
@@ -134,6 +134,7 @@ export async function setStakerConfig<T extends Network>({
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
+    network: stakerConfig.network,
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
@@ -143,7 +144,8 @@ export async function setStakerConfig<T extends Network>({
       network: stakerConfig.network,
       executionClient: currentExecClient,
       consensusClient: stakerConfig.consensusClient?.dnpName,
-      mevBoost: stakerConfig.mevBoost?.dnpName
+      mevBoost: stakerConfig.mevBoost?.dnpName,
+      feeRecipient: stakerConfig.feeRecipient
     });
     throw e;
   });
@@ -160,7 +162,8 @@ export async function setStakerConfig<T extends Network>({
         ...stakerConfig,
         executionClient: currentExecClient,
         consensusClient: currentConsClient,
-        mevBoost: stakerConfig.mevBoost?.dnpName
+        mevBoost: stakerConfig.mevBoost?.dnpName,
+        feeRecipient: stakerConfig.feeRecipient
       });
       throw e;
     });
@@ -176,7 +179,8 @@ export async function setStakerConfig<T extends Network>({
       ...stakerConfig,
       executionClient: currentExecClient,
       consensusClient: currentConsClient,
-      mevBoost: stakerConfig.mevBoost?.dnpName
+      mevBoost: stakerConfig.mevBoost?.dnpName,
+      feeRecipient: stakerConfig.feeRecipient
     });
     throw e;
   });
@@ -186,7 +190,8 @@ export async function setStakerConfig<T extends Network>({
     network: stakerConfig.network,
     executionClient: stakerConfig.executionClient?.dnpName,
     consensusClient: stakerConfig.consensusClient?.dnpName,
-    mevBoost: stakerConfig.mevBoost?.dnpName
+    mevBoost: stakerConfig.mevBoost?.dnpName,
+    feeRecipient: stakerConfig.feeRecipient
   });
 }
 
@@ -271,10 +276,12 @@ async function setExecutionClientConfig<T extends Network>({
 }
 
 async function setConsensusClientConfig<T extends Network>({
+  network,
   currentConsClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
+  network: Network;
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
@@ -300,7 +307,9 @@ async function setConsensusClientConfig<T extends Network>({
   }
   // User settings object: GRAFFITI, FEE_RECIPIENT_ADDRESS, CHECKPOINTSYNC
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
-    ...targetConsensusClient
+    dnpName: targetConsensusClient.dnpName,
+    network,
+    useCheckpointSync: targetConsensusClient.useCheckpointSync
   });
 
   if (targetConsensusClient.dnpName && !currentConsClient) {
@@ -315,9 +324,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -336,9 +345,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start package
       await dockerComposeUpPackage(
@@ -363,9 +372,9 @@ async function setConsensusClientConfig<T extends Network>({
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
       // Update env if needed
-      await updateConsensusEnv({
+      await setUseCheckpointSync({
         targetConsensusClient,
-        userSettings
+        network
       });
       // Start new client
       await dockerComposeUpPackage(
@@ -468,12 +477,14 @@ function setStakerConfigOnDb<T extends Network>({
   network,
   executionClient,
   consensusClient,
-  mevBoost
+  mevBoost,
+  feeRecipient
 }: {
   network: T;
   executionClient?: ExecutionClient<T>;
   consensusClient?: ConsensusClient<T>;
   mevBoost?: MevBoost<T>;
+  feeRecipient?: string;
 }): void {
   switch (network) {
     case "mainnet":
@@ -487,6 +498,11 @@ function setStakerConfigOnDb<T extends Network>({
         );
       if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
         db.mevBoostMainnet.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientMainnet.get() !== feeRecipient
+      )
+        db.feeRecipientMainnet.set(feeRecipient);
       break;
     case "gnosis":
       if (db.executionClientGnosis.get() !== executionClient)
@@ -495,6 +511,11 @@ function setStakerConfigOnDb<T extends Network>({
         db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
       if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
         db.mevBoostGnosis.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientGnosis.get() !== feeRecipient
+      )
+        db.feeRecipientGnosis.set(feeRecipient);
       break;
     case "prater":
       if (db.executionClientPrater.get() !== executionClient)
@@ -503,6 +524,11 @@ function setStakerConfigOnDb<T extends Network>({
         db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
       if (db.mevBoostPrater.get() !== Boolean(mevBoost))
         db.mevBoostPrater.set(mevBoost ? true : false);
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientPrater.get() !== feeRecipient
+      )
+        db.feeRecipientPrater.set(feeRecipient);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);

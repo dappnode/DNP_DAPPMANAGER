@@ -54,7 +54,8 @@ export function stakerParamsByNetwork<T extends Network>(
           minVersion: "0.1.4"
         },
         mevBoost: "mev-boost.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostMainnet.get()
+        isMevBoostSelected: db.mevBoostMainnet.get(),
+        feeRecipient: db.feeRecipientMainnet.get() || ""
       } as StakerParamsByNetwork<T>;
 
     case "gnosis":
@@ -86,7 +87,8 @@ export function stakerParamsByNetwork<T extends Network>(
           minVersion: "0.1.10"
         },
         mevBoost: "mev-boost-gnosis.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostGnosis.get()
+        isMevBoostSelected: db.mevBoostGnosis.get(),
+        feeRecipient: db.feeRecipientGnosis.get() || ""
       } as StakerParamsByNetwork<T>;
     case "prater":
       return {
@@ -137,7 +139,8 @@ export function stakerParamsByNetwork<T extends Network>(
           minVersion: "0.1.11"
         },
         mevBoost: "mev-boost-goerli.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostPrater.get()
+        isMevBoostSelected: db.mevBoostPrater.get(),
+        feeRecipient: db.feeRecipientPrater.get() || ""
       } as StakerParamsByNetwork<T>;
     default:
       throw Error(`Unsupported network: ${network}`);

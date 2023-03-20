@@ -55,9 +55,12 @@ export default function Repository({
       <div className="header">
         <div className="title">Repository Source</div>
         <div className="description">
-          Dappnode uses smart contracts on the Ethereum Blockchain to provide access a decentralized respository of Official Dappnode Packages (DNPs) and publicly DApp Packages.
+          Official DAppNode Packages (DNPs) and Community Packages (Public) are
+          published in a decentralized repository. To access this repository,
+          DAppNode uses smart contracts on the Ethereum Blockchain.
           <br />
-          Choose to connect to a remote Ethereum Node or choose to use your own locally run Ethereum Node
+          You can either connect to a remote Ethereum node maintained by
+          DAppNode or easily run your own node to promote decentralization.
         </div>
       </div>
 
