@@ -68,6 +68,10 @@ export function stakerParamsByNetwork<T extends Network>(
           {
             dnpName: "nethermind-xdai.dnp.dappnode.eth",
             minVersion: "1.0.18"
+          },
+          {
+            dnpName: "erigon-gnosis.dnp.dappnode.eth",
+            minVersion: "0.1.0"
           }
         ],
         currentExecClient: db.executionClientGnosis.get(),
