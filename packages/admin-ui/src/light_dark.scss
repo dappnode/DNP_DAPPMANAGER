@@ -94,24 +94,24 @@
 
     // ALERTS
     .alert:not(a) {
-      color: #ffffff;
+      color: var(--color-dark-quaternarytext);
 
       p,
       strong {
-        color: #ffffff;
+        color: var(--color-dark-quaternarytext);
       }
     }
 
     .alert-secondary {
       background-color: var(--color-dark-card-hover) !important;
       border-color: var(--color-dark-secondarytext);
-      color:#ffffff
+      color: var(--color-dark-quaternarytext);
     }
 
     .alert-info {
       background-color: rgba(0, 177, 244, 0.4);
       border-color: var(--color-dark-secondarytext);
-      color:#ffffff
+      color: var(--color-dark-quaternarytext);
     }
 
     // INPUTS
