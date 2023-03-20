@@ -1,17 +1,23 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { sidenavItems, fundedBy } from "./navbarItems";
+import { advancedItems, basicItems, fundedBy } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
 import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
-import { ThemeContext } from "../../App";
+import { ThemeContext, UsageContext } from "../../App";
 import "./sidebar.scss";
 
-if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
+if (!Array.isArray(advancedItems))
+  throw Error("advancedItems must be an array");
+if (!Array.isArray(basicItems)) throw Error("basicItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
   const { theme } = React.useContext(ThemeContext);
+  const { usage } = React.useContext(UsageContext);
+
+  const sidenavItems =
+    usage === "advanced" ? [...basicItems, ...advancedItems] : basicItems;
   return (
     <div id="sidebar">
       <NavLink to={"/"}>
