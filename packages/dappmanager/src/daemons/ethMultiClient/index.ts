@@ -82,9 +82,8 @@ export async function runEthClientInstaller(
                 name: target,
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
-                  checkpointSync: useCheckpointSync
-                    ? params.ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE
-                    : undefined
+                  network: "mainnet",
+                  useCheckpointSync
                 })
               });
             else await packageInstall({ name: target });

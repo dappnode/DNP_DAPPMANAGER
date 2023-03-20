@@ -22,10 +22,7 @@ export const launchpadSteps = <T extends Network>({
   newConsClient,
   setNewMevBoost,
   newMevBoost,
-  feeRecipientError,
-  graffitiError,
-  defaultGraffiti,
-  defaultCheckpointSync
+  feeRecipientError
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
@@ -46,9 +43,6 @@ export const launchpadSteps = <T extends Network>({
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
   feeRecipientError: string | null;
-  graffitiError: string | null;
-  defaultGraffiti: string;
-  defaultCheckpointSync: string;
 }) => [
   {
     title: "Create the validator keystores and do the deposit",
@@ -100,9 +94,6 @@ export const launchpadSteps = <T extends Network>({
             setNewConsClient={setNewConsClient}
             newConsClient={newConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
-            graffitiError={graffitiError}
-            defaultGraffiti={defaultGraffiti}
-            defaultCheckpointSync={defaultCheckpointSync}
           />
         ))}
       </div>
@@ -169,9 +160,6 @@ export const launchpadSteps = <T extends Network>({
             setNewConsClient={setNewConsClient}
             newConsClient={newConsClient}
             isSelected={true}
-            graffitiError={graffitiError}
-            defaultGraffiti={defaultGraffiti}
-            defaultCheckpointSync={defaultCheckpointSync}
           />
         )}
         {newMevBoost && (
