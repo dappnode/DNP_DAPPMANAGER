@@ -1270,6 +1270,38 @@
     timestring "^5.0.1"
     yargs "^13.2.4"
 
+"@dappnode/dappnodesdk@^0.2.74":
+  version "0.2.74"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.74.tgz#1edccdce78cba18c3e6145c627d93cf0618e5fd0"
+  integrity sha512-6uYe8yzq0kNk3vKmnnMVVwuAOIwVIp37x1LhbfMSr/P3wDb4/PAKVpARQcP0Ab4G1MZ/+/tJkagE39je7dgrAw==
+  dependencies:
+    "@octokit/rest" "^18.0.12"
+    ajv "^8.11.0"
+    ajv-errors "^3.0.0"
+    async-retry "^1.2.3"
+    chalk "^2.4.2"
+    cli-progress "^3.8.2"
+    dotenv "^8.2.0"
+    ethers "^5.7.2"
+    figlet "^1.2.3"
+    form-data "^3.0.0"
+    got "^10.5.5"
+    image-size "^0.8.1"
+    inquirer "^6.2.1"
+    js-yaml "^3.12.1"
+    listr "^0.14.3"
+    lodash "^4.17.20"
+    mime-types "^2.1.24"
+    moment "^2.27.0"
+    prettier "^2.1.2"
+    request "^2.88.2"
+    rimraf "^3.0.2"
+    semver "^5.6.0"
+    source-map-support "^0.5.19"
+    tar-fs "^2.0.0"
+    timestring "^5.0.1"
+    yargs "^13.2.4"
+
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"

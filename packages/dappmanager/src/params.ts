@@ -1,6 +1,5 @@
 import path from "path";
-import { FileFormat } from "./types.js";
-import { Architecture } from "@dappnode/dappnodesdk";
+import { getContainerDomain } from "@dappnode/dappnodesdk";
 import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
@@ -359,33 +358,6 @@ export const ethClientData: {
 
 // Naming
 
-/**
- * Get a unique domain per container, considering multi-service packages
- */
-export const getContainerDomain = ({
-  dnpName,
-  serviceName
-}: {
-  serviceName: string;
-  dnpName: string;
-}): string => {
-  if (!serviceName || serviceName === dnpName) {
-    return dnpName;
-  } else {
-    return [serviceName, dnpName].join(".");
-  }
-};
-
-export const getImageTag = ({
-  dnpName,
-  serviceName,
-  version
-}: {
-  dnpName: string;
-  serviceName: string;
-  version: string;
-}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
-
 export const getContainerName = ({
   dnpName,
   serviceName,
@@ -400,103 +372,3 @@ export const getContainerName = ({
     isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
     getContainerDomain({ dnpName, serviceName })
   ].join("");
-
-// From SDK, must be in sync
-
-export const releaseFiles = {
-  manifest: {
-    regex: /dappnode_package.*\.(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 100e3, // Limit size to ~100KB
-    required: true as const,
-    multiple: false as const
-  },
-  compose: {
-    regex: /compose.*\.yml$/,
-    format: FileFormat.YAML,
-    maxSize: 10e3, // Limit size to ~10KB
-    required: true as const,
-    multiple: false as const
-  },
-  signature: {
-    regex: /^signature\.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3, // Limit size to ~10KB
-    required: false as const,
-    multiple: false as const
-  },
-  avatar: {
-    regex: /avatar.*\.png$/,
-    format: null,
-    maxSize: 100e3,
-    required: true as const,
-    multiple: false as const
-  },
-  setupWizard: {
-    regex: /setup-wizard\..*(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupSchema: {
-    regex: /setup\..*\.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupTarget: {
-    regex: /setup-target\..*json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupUiJson: {
-    regex: /setup-ui\..*json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  disclaimer: {
-    regex: /disclaimer\.md$/i,
-    format: FileFormat.TEXT,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  gettingStarted: {
-    regex: /getting.*started\.md$/i,
-    format: FileFormat.TEXT,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  prometheusTargets: {
-    regex: /.*prometheus-targets.(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  grafanaDashboards: {
-    regex: /.*grafana-dashboard.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e6, // ~ 10MB
-    required: false as const,
-    multiple: true as const
-  }
-};
-
-// Single arch images
-export const getArchTag = (arch: Architecture): string =>
-  arch.replace(/\//g, "-");
-export const getImagePath = (
-  dnpName: string,
-  version: string,
-  arch: Architecture
-): string => `${dnpName}_${version}_${getArchTag(arch)}.txz`;
-export const getLegacyImagePath = (dnpName: string, version: string): string =>
-  `${dnpName}_${version}.tar.xz`;
