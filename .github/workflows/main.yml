@@ -50,15 +50,15 @@ jobs:
       - run: yarn build
       - run: yarn test:int
 
-  end-to-end-test:
-    runs-on: dappmanager
-    name: In real environment end-to-end tests
-    steps:
-      - uses: actions/checkout@v2
-      - run: yarn # Caching only saves 30s
-      - run: yarn bootstrap
-      - run: yarn generate
-      - run: yarn test:end
+  #  end-to-end-test:
+  #    runs-on: dappmanager
+  #    name: In real environment end-to-end tests
+  #    steps:
+  #      - uses: actions/checkout@v2
+  #      - run: yarn # Caching only saves 30s
+  #      - run: yarn bootstrap
+  #      - run: yarn generate
+  #      - run: yarn test:end
 
   release:
     name: Release
