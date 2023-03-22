@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import params from "../../src/params";
+import params from "../../src/params.js";
 import os from "os";
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

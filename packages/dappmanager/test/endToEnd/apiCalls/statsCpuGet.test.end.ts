@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { dappmanagerTestApiUrl } from "../endToEndUtils";
-import { validateRoutesReturn } from "../../../src/common";
+import { validateRoutesReturn } from "@dappnode/common";
 import fetch from "node-fetch";
 import { URL } from "url";
 
