@@ -1,34 +1,9 @@
+import { getContainerDomain } from "@dappnode/dappnodesdk";
+
 const params = {
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-"
 };
-
-/**
- * Get a unique domain per container, considering multi-service packages
- */
-export const getContainerDomain = ({
-  dnpName,
-  serviceName
-}: {
-  serviceName: string;
-  dnpName: string;
-}): string => {
-  if (!serviceName || serviceName === dnpName) {
-    return dnpName;
-  } else {
-    return [serviceName, dnpName].join(".");
-  }
-};
-
-export const getImageTag = ({
-  dnpName,
-  serviceName,
-  version
-}: {
-  dnpName: string;
-  serviceName: string;
-  version: string;
-}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
 
 export const getContainerName = ({
   dnpName,

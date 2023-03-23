@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import { omit } from "lodash-es";
-import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
+import { Manifest, SetupWizard, getImageTag } from "@dappnode/dappnodesdk";
 import * as calls from "../../src/calls/index.js";
 import { ManifestWithImage } from "../../src/types.js";
 import {
@@ -22,7 +22,7 @@ import * as validate from "../../src/utils/validate.js";
 import { dockerComposeUp } from "../../src/modules/docker/compose/index.js";
 import { ComposeEditor } from "../../src/modules/compose/editor.js";
 import { writeDefaultsToLabels } from "../../src/modules/compose/index.js";
-import { getContainerName, getImageTag } from "../../src/params.js";
+import { getContainerName } from "../../src/params.js";
 import { RequestedDnp } from "@dappnode/common";
 
 describe("Fetch releases", () => {
