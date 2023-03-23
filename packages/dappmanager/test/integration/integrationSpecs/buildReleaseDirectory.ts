@@ -5,12 +5,13 @@ import { mapValues } from "lodash-es";
 import { ipfs } from "../../../src/modules/ipfs/index.js";
 import shell from "../../../src/utils/shell.js";
 import { yamlDump } from "../../../src/utils/yaml.js";
-import { getContainerName, getImageTag } from "../../../src/params.js";
+import { getContainerName } from "../../../src/params.js";
 import {
   Manifest,
   Compose,
   SetupWizard,
-  ComposeService
+  ComposeService,
+  getImageTag
 } from "@dappnode/dappnodesdk";
 import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
 import { ipfsAddAll } from "../testIpfsUtils.js";
