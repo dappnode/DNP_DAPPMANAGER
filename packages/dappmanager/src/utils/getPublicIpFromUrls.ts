@@ -27,7 +27,7 @@ export default async function getPublicIpFromUrls(options?: {
   for (const url of urls) {
     try {
       const ip = await retry(
-        () => fetch(url, { timeout }).then(res => res.text()),
+        () => fetch.default(url, { timeout }).then(res => res.text()),
         { retries }
       );
       if (isIp(ip)) return ip;

@@ -6,7 +6,7 @@ import {
   catStreamToFs,
   writeCarToFs
 } from "./writeStreamToFs.js";
-import { IpfsCatOptions, IPFSEntry, IPFSPath } from "./types.js";
+import { IpfsCatOptions, IPFSEntry } from "./types.js";
 import { handleIpfsError } from "./utils.js";
 import { catCarReaderToMemory, catString } from "./writeFileToMemory.js";
 import { IpfsClientTarget } from "@dappnode/common";
@@ -100,11 +100,11 @@ export class Ipfs {
   /**
    * Pin a hash
    */
-  async pinAdd(hash: IPFSPath): Promise<void> {
+  async pinAdd(hash: string): Promise<void> {
     await this.ipfs.pin.add(hash, { timeout: this.timeout });
   }
 
-  async pinAddNoThrow(hash: IPFSPath): Promise<void> {
+  async pinAddNoThrow(hash: string): Promise<void> {
     // Pin release on visit
     if (db.ipfsClientTarget.get() === "local") {
       await this.pinAdd(hash).catch((e: Error) =>

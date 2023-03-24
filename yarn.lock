@@ -1729,13 +1729,23 @@
   resolved "https://registry.yarnpkg.com/@hutson/parse-repository-url/-/parse-repository-url-3.0.2.tgz#98c23c950a3d9b6c8f0daed06da6c3af06981340"
   integrity sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==
 
-"@ipld/car@^3.1.16", "@ipld/car@^3.2.3":
+"@ipld/car@^3.2.3":
   version "3.2.4"
   resolved "https://registry.yarnpkg.com/@ipld/car/-/car-3.2.4.tgz#115951ba2255ec51d865773a074e422c169fb01c"
   integrity sha512-rezKd+jk8AsTGOoJKqzfjLJ3WVft7NZNH95f0pfPbicROvzTyvHCNy567HzSUd6gRXZ9im29z5ZEv9Hw49jSYw==
   dependencies:
     "@ipld/dag-cbor" "^7.0.0"
     multiformats "^9.5.4"
+    varint "^6.0.0"
+
+"@ipld/car@^5.1.1":
+  version "5.1.1"
+  resolved "https://registry.yarnpkg.com/@ipld/car/-/car-5.1.1.tgz#14a26dc97c4783ade491ac811f61885259b9d75e"
+  integrity sha512-HoFTUqUJL9cPGhC9qRmHCvamfIsj1JllQSQ/Xu9/KN/VNJp8To9Ms4qiZPEMOwcrNFclfYqrahjGYbf4KL/d9A==
+  dependencies:
+    "@ipld/dag-cbor" "^9.0.0"
+    cborg "^1.9.0"
+    multiformats "^11.0.0"
     varint "^6.0.0"
 
 "@ipld/dag-cbor@^7.0.0", "@ipld/dag-cbor@^7.0.2":
@@ -1752,6 +1762,14 @@
   integrity sha512-mHRuzgGXNk0Y5W7nNQdN37qJiig1Kdgf92icBVFRUNtBc9Ezl5DIdWfiGWBucHBrhqPBncxoH3As9cHPIRozxA==
   dependencies:
     cborg "^1.6.0"
+    multiformats "^11.0.0"
+
+"@ipld/dag-cbor@^9.0.0":
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/@ipld/dag-cbor/-/dag-cbor-9.0.0.tgz#51902f7d19ce2203b04e4cfe0514936b82d09d91"
+  integrity sha512-zdsiSiYDEOIDW7mmWOYWC9gukjXO+F8wqxz/LfN7iSwTfIyipC8+UQrCbPupFMRb/33XQTZk8yl3My8vUQBRoA==
+  dependencies:
+    cborg "^1.10.0"
     multiformats "^11.0.0"
 
 "@ipld/dag-json@^9.0.0":
@@ -5989,6 +6007,11 @@ caseless@~0.12.0:
   version "0.12.0"
   resolved "https://registry.yarnpkg.com/caseless/-/caseless-0.12.0.tgz#1b681c21ff84033c826543090689420d187151dc"
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
+
+cborg@^1.10.0, cborg@^1.9.0:
+  version "1.10.1"
+  resolved "https://registry.yarnpkg.com/cborg/-/cborg-1.10.1.tgz#24cfe52c69ec0f66f95e23dc57f2086954c8d718"
+  integrity sha512-et6Qm8MOUY2kCWa5GKk2MlBVoPjHv0hQBmlzI/Z7+5V3VJCeIkGehIB3vWknNsm2kOkAIs6wEKJFJo8luWQQ/w==
 
 cborg@^1.5.4:
   version "1.10.0"

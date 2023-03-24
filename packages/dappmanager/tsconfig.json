@@ -3,7 +3,7 @@
     "target": "es2019",
     "lib": ["ES2020", "dom"],
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,

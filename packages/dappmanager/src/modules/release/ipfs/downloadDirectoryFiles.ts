@@ -3,13 +3,13 @@ import { ReleaseSignature } from "../../../types.js";
 import { Compose, Manifest } from "@dappnode/dappnodesdk";
 import { findEntries } from "./findEntries.js";
 import { downloadAsset } from "./downloadAssets.js";
-import { IPFSEntry } from "ipfs-core-types/src/root";
 import { promiseAllValues } from "../../../utils/promises.js";
 import {
   releaseFilesToDownload,
   DirectoryFiles,
   joinFilesInManifest
 } from "./params.js";
+import { IPFSEntry } from "../../ipfs/types.js";
 
 export async function downloadDirectoryFiles(ipfsFiles: IPFSEntry[]): Promise<{
   manifest: Manifest;

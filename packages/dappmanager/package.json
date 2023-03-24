@@ -22,8 +22,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/dappnodesdk": "^0.2.74",
-    "@ipld/car": "^3.1.16",
+    "@dappnode/dappnodesdk": "^0.2.79",
+    "@ipld/car": "^5.1.1",
     "@types/async": "^3.0.1",
     "@types/async-retry": "^1.4.2",
     "@types/bcryptjs": "^2.4.2",

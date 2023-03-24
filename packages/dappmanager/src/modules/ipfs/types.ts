@@ -13,13 +13,7 @@ export interface IpfsCatOptions {
 export type IpfsInstance = IPFSHTTPClient;
 
 // Extract IPFSEntry type from ls since it's not exported
-export type IPFSEntry = ReturnType<IPFSHTTPClient["ls"]> extends AsyncIterable<
-  infer U
->
-  ? U
-  : never;
-
-export type IPFSPath = Parameters<IPFSHTTPClient["ls"]>[0];
+export type IPFSEntry = ReturnType<IPFSHTTPClient["ls"]>;
 
 // {
 //   name: string; // 'avatar.png',

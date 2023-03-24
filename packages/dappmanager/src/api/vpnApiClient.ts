@@ -53,7 +53,7 @@ async function vpnRpcCall<R>(
   route: string,
   ...args: Args
 ): Promise<R> {
-  const res = await fetch(params.VPN_API_RPC_URL, {
+  const res = await fetch.default(params.VPN_API_RPC_URL, {
     method: "post",
     body: JSON.stringify({ method: route, params: args }),
     headers: { "Content-Type": "application/json" }

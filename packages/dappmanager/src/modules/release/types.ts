@@ -2,7 +2,7 @@ import { DistributedFile } from "@dappnode/common";
 import { ReleaseSignature } from "../../types.js";
 import { FileFormat } from "../../types.js";
 import { Manifest, Compose } from "@dappnode/dappnodesdk";
-import { IPFSEntry } from "ipfs-core-types/src/root";
+import { IPFSEntry } from "../ipfs/types.js";
 
 export interface FileConfig {
   regex: RegExp;

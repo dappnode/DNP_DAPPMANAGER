@@ -38,7 +38,7 @@ export default async function updateIp(): Promise<string | void> {
   ];
   const url = `${dyndnsHost}/?${parameters.join("&")}`;
   try {
-    const res = await fetch(url);
+    const res = await fetch.default(url);
 
     const status = res.status;
     if (status !== 200) {

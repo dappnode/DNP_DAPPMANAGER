@@ -259,7 +259,7 @@ async function isSyncedWithConsensus(
 ): Promise<boolean> {
   const provider = new ethers.providers.JsonRpcProvider(execUrl);
   const execBlockNumber = await provider.getBlockNumber();
-  const execBlockHeadersResponse = await fetch(
+  const execBlockHeadersResponse = await fetch.default(
     consUrl + "/eth/v2/beacon/blocks/head"
   );
   const consBlockHeadersResponseParsed = await execBlockHeadersResponse.json();

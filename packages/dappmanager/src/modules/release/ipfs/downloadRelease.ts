@@ -1,7 +1,6 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs } from "../../ipfs/index.js";
-import { IPFSEntry } from "ipfs-core-types/src/root";
+import { IPFSEntry, ipfs } from "../../ipfs/index.js";
 import {
   manifestToCompose,
   validateManifestWithImage

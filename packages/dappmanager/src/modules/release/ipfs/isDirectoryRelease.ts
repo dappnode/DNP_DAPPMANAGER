@@ -1,5 +1,5 @@
 import { releaseFiles } from "@dappnode/dappnodesdk";
-import { IPFSEntry } from "ipfs-core-types/src/root";
+import { IPFSEntry } from "../../ipfs/types.js";
 
 /**
  * Check if the IPFS path is a root directory
