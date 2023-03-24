@@ -1238,10 +1238,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
   integrity sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==
 
-"@dappnode/dappnodesdk@^0.2.71":
-  version "0.2.71"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.71.tgz#2d65bc3a088ee8a80da774a70d80707c4a237bc7"
-  integrity sha512-bfk3EWM8hwx7PZWFF73Gqpd4pJioHRC66Urt6ZEYOL9RdBuNxe79ZjNr8taS8mabz3I46Fj1faaQXNPjY0ylwA==
+"@dappnode/dappnodesdk@^0.2.74":
+  version "0.2.74"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.74.tgz#1edccdce78cba18c3e6145c627d93cf0618e5fd0"
+  integrity sha512-6uYe8yzq0kNk3vKmnnMVVwuAOIwVIp37x1LhbfMSr/P3wDb4/PAKVpARQcP0Ab4G1MZ/+/tJkagE39je7dgrAw==
   dependencies:
     "@octokit/rest" "^18.0.12"
     ajv "^8.11.0"
@@ -1270,10 +1270,10 @@
     timestring "^5.0.1"
     yargs "^13.2.4"
 
-"@dappnode/dappnodesdk@^0.2.74":
-  version "0.2.74"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.74.tgz#1edccdce78cba18c3e6145c627d93cf0618e5fd0"
-  integrity sha512-6uYe8yzq0kNk3vKmnnMVVwuAOIwVIp37x1LhbfMSr/P3wDb4/PAKVpARQcP0Ab4G1MZ/+/tJkagE39je7dgrAw==
+"@dappnode/dappnodesdk@^0.2.79":
+  version "0.2.79"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.79.tgz#40e1e479beb652bf7268031e6ebfa8bb4e9043f5"
+  integrity sha512-BVRG8mQrKPr9vkW6bmwReZUTBhHr1rDKRtkXNX6fH5HwpOVSkKJdzGzHOLgIE7/DknZG7sUgDArxE8BqyRqZIA==
   dependencies:
     "@octokit/rest" "^18.0.12"
     ajv "^8.11.0"
@@ -1290,7 +1290,7 @@
     inquirer "^6.2.1"
     js-yaml "^3.12.1"
     listr "^0.14.3"
-    lodash "^4.17.20"
+    lodash-es "^4.17.21"
     mime-types "^2.1.24"
     moment "^2.27.0"
     prettier "^2.1.2"

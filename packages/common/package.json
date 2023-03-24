@@ -18,7 +18,7 @@
     "dev": "tsc -w"
   },
   "dependencies": {
-    "@dappnode/dappnodesdk": "^0.2.71",
+    "@dappnode/dappnodesdk": "^0.2.79",
     "@types/node": "^18.11.18",
     "lodash-es": "^4.17.21"
   },

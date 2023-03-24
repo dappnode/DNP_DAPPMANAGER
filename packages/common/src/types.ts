@@ -11,7 +11,6 @@ import {
   Dependencies,
   PackageEnvs,
 } from "@dappnode/dappnodesdk";
-import { build } from "@dappnode/dappnodesdk/dist/commands/build";
 
 /**
  * Take into account the following tags to document the new types inside this file

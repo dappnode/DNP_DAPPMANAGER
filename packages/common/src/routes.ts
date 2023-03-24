@@ -44,8 +44,8 @@ import {
   Network,
   StakerConfigSet,
   StakerConfigGet,
-  Eth2ClientTarget
-} from "./types";
+  Eth2ClientTarget,
+} from "./types.js";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
 export interface Routes {
@@ -773,7 +773,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
 };
 
 // DO NOT REMOVE
