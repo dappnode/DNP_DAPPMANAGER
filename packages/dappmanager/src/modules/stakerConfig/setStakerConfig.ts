@@ -573,8 +573,6 @@ function checkLodestarMinVersions<T extends Network>(
     pkg => pkg.dnpName === executionClientDnpName
   );
 
-  console.log(JSON.stringify(installedExecClient));
-
   const installedExecClientVersion = installedExecClient?.version;
 
   if (
