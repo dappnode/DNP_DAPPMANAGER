@@ -33,7 +33,7 @@ import { dockerComposeUpPackage } from "../docker/index.js";
 import { lt } from "semver";
 import * as db from "../../db/index.js";
 import { getLodestarStakersMinimumVersions } from "./params.js";
-import { ExecutionClientOrSignerVersion } from "./types.js";
+import { ExecutionClientOrSignerVersions } from "./types.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -561,7 +561,9 @@ function checkLodestarMinVersions<T extends Network>(
   web3signerDnpName: Signer<T>,
   web3signerVersion: string | undefined
 ): void {
-  const lodestarMinVersions = getLodestarStakersMinimumVersions(network);
+  const lodestarMinVersions = getLodestarStakersMinimumVersions(
+    network
+  ) as ExecutionClientOrSignerVersions<T>;
 
   if (!lodestarMinVersions) {
     throw Error(`Lodestar ${network} minimum versions are not defined.`);
@@ -571,6 +573,8 @@ function checkLodestarMinVersions<T extends Network>(
     pkg => pkg.dnpName === executionClientDnpName
   );
 
+  console.log(JSON.stringify(installedExecClient));
+
   const installedExecClientVersion = installedExecClient?.version;
 
   if (
@@ -578,7 +582,7 @@ function checkLodestarMinVersions<T extends Network>(
     lt(
       installedExecClientVersion,
       lodestarMinVersions[
-        executionClientDnpName as keyof ExecutionClientOrSignerVersion<T>
+        executionClientDnpName as keyof ExecutionClientOrSignerVersions<T>
       ]
     )
   ) {
@@ -588,7 +592,7 @@ function checkLodestarMinVersions<T extends Network>(
       } version ${installedExecClientVersion} is not compatible with Lodestar. 
       Minimum version required: ${
         lodestarMinVersions[
-          executionClientDnpName as keyof ExecutionClientOrSignerVersion<T>
+          executionClientDnpName as keyof ExecutionClientOrSignerVersions<T>
         ]
       }`
     );
@@ -600,15 +604,15 @@ function checkLodestarMinVersions<T extends Network>(
     lt(
       web3signerVersion,
       lodestarMinVersions[
-        web3signerDnpName as keyof ExecutionClientOrSignerVersion<T>
+        web3signerDnpName as keyof ExecutionClientOrSignerVersions<T>
       ]
     )
   ) {
     throw Error(
-      `Signer ${executionClientDnpName} version ${web3signerVersion} is not compatible with Lodestar. 
+      `Signer ${web3signerDnpName} version ${web3signerVersion} is not compatible with Lodestar. 
       Minimum version required: ${
         lodestarMinVersions[
-          web3signerDnpName as keyof ExecutionClientOrSignerVersion<T>
+          web3signerDnpName as keyof ExecutionClientOrSignerVersions<T>
         ]
       }`
     );

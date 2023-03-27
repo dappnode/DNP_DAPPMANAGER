@@ -1,7 +1,7 @@
 import { Network } from "@dappnode/common";
-import { ExecutionClientOrSignerVersion } from "./types";
+import { ExecutionClientOrSignerVersions } from "./types";
 
-const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersion<"prater"> =
+const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersions<"prater"> =
   {
     "goerli-nethermind.dnp.dappnode.eth": "1.0.8",
     "goerli-geth.dnp.dappnode.eth": "0.4.28",
@@ -10,13 +10,13 @@ const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersion<"prat
     "web3signer-prater.dnp.dappnode.eth": "0.1.18"
   };
 
-const lodestarStakersGnosisMinimumVersions: ExecutionClientOrSignerVersion<"gnosis"> =
+const lodestarStakersGnosisMinimumVersions: ExecutionClientOrSignerVersions<"gnosis"> =
   {
     "nethermind-xdai.dnp.dappnode.eth": "1.0.29", // Needs publishment
     "web3signer-gnosis.dnp.dappnode.eth": "0.1.13" // Needs publishment
   };
 
-const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersion<"mainnet"> =
+const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersions<"mainnet"> =
   {
     "nethermind.public.dappnode.eth": "1.0.35",
     "geth.dnp.dappnode.eth": "0.1.38",
@@ -27,14 +27,14 @@ const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersion<"mai
 
 export function getLodestarStakersMinimumVersions<T extends Network>(
   network: T
-): ExecutionClientOrSignerVersion<T> {
+): ExecutionClientOrSignerVersions<T> {
   switch (network) {
     case "prater":
-      return lodestarStakersPraterMinimumVersions as ExecutionClientOrSignerVersion<T>;
+      return lodestarStakersPraterMinimumVersions as ExecutionClientOrSignerVersions<T>;
     case "gnosis":
-      return lodestarStakersGnosisMinimumVersions as ExecutionClientOrSignerVersion<T>;
+      return lodestarStakersGnosisMinimumVersions as ExecutionClientOrSignerVersions<T>;
     case "mainnet":
-      return lodestarStakersMainnetMinimumVersions as ExecutionClientOrSignerVersion<T>;
+      return lodestarStakersMainnetMinimumVersions as ExecutionClientOrSignerVersions<T>;
     default:
       throw Error(`Network ${network} not supported`);
   }
