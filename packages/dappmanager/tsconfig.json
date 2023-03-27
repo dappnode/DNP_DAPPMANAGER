@@ -1,9 +1,10 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "target": "es2019",
     "lib": ["ES2020", "dom"],
     "module": "esnext",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowJs": true,
@@ -12,7 +13,13 @@
     "types": ["mocha", "node"],
     "outDir": "dist",
     "sourceMap": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+
+    "paths": {
+      "@dappnode/dappnodesdk/*": [
+        "../../../node_modules/@dappnode/dappnodesdk/dist/*"
+      ]
+    }
   },
   "ts-node": {
     "esm": true,
@@ -20,5 +27,5 @@
     "experimentalResolver": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "test/**/*"]
+  "exclude": ["test/**/*", "node_modules"]
 }

@@ -10,7 +10,7 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": false,
-    "module": "ESNext",
+    "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -22,7 +22,7 @@
     "paths": {
       "@dappnode/common": ["../../common/src"],
       "@dappnode/dappnodesdk/*": [
-        "../../../node_modules/@dappnode/dappnodesdk/src/*"
+        "../../../node_modules/@dappnode/dappnodesdk/dist/*"
       ]
     }
   },
