@@ -1,8 +1,5 @@
 import { Network } from "@dappnode/common";
-import {
-  ExecutionClientOrSignerVersion,
-  LodestarStakersMinimumVersions
-} from "./types";
+import { ExecutionClientOrSignerVersion } from "./types";
 
 const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersion<"prater"> =
   {
@@ -28,9 +25,17 @@ const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersion<"mai
     "web3signer.dnp.dappnode.eth": "0.1.7" // Needs publishment
   };
 
-export const lodestarStakersMinimumVersions: LodestarStakersMinimumVersions<Network> =
-  {
-    prater: lodestarStakersPraterMinimumVersions,
-    gnosis: lodestarStakersGnosisMinimumVersions,
-    mainnet: lodestarStakersMainnetMinimumVersions
-  };
+export function getLodestarStakersMinimumVersions<T extends Network>(
+  network: T
+): ExecutionClientOrSignerVersion<T> {
+  switch (network) {
+    case "prater":
+      return lodestarStakersPraterMinimumVersions as ExecutionClientOrSignerVersion<T>;
+    case "gnosis":
+      return lodestarStakersGnosisMinimumVersions as ExecutionClientOrSignerVersion<T>;
+    case "mainnet":
+      return lodestarStakersMainnetMinimumVersions as ExecutionClientOrSignerVersion<T>;
+    default:
+      throw Error(`Network ${network} not supported`);
+  }
+}

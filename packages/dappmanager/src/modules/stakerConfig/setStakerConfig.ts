@@ -32,7 +32,8 @@ import { listPackageNoThrow } from "../docker/list/listPackages.js";
 import { dockerComposeUpPackage } from "../docker/index.js";
 import { lt } from "semver";
 import * as db from "../../db/index.js";
-import { lodestarStakersMinimumVersions } from "./params.js";
+import { getLodestarStakersMinimumVersions } from "./params.js";
+import { ExecutionClientOrSignerVersion } from "./types.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -133,10 +134,11 @@ export async function setStakerConfig<T extends Network>({
     stakerConfig.consensusClient?.dnpName.includes("lodestar")
   ) {
     checkLodestarMinVersions(
+      pkgs,
       stakerConfig.network,
-      stakerConfig.executionClient,
+      stakerConfig.executionClient.dnpName,
       stakerConfig.enableWeb3signer,
-      web3signer?.dnpName,
+      web3signer.dnpName,
       currentWeb3signerPkg?.version
     );
   }
@@ -551,52 +553,66 @@ function setStakerConfigOnDb<T extends Network>({
   }
 }
 
-function checkLodestarMinVersions(
+function checkLodestarMinVersions<T extends Network>(
+  pkgs: InstalledPackageDataApiReturn[],
   network: Network,
-  selectedExecClient: StakerItemOk<Network, "execution">,
+  executionClientDnpName: ExecutionClient<T>,
   isSignerSelected: boolean | undefined,
-  web3signerDnpName: Signer<Network> | undefined,
+  web3signerDnpName: Signer<T>,
   web3signerVersion: string | undefined
 ): void {
-  const lodestarMinVersions = lodestarStakersMinimumVersions[network];
+  const lodestarMinVersions = getLodestarStakersMinimumVersions(network);
 
   if (!lodestarMinVersions) {
     throw Error(`Lodestar ${network} minimum versions are not defined.`);
   }
 
-  const selectedExecClientVersion = selectedExecClient.data?.metadata.version;
+  const installedExecClient = pkgs.find(
+    pkg => pkg.dnpName === executionClientDnpName
+  );
 
-  //Throw error if execution client version cannot be fetched
-  if (!selectedExecClientVersion || selectedExecClient.dnpName === "") {
-    throw Error(
-      `Execution client ${selectedExecClient.dnpName} version could not be fetched.`
-    );
-  }
+  const installedExecClientVersion = installedExecClient?.version;
 
   if (
+    installedExecClientVersion &&
     lt(
-      selectedExecClientVersion,
-      lodestarMinVersions[selectedExecClient.dnpName]
+      installedExecClientVersion,
+      lodestarMinVersions[
+        executionClientDnpName as keyof ExecutionClientOrSignerVersion<T>
+      ]
     )
   ) {
     throw Error(
       `Execution client ${
-        selectedExecClient.dnpName
-      } version ${selectedExecClientVersion} is not compatible with Lodestar. Minimum version required: ${
-        lodestarMinVersions[selectedExecClient.dnpName]
+        installedExecClient.dnpName
+      } version ${installedExecClientVersion} is not compatible with Lodestar. 
+      Minimum version required: ${
+        lodestarMinVersions[
+          executionClientDnpName as keyof ExecutionClientOrSignerVersion<T>
+        ]
       }`
     );
   }
 
-  if (!isSignerSelected || !web3signerDnpName) return;
+  if (!isSignerSelected || !web3signerVersion) return;
 
-  if (!web3signerVersion) {
-    throw Error(`Signer ${web3signerDnpName} version could not be fetched.`);
-  }
-
-  if (lt(web3signerVersion, lodestarMinVersions[web3signerDnpName])) {
+  if (
+    lt(
+      web3signerVersion,
+      lodestarMinVersions[
+        web3signerDnpName as keyof ExecutionClientOrSignerVersion<T>
+      ]
+    )
+  ) {
     throw Error(
-      `Signer ${selectedExecClient.dnpName} version ${web3signerVersion} is not compatible with Lodestar. Minimum version required: ${lodestarMinVersions[web3signerDnpName]}`
+      `Signer ${executionClientDnpName} version ${web3signerVersion} is not compatible with Lodestar. 
+      Minimum version required: ${
+        lodestarMinVersions[
+          web3signerDnpName as keyof ExecutionClientOrSignerVersion<T>
+        ]
+      }`
     );
   }
+
+  logs.debug("All packages are compatible with Lodestar");
 }
