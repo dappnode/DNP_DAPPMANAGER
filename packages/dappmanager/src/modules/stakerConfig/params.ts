@@ -21,10 +21,10 @@ const lodestarStakersGnosisMinimumVersions: ExecutionClientOrSignerVersion<"gnos
 
 const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersion<"mainnet"> =
   {
-    "nethermind.public.dappnode.eth": "1.0.35", // Not working
-    "geth.dnp.dappnode.eth": "0.1.38", // Needs publishment
+    "nethermind.public.dappnode.eth": "1.0.35",
+    "geth.dnp.dappnode.eth": "0.1.38",
     "erigon.dnp.dappnode.eth": "0.1.38",
-    "besu.public.dappnode.eth": "1.2.7", // Needs publishment
+    "besu.public.dappnode.eth": "1.2.7",
     "web3signer.dnp.dappnode.eth": "0.1.7" // Needs publishment
   };
 
