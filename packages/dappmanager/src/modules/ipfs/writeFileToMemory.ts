@@ -1,6 +1,6 @@
 import { IpfsInstance, IpfsCatOptions } from "./types.js";
 import { getContentFromGateway } from "./getContentFromGateway.js";
-import { unpack } from "ipfs-car/unpack";
+import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { handleIpfsError } from "./utils.js";
 
 /**
@@ -15,20 +15,21 @@ export async function catCarReaderToMemory(
   opts?: IpfsCatOptions
 ): Promise<Buffer> {
   const chunks = [];
-  try {
-    const content = await getContentFromGateway(ipfs, hash);
-    for await (const unixFsEntry of unpack(content.carReader)) {
-      try {
-        const content = unixFsEntry.content();
-        for await (const chunk of content) {
-          chunks.push(chunk);
-        }
-      } catch (e) {
-        throw Error(`Error getting chunk from file ${unixFsEntry.name}. ${e}`);
-      }
+
+  const content = await getContentFromGateway(ipfs, hash);
+  const roots = await content.carReader.getRoots();
+  const entries = exporter(roots[0], {
+    async get(cid) {
+      const block = await content.carReader.get(cid);
+      return block.bytes;
     }
-  } catch (e) {
-    throw Error(`Error getting carReaderToMemory from ${hash}. ${e}`);
+  });
+
+  for await (const entry of entries) {
+    const content = entry.content();
+    for await (const chunk of content) {
+      chunks.push(chunk);
+    }
   }
 
   const data = Buffer.concat(chunks);
