@@ -8,7 +8,7 @@ import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 // Styles
 import "./topbar.scss";
 import "./notifications.scss";
-import UsageSwitch from "./dropdownMenus/UsageSwitch";
+// import UsageSwitch from "./dropdownMenus/UsageSwitch";
 
 export const TopBar = ({
   username,
@@ -24,7 +24,8 @@ export const TopBar = ({
 
     <div className="beta">
       <span>BETA</span>
-      <UsageSwitch toggleUsage={toggleUsage} />
+      {/* Theme usage requires more feedback */}
+      {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
       <ThemeSwitch toggleTheme={toggleTheme} />
     </div>
 
