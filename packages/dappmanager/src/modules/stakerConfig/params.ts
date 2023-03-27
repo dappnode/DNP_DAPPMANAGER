@@ -13,7 +13,7 @@ const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersions<"pra
 const lodestarStakersGnosisMinimumVersions: ExecutionClientOrSignerVersions<"gnosis"> =
   {
     "nethermind-xdai.dnp.dappnode.eth": "1.0.29", // Needs publishment
-    "web3signer-gnosis.dnp.dappnode.eth": "0.1.13" // Needs publishment
+    "web3signer-gnosis.dnp.dappnode.eth": "0.1.14" // Needs publishment
   };
 
 const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersions<"mainnet"> =
