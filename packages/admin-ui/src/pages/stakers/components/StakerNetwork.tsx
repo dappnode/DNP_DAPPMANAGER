@@ -19,26 +19,21 @@ import RemoteSigner from "./columns/RemoteSigner";
 import ConsensusClient from "./columns/ConsensusClient";
 import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
-import AdvanceView from "./AdvanceView";
-import {
-  defaultDappnodeGraffiti,
-  disclaimer,
-  getDefaultCheckpointSync
-} from "../data";
+import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import {
   getChanges,
   isOkSelectedInstalledAndRunning,
-  validateEthereumAddress,
-  validateGraffiti
+  validateEthereumAddress
 } from "./utils";
 import { responseInterface } from "swr";
-import { Alert } from "react-bootstrap";
+import { Alert, Form } from "react-bootstrap";
 import { ReqStatus } from "types";
 import "./columns.scss";
 import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
+import Input from "components/Input";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -56,10 +51,10 @@ export default function StakerNetwork<T extends Network>({
   const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
     null
   );
-  const [graffitiError, setGraffitiError] = useState<string | null>(null);
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
+  const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
   const [newExecClient, setNewExecClient] = useState<
     StakerItemOk<T, "execution">
   >();
@@ -73,14 +68,6 @@ export default function StakerNetwork<T extends Network>({
     false
   );
 
-  // Default config
-  const [defaultGraffiti, setDefaultGraffiti] = useState<string>(
-    defaultDappnodeGraffiti
-  );
-  const [defaultFeeRecipient, setDefaultFeeRecipient] = useState<string>("");
-  const [defaultCheckpointSync, setDefaultCheckpointSync] = useState<string>(
-    getDefaultCheckpointSync(network)
-  );
   // Apply button state
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
@@ -101,7 +88,8 @@ export default function StakerNetwork<T extends Network>({
         executionClients,
         consensusClients,
         mevBoost,
-        web3Signer
+        web3Signer,
+        feeRecipient
       } = currentStakerConfigReq.data;
 
       const executionClient = executionClients.find(ec =>
@@ -116,9 +104,11 @@ export default function StakerNetwork<T extends Network>({
         setNewExecClient(executionClient);
       if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
+
       if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
         setNewMevBoost(mevBoost);
       setNewEnableWeb3signer(enableWeb3signer);
+      if (feeRecipient) setNewFeeRecipient(feeRecipient);
 
       // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
@@ -131,28 +121,9 @@ export default function StakerNetwork<T extends Network>({
           mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
             ? mevBoost
             : undefined,
-        enableWeb3signer
+        enableWeb3signer,
+        feeRecipient
       });
-
-      // Set default consensus client: fee recipient, checkpointsync and graffiti
-      if (consensusClient && consensusClient.status === "ok") {
-        if (!consensusClient.checkpointSync)
-          setNewConsClient({
-            ...consensusClient,
-            checkpointSync: defaultCheckpointSync
-          });
-        else setDefaultCheckpointSync(consensusClient.checkpointSync);
-
-        if (!consensusClient.graffiti)
-          setNewConsClient({
-            ...consensusClient,
-            graffiti: defaultDappnodeGraffiti
-          });
-        else setDefaultGraffiti(consensusClient.graffiti);
-
-        if (consensusClient.feeRecipient)
-          setDefaultFeeRecipient(consensusClient.feeRecipient);
-      }
 
       // set allStakerItemsOk
       setAllStakerItemsOk(
@@ -166,11 +137,9 @@ export default function StakerNetwork<T extends Network>({
   }, [currentStakerConfigReq.data]);
 
   useEffect(() => {
-    if (newConsClient) {
-      setFeeRecipientError(validateEthereumAddress(newConsClient.feeRecipient));
-      setGraffitiError(validateGraffiti(newConsClient.graffiti));
-    }
-  }, [newConsClient]);
+    if (newFeeRecipient)
+      setFeeRecipientError(validateEthereumAddress(newFeeRecipient));
+  }, [newFeeRecipient]);
 
   useEffect(() => {
     if (currentStakerConfig)
@@ -178,21 +147,21 @@ export default function StakerNetwork<T extends Network>({
         getChanges({
           currentStakerConfig,
           feeRecipientError,
-          graffitiError,
           newConsClient,
           newMevBoost,
           newEnableWeb3signer,
-          newExecClient
+          newExecClient,
+          newFeeRecipient
         })
       );
   }, [
     currentStakerConfig,
     feeRecipientError,
-    graffitiError,
     newConsClient,
     newMevBoost,
     newEnableWeb3signer,
-    newExecClient
+    newExecClient,
+    newFeeRecipient
   ]);
 
   /**
@@ -298,6 +267,23 @@ export default function StakerNetwork<T extends Network>({
           </p>
           <br />
 
+          <p>{description}</p>
+
+          <>
+            <Input
+              value={newFeeRecipient || ""}
+              onValueChange={setNewFeeRecipient}
+              isInvalid={Boolean(feeRecipientError)}
+              prepend="Default Fee Recipient"
+              placeholder="Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
+            />
+            {newFeeRecipient && feeRecipientError && (
+              <Form.Text className="text-danger" as="span">
+                {feeRecipientError}
+              </Form.Text>
+            )}
+          </>
+
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
@@ -327,11 +313,6 @@ export default function StakerNetwork<T extends Network>({
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
                     }
-                    graffitiError={graffitiError}
-                    feeRecipientError={feeRecipientError}
-                    defaultGraffiti={defaultGraffiti}
-                    defaultFeeRecipient={defaultFeeRecipient}
-                    defaultCheckpointSync={defaultCheckpointSync}
                   />
                 )
               )}
@@ -367,16 +348,6 @@ export default function StakerNetwork<T extends Network>({
           <hr />
 
           <div>
-            {currentStakerConfig && (
-              <AdvanceView<T>
-                currentStakerConfig={currentStakerConfig}
-                newExecClient={newExecClient}
-                newConsClient={newConsClient}
-                newMevBoost={newMevBoost}
-                newEnableWeb3signer={newEnableWeb3signer}
-              />
-            )}
-
             <div className="staker-buttons">
               <Button
                 variant="dappnode"
@@ -419,6 +390,8 @@ export default function StakerNetwork<T extends Network>({
               }
               setNewConfig={setNewConfig}
               setShowLaunchpadValidators={setShowLaunchpadValidators}
+              setNewFeeRecipient={setNewFeeRecipient}
+              newFeeRecipient={newFeeRecipient}
               setNewExecClient={setNewExecClient}
               setNewConsClient={setNewConsClient}
               setNewMevBoost={setNewMevBoost}
@@ -426,10 +399,6 @@ export default function StakerNetwork<T extends Network>({
               newConsClient={newConsClient}
               newMevBoost={newMevBoost}
               feeRecipientError={feeRecipientError}
-              graffitiError={graffitiError}
-              defaultGraffiti={defaultGraffiti}
-              defaultFeeRecipient={defaultFeeRecipient}
-              defaultCheckpointSync={defaultCheckpointSync}
             />
           )}
         </Card>

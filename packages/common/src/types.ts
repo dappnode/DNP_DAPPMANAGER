@@ -11,6 +11,7 @@ import {
   Dependencies,
   PackageEnvs,
 } from "@dappnode/dappnodesdk";
+import { build } from "@dappnode/dappnodesdk/dist/commands/build";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -1237,9 +1238,7 @@ interface StakerExecution<T extends Network> {
 
 interface StakerConsensus<T extends Network> {
   dnpName: ConsensusClient<T>;
-  graffiti?: string;
-  feeRecipient?: string;
-  checkpointSync?: string;
+  useCheckpointSync?: boolean;
 }
 
 interface StakerSigner<T extends Network> {
@@ -1300,6 +1299,7 @@ export interface StakerConfigGet<T extends Network> {
   consensusClients: StakerItem<T, "consensus">[];
   web3Signer: StakerItem<T, "signer">;
   mevBoost: StakerItem<T, "mev-boost">;
+  feeRecipient: string;
 }
 
 export interface StakerConfigGetOk<T extends Network> {
@@ -1314,6 +1314,7 @@ export interface StakerConfigSet<T extends Network> {
   consensusClient?: StakerItemOk<T, "consensus">;
   mevBoost?: StakerItemOk<T, "mev-boost">;
   enableWeb3signer?: boolean;
+  feeRecipient?: string;
 }
 
 export type ExecutionClient<T extends Network> = T extends "mainnet"
@@ -1365,6 +1366,7 @@ export interface StakerParamsByNetwork<T extends Network> {
   };
   mevBoost: MevBoost<T>;
   isMevBoostSelected: boolean;
+  feeRecipient: string;
 }
 
 /**

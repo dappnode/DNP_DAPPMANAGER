@@ -10,22 +10,22 @@ export default function LaunchpadValidators<T extends Network>({
   stakerConfig,
   setNewConfig,
   setShowLaunchpadValidators,
+  setNewFeeRecipient,
+  newFeeRecipient,
   setNewExecClient,
   newExecClient,
   setNewConsClient,
   newConsClient,
   setNewMevBoost,
   newMevBoost,
-  feeRecipientError,
-  graffitiError,
-  defaultGraffiti,
-  defaultFeeRecipient,
-  defaultCheckpointSync
+  feeRecipientError
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
   setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
+  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string | undefined>>;
+  newFeeRecipient?: string;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;
@@ -39,10 +39,6 @@ export default function LaunchpadValidators<T extends Network>({
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
   feeRecipientError: string | null;
-  graffitiError: string | null;
-  defaultGraffiti: string;
-  defaultFeeRecipient: string;
-  defaultCheckpointSync: string;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [nextEnabled, setNextEnabled] = useState(false);
@@ -54,26 +50,30 @@ export default function LaunchpadValidators<T extends Network>({
   };
 
   useEffect(() => {
-    if (newExecClient && newConsClient) setNextEnabled(true);
+    if (
+      newExecClient &&
+      newConsClient &&
+      newFeeRecipient &&
+      !Boolean(feeRecipientError)
+    )
+      setNextEnabled(true);
     else setNextEnabled(false);
-  }, [newExecClient, newConsClient]);
+  }, [newExecClient, newConsClient, newFeeRecipient, feeRecipientError]);
 
   const steps = launchpadSteps<T>({
     network,
     stakerConfig,
     setNewConfig,
     setShowLaunchpadValidators,
+    setNewFeeRecipient,
+    newFeeRecipient,
     setNewExecClient,
     newExecClient,
     setNewConsClient,
     newConsClient,
     setNewMevBoost,
     newMevBoost,
-    feeRecipientError,
-    graffitiError,
-    defaultGraffiti,
-    defaultFeeRecipient,
-    defaultCheckpointSync
+    feeRecipientError
   });
 
   const currentStep = steps[stepIndex];
