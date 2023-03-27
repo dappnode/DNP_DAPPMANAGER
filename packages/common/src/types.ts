@@ -1361,7 +1361,7 @@ export interface StakerParamsByNetwork<T extends Network> {
   }[];
   currentConsClient: ConsensusClient<T>;
   web3signer: {
-    dnpName: string;
+    dnpName: Signer<T>;
     minVersion: string;
   };
   mevBoost: MevBoost<T>;
