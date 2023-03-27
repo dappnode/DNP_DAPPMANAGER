@@ -1,4 +1,7 @@
-import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/dappnodesdk";
+import {
+  ComposeNetwork,
+  ComposeServiceNetwork
+} from "@dappnode/dappnodesdk/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";

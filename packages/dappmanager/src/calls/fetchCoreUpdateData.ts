@@ -7,6 +7,7 @@ import computeSemverUpdateType from "../utils/computeSemverUpdateType.js";
 import { getCoreVersionId } from "../utils/coreVersionId.js";
 import { ErrorDappGetDowngrade } from "../modules/dappGet/errors.js";
 import { logs } from "../logs.js";
+import { Manifest } from "@dappnode/dappnodesdk/dist/types.js";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";
@@ -104,7 +105,7 @@ export async function getCoreUpdateData(
   const coreRelease =
     releases.find(({ dnpName }) => dnpName === coreName) ||
     (await releaseFetcher.getRelease(coreName, coreVersion));
-  const { metadata: coreManifest } = coreRelease;
+  const coreManifest: Manifest = coreRelease.metadata;
   const dnpCore = dnpList.find(dnp => dnp.dnpName === coreName);
   const from = dnpCore ? dnpCore.version : "";
   const to = coreManifest.version;

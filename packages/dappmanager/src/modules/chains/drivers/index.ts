@@ -5,7 +5,7 @@ import { bitcoin } from "./bitcoin.js";
 import { ethereum } from "./ethereum.js";
 import { ethereum2 } from "./ethereum2.js";
 import { monero } from "./monero.js";
-import { ChainDriver, ChainDriverSpecs } from "@dappnode/dappnodesdk";
+import { ChainDriver, ChainDriverSpecs } from "@dappnode/dappnodesdk/types";
 
 /**
  * Returns chain data given a driver and api URL

@@ -6,7 +6,7 @@ import {
   SetupWizardField,
   SetupUiJson,
   SetupTarget
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/types";
 
 /**
  * Format setup wizard v1 files as a unique setup wizard v2 object

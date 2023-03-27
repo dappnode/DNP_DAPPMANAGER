@@ -36,7 +36,7 @@ export async function performPortsScan({
     .join(",");
 
   try {
-    const response = await fetch.default(
+    const response = await fetch(
       `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`
     );
 

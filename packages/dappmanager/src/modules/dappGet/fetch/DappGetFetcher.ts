@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/dappnodesdk";
+import { Dependencies } from "@dappnode/dappnodesdk/types";
 import { validRange, satisfies, valid } from "semver";
 import { ReleaseFetcher } from "../../release/index.js";
 

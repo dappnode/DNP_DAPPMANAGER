@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/dappnodesdk";
+import { Compose } from "@dappnode/dappnodesdk/types";
 import { ComposeServicesSharingPid } from "../types.js";
 import { InstallPackageData, PackageContainer } from "@dappnode/common";
 
@@ -7,7 +7,8 @@ import { InstallPackageData, PackageContainer } from "@dappnode/common";
  * contains compose feature pid in any of its services
  */
 export function packageToInstallHasPid(pkg: InstallPackageData): boolean {
-  for (const service of Object.values(pkg.compose.services)) {
+  const compose: Compose = pkg.compose;
+  for (const service of Object.values(compose.services)) {
     if (service.pid) return true;
   }
   return false;

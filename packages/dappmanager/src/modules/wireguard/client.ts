@@ -78,7 +78,7 @@ export class WireguardClient {
 // Utils
 
 async function fetchWireguardConfigFile(url: string): Promise<string> {
-  const res = await fetch.default(url);
+  const res = await fetch(url);
 
   const body = await res.text();
   if (!res.ok) {

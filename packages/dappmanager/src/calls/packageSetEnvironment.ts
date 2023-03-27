@@ -6,7 +6,7 @@ import {
   dockerComposeUpPackage
 } from "../modules/docker/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
-import { PackageEnvs } from "@dappnode/dappnodesdk";
+import { PackageEnvs } from "@dappnode/dappnodesdk/types";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it

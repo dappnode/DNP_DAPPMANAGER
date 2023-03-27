@@ -14,7 +14,8 @@ export async function exposeByDefaultHttpsPorts(
   const exposables = pkg.metadata.exposable;
 
   // Return if no exposable or not exposeByDefault
-  if (!exposables || !exposables.some(exp => exp.exposeByDefault)) return;
+  if (!exposables || !exposables.some((exp: any) => exp.exposeByDefault))
+    return;
 
   // Requires that https package exists and it is running
   if (!(await isRunningHttps()))

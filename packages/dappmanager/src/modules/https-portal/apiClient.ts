@@ -99,7 +99,7 @@ export class HttpsPortalApiClient {
   }
 
   private async get<T>(url: string): Promise<T> {
-    const res = await fetch.default(url, { method: "GET" });
+    const res = await fetch(url, { method: "GET" });
     const body = await res.text();
 
     if (!res.ok) {

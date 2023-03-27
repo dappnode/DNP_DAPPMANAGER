@@ -3,7 +3,8 @@ import { isAbsolute } from "path";
 import { TimeoutErrorKy, IpfsInstance } from "./types.js";
 import { getContentFromGateway } from "./getContentFromGateway.js";
 import { CarReader } from "@ipld/car";
-import { recursive as exporter } from "ipfs-unixfs-exporter";
+import { unpack } from "ipfs-car/unpack";
+import { logs } from "../../logs.js";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;
@@ -110,24 +111,20 @@ async function unpackFileFromCarReader(
   carReader: CarReader
 ): Promise<AsyncIterable<Uint8Array>> {
   const filesIterables = [];
-
-  const roots = await carReader.getRoots();
-  const entries = exporter(roots[0], {
-    async get(cid) {
-      const block = await carReader.get(cid);
-      return block.bytes;
+  try {
+    for await (const unixFsEntry of unpack(carReader)) {
+      if (unixFsEntry.type === "file") {
+        filesIterables.push(unixFsEntry.content());
+      } else {
+        throw Error(`Expexted type: file. Got: ${unixFsEntry.type}`);
+      }
     }
-  });
 
-  for await (const entry of entries) {
-    if (entry.type === "file") {
-      filesIterables.push(entry.content());
-    } else {
-      throw Error(`Expexted type: file. Got: ${entry.type}`);
-    }
+    if (filesIterables.length > 1)
+      throw Error(`Unexpected number of files. There must be only one`);
+
+    return filesIterables[0];
+  } catch (e) {
+    throw e;
   }
-
-  if (filesIterables.length > 1)
-    throw Error(`Unexpected number of files. There must be only one`);
-  return filesIterables[0];
 }

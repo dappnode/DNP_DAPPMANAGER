@@ -3,7 +3,11 @@ import { parseVolumeMappings } from "../compose/volumes.js";
 import { parseEnvironment } from "../compose/environment.js";
 import params, { getContainerName } from "../../params.js";
 import { ManifestWithImage } from "../../types.js";
-import { Compose, ComposeVolumes, getImageTag } from "@dappnode/dappnodesdk";
+import {
+  Compose,
+  ComposeVolumes,
+  getImageTag
+} from "@dappnode/dappnodesdk/exports";
 import { getIsCore } from "./getIsCore.js";
 import { cleanCompose } from "../compose/clean.js";
 

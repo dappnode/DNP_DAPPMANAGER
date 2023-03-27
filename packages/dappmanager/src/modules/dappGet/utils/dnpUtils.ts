@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/dappnodesdk";
+import { Dependencies } from "@dappnode/dappnodesdk/types";
 import { DappGetDnps, DappGetDnp } from "../types.js";
 import { sanitizeDependencies } from "./sanitizeDependencies.js";
 

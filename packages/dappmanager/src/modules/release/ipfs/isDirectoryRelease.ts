@@ -1,4 +1,4 @@
-import { releaseFiles } from "@dappnode/dappnodesdk";
+import { releaseFiles } from "@dappnode/dappnodesdk/params";
 import { IPFSEntry } from "../../ipfs/types.js";
 
 /**

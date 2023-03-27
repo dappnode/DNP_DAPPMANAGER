@@ -6,12 +6,12 @@ import {
   SetupTarget,
   SetupUiJson,
   Manifest,
-  releaseFiles
-} from "@dappnode/dappnodesdk";
+  Compose
+} from "@dappnode/dappnodesdk/types";
 import { ReleaseSignature } from "../../../types.js";
 import { validateManifestBasic } from "../../manifest/index.js";
 import { validateCompose } from "../../compose/index.js";
-import { Compose } from "@dappnode/dappnodesdk";
+import { releaseFiles } from "@dappnode/dappnodesdk/params";
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets
 // that may be added in the future

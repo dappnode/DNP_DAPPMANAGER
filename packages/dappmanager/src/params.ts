@@ -1,5 +1,5 @@
 import path from "path";
-import { getContainerDomain } from "@dappnode/dappnodesdk";
+import { getContainerDomain } from "@dappnode/dappnodesdk/params";
 import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";

@@ -1,6 +1,6 @@
 import { mapValues } from "lodash-es";
 import { ReleaseSignature } from "../../../types.js";
-import { Compose, Manifest } from "@dappnode/dappnodesdk";
+import { Compose, Manifest } from "@dappnode/dappnodesdk/types";
 import { findEntries } from "./findEntries.js";
 import { downloadAsset } from "./downloadAssets.js";
 import { promiseAllValues } from "../../../utils/promises.js";

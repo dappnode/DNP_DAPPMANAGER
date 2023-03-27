@@ -1,4 +1,4 @@
-import { getContainerDomain } from "@dappnode/dappnodesdk";
+import { getContainerDomain } from "@dappnode/dappnodesdk/params";
 import params from "./params.js";
 
 export function stripCharacters(s: string): string {

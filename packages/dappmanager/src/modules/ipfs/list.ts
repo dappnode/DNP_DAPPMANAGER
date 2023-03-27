@@ -1,4 +1,5 @@
-import { IpfsInstance, IpfsDagGet, IPFSEntry } from "./types.js";
+import { IPFSEntry } from "ipfs-core-types/src/root";
+import { IpfsInstance, IpfsDagGet } from "./types.js";
 import { sanitizeIpfsPath } from "./utils.js";
 import path from "path";
 import { CID } from "ipfs-http-client";
