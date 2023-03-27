@@ -6,7 +6,7 @@ import { api } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
 import { InstalledPackageData, PackageContainer } from "@dappnode/common";
 import { continueIfCalleDisconnected } from "api/utils";
-import { PackageEnvs } from "@dappnode/dappnodesdk";
+import { PackageEnvs } from "@dappnode/dappnodesdk/types";
 
 // Used in package interface / envs
 

@@ -1,4 +1,4 @@
-import { getContainerDomain } from "@dappnode/dappnodesdk";
+import { getContainerDomain } from "@dappnode/dappnodesdk/params";
 
 const params = {
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",

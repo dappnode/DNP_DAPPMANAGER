@@ -16,10 +16,19 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "strictBooleanExpressions": false,
     "paths": {
-      "@dappnode/common": ["../../common/src"]
+      "@dappnode/common": ["../../common/src"],
+      "@dappnode/dappnodesdk/*": [
+        "../../../node_modules/@dappnode/dappnodesdk/src/*"
+      ]
     }
   },
+  "resolve": {
+    "extensions": [".js", ".json", ".ts"]
+  },
   "include": ["src/**/*"],
-  "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*"]
+  "exclude": ["test/**/*", "src/__tests__/*"]
 }

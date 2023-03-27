@@ -9,7 +9,7 @@ import { MdClose } from "react-icons/md";
 import { Links } from "./Links";
 import newTabProps from "utils/newTabProps";
 import { InstalledPackageDetailData } from "@dappnode/common";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import { RemovePackage } from "./RemovePackage";
 import { VolumesList } from "./VolumesList";
