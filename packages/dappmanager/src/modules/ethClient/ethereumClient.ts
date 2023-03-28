@@ -221,7 +221,8 @@ export class EthereumClient {
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
           network: "mainnet",
-          useCheckpointSync
+          useCheckpointSync,
+          feeRecipient: db.feeRecipientMainnet.get() || ""
         });
         await packageInstall({ name: consClient, userSettings });
       } else {

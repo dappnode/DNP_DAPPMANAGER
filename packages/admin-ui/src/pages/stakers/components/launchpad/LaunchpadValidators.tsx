@@ -24,8 +24,8 @@ export default function LaunchpadValidators<T extends Network>({
   stakerConfig: StakerConfigGetOk<T>;
   setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
-  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string | undefined>>;
-  newFeeRecipient?: string;
+  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string>>;
+  newFeeRecipient: string;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;

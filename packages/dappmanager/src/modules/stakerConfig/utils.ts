@@ -62,7 +62,7 @@ export function getConsensusUserSettings({
 }: {
   dnpName: string;
   network: Network;
-  feeRecipient?: string;
+  feeRecipient: string;
   useCheckpointSync?: boolean;
 }): UserSettingsAllDnps {
   const validatorServiceName = getValidatorServiceName(dnpName);
