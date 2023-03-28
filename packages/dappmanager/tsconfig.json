@@ -26,6 +26,9 @@
     "experimentalSpecifierResolution": "node",
     "experimentalResolver": true
   },
+  "resolve": {
+    "extensions": [".js", ".json", ".ts"]
+  },
   "include": ["src/**/*"],
-  "exclude": ["test/**/*", "node_modules"]
+  "exclude": ["test/**/*"]
 }
