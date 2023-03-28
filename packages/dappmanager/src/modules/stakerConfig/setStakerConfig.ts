@@ -302,7 +302,7 @@ async function setConsensusClientConfig<T extends Network>({
   currentConsClientPkg
 }: {
   network: Network;
-  feeRecipient?: string;
+  feeRecipient: string;
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
