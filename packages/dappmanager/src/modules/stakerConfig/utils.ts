@@ -57,21 +57,26 @@ export async function stopAllPkgContainers(
 export function getConsensusUserSettings({
   dnpName,
   network,
+  feeRecipient,
   useCheckpointSync
 }: {
   dnpName: string;
   network: Network;
+  feeRecipient?: string;
   useCheckpointSync?: boolean;
 }): UserSettingsAllDnps {
   const validatorServiceName = getValidatorServiceName(dnpName);
   const beaconServiceName = getBeaconServiceName(dnpName);
   const defaultDappnodeGraffiti = "validating_from_DAppNode";
+  const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
   return {
     [dnpName]: {
       environment:
         beaconServiceName === validatorServiceName
           ? {
               [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
@@ -82,11 +87,15 @@ export function getConsensusUserSettings({
             }
           : {
               [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti
               },
 
               [beaconServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
                 // Checkpoint sync is an optional value
                 ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
                   ? getDefaultCheckpointSync(network)
@@ -107,28 +116,27 @@ export const getDefaultCheckpointSync = (network: Network): string =>
     : "";
 
 /**
- * Sets checkpointsync url to the default or empty string
+ * Sets consensus client environment variables
+ * - Sets checkpointsync url to the default or empty string
+ * - Sets fee recipient to the default
  */
-export async function setUseCheckpointSync<T extends Network>({
+export async function updateConsensusEnv<T extends Network>({
   targetConsensusClient,
-  network
+  userSettings
 }: {
   targetConsensusClient: StakerItemOk<T, "consensus">;
-  network: Network;
+  userSettings: UserSettingsAllDnps;
 }): Promise<void> {
-  const environmentByService = {
-    [getBeaconServiceName(targetConsensusClient.dnpName)]: {
-      ["CHECKPOINT_SYNC_URL"]: targetConsensusClient.useCheckpointSync
-        ? getDefaultCheckpointSync(network)
-        : ""
-    }
-  };
+  const environmentByService =
+    userSettings[targetConsensusClient.dnpName].environment;
 
-  logs.info("Updating environment for " + targetConsensusClient.dnpName);
-  await packageSetEnvironment({
-    dnpName: targetConsensusClient.dnpName,
-    environmentByService
-  });
+  if (environmentByService) {
+    logs.info("Updating environment for " + targetConsensusClient.dnpName);
+    await packageSetEnvironment({
+      dnpName: targetConsensusClient.dnpName,
+      environmentByService
+    });
+  }
 }
 
 /**

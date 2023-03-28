@@ -24,7 +24,7 @@ import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
-  setUseCheckpointSync,
+  updateConsensusEnv,
   getMevBoostUserSettings,
   updateMevBoostEnv
 } from "./utils.js";
@@ -153,6 +153,7 @@ export async function setStakerConfig<T extends Network>({
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
     network: stakerConfig.network,
+    feeRecipient: stakerConfig.feeRecipient,
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
@@ -295,11 +296,13 @@ async function setExecutionClientConfig<T extends Network>({
 
 async function setConsensusClientConfig<T extends Network>({
   network,
+  feeRecipient,
   currentConsClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
   network: Network;
+  feeRecipient?: string;
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
@@ -327,6 +330,7 @@ async function setConsensusClientConfig<T extends Network>({
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
     dnpName: targetConsensusClient.dnpName,
     network,
+    feeRecipient,
     useCheckpointSync: targetConsensusClient.useCheckpointSync
   });
 
@@ -342,9 +346,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -363,9 +367,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start package
       await dockerComposeUpPackage(
@@ -390,9 +394,9 @@ async function setConsensusClientConfig<T extends Network>({
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start new client
       await dockerComposeUpPackage(
@@ -490,6 +494,7 @@ async function setMevBoostConfig<T extends Network>({
 
 /**
  * Sets the staker configuration on db for a given network
+ * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
 function setStakerConfigOnDb<T extends Network>({
   network,
