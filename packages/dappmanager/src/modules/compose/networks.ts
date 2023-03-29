@@ -1,7 +1,7 @@
 import {
   ComposeServiceNetworks,
   ComposeServiceNetworksObj
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 
 /**
  * Parse service networks to object form

@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/dappnodesdk";
+import { Dependencies } from "@dappnode/dappnodesdk/dist/exports";
 import { mapValues } from "lodash-es";
 
 /**

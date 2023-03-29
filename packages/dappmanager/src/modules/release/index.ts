@@ -4,7 +4,7 @@ import { getManifest } from "./getManifest.js";
 import { PackageRequest } from "../../types.js";
 import dappGet, { DappgetOptions } from "../dappGet/index.js";
 import { Apm } from "../apm/index.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/dist/exports";
 import { DappGetState } from "../dappGet/types.js";
 import { PackageRelease } from "@dappnode/common";
 

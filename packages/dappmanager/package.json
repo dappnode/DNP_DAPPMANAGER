@@ -22,7 +22,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/dappnodesdk": "^0.2.71",
+    "@dappnode/dappnodesdk": "^0.2.82",
     "@ipld/car": "^3.1.16",
     "@types/async": "^3.0.1",
     "@types/async-retry": "^1.4.2",
@@ -95,8 +95,8 @@
     "tweetnacl-util": "^0.15.0"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.30.0",
-    "@typescript-eslint/parser": "^4.30.0",
+    "@typescript-eslint/eslint-plugin": "^5.57.0",
+    "@typescript-eslint/parser": "^5.57.0",
     "chai": "^4.1.2",
     "dotenv": "^8.2.0",
     "eslint": "^7.32.0",
@@ -107,6 +107,6 @@
     "sinon": "^5.0.10",
     "socket.io-client": "^4.5.1",
     "ts-node": "^10.8.1",
-    "typescript": "^4.7.3"
+    "typescript": "^5.0.2"
   }
 }

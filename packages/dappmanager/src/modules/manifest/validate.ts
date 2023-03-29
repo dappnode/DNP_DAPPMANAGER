@@ -1,7 +1,7 @@
 import { getValidator } from "../../utils/schema.js";
 import manifestBasicSchema from "./manifest-basic.schema.json" assert { type: "json" };
 import manifestWithImageSchema from "./manifest-with-image.schema.json" assert { type: "json" };
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/dist/exports";
 import { ManifestWithImage } from "../../types.js";
 
 /**

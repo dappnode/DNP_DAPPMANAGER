@@ -3,7 +3,7 @@ import { mapKeys } from "lodash-es";
 import * as db from "../db/index.js";
 import params from "../params.js";
 import { stringifyEnvironment } from "../modules/compose/index.js";
-import { PackageEnvs } from "@dappnode/dappnodesdk";
+import { PackageEnvs } from "@dappnode/dappnodesdk/dist/exports";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { logs } from "../logs.js";
 import { ComposeFileEditor } from "./compose/editor.js";

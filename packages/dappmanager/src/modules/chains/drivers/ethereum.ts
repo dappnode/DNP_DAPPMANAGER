@@ -3,7 +3,7 @@ import { InstalledPackageData } from "@dappnode/common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers.js";
 import { getPrivateNetworkAlias } from "../../../domains.js";
-import { ChainDriverSpecs } from "@dappnode/dappnodesdk";
+import { ChainDriverSpecs } from "@dappnode/dappnodesdk/dist/exports";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
 

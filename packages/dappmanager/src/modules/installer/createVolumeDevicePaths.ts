@@ -1,5 +1,5 @@
 import path from "path";
-import { Compose } from "@dappnode/dappnodesdk";
+import { Compose } from "@dappnode/dappnodesdk/dist/exports";
 import { logs } from "../../logs.js";
 import { uniq } from "lodash-es";
 import { shellHost } from "../../utils/shell.js";

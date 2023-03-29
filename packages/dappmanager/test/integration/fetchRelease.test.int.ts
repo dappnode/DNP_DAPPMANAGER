@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import { omit } from "lodash-es";
-import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
+import { Manifest, SetupWizard } from "@dappnode/dappnodesdk/dist/exports";
 import * as calls from "../../src/calls/index.js";
 import { ManifestWithImage } from "../../src/types.js";
 import {

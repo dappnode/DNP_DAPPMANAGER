@@ -9,7 +9,7 @@ import { packageInstall as packageInstallType } from "../../../src/calls/package
 import { DappGetState } from "../../../src/modules/dappGet/types.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
 import { ReleaseFetcher } from "../../../src/modules/release/index.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/dist/exports";
 import { PackageRequest } from "../../../src/types.js";
 
 describe.skip("Call function: packageInstall", function () {

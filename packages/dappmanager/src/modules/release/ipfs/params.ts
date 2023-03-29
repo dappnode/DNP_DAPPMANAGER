@@ -5,13 +5,13 @@ import {
   PrometheusTarget,
   SetupTarget,
   SetupUiJson,
-  Manifest
-} from "@dappnode/dappnodesdk";
+  Manifest,
+  Compose
+} from "@dappnode/dappnodesdk/dist/exports";
 import { ReleaseSignature } from "../../../types.js";
 import { releaseFiles } from "../../../params.js";
 import { validateManifestBasic } from "../../manifest/index.js";
 import { validateCompose } from "../../compose/index.js";
-import { Compose } from "@dappnode/dappnodesdk";
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets
 // that may be added in the future

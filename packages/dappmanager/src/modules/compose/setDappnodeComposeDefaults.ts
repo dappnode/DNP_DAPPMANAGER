@@ -12,7 +12,7 @@ import {
   ComposeServiceNetworks,
   ComposeNetworks,
   composeSafeKeys
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 import { lt } from "semver";
 
 /**

@@ -6,7 +6,7 @@ import { SetupWizard } from "components/SetupWizard";
 import {
   SetupWizard as SetupWizardType,
   PackageEnvs
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/types";
 import { UserSettingsAllDnps, UserSettings } from "@dappnode/common";
 import { difference } from "utils/lodashExtended";
 

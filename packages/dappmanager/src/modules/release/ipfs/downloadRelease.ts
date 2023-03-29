@@ -21,7 +21,7 @@ import {
   validateDappnodeCompose,
   validateManifestSchema,
   validateSetupWizardSchema
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 import { getIsCore } from "../../manifest/getIsCore.js";
 import { DistributedFile } from "@dappnode/common";
 

@@ -4,7 +4,7 @@ import {
   SetupSchema,
   SetupUiJson,
   SetupTarget
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";

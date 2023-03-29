@@ -5,7 +5,7 @@ import { ipfs } from "../../src/modules/ipfs/index.js";
 import { ReleaseFetcher } from "../../src/modules/release/index.js";
 import { getContainerName, getImageTag } from "../../src/params.js";
 import { ReleaseSignatureStatusCode } from "@dappnode/common";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/dist/exports";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { signRelease } from "./integrationSpecs/signRelease.js";
 

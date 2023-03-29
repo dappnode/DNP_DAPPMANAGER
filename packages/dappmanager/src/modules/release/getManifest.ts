@@ -1,6 +1,6 @@
 import { ipfs, IPFSEntry } from "../ipfs/index.js";
 import { parseManifest, validateManifestBasic } from "../manifest/index.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/dappnodesdk/dist/exports";
 import { isDirectoryRelease } from "./ipfs/isDirectoryRelease.js";
 import { IpfsClientTarget } from "@dappnode/common";
 import { releaseFiles } from "../../params.js";

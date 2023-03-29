@@ -7,7 +7,7 @@ import { listPackage } from "../modules/docker/list/index.js";
 import { packageRestart } from "./packageRestart.js";
 import shell from "../utils/shell.js";
 import validateBackupArray from "../utils/validateBackupArray.js";
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import { PackageBackup } from "@dappnode/dappnodesdk/dist/exports";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 

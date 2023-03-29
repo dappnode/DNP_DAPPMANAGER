@@ -4,7 +4,7 @@ import {
   Compose,
   Manifest,
   validateDappnodeCompose
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 import { setDappnodeComposeDefaults } from "../../../../src/modules/compose/setDappnodeComposeDefaults.js";
 
 describe("setDappnodeComposeDefaults", () => {

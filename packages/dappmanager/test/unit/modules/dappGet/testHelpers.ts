@@ -6,7 +6,7 @@ import {
   DappGetState,
   DappGetDnps
 } from "../../../../src/modules/dappGet/types.js";
-import { Dependencies } from "@dappnode/dappnodesdk";
+import { Dependencies } from "@dappnode/dappnodesdk/dist/exports";
 
 export interface DappgetTestCase {
   // Data for test

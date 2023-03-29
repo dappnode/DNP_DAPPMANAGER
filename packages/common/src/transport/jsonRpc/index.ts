@@ -1,4 +1,4 @@
-import { RpcResponse } from "../../types";
+import { RpcResponse } from "../../types.js";
 
 /**
  * Parse RPC response, to be used in the client
@@ -13,7 +13,7 @@ export async function parseRpcResponse<R>(body: RpcResponse<R>): Promise<R> {
     }
     throw error;
   } else {
-    return (body.result as unknown) as R;
+    return body.result as unknown as R;
   }
 }
 

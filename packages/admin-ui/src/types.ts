@@ -1,4 +1,4 @@
-import { SetupTarget } from "@dappnode/dappnodesdk";
+import { SetupTarget } from "@dappnode/dappnodesdk/dist/types";
 import { PackageVersionData } from "@dappnode/common";
 
 export interface WifiCredentials {

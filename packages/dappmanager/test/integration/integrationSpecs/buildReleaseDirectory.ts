@@ -11,7 +11,7 @@ import {
   Compose,
   SetupWizard,
   ComposeService
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/dappnodesdk/dist/exports";
 import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
 import { ipfsAddAll } from "../testIpfsUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";

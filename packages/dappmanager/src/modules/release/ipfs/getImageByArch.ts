@@ -1,5 +1,9 @@
 import { NodeArch } from "../../../types.js";
-import { Manifest, Architecture, defaultArch } from "@dappnode/dappnodesdk";
+import {
+  Manifest,
+  Architecture,
+  defaultArch
+} from "@dappnode/dappnodesdk/dist/exports";
 import { NoImageForArchError } from "../errors.js";
 import { getImagePath, getLegacyImagePath } from "../../../params.js";
 import { IPFSEntryName } from "../types.js";
