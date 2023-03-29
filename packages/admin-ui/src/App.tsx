@@ -34,7 +34,8 @@ function MainApp({ username }: { username: string }) {
 
   const storedUsage = localStorage.getItem("usage");
   const storedTheme = localStorage.getItem("theme");
-  const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
+  //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
+  const initialUsage = "advanced";
   const initialTheme =
     storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
