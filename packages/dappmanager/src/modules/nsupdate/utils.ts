@@ -1,6 +1,7 @@
 import { isEmpty } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import params, { getContainerDomain } from "../../params.js";
+import params from "../../params.js";
+import { getContainerDomain } from "@dappnode/dappnodesdk/dist/exports";
 import {
   getPrivateNetworkAlias,
   stripCharacters,

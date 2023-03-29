@@ -4,7 +4,7 @@ import * as validate from "../../utils/validate.js";
 import verifyXz from "../../utils/verifyXz.js";
 import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
-import { getImageTag } from "../../params.js";
+import { getImageTag } from "@dappnode/dappnodesdk/dist/exports";
 import { dockerImageManifest } from "../docker/cli.js";
 
 export default async function getImage(

@@ -1,5 +1,5 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
-import params, { getImageTag, getContainerName } from "../../params.js";
+import params, { getContainerName } from "../../params.js";
 import { getIsCore } from "../manifest/getIsCore.js";
 import { cleanCompose } from "./clean.js";
 import { parseEnvironment } from "./environment.js";
@@ -11,7 +11,8 @@ import {
   ComposeService,
   ComposeServiceNetworks,
   ComposeNetworks,
-  composeSafeKeys
+  composeSafeKeys,
+  getImageTag
 } from "@dappnode/dappnodesdk/dist/exports";
 import { lt } from "semver";
 

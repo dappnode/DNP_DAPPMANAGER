@@ -1,4 +1,4 @@
-import { releaseFiles } from "../../../params.js";
+import { releaseFiles } from "@dappnode/dappnodesdk/dist/exports";
 import { FileConfig, IPFSEntryName } from "../types.js";
 
 type ReleaseFiles = typeof releaseFiles;

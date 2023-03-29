@@ -11,7 +11,6 @@ import { NoImageForArchError } from "../errors.js";
 import { downloadDirectoryFiles } from "./downloadDirectoryFiles.js";
 import { getImageByArch } from "./getImageByArch.js";
 import { findEntries } from "./findEntries.js";
-import { releaseFiles } from "../../../params.js";
 import { downloadAssetRequired } from "./downloadAssets.js";
 import { isDirectoryRelease } from "./isDirectoryRelease.js";
 import { serializeIpfsDirectory } from "../releaseSignature.js";
@@ -20,6 +19,7 @@ import {
   Manifest,
   validateDappnodeCompose,
   validateManifestSchema,
+  releaseFiles,
   validateSetupWizardSchema
 } from "@dappnode/dappnodesdk/dist/exports";
 import { getIsCore } from "../../manifest/getIsCore.js";

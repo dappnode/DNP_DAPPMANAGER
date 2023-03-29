@@ -6,10 +6,10 @@ import {
   SetupTarget,
   SetupUiJson,
   Manifest,
-  Compose
+  Compose,
+  releaseFiles
 } from "@dappnode/dappnodesdk/dist/exports";
 import { ReleaseSignature } from "../../../types.js";
-import { releaseFiles } from "../../../params.js";
 import { validateManifestBasic } from "../../manifest/index.js";
 import { validateCompose } from "../../compose/index.js";
 
