@@ -23,7 +23,7 @@ async function downloadIPFSContentToFS(
   { path, timeout, fileSize, progress }: CatStreamToFsArgs
 ): Promise<void> {
   return new Promise(async (resolve, reject): Promise<void> => {
-    if (!path || path.startsWith("/ipfs/") || !isAbsolute(path)) {
+    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) {
       reject(Error(`Invalid path: "${path}"`));
     }
 
