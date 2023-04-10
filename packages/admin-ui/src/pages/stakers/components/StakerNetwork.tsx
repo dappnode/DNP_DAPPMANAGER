@@ -133,8 +133,7 @@ export default function StakerNetwork<T extends Network>({
           web3Signer.status === "ok"
       );
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStakerConfigReq.data]);
+  }, [currentStakerConfigReq.data, network, newConsClient]);
 
   useEffect(() => {
     if (newFeeRecipient)
