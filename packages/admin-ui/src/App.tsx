@@ -14,6 +14,8 @@ import { pages, defaultPage } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
+// Types
+import { Theme, UsageMode } from "types";
 
 export const UsageContext = React.createContext({
   usage: "advanced",
@@ -39,8 +41,8 @@ function MainApp({ username }: { username: string }) {
   const initialTheme =
     storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
-  const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
-  const [usage, setUsage] = useState<"basic" | "advanced">(initialUsage);
+  const [theme, setTheme] = useState<Theme>(initialTheme);
+  const [usage, setUsage] = useState<UsageMode>(initialUsage);
 
   const toggleTheme = () => {
     setTheme(curr => (curr === "light" ? "dark" : "light"));
@@ -77,6 +79,7 @@ function MainApp({ username }: { username: string }) {
           <SideBar screenWidth={screenWidth} />
           <TopBar
             username={username}
+            theme={theme}
             toggleUsage={toggleUsage}
             toggleTheme={toggleTheme}
           />
