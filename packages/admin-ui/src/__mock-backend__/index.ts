@@ -122,9 +122,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-  dappnodeWebNameSet: async newDappnodeWebName => {
-    dappnodeWebName = newDappnodeWebName;
-  },
+  dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
