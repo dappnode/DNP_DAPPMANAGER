@@ -43,3 +43,7 @@ export interface DappnodeParams {
   DNCORE_DIR: string;
   REPO_DIR: string;
 }
+
+export type Theme = "light" | "dark";
+
+export type UsageMode = "basic" | "advanced";
