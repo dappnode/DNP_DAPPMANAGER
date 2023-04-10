@@ -9,13 +9,17 @@ import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 import "./topbar.scss";
 import "./notifications.scss";
 // import UsageSwitch from "./dropdownMenus/UsageSwitch";
+// Types
+import { Theme } from "types";
 
 export const TopBar = ({
   username,
+  theme,
   toggleTheme,
   toggleUsage
 }: {
   username: string;
+  theme: Theme;
   toggleTheme: () => void;
   toggleUsage: () => void;
 }) => (
@@ -23,7 +27,7 @@ export const TopBar = ({
     {/* Right justified items */}
 
     <div className="beta">
-      <span>BETA</span>
+      {theme === "light" && <span>BETA</span>}
       {/* Theme usage requires more feedback */}
       {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
       <ThemeSwitch toggleTheme={toggleTheme} />
