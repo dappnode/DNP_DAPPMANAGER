@@ -10,8 +10,25 @@ export function startTestApi(): http.Server {
   const server = new http.Server(app);
   app.use(bodyParser.json());
   app.use(bodyParser.text());
+  app.use(bodyParser.urlencoded({ extended: true }));
 
-  logs.info("Test API CALLS:");
+  // Middleware to parse arrays in string format
+  app.use((req, res, next) => {
+    if (req.query) {
+      for (const key in req.query) {
+        const value = req.query[key];
+        if (typeof value === "string") {
+          try {
+            req.query[key] = JSON.parse(value);
+          } catch (e) {
+            // Do nothing
+          }
+        }
+      }
+    }
+    next();
+  });
+
   for (const call in api) {
     const callCasted = call as unknown as keyof typeof api;
     const callFn = api[callCasted];
@@ -30,6 +47,11 @@ export function startTestApi(): http.Server {
       });
     }
   }
+
+  // Health check
+  app.get("/ping", (req, res) => {
+    res.send("OK");
+  });
 
   app.use((req, res) => {
     res.status(404).send("Not found");

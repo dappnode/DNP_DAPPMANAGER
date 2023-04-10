@@ -1,5 +1,6 @@
 import { SshManager } from "../../modules/sshManager.js";
 import { ShhStatus } from "@dappnode/common";
+import { SshManager } from "../../modules/sshManager";
 
 // ### TODO: Review this numbers
 const maxPortNumber = 32600;
