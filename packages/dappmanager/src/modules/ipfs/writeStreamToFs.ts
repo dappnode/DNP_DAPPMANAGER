@@ -4,7 +4,8 @@ import { TimeoutErrorKy, IpfsInstance } from "./types.js";
 import { getContentFromGateway } from "./getContentFromGateway.js";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
-import { logs } from "../../logs.js";
+import type { Readable } from "stream";
+import { pipeline } from "stream/promises";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;
@@ -17,30 +18,25 @@ export interface CatStreamToFsArgs {
   progress?: (n: number) => void;
 }
 
-async function readableStream(
+async function downloadIPFSContentToFS(
   readable: AsyncIterable<Uint8Array>,
   { path, timeout, fileSize, progress }: CatStreamToFsArgs
 ): Promise<void> {
   return new Promise(async (resolve, reject): Promise<void> => {
-    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
+    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) {
       reject(Error(`Invalid path: "${path}"`));
+    }
 
-    let asyncIterableArray: Uint8Array[] = [];
+    const asyncIterableArray: Uint8Array[] = [];
 
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
       reject(TimeoutErrorKy);
     }, timeout || 30 * 1000);
 
-    const onError =
-      (streamId: string) =>
-      (err: Error): void => {
-        clearTimeout(timeoutToCancel);
-        reject(Error(streamId + ": " + err));
-      };
-
     let totalData = 0;
     let previousProgress = -1;
+    const resolution = 1;
     const round = (n: number): number =>
       resolution * Math.round((100 * n) / resolution);
 
@@ -62,11 +58,18 @@ async function readableStream(
       resolve();
     };
 
+    const onError =
+      (streamId: string) =>
+      (err: Error): void => {
+        clearTimeout(timeoutToCancel);
+        reject(Error(streamId + ": " + err));
+      };
+
     try {
       for await (const chunk of readable) onData(chunk);
-      fs.writeFileSync(path, Buffer.concat(asyncIterableArray), {
-        encoding: "binary"
-      });
+
+      const writable = fs.createWriteStream(path);
+      await pipeline(asyncIterableArray, writable);
       onFinish();
     } catch (e) {
       onError("Error writing to fs")(e);
@@ -90,7 +93,7 @@ export async function catStreamToFs(
   args: CatStreamToFsArgs,
   ipfs: IpfsInstance
 ): Promise<void> {
-  await readableStream(ipfs.cat(args.hash), args);
+  await downloadIPFSContentToFS(ipfs.cat(args.hash), args);
 }
 
 /**
@@ -104,7 +107,7 @@ export async function writeCarToFs(
   const content = await getContentFromGateway(ipfs, args.hash);
   const fileIterable = await unpackFileFromCarReader(content.carReader);
 
-  await readableStream(fileIterable, args);
+  await downloadIPFSContentToFS(fileIterable, args);
 }
 
 async function unpackFileFromCarReader(
