@@ -1181,6 +1181,7 @@ export const consensusClientsMainnet = [
   "lighthouse.dnp.dappnode.eth",
   "teku.dnp.dappnode.eth",
   "nimbus.dnp.dappnode.eth",
+  "lodestar.dnp.dappnode.eth",
   "",
 ] as const;
 export type ConsensusClientMainnet = typeof consensusClientsMainnet[number];
@@ -1221,6 +1222,7 @@ export type ConsensusClientGnosis =
   | "lighthouse-gnosis.dnp.dappnode.eth"
   | "teku-gnosis.dnp.dappnode.eth"
   | "nimbus-gnosis.dnp.dappnode.eth"
+  | "lodestar-gnosis.dnp.dappnode.eth"
   | "";
 export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth" | "";
 export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
