@@ -44,7 +44,7 @@ import {
   Network,
   StakerConfigSet,
   StakerConfigGet,
-  Eth2ClientTarget
+  Eth2ClientTarget,
 } from "./types";
 import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
 
@@ -139,7 +139,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
-  dappnodeWebNameSet: (dappnodeWebName: string) => Promise<void>;
+  dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
 
   /**
    * Creates a new device with the provided id.
@@ -277,9 +277,11 @@ export interface Routes {
   }) => Promise<UserActionLog[]>;
 
   /** HTTPs Portal: map a subdomain */
-  httpsPortalMappingAdd(mapping: HttpsPortalMapping): Promise<void>;
+  httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
-  httpsPortalMappingRemove(mapping: HttpsPortalMapping): Promise<void>;
+  httpsPortalMappingRemove(kwargs: {
+    mapping: HttpsPortalMapping;
+  }): Promise<void>;
   /** HTTPs Portal: get all mappings */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
   /** HTTPs Portal: get exposable services with metadata */
@@ -773,7 +775,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
 };
 
 // DO NOT REMOVE
