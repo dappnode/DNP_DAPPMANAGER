@@ -13,7 +13,7 @@ const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersions<"pra
 const lodestarStakersGnosisMinimumVersions: ExecutionClientOrSignerVersions<"gnosis"> =
   {
     "nethermind-xdai.dnp.dappnode.eth": "1.0.29",
-    "web3signer-gnosis.dnp.dappnode.eth": "0.1.14" // Needs publishment
+    "web3signer-gnosis.dnp.dappnode.eth": "1.0.1"
   };
 
 const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersions<"mainnet"> =
@@ -22,7 +22,7 @@ const lodestarStakersMainnetMinimumVersions: ExecutionClientOrSignerVersions<"ma
     "geth.dnp.dappnode.eth": "0.1.38",
     "erigon.dnp.dappnode.eth": "0.1.38",
     "besu.public.dappnode.eth": "1.2.7",
-    "web3signer.dnp.dappnode.eth": "0.1.7" // Needs publishment
+    "web3signer.dnp.dappnode.eth": "2.0.0"
   };
 
 export function getLodestarStakersMinimumVersions<T extends Network>(
