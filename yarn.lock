@@ -1238,10 +1238,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
   integrity sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==
 
-"@dappnode/dappnodesdk@^0.2.71":
-  version "0.2.71"
-  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.71.tgz#2d65bc3a088ee8a80da774a70d80707c4a237bc7"
-  integrity sha512-bfk3EWM8hwx7PZWFF73Gqpd4pJioHRC66Urt6ZEYOL9RdBuNxe79ZjNr8taS8mabz3I46Fj1faaQXNPjY0ylwA==
+"@dappnode/dappnodesdk@^0.2.83":
+  version "0.2.83"
+  resolved "https://registry.yarnpkg.com/@dappnode/dappnodesdk/-/dappnodesdk-0.2.83.tgz#fe6fc6db6fcfa02188b473f6e9d37ba44c58750f"
+  integrity sha512-X7YhfIRdXCrfzYpjPhaaS+1Qx3l8pbCYkTAbkljyx8STVnl0sposa5N233U9/CC1ldekQVph5HEzj87tTql6Ng==
   dependencies:
     "@octokit/rest" "^18.0.12"
     ajv "^8.11.0"
@@ -1258,7 +1258,7 @@
     inquirer "^6.2.1"
     js-yaml "^3.12.1"
     listr "^0.14.3"
-    lodash "^4.17.20"
+    lodash-es "^4.17.21"
     mime-types "^2.1.24"
     moment "^2.27.0"
     prettier "^2.1.2"

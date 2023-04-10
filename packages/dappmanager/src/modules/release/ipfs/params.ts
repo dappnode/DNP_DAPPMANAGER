@@ -5,10 +5,10 @@ import {
   PrometheusTarget,
   SetupTarget,
   SetupUiJson,
-  Manifest
+  Manifest,
+  releaseFiles
 } from "@dappnode/dappnodesdk";
 import { ReleaseSignature } from "../../../types.js";
-import { releaseFiles } from "../../../params.js";
 import { validateManifestBasic } from "../../manifest/index.js";
 import { validateCompose } from "../../compose/index.js";
 import { Compose } from "@dappnode/dappnodesdk";

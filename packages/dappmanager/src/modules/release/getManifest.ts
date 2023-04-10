@@ -1,9 +1,8 @@
 import { ipfs, IPFSEntry } from "../ipfs/index.js";
 import { parseManifest, validateManifestBasic } from "../manifest/index.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest, releaseFiles } from "@dappnode/dappnodesdk";
 import { isDirectoryRelease } from "./ipfs/isDirectoryRelease.js";
 import { IpfsClientTarget } from "@dappnode/common";
-import { releaseFiles } from "../../params.js";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
