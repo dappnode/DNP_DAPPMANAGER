@@ -2,8 +2,8 @@ import path from "path";
 import { testDir } from "../../testUtils.js";
 import shell from "../../../src/utils/shell.js";
 import * as validate from "../../../src/utils/validate.js";
-import { getImageTag } from "../../../src/params.js";
 import { fileURLToPath } from "url";
+import { getImageTag } from "@dappnode/dappnodesdk";
 
 const dockerContextPath = path.resolve(
   path.dirname(fileURLToPath(import.meta.url))
