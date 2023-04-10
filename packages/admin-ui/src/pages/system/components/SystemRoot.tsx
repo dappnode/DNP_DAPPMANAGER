@@ -21,14 +21,12 @@ import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { Notifications } from "./Notifications";
 import Hardware from "./Hardware";
+import { UsageContext } from "App";
 
 const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
-  /**
-   * Construct all subroutes to iterate them both in:
-   * - Link (to)
-   * - Route (render, path)
-   */
-  const availableRoutes: {
+  const { usage } = React.useContext(UsageContext);
+
+  const basicRoutes: {
     name: string;
     subPath: string;
     component: React.ComponentType<any>;
@@ -40,6 +38,28 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: SystemInfo
     },
     {
+      name: "Auto updates",
+      subPath: subPaths.autoUpdates,
+      component: AutoUpdates
+    },
+    {
+      name: "Profile",
+      subPath: subPaths.profile,
+      component: Profile
+    },
+    {
+      name: "Power",
+      subPath: subPaths.power,
+      component: PowerManagment
+    }
+  ];
+  const advancedRoutes: {
+    name: string;
+    subPath: string;
+    component: React.ComponentType<any>;
+    hideFromMenu?: boolean;
+  }[] = [
+    {
       name: "Notifications",
       subPath: subPaths.notifications,
       component: Notifications
@@ -50,11 +70,7 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: Identity,
       hideFromMenu: true
     },
-    {
-      name: "Auto updates",
-      subPath: subPaths.autoUpdates,
-      component: AutoUpdates
-    },
+
     {
       name: "Network",
       subPath: subPaths.network,
@@ -63,14 +79,9 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
     {
       name: "Update",
       subPath: subPaths.update,
-      component: SystemUpdate,
-      hideFromMenu: true
+      component: SystemUpdate
     },
-    {
-      name: "Profile",
-      subPath: subPaths.profile,
-      component: Profile
-    },
+
     {
       name: "Peers",
       subPath: subPaths.peers,
@@ -90,13 +101,11 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       name: "Advanced",
       subPath: subPaths.advanced,
       component: Advanced
-    },
-    {
-      name: "Power",
-      subPath: subPaths.power,
-      component: PowerManagment
     }
   ];
+
+  const availableRoutes =
+    usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
 
   return (
     <>

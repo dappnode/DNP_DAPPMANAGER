@@ -46,6 +46,10 @@ export function stakerParamsByNetwork<T extends Network>(
           {
             dnpName: "nimbus.dnp.dappnode.eth",
             minVersion: "1.0.5"
+          },
+          {
+            dnpName: "lodestar.dnp.dappnode.eth",
+            minVersion: "0.1.0"
           }
         ],
         currentConsClient: db.consensusClientMainnet.get(),
@@ -131,6 +135,10 @@ export function stakerParamsByNetwork<T extends Network>(
           {
             dnpName: "nimbus-prater.dnp.dappnode.eth",
             minVersion: "0.1.7"
+          },
+          {
+            dnpName: "lodestar-prater.dnp.dappnode.eth",
+            minVersion: "0.1.0"
           }
         ],
         currentConsClient: db.consensusClientPrater.get(),

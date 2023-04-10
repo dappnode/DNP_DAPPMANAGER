@@ -54,7 +54,7 @@ export default function StakerNetwork<T extends Network>({
   // Req
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   // New config
-  const [newFeeRecipient, setNewFeeRecipient] = useState<string>();
+  const [newFeeRecipient, setNewFeeRecipient] = useState<string>("");
   const [newExecClient, setNewExecClient] = useState<
     StakerItemOk<T, "execution">
   >();
@@ -211,6 +211,7 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
+                feeRecipient: newFeeRecipient,
                 executionClient:
                   newExecClient?.status === "ok"
                     ? { ...newExecClient, data: undefined }

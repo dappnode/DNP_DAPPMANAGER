@@ -15,6 +15,11 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 
+export const UsageContext = React.createContext({
+  usage: "advanced",
+  toggleUsage: () => {}
+});
+
 export const ThemeContext = React.createContext({
   theme: "light",
   toggleTheme: () => {}
@@ -27,19 +32,31 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
 
+  //const storedUsage = localStorage.getItem("usage");
   const storedTheme = localStorage.getItem("theme");
+  //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
+  const initialUsage = "advanced";
   const initialTheme =
     storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
   const [theme, setTheme] = useState<"light" | "dark">(initialTheme);
+  const [usage, setUsage] = useState<"basic" | "advanced">(initialUsage);
 
   const toggleTheme = () => {
     setTheme(curr => (curr === "light" ? "dark" : "light"));
   };
 
+  const toggleUsage = () => {
+    setUsage(curr => (curr === "basic" ? "advanced" : "basic"));
+  };
+
   useEffect(() => {
     localStorage.setItem("theme", theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem("usage", usage);
+  }, [usage]);
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -54,38 +71,44 @@ function MainApp({ username }: { username: string }) {
   }, [location.pathname]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <div className="body" id={theme}>
-        <SideBar screenWidth={screenWidth} />
-        <TopBar username={username} toggleTheme={toggleTheme} />
-        <div id="main">
-          <ErrorBoundary>
-            <NotificationsMain />
-          </ErrorBoundary>
-          <Switch>
-            {Object.values(pages).map(({ RootComponent, rootPath }) => (
-              <Route
-                key={rootPath}
-                path={rootPath}
-                render={props => (
-                  <ErrorBoundary>
-                    <RootComponent {...props} />
-                  </ErrorBoundary>
-                )}
-              />
-            ))}
-            {/* 404 routes redirect to dashboard or default page */}
-            <Route path="*">
-              <Redirect to={defaultPage.rootPath} />
-            </Route>
-          </Switch>
-        </div>
+    <UsageContext.Provider value={{ usage, toggleUsage }}>
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <div className="body" id={theme}>
+          <SideBar screenWidth={screenWidth} />
+          <TopBar
+            username={username}
+            toggleUsage={toggleUsage}
+            toggleTheme={toggleTheme}
+          />
+          <div id="main">
+            <ErrorBoundary>
+              <NotificationsMain />
+            </ErrorBoundary>
+            <Switch>
+              {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                <Route
+                  key={rootPath}
+                  path={rootPath}
+                  render={props => (
+                    <ErrorBoundary>
+                      <RootComponent {...props} />
+                    </ErrorBoundary>
+                  )}
+                />
+              ))}
+              {/* 404 routes redirect to dashboard or default page */}
+              <Route path="*">
+                <Redirect to={defaultPage.rootPath} />
+              </Route>
+            </Switch>
+          </div>
 
-        {/* Place here non-page components */}
-        <Welcome />
-        <ToastContainer />
-      </div>
-    </ThemeContext.Provider>
+          {/* Place here non-page components */}
+          <Welcome />
+          <ToastContainer />
+        </div>
+      </ThemeContext.Provider>
+    </UsageContext.Provider>
   );
 }
 

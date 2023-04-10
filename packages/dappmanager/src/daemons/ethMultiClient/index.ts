@@ -83,7 +83,8 @@ export async function runEthClientInstaller(
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
                   network: "mainnet",
-                  useCheckpointSync
+                  useCheckpointSync,
+                  feeRecipient: db.feeRecipientMainnet.get() || ""
                 })
               });
             else await packageInstall({ name: target });

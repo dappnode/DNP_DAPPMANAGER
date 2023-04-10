@@ -94,22 +94,24 @@
 
     // ALERTS
     .alert:not(a) {
-      color: #000000;
+      color: var(--color-dark-quaternarytext);
 
       p,
       strong {
-        color: #000000;
+        color: var(--color-dark-quaternarytext);
       }
     }
 
     .alert-secondary {
       background-color: var(--color-dark-card-hover) !important;
       border-color: var(--color-dark-secondarytext);
+      color: var(--color-dark-quaternarytext);
     }
 
     .alert-info {
       background-color: rgba(0, 177, 244, 0.4);
       border-color: var(--color-dark-secondarytext);
+      color: var(--color-dark-quaternarytext);
     }
 
     // INPUTS
@@ -175,7 +177,10 @@
   }
   #topbar {
     background-color: var(--color-dark-background-topbar);
-    .tn-dropdown .tn-dropdown-toggle {
+    .tn-dropdown .tn-dropdown-toggle,
+    p,
+    span,
+    div {
       color: var(--color-dark-maintext);
       opacity: 1;
     }

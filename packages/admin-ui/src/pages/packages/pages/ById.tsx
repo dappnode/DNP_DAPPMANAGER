@@ -19,10 +19,12 @@ import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
+import { UsageContext } from "App";
 
 export const PackageById: React.FC<RouteComponentProps<{
   id: string;
 }>> = ({ match }) => {
+  const { usage } = React.useContext(UsageContext);
   const id = decodeURIComponent(match.params.id || "");
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
@@ -61,7 +63,8 @@ export const PackageById: React.FC<RouteComponentProps<{
    * - Link (to)
    * - Route (render, path)
    */
-  const availableRoutes: {
+
+  const basicRoutes: {
     name: string;
     subPath: string;
     render: () => JSX.Element;
@@ -73,7 +76,13 @@ export const PackageById: React.FC<RouteComponentProps<{
         <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />
       ),
       available: true
-    },
+    }
+  ].filter(route => route.available);
+  const advancedRoutes: {
+    name: string;
+    subPath: string;
+    render: () => JSX.Element;
+  }[] = [
     {
       name: "Config",
       subPath: "config",
@@ -107,6 +116,9 @@ export const PackageById: React.FC<RouteComponentProps<{
       available: true
     }
   ].filter(route => route.available);
+
+  const availableRoutes =
+    usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
 
   return (
     <>

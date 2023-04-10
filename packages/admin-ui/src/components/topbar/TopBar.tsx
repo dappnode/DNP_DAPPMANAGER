@@ -8,17 +8,27 @@ import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 // Styles
 import "./topbar.scss";
 import "./notifications.scss";
+// import UsageSwitch from "./dropdownMenus/UsageSwitch";
 
 export const TopBar = ({
   username,
-  toggleTheme
+  toggleTheme,
+  toggleUsage
 }: {
   username: string;
   toggleTheme: () => void;
+  toggleUsage: () => void;
 }) => (
   <div id="topbar">
     {/* Right justified items */}
-    <ThemeSwitch toggleTheme={toggleTheme} />
+
+    <div className="beta">
+      <span>BETA</span>
+      {/* Theme usage requires more feedback */}
+      {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
+      <ThemeSwitch toggleTheme={toggleTheme} />
+    </div>
+
     <DappnodeIdentity />
     <div className="topnav-icon-separator" />
     <ChainDataDropdown />

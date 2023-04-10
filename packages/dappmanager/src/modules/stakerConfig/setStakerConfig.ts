@@ -14,6 +14,7 @@ import {
   MevBoostMainnet,
   MevBoostPrater,
   Network,
+  Signer,
   StakerConfigSet,
   StakerItemOk,
   UserSettingsAllDnps
@@ -23,7 +24,7 @@ import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
-  setUseCheckpointSync,
+  updateConsensusEnv,
   getMevBoostUserSettings,
   updateMevBoostEnv
 } from "./utils.js";
@@ -31,6 +32,8 @@ import { listPackageNoThrow } from "../docker/list/listPackages.js";
 import { dockerComposeUpPackage } from "../docker/index.js";
 import { lt } from "semver";
 import * as db from "../../db/index.js";
+import { getLodestarStakersMinimumVersions } from "./params.js";
+import { ExecutionClientOrSignerVersions } from "./types.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -125,6 +128,21 @@ export async function setStakerConfig<T extends Network>({
       `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${web3signer.minVersion} required to work with the stakers UI. Update it to continue.`
     );
 
+  // If consensus client is lodestar, check that all the execution client and signer versions
+  if (
+    stakerConfig.executionClient &&
+    stakerConfig.consensusClient?.dnpName.includes("lodestar")
+  ) {
+    checkLodestarMinVersions(
+      pkgs,
+      stakerConfig.network,
+      stakerConfig.executionClient.dnpName,
+      stakerConfig.enableWeb3signer,
+      web3signer.dnpName,
+      currentWeb3signerPkg?.version
+    );
+  }
+
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
     currentExecClient,
@@ -135,6 +153,7 @@ export async function setStakerConfig<T extends Network>({
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
     network: stakerConfig.network,
+    feeRecipient: stakerConfig.feeRecipient,
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
@@ -277,11 +296,13 @@ async function setExecutionClientConfig<T extends Network>({
 
 async function setConsensusClientConfig<T extends Network>({
   network,
+  feeRecipient,
   currentConsClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
   network: Network;
+  feeRecipient: string;
   currentConsClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
@@ -309,6 +330,7 @@ async function setConsensusClientConfig<T extends Network>({
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
     dnpName: targetConsensusClient.dnpName,
     network,
+    feeRecipient,
     useCheckpointSync: targetConsensusClient.useCheckpointSync
   });
 
@@ -324,9 +346,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -345,9 +367,9 @@ async function setConsensusClientConfig<T extends Network>({
       });
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start package
       await dockerComposeUpPackage(
@@ -372,9 +394,9 @@ async function setConsensusClientConfig<T extends Network>({
         await stopAllPkgContainers(currentConsClientPkg);
     } else {
       // Update env if needed
-      await setUseCheckpointSync({
+      await updateConsensusEnv({
         targetConsensusClient,
-        network
+        userSettings
       });
       // Start new client
       await dockerComposeUpPackage(
@@ -472,6 +494,7 @@ async function setMevBoostConfig<T extends Network>({
 
 /**
  * Sets the staker configuration on db for a given network
+ * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
 function setStakerConfigOnDb<T extends Network>({
   network,
@@ -533,4 +556,70 @@ function setStakerConfigOnDb<T extends Network>({
     default:
       throw new Error(`Unsupported network: ${network}`);
   }
+}
+
+function checkLodestarMinVersions<T extends Network>(
+  pkgs: InstalledPackageDataApiReturn[],
+  network: Network,
+  executionClientDnpName: ExecutionClient<T>,
+  isSignerSelected: boolean | undefined,
+  web3signerDnpName: Signer<T>,
+  web3signerVersion: string | undefined
+): void {
+  const lodestarMinVersions = getLodestarStakersMinimumVersions(
+    network
+  ) as ExecutionClientOrSignerVersions<T>;
+
+  if (!lodestarMinVersions) {
+    throw Error(`Lodestar ${network} minimum versions are not defined.`);
+  }
+
+  const installedExecClient = pkgs.find(
+    pkg => pkg.dnpName === executionClientDnpName
+  );
+
+  const installedExecClientVersion = installedExecClient?.version;
+
+  if (
+    installedExecClientVersion &&
+    lt(
+      installedExecClientVersion,
+      lodestarMinVersions[
+        executionClientDnpName as keyof ExecutionClientOrSignerVersions<T>
+      ]
+    )
+  ) {
+    throw Error(
+      `Execution client ${
+        installedExecClient.dnpName
+      } version ${installedExecClientVersion} is not compatible with Lodestar. 
+      Minimum version required: ${
+        lodestarMinVersions[
+          executionClientDnpName as keyof ExecutionClientOrSignerVersions<T>
+        ]
+      }`
+    );
+  }
+
+  if (!isSignerSelected || !web3signerVersion) return;
+
+  if (
+    lt(
+      web3signerVersion,
+      lodestarMinVersions[
+        web3signerDnpName as keyof ExecutionClientOrSignerVersions<T>
+      ]
+    )
+  ) {
+    throw Error(
+      `Signer ${web3signerDnpName} version ${web3signerVersion} is not compatible with Lodestar. 
+      Minimum version required: ${
+        lodestarMinVersions[
+          web3signerDnpName as keyof ExecutionClientOrSignerVersions<T>
+        ]
+      }`
+    );
+  }
+
+  logs.debug("All packages are compatible with Lodestar");
 }
