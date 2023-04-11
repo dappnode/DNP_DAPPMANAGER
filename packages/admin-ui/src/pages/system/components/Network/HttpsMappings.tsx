@@ -66,10 +66,13 @@ export function HttpsMappings() {
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingAdd(mappingInfo), {
-        message: "Adding HTTPs mapping...",
-        onSuccess: "Added HTTPs mapping"
-      });
+      await withToast(
+        () => api.httpsPortalMappingAdd({ mapping: mappingInfo }),
+        {
+          message: "Adding HTTPs mapping...",
+          onSuccess: "Added HTTPs mapping"
+        }
+      );
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e.message });
@@ -91,7 +94,7 @@ export function HttpsMappings() {
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingRemove(mapping), {
+      await withToast(() => api.httpsPortalMappingRemove({ mapping }), {
         message: "Removing HTTPs mapping...",
         onSuccess: "Removed HTTPs mapping"
       });
