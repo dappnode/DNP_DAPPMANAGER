@@ -2,12 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM"],
-    "module": "ESNext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "allowJs": true,
-    "strict": true,
     "useUnknownInCatchVariables": false,
     "types": ["node"],
     "outDir": "dist",

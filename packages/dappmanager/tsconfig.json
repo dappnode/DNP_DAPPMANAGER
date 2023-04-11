@@ -2,12 +2,9 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"],
-    "module": "esnext",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
     "useUnknownInCatchVariables": false,
     "types": ["mocha", "node"],
     "outDir": "dist",

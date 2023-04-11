@@ -1,8 +1,11 @@
 {
-    "compilerOptions": {
-        "target": "ES2019",
-        "lib": ["DOM"],
-        
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["DOM"],
+    "module": "ESNext",
 
-    }
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "strict": true,
+  }
 }
