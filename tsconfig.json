@@ -2,10 +2,25 @@
   "compilerOptions": {
     "target": "ES2019",
     "lib": ["DOM"],
-    "module": "ESNext",
 
-    "allowJs": true,
+    /* Type Checking */
     "allowUnreachableCode": false,
     "strict": true,
+
+    /* Modules */
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+
+    /* Emit */
+
+    /* Interop Constraints */
+    "esModuleInterop": true,
+
+    /* Javascript support */
+    "allowJs": true,
+
+    /* Completeness */
+    "skipLibCheck": true
   }
 }

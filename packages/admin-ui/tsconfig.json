@@ -3,13 +3,9 @@
   "compilerOptions": {
     "baseUrl": "src",
     "lib": ["DOM", "dom.iterable", "esnext"],
-    "skipLibCheck": true,
-    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "useUnknownInCatchVariables": false,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react",
