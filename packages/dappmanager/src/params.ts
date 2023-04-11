@@ -321,6 +321,12 @@ const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x9D055dd23de15114EC95921208c741873eDE8558"
+    },
+    {
+      name: "ETC Cooperative",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xfB737B2bb2067C3f9E1448AA2D70D32Db4fb51C4"
     }
   ]
 };
