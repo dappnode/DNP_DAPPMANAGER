@@ -1,16 +1,23 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    /* Modules */
     "baseUrl": "src",
-    "lib": ["DOM", "dom.iterable", "esnext"],
-    "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react",
     "paths": {
       "@dappnode/common": ["../../common/src"]
-    }
+    },
+
+    /* Emit */
+    "noEmit": true,
+
+    /* Language and Environment */
+    "lib": ["DOM", "dom.iterable", "esnext"],
+    "jsx": "react",
+
+    /* Interop Constraints */
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
   },
   "include": ["src/**/*"],
   "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*"]

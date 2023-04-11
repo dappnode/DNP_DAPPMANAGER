@@ -1,10 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"],
+    /* Modules */
     "types": ["mocha", "node"],
+
+    /* Emit */
+    "declaration": false /* TODO: Should be removed when code is fixed */,
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+
+    /* Language and Environment */
+    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
   },
   "ts-node": {
     "esm": true,

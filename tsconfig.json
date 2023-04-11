@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
-    "lib": ["DOM"],
-
     /* Type Checking */
     "allowUnreachableCode": false,
     "strict": true,
@@ -14,14 +11,19 @@
     "resolveJsonModule": true,
 
     /* Emit */
+    "declaration": true,
 
     /* Interop Constraints */
     "esModuleInterop": true,
 
     /* Javascript support */
-    "allowJs": true,
+    "allowJs": true /* TODO: We should not need to allow JS files (we could have full TS) */,
+
+    /* Language and Environment */
+    "lib": ["DOM"],
+    "target": "ES2019",
 
     /* Completeness */
-    "skipLibCheck": true
+    "skipLibCheck": true /* TODO: Should be removed when code is fixed */,
   }
 }

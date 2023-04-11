@@ -1,12 +1,15 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["DOM"],
+    /* Modules */
     "types": ["node"],
+
+    /* Emit */
     "outDir": "dist",
     "sourceMap": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true
+
+    /* Language and Environment */
+    "lib": ["DOM"]
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "include": ["src/**/*", "src/**/*.json"],
