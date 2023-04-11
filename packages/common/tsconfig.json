@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["DOM"],
-    "useUnknownInCatchVariables": false,
     "types": ["node"],
     "outDir": "dist",
     "sourceMap": true,

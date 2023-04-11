@@ -6,6 +6,7 @@
     /* Type Checking */
     "allowUnreachableCode": false,
     "strict": true,
+    "useUnknownInCatchVariables": false,
 
     /* Modules */
     "module": "ESNext",
