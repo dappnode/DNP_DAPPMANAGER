@@ -20,7 +20,7 @@
     "allowJs": true /* TODO: We should not need to allow JS files (we could have full TS) */,
 
     /* Language and Environment */
-    "target": "ES2019",
+    "target": "ESNext" /* TODO: Review if we can use a defined target like ES2020 */,
 
     /* Completeness */
     "skipLibCheck": true /* TODO: Should be removed when code is fixed */

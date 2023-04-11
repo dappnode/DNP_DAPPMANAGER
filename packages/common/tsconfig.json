@@ -9,7 +9,7 @@
     "sourceMap": true,
 
     /* Language and Environment */
-    "lib": ["DOM"]
+    "lib": ["DOM", "ESNext"]
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "include": ["src/**/*", "src/**/*.json"],

@@ -10,6 +10,7 @@
     "sourceMap": true,
 
     /* Language and Environment */
+    "target": "ES2019",
     "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
   },
   "ts-node": {
