@@ -7,6 +7,9 @@ module.exports = {
     "src/modules/chains/drivers/monero.ts",
     "src/modules/ipfs/writeStreamToFs.ts"
   ],
+  parserOptions: {
+    ecmaVersion: 2019 // For target ES2019
+  },
   rules: {
     // ##### Some libraries do not have typings and the compiler does not understand .d.ts files
     "@typescript-eslint/no-var-requires": "off",
