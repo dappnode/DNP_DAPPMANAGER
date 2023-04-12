@@ -1,20 +1,15 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ESNext",
-    "lib": ["ESNext", "DOM"],
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "allowJs": true,
-    "strict": true,
-    "useUnknownInCatchVariables": false,
+    /* Modules */
     "types": ["node"],
+
+    /* Emit */
     "outDir": "dist",
     "sourceMap": true,
-    "declaration": true,
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+
+    /* Language and Environment */
+    "lib": ["DOM", "ESNext"]
   },
   "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
   "include": ["src/**/*", "src/**/*.json"],

@@ -1,18 +1,17 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es2019",
-    "lib": ["ES2020", "dom", "ESNext", "ESNext.Promise"],
-    "module": "esnext",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
-    "useUnknownInCatchVariables": false,
+    /* Modules */
     "types": ["mocha", "node"],
+
+    /* Emit */
+    "declaration": false /* TODO: Should be removed when code is fixed */,
     "outDir": "dist",
     "sourceMap": true,
-    "skipLibCheck": true
+
+    /* Language and Environment */
+    "target": "ES2019",
+    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
   },
   "ts-node": {
     "esm": true,
