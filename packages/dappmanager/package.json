@@ -96,11 +96,8 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "@typescript-eslint/eslint-plugin": "^4.30.0",
-    "@typescript-eslint/parser": "^4.30.0",
     "chai": "^4.1.2",
     "dotenv": "^8.2.0",
-    "eslint": "^7.32.0",
     "mocha": "^10.2.0",
     "nodemon": "^2.0.6",
     "prettier": "^2.3.2",

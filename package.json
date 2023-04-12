@@ -28,6 +28,10 @@
     "postinstall-postinstall": "^2.1.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.30.0",
+    "@typescript-eslint/parser": "^4.30.0",
+    "eslint": "^7.32.0",
+    "eslint-config-react-app": "^7.0.1",
     "lerna": "^6.3.0",
     "rimraf": "^3.0.2",
     "ts-node": "^10.8.1"
