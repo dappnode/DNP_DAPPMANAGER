@@ -8,12 +8,7 @@ module.exports = {
     ecmaVersion: 2022,
     sourceType: "module", // Allows for the use of imports
   },
-  plugins: ["@typescript-eslint"],
-  ignorePatterns: [
-    "packages/dappmanager/src/modules/chains/drivers/bitcoin.ts",
-    "packages/dappmanager/src/modules/chains/drivers/monero.ts",
-    "packages/dappmanager/src/modules/ipfs/writeStreamToFs.ts",
-  ],
+  //plugins: ["@typescript-eslint"],
   env: {
     node: true,
     mocha: true,
