@@ -15,7 +15,8 @@
   "scripts": {
     "build": "yarn run generate && tsc -p tsconfig.json",
     "generate": "ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix"
   },
   "dependencies": {
     "@dappnode/dappnodesdk": "^0.2.83",
