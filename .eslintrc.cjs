@@ -5,7 +5,7 @@ module.exports = {
   ],
   parserOptions: {
     ecmaVersion: "latest", // For target ESNext
-    sourceType: "module", // Allows for the use of imports
+    sourceType: "module", // Allows the use of imports
   },
   env: {
     node: true,
