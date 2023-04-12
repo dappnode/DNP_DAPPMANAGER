@@ -50,6 +50,7 @@ RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 # Build common
 WORKDIR /app/packages/common/
 COPY packages/common/ .
+COPY tsconfig.json /app
 RUN yarn build
 # Results in dist/*
 
