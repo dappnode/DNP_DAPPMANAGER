@@ -22,7 +22,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: StakerNetwork({
         network: "mainnet",
         description:
-          "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
+          "Ethereum is an open source, Proof of Stake (PoS), distributed software platform based on blockchain technology. It has its own native cryptocurrency called Ether and a full featured programming language called Solidity for writing and executing Smart Contracts on the Ethereum Vitual Machine (EVM)."
       })
     },
     {
@@ -31,7 +31,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: StakerNetwork({
         network: "gnosis",
         description:
-          "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
+          "Gnosis Chain is a fork of Ethereum being fully compatible with the EVM. This blockchain was built for rapid and cheap transactions. xDai is the xDai networks native token and is pegged at $1/xDai. Staked GNO tokens provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
       })
     },
     {
@@ -40,7 +40,7 @@ const StakersRoot: React.FC<RouteComponentProps> = ({ match }) => {
       component: StakerNetwork({
         network: "prater",
         description:
-          "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
+          "The resulting testnet from the Prater and Göerli merge is the current Goerli/Prater long-term Ethereum testnet. Node operators can use it to test their node setups and app developers can use it to test their stack on a chain that's practically identical to Mainnet Ethereum but can be used and tested at no cost with testnet ETH (GoETH)"
       })
     }
   ];
