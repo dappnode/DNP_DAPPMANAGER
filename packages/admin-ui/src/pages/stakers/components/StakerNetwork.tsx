@@ -133,7 +133,7 @@ export default function StakerNetwork<T extends Network>({
           web3Signer.status === "ok"
       );
     }
-  }, [currentStakerConfigReq.data, network, newConsClient]);
+  }, [currentStakerConfigReq.data, network]);
 
   useEffect(() => {
     if (newFeeRecipient)
@@ -309,7 +309,6 @@ export default function StakerNetwork<T extends Network>({
                     key={i}
                     consensusClient={consensusClient}
                     setNewConsClient={setNewConsClient}
-                    newConsClient={newConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
                     }

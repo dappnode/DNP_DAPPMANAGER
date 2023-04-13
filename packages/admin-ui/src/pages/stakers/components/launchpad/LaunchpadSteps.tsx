@@ -92,7 +92,6 @@ export const launchpadSteps = <T extends Network>({
             key={i}
             consensusClient={consensusClient}
             setNewConsClient={setNewConsClient}
-            newConsClient={newConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
           />
         ))}
@@ -158,7 +157,6 @@ export const launchpadSteps = <T extends Network>({
           <ConsensusClient<T>
             consensusClient={newConsClient}
             setNewConsClient={setNewConsClient}
-            newConsClient={newConsClient}
             isSelected={true}
           />
         )}
