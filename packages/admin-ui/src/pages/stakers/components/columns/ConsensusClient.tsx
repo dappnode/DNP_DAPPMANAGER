@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -14,7 +14,6 @@ import Switch from "components/Switch";
 export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
-  newConsClient,
   isSelected,
   ...props
 }: {
@@ -22,20 +21,11 @@ export default function ConsensusClient<T extends Network>({
   setNewConsClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
-  newConsClient: StakerItemOk<T, "consensus"> | undefined;
   isSelected: boolean;
 }) {
-  const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
+  const [useCheckpointSync, setUseCheckpointSync] = useState(
     consensusClient.useCheckpointSync || false
   );
-  useEffect(() => {
-    if (consensusClient.status === "ok")
-      setNewConsClient({
-        ...consensusClient,
-        useCheckpointSync: newUseCheckpointSync
-      });
-  }, [consensusClient, newUseCheckpointSync, setNewConsClient]);
-
   return (
     <Card
       {...props}
@@ -46,11 +36,12 @@ export default function ConsensusClient<T extends Network>({
         onClick={
           consensusClient.status === "ok"
             ? isSelected
-              ? () => setNewConsClient(undefined)
-              : () =>
-                  setNewConsClient({
-                    ...consensusClient
-                  })
+              ? () => {
+                  setNewConsClient(undefined);
+                }
+              : () => {
+                  setNewConsClient(consensusClient);
+                }
             : undefined
         }
       >
@@ -90,8 +81,14 @@ export default function ConsensusClient<T extends Network>({
             )}
             {consensusClient.useCheckpointSync !== undefined && (
               <Switch
-                checked={newUseCheckpointSync}
-                onToggle={() => setNewUseCheckpointSync(!newUseCheckpointSync)}
+                checked={useCheckpointSync}
+                onToggle={() => {
+                  setNewConsClient({
+                    ...consensusClient,
+                    useCheckpointSync: !useCheckpointSync
+                  });
+                  setUseCheckpointSync(!useCheckpointSync);
+                }}
                 label={"Use checksync"}
               />
             )}
