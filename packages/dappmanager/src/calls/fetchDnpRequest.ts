@@ -205,6 +205,7 @@ async function shouldAddSetupWizardField(
             // 404 path not found, Base64 parsing, JSON parsing, etc.
           }
       }
+      return true;
 
     default:
       return true;

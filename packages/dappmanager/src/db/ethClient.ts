@@ -129,6 +129,7 @@ export const ethProviderUrl = interceptOnSet(
  * @param dbSetter
  */
 function interceptOnSet<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   F extends (...args: any[]) => any,
   T extends { set: F }
 >(dbSetter: T): T {

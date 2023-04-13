@@ -25,9 +25,10 @@ export default async function getImage(
     // Continue, bad image
   }
 
+  const { hash, size } = imageFile;
+
   switch (imageFile.source) {
     case "ipfs":
-      const { hash, size } = imageFile;
       await downloadImage(hash, path, size, progress);
       break;
     default:

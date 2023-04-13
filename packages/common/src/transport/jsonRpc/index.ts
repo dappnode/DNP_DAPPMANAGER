@@ -13,7 +13,7 @@ export async function parseRpcResponse<R>(body: RpcResponse<R>): Promise<R> {
     }
     throw error;
   } else {
-    return (body.result as unknown) as R;
+    return body.result as unknown as R;
   }
 }
 
@@ -22,6 +22,7 @@ export async function parseRpcResponse<R>(body: RpcResponse<R>): Promise<R> {
  */
 class JsonRpcResError extends Error {
   code: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any;
   constructor(jsonRpcError: RpcResponse["error"]) {
     super(jsonRpcError?.message);

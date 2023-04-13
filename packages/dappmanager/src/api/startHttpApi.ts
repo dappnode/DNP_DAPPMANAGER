@@ -5,7 +5,7 @@ import compression from "compression";
 import fileUpload from "express-fileupload";
 import { helmetConf } from "./helmet.js";
 import cors from "cors";
-import { Socket, Server } from "socket.io";
+import { Server } from "socket.io";
 import path from "path";
 import { toSocketIoHandler, wrapHandler } from "./utils.js";
 import {

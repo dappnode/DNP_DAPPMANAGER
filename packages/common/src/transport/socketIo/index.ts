@@ -14,6 +14,7 @@ interface SocketIsh {
    * take whatever data was sent with the packet
    * @returns The default '/' Namespace
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   emit(event: string, ...args: any[]): any;
   /**
    * Base 'on' method to add a listener for an event
@@ -22,6 +23,7 @@ interface SocketIsh {
    * for the callback depend on the event
    * @returns The default '/' Namespace
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   on(event: string, listener: Function): any;
 }
 
@@ -40,6 +42,7 @@ interface SocketIsh {
  */
 export function subscriptionsFactory(
   io: SocketIsh,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   subscriptionsArgumentsSchema: any,
   loggerMiddleware?: LoggerMiddleware
 ): Subscriptions {
@@ -58,7 +61,7 @@ export function subscriptionsFactory(
         }
       },
       on: (handler: (...args: Args) => void | Promise<void>): void => {
-        io.on(route, async function(...args: Args): Promise<void> {
+        io.on(route, async function (...args: Args): Promise<void> {
           // Use try / catch and await to be safe for async and sync methods
           try {
             if (onCall) onCall(`on - ${route}`, args);

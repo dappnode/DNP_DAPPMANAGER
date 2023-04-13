@@ -17,6 +17,7 @@ export class HttpError extends Error {
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function wrapHandler<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReqParams extends { [key: string]: any } = Record<string, any>
 >(
   handler: express.RequestHandler<ReqParams>
@@ -51,8 +52,8 @@ export function wrapHandler<
  * Wrap express routes to be able to safely throw errors and return HTML
  * @param handler
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function wrapHandlerHtml<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReqParams extends { [key: string]: any } = Record<string, any>
 >(
   handler: express.RequestHandler<ReqParams>

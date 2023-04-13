@@ -152,14 +152,15 @@ async function getContainerTargetStatus(
   }
 
   switch (container.state) {
-    case "removing":
     // Status exited means that the container has receive a signal to stop or kill the process. Deppending on
     // how the docker container handles the signal it will exit with code 0 or != 0. So it cannot be
     // determined if the container was manually and gracefully stopped or not.
-    case "exited":
+
     // When packages are gracefully stopped they might be recreated again by this code
     // and stay in created status, because they won't be stopped. So we must consider
     // a created state as stopped to preserve the user's preference
+    case "removing":
+    case "exited":
     case "created":
       return "stopped";
 

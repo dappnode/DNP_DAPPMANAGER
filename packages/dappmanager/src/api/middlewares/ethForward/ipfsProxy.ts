@@ -94,6 +94,8 @@ function getTargetUrl(proxyType: ProxyType, content: Content): string {
           return urlJoin(params.ETHFORWARD_IPFS_REDIRECT, "ipfs", content.hash);
         case "swarm":
           return urlJoin(params.ETHFORWARD_SWARM_REDIRECT, content.hash);
+        default:
+          throw Error(`Unknown content location, allowed: ipfs, swarm`);
       }
 
     case ProxyType.IPFS_GATEWAY:
@@ -102,6 +104,8 @@ function getTargetUrl(proxyType: ProxyType, content: Content): string {
           return params.ETHFORWARD_IPFS_REDIRECT;
         case "swarm":
           return params.ETHFORWARD_SWARM_REDIRECT;
+        default:
+          throw Error(`Unknown content location, allowed: ipfs, swarm`);
       }
   }
 }

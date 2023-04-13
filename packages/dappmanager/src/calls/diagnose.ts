@@ -9,7 +9,7 @@ export async function diagnose(): Promise<HostDiagnoseItem[]> {
     const hostInfo = await getHostInfoMemoized();
     return Object.entries(hostInfo).map(([name, data]) => ({ name, data }));
   } catch (e) {
-    e = `Error collecting host info: ${e.message}`;
+    e.message += `Error collecting host info: ${e.message}`;
     throw e;
   }
 }

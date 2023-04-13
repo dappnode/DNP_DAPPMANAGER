@@ -24,6 +24,7 @@ export const getRpcHandler = (
       const { method, params } = parseRpcRequest(body);
 
       // Get handler
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handler = methods[method] as (...params: any[]) => Promise<any>;
       if (!handler) throw new JsonRpcReqError(`Method not found ${method}`);
       if (onCall) onCall(method, params);
@@ -55,6 +56,7 @@ export const getRpcHandler = (
  */
 function parseRpcRequest(body: RpcPayload): {
   method: keyof Routes;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any[];
 } {
   if (typeof body !== "object")
@@ -67,6 +69,7 @@ function parseRpcRequest(body: RpcPayload): {
   return { method: method as keyof Routes, params };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
   try {
     return parseRpcRequest(body);

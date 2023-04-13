@@ -4,5 +4,5 @@
  * @returns "QmZZ6a6a6a"
  */
 export function sanitizeIpfsPath(ipfsPath: string): string {
-  return ipfsPath.split(/ipfs[\/\:]+/)[1] || ipfsPath;
+  return ipfsPath.split(/ipfs[/:]+/)[1] || ipfsPath;
 }

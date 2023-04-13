@@ -27,9 +27,7 @@ export function getDevicePath({
     );
 
   const stripCharacters = (s: string): string =>
-    s
-      .replace(/[`~!@#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "")
-      .replace(/\.+/, ".");
+    s.replace(/[`~!@#$%^&*()|+=?;:'",<>{}[\]\\/]/gi, "").replace(/\.+/, ".");
 
   return path.join(
     mountpoint,

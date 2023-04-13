@@ -1,4 +1,4 @@
-import Ajv, { ErrorObject } from "ajv";
+import Ajv from "ajv";
 // @ts-ignore
 import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" assert { type: "json" };
 // @ts-ignore
@@ -18,6 +18,7 @@ export function validateRoutesArgsFactory() {
   };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function validateRoutesReturn(route: string, returnData: any): void {
   const validate = ajv.compile(routesReturnSchema);
   const valid = validate({ [route]: returnData });
@@ -34,10 +35,8 @@ export function validateSubscriptionsArgsFactory() {
 }
 
 function formatErrors(
-  errors:
-    | any[]
-    | null
-    | undefined,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: any[] | null | undefined,
   dataVar: string
 ): string {
   return (
