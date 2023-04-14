@@ -55,8 +55,7 @@ export async function backupGet({
         successfulBackups.push(name);
       } catch (e) {
         if (e.message.includes("No such container:path"))
-          e = Error(`path ${fromPath} does not exist`);
-        lastError = e;
+          lastError = Error(`path ${fromPath} does not exist`);
         logs.error("Error getting backup", { dnpName, name, fromPath }, e);
       }
     }

@@ -6,16 +6,13 @@ import { IpfsClientTarget } from "@dappnode/common";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
   let data: string;
-  try {
-    const ipfsEntries = await ipfs.list(contentUri);
-    const isDirectory = await isDirectoryRelease(ipfsEntries);
-    if (isDirectory) {
-      data = await getManifestFromDir(ipfsEntries, contentUri);
-    } else {
-      data = await ipfs.writeFileToMemory(contentUri);
-    }
-  } catch (e) {
-    throw e;
+
+  const ipfsEntries = await ipfs.list(contentUri);
+  const isDirectory = await isDirectoryRelease(ipfsEntries);
+  if (isDirectory) {
+    data = await getManifestFromDir(ipfsEntries, contentUri);
+  } else {
+    data = await ipfs.writeFileToMemory(contentUri);
   }
 
   return validateManifestBasic(parseManifest(data));

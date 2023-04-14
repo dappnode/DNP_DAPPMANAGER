@@ -25,7 +25,9 @@ const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
   if (value)
     try {
       return JSON.parse(value);
-    } catch {}
+    } catch {
+      return;
+    }
 };
 
 const writeString = (data: string | undefined): string | undefined => data;

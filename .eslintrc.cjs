@@ -1,8 +1,8 @@
 module.exports = {
+  root: true,
   parser: "@typescript-eslint/parser",
-  extends: [
-    "plugin:@typescript-eslint/recommended", // Uses the recommended rules from the @typescript-eslint/eslint-plugin
-  ],
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+  plugins: ["@typescript-eslint"],
   parserOptions: {
     ecmaVersion: "latest", // For target ESNext
     sourceType: "module", // Allows the use of imports

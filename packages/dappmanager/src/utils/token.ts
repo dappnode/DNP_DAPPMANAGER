@@ -9,7 +9,7 @@ export function getRandomAlphanumericToken(len: number): string {
       .toString("base64")
       .replace(/\+/g, "")
       .replace(/\//g, "")
-      .replace(/\=/g, "");
+      .replace(/=/g, "");
   }
 
   return token.slice(0, len);

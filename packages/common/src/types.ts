@@ -3,15 +3,11 @@ import {
   SetupWizard,
   Compose,
   ChainDriver,
-  SetupSchema,
-  SetupUiJson,
-  SetupTarget,
   ManifestUpdateAlert,
   PackageBackup,
   Dependencies,
   PackageEnvs,
 } from "@dappnode/dappnodesdk";
-import { build } from "@dappnode/dappnodesdk/dist/commands/build";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -658,7 +654,9 @@ export interface UserActionLog {
   timestamp: number; // 1591095463341
   event: string; // "packageInstall.dnp.dappnode.eth"
   message: string; // "Successfully install DNP", { string } Returned message from the call function*
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   args: any[]; // { id: "dnpName" }, { object }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   result?: any; // If success: { data: "contents" }, {*} Returned result from the call function
   stack?: string; // If error: e.stack { string }
   // Additional properties to compress repeated logs (mainly errors)
@@ -1382,7 +1380,9 @@ export interface RpcPayload {
   params: Args;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Args = any[];
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type Result = any | void;
 export interface LoggerMiddleware {
   onCall?: (route: string, args?: Args) => void;
@@ -1390,7 +1390,9 @@ export interface LoggerMiddleware {
   onError?: (route: string, error: Error, args?: Args) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface RpcResponse<R = any> {
   result?: R;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error?: { code: number; message: string; data?: any };
 }

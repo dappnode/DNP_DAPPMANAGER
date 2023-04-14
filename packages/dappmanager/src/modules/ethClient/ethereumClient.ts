@@ -153,10 +153,10 @@ export class EthereumClient {
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
       ...currentEndpointConfig,
       Aliases: [
-        ...currentEndpointConfig?.Aliases.filter(
+        ...(currentEndpointConfig?.Aliases.filter(
           // according to docs for compose file v3, aliases are declared as strings https://docs.docker.com/compose/compose-file/compose-file-v3/#aliases
           (item: string) => item !== params.FULLNODE_ALIAS
-        )
+        ) || [])
       ]
     };
 
