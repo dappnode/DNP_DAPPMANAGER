@@ -26,12 +26,16 @@ export const TopBar = ({
   <div id="topbar">
     {/* Right justified items */}
 
-    <div className="beta">
-      {theme === "light" && <span>BETA</span>}
-      {/* Theme usage requires more feedback */}
-      {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
+    {theme === "light" ? (
+      <div className="beta">
+        <span>BETA</span>
+        {/* Theme usage requires more feedback */}
+        {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
+        <ThemeSwitch toggleTheme={toggleTheme} />
+      </div>
+    ) : (
       <ThemeSwitch toggleTheme={toggleTheme} />
-    </div>
+    )}
 
     <DappnodeIdentity />
     <div className="topnav-icon-separator" />
