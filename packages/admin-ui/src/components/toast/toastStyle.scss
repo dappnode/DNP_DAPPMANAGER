@@ -8,7 +8,7 @@
 }
 
 .slider-fade {
-  background-image: linear-gradient(to right, #ff000000, white);
+  background-image: none;
   position: relative;
   left: -8px;
   bottom: -8px;
@@ -20,14 +20,14 @@
 .line {
   position: absolute;
   opacity: 0.4;
-  background: #2fbcb2;
+  background: var(--dappnode-strong-main-color);
   width: 150%;
   height: 6px;
 }
 
 .subline {
   position: absolute;
-  background: #2fbcb2;
+  background: var(--dappnode-strong-main-color);
   height: 6px;
 }
 .inc {

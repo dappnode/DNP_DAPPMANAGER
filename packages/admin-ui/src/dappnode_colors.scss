@@ -146,8 +146,8 @@
 
 .Toastify__toast--success,
 .Toastify__toast--default {
-  background: var(--success-color) !important;
   color: var(--color-dark-maintext) !important;
+  background: var(--success-color) !important;
 }
 .Toastify__toast--warning {
   background: var(--warning-color) !important;
