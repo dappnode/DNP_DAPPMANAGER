@@ -21,7 +21,7 @@ export function startTestApi(): http.Server {
           try {
             req.query[key] = JSON.parse(value);
           } catch (e) {
-            // Do nothing
+            res.status(500).send(`Error parsing ${key}: ${e.message}`);
           }
         }
       }
@@ -35,17 +35,19 @@ export function startTestApi(): http.Server {
     const callFn = api[callCasted];
 
     if (typeof callFn === "function") {
-      app.get(`/${callCasted}`, (req, res) => {
-        logs.info(`Test API call: ${callCasted}`);
-        callFn(req.query as never)
-          .then(result => {
-            res.send(result);
-          })
-          .catch(e => {
-            logs.error(`Test API ERROR in ${callCasted}: ${e}`);
-            res.status(500).send(e);
-          });
-      });
+      if (callFn.length > 0) {
+        app.post(`/${callCasted}`, (req, res) => {
+          callFn(req.body as never)
+            .then(data => res.send(data))
+            .catch(e => res.status(500).send(e.message));
+        });
+      } else {
+        app.get(`/${callCasted}`, (req, res) => {
+          callFn(req.query as never)
+            .then(data => res.send(data))
+            .catch(e => res.status(500).send(e.message));
+        });
+      }
     }
   }
 
