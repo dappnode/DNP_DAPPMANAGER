@@ -21,7 +21,7 @@ export function startTestApi(): http.Server {
           try {
             req.query[key] = JSON.parse(value);
           } catch (e) {
-            // Do nothing
+            res.status(500).send(`Error parsing ${key}: ${e.message}`);
           }
         }
       }
