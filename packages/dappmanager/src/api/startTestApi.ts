@@ -39,13 +39,19 @@ export function startTestApi(): http.Server {
         app.post(`/${callCasted}`, (req, res) => {
           callFn(req.body as never)
             .then(data => res.send(data))
-            .catch(e => res.status(500).send(e.message));
+            .catch(e => {
+              logs.error(`Error in ${callCasted}: ${e.stack}`);
+              res.status(500).send(e.message);
+            });
         });
       } else {
         app.get(`/${callCasted}`, (req, res) => {
           callFn(req.query as never)
             .then(data => res.send(data))
-            .catch(e => res.status(500).send(e.message));
+            .catch(e => {
+              logs.error(`Error in ${callCasted}: ${e.stack}`);
+              res.status(500).send(e.message);
+            });
         });
       }
     }
