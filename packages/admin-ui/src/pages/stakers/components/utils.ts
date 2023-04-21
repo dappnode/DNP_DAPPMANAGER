@@ -224,12 +224,6 @@ export const getDefaultRelays = <T extends Network>(
           docs: "https://docs.edennetwork.io/",
           url:
             "https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io"
-        },
-        {
-          operator: "Anonymous",
-          ofacCompliant: false,
-          url:
-            "https://0x84e78cb2ad883861c9eeeb7d1b22a8e02332637448f84144e245d20dff1eb97d7abdde96d4e7f80934e5554e11915c56@relayooor.wtf"
         }
       ];
     case "prater":
