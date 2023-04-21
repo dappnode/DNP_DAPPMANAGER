@@ -11,6 +11,7 @@ import { parseStaticDate } from "utils/dates";
 import { stringifyObjSafe } from "utils/objects";
 import { stringSplit } from "utils/strings";
 import newTabProps from "utils/newTabProps";
+import { ThemeContext } from "App";
 // Own module
 import "./activity.scss";
 
@@ -85,6 +86,8 @@ function ActivityItem({ log }: { log: UserActionLog }) {
   const date = parseStaticDate(log.timestamp);
   const eventShort = stringSplit(log.event, ".")[0];
 
+  const { theme } = React.useContext(ThemeContext);
+
   // Force a re-render every 15 seconds for the timeFrom to show up correctly
   const [, setClock] = useState(0);
   useEffect(() => {
@@ -118,7 +121,7 @@ function ActivityItem({ log }: { log: UserActionLog }) {
             ) : null}
             {/* Count badge */}
             {log.count ? (
-              <span className={badgeClass + "light"}>{log.count}</span>
+              <span className={badgeClass + theme}>{log.count}</span>
             ) : null}
             {/* Call name */}
             <span className={"text-" + type}>

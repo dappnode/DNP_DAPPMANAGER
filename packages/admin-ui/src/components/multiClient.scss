@@ -37,8 +37,8 @@
 
   // Button feel
   &:hover:not(.selected) {
-    border-color: rgb(218, 218, 218);
-    background-color: rgb(218, 218, 218);
+    border-color: var(--color-light-card-hover);
+    background-color: var(--color-light-card-hover);
     cursor: pointer;
   }
   &.selected {
