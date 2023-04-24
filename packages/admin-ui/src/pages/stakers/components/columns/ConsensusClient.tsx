@@ -24,7 +24,9 @@ export default function ConsensusClient<T extends Network>({
   isSelected: boolean;
 }) {
   const [useCheckpointSync, setUseCheckpointSync] = useState(
-    consensusClient.useCheckpointSync || false
+    consensusClient.useCheckpointSync !== undefined
+      ? consensusClient.useCheckpointSync
+      : true
   );
   return (
     <Card
