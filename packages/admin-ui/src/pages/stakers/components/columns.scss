@@ -62,7 +62,7 @@
   &:hover:not(.isSelected) {
     cursor: pointer;
     border-color: var(--color-light-card-hover);
-    background-color: rgb(--color-light-card-hover);
+    background-color: var(--color-light-card-hover);
   }
   &.isSelected {
     border-color: var(--dappnode-color);
