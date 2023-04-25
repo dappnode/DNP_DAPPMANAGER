@@ -1,5 +1,5 @@
 // @ts-ignore
-import Daemon from "monero-rpc";
+import { Daemon } from "monero-rpc";
 import { InstalledPackageData } from "@dappnode/common";
 import { getPrivateNetworkAlias } from "../../../domains.js";
 import { ChainDataResult } from "../types.js";
