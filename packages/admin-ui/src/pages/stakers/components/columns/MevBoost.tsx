@@ -10,6 +10,7 @@ import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
+import { AiFillInfoCircle } from "react-bootstrap";
 import { getDefaultRelays, RelayIface } from "../utils";
 
 export default function MevBoost<T extends Network>({
