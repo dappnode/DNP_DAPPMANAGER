@@ -107,11 +107,7 @@ function RelaysList<T extends Network>({
         <thead>
           <tr>
             <th>Relay</th>
-            <th>OFAC 
-              <a href="https://www.mevwatch.info/" target="_blank" rel="noopener noreferrer">
-                <AiFillInfoCircle />
-              </a>
-            </th>
+            <th>OFAC</th>
             <th>Status</th>
           </tr>
         </thead>
