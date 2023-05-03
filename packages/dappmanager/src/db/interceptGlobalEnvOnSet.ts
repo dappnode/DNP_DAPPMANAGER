@@ -5,6 +5,8 @@ import {
 } from "../modules/globalEnvs.js";
 import params from "../params.js";
 
+
+
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:
  * - Set the new value in the DB
@@ -16,15 +18,17 @@ import params from "../params.js";
  * ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
  * @param dbSetter
  */
-export function interceptGlobalEnvOnSet<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  F extends (...args: any[]) => any,
-  T extends { set: F }
->(dbSetter: T, globEnvKey: string): T {
+export function interceptGlobalEnvOnSet<T, U>(
+  dbSetter: { get: () => T; set: (value: U) => void },
+  globEnvKey: string
+): {
+  get: () => T;
+  set: (globEnvValue: U) => Promise<void>;
+} {
   return {
     ...dbSetter,
 
-    set: function (globEnvValue: string): void {
+    set: async function (globEnvValue: U): Promise<void> {
       // Must be with prefix _DAPPNODE_GLOBAL_
       if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
         globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
@@ -33,17 +37,13 @@ export function interceptGlobalEnvOnSet<
       // Update the global env file
       writeGlobalEnvsToEnvFile();
       // List packages using the global env and update the global envs in composes files
-      updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue)
-        .then(() => {
-          logs.info(
-            `Updated global env ${globEnvKey} to ${globEnvValue} in all dappnode packages`
-          );
-        })
-        .catch(err => {
-          logs.error(
-            `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
-          );
-        });
+      try {
+        await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
+      } catch (err) {
+        logs.error(
+          `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
+        );
+      }
     }
   };
 }

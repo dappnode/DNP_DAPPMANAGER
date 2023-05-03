@@ -460,24 +460,24 @@ async function setMevBoostConfig<T extends Network>({
  * Sets the staker configuration on db for a given network
  * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
-function setExecutionOnDb<T extends Network>(
+async function setExecutionOnDb<T extends Network>(
   network: T,
   executionClient?: ExecutionClient<T>
-): void {
+): Promise<void> {
   switch (network) {
     case "mainnet":
       if (db.executionClientMainnet.get() !== executionClient)
-        db.executionClientMainnet.set(
+       await db.executionClientMainnet.set(
           executionClient as ExecutionClientMainnet
         );
       break;
     case "gnosis":
       if (db.executionClientGnosis.get() !== executionClient)
-        db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
+        await db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
       break;
     case "prater":
       if (db.executionClientPrater.get() !== executionClient)
-        db.executionClientPrater.set(executionClient as ExecutionClientPrater);
+       await db.executionClientPrater.set(executionClient as ExecutionClientPrater);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
@@ -488,24 +488,24 @@ function setExecutionOnDb<T extends Network>(
  * Sets the staker configuration on db for a given network
  * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
-function setConsensusOnDb<T extends Network>(
+async function setConsensusOnDb<T extends Network>(
   network: T,
   consensusClient?: ConsensusClient<T>
-): void {
+): Promise<void> {
   switch (network) {
     case "mainnet":
       if (db.consensusClientMainnet.get() !== consensusClient)
-        db.consensusClientMainnet.set(
+       await db.consensusClientMainnet.set(
           consensusClient as ConsensusClientMainnet
         );
       break;
     case "gnosis":
       if (db.consensusClientGnosis.get() !== consensusClient)
-        db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
+       await db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
       break;
     case "prater":
       if (db.consensusClientPrater.get() !== consensusClient)
-        db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
+      await  db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
@@ -516,22 +516,22 @@ function setConsensusOnDb<T extends Network>(
  * Sets the staker configuration on db for a given network
  * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
-function setMevBoostOnDb<T extends Network>(
+async function setMevBoostOnDb<T extends Network>(
   network: T,
   mevBoost?: MevBoost<T>
-): void {
+): Promise<void> {
   switch (network) {
     case "mainnet":
       if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
-        db.mevBoostMainnet.set(mevBoost ? true : false);
+       await db.mevBoostMainnet.set(mevBoost ? true : false);
       break;
     case "gnosis":
       if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
-        db.mevBoostGnosis.set(mevBoost ? true : false);
+       await db.mevBoostGnosis.set(mevBoost ? true : false);
       break;
     case "prater":
       if (db.mevBoostPrater.get() !== Boolean(mevBoost))
-        db.mevBoostPrater.set(mevBoost ? true : false);
+        await db.mevBoostPrater.set(mevBoost ? true : false);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
