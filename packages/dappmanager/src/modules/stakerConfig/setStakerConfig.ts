@@ -151,7 +151,7 @@ export async function setStakerConfig<T extends Network>({
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
-  }).then(() => setExecutionOnDb(stakerConfig.network, currentExecClient));
+  }).then(() => setExecutionOnDb(stakerConfig.network, stakerConfig.executionClient?.dnpName));
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
@@ -160,7 +160,7 @@ export async function setStakerConfig<T extends Network>({
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
-  }).then(() => setConsensusOnDb(stakerConfig.network, currentConsClient));
+  }).then(() => setConsensusOnDb(stakerConfig.network, stakerConfig.consensusClient?.dnpName));
 
   // WEB3SIGNER
   if (stakerConfig.enableWeb3signer !== undefined)
@@ -175,7 +175,7 @@ export async function setStakerConfig<T extends Network>({
     mevBoost,
     targetMevBoost: stakerConfig.mevBoost,
     currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
-  }).then(() => setMevBoostOnDb(stakerConfig.network, mevBoost));
+  }).then(() => setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName));
 }
 
 async function setExecutionClientConfig<T extends Network>({
