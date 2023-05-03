@@ -46,8 +46,8 @@ export async function setDefaultFeeRecipient(): Promise<void> {
     }
 
     // Set default fee recipient, if no default value, set empty string to avoid triggereing this migration again
-    if (network === "prater") db.feeRecipientPrater.set(envVarValue);
-    if (network === "gnosis") db.feeRecipientGnosis.set(envVarValue);
-    if (network === "mainnet") db.feeRecipientMainnet.set(envVarValue);
+    if (network === "prater") await db.feeRecipientPrater.set(envVarValue);
+    if (network === "gnosis") await db.feeRecipientGnosis.set(envVarValue);
+    if (network === "mainnet") await db.feeRecipientMainnet.set(envVarValue);
   }
 }
