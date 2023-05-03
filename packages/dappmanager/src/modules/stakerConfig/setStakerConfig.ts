@@ -144,14 +144,14 @@ export async function setStakerConfig<T extends Network>({
   }
 
   // Set fee recipient on db
-  setFeeRecipientOnDb(stakerConfig.network, stakerConfig.feeRecipient);
+  await setFeeRecipientOnDb(stakerConfig.network, stakerConfig.feeRecipient);
 
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
-  }).then(() => setExecutionOnDb(stakerConfig.network, stakerConfig.executionClient?.dnpName));
+  }).then(async () => await setExecutionOnDb(stakerConfig.network, stakerConfig.executionClient?.dnpName));
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
@@ -160,7 +160,7 @@ export async function setStakerConfig<T extends Network>({
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
-  }).then(() => setConsensusOnDb(stakerConfig.network, stakerConfig.consensusClient?.dnpName));
+  }).then(async () => await setConsensusOnDb(stakerConfig.network, stakerConfig.consensusClient?.dnpName));
 
   // WEB3SIGNER
   if (stakerConfig.enableWeb3signer !== undefined)
@@ -175,7 +175,7 @@ export async function setStakerConfig<T extends Network>({
     mevBoost,
     targetMevBoost: stakerConfig.mevBoost,
     currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
-  }).then(() => setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName));
+  }).then(async () => await setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName));
 }
 
 async function setExecutionClientConfig<T extends Network>({
@@ -542,31 +542,31 @@ async function setMevBoostOnDb<T extends Network>(
  * Sets the staker configuration on db for a given network
  * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
-function setFeeRecipientOnDb<T extends Network>(
+async function setFeeRecipientOnDb<T extends Network>(
   network: T,
   feeRecipient?: string
-): void {
+): Promise<void> {
   switch (network) {
     case "mainnet":
       if (
         feeRecipient !== undefined &&
         db.feeRecipientMainnet.get() !== feeRecipient
       )
-        db.feeRecipientMainnet.set(feeRecipient);
+       await db.feeRecipientMainnet.set(feeRecipient);
       break;
     case "gnosis":
       if (
         feeRecipient !== undefined &&
         db.feeRecipientGnosis.get() !== feeRecipient
       )
-        db.feeRecipientGnosis.set(feeRecipient);
+        await db.feeRecipientGnosis.set(feeRecipient);
       break;
     case "prater":
       if (
         feeRecipient !== undefined &&
         db.feeRecipientPrater.get() !== feeRecipient
       )
-        db.feeRecipientPrater.set(feeRecipient);
+      await  db.feeRecipientPrater.set(feeRecipient);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
