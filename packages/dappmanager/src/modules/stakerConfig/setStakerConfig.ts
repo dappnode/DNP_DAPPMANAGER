@@ -148,11 +148,14 @@ export async function setStakerConfig<T extends Network>({
 
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
-    network: stakerConfig.network,
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
+  await setExecutionOnDb(
+    stakerConfig.network,
+    stakerConfig.executionClient?.dnpName
+  );
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
@@ -162,6 +165,10 @@ export async function setStakerConfig<T extends Network>({
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
   });
+  await setConsensusOnDb(
+    stakerConfig.network,
+    stakerConfig.consensusClient?.dnpName
+  );
 
   // WEB3SIGNER
   if (stakerConfig.enableWeb3signer !== undefined)
@@ -173,20 +180,18 @@ export async function setStakerConfig<T extends Network>({
 
   // MEV BOOST
   await setMevBoostConfig({
-    network: stakerConfig.network,
     mevBoost,
     targetMevBoost: stakerConfig.mevBoost,
     currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
   });
+  await setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName);
 }
 
 async function setExecutionClientConfig<T extends Network>({
-  network,
   currentExecClient,
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  network: T;
   currentExecClient?: T extends "mainnet"
     ? ExecutionClientMainnet
     : T extends "gnosis"
@@ -260,8 +265,6 @@ async function setExecutionClientConfig<T extends Network>({
         await stopAllPkgContainers(currentExecClientPkg);
     }
   }
-
-  await setExecutionOnDb(network, targetExecutionClient?.dnpName);
 }
 
 async function setConsensusClientConfig<T extends Network>({
@@ -380,8 +383,6 @@ async function setConsensusClientConfig<T extends Network>({
         await stopAllPkgContainers(currentConsClientPkg);
     }
   }
-
-  await setConsensusOnDb(network, targetConsensusClient.dnpName);
 }
 
 async function setWeb3signerConfig(
@@ -409,12 +410,10 @@ async function setWeb3signerConfig(
 }
 
 async function setMevBoostConfig<T extends Network>({
-  network,
   mevBoost,
   targetMevBoost,
   currentMevBoostPkg
 }: {
-  network: T;
   mevBoost: T extends "mainnet"
     ? MevBoostMainnet
     : T extends "gnosis"
@@ -464,8 +463,6 @@ async function setMevBoostConfig<T extends Network>({
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoost, userSettings });
   }
-
-  await setMevBoostOnDb(network, targetMevBoost.dnpName);
 }
 
 /**
