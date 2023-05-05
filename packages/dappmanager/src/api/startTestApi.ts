@@ -71,7 +71,6 @@ export function startTestApi(): http.Server {
   });
 
   app.use((req, res) => {
-    console.log("endpoint not found")
     res.status(404).send("Not found");
   });
 
