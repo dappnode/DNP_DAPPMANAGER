@@ -40,8 +40,13 @@ export function startTestApi(): http.Server {
           callFn(req.body as never)
             .then(data => res.send(data))
             .catch(e => {
+              const errorResponse = {
+                name: e.name,
+                message: e.message,
+                stack: e.stack
+              };
               logs.error(`Error in ${callCasted}: ${e.stack}`);
-              res.status(500).send(e.message);
+              res.status(500).send(errorResponse);
             });
         });
       } else {
@@ -49,8 +54,13 @@ export function startTestApi(): http.Server {
           callFn(req.query as never)
             .then(data => res.send(data))
             .catch(e => {
+              const errorResponse = {
+                name: e.name,
+                message: e.message,
+                stack: e.stack
+              };
               logs.error(`Error in ${callCasted}: ${e.stack}`);
-              res.status(500).send(e.message);
+              res.status(500).send(errorResponse);
             });
         });
       }
