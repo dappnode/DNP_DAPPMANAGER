@@ -45,6 +45,7 @@ export function startTestApi(): http.Server {
                 message: e.message,
                 stack: e.stack
               };
+              logs.error(`Error in ${callCasted}: ${e.stack}`);
               res.status(500).send(errorResponse);
             });
         });
@@ -58,6 +59,7 @@ export function startTestApi(): http.Server {
                 message: e.message,
                 stack: e.stack
               };
+              logs.error(`Error in ${callCasted}: ${e.stack}`);
               res.status(500).send(errorResponse);
             });
         });
