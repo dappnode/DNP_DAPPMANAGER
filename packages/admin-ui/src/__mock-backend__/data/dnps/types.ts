@@ -1,4 +1,4 @@
-import { Manifest, SetupWizard } from "@dappnode/dappnodesdk";
+import { Manifest, SetupWizard } from "@dappnode/types";
 import {
   UserSettings,
   SpecialPermission,

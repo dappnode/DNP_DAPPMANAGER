@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/dappnodesdk";
+import { Compose } from "@dappnode/types";
 import { ComposeServicesSharingPid } from "../types.js";
 import { InstallPackageData, PackageContainer } from "@dappnode/common";
 

@@ -6,7 +6,7 @@ import {
   stripCharacters,
   ContainerNames
 } from "../../domains.js";
-import { getContainerDomain } from "@dappnode/dappnodesdk";
+import { getContainerDomain } from "@dappnode/types";
 
 const TTL = 60;
 const ethZone = "eth.";

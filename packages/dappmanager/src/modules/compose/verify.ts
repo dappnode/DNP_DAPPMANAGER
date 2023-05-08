@@ -1,5 +1,5 @@
 import { maxPortNumber } from "../../params.js";
-import { Compose } from "@dappnode/dappnodesdk";
+import { Compose } from "@dappnode/types";
 import { applyRecursivelyToStringValues } from "../../utils/objects.js";
 import { parsePortMappings } from "./ports.js";
 

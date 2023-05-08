@@ -13,7 +13,7 @@ import {
   ComposeNetworks,
   composeSafeKeys,
   getImageTag
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 import { lt } from "semver";
 
 /**

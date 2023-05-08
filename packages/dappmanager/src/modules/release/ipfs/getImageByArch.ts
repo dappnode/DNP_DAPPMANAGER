@@ -5,7 +5,7 @@ import {
   defaultArch,
   getImagePath,
   getLegacyImagePath
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 import { NoImageForArchError } from "../errors.js";
 import { IPFSEntryName } from "../types.js";
 
