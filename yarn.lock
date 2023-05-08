@@ -1231,20 +1231,20 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
   integrity sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==
 
-"@dappnode/schemas@^0.1.5":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@dappnode/schemas/-/schemas-0.1.5.tgz#e86f4573515d0e100a45259d63bed05d5ed1a6b9"
-  integrity sha512-zurT3wD/Cj9vZ3iynAUE267ib/va48IIPpTWICkJvccQ70x+4j1Jk601/d2RkH/d69YXpcBj6FY+VU1I8xbhwQ==
+"@dappnode/schemas@^0.1.6":
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@dappnode/schemas/-/schemas-0.1.6.tgz#d299cc6b7a4aec663688dcbb3ea7ebc1f4963aef"
+  integrity sha512-deKlp0PBEszpYmZFSevMFs/RqJnxuTxkxWAVTNKs2vvHbcCP50kWw/agl0pHCIJPqg8S83rq5H88lpL3vtP5Rw==
   dependencies:
-    "@dappnode/types" "^0.1.8"
+    "@dappnode/types" "^0.1.9"
     ajv "^8.12.0"
     ajv-errors "^3.0.0"
     semver "^7.5.0"
 
-"@dappnode/types@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.8.tgz#784419a072fc008af7bbc618c93fa39ea2ee7e1e"
-  integrity sha512-uvDAo9HPj64+/OqDbK9DmYrWa/doqYXMhDoNLs6a5tkHHJQPz5D3HSD7Qbvi+nVsg17PnXfdapsQstmlOa0NHg==
+"@dappnode/types@^0.1.9":
+  version "0.1.9"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.9.tgz#23d13181ab077b33e23b929bd32cc6b2b618ec4a"
+  integrity sha512-F8gGpW25+ahLvINMo5ppAEK0F57sc/0zxATGjDPA+YOc1anawJejy3XwhGu8C9bZwrdEc7wuUtLFGD0zZveLqw==
 
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
