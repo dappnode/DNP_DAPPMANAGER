@@ -68,7 +68,7 @@ yarn
 yarn generate
 ```
 
-There are 3 different developing modes:
+There are 4 different developing modes:
 
 1. Standalone UI: this mode allows developers to have a standalone UI with basic functionality, to develop and test UI elements without connecting to a DAppNode or a mock server. This is a fully static site that will be deployed to Netlify on every PR to speed up the reviewing process of PRs.
 
@@ -104,6 +104,26 @@ yarn start
 ```
 
 _Note: This mode is not working a the moment since cross-domain cookies are not enabled._
+
+4. Docker real-time development (Recomended).
+
+First SSH into Dappnode with VS code.
+
+Then force remove Dappmanager container:
+```
+docker ps | grep dappmanager
+docker rm -f <dappmanagerID>
+```
+
+Build Dappmanager:
+```
+docker-compose -f docker-compose-dev.yml build
+```
+
+Start Dappmanager:
+```
+docker-compose -f docker-compose-dev.yml up -d
+```
 
 ### Distributing
 
