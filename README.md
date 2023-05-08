@@ -107,22 +107,39 @@ _Note: This mode is not working a the moment since cross-domain cookies are not 
 
 4. Docker real-time development (Recomended).
 
-First SSH into Dappnode with VS code.
+SSH into your Dappnode and clone this repo:
 
-Then force remove Dappmanager container:
 ```
-docker ps | grep dappmanager
-docker rm -f <dappmanagerID>
+https://github.com/dappnode/DNP_DAPPMANAGER
 ```
 
-Build Dappmanager:
+Open the directory where you cloned the repo using VS Code SSH extension (optional, but recommended)
+
+Force remove Dappmanager container:
+```
+docker rm -f DAppNodeCore-dappmanager.dnp.dappnode.eth
+```
+
+Build dev Dappmanager:
+
+
 ```
 docker-compose -f docker-compose-dev.yml build
 ```
 
-Start Dappmanager:
+Start dev Dappmanager:
+
 ```
 docker-compose -f docker-compose-dev.yml up -d
+```
+
+After this, you will be able to access the dappmanager through http://172.33.1.7:5000/
+
+_Note: To switch back to production Dappmanager, you will have to remove this container and run:_
+
+
+```
+docker-compose -f /usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml up -d
 ```
 
 ### Distributing
