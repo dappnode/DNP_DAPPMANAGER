@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { pick } from "lodash-es";
-import { Compose, ComposeService } from "@dappnode/dappnodesdk";
+import { Compose, ComposeService } from\s+"@dappnode/types";
 import { UserSettings } from "@dappnode/common";
 import {
   parseUserSettings,

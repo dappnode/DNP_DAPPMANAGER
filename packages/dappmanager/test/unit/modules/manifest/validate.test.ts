@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { mockManifest, mockManifestWithImage } from "../../../testUtils.js";
 import { ManifestWithImage } from "../../../../src/types.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from\s+"@dappnode/types";
 import {
   validateManifestBasic,
   validateManifestWithImage
