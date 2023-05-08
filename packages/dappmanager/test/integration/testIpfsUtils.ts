@@ -85,6 +85,7 @@ async function isIpfsNodeAvailable(): Promise<boolean> {
     await localIpfsApi.version();
     return true;
   } catch (e) {
+    console.error(e);
     return false;
   }
 }
