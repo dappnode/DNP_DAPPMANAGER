@@ -106,13 +106,14 @@ function RelaysList<T extends Network>({
       <Table striped bordered hover size="sm">
         <thead>
           <tr>
-            <th>Relay</th>
-            <th>OFAC 
-              <a href="https://www.mevwatch.info/" target="_blank" rel="noopener noreferrer">
-                <AiFillInfoCircle />
+            <th style={{verticalAlign: "middle"}}>Relay</th>
+            <th>OFAC <br/>
+            Censorship
+              <a href="https://www.mevwatch.info/" target="_blank" rel="noopener noreferrer" >
+                <AiFillInfoCircle style={{ fontSize: "0.8em", verticalAlign: "top"}} />
               </a>
             </th>
-            <th>Status</th>
+            <th style={{verticalAlign: "middle"}}>Status</th>
           </tr>
         </thead>
         <tbody>
