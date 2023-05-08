@@ -1,10 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import {
-  Compose,
-  Manifest,
-  validateDappnodeCompose
-} from\s+"@dappnode/types";
+import { Compose, Manifest, validateDappnodeCompose } from "@dappnode/types";
 import { setDappnodeComposeDefaults } from "../../../../src/modules/compose/setDappnodeComposeDefaults.js";
 
 describe("setDappnodeComposeDefaults", () => {

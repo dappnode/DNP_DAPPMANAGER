@@ -12,7 +12,7 @@ import {
   SetupWizard,
   getImageTag,
   ComposeService
-} from\s+"@dappnode/types";
+} from "@dappnode/types";
 import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
 import { ipfsAddAll } from "../testIpfsUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";
