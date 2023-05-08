@@ -9,7 +9,7 @@ import { Manifest } from "@dappnode/types";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";
 const ipfsTestContainerName = "dappnode_ipfs_host";
-const ipfsLocalUrl = "http://localhost";
+const ipfsLocalUrl = "http://127.0.0.1";
 const ipfsApiPort = "5001";
 const ipfsGatewayPort = "8080";
 const timeout = 30 * 1000;
