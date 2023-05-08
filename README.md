@@ -122,7 +122,6 @@ docker rm -f DAppNodeCore-dappmanager.dnp.dappnode.eth
 
 Build dev Dappmanager:
 
-
 ```
 docker-compose -f docker-compose-dev.yml build
 ```
