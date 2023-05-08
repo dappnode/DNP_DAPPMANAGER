@@ -29,7 +29,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "16.15.0"
+          node-version: "18"
       - run: yarn
       - run: yarn build
       - run: yarn test
@@ -45,7 +45,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "16.15.0"
+          node-version: "18"
       - run: yarn # Caching only saves 30s
       - run: yarn build
       - run: yarn test:int
@@ -64,7 +64,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v1
         with:
-          node-version: "16.15.0"
+          node-version: "18"
       - name: Publish
         run: npx @dappnode/dappnodesdk publish ${BUMP_TYPE} --dappnode_team_preset
         env:
