@@ -101,8 +101,8 @@ export class EthereumClient {
     } else {
       const { execClient, consClient } = nextTarget;
       db.ethClientRemote.set(EthClientRemote.off);
-      db.executionClientMainnet.set(execClient);
-      db.consensusClientMainnet.set(consClient);
+      await db.executionClientMainnet.set(execClient);
+      await db.consensusClientMainnet.set(consClient);
       if (sync)
         await this.changeEthClientSync(
           execClient,

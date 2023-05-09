@@ -143,12 +143,19 @@ export async function setStakerConfig<T extends Network>({
     );
   }
 
+  // Set fee recipient on db
+  await setFeeRecipientOnDb(stakerConfig.network, stakerConfig.feeRecipient);
+
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
     currentExecClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
+  await setExecutionOnDb(
+    stakerConfig.network,
+    stakerConfig.executionClient?.dnpName
+  );
 
   // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
   await setConsensusClientConfig<T>({
@@ -157,17 +164,11 @@ export async function setStakerConfig<T extends Network>({
     currentConsClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
-  }).catch(e => {
-    // The previous EXECUTION CLIENT must be persisted
-    setStakerConfigOnDb<T>({
-      network: stakerConfig.network,
-      executionClient: currentExecClient,
-      consensusClient: stakerConfig.consensusClient?.dnpName,
-      mevBoost: stakerConfig.mevBoost?.dnpName,
-      feeRecipient: stakerConfig.feeRecipient
-    });
-    throw e;
   });
+  await setConsensusOnDb(
+    stakerConfig.network,
+    stakerConfig.consensusClient?.dnpName
+  );
 
   // WEB3SIGNER
   if (stakerConfig.enableWeb3signer !== undefined)
@@ -175,43 +176,15 @@ export async function setStakerConfig<T extends Network>({
       stakerConfig.enableWeb3signer,
       web3signer.dnpName,
       currentWeb3signerPkg
-    ).catch(e => {
-      // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
-      setStakerConfigOnDb({
-        ...stakerConfig,
-        executionClient: currentExecClient,
-        consensusClient: currentConsClient,
-        mevBoost: stakerConfig.mevBoost?.dnpName,
-        feeRecipient: stakerConfig.feeRecipient
-      });
-      throw e;
-    });
+    );
 
   // MEV BOOST
   await setMevBoostConfig({
     mevBoost,
     targetMevBoost: stakerConfig.mevBoost,
     currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
-  }).catch(e => {
-    // The previous EXECUTION CLIENT and CONSENSUS CLIENT must be persisted
-    setStakerConfigOnDb({
-      ...stakerConfig,
-      executionClient: currentExecClient,
-      consensusClient: currentConsClient,
-      mevBoost: stakerConfig.mevBoost?.dnpName,
-      feeRecipient: stakerConfig.feeRecipient
-    });
-    throw e;
   });
-
-  // Persist the staker config on db
-  setStakerConfigOnDb({
-    network: stakerConfig.network,
-    executionClient: stakerConfig.executionClient?.dnpName,
-    consensusClient: stakerConfig.consensusClient?.dnpName,
-    mevBoost: stakerConfig.mevBoost?.dnpName,
-    feeRecipient: stakerConfig.feeRecipient
-  });
+  await setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName);
 }
 
 async function setExecutionClientConfig<T extends Network>({
@@ -496,62 +469,121 @@ async function setMevBoostConfig<T extends Network>({
  * Sets the staker configuration on db for a given network
  * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
  */
-function setStakerConfigOnDb<T extends Network>({
-  network,
-  executionClient,
-  consensusClient,
-  mevBoost,
-  feeRecipient
-}: {
-  network: T;
-  executionClient?: ExecutionClient<T>;
-  consensusClient?: ConsensusClient<T>;
-  mevBoost?: MevBoost<T>;
-  feeRecipient?: string;
-}): void {
+async function setExecutionOnDb<T extends Network>(
+  network: T,
+  executionClient?: ExecutionClient<T>
+): Promise<void> {
   switch (network) {
     case "mainnet":
       if (db.executionClientMainnet.get() !== executionClient)
-        db.executionClientMainnet.set(
+        await db.executionClientMainnet.set(
           executionClient as ExecutionClientMainnet
         );
+      break;
+    case "gnosis":
+      if (db.executionClientGnosis.get() !== executionClient)
+        await db.executionClientGnosis.set(
+          executionClient as ExecutionClientGnosis
+        );
+      break;
+    case "prater":
+      if (db.executionClientPrater.get() !== executionClient)
+        await db.executionClientPrater.set(
+          executionClient as ExecutionClientPrater
+        );
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
+  }
+}
+
+/**
+ * Sets the staker configuration on db for a given network
+ * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
+ */
+async function setConsensusOnDb<T extends Network>(
+  network: T,
+  consensusClient?: ConsensusClient<T>
+): Promise<void> {
+  switch (network) {
+    case "mainnet":
       if (db.consensusClientMainnet.get() !== consensusClient)
-        db.consensusClientMainnet.set(
+        await db.consensusClientMainnet.set(
           consensusClient as ConsensusClientMainnet
         );
+      break;
+    case "gnosis":
+      if (db.consensusClientGnosis.get() !== consensusClient)
+        await db.consensusClientGnosis.set(
+          consensusClient as ConsensusClientGnosis
+        );
+      break;
+    case "prater":
+      if (db.consensusClientPrater.get() !== consensusClient)
+        await db.consensusClientPrater.set(
+          consensusClient as ConsensusClientPrater
+        );
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
+  }
+}
+
+/**
+ * Sets the staker configuration on db for a given network
+ * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
+ */
+async function setMevBoostOnDb<T extends Network>(
+  network: T,
+  mevBoost?: MevBoost<T>
+): Promise<void> {
+  switch (network) {
+    case "mainnet":
       if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
-        db.mevBoostMainnet.set(mevBoost ? true : false);
+        await db.mevBoostMainnet.set(mevBoost ? true : false);
+      break;
+    case "gnosis":
+      if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
+        await db.mevBoostGnosis.set(mevBoost ? true : false);
+      break;
+    case "prater":
+      if (db.mevBoostPrater.get() !== Boolean(mevBoost))
+        await db.mevBoostPrater.set(mevBoost ? true : false);
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
+  }
+}
+
+/**
+ * Sets the staker configuration on db for a given network
+ * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
+ */
+async function setFeeRecipientOnDb<T extends Network>(
+  network: T,
+  feeRecipient?: string
+): Promise<void> {
+  switch (network) {
+    case "mainnet":
       if (
         feeRecipient !== undefined &&
         db.feeRecipientMainnet.get() !== feeRecipient
       )
-        db.feeRecipientMainnet.set(feeRecipient);
+        await db.feeRecipientMainnet.set(feeRecipient);
       break;
     case "gnosis":
-      if (db.executionClientGnosis.get() !== executionClient)
-        db.executionClientGnosis.set(executionClient as ExecutionClientGnosis);
-      if (db.consensusClientGnosis.get() !== consensusClient)
-        db.consensusClientGnosis.set(consensusClient as ConsensusClientGnosis);
-      if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
-        db.mevBoostGnosis.set(mevBoost ? true : false);
       if (
         feeRecipient !== undefined &&
         db.feeRecipientGnosis.get() !== feeRecipient
       )
-        db.feeRecipientGnosis.set(feeRecipient);
+        await db.feeRecipientGnosis.set(feeRecipient);
       break;
     case "prater":
-      if (db.executionClientPrater.get() !== executionClient)
-        db.executionClientPrater.set(executionClient as ExecutionClientPrater);
-      if (db.consensusClientPrater.get() !== consensusClient)
-        db.consensusClientPrater.set(consensusClient as ConsensusClientPrater);
-      if (db.mevBoostPrater.get() !== Boolean(mevBoost))
-        db.mevBoostPrater.set(mevBoost ? true : false);
       if (
         feeRecipient !== undefined &&
         db.feeRecipientPrater.get() !== feeRecipient
       )
-        db.feeRecipientPrater.set(feeRecipient);
+        await db.feeRecipientPrater.set(feeRecipient);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);

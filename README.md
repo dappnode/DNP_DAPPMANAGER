@@ -52,7 +52,7 @@ The DNP_DAPPMANAGER expects to be in a DAppNode network to connect to its WAMP m
 
 ### Building
 
-After making sure that the nodejs app runs successfully on it own and passes the tests `npm test`, you can dockerize the package.
+After making sure that the nodejs app runs successfully on its own and passes the tests `npm test`, you can dockerize the package.
 
 ```
 docker-compose build
@@ -77,14 +77,14 @@ Netlify settings:
 - Production branch: **master**
 - Other branches: **v...** (e.g v0.2.41)
 
-Netlify will deploy an static site on every PR against the mentioned PRs
+Netlify will deploy a static site on every PR against the mentioned PRs
 
 ```
 cd packages/admin-ui
 yarn mock-standalone
 ```
 
-2. Server mock: this mode allow to simulate backend situations, such as cookies and sessions, alerts, or notifications. You should run the UI devserver and a mock backend server with:
+2. Server mock: this mode allows to simulate backend situations, such as cookies and sessions, alerts, or notifications. You should run the UI devserver and a mock backend server with:
 
 ```
 cd packages/admin-ui

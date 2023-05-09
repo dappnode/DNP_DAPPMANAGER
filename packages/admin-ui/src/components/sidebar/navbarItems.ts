@@ -45,7 +45,7 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
     logo: GivethLogo,
     text: "Giveth",
-    link: "https://beta.giveth.io/campaigns/5b44b198647f33526e67c262"
+    link: "https://giveth.io/project/dappnode"
   },
   {
     logo: EcfLogo,
