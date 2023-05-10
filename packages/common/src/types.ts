@@ -7,7 +7,7 @@ import {
   PackageBackup,
   Dependencies,
   PackageEnvs,
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 
 /**
  * Take into account the following tags to document the new types inside this file

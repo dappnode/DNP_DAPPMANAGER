@@ -46,7 +46,7 @@ import {
   StakerConfigGet,
   Eth2ClientTarget,
 } from "./types";
-import { PackageBackup, PackageEnvs } from "@dappnode/dappnodesdk";
+import { PackageBackup, PackageEnvs } from "@dappnode/types";
 
 export interface Routes {
   /**

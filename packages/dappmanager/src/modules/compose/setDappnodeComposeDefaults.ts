@@ -11,9 +11,9 @@ import {
   ComposeService,
   ComposeServiceNetworks,
   ComposeNetworks,
-  composeSafeKeys,
+  dockerComposeSafeKeys,
   getImageTag
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 import { lt } from "semver";
 
 /**
@@ -47,7 +47,7 @@ export function setDappnodeComposeDefaults(
           // SAFE KEYS: values that are whitelisted
           ...pick(
             serviceUnsafe,
-            composeSafeKeys.filter(safeKey => safeKey !== "build")
+            dockerComposeSafeKeys.filter(safeKey => safeKey !== "build")
           ),
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults

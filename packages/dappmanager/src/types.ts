@@ -1,4 +1,4 @@
-import { ChainDriver, Dependencies, Manifest } from "@dappnode/dappnodesdk";
+import { ChainDriver, Dependencies, Manifest } from "@dappnode/types";
 import {
   ExecutionClientMainnet,
   ReleaseSignatureProtocol

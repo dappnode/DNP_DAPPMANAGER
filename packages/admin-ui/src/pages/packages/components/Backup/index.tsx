@@ -4,7 +4,7 @@ import Columns from "components/Columns";
 import { BackupDownload } from "./Download";
 import { BackupRestore } from "./Restore";
 import "./backup.scss";
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import { PackageBackup } from "@dappnode/types";
 
 export function Backup({
   dnpName,

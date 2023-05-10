@@ -15,14 +15,13 @@ import { downloadAssetRequired } from "./downloadAssets.js";
 import { isDirectoryRelease } from "./isDirectoryRelease.js";
 import { serializeIpfsDirectory } from "../releaseSignature.js";
 import { ReleaseDownloadedContents } from "../types.js";
-import {
-  Manifest,
-  validateDappnodeCompose,
-  validateManifestSchema,
-  releaseFiles
-} from "@dappnode/dappnodesdk";
+import { Manifest, releaseFiles } from "@dappnode/types";
 import { getIsCore } from "../../manifest/getIsCore.js";
 import { DistributedFile } from "@dappnode/common";
+import {
+  validateManifestSchema,
+  validateDappnodeCompose
+} from "@dappnode/schemas";
 
 const source = "ipfs" as const;
 
