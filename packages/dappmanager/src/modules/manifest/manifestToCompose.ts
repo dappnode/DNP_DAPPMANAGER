@@ -19,6 +19,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
   const version = manifest.version;
   const isCore = getIsCore(manifest);
   const serviceName = dnpName;
+  const isMonoService = true;
   const image = manifest.image;
 
   const volumes: ComposeVolumes = {};
@@ -50,7 +51,7 @@ export function manifestToCompose(manifest: ManifestWithImage): Compose {
           "command"
         ]),
         container_name: getContainerName({ dnpName, serviceName, isCore }),
-        image: getImageTag({ serviceName, dnpName, version }),
+        image: getImageTag({ serviceName, dnpName, version, isMonoService }),
         environment: parseEnvironment(image.environment || {}),
         volumes: image.volumes,
         labels: parseEnvironment(image.labels || {}),
