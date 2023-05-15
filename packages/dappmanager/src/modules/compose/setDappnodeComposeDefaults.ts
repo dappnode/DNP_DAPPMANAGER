@@ -12,7 +12,8 @@ import {
   ComposeServiceNetworks,
   ComposeNetworks,
   dockerComposeSafeKeys,
-  getImageTag
+  getImageTag,
+  getIsMonoService
 } from "@dappnode/types";
 import { lt } from "semver";
 
@@ -26,6 +27,7 @@ export function setDappnodeComposeDefaults(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
+  const isMonoService = getIsMonoService(composeUnsafe);
 
   return cleanCompose({
     version: ensureMinimumComposeVersion(composeUnsafe.version),
@@ -52,13 +54,14 @@ export function setDappnodeComposeDefaults(
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults
           container_name: getContainerName({ dnpName, serviceName, isCore }),
-          image: getImageTag({ serviceName, dnpName, version }),
+          image: getImageTag({ serviceName, dnpName, version, isMonoService }),
           environment: parseEnvironment(serviceUnsafe.environment || {}),
           dns: params.DNS_SERVICE, // Common DAppNode ENS
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
             dnpName,
-            isMain: manifest.mainService === serviceName
+            // The root pkg alias will be added to the main service or if it is a mono service
+            isMain: isMonoService || manifest.mainService === serviceName
           })
         });
       }
