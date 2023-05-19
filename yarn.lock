@@ -1231,10 +1231,10 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.0.2.tgz#1bfafe4b7ed0f3e4105837e056e0a89b108ebe36"
   integrity sha512-IkpVW/ehM1hWKln4fCA3NzJU8KwD+kIOvPZA4cqxoJHtE21CCzjyp+Kxbu0i5I4tBNOlXPL9mjwnWlL0VEG4Fg==
 
-"@dappnode/schemas@^0.1.6":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@dappnode/schemas/-/schemas-0.1.6.tgz#d299cc6b7a4aec663688dcbb3ea7ebc1f4963aef"
-  integrity sha512-deKlp0PBEszpYmZFSevMFs/RqJnxuTxkxWAVTNKs2vvHbcCP50kWw/agl0pHCIJPqg8S83rq5H88lpL3vtP5Rw==
+"@dappnode/schemas@^0.1.7":
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/@dappnode/schemas/-/schemas-0.1.7.tgz#b53658e4cd58d8def8cb4cd2df5143a7209b761a"
+  integrity sha512-jd72x7Qf4IuWdgaeqlajgGaZ7vSAmMZrEg9mwe5NcEgrBfgIE4sWA8ewnIswV+1BCtWsewkEpvAA4WdKIfNyjQ==
   dependencies:
     "@dappnode/types" "^0.1.9"
     ajv "^8.12.0"
