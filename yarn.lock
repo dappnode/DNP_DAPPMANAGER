@@ -1241,10 +1241,10 @@
     ajv-errors "^3.0.0"
     semver "^7.5.0"
 
-"@dappnode/types@^0.1.14":
-  version "0.1.14"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.14.tgz#4460ba8bbf006a00363b5b7680203e83851e1d51"
-  integrity sha512-gby/fFZIIs66JWkMZcwnRRBY19DqZ/FYVfRNcttMEHNAIAv4qqcfWTPYtAllSi/Gh2GEPbeWZHG6N0S9hbWq1g==
+"@dappnode/types@^0.1.16":
+  version "0.1.16"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.16.tgz#bdf758d56329c0be27d07388f7adfd5596f0aaa6"
+  integrity sha512-LCatbaRqu0v1P6GZDRrLSOz4/y6XyN1A7QUyOCgnwSqcoi00FAxY8uiMiKsXJVZyjzPMQVTswi0qlCdFh56aKg==
 
 "@dappnode/types@^0.1.9":
   version "0.1.9"

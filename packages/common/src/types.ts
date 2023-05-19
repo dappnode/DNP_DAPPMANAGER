@@ -7,6 +7,18 @@ import {
   PackageBackup,
   Dependencies,
   PackageEnvs,
+  ConsensusClientGnosis,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network,
+  SignerMainnet,
+  SignerPrater,
+  SignerGnosis,
 } from "@dappnode/types";
 
 /**
@@ -1170,62 +1182,6 @@ export interface TrustedReleaseKey {
  * =======
  */
 
-export type Network = "mainnet" | "prater" | "gnosis";
-
-// Mainnet
-
-export const consensusClientsMainnet = [
-  "prysm.dnp.dappnode.eth",
-  "lighthouse.dnp.dappnode.eth",
-  "teku.dnp.dappnode.eth",
-  "nimbus.dnp.dappnode.eth",
-  "lodestar.dnp.dappnode.eth",
-  "",
-] as const;
-export type ConsensusClientMainnet = typeof consensusClientsMainnet[number];
-export const executionClientsMainnet = [
-  "geth.dnp.dappnode.eth",
-  "besu.public.dappnode.eth",
-  "erigon.dnp.dappnode.eth",
-  "nethermind.public.dappnode.eth",
-  "",
-] as const;
-export type ExecutionClientMainnet = typeof executionClientsMainnet[number];
-export type SignerMainnet = "web3signer.dnp.dappnode.eth" | "";
-export type MevBoostMainnet = "mev-boost.dnp.dappnode.eth" | "";
-
-// Prater
-
-export type ConsensusClientPrater =
-  | "prysm-prater.dnp.dappnode.eth"
-  | "lighthouse-prater.dnp.dappnode.eth"
-  | "teku-prater.dnp.dappnode.eth"
-  | "nimbus-prater.dnp.dappnode.eth"
-  | "lodestar-prater.dnp.dappnode.eth"
-  | "";
-
-export type ExecutionClientPrater =
-  | "goerli-geth.dnp.dappnode.eth"
-  | "goerli-erigon.dnp.dappnode.eth"
-  | "goerli-nethermind.dnp.dappnode.eth"
-  | "goerli-besu.dnp.dappnode.eth"
-  | "";
-export type SignerPrater = "web3signer-prater.dnp.dappnode.eth" | "";
-export type MevBoostPrater = "mev-boost-goerli.dnp.dappnode.eth" | "";
-
-// Gnosis
-
-export type ConsensusClientGnosis =
-  | "gnosis-beacon-chain-prysm.dnp.dappnode.eth"
-  | "lighthouse-gnosis.dnp.dappnode.eth"
-  | "teku-gnosis.dnp.dappnode.eth"
-  | "nimbus-gnosis.dnp.dappnode.eth"
-  | "lodestar-gnosis.dnp.dappnode.eth"
-  | "";
-export type ExecutionClientGnosis = "nethermind-xdai.dnp.dappnode.eth" | "";
-export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
-export type MevBoostGnosis = "mev-boost-gnosis.dnp.dappnode.eth" | "";
-
 export type StakerType = "execution" | "consensus" | "signer" | "mev-boost";
 
 export type StakerItem<T extends Network, P extends StakerType> =
@@ -1343,8 +1299,6 @@ export type Signer<T extends Network> = T extends "mainnet"
 
 export type MevBoost<T extends Network> = T extends "mainnet"
   ? MevBoostMainnet
-  : T extends "gnosis"
-  ? MevBoostGnosis
   : T extends "prater"
   ? MevBoostPrater
   : never;

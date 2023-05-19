@@ -2,9 +2,9 @@ import client from "prom-client";
 import { wrapHandler } from "../utils.js";
 import * as db from "../../db/index.js";
 import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork.js";
-import { Network } from "@dappnode/common";
 import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { isEmpty } from "lodash-es";
+import { Network } from "@dappnode/types";
 
 /**
  * Collect the metrics:

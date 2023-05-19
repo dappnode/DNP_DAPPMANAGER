@@ -2,12 +2,13 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { Network } from "@dappnode/types";
 
 export default function ExecutionClient<T extends Network>({
   executionClient,

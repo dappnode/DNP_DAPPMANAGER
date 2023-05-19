@@ -1,4 +1,4 @@
-import { Network } from "@dappnode/common";
+import { Network } from "@dappnode/types";
 import { ExecutionClientOrSignerVersions } from "./types";
 
 const lodestarStakersPraterMinimumVersions: ExecutionClientOrSignerVersions<"prater"> =

@@ -4,7 +4,6 @@ import {
   ConsensusClient,
   ExecutionClient,
   MevBoost,
-  Network,
   Signer,
   StakerConfigGet,
   StakerItem
@@ -14,6 +13,7 @@ import { listPackages } from "../docker/list/index.js";
 import { ReleaseFetcher } from "../release/index.js";
 import { getBeaconServiceName, getIsRunning, getPkgData } from "./utils.js";
 import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
+import { Network } from "@dappnode/types";
 
 /**
  * Fetches the current staker configuration:

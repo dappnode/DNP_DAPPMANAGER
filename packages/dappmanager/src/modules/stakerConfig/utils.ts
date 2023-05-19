@@ -1,5 +1,4 @@
 import {
-  Network,
   UserSettingsAllDnps,
   InstalledPackageData,
   InstalledPackageDataApiReturn,
@@ -12,7 +11,7 @@ import { packageSetEnvironment } from "../../calls/index.js";
 import { logs } from "../../logs.js";
 import { dockerContainerStop } from "../docker/index.js";
 import { pick } from "lodash-es";
-import { Manifest } from "@dappnode/types";
+import { Manifest, Network } from "@dappnode/types";
 import { ReleaseFetcher } from "../release/index.js";
 import { eventBus } from "../../eventBus.js";
 

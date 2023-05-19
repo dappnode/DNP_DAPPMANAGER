@@ -1,14 +1,14 @@
-import {
-  ConsensusClientPrater,
-  ConsensusClientMainnet,
-  ConsensusClientGnosis,
-  ExecutionClientGnosis,
-  ExecutionClientMainnet,
-  ExecutionClientPrater,
-  StakerItemData
-} from "@dappnode/common";
+import { StakerItemData } from "@dappnode/common";
 import { dbCache, dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import {
+  ConsensusClientMainnet,
+  ExecutionClientMainnet,
+  ConsensusClientGnosis,
+  ExecutionClientGnosis,
+  ConsensusClientPrater,
+  ExecutionClientPrater
+} from "@dappnode/types";
 
 // Cache
 
