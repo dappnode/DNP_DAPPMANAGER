@@ -1,19 +1,9 @@
 import { packagesGet, packageInstall } from "../../calls/index.js";
 import {
   ConsensusClient,
-  ConsensusClientGnosis,
-  ConsensusClientMainnet,
-  ConsensusClientPrater,
   ExecutionClient,
-  ExecutionClientGnosis,
-  ExecutionClientMainnet,
-  ExecutionClientPrater,
   InstalledPackageDataApiReturn,
   MevBoost,
-  MevBoostGnosis,
-  MevBoostMainnet,
-  MevBoostPrater,
-  Network,
   Signer,
   StakerConfigSet,
   StakerItemOk,
@@ -34,6 +24,17 @@ import { lt } from "semver";
 import * as db from "../../db/index.js";
 import { getLodestarStakersMinimumVersions } from "./params.js";
 import { ExecutionClientOrSignerVersions } from "./types.js";
+import {
+  ExecutionClientMainnet,
+  ExecutionClientGnosis,
+  ExecutionClientPrater,
+  ConsensusClientMainnet,
+  ConsensusClientGnosis,
+  ConsensusClientPrater,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network
+} from "@dappnode/types";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -414,11 +415,7 @@ async function setMevBoostConfig<T extends Network>({
   targetMevBoost,
   currentMevBoostPkg
 }: {
-  mevBoost: T extends "mainnet"
-    ? MevBoostMainnet
-    : T extends "gnosis"
-    ? MevBoostGnosis
-    : MevBoostPrater;
+  mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {

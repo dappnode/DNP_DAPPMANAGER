@@ -3,11 +3,12 @@ import React from "react";
 import ConsensusClient from "../columns/ConsensusClient";
 import ExecutionClient from "../columns/ExecutionClient";
 import MevBoost from "../columns/MevBoost";
-import { Network, StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
+import { StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
 import { InputForm } from "components/InputForm";
 import Input from "components/Input";
+import { Network } from "@dappnode/types";
 
 export const launchpadSteps = <T extends Network>({
   network,

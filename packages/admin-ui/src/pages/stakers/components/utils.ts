@@ -1,10 +1,10 @@
 import {
-  Network,
   StakerConfigSet,
   StakerItem,
   StakerItemOk,
   StakerType
 } from "@dappnode/common";
+import { Network } from "@dappnode/types";
 
 export function subStringifyConfig(config: string): string {
   return config.length > 35

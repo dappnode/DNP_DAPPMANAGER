@@ -10,11 +10,7 @@ import {
   serializeError
 } from "../../modules/ethClient/types.js";
 import { logs } from "../../logs.js";
-import {
-  ConsensusClientMainnet,
-  EthClientRemote,
-  ExecutionClientMainnet
-} from "@dappnode/common";
+import { EthClientRemote } from "@dappnode/common";
 import {
   ethereumClient,
   EthProviderError,
@@ -23,6 +19,10 @@ import {
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
 import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
 import { dockerComposeUpPackage } from "../../modules/docker/index.js";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
+} from "@dappnode/types";
 
 /**
  * Check status of the Ethereum client and do next actions

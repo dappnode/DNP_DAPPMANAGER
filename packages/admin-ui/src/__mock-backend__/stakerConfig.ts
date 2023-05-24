@@ -2,10 +2,10 @@ import {
   ConsensusClient,
   ExecutionClient,
   MevBoost,
-  Network,
   Routes,
   Signer
 } from "@dappnode/common";
+import { Network } from "@dappnode/types";
 
 export const stakerConfig: Pick<
   Routes,
