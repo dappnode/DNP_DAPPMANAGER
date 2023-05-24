@@ -1,14 +1,14 @@
 import { eventBus } from "../eventBus.js";
-import { getDirectory } from "../modules/directory/index.js";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
 import { logs } from "../logs.js";
 import { listPackages } from "../modules/docker/list/index.js";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";
 import { throttle } from "lodash-es";
-import { getEthersProvider } from "../modules/ethClient/index.js";
+import { getEthProviderUrl } from "../modules/ethClient/index.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { NoImageForArchError } from "../modules/release/errors.js";
+import { DappNodeDirectory } from "@dappnode/toolkit";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -16,13 +16,16 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const provider = await getEthersProvider();
+  const providerUrl = await getEthProviderUrl();
+  const directory = new DappNodeDirectory(providerUrl);
+
   const releaseFetcher = new ReleaseFetcher();
 
-  const dnpList = await listPackages();
+  const installedDnpList = await listPackages();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
-  const directory = await getDirectory(provider);
+  const directoryPkgs = await directory.getDirectoryPkgs();
+
   const directoryDnps: DirectoryItem[] = [];
 
   let directoryDnpsPending: DirectoryItem[] = [];
@@ -39,7 +42,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   }
 
   await Promise.all(
-    directory.map(async ({ name, isFeatured }, index): Promise<void> => {
+    directoryPkgs.map(async ({ name, isFeatured }, index): Promise<void> => {
       const whitelisted = true;
       const directoryItemBasic = { index, name, whitelisted, isFeatured };
       try {
@@ -52,8 +55,8 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           status: "ok",
           description: getShortDescription(metadata),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-          isInstalled: getIsInstalled(release, dnpList),
-          isUpdated: getIsUpdated(release, dnpList),
+          isInstalled: getIsInstalled(release, installedDnpList),
+          isUpdated: getIsUpdated(release, installedDnpList),
           featuredStyle: metadata.style,
           categories: metadata.categories || getFallBackCategories(name) || []
         });
