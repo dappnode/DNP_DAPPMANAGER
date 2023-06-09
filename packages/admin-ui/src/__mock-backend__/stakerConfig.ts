@@ -369,9 +369,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExecutionClient<
-                T
-              >,
+              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -417,7 +415,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
                 metadata: {
-                  name: "besu.dnp.dappnode.eth",
+                  name: "besu.public.dappnode.eth",
                   description: "Besu execution client",
                   shortDescription: "Besu execution client",
                   version: "0.1.0"
@@ -570,6 +568,34 @@ export const stakerConfig: Pick<
                 }
               },
               useCheckpointSync: true
+            },
+            {
+              status: "ok",
+              dnpName: "lodestar-prater.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                metadata: {
+                  name: "lodestar.dnp.dappnode.eth",
+                  description: "Lodestar consensus client",
+                  shortDescription: "Lodestar consensus client",
+                  version: "0.1.0"
+                }
+              },
+              useCheckpointSync: true
             }
           ],
           web3Signer: {
@@ -645,7 +671,7 @@ export const stakerConfig: Pick<
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
-              isSelected: true,
+              isSelected: false,
               avatarUrl: "",
               data: {
                 dnpName: "package",
@@ -666,18 +692,44 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               }
+            },
+            {
+              status: "ok",
+              dnpName: "erigon-gnosis.dnp.dappnode.eth" as ExecutionClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+
+                metadata: {
+                  name: "erigon.dnp.dappnode.eth",
+                  description: "Erigon execution client",
+                  shortDescription: "Erigon execution client",
+                  version: "0.1.0"
+                }
+              }
             }
           ],
           consensusClients: [
             {
               status: "ok",
-              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
-              isSelected: true,
+              isSelected: false,
               avatarUrl: "",
               data: {
                 dnpName: "package",
@@ -702,9 +754,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "lighthouse-gnosis.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "lighthouse-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -783,6 +833,34 @@ export const stakerConfig: Pick<
                   name: "nimbus.dnp.dappnode.eth",
                   description: "Nimbus consensus client",
                   shortDescription: "Nimbus consensus client",
+                  version: "0.1.0"
+                }
+              },
+              useCheckpointSync: true
+            },
+            {
+              status: "ok",
+              dnpName: "lodestar-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                metadata: {
+                  name: "lodestar.dnp.dappnode.eth",
+                  description: "Lodestar consensus client",
+                  shortDescription: "Lodestar consensus client",
                   version: "0.1.0"
                 }
               },
