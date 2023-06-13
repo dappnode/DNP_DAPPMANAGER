@@ -161,8 +161,9 @@ const stakeHouseCard: DirectoryItemOk = {
   whitelisted: true,
   isFeatured: true,
   status: "ok",
-  description: "Join or create an LSD Network and stake a validator with 4 ETH. Stakehouse offers perfect accounting with on-chain monitoring that tracks every ETH at the validator level for all user deposits. Natively compatible with all current and future Ethereum clients and DVT solutions.",
-  avatarUrl: "/ipfs/Qmdwfyfpiak1LGg2wzqLvofexQWQFes4bfiCB4TofjtasQ", // Stakehouse image logo
+  description:
+    "Join or create an LSD Network and stake a validator with 4 ETH. Stakehouse offers perfect accounting with on-chain monitoring that tracks every ETH at the validator level for all user deposits. Natively compatible with all current and future Ethereum clients and DVT solutions.",
+  avatarUrl: "/ipfs/QmSXLENQoS7iMbzDHgu9adbTUPW6pCCvkdvUvW3roYzxXE", // Stakehouse image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {
