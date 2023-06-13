@@ -5,11 +5,11 @@ import { AddResult } from "ipfs-core-types/src/root";
 import { sleep } from "../../src/utils/asyncFlows.js";
 import all from "it-all";
 import shell from "../../src/utils/shell.js";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/types";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";
 const ipfsTestContainerName = "dappnode_ipfs_host";
-const ipfsLocalUrl = "http://localhost";
+const ipfsLocalUrl = "http://127.0.0.1";
 const ipfsApiPort = "5001";
 const ipfsGatewayPort = "8080";
 const timeout = 30 * 1000;
@@ -43,7 +43,7 @@ export const localIpfsGateway: IPFSHTTPClient = create({
 export async function setUpIpfsNode(): Promise<void> {
   // Startup ipfs container
   await shell(
-    `docker run --rm -d --name ${ipfsTestContainerName} -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.12.1`
+    `docker run --rm -d --name ${ipfsTestContainerName} -p 127.0.0.1:8080:8080 -p 127.0.0.1:5001:5001 ipfs/go-ipfs:v0.19.2`
   );
 
   // Wait until ipfs is available
@@ -85,6 +85,7 @@ async function isIpfsNodeAvailable(): Promise<boolean> {
     await localIpfsApi.version();
     return true;
   } catch (e) {
+    console.error(e);
     return false;
   }
 }

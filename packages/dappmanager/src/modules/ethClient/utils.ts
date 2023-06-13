@@ -1,9 +1,10 @@
 import {
-  ConsensusClientMainnet,
-  consensusClientsMainnet,
   ExecutionClientMainnet,
-  executionClientsMainnet
-} from "@dappnode/common";
+  executionClientsMainnet,
+  ConsensusClientMainnet,
+  consensusClientsMainnet
+} from "@dappnode/types";
+
 export const isExecClient = (
   client: string
 ): client is ExecutionClientMainnet =>

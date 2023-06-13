@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { MdCheck, MdClose } from "react-icons/md";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
+import { AiFillInfoCircle } from "react-icons/ai";
 import { getDefaultRelays, RelayIface } from "../utils";
+import { Network } from "@dappnode/types";
 
 export default function MevBoost<T extends Network>({
   network,
@@ -107,7 +108,16 @@ function RelaysList<T extends Network>({
         <thead>
           <tr>
             <th>Relay</th>
-            <th>OFAC</th>
+            <th>
+              OFAC
+              <a
+                href="https://www.mevwatch.info/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <AiFillInfoCircle />
+              </a>
+            </th>
             <th>Status</th>
           </tr>
         </thead>
@@ -153,13 +163,11 @@ function Relay<T extends Network>({
         )}
       </td>
       <td>
-        {relay.ofacCompliant === undefined ? (
-          "-"
-        ) : relay.ofacCompliant ? (
-          <MdCheck color="#00b1f4" />
-        ) : (
-          <MdClose color="#ff0000" />
-        )}
+        {relay.ofacCompliant === undefined
+          ? "-"
+          : relay.ofacCompliant
+          ? "Yes"
+          : "No"}
       </td>
       <td>
         <Form.Check

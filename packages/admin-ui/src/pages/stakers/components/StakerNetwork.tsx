@@ -5,7 +5,6 @@ import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import {
-  Network,
   StakerConfigGet,
   StakerConfigGetOk,
   StakerConfigSet,
@@ -34,6 +33,7 @@ import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
 import Input from "components/Input";
+import { Network } from "@dappnode/types";
 
 export default function StakerNetwork<T extends Network>({
   network,

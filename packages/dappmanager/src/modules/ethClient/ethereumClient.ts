@@ -1,10 +1,5 @@
 import { isEqual } from "lodash-es";
-import {
-  ConsensusClientMainnet,
-  Eth2ClientTarget,
-  EthClientRemote,
-  ExecutionClientMainnet
-} from "@dappnode/common";
+import { Eth2ClientTarget, EthClientRemote } from "@dappnode/common";
 import * as db from "../../db/index.js";
 import { eventBus } from "../../eventBus.js";
 import { logs } from "../../logs.js";
@@ -23,6 +18,10 @@ import {
 } from "../docker/index.js";
 import Dockerode from "dockerode";
 import { listPackageNoThrow } from "../docker/list/index.js";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
+} from "@dappnode/types";
 
 export class EthereumClient {
   /**
@@ -101,8 +100,8 @@ export class EthereumClient {
     } else {
       const { execClient, consClient } = nextTarget;
       db.ethClientRemote.set(EthClientRemote.off);
-      db.executionClientMainnet.set(execClient);
-      db.consensusClientMainnet.set(consClient);
+      await db.executionClientMainnet.set(execClient);
+      await db.consensusClientMainnet.set(consClient);
       if (sync)
         await this.changeEthClientSync(
           execClient,

@@ -22,7 +22,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/dappnodesdk": "^0.2.83",
+    "@dappnode/schemas": "^0.1.7",
+    "@dappnode/types": "^0.1.17",
     "@ipld/car": "^3.1.16",
     "@types/async": "^3.0.1",
     "@types/async-retry": "^1.4.2",
@@ -70,7 +71,7 @@
     "helmet": "^4.4.1",
     "http-proxy": "^1.18.0",
     "ipfs-car": "^0.9.1",
-    "ipfs-http-client": "^59.0.0",
+    "ipfs-http-client": "^60.0.0",
     "is-ip": "^3.0.0",
     "is-ipfs": "^8.0.1",
     "js-yaml": "^3.11.0",

@@ -1,4 +1,5 @@
-import { ExecutionClient, Network, Signer } from "@dappnode/common";
+import { ExecutionClient, Signer } from "@dappnode/common";
+import { Network } from "@dappnode/types";
 
 export type ExecutionClientOrSignerVersions<T extends Network> = {
   [key in Exclude<ExecutionClient<T> | Signer<T>, "">]: string;

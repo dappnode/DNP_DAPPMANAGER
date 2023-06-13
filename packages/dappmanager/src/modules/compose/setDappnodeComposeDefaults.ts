@@ -11,9 +11,9 @@ import {
   ComposeService,
   ComposeServiceNetworks,
   ComposeNetworks,
-  composeSafeKeys,
+  dockerComposeSafeKeys,
   getImageTag
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 import { lt } from "semver";
 
 /**
@@ -26,6 +26,7 @@ export function setDappnodeComposeDefaults(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
+  const isMonoService = getIsMonoService(composeUnsafe);
 
   return cleanCompose({
     version: ensureMinimumComposeVersion(composeUnsafe.version),
@@ -47,7 +48,7 @@ export function setDappnodeComposeDefaults(
           // SAFE KEYS: values that are whitelisted
           ...pick(
             serviceUnsafe,
-            composeSafeKeys.filter(safeKey => safeKey !== "build")
+            dockerComposeSafeKeys.filter(safeKey => safeKey !== "build")
           ),
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults
@@ -58,7 +59,8 @@ export function setDappnodeComposeDefaults(
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
             dnpName,
-            isMain: manifest.mainService === serviceName
+            // The root pkg alias will be added to the main service or if it is a mono service
+            isMain: isMonoService || manifest.mainService === serviceName
           })
         });
       }
@@ -148,4 +150,11 @@ function setNetworks(
  */
 function sortServiceKeys(service: ComposeService): ComposeService {
   return fromPairs(sortBy(toPairs(service), "0")) as ComposeService;
+}
+
+/**
+ * Returns true if there is only one service in the compose file
+ */
+function getIsMonoService(compose: Compose): boolean {
+  return Object.keys(compose.services).length === 1;
 }

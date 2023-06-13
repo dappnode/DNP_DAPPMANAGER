@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -10,6 +10,7 @@ import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
+import { Network } from "@dappnode/types";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
@@ -24,7 +25,9 @@ export default function ConsensusClient<T extends Network>({
   isSelected: boolean;
 }) {
   const [useCheckpointSync, setUseCheckpointSync] = useState(
-    consensusClient.useCheckpointSync || false
+    consensusClient.useCheckpointSync !== undefined
+      ? consensusClient.useCheckpointSync
+      : true
   );
   return (
     <Card
@@ -99,7 +102,8 @@ export default function ConsensusClient<T extends Network>({
       ) : null}
 
       {isSelected &&
-        consensusClient.dnpName ===
+        // cast to any as long as the gnosis prysm was deprecated
+        (consensusClient.dnpName as any) ===
           "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
           <Alert variant="warning">
             It is <b>not recommended</b> to use <b>Prysm</b> as a consensus

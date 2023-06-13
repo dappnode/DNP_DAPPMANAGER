@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import "./launchpad-validators.scss";
 import Button from "components/Button";
-import { Network, StakerItemOk } from "@dappnode/common";
+import { StakerItemOk } from "@dappnode/common";
 import { StakerConfigGetOk } from "@dappnode/common";
 import { launchpadSteps } from "./LaunchpadSteps";
+import { Network } from "@dappnode/types";
 
 export default function LaunchpadValidators<T extends Network>({
   network,

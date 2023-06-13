@@ -1,17 +1,17 @@
-import {
-  ConsensusClientGnosis,
-  ConsensusClientMainnet,
-  ConsensusClientPrater,
-  ExecutionClientGnosis,
-  ExecutionClientMainnet,
-  ExecutionClientPrater,
-  InstalledPackageDataApiReturn,
-  Network
-} from "@dappnode/common";
+import { InstalledPackageDataApiReturn } from "@dappnode/common";
 import * as db from "../../db/index.js";
 import { packagesGet } from "../../calls/index.js";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { stakerParamsByNetwork } from "../stakerConfig/stakerParamsByNetwork.js";
+import {
+  ExecutionClientMainnet,
+  ExecutionClientGnosis,
+  ExecutionClientPrater,
+  ConsensusClientMainnet,
+  ConsensusClientGnosis,
+  ConsensusClientPrater,
+  Network
+} from "@dappnode/types";
 
 /**
  * Sets default values for the global environment variables:
@@ -41,6 +41,7 @@ export async function setDefaultStakerConfig(): Promise<void> {
         // Look for pkg ethclient target (fullnode), installed and running
         const execClientTargetDnpName = getExecClientTargetDnpName();
         if (
+          execClientTargetDnpName &&
           pkgs.find(
             pkg =>
               pkg.dnpName === execClientTargetDnpName &&
@@ -192,7 +193,7 @@ function getClientInstalled(
   return "";
 }
 
-function getExecClientTargetDnpName(): ExecutionClientMainnet {
+function getExecClientTargetDnpName(): ExecutionClientMainnet | null {
   const repository = db.ethClientTarget.get();
   switch (repository) {
     case "geth":
@@ -204,6 +205,6 @@ function getExecClientTargetDnpName(): ExecutionClientMainnet {
     case "erigon":
       return "erigon.dnp.dappnode.eth";
     default:
-      return "";
+      return null;
   }
 }

@@ -4,11 +4,12 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { Network, StakerItem } from "@dappnode/common";
+import { StakerItem } from "@dappnode/common";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { FaKey } from "react-icons/fa";
+import { Network } from "@dappnode/types";
 
 export default function RemoteSigner<T extends Network>({
   signer,

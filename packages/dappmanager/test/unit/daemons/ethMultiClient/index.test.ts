@@ -8,12 +8,14 @@ import {
   UserSettings,
   InstalledPackageData,
   Eth2ClientTarget,
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
   EthClientRemote
 } from "@dappnode/common";
 import { mockDnp, mockContainer } from "../../../testUtils.js";
 import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types.js";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
+} from "@dappnode/types";
 
 interface State {
   target: Eth2ClientTarget;
@@ -47,17 +49,16 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
 
     // Disable return typing for the db object since it's extremely verbose and unnecessary for a mock test
     // Also, it will be enforced by rewiremock in case of error
-    /* eslint-disable @typescript-eslint/explicit-function-return-type */
     const db = {
       executionClientMainnet: {
         get: (): ExecutionClientMainnet | null => currentExecClient,
-        set: (execClient: ExecutionClientMainnet | null) => {
+        set: async (execClient: ExecutionClientMainnet | null) => {
           currentExecClient = execClient;
         }
       },
       consensusClientMainnet: {
         get: (): ConsensusClientMainnet | null => currentConsClient,
-        set: (consClient: ConsensusClientMainnet | null) => {
+        set: async (consClient: ConsensusClientMainnet | null) => {
           currentConsClient = consClient;
         }
       },

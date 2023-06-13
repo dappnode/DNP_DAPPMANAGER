@@ -20,7 +20,7 @@ import {
   ComposeServiceNetwork,
   PackageEnvs,
   Manifest
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 import {
   stringifyPortMappings,
   parsePortMappings,

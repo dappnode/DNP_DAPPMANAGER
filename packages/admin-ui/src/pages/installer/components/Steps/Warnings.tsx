@@ -3,7 +3,7 @@ import Card from "components/Card";
 import { RequestedDnp } from "@dappnode/common";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/types";
 
 export default function Warnings({
   goNext,

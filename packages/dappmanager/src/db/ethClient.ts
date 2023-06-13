@@ -6,10 +6,12 @@ import {
   EthClientTarget,
   EthClientRemote,
   EthClientFallback,
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
   EthClientStatus
 } from "@dappnode/common";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
+} from "@dappnode/types";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";

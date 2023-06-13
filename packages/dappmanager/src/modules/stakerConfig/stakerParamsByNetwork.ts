@@ -1,5 +1,6 @@
+import { Network } from "@dappnode/types";
 import * as db from "../../db/index.js";
-import { Network, StakerParamsByNetwork } from "@dappnode/common";
+import { StakerParamsByNetwork } from "@dappnode/common";
 
 /**
  * Get the current staker config (execution and consensus clients selected) as well as
@@ -94,8 +95,7 @@ export function stakerParamsByNetwork<T extends Network>(
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: "0.1.10"
         },
-        mevBoost: "mev-boost-gnosis.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostGnosis.get(),
+
         feeRecipient: db.feeRecipientGnosis.get() || ""
       } as StakerParamsByNetwork<T>;
     case "prater":

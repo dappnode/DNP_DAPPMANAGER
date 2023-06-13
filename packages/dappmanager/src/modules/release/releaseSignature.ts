@@ -12,7 +12,7 @@ import {
   ReleaseSignatureProtocol
 } from "@dappnode/common";
 import { CID } from "ipfs-http-client";
-import { releaseFiles } from "@dappnode/dappnodesdk";
+import { releaseFiles } from "@dappnode/types";
 
 export function getReleaseSignatureStatus(
   dnpName: string,
