@@ -28,6 +28,8 @@ import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { PublicSwitch } from "../PublicSwitch";
+import { confirmPromise } from "components/ConfirmDialog";
+import { stakehouseLsdUrl } from "params";
 
 export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   const directory = useSelector(getDnpDirectory);
@@ -61,13 +63,33 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    // Middleware for Ethereum and Gnosis fake cards to redirect to stakers UI:
+    // Middleware for Ethereum, Gnosis and Stakehouse fake cards to redirect to stakers UI:
     // - Mainnet: http://my.dappnode/#/stakers/mainnet
     // - Gnosis: http://my.dappnode/#/stakers/gnosis
+    // - Stakehouse: http://my.dappnode/#/stakers/stakehouse
     if (id === "ethereum.dnp.dappnode.eth")
       routeProps.history.push(stakersPath + "/mainnet");
     else if (id === "gnosis.dnp.dappnode.eth")
       routeProps.history.push(stakersPath + "/gnosis");
+    else if (id === "stakehouse.dnp.dappnode.eth") {
+      // open a dialog that says it will open an external link, are you sure?
+      confirmPromise({
+        title: "Open Stakehouse LSD",
+        text: "This will open an external link to Stakehouse website, are you sure?",
+        buttons: [
+          {
+            label: "Cancel",
+            onClick: () => null
+          },
+          {
+            label: "Open",
+            onClick: () => {
+              window.open(stakehouseLsdUrl, "_blank");
+            }
+          }
+        ]
+      });
+    }
     else routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
   }
 
