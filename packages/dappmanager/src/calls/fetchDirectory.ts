@@ -72,7 +72,7 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
     })
   );
 
-  directoryDnps.push(stakerMainnetCard, stakerGnosisCard);
+  directoryDnps.push(stakerMainnetCard, stakerGnosisCard, stakeHouseCard);
 
   return directoryDnps.sort((a, b) => a.index - b.index);
 }
@@ -145,6 +145,25 @@ const stakerGnosisCard: DirectoryItemOk = {
   status: "ok",
   description: "Easily set-up your Gnosis Chain node and validator",
   avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};
+
+const stakeHouseCard: DirectoryItemOk = {
+  index: 0,
+  name: "stakehouse.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description:
+    "Join or create an LSD Network and stake a validator with 4 ETH.",
+  avatarUrl: "/ipfs/QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw", // Stakehouse image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {

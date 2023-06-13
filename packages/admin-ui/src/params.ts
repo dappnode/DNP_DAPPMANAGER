@@ -66,6 +66,7 @@ export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
 // URLs / Links
+export const stakehouseLsdUrl = "https://lsd.joinstakehouse.com/"
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
