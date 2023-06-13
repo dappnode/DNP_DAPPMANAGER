@@ -74,8 +74,8 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
-        title: "Open Stakehouse LSD",
-        text: "This will open an external link to Stakehouse website, are you sure?",
+        title: "Ready to Explore Stakehouse?",
+        text: "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
         buttons: [
           {
             label: "Cancel",
