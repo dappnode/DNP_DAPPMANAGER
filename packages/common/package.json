@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "yarn run generate && tsc -p tsconfig.json",
-    "generate": "ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
+    "generate": "NODE_OPTIONS=--loader=ts-node/esm ts-node -P tsconfig.json ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
