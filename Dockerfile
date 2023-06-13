@@ -1,4 +1,4 @@
-ARG NODE_VERSION=19.2.0
+ARG NODE_VERSION=20.3.0
 
 ############
 # GIT-DATA #
