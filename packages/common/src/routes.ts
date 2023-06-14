@@ -27,7 +27,6 @@ import {
   UpnpTablePortStatus,
   ApiTablePortStatus,
   HttpsPortalMapping,
-  DockerUpdateStatus,
   WireguardDeviceCredentials,
   ExposableServiceMapping,
   HostDiagnoseItem,
@@ -201,15 +200,6 @@ export interface Routes {
    * Collect host info for support
    */
   diagnose: () => Promise<HostDiagnoseItem[]>;
-
-  /** Updates docker compose */
-  dockerComposeUpdate: () => Promise<string>;
-  /** Returns docker-compose update requirements */
-  dockerComposeUpdateCheck: () => Promise<DockerUpdateStatus>;
-  /** Updates docker engine */
-  dockerEngineUpdate: () => Promise<string>;
-  /** Returns docker engine update requirements */
-  dockerEngineUpdateCheck: () => Promise<DockerUpdateStatus>;
 
   /**
    * Sets if a fallback should be used
@@ -619,11 +609,6 @@ export interface Routes {
   systemInfoGet: () => Promise<SystemInfo>;
 
   /**
-   * Executes updates on host
-   */
-  runHostUpdates: () => Promise<string>;
-
-  /**
    * Attemps to open ports using UPnP
    */
   natRenewalEnable: (kwargs: { enableNatRenewal: boolean }) => Promise<void>;
@@ -696,10 +681,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
-  dockerComposeUpdate: { log: true },
-  dockerComposeUpdateCheck: {},
-  dockerEngineUpdate: { log: true },
-  dockerEngineUpdateCheck: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
   fetchCoreUpdateData: {},
@@ -749,7 +730,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
-  runHostUpdates: {},
   seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   statsCpuGet: {},

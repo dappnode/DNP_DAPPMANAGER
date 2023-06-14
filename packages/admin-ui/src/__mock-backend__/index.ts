@@ -1,7 +1,6 @@
 import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
-import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
 import { localProxying } from "./localProxying";
@@ -20,7 +19,6 @@ import { stakerConfig } from "./stakerConfig";
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
-  ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
   ...localProxying,
@@ -227,8 +225,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       // "change-host-password"
     ]
   }),
-  runHostUpdates: async () =>
-    "Host updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [

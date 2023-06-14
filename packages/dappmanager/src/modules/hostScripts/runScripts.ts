@@ -13,10 +13,7 @@ type ScriptName =
   | "lvm.sh"
   | "detect_fs.sh"
   | "migrate_volume.sh"
-  | "docker_engine_update.sh"
-  | "docker_compose_update.sh"
   | "collect_host_info.sh"
-  | "host_update.sh"
   | "avahi_daemon.sh";
 
 /**
