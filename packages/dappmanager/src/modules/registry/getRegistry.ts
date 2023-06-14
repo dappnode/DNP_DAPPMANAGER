@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import { abi } from "../../contracts/registry.js";
 import * as db from "../../db/index.js";
 import { wrapError } from "../../utils/wrapError.js";
-import { DirectoryDnp } from "@dappnode/common";
+import { DirectoryDnp } from "@dappnode/toolkit";
 
 // Topic name
 const eventNewRepo = "NewRepo";

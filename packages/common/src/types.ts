@@ -187,18 +187,6 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
-export type DirectoryDnpStatus = "Deleted" | "Active" | "Developing";
-
-export interface DirectoryDnp {
-  name: string;
-  statusName: DirectoryDnpStatus;
-  position: number;
-  isFeatured: boolean;
-  featuredIndex: number;
-  manifest?: Manifest;
-  avatar?: string;
-}
-
 /**
  * =========================
  * SMART CONTRACT - REGISTRY
