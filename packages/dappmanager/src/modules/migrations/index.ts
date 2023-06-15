@@ -54,20 +54,6 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  /**
-   * WARNING! This migration is dangerous if user has not set a staker config, the docker daemon can crash and is safer to not do it automatically
-   *  
-   setDefaultStakerConfig().catch(e =>
-    migrationErrors.push({
-      migration: "set default staker configuration",
-      coreVersion: "v0.2.58",
-      name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack
-    })
-  );
-   */
-
   switchEthClientIfOpenethereumOrGethLight().catch(e =>
     migrationErrors.push({
       migration:

@@ -1,18 +1,17 @@
 import { Network } from "@dappnode/types";
-import * as db from "../../db/index.js";
-import { StakerParamsByNetwork } from "@dappnode/common";
+import { StakerCompatibleVersionsByNetwork } from "@dappnode/common";
 
 /**
  * Get the current staker config (execution and consensus clients selected) as well as
  * the pkgs available for each network
  */
-export function stakerParamsByNetwork<T extends Network>(
-  network: T
-): StakerParamsByNetwork<T> {
+export function getStakerCompatibleVersionsByNetwork(
+  network: Network
+): StakerCompatibleVersionsByNetwork<Network> {
   switch (network) {
     case "mainnet":
       return {
-        execClients: [
+        compatibleExecution: [
           {
             dnpName: "geth.dnp.dappnode.eth",
             minVersion: "0.1.37"
@@ -30,8 +29,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "1.2.6"
           }
         ],
-        currentExecClient: db.executionClientMainnet.get(),
-        consClients: [
+        compatibleConsensus: [
           {
             dnpName: "prysm.dnp.dappnode.eth",
             minVersion: "3.0.4"
@@ -53,30 +51,25 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentConsClient: db.consensusClientMainnet.get(),
-        web3signer: {
+        compatibleSigner: {
           dnpName: "web3signer.dnp.dappnode.eth",
           minVersion: "0.1.4"
         },
-        mevBoost: "mev-boost.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostMainnet.get(),
-        feeRecipient: db.feeRecipientMainnet.get() || ""
-      } as StakerParamsByNetwork<T>;
+        compatibleMevBoost: {
+          dnpName: "mev-boost.dnp.dappnode.eth",
+          minVersion: "0.1.0"
+        }
+      };
 
     case "gnosis":
       return {
-        execClients: [
+        compatibleExecution: [
           {
             dnpName: "nethermind-xdai.dnp.dappnode.eth",
             minVersion: "1.0.18"
           }
         ],
-        currentExecClient: db.executionClientGnosis.get(),
-        consClients: [
-          {
-            dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
-            minVersion: "2.0.0"
-          },
+        compatibleConsensus: [
           {
             dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
             minVersion: "0.1.5"
@@ -90,17 +83,15 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentConsClient: db.consensusClientGnosis.get(),
-        web3signer: {
+        compatibleSigner: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth",
           minVersion: "0.1.10"
         },
-
-        feeRecipient: db.feeRecipientGnosis.get() || ""
-      } as StakerParamsByNetwork<T>;
+        compatibleMevBoost: null // No MEV-Boost for Gnosis
+      };
     case "prater":
       return {
-        execClients: [
+        compatibleExecution: [
           {
             dnpName: "goerli-geth.dnp.dappnode.eth",
             minVersion: "0.4.26"
@@ -118,8 +109,7 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentExecClient: db.executionClientPrater.get(),
-        consClients: [
+        compatibleConsensus: [
           {
             dnpName: "prysm-prater.dnp.dappnode.eth",
             minVersion: "1.0.15"
@@ -141,15 +131,15 @@ export function stakerParamsByNetwork<T extends Network>(
             minVersion: "0.1.0"
           }
         ],
-        currentConsClient: db.consensusClientPrater.get(),
-        web3signer: {
+        compatibleSigner: {
           dnpName: "web3signer-prater.dnp.dappnode.eth",
           minVersion: "0.1.11"
         },
-        mevBoost: "mev-boost-goerli.dnp.dappnode.eth",
-        isMevBoostSelected: db.mevBoostPrater.get(),
-        feeRecipient: db.feeRecipientPrater.get() || ""
-      } as StakerParamsByNetwork<T>;
+        compatibleMevBoost: {
+          dnpName: "mev-boost-goerli.dnp.dappnode.eth",
+          minVersion: "0.1.0"
+        }
+      };
     default:
       throw Error(`Unsupported network: ${network}`);
   }

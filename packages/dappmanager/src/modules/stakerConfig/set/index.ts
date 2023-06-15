@@ -1,4 +1,4 @@
-import { packagesGet, packageInstall } from "../../calls/index.js";
+import { packagesGet, packageInstall } from "../../../calls/index.js";
 import {
   ConsensusClient,
   ExecutionClient,
@@ -9,21 +9,21 @@ import {
   StakerItemOk,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { logs } from "../../logs.js";
-import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
+import { logs } from "../../../logs.js";
+import { getStakerCompatibleVersionsByNetwork } from "../getStakerCompatibleVersionsByNetwork.js";
 import {
   getConsensusUserSettings,
   stopAllPkgContainers,
   updateConsensusEnv,
   getMevBoostUserSettings,
   updateMevBoostEnv
-} from "./utils.js";
-import { listPackageNoThrow } from "../docker/list/listPackages.js";
-import { dockerComposeUpPackage } from "../docker/index.js";
+} from "../utils.js";
+import { listPackageNoThrow } from "../../docker/list/listPackages.js";
+import { dockerComposeUpPackage } from "../../docker/index.js";
 import { lt } from "semver";
-import * as db from "../../db/index.js";
-import { getLodestarStakersMinimumVersions } from "./params.js";
-import { ExecutionClientOrSignerVersions } from "./types.js";
+import * as db from "../../../db/index.js";
+import { getLodestarStakersMinimumVersions } from "../params.js";
+import { ExecutionClientOrSignerVersions } from "../types.js";
 import {
   ExecutionClientMainnet,
   ExecutionClientGnosis,
@@ -35,6 +35,7 @@ import {
   MevBoostPrater,
   Network
 } from "@dappnode/types";
+import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -51,18 +52,23 @@ export async function setStakerConfig<T extends Network>({
   stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
   const {
-    execClients,
-    currentExecClient,
-    consClients,
-    currentConsClient,
-    web3signer,
-    mevBoost
-  } = stakerParamsByNetwork<T>(stakerConfig.network);
+    compatibleExecution,
+    compatibleConsensus,
+    compatibleSigner,
+    compatibleMevBoost
+  } = getStakerCompatibleVersionsByNetwork(stakerConfig.network);
+
+  const {
+    executionClient: currentExecutionClient,
+    consensusClient: currentConsensusClient,
+    feeRecipient,
+    isMevBoostSelected
+  } = getStakerConfigByNetwork(stakerConfig.network);
 
   // Ensure Execution clients DNP's names are valid
   if (
     stakerConfig.executionClient &&
-    !execClients
+    !compatibleExecution
       .map(exCl => exCl.dnpName)
       .includes(stakerConfig.executionClient.dnpName)
   )
@@ -72,7 +78,7 @@ export async function setStakerConfig<T extends Network>({
   // Ensure Consensus clients DNP's names are valid
   if (
     stakerConfig.consensusClient &&
-    !consClients
+    !compatibleConsensus
       .map(coCl => coCl.dnpName)
       .includes(stakerConfig.consensusClient.dnpName)
   )
@@ -83,11 +89,11 @@ export async function setStakerConfig<T extends Network>({
   const pkgs = await packagesGet();
 
   const currentExecClientPkg = pkgs.find(
-    pkg => pkg.dnpName === currentExecClient
+    pkg => pkg.dnpName === currentExecutionClient
   );
   // Ensure Execution clients DNP's versions names are valid
   if (currentExecClientPkg) {
-    const execClient = execClients.find(
+    const execClient = compatibleExecution.find(
       exCl => exCl.dnpName === currentExecClientPkg.dnpName
     );
     if (
@@ -100,11 +106,11 @@ export async function setStakerConfig<T extends Network>({
   }
 
   const currentConsClientPkg = pkgs.find(
-    pkg => pkg.dnpName === currentConsClient
+    pkg => pkg.dnpName === currentConsensusClient
   );
   // Ensure Execution clients DNP's versions names are valid
   if (currentConsClientPkg) {
-    const consClient = consClients.find(
+    const consClient = compatibleConsensus.find(
       exCl => exCl.dnpName === currentConsClientPkg.dnpName
     );
     if (
@@ -117,16 +123,16 @@ export async function setStakerConfig<T extends Network>({
   }
 
   const currentWeb3signerPkg = pkgs.find(
-    pkg => pkg.dnpName === web3signer.dnpName
+    pkg => pkg.dnpName === compatibleSigner.dnpName
   );
   // Ensure Web3signer DNP's version is valid
   if (
-    web3signer.minVersion &&
+    compatibleSigner.minVersion &&
     currentWeb3signerPkg &&
-    lt(currentWeb3signerPkg.version, web3signer.minVersion)
+    lt(currentWeb3signerPkg.version, compatibleSigner.minVersion)
   )
     throw Error(
-      `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${web3signer.minVersion} required to work with the stakers UI. Update it to continue.`
+      `Web3signer version ${currentWeb3signerPkg.version} is lower than the minimum version ${compatibleSigner.minVersion} required to work with the stakers UI. Update it to continue.`
     );
 
   // If consensus client is lodestar, check that all the execution client and signer versions
@@ -139,7 +145,7 @@ export async function setStakerConfig<T extends Network>({
       stakerConfig.network,
       stakerConfig.executionClient.dnpName,
       stakerConfig.enableWeb3signer,
-      web3signer.dnpName,
+      compatibleSigner.dnpName,
       currentWeb3signerPkg?.version
     );
   }
@@ -149,7 +155,7 @@ export async function setStakerConfig<T extends Network>({
 
   // EXECUTION CLIENT
   await setExecutionClientConfig<T>({
-    currentExecClient,
+    currentExecutionClient,
     targetExecutionClient: stakerConfig.executionClient,
     currentExecClientPkg
   });
@@ -162,7 +168,7 @@ export async function setStakerConfig<T extends Network>({
   await setConsensusClientConfig<T>({
     network: stakerConfig.network,
     feeRecipient: stakerConfig.feeRecipient,
-    currentConsClient,
+    currentConsensusClient,
     targetConsensusClient: stakerConfig.consensusClient,
     currentConsClientPkg
   });
@@ -175,25 +181,25 @@ export async function setStakerConfig<T extends Network>({
   if (stakerConfig.enableWeb3signer !== undefined)
     await setWeb3signerConfig(
       stakerConfig.enableWeb3signer,
-      web3signer.dnpName,
+      compatibleSigner.dnpName,
       currentWeb3signerPkg
     );
 
   // MEV BOOST
   await setMevBoostConfig({
-    mevBoost,
+    mevBoost: compatibleMevBoost,
     targetMevBoost: stakerConfig.mevBoost,
-    currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === mevBoost)
+    currentMevBoostPkg: pkgs.find(pkg => pkg.dnpName === compatibleMevBoost)
   });
   await setMevBoostOnDb(stakerConfig.network, stakerConfig.mevBoost?.dnpName);
 }
 
 async function setExecutionClientConfig<T extends Network>({
-  currentExecClient,
+  currentExecutionClient,
   targetExecutionClient,
   currentExecClientPkg
 }: {
-  currentExecClient?: T extends "mainnet"
+  currentExecutionClient?: T extends "mainnet"
     ? ExecutionClientMainnet
     : T extends "gnosis"
     ? ExecutionClientGnosis
@@ -201,15 +207,15 @@ async function setExecutionClientConfig<T extends Network>({
   targetExecutionClient?: StakerItemOk<T, "execution">;
   currentExecClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
-  if (!targetExecutionClient?.dnpName && !currentExecClient) {
+  if (!targetExecutionClient?.dnpName && !currentExecutionClient) {
     // Stop the current execution client if no option and not currentu execution client
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (!targetExecutionClient?.dnpName && currentExecClient) {
+  } else if (!targetExecutionClient?.dnpName && currentExecutionClient) {
     // Stop the current execution client if no target provided
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (targetExecutionClient?.dnpName && !currentExecClient) {
+  } else if (targetExecutionClient?.dnpName && !currentExecutionClient) {
     const targetExecClientPkg = await listPackageNoThrow({
       dnpName: targetExecutionClient.dnpName
     });
@@ -227,7 +233,7 @@ async function setExecutionClientConfig<T extends Network>({
     }
   } else if (
     targetExecutionClient?.dnpName &&
-    targetExecutionClient.dnpName === currentExecClient
+    targetExecutionClient.dnpName === currentExecutionClient
   ) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
@@ -242,7 +248,7 @@ async function setExecutionClientConfig<T extends Network>({
     }
   } else if (
     targetExecutionClient &&
-    targetExecutionClient.dnpName !== currentExecClient
+    targetExecutionClient.dnpName !== currentExecutionClient
   ) {
     const targetExecClientPkg = await listPackageNoThrow({
       dnpName: targetExecutionClient.dnpName
@@ -271,13 +277,13 @@ async function setExecutionClientConfig<T extends Network>({
 async function setConsensusClientConfig<T extends Network>({
   network,
   feeRecipient,
-  currentConsClient,
+  currentConsensusClient,
   targetConsensusClient,
   currentConsClientPkg
 }: {
   network: Network;
   feeRecipient: string;
-  currentConsClient?: T extends "mainnet"
+  currentConsensusClient?: T extends "mainnet"
     ? ConsensusClientMainnet
     : T extends "gnosis"
     ? ConsensusClientGnosis
@@ -286,12 +292,12 @@ async function setConsensusClientConfig<T extends Network>({
   currentConsClientPkg?: InstalledPackageDataApiReturn;
 }): Promise<void> {
   if (!targetConsensusClient?.dnpName) {
-    if (!currentConsClient) {
+    if (!currentConsensusClient) {
       // Stop the current consensus client if no option and not current consensus client
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
-    } else if (!targetConsensusClient?.dnpName && currentConsClient) {
+    } else if (!targetConsensusClient?.dnpName && currentConsensusClient) {
       // Stop the current consensus client if no target provided
       logs.info(`Not consensus client selected`);
       if (currentConsClientPkg)
@@ -308,7 +314,7 @@ async function setConsensusClientConfig<T extends Network>({
     useCheckpointSync: targetConsensusClient.useCheckpointSync
   });
 
-  if (targetConsensusClient.dnpName && !currentConsClient) {
+  if (targetConsensusClient.dnpName && !currentConsensusClient) {
     const targetConsClientPkg = await listPackageNoThrow({
       dnpName: targetConsensusClient.dnpName
     });
@@ -332,7 +338,7 @@ async function setConsensusClientConfig<T extends Network>({
         true
       );
     }
-  } else if (targetConsensusClient.dnpName === currentConsClient) {
+  } else if (targetConsensusClient.dnpName === currentConsensusClient) {
     if (!currentConsClientPkg) {
       logs.info("Installing consensus client " + targetConsensusClient);
       await packageInstall({
@@ -353,7 +359,7 @@ async function setConsensusClientConfig<T extends Network>({
         true
       );
     }
-  } else if (targetConsensusClient.dnpName !== currentConsClient) {
+  } else if (targetConsensusClient.dnpName !== currentConsensusClient) {
     const targetExecClientPkg = await listPackageNoThrow({
       dnpName: targetConsensusClient.dnpName
     });

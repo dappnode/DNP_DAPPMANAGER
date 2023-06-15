@@ -1,5 +1,8 @@
-import { packageGet } from "../../calls/index.js";
-import { getIsInstalled, getIsUpdated } from "../../calls/fetchDnpRequest.js";
+import { packageGet } from "../../../calls/index.js";
+import {
+  getIsInstalled,
+  getIsUpdated
+} from "../../../calls/fetchDnpRequest.js";
 import {
   ConsensusClient,
   ExecutionClient,
@@ -8,12 +11,13 @@ import {
   StakerConfigGet,
   StakerItem
 } from "@dappnode/common";
-import { fileToGatewayUrl } from "../../utils/distributedFile.js";
-import { listPackages } from "../docker/list/index.js";
-import { ReleaseFetcher } from "../release/index.js";
-import { getBeaconServiceName, getIsRunning, getPkgData } from "./utils.js";
-import { stakerParamsByNetwork } from "./stakerParamsByNetwork.js";
+import { fileToGatewayUrl } from "../../../utils/distributedFile.js";
+import { listPackages } from "../../docker/list/index.js";
+import { ReleaseFetcher } from "../../release/index.js";
+import { getBeaconServiceName, getIsRunning, getPkgData } from "../utils.js";
 import { Network } from "@dappnode/types";
+import { getStakerDnpNamesByNetwork } from "../getStakerDnpNamesByNetwork.js";
+import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
 
 /**
  * Fetches the current staker configuration:
@@ -32,59 +36,52 @@ export async function getStakerConfig<T extends Network>(
   try {
     const releaseFetcher = new ReleaseFetcher();
 
+    const { executionClients, consensusClients, signer, mevBoost } =
+      getStakerDnpNamesByNetwork(network);
+
     const {
-      execClients,
-      currentExecClient,
-      consClients,
-      currentConsClient,
-      web3signer,
-      mevBoost,
-      isMevBoostSelected,
-      feeRecipient
-    } = stakerParamsByNetwork(network);
+      executionClient: currentExecClient,
+      consensusClient: currentConsClient,
+      feeRecipient,
+      isMevBoostSelected
+    } = getStakerConfigByNetwork(network);
 
     const dnpList = await listPackages();
 
     return {
       executionClients: await Promise.all(
-        execClients.map(async execClient => {
+        executionClients.map(async execClient => {
           try {
-            if (!(await releaseFetcher.repoExists(execClient.dnpName)))
-              throw Error(`Repository ${execClient.dnpName} does not exist`);
+            if (!(await releaseFetcher.repoExists(execClient)))
+              throw Error(`Repository ${execClient} does not exist`);
 
-            const pkgData = await getPkgData(
-              releaseFetcher,
-              execClient.dnpName
-            );
+            const pkgData = await getPkgData(releaseFetcher, execClient);
 
             return {
               status: "ok",
-              dnpName: execClient.dnpName as ExecutionClient<T>,
+              dnpName: execClient as ExecutionClient<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
-              isSelected: execClient.dnpName === currentExecClient
+              isSelected: execClient === currentExecClient
             };
           } catch (error) {
             return {
               status: "error",
-              dnpName: execClient.dnpName as ExecutionClient<T>,
+              dnpName: execClient as ExecutionClient<T>,
               error
             };
           }
         })
       ),
       consensusClients: await Promise.all(
-        consClients.map(async consClient => {
+        consensusClients.map(async consClient => {
           try {
-            if (!(await releaseFetcher.repoExists(consClient.dnpName)))
-              throw Error(`Repository ${consClient.dnpName} does not exist`);
-            const pkgData = await getPkgData(
-              releaseFetcher,
-              consClient.dnpName
-            );
+            if (!(await releaseFetcher.repoExists(consClient)))
+              throw Error(`Repository ${consClient} does not exist`);
+            const pkgData = await getPkgData(releaseFetcher, consClient);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             let useCheckpointSync = false;
             if (isInstalled) {
@@ -100,19 +97,19 @@ export async function getStakerConfig<T extends Network>(
             }
             return {
               status: "ok",
-              dnpName: consClient.dnpName as ConsensusClient<T>,
+              dnpName: consClient as ConsensusClient<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
-              isSelected: consClient.dnpName === currentConsClient,
+              isSelected: consClient === currentConsClient,
               useCheckpointSync
             };
           } catch (error) {
             return {
               status: "error",
-              dnpName: consClient.dnpName as ConsensusClient<T>,
+              dnpName: consClient as ConsensusClient<T>,
               error
             };
           }
@@ -121,16 +118,13 @@ export async function getStakerConfig<T extends Network>(
       web3Signer: await new Promise<StakerItem<T, "signer">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(web3signer.dnpName)))
-              throw Error(`Repository ${web3signer.dnpName} does not exist`);
-            const pkgData = await getPkgData(
-              releaseFetcher,
-              web3signer.dnpName
-            );
+            if (!(await releaseFetcher.repoExists(signer[0])))
+              throw Error(`Repository ${signer[0]} does not exist`);
+            const pkgData = await getPkgData(releaseFetcher, signer[0]);
             const signerIsRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
-              dnpName: web3signer.dnpName as Signer<T>,
+              dnpName: signer[0] as Signer<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
@@ -141,7 +135,7 @@ export async function getStakerConfig<T extends Network>(
           } catch (error) {
             resolve({
               status: "error",
-              dnpName: web3signer.dnpName as Signer<T>,
+              dnpName: signer[0] as Signer<T>,
               error
             });
           }
@@ -150,9 +144,9 @@ export async function getStakerConfig<T extends Network>(
       mevBoost: await new Promise<StakerItem<T, "mev-boost">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(mevBoost)))
-              throw Error(`Repository ${mevBoost} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, mevBoost);
+            if (!(await releaseFetcher.repoExists(mevBoost[0])))
+              throw Error(`Repository ${mevBoost[0]} does not exist`);
+            const pkgData = await getPkgData(releaseFetcher, mevBoost[0]);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             const relays: string[] = [];
             if (isInstalled) {
@@ -166,19 +160,19 @@ export async function getStakerConfig<T extends Network>(
             }
             resolve({
               status: "ok",
-              dnpName: mevBoost as MevBoost<T>,
+              dnpName: mevBoost[0] as MevBoost<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled,
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
-              isSelected: isMevBoostSelected,
+              isSelected: Boolean(isMevBoostSelected),
               relays
             });
           } catch (error) {
             resolve({
               status: "error",
-              dnpName: mevBoost as MevBoost<T>,
+              dnpName: mevBoost[0] as MevBoost<T>,
               error
             });
           }

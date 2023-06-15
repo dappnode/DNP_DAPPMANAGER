@@ -33,16 +33,20 @@ const FEE_RECIPIENT_MAINNET = "fee-recipient-mainnet";
  * consensusClientMainnet, executionClientMainnet will change as well
  */
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientMainnet | null>(
+  dbMain.staticKey<ConsensusClientMainnet | undefined | null>(
     CONSENSUS_CLIENT_MAINNET,
     null
   ),
   Object.keys({ CONSENSUS_CLIENT_MAINNET })[0]
 );
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const executionClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientMainnet | null>(
+  dbMain.staticKey<ExecutionClientMainnet | undefined | null>(
     EXECUTION_CLIENT_MAINNET,
     null
   ),
@@ -66,13 +70,23 @@ const EXECUTION_CLIENT_GNOSIS = "execution-client-gnosis";
 const MEVBOOST_GNOSIS = "mevboost-gnosis";
 const FEE_RECIPIENT_GNOSIS = "fee-recipient-gnosis";
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientGnosis | null>(CONSENSUS_CLIENT_GNOSIS, null),
+  dbMain.staticKey<ConsensusClientGnosis | undefined | null>(
+    CONSENSUS_CLIENT_GNOSIS,
+    null
+  ),
   Object.keys({ CONSENSUS_CLIENT_GNOSIS })[0]
 );
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const executionClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientGnosis | null>(EXECUTION_CLIENT_GNOSIS, null),
+  dbMain.staticKey<ExecutionClientGnosis | undefined | null>(
+    EXECUTION_CLIENT_GNOSIS,
+    null
+  ),
   Object.keys({ EXECUTION_CLIENT_GNOSIS })[0]
 );
 
@@ -93,13 +107,23 @@ const EXECUTION_CLIENT_PRATER = "execution-client-prater";
 const MEVBOOST_PRATER = "mevboost-prater";
 const FEE_RECIPIENT_PRATER = "fee-recipient-prater";
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const consensusClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientPrater | null>(CONSENSUS_CLIENT_PRATER, null),
+  dbMain.staticKey<ConsensusClientPrater | undefined | null>(
+    CONSENSUS_CLIENT_PRATER,
+    null
+  ),
   Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
 );
 
+// Null means not set
+// Undefined means its set but the user has not selected any value
 export const executionClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientPrater | null>(EXECUTION_CLIENT_PRATER, null),
+  dbMain.staticKey<ExecutionClientPrater | undefined | null>(
+    EXECUTION_CLIENT_PRATER,
+    null
+  ),
   Object.keys({ EXECUTION_CLIENT_PRATER })[0]
 );
 
