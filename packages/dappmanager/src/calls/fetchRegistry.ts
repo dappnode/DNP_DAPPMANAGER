@@ -5,11 +5,7 @@ import { eventBus } from "../eventBus.js";
 import { throttle } from "lodash-es";
 import { NoImageForArchError } from "../modules/release/errors.js";
 import { logs } from "../logs.js";
-import {
-  DirectoryItem,
-  DirectoryDnp,
-  RegistryScanProgress
-} from "@dappnode/common";
+import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import {
@@ -18,6 +14,7 @@ import {
 } from "./fetchDirectory.js";
 import { getRegistry } from "../modules/registry/index.js";
 import * as db from "../db/index.js";
+import { DirectoryDnp } from "@dappnode/toolkit";
 
 const defaultEnsName = "public.dappnode.eth";
 const minDeployBlock = 6312046;
