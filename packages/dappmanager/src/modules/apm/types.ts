@@ -1,3 +1,5 @@
+import { ApmVersionRaw } from "@dappnode/toolkit";
+
 /**
  * Data fetch from blockchain events. May not exist
  */
@@ -14,15 +16,4 @@ export interface ApmVersionMetadata {
 export interface ApmVersionState extends ApmVersionRaw {
   version: string;
   versionId: number;
-}
-
-export interface ApmVersionRaw {
-  version: string;
-  contentUri: string;
-}
-
-export interface ApmRepoVersionReturn {
-  semanticVersion: number[]; // uint16[3]
-  contractAddress: string; // address
-  contentURI: string; // bytes
 }

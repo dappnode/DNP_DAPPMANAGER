@@ -1,10 +1,11 @@
 import { ethers } from "ethers";
-import { getEthersProvider } from "../ethClient/index.js";
+import { getEthProviderUrl, getEthersProvider } from "../ethClient/index.js";
 import { fetchApmVersionsMetadata } from "./fetchApmVersionsMetadata.js";
 import { fetchApmVersionsState } from "./fetchApmVersionsState.js";
-import { fetchVersion } from "./fetchVersion.js";
 import { repoExists } from "./repoExists.js";
-import { ApmVersionState, ApmVersionMetadata, ApmVersionRaw } from "./types.js";
+import { ApmVersionState, ApmVersionMetadata } from "./types.js";
+import { ApmVersionRaw, DappnodeRepository } from "@dappnode/toolkit";
+import { getIpfsUrl } from "../ipfs/utils.js";
 
 export class Apm {
   provider: ethers.providers.Provider | undefined = undefined;
@@ -24,7 +25,14 @@ export class Apm {
     dnpName: string,
     version?: string
   ): Promise<ApmVersionRaw> {
-    return fetchVersion(await this.getProvider(), dnpName, version);
+    // Get IPFS provider URL
+
+    const dappnodeRepo = new DappnodeRepository(
+      getIpfsUrl(),
+      await getEthProviderUrl()
+    );
+
+    return dappnodeRepo.getVersionAndIpfsHash({ dnpName, version });
   }
 
   /**

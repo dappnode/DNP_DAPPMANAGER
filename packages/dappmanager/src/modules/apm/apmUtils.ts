@@ -1,6 +1,6 @@
+import { ApmRepoVersionReturn } from "@dappnode/toolkit";
 import { ethers } from "ethers";
 import { parse } from "semver";
-import { ApmRepoVersionReturn } from "./types.js";
 
 /**
  * Parse a raw version response from an APM repo
