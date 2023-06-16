@@ -5,14 +5,10 @@ import {
   MevBoost
 } from "@dappnode/common";
 import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
-import { packageInstall } from "../../../calls";
+import { packageInstall, packageSetEnvironment } from "../../../calls";
 import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
-import {
-  stopAllPkgContainers,
-  getMevBoostUserSettings,
-  updateMevBoostEnv
-} from "../utils";
+import { stopAllPkgContainers } from "../utils";
 import * as db from "../../../db/index.js";
 
 export async function setMevBoost<T extends Network>({
@@ -110,4 +106,51 @@ async function setMevBoostOnDb<T extends Network>(
     default:
       throw new Error(`Unsupported network: ${network}`);
   }
+}
+
+/**
+ * Update environemnt variables for the mev boost
+ * only if relays are set
+ */
+async function updateMevBoostEnv<T extends Network>({
+  targetMevBoost,
+  userSettings
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+  userSettings: UserSettingsAllDnps;
+}): Promise<void> {
+  if (targetMevBoost.relays) {
+    const serviceEnv = userSettings[targetMevBoost.dnpName].environment;
+
+    if (serviceEnv) {
+      logs.info("Updating environment for " + targetMevBoost.dnpName);
+      await packageSetEnvironment({
+        dnpName: targetMevBoost.dnpName,
+        environmentByService: serviceEnv
+      });
+    }
+  }
+}
+
+/**
+ * Get the user settings for the mev boost
+ */
+function getMevBoostUserSettings<T extends Network>({
+  targetMevBoost
+}: {
+  targetMevBoost: StakerItemOk<T, "mev-boost">;
+}): UserSettingsAllDnps {
+  return {
+    [targetMevBoost.dnpName]: {
+      environment: {
+        "mev-boost": {
+          ["RELAYS"]:
+            targetMevBoost.relays
+              ?.join(",")
+              .trim()
+              .replace(/(^,)|(,$)/g, "") || ""
+        }
+      }
+    }
+  };
 }

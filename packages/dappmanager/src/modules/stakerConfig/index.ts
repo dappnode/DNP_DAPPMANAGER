@@ -1,3 +1,3 @@
-export { getStakerConfig } from "./get/getStakerConfig.js";
-export { setStakerConfig } from "./set/setStakerConfig.js";
+export * from "./get/index.js";
+export * from "./set/index.js";
 export { getStakerConfigByNetwork } from "./getStakerConfigByNetwork.js";

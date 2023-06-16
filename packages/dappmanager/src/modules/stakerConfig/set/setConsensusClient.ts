@@ -4,15 +4,11 @@ import {
   InstalledPackageDataApiReturn,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { packageInstall } from "../../../calls";
+import { packageInstall, packageSetEnvironment } from "../../../calls";
 import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
 import { listPackageNoThrow } from "../../docker/list";
-import {
-  stopAllPkgContainers,
-  getConsensusUserSettings,
-  updateConsensusEnv
-} from "../utils";
+import { stopAllPkgContainers, getConsensusUserSettings } from "../utils";
 import * as db from "../../../db/index.js";
 import {
   ConsensusClientGnosis,
@@ -188,5 +184,29 @@ async function setConsensusOnDb<T extends Network>(
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
+  }
+}
+
+/**
+ * Sets consensus client environment variables
+ * - Sets checkpointsync url to the default or empty string
+ * - Sets fee recipient to the default
+ */
+async function updateConsensusEnv<T extends Network>({
+  targetConsensusClient,
+  userSettings
+}: {
+  targetConsensusClient: StakerItemOk<T, "consensus">;
+  userSettings: UserSettingsAllDnps;
+}): Promise<void> {
+  const environmentByService =
+    userSettings[targetConsensusClient.dnpName].environment;
+
+  if (environmentByService) {
+    logs.info("Updating environment for " + targetConsensusClient.dnpName);
+    await packageSetEnvironment({
+      dnpName: targetConsensusClient.dnpName,
+      environmentByService
+    });
   }
 }

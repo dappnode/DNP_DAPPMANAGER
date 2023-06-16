@@ -6,18 +6,22 @@ import {
 import {
   ConsensusClient,
   ExecutionClient,
+  InstalledPackageData,
   MevBoost,
   Signer,
   StakerConfigGet,
-  StakerItem
+  StakerItem,
+  StakerItemData
 } from "@dappnode/common";
 import { fileToGatewayUrl } from "../../../utils/distributedFile.js";
 import { listPackages } from "../../docker/list/index.js";
 import { ReleaseFetcher } from "../../release/index.js";
-import { getBeaconServiceName, getIsRunning, getPkgData } from "../utils.js";
+import { getBeaconServiceName, pickStakerItemData } from "../utils.js";
 import { Network } from "@dappnode/types";
-import { getStakerDnpNamesByNetwork } from "../set/getStakerDnpNamesByNetwork.js";
+import { getStakerDnpNamesByNetwork } from "../getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
+import { eventBus } from "../../../eventBus.js";
+import * as db from "../../../db/index.js";
 
 /**
  * Fetches the current staker configuration:
@@ -182,5 +186,43 @@ export async function getStakerConfig<T extends Network>(
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);
+  }
+}
+
+/**
+ * Returns true if the package is running or false if not
+ * For web3signer, it does not take into account the container "flyway" which may not be running
+ */
+function getIsRunning(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): boolean {
+  const flywayServiceName = "flyway";
+  const isSigner = dnpName.includes("web3signer");
+  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
+  if (dnp) {
+    if (isSigner)
+      return dnp.containers
+        .filter(c => c.serviceName !== flywayServiceName)
+        .every(c => c.running);
+    else return dnp.containers.every(c => c.running);
+  }
+  return false;
+}
+
+async function getPkgData(
+  releaseFetcher: ReleaseFetcher,
+  dnpName: string
+): Promise<StakerItemData> {
+  const cachedDnp = db.stakerItemMetadata.get(dnpName);
+  if (cachedDnp) {
+    // Update cache in the background
+    eventBus.runStakerCacheUpdate.emit({ dnpName });
+    return cachedDnp;
+  } else {
+    const repository = await releaseFetcher.getRelease(dnpName);
+    const dataDnp = pickStakerItemData(repository);
+    db.stakerItemMetadata.set(dnpName, dataDnp);
+    return dataDnp;
   }
 }
