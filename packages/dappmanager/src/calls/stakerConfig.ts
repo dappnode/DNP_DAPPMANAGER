@@ -12,7 +12,7 @@ export async function stakerConfigSet<T extends Network>({
 }: {
   stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
-  await setStakerConfig({ stakerConfig });
+  await setStakerConfig<T>({ ...stakerConfig });
 }
 
 /**

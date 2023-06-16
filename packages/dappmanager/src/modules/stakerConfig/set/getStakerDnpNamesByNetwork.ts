@@ -20,8 +20,8 @@ interface StakerDnpNamesByNetwork {
   mevBoost: readonly string[];
 }
 
-export function getStakerDnpNamesByNetwork<T extends Network>(
-  network: T
+export function getStakerDnpNamesByNetwork(
+  network: Network
 ): StakerDnpNamesByNetwork {
   switch (network) {
     case "mainnet":

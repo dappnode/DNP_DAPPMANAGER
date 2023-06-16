@@ -1,29 +1,33 @@
-import { StakerConfigByNetwork } from "@dappnode/common";
+import {
+  ConsensusClient,
+  ExecutionClient,
+  StakerConfigByNetwork
+} from "@dappnode/common";
 import { Network } from "@dappnode/types";
 import * as db from "../../db/index.js";
 
-export function getStakerConfigByNetwork(
-  network: Network
-): StakerConfigByNetwork<Network> {
+export function getStakerConfigByNetwork<T extends Network>(
+  network: T
+): StakerConfigByNetwork<T> {
   switch (network) {
     case "mainnet":
       return {
-        executionClient: "geth.dnp.dappnode.eth",
-        consensusClient: db.consensusClientMainnet.get(),
+        executionClient: "geth.dnp.dappnode.eth" as ExecutionClient<T>,
+        consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
         feeRecipient: db.feeRecipientMainnet.get(),
         isMevBoostSelected: db.mevBoostMainnet.get()
       };
     case "gnosis":
       return {
-        executionClient: db.executionClientGnosis.get(),
-        consensusClient: db.consensusClientGnosis.get(),
+        executionClient: db.executionClientGnosis.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientGnosis.get() as ConsensusClient<T>,
         feeRecipient: db.feeRecipientGnosis.get(),
-        isMevBoostSelected: null
+        isMevBoostSelected: false // gnosis doesn't support mevBoost
       };
     case "prater":
       return {
-        executionClient: db.executionClientMainnet.get(),
-        consensusClient: db.consensusClientMainnet.get(),
+        executionClient: db.executionClientMainnet.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
         feeRecipient: db.feeRecipientMainnet.get(),
         isMevBoostSelected: db.mevBoostPrater.get()
       };

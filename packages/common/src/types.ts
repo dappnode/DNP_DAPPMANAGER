@@ -1295,9 +1295,7 @@ export interface StakerConfigByNetwork<T extends Network> {
   executionClient: ExecutionClient<T> | undefined | null;
   consensusClient: ConsensusClient<T> | undefined | null;
   feeRecipient: string | null;
-  isMevBoostSelected: T extends "gnosis" // Gnosis doesn't have mev-boost
-    ? null
-    : boolean;
+  isMevBoostSelected: boolean;
 }
 export interface StakerCompatibleVersionsByNetwork<T extends Network> {
   compatibleExecution: {
@@ -1312,9 +1310,7 @@ export interface StakerCompatibleVersionsByNetwork<T extends Network> {
     dnpName: Signer<T>;
     minVersion: string;
   };
-  compatibleMevBoost: T extends "gnosis" // Gnosis doesn't have mev-boost
-    ? null
-    : { dnpName: MevBoost<T>; minVersion: string };
+  compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
 }
 
 /**

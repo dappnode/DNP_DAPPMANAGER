@@ -16,7 +16,7 @@ import { listPackages } from "../../docker/list/index.js";
 import { ReleaseFetcher } from "../../release/index.js";
 import { getBeaconServiceName, getIsRunning, getPkgData } from "../utils.js";
 import { Network } from "@dappnode/types";
-import { getStakerDnpNamesByNetwork } from "../getStakerDnpNamesByNetwork.js";
+import { getStakerDnpNamesByNetwork } from "../set/getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
 
 /**
