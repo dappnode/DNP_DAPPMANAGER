@@ -1338,6 +1338,11 @@
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.17.tgz#b15fba7356acae7f2751f0cfe4db08eccb004993"
   integrity sha512-XfMYmF/b/p9a24YB2b6D7LWS/wQzPMYEklTAvVRRmJbVgwklIE+j02O90Qhc9RXxqxL9gB+WnpPEiXie2EUhIw==
 
+"@dappnode/types@^0.1.19":
+  version "0.1.19"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.19.tgz#5082aac037912085df0eaf7af79f5e871c9d7052"
+  integrity sha512-kM6+jbCZLQ6byME812JZ0kFqbVKmMTD4Ilu9tF6tK08wC+eH5vUg4074CWcCqLsoR/Eo0l3oRTQ8IZcLhEmP+w==
+
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"
