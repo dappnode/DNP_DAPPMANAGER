@@ -122,7 +122,7 @@ export default function StakerNetwork<T extends Network>({
             ? mevBoost
             : undefined,
         enableWeb3signer,
-        feeRecipient
+        feeRecipient: feeRecipient || ""
       });
 
       // set allStakerItemsOk

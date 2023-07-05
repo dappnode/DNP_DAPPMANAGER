@@ -24,9 +24,9 @@ interface State {
 
 describe.skip("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    let currentExecClient: ExecutionClientMainnet | null =
+    let currentExecClient: ExecutionClientMainnet | undefined | null =
       "besu.public.dappnode.eth";
-    let currentConsClient: ConsensusClientMainnet | null =
+    let currentConsClient: ConsensusClientMainnet | undefined | null =
       "prysm.dnp.dappnode.eth";
     let currentRemote: EthClientRemote | null = EthClientRemote.on;
     const newTarget: Eth2ClientTarget = {
@@ -51,14 +51,14 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
     // Also, it will be enforced by rewiremock in case of error
     const db = {
       executionClientMainnet: {
-        get: (): ExecutionClientMainnet | null => currentExecClient,
-        set: async (execClient: ExecutionClientMainnet | null) => {
+        get: (): ExecutionClientMainnet | undefined | null => currentExecClient,
+        set: async (execClient: ExecutionClientMainnet | undefined | null) => {
           currentExecClient = execClient;
         }
       },
       consensusClientMainnet: {
-        get: (): ConsensusClientMainnet | null => currentConsClient,
-        set: async (consClient: ConsensusClientMainnet | null) => {
+        get: (): ConsensusClientMainnet | undefined | null => currentConsClient,
+        set: async (consClient: ConsensusClientMainnet | undefined | null) => {
           currentConsClient = consClient;
         }
       },
