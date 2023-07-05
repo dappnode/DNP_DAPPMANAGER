@@ -4,44 +4,15 @@ import {
   InstalledPackageDataApiReturn,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { packageInstall, packageSetEnvironment } from "../../../calls";
-import { logs } from "../../../logs";
-import { dockerComposeUpPackage } from "../../docker";
-import { listPackageNoThrow } from "../../docker/list";
-import { getConsensusUserSettings } from "../utils";
+import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
+import { logs } from "../../../logs.js";
+import { dockerComposeUpPackage } from "../../docker/index.js";
+import { listPackageNoThrow } from "../../docker/list/index.js";
+import { getConsensusUserSettings } from "../utils.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import * as db from "../../../db/index.js";
-import {
-  ConsensusClientGnosis,
-  ConsensusClientMainnet,
-  ConsensusClientPrater,
-  Network
-} from "@dappnode/types";
+import { Network } from "@dappnode/types";
 
 export async function setConsensusClient<T extends Network>({
-  network,
-  feeRecipient,
-  currentConsensusClient,
-  targetConsensusClient,
-  currentConsClientPkg
-}: {
-  network: Network;
-  feeRecipient: string | null;
-  currentConsensusClient?: ConsensusClient<T> | null;
-  targetConsensusClient?: StakerItemOk<T, "consensus">;
-  currentConsClientPkg?: InstalledPackageDataApiReturn;
-}): Promise<void> {
-  await setConsensusClientConfig({
-    network,
-    feeRecipient,
-    currentConsensusClient,
-    targetConsensusClient,
-    currentConsClientPkg
-  });
-  await setConsensusOnDb(network, targetConsensusClient?.dnpName);
-}
-
-async function setConsensusClientConfig<T extends Network>({
   network,
   feeRecipient,
   currentConsensusClient,
@@ -153,38 +124,6 @@ async function setConsensusClientConfig<T extends Network>({
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);
     }
-  }
-}
-
-/**
- * Sets the staker configuration on db for a given network
- * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
- */
-async function setConsensusOnDb<T extends Network>(
-  network: T,
-  consensusClient?: ConsensusClient<T>
-): Promise<void> {
-  switch (network) {
-    case "mainnet":
-      if (db.consensusClientMainnet.get() !== consensusClient)
-        await db.consensusClientMainnet.set(
-          consensusClient as ConsensusClientMainnet
-        );
-      break;
-    case "gnosis":
-      if (db.consensusClientGnosis.get() !== consensusClient)
-        await db.consensusClientGnosis.set(
-          consensusClient as ConsensusClientGnosis
-        );
-      break;
-    case "prater":
-      if (db.consensusClientPrater.get() !== consensusClient)
-        await db.consensusClientPrater.set(
-          consensusClient as ConsensusClientPrater
-        );
-      break;
-    default:
-      throw new Error(`Unsupported network: ${network}`);
   }
 }
 
