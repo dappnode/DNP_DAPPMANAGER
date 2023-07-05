@@ -8,7 +8,8 @@ import { packageInstall, packageSetEnvironment } from "../../../calls";
 import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
 import { listPackageNoThrow } from "../../docker/list";
-import { stopAllPkgContainers, getConsensusUserSettings } from "../utils";
+import { getConsensusUserSettings } from "../utils";
+import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import * as db from "../../../db/index.js";
 import {
   ConsensusClientGnosis,

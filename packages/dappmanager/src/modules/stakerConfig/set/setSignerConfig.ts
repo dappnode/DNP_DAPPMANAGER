@@ -2,7 +2,7 @@ import { InstalledPackageDataApiReturn } from "@dappnode/common";
 import { packageInstall } from "../../../calls";
 import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
-import { stopAllPkgContainers } from "../utils";
+import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setSignerConfig(
   enableWeb3signer: boolean,

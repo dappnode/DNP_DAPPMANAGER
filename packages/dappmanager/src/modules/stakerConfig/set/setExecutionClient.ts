@@ -7,7 +7,7 @@ import { packageInstall } from "../../../calls";
 import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
 import { listPackageNoThrow } from "../../docker/list";
-import { stopAllPkgContainers } from "../utils";
+import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import {
   ExecutionClientGnosis,
   ExecutionClientMainnet,

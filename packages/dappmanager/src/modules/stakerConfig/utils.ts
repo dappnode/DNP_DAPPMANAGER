@@ -29,21 +29,6 @@ export function getBeaconServiceName(dnpName: string): string {
 }
 
 /**
- * Stop all the containers from a given package dnpName
- */
-export async function stopAllPkgContainers(
-  pkg: InstalledPackageDataApiReturn | InstalledPackageData
-): Promise<void> {
-  await Promise.all(
-    pkg.containers
-      .filter(c => c.running)
-      .map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
-  ).catch(e => logs.error(e.message));
-}
-
-/**
  * Get the user settings for the consensus client.
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
