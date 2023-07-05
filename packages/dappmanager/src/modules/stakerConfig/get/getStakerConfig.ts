@@ -122,13 +122,13 @@ export async function getStakerConfig<T extends Network>(
       web3Signer: await new Promise<StakerItem<T, "signer">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(signer[0])))
-              throw Error(`Repository ${signer[0]} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, signer[0]);
+            if (!(await releaseFetcher.repoExists(signer)))
+              throw Error(`Repository ${signer} does not exist`);
+            const pkgData = await getPkgData(releaseFetcher, signer);
             const signerIsRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
-              dnpName: signer[0] as Signer<T>,
+              dnpName: signer as Signer<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled: getIsInstalled(pkgData, dnpList),
               isUpdated: getIsUpdated(pkgData, dnpList),
@@ -139,7 +139,7 @@ export async function getStakerConfig<T extends Network>(
           } catch (error) {
             resolve({
               status: "error",
-              dnpName: signer[0] as Signer<T>,
+              dnpName: signer as Signer<T>,
               error
             });
           }
@@ -148,9 +148,9 @@ export async function getStakerConfig<T extends Network>(
       mevBoost: await new Promise<StakerItem<T, "mev-boost">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(mevBoost[0])))
-              throw Error(`Repository ${mevBoost[0]} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, mevBoost[0]);
+            if (!(await releaseFetcher.repoExists(mevBoost)))
+              throw Error(`Repository ${mevBoost} does not exist`);
+            const pkgData = await getPkgData(releaseFetcher, mevBoost);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             const relays: string[] = [];
             if (isInstalled) {
@@ -164,7 +164,7 @@ export async function getStakerConfig<T extends Network>(
             }
             resolve({
               status: "ok",
-              dnpName: mevBoost[0] as MevBoost<T>,
+              dnpName: mevBoost as MevBoost<T>,
               avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
               isInstalled,
               isUpdated: getIsUpdated(pkgData, dnpList),
@@ -176,7 +176,7 @@ export async function getStakerConfig<T extends Network>(
           } catch (error) {
             resolve({
               status: "error",
-              dnpName: mevBoost[0] as MevBoost<T>,
+              dnpName: mevBoost as MevBoost<T>,
               error
             });
           }
