@@ -16,8 +16,8 @@ import {
 interface StakerDnpNamesByNetwork {
   executionClients: readonly string[];
   consensusClients: readonly string[];
-  signer: readonly string[];
-  mevBoost: readonly string[];
+  signer:  string;
+  mevBoost:  string;
 }
 
 export function getStakerDnpNamesByNetwork(
@@ -43,7 +43,7 @@ export function getStakerDnpNamesByNetwork(
         executionClients: executionClientsGnosis,
         consensusClients: consensusClientsGnosis,
         signer: signerGnosis,
-        mevBoost: [] // As no mevBoost for gnosis is specified
+        mevBoost: "" // As no mevBoost for gnosis is specified
       };
     default:
       throw new Error(`Unsupported network: ${network}`);

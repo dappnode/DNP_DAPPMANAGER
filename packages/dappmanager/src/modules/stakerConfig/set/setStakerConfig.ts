@@ -37,7 +37,6 @@ export async function setStakerConfig<T extends Network>({
     executionClient: currentExecutionClient,
     consensusClient: currentConsensusClient,
     feeRecipient,
-    isMevBoostSelected
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await packagesGet();
