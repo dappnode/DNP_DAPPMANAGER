@@ -1,26 +1,51 @@
 import {
   UserSettingsAllDnps,
-  InstalledPackageData,
-  InstalledPackageDataApiReturn,
-  StakerItemOk,
   StakerItemData,
-  PackageRelease
+  PackageRelease,
+  ConsensusClient,
+  ExecutionClient,
+  StakerConfigByNetwork
 } from "@dappnode/common";
-import * as db from "../../db/index.js";
-import { packageSetEnvironment } from "../../calls/index.js";
-import { logs } from "../../logs.js";
-import { dockerContainerStop } from "../docker/index.js";
 import { pick } from "lodash-es";
 import { Manifest, Network } from "@dappnode/types";
-import { ReleaseFetcher } from "../release/index.js";
-import { eventBus } from "../../eventBus.js";
+import * as db from "../../db/index.js";
+
+export function getStakerConfigByNetwork<T extends Network>(
+  network: T
+): StakerConfigByNetwork<T> {
+  switch (network) {
+    case "mainnet":
+      return {
+        executionClient: "geth.dnp.dappnode.eth" as ExecutionClient<T>,
+        consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientMainnet.get(),
+        isMevBoostSelected: db.mevBoostMainnet.get()
+      };
+    case "gnosis":
+      return {
+        executionClient: db.executionClientGnosis.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientGnosis.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientGnosis.get(),
+        isMevBoostSelected: false // gnosis doesn't support mevBoost
+      };
+    case "prater":
+      return {
+        executionClient: db.executionClientMainnet.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientMainnet.get(),
+        isMevBoostSelected: db.mevBoostPrater.get()
+      };
+    default:
+      throw new Error(`Network ${network} not supported`);
+  }
+}
 
 /**
  * Get the validator service name.
  * - Nimbus package is monoservice (beacon-validator)
  * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
  */
-export function getValidatorServiceName(dnpName: string): string {
+function getValidatorServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
 }
 
@@ -31,21 +56,6 @@ export function getValidatorServiceName(dnpName: string): string {
  */
 export function getBeaconServiceName(dnpName: string): string {
   return dnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain";
-}
-
-/**
- * Stop all the containers from a given package dnpName
- */
-export async function stopAllPkgContainers(
-  pkg: InstalledPackageDataApiReturn | InstalledPackageData
-): Promise<void> {
-  await Promise.all(
-    pkg.containers
-      .filter(c => c.running)
-      .map(async c =>
-        dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-      )
-  ).catch(e => logs.error(e.message));
 }
 
 /**
@@ -105,7 +115,7 @@ export function getConsensusUserSettings({
   };
 }
 
-export const getDefaultCheckpointSync = (network: Network): string =>
+const getDefaultCheckpointSync = (network: Network): string =>
   network === "mainnet"
     ? "https://checkpoint-sync.dappnode.io"
     : network === "prater"
@@ -113,115 +123,6 @@ export const getDefaultCheckpointSync = (network: Network): string =>
     : network === "gnosis"
     ? "https://checkpoint-sync-gnosis.dappnode.io"
     : "";
-
-/**
- * Sets consensus client environment variables
- * - Sets checkpointsync url to the default or empty string
- * - Sets fee recipient to the default
- */
-export async function updateConsensusEnv<T extends Network>({
-  targetConsensusClient,
-  userSettings
-}: {
-  targetConsensusClient: StakerItemOk<T, "consensus">;
-  userSettings: UserSettingsAllDnps;
-}): Promise<void> {
-  const environmentByService =
-    userSettings[targetConsensusClient.dnpName].environment;
-
-  if (environmentByService) {
-    logs.info("Updating environment for " + targetConsensusClient.dnpName);
-    await packageSetEnvironment({
-      dnpName: targetConsensusClient.dnpName,
-      environmentByService
-    });
-  }
-}
-
-/**
- * Get the user settings for the mev boost
- */
-export function getMevBoostUserSettings<T extends Network>({
-  targetMevBoost
-}: {
-  targetMevBoost: StakerItemOk<T, "mev-boost">;
-}): UserSettingsAllDnps {
-  return {
-    [targetMevBoost.dnpName]: {
-      environment: {
-        "mev-boost": {
-          ["RELAYS"]:
-            targetMevBoost.relays
-              ?.join(",")
-              .trim()
-              .replace(/(^,)|(,$)/g, "") || ""
-        }
-      }
-    }
-  };
-}
-
-/**
- * Update environemnt variables for the mev boost
- * only if relays are set
- */
-export async function updateMevBoostEnv<T extends Network>({
-  targetMevBoost,
-  userSettings
-}: {
-  targetMevBoost: StakerItemOk<T, "mev-boost">;
-  userSettings: UserSettingsAllDnps;
-}): Promise<void> {
-  if (targetMevBoost.relays) {
-    const serviceEnv = userSettings[targetMevBoost.dnpName].environment;
-
-    if (serviceEnv) {
-      logs.info("Updating environment for " + targetMevBoost.dnpName);
-      await packageSetEnvironment({
-        dnpName: targetMevBoost.dnpName,
-        environmentByService: serviceEnv
-      });
-    }
-  }
-}
-
-/**
- * Returns true if the package is running or false if not
- * For web3signer, it does not take into account the container "flyway" which may not be running
- */
-export function getIsRunning(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const flywayServiceName = "flyway";
-  const isSigner = dnpName.includes("web3signer");
-  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
-  if (dnp) {
-    if (isSigner)
-      return dnp.containers
-        .filter(c => c.serviceName !== flywayServiceName)
-        .every(c => c.running);
-    else return dnp.containers.every(c => c.running);
-  }
-  return false;
-}
-
-export async function getPkgData(
-  releaseFetcher: ReleaseFetcher,
-  dnpName: string
-): Promise<StakerItemData> {
-  const cachedDnp = db.stakerItemMetadata.get(dnpName);
-  if (cachedDnp) {
-    // Update cache in the background
-    eventBus.runStakerCacheUpdate.emit({ dnpName });
-    return cachedDnp;
-  } else {
-    const repository = await releaseFetcher.getRelease(dnpName);
-    const dataDnp = pickStakerItemData(repository);
-    db.stakerItemMetadata.set(dnpName, dataDnp);
-    return dataDnp;
-  }
-}
 
 export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
   return {

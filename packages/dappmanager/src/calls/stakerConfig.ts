@@ -1,6 +1,5 @@
 import { Network } from "@dappnode/types";
-import { getStakerConfig } from "../modules/stakerConfig/getStakerConfig.js";
-import { setStakerConfig } from "../modules/stakerConfig/setStakerConfig.js";
+import { getStakerConfig,setStakerConfig } from "../modules/stakerConfig/index.js";
 import { StakerConfigGet, StakerConfigSet } from "@dappnode/common";
 
 /**
@@ -12,7 +11,7 @@ export async function stakerConfigSet<T extends Network>({
 }: {
   stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
-  await setStakerConfig({ stakerConfig });
+  await setStakerConfig<T>({ ...stakerConfig });
 }
 
 /**

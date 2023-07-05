@@ -1,7 +1,7 @@
 import client from "prom-client";
 import { wrapHandler } from "../utils.js";
 import * as db from "../../db/index.js";
-import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork.js";
+import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
@@ -100,40 +100,37 @@ register.registerMetric(
       }
 
       for (const network of ["mainnet", "prater", "gnosis"] as Network[]) {
-        const stakerConfig = stakerParamsByNetwork(network);
+        const { executionClient, consensusClient, isMevBoostSelected } =
+          getStakerConfigByNetwork(network);
 
         // Execution client
         if (
-          stakerConfig.currentExecClient &&
+          executionClient &&
           (await listPackageNoThrow({
-            dnpName: stakerConfig.currentExecClient
+            dnpName: executionClient
           }))
         )
           this.set(
             { executionClient: network },
-            parseClientToNumber(stakerConfig.currentExecClient)
+            parseClientToNumber(executionClient)
           );
         else this.set({ executionClient: network }, 0);
 
         // Consensus client
         if (
-          stakerConfig.currentConsClient &&
+          consensusClient &&
           (await listPackageNoThrow({
-            dnpName: stakerConfig.currentConsClient
+            dnpName: consensusClient
           }))
         )
           this.set(
             { consensusClient: network },
-            parseClientToNumber(stakerConfig.currentConsClient)
+            parseClientToNumber(consensusClient)
           );
         else this.set({ consensusClient: network }, 0);
 
         // MEV boost
-        if (
-          stakerConfig.isMevBoostSelected &&
-          (await listPackageNoThrow({ dnpName: stakerConfig.mevBoost }))
-        )
-          this.set({ mevBoost: network }, 1);
+        if (isMevBoostSelected) this.set({ mevBoost: network }, 1);
         else this.set({ mevBoost: network }, 0);
       }
     }
