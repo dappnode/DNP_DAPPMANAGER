@@ -3,7 +3,7 @@ import { StakerConfigSet } from "@dappnode/common";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "../../../db/index.js";
 import { Network } from "@dappnode/types";
-import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
+import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
 import { setExecutionClient } from "./setExecutionClient.js";
 import { setSignerConfig } from "./setSignerConfig.js";
@@ -36,7 +36,7 @@ export async function setStakerConfig<T extends Network>({
   const {
     executionClient: currentExecutionClient,
     consensusClient: currentConsensusClient,
-    feeRecipient,
+    feeRecipient
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await packagesGet();
