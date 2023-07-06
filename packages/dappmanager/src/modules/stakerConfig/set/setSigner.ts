@@ -4,7 +4,7 @@ import { logs } from "../../../logs";
 import { dockerComposeUpPackage } from "../../docker";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
-export async function setSignerConfig(
+export async function setSigner(
   enableWeb3signer: boolean,
   web3signerDnpName: string,
   web3signerPkg: InstalledPackageDataApiReturn | undefined
