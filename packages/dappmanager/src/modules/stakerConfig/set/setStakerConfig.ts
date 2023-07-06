@@ -67,6 +67,7 @@ export async function setStakerConfig<T extends Network>({
   });
   // Set fee recipient on db
   await setFeeRecipientOnDb(network, feeRecipient || undefined);
+
   await Promise.all([
     // EXECUTION CLIENT
     setExecutionClient<T>({

@@ -3,10 +3,10 @@ import {
   StakerItemOk,
   InstalledPackageDataApiReturn
 } from "@dappnode/common";
-import { packageInstall } from "../../../calls";
-import { logs } from "../../../logs";
-import { dockerComposeUpPackage } from "../../docker";
-import { listPackageNoThrow } from "../../docker/list";
+import { packageInstall } from "../../../calls/index.js";
+import { logs } from "../../../logs.js";
+import { dockerComposeUpPackage } from "../../docker/index.js";
+import { listPackageNoThrow } from "../../docker/list/index.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import {
   ExecutionClientGnosis,
