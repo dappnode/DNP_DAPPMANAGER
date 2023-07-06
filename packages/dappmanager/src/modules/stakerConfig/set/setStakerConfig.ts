@@ -6,7 +6,7 @@ import { Network } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
 import { setExecutionClient } from "./setExecutionClient.js";
-import { setSignerConfig } from "./setSignerConfig.js";
+import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 
@@ -65,42 +65,39 @@ export async function setStakerConfig<T extends Network>({
     currentConsClientPkg,
     currentWeb3signerPkg
   });
-
   // Set fee recipient on db
   await setFeeRecipientOnDb(network, feeRecipient || undefined);
-
-  // EXECUTION CLIENT
-  await setExecutionClient<T>({
-    network,
-    currentExecutionClient,
-    targetExecutionClient: executionClient,
-    currentExecClientPkg
-  });
-
-  // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-  await setConsensusClient<T>({
-    network: network,
-    feeRecipient: feeRecipient,
-    currentConsensusClient,
-    targetConsensusClient: consensusClient,
-    currentConsClientPkg
-  });
-
-  // WEB3SIGNER
-  if (enableWeb3signer !== undefined)
-    await setSignerConfig(
-      enableWeb3signer,
-      compatibleSigner.dnpName,
-      currentWeb3signerPkg
-    );
-
-  // MEV BOOST
-  await setMevBoost({
-    network,
-    mevBoost: compatibleMevBoost?.dnpName,
-    targetMevBoost: mevBoost,
-    currentMevBoostPkg
-  });
+  await Promise.all([
+    // EXECUTION CLIENT
+    setExecutionClient<T>({
+      network,
+      currentExecutionClient,
+      targetExecutionClient: executionClient,
+      currentExecClientPkg
+    }),
+    // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
+    setConsensusClient<T>({
+      network: network,
+      feeRecipient: feeRecipient,
+      currentConsensusClient,
+      targetConsensusClient: consensusClient,
+      currentConsClientPkg
+    }),
+    // WEB3SIGNER
+    enableWeb3signer !== undefined &&
+      setSigner(
+        enableWeb3signer,
+        compatibleSigner.dnpName,
+        currentWeb3signerPkg
+      ),
+    // MEVBOOST
+    setMevBoost({
+      network,
+      mevBoost: compatibleMevBoost?.dnpName,
+      targetMevBoost: mevBoost,
+      currentMevBoostPkg
+    })
+  ]);
 }
 
 /**
