@@ -69,14 +69,14 @@ export async function setStakerConfig<T extends Network>({
   await setFeeRecipientOnDb(network, feeRecipient || undefined);
   await Promise.all([
     // EXECUTION CLIENT
-    await setExecutionClient<T>({
+    setExecutionClient<T>({
       network,
       currentExecutionClient,
       targetExecutionClient: executionClient,
       currentExecClientPkg
     }),
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
-    await setConsensusClient<T>({
+    setConsensusClient<T>({
       network: network,
       feeRecipient: feeRecipient,
       currentConsensusClient,
@@ -85,13 +85,13 @@ export async function setStakerConfig<T extends Network>({
     }),
     // WEB3SIGNER
     enableWeb3signer !== undefined &&
-      (await setSigner(
+      setSigner(
         enableWeb3signer,
         compatibleSigner.dnpName,
         currentWeb3signerPkg
-      )),
+      ),
     // MEVBOOST
-    await setMevBoost({
+    setMevBoost({
       network,
       mevBoost: compatibleMevBoost?.dnpName,
       targetMevBoost: mevBoost,
