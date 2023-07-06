@@ -6,7 +6,7 @@ import { Network } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
 import { setExecutionClient } from "./setExecutionClient.js";
-import { setSignerConfig } from "./setSignerConfig.js";
+import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 
@@ -88,7 +88,7 @@ export async function setStakerConfig<T extends Network>({
 
   // WEB3SIGNER
   if (enableWeb3signer !== undefined)
-    await setSignerConfig(
+    await setSigner(
       enableWeb3signer,
       compatibleSigner.dnpName,
       currentWeb3signerPkg
