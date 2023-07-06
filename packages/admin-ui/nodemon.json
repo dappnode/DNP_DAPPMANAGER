@@ -3,6 +3,9 @@
   "ext": "js,ts,json",
   "ignore": ["*.test.ts"],
   "execMap": {
-    "ts": "ts-node --project server-mock/tsconfig.json"
+    "ts": "ts-node/esm --project server-mock/tsconfig.json"
+  },
+  "env": {
+    "TS_NODE_COMPILER_OPTIONS": "{\"module\":\"esnext\"}"
   }
 }
