@@ -4,11 +4,11 @@ import {
   InstalledPackageDataApiReturn,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { packageInstall, packageSetEnvironment } from "../../../calls";
-import { logs } from "../../../logs";
-import { dockerComposeUpPackage } from "../../docker";
-import { listPackageNoThrow } from "../../docker/list";
-import { getConsensusUserSettings } from "../utils";
+import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
+import { logs } from "../../../logs.js";
+import { dockerComposeUpPackage } from "../../docker/index.js";
+import { listPackageNoThrow } from "../../docker/list/index.js";
+import { getConsensusUserSettings } from "../utils.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import * as db from "../../../db/index.js";
 import {
