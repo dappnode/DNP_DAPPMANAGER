@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon -w src -e js,ts,json --require dotenv/config -x ts-node src/index.ts",
+    "dev": "nodemon -w src -e js,ts,json --require dotenv/config -x 'ts-node --esm --experimentalSpecifierResolution src/index.ts'",
     "build": "tsc -p tsconfig.json",
     "watch-ts": "tsc -w",
     "file": "node",
@@ -101,7 +101,7 @@
     "chai": "^4.1.2",
     "dotenv": "^8.2.0",
     "mocha": "^10.2.0",
-    "nodemon": "^2.0.6",
+    "nodemon": "^2.0.22",
     "prettier": "^2.3.2",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
