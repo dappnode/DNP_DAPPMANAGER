@@ -62,13 +62,6 @@ COPY packages/common/ .
 RUN yarn build
 # Results in dist/*
 
-# Build admin-ui
-WORKDIR /tmp-app/packages/admin-ui/
-COPY packages/admin-ui/ .
-ENV REACT_APP_API_URL /
-RUN yarn build
-# Results in build/*
-
 # Copy docker
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
