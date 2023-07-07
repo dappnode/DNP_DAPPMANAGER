@@ -9,7 +9,8 @@ import {
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
-  getContainersAndVolumesToRemove
+  getContainersAndVolumesToRemove,
+  dockerContainerStop
 } from "../modules/docker/index.js";
 import { listPackage } from "../modules/docker/list/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
@@ -58,6 +59,7 @@ export async function packageRestartVolumes({
   let err: Error | null = null;
   try {
     for (const containerName of containersToRemove) {
+      await dockerContainerStop(containerName, { timeout: 5 });
       await dockerContainerRemove(containerName);
     }
     for (const volName of volumesToRemove) {
