@@ -12255,7 +12255,7 @@ node-telegram-bot-api@^0.50.0:
     request "^2.83.0"
     request-promise "^4.2.2"
 
-nodemon@^2.0.4, nodemon@^2.0.6:
+nodemon@^2.0.22, nodemon@^2.0.4:
   version "2.0.22"
   resolved "https://registry.yarnpkg.com/nodemon/-/nodemon-2.0.22.tgz#182c45c3a78da486f673d6c1702e00728daf5258"
   integrity sha512-B8YqaKMmyuCO7BowF1Z1/mkPqLk6cs/l63Ojtd6otKjMx47Dq1utxfRxcavH1I7VSaL8n5BUaoutadnsX3AAVQ==

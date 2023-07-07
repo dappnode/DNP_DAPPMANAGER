@@ -28,6 +28,9 @@ packages/common/src/validation/schemas
 # Version data file
 .version.json
 
+# Git data .git-data.json
+packages/*/.git-data.json
+
 # Extra
 node_modules/\.yarn-integrity
 
