@@ -16,7 +16,7 @@ export function getStakerConfigByNetwork<T extends Network>(
   switch (network) {
     case "mainnet":
       return {
-        executionClient: "geth.dnp.dappnode.eth" as ExecutionClient<T>,
+        executionClient: db.executionClientMainnet.get() as ExecutionClient<T>,
         consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
         feeRecipient: db.feeRecipientMainnet.get(),
         isMevBoostSelected: db.mevBoostMainnet.get()
@@ -30,9 +30,9 @@ export function getStakerConfigByNetwork<T extends Network>(
       };
     case "prater":
       return {
-        executionClient: db.executionClientMainnet.get() as ExecutionClient<T>,
-        consensusClient: db.consensusClientMainnet.get() as ConsensusClient<T>,
-        feeRecipient: db.feeRecipientMainnet.get(),
+        executionClient: db.executionClientPrater.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientPrater.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientPrater.get(),
         isMevBoostSelected: db.mevBoostPrater.get()
       };
     default:
