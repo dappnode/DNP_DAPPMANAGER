@@ -29,7 +29,7 @@ packages/common/src/validation/schemas
 .version.json
 
 # Git data .git-data.json
-packages/admin-ui/.git-data.json
+packages/*/.git-data.json
 
 # Extra
 node_modules/\.yarn-integrity

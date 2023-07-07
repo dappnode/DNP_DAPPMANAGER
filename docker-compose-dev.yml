@@ -20,6 +20,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock"
       - "/etc/hostname:/etc/dappnodename:ro"
       - "./:/app"
+    user: "1001:1001" # Use dappnode user to avoid permission issues (`id dappnode`)
     environment:
       - LOG_LEVEL=info
       - ETH_MAINNET_RPC_URL_OVERRIDE=
