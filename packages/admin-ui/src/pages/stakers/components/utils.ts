@@ -177,13 +177,6 @@ export const getDefaultRelays = <T extends Network>(
             "https://0xa7ab7a996c8584251c8f925da3170bdfd6ebc75d50f5ddc4050a6fdc77f2a3b5fce2cc750d0865e05d7228af97d69561@agnostic-relay.net"
         },
         {
-          operator: "Ultra Sound",
-          ofacCompliant: false,
-          docs: "https://relay.ultrasound.money/",
-          url:
-            "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
-        },
-        {
           operator: "Flashbots",
           ofacCompliant: true,
           docs: "https://boost.flashbots.net/",
