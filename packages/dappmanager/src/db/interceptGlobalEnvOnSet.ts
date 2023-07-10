@@ -5,8 +5,6 @@ import {
 } from "../modules/globalEnvs.js";
 import params from "../params.js";
 
-
-
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:
  * - Set the new value in the DB
@@ -38,7 +36,9 @@ export function interceptGlobalEnvOnSet<T, U>(
       writeGlobalEnvsToEnvFile();
       // List packages using the global env and update the global envs in composes files
       try {
-        await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
+        // Only attempt to update packages if the global env is not empty
+        if (globEnvValue)
+          await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
       } catch (err) {
         logs.error(
           `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`

@@ -1,5 +1,5 @@
 import {
-  InstalledPackageDataApiReturn,
+  InstalledPackageData,
   ExecutionClient,
   StakerItemOk,
   ConsensusClient,
@@ -34,9 +34,9 @@ export function ensureSetRequirements<T extends Network>({
     dnpName: Signer<T>;
     minVersion: string;
   };
-  currentExecClientPkg?: InstalledPackageDataApiReturn;
-  currentConsClientPkg?: InstalledPackageDataApiReturn;
-  currentWeb3signerPkg?: InstalledPackageDataApiReturn;
+  currentExecClientPkg?: InstalledPackageData;
+  currentConsClientPkg?: InstalledPackageData;
+  currentWeb3signerPkg?: InstalledPackageData;
 }): void {
   // Ensure Execution clients DNP's names are valid
   if (

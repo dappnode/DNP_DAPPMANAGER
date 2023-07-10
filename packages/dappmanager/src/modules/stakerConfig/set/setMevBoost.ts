@@ -1,43 +1,22 @@
 import {
   StakerItemOk,
-  InstalledPackageDataApiReturn,
   UserSettingsAllDnps,
-  MevBoost
+  InstalledPackageData
 } from "@dappnode/common";
 import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
 import { logs } from "../../../logs.js";
 import { dockerComposeUpPackage } from "../../docker/index.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import * as db from "../../../db/index.js";
 
 export async function setMevBoost<T extends Network>({
-  network,
-  mevBoost,
-  targetMevBoost,
-  currentMevBoostPkg
-}: {
-  network: T;
-  mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
-  targetMevBoost?: StakerItemOk<T, "mev-boost">;
-  currentMevBoostPkg?: InstalledPackageDataApiReturn;
-}): Promise<void> {
-  await setMevBoostConfig({
-    mevBoost,
-    targetMevBoost,
-    currentMevBoostPkg
-  });
-  await setMevBoostOnDb(network, targetMevBoost?.dnpName);
-}
-
-async function setMevBoostConfig<T extends Network>({
   mevBoost,
   targetMevBoost,
   currentMevBoostPkg
 }: {
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
-  currentMevBoostPkg?: InstalledPackageDataApiReturn;
+  currentMevBoostPkg?: InstalledPackageData;
 }): Promise<void> {
   if (!targetMevBoost?.dnpName) {
     if (!mevBoost) {
@@ -79,32 +58,6 @@ async function setMevBoostConfig<T extends Network>({
   else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
     await packageInstall({ name: mevBoost, userSettings });
-  }
-}
-
-/**
- * Sets the staker configuration on db for a given network
- * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
- */
-async function setMevBoostOnDb<T extends Network>(
-  network: T,
-  mevBoost?: MevBoost<T>
-): Promise<void> {
-  switch (network) {
-    case "mainnet":
-      if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
-        await db.mevBoostMainnet.set(mevBoost ? true : false);
-      break;
-    case "gnosis":
-      if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
-        await db.mevBoostGnosis.set(mevBoost ? true : false);
-      break;
-    case "prater":
-      if (db.mevBoostPrater.get() !== Boolean(mevBoost))
-        await db.mevBoostPrater.set(mevBoost ? true : false);
-      break;
-    default:
-      throw new Error(`Unsupported network: ${network}`);
   }
 }
 
