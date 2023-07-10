@@ -1,8 +1,21 @@
 import { packagesGet } from "../../../calls/index.js";
-import { StakerConfigSet } from "@dappnode/common";
+import {
+  ConsensusClient,
+  ExecutionClient,
+  MevBoost,
+  StakerConfigSet
+} from "@dappnode/common";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "../../../db/index.js";
-import { Network } from "@dappnode/types";
+import {
+  ConsensusClientGnosis,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
+  Network
+} from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
 import { setExecutionClient } from "./setExecutionClient.js";
@@ -68,10 +81,10 @@ export async function setStakerConfig<T extends Network>({
   // Set fee recipient on db
   await setFeeRecipientOnDb(network, feeRecipient || undefined);
 
+  // Set staker config pkgs and its configurations
   await Promise.all([
     // EXECUTION CLIENT
     setExecutionClient<T>({
-      network,
       currentExecutionClient,
       targetExecutionClient: executionClient,
       currentExecClientPkg
@@ -93,12 +106,19 @@ export async function setStakerConfig<T extends Network>({
       ),
     // MEVBOOST
     setMevBoost({
-      network,
       mevBoost: compatibleMevBoost?.dnpName,
       targetMevBoost: mevBoost,
       currentMevBoostPkg
     })
   ]);
+
+  // Set staker config on db
+  await setStakerConfigOnDb(
+    network,
+    executionClient?.dnpName,
+    consensusClient?.dnpName,
+    mevBoost?.dnpName
+  );
 }
 
 /**
@@ -130,6 +150,55 @@ async function setFeeRecipientOnDb<T extends Network>(
         db.feeRecipientPrater.get() !== feeRecipient
       )
         await db.feeRecipientPrater.set(feeRecipient);
+      break;
+    default:
+      throw new Error(`Unsupported network: ${network}`);
+  }
+}
+
+async function setStakerConfigOnDb<T extends Network>(
+  network: T,
+  executionClient?: ExecutionClient<T>,
+  consensusClient?: ConsensusClient<T>,
+  mevBoost?: MevBoost<T>
+): Promise<void> {
+  switch (network) {
+    case "mainnet":
+      if (db.executionClientMainnet.get() !== executionClient)
+        await db.executionClientMainnet.set(
+          executionClient as ExecutionClientMainnet
+        );
+      if (db.consensusClientMainnet.get() !== consensusClient)
+        await db.consensusClientMainnet.set(
+          consensusClient as ConsensusClientMainnet
+        );
+      if (db.mevBoostMainnet.get() !== Boolean(mevBoost))
+        await db.mevBoostMainnet.set(mevBoost ? true : false);
+      break;
+    case "gnosis":
+      if (db.executionClientGnosis.get() !== executionClient)
+        await db.executionClientGnosis.set(
+          executionClient as ExecutionClientGnosis
+        );
+      if (db.consensusClientGnosis.get() !== consensusClient)
+        await db.consensusClientGnosis.set(
+          consensusClient as ConsensusClientGnosis
+        );
+      /*if (db.mevBoostGnosis.get() !== Boolean(mevBoost))
+        await db.mevBoostMainnet.set(mevBoost ? true : false);*/
+      break;
+
+    case "prater":
+      if (db.executionClientPrater.get() !== executionClient)
+        await db.executionClientPrater.set(
+          executionClient as ExecutionClientPrater
+        );
+      if (db.consensusClientPrater.get() !== consensusClient)
+        await db.consensusClientPrater.set(
+          consensusClient as ConsensusClientPrater
+        );
+      if (db.mevBoostPrater.get() !== Boolean(mevBoost))
+        await db.mevBoostPrater.set(mevBoost ? true : false);
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);
