@@ -38,6 +38,7 @@ export async function getRelease({
   const { imageFile, avatarFile, manifest, composeUnsafe, signature } =
     await downloadRelease(hash, reqName || hash);
 
+  // TODO: improve this error handling
   if (
     reqName &&
     isEnsDomain(reqName) &&
