@@ -1,4 +1,3 @@
-import { packagesGet } from "../../../calls/index.js";
 import { StakerConfigSet } from "@dappnode/common";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "../../../db/index.js";
@@ -9,6 +8,8 @@ import { setExecutionClient } from "./setExecutionClient.js";
 import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
+import { listPackages } from "../../docker/list/listPackages.js";
+import { getIsRunning } from "../utils.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -39,7 +40,7 @@ export async function setStakerConfig<T extends Network>({
     feeRecipient
   } = getStakerConfigByNetwork(network);
 
-  const pkgs = await packagesGet();
+  const pkgs = await listPackages();
   const currentExecClientPkg = pkgs.find(
     pkg => pkg.dnpName === currentExecutionClient
   );
@@ -74,7 +75,10 @@ export async function setStakerConfig<T extends Network>({
       network,
       currentExecutionClient,
       targetExecutionClient: executionClient,
-      currentExecClientPkg
+      currentExecClientPkg,
+      isTargetRunning: executionClient?.dnpName
+        ? getIsRunning({ dnpName: executionClient.dnpName }, pkgs)
+        : false
     }),
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     setConsensusClient<T>({
@@ -82,21 +86,26 @@ export async function setStakerConfig<T extends Network>({
       feeRecipient: feeRecipient,
       currentConsensusClient,
       targetConsensusClient: consensusClient,
-      currentConsClientPkg
+      currentConsClientPkg,
+      isTargetRunning: consensusClient?.dnpName
+        ? getIsRunning({ dnpName: consensusClient.dnpName }, pkgs)
+        : false
     }),
     // WEB3SIGNER
     enableWeb3signer !== undefined &&
-      setSigner(
+      setSigner({
         enableWeb3signer,
-        compatibleSigner.dnpName,
-        currentWeb3signerPkg
-      ),
+        web3signerDnpName: compatibleSigner.dnpName,
+        web3signerPkg: currentWeb3signerPkg,
+        isRunning: getIsRunning({ dnpName: compatibleSigner.dnpName }, pkgs)
+      }),
     // MEVBOOST
     setMevBoost({
       network,
       mevBoost: compatibleMevBoost?.dnpName,
       targetMevBoost: mevBoost,
-      currentMevBoostPkg
+      currentMevBoostPkg,
+      isRunning: getIsRunning({ dnpName: compatibleMevBoost?.dnpName }, pkgs)
     })
   ]);
 }

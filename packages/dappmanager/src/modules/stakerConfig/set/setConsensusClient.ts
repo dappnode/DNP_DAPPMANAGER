@@ -1,7 +1,7 @@
 import {
   ConsensusClient,
   StakerItemOk,
-  InstalledPackageDataApiReturn,
+  InstalledPackageData,
   UserSettingsAllDnps
 } from "@dappnode/common";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
@@ -23,20 +23,23 @@ export async function setConsensusClient<T extends Network>({
   feeRecipient,
   currentConsensusClient,
   targetConsensusClient,
-  currentConsClientPkg
+  currentConsClientPkg,
+  isTargetRunning
 }: {
   network: Network;
   feeRecipient: string | null;
   currentConsensusClient?: ConsensusClient<T> | null;
   targetConsensusClient?: StakerItemOk<T, "consensus">;
-  currentConsClientPkg?: InstalledPackageDataApiReturn;
+  currentConsClientPkg?: InstalledPackageData;
+  isTargetRunning: boolean;
 }): Promise<void> {
   await setConsensusClientConfig({
     network,
     feeRecipient,
     currentConsensusClient,
     targetConsensusClient,
-    currentConsClientPkg
+    currentConsClientPkg,
+    isTargetRunning
   });
   await setConsensusOnDb(network, targetConsensusClient?.dnpName);
 }
@@ -46,13 +49,15 @@ async function setConsensusClientConfig<T extends Network>({
   feeRecipient,
   currentConsensusClient,
   targetConsensusClient,
-  currentConsClientPkg
+  currentConsClientPkg,
+  isTargetRunning
 }: {
   network: Network;
   feeRecipient: string | null;
   currentConsensusClient?: ConsensusClient<T> | null;
   targetConsensusClient?: StakerItemOk<T, "consensus">;
-  currentConsClientPkg?: InstalledPackageDataApiReturn;
+  currentConsClientPkg?: InstalledPackageData;
+  isTargetRunning: boolean;
 }): Promise<void> {
   if (!targetConsensusClient?.dnpName) {
     if (!currentConsensusClient) {
@@ -95,12 +100,13 @@ async function setConsensusClientConfig<T extends Network>({
         userSettings
       });
       // Start new consensus client if not running
-      await dockerComposeUpPackage(
-        { dnpName: targetConsClientPkg.dnpName },
-        {},
-        {},
-        true
-      );
+      if (!isTargetRunning)
+        await dockerComposeUpPackage(
+          { dnpName: targetConsClientPkg.dnpName },
+          {},
+          {},
+          true
+        );
     }
   } else if (targetConsensusClient.dnpName === currentConsensusClient) {
     if (!currentConsClientPkg) {
@@ -116,18 +122,19 @@ async function setConsensusClientConfig<T extends Network>({
         userSettings
       });
       // Start package
-      await dockerComposeUpPackage(
-        { dnpName: currentConsClientPkg.dnpName },
-        {},
-        {},
-        true
-      );
+      if (!isTargetRunning)
+        await dockerComposeUpPackage(
+          { dnpName: currentConsClientPkg.dnpName },
+          {},
+          {},
+          true
+        );
     }
   } else if (targetConsensusClient.dnpName !== currentConsensusClient) {
-    const targetExecClientPkg = await listPackageNoThrow({
+    const targetConsClientPkg = await listPackageNoThrow({
       dnpName: targetConsensusClient.dnpName
     });
-    if (!targetExecClientPkg) {
+    if (!targetConsClientPkg) {
       // Install new client if not installed
       await packageInstall({
         name: targetConsensusClient.dnpName,
@@ -143,12 +150,13 @@ async function setConsensusClientConfig<T extends Network>({
         userSettings
       });
       // Start new client
-      await dockerComposeUpPackage(
-        { dnpName: targetExecClientPkg.dnpName },
-        {},
-        {},
-        true
-      );
+      if (!isTargetRunning)
+        await dockerComposeUpPackage(
+          { dnpName: targetConsClientPkg.dnpName },
+          {},
+          {},
+          true
+        );
       // Stop old client
       if (currentConsClientPkg)
         await stopAllPkgContainers(currentConsClientPkg);

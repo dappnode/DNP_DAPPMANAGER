@@ -1,7 +1,7 @@
 import {
   ExecutionClient,
   StakerItemOk,
-  InstalledPackageDataApiReturn
+  InstalledPackageData
 } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
 import { logs } from "../../../logs.js";
@@ -20,17 +20,20 @@ export async function setExecutionClient<T extends Network>({
   network,
   currentExecutionClient,
   targetExecutionClient,
-  currentExecClientPkg
+  currentExecClientPkg,
+  isTargetRunning
 }: {
   network: Network;
   currentExecutionClient?: ExecutionClient<T> | null;
   targetExecutionClient?: StakerItemOk<T, "execution">;
-  currentExecClientPkg?: InstalledPackageDataApiReturn;
+  currentExecClientPkg?: InstalledPackageData;
+  isTargetRunning: boolean;
 }): Promise<void> {
   await setExecutionClientConfig({
     currentExecutionClient,
     targetExecutionClient,
-    currentExecClientPkg
+    currentExecClientPkg,
+    isTargetRunning
   });
   await setExecutionOnDb(network, targetExecutionClient?.dnpName);
 }
@@ -38,11 +41,13 @@ export async function setExecutionClient<T extends Network>({
 async function setExecutionClientConfig<T extends Network>({
   currentExecutionClient,
   targetExecutionClient,
-  currentExecClientPkg
+  currentExecClientPkg,
+  isTargetRunning
 }: {
   currentExecutionClient?: ExecutionClient<T> | null;
   targetExecutionClient?: StakerItemOk<T, "execution">;
-  currentExecClientPkg?: InstalledPackageDataApiReturn;
+  currentExecClientPkg?: InstalledPackageData;
+  isTargetRunning: boolean;
 }): Promise<void> {
   if (!targetExecutionClient?.dnpName && !currentExecutionClient) {
     // Stop the current execution client if no option and not currentu execution client
@@ -57,10 +62,10 @@ async function setExecutionClientConfig<T extends Network>({
       dnpName: targetExecutionClient.dnpName
     });
     if (!targetExecClientPkg) {
-      // Install new consensus client if not installed
+      // Install new execution client if not installed
       await packageInstall({ name: targetExecutionClient.dnpName });
-    } else {
-      // Start new consensus client if not running
+    } else if (!isTargetRunning) {
+      // Start new execution client if not running
       await dockerComposeUpPackage(
         { dnpName: targetExecClientPkg.dnpName },
         {},
@@ -75,7 +80,7 @@ async function setExecutionClientConfig<T extends Network>({
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
       await packageInstall({ name: targetExecutionClient.dnpName });
-    } else {
+    } else if (!isTargetRunning) {
       await dockerComposeUpPackage(
         { dnpName: currentExecClientPkg.dnpName },
         {},
@@ -96,7 +101,7 @@ async function setExecutionClientConfig<T extends Network>({
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);
-    } else {
+    } else if (!isTargetRunning) {
       // Start new client
       await dockerComposeUpPackage(
         { dnpName: targetExecClientPkg.dnpName },

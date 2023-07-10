@@ -1,6 +1,6 @@
 import {
   StakerItemOk,
-  InstalledPackageDataApiReturn,
+  InstalledPackageData,
   UserSettingsAllDnps,
   MevBoost
 } from "@dappnode/common";
@@ -15,17 +15,20 @@ export async function setMevBoost<T extends Network>({
   network,
   mevBoost,
   targetMevBoost,
-  currentMevBoostPkg
+  currentMevBoostPkg,
+  isRunning
 }: {
   network: T;
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
-  currentMevBoostPkg?: InstalledPackageDataApiReturn;
+  currentMevBoostPkg?: InstalledPackageData;
+  isRunning: boolean;
 }): Promise<void> {
   await setMevBoostConfig({
     mevBoost,
     targetMevBoost,
-    currentMevBoostPkg
+    currentMevBoostPkg,
+    isRunning
   });
   await setMevBoostOnDb(network, targetMevBoost?.dnpName);
 }
@@ -33,11 +36,13 @@ export async function setMevBoost<T extends Network>({
 async function setMevBoostConfig<T extends Network>({
   mevBoost,
   targetMevBoost,
-  currentMevBoostPkg
+  currentMevBoostPkg,
+  isRunning
 }: {
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
-  currentMevBoostPkg?: InstalledPackageDataApiReturn;
+  currentMevBoostPkg?: InstalledPackageData;
+  isRunning: boolean;
 }): Promise<void> {
   if (!targetMevBoost?.dnpName) {
     if (!mevBoost) {
@@ -59,8 +64,8 @@ async function setMevBoostConfig<T extends Network>({
   });
 
   // MevBoost installed and enable => make sure its running
-  if (currentMevBoostPkg && targetMevBoost.dnpName) {
-    logs.info("MevBoost is already installed");
+  if (currentMevBoostPkg && targetMevBoost.dnpName && !isRunning) {
+    logs.info("MevBoost is already installed, starting it");
     // Update env if needed
     await updateMevBoostEnv({
       targetMevBoost,
