@@ -161,6 +161,7 @@ export function getIsRunning(
   { dnpName }: { dnpName: string },
   dnpList: InstalledPackageData[]
 ): boolean {
+  if (!dnpName) return false;
   const flywayServiceName = "flyway";
   const isSigner = dnpName.includes("web3signer");
   const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
