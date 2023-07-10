@@ -1,14 +1,13 @@
 import {
   StakerItemOk,
-  InstalledPackageDataApiReturn,
-  UserSettingsAllDnps
+  UserSettingsAllDnps,
+  InstalledPackageData
 } from "@dappnode/common";
 import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
 import { logs } from "../../../logs.js";
 import { dockerComposeUpPackage } from "../../docker/index.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import * as db from "../../../db/index.js";
 
 export async function setMevBoost<T extends Network>({
   mevBoost,
@@ -17,7 +16,7 @@ export async function setMevBoost<T extends Network>({
 }: {
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
-  currentMevBoostPkg?: InstalledPackageDataApiReturn;
+  currentMevBoostPkg?: InstalledPackageData;
 }): Promise<void> {
   if (!targetMevBoost?.dnpName) {
     if (!mevBoost) {

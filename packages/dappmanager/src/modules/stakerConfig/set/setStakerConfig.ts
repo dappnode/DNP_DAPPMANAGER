@@ -1,4 +1,3 @@
-import { packagesGet } from "../../../calls/index.js";
 import {
   ConsensusClient,
   ExecutionClient,
@@ -22,6 +21,7 @@ import { setExecutionClient } from "./setExecutionClient.js";
 import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
+import { listPackages } from "../../docker/list/listPackages.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -52,7 +52,7 @@ export async function setStakerConfig<T extends Network>({
     feeRecipient
   } = getStakerConfigByNetwork(network);
 
-  const pkgs = await packagesGet();
+  const pkgs = await listPackages();
   const currentExecClientPkg = pkgs.find(
     pkg => pkg.dnpName === currentExecutionClient
   );
@@ -97,13 +97,6 @@ export async function setStakerConfig<T extends Network>({
       targetConsensusClient: consensusClient,
       currentConsClientPkg
     }),
-    // WEB3SIGNER
-    enableWeb3signer !== undefined &&
-      setSigner(
-        enableWeb3signer,
-        compatibleSigner.dnpName,
-        currentWeb3signerPkg
-      ),
     // MEVBOOST
     setMevBoost({
       mevBoost: compatibleMevBoost?.dnpName,
@@ -119,6 +112,15 @@ export async function setStakerConfig<T extends Network>({
     consensusClient?.dnpName,
     mevBoost?.dnpName
   );
+
+  // WEB3SIGNER
+  // The web3signer deppends on the global envs EXECUTION_CLIENT and CONSENSUS_CLIENT
+  // so it is convenient to set it at the end once the db is updated
+  await setSigner({
+    enableWeb3signer,
+    web3signerDnpName: compatibleSigner.dnpName,
+    web3signerPkg: currentWeb3signerPkg
+  });
 }
 
 /**

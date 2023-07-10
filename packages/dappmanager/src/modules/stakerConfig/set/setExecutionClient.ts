@@ -1,7 +1,7 @@
 import {
   ExecutionClient,
   StakerItemOk,
-  InstalledPackageDataApiReturn
+  InstalledPackageData
 } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
 import { logs } from "../../../logs.js";
@@ -17,7 +17,7 @@ export async function setExecutionClient<T extends Network>({
 }: {
   currentExecutionClient?: ExecutionClient<T> | null;
   targetExecutionClient?: StakerItemOk<T, "execution">;
-  currentExecClientPkg?: InstalledPackageDataApiReturn;
+  currentExecClientPkg?: InstalledPackageData;
 }): Promise<void> {
   if (!targetExecutionClient?.dnpName && !currentExecutionClient) {
     // Stop the current execution client if no option and not currentu execution client

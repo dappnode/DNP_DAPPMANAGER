@@ -1,14 +1,18 @@
-import { InstalledPackageDataApiReturn } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
 import { logs } from "../../../logs.js";
 import { dockerComposeUpPackage } from "../../docker/index.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
-export async function setSigner(
-  enableWeb3signer: boolean,
-  web3signerDnpName: string,
-  web3signerPkg: InstalledPackageDataApiReturn | undefined
-): Promise<void> {
+export async function setSigner({
+  web3signerDnpName,
+  web3signerPkg,
+  enableWeb3signer
+}: {
+  web3signerDnpName: string;
+  web3signerPkg: InstalledPackageData | undefined;
+  enableWeb3signer?: boolean;
+}): Promise<void> {
   // Web3signer installed and enable => make sure its running
   if (web3signerPkg && enableWeb3signer) {
     logs.info("Web3Signer is already installed");

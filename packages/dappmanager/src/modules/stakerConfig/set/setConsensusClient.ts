@@ -1,7 +1,7 @@
 import {
   ConsensusClient,
   StakerItemOk,
-  InstalledPackageDataApiReturn,
+  InstalledPackageData,
   UserSettingsAllDnps
 } from "@dappnode/common";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
@@ -23,7 +23,7 @@ export async function setConsensusClient<T extends Network>({
   feeRecipient: string | null;
   currentConsensusClient?: ConsensusClient<T> | null;
   targetConsensusClient?: StakerItemOk<T, "consensus">;
-  currentConsClientPkg?: InstalledPackageDataApiReturn;
+  currentConsClientPkg?: InstalledPackageData;
 }): Promise<void> {
   if (!targetConsensusClient?.dnpName) {
     if (!currentConsensusClient) {
