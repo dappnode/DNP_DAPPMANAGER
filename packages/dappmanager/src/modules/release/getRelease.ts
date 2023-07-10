@@ -42,9 +42,10 @@ export async function getRelease({
     reqName &&
     isEnsDomain(reqName) &&
     reqName !== manifest.name &&
-    !reqName.startsWith("/ipfs/") // pkgs may have depdendencies with /ipfs/ instead of versions for testing purposes
+    origin &&
+    !origin.startsWith("/ipfs/") // pkgs may have depdendencies with /ipfs/ instead of versions for testing purposes)
   )
-    throw Error("DNP's name doesn't match the manifest's name");
+    throw Error("Origin must be an IPFS hash");
 
   const dnpName = manifest.name;
   const isCore = getIsCore(manifest);
