@@ -59,7 +59,9 @@ export async function packageRestartVolumes({
   let err: Error | null = null;
   try {
     for (const containerName of containersToRemove) {
-      await dockerContainerStop(containerName, { timeout: 5 });
+      // only stop containers that are running
+      if (containersStatus[containerName]?.targetStatus === "running")
+        await dockerContainerStop(containerName, { timeout: 5 });
       await dockerContainerRemove(containerName);
     }
     for (const volName of volumesToRemove) {
