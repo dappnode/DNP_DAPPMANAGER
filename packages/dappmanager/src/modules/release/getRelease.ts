@@ -38,7 +38,12 @@ export async function getRelease({
   const { imageFile, avatarFile, manifest, composeUnsafe, signature } =
     await downloadRelease(hash, reqName || hash);
 
-  if (reqName && isEnsDomain(reqName) && reqName !== manifest.name)
+  if (
+    reqName &&
+    isEnsDomain(reqName) &&
+    reqName !== manifest.name &&
+    !reqName.startsWith("/ipfs/") // pkgs may have depdendencies with /ipfs/ instead of versions for testing purposes
+  )
     throw Error("DNP's name doesn't match the manifest's name");
 
   const dnpName = manifest.name;
