@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, RouteComponentProps } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
@@ -110,10 +110,9 @@ function WireguardDeviceDetailsLoaded({
   );
 }
 
-export const WireguardDeviceDetails: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
-  const id = match.params.id;
+export const WireguardDeviceDetails: React.FC = () => {
+  const params = useParams()
+  const id = params.id || "";
   const device = useApi.wireguardDeviceGet(id);
 
   return (

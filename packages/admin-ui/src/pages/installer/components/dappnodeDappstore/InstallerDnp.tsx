@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RouteComponentProps, NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
@@ -31,7 +31,9 @@ import { PublicSwitch } from "../PublicSwitch";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
 
-export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
+export const InstallerDnp: React.FC = routeProps => {
+  const navigate = useNavigate();
+
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -68,9 +70,9 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
     // - Gnosis: http://my.dappnode/#/stakers/gnosis
     // - Stakehouse: http://my.dappnode/#/stakers/stakehouse
     if (id === "ethereum.dnp.dappnode.eth")
-      routeProps.history.push(stakersPath + "/mainnet");
+      navigate(stakersPath + "/mainnet");
     else if (id === "gnosis.dnp.dappnode.eth")
-      routeProps.history.push(stakersPath + "/gnosis");
+      navigate(stakersPath + "/gnosis");
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
@@ -91,7 +93,7 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
         ]
       });
     }
-    else routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
+    else navigate(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {

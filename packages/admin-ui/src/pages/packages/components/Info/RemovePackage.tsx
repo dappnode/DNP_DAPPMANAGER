@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { api } from "api";
 // Components
 import Button from "components/Button";
@@ -27,7 +27,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     manifest
   } = dnp;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   async function packageRemove() {
     // Dialog to confirm warning onRemove from manifest
@@ -97,7 +97,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
       });
-      history.push(packagesRootPath);
+      navigate(packagesRootPath);
     } catch (e) {
       console.error(e);
     }

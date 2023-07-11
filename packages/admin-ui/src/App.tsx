@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Switch, Route, Redirect, useLocation } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import { ToastContainer } from "react-toastify";
@@ -19,12 +19,12 @@ import { Theme, UsageMode } from "types";
 
 export const UsageContext = React.createContext({
   usage: "advanced",
-  toggleUsage: () => {}
+  toggleUsage: () => { }
 });
 
 export const ThemeContext = React.createContext({
   theme: "light",
-  toggleTheme: () => {}
+  toggleTheme: () => { }
 });
 
 function MainApp({ username }: { username: string }) {
@@ -72,6 +72,15 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
+  const RedirectToDefault = () => {
+    const navigate = useNavigate();
+    useEffect(() => {
+      navigate(defaultPage.rootPath);
+    }, [navigate]);
+
+    return null;
+  };
+
   return (
     <UsageContext.Provider value={{ usage, toggleUsage }}>
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
@@ -87,23 +96,22 @@ function MainApp({ username }: { username: string }) {
             <ErrorBoundary>
               <NotificationsMain />
             </ErrorBoundary>
-            <Switch>
+            <Routes>
               {Object.values(pages).map(({ RootComponent, rootPath }) => (
                 <Route
                   key={rootPath}
                   path={rootPath}
-                  render={props => (
+                  element={
                     <ErrorBoundary>
-                      <RootComponent {...props} />
+                      <RootComponent />
                     </ErrorBoundary>
-                  )}
+                  }
                 />
               ))}
               {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*">
-                <Redirect to={defaultPage.rootPath} />
-              </Route>
-            </Switch>
+              <Route path="*" element={<RedirectToDefault />} />
+
+            </Routes>
           </div>
 
           {/* Place here non-page components */}

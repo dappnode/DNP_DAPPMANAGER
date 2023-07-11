@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, RouteComponentProps } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
@@ -49,7 +49,7 @@ function OpenVpnDeviceDetailsLoaded({
         <Input
           lock={true}
           value={url || ""}
-          onValueChange={() => {}}
+          onValueChange={() => { }}
           className="copy-input"
           append={
             <>
@@ -83,7 +83,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.id || ""}
-                onValueChange={() => {}}
+                onValueChange={() => { }}
                 className="copy-input"
                 append={
                   <>
@@ -102,7 +102,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.password || ""}
-                onValueChange={() => {}}
+                onValueChange={() => { }}
                 className="copy-input"
                 append={
                   <>
@@ -130,10 +130,9 @@ function OpenVpnDeviceDetailsLoaded({
   );
 }
 
-export const OpenVpnDeviceDetails: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
-  const id = match.params.id;
+export const OpenVpnDeviceDetails: React.FC = () => {
+  const params = useParams()
+  const id = params.id || "";
   const deviceCredentials = useApi.deviceCredentialsGet({ id });
 
   return (

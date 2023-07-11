@@ -1,11 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { title, subPaths } from "../data";
 import {
-  Switch,
+  Routes,
   Route,
   NavLink,
-  Redirect,
-  RouteComponentProps
+  useNavigate,
 } from "react-router-dom";
 // Components
 import Title from "components/Title";
@@ -23,89 +22,97 @@ import { Notifications } from "./Notifications";
 import Hardware from "./Hardware";
 import { UsageContext } from "App";
 
-const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
+const SystemRoot: React.FC = () => {
   const { usage } = React.useContext(UsageContext);
-
+  const navigate = useNavigate();
   const basicRoutes: {
     name: string;
     subPath: string;
     component: React.ComponentType<any>;
     hideFromMenu?: boolean;
   }[] = [
-    {
-      name: "Info",
-      subPath: subPaths.info,
-      component: SystemInfo
-    },
-    {
-      name: "Auto updates",
-      subPath: subPaths.autoUpdates,
-      component: AutoUpdates
-    },
-    {
-      name: "Profile",
-      subPath: subPaths.profile,
-      component: Profile
-    },
-    {
-      name: "Power",
-      subPath: subPaths.power,
-      component: PowerManagment
-    }
-  ];
+      {
+        name: "Info",
+        subPath: subPaths.info,
+        component: SystemInfo
+      },
+      {
+        name: "Auto updates",
+        subPath: subPaths.autoUpdates,
+        component: AutoUpdates
+      },
+      {
+        name: "Profile",
+        subPath: subPaths.profile,
+        component: Profile
+      },
+      {
+        name: "Power",
+        subPath: subPaths.power,
+        component: PowerManagment
+      }
+    ];
   const advancedRoutes: {
     name: string;
     subPath: string;
     component: React.ComponentType<any>;
     hideFromMenu?: boolean;
   }[] = [
-    {
-      name: "Notifications",
-      subPath: subPaths.notifications,
-      component: Notifications
-    },
-    {
-      name: "Identity",
-      subPath: subPaths.identity,
-      component: Identity,
-      hideFromMenu: true
-    },
+      {
+        name: "Notifications",
+        subPath: subPaths.notifications,
+        component: Notifications
+      },
+      {
+        name: "Identity",
+        subPath: subPaths.identity,
+        component: Identity,
+        hideFromMenu: true
+      },
 
-    {
-      name: "Network",
-      subPath: subPaths.network,
-      component: Network
-    },
-    {
-      name: "Update",
-      subPath: subPaths.update,
-      component: SystemUpdate
-    },
+      {
+        name: "Network",
+        subPath: subPaths.network,
+        component: Network
+      },
+      {
+        name: "Update",
+        subPath: subPaths.update,
+        component: SystemUpdate
+      },
 
-    {
-      name: "Peers",
-      subPath: subPaths.peers,
-      component: Peers
-    },
-    {
-      name: "Security",
-      subPath: subPaths.security,
-      component: Security
-    },
-    {
-      name: "Hardware",
-      subPath: subPaths.hardware,
-      component: Hardware
-    },
-    {
-      name: "Advanced",
-      subPath: subPaths.advanced,
-      component: Advanced
-    }
-  ];
+      {
+        name: "Peers",
+        subPath: subPaths.peers,
+        component: Peers
+      },
+      {
+        name: "Security",
+        subPath: subPaths.security,
+        component: Security
+      },
+      {
+        name: "Hardware",
+        subPath: subPaths.hardware,
+        component: Hardware
+      },
+      {
+        name: "Advanced",
+        subPath: subPaths.advanced,
+        component: Advanced
+      }
+    ];
 
   const availableRoutes =
     usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
+
+  // Redirect automatically to the first route. DO NOT hardcode
+  // to prevent typos and causing infinite loops 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    navigate(`${availableRoutes[0].subPath}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   return (
     <>
@@ -117,7 +124,7 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
           .map(route => (
             <button key={route.subPath} className="item-container">
               <NavLink
-                to={`${match.url}/${route.subPath}`}
+                to={route.subPath}
                 className="item no-a-style"
                 style={{ whiteSpace: "nowrap" }}
               >
@@ -128,18 +135,15 @@ const SystemRoot: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );
