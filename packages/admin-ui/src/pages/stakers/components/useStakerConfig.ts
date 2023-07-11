@@ -21,6 +21,41 @@ export const useStakerConfig = <T extends Network>(network: T, currentStakerConf
     const [currentStakerConfig, setCurrentStakerConfig] = useState<StakerConfigSet<T>>();
     // Changes 
     const [changes, setChanges] = useState<{ isAllowed: boolean; reason?: string; severity?: "warning" | "secondary" | "danger"; }>({ isAllowed: false });
+    // execution client cards
+    const [executionClientsCards, setExecutionClientsCards] = useState<StakerItem<T, "execution">[]>([]);
+    // consensus clients cards
+    const [consensusClientsCards, setConsensusClientsCards] = useState<StakerItem<T, "consensus">[]>([]);
+
+    // Use effect to set the execution and consensus clients cards
+    // it will order them so that the selected one is first
+    useEffect(() => {
+        if (currentStakerConfigReq.data) {
+            const { executionClients, consensusClients } = currentStakerConfigReq.data;
+            setExecutionClientsCards(executionClients.sort((a, b) => {
+                if (a.status === "ok" && b.status === "ok") {
+                    if (a.isSelected && b.isSelected) return 0;
+                    if (a.isSelected) return -1;
+                    if (b.isSelected) return 1;
+                    return 0;
+                }
+                if (a.status === "ok") return -1;
+                if (b.status === "ok") return 1;
+                return 0;
+            }))
+            setConsensusClientsCards(consensusClients.sort((a, b) => {
+                if (a.status === "ok" && b.status === "ok") {
+                    if (a.isSelected && b.isSelected) return 0;
+                    if (a.isSelected) return -1;
+                    if (b.isSelected) return 1;
+                    return 0;
+                }
+                if (a.status === "ok") return -1;
+                if (b.status === "ok") return 1;
+                return 0;
+            }))
+        }
+
+    }, [currentStakerConfigReq.data, network])
 
     useEffect(() => {
         if (currentStakerConfigReq.data) {
@@ -121,6 +156,10 @@ export const useStakerConfig = <T extends Network>(network: T, currentStakerConf
         newEnableWeb3signer,
         setNewEnableWeb3signer,
         changes,
+        executionClientsCards,
+        setExecutionClientsCards,
+        consensusClientsCards,
+        setConsensusClientsCards,
     };
 };
 

@@ -14,14 +14,14 @@ import { Network } from "@dappnode/types";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
+  handleConsensusClientCardClick,
   setNewConsClient,
   isSelected,
   ...props
 }: {
   consensusClient: StakerItem<T, "consensus">;
-  setNewConsClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
-  >;
+  handleConsensusClientCardClick: (card: StakerItem<T, "consensus">) => void;
+  setNewConsClient: React.Dispatch<React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>>;
   isSelected: boolean;
 }) {
   const [useCheckpointSync, setUseCheckpointSync] = useState(
@@ -36,16 +36,7 @@ export default function ConsensusClient<T extends Network>({
       shadow={isSelected}
     >
       <div
-        onClick={
-          consensusClient.status === "ok"
-            ? isSelected
-              ? () => {
-                  setNewConsClient(undefined);
-                }
-              : () => {
-                  setNewConsClient(consensusClient);
-                }
-            : undefined
+        onClick={() => handleConsensusClientCardClick(consensusClient)
         }
       >
         {consensusClient.status === "ok" ? (
@@ -102,7 +93,7 @@ export default function ConsensusClient<T extends Network>({
       {isSelected &&
         // cast to any as long as the gnosis prysm was deprecated
         (consensusClient.dnpName as any) ===
-          "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
+        "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
           <Alert variant="warning">
             It is <b>not recommended</b> to use <b>Prysm</b> as a consensus
             client <b>in Gnosis</b>. Use it at your own risk or change to

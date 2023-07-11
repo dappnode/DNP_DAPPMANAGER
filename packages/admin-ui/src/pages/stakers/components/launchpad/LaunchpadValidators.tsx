@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./launchpad-validators.scss";
 import Button from "components/Button";
-import { StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import { StakerConfigGetOk } from "@dappnode/common";
 import { launchpadSteps } from "./LaunchpadSteps";
 import { Network } from "@dappnode/types";
@@ -13,13 +13,14 @@ export default function LaunchpadValidators<T extends Network>({
   setShowLaunchpadValidators,
   setNewFeeRecipient,
   newFeeRecipient,
-  setNewExecClient,
   newExecClient,
   setNewConsClient,
   newConsClient,
   setNewMevBoost,
   newMevBoost,
-  feeRecipientError
+  feeRecipientError,
+  handleExecutionClientCardClick,
+  handleConsensusClientCardClick
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
@@ -27,9 +28,6 @@ export default function LaunchpadValidators<T extends Network>({
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
   setNewFeeRecipient: React.Dispatch<React.SetStateAction<string>>;
   newFeeRecipient: string;
-  setNewExecClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
-  >;
   newExecClient?: StakerItemOk<T, "execution">;
   setNewConsClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
@@ -40,6 +38,8 @@ export default function LaunchpadValidators<T extends Network>({
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
   feeRecipientError: string | null;
+  handleExecutionClientCardClick: (card: StakerItem<T, "execution">) => void,
+  handleConsensusClientCardClick: (card: StakerItem<T, "consensus">) => void;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [nextEnabled, setNextEnabled] = useState(false);
@@ -68,13 +68,14 @@ export default function LaunchpadValidators<T extends Network>({
     setShowLaunchpadValidators,
     setNewFeeRecipient,
     newFeeRecipient,
-    setNewExecClient,
     newExecClient,
     setNewConsClient,
     newConsClient,
     setNewMevBoost,
     newMevBoost,
-    feeRecipientError
+    feeRecipientError,
+    handleExecutionClientCardClick,
+    handleConsensusClientCardClick
   });
 
   const currentStep = steps[stepIndex];

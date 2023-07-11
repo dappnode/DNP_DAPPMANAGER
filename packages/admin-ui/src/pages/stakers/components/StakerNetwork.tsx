@@ -7,6 +7,7 @@ import Row from "react-bootstrap/Row";
 import {
   StakerConfigGet,
   StakerConfigGetOk,
+  StakerItem,
 } from "@dappnode/common";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
@@ -61,7 +62,60 @@ export default function StakerNetwork<T extends Network>({
     newEnableWeb3signer,
     setNewEnableWeb3signer,
     changes,
+    executionClientsCards,
+    setExecutionClientsCards,
+    consensusClientsCards,
+    setConsensusClientsCards
   } = useStakerConfig(network, currentStakerConfigReq);
+
+  function handleExecutionClientCardClick(executionClient: StakerItem<T, "execution">) {
+    if (executionClient.status === "ok") {
+      if (executionClient.isSelected) setNewExecClient(undefined);
+      else setNewExecClient(executionClient);
+    }
+    setExecutionClientsCards(prevState => {
+      // Find the card to be moved
+      const cardToMove = prevState.find(card => card.status === "ok" && card.isSelected);
+
+      if (!cardToMove) {
+        // If no card satisfies the conditions, return the current state
+        return prevState;
+      }
+
+      // Create a new array that does not include the card to be moved
+      const remainingCards = prevState.filter(card => card !== cardToMove);
+
+      // Add the card to the start of the new array
+      const newCards = [cardToMove, ...remainingCards];
+
+      return newCards;
+    });
+  }
+
+  function handleConsensusClientCardClick(consensusClient: StakerItem<T, "consensus">) {
+    if (consensusClient.status === "ok") {
+      if (consensusClient.isSelected) setNewConsClient(undefined);
+      else setNewConsClient(consensusClient);
+    }
+
+    setConsensusClientsCards(prevState => {
+      // Find the card to be moved
+      const cardToMove = prevState.find(card => card.status === "ok" && card.isSelected);
+
+      if (!cardToMove) {
+        // If no card satisfies the conditions, return the current state
+        return prevState;
+      }
+
+      // Create a new array that does not include the card to be moved
+      const remainingCards = prevState.filter(card => card !== cardToMove);
+
+      // Add the card to the start of the new array
+      const newCards = [cardToMove, ...remainingCards];
+
+      return newCards;
+    });
+  }
 
   /**
    * Set new staker config
@@ -187,12 +241,12 @@ export default function StakerNetwork<T extends Network>({
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
-              {currentStakerConfigReq.data.executionClients.map(
+              {executionClientsCards.map(
                 (executionClient, i) => (
                   <ExecutionClient<T>
                     key={i}
                     executionClient={executionClient}
-                    setNewExecClient={setNewExecClient}
+                    handleExecutionClientCardClick={handleExecutionClientCardClick}
                     isSelected={
                       executionClient.dnpName === newExecClient?.dnpName
                     }
@@ -203,11 +257,12 @@ export default function StakerNetwork<T extends Network>({
 
             <Col>
               <SubTitle>Consensus Clients</SubTitle>
-              {currentStakerConfigReq.data.consensusClients.map(
+              {consensusClientsCards.map(
                 (consensusClient, i) => (
                   <ConsensusClient<T>
                     key={i}
                     consensusClient={consensusClient}
+                    handleConsensusClientCardClick={handleConsensusClientCardClick}
                     setNewConsClient={setNewConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
@@ -291,7 +346,8 @@ export default function StakerNetwork<T extends Network>({
               setShowLaunchpadValidators={setShowLaunchpadValidators}
               setNewFeeRecipient={setNewFeeRecipient}
               newFeeRecipient={newFeeRecipient}
-              setNewExecClient={setNewExecClient}
+              handleConsensusClientCardClick={handleConsensusClientCardClick}
+              handleExecutionClientCardClick={handleExecutionClientCardClick}
               setNewConsClient={setNewConsClient}
               setNewMevBoost={setNewMevBoost}
               newExecClient={newExecClient}

@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -12,26 +12,19 @@ import { Network } from "@dappnode/types";
 
 export default function ExecutionClient<T extends Network>({
   executionClient,
-  setNewExecClient,
+  handleExecutionClientCardClick,
   isSelected,
   ...props
 }: {
   executionClient: StakerItem<T, "execution">;
-  setNewExecClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
-  >;
+  handleExecutionClientCardClick: (card: StakerItem<T, "execution">) => void,
   isSelected: boolean;
 }) {
   return (
     <Card
       {...props}
       className={`execution-client ${joinCssClass({ isSelected })}`}
-      onClick={
-        executionClient.status === "ok"
-          ? isSelected
-            ? () => setNewExecClient(undefined)
-            : () => setNewExecClient(executionClient)
-          : undefined
+      onClick={() => handleExecutionClientCardClick(executionClient)
       }
       shadow={isSelected}
     >
