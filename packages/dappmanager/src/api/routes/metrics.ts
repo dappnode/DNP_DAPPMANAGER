@@ -95,6 +95,7 @@ register.registerMetric(
         if (client.includes("nimbus")) return 2;
         if (client.includes("prysm")) return 3;
         if (client.includes("teku")) return 4;
+        if (client.includes("lodestar")) return 5;
 
         return 0;
       }
