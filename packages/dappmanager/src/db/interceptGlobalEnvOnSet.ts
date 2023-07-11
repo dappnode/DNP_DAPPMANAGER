@@ -36,8 +36,8 @@ export function interceptGlobalEnvOnSet<T, U>(
       writeGlobalEnvsToEnvFile();
       // List packages using the global env and update the global envs in composes files
       try {
-        // Only attempt to update packages if the global env is not empty
-        if (globEnvValue)
+        // Only attempt to update packages if the global env is not nullish
+        if (globEnvValue !== null && globEnvValue !== undefined)
           await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
       } catch (err) {
         logs.error(
