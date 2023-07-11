@@ -15,6 +15,7 @@ import {
 import { listPackage } from "../modules/docker/list/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { containerNamePrefix } from "@dappnode/types";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -59,9 +60,14 @@ export async function packageRestartVolumes({
   let err: Error | null = null;
   try {
     for (const containerName of containersToRemove) {
+      // get the service name from the container name
+      const serviceName = containerName
+        .split(containerNamePrefix)[1]
+        .split(".")[0];
       // only stop containers that are running
-      if (containersStatus[containerName]?.targetStatus === "running")
+      if (containersStatus[serviceName]?.targetStatus === "running")
         await dockerContainerStop(containerName, { timeout: 5 });
+
       await dockerContainerRemove(containerName);
     }
     for (const volName of volumesToRemove) {
