@@ -54,12 +54,7 @@ export default function ChangeHostUserPassword() {
           }
         ]}
       >
-        <Button
-          type="submit"
-          variant="dappnode"
-          disabled={!isValid}
-          onClick={onChangePassword}
-        >
+        <Button type="submit" disabled={!isValid} onClick={onChangePassword}>
           Change password
         </Button>
       </InputForm>

@@ -29,7 +29,7 @@ export function AlertPackageUpdateAvailable({
           `(${updateAvailable.upstreamVersion} upstream)`}
       </div>
       <NavLink to={urlJoin(installerRootPath, dnpName)}>
-        <Button variant="dappnode">Update</Button>
+        <Button>Update</Button>
       </NavLink>
     </Alert>
   ) : null;

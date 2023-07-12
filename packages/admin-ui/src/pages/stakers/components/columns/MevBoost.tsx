@@ -69,7 +69,7 @@ export default function MevBoost<T extends Network>({
         !mevBoost.isUpdated && (
           <>
             <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
+              <Button>UPDATE</Button>
             </Link>
             <br />
             <br />
@@ -171,8 +171,8 @@ function Relay<T extends Network>({
         {relay.ofacCompliant === undefined
           ? "-"
           : relay.ofacCompliant
-            ? "Yes"
-            : "No"}
+          ? "Yes"
+          : "No"}
       </td>
       <td>
         <Form.Check
@@ -202,9 +202,7 @@ function Relay<T extends Network>({
 
 // Utils
 
-const getDefaultRelays = <T extends Network>(
-  network: T
-): RelayIface[] => {
+const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
   switch (network) {
     case "mainnet":
       return [

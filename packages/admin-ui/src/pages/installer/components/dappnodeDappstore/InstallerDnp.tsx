@@ -69,15 +69,15 @@ export const InstallerDnp: React.FC = routeProps => {
     // - Mainnet: http://my.dappnode/#/stakers/mainnet
     // - Gnosis: http://my.dappnode/#/stakers/gnosis
     // - Stakehouse: http://my.dappnode/#/stakers/stakehouse
-    if (id === "ethereum.dnp.dappnode.eth")
-      navigate(stakersPath + "/mainnet");
+    if (id === "ethereum.dnp.dappnode.eth") navigate(stakersPath + "/mainnet");
     else if (id === "gnosis.dnp.dappnode.eth")
       navigate(stakersPath + "/gnosis");
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
         title: "Ready to Explore Stakehouse?",
-        text: "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
+        text:
+          "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
         buttons: [
           {
             label: "Cancel",
@@ -85,15 +85,13 @@ export const InstallerDnp: React.FC = routeProps => {
           },
           {
             label: "Open",
-            variant: "dappnode",
             onClick: () => {
               window.open(stakehouseLsdUrl, "_blank");
             }
           }
         ]
       });
-    }
-    else navigate(rootPath + "/" + encodeURIComponent(id));
+    } else navigate(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {

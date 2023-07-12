@@ -97,7 +97,7 @@ export default function NotificationsView() {
             <RenderMarkdown source={body} />
             {linkText && linkPath ? (
               <NavLink to={linkPath}>
-                <Button variant="warning">{linkText}</Button>
+                <Button color="warning">{linkText}</Button>
               </NavLink>
             ) : null}
           </AlertDismissible>

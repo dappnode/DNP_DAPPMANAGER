@@ -65,8 +65,7 @@ export function BackupRestore({
         { title: "Selected file", body: `${file.name} (${humanFS(file.size)})` }
       ],
       label: "Restore",
-      onClick: () => restoreBackup(file),
-      variant: "dappnode"
+      onClick: () => restoreBackup(file)
     });
   }
 

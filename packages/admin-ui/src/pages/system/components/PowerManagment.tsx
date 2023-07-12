@@ -15,8 +15,7 @@ function PowerManagment() {
           title: `Rebooting host`,
           text: `Are you sure you want to reboot the host machine? Only do this if it’s strictly necessary.`,
           label: "Reboot",
-          onClick: resolve,
-          variant: "danger"
+          onClick: resolve
         })
       );
 
@@ -37,8 +36,7 @@ function PowerManagment() {
           title: `Powering off host`,
           text: `WARNING! Your machine will power off and you will not be able to turn it back on without physical access or a remote way to switch on the power.`,
           label: "Power off",
-          onClick: resolve,
-          variant: "danger"
+          onClick: resolve
         })
       );
 
@@ -47,8 +45,7 @@ function PowerManagment() {
           title: `Are you sure?`,
           text: `Please make sure you have a way of turning the host machine’s power back on.`,
           label: "I am sure, power off",
-          onClick: resolve,
-          variant: "danger"
+          onClick: resolve
         })
       );
 
@@ -74,7 +71,6 @@ function PowerManagment() {
           <Button
             onClick={reboot}
             // disabled={isOnProgress}
-            variant="outline-danger"
           >
             Reboot
           </Button>
@@ -90,7 +86,6 @@ function PowerManagment() {
           <Button
             onClick={powerOff}
             // disabled={isOnProgress}
-            variant="outline-danger"
           >
             Power off
           </Button>

@@ -121,7 +121,6 @@ export function SetupWizard({
           {goBack && <Button onClick={goBack}>Cancel</Button>}
           <Button
             onClick={handleSubmit}
-            variant="dappnode"
             disabled={
               disableIfEqual && isEqual(initialUserSettings, userSettings)
             }

@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Button, { ButtonVariant } from "components/Button";
+import Button from "components/Button";
 import { render, unmountComponentAtNode } from "react-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import { stringIncludes } from "utils/strings";
@@ -8,7 +8,14 @@ import "./confirmDialog.scss";
 interface ModalButtonData {
   label: string;
   onClick?: () => void;
-  variant?: ButtonVariant;
+  color?:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning";
 }
 
 interface ConfirmDialogProps {
@@ -22,7 +29,14 @@ interface ConfirmDialogProps {
   // Main Button
   label?: string;
   onClick?: () => void;
-  variant?: ButtonVariant;
+  color?:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning";
 }
 
 /**
@@ -45,7 +59,7 @@ function Modal({
   buttons = [],
   label: mainLabel,
   onClick: mainOnClick,
-  variant: mainVariant,
+  color: mainColor,
   onClose
 }: ConfirmDialogProps & { onClose: () => void }) {
   // If user clicks the modal itself, do not close
@@ -56,12 +70,12 @@ function Modal({
     buttons.push({
       label: mainLabel,
       onClick: mainOnClick,
-      variant: mainVariant
+      color: mainColor
     });
 
   // If there is no "Cancel" option, add it as the first
   if (!buttons.find(({ label }) => stringIncludes(label, "Cancel")))
-    buttons.unshift({ label: "Cancel", variant: "outline-secondary" });
+    buttons.unshift({ label: "Cancel", color: "info" });
 
   return (
     <div
@@ -96,10 +110,10 @@ function Modal({
         )}
 
         <div className="buttons">
-          {buttons.map(({ label, variant, onClick }) => (
+          {buttons.map(({ label, color, onClick }) => (
             <Button
               key={label}
-              variant={variant || "outline-danger"}
+              color={color || "secondary"}
               onClick={() => {
                 if (onClick) onClick();
                 onClose();

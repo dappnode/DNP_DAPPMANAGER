@@ -126,7 +126,6 @@ export default function Eth() {
 
       <div style={{ textAlign: "end" }}>
         <Button
-          variant="dappnode"
           onClick={changeClient}
           disabled={!target || isEqual(ethClientTarget, target)}
         >

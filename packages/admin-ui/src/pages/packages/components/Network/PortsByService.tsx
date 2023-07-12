@@ -257,15 +257,11 @@ export function PortsByService({
       ))}
 
       <div className="button-row">
-        <Button
-          variant={"dappnode"}
-          onClick={onUpdateEnvsSubmit}
-          disabled={disableUpdate}
-        >
+        <Button onClick={onUpdateEnvsSubmit} disabled={disableUpdate}>
           Update port mappings
         </Button>
 
-        <Button variant={"dappnode"} onClick={addNewPort}>
+        <Button onClick={addNewPort}>
           New port <MdAdd />
         </Button>
       </div>

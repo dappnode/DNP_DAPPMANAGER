@@ -102,7 +102,6 @@ export default function WifiCredentials(): JSX.Element {
             >
               <Button
                 type="submit"
-                variant="dappnode"
                 disabled={!isValid}
                 onClick={() => onChangeCredentials}
               >

@@ -43,7 +43,7 @@ const Disclaimer: React.FC<DisclaimerProps> = ({
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
-        <Button variant="dappnode" onClick={onAccept}>
+        <Button onClick={onAccept}>
           {disclaimers.length === 0 ? "Next" : "Accept"}
         </Button>
       </div>

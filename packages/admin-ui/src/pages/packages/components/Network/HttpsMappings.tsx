@@ -62,8 +62,7 @@ export function HttpsMappings({
         title: "Exposing service",
         text:
           "Are you sure you want to expose this service to the public internet?",
-        label: "Expose",
-        variant: "dappnode"
+        label: "Expose"
       });
 
       setReqStatus({ loading: true });
@@ -91,8 +90,7 @@ export function HttpsMappings({
       await confirmPromise({
         title: "Removing HTTPs mapping",
         text: "Are you sure you want to remove this HTTPs mapping?",
-        label: "Remove",
-        variant: "outline-danger"
+        label: "Remove"
       });
 
       setReqStatus({ loading: true });
@@ -207,7 +205,6 @@ export function HttpsMappings({
           >
             <Button
               type="submit"
-              variant="dappnode"
               onClick={addMapping}
               disabled={!isValid || reqStatus.loading}
             >
@@ -229,7 +226,6 @@ export function HttpsMappings({
           ) : (
             <Button
               className="new-mapping-button"
-              variant="dappnode"
               onClick={() => setEditing(true)}
             >
               New mapping <MdAdd />

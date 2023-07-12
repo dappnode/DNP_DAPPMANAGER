@@ -37,9 +37,9 @@ export function ResetPassword({
       </div>
 
       <Alert variant="warning">
-        If you have lost your password and recovery token you have to directly access your
-        machine via SSH or by connecting a keyboard and screen and follow this
-        guide
+        If you have lost your password and recovery token you have to directly
+        access your machine via SSH or by connecting a keyboard and screen and
+        follow this guide
         <br />
         <LinkDocs href={docsUrl.recoverPasswordGuide}>
           Reset your DAppNode admin password
@@ -63,9 +63,8 @@ export function ResetPassword({
           type="submit"
           className="register-button"
           onClick={onReset}
-          variant="dappnode"
           disabled={reqStatus.loading || !token}
-          fullwidth
+          fullWidth
         >
           Reset password
         </Button>

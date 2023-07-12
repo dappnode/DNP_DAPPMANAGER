@@ -16,11 +16,7 @@ export default function TypeFilter({
       {Object.entries(categories)
         .sort()
         .map(([category, checked]) => (
-          <Button
-            key={category}
-            onClick={() => onCategoryChange(category)}
-            variant={checked ? "dappnode" : "outline-secondary"}
-          >
+          <Button key={category} onClick={() => onCategoryChange(category)}>
             {category}
           </Button>
         ))}

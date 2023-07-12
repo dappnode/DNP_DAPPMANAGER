@@ -49,7 +49,7 @@ export function PackageUpdates() {
                     `(${updateAvailable.upstreamVersion} upstream)`}
                 </span>
                 <NavLink to={urlJoin(installerRootPath, dnpName)}>
-                  <Button variant="dappnode">Update</Button>
+                  <Button>Update</Button>
                 </NavLink>
               </div>
             ))}

@@ -69,7 +69,7 @@ export default function ConsensusClient<T extends Network>({
           {consensusClient.isInstalled && !consensusClient.isUpdated && (
             <>
               <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
-                <Button variant="dappnode">UPDATE</Button>
+                <Button>UPDATE</Button>
               </Link>
               <br />
               <br />

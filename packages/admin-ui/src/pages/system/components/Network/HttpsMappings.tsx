@@ -34,8 +34,7 @@ export function HttpsMappings() {
         title: "Recreate HTTPs mappings",
         text:
           "You are about to recreate the HTTPs mappings. You should execute this action only in response to an error",
-        label: "Recreate",
-        variant: "dappnode"
+        label: "Recreate"
       });
 
       setReqStatus({ loading: true });
@@ -61,8 +60,7 @@ export function HttpsMappings() {
         title: "Exposing service",
         text:
           "Are you sure you want to expose this service to the public internet?",
-        label: "Expose",
-        variant: "dappnode"
+        label: "Expose"
       });
 
       setReqStatus({ loading: true });
@@ -89,8 +87,7 @@ export function HttpsMappings() {
       await confirmPromise({
         title: "Removing HTTPs mapping",
         text: "Are you sure you want to remove this HTTPs mapping?",
-        label: "Remove",
-        variant: "outline-danger"
+        label: "Remove"
       });
 
       setReqStatus({ loading: true });

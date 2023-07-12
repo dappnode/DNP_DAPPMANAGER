@@ -24,11 +24,7 @@ export default function Finished({
         </div>
       </div>
 
-      <Button
-        className="big-centered-button"
-        onClick={onNext}
-        variant="dappnode"
-      >
+      <Button className="big-centered-button" onClick={onNext}>
         Finish
       </Button>
 

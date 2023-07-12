@@ -48,9 +48,7 @@ export default function SystemUpdateDetails() {
       {/* Dedicated per core version update and warnings */}
       <DependencyList deps={coreDeps} />
 
-      <Button variant="dappnode" onClick={() => dispatch(updateCore())}>
-        Update
-      </Button>
+      <Button onClick={() => dispatch(updateCore())}>Update</Button>
     </Card>
   );
 }

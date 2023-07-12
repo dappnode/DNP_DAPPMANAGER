@@ -53,7 +53,7 @@ export default function ExecutionClient<T extends Network>({
         !executionClient.isUpdated && (
           <>
             <Link to={`${installedRootPath}/${executionClient.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
+              <Button>UPDATE</Button>
             </Link>
             <br />
             <br />

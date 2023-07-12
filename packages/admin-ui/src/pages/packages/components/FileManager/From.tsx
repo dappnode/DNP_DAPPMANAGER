@@ -47,7 +47,7 @@ export function CopyFileFrom({
             {...newTabProps}
             className="no-a-style"
           >
-            <Button variant="dappnode">Download</Button>
+            <Button>Download</Button>
           </a>
         }
       />

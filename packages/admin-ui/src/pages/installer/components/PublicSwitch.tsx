@@ -29,12 +29,10 @@ export function PublicSwitch() {
           label: "Public DAppStore",
           buttons: [
             {
-              variant: "dappnode",
               label: "Cancel",
               onClick: () => resolve
             },
             {
-              variant: "danger",
               label: "I understand, take me to the public repo",
               onClick: () => {
                 navigate(rootPath + subPathPublic);

@@ -115,7 +115,6 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         <div>Delete {prettyDnpName(dnpName)} package permanently.</div>
       </div>
       <Button
-        variant="outline-danger"
         onClick={packageRemove}
         style={{ whiteSpace: "normal" }}
         disabled={notRemovable}

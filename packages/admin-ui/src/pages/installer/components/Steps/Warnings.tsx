@@ -76,9 +76,7 @@ export default function Warnings({
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
-        <Button variant="dappnode" onClick={goNext}>
-          Next
-        </Button>
+        <Button onClick={goNext}>Next</Button>
       </div>
     </Card>
   );

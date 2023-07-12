@@ -47,7 +47,7 @@ export default function RemoteSigner<T extends Network>({
         !signer.isUpdated && (
           <>
             <Link to={`${installedRootPath}/${signer.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
+              <Button>UPDATE</Button>
             </Link>
             <br />
             <br />

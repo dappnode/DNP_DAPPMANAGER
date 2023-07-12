@@ -50,7 +50,6 @@ export const launchpadSteps = <T extends Network>({
     description: `To become a ${network.toUpperCase()} validator and participate in the network's Proof of Stake (PoS) consensus mechanism, you will need to create a validator keystore file and make a deposit of at least 32 ETH`,
     component: (
       <Button
-        variant="dappnode"
         onClick={() => {
           window.open(
             network === "mainnet"
@@ -182,7 +181,6 @@ export const launchpadSteps = <T extends Network>({
           <RenderMarkdown source={disclaimer} />
         </div>
         <Button
-          variant="dappnode"
           disabled={!newExecClient || !newConsClient || !newFeeRecipient}
           onClick={() => {
             setNewConfig(true);

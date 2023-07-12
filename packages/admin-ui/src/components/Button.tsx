@@ -1,64 +1,31 @@
 import React from "react";
-import { IconType } from "react-icons/lib";
-import ButtonBootstap, {
-  ButtonProps as ButtonBootstrapProps
-} from "react-bootstrap/esm/Button";
-import { joinCssClass } from "utils/css";
-import "./button.scss";
-
-export type ButtonType = "button" | "submit" | "reset" | undefined;
-export type ButtonVariant =
-  | "secondary"
-  | "dappnode"
-  | "warning"
-  | "danger"
-  | "info"
-  | "outline-secondary"
-  | "outline-dappnode"
-  | "outline-warning"
-  | "outline-danger"
-  | "outline-info";
-const defaultVariant: ButtonVariant = "outline-secondary";
+import ButtonMUI from "@mui/material/Button";
+import { ButtonProps as ButtonMUIProps } from "@mui/material/Button";
+import Icon from "@mui/material/Icon"; // Add this line if your Icon is MUI icon
 
 interface ButtonProps {
-  variant?: ButtonVariant;
-  pill?: boolean;
-  fullwidth?: boolean;
-  disabled?: boolean;
-  type?: ButtonType;
-  Icon?: IconType;
+  Icon?: React.ComponentType;
 }
 
-const Button: React.FC<ButtonBootstrapProps &
-  ButtonProps &
-  React.HTMLAttributes<HTMLButtonElement>> = ({
-  variant = defaultVariant,
+const MyButton: React.FC<ButtonMUIProps & ButtonProps> = ({
+  variant = "outlined",
+  color = "primary",
   children,
-  pill,
-  fullwidth,
-  className,
+  fullWidth,
   disabled,
   Icon,
   ...props
 }) => (
-  <>
-    <ButtonBootstap
-      variant={variant}
-      disabled={disabled}
-      block={fullwidth}
-      className={joinCssClass({ pill }, className)}
-      {...props}
-    >
-      {Icon ? (
-        <span className="btn-with-icon">
-          <Icon />
-          <span>{children}</span>
-        </span>
-      ) : (
-        children
-      )}
-    </ButtonBootstap>
-  </>
+  <ButtonMUI
+    variant={variant}
+    color={color}
+    disabled={disabled}
+    fullWidth={fullWidth}
+    startIcon={Icon ? <Icon /> : null} // Apply the icon here
+    {...props}
+  >
+    {children}
+  </ButtonMUI>
 );
 
-export default Button;
+export default MyButton;

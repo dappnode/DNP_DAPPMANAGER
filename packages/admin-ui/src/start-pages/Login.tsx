@@ -57,7 +57,7 @@ export function Login({
   }
 
   async function onSuccessfulReset() {
-    await refetchStatus()?.catch(() => { });
+    await refetchStatus()?.catch(() => {});
     navigate(loginRootPath);
   }
 
@@ -94,9 +94,8 @@ export function Login({
           type="submit"
           className="register-button"
           onClick={onLogin}
-          variant="dappnode"
           disabled={reqStatus.loading || !password}
-          fullwidth
+          fullWidth
         >
           Login
         </Button>
