@@ -4,7 +4,7 @@ import { advancedItems, basicItems, fundedBy } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
 import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
-import { ThemeContext, UsageContext } from "../../App";
+import { UsageContext } from "../../App";
 import "./sidebar.scss";
 
 if (!Array.isArray(advancedItems))
@@ -13,7 +13,6 @@ if (!Array.isArray(basicItems)) throw Error("basicItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
-  const { theme } = React.useContext(ThemeContext);
   const { usage } = React.useContext(UsageContext);
 
   const sidenavItems =
@@ -23,13 +22,7 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       <NavLink to={"/"}>
         <img
           className="sidebar-logo header"
-          src={
-            screenWidth > 640
-              ? theme === "dark"
-                ? logoWideDark
-                : logoWide
-              : logomin
-          }
+          src={screenWidth > 640 ? logoWide : logomin}
           alt="logo"
         />
       </NavLink>
@@ -54,23 +47,13 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       <div className="spacer" />
 
       <div className="funded-by">
-        <div
-          className={
-            theme === "light" ? "funded-by-text-light" : "funded-by-text-dark"
-          }
-        >
-          SUPPORTED BY
-        </div>
+        <div className={"funded-by-text-light"}>SUPPORTED BY</div>
         <div className="funded-by-logos">
           {fundedBy.map((item, i) => (
             <a key={i} href={item.link}>
               <img
                 src={item.logo}
-                className={
-                  theme === "light"
-                    ? "img-fluid funded-by-logo-light"
-                    : "img-fluid funded-by-logo-dark"
-                }
+                className={"img-fluid funded-by-logo-light"}
                 alt="logo"
                 data-toggle="tooltip"
                 data-placement="top"

@@ -15,16 +15,15 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { Theme, UsageMode } from "types";
+import { UsageMode } from "types";
+import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+
+const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
 export const UsageContext = React.createContext({
   usage: "advanced",
-  toggleUsage: () => { }
-});
-
-export const ThemeContext = React.createContext({
-  theme: "light",
-  toggleTheme: () => { }
+  toggleUsage: () => {}
 });
 
 function MainApp({ username }: { username: string }) {
@@ -34,27 +33,35 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
 
-  //const storedUsage = localStorage.getItem("usage");
-  const storedTheme = localStorage.getItem("theme");
+  const theme = useTheme();
+  const colorContext = React.useContext(ColorModeContext);
+  const [mode, setMode] = React.useState<"light" | "dark">("light");
+  const colorMode = React.useMemo(
+    () => ({
+      toggleColorMode: () => {
+        setMode(prevMode => (prevMode === "light" ? "dark" : "light"));
+      }
+    }),
+    []
+  );
+  const themeMemo = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode
+        }
+      }),
+    [mode]
+  );
+
   //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
   const initialUsage = "advanced";
-  const initialTheme =
-    storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
-  const [theme, setTheme] = useState<Theme>(initialTheme);
   const [usage, setUsage] = useState<UsageMode>(initialUsage);
-
-  const toggleTheme = () => {
-    setTheme(curr => (curr === "light" ? "dark" : "light"));
-  };
 
   const toggleUsage = () => {
     setUsage(curr => (curr === "basic" ? "advanced" : "basic"));
   };
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem("usage", usage);
@@ -83,42 +90,44 @@ function MainApp({ username }: { username: string }) {
 
   return (
     <UsageContext.Provider value={{ usage, toggleUsage }}>
-      <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <div className="body" id={theme}>
-          <SideBar screenWidth={screenWidth} />
-          <TopBar
-            username={username}
-            theme={theme}
-            toggleUsage={toggleUsage}
-            toggleTheme={toggleTheme}
-          />
-          <div id="main">
-            <ErrorBoundary>
-              <NotificationsMain />
-            </ErrorBoundary>
-            <Routes>
-              {Object.values(pages).map(({ RootComponent, rootPath }) => (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent />
-                    </ErrorBoundary>
-                  }
-                />
-              ))}
-              {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<RedirectToDefault />} />
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={themeMemo}>
+          <CssBaseline />
+          <div className="body">
+            <SideBar screenWidth={screenWidth} />
+            <TopBar
+              username={username}
+              theme={theme.palette.mode}
+              toggleUsage={toggleUsage}
+              toggleColorMode={colorContext.toggleColorMode}
+            />
+            <div id="main">
+              <ErrorBoundary>
+                <NotificationsMain />
+              </ErrorBoundary>
+              <Routes>
+                {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                  <Route
+                    key={rootPath}
+                    path={rootPath}
+                    element={
+                      <ErrorBoundary>
+                        <RootComponent />
+                      </ErrorBoundary>
+                    }
+                  />
+                ))}
+                {/* 404 routes redirect to dashboard or default page */}
+                <Route path="*" element={<RedirectToDefault />} />
+              </Routes>
+            </div>
 
-            </Routes>
+            {/* Place here non-page components */}
+            <Welcome />
+            <ToastContainer />
           </div>
-
-          {/* Place here non-page components */}
-          <Welcome />
-          <ToastContainer />
-        </div>
-      </ThemeContext.Provider>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
     </UsageContext.Provider>
   );
 }
