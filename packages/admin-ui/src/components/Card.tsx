@@ -1,8 +1,6 @@
 import React from "react";
-import BootstrapCard from "react-bootstrap/Card";
-import { joinCssClass } from "utils/css";
-
-const shadowStyle = { boxShadow: "1px 1px 15px 0 rgba(0, 0, 0, 0.07)" };
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
 
 interface CardProps {
   shadow?: boolean;
@@ -11,10 +9,7 @@ interface CardProps {
   noscroll?: boolean;
 }
 
-/**
- * [NOTE] style is injected to the card-body div via ...props
- */
-const Card: React.FC<CardProps & React.HTMLAttributes<HTMLDivElement>> = ({
+const MyCard: React.FC<CardProps & React.HTMLAttributes<HTMLDivElement>> = ({
   children,
   className = "",
   shadow,
@@ -23,24 +18,15 @@ const Card: React.FC<CardProps & React.HTMLAttributes<HTMLDivElement>> = ({
   noscroll,
   ...props
 }) => (
-  <BootstrapCard
-    style={{
-      overflowX: noscroll ? "visible" : "auto",
-      ...(shadow ? shadowStyle : {})
+  <Card
+    sx={{
+      overflowX: noscroll ? "visible" : "auto"
     }}
+    elevation={shadow ? 3 : 1} // Shadow: you can change this number based on how much shadow you want.
+    {...props}
   >
-    <BootstrapCard.Body
-      className={joinCssClass({
-        spacing,
-        divider,
-        noscroll,
-        [className]: className
-      })}
-      {...props}
-    >
-      {children}
-    </BootstrapCard.Body>
-  </BootstrapCard>
+    <CardContent>{children}</CardContent>
+  </Card>
 );
 
-export default Card;
+export default MyCard;
