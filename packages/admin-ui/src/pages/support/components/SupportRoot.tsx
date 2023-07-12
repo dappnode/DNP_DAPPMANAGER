@@ -1,10 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  Routes,
-  Route,
-  NavLink,
-  useNavigate,
-} from "react-router-dom";
+import React from "react";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { title } from "../data";
 // Components
 import AutoDiagnose from "./AutoDiagnose";
@@ -16,7 +11,6 @@ import "./support.scss";
 import Ports from "./Ports";
 
 const SupportRoot: React.FC = () => {
-  const navigate = useNavigate();
   const routes = [
     {
       name: "Auto Diagnose",
@@ -39,14 +33,6 @@ const SupportRoot: React.FC = () => {
       component: Activity
     }
   ];
-
-  // Redirect automatically to the first route. DO NOT hardcode
-  // to prevent typos and causing infinite loops 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    navigate(`${routes[0].subPath}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
 
   return (
     <>

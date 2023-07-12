@@ -1,10 +1,5 @@
-import React, { useMemo, useEffect } from "react";
-import {
-  NavLink,
-  Routes,
-  Route,
-  useNavigate,
-} from "react-router-dom";
+import React, { useMemo } from "react";
+import { NavLink, Routes, Route } from "react-router-dom";
 import { useApi } from "api";
 import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
@@ -14,7 +9,6 @@ import { docsUrl, vpnDnpName, wireguardDnpName } from "params";
 import LinkDocs from "components/LinkDocs";
 
 export function VpnHome() {
-  const navigate = useNavigate();
   const dnpsRequest = useApi.packagesGet();
   const availableRoutes = useMemo(() => {
     const dnpsSet = dnpsRequest.data
@@ -27,32 +21,24 @@ export function VpnHome() {
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
-        {
-          name: "OpenVpn",
-          subPath: subPaths.openVpn,
-          component: OpenVpnDevicesRoot,
-          installed: dnpsSet.has(vpnDnpName)
-        },
-        {
-          name: "Wireguard",
-          subPath: subPaths.wireguard,
-          component: WireguardDevicesRoot,
-          installed: dnpsSet.has(wireguardDnpName)
-        }
-      ];
+      {
+        name: "OpenVpn",
+        subPath: subPaths.openVpn,
+        component: OpenVpnDevicesRoot,
+        installed: dnpsSet.has(vpnDnpName)
+      },
+      {
+        name: "Wireguard",
+        subPath: subPaths.wireguard,
+        component: WireguardDevicesRoot,
+        installed: dnpsSet.has(wireguardDnpName)
+      }
+    ];
 
     return routes.sort((a, b) =>
       a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0
     );
   }, [dnpsRequest.data]);
-
-  // Redirect automatically to the first route. DO NOT hardcode
-  // to prevent typos and causing infinite loops 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    navigate(`${availableRoutes[0].subPath}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
 
   return (
     <>
