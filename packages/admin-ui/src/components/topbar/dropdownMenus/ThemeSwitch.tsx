@@ -2,16 +2,17 @@ import { BsMoon } from "react-icons/bs";
 import { FaSun } from "react-icons/fa";
 import React from "react";
 import "./dropdown.scss";
-import { ThemeContext } from "App";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import { PaletteMode } from "@mui/material";
 
 export default function ThemeSwitch({
-  toggleTheme
+  theme,
+  toggleColorMode
 }: {
-  toggleTheme: () => void;
+  theme: PaletteMode;
+  toggleColorMode: () => void;
 }) {
-  const { theme } = React.useContext(ThemeContext);
   return (
     <div className="tn-dropdown">
       <OverlayTrigger
@@ -25,7 +26,7 @@ export default function ThemeSwitch({
         <button
           style={{ border: "none", background: "none" }}
           className="tn-dropdown-toggle"
-          onClick={toggleTheme}
+          onClick={toggleColorMode}
         >
           {theme === "light" ? (
             <BsMoon style={{ fontSize: "larger" }} />

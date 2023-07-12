@@ -21,7 +21,6 @@ import Loading from "components/Loading";
 import { responseInterface } from "swr";
 import { Alert, Form } from "react-bootstrap";
 import "./columns.scss";
-import { ThemeContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
 import Input from "components/Input";
@@ -35,9 +34,6 @@ export default function StakerNetwork<T extends Network>({
   network: T;
   description: string;
 }) {
-  // Context
-  const { theme } = React.useContext(ThemeContext);
-
   const currentStakerConfigReq = useApi.stakerConfigGet(
     network
   ) as responseInterface<StakerConfigGet<T>, Error>;
@@ -148,7 +144,7 @@ export default function StakerNetwork<T extends Network>({
   }
 
   return (
-    <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
+    <div className={"stakers-light"}>
       {currentStakerConfigReq.data ? (
         <Card>
           <p>
