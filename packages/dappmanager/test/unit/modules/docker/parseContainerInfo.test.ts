@@ -328,7 +328,6 @@ describe("modules / docker / parseContainerInfo", function () {
         isCore: true,
         created: 1560334707,
         image: "bind.dnp.dappnode.eth:0.2.0",
-        ip: "172.33.1.2",
         ports: [
           {
             container: 53,
