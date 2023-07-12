@@ -1,10 +1,9 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import {
   NavLink,
-  Switch,
+  Routes,
   Route,
-  Redirect,
-  RouteComponentProps
+  useNavigate,
 } from "react-router-dom";
 import { useApi } from "api";
 import { title, subPaths } from "../data";
@@ -14,7 +13,8 @@ import Title from "components/Title";
 import { docsUrl, vpnDnpName, wireguardDnpName } from "params";
 import LinkDocs from "components/LinkDocs";
 
-export function VpnHome({ match }: RouteComponentProps) {
+export function VpnHome() {
+  const navigate = useNavigate();
   const dnpsRequest = useApi.packagesGet();
   const availableRoutes = useMemo(() => {
     const dnpsSet = dnpsRequest.data
@@ -27,24 +27,32 @@ export function VpnHome({ match }: RouteComponentProps) {
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
-      {
-        name: "OpenVpn",
-        subPath: subPaths.openVpn,
-        component: OpenVpnDevicesRoot,
-        installed: dnpsSet.has(vpnDnpName)
-      },
-      {
-        name: "Wireguard",
-        subPath: subPaths.wireguard,
-        component: WireguardDevicesRoot,
-        installed: dnpsSet.has(wireguardDnpName)
-      }
-    ];
+        {
+          name: "OpenVpn",
+          subPath: subPaths.openVpn,
+          component: OpenVpnDevicesRoot,
+          installed: dnpsSet.has(vpnDnpName)
+        },
+        {
+          name: "Wireguard",
+          subPath: subPaths.wireguard,
+          component: WireguardDevicesRoot,
+          installed: dnpsSet.has(wireguardDnpName)
+        }
+      ];
 
     return routes.sort((a, b) =>
       a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0
     );
   }, [dnpsRequest.data]);
+
+  // Redirect automatically to the first route. DO NOT hardcode
+  // to prevent typos and causing infinite loops 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    navigate(`${availableRoutes[0].subPath}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   return (
     <>
@@ -53,7 +61,7 @@ export function VpnHome({ match }: RouteComponentProps) {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -72,18 +80,15 @@ export function VpnHome({ match }: RouteComponentProps) {
       </p>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

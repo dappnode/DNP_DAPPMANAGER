@@ -1,6 +1,5 @@
-import React from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { Switch, Route, NavLink, Redirect } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, NavLink, useParams, useNavigate } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
 // This module
@@ -21,14 +20,15 @@ import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
 import { UsageContext } from "App";
 
-export const PackageById: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
+export const PackageById: React.FC = () => {
+  const navigate = useNavigate();
+  const params = useParams()
+  const id = params.id || ""
   const { usage } = React.useContext(UsageContext);
-  const id = decodeURIComponent(match.params.id || "");
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
   const dnp = dnpRequest.data;
+
   if (!dnp) {
     return (
       <>
@@ -120,6 +120,14 @@ export const PackageById: React.FC<RouteComponentProps<{
   const availableRoutes =
     usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
 
+  // Redirect automatically to the first route. DO NOT hardcode
+  // to prevent typos and causing infinite loops 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    navigate(`${availableRoutes[0].subPath}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
+
   return (
     <>
       <Title title={title} subtitle={prettyDnpName(dnpName)} />
@@ -128,7 +136,7 @@ export const PackageById: React.FC<RouteComponentProps<{
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -146,18 +154,15 @@ export const PackageById: React.FC<RouteComponentProps<{
       )}
 
       <div className="packages-content">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              render={route.render}
+              path={route.subPath}
+              element={<route.render />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

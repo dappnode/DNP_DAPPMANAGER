@@ -1,5 +1,5 @@
-import React from "react";
-import { Switch, Route, RouteComponentProps, Redirect } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 // Components
 import InstallDnpContainer from "./InstallDnpContainer";
 import { title, rootPath, subPathPublic } from "../data";
@@ -8,30 +8,33 @@ import { InstallerDnp } from "./dappnodeDappstore/InstallerDnp";
 import { InstallerPublic } from "./publicDappstore/InstallerPublic";
 // Styles
 import "./installer.scss";
+const InstallerRoot: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
 
-const InstallerRoot: React.FC<RouteComponentProps> = ({ match }) => {
+  useEffect(() => {
+    navigate(rootPath);
+  }, [navigate]);
   return (
     <>
       <Title title={title} />
 
-      <Switch>
+      <Routes>
         {/*Root path: dappstore dnp*/}
         <Route
           key={rootPath}
-          exact
-          path={match.path}
-          component={InstallerDnp}
+          path={location.pathname}
+          element={<InstallerDnp />}
         />
         {/*Public path: dappstore public*/}
         <Route
           key={subPathPublic}
-          path={match.path + subPathPublic}
-          component={InstallerPublic}
+          path={location.pathname + subPathPublic}
+          element={<InstallerPublic />}
         />
         {/*DNP installer path*/}
-        <Route path={match.path + "/:id"} component={InstallDnpContainer} />
-        <Redirect to={rootPath} />
-      </Switch>
+        <Route path={location.pathname + "/:id"} element={<InstallDnpContainer />} />
+      </Routes>
     </>
   );
 };

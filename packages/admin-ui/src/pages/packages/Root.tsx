@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, RouteComponentProps } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { systemPackagesSubPath } from "./data";
 // Components
 import { PackagesHome } from "./pages/Home";
@@ -7,13 +7,14 @@ import { PackageById } from "./pages/ById";
 // Style
 import "./components/packages.scss";
 
-export const PackagesRoot: React.FC<RouteComponentProps> = ({ match }) => (
-  <Switch>
-    <Route exact path={match.path} component={PackagesHome} />
+export const PackagesRoot: React.FC = (
+) => (
+  <Routes>
+    <Route path={"/"} element={<PackagesHome showCoreDnps={false} />} />
     <Route
-      path={match.path + systemPackagesSubPath}
-      render={props => <PackagesHome {...props} showCoreDnps={true} />}
+      path={systemPackagesSubPath}
+      element={<PackagesHome showCoreDnps={true} />}
     />
-    <Route path={match.path + "/:id"} component={PackageById} />
-  </Switch>
+    <Route path={"/:id"} element={<PackageById />} />
+  </Routes>
 );
