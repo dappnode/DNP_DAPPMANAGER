@@ -1,19 +1,21 @@
 import fs from "fs";
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume";
-import { eventBus } from "../eventBus";
-import params from "../params";
-import { logs } from "../logs";
-import * as getPath from "../utils/getPath";
+import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
+import { logs } from "../logs.js";
+import * as getPath from "../utils/getPath.js";
 import {
   dockerContainerRemove,
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
-  getContainersAndVolumesToRemove
-} from "../modules/docker";
-import { listPackage } from "../modules/docker/list";
-import { packageInstalledHasPid } from "../utils/pid";
-import { ComposeFileEditor } from "../modules/compose/editor";
+  getContainersAndVolumesToRemove,
+  dockerContainerStop
+} from "../modules/docker/index.js";
+import { listPackage } from "../modules/docker/list/index.js";
+import { packageInstalledHasPid } from "../utils/pid.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { containerNamePrefix } from "@dappnode/types";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -44,10 +46,8 @@ export async function packageRestartVolumes({
   if (!fs.existsSync(composePath))
     throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
 
-  const {
-    volumesToRemove,
-    containersToRemove
-  } = getContainersAndVolumesToRemove(dnp, volumeName, volumes);
+  const { volumesToRemove, containersToRemove } =
+    getContainersAndVolumesToRemove(dnp, volumeName, volumes);
   logs.debug({ dnpName, volumesToRemove, containersToRemove });
 
   // Skip early to prevent calling dockerComposeUp
@@ -60,6 +60,14 @@ export async function packageRestartVolumes({
   let err: Error | null = null;
   try {
     for (const containerName of containersToRemove) {
+      // get the service name from the container name
+      const serviceName = containerName
+        .split(containerNamePrefix)[1]
+        .split(".")[0];
+      // only stop containers that are running
+      if (containersStatus[serviceName]?.targetStatus === "running")
+        await dockerContainerStop(containerName, { timeout: 5 });
+
       await dockerContainerRemove(containerName);
     }
     for (const volName of volumesToRemove) {

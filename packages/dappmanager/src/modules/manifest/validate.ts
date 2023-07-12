@@ -1,8 +1,8 @@
-import { getValidator } from "../../utils/schema";
-import manifestBasicSchema from "./manifest-basic.schema.json";
-import manifestWithImageSchema from "./manifest-with-image.schema.json";
-import { Manifest } from "@dappnode/dappnodesdk";
-import { ManifestWithImage } from "../../types";
+import { getValidator } from "../../utils/schema.js";
+import manifestBasicSchema from "./manifest-basic.schema.json" assert { type: "json" };
+import manifestWithImageSchema from "./manifest-with-image.schema.json" assert { type: "json" };
+import { Manifest } from "@dappnode/types";
+import { ManifestWithImage } from "../../types.js";
 
 /**
  * Validates a manifest with only the basic data

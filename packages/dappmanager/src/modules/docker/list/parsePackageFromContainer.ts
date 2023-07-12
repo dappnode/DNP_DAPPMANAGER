@@ -1,5 +1,5 @@
-import { pick } from "lodash";
-import { InstalledPackageData, PackageContainer } from "../../../types";
+import { pick } from "lodash-es";
+import { InstalledPackageData, PackageContainer } from "@dappnode/common";
 
 /**
  * Return containers grouped by parent package. Necessary for multi-service packages

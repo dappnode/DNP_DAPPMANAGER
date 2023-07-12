@@ -1,22 +1,19 @@
-import fs from "fs";
-import { orderBy } from "lodash";
-import { eventBus } from "./eventBus";
-import params from "./params";
-import { UserActionLog } from "./types";
-import { logSafeObjects } from "./utils/logs";
-import { logs } from "./logs";
-import { isNotFoundError } from "./utils/node";
-import { JsonFileDb } from "./utils/fileDb";
+import { eventBus } from "./eventBus.js";
+import params from "./params.js";
+import { UserActionLog } from "@dappnode/common";
+import { logSafeObjects } from "./utils/logs.js";
+import { JsonFileDb } from "./utils/fileDb.js";
+import { logs } from "./logs.js";
 
 /**
  * Max number of logs to prevent the log file from growing too big
  * An averagae single log weights 1-0.5KB in file as JSON
  */
-const maxNumOfLogs = 2000;
-const dbPath = params.USER_ACTION_LOGS_DB_PATH;
+
 let db: JsonFileDb<UserActionLog[]> | null = null;
 function getDb(): JsonFileDb<UserActionLog[]> {
-  if (!db) db = new JsonFileDb<UserActionLog[]>(dbPath, []);
+  if (!db)
+    db = new JsonFileDb<UserActionLog[]>(params.USER_ACTION_LOGS_DB_PATH, []);
   return db;
 }
 
@@ -29,7 +26,10 @@ type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
  * Specific RPCs will have a ```userAction``` flag to indicate that the result
  * should be logged by this module.
  */
-function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
+export function push(
+  log: UserActionLogPartial,
+  level: UserActionLog["level"]
+): void {
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
@@ -38,11 +38,25 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
     ...(log.result ? { result: logSafeObjects(log.result) } : {})
   };
 
+  // Skip for logs greater than 3 KB
+  if (isLogTooBig(userActionLog)) {
+    logs.warn(
+      `The log ${userActionLog.event} is too big. It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
+    );
+    return;
+  }
+
   // Emit the log to the UI
   eventBus.logUserAction.emit(userActionLog);
 
   // Store the log in disk
   set([userActionLog, ...get()]);
+}
+
+export function isLogTooBig(log: UserActionLog): boolean {
+  const maxLogSize = 3072; // 3072 Bytes = 3KB
+  const logSize = Buffer.byteLength(JSON.stringify(log), "utf8");
+  return logSize > maxLogSize;
 }
 
 export function info(log: UserActionLogPartial): void {
@@ -64,43 +78,7 @@ export function get(): UserActionLog[] {
  * Overwrites to the db a new array of logs
  * @param userActionLogs
  */
-function set(userActionLogs: UserActionLog[]): void {
+export function set(userActionLogs: UserActionLog[]): void {
+  const maxNumOfLogs = 2000;
   getDb().write(userActionLogs.slice(0, maxNumOfLogs));
-}
-
-/**
- * Migrate winston .log JSON file to a lowdb
- * Prevents having to manually parse the .log file which was happening on every
- * ADMIN UI visit
- */
-export async function migrateUserActionLogs(): Promise<void> {
-  const userActionLogLegacyFile = params.userActionLogsFilename;
-  try {
-    const fileData = fs.readFileSync(userActionLogLegacyFile, "utf8");
-
-    const userActionLogs: UserActionLog[] = [];
-    for (const row of fileData.trim().split(/\r?\n/)) {
-      try {
-        const winstonLog = JSON.parse(row);
-        userActionLogs.push({
-          ...winstonLog,
-          args: winstonLog.args || [winstonLog.kwargs],
-          timestamp: new Date(winstonLog.timestamp).getTime()
-        });
-      } catch (e) {
-        logs.debug(`Error parsing user action log row: ${e.message}\n${row}`);
-      }
-    }
-
-    set(orderBy([...get(), ...userActionLogs], log => log.timestamp, "desc"));
-    fs.unlinkSync(userActionLogLegacyFile);
-
-    logs.info(`Migrated ${userActionLogs.length} userActionLogs`);
-  } catch (e) {
-    if (isNotFoundError(e)) {
-      logs.debug("userActionLogs file not found, already migrated");
-    } else {
-      logs.error("Error migrating userActionLogs", e);
-    }
-  }
 }

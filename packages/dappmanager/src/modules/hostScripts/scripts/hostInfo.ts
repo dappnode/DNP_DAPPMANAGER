@@ -1,6 +1,6 @@
 import memoize from "memoizee";
-import { HostInfoScript } from "../../../types";
-import { runScript } from "../runScripts";
+import { HostInfoScript } from "@dappnode/common";
+import { runScript } from "../runScripts.js";
 
 /**
  * Collects host info
@@ -18,7 +18,7 @@ import { runScript } from "../runScripts";
  * ```
  */
 export const getHostInfoMemoized = memoize(
-  async function(): Promise<HostInfoScript> {
+  async function (): Promise<HostInfoScript> {
     const hostInfo = await runScript("collect_host_info.sh");
     const info: HostInfoScript = JSON.parse(hostInfo);
     return {

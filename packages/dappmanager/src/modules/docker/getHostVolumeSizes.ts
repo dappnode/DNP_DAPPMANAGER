@@ -1,7 +1,7 @@
-import { isEmpty } from "lodash";
-import { shellHost } from "../../utils/shell";
-import { parseDuOutput } from "../../utils/unix";
-import { parseDevicePath } from "../compose";
+import { isEmpty } from "lodash-es";
+import { shellHost } from "../../utils/shell.js";
+import { parseDuOutput } from "../../utils/unix.js";
+import { parseDevicePath } from "../compose/index.js";
 
 interface VolDevicePaths {
   [volumeName: string]: string;

@@ -2,19 +2,19 @@ import "mocha";
 import { expect } from "chai";
 import * as fs from "fs";
 import * as path from "path";
-import * as db from "../../src/db";
-import shell from "../../src/utils/shell";
+import * as db from "../../src/db/index.js";
+import shell from "../../src/utils/shell.js";
 import {
   testDir,
   cleanTestDir,
   createTestDir,
   clearDbs,
   shellSafe
-} from "../testUtils";
+} from "../testUtils.js";
 
 // Calls
-import { backupGet } from "../../src/calls/backupGet";
-import { backupRestore } from "../../src/calls/backupRestore";
+import { backupGet } from "../../src/calls/backupGet.js";
+import { backupRestore } from "../../src/calls/backupRestore.js";
 
 // MUST use function for this.timeout to work <====== function() ???
 describe("Integration test for backup to and from:", function () {

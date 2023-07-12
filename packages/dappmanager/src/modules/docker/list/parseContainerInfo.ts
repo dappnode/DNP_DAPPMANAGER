@@ -1,19 +1,19 @@
 import { ContainerInfo } from "dockerode";
-import params from "../../../params";
+import params from "../../../params.js";
 import {
   PackageContainer,
   VolumeMapping,
   ContainerState
-} from "../../../types";
+} from "@dappnode/common";
 import {
   parseEnvironment,
   parsePortMappings,
   parseVolumeMappings,
   readContainerLabels
-} from "../../compose";
-import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile";
-import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus";
-import { ensureUniquePortsFromDockerApi } from "../utils";
+} from "../../compose/index.js";
+import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile.js";
+import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus.js";
+import { ensureUniquePortsFromDockerApi } from "../utils.js";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;

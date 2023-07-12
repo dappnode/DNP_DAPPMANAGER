@@ -1,4 +1,5 @@
-import params, { getContainerDomain } from "./params";
+import params from "./params.js";
+import { getContainerDomain } from "@dappnode/types";
 
 export function stripCharacters(s: string): string {
   return s.replace(RegExp("_", "g"), "");

@@ -1,6 +1,6 @@
-import { Dependencies } from "@dappnode/dappnodesdk";
-import { DappGetDnps, DappGetDnp } from "../types";
-import { sanitizeDependencies } from "./sanitizeDependencies";
+import { Dependencies } from "@dappnode/types";
+import { DappGetDnps, DappGetDnp } from "../types.js";
+import { sanitizeDependencies } from "./sanitizeDependencies.js";
 
 function getVersion(
   dnps: DappGetDnps,

@@ -1,5 +1,5 @@
-import semver from "semver";
-import { imagesList, imageRemove } from "./api";
+import { valid, lt } from "semver";
+import { imagesList, imageRemove } from "./api/index.js";
 
 /**
  * Clean old semver tagged images for DNP `name` expect tag `version`.
@@ -22,9 +22,9 @@ export async function dockerCleanOldImages(
           (imageName === dnpName ||
             // Get multi-service images, but not mix `goerli-geth` with `goerli` for example
             imageName.endsWith("." + dnpName)) &&
-          semver.valid(imageVersion) &&
-          semver.valid(version) &&
-          semver.lt(imageVersion, version)
+          valid(imageVersion) &&
+          valid(version) &&
+          lt(imageVersion, version)
         );
       })
   );

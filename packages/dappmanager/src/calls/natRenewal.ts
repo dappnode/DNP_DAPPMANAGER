@@ -1,5 +1,5 @@
-import { throttledNatRenewal } from "../daemons/natRenewal";
-import * as db from "../db";
+import { throttledNatRenewal } from "../daemons/natRenewal/index.js";
+import * as db from "../db/index.js";
 
 export async function natRenewalEnable({
   enableNatRenewal

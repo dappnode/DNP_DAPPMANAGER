@@ -1,25 +1,27 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs } from "../../ipfs";
+import { ipfs } from "../../ipfs/index.js";
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { manifestToCompose, validateManifestWithImage } from "../../manifest";
-import { DistributedFile, ManifestWithImage, NodeArch } from "../../../types";
-import { NoImageForArchError } from "../errors";
-import { downloadDirectoryFiles } from "./downloadDirectoryFiles";
-import { getImageByArch } from "./getImageByArch";
-import { findEntries } from "./findEntries";
-import { releaseFiles } from "../../../params";
-import { downloadAssetRequired } from "./downloadAssets";
-import { isDirectoryRelease } from "./isDirectoryRelease";
-import { serializeIpfsDirectory } from "../releaseSignature";
-import { ReleaseDownloadedContents } from "../types";
 import {
-  Manifest,
-  validateDappnodeCompose,
+  manifestToCompose,
+  validateManifestWithImage
+} from "../../manifest/index.js";
+import { ManifestWithImage, NodeArch } from "../../../types.js";
+import { NoImageForArchError } from "../errors.js";
+import { downloadDirectoryFiles } from "./downloadDirectoryFiles.js";
+import { getImageByArch } from "./getImageByArch.js";
+import { findEntries } from "./findEntries.js";
+import { downloadAssetRequired } from "./downloadAssets.js";
+import { isDirectoryRelease } from "./isDirectoryRelease.js";
+import { serializeIpfsDirectory } from "../releaseSignature.js";
+import { ReleaseDownloadedContents } from "../types.js";
+import { Manifest, releaseFiles } from "@dappnode/types";
+import { getIsCore } from "../../manifest/getIsCore.js";
+import { DistributedFile } from "@dappnode/common";
+import {
   validateManifestSchema,
-  validateSetupWizardSchema
-} from "@dappnode/dappnodesdk";
-import { getIsCore } from "../../manifest/getIsCore";
+  validateDappnodeCompose
+} from "@dappnode/schemas";
 
 const source = "ipfs" as const;
 
@@ -46,64 +48,60 @@ async function downloadReleaseIpfsFn(
 ): Promise<ReleaseDownloadedContents> {
   const arch = os.arch() as NodeArch;
 
-  try {
-    // Check if it is an ipfs path of a root directory release
-    const ipfsEntries = await ipfs.list(hash);
-    const isDirectory = await isDirectoryRelease(ipfsEntries);
+  // Check if it is an ipfs path of a root directory release
+  const ipfsEntries = await ipfs.list(hash);
+  const isDirectory = await isDirectoryRelease(ipfsEntries);
 
-    if (!isDirectory) {
-      const manifest = await downloadManifest(hash);
+  if (!isDirectory) {
+    const manifest = await downloadManifest(hash);
 
-      // Disable manifest type releases for ARM architectures
-      if (isArmArch(arch)) throw new NoImageForArchError(arch);
+    // Disable manifest type releases for ARM architectures
+    if (isArmArch(arch)) throw new NoImageForArchError(arch);
 
-      // Make sure manifest.image.hash exists. Otherwise, will throw
-      const manifestWithImage = validateManifestWithImage(
-        manifest as ManifestWithImage
-      );
-      const { image, avatar } = manifestWithImage;
-      return {
-        imageFile: getFileFromHash(image.hash, image.size),
-        avatarFile: avatar ? getFileFromHash(avatar) : undefined,
-        manifest,
-        composeUnsafe: manifestToCompose(manifestWithImage)
-      };
-    } else {
-      const files = await ipfs.list(hash);
-      const { manifest, compose, signature } = await downloadDirectoryFiles(
-        files
-      );
-      validateManifestSchema(manifest);
-      // Bypass error until publish DNP_BIND v0.2.7 (current DNP_BIND docker-compose.yml file has docker network wrong defined)
-      try {
-        validateDappnodeCompose(compose, manifest);
-      } catch (e) {
-        if (getIsCore(manifest)) {
-          console.warn(e);
-        } else {
-          throw e;
-        }
+    // Make sure manifest.image.hash exists. Otherwise, will throw
+    const manifestWithImage = validateManifestWithImage(
+      manifest as ManifestWithImage
+    );
+    const { image, avatar } = manifestWithImage;
+    return {
+      imageFile: getFileFromHash(image.hash, image.size),
+      avatarFile: avatar ? getFileFromHash(avatar) : undefined,
+      manifest,
+      composeUnsafe: manifestToCompose(manifestWithImage)
+    };
+  } else {
+    const files = await ipfs.list(hash);
+    const { manifest, compose, signature } = await downloadDirectoryFiles(
+      files
+    );
+    validateManifestSchema(manifest);
+    // Bypass error until publish DNP_BIND v0.2.7 (current DNP_BIND docker-compose.yml file has docker network wrong defined)
+    try {
+      validateDappnodeCompose(compose, manifest);
+    } catch (e) {
+      if (getIsCore(manifest)) {
+        console.warn(e);
+      } else {
+        throw e;
       }
-
-      ipfs.pinAddNoThrow(hash);
-
-      // Fetch image by arch, will throw if not available
-      const imageEntry = getImageByArch(manifest, files, arch);
-      const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
-
-      return {
-        imageFile: getFileFromEntry(imageEntry),
-        avatarFile: getFileFromEntry(avatarEntry),
-        manifest,
-        composeUnsafe: compose,
-        signature: signature && {
-          signature,
-          signedData: serializeIpfsDirectory(files, signature.cid)
-        }
-      };
     }
-  } catch (e) {
-    throw e;
+
+    ipfs.pinAddNoThrow(hash);
+
+    // Fetch image by arch, will throw if not available
+    const imageEntry = getImageByArch(manifest, files, arch);
+    const avatarEntry = findEntries(files, releaseFiles.avatar, "avatar");
+
+    return {
+      imageFile: getFileFromEntry(imageEntry),
+      avatarFile: getFileFromEntry(avatarEntry),
+      manifest,
+      composeUnsafe: compose,
+      signature: signature && {
+        signature,
+        signedData: serializeIpfsDirectory(files, signature.cid)
+      }
+    };
   }
 }
 

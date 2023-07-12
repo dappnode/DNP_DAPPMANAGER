@@ -1,5 +1,5 @@
-import shell from "../utils/shell";
-import getDappmanagerImage from "../utils/getDappmanagerImage";
+import shell from "../utils/shell.js";
+import getDappmanagerImage from "../utils/getDappmanagerImage.js";
 
 const insecureSalt = "insecur3";
 

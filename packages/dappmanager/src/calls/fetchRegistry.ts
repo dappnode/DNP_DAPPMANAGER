@@ -1,16 +1,20 @@
-import { getEthersProvider } from "../modules/ethClient";
-import { ReleaseFetcher } from "../modules/release";
-import { listPackages } from "../modules/docker/list";
-import { eventBus } from "../eventBus";
-import { throttle } from "lodash";
-import { NoImageForArchError } from "../modules/release/errors";
-import { logs } from "../logs";
-import { DirectoryItem, DirectoryDnp, RegistryScanProgress } from "../types";
-import { fileToGatewayUrl } from "../utils/distributedFile";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
-import { getShortDescription, getFallBackCategories } from "./fetchDirectory";
-import { getRegistry } from "../modules/registry";
-import * as db from "../db";
+import { getEthersProvider } from "../modules/ethClient/index.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import { eventBus } from "../eventBus.js";
+import { throttle } from "lodash-es";
+import { NoImageForArchError } from "../modules/release/errors.js";
+import { logs } from "../logs.js";
+import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
+import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
+import {
+  getShortDescription,
+  getFallBackCategories
+} from "./fetchDirectory.js";
+import { getRegistry } from "../modules/registry/index.js";
+import * as db from "../db/index.js";
+import { DirectoryDnp } from "@dappnode/toolkit";
 
 const defaultEnsName = "public.dappnode.eth";
 const minDeployBlock = 6312046;
@@ -85,43 +89,41 @@ async function fetchRegistryIpfsData(
   }
 
   await Promise.all(
-    registry.map(
-      async ({ name, isFeatured }, index): Promise<void> => {
-        const registryItemBasic = {
-          index,
-          name,
-          whitelisted: true,
-          isFeatured
-        };
-        try {
-          // Now resolve the last version of the package
-          const release = await releaseFetcher.getRelease(name);
-          const { metadata, avatarFile } = release;
+    registry.map(async ({ name, isFeatured }, index): Promise<void> => {
+      const registryItemBasic = {
+        index,
+        name,
+        whitelisted: true,
+        isFeatured
+      };
+      try {
+        // Now resolve the last version of the package
+        const release = await releaseFetcher.getRelease(name);
+        const { metadata, avatarFile } = release;
 
+        pushRegistryItem({
+          ...registryItemBasic,
+          status: "ok",
+          description: getShortDescription(metadata),
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          isInstalled: getIsInstalled(release, dnpList),
+          isUpdated: getIsUpdated(release, dnpList),
+          featuredStyle: metadata.style,
+          categories: metadata.categories || getFallBackCategories(name) || []
+        });
+      } catch (e) {
+        if (e instanceof NoImageForArchError) {
+          logs.debug(`Package ${name} is not available in current arch`);
+        } else {
+          logs.error(`Error fetching ${name} release`, e);
           pushRegistryItem({
             ...registryItemBasic,
-            status: "ok",
-            description: getShortDescription(metadata),
-            avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-            isInstalled: getIsInstalled(release, dnpList),
-            isUpdated: getIsUpdated(release, dnpList),
-            featuredStyle: metadata.style,
-            categories: metadata.categories || getFallBackCategories(name) || []
+            status: "error",
+            message: e.message
           });
-        } catch (e) {
-          if (e instanceof NoImageForArchError) {
-            logs.debug(`Package ${name} is not available in current arch`);
-          } else {
-            logs.error(`Error fetching ${name} release`, e);
-            pushRegistryItem({
-              ...registryItemBasic,
-              status: "error",
-              message: e.message
-            });
-          }
         }
       }
-    )
+    })
   );
 
   return registryPublicDnps;

@@ -1,9 +1,9 @@
-import { logs } from "../logs";
+import { logs } from "../logs.js";
 import {
   updatePkgsWithGlobalEnvs,
   writeGlobalEnvsToEnvFile
-} from "../modules/globalEnvs";
-import params from "../params";
+} from "../modules/globalEnvs.js";
+import params from "../params.js";
 
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:
@@ -16,45 +16,34 @@ import params from "../params";
  * ACTIVE: string, INTERNAL_IP: string, STATIC_IP: string, HOSTNAME: string, UPNP_AVAILABLE: boolean, NO_NAT_LOOPBACK: boolean, DOMAIN: string, PUBKEY: string, ADDRESS: string, PUBLIC_IP: string, SERVER_NAME: string
  * @param dbSetter
  */
-export function interceptGlobalEnvOnSet({
-  get,
-  set,
-  globEnvKey
-}: {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get: () => any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set: (globEnvValue: any) => void;
-  globEnvKey: string;
-}): {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  get: () => any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  set: (globEnvValue: any) => void;
+export function interceptGlobalEnvOnSet<T, U>(
+  dbSetter: { get: () => T; set: (value: U) => void },
+  globEnvKey: string
+): {
+  get: () => T;
+  set: (globEnvValue: U) => Promise<void>;
 } {
   return {
-    get,
+    ...dbSetter,
 
-    set: function (globEnvValue: string): void {
+    set: async function (globEnvValue: U): Promise<void> {
       // Must be with prefix _DAPPNODE_GLOBAL_
       if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
         globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
 
-      set(globEnvValue);
+      dbSetter.set(globEnvValue);
       // Update the global env file
       writeGlobalEnvsToEnvFile();
       // List packages using the global env and update the global envs in composes files
-      updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue)
-        .then(() => {
-          logs.info(
-            `Updated global env ${globEnvKey} to ${globEnvValue} in all dappnode packages`
-          );
-        })
-        .catch(err => {
-          logs.error(
-            `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
-          );
-        });
+      try {
+        // Only attempt to update packages if the global env is not nullish
+        if (globEnvValue !== null && globEnvValue !== undefined)
+          await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
+      } catch (err) {
+        logs.error(
+          `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
+        );
+      }
     }
   };
 }

@@ -1,13 +1,11 @@
 import { ethers } from "ethers";
-import semver from "semver";
-import { ApmRepoVersionReturn } from "./types";
+import { parse } from "semver";
+import { ApmRepoVersionReturn } from "./types.js";
 
 /**
  * Parse a raw version response from an APM repo
  */
-export function parseApmVersionReturn(
-  res: ApmRepoVersionReturn
-): {
+export function parseApmVersionReturn(res: ApmRepoVersionReturn): {
   version: string;
   contentUri: string;
 } {
@@ -17,7 +15,7 @@ export function parseApmVersionReturn(
     version: res.semanticVersion.join("."),
     // Second argument = true: ignore UTF8 parsing errors
     // Let downstream code identify the content hash as wrong
-    contentUri: ethers.utils.toUtf8String(res.contentURI, true)
+    contentUri: ethers.utils.toUtf8String(res.contentURI)
   };
 }
 
@@ -26,7 +24,7 @@ export function parseApmVersionReturn(
  * @param version "0.2.4"
  */
 export function toApmVersionArray(version: string): [number, number, number] {
-  const semverObj = semver.parse(version);
+  const semverObj = parse(version);
   if (!semverObj) throw Error(`Invalid semver ${version}`);
   return [semverObj.major, semverObj.minor, semverObj.patch];
 }

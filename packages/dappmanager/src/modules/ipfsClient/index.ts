@@ -1,1 +1,1 @@
-export { changeIpfsClient } from "./changeIpfsClient";
+export { changeIpfsClient } from "./changeIpfsClient.js";

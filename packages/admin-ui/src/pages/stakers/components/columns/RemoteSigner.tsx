@@ -4,19 +4,20 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import "./columns.scss";
-import { StakerItem } from "common";
+import { StakerItem } from "@dappnode/common";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { FaKey } from "react-icons/fa";
+import { Network } from "@dappnode/types";
 
-export default function RemoteSigner({
+export default function RemoteSigner<T extends Network>({
   signer,
   setEnableWeb3signer,
   isSelected,
   ...props
 }: {
-  signer: StakerItem;
+  signer: StakerItem<T, "signer">;
   setEnableWeb3signer: (installWeb3signer: boolean) => void;
   isSelected: boolean;
 }) {
@@ -24,20 +25,21 @@ export default function RemoteSigner({
     <Card
       {...props}
       className={`remote-signer ${joinCssClass({ isSelected })}`}
-      onClick={() => setEnableWeb3signer(!isSelected)}
       shadow={isSelected}
     >
-      {signer.status === "ok" ? (
-        <div className="avatar">
-          <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
-        </div>
-      ) : signer.status === "error" ? (
-        <div className="avatar">
-          <img src={errorAvatar} alt="avatar" />
-        </div>
-      ) : null}
+      <div onClick={() => setEnableWeb3signer(!isSelected)}>
+        {signer.status === "ok" ? (
+          <div className="avatar">
+            <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />
+          </div>
+        ) : signer.status === "error" ? (
+          <div className="avatar">
+            <img src={errorAvatar} alt="avatar" />
+          </div>
+        ) : null}
 
-      <div className="title">{prettyDnpName(signer.dnpName)} </div>
+        <div className="title">{prettyDnpName(signer.dnpName)} </div>
+      </div>
 
       {signer.status === "ok" &&
         isSelected &&
@@ -52,9 +54,30 @@ export default function RemoteSigner({
           </>
         )}
 
+      {signer.status === "ok" &&
+        isSelected &&
+        signer.isInstalled &&
+        signer.data?.metadata.links?.ui && (
+          <div
+            style={{
+              alignItems: "center",
+              textTransform: "capitalize",
+              whiteSpace: "nowrap"
+            }}
+          >
+            <a
+              href={signer.data.metadata.links.ui}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              <FaKey /> {"  "} Upload keystores
+            </a>
+          </div>
+        )}
+
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected && signer.metadata.shortDescription}
+          {isSelected && signer.data && signer.data.metadata.shortDescription}
         </div>
       )}
     </Card>

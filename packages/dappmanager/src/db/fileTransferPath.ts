@@ -1,4 +1,4 @@
-import { dbCache } from "./dbFactory";
+import { dbCache } from "./dbFactory.js";
 
 const FILE_TRANSFER_PATH = "file-transfer-path";
 

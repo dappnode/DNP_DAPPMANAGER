@@ -1,19 +1,23 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "es6",
-    "lib": ["es6", "DOM"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
-    "strict": true,
-    // TODO: Fix in a latter PR, too many changes for now
-    "useUnknownInCatchVariables": false,
+    /* Modules */
     "types": ["mocha", "node"],
+
+    /* Emit */
+    "declaration": false /* TODO: Should be removed when code is fixed */,
     "outDir": "dist",
-    "sourceMap": true
+    "sourceMap": true,
+
+    /* Language and Environment */
+    "target": "ES2019",
+    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
   },
-  "include": ["src/**/*", "test/**/*"],
-  "exclude": ["node_modules"]
+  "ts-node": {
+    "esm": true,
+    "experimentalSpecifierResolution": "node",
+    "experimentalResolver": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "test/**/*"]
 }

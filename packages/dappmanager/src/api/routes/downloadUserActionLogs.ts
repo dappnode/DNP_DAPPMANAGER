@@ -1,5 +1,5 @@
-import * as logUserAction from "../../logUserAction";
-import { wrapHandlerHtml } from "../utils";
+import * as logUserAction from "../../logUserAction.js";
+import { wrapHandlerHtml } from "../utils.js";
 
 /**
  * Endpoint to download user action logs.

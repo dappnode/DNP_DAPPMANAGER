@@ -1,5 +1,5 @@
-import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types";
-import { stringifyEnvironment } from "./environment";
+import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types.js";
+import { stringifyEnvironment } from "./environment.js";
 import {
   ComposeService,
   ChainDriver,
@@ -7,8 +7,8 @@ import {
   ChainDriverType,
   chainDriversTypes,
   Dependencies
-} from "@dappnode/dappnodesdk";
-import { pick, omitBy, mapValues } from "lodash";
+} from "@dappnode/types";
+import { pick, omitBy, mapValues } from "lodash-es";
 
 /**
  * This module ensures that data stored in a DNP's container labels
@@ -25,7 +25,9 @@ const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
   if (value)
     try {
       return JSON.parse(value);
-    } catch {}
+    } catch {
+      return;
+    }
 };
 
 const writeString = (data: string | undefined): string | undefined => data;

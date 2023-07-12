@@ -1,21 +1,24 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    /* Modules */
     "baseUrl": "src",
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "useUnknownInCatchVariables": false,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
+    "paths": {
+      "@dappnode/common": ["../../common/src"]
+    },
+
+    /* Emit */
     "noEmit": true,
-    "jsx": "react"
+
+    /* Language and Environment */
+    "lib": ["DOM", "dom.iterable", "esnext"],
+    "jsx": "react",
+
+    /* Interop Constraints */
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*"]
 }

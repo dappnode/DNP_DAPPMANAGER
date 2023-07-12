@@ -13,10 +13,11 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { ReqStatus, HttpsPortalMapping, ExposableServiceInfo } from "types";
+import { ReqStatus } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 import Button from "components/Button";
+import { ExposableServiceInfo, HttpsPortalMapping } from "@dappnode/common";
 
 export function HttpsMappings() {
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
@@ -65,10 +66,13 @@ export function HttpsMappings() {
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingAdd(mappingInfo), {
-        message: "Adding HTTPs mapping...",
-        onSuccess: "Added HTTPs mapping"
-      });
+      await withToast(
+        () => api.httpsPortalMappingAdd({ mapping: mappingInfo }),
+        {
+          message: "Adding HTTPs mapping...",
+          onSuccess: "Added HTTPs mapping"
+        }
+      );
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e.message });
@@ -90,7 +94,7 @@ export function HttpsMappings() {
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingRemove(mapping), {
+      await withToast(() => api.httpsPortalMappingRemove({ mapping }), {
         message: "Removing HTTPs mapping...",
         onSuccess: "Removed HTTPs mapping"
       });

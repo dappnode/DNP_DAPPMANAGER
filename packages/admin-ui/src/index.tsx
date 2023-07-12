@@ -12,9 +12,11 @@ import { cleanObj } from "utils/objects";
 import "react-toastify/dist/ReactToastify.css";
 // Boostrap loaders
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./layout.scss";
+// Custom styles
 import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
+import "./light_dark.scss";
+import "./layout.scss";
 
 // This process.env. vars will be substituted at build time
 // The REACT_APP_ prefix is mandatory for the substitution to work

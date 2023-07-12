@@ -20,7 +20,6 @@ export function PackagesHome({ showCoreDnps }: { showCoreDnps: boolean }) {
           <button key={option.path} className="item-container">
             <NavLink
               to={option.path}
-              exact
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >

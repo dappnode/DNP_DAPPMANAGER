@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
-import params from "../../params";
-import * as db from "../../db";
-import { logs } from "../../logs";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import { logs } from "../../logs.js";
 
 const corruptedPrivateKeyMessage = `
 
@@ -46,10 +46,7 @@ export default function generateKeys(): void {
     publicKey: ethers.utils.computePublicKey(identity.privateKey)
   });
 
-  const subdomain = identity.address
-    .toLowerCase()
-    .substr(2)
-    .substring(0, 16);
+  const subdomain = identity.address.toLowerCase().substr(2).substring(0, 16);
   const domain = [subdomain, dyndnsDomain].join(".");
   db.domain.set(domain);
 }

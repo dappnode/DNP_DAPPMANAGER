@@ -5,21 +5,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
-    defaults:
-      run:
-        working-directory: packages/admin-ui/
+    runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       # Setup node version 14 for node-sass 4.14 https://stackoverflow.com/questions/60394291/error-node-modules-node-sass-command-failed
       - uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "20"
       # Install dependencies
       - run: yarn install
       # Generate schemas
-      - run: yarn generate
+      - run: yarn build
       # Build
       - run: yarn mock-standalone:build
       # Deploy

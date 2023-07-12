@@ -1,25 +1,25 @@
-import { mapValues, omit } from "lodash";
-import semver from "semver";
-import { Manifest, SetupWizardField } from "@dappnode/dappnodesdk";
-import { listPackages } from "../modules/docker/list";
-import params from "../params";
-import shouldUpdate from "../modules/dappGet/utils/shouldUpdate";
+import { mapValues, omit } from "lodash-es";
+import { valid, gt } from "semver";
+import { Manifest, SetupWizardField } from "@dappnode/types";
+import { listPackages } from "../modules/docker/list/index.js";
+import params from "../params.js";
+import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import deepmerge from "deepmerge";
-import { fileToGatewayUrl } from "../utils/distributedFile";
-import { ReleaseFetcher } from "../modules/release";
-import { dockerInfoArchive } from "../modules/docker/api";
-import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor";
-import { parseSpecialPermissions } from "../modules/compose/specialPermissions";
+import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { dockerInfoArchive } from "../modules/docker/api/index.js";
+import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor.js";
+import { parseSpecialPermissions } from "../modules/compose/specialPermissions.js";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
-  CompatibleDnps,
-  PackageRelease,
-  SetupWizardAllDnps,
   SpecialPermissionAllDnps,
-  InstalledPackageData
-} from "../types";
-import { ReleaseSignatureStatusCode } from "../common";
+  SetupWizardAllDnps,
+  PackageRelease,
+  CompatibleDnps,
+  InstalledPackageData,
+  ReleaseSignatureStatusCode
+} from "@dappnode/common";
 
 export async function fetchDnpRequest({
   id
@@ -165,9 +165,9 @@ function getRequiresCoreUpdate(
     : "";
   return Boolean(
     metadata.requirements &&
-      semver.valid(minDnVersion) &&
-      semver.valid(coreVersion) &&
-      semver.gt(minDnVersion, coreVersion)
+      valid(minDnVersion) &&
+      valid(coreVersion) &&
+      gt(minDnVersion, coreVersion)
   );
 }
 
@@ -205,6 +205,7 @@ async function shouldAddSetupWizardField(
             // 404 path not found, Base64 parsing, JSON parsing, etc.
           }
       }
+      return true;
 
     default:
       return true;

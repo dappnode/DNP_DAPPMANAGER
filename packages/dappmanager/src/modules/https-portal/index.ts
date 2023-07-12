@@ -3,18 +3,17 @@ import {
   dockerListNetworks,
   dockerNetworkConnect,
   dockerNetworkDisconnect
-} from "../docker";
-import { listContainers } from "../docker/list";
-import params from "../../params";
-import { getExternalNetworkAlias } from "../../domains";
-import { PackageContainer, HttpsPortalMapping } from "../../types";
-import { HttpsPortalApiClient } from "./apiClient";
-import { ComposeEditor } from "../compose/editor";
-import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose";
-import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose";
-export { addAliasToRunningContainersMigration } from "./migration";
+} from "../docker/index.js";
+import { listContainers } from "../docker/list/index.js";
+import params from "../../params.js";
+import { getExternalNetworkAlias } from "../../domains.js";
+import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
+import { HttpsPortalApiClient } from "./apiClient.js";
+import { ComposeEditor } from "../compose/editor.js";
+import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose.js";
+import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose.js";
 export { HttpsPortalApiClient };
-export { getExposableServices } from "./exposable";
+export { getExposableServices } from "./exposable/index.js";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
@@ -34,12 +33,6 @@ export class HttpsPortal {
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
     const aliases = [externalNetworkAlias];
-
-    // Call Http Portal API to add the mapping
-    await this.httpsPortalApiClient.add({
-      fromSubdomain: mapping.fromSubdomain,
-      toHost: `${externalNetworkAlias}:${mapping.port}`
-    });
 
     // Ensure network exists
     const networks = await dockerListNetworks();
@@ -66,6 +59,12 @@ export class HttpsPortal {
         Aliases: aliases
       });
     }
+
+    // Call Http Portal API to add the mapping
+    await this.httpsPortalApiClient.add({
+      fromSubdomain: mapping.fromSubdomain,
+      toHost: `${externalNetworkAlias}:${mapping.port}`
+    });
 
     // Edit compose to persist the setting
     addNetworkAliasCompose(container, externalNetworkName, aliases);

@@ -1,4 +1,4 @@
-import { dbMain } from "./dbFactory";
+import { dbMain } from "./dbFactory.js";
 
 const NACL_SECRET_KEY = "nacl-secret-key";
 const NACL_PUBLIC_KEY = "nacl-public-key";

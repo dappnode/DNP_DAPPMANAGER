@@ -1,5 +1,5 @@
-import { HostStatMemory } from "../types";
-import { parseMemoryStats } from "../utils/parseMemoryStats";
+import { HostStatMemory } from "@dappnode/common";
+import { parseMemoryStats } from "../utils/parseMemoryStats.js";
 import osu from "node-os-utils";
 
 /**

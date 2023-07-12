@@ -3,7 +3,7 @@ import {
   fallbackToBoolean,
   booleanToFallback
 } from "components/EthMultiClient";
-import { EthClientFallback } from "types";
+import { EthClientFallback } from "@dappnode/common";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
 import Alert from "react-bootstrap/Alert";
@@ -13,7 +13,6 @@ import SwitchBig from "components/SwitchBig";
  * View to chose or change the Eth multi-client
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */

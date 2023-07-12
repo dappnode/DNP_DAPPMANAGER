@@ -1,11 +1,11 @@
 import React from "react";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 import Badge from "react-bootstrap/Badge";
 import computeSemverUpdateType from "utils/computeSemverUpdateType";
 import RenderMarkdown from "components/RenderMarkdown";
 import styled from "styled-components";
 import { prettyDnpName } from "utils/format";
-import { DependencyListItem } from "types";
+import { DependencyListItem } from "@dappnode/common";
 
 const InfoContainer = styled.div`
   display: grid;

@@ -1,9 +1,9 @@
-import { ChainData } from "../../types";
-import { logs } from "../../logs";
-import { listPackages } from "../docker/list";
-import { parseChainErrors } from "./utils";
-import { runWithChainDriver } from "./drivers";
-import { getChainDriverName } from "./getChainDriverName";
+import { ChainData } from "@dappnode/common";
+import { logs } from "../../logs.js";
+import { listPackages } from "../docker/list/index.js";
+import { parseChainErrors } from "./utils.js";
+import { runWithChainDriver } from "./drivers/index.js";
+import { getChainDriverName } from "./getChainDriverName.js";
 
 // Keep track of already logged errors to reduce spam
 // This functions are called often so the same error will persist
@@ -52,5 +52,5 @@ export async function getChainsData(): Promise<ChainData[]> {
     })
   );
 
-  return chainsData;
+  return chainsData.sort((a, b) => a.dnpName.localeCompare(b.dnpName));
 }

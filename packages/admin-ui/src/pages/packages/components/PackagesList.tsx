@@ -10,7 +10,7 @@ import Card from "components/Card";
 import { MdRefresh, MdOpenInNew } from "react-icons/md";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { sortBy } from "lodash";
+import { sortBy } from "lodash-es";
 import { rootPath as packagesRootPath } from "pages/packages";
 // Images
 import defaultAvatar from "img/defaultAvatar.png";

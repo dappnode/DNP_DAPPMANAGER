@@ -1,12 +1,11 @@
-import { AbortSignal } from "abort-controller";
-import { eventBus } from "../../eventBus";
-import params from "../../params";
-import * as db from "../../db";
-import updateIp from "../../modules/dyndns/updateIp";
-import lookup from "../../utils/lookup";
-import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls";
-import { logs } from "../../logs";
-import { runAtMostEvery } from "../../utils/asyncFlows";
+import { eventBus } from "../../eventBus.js";
+import params from "../../params.js";
+import * as db from "../../db/index.js";
+import updateIp from "../../modules/dyndns/updateIp.js";
+import lookup from "../../utils/lookup.js";
+import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls.js";
+import { logs } from "../../logs.js";
+import { runAtMostEvery } from "../../utils/asyncFlows.js";
 
 /**
  * DynDNS interval check

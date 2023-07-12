@@ -1,14 +1,14 @@
-import { eventBus } from "../eventBus";
-import { getDirectory } from "../modules/directory";
-import { DirectoryItem } from "../types";
-import { logs } from "../logs";
-import { listPackages } from "../modules/docker/list";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest";
-import { fileToGatewayUrl } from "../utils/distributedFile";
-import { throttle } from "lodash";
-import { getEthersProvider } from "../modules/ethClient";
-import { ReleaseFetcher } from "../modules/release";
-import { NoImageForArchError } from "../modules/release/errors";
+import { eventBus } from "../eventBus.js";
+import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
+import { logs } from "../logs.js";
+import { listPackages } from "../modules/docker/list/index.js";
+import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
+import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { throttle } from "lodash-es";
+import { getEthProviderUrl } from "../modules/ethClient/index.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { NoImageForArchError } from "../modules/release/errors.js";
+import { DappNodeDirectory } from "@dappnode/toolkit";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -16,13 +16,16 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const provider = await getEthersProvider();
+  const providerUrl = await getEthProviderUrl();
+  const directory = new DappNodeDirectory(providerUrl);
+
   const releaseFetcher = new ReleaseFetcher();
 
-  const dnpList = await listPackages();
+  const installedDnpList = await listPackages();
 
   // Returns already sorted by: feat#0, feat#1, dnp#0, dnp#1, dnp#2
-  const directory = await getDirectory(provider);
+  const directoryPkgs = await directory.getDirectoryPkgs();
+
   const directoryDnps: DirectoryItem[] = [];
 
   let directoryDnpsPending: DirectoryItem[] = [];
@@ -39,40 +42,40 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
   }
 
   await Promise.all(
-    directory.map(
-      async ({ name, isFeatured }, index): Promise<void> => {
-        const whitelisted = true;
-        const directoryItemBasic = { index, name, whitelisted, isFeatured };
-        try {
-          // Now resolve the last version of the package
-          const release = await releaseFetcher.getRelease(name);
-          const { metadata, avatarFile } = release;
+    directoryPkgs.map(async ({ name, isFeatured }, index): Promise<void> => {
+      const whitelisted = true;
+      const directoryItemBasic = { index, name, whitelisted, isFeatured };
+      try {
+        // Now resolve the last version of the package
+        const release = await releaseFetcher.getRelease(name);
+        const { metadata, avatarFile } = release;
 
+        pushDirectoryItem({
+          ...directoryItemBasic,
+          status: "ok",
+          description: getShortDescription(metadata),
+          avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
+          isInstalled: getIsInstalled(release, installedDnpList),
+          isUpdated: getIsUpdated(release, installedDnpList),
+          featuredStyle: metadata.style,
+          categories: metadata.categories || getFallBackCategories(name) || []
+        });
+      } catch (e) {
+        if (e instanceof NoImageForArchError) {
+          logs.debug(`Package ${name} is not available in current arch`);
+        } else {
+          logs.error(`Error fetching ${name} release`, e);
           pushDirectoryItem({
             ...directoryItemBasic,
-            status: "ok",
-            description: getShortDescription(metadata),
-            avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
-            isInstalled: getIsInstalled(release, dnpList),
-            isUpdated: getIsUpdated(release, dnpList),
-            featuredStyle: metadata.style,
-            categories: metadata.categories || getFallBackCategories(name) || []
+            status: "error",
+            message: e.message
           });
-        } catch (e) {
-          if (e instanceof NoImageForArchError) {
-            logs.debug(`Package ${name} is not available in current arch`);
-          } else {
-            logs.error(`Error fetching ${name} release`, e);
-            pushDirectoryItem({
-              ...directoryItemBasic,
-              status: "error",
-              message: e.message
-            });
-          }
         }
       }
-    )
+    })
   );
+
+  directoryDnps.push(stakerMainnetCard, stakerGnosisCard, stakeHouseCard);
 
   return directoryDnps.sort((a, b) => a.index - b.index);
 }
@@ -118,3 +121,58 @@ const fallbackCategories: { [dnpName: string]: string[] } = {
 export function getFallBackCategories(dnpName: string): string[] {
   return fallbackCategories[dnpName];
 }
+
+const stakerMainnetCard: DirectoryItemOk = {
+  index: 0,
+  name: "ethereum.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description: "Easily set-up your Ethereum node and validator",
+  avatarUrl: "/ipfs/QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y", // Ethereum image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};
+
+const stakerGnosisCard: DirectoryItemOk = {
+  index: 0,
+  name: "gnosis.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description: "Easily set-up your Gnosis Chain node and validator",
+  avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};
+
+const stakeHouseCard: DirectoryItemOk = {
+  index: 0,
+  name: "stakehouse.dnp.dappnode.eth",
+  whitelisted: true,
+  isFeatured: true,
+  status: "ok",
+  description:
+    "Join or create an LSD Network and stake a validator with 4 ETH.",
+  avatarUrl: "/ipfs/QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw", // Stakehouse image logo
+  isInstalled: false,
+  isUpdated: false,
+  featuredStyle: {
+    featuredBackground: "linear-gradient(67deg, rgb(0, 0, 0), rgb(18, 57, 57))",
+    featuredColor: "white",
+    featuredAvatarFilter: ""
+  },
+  categories: []
+};

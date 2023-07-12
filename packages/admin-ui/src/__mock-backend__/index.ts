@@ -1,7 +1,6 @@
-import { PortProtocol, Routes, IpfsClientTarget } from "../common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
-import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
 import { localProxying } from "./localProxying";
@@ -20,7 +19,6 @@ import { stakerConfig } from "./stakerConfig";
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
-  ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
   ...localProxying,
@@ -122,9 +120,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-  dappnodeWebNameSet: async newDappnodeWebName => {
-    dappnodeWebName = newDappnodeWebName;
-  },
+  dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
@@ -210,6 +206,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
+    eth2ClientTarget: {
+      execClient: "besu.public.dappnode.eth",
+      consClient: "lighthouse.dnp.dappnode.eth"
+    },
     ethClientFallback: "off",
     ethClientStatus: {
       ok: false,
@@ -225,8 +225,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       // "change-host-password"
     ]
   }),
-  runHostUpdates: async () =>
-    "Host updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [

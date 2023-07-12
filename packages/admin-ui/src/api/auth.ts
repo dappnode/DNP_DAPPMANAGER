@@ -1,4 +1,4 @@
-import { LoginStatusReturn } from "types";
+import { LoginStatusReturn } from "@dappnode/common";
 import {
   apiTestMode,
   apiUrls,

@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { runService } from "../runService";
+import { runService } from "../runService.js";
 
 /**
  * Updates docker engine:
@@ -11,7 +11,7 @@ import { runService } from "../runService";
  * - When running this host service containers will restart and connection with the dappnode will be lost for a while
  */
 export const updateDockerEngine = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runService("update-docker-engine.service", false);
   },
   // Prevent running this service more than once

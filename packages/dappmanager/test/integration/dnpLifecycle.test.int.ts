@@ -1,19 +1,19 @@
 import "mocha";
 import { expect } from "chai";
 import path from "path";
-import { Compose, Manifest, PackageEnvs } from "@dappnode/dappnodesdk";
-import { mapValues, pick } from "lodash";
-import * as calls from "../../src/calls";
-import params from "../../src/params";
-import { logs } from "../../src/logs";
-import { getDnpFromListPackages, getDnpState } from "../testPackageUtils";
+import { Compose, Manifest, PackageEnvs } from "@dappnode/types";
+import { mapValues, pick } from "lodash-es";
+import * as calls from "../../src/calls/index.js";
+import params from "../../src/params.js";
+import { logs } from "../../src/logs.js";
+import { getDnpFromListPackages, getDnpState } from "./testPackageUtils.js";
 import {
   PortMapping,
   UserSettingsAllDnps,
   PackageContainer,
   InstalledPackageData,
   PortProtocol
-} from "../../src/types";
+} from "@dappnode/common";
 import {
   clearDbs,
   getTestMountpoint,
@@ -21,18 +21,18 @@ import {
   cleanRepos,
   cleanContainers,
   sampleFile
-} from "../testUtils";
+} from "../testUtils.js";
 import {
   stringifyPortMappings,
   parseEnvironment
-} from "../../src/modules/compose";
+} from "../../src/modules/compose/index.js";
 import {
   dockerContainerInspect,
   dockerGetArchiveSingleFile
-} from "../../src/modules/docker/api";
-import { listContainer } from "../../src/modules/docker/list";
-import { uploadDirectoryRelease } from "../integrationSpecs";
-import { MemoryWritable } from "../testStreamUtils";
+} from "../../src/modules/docker/api/index.js";
+import { listContainer } from "../../src/modules/docker/list/index.js";
+import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
+import { MemoryWritable } from "./testStreamUtils.js";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.

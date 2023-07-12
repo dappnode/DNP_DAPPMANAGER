@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
-import { JsonFileDb } from "../../utils/fileDb";
-import { getRandomAlphanumericToken } from "../../utils/token";
+import { JsonFileDb } from "../../utils/fileDb.js";
+import { getRandomAlphanumericToken } from "../../utils/token.js";
 
 export enum AdminPasswordDbError {
   PASSWORD_CHANGED = "ADMIN_PASSWORD_DB_ERROR_PASSWORD_CHANGED"

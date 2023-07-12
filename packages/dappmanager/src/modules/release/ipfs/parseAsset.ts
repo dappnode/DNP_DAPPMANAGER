@@ -1,5 +1,5 @@
-import { FileFormat } from "../../../types";
-import { yamlParse } from "../../../utils/yaml";
+import { FileFormat } from "../../../types.js";
+import { yamlParse } from "../../../utils/yaml.js";
 
 export function parseAsset<T>(data: string, format: FileFormat): T {
   switch (format) {
@@ -8,7 +8,7 @@ export function parseAsset<T>(data: string, format: FileFormat): T {
     case FileFormat.JSON:
       return jsonParse(data);
     case FileFormat.TEXT:
-      return (data as unknown) as T;
+      return data as unknown as T;
     default:
       throw Error(`Attempting to parse unknown format ${format}`);
   }

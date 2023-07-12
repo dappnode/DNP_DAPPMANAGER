@@ -1,9 +1,9 @@
 import {
   listContainers,
   listContainerNoThrow
-} from "../../modules/docker/list";
-import { PackageContainer } from "../../types";
-import { wrapHandler } from "../utils";
+} from "../../modules/docker/list/index.js";
+import { PackageContainer } from "@dappnode/common";
+import { wrapHandler } from "../utils.js";
 
 interface Params {
   containerName: string;
@@ -31,9 +31,7 @@ export const publicPackagesData = wrapHandler<Params>(async (req, res) => {
 /**
  * Return only non-sensitive data
  */
-function getPublicPackageData(
-  container: PackageContainer
-): {
+function getPublicPackageData(container: PackageContainer): {
   name: string;
   version: string;
   state: string;

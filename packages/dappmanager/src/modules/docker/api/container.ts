@@ -1,5 +1,5 @@
 import Docker from "dockerode";
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 /**
  * Inspect container

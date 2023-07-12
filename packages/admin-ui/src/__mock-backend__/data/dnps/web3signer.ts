@@ -58,8 +58,8 @@ export const web3signer: MockDnp = {
         },
         title: "Beacon Chain Consensus Layer Client",
         description:
-          "**WARNING**: MAKE SURE YOU SELECT A CLIENT YOU ALREADY HAVE INSTALLED OR ARE ABOUT TO INSTALL. Select the Eth2 client you want the web3signer listen requests from. You can change this parameter in the future",
-        enum: ["prysm", "teku", "lighthouse", "nimbus"],
+          "**WARNING**: MAKE SURE YOU SELECT A CLIENT YOU ALREADY HAVE INSTALLED OR ARE ABOUT TO INSTALL. Select the Consensus layer client you want the web3signer to listen to requests from. You can change this parameter in the future",
+        enum: ["prysm", "teku", "lighthouse", "lodestar", "nimbus"],
         required: true
       }
     ]

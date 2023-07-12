@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
-import { ApmVersionMetadata } from "./types";
-import { getTimestamp } from "./apmUtils";
+import { ApmVersionMetadata } from "./types.js";
+import { getTimestamp } from "./apmUtils.js";
 
 const repoAbi = [
   "event NewVersion(uint256 versionId, uint16[3] semanticVersion)"
@@ -24,7 +24,7 @@ export async function fetchApmVersionsMetadata(
 
   const event = repo.events;
 
-  const topic = event.topic.topic;
+  const topic = event.topic.name;
 
   const result = await provider.getLogs({
     address: addressOrEnsName, // or contractEnsName,
@@ -34,22 +34,20 @@ export async function fetchApmVersionsMetadata(
   });
 
   return await Promise.all(
-    result.map(
-      async (log): Promise<ApmVersionMetadata> => {
-        // Parse values
-        const parsedLog = repo.parseLog(log);
+    result.map(async (log): Promise<ApmVersionMetadata> => {
+      // Parse values
+      const parsedLog = repo.parseLog(log);
 
-        if (!parsedLog || !parsedLog.values)
-          throw Error(`Error parsing NewRepo event`);
-        // const versionId = parsedLog.values.versionId.toNumber();
-        return {
-          version: parsedLog.values.semanticVersion.join("."),
-          // Parse tx data
-          txHash: log.transactionHash,
-          blockNumber: log.blockNumber,
-          timestamp: await getTimestamp(log.blockNumber, provider)
-        };
-      }
-    )
+      if (!parsedLog || !parsedLog.args)
+        throw Error(`Error parsing NewRepo event`);
+      // const versionId = parsedLog.values.versionId.toNumber();
+      return {
+        version: parsedLog.args.semanticVersion.join("."),
+        // Parse tx data
+        txHash: log.transactionHash,
+        blockNumber: log.blockNumber,
+        timestamp: await getTimestamp(log.blockNumber, provider)
+      };
+    })
   );
 }

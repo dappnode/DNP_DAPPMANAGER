@@ -1,13 +1,13 @@
-import verifyState from "./verifyState";
+import verifyState from "./verifyState.js";
 import {
   getPermutationsTable,
   getTotalPermutations,
   getPermutation
-} from "./permutations";
-import { pickBy, mapValues } from "lodash";
-import generateErrorMessage from "./generateErrorMessage";
-import { DappGetDnps, DappGetErrors } from "../types";
-import { logs } from "../../../logs";
+} from "./permutations.js";
+import { pickBy, mapValues } from "lodash-es";
+import generateErrorMessage from "./generateErrorMessage.js";
+import { DappGetDnps, DappGetErrors } from "../types.js";
+import { logs } from "../../../logs.js";
 
 const timeoutMs = 10 * 1000; // ms
 
@@ -59,9 +59,11 @@ const timeoutMs = 10 * 1000; // ms
  *     versions of y.dnp.dappnode.eth. Checked 256/256 possible states.'
  * }
  */
-export default function resolver(
-  dnps: DappGetDnps
-): { success: boolean; message: string; state: { [dnpName: string]: string } } {
+export default function resolver(dnps: DappGetDnps): {
+  success: boolean;
+  message: string;
+  state: { [dnpName: string]: string };
+} {
   const errors: DappGetErrors = {};
 
   const permutationsTable = getPermutationsTable(dnps);

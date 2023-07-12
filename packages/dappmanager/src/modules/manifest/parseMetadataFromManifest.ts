@@ -1,7 +1,7 @@
-import { omit } from "lodash";
-import { setupWizard1To2 } from "../setupWizard/setupWizard1To2";
-import { ManifestWithImage } from "../../types";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { omit } from "lodash-es";
+import { setupWizard1To2 } from "../setupWizard/setupWizard1To2.js";
+import { ManifestWithImage } from "../../types.js";
+import { Manifest } from "@dappnode/types";
 
 /**
  * Sanitize metadata from the manifest.

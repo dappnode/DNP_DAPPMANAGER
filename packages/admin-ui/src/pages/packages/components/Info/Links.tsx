@@ -2,7 +2,7 @@ import React from "react";
 import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { AiFillBug } from "react-icons/ai";
-import { Manifest } from "@dappnode/dappnodesdk";
+import { Manifest } from "@dappnode/types";
 
 export function Links({
   links,
@@ -42,7 +42,7 @@ export function Links({
             <AiFillBug />
           ) : null}
         </span>
-        <span>{name}</span>
+        <span className="links-name">{name}</span>
       </a>
     ) : name === "api" || name === "queryingApi" || name === "endpoint" ? (
       <span className="api-link-container">
@@ -54,7 +54,7 @@ export function Links({
         </a>
         <div className="api-link-box">{url}</div>
       </span>
-    ) : name === "apiEngine" || name ==="engineAPI" ? (
+    ) : name === "apiEngine" || name === "engineAPI" ? (
       <span className="api-link-container">
         <a href={url} {...newTabProps}>
           <span className="links-icon">

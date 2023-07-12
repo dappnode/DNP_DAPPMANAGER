@@ -1,6 +1,7 @@
 .dnp-card.loading,
 .dnp-card.error {
   .description {
+    color: #959595;
     .status {
       font-weight: bold;
     }
@@ -14,8 +15,11 @@
   .action {
     color: var(--dappnode-gray-main-color);
   }
-  .description {
-    color: #959595;
+}
+
+.dnp-card.card-body {
+  .description::after {
+    display: none !important;
   }
 }
 

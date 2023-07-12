@@ -1,33 +1,33 @@
-import { AbortController } from "abort-controller";
-import * as db from "./db";
-import { eventBus } from "./eventBus";
-import initializeDb from "./initializeDb";
-import { createGlobalEnvsEnvFile } from "./modules/globalEnvs";
-import { generateKeyPair } from "./utils/publickeyEncryption";
-import { copyHostScripts } from "./modules/hostScripts";
-import { switchEthClientIfOpenethereum } from "./modules/ethClient";
-import { runLegacyActions } from "./modules/legacy";
-import { migrateUserActionLogs } from "./logUserAction";
-import { postRestartPatch } from "./modules/installer/restartPatch";
-import { startDaemons } from "./daemons";
-import { SshManager } from "./modules/sshManager";
-import * as calls from "./calls";
-import { routesLogger, subscriptionsLogger } from "./api/logger";
-import * as routes from "./api/routes";
-import { logs } from "./logs";
-import params from "./params";
-import { getEthForwardMiddleware } from "./ethForward";
-import { getVpnApiClient } from "./api/vpnApiClient";
+import * as db from "./db/index.js";
+import { eventBus } from "./eventBus.js";
+import initializeDb from "./initializeDb.js";
+import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
+import { generateKeyPair } from "./utils/publickeyEncryption.js";
+import { copyHostScripts } from "./modules/hostScripts/index.js";
+import { postRestartPatch } from "./modules/installer/restartPatch.js";
+import { startDaemons } from "./daemons/index.js";
+import { SshManager } from "./modules/sshManager.js";
+import * as calls from "./calls/index.js";
+import { routesLogger, subscriptionsLogger } from "./api/logger.js";
+import * as routes from "./api/routes/index.js";
+import { logs } from "./logs.js";
+import params from "./params.js";
+import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {
   getVersionData,
   isNewDappmanagerVersion
-} from "./utils/getVersionData";
-import { shellHost } from "./utils/shell";
-import { startDappmanager } from "./startDappmanager";
-import { addAliasToRunningContainersMigration } from "./modules/https-portal";
-import { copyHostServices } from "./modules/hostServices/copyHostServices";
-import { startAvahiDaemon } from "./daemons/avahi";
-import { setDefaultStakerConfig } from "./modules/stakerConfig/setDefaultStakerConfig";
+} from "./utils/getVersionData.js";
+import { shellHost } from "./utils/shell.js";
+import { startDappmanager } from "./startDappmanager.js";
+import { copyHostServices } from "./modules/hostServices/copyHostServices.js";
+import { startAvahiDaemon } from "./daemons/avahi/index.js";
+import { executeMigrations } from "./modules/migrations/index.js";
+import { startTestApi } from "./api/startTestApi.js";
+import {
+  getLimiter,
+  getViewsCounterMiddleware,
+  getEthForwardMiddleware
+} from "./api/middlewares/index.js";
 
 const controller = new AbortController();
 
@@ -39,6 +39,8 @@ const server = startDappmanager({
   params,
   logs,
   routes,
+  limiterMiddleware: getLimiter(),
+  counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
   methods: calls,
@@ -49,11 +51,11 @@ const server = startDappmanager({
   sshManager
 });
 
-// Deprecate openethereum. MUST be executed before EthClientInstaller daemon to avoid have the error:
-// `Error on eth client installer daemon Error: No client data for target: openethereum`
-switchEthClientIfOpenethereum().catch(e =>
-  logs.error("Error switch client openethereum", e)
-);
+// Start Test API
+if (params.TEST) startTestApi();
+
+// Execute migrations
+executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
 
 // Initialize DB
 initializeDb()
@@ -100,30 +102,6 @@ calls
 const versionData = getVersionData();
 if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
-
-/**
- * [LEGACY] The previous method of injecting ENVs to a DNP was via .env files
- * This function will read the contents of .env files and add them in the
- * compose itself in the `environment` field in array format.
- *
- * [LEGACY] The DB is split into two where the old db becomes a cache only
- * and the new one is for permanent required data. Some key-values will be
- * moved from the old db to the cache db.
- */
-
-migrateUserActionLogs().catch(e =>
-  logs.error("Error migrating userActionLogs", e)
-);
-
-runLegacyActions().catch(e => logs.error("Error running legacy actions", e));
-
-addAliasToRunningContainersMigration().catch(e =>
-  logs.error("Error adding alias to running containers", e)
-);
-
-setDefaultStakerConfig().catch(e =>
-  logs.error("Error setting default staker config", e)
-);
 
 postRestartPatch().catch(e => logs.error("Error on postRestartPatch", e));
 

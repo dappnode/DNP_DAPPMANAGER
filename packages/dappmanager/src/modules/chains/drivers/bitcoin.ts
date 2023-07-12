@@ -1,9 +1,10 @@
-const Client = require("bitcoin-core");
-import { InstalledPackageData } from "../../../types";
-import { dockerContainerInspect } from "../../docker";
-import { parseEnvironment } from "../../compose";
-import { getPrivateNetworkAlias } from "../../../domains";
-import { ChainDataResult } from "../types";
+// @ts-ignore
+import Client from "bitcoin-core";
+import { InstalledPackageData } from "@dappnode/common";
+import { dockerContainerInspect } from "../../docker/index.js";
+import { parseEnvironment } from "../../compose/index.js";
+import { getPrivateNetworkAlias } from "../../../domains.js";
+import { ChainDataResult } from "../types.js";
 
 function getMinBlockDiffSync(dnpName: string): number {
   return dnpName.includes("bitcoin")
@@ -96,9 +97,7 @@ export async function bitcoin(
  * "[BTC_RPCUSER=dappnode BTC_RPCPASSWORD=dappnode BTC_TXINDEX=1 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
  * "[ZCASH_RPCUSER=dappnode ZCASH_RPCPASSWORD=dappnode ZCASH_RPCPORT=8342 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
  */
-export function parseCredentialsFromEnvs(
-  envsArray: string[]
-): {
+export function parseCredentialsFromEnvs(envsArray: string[]): {
   username: string;
   password: string;
   port: number | null;

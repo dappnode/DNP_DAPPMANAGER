@@ -1,6 +1,11 @@
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 
-export type SimpleState = "stopped" | "crashed" | "running" | "restarting";
+export type SimpleState =
+  | "stopped"
+  | "crashed"
+  | "running"
+  | "restarting"
+  | "removing";
 export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
 export type PackageContainerStatus = Pick<
   PackageContainer,
@@ -13,6 +18,8 @@ export function parseContainerState(
   const { state, exitCode } = container;
 
   switch (state) {
+    case "removing":
+      return { variant: "secondary", state: "removing", title: "Removing" };
     case "created":
       return { variant: "secondary", state: "stopped", title: "Created" };
 

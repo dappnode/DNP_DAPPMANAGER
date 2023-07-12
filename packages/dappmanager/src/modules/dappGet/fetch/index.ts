@@ -1,1 +1,1 @@
-export * from "./DappGetFetcher";
+export * from "./DappGetFetcher.js";

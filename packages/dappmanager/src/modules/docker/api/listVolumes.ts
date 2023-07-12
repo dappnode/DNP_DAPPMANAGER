@@ -1,4 +1,4 @@
-import { docker } from "./docker";
+import { docker } from "./docker.js";
 
 export async function dockerVolumesList(
   options?: DockerApiListVolumesOptions

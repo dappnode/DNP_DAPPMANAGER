@@ -1,5 +1,4 @@
-import { PortProtocol } from "../../common";
-import { PackagePort } from "../../types";
+import { PackagePort, PortProtocol } from "@dappnode/common";
 
 // Default ports to open in case getPortsToOpen throws
 const defaultPortsToOpen: PackagePort[] = [

@@ -1,13 +1,13 @@
 import path from "path";
 import fs from "fs";
-import * as db from "../db";
-import params from "../params";
-import { logs } from "../logs";
-import { listPackage } from "../modules/docker/list";
-import { packageRestart } from "./packageRestart";
-import shell from "../utils/shell";
-import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import * as db from "../db/index.js";
+import params from "../params.js";
+import { logs } from "../logs.js";
+import { listPackage } from "../modules/docker/list/index.js";
+import { packageRestart } from "./packageRestart.js";
+import shell from "../utils/shell.js";
+import validateBackupArray from "../utils/validateBackupArray.js";
+import { PackageBackup } from "@dappnode/types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 

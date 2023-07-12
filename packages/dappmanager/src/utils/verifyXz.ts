@@ -1,4 +1,4 @@
-import shell from "./shell";
+import shell from "./shell.js";
 
 /**
  * Verify a compressed .xz file
@@ -10,9 +10,7 @@ import shell from "./shell";
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-export default function verifyXz(
-  xzFilePath: string
-): Promise<{
+export default function verifyXz(xzFilePath: string): Promise<{
   success: boolean;
   message: string;
 }> {

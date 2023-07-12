@@ -1,16 +1,18 @@
 import { useEffect } from "react";
 import useSWR, { responseInterface } from "swr";
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 import mitt from "mitt";
 // Transport
-import { subscriptionsFactory } from "common/transport/socketIo";
 import {
   Subscriptions,
   subscriptionsData,
-  SubscriptionsTypes
-} from "common/subscriptions";
-import { Routes, routesData, ResolvedType } from "common/routes";
-import { parseRpcResponse } from "common/transport/jsonRpc";
+  SubscriptionsTypes,
+  Routes,
+  routesData,
+  ResolvedType,
+  parseRpcResponse,
+  subscriptionsFactory
+} from "@dappnode/common";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";

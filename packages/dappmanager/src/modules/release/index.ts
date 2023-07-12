@@ -1,11 +1,12 @@
-import resolveReleaseName from "./resolveReleaseName";
-import { getRelease } from "./getRelease";
-import { getManifest } from "./getManifest";
-import { PackageRelease, PackageRequest } from "../../types";
-import dappGet, { DappgetOptions } from "../dappGet";
-import { Apm } from "../apm";
-import { Manifest } from "@dappnode/dappnodesdk";
-import { DappGetState } from "../dappGet/types";
+import resolveReleaseName from "./resolveReleaseName.js";
+import { getRelease } from "./getRelease.js";
+import { getManifest } from "./getManifest.js";
+import { PackageRequest } from "../../types.js";
+import dappGet, { DappgetOptions } from "../dappGet/index.js";
+import { Apm } from "../apm/index.js";
+import { Manifest } from "@dappnode/types";
+import { DappGetState } from "../dappGet/types.js";
+import { PackageRelease } from "@dappnode/common";
 
 export class ReleaseFetcher extends Apm {
   /**

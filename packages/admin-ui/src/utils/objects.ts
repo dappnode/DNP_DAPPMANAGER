@@ -1,4 +1,4 @@
-import { pickBy } from "lodash";
+import { pickBy } from "lodash-es";
 
 /**
  * Safe version of JSON.stringify. On error returns an error string

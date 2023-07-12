@@ -1,9 +1,9 @@
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import { logs } from "../../logs";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import { formatNotification } from "./formatNotification";
-import { DappnodeTelegramBot } from "./commands";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import { logs } from "../../logs.js";
+import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
+import { formatNotification } from "./formatNotification.js";
+import { DappnodeTelegramBot } from "./commands.js";
 
 // Telegram setup When reboot it lost
 let currentTelegramToken: string | null;
@@ -43,9 +43,8 @@ async function checkTelegramStatus(): Promise<void> {
   }
 }
 
-const checkTelegramStatusThrottled = runOnlyOneSequentially(
-  checkTelegramStatus
-);
+const checkTelegramStatusThrottled =
+  runOnlyOneSequentially(checkTelegramStatus);
 
 /**
  * Telegram bot

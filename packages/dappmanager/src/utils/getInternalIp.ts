@@ -1,6 +1,6 @@
 import isIp from "is-ip";
-import shell from "./shell";
-import getDappmanagerImage from "./getDappmanagerImage";
+import shell from "./shell.js";
+import getDappmanagerImage from "./getDappmanagerImage.js";
 
 export default async function getInternalIp(): Promise<string> {
   try {

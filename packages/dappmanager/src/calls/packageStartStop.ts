@@ -1,10 +1,13 @@
-import { listPackage } from "../modules/docker/list";
-import { dockerContainerStop, dockerContainerStart } from "../modules/docker";
-import { eventBus } from "../eventBus";
-import params from "../params";
-import { getServicesSharingPid } from "../utils/pid";
-import { ComposeFileEditor } from "../modules/compose/editor";
-import { PackageContainer } from "../common";
+import { listPackage } from "../modules/docker/list/index.js";
+import {
+  dockerContainerStop,
+  dockerContainerStart
+} from "../modules/docker/index.js";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
+import { getServicesSharingPid } from "../utils/pid.js";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { PackageContainer } from "@dappnode/common";
 
 const dnpsAllowedToStop = [
   params.ipfsDnpName,

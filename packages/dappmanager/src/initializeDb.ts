@@ -1,22 +1,23 @@
-import * as db from "./db";
-import { eventBus } from "./eventBus";
-import * as dyndns from "./modules/dyndns";
-import getDappmanagerImage from "./utils/getDappmanagerImage";
-import getServerName from "./utils/getServerName";
-import getInternalIp from "./utils/getInternalIp";
-import getStaticIp from "./utils/getStaticIp";
-import getExternalUpnpIp from "./modules/upnpc/getExternalIp";
-import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs";
-import getPublicIpFromUrls from "./utils/getPublicIpFromUrls";
-import params from "./params";
-import ping from "./utils/ping";
-import { pause } from "./utils/asyncFlows";
+import * as db from "./db/index.js";
+import { eventBus } from "./eventBus.js";
+import * as dyndns from "./modules/dyndns/index.js";
+import getDappmanagerImage from "./utils/getDappmanagerImage.js";
+import getServerName from "./utils/getServerName.js";
+import getInternalIp from "./utils/getInternalIp.js";
+import getStaticIp from "./utils/getStaticIp.js";
+import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
+import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs.js";
+import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
+import params from "./params.js";
+import ping from "./utils/ping.js";
+import { pause } from "./utils/asyncFlows.js";
 import retry from "async-retry";
-import shell from "./utils/shell";
-import { IdentityInterface, IpfsClientTarget } from "./types";
-import { logs } from "./logs";
-import { localProxyingEnableDisable } from "./calls";
-import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable";
+import shell from "./utils/shell.js";
+import { IdentityInterface } from "./types.js";
+import { logs } from "./logs.js";
+import { localProxyingEnableDisable } from "./calls/index.js";
+import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable.js";
+import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -56,6 +57,25 @@ export default async function initializeDb(): Promise<void> {
   } catch (e) {
     logs.error("Error getting ipfsClientTarget", e);
     db.ipfsClientTarget.set(IpfsClientTarget.local);
+  }
+
+  /**
+   * Eth client remote
+   */
+  try {
+    const ethClientRemote = db.ethClientRemote.get();
+    if (!ethClientRemote) {
+      logs.info(
+        "ethClientRemote not found, grabbing default value from db, key eth-client-target"
+      );
+      const ethClientTarget = db.ethClientTarget.get();
+      if (ethClientTarget && ethClientTarget === "remote")
+        db.ethClientRemote.set(EthClientRemote.on);
+      else db.ethClientRemote.set(EthClientRemote.off);
+    }
+  } catch (e) {
+    logs.error("Error setting default value for eth-client-remote", e);
+    db.ethClientRemote.set(EthClientRemote.off);
   }
 
   /**

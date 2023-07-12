@@ -1,6 +1,6 @@
-import { Dependencies } from "@dappnode/dappnodesdk";
-import semver from "semver";
-import { ReleaseFetcher } from "../../release";
+import { Dependencies } from "@dappnode/types";
+import { validRange, satisfies, valid } from "semver";
+import { ReleaseFetcher } from "../../release/index.js";
 
 export class DappGetFetcher {
   private releaseFetcher: ReleaseFetcher;
@@ -33,7 +33,7 @@ export class DappGetFetcher {
    * @returns set of versions
    */
   async versions(name: string, versionRange: string): Promise<string[]> {
-    if (semver.validRange(versionRange)) {
+    if (validRange(versionRange)) {
       if (versionRange === "*") {
         // ##### TODO: Case 0. Force "*" to strictly fetch the last version only
         // If "*" is interpreted as any version, many old manifests are not well
@@ -41,7 +41,7 @@ export class DappGetFetcher {
         // to timeout in order to proceed
         const latestVersion = await this.releaseFetcher.fetchVersion(name);
         return [latestVersion.version];
-      } else if (semver.valid(versionRange)) {
+      } else if (valid(versionRange)) {
         // Case 1. Valid semver version (not range): Return that version
         return [versionRange];
       } else {
@@ -50,7 +50,7 @@ export class DappGetFetcher {
           await this.releaseFetcher.fetchApmVersionsState(name);
         return Object.values(requestedVersions)
           .map(({ version }) => version)
-          .filter(version => semver.satisfies(version, versionRange));
+          .filter(version => satisfies(version, versionRange));
       }
     }
     // Case 3. unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version

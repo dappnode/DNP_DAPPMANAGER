@@ -1,6 +1,6 @@
 import React from "react";
 import "./multiClient.scss";
-import { IpfsClientTarget } from "common";
+import { IpfsClientTarget } from "@dappnode/common";
 import Card from "components/Card";
 import { joinCssClass } from "utils/css";
 import Input from "./Input";

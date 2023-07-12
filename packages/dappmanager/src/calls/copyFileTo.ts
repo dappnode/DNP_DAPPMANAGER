@@ -3,11 +3,11 @@ import path from "path";
 import {
   dockerCopyFileTo,
   dockerGetContainerWorkingDir
-} from "../modules/docker/cli";
+} from "../modules/docker/cli.js";
 // Utils
-import shell from "../utils/shell";
-import dataUriToFile from "../utils/dataUriToFile";
-import params from "../params";
+import shell from "../utils/shell.js";
+import dataUriToFile from "../utils/dataUriToFile.js";
+import params from "../params.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 

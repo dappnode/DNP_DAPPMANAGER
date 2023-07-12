@@ -1,10 +1,6 @@
 import path from "path";
-import {
-  Architecture,
-  EthClientTargetPackage,
-  UserSettings,
-  FileFormat
-} from "./types";
+import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
+import { getContainerDomain } from "@dappnode/types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -84,6 +80,7 @@ const params = {
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
   IPFS_GATEWAY: "/ipfs/",
+  TEST_API_PORT: 7000,
   HTTP_API_PORT: process.env.HTTP_API_PORT || 80,
   HTTP_CORS_WHITELIST: [
     "http://localhost:3000",
@@ -148,6 +145,7 @@ const params = {
   ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
   ETH_MAINNET_RPC_URL_REMOTE:
     process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.io",
 
   // Prysm legacy specs for: prater, gnosis and mainnet
   prysmLegacySpecs: [
@@ -159,7 +157,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku-prater.dnp.dappnode.eth",
         "lighthouse-prater.dnp.dappnode.eth",
-        "nimbus-prater.dnp.dappnode.eth"
+        "nimbus-prater.dnp.dappnode.eth",
+        "lodestar-prater.dnp.dappnode.eth"
       ]
     },
     // v0.2.51
@@ -170,7 +169,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku-gnosis.dnp.dappnode.eth",
         "lighthouse-gnosis.dnp.dappnode.eth",
-        "nimbus-gnosis.dnp.dappnode.eth"
+        "nimbus-gnosis.dnp.dappnode.eth",
+        "lodestar-gnosis.dnp.dappnode.eth"
       ]
     },
     // v0.2.52
@@ -181,7 +181,8 @@ const params = {
       incompatibleClientsDnpNames: [
         "teku.dnp.dappnode.eth",
         "lighthouse.dnp.dappnode.eth",
-        "nimbus.dnp.dappnode.eth"
+        "nimbus.dnp.dappnode.eth",
+        "lodestar.dnp.dappnode.eth"
       ]
     }
   ],
@@ -292,6 +293,7 @@ const params = {
   // Flags
   DISABLE_UPNP: /true/i.test(process.env.DISABLE_UPNP || ""),
   AUTH_IP_ALLOW_LOCAL_IP: Boolean(process.env.AUTH_IP_ALLOW_LOCAL_IP),
+  TEST: Boolean(process.env.TEST),
 
   DEFAULT_RELEASE_TRUSTED_KEYS: [
     {
@@ -299,6 +301,30 @@ const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
+    },
+    {
+      name: "Nethermind Ethereum client team (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246"
+    },
+    {
+      name: "Nethermind Ethereum client team (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246"
+    },
+    {
+      name: "Lodestar Ethereum consensus client team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x9D055dd23de15114EC95921208c741873eDE8558"
+    },
+    {
+      name: "ETC Cooperative",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xfB737B2bb2067C3f9E1448AA2D70D32Db4fb51C4"
     }
   ]
 };
@@ -325,47 +351,16 @@ export const ethClientData: {
     dnpName: string; // "geth.dnp.dappnode.eth"
     url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
     version?: string;
-    userSettings?: UserSettings; // Custom installation for geth light client
+    userSettings?: UserSettings;
   };
 } = {
-  "geth-light": {
-    dnpName: "geth.dnp.dappnode.eth",
-    userSettings: {
-      environment: { "geth.dnp.dappnode.eth": { SYNCMODE: "light" } }
-    }
-  },
   geth: { dnpName: "geth.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" }
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" },
+  besu: { dnpName: "besu.public.dappnode.eth" },
+  erigon: { dnpName: "erigon.dnp.dappnode.eth" }
 };
 
 // Naming
-
-/**
- * Get a unique domain per container, considering multi-service packages
- */
-export const getContainerDomain = ({
-  dnpName,
-  serviceName
-}: {
-  serviceName: string;
-  dnpName: string;
-}): string => {
-  if (!serviceName || serviceName === dnpName) {
-    return dnpName;
-  } else {
-    return [serviceName, dnpName].join(".");
-  }
-};
-
-export const getImageTag = ({
-  dnpName,
-  serviceName,
-  version
-}: {
-  dnpName: string;
-  serviceName: string;
-  version: string;
-}): string => [getContainerDomain({ dnpName, serviceName }), version].join(":");
 
 export const getContainerName = ({
   dnpName,
@@ -381,103 +376,3 @@ export const getContainerName = ({
     isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
     getContainerDomain({ dnpName, serviceName })
   ].join("");
-
-// From SDK, must be in sync
-
-export const releaseFiles = {
-  manifest: {
-    regex: /dappnode_package.*\.(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 100e3, // Limit size to ~100KB
-    required: true as const,
-    multiple: false as const
-  },
-  compose: {
-    regex: /compose.*\.yml$/,
-    format: FileFormat.YAML,
-    maxSize: 10e3, // Limit size to ~10KB
-    required: true as const,
-    multiple: false as const
-  },
-  signature: {
-    regex: /^signature\.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3, // Limit size to ~10KB
-    required: false as const,
-    multiple: false as const
-  },
-  avatar: {
-    regex: /avatar.*\.png$/,
-    format: null,
-    maxSize: 100e3,
-    required: true as const,
-    multiple: false as const
-  },
-  setupWizard: {
-    regex: /setup-wizard\..*(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupSchema: {
-    regex: /setup\..*\.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupTarget: {
-    regex: /setup-target\..*json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  setupUiJson: {
-    regex: /setup-ui\..*json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  disclaimer: {
-    regex: /disclaimer\.md$/i,
-    format: FileFormat.TEXT,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  gettingStarted: {
-    regex: /getting.*started\.md$/i,
-    format: FileFormat.TEXT,
-    maxSize: 100e3,
-    required: false as const,
-    multiple: false as const
-  },
-  prometheusTargets: {
-    regex: /.*prometheus-targets.(json|yaml|yml)$/,
-    format: FileFormat.YAML,
-    maxSize: 10e3,
-    required: false as const,
-    multiple: false as const
-  },
-  grafanaDashboards: {
-    regex: /.*grafana-dashboard.json$/,
-    format: FileFormat.JSON,
-    maxSize: 10e6, // ~ 10MB
-    required: false as const,
-    multiple: true as const
-  }
-};
-
-// Single arch images
-export const getArchTag = (arch: Architecture): string =>
-  arch.replace(/\//g, "-");
-export const getImagePath = (
-  dnpName: string,
-  version: string,
-  arch: Architecture
-): string => `${dnpName}_${version}_${getArchTag(arch)}.txz`;
-export const getLegacyImagePath = (dnpName: string, version: string): string =>
-  `${dnpName}_${version}.tar.xz`;

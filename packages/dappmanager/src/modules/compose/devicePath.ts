@@ -27,9 +27,7 @@ export function getDevicePath({
     );
 
   const stripCharacters = (s: string): string =>
-    s
-      .replace(/[`~!@#$%^&*()|+=?;:'",<>\{\}\[\]\\\/]/gi, "")
-      .replace(/\.+/, ".");
+    s.replace(/[`~!@#$%^&*()|+=?;:'",<>{}[\]\\/]/gi, "").replace(/\.+/, ".");
 
   return path.join(
     mountpoint,
@@ -50,9 +48,7 @@ export function getDevicePath({
  *   mountpointPath: "/dev1/data/dappnode-volumes"
  * }
  */
-export function parseDevicePath(
-  devicePath: string
-):
+export function parseDevicePath(devicePath: string):
   | {
       mountpoint: string;
       dnpName: string;

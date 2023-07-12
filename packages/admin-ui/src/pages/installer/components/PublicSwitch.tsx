@@ -1,10 +1,13 @@
 import Switch from "components/Switch";
 import { confirm } from "components/ConfirmDialog";
-import { RouteComponentProps } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { subPathPublic, rootPath } from "../data";
+import { useNavigate, useLocation } from "react-router-dom";
 
-export function PublicSwitch({ location, history }: RouteComponentProps) {
+export function PublicSwitch() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [dappstorePublic, setDappstorePublic] = useState(
     location.pathname === "/installer/public" ? true : false
   );
@@ -34,7 +37,7 @@ export function PublicSwitch({ location, history }: RouteComponentProps) {
               variant: "danger",
               label: "I understand, take me to the public repo",
               onClick: () => {
-                history.push(rootPath + subPathPublic);
+                navigate(rootPath + subPathPublic);
                 setDappstorePublic(true);
               }
             }
@@ -42,7 +45,7 @@ export function PublicSwitch({ location, history }: RouteComponentProps) {
         })
       );
     } else {
-      history.push(rootPath);
+      navigate(rootPath);
       setDappstorePublic(false);
     }
   }

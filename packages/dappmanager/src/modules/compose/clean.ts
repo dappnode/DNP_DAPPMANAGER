@@ -1,5 +1,5 @@
-import { mapValues, omitBy, isObject, isEmpty, pick } from "lodash";
-import { Compose } from "@dappnode/dappnodesdk";
+import { mapValues, omitBy, isObject, isEmpty, pick } from "lodash-es";
+import { Compose } from "@dappnode/types";
 
 /**
  * Cleans empty or null properties

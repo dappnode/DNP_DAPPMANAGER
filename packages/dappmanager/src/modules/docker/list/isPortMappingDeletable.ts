@@ -1,4 +1,4 @@
-import { PortMapping } from "../../../types";
+import { PortMapping } from "@dappnode/common";
 
 /**
  * Utility to mark a port mapping as deletable in the admin UI

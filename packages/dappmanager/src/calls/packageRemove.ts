@@ -1,15 +1,18 @@
 import fs from "fs";
-import { eventBus } from "../eventBus";
-import params from "../params";
-import { dockerComposeDown } from "../modules/docker/compose";
-import { dockerContainerRemove, dockerContainerStop } from "../modules/docker";
-import * as getPath from "../utils/getPath";
-import shell from "../utils/shell";
-import { listPackage } from "../modules/docker/list";
-import { logs } from "../logs";
-import { getDockerTimeoutMax } from "../modules/docker/utils";
-import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps";
-import { httpsPortal } from "./httpsPortal";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
+import { dockerComposeDown } from "../modules/docker/compose/index.js";
+import {
+  dockerContainerRemove,
+  dockerContainerStop
+} from "../modules/docker/index.js";
+import * as getPath from "../utils/getPath.js";
+import shell from "../utils/shell.js";
+import { listPackage } from "../modules/docker/list/index.js";
+import { logs } from "../logs.js";
+import { getDockerTimeoutMax } from "../modules/docker/utils.js";
+import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
+import { httpsPortal } from "./httpsPortal.js";
 
 /**
  * Remove package data: docker down + disk files
@@ -87,7 +90,15 @@ export async function packageRemove({
     const containerNames = dnp.containers.map(c => c.containerName);
     await Promise.all(
       containerNames.map(async containerName => {
-        await dockerContainerStop(containerName, { timeout });
+        // Continue removing package even if container is already stopped
+        await dockerContainerStop(containerName, { timeout }).catch(e => {
+          if (
+            e.reason.includes("container already stopped") &&
+            e.statusCode === 304
+          )
+            return;
+          else throw e;
+        });
         await dockerContainerRemove(containerName, { volumes: deleteVolumes });
       })
     );

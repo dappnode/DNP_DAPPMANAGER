@@ -1,0 +1,38 @@
+version: "3.5"
+networks:
+  dncore_network:
+    name: dncore_network
+    external: true
+volumes:
+  dappmanagerdnpdappnodeeth_data: {}
+services:
+  dappmanager.dnp.dappnode.eth:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: "dappmanager.dnp.dappnode.eth:0.2.43"
+    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
+    restart: always
+    volumes:
+      - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
+      - "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data:/usr/src/app/dnp_repo/"
+      - "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/etc/hostname:/etc/dappnodename:ro"
+      - "./:/app"
+    environment:
+      - LOG_LEVEL=info
+      - ETH_MAINNET_RPC_URL_OVERRIDE=
+      - ETH_MAINNET_RPC_URL_REMOTE=
+      - IPFS_HOST=
+      - DISABLE_UPNP=
+    dns: 172.33.1.2
+    networks:
+      dncore_network:
+        ipv4_address: 172.33.1.7
+        aliases:
+          - dappmanager.dappnode
+          - my.dappnode
+          - dappnode.local
+    logging:
+      driver: journald

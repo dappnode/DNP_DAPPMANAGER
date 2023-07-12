@@ -15,7 +15,7 @@ import {
 } from "utils/format";
 import { parseStaticDate } from "utils/dates";
 import { joinCssClass } from "utils/css";
-import { VolumeData } from "types";
+import { VolumeData } from "@dappnode/common";
 // Selectors
 import { getVolumes } from "services/dappnodeStatus/selectors";
 // Actions

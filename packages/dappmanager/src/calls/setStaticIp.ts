@@ -1,7 +1,7 @@
-import * as db from "../db";
-import * as dyndns from "../modules/dyndns";
-import { eventBus } from "../eventBus";
-import { logs } from "../logs";
+import * as db from "../db/index.js";
+import * as dyndns from "../modules/dyndns/index.js";
+import { eventBus } from "../eventBus.js";
+import { logs } from "../logs.js";
 
 /**
  * Sets the static IP
@@ -33,8 +33,7 @@ export async function setStaticIp({
     id: "staticIpUpdated",
     type: "warning",
     title: "Update connection profiles",
-    body:
-      "Your static IP was changed, please download and install your VPN connection profile again. Instruct your users to do so also."
+    body: "Your static IP was changed, please download and install your VPN connection profile again. Instruct your users to do so also."
   });
 
   // Dynamic update with the new staticIp

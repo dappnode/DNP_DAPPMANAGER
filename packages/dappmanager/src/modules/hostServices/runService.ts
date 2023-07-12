@@ -1,9 +1,9 @@
 import path from "path";
 import fs from "fs";
-import params from "../../params";
-import { shellHost } from "../../utils/shell";
-import { copyHostService } from "./copyHostService";
-import { reloadServices } from "./reloadServices";
+import params from "../../params.js";
+import { shellHost } from "../../utils/shell.js";
+import { copyHostService } from "./copyHostService.js";
+import { reloadServices } from "./reloadServices.js";
 
 /**
  * Service runners. Helps ensure no typos

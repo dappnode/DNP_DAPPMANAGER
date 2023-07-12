@@ -1,7 +1,7 @@
-import * as validate from "../utils/validate";
-import { logs } from "../logs";
-import { JsonFileDb } from "../utils/fileDb";
-import params from "../params";
+import * as validate from "../utils/validate.js";
+import { logs } from "../logs.js";
+import { JsonFileDb } from "../utils/fileDb.js";
+import params from "../params.js";
 
 /**
  * Stores critical data for this DAppNode, such as the DynDNS identity

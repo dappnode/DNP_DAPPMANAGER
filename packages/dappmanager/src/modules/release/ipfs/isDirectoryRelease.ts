@@ -1,4 +1,4 @@
-import { releaseFiles } from "../../../params";
+import { releaseFiles } from "@dappnode/types";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 
 /**

@@ -1,10 +1,11 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { TimeoutErrorKy, IpfsInstance } from "./types";
-import { getContentFromGateway } from "./getContentFromGateway";
+import { TimeoutErrorKy, IpfsInstance } from "./types.js";
+import { getContentFromGateway } from "./getContentFromGateway.js";
 import { CarReader } from "@ipld/car";
 import { unpack } from "ipfs-car/unpack";
-const toStream = require("it-to-stream");
+import type { Readable } from "stream";
+import { pipeline } from "stream/promises";
 
 const resolution = 2;
 const timeoutMaxDownloadTime = 5 * 60 * 1000;
@@ -17,35 +18,32 @@ export interface CatStreamToFsArgs {
   progress?: (n: number) => void;
 }
 
-async function readableStream(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  readable: any,
+async function downloadIPFSContentToFS(
+  readable: AsyncIterable<Uint8Array>,
   { path, timeout, fileSize, progress }: CatStreamToFsArgs
 ): Promise<void> {
-  return new Promise((resolve, reject): void => {
-    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
+  return new Promise(async (resolve, reject): Promise<void> => {
+    if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) {
       reject(Error(`Invalid path: "${path}"`));
+    }
+
+    const asyncIterableArray: Uint8Array[] = [];
 
     // Timeout cancel mechanism
     const timeoutToCancel = setTimeout(() => {
       reject(TimeoutErrorKy);
     }, timeout || 30 * 1000);
 
-    const onError =
-      (streamId: string) =>
-      (err: Error): void => {
-        clearTimeout(timeoutToCancel);
-        reject(Error(streamId + ": " + err));
-      };
-
     let totalData = 0;
     let previousProgress = -1;
+    const resolution = 1;
     const round = (n: number): number =>
       resolution * Math.round((100 * n) / resolution);
 
-    const onData = (chunk: Buffer): void => {
+    const onData = (chunk: Uint8Array): void => {
       clearTimeout(timeoutToCancel);
       totalData += chunk.length;
+      asyncIterableArray.push(chunk);
       if (progress && fileSize) {
         const currentProgress = round(totalData / fileSize);
         if (currentProgress !== previousProgress) {
@@ -60,14 +58,22 @@ async function readableStream(
       resolve();
     };
 
-    const readStream = readable
-      .on("data", onData)
-      .on("error", onError("ReadableStream"));
-    const writeStream = fs
-      .createWriteStream(path)
-      .on("finish", onFinish)
-      .on("error", onError("WriteStream"));
-    readStream.pipe(writeStream);
+    const onError =
+      (streamId: string) =>
+      (err: Error): void => {
+        clearTimeout(timeoutToCancel);
+        reject(Error(streamId + ": " + err));
+      };
+
+    try {
+      for await (const chunk of readable) onData(chunk);
+
+      const writable = fs.createWriteStream(path);
+      await pipeline(asyncIterableArray, writable);
+      onFinish();
+    } catch (e) {
+      onError("Error writing to fs")(e);
+    }
   });
 }
 
@@ -87,13 +93,7 @@ export async function catStreamToFs(
   args: CatStreamToFsArgs,
   ipfs: IpfsInstance
 ): Promise<void> {
-  // IPFS native timeout will interrupt a working but slow stream
-  // Use a max higher timeout that the one to check availability
-  const readable = toStream.readable(
-    ipfs.cat(args.hash, { timeout: timeoutMaxDownloadTime })
-  );
-
-  await readableStream(readable, args);
+  await downloadIPFSContentToFS(ipfs.cat(args.hash), args);
 }
 
 /**
@@ -107,9 +107,7 @@ export async function writeCarToFs(
   const content = await getContentFromGateway(ipfs, args.hash);
   const fileIterable = await unpackFileFromCarReader(content.carReader);
 
-  const readable = toStream.readable(fileIterable);
-
-  await readableStream(readable, args);
+  await downloadIPFSContentToFS(fileIterable, args);
 }
 
 async function unpackFileFromCarReader(

@@ -1,4 +1,4 @@
-import { shellHost } from "../../utils/shell";
+import { shellHost } from "../../utils/shell.js";
 
 /**
  * Reload services: Only necessary if there are any service "enabled" (systemctl enable service)

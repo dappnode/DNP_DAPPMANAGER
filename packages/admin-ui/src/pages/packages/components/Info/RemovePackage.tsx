@@ -1,5 +1,5 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { api } from "api";
 // Components
 import Button from "components/Button";
@@ -8,7 +8,7 @@ import { withToast } from "components/toast/Toast";
 import { BsTrash } from "react-icons/bs";
 // Utils
 import { prettyDnpName } from "utils/format";
-import { InstalledPackageDetailData } from "common";
+import { InstalledPackageDetailData } from "@dappnode/common";
 import { rootPath as packagesRootPath } from "../../data";
 import { markdownList } from "utils/markdown";
 import "./removePackage.scss";
@@ -27,7 +27,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     manifest
   } = dnp;
 
-  const history = useHistory();
+  const navigate = useNavigate();
 
   async function packageRemove() {
     // Dialog to confirm warning onRemove from manifest
@@ -97,7 +97,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
       });
-      history.push(packagesRootPath);
+      navigate(packagesRootPath);
     } catch (e) {
       console.error(e);
     }

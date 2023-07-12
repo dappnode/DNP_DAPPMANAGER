@@ -1,7 +1,7 @@
-import { IpfsInstance, IpfsCatOptions } from "./types";
-import { getContentFromGateway } from "./getContentFromGateway";
+import { IpfsInstance, IpfsCatOptions } from "./types.js";
+import { getContentFromGateway } from "./getContentFromGateway.js";
 import { unpack } from "ipfs-car/unpack";
-import { handleIpfsError } from "./utils";
+import { handleIpfsError } from "./utils.js";
 
 /**
  * REMOTE-GATEWAY

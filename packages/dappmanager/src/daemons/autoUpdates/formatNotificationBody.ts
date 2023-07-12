@@ -1,11 +1,11 @@
-import { CoreUpdateDataAvailable } from "../../common";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   adminUiInstallPackageUrl,
   adminUiUpdateCoreUrl
-} from "../../externalLinks";
-import { prettyDnpName } from "../../utils/format";
-import { urlJoin } from "../../utils/url";
-import { enableAutoUpdatesCmd } from "../telegramBot/commands";
+} from "../../externalLinks.js";
+import { prettyDnpName } from "../../utils/format.js";
+import { urlJoin } from "../../utils/url.js";
+import { enableAutoUpdatesCmd } from "../telegramBot/commands.js";
 
 export function formatPackageUpdateNotification({
   dnpName,

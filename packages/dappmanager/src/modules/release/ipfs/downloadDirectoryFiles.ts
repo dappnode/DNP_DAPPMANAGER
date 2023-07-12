@@ -1,15 +1,15 @@
-import { mapValues } from "lodash";
-import { ReleaseSignature } from "../../../types";
-import { Compose, Manifest } from "@dappnode/dappnodesdk";
-import { findEntries } from "./findEntries";
-import { downloadAsset } from "./downloadAssets";
+import { mapValues } from "lodash-es";
+import { ReleaseSignature } from "../../../types.js";
+import { Compose, Manifest } from "@dappnode/types";
+import { findEntries } from "./findEntries.js";
+import { downloadAsset } from "./downloadAssets.js";
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { promiseAllValues } from "../../../utils/promises";
+import { promiseAllValues } from "../../../utils/promises.js";
 import {
   releaseFilesToDownload,
   DirectoryFiles,
   joinFilesInManifest
-} from "./params";
+} from "./params.js";
 
 export async function downloadDirectoryFiles(ipfsFiles: IPFSEntry[]): Promise<{
   manifest: Manifest;

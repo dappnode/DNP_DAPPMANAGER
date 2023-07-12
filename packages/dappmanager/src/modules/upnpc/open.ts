@@ -1,5 +1,5 @@
-import upnpcCommand from "./upnpcCommand";
-import { PackagePort } from "../../types";
+import upnpcCommand from "./upnpcCommand.js";
+import { PackagePort } from "@dappnode/common";
 
 /**
  * Opens port = adds port mapping

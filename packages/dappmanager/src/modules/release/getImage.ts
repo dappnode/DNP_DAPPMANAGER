@@ -1,11 +1,11 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import * as validate from "../../utils/validate";
-import verifyXz from "../../utils/verifyXz";
-import downloadImage from "./ipfs/downloadImage";
-import { DistributedFile } from "../../types";
-import { getImageTag } from "../../params";
-import { dockerImageManifest } from "../docker/cli";
+import * as validate from "../../utils/validate.js";
+import verifyXz from "../../utils/verifyXz.js";
+import downloadImage from "./ipfs/downloadImage.js";
+import { DistributedFile } from "@dappnode/common";
+import { dockerImageManifest } from "../docker/cli.js";
+import { getImageTag } from "@dappnode/types";
 
 export default async function getImage(
   imageFile: DistributedFile,
@@ -25,9 +25,10 @@ export default async function getImage(
     // Continue, bad image
   }
 
+  const { hash, size } = imageFile;
+
   switch (imageFile.source) {
     case "ipfs":
-      const { hash, size } = imageFile;
       await downloadImage(hash, path, size, progress);
       break;
     default:

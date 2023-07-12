@@ -1,8 +1,8 @@
-import { storePrivateKeyFromSeed } from "../utils/seedPhrase";
-import { decrypt } from "../utils/publickeyEncryption";
-import * as db from "../db";
-import { eventBus } from "../eventBus";
-import params from "../params";
+import { storePrivateKeyFromSeed } from "../utils/seedPhrase.js";
+import { decrypt } from "../utils/publickeyEncryption.js";
+import * as db from "../db/index.js";
+import { eventBus } from "../eventBus.js";
+import params from "../params.js";
 
 const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
 

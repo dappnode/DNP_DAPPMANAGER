@@ -1,6 +1,5 @@
-import { uniqBy, concat } from "lodash";
-import { PortProtocol } from "../../common";
-import { PortMapping } from "../../types";
+import { PortMapping, PortProtocol } from "@dappnode/common";
+import { uniqBy, concat } from "lodash-es";
 
 /**
  * Parses a port string array from a docker-compose.yml
@@ -9,29 +8,27 @@ import { PortMapping } from "../../types";
  *   ["30505:4001/udp", "30505:4001"]
  */
 export function parsePortMappings(portsArray: string[]): PortMapping[] {
-  return portsArray.map(
-    (portString): PortMapping => {
-      const [portMapping, protocolString = ""] = portString.split("/");
+  return portsArray.map((portString): PortMapping => {
+    const [portMapping, protocolString = ""] = portString.split("/");
 
-      // Make sure the protocol is correct
-      const protocolParsed =
-        protocolString.toLowerCase() === "udp"
-          ? PortProtocol.UDP
-          : PortProtocol.TCP;
-      const [hostString, containerString] = portMapping.split(":");
+    // Make sure the protocol is correct
+    const protocolParsed =
+      protocolString.toLowerCase() === "udp"
+        ? PortProtocol.UDP
+        : PortProtocol.TCP;
+    const [hostString, containerString] = portMapping.split(":");
 
-      // Convert to appropiate types + Cast to a PortProtocol type
-      const host = parseInt(hostString);
-      const container = parseInt(containerString);
-      const protocol = protocolParsed;
+    // Convert to appropiate types + Cast to a PortProtocol type
+    const host = parseInt(hostString);
+    const container = parseInt(containerString);
+    const protocol = protocolParsed;
 
-      return container
-        ? // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
-          { host, container, protocol }
-        : // CONTAINER/protocol, return [null, CONTAINER/protocol]
-          { container: host, protocol };
-    }
-  );
+    return container
+      ? // HOST:CONTAINER/protocol, return [HOST, CONTAINER/protocol]
+        { host, container, protocol }
+      : // CONTAINER/protocol, return [null, CONTAINER/protocol]
+        { container: host, protocol };
+  });
 }
 
 /**

@@ -1,9 +1,9 @@
 import fetch from "node-fetch";
-import { urlJoin } from "../../utils/url";
-import params from "../../params";
-import { packageSetEnvironment } from "../../calls/packageSetEnvironment";
-import { ComposeFileEditor } from "../compose/editor";
-import { WireguardDeviceCredentials } from "../../types";
+import { urlJoin } from "../../utils/url.js";
+import params from "../../params.js";
+import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
+import { ComposeFileEditor } from "../compose/editor.js";
+import { WireguardDeviceCredentials } from "@dappnode/common";
 
 const {
   WIREGUARD_API_URL,

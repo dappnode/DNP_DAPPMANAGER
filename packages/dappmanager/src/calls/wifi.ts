@@ -1,8 +1,8 @@
-import { ComposeFileEditor } from "../modules/compose/editor";
-import { logContainer } from "../modules/docker/api";
-import { listContainer } from "../modules/docker/list";
-import { CurrentWifiCredentials, WifiReport } from "../types";
-import params from "../params";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { logContainer } from "../modules/docker/api/index.js";
+import { listContainer } from "../modules/docker/list/index.js";
+import { CurrentWifiCredentials, WifiReport } from "@dappnode/common";
+import params from "../params.js";
 
 /**
  * Return wifi report
@@ -22,10 +22,13 @@ export async function wifiReportGet(): Promise<WifiReport> {
   switch (wifiContainer.state) {
     case "created":
       info = "Wifi has not been initialized yet";
+      break;
     case "running":
       info = "Wifi is currently running";
+      break;
     case "restarting":
       info = "Wifi restarting. Wait until it starts";
+      break;
     case "dead":
       info =
         "Wifi service dead, you must manually remove it and install it again";
@@ -33,14 +36,17 @@ export async function wifiReportGet(): Promise<WifiReport> {
         lastLog: parseWifiLogs(await getWifiLastLog()),
         exitCode: wifiContainer.exitCode
       };
+      break;
     case "exited":
       info = "Wifi service exited due to an internal error";
       report = {
         lastLog: parseWifiLogs(await getWifiLastLog()),
         exitCode: wifiContainer.exitCode
       };
+      break;
     case "paused":
       info = "Wifi service is paused. Restart wifi to get back access again";
+      break;
   }
 
   return {

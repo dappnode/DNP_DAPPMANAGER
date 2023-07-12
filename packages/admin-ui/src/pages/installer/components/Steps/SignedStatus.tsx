@@ -1,8 +1,8 @@
 import React from "react";
-import { RequestedDnp } from "types";
 import Ok from "components/Ok";
 import { prettyDnpName } from "utils/format";
 import "./signedStatus.scss";
+import { RequestedDnp } from "@dappnode/common";
 
 export function SignedStatus({
   signedSafe

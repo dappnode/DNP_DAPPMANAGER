@@ -1,4 +1,4 @@
-export * from "./changeEthMultiClient";
-export * from "./ethersProvider";
-export * from "./switchEthClientIfOpenethereum";
-export * from "./localFallbackVersions";
+import { EthereumClient } from "./ethereumClient.js";
+export * from "./ethersProvider.js";
+export * from "./localFallbackVersions.js";
+export const ethereumClient = new EthereumClient();

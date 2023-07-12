@@ -1,10 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
-  Switch,
+  Routes,
   Route,
   NavLink,
-  Redirect,
-  RouteComponentProps
+  useNavigate
 } from "react-router-dom";
 // Own module
 import { title, subPaths } from "../data";
@@ -15,23 +14,32 @@ import { LocalProxying } from "./localProxying/LocalProxying";
 // CSS
 import "./wifiLocal.scss";
 
-export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
+export const WifiLocalHome: React.FC = () => {
+  const navigate = useNavigate();
   const availableRoutes: {
     name: string;
     subPath: string;
     component: React.ComponentType<any>;
   }[] = [
-    {
-      name: "Wi-Fi",
-      subPath: subPaths.wifi,
-      component: WifiHome
-    },
-    {
-      name: "Local Network",
-      subPath: subPaths.local,
-      component: LocalProxying
-    }
-  ];
+      {
+        name: "Wi-Fi",
+        subPath: subPaths.wifi,
+        component: WifiHome
+      },
+      {
+        name: "Local Network",
+        subPath: subPaths.local,
+        component: LocalProxying
+      }
+    ];
+
+  // Redirect automatically to the first route. DO NOT hardcode
+  // to prevent typos and causing infinite loops 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    navigate(`${availableRoutes[0].subPath}`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate]);
 
   return (
     <>
@@ -40,7 +48,7 @@ export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -51,18 +59,15 @@ export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

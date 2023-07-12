@@ -1,20 +1,35 @@
-import { ethClientTargets } from "../types";
-import { changeEthMultiClient } from "../modules/ethClient";
-import { EthClientTarget } from "../types";
+import { Eth2ClientTarget } from "@dappnode/common";
+import { ethereumClient } from "../modules/ethClient/index.js";
 
 /**
  * Changes the ethereum client used to fetch package data
  */
 export async function ethClientTargetSet({
   target,
-  deletePrevEthClient
+  sync = false,
+  useCheckpointSync = false,
+  deletePrevExecClient = false,
+  deletePrevExecClientVolumes = false,
+  deletePrevConsClient = false,
+  deletePrevConsClientVolumes = false
 }: {
-  target: EthClientTarget;
-  deletePrevEthClient?: boolean;
+  target: Eth2ClientTarget;
+  sync?: boolean;
+  useCheckpointSync?: boolean;
+  deletePrevExecClient?: boolean;
+  deletePrevExecClientVolumes?: boolean;
+  deletePrevConsClient?: boolean;
+  deletePrevConsClientVolumes?: boolean;
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
-  if (!ethClientTargets.includes(target))
-    throw Error(`Unknown client target: ${target}`);
 
-  await changeEthMultiClient(target, deletePrevEthClient);
+  await ethereumClient.changeEthClient(
+    target,
+    sync,
+    useCheckpointSync,
+    deletePrevExecClient,
+    deletePrevExecClientVolumes,
+    deletePrevConsClient,
+    deletePrevConsClientVolumes
+  );
 }

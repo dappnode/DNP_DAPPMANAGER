@@ -1,6 +1,6 @@
 import React from "react";
 import { useApi } from "api";
-import { NavLink, Route, RouteComponentProps } from "react-router-dom";
+import { NavLink, Route } from "react-router-dom";
 import { wireguardDnpName } from "params";
 import { rootPath as installedRootPath } from "pages/installer";
 import { urlJoin } from "utils/url";
@@ -14,9 +14,7 @@ import { WireguardDevicesHome } from "./WireguardDevicesHome";
 import "./wireguard.scss";
 import Title from "components/Title";
 
-export const WireguardDevicesRoot: React.FC<RouteComponentProps> = ({
-  match
-}) => {
+export const WireguardDevicesRoot: React.FC = () => {
   const dnpsRequest = useApi.packagesGet();
 
   return renderResponse(
@@ -39,10 +37,10 @@ export const WireguardDevicesRoot: React.FC<RouteComponentProps> = ({
 
       return (
         <>
-          <Route exact path={match.path} component={WireguardDevicesHome} />
+          <Route path={"/"} element={<WireguardDevicesHome />} />
           <Route
-            path={match.path + "/:id"}
-            component={WireguardDeviceDetails}
+            path={"/:id"}
+            element={<WireguardDeviceDetails />}
           />
         </>
       );

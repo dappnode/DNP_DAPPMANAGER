@@ -1,7 +1,7 @@
 import path from "path";
 import { calls } from "../src/__mock-backend__";
 import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
-import { LoggerMiddleware } from "../src/common/transport/types";
+import { LoggerMiddleware } from "@dappnode/common";
 import { MockVpnApiClient } from "./mockVpnClient";
 import { eventBus } from "./eventBus";
 import { MockSshManager } from "./mockSshManager";
@@ -51,9 +51,16 @@ startDappmanager({
     globalEnvs: () => {},
     notificationSend: () => {},
     packageManifest: () => {},
+    metrics: () => {},
     publicPackagesData: () => {},
     sign: () => {},
     upload: () => {}
+  },
+  limiterMiddleware: (req, res, next) => {
+    next();
+  },
+  counterViewsMiddleware: (req, res, next) => {
+    next();
   },
   ethForwardMiddleware: (req, res, next) => {
     next();

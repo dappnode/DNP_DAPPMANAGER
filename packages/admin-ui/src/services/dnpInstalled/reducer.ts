@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { InstalledPackageData } from "common/types";
+import { InstalledPackageData } from "@dappnode/common";
 
 // Service > dnpInstalled
 

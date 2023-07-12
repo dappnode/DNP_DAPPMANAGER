@@ -6,7 +6,7 @@
 [![Discord DAppNode](https://img.shields.io/discord/747647430450741309?label=Discord&logo=Discord&style=plastic)](https://discord.gg/g9k6vkW)
 [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.dappnode.io)
 
-The **DNP_DAPPMANAGER** handles the DAppNode core DNPs and any installed DNPs. It also performs maintenance checks.
+The **DNP_DAPPMANAGER** handles the DAppNode core DNPs and any user installed DNPs. It also performs maintenance checks.
 
 - :bust_in_silhouette: For user / usage documentation go to the [user guide](https://dappnode.github.io/DAppNodeDocs/#i-am-a-user/)
 - :wrench: For developers check the [technical documentation](https://dappnode.github.io/DAppNodeDocs/#i-am-a-developer)
@@ -22,7 +22,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You must have git, docker and docker-compose in your environment to run this repo. To verify so, run the following commands.
+You must have git, docker, and docker-compose in your environment to run this repo. To verify these are installed properly, run the following commands.
 
 ```bash
 git --version
@@ -30,7 +30,7 @@ docker --version
 docker-compose --version
 ```
 
-Go to the [pre-requisites setup](https://github.com/dappnode/DAppNode/wiki/DAppNode-Installation-Guide#install-dappnode-prerequisites) in our installation guide if you any command returned an error and need to install a pre-requisite.
+Go to the [pre-requisites setup](https://docs.dappnode.io/user/quick-start/core/installation/#prerequisites) in our installation guide if any of the above commands return an error and need to be installed or has its own unmet dependencies.
 
 ### Installing
 
@@ -52,7 +52,7 @@ The DNP_DAPPMANAGER expects to be in a DAppNode network to connect to its WAMP m
 
 ### Building
 
-After making sure that the nodejs app runs successfully on it own and passes the tests `npm test`, you can dockerize the package.
+After making sure that the nodejs app runs successfully on its own and passes the tests `npm test`, you can dockerize the package.
 
 ```
 docker-compose build
@@ -61,6 +61,12 @@ docker-compose logs -f
 ```
 
 ### Developing
+
+Before choosing any of the following options for development, remember to run:
+```
+yarn
+yarn generate
+```
 
 There are 3 different developing modes:
 
@@ -71,14 +77,14 @@ Netlify settings:
 - Production branch: **master**
 - Other branches: **v...** (e.g v0.2.41)
 
-Netlify will deploy an static site on every PR against the mentioned PRs
+Netlify will deploy a static site on every PR against the mentioned PRs
 
 ```
 cd packages/admin-ui
 yarn mock-standalone
 ```
 
-2. Server mock: this mode allow to simulate backend situations, such as cookies and sessions, alerts, or notifications. You should run the UI devserver and a mock backend server with:
+2. Server mock: this mode allows to simulate backend situations, such as cookies and sessions, alerts, or notifications. You should run the UI devserver and a mock backend server with:
 
 ```
 cd packages/admin-ui

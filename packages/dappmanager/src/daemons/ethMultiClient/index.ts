@@ -1,23 +1,28 @@
-import merge from "deepmerge";
-import { AbortSignal } from "abort-controller";
-import * as db from "../../db";
-import { eventBus } from "../../eventBus";
-import params, { ethClientData } from "../../params";
-import { packageInstall } from "../../calls";
-import { listPackageNoThrow } from "../../modules/docker/list";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows";
-import { runAtMostEvery } from "../../utils/asyncFlows";
+import * as db from "../../db/index.js";
+import { eventBus } from "../../eventBus.js";
+import params from "../../params.js";
+import { packageInstall } from "../../calls/index.js";
+import { listPackageNoThrow } from "../../modules/docker/list/index.js";
+import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
+import { runAtMostEvery } from "../../utils/asyncFlows.js";
 import {
   EthClientInstallStatus,
   serializeError
-} from "../../modules/ethClient/types";
-import { logs } from "../../logs";
-import { EthClientTarget } from "../../types";
+} from "../../modules/ethClient/types.js";
+import { logs } from "../../logs.js";
+import { EthClientRemote } from "@dappnode/common";
 import {
+  ethereumClient,
   EthProviderError,
-  getLocalFallbackContentHash,
-  setDefaultEthClientFullNode
-} from "../../modules/ethClient";
+  getLocalFallbackContentHash
+} from "../../modules/ethClient/index.js";
+import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
+import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
+import { dockerComposeUpPackage } from "../../modules/docker/index.js";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet
+} from "@dappnode/types";
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -32,19 +37,20 @@ import {
  * It also retries each step automatically without added logic
  */
 export async function runEthClientInstaller(
-  target: EthClientTarget,
-  status: EthClientInstallStatus | undefined
+  target: ExecutionClientMainnet | ConsensusClientMainnet | "remote",
+  status: EthClientInstallStatus | undefined,
+  useCheckpointSync?: boolean
 ): Promise<EthClientInstallStatus | null> {
   // Re-check just in case, on run the installer for local target clients
   if (target === "remote") return null;
 
-  const clientData = ethClientData[target];
-  if (!clientData) throw Error(`No client data for target: ${target}`);
-  const { dnpName, version, userSettings } = clientData;
-  const dnp = await listPackageNoThrow({ dnpName });
+  if (!target) throw Error(`No client data for target: ${target}`);
+  const dnp = await listPackageNoThrow({ dnpName: target });
 
   if (dnp) {
-    // OK: Client is already installed
+    // OK: Client is already installed, ensure it's running
+    if (dnp.containers.some(c => !c.running))
+      await dockerComposeUpPackage({ dnpName: target }, {}, {}, true);
     return { status: "INSTALLED" };
   } else {
     // Client is not installed
@@ -58,24 +64,30 @@ export async function runEthClientInstaller(
       case "TO_INSTALL":
       case "INSTALLING_ERROR":
         // OK: Expected state, run / retry installation
-
         try {
-          db.ethClientInstallStatus.set(target, { status: "INSTALLING" });
-
-          const installOptions: Parameters<typeof packageInstall>[0] = {
-            name: dnpName,
-            version,
-            userSettings: {
-              [dnpName]: merge(
-                // Merge the default user settings with any customization from the user
-                userSettings || {},
-                db.ethClientUserSettings.get(target) || {}
-              )
-            }
-          };
+          if (isExecClient(target))
+            db.ethExecClientInstallStatus.set(
+              target as ExecutionClientMainnet,
+              { status: "INSTALLING" }
+            );
+          else if (isConsClient(target))
+            db.ethConsClientInstallStatus.set(
+              target as ConsensusClientMainnet,
+              { status: "INSTALLING" }
+            );
 
           try {
-            await packageInstall(installOptions);
+            if (isConsClient(target))
+              await packageInstall({
+                name: target,
+                userSettings: getConsensusUserSettings({
+                  dnpName: target,
+                  network: "mainnet",
+                  useCheckpointSync,
+                  feeRecipient: db.feeRecipientMainnet.get() || ""
+                })
+              });
+            else await packageInstall({ name: target });
           } catch (e) {
             // When installing DAppNode for the first time, if the user selects a
             // non-remote target and disabled fallback, there must be a way to
@@ -83,9 +95,9 @@ export async function runEthClientInstaller(
             // covers this case by re-trying the installation with a locally available
             // IPFS content hash for all target packages
             if (e instanceof EthProviderError) {
-              const contentHash = getLocalFallbackContentHash(dnpName);
-              if (!contentHash) throw Error(`No local version for ${dnpName}`);
-              await packageInstall({ ...installOptions, version: contentHash });
+              const contentHash = getLocalFallbackContentHash(target);
+              if (!contentHash) throw Error(`No local version for ${target}`);
+              await packageInstall({ name: target, version: contentHash });
             } else {
               throw e;
             }
@@ -114,11 +126,19 @@ export async function runEthClientInstaller(
  * resets during an installation of the client
  */
 function verifyInitialStatusIsNotInstalling(): void {
-  const target = db.ethClientTarget.get();
-  if (target) {
-    const status = db.ethClientInstallStatus.get(target);
+  const execClient = db.executionClientMainnet.get();
+  if (execClient) {
+    const status = db.ethExecClientInstallStatus.get(execClient);
     if (status && status.status === "INSTALLING") {
-      db.ethClientInstallStatus.set(target, { status: "TO_INSTALL" });
+      db.ethExecClientInstallStatus.set(execClient, { status: "TO_INSTALL" });
+    }
+  }
+
+  const consClient = db.consensusClientMainnet.get();
+  if (consClient) {
+    const status = db.ethConsClientInstallStatus.get(consClient);
+    if (status && status.status === "INSTALLING") {
+      db.ethConsClientInstallStatus.set(consClient, { status: "TO_INSTALL" });
     }
   }
 }
@@ -133,37 +153,63 @@ function verifyInitialStatusIsNotInstalling(): void {
 export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
-  const runEthMultiClientTaskMemo = runOnlyOneSequentially(async () => {
-    try {
-      const target = db.ethClientTarget.get();
-      if (!target || target === "remote") return; // Nothing to install
+  const runEthMultiClientTaskMemo = runOnlyOneSequentially(
+    async (useCheckpointSync: boolean | undefined) => {
+      try {
+        const execClient = db.executionClientMainnet.get();
+        const consClient = db.consensusClientMainnet.get();
 
-      const prev = db.ethClientInstallStatus.get(target);
-      const next = await runEthClientInstaller(target, prev);
-      if (!next) return; // Package is uninstalled
+        if (
+          db.ethClientRemote.get() === EthClientRemote.on ||
+          !execClient ||
+          !consClient
+        )
+          return; // Nothing to install
 
-      db.ethClientInstallStatus.set(target, next);
+        for (const client of [execClient, consClient]) {
+          if (!client) continue;
 
-      if (!prev || prev.status !== next.status) {
-        // Next run MUST be defered to next event loop for prevStatus to refresh
-        setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+          const prev = isExecClient(client)
+            ? db.ethExecClientInstallStatus.get(client)
+            : db.ethConsClientInstallStatus.get(client);
+          const next = await runEthClientInstaller(
+            client,
+            prev,
+            useCheckpointSync
+          );
 
-        if (next.status === "INSTALLED") {
-          // If status switched to "INSTALLED", map to fullnode.dappnode
-          // Must be done here in case the package is already installed
-          // 1. Domain for BIND package
-          db.fullnodeDomainTarget.set(ethClientData[target].dnpName);
-          // 2. Add network alias for docker DNS
-          await setDefaultEthClientFullNode(ethClientData[target].dnpName);
+          if (!next) continue; // Package is uninstalled
+          isExecClient(client)
+            ? db.ethExecClientInstallStatus.set(execClient, next)
+            : db.ethConsClientInstallStatus.set(consClient, next);
+
+          if (!prev || prev.status !== next.status) {
+            // Next run MUST be defered to next event loop for prevStatus to refresh
+            setTimeout(eventBus.runEthClientInstaller.emit, 1000);
+
+            if (isExecClient(client) && next.status === "INSTALLED") {
+              // If status switched to "INSTALLED", map to fullnode.dappnode
+              // Must be done here in case the package is already installed
+              // 1. Domain for BIND package
+              db.fullnodeDomainTarget.set(execClient);
+              // 2. Add network alias for docker DNS
+              ethereumClient.setDefaultEthClientFullNode({
+                dnpName: execClient,
+                removeAlias: true
+              });
+            }
+          }
         }
+      } catch (e) {
+        logs.error("Error on eth client installer daemon", e);
       }
-    } catch (e) {
-      logs.error("Error on eth client installer daemon", e);
     }
-  });
+  );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(runEthMultiClientTaskMemo);
+  eventBus.runEthClientInstaller.on(({ useCheckpointSync }) =>
+    runEthMultiClientTaskMemo(useCheckpointSync)
+  );
 
   runAtMostEvery(
     async () => runEthMultiClientTaskMemo(),

@@ -1,9 +1,9 @@
 import fs from "fs";
-import { Manifest } from "@dappnode/dappnodesdk";
-import * as getPath from "../../utils/getPath";
-import * as validate from "../../utils/validate";
-import { isNotFoundError } from "../../utils/node";
-import { yamlParse } from "../../utils/yaml";
+import { Manifest } from "@dappnode/types";
+import * as getPath from "../../utils/getPath.js";
+import * as validate from "../../utils/validate.js";
+import { isNotFoundError } from "../../utils/node.js";
+import { yamlParse } from "../../utils/yaml.js";
 
 /**
  * Improve error reporting, know what type of parsing is failing.

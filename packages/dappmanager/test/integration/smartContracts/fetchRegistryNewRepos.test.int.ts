@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-import * as calls from "../../../src/calls";
-import * as db from "../../../src/db";
-import { getRegistryOnRange } from "../../../src/modules/registry";
-import { clearDbs } from "../../testUtils";
-import { RegistryNewRepoEvent } from "../../../src/types";
+import * as calls from "../../../src/calls/index.js";
+import * as db from "../../../src/db/index.js";
+import { getRegistryOnRange } from "../../../src/modules/registry/index.js";
+import { clearDbs } from "../../testUtils.js";
+import { RegistryNewRepoEvent } from "../../../src/types.js";
 
 describe.skip("APM Registry", () => {
   before("Clear DBs and set remote", async () => {
@@ -87,7 +87,7 @@ describe.skip("APM Registry", () => {
     });
   }
 
-  it.skip("Fetch all events from public.dappnode.eth", async function() {
+  it.skip("Fetch all events from public.dappnode.eth", async function () {
     // takes a loooong time
     this.timeout(30 * 60 * 1000);
 

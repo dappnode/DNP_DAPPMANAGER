@@ -19,10 +19,11 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { ReqStatus, HttpsPortalMapping } from "types";
+import { HttpsPortalMapping } from "@dappnode/common";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 import { urlJoin } from "utils/url";
+import { ReqStatus } from "types";
 
 export function HttpsMappings({
   dnpName,
@@ -66,7 +67,7 @@ export function HttpsMappings({
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingAdd(mapping), {
+      await withToast(() => api.httpsPortalMappingAdd({ mapping }), {
         message: "Adding HTTPs mapping...",
         onSuccess: "Added HTTPs mapping"
       });
@@ -95,7 +96,7 @@ export function HttpsMappings({
       });
 
       setReqStatus({ loading: true });
-      await withToast(() => api.httpsPortalMappingRemove(mapping), {
+      await withToast(() => api.httpsPortalMappingRemove({ mapping }), {
         message: "Removing HTTPs mapping...",
         onSuccess: "Removed HTTPs mapping"
       });

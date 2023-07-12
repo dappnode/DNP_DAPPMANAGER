@@ -1,6 +1,6 @@
 import memoize from "memoizee";
-import { MountpointData } from "../../../types";
-import { runScript } from "../runScripts";
+import { MountpointData } from "@dappnode/common";
+import { runScript } from "../runScripts.js";
 
 /**
  * Detects mountpoints in the host
@@ -22,7 +22,7 @@ import { runScript } from "../runScripts";
  *   will clear the cache and force a re-run
  */
 export const detectMountpoints = memoize(
-  async function(): Promise<MountpointData[]> {
+  async function (): Promise<MountpointData[]> {
     const rawMountpointsJson = await runScript("detect_fs.sh");
 
     // Everything returned by the script is a string

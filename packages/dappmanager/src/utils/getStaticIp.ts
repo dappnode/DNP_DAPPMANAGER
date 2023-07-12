@@ -1,9 +1,9 @@
 import fs from "fs";
-import * as db from "../db";
-import params from "../params";
-import { logs } from "../logs";
+import * as db from "../db/index.js";
+import params from "../params.js";
+import { logs } from "../logs.js";
 import isIp from "is-ip";
-import { isNotFoundError } from "./node";
+import { isNotFoundError } from "./node.js";
 
 const staticIpPath = params.STATIC_IP_PATH;
 

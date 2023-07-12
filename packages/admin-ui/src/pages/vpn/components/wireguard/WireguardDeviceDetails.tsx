@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, RouteComponentProps } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
@@ -17,7 +17,7 @@ import { apiRoutes } from "api";
 import { FiDownload } from "react-icons/fi";
 import { GoClippy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
-import { WireguardDeviceCredentials } from "types";
+import { WireguardDeviceCredentials } from "@dappnode/common";
 // Utils
 import { urlJoin } from "utils/url";
 
@@ -67,7 +67,7 @@ function WireguardDeviceDetailsLoaded({
         <a
           href={apiRoutes.downloadWireguardConfig({
             device: id,
-            isLocal: false
+            isLocal: showLocalCreds
           })}
         >
           <Button>
@@ -110,10 +110,9 @@ function WireguardDeviceDetailsLoaded({
   );
 }
 
-export const WireguardDeviceDetails: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
-  const id = match.params.id;
+export const WireguardDeviceDetails: React.FC = () => {
+  const params = useParams()
+  const id = params.id || "";
   const device = useApi.wireguardDeviceGet(id);
 
   return (

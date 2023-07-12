@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientTarget, EthClientFallback } from "types";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
 import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
@@ -10,7 +10,6 @@ import { api } from "api";
  * View to chose or change the Eth multi-client
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
@@ -22,7 +21,8 @@ export default function Repository({
   onNext: () => void;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
-  const [target, setTarget] = useState<EthClientTarget>("remote");
+  const [useCheckpointSync, setUseCheckpointSync] = useState(true);
+  const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
 
@@ -32,9 +32,14 @@ export default function Repository({
 
   async function changeClient() {
     if (target) {
-      api.ethClientTargetSet({ target }).catch(e => {
-        console.error(`Error on ethClientTargetSet: ${e.stack}`);
-      });
+      api
+        .ethClientTargetSet({
+          target,
+          useCheckpointSync
+        })
+        .catch(e => {
+          console.error(`Error on ethClientTargetSet: ${e.stack}`);
+        });
       // Only set the fallback if the user is setting a target
       // Otherwise, the fallback could be activated without the user wanting to
       if (fallback === "on")
@@ -50,16 +55,20 @@ export default function Repository({
       <div className="header">
         <div className="title">Repository Source</div>
         <div className="description">
-          DAppNode uses smart contracts to access a decentralized respository of
-          DApps
+          Official DAppNode Packages (DNPs) and Community Packages (Public) are
+          published in a decentralized repository. To access this repository,
+          DAppNode uses smart contracts on the Ethereum Blockchain.
           <br />
-          Choose to connect to a remote network or use your own local node
+          You can either connect to a remote Ethereum node maintained by
+          DAppNode or easily run your own node to promote decentralization.
         </div>
       </div>
 
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        useCheckpointSync={useCheckpointSync}
+        setUseCheckpointSync={setUseCheckpointSync}
         showStats
         fallback={fallback}
         onFallbackChange={setFallback}

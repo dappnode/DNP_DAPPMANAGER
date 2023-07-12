@@ -1,16 +1,16 @@
-import { eventBus } from "../../eventBus";
-import params from "../../params";
+import { eventBus } from "../../eventBus.js";
+import params from "../../params.js";
 import {
   isUpdateDelayCompleted,
   flagCompletedUpdate,
   flagErrorUpdate,
   isCoreUpdateEnabled
-} from "../../utils/autoUpdateHelper";
-import { packageInstall } from "../../calls";
-import { logs } from "../../logs";
-import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData";
-import { CoreUpdateDataAvailable } from "../../types";
-import { sendUpdateSystemNotificationMaybe } from "./sendUpdateNotification";
+} from "../../utils/autoUpdateHelper.js";
+import { packageInstall } from "../../calls/index.js";
+import { logs } from "../../logs.js";
+import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData.js";
+import { CoreUpdateDataAvailable } from "@dappnode/common";
+import { sendUpdateSystemNotificationMaybe } from "./sendUpdateNotification.js";
 
 const coreDnpName = params.coreDnpName;
 

@@ -1,23 +1,25 @@
-export * from "./autoUpdateSettings";
-export * from "./coreUpdate";
-export * from "./dyndns";
-export * from "./ethClient";
-export * from "./ipfsClient";
-export * from "./fileTransferPath";
-export * from "./network";
-export * from "./notification";
-export * from "./package";
-export * from "./registry";
-export * from "./releaseKeys";
-export * from "./secrets";
-export * from "./system";
-export * from "./systemFlags";
-export * from "./ui";
-export * from "./upnp";
-export * from "./vpn";
-export * from "./stakerConfig";
+export * from "./autoUpdateSettings.js";
+export * from "./coreUpdate.js";
+export * from "./counterViews.js";
+export * from "./dyndns.js";
+export * from "./ethClient.js";
+export * from "./ipfsClient.js";
+export * from "./fileTransferPath.js";
+export * from "./network.js";
+export * from "./notification.js";
+export * from "./package.js";
+export * from "./registry.js";
+export * from "./releaseKeys.js";
+export * from "./secrets.js";
+export * from "./stakerConfig.js";
+export * from "./system.js";
+export * from "./systemFlags.js";
+export * from "./ui.js";
+export * from "./upnp.js";
+export * from "./vpn.js";
+export * from "./stakerConfig.js";
 // Aditional low levels methods
-import { dbCache, dbMain } from "./dbFactory";
+import { dbCache, dbMain } from "./dbFactory.js";
 
 /** WARNING! Only clear cache DB if necessary */
 export const clearCacheDb = dbCache.clearDb;

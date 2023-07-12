@@ -2,7 +2,7 @@ import React from "react";
 import { useState } from "react";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
-import { PackageContainer } from "types";
+import { PackageContainer } from "@dappnode/common";
 import { ServiceSelector } from "../ServiceSelector";
 import { PortsByService } from "./PortsByService";
 import { HttpsMappings } from "./HttpsMappings";

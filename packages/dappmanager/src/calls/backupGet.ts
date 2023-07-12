@@ -1,16 +1,15 @@
 import fs from "fs";
 import crypto from "crypto";
 import path from "path";
-import { logs } from "../logs";
-
-import * as db from "../db";
-import params from "../params";
+import { logs } from "../logs.js";
+import * as db from "../db/index.js";
+import params from "../params.js";
 // Modules
-import { listPackage } from "../modules/docker/list";
+import { listPackage } from "../modules/docker/list/index.js";
 // Utils
-import shell from "../utils/shell";
-import validateBackupArray from "../utils/validateBackupArray";
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import shell from "../utils/shell.js";
+import validateBackupArray from "../utils/validateBackupArray.js";
+import { PackageBackup } from "@dappnode/types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -56,8 +55,7 @@ export async function backupGet({
         successfulBackups.push(name);
       } catch (e) {
         if (e.message.includes("No such container:path"))
-          e = Error(`path ${fromPath} does not exist`);
-        lastError = e;
+          lastError = Error(`path ${fromPath} does not exist`);
         logs.error("Error getting backup", { dnpName, name, fromPath }, e);
       }
     }

@@ -1,5 +1,8 @@
-import { GlobalEnvs, computeGlobalEnvsFromDb } from "../../modules/globalEnvs";
-import { wrapHandler } from "../utils";
+import {
+  GlobalEnvs,
+  computeGlobalEnvsFromDb
+} from "../../modules/globalEnvs.js";
+import { wrapHandler } from "../utils.js";
 
 interface Params {
   name: string;

@@ -1,7 +1,7 @@
 // TELEGRAM COMMANDS MESSAGES
 // In this file are the functions related to build messages responses to commands
 
-import { TelegramCommandMessageHeader } from "./types";
+import { TelegramCommandMessageHeader } from "./types.js";
 
 /**
  * Builds the telegram command message header

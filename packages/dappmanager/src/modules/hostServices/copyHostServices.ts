@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import params from "../../params";
-import { logs } from "../../logs";
-import { sha256File } from "../hostScripts";
+import params from "../../params.js";
+import { logs } from "../../logs.js";
+import { sha256File } from "../hostScripts/index.js";
 
 const hostServicesDir = params.HOST_SERVICES_DIR;
 const hostServicesDirSource = params.HOST_SERVICES_SOURCE_DIR;

@@ -1,5 +1,5 @@
-import { docker } from "./docker";
-import { stripDockerApiLogsHeaderAndAnsi } from "../utils";
+import { docker } from "./docker.js";
+import { stripDockerApiLogsHeaderAndAnsi } from "../utils.js";
 
 /**
  * Returns container's logs as a string with escape codes
@@ -12,7 +12,7 @@ export async function logContainer(
   const container = docker.getContainer(containerNameOrId);
   const res = await container.logs({ stdout: true, stderr: true, ...options });
   // Return is incorrectly typed as NodeJS.ReadableStream, but it's string
-  const data = ((res as unknown) as string) || "";
+  const data = (res as unknown as string) || "";
 
   // Remove prepended bytes added to each line by the docker API
   return stripDockerApiLogsHeaderAndAnsi(data.toString());

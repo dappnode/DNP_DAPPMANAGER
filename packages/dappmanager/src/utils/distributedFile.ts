@@ -1,5 +1,5 @@
-import { DistributedFile } from "../types";
-import params from "../params";
+import { DistributedFile } from "@dappnode/common";
+import params from "../params.js";
 
 /**
  * Return a queriable gateway url for a distributed file

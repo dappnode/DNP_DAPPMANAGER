@@ -1,4 +1,4 @@
-import { pick, omit, uniq, isEmpty } from "lodash";
+import { pick, omit, uniq, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import {
   SetupWizard,
@@ -6,7 +6,7 @@ import {
   SetupWizardField,
   SetupUiJson,
   SetupTarget
-} from "@dappnode/dappnodesdk";
+} from "@dappnode/types";
 
 /**
  * Format setup wizard v1 files as a unique setup wizard v2 object

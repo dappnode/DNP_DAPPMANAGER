@@ -23,10 +23,13 @@ packages/*/test_mountpoints_*/*
 .temp-transfer
 
 # Built schemas
-packages/*/src/common/schemas
+packages/common/src/validation/schemas
 
 # Version data file
 .version.json
+
+# Git data .git-data.json
+packages/*/.git-data.json
 
 # Extra
 node_modules/\.yarn-integrity
@@ -44,3 +47,8 @@ packages/*/yarn-debug.log*
 packages/*/yarn-error.log*
 # This project uses yarn
 packages/*/package-lock.json 
+
+# Dev links
+packages/dappmanager/dist
+packages/dappmanager/DNCORE
+packages/dappmanager/dnp_repo

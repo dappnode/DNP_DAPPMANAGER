@@ -1,13 +1,13 @@
 import fs from "fs";
-import { mapKeys } from "lodash";
-import * as db from "../db";
-import params from "../params";
-import { stringifyEnvironment } from "../modules/compose";
-import { PackageEnvs } from "@dappnode/dappnodesdk";
-import { packageSetEnvironment } from "../calls/packageSetEnvironment";
-import { logs } from "../logs";
-import { ComposeFileEditor } from "./compose/editor";
-import { listContainers } from "./docker/list";
+import { mapKeys } from "lodash-es";
+import * as db from "../db/index.js";
+import params from "../params.js";
+import { stringifyEnvironment } from "../modules/compose/index.js";
+import { PackageEnvs } from "@dappnode/types";
+import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
+import { logs } from "../logs.js";
+import { ComposeFileEditor } from "./compose/editor.js";
+import { listContainers } from "./docker/list/index.js";
 
 type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
 type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
@@ -45,12 +45,15 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_MAINNET`]: db.consensusClientMainnet.get(),
     [`${prefix}EXECUTION_CLIENT_MAINNET`]: db.executionClientMainnet.get(),
     [`${prefix}MEVBOOST_MAINNET`]: db.mevBoostMainnet.get(),
+    [`${prefix}FEE_RECIPIENT_MAINNET`]: db.feeRecipientMainnet.get(),
     [`${prefix}CONSENSUS_CLIENT_GNOSIS`]: db.consensusClientGnosis.get(),
     [`${prefix}EXECUTION_CLIENT_GNOSIS`]: db.executionClientGnosis.get(),
     [`${prefix}MEVBOOST_GNOSIS`]: db.mevBoostGnosis.get(),
+    [`${prefix}FEE_RECIPIENT_GNOSIS`]: db.feeRecipientGnosis.get(),
     [`${prefix}CONSENSUS_CLIENT_PRATER`]: db.consensusClientPrater.get(),
     [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get(),
-    [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get()
+    [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get(),
+    [`${prefix}FEE_RECIPIENT_PRATER`]: db.feeRecipientPrater.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
@@ -95,8 +98,6 @@ export async function updatePkgsWithGlobalEnvs(
     if (environmentsByService.length === 0) continue;
     const environmentByService: { [serviceName: string]: PackageEnvs } =
       environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});
-
-    logs.info(`Setting environment: ${environmentByService}`);
 
     await packageSetEnvironment({
       dnpName: pkg.dnpName,

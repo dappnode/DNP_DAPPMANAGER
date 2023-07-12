@@ -2,22 +2,24 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import "./columns.scss";
-import { StakerItem } from "common";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { Network } from "@dappnode/types";
 
-export default function ExecutionClient({
+export default function ExecutionClient<T extends Network>({
   executionClient,
   setNewExecClient,
   isSelected,
   ...props
 }: {
-  executionClient: StakerItem;
-  setNewExecClient: (executionClient: string) => void;
+  executionClient: StakerItem<T, "execution">;
+  setNewExecClient: React.Dispatch<
+    React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
+  >;
   isSelected: boolean;
 }) {
   return (
@@ -25,9 +27,11 @@ export default function ExecutionClient({
       {...props}
       className={`execution-client ${joinCssClass({ isSelected })}`}
       onClick={
-        isSelected
-          ? () => setNewExecClient("")
-          : () => setNewExecClient(executionClient.dnpName)
+        executionClient.status === "ok"
+          ? isSelected
+            ? () => setNewExecClient(undefined)
+            : () => setNewExecClient(executionClient)
+          : undefined
       }
       shadow={isSelected}
     >
@@ -58,7 +62,9 @@ export default function ExecutionClient({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected && executionClient.metadata.shortDescription}
+          {isSelected &&
+            executionClient.data &&
+            executionClient.data.metadata.shortDescription}
         </div>
       )}
     </Card>

@@ -1,11 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { mockManifestWithImage } from "../../testUtils";
-import { ManifestWithImage } from "../../../src/types";
-import { uploadManifestRelease } from "../../integrationSpecs/buildReleaseManifest";
-import { uploadDirectoryRelease } from "../../integrationSpecs/buildReleaseDirectory";
-import { ipfs } from "../../../src/modules/ipfs";
-import { getManifest } from "../../../src/modules/release/getManifest";
+import { mockManifestWithImage } from "../../testUtils.js";
+import { ManifestWithImage } from "../../../src/types.js";
+import { uploadManifestRelease } from "../integrationSpecs/buildReleaseManifest.js";
+import { uploadDirectoryRelease } from "../integrationSpecs/buildReleaseDirectory.js";
+import { ipfs } from "../../../src/modules/ipfs/index.js";
+import { getManifest } from "../../../src/modules/release/getManifest.js";
 
 describe("IPFS remote", function () {
   this.timeout(100000 * 5);

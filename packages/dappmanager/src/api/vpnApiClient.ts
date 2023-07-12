@@ -1,7 +1,10 @@
 import fetch from "node-fetch";
-import { mapValues } from "lodash";
-import { parseRpcResponse } from "../common";
-import { PackageVersionData } from "../types";
+import { mapValues } from "lodash-es";
+import {
+  PackageVersionData,
+  RpcResponse,
+  parseRpcResponse
+} from "@dappnode/common";
 
 export interface VpnApiClient {
   addDevice: (kwargs: { id: string }) => Promise<void>;
@@ -32,8 +35,12 @@ type Args = any[];
 
 export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return mapValues(vpnApiRoutesData, (data, route) => (...args: Args): any =>
-    vpnRpcCall(params, route, ...args)
+  return mapValues(
+    vpnApiRoutesData,
+    (data, route) =>
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (...args: Args): any =>
+        vpnRpcCall(params, route, ...args)
   );
 }
 
@@ -55,7 +62,7 @@ async function vpnRpcCall<R>(
 
   // If body is not JSON log it to get info about the error. Express may respond with HTML
   const bodyText = await res.text();
-  let body: R;
+  let body: RpcResponse<R>;
   try {
     body = JSON.parse(bodyText);
   } catch (e) {
@@ -65,7 +72,7 @@ async function vpnRpcCall<R>(
   }
 
   if (!res.ok) {
-    const errorBody = (body as unknown) as Error;
+    const errorBody = body as unknown as Error;
     throw Error(`${res.status} ${res.statusText} ${errorBody.message || ""}`);
   }
 

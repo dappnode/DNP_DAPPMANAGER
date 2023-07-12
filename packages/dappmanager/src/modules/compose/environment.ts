@@ -1,5 +1,5 @@
-import { PackageEnvs } from "@dappnode/dappnodesdk";
-import { pickBy } from "lodash";
+import { PackageEnvs } from "@dappnode/types";
+import { pickBy } from "lodash-es";
 
 /**
  * Parses an envs array from a manifest or docker-compose.yml

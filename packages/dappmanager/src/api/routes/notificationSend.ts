@@ -1,6 +1,6 @@
-import { getDnpFromIp } from "./sign";
-import { eventBus } from "../../eventBus";
-import { HttpError, wrapHandler } from "../utils";
+import { getDnpFromIp } from "./sign.js";
+import { eventBus } from "../../eventBus.js";
+import { HttpError, wrapHandler } from "../utils.js";
 
 /**
  * Receive arbitrary notifications from packages to be shown in the UI

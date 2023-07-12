@@ -13,7 +13,7 @@ export default function CommunityHome() {
     <>
       <Title title={title} />
 
-      <div className="community-container">
+      <Card>
         {communityTypes.map((communityItem: CommunityItem) => (
           <Card className="text-center">
             <SubTitle key={communityItem.title}>
@@ -27,7 +27,7 @@ export default function CommunityHome() {
             </div>
           </Card>
         ))}
-      </div>
+      </Card>
     </>
   );
 }

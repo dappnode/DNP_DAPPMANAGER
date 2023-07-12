@@ -1,11 +1,11 @@
 // Ipfs
-import { IpfsInstance } from "./types";
+import { IpfsInstance } from "./types.js";
 import { CID } from "ipfs-http-client";
 import { CarReader } from "@ipld/car";
 // Hash
 import crypto from "crypto";
 import mh from "multihashes";
-import { sanitizeIpfsPath } from "./utils";
+import { sanitizeIpfsPath } from "./utils.js";
 
 export interface ContentFromIpfsGateway {
   carReader: CarReader;

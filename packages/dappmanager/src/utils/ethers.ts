@@ -1,4 +1,4 @@
-import { mapValues } from "lodash";
+import { mapValues } from "lodash-es";
 
 type EthSyncingReturn =
   | false
@@ -28,6 +28,14 @@ export type EthSyncing =
       warpChunksProcessed?: number; // 1432;
     };
 
+export type NetPeersCountReturn = {
+  id: number;
+  jsonrpc: string;
+  result: string;
+};
+
+export type NetPeersCount = number;
+
 /**
  * Parse an eth_syncing call to an ethers provider
  * Makes sure all keys are defined (cleans null values) and parses hex strings
@@ -53,4 +61,10 @@ export function parseEthersSyncing(syncing: EthSyncingReturn): EthSyncing {
     currentBlock: parsedSyncing.currentBlock || 0,
     highestBlock: parsedSyncing.highestBlock || 0
   };
+}
+/**
+ * Parse an eth_blocknumber call to an ethers provider
+ */
+export async function parseEthersBlock(ethBlock: string): Promise<number> {
+  return parseInt(ethBlock);
 }

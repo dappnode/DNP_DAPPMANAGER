@@ -1,10 +1,10 @@
 import retry from "async-retry";
-import { ipfs } from "../../ipfs";
+import { ipfs } from "../../ipfs/index.js";
 import { IPFSEntry } from "ipfs-core-types/src/root";
-import { parseAsset } from "./parseAsset";
-import { FileConfig } from "../types";
-import { validateAsset, DirectoryFiles } from "./params";
-import { FileFormat } from "../../../types";
+import { parseAsset } from "./parseAsset.js";
+import { FileConfig } from "../types.js";
+import { validateAsset, DirectoryFiles } from "./params.js";
+import { FileFormat } from "../../../types.js";
 
 export async function downloadAsset<T>(
   file: IPFSEntry[] | IPFSEntry | undefined,

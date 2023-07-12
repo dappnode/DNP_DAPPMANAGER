@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RouteComponentProps, NavLink } from "react-router-dom";
-import { throttle, isEmpty } from "lodash";
+import { NavLink, useNavigate } from "react-router-dom";
+import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
 import isIpfsHash from "utils/isIpfsHash";
@@ -30,7 +30,9 @@ import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 import { PublicSwitch } from "../PublicSwitch";
 import { useApi } from "api";
 
-export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
+export const InstallerPublic: React.FC = routeProps => {
+  const navigate = useNavigate();
+
   const registry = useSelector(getDnpRegistry);
   const requestStatus = useSelector(getRegistryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -74,7 +76,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
+    navigate(rootPath + "/" + encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -176,7 +178,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
         <Loading
           steps={[
             `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
-              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
+            `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
           ]}
         />
       ) : requestStatus.success ? (

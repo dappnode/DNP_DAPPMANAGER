@@ -1,6 +1,6 @@
-import shell from "../../utils/shell";
-import getDappmanagerImage from "../../utils/getDappmanagerImage";
-import { parseUpnpErrors } from "./upnpError";
+import shell from "../../utils/shell.js";
+import getDappmanagerImage from "../../utils/getDappmanagerImage.js";
+import { parseUpnpErrors } from "./upnpError.js";
 
 export default async function upnpcCommand(cmd: string): Promise<string> {
   try {

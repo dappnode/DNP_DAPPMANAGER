@@ -4,45 +4,36 @@ import "./multiClient.scss";
 import { joinCssClass } from "utils/css";
 import Select from "components/Select";
 import {
-  EthClientTarget,
   EthClientFallback,
   EthClientStatus,
-  EthClientStatusError
-} from "types";
+  EthClientStatusError,
+  Eth2ClientTarget
+} from "@dappnode/common";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
+import { prettyDnpName } from "utils/format";
+import {
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
+  executionClientsMainnet,
+  consensusClientsMainnet
+} from "@dappnode/types";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
 export const booleanToFallback = (bool: boolean): EthClientFallback =>
   bool ? "on" : "off";
 
-export function getEthClientPrettyName(target: EthClientTarget): string {
-  switch (target) {
-    case "remote":
-      return "Remote";
-    case "geth-light":
-      return "Geth light client";
-    case "geth":
-      return "Geth";
-    case "nethermind":
-      return "Nethermind";
-  }
-}
-
 /**
  * Get client type from a target
  */
-export function getEthClientType(target: EthClientTarget): string {
+export function getEthClientType(target: Eth2ClientTarget): string {
   switch (target) {
     case "remote":
       return "Remote";
-    case "geth-light":
-      return "Light client";
-    case "geth":
-    case "nethermind":
+    default:
       return "Full node";
   }
 }
@@ -96,48 +87,17 @@ export function getEthClientPrettyStatus(
   return `Not available ${fallbackOn ? "(using remote)" : ""} - ${message}`;
 }
 
-const clients: EthClientData[] = [
-  {
-    title: "Remote",
-    description: "Public node API mantained by DAppNode",
-    options: ["remote"],
-    stats: {
-      syncTime: "Instant",
-      requirements: "No requirements",
-      trust: "Centralized trust"
-    },
-    highlight: "syncTime"
-  },
-  {
-    title: "Light client",
-    description: "Lightweight client for low-resource devices",
-    options: ["geth-light"],
-    stats: {
-      syncTime: "Fast sync",
-      requirements: "Light requirements",
-      trust: "Semi-decentralized"
-    },
-    highlight: "requirements"
-  },
-  {
-    title: "Full node",
-    description: "Your own Ethereum node w/out 3rd parties",
-    options: ["geth", "nethermind"],
-    stats: {
-      syncTime: "Slow sync",
-      requirements: "High requirements",
-      trust: "Fully decentralized"
-    },
-    highlight: "trust"
-  }
-];
-
 interface EthClientData {
   title: string;
   description: string;
-  options: EthClientTarget[];
+  options:
+    | "remote"
+    | {
+        execClients: ExecutionClientMainnet[];
+        consClients: ConsensusClientMainnet[];
+      };
   stats: EthClientDataStats;
-  highlight: keyof EthClientDataStats;
+  highlights: (keyof EthClientDataStats)[];
 }
 interface EthClientDataStats {
   syncTime: string;
@@ -145,91 +105,183 @@ interface EthClientDataStats {
   trust: string;
 }
 
-interface OptionsMap {
-  [name: string]: EthClientTarget;
-}
-
-/**
- * Utility to pretty names to the actual target of that option
- */
-function getOptionsMap(options?: EthClientTarget[]): OptionsMap {
-  return options
-    ? options.reduce((optMap: { [name: string]: EthClientTarget }, target) => {
-        optMap[getEthClientPrettyName(target)] = target;
-        return optMap;
-      }, {})
-    : {};
-}
-
 /**
  * View to chose or change the Eth multi-client
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
 function EthMultiClients({
   target: selectedTarget,
   onTargetChange,
-  showStats
+  showStats,
+  useCheckpointSync
 }: {
-  target: EthClientTarget | null;
-  onTargetChange: (newTarget: EthClientTarget) => void;
+  target: Eth2ClientTarget | null;
+  onTargetChange: (newTarget: Eth2ClientTarget) => void;
   showStats?: boolean;
+  useCheckpointSync?: boolean;
 }) {
+  const clients: EthClientData[] = [
+    {
+      title: "Remote",
+      description: "Public node API mantained by DAppNode",
+      options: "remote",
+      stats: {
+        syncTime: "Instant",
+        requirements: "No requirements",
+        trust: "Centralized trust"
+      },
+      highlights: ["syncTime", "requirements"]
+    },
+    {
+      title: "Full node",
+      description: "Your own Ethereum node w/out 3rd parties",
+      options: {
+        execClients: [...executionClientsMainnet],
+        consClients: [...consensusClientsMainnet]
+      },
+      stats: {
+        syncTime: useCheckpointSync ? "Fast sync" : "Slow sync",
+        requirements: "High requirements",
+        trust: "Fully decentralized"
+      },
+      highlights: useCheckpointSync ? ["trust", "syncTime"] : ["trust"]
+    }
+  ];
+
   return (
     <div className="eth-multi-clients">
-      {clients
-        .filter(({ options }) => options.length > 0)
-        .map(({ title, description, options, stats, highlight }) => {
-          const defaultTarget = options[0];
-          const selected = selectedTarget && options.includes(selectedTarget);
-          const optionMap = getOptionsMap(options);
-          const getSvgClass = (_highlight: keyof EthClientDataStats) =>
-            joinCssClass({ active: highlight === _highlight });
-          return (
-            <Card
-              key={defaultTarget}
-              shadow
-              className={`eth-multi-client ${joinCssClass({ selected })}`}
-              onClick={() => {
-                // Prevent over-riding the options onTargetChange call
-                if (!selected) onTargetChange(defaultTarget);
-              }}
-            >
-              <div className="title">{title}</div>
-              <div className="description">{description}</div>
+      {clients.map(({ title, description, options, stats, highlights }) => {
+        const defaultTarget: Eth2ClientTarget =
+          options === "remote"
+            ? options
+            : {
+                execClient: options.execClients[0],
+                consClient: options.consClients[0]
+              };
+        let selected: boolean;
+        if (options === "remote") {
+          selected = selectedTarget === options ? true : false;
+        } else {
+          selected =
+            selectedTarget &&
+            selectedTarget !== "remote" &&
+            options.execClients.includes(selectedTarget.execClient) &&
+            options.consClients.includes(selectedTarget.consClient)
+              ? true
+              : false;
+        }
+        const getSvgClass = (_highlight: keyof EthClientDataStats) =>
+          joinCssClass({
+            active: highlights.find(highlight => highlight === _highlight)
+          });
+        return (
+          <Card
+            key={title}
+            shadow
+            className={`eth-multi-client ${joinCssClass({ selected })}`}
+            onClick={() => {
+              // Prevent over-riding the options onTargetChange call
+              if (!selected) onTargetChange(defaultTarget);
+            }}
+          >
+            <div className="title">{title}</div>
+            <div className="description">{description}</div>
 
-              {showStats && <hr></hr>}
-              {showStats && (
-                <div className="eth-multi-client-stats">
-                  <AiFillClockCircle className={getSvgClass("syncTime")} />
-                  <FaDatabase className={getSvgClass("requirements")} />
-                  <AiFillSafetyCertificate className={getSvgClass("trust")} />
-                  <div className="tag">{stats.syncTime}</div>
-                  <div className="tag">{stats.requirements}</div>
-                  <div className="tag">{stats.trust}</div>
-                </div>
-              )}
+            {showStats && <hr></hr>}
+            {showStats && (
+              <div className="eth-multi-client-stats">
+                <AiFillClockCircle className={getSvgClass("syncTime")} />
+                <FaDatabase className={getSvgClass("requirements")} />
+                <AiFillSafetyCertificate className={getSvgClass("trust")} />
+                <div className="tag">{stats.syncTime}</div>
+                <div className="tag">{stats.requirements}</div>
+                <div className="tag">{stats.trust}</div>
+              </div>
+            )}
 
-              {selected && options.length > 1 && (
-                <Select
-                  value={
-                    selectedTarget
-                      ? getEthClientPrettyName(selectedTarget)
-                      : undefined
-                  }
-                  options={options.map(getEthClientPrettyName)}
-                  onValueChange={(newOpt: string) => {
-                    onTargetChange(optionMap[newOpt]);
-                  }}
-                ></Select>
+            {selected &&
+              selectedTarget &&
+              selectedTarget !== "remote" &&
+              options !== "remote" && (
+                <>
+                  <Select
+                    value={
+                      selectedTarget
+                        ? prettyDnpName(selectedTarget.execClient)
+                        : undefined
+                    }
+                    options={options.execClients
+                      .filter(ec => ec)
+                      .map(ec => prettyDnpName(ec))}
+                    onValueChange={(newOpt: string) => {
+                      const newEc = executionClientsMainnet.find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
+                      if (newEc)
+                        onTargetChange({
+                          ...selectedTarget,
+                          execClient: newEc
+                        });
+                    }}
+                    prepend="Execution client"
+                  ></Select>
+                  <Select
+                    value={
+                      selectedTarget
+                        ? prettyDnpName(selectedTarget.consClient)
+                        : undefined
+                    }
+                    options={options.consClients
+                      .filter(ec => ec)
+                      .map(ec => prettyDnpName(ec))}
+                    onValueChange={(newOpt: string) => {
+                      const newCc = consensusClientsMainnet.find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
+                      if (newCc)
+                        onTargetChange({
+                          ...selectedTarget,
+                          consClient: newCc
+                        });
+                    }}
+                    prepend="Consensus client"
+                  ></Select>
+                </>
               )}
-            </Card>
-          );
-        })}
+          </Card>
+        );
+      })}
     </div>
+  );
+}
+
+/**
+ * View and toggle using the checkpointsync
+ * This component should be used with EthMultiClients
+ */
+function EthMultiClientCheckpointSync({
+  target,
+  useCheckpointSync,
+  setUseCheckpointSync
+}: {
+  target: Eth2ClientTarget | null;
+  useCheckpointSync: boolean;
+  setUseCheckpointSync: (newUseCheckpointSync: boolean) => void;
+}) {
+  // Do not render for remote
+  if (!target || target === "remote") return null;
+
+  return (
+    <Switch
+      className="eth-multi-clients-fallback"
+      checked={useCheckpointSync}
+      onToggle={bool => setUseCheckpointSync(bool)}
+      label={`Use dappnode checkpoint sync (https://checkpoint-sync.dappnode.io) for consensus client fast sync`}
+      id="eth-multi-clients-checkpointsync-switch"
+    />
   );
 }
 
@@ -242,7 +294,7 @@ function EthMultiClientFallback({
   fallback,
   onFallbackChange
 }: {
-  target: EthClientTarget | null;
+  target: Eth2ClientTarget | null;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
 }) {
@@ -264,19 +316,22 @@ function EthMultiClientFallback({
  * View to chose or change the Eth multi-client, plus choose to use a fallback
  * There are three main options:
  * - Remote
- * - Light client
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
 export function EthMultiClientsAndFallback({
   target,
   onTargetChange,
+  useCheckpointSync,
+  setUseCheckpointSync,
   showStats,
   fallback,
   onFallbackChange
 }: {
-  target: EthClientTarget | null;
-  onTargetChange: (newTarget: EthClientTarget) => void;
+  target: Eth2ClientTarget | null;
+  onTargetChange: (newTarget: Eth2ClientTarget) => void;
+  useCheckpointSync?: boolean;
+  setUseCheckpointSync?: (newUseCheckpointSync: boolean) => void;
   showStats?: boolean;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
@@ -287,6 +342,7 @@ export function EthMultiClientsAndFallback({
         target={target}
         onTargetChange={onTargetChange}
         showStats={showStats}
+        useCheckpointSync={useCheckpointSync}
       />
 
       <EthMultiClientFallback
@@ -300,6 +356,24 @@ export function EthMultiClientsAndFallback({
           If your node is not available, you won't be able to update packages or
           access the DAppStore.
         </Alert>
+      )}
+
+      {useCheckpointSync !== undefined && setUseCheckpointSync !== undefined && (
+        <>
+          <br />
+          <br />
+          <EthMultiClientCheckpointSync
+            target={target}
+            useCheckpointSync={useCheckpointSync}
+            setUseCheckpointSync={setUseCheckpointSync}
+          />
+
+          {target && target !== "remote" && !useCheckpointSync && (
+            <Alert variant="warning">
+              It may take a while for the consensus client to sync from genesis.
+            </Alert>
+          )}
+        </>
       )}
     </div>
   );

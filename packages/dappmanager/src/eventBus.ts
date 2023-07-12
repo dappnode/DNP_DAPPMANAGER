@@ -1,6 +1,6 @@
 import { EventEmitter } from "events";
-import { logs } from "./logs";
-import { mapValues } from "lodash";
+import { logs } from "./logs.js";
+import { mapValues } from "lodash-es";
 import {
   ChainData,
   InstalledPackageData,
@@ -8,7 +8,7 @@ import {
   UserActionLog,
   PackageNotification,
   DirectoryItem
-} from "./types";
+} from "@dappnode/common";
 
 interface EventTypes {
   chainData: ChainData[];
@@ -27,8 +27,9 @@ interface EventTypes {
   requestDevices: void;
   requestPackages: void;
   requestSystemInfo: void;
-  runEthClientInstaller: void;
+  runEthClientInstaller: { useCheckpointSync?: boolean };
   runNatRenewal: void;
+  runStakerCacheUpdate: { dnpName: string };
 }
 
 const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
@@ -43,14 +44,14 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   // Events without arguments
   telegramStatusChanged: {},
   initializedDb: {},
-
   requestAutoUpdateData: {},
   requestChainData: {},
   requestDevices: {},
   requestPackages: {},
   requestSystemInfo: {},
   runEthClientInstaller: {},
-  runNatRenewal: {}
+  runNatRenewal: {},
+  runStakerCacheUpdate: {}
 };
 
 const eventEmitter = new EventEmitter();

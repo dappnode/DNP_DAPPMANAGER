@@ -1,36 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
-import { InputForm } from "components/InputForm";
 import { joinCssClass } from "utils/css";
-import { ConsensusClient as ConsensusClientIface, StakerItem } from "types";
-import "./columns.scss";
+import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { rootPath as installedRootPath } from "pages/installer";
 import { Link } from "react-router-dom";
+import { Alert } from "react-bootstrap";
+import Switch from "components/Switch";
+import { Network } from "@dappnode/types";
 
-export default function ConsensusClient({
+export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
-  newConsClient,
   isSelected,
-  feeRecipientError,
-  graffitiError,
-  checkpointSyncPlaceHolder,
   ...props
 }: {
-  consensusClient: StakerItem;
+  consensusClient: StakerItem<T, "consensus">;
   setNewConsClient: React.Dispatch<
-    React.SetStateAction<ConsensusClientIface | undefined>
+    React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
-  newConsClient: ConsensusClientIface | undefined;
   isSelected: boolean;
-  feeRecipientError: string | null;
-  graffitiError: string | null;
-  checkpointSyncPlaceHolder: string;
 }) {
+  const [useCheckpointSync, setUseCheckpointSync] = useState(
+    consensusClient.useCheckpointSync !== undefined
+      ? consensusClient.useCheckpointSync
+      : true
+  );
   return (
     <Card
       {...props}
@@ -41,14 +39,12 @@ export default function ConsensusClient({
         onClick={
           consensusClient.status === "ok"
             ? isSelected
-              ? () => setNewConsClient(undefined)
-              : () =>
-                  setNewConsClient({
-                    dnpName: consensusClient.dnpName,
-                    graffiti: consensusClient.graffiti,
-                    feeRecipient: consensusClient.feeRecipient,
-                    checkpointSync: consensusClient.checkpointSync
-                  })
+              ? () => {
+                  setNewConsClient(undefined);
+                }
+              : () => {
+                  setNewConsClient(consensusClient);
+                }
             : undefined
         }
       >
@@ -68,70 +64,51 @@ export default function ConsensusClient({
         <div className="title">{prettyDnpName(consensusClient.dnpName)}</div>
       </div>
 
-      {consensusClient.status === "ok" &&
-        isSelected &&
-        consensusClient.isInstalled &&
-        !consensusClient.isUpdated && (
-          <>
-            <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
-            <br />
-            <br />
-          </>
-        )}
-
-      {consensusClient.status === "ok" && (
-        <div className="description">
-          {isSelected && consensusClient.metadata.shortDescription}
-        </div>
-      )}
-      {isSelected && newConsClient && (
+      {consensusClient.status === "ok" && isSelected ? (
         <>
-          <hr />
-          <InputForm
-            fields={[
-              {
-                label: "Fee recipient address",
-                labelId: "fee-recipient-address",
-                name: "fee-recipient-address",
-                autoComplete: "fee-recipient-address",
-                secret: false,
-                value: newConsClient.feeRecipient || "",
-                onValueChange: (value: string) =>
-                  setNewConsClient({ ...newConsClient, feeRecipient: value }),
-                error: feeRecipientError
-              },
-              {
-                label: "Graffiti",
-                labelId: "graffiti",
-                name: "graffiti",
-                autoComplete: "validating_from_DAppNode",
-                secret: false,
-                value: newConsClient.graffiti || "",
-                onValueChange: (value: string) =>
-                  setNewConsClient({ ...newConsClient, graffiti: value }),
-                error: graffitiError
-              },
-              {
-                label: "Checkpoint sync",
-                labelId: "checkpoint-sync",
-                name: "checkpoint-sync",
-                autoComplete: "checkpoint-sync",
-                placeholder: checkpointSyncPlaceHolder,
-                secret: false,
-                value: newConsClient.checkpointSync || "",
-                onValueChange: (value: string) =>
+          {consensusClient.isInstalled && !consensusClient.isUpdated && (
+            <>
+              <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
+                <Button variant="dappnode">UPDATE</Button>
+              </Link>
+              <br />
+              <br />
+            </>
+          )}
+          <>
+            {consensusClient.data && (
+              <div className="description">
+                {consensusClient.data.metadata.shortDescription}
+                <hr />
+              </div>
+            )}
+            {consensusClient.useCheckpointSync !== undefined && (
+              <Switch
+                checked={useCheckpointSync}
+                onToggle={() => {
                   setNewConsClient({
-                    ...newConsClient,
-                    checkpointSync: value
-                  }),
-                error: null
-              }
-            ]}
-          />
+                    ...consensusClient,
+                    useCheckpointSync: !useCheckpointSync
+                  });
+                  setUseCheckpointSync(!useCheckpointSync);
+                }}
+                label={"Use checksync"}
+              />
+            )}
+          </>
         </>
-      )}
+      ) : null}
+
+      {isSelected &&
+        // cast to any as long as the gnosis prysm was deprecated
+        (consensusClient.dnpName as any) ===
+          "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
+          <Alert variant="warning">
+            It is <b>not recommended</b> to use <b>Prysm</b> as a consensus
+            client <b>in Gnosis</b>. Use it at your own risk or change to
+            another alternative.
+          </Alert>
+        )}
     </Card>
   );
 }

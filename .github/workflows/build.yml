@@ -7,7 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: npx @dappnode/dappnodesdk github-action build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

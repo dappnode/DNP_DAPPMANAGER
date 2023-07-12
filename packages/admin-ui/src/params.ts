@@ -66,6 +66,7 @@ export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
 // URLs / Links
+export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE"
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
@@ -79,15 +80,15 @@ export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
 export const docsUrl = {
-  recoverPasswordGuide:
-    "https://docs.dappnode.io/user-guide/support/troubleshooting#recover-ui-password",
-  connectWifi: "https://docs.dappnode.io/user-guide/ui/access/wifi",
-  connectLocalProxy:
-    "https://docs.dappnode.io/user-guide/ui/access/local-proxy",
-  connectVpn: "https://docs.dappnode.io/user-guide/ui/access/vpn",
-  httpsExplanation: "https://docs.dappnode.io/user-guide/ui/system#network",
+  main: "https://docs.dappnode.io",
+  recoverPasswordGuide: "https://docs.dappnode.io/user/faq/troubleshooting",
+  connectWifi: "https://docs.dappnode.io/user/guides/access/wifi",
+  connectLocalProxy: "https://docs.dappnode.io/user/guides/access/local",
+  connectVpn: "https://docs.dappnode.io/user/guides/access/vpn",
+  httpsExplanation:
+    "https://docs.dappnode.io/user/product-manual/system#networkk",
   ipfsPeersExplanation:
-    "https://docs.dappnode.io/user-guide/ui/recommended-set-ups/add-ipfs-peers"
+    "https://docs.dappnode.io/user/product-manual/system#peers"
 };
 
 export const forumUrl = {
@@ -100,12 +101,9 @@ export const forumUrl = {
 };
 
 export const troubleShootMountpointsGuideUrl =
-  "https://github.com/dappnode/DAppNode/wiki/Troubleshoot-mountpoints";
-export const dappnodeUserGuideUrl =
-  "https://dappnode.github.io/DAppNodeDocs/what-can-you-do/";
-export const mediumTreasuryUrl =
-  "https://medium.com/dappnode/dappnodes-community-treasury-b47ac2bb87f2";
-export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
+  "https://docs.dappnode.io/developers/package-dev/wizard#target";
+export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
+export const explorerGitcoinUrl = "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
 export const dappnodeDiscord = "https://discord.gg/dappnode";

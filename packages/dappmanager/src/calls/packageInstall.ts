@@ -1,10 +1,13 @@
-import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData";
-import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths";
+import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData.js";
+import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths.js";
 // Utils
-import { getLogUi, logUiClear } from "../utils/logUi";
-import { sanitizeRequestName, sanitizeRequestVersion } from "../utils/sanitize";
-import { ReleaseFetcher } from "../modules/release";
-import { PackageRequest, Routes } from "../types";
+import { getLogUi, logUiClear } from "../utils/logUi.js";
+import {
+  sanitizeRequestName,
+  sanitizeRequestVersion
+} from "../utils/sanitize.js";
+import { ReleaseFetcher } from "../modules/release/index.js";
+import { PackageRequest } from "../types.js";
 import {
   downloadImages,
   loadImages,
@@ -15,12 +18,13 @@ import {
   writeAndValidateFiles,
   postInstallClean,
   afterInstall
-} from "../modules/installer";
-import { logs } from "../logs";
+} from "../modules/installer/index.js";
+import { logs } from "../logs.js";
 import {
   ensureEth2MigrationRequirements,
   isPrysmLegacy
-} from "../modules/installer/ensureEth2MigrationRequirements";
+} from "../modules/installer/ensureEth2MigrationRequirements.js";
+import { Routes } from "@dappnode/common";
 
 /**
  * Installs a DAppNode Package.

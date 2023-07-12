@@ -1,13 +1,21 @@
 import fs from "fs";
-import params from "../../params";
-import * as getPath from "../../utils/getPath";
-import { restartDappmanagerPatch } from "../installer/restartPatch";
-import { ComposeFileEditor } from "../compose/editor";
-import { dockerComposeUp, DockerComposeUpOptions } from "./compose";
-import { listPackageNoThrow } from "./list";
-import { getDockerTimeoutMax } from "./utils";
-import { ContainersStatus, PackageContainer } from "../../types";
-import { InstalledPackageData } from "../../common";
+import params from "../../params.js";
+import * as getPath from "../../utils/getPath.js";
+import { restartDappmanagerPatch } from "../installer/restartPatch.js";
+import { ComposeFileEditor } from "../compose/editor.js";
+import {
+  dockerComposeDown,
+  dockerComposeUp,
+  DockerComposeUpOptions
+} from "./compose/index.js";
+import { listPackageNoThrow } from "./list/index.js";
+import { getDockerTimeoutMax } from "./utils.js";
+import { logs } from "../../logs.js";
+import {
+  ContainersStatus,
+  InstalledPackageData,
+  PackageContainer
+} from "@dappnode/common";
 
 interface ComposeUpArgs {
   dnpName: string;
@@ -48,27 +56,44 @@ export async function dockerComposeUpPackage(
     serviceName => containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
-  if (
-    upAll ||
-    serviceNames.length === servicesToStart.length ||
-    dnpName === params.coreDnpName
-  ) {
-    // Run docker-compose up on all services for:
-    // - packages with all services running
-    // - core package, it must be executed always. No matter the previous status
-    await dockerComposeUp(composePath, dockerComposeUpOptions);
-  } else {
-    // If some services are not running, first create the containers
-    // then start only those that are running
-    await dockerComposeUp(composePath, {
-      ...dockerComposeUpOptions,
-      noStart: true
-    });
-    if (servicesToStart.length > 0) {
+  try {
+    if (
+      upAll ||
+      serviceNames.length === servicesToStart.length ||
+      dnpName === params.coreDnpName
+    ) {
+      // Run docker-compose up on all services for:
+      // - packages with all services running
+      // - core package, it must be executed always. No matter the previous status
+      await dockerComposeUp(composePath, dockerComposeUpOptions);
+    } else {
+      // If some services are not running, first create the containers
+      // then start only those that are running
       await dockerComposeUp(composePath, {
         ...dockerComposeUpOptions,
-        serviceNames: servicesToStart
+        noStart: true
       });
+      if (servicesToStart.length > 0) {
+        await dockerComposeUp(composePath, {
+          ...dockerComposeUpOptions,
+          serviceNames: servicesToStart
+        });
+      }
+    }
+  } catch (e) {
+    if (
+      e.message.includes(
+        "Renaming a container with the same name as its current name"
+      )
+    ) {
+      // Catch error: Error response from daemon: Renaming a container with the same name as its current name
+      // Ref: https://github.com/docker/compose/issues/6704
+      logs.info("Catch error renaming container with the same name");
+      // Do compose down and compose up
+      await dockerComposeDown(composePath);
+      await dockerComposeUp(composePath, dockerComposeUpOptions);
+    } else {
+      throw e;
     }
   }
 }
@@ -130,10 +155,12 @@ async function getContainerTargetStatus(
     // Status exited means that the container has receive a signal to stop or kill the process. Deppending on
     // how the docker container handles the signal it will exit with code 0 or != 0. So it cannot be
     // determined if the container was manually and gracefully stopped or not.
-    case "exited":
+
     // When packages are gracefully stopped they might be recreated again by this code
     // and stay in created status, because they won't be stopped. So we must consider
     // a created state as stopped to preserve the user's preference
+    case "removing":
+    case "exited":
     case "created":
       return "stopped";
 

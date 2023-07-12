@@ -1,8 +1,9 @@
-import { DirectoryDnp, RegistryNewRepoEvent } from "../../types";
+import { RegistryNewRepoEvent } from "../../types.js";
 import { ethers } from "ethers";
-import { abi } from "../../contracts/registry";
-import * as db from "../../db";
-import { wrapError } from "../../utils/wrapError";
+import { abi } from "../../contracts/registry.js";
+import * as db from "../../db/index.js";
+import { wrapError } from "../../utils/wrapError.js";
+import { DirectoryDnp } from "@dappnode/toolkit";
 
 // Topic name
 const eventNewRepo = "NewRepo";
@@ -139,12 +140,12 @@ export async function getRegistryOnRange(
             `${eventNewRepo} log at ${log.blockNumber} has no txHash`
           );
         }
-        if (!event.values) {
+        if (!event.args) {
           throw Error(
-            `${eventNewRepo} event at ${log.blockNumber} has no values`
+            `${eventNewRepo} event at ${log.blockNumber} has no args`
           );
         }
-        const name = event.values.name as string;
+        const name = event.args.name as string;
         const block = await provider.getBlock(log.blockNumber);
         return {
           ensName: `${name}.${registryEns}`,
@@ -177,7 +178,7 @@ function getRegistryCached(registryEns: string): DirectoryDnp[] {
 
 // Utils
 
-/** Get a topic from a given event, if either event or topic does not exist then error */
+/** Get a topic in hex format from a given event, if either event or topic does not exist then error */
 function getTopicFromEvent(
   iface: ethers.utils.Interface,
   eventName: string
@@ -186,9 +187,9 @@ function getTopicFromEvent(
     eventValue => eventValue.name === eventName
   );
   if (!event) throw Error(`Event ${eventName} not found`);
-  const topic = event.topic;
+  const topic = event.name;
   if (!topic) throw Error(`Topic not found on event ${event}`);
-  return topic;
+  return iface.getEventTopic(event);
 }
 
 /** Sort packages in descendent order by timestamp (newest first) */

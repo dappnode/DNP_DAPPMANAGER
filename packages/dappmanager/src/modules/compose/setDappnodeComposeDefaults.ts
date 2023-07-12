@@ -1,19 +1,20 @@
-import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash";
-import params, { getImageTag, getContainerName } from "../../params";
-import { getIsCore } from "../manifest/getIsCore";
-import { cleanCompose } from "./clean";
-import { parseEnvironment } from "./environment";
-import { parseServiceNetworks } from "./networks";
-import { getPrivateNetworkAliases } from "../../domains";
+import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
+import params, { getContainerName } from "../../params.js";
+import { getIsCore } from "../manifest/getIsCore.js";
+import { cleanCompose } from "./clean.js";
+import { parseEnvironment } from "./environment.js";
+import { parseServiceNetworks } from "./networks.js";
+import { getPrivateNetworkAliases } from "../../domains.js";
 import {
   Manifest,
   Compose,
   ComposeService,
   ComposeServiceNetworks,
   ComposeNetworks,
-  composeSafeKeys
-} from "@dappnode/dappnodesdk";
-import semver from "semver";
+  dockerComposeSafeKeys,
+  getImageTag
+} from "@dappnode/types";
+import { lt } from "semver";
 
 /**
  * Returns the compose file for the given manifest
@@ -25,6 +26,7 @@ export function setDappnodeComposeDefaults(
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = getIsCore(manifest);
+  const isMonoService = getIsMonoService(composeUnsafe);
 
   return cleanCompose({
     version: ensureMinimumComposeVersion(composeUnsafe.version),
@@ -34,13 +36,6 @@ export function setDappnodeComposeDefaults(
       (serviceUnsafe, serviceName) => {
         return sortServiceKeys({
           // OVERRIDABLE VALUES: values that in case of not been set, it will take the following values
-          deploy: {
-            resources: {
-              limits: {
-                memory: "16384M"
-              }
-            }
-          },
           logging: {
             driver: "json-file",
             options: {
@@ -53,7 +48,7 @@ export function setDappnodeComposeDefaults(
           // SAFE KEYS: values that are whitelisted
           ...pick(
             serviceUnsafe,
-            composeSafeKeys.filter(safeKey => safeKey !== "build")
+            dockerComposeSafeKeys.filter(safeKey => safeKey !== "build")
           ),
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults
@@ -63,7 +58,8 @@ export function setDappnodeComposeDefaults(
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
             dnpName,
-            isMain: manifest.mainService === serviceName
+            // The root pkg alias will be added to the main service or if it is a mono service
+            isMain: isMonoService || manifest.mainService === serviceName
           })
         });
       }
@@ -84,9 +80,7 @@ export function setDappnodeComposeDefaults(
  * https://docs.docker.com/compose/compose-file/compose-file-v3/#name-1
  */
 function ensureMinimumComposeVersion(composeFileVersion: string): string {
-  if (
-    semver.lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0")
-  )
+  if (lt(composeFileVersion + ".0", params.MINIMUM_COMPOSE_VERSION + ".0"))
     composeFileVersion = params.MINIMUM_COMPOSE_VERSION;
 
   return composeFileVersion;
@@ -155,4 +149,11 @@ function setNetworks(
  */
 function sortServiceKeys(service: ComposeService): ComposeService {
   return fromPairs(sortBy(toPairs(service), "0")) as ComposeService;
+}
+
+/**
+ * Returns true if there is only one service in the compose file
+ */
+function getIsMonoService(compose: Compose): boolean {
+  return Object.keys(compose.services).length === 1;
 }
