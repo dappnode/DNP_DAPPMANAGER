@@ -10,7 +10,7 @@ import { Network } from "@dappnode/types";
  * Collect the metrics:
  *   - IPFS node local or remote
  *   - Ethereum node local or remote
- *   - Which clients running on Ethereum, Gnosis, and prater
+ *   - Which clients running on Ethereum, Gnosis, Lukso and prater
  *   - Which is the favourite connectivity method: Wifi, VPN, Wireguard, local
  *   - Auto-updates enabled
  *   - Fallback enabled
@@ -100,7 +100,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis"] as Network[]) {
+      for (const network of ["mainnet", "prater", "gnosis", "lukso"] as Network[]) {
         const { executionClient, consensusClient, isMevBoostSelected } =
           getStakerConfigByNetwork(network);
 

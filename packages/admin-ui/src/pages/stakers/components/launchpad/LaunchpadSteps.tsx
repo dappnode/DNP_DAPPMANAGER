@@ -57,7 +57,9 @@ export const launchpadSteps = <T extends Network>({
               ? "https://launchpad.ethereum.org/"
               : network === "prater"
               ? "https://goerli.launchpad.ethereum.org/"
-              : "https://launchpad.gnosis.gateway.fm/"
+              : network === "gnosis"
+              ? "https://launchpad.gnosis.gateway.fm/"
+              : "https://deposit.mainnet.lukso.network/en/overview"
           );
         }}
       >

@@ -146,6 +146,34 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           minVersion: "0.1.0"
         }
       };
+    case "lukso":
+      return {
+        compatibleExecution: [
+          {
+            dnpName: "lukso-geth.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "lukso-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
+          }
+        ],
+        compatibleConsensus: [
+          {
+            dnpName: "lighthouse-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "prysm-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          }
+        ],
+        compatibleSigner: {
+          dnpName: "web3signer-lukso.dnp.dappnode.eth" as Signer<T>,
+          minVersion: "0.1.0"
+        },
+        compatibleMevBoost: null as MevBoost<"lukso"> // No MEV-Boost for Lukso
+      };
     default:
       throw Error(`Unsupported network: ${network}`);
   }
