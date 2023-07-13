@@ -92,15 +92,10 @@ WORKDIR /usr/src/app
 # TODO: consider moving all these binaries to the build-binaries stage
 RUN apk add --no-cache bind-dev xz libltdl miniupnpc zip unzip dbus bind avahi-tools
 
-# Copy docker
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 # Copy binaries
-COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 

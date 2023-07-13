@@ -105,7 +105,6 @@ describe("setDappnodeComposeDefaults", () => {
         "beacon-chain": {
           container_name:
             "DAppNodePackage-beacon-chain.teku-gnosis.dnp.dappnode.eth",
-          deploy: { resources: { limits: { memory: "16384M" } } },
           dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
@@ -129,7 +128,6 @@ describe("setDappnodeComposeDefaults", () => {
         validator: {
           container_name:
             "DAppNodePackage-validator.teku-gnosis.dnp.dappnode.eth",
-          deploy: { resources: { limits: { memory: "16384M" } } },
           dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
@@ -232,7 +230,6 @@ describe("setDappnodeComposeDefaults", () => {
       services: {
         "dappmanager.dnp.dappnode.eth": {
           container_name: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
-          deploy: { resources: { limits: { memory: "16384M" } } },
           dns: "172.33.1.2",
           environment: {
             LOG_LEVEL: "info",
