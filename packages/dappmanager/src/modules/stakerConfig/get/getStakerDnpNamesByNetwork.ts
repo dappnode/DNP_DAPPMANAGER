@@ -3,24 +3,21 @@ import {
   consensusClientsGnosis,
   consensusClientsMainnet,
   consensusClientsPrater,
-  consensusClientsLukso,
   executionClientsGnosis,
   executionClientsMainnet,
   executionClientsPrater,
-  executionClientsLukso,
   mevBoostMainnet,
   mevBoostPrater,
   signerGnosis,
   signerMainnet,
-  signerPrater,
-  signerLukso
+  signerPrater
 } from "@dappnode/types";
 
 interface StakerDnpNamesByNetwork {
   executionClients: readonly string[];
   consensusClients: readonly string[];
-  signer: string;
-  mevBoost: string;
+  signer:  string;
+  mevBoost:  string;
 }
 
 export function getStakerDnpNamesByNetwork(
@@ -47,13 +44,6 @@ export function getStakerDnpNamesByNetwork(
         consensusClients: consensusClientsGnosis,
         signer: signerGnosis,
         mevBoost: "" // As no mevBoost for gnosis is specified
-      };
-    case "lukso":
-      return {
-        executionClients: executionClientsLukso,
-        consensusClients: consensusClientsLukso,
-        signer: signerLukso,
-        mevBoost: "" // As no mevBoost for lukso is specified
       };
     default:
       throw new Error(`Unsupported network: ${network}`);

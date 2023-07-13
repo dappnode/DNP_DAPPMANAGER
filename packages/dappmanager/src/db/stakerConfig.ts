@@ -7,9 +7,7 @@ import {
   ConsensusClientGnosis,
   ExecutionClientGnosis,
   ConsensusClientPrater,
-  ExecutionClientPrater,
-  ConsensusClientLukso,
-  ExecutionClientLukso
+  ExecutionClientPrater
 } from "@dappnode/types";
 
 // Cache
@@ -137,41 +135,4 @@ export const mevBoostPrater = interceptGlobalEnvOnSet(
 export const feeRecipientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | null>(FEE_RECIPIENT_PRATER, null),
   Object.keys({ FEE_RECIPIENT_PRATER })[0]
-);
-
-// Lukso
-
-const CONSENSUS_CLIENT_LUKSO = "consensus-client-lukso";
-const EXECUTION_CLIENT_LUKSO = "execution-client-lukso";
-const MEVBOOST_LUKSO = "mevboost-lukso";
-const FEE_RECIPIENT_LUKSO = "fee-recipient-lukso";
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const consensusClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientLukso | undefined | null>(
-    CONSENSUS_CLIENT_LUKSO,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_LUKSO })[0]
-);
-
-// Null means not set
-// Undefined means its set but the user has not selected any value
-export const executionClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientLukso | undefined | null>(
-    EXECUTION_CLIENT_LUKSO,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_LUKSO })[0]
-);
-
-export const mevBoostLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
-  Object.keys({ MEVBOOST_LUKSO })[0]
-);
-
-export const feeRecipientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | null>(FEE_RECIPIENT_LUKSO, null),
-  Object.keys({ FEE_RECIPIENT_LUKSO })[0]
 );

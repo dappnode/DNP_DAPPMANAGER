@@ -35,13 +35,6 @@ export function getStakerConfigByNetwork<T extends Network>(
         feeRecipient: db.feeRecipientPrater.get(),
         isMevBoostSelected: db.mevBoostPrater.get()
       };
-    case "lukso":
-      return {
-        executionClient: db.executionClientLukso.get() as ExecutionClient<T>,
-        consensusClient: db.consensusClientLukso.get() as ConsensusClient<T>,
-        feeRecipient: db.feeRecipientLukso.get(),
-        isMevBoostSelected: false // lukso doesn't support mevBoost
-      };
     default:
       throw new Error(`Network ${network} not supported`);
   }
@@ -129,8 +122,6 @@ const getDefaultCheckpointSync = (network: Network): string =>
     ? "https://checkpoint-sync-prater.dappnode.io"
     : network === "gnosis"
     ? "https://checkpoint-sync-gnosis.dappnode.io"
-    : network === "lukso"
-    ? "https://checkpoint-sync-lukso.dappnode.io"
     : "";
 
 export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
