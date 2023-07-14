@@ -3,7 +3,7 @@ export const relativePath = "packages/my"; // default redirect to packages
 export const rootPath = "packages/*";
 export const title = "Packages";
 
-// SubPaths
-export const systemPackagesSubPath = "system";
-export const myPackagesSubPath = "my";
-export const systemPackagesPath = rootPath + systemPackagesSubPath;
+export const subPaths = {
+  my: "my/*",
+  system: "system/*"
+};
