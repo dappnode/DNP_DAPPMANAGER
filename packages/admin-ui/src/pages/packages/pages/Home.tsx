@@ -1,14 +1,17 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { title, rootPath, systemPackagesSubPath } from "../data";
+import { title, relativePath, systemPackagesSubPath } from "../data";
 // Components
 import { PackagesList } from "../components/PackagesList";
 import Title from "components/Title";
 
 export function PackagesHome({ showCoreDnps }: { showCoreDnps: boolean }) {
   const options = [
-    { name: "My packages", path: rootPath },
-    { name: "System packages", path: rootPath + systemPackagesSubPath }
+    { name: "My packages", path: relativePath },
+    {
+      name: "System packages",
+      path: relativePath + "/" + systemPackagesSubPath
+    }
   ];
 
   return (

@@ -4,4 +4,4 @@ export const rootPath = relativePath + "/*";
 export const title = "DAppStore";
 
 // Subpaths
-export const subPathPublic = "/public";
+export const subPathPublic = "public";
