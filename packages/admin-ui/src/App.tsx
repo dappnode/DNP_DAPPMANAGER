@@ -19,12 +19,12 @@ import { Theme, UsageMode } from "types";
 
 export const UsageContext = React.createContext({
   usage: "advanced",
-  toggleUsage: () => { }
+  toggleUsage: () => {}
 });
 
 export const ThemeContext = React.createContext({
   theme: "light",
-  toggleTheme: () => { }
+  toggleTheme: () => {}
 });
 
 function MainApp({ username }: { username: string }) {
@@ -109,8 +109,8 @@ function MainApp({ username }: { username: string }) {
                 />
               ))}
               {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<RedirectToDefault />} />
-
+              {/*TODO: REGEX OF SUBPATHS */}
+              {/*<Route path="*" element={<RedirectToDefault />} />*/}
             </Routes>
           </div>
 

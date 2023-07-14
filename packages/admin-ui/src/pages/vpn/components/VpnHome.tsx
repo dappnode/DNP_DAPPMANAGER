@@ -10,6 +10,7 @@ import LinkDocs from "components/LinkDocs";
 
 export function VpnHome() {
   const dnpsRequest = useApi.packagesGet();
+
   const availableRoutes = useMemo(() => {
     const dnpsSet = dnpsRequest.data
       ? new Set(dnpsRequest.data.map(dnp => dnp.dnpName))
@@ -18,18 +19,21 @@ export function VpnHome() {
     const routes: {
       name: string;
       subPath: string;
+      subLink: string;
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
       {
         name: "OpenVpn",
         subPath: subPaths.openVpn,
+        subLink: "openvpn",
         component: OpenVpnDevicesRoot,
         installed: dnpsSet.has(vpnDnpName)
       },
       {
         name: "Wireguard",
         subPath: subPaths.wireguard,
+        subLink: "wireguard",
         component: WireguardDevicesRoot,
         installed: dnpsSet.has(wireguardDnpName)
       }
@@ -47,7 +51,7 @@ export function VpnHome() {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={route.subPath}
+              to={route.subLink}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >

@@ -1,4 +1,5 @@
-export const rootPath = "/stakers";
+export const relativePath = "stakers/mainnet"; // default redirect to mainnet
+export const rootPath = "stakers/*";
 export const title = "Stakers";
 export const disclaimer = `## Terms of Use - DAppNode
 

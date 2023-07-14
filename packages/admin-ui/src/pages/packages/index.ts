@@ -1,3 +1,3 @@
 import { PackagesRoot } from "./Root";
-export { rootPath } from "./data";
+export { rootPath, relativePath } from "./data";
 export const RootComponent = PackagesRoot;

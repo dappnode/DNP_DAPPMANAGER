@@ -10,7 +10,8 @@ import DiscourseActions from "./components/DiscourseActions";
 import GithubActions from "./components/GithubActions";
 import GitcoinActions from "./components/GitcoinActions";
 
-export const rootPath = "/community";
+export const relativePath = "community";
+export const rootPath = "community";
 export const title = "Community";
 
 export const communityTypes: CommunityItem[] = [

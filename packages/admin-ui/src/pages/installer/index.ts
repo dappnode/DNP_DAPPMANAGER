@@ -1,3 +1,3 @@
 import InstallerRoot from "./components/InstallerRoot";
-export { rootPath } from "./data";
+export { rootPath, relativePath } from "./data";
 export const RootComponent = InstallerRoot;

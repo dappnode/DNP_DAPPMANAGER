@@ -1,3 +1,3 @@
 import SdkHome from "./components/SdkHome";
-export { rootPath } from "./data";
+export { rootPath, relativePath } from "./data";
 export const RootComponent = SdkHome;

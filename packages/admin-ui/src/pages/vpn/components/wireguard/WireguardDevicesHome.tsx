@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink } from "react-router-dom";
 // Own module
-import { maxIdLength, rootPath, subPaths } from "../../data";
+import { maxIdLength } from "../../data";
 import coerceDeviceName from "../../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
@@ -15,7 +15,6 @@ import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
-import { urlJoin } from "utils/url";
 // Params
 import { wireguardDnpName } from "params";
 import { rootPath as installedRootPath } from "pages/installer";
@@ -105,10 +104,7 @@ export function WireguardDevicesHome() {
             .map(id => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
-                <NavLink
-                  to={urlJoin(rootPath, subPaths.wireguard, id)}
-                  className="no-a-style"
-                >
+                <NavLink to={id} className="no-a-style">
                   <Button className="get-link">Get</Button>
                 </NavLink>
 

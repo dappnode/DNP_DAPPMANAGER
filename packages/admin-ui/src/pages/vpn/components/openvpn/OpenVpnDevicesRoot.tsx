@@ -1,5 +1,5 @@
 import React from "react";
-import { Route } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 // Components
 import { OpenVpnDeviceDetails } from "./OpenVpnDeviceDetails";
 import OpenVpnDevicesHome from "./OpenVpnDevicesHome";
@@ -8,9 +8,9 @@ import "./openVpnDevices.scss";
 
 export const OpenVpnDevicesRoot: React.FC = () => {
   return (
-    <>
+    <Routes>
       <Route path={"/"} element={<OpenVpnDevicesHome />} />
-      <Route path={"/:id"} element={<OpenVpnDeviceDetails />} />
-    </>
+      <Route path=":id" element={<OpenVpnDeviceDetails />} />
+    </Routes>
   );
 };
