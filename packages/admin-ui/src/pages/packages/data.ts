@@ -5,4 +5,5 @@ export const title = "Packages";
 
 // SubPaths
 export const systemPackagesSubPath = "system";
+export const myPackagesSubPath = "my";
 export const systemPackagesPath = rootPath + systemPackagesSubPath;
