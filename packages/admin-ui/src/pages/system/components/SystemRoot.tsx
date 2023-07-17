@@ -1,6 +1,6 @@
 import React from "react";
 import { title, subPaths } from "../data";
-import { Routes, Route, NavLink, useNavigate } from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 // Components
 import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
@@ -19,7 +19,6 @@ import { UsageContext } from "App";
 
 const SystemRoot: React.FC = () => {
   const { usage } = React.useContext(UsageContext);
-  const navigate = useNavigate();
   const basicRoutes: {
     name: string;
     subPath: string;
