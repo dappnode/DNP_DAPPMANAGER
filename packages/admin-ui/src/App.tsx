@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import { ToastContainer } from "react-toastify";
@@ -10,7 +10,7 @@ import Welcome from "components/welcome/Welcome";
 import SideBar from "components/sidebar/SideBar";
 import { TopBar } from "components/topbar/TopBar";
 // Pages
-import { pages, defaultPage } from "./pages";
+import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
@@ -72,14 +72,14 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  const RedirectToDefault = () => {
+  /*const RedirectToDefault = () => {
     const navigate = useNavigate();
     useEffect(() => {
       navigate(defaultPage.rootPath);
     }, [navigate]);
 
     return null;
-  };
+  };*/
 
   return (
     <UsageContext.Provider value={{ usage, toggleUsage }}>
