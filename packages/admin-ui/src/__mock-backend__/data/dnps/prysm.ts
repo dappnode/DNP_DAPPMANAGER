@@ -12,7 +12,7 @@ export const prysm: MockDnp = {
     upstreamArg: "UPSTREAM_VERSION",
     shortDescription: "Prysm mainnet ETH2.0 Beacon chain + validator",
     description:
-      "Validate with Prysm: a Go implementation of the Ethereum 2.0 Serenity protocol and open source project created by Prysmatic Labs.\n\nIt includes a Grafana dashboard for the [DMS](http://my.dappnode/#/installer/dms.dnp.dappnode.eth) thanks to the amazing work of [metanull-operator](https://github.com/metanull-operator/eth2-grafana)",
+      "Validate with Prysm: a Go implementation of the Ethereum 2.0 Serenity protocol and open source project created by Prysmatic Labs.\n\nIt includes a Grafana dashboard for the [DMS](http://my.dappnode/installer/dms.dnp.dappnode.eth) thanks to the amazing work of [metanull-operator](https://github.com/metanull-operator/eth2-grafana)",
     type: "service",
     architectures: ["linux/amd64"],
     mainService: "validator",
@@ -81,7 +81,7 @@ export const prysm: MockDnp = {
         },
         title: "Execution Client endpoint",
         description:
-          "Consensus clients require access to an execution client. \n- Geth - `http://geth.dappnode:8545` - [Install link](http://my.dappnode/#/installer/geth.dnp.dappnode.eth)\n- Nethermind - `http://nethermind.public.dappnode:8545` - [Install link](http://my.dappnode/#/installer/nethermind.public.dappnode.eth)"
+          "Consensus clients require access to an execution client. \n- Geth - `http://geth.dappnode:8545` - [Install link](http://my.dappnode/installer/geth.dnp.dappnode.eth)\n- Nethermind - `http://nethermind.public.dappnode:8545` - [Install link](http://my.dappnode/installer/nethermind.public.dappnode.eth)"
       },
       {
         id: "web3Backup",

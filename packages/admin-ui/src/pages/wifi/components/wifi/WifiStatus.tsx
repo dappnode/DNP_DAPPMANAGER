@@ -117,7 +117,7 @@ export default function WifiStatus(): JSX.Element {
               <MdWifi className="wifi-local-status-icon" />
               <NavLink
                 className="wifi-status-name"
-                to="http://my.dappnode/#/packages/wifi.dnp.dappnode.eth"
+                to="http://my.dappnode/packages/wifi.dnp.dappnode.eth"
               >
                 {prettyDnpName(wifiDnpName)}
               </NavLink>
