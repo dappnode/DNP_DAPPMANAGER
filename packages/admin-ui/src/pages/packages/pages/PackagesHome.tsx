@@ -7,6 +7,7 @@ import { PackagesList } from "../components/PackagesList";
 import Title from "components/Title";
 // Style
 import "../components/packages.scss";
+import { PackageById } from "./ById";
 
 export function PackagesHome() {
   const routes: {
@@ -52,7 +53,12 @@ export function PackagesHome() {
           <Route
             key={route.subPath}
             path={route.subPath}
-            element={<route.component />}
+            element={
+              <Routes>
+                <Route index element={<route.component />} />
+                <Route path=":id/*" element={<PackageById />} />
+              </Routes>
+            }
           />
         ))}
       </Routes>
