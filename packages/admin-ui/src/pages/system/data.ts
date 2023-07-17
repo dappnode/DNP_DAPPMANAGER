@@ -1,6 +1,6 @@
 // This will be used later in our root reducer and selectors
-
-export const rootPath = "/system";
+export const relativePath = "system/info"; // default redirect to info
+export const rootPath = "system/*";
 export const title = "System";
 
 // Aditional data

@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 // Components
 import InstallDnpContainer from "./InstallDnpContainer";
 import { title, rootPath, subPathPublic } from "../data";
@@ -9,31 +9,21 @@ import { InstallerPublic } from "./publicDappstore/InstallerPublic";
 // Styles
 import "./installer.scss";
 const InstallerRoot: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate(rootPath);
-  }, [navigate]);
   return (
     <>
       <Title title={title} />
 
       <Routes>
         {/*Root path: dappstore dnp*/}
-        <Route
-          key={rootPath}
-          path={location.pathname}
-          element={<InstallerDnp />}
-        />
+        <Route key={rootPath} path={"/"} element={<InstallerDnp />} />
         {/*Public path: dappstore public*/}
         <Route
           key={subPathPublic}
-          path={location.pathname + subPathPublic}
+          path={subPathPublic}
           element={<InstallerPublic />}
         />
         {/*DNP installer path*/}
-        <Route path={location.pathname + "/:id"} element={<InstallDnpContainer />} />
+        <Route path={"/:id"} element={<InstallDnpContainer />} />
       </Routes>
     </>
   );

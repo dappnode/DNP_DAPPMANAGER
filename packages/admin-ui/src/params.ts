@@ -66,7 +66,7 @@ export const adminNaclPublicKey =
   "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
 
 // URLs / Links
-export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE"
+export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
@@ -103,7 +103,8 @@ export const forumUrl = {
 export const troubleShootMountpointsGuideUrl =
   "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
-export const explorerGitcoinUrl = "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
+export const explorerGitcoinUrl =
+  "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
 export const dappnodeDiscord = "https://discord.gg/dappnode";

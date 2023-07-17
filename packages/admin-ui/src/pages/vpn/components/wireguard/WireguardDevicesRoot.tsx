@@ -1,6 +1,6 @@
 import React from "react";
 import { useApi } from "api";
-import { NavLink, Route } from "react-router-dom";
+import { NavLink, Route, Routes } from "react-router-dom";
 import { wireguardDnpName } from "params";
 import { rootPath as installedRootPath } from "pages/installer";
 import { urlJoin } from "utils/url";
@@ -36,13 +36,10 @@ export const WireguardDevicesRoot: React.FC = () => {
       }
 
       return (
-        <>
+        <Routes>
           <Route path={"/"} element={<WireguardDevicesHome />} />
-          <Route
-            path={"/:id"}
-            element={<WireguardDeviceDetails />}
-          />
-        </>
+          <Route path=":id" element={<WireguardDeviceDetails />} />
+        </Routes>
       );
     }
   );

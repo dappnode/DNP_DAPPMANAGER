@@ -1,10 +1,5 @@
-import React, { useEffect } from "react";
-import {
-  Routes,
-  Route,
-  NavLink,
-  useNavigate
-} from "react-router-dom";
+import React from "react";
+import { Routes, Route, NavLink } from "react-router-dom";
 // Own module
 import { title, subPaths } from "../data";
 // Components
@@ -15,31 +10,22 @@ import { LocalProxying } from "./localProxying/LocalProxying";
 import "./wifiLocal.scss";
 
 export const WifiLocalHome: React.FC = () => {
-  const navigate = useNavigate();
   const availableRoutes: {
     name: string;
     subPath: string;
     component: React.ComponentType<any>;
   }[] = [
-      {
-        name: "Wi-Fi",
-        subPath: subPaths.wifi,
-        component: WifiHome
-      },
-      {
-        name: "Local Network",
-        subPath: subPaths.local,
-        component: LocalProxying
-      }
-    ];
-
-  // Redirect automatically to the first route. DO NOT hardcode
-  // to prevent typos and causing infinite loops 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    navigate(`${availableRoutes[0].subPath}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
+    {
+      name: "Wi-Fi",
+      subPath: subPaths.wifi,
+      component: WifiHome
+    },
+    {
+      name: "Local Network",
+      subPath: subPaths.local,
+      component: LocalProxying
+    }
+  ];
 
   return (
     <>

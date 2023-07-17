@@ -18,17 +18,17 @@ import {
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
 // URLs
-import { rootPath as dashboardRootPath } from "pages/dashboard";
-import { rootPath as devicesRootPath } from "pages/vpn";
-import { rootPath as installerRootPath } from "pages/installer";
-import { rootPath as packagesRootPath } from "pages/packages";
-import { rootPath as systemRootPath } from "pages/system";
-import { rootPath as sdkRootPath } from "pages/sdk";
-import { rootPath as supportRootPath } from "pages/support";
-import { rootPath as wifiRootPath } from "pages/wifi";
-import { rootPath as communityRootPath } from "pages/community";
-import { rootPath as stakersRootPath } from "pages/stakers";
-import { rootPath as repositoryRootPath } from "pages/repository";
+import { relativePath as dashboardRelativePath } from "pages/dashboard";
+import { relativePath as devicesRelativePath } from "pages/vpn";
+import { relativePath as installerRelativePath } from "pages/installer";
+import { relativePath as packagesRelativePath } from "pages/packages";
+import { relativePath as systemRelativePath } from "pages/system";
+import { relativePath as sdkRelativePath } from "pages/sdk";
+import { relativePath as supportRelativePath } from "pages/support";
+import { relativePath as wifiRelativePath } from "pages/wifi";
+import { relativePath as communityRelativePath } from "pages/community";
+import { relativePath as stakersRelativePath } from "pages/stakers";
+import { relativePath as repositoryRelativePath } from "pages/repository";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -61,17 +61,17 @@ export const advancedItems: {
 }[] = [
   {
     name: "Community",
-    href: communityRootPath,
+    href: communityRelativePath,
     icon: MdPeople
   },
   {
     name: "Sdk",
-    href: sdkRootPath,
+    href: sdkRelativePath,
     icon: MdBuild
   },
   {
     name: "Support",
-    href: supportRootPath,
+    href: supportRelativePath,
     icon: MdHelp
   }
 ];
@@ -83,42 +83,42 @@ export const basicItems: {
 }[] = [
   {
     name: "Dashboard",
-    href: dashboardRootPath,
+    href: dashboardRelativePath,
     icon: MdDashboard
   },
   {
     name: "Wi-Fi",
-    href: wifiRootPath,
+    href: wifiRelativePath,
     icon: MdWifi
   },
   {
     name: "VPN",
-    href: devicesRootPath,
+    href: devicesRelativePath,
     icon: MdDevices
   },
   {
     name: "DAppStore",
-    href: installerRootPath,
+    href: installerRelativePath,
     icon: MdCreateNewFolder
   },
   {
     name: "Packages",
-    href: packagesRootPath,
+    href: packagesRelativePath,
     icon: MdFolder
   },
   {
     name: "Stakers",
-    href: stakersRootPath,
+    href: stakersRelativePath,
     icon: SiEthereum
   },
   {
     name: "Repository",
-    href: repositoryRootPath,
+    href: repositoryRelativePath,
     icon: BiGitRepoForked
   },
   {
     name: "System",
-    href: systemRootPath,
+    href: systemRelativePath,
     icon: MdSettings
   }
 ];

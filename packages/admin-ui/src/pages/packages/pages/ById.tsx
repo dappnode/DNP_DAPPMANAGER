@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Routes, Route, NavLink, useParams, useNavigate } from "react-router-dom";
+import React from "react";
+import { Routes, Route, NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
 // This module
@@ -21,9 +21,8 @@ import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAva
 import { UsageContext } from "App";
 
 export const PackageById: React.FC = () => {
-  const navigate = useNavigate();
-  const params = useParams()
-  const id = params.id || ""
+  const params = useParams();
+  const id = params.id || "";
   const { usage } = React.useContext(UsageContext);
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
@@ -119,14 +118,6 @@ export const PackageById: React.FC = () => {
 
   const availableRoutes =
     usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
-
-  // Redirect automatically to the first route. DO NOT hardcode
-  // to prevent typos and causing infinite loops 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    navigate(`${availableRoutes[0].subPath}`);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigate]);
 
   return (
     <>
