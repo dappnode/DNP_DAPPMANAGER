@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { rootPath as installerRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 // Components
 import Button from "components/Button";
 
@@ -10,7 +10,7 @@ export const NoPackagesYet = () => (
     <p>
       If you would like install a DAppNode package, go to the DAppStore tab.
     </p>
-    <Link to={installerRootPath}>
+    <Link to={installedRelativePath}>
       <Button>Go to DAppStore</Button>
     </Link>
   </div>

@@ -2,7 +2,7 @@ import React from "react";
 import { useApi } from "api";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { wireguardDnpName } from "params";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { urlJoin } from "utils/url";
 import { title } from "../../data";
 // Components
@@ -23,7 +23,7 @@ export const WireguardDevicesRoot: React.FC = () => {
     dnps => {
       const wireguardDnp = dnps.find(dnp => dnp.dnpName === wireguardDnpName);
       if (!wireguardDnp) {
-        const url = urlJoin(installedRootPath, wireguardDnpName);
+        const url = urlJoin(installedRelativePath, wireguardDnpName);
         return (
           <>
             <Title title={title} />

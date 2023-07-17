@@ -3,7 +3,7 @@ import { api, useApi } from "api";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import Alert from "react-bootstrap/esm/Alert";
 import { BsArrowRight } from "react-icons/bs";
 import { withToast } from "components/toast/Toast";
@@ -112,7 +112,7 @@ export function HttpsMappings() {
       dnp => dnp.dnpName === httpsPortalDnpName
     );
     if (!httpsPortalDnp) {
-      const url = `${installedRootPath}/${httpsPortalDnpName}`;
+      const url = `${installedRelativePath}/${httpsPortalDnpName}`;
       return (
         <Alert variant="secondary">
           You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use

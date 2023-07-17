@@ -18,7 +18,7 @@ import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 // Params
 import { vpnDnpName } from "params";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 
 export default function OpenVpnDevicesHome() {
   const [input, setInput] = useState("");
@@ -81,7 +81,7 @@ export default function OpenVpnDevicesHome() {
   if (dnpsRequest.data) {
     const vpnDnp = dnpsRequest.data.find(dnp => dnp.dnpName === vpnDnpName);
     if (!vpnDnp) {
-      const url = `${installedRootPath}/${vpnDnpName}`;
+      const url = `${installedRelativePath}/${vpnDnpName}`;
       return (
         <Alert variant="secondary">
           You must <NavLink to={url}>install the OpenVPN package</NavLink> to

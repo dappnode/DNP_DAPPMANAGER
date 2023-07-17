@@ -6,7 +6,7 @@ import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import { StakerItem } from "@dappnode/common";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { FaKey } from "react-icons/fa";
 import { Network } from "@dappnode/types";
@@ -46,7 +46,7 @@ export default function RemoteSigner<T extends Network>({
         signer.isInstalled &&
         !signer.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${signer.dnpName}`}>
+            <Link to={`${installedRelativePath}/${signer.dnpName}`}>
               <Button variant="dappnode">UPDATE</Button>
             </Link>
             <br />

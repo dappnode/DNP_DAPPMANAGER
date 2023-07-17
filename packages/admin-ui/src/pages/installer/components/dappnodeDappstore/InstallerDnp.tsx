@@ -11,7 +11,6 @@ import filterDirectory from "../../helpers/filterDirectory";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
-import { subPaths } from "../../data";
 // Components
 import Input from "components/Input";
 import Button from "components/Button";

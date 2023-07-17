@@ -7,7 +7,7 @@ import { ReqStatus } from "types";
 // Own components
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 import Card from "components/Card";
@@ -65,7 +65,7 @@ export function LocalProxying() {
   }
 
   if (localProxyingStatus.data === "https missing") {
-    const url = `${installedRootPath}/${httpsPortalDnpName}`;
+    const url = `${installedRelativePath}/${httpsPortalDnpName}`;
     return (
       <Alert variant="secondary">
         You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use

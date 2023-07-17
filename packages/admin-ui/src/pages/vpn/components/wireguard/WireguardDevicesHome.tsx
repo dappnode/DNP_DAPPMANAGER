@@ -17,7 +17,7 @@ import { MdDelete } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 // Params
 import { wireguardDnpName } from "params";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 
 export function WireguardDevicesHome() {
   const [input, setInput] = useState("");
@@ -57,7 +57,7 @@ export function WireguardDevicesHome() {
       dnp => dnp.dnpName === wireguardDnpName
     );
     if (!wireguardDnp) {
-      const url = `${installedRootPath}/${wireguardDnpName}`;
+      const url = `${installedRelativePath}/${wireguardDnpName}`;
       return (
         <Alert variant="secondary">
           You must <NavLink to={url}>install the Wireguard package</NavLink> to

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { rootPath as installerRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import { prettyDnpName } from "utils/format";
@@ -28,7 +28,7 @@ export function AlertPackageUpdateAvailable({
         {updateAvailable.upstreamVersion &&
           `(${updateAvailable.upstreamVersion} upstream)`}
       </div>
-      <NavLink to={urlJoin(installerRootPath, dnpName)}>
+      <NavLink to={urlJoin(installedRelativePath, dnpName)}>
         <Button variant="dappnode">Update</Button>
       </NavLink>
     </Alert>

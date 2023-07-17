@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 // Components
 import Button from "components/Button";
 // Modules
-import { rootPath as installerRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { rootPath as packagesRootPath } from "pages/packages";
 // Utils
 import { prettyDnpName } from "utils/format";
@@ -15,7 +15,7 @@ export const NoDnpInstalled = ({ id }: { id: string }) => (
     <Link style={{ margin: "0 10px" }} to={packagesRootPath}>
       <Button style={{ textTransform: "capitalize" }}>Packages</Button>
     </Link>
-    <Link style={{ margin: "0 10px" }} to={installerRootPath + "/" + id}>
+    <Link style={{ margin: "0 10px" }} to={installedRelativePath + "/" + id}>
       <Button>Install {prettyDnpName(id)}</Button>
     </Link>
   </div>

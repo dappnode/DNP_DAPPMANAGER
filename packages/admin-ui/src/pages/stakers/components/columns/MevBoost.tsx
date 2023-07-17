@@ -6,7 +6,7 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
@@ -68,7 +68,7 @@ export default function MevBoost<T extends Network>({
         mevBoost.isInstalled &&
         !mevBoost.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
+            <Link to={`${installedRelativePath}/${mevBoost.dnpName}`}>
               <Button variant="dappnode">UPDATE</Button>
             </Link>
             <br />
@@ -171,8 +171,8 @@ function Relay<T extends Network>({
         {relay.ofacCompliant === undefined
           ? "-"
           : relay.ofacCompliant
-            ? "Yes"
-            : "No"}
+          ? "Yes"
+          : "No"}
       </td>
       <td>
         <Form.Check
@@ -202,9 +202,7 @@ function Relay<T extends Network>({
 
 // Utils
 
-const getDefaultRelays = <T extends Network>(
-  network: T
-): RelayIface[] => {
+const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
   switch (network) {
     case "mainnet":
       return [

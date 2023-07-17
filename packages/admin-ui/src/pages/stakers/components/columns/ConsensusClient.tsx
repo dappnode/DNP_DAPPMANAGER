@@ -6,7 +6,7 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
@@ -68,7 +68,7 @@ export default function ConsensusClient<T extends Network>({
         <>
           {consensusClient.isInstalled && !consensusClient.isUpdated && (
             <>
-              <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
+              <Link to={`${installedRelativePath}/${consensusClient.dnpName}`}>
                 <Button variant="dappnode">UPDATE</Button>
               </Link>
               <br />

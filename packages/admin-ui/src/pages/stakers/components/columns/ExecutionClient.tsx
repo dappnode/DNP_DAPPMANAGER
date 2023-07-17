@@ -6,7 +6,7 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
+import { relativePath as installedRelativePath } from "pages/installer";
 import { Link } from "react-router-dom";
 import { Network } from "@dappnode/types";
 
@@ -52,7 +52,7 @@ export default function ExecutionClient<T extends Network>({
         executionClient.isInstalled &&
         !executionClient.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${executionClient.dnpName}`}>
+            <Link to={`${installedRelativePath}/${executionClient.dnpName}`}>
               <Button variant="dappnode">UPDATE</Button>
             </Link>
             <br />
