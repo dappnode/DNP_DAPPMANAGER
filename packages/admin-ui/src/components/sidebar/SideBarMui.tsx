@@ -6,11 +6,8 @@ import MuiDrawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import CssBaseline from "@mui/material/CssBaseline";
 import { UsageContext } from "../../App";
-
-import "./sidebar.scss";
 import logoWide from "img/dappnode-logo-wide-min.png";
 import logomin from "img/dappnode-logo-only.png";
-import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 
 import { advancedItems, basicItems, fundedBy } from "./navbarItems";
 import { NavLink } from "react-router-dom";
