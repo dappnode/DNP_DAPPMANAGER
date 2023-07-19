@@ -16,8 +16,8 @@ import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
 import { UsageMode } from "types";
-import { createTheme, useTheme } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+// Styles
+import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
 
 const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
@@ -34,9 +34,8 @@ function MainApp({ username }: { username: string }) {
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
 
   const theme = useTheme();
-  const colorContext = React.useContext(ColorModeContext);
   const [mode, setMode] = React.useState<"light" | "dark">("light");
-  const colorMode = React.useMemo(
+  const colorMemo = React.useMemo(
     () => ({
       toggleColorMode: () => {
         setMode(prevMode => (prevMode === "light" ? "dark" : "light"));
@@ -80,38 +79,45 @@ function MainApp({ username }: { username: string }) {
   }, [screenLocation.pathname]);
 
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <UsageContext.Provider value={{ usage, toggleUsage }}>
-        <div className="body">
-          <SideBar screenWidth={screenWidth} />
-          <TopBar username={username} toggleUsage={toggleUsage} />
-          <div id="main">
-            <ErrorBoundary>
-              <NotificationsMain />
-            </ErrorBoundary>
-            <Routes>
-              {Object.values(pages).map(({ RootComponent, rootPath }) => (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent />
-                    </ErrorBoundary>
-                  }
-                />
-              ))}
-              {/* Redirection for routes with hashes */}
-              {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<DefaultRedirect />} />
-            </Routes>
-          </div>
+    <ColorModeContext.Provider value={colorMemo}>
+      <ThemeProvider theme={themeMemo}>
+        <UsageContext.Provider value={{ usage, toggleUsage }}>
+          <div className="body">
+            <SideBar screenWidth={screenWidth} />
+            <TopBar
+              username={username}
+              theme={theme.palette.mode}
+              toggleColorMode={colorMemo.toggleColorMode}
+              toggleUsage={toggleUsage}
+            />
+            <div id="main">
+              <ErrorBoundary>
+                <NotificationsMain />
+              </ErrorBoundary>
+              <Routes>
+                {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                  <Route
+                    key={rootPath}
+                    path={rootPath}
+                    element={
+                      <ErrorBoundary>
+                        <RootComponent />
+                      </ErrorBoundary>
+                    }
+                  />
+                ))}
+                {/* Redirection for routes with hashes */}
+                {/* 404 routes redirect to dashboard or default page */}
+                <Route path="*" element={<DefaultRedirect />} />
+              </Routes>
+            </div>
 
-          {/* Place here non-page components */}
-          <Welcome />
-          <ToastContainer />
-        </div>
-      </UsageContext.Provider>
+            {/* Place here non-page components */}
+            <Welcome />
+            <ToastContainer />
+          </div>
+        </UsageContext.Provider>
+      </ThemeProvider>
     </ColorModeContext.Provider>
   );
 }
