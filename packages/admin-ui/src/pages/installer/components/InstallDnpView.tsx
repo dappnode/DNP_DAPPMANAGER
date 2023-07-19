@@ -265,7 +265,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   ].filter(route => route.available);
 
   // Compute the route index for the stepper display
-  const currentSubRoute = location.pathname.split(`${params.id}/`)[1] || "";
+  const currentSubRoute =
+    location.pathname.split(`${encodeURIComponent(params.id || "")}/`)[1] || "";
   const currentIndex = availableRoutes.findIndex(
     ({ subPath }) => subPath && currentSubRoute.includes(subPath)
   );
