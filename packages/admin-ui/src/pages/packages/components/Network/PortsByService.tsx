@@ -161,7 +161,7 @@ export function PortsByService({
 
   for (const portOverTheMax of portsOverTheMax)
     errors.push(
-      `Port mapping ${portOverTheMax.container}/${portOverTheMax.protocol} is in the ephemeral port range (32768-65535). It must be avoided.`
+      `Host port mapping ${portOverTheMax.host}/${portOverTheMax.protocol} is in the ephemeral port range (32768-65535). It must be avoided.`
     );
 
   // Aggregate conditions to disable the update
