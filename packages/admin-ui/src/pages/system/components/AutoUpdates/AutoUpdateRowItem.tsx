@@ -4,7 +4,7 @@ import Switch from "components/Switch";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
 import { autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
-import { relativePath as installedRelativePath } from "pages/installer";
+import { getInstallerPath } from "pages/installer";
 import {
   rootPath as systemRootPath,
   subPaths as systemSubPaths
@@ -51,7 +51,7 @@ export function AutoUpdateRowItem({
       ? null
       : id === SYSTEM_PACKAGES
       ? `${systemRootPath}/${systemSubPaths.update}`
-      : `${installedRelativePath}/${id}`;
+      : `${getInstallerPath(id)}/${id}`;
 
   const feedbackText = !enabled
     ? "-"

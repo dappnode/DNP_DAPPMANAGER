@@ -1,9 +1,10 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
-import { relativePath as installedRelativePath } from "pages/installer";
+import { getInstallerPath } from "pages/installer";
 import Alert from "react-bootstrap/esm/Alert";
 import { BsArrowRight } from "react-icons/bs";
 import { withToast } from "components/toast/Toast";
@@ -20,6 +21,7 @@ import Button from "components/Button";
 import { ExposableServiceInfo, HttpsPortalMapping } from "@dappnode/common";
 
 export function HttpsMappings() {
+  const navigate = useNavigate();
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const mappings = useApi.httpsPortalExposableServicesGet();
   const dnpsRequest = useApi.packagesGet();
@@ -112,11 +114,16 @@ export function HttpsMappings() {
       dnp => dnp.dnpName === httpsPortalDnpName
     );
     if (!httpsPortalDnp) {
-      const url = `${installedRelativePath}/${httpsPortalDnpName}`;
+      const url = `${getInstallerPath(
+        httpsPortalDnpName
+      )}/${httpsPortalDnpName}`;
       return (
         <Alert variant="secondary">
-          You must <NavLink to={url}>install the HTTPs Portal</NavLink> to use
-          this feature
+          You must{" "}
+          <a href="#" onClick={() => navigate(url)}>
+            install the HTTPs Portal
+          </a>{" "}
+          to use this feature
         </Alert>
       );
     }

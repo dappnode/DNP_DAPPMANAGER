@@ -6,8 +6,8 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { relativePath as installedRelativePath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
 import { Network } from "@dappnode/types";
@@ -24,6 +24,8 @@ export default function ConsensusClient<T extends Network>({
   >;
   isSelected: boolean;
 }) {
+  const navigate = useNavigate();
+
   const [useCheckpointSync, setUseCheckpointSync] = useState(
     consensusClient.useCheckpointSync !== undefined
       ? consensusClient.useCheckpointSync
@@ -68,9 +70,18 @@ export default function ConsensusClient<T extends Network>({
         <>
           {consensusClient.isInstalled && !consensusClient.isUpdated && (
             <>
-              <Link to={`${installedRelativePath}/${consensusClient.dnpName}`}>
-                <Button variant="dappnode">UPDATE</Button>
-              </Link>
+              <Button
+                onClick={() =>
+                  navigate(
+                    `${getInstallerPath(consensusClient.dnpName)}/${
+                      consensusClient.dnpName
+                    }`
+                  )
+                }
+                variant="dappnode"
+              >
+                UPDATE
+              </Button>
               <br />
               <br />
             </>

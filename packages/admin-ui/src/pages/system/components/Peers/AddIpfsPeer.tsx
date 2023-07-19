@@ -35,7 +35,7 @@ import Ok from "components/Ok";
  * - /dnsaddr/
  */
 
-export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl: string }) {
+export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
   const [peerInput, setPeerInput] = useState("");
   const [addStat, setAddStat] = useState<{
     msg?: string;

@@ -6,8 +6,8 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { relativePath as installedRelativePath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
 import { AiFillInfoCircle } from "react-icons/ai";
@@ -35,6 +35,8 @@ export default function MevBoost<T extends Network>({
   >;
   isSelected: boolean;
 }) {
+  const navigate = useNavigate();
+
   return (
     <Card
       {...props}
@@ -68,9 +70,16 @@ export default function MevBoost<T extends Network>({
         mevBoost.isInstalled &&
         !mevBoost.isUpdated && (
           <>
-            <Link to={`${installedRelativePath}/${mevBoost.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
+            <Button
+              onClick={() =>
+                navigate(
+                  `${getInstallerPath(mevBoost.dnpName)}/${mevBoost.dnpName}`
+                )
+              }
+              variant="dappnode"
+            >
+              UPDATE
+            </Button>
             <br />
             <br />
           </>

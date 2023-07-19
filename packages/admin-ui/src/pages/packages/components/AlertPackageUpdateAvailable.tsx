@@ -1,10 +1,9 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
-import { relativePath as installedRelativePath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import { prettyDnpName } from "utils/format";
-import { urlJoin } from "utils/url";
 import { UpdateAvailable } from "@dappnode/common";
 
 export function AlertPackageUpdateAvailable({
@@ -15,6 +14,7 @@ export function AlertPackageUpdateAvailable({
   updateAvailable: UpdateAvailable;
 }) {
   const [show, setShow] = useState(true);
+  const navigate = useNavigate();
   return show ? (
     <Alert
       variant="info"
@@ -28,9 +28,12 @@ export function AlertPackageUpdateAvailable({
         {updateAvailable.upstreamVersion &&
           `(${updateAvailable.upstreamVersion} upstream)`}
       </div>
-      <NavLink to={urlJoin(installedRelativePath, dnpName)}>
-        <Button variant="dappnode">Update</Button>
-      </NavLink>
+      <Button
+        onClick={() => navigate(`${getInstallerPath(dnpName)}/${dnpName}`)}
+        variant="dappnode"
+      >
+        Update
+      </Button>
     </Alert>
   ) : null;
 }

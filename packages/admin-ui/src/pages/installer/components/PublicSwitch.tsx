@@ -45,7 +45,7 @@ export function PublicSwitch() {
         })
       );
     } else {
-      navigate(relativePath);
+      navigate(`/${relativePath}`);
       setDappstorePublic(false);
     }
   }
