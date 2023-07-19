@@ -7,7 +7,7 @@ import NotificationsMain from "./components/NotificationsMain";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
-import SideBar from "components/sidebar/SideBar";
+import SideBar from "components/sidebar/SideBarMui";
 import { TopBar } from "components/topbar/TopBar";
 // Pages
 import { pages } from "./pages";
