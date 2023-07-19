@@ -26,7 +26,6 @@ import {
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
-import { PublicSwitch } from "../PublicSwitch";
 import { useApi } from "api";
 
 export const InstallerPublic: React.FC = routeProps => {
@@ -116,7 +115,6 @@ export const InstallerPublic: React.FC = routeProps => {
 
   return (
     <>
-      <PublicSwitch {...routeProps} />
       <AlertDismissible variant="warning">
         The public repository is open and permissionless and can contain
         malicious packages that can compromise the security of your DAppNode.

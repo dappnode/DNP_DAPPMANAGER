@@ -25,7 +25,6 @@ import {
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
-import { PublicSwitch } from "../PublicSwitch";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
 
@@ -67,8 +66,8 @@ export const InstallerDnp: React.FC = routeProps => {
     // - Mainnet: http://my.dappnode/stakers/mainnet
     // - Gnosis: http://my.dappnode/stakers/gnosis
     // - Stakehouse: http://my.dappnode/stakers/stakehouse
-    if (id === "ethereum.dnp.dappnode.eth") navigate("stakers/mainnet");
-    else if (id === "gnosis.dnp.dappnode.eth") navigate("stakers/gnosis");
+    if (id === "ethereum.dnp.dappnode.eth") navigate("/stakers/ethereum");
+    else if (id === "gnosis.dnp.dappnode.eth") navigate("/stakers/gnosis");
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
@@ -130,7 +129,6 @@ export const InstallerDnp: React.FC = routeProps => {
 
   return (
     <>
-      <PublicSwitch {...routeProps} />
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}
