@@ -1,6 +1,8 @@
 import { eventBus } from "../../eventBus.js";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import * as db from "../../db/index.js";
+import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import params from "../../params.js";
 
 async function removeStakerPkgsFromDbIfSelected({
   dnpNames
@@ -51,16 +53,16 @@ async function removeStakerPkgsFromDbIfSelected({
  * stakerDbUpdate daemon.
  * Makes sure the main DB is updated when any package selected in the stakers is removed
  */
-export function startStakerDbUpdateDaemon(/*signal: AbortSignal*/): void {
+export function startStakerDbUpdateDaemon(signal: AbortSignal): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
     if (removed) {
       removeStakerPkgsFromDbIfSelected({ dnpNames });
     }
   });
 
-  /*runAtMostEvery(
+  runAtMostEvery(
     async () => removeStakerPkgsFromDbIfSelected({}),
     params.STAKER_DB_UPDATE_INTERVAL,
     signal
-  );*/
+  );
 }
