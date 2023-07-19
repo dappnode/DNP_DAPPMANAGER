@@ -66,8 +66,8 @@ export const InstallerDnp: React.FC = routeProps => {
     // - Mainnet: http://my.dappnode/stakers/mainnet
     // - Gnosis: http://my.dappnode/stakers/gnosis
     // - Stakehouse: http://my.dappnode/stakers/stakehouse
-    if (id === "ethereum.dnp.dappnode.eth") navigate("stakers/mainnet");
-    else if (id === "gnosis.dnp.dappnode.eth") navigate("stakers/gnosis");
+    if (id === "ethereum.dnp.dappnode.eth") navigate("/stakers/ethereum");
+    else if (id === "gnosis.dnp.dappnode.eth") navigate("/stakers/gnosis");
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
