@@ -2,29 +2,28 @@ import React, { useCallback, useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
-import { ToastContainer } from "react-toastify";
 import NotificationsMain from "./components/NotificationsMain";
 import ErrorBoundary from "./components/ErrorBoundary";
 import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
 import SideBar from "components/sidebar/SideBarMui";
 import { TopBar } from "components/topbar/TopBar";
+import { ToastContainer } from "react-toastify";
 // Pages
 import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { Theme, UsageMode } from "types";
+import { UsageMode } from "types";
+// Styles
+import { ThemeProvider, createTheme, useTheme } from "@mui/material/styles";
+
+const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
 
 export const UsageContext = React.createContext({
   usage: "advanced",
   toggleUsage: () => {}
-});
-
-export const ThemeContext = React.createContext({
-  theme: "light",
-  toggleTheme: () => {}
 });
 
 function MainApp({ username }: { username: string }) {
@@ -34,27 +33,35 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.screen.width);
 
-  //const storedUsage = localStorage.getItem("usage");
-  const storedTheme = localStorage.getItem("theme");
+  const theme = useTheme();
+  const [mode, setMode] = React.useState<"light" | "dark">("light");
+  const colorMemo = React.useMemo(
+    () => ({
+      toggleColorMode: () => {
+        console.log("toggleColorMode");
+        setMode(prevMode => (prevMode === "light" ? "dark" : "light"));
+      }
+    }),
+    []
+  );
+  const themeMemo = React.useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode
+        }
+      }),
+    [mode]
+  );
+
   //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
   const initialUsage = "advanced";
-  const initialTheme =
-    storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
 
-  const [theme, setTheme] = useState<Theme>(initialTheme);
   const [usage, setUsage] = useState<UsageMode>(initialUsage);
-
-  const toggleTheme = () => {
-    setTheme(curr => (curr === "light" ? "dark" : "light"));
-  };
 
   const toggleUsage = () => {
     setUsage(curr => (curr === "basic" ? "advanced" : "basic"));
   };
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
 
   useEffect(() => {
     localStorage.setItem("usage", usage);
@@ -82,44 +89,46 @@ function MainApp({ username }: { username: string }) {
   };*/
 
   return (
-    <UsageContext.Provider value={{ usage, toggleUsage }}>
-      <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <div className="body" id={theme}>
-          <SideBar screenWidth={screenWidth} />
-          <TopBar
-            username={username}
-            theme={theme}
-            toggleUsage={toggleUsage}
-            toggleTheme={toggleTheme}
-          />
-          <div id="main">
-            <ErrorBoundary>
-              <NotificationsMain />
-            </ErrorBoundary>
-            <Routes>
-              {Object.values(pages).map(({ RootComponent, rootPath }) => (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent />
-                    </ErrorBoundary>
-                  }
-                />
-              ))}
-              {/* 404 routes redirect to dashboard or default page */}
-              {/*TODO: REGEX OF SUBPATHS */}
-              {/*<Route path="*" element={<RedirectToDefault />} />*/}
-            </Routes>
-          </div>
+    <ColorModeContext.Provider value={colorMemo}>
+      <ThemeProvider theme={themeMemo}>
+        <UsageContext.Provider value={{ usage, toggleUsage }}>
+          <div className="body">
+            <SideBar screenWidth={screenWidth} />
+            <TopBar
+              username={username}
+              theme={theme.palette.mode}
+              toggleColorMode={colorMemo.toggleColorMode}
+              toggleUsage={toggleUsage}
+            />
+            <div id="main">
+              <ErrorBoundary>
+                <NotificationsMain />
+              </ErrorBoundary>
+              <Routes>
+                {Object.values(pages).map(({ RootComponent, rootPath }) => (
+                  <Route
+                    key={rootPath}
+                    path={rootPath}
+                    element={
+                      <ErrorBoundary>
+                        <RootComponent />
+                      </ErrorBoundary>
+                    }
+                  />
+                ))}
+                {/* 404 routes redirect to dashboard or default page */}
+                {/*TODO: REGEX OF SUBPATHS */}
+                {/*<Route path="*" element={<RedirectToDefault />} />*/}
+              </Routes>
+            </div>
 
-          {/* Place here non-page components */}
-          <Welcome />
-          <ToastContainer />
-        </div>
-      </ThemeContext.Provider>
-    </UsageContext.Provider>
+            {/* Place here non-page components */}
+            <Welcome />
+            <ToastContainer />
+          </div>
+        </UsageContext.Provider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 

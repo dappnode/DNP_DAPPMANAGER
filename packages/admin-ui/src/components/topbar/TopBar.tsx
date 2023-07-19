@@ -9,18 +9,17 @@ import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 import "./topbar.scss";
 import "./notifications.scss";
 // import UsageSwitch from "./dropdownMenus/UsageSwitch";
-// Types
-import { Theme } from "types";
+import { PaletteMode } from "@mui/material";
 
 export const TopBar = ({
   username,
   theme,
-  toggleTheme,
+  toggleColorMode,
   toggleUsage
 }: {
   username: string;
-  theme: Theme;
-  toggleTheme: () => void;
+  theme: PaletteMode;
+  toggleColorMode: () => void;
   toggleUsage: () => void;
 }) => (
   <div id="topbar">
@@ -31,10 +30,10 @@ export const TopBar = ({
         <span>BETA</span>
         {/* Theme usage requires more feedback */}
         {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
-        <ThemeSwitch toggleTheme={toggleTheme} />
+        <ThemeSwitch toggleColorMode={toggleColorMode} theme={theme} />
       </div>
     ) : (
-      <ThemeSwitch toggleTheme={toggleTheme} />
+      <ThemeSwitch toggleColorMode={toggleColorMode} theme={theme} />
     )}
 
     <DappnodeIdentity />
