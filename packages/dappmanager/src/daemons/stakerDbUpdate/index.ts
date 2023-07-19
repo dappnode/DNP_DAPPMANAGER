@@ -1,9 +1,5 @@
 import { eventBus } from "../../eventBus.js";
-import {
-  mevBoostMainnet,
-  mevBoostPrater,
-  stakerPkgs
-} from "@dappnode/types";
+import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import * as db from "../../db/index.js";
 
 async function removeStakerPkgsFromDbIfSelected({
@@ -20,7 +16,6 @@ async function removeStakerPkgsFromDbIfSelected({
   if (dnpNames.length === 0) return;
 
   dnpNames.forEach(dnpName => {
-    // TODO: For each DNP, remove it from DB if it is selected in the stakers config
     switch (dnpName) {
       case db.executionClientMainnet.get():
         db.executionClientMainnet.set(null);
