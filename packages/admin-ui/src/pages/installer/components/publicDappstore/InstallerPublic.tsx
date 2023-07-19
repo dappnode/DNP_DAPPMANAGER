@@ -8,7 +8,6 @@ import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterDirectory from "../../helpers/filterDirectory";
-import { rootPath } from "../../data";
 import CategoryFilter from "../CategoryFilter";
 import NoPackageFound from "../NoPackageFound";
 import DnpStore from "../DnpStore";
@@ -76,7 +75,7 @@ export const InstallerPublic: React.FC = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    navigate(rootPath + "/" + encodeURIComponent(id));
+    navigate(encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -178,7 +177,7 @@ export const InstallerPublic: React.FC = routeProps => {
         <Loading
           steps={[
             `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
-            `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
+              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
           ]}
         />
       ) : requestStatus.success ? (

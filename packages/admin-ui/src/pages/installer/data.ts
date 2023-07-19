@@ -1,7 +1,14 @@
 // This will be used later in our root reducer and selectors
-export const relativePath = "installer";
-export const rootPath = relativePath + "/*";
+export const relativePath = "installer/dnp";
+export const getInstallerPath = (dnpName: string) => {
+  if (dnpName.includes("public")) return "/installer/public";
+  return "/installer/dnp";
+};
+export const rootPath = "installer/*";
 export const title = "DAppStore";
 
 // Subpaths
-export const subPathPublic = "public";
+export const subPaths = {
+  dnp: "dnp/*",
+  public: "public/*"
+};

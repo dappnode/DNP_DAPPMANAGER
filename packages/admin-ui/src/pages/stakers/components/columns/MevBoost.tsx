@@ -6,8 +6,8 @@ import { StakerItem, StakerItemOk } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
 import { AiFillInfoCircle } from "react-icons/ai";
@@ -35,6 +35,8 @@ export default function MevBoost<T extends Network>({
   >;
   isSelected: boolean;
 }) {
+  const navigate = useNavigate();
+
   return (
     <Card
       {...props}
@@ -68,9 +70,16 @@ export default function MevBoost<T extends Network>({
         mevBoost.isInstalled &&
         !mevBoost.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${mevBoost.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
+            <Button
+              onClick={() =>
+                navigate(
+                  `${getInstallerPath(mevBoost.dnpName)}/${mevBoost.dnpName}`
+                )
+              }
+              variant="dappnode"
+            >
+              UPDATE
+            </Button>
             <br />
             <br />
           </>
@@ -171,8 +180,8 @@ function Relay<T extends Network>({
         {relay.ofacCompliant === undefined
           ? "-"
           : relay.ofacCompliant
-            ? "Yes"
-            : "No"}
+          ? "Yes"
+          : "No"}
       </td>
       <td>
         <Form.Check
@@ -202,9 +211,7 @@ function Relay<T extends Network>({
 
 // Utils
 
-const getDefaultRelays = <T extends Network>(
-  network: T
-): RelayIface[] => {
+const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
   switch (network) {
     case "mainnet":
       return [

@@ -8,8 +8,6 @@ import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterDirectory from "../../helpers/filterDirectory";
-import { rootPath } from "../../data";
-import { rootPath as stakersPath } from "../../../stakers/data";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
@@ -69,9 +67,8 @@ export const InstallerDnp: React.FC = routeProps => {
     // - Mainnet: http://my.dappnode/stakers/mainnet
     // - Gnosis: http://my.dappnode/stakers/gnosis
     // - Stakehouse: http://my.dappnode/stakers/stakehouse
-    if (id === "ethereum.dnp.dappnode.eth") navigate(stakersPath + "/mainnet");
-    else if (id === "gnosis.dnp.dappnode.eth")
-      navigate(stakersPath + "/gnosis");
+    if (id === "ethereum.dnp.dappnode.eth") navigate("stakers/mainnet");
+    else if (id === "gnosis.dnp.dappnode.eth") navigate("stakers/gnosis");
     else if (id === "stakehouse.dnp.dappnode.eth") {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
@@ -92,7 +89,7 @@ export const InstallerDnp: React.FC = routeProps => {
           }
         ]
       });
-    } else navigate(rootPath + "/" + encodeURIComponent(id));
+    } else navigate(encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {

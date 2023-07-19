@@ -1,7 +1,7 @@
 import Switch from "components/Switch";
 import { confirm } from "components/ConfirmDialog";
 import React, { useState, useEffect } from "react";
-import { subPathPublic, relativePath } from "../data";
+import { subPaths, relativePath } from "../data";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export function PublicSwitch() {
@@ -37,7 +37,7 @@ export function PublicSwitch() {
               variant: "danger",
               label: "I understand, take me to the public repo",
               onClick: () => {
-                navigate(subPathPublic);
+                navigate(subPaths.public);
                 setDappstorePublic(true);
               }
             }
@@ -45,7 +45,7 @@ export function PublicSwitch() {
         })
       );
     } else {
-      navigate(relativePath);
+      navigate(`/${relativePath}`);
       setDappstorePublic(false);
     }
   }
