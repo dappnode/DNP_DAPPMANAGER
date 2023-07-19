@@ -25,7 +25,6 @@ import {
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
-import { PublicSwitch } from "../PublicSwitch";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
 
@@ -130,7 +129,6 @@ export const InstallerDnp: React.FC = routeProps => {
 
   return (
     <>
-      <PublicSwitch {...routeProps} />
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}
