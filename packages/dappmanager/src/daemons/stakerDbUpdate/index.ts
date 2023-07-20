@@ -1,41 +1,33 @@
 import { eventBus } from "../../eventBus.js";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import * as db from "../../db/index.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import params from "../../params.js";
+import { logger } from "ethers";
 
 async function removeStakerPkgsFromDbIfSelected({
   dnpNames
 }: {
   dnpNames?: string[];
 }): Promise<void> {
-  // Only leave the dnpName included in stakerPkgs
-  dnpNames =
-    dnpNames?.filter(dnpName =>
-      stakerPkgs.some(stakerPkg => stakerPkg === dnpName)
-    ) || [];
-
-  if (dnpNames.length === 0) return;
-
+  if (!dnpNames) return;
   dnpNames.forEach(dnpName => {
     switch (dnpName) {
       case db.executionClientMainnet.get():
-        db.executionClientMainnet.set(null);
+        db.executionClientMainnet.set(undefined);
         break;
       case db.executionClientGnosis.get():
-        db.executionClientGnosis.set(null);
+        db.executionClientGnosis.set(undefined);
         break;
       case db.executionClientPrater.get():
-        db.executionClientPrater.set(null);
+        db.executionClientPrater.set(undefined);
         break;
       case db.consensusClientMainnet.get():
-        db.consensusClientMainnet.set(null);
+        db.consensusClientMainnet.set(undefined);
         break;
       case db.consensusClientGnosis.get():
-        db.consensusClientGnosis.set(null);
+        db.consensusClientGnosis.set(undefined);
         break;
       case db.consensusClientPrater.get():
-        db.consensusClientPrater.set(null);
+        db.consensusClientPrater.set(undefined);
         break;
       case mevBoostMainnet[0]:
         db.mevBoostMainnet.set(false);
@@ -47,22 +39,21 @@ async function removeStakerPkgsFromDbIfSelected({
         break;
     }
   });
+
+  logger.info(`Removed clients/mev-boost ${dnpNames} from main DB`);
 }
 
 /**
  * stakerDbUpdate daemon.
  * Makes sure the main DB is updated when any package selected in the stakers is removed
  */
-export function startStakerDbUpdateDaemon(signal: AbortSignal): void {
+export function startStakerDbUpdateDaemon(): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
+    logger.debug(
+      `packagesModified event received in removeStakerPkgsFromDbIfSelected daemon: ${dnpNames}`
+    );
     if (removed) {
       removeStakerPkgsFromDbIfSelected({ dnpNames });
     }
   });
-
-  runAtMostEvery(
-    async () => removeStakerPkgsFromDbIfSelected({}),
-    params.STAKER_DB_UPDATE_INTERVAL,
-    signal
-  );
 }
