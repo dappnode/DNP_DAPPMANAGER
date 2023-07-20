@@ -29,10 +29,10 @@ async function removeStakerPkgsFromDbIfSelected({
       case db.consensusClientPrater.get():
         db.consensusClientPrater.set(undefined);
         break;
-      case mevBoostMainnet[0]:
+      case "mev-boost.dnp.dappnode.eth":
         db.mevBoostMainnet.set(false);
         break;
-      case mevBoostPrater[0]:
+      case "mev-boost-goerli.dnp.dappnode.eth":
         db.mevBoostPrater.set(false);
         break;
       default:
