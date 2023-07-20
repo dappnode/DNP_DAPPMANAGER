@@ -22,7 +22,7 @@ import HorizontalStepper from "./HorizontalStepper";
 import Card from "components/Card";
 import StatusIcon from "components/StatusIcon";
 // External
-import { rootPath as packagesRootPath } from "pages/packages/data";
+import { relativePath as packagesRelativePath } from "pages/packages/data";
 import { ProgressLogs } from "types";
 import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
@@ -132,7 +132,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
-            navigate(packagesRootPath + "/" + dnpName);
+            navigate("/" + packagesRelativePath + "/" + dnpName + "/info");
           }
         }, 1000);
       }
