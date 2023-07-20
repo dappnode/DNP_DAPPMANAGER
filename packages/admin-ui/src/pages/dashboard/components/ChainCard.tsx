@@ -7,7 +7,7 @@ import { prettyDnpName } from "utils/format";
 import { ChainData } from "@dappnode/common";
 import { HelpTo } from "components/Help";
 import { Link } from "react-router-dom";
-import { rootPath as packagesRootPath } from "pages/packages";
+import { relativePath as packagesRelativePath } from "pages/packages";
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -64,7 +64,7 @@ function ChainCard(chain: ChainData) {
         )}
         {peers && <RenderMarkdown source={`Peers: ${peers}`} noMargin />}
         {error ? (
-          <Link to={`${packagesRootPath}/${dnpName}/logs`}>More info</Link>
+          <Link to={`/${packagesRelativePath}/${dnpName}/logs`}>More info</Link>
         ) : null}
       </div>
     </Card>

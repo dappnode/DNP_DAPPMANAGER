@@ -9,7 +9,7 @@ import { BsTrash } from "react-icons/bs";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { InstalledPackageDetailData } from "@dappnode/common";
-import { rootPath as packagesRootPath } from "../../data";
+import { relativePath as packagesRelativePath } from "../../data";
 import { markdownList } from "utils/markdown";
 import "./removePackage.scss";
 
@@ -97,7 +97,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         message: `Removing ${name} ${deleteVolumes ? " and volumes" : ""}...`,
         onSuccess: `Removed ${name}`
       });
-      navigate(packagesRootPath);
+      navigate("/" + packagesRelativePath);
     } catch (e) {
       console.error(e);
     }
