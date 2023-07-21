@@ -5,7 +5,6 @@ import { startEthMultiClientDaemon } from "./ethMultiClient/index.js";
 import { startNatRenewalDaemon } from "./natRenewal/index.js";
 import { startNsUpdateDaemon } from "./nsupdate/index.js";
 import { startStakerDaemon } from "./stakerConfig/index.js";
-import { startStakerDbUpdateDaemon } from "./stakerDbUpdate/index.js";
 import { startTelegramBotDaemon } from "./telegramBot/index.js";
 
 export function startDaemons(signal: AbortSignal): void {
@@ -16,6 +15,5 @@ export function startDaemons(signal: AbortSignal): void {
   startNatRenewalDaemon(signal);
   startNsUpdateDaemon(signal);
   startStakerDaemon();
-  startStakerDbUpdateDaemon();
   startTelegramBotDaemon();
 }
