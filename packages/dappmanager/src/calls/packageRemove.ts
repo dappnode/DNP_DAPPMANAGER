@@ -14,7 +14,7 @@ import { getDockerTimeoutMax } from "../modules/docker/utils.js";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";
-import { mevBoostMainnet, mevBoostPrater } from "@dappnode/types";
+import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 
 /**
  * Remove package data: docker down + disk files
@@ -110,7 +110,8 @@ export async function packageRemove({
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
 
   // Remove client from maindb.json if it is a staker package
-  await removeStakerPkgFromDbIfSelected({ dnpName });
+  if (stakerPkgs.some(stakerPkg => stakerPkg === dnp.dnpName))
+    await removeStakerPkgFromDbIfSelected({ dnpName });
 
   // Emit packages update
   eventBus.requestPackages.emit();
