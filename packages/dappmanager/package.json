@@ -24,7 +24,7 @@
     "@dappnode/common": "^0.1.0",
     "@dappnode/schemas": "^0.1.7",
     "@dappnode/toolkit": "^0.1.19",
-    "@dappnode/types": "^0.1.20",
+    "@dappnode/types": "0.1.22",
     "@ipld/car": "^3.1.16",
     "@types/async": "^3.0.1",
     "@types/async-retry": "^1.4.2",

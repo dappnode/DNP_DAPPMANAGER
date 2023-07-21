@@ -1370,6 +1370,11 @@
     semver "^7.5.0"
     yaml "^2.2.2"
 
+"@dappnode/types@0.1.22":
+  version "0.1.22"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.22.tgz#89a74cb392847eaf63d91d5b705fe5e99b5bded3"
+  integrity sha512-Os7hDmiDteIxmfY9R5dUAyyBdh4G4CgZfwJZcX6tx1luidFopFCDB/kVCSSvg8jV0nqDgoFhnbmjxlI1jxHBDw==
+
 "@dappnode/types@^0.1.12", "@dappnode/types@^0.1.9":
   version "0.1.17"
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.17.tgz#b15fba7356acae7f2751f0cfe4db08eccb004993"
