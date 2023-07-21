@@ -13,6 +13,8 @@ import { logs } from "../logs.js";
 import { getDockerTimeoutMax } from "../modules/docker/utils.js";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";
+import * as db from "../db/index.js";
+import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 
 /**
  * Remove package data: docker down + disk files
@@ -107,7 +109,52 @@ export async function packageRemove({
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
 
+  // Remove client from maindb.json if it is a staker package
+  if (stakerPkgs.some(stakerPkg => stakerPkg === dnp.dnpName))
+    await removeStakerPkgFromDbIfSelected({ dnpName });
+
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnp.dnpName], removed: true });
+}
+/**
+ * Removes the package from the main DB if it is a staker package and it is selected as current client
+ *
+ * @param dnpName DNP of the removed package
+ */
+async function removeStakerPkgFromDbIfSelected({
+  dnpName
+}: {
+  dnpName: string;
+}): Promise<void> {
+  switch (dnpName) {
+    case db.executionClientMainnet.get():
+      await db.executionClientMainnet.set(undefined);
+      break;
+    case db.executionClientGnosis.get():
+      await db.executionClientGnosis.set(undefined);
+      break;
+    case db.executionClientPrater.get():
+      await db.executionClientPrater.set(undefined);
+      break;
+    case db.consensusClientMainnet.get():
+      await db.consensusClientMainnet.set(undefined);
+      break;
+    case db.consensusClientGnosis.get():
+      await db.consensusClientGnosis.set(undefined);
+      break;
+    case db.consensusClientPrater.get():
+      await db.consensusClientPrater.set(undefined);
+      break;
+    case mevBoostMainnet:
+      await db.mevBoostMainnet.set(false);
+      break;
+    case mevBoostPrater:
+      await db.mevBoostPrater.set(false);
+      break;
+    default:
+      return;
+  }
+
+  logs.info(`Removed client ${dnpName} from main DB after package is removed`);
 }
