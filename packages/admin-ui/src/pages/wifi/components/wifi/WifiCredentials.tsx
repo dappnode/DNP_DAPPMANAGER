@@ -13,7 +13,7 @@ import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
 
-import { withToastNoThrow } from "components/toast/Toast";
+import { withToast } from "components/toast/Toast";
 import { InputForm } from "components/InputForm";
 
 export default function WifiCredentials(): JSX.Element {
@@ -47,7 +47,7 @@ export default function WifiCredentials(): JSX.Element {
       [wifiEnvWPA_PASSPHRASE]: password
     };
     if (isValid)
-      await withToastNoThrow(
+      await withToast(
         () =>
           api.packageSetEnvironment({
             dnpName: wifiDnpName,
@@ -104,7 +104,7 @@ export default function WifiCredentials(): JSX.Element {
                 type="submit"
                 variant="dappnode"
                 disabled={!isValid}
-                onClick={() => onChangeCredentials}
+                onClick={() => onChangeCredentials()}
               >
                 Change credentials
               </Button>
