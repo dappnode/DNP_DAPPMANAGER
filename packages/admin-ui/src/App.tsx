@@ -99,10 +99,9 @@ function MainApp({ username }: { username: string }) {
                   }
                 />
               ))}
-              {/* Order matters here! The most specific paths need to be first */}
               {/* Redirection for routes with hashes */}
               {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<Fallback />} />
+              <Route path="*" element={<DefaultRedirect />} />
             </Routes>
           </div>
 
@@ -115,19 +114,12 @@ function MainApp({ username }: { username: string }) {
   );
 }
 
-function Fallback() {
-  const location = useLocation();
+function DefaultRedirect() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // Check if the URL includes a hash
-    if (location.hash) {
-      // Replace '#/' with nothing and navigate
-      // This is to support the old URLs with hashes that were used when hash routing was used
-      const newPathname = location.pathname + location.hash.replace("#/", "");
-      navigate(newPathname, { replace: true });
-    } else {
-      // Redirect to the default dashboard
+    if (location.pathname === "/") {
       navigate("/dashboard", { replace: true });
     }
   }, [location, navigate]);
