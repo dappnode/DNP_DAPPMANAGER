@@ -14,13 +14,15 @@ interface DappnodeStatusState {
    */
   passwordIsSecure: boolean | null;
   volumes: VolumeData[];
+  rebootIsRequired: boolean | null;
 }
 
 const initialState: DappnodeStatusState = {
   systemInfo: null,
   wifiCredentials: null,
   passwordIsSecure: null,
-  volumes: []
+  volumes: [],
+  rebootIsRequired: null
 };
 
 export const dappnodeStatus = createSlice({

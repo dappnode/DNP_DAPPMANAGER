@@ -6,7 +6,7 @@ import { autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
 import { getInstallerPath } from "pages/installer";
 import {
-  rootPath as systemRootPath,
+  pathName as systemPathName,
   subPaths as systemSubPaths
 } from "pages/system/data";
 
@@ -50,7 +50,7 @@ export function AutoUpdateRowItem({
     id === MY_PACKAGES
       ? null
       : id === SYSTEM_PACKAGES
-      ? `${systemRootPath}/${systemSubPaths.update}`
+      ? `${systemPathName}/${systemSubPaths.update}`
       : `${getInstallerPath(id)}/${id}`;
 
   const feedbackText = !enabled
