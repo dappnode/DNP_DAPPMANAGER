@@ -179,6 +179,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
+  rebootHostIsRequiredGet: async () => false,
   seedPhraseSet: async () => {},
   setStaticIp: async () => {},
 

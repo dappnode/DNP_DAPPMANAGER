@@ -536,6 +536,11 @@ export interface Routes {
    */
   rebootHost: () => Promise<void>;
 
+  /**
+   *  Returns true if a reboot is required
+   */
+  rebootHostIsRequiredGet: () => Promise<boolean>;
+
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
@@ -727,6 +732,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
+  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },

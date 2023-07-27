@@ -49,6 +49,7 @@ export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
+export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
 export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";
