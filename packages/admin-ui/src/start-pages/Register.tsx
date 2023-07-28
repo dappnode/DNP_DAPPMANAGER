@@ -99,9 +99,8 @@ export function Register({
         <Button
           type="submit"
           onClick={onRegister}
-          variant="dappnode"
           disabled={reqStatus.loading || !isValid}
-          fullwidth
+          fullWidth
         >
           Register
         </Button>
@@ -134,11 +133,7 @@ function CopyRecoveryToken({
         access your machine
       </Alert>
 
-      <Button
-        className="register-button"
-        onClick={onCopiedRecoveryToken}
-        variant="dappnode"
-      >
+      <Button className="register-button" onClick={onCopiedRecoveryToken}>
         I've copied the recovery token
       </Button>
     </StandaloneContainer>

@@ -52,9 +52,7 @@ const Permissions: React.FC<PermissionsProps> = ({
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
-        <Button variant="dappnode" onClick={onAccept}>
-          Accept
-        </Button>
+        <Button onClick={onAccept}>Accept</Button>
       </div>
     </Card>
   );

@@ -140,7 +140,6 @@ export function PortsStatusTable({
         <SubTitle>
           Ports table
           <Button
-            variant={"dappnode"}
             className="float-right"
             onClick={apiStatusGet}
             style={{ margin: "auto 5px auto" }}
@@ -150,7 +149,6 @@ export function PortsStatusTable({
           </Button>
           {isUpnpEnabled ? (
             <Button
-              variant={"dappnode"}
               className="float-right"
               onClick={upnpStatusGet}
               style={{ margin: "auto 5px auto" }}

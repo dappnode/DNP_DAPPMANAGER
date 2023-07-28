@@ -28,12 +28,10 @@ export async function enableAutoUpdatesForPackageWithConfirm(
         buttons: [
           {
             label: "Enable for all packages",
-            variant: "outline-secondary",
             onClick: () => resolve(true)
           },
           {
             label: "Enable",
-            variant: "dappnode",
             onClick: () => resolve(false)
           }
         ]

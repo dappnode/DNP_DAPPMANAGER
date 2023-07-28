@@ -81,7 +81,6 @@ export const InstallerDnp: React.FC = routeProps => {
           },
           {
             label: "Open",
-            variant: "dappnode",
             onClick: () => {
               window.open(stakehouseLsdUrl, "_blank");
             }

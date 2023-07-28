@@ -30,9 +30,7 @@ export function ClearCacheDb() {
         Activity tab.
       </p>
 
-      <Button variant="outline-danger" onClick={cleanCache}>
-        Clear cache database
-      </Button>
+      <Button onClick={cleanCache}>Clear cache database</Button>
     </Card>
   );
 }

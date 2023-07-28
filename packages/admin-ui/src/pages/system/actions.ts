@@ -38,7 +38,6 @@ export const changeEthClientTarget = (
           buttons: [
             {
               label: "Keep node running",
-              variant: "danger",
               onClick: () => {
                 deletePrevExecClient = false;
                 deletePrevExecClientVolumes = false;
@@ -47,7 +46,6 @@ export const changeEthClientTarget = (
             },
             {
               label: "Remove and keep volumes",
-              variant: "warning",
               onClick: () => {
                 deletePrevExecClient = true;
                 deletePrevExecClientVolumes = false;
@@ -56,7 +54,6 @@ export const changeEthClientTarget = (
             },
             {
               label: "Remove and delete volumes",
-              variant: "dappnode",
               onClick: () => {
                 deletePrevExecClient = true;
                 deletePrevExecClientVolumes = true;
@@ -80,7 +77,6 @@ export const changeEthClientTarget = (
           buttons: [
             {
               label: "Keep node running",
-              variant: "danger",
               onClick: () => {
                 deletePrevConsClient = false;
                 deletePrevConsClientVolumes = false;
@@ -89,7 +85,6 @@ export const changeEthClientTarget = (
             },
             {
               label: "Remove and keep volumes",
-              variant: "warning",
               onClick: () => {
                 deletePrevConsClient = true;
                 deletePrevConsClientVolumes = false;
@@ -98,7 +93,6 @@ export const changeEthClientTarget = (
             },
             {
               label: "Remove and delete volumes",
-              variant: "dappnode",
               onClick: () => {
                 deletePrevConsClient = true;
                 deletePrevConsClientVolumes = true;
@@ -146,7 +140,6 @@ export const passwordChange = (
       title: `Changing host user password`,
       text: `Make sure to safely store this password and keep a back up. \n\nYou will never be able to see this password again. If you lose it, you will not be able to recover it in any way.`,
       label: "Change",
-      variant: "dappnode",
       onClick: resolve
     })
   );
@@ -166,7 +159,6 @@ export const volumeRemove = (name: string): AppThunk => async dispatch => {
       title: `Removing volume`,
       text: `Are you sure you want to permanently remove volume ${name}?`,
       label: "Remove",
-      variant: "danger",
       onClick: resolve
     })
   );

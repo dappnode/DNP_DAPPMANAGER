@@ -61,7 +61,6 @@ export default function ExecutionClient<T extends Network>({
                   }`
                 )
               }
-              variant="dappnode"
             >
               UPDATE
             </Button>

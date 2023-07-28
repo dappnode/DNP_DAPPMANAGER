@@ -30,9 +30,7 @@ export function ClearMainDb() {
         configuration and more
       </p>
 
-      <Button variant="outline-danger" onClick={cleanDb}>
-        Clear main database
-      </Button>
+      <Button onClick={cleanDb}>Clear main database</Button>
     </Card>
   );
 }

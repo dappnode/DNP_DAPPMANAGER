@@ -76,7 +76,6 @@ export default function MevBoost<T extends Network>({
                   `${getInstallerPath(mevBoost.dnpName)}/${mevBoost.dnpName}`
                 )
               }
-              variant="dappnode"
             >
               UPDATE
             </Button>

@@ -4,10 +4,7 @@ import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  StakerConfigGet,
-  StakerConfigGetOk,
-} from "@dappnode/common";
+import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/common";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -56,7 +53,7 @@ export default function StakerNetwork<T extends Network>({
     setNewMevBoost,
     newEnableWeb3signer,
     setNewEnableWeb3signer,
-    changes,
+    changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
   /**
@@ -231,7 +228,7 @@ export default function StakerNetwork<T extends Network>({
                   setNewMevBoost={setNewMevBoost}
                   isSelected={
                     currentStakerConfigReq.data.mevBoost.dnpName ===
-                      newMevBoost?.dnpName
+                    newMevBoost?.dnpName
                       ? true
                       : false
                   }
@@ -245,7 +242,6 @@ export default function StakerNetwork<T extends Network>({
           <div>
             <div className="staker-buttons">
               <Button
-                variant="dappnode"
                 disabled={!changes.isAllowed || reqStatus.loading}
                 onClick={() => setNewConfig(false)}
               >
@@ -255,7 +251,6 @@ export default function StakerNetwork<T extends Network>({
                 <Button
                   disabled={!allStakerItemsOk}
                   onClick={() => setShowLaunchpadValidators(true)}
-                  variant="dappnode"
                 >
                   <FaEthereum /> Step by step setup
                 </Button>

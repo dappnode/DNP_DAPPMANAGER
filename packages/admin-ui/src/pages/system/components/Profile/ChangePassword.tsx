@@ -80,7 +80,6 @@ export function ChangePassword() {
         <Button
           type="submit"
           onClick={onChangePassword}
-          variant="dappnode"
           disabled={reqStatus.loading}
         >
           Change UI password

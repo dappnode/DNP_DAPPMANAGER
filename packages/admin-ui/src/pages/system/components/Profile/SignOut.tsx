@@ -23,7 +23,6 @@ export function SignOut() {
       <Button
         className="register-button"
         onClick={onLogout}
-        variant="outline-danger"
         disabled={reqStatus.loading}
       >
         Sign out

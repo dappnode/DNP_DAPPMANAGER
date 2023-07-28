@@ -60,7 +60,6 @@ function ReleaseTrustedKeysGrid({
         text:
           "Your DAppNode won't be to safely verify releases signed by this key.",
         label: "Remove",
-        variant: "danger",
         onClick: resolve
       })
     );
@@ -168,7 +167,7 @@ function ReleaseTrustedKeysAdder({ onEdit }: { onEdit: () => void }) {
         }
       ]}
     >
-      <Button type="submit" onClick={addTrustedKey} variant="dappnode">
+      <Button type="submit" onClick={addTrustedKey}>
         Submit key
       </Button>
     </InputForm>

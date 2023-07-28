@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import Button, { ButtonVariant } from "components/Button";
+import Button from "components/Button";
 import { render, unmountComponentAtNode } from "react-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import { stringIncludes } from "utils/strings";
@@ -8,7 +8,6 @@ import "./confirmDialog.scss";
 interface ModalButtonData {
   label: string;
   onClick?: () => void;
-  variant?: ButtonVariant;
 }
 
 interface ConfirmDialogProps {
@@ -22,7 +21,6 @@ interface ConfirmDialogProps {
   // Main Button
   label?: string;
   onClick?: () => void;
-  variant?: ButtonVariant;
 }
 
 /**
@@ -45,7 +43,6 @@ function Modal({
   buttons = [],
   label: mainLabel,
   onClick: mainOnClick,
-  variant: mainVariant,
   onClose
 }: ConfirmDialogProps & { onClose: () => void }) {
   // If user clicks the modal itself, do not close
@@ -55,13 +52,12 @@ function Modal({
   if (mainLabel && mainOnClick)
     buttons.push({
       label: mainLabel,
-      onClick: mainOnClick,
-      variant: mainVariant
+      onClick: mainOnClick
     });
 
   // If there is no "Cancel" option, add it as the first
   if (!buttons.find(({ label }) => stringIncludes(label, "Cancel")))
-    buttons.unshift({ label: "Cancel", variant: "outline-secondary" });
+    buttons.unshift({ label: "Cancel" });
 
   return (
     <div
@@ -96,10 +92,9 @@ function Modal({
         )}
 
         <div className="buttons">
-          {buttons.map(({ label, variant, onClick }) => (
+          {buttons.map(({ label, onClick }) => (
             <Button
               key={label}
-              variant={variant || "outline-danger"}
               onClick={() => {
                 if (onClick) onClick();
                 onClose();

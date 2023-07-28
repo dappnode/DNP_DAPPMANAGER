@@ -92,18 +92,11 @@ export default function LaunchpadValidators<T extends Network>({
         <div className="bottom-buttons">
           <div className="left-buttons">
             {stepIndex !== 0 && (
-              <Button
-                onClick={handlePrevStep}
-                variant="outline-secondary"
-                className="back"
-              >
+              <Button onClick={handlePrevStep} className="back">
                 Back
               </Button>
             )}
-            <Button
-              onClick={() => setShowLaunchpadValidators(false)}
-              variant="outline-secondary"
-            >
+            <Button onClick={() => setShowLaunchpadValidators(false)}>
               Cancel
             </Button>
           </div>
@@ -112,7 +105,6 @@ export default function LaunchpadValidators<T extends Network>({
             <Button
               onClick={handleNextStep}
               disabled={!nextEnabled}
-              variant="dappnode"
               className="next"
             >
               Next

@@ -52,7 +52,7 @@ export default function Activity() {
           {...newTabProps}
           className="no-a-style"
         >
-          <Button variant="dappnode"> Download all logs</Button>
+          <Button> Download all logs</Button>
         </a>
       </div>
 

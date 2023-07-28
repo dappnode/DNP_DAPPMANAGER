@@ -67,7 +67,6 @@ export default function Ipfs() {
 
           <div style={{ textAlign: "end" }}>
             <Button
-              variant="dappnode"
               onClick={changeIpfsClient}
               disabled={
                 !ipfsClientTarget ||

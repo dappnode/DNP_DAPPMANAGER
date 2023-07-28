@@ -53,7 +53,7 @@ export function BackupDownload({
       {reqStatus.result ? (
         <>
           <a href={reqStatus.result} {...newTabProps} className="no-a-style">
-            <Button variant="dappnode">Download backup</Button>
+            <Button>Download backup</Button>
             <div
               style={{
                 opacity: 0.7,
@@ -70,11 +70,7 @@ export function BackupDownload({
           </Alert>
         </>
       ) : (
-        <Button
-          onClick={prepareBackupForDownload}
-          disabled={reqStatus.loading}
-          variant="dappnode"
-        >
+        <Button onClick={prepareBackupForDownload} disabled={reqStatus.loading}>
           Backup now
         </Button>
       )}

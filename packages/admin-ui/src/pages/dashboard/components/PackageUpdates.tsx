@@ -53,7 +53,6 @@ export function PackageUpdates() {
                   onClick={() =>
                     navigate(`${getInstallerPath(dnpName)}/${dnpName}`)
                   }
-                  variant="dappnode"
                 >
                   Update
                 </Button>

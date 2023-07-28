@@ -1,30 +1,26 @@
 import React from "react";
-import Button, { ButtonVariant } from "components/Button";
+import Button from "components/Button";
 
 export default function BottomButtons({
   onBack,
   onNext,
   backTag = "Back",
-  nextTag = "Next",
-  backVariant = "outline-secondary",
-  nextVariant = "dappnode"
+  nextTag = "Next"
 }: {
   onBack?: () => void;
   onNext?: () => void;
   backTag?: string;
   nextTag?: string;
-  backVariant?: ButtonVariant;
-  nextVariant?: ButtonVariant;
 }) {
   return (
     <div className="bottom-buttons">
       {onBack && (
-        <Button onClick={onBack} variant={backVariant} className="back">
+        <Button onClick={onBack} className="back">
           {backTag}
         </Button>
       )}
       {onNext && (
-        <Button onClick={onNext} variant={nextVariant} className="next">
+        <Button onClick={onNext} className="next">
           {nextTag}
         </Button>
       )}

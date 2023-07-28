@@ -78,7 +78,6 @@ export default function ConsensusClient<T extends Network>({
                     }`
                   )
                 }
-                variant="dappnode"
               >
                 UPDATE
               </Button>
