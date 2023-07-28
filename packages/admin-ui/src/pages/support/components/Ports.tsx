@@ -10,7 +10,7 @@ export default function Ports() {
   const systemInfo = useApi.systemInfoGet();
 
   return (
-    <Card spacing>
+    <Card>
       {systemInfo.data ? (
         <>
           {systemInfo.data.publicIp !== systemInfo.data.internalIp ? (

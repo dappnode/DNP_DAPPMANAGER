@@ -59,7 +59,7 @@ export default function ChangeWifiPassword() {
   }
 
   return (
-    <Card spacing>
+    <Card>
       <div>
         Please change the WIFI credentials. The current password is the factory
         insecure default. Changing it to a strong password will protect your

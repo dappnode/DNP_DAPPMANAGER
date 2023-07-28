@@ -98,7 +98,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
     : "Lines must be a number > 0";
 
   return (
-    <Card spacing>
+    <Card>
       <ServiceSelector
         serviceName={serviceName}
         setServiceName={setServiceName}

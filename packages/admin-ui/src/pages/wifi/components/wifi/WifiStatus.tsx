@@ -108,7 +108,7 @@ export default function WifiStatus(): JSX.Element {
   return (
     <>
       {wifiDnp.data ? (
-        <Card spacing>
+        <Card>
           <WifiInfo wifiStatus={wifiDnp.data.containers[0].state} />
           <hr />
           <div className="wifi-local-status-actions-row">

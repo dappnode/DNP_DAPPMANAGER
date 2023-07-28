@@ -26,7 +26,7 @@ const Permissions: React.FC<PermissionsProps> = ({
    * }, ... ]
    */
   return (
-    <Card className="permissions-list" spacing divider>
+    <Card className="permissions-list">
       {Object.entries(permissions).map(([dnpName, permissionsDnp]) => (
         <div key={dnpName}>
           <div className="card-section-header">

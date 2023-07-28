@@ -89,7 +89,7 @@ export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {
   const addMyPeerUrl = `http://my.dappnode/${matchUrl}/${peerMultiAddressEncoded}`;
 
   return (
-    <Card spacing>
+    <Card>
       <div>
         Share this link with another DAppNode admin to automatically
         peer-connect your two IPFS nodes. Use this resource to mitigate slow

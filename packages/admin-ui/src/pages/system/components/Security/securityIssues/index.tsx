@@ -54,7 +54,7 @@ export default function SecurityIssues() {
 
   return (
     <>
-      <Card spacing>
+      <Card>
         <StatusIcon
           success={!areActiveIssues}
           message={

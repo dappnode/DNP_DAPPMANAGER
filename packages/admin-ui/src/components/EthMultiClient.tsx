@@ -180,7 +180,6 @@ function EthMultiClients({
         return (
           <Card
             key={title}
-            shadow
             className={`eth-multi-client ${joinCssClass({ selected })}`}
             onClick={() => {
               // Prevent over-riding the options onTargetChange call

@@ -11,7 +11,7 @@ export function Advanced() {
   return (
     <>
       <SubTitle>Change DappNode Name</SubTitle>
-      <Card spacing>
+      <Card>
         <div>
           Dappnode name only affects to the User Web Interface. It's the name
           appears on the top navigation bar.

@@ -152,7 +152,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
 
   return (
     <>
-      <Card className="installer-header" noscroll>
+      <Card className="installer-header">
         <div className="details-header">
           <div className="left avatar">
             <img src={avatarUrl || defaultAvatar} alt="Avatar" />

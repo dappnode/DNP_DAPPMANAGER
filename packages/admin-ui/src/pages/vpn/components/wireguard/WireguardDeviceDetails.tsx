@@ -39,7 +39,7 @@ function WireguardDeviceDetailsLoaded({
   }, []);
 
   return (
-    <Card className="wireguard-device-settings" spacing>
+    <Card className="wireguard-device-settings">
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
@@ -111,7 +111,7 @@ function WireguardDeviceDetailsLoaded({
 }
 
 export const WireguardDeviceDetails: React.FC = () => {
-  const params = useParams()
+  const params = useParams();
   const id = params.id || "";
   const device = useApi.wireguardDeviceGet(id);
 

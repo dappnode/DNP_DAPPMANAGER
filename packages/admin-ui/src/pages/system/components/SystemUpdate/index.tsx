@@ -36,7 +36,7 @@ export default function SystemUpdate() {
       ) : error ? (
         <ErrorView error={`Error checking core version: ${error}`}></ErrorView>
       ) : success ? (
-        <Card spacing>
+        <Card>
           <StatusIcon success message="System up to date" />
         </Card>
       ) : null}

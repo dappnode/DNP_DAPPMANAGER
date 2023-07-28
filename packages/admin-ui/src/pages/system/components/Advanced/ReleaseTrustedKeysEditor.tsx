@@ -20,7 +20,7 @@ export function ReleaseTrustedKeysEditor() {
   const trustedKeys = useApi.releaseTrustedKeyList();
 
   return (
-    <Card spacing>
+    <Card>
       {trustedKeys.data ? (
         <ReleaseTrustedKeysGrid
           keys={trustedKeys.data}

@@ -33,7 +33,7 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
       if (!filteredDnps.length) return <NoPackagesYet />;
 
       return (
-        <Card spacing>
+        <Card>
           <StateBadgeLegend dnps={filteredDnps}></StateBadgeLegend>
 
           <div className="list-grid dnps no-a-style">

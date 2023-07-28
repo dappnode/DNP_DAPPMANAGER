@@ -5,7 +5,7 @@ import { SshManagerChangeStatus } from "./ChangeStatus";
 
 export function SshManager() {
   return (
-    <Card spacing>
+    <Card>
       <div className="subtle-header">ENABLE, DISABLE SSH</div>
       <p>
         Enable and start or disable and stop the ssh.service of your DAppNode

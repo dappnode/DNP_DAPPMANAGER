@@ -8,7 +8,7 @@ export default function Profile() {
   return (
     <>
       <SubTitle>Change UI password</SubTitle>
-      <Card spacing>
+      <Card>
         <div>
           This password is used to authorize admin access to this UI. It
           protects you from Cross Site Scripting (XSS) attacks, and un-wanted
@@ -19,7 +19,7 @@ export default function Profile() {
       </Card>
 
       <SubTitle>Sign out</SubTitle>
-      <Card spacing>
+      <Card>
         <SignOut />
       </Card>
     </>

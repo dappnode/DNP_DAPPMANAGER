@@ -35,7 +35,7 @@ export default function ConsensusClient<T extends Network>({
     <Card
       {...props}
       className={`consensus-client ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
+      raised={isSelected}
     >
       <div
         onClick={

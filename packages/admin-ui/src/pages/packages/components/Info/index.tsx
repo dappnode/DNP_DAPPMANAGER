@@ -77,7 +77,7 @@ export function Info({
         </>
       )}
 
-      <Card spacing divider>
+      <Card>
         <div className="package-info">
           {/* <ReadMoreMarkdown
             source={

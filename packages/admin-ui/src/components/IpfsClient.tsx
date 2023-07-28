@@ -53,7 +53,6 @@ export function IpfsClient({
           return (
             <Card
               key={option}
-              shadow
               className={`ipfs-multi-client ${joinCssClass({ selected })}`}
               onClick={() => {
                 // Prevent over-riding the options onClientTargetChange call

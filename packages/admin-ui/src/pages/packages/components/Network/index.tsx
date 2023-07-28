@@ -14,7 +14,7 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
   const container = containers.find(c => c.serviceName === serviceName);
   return (
     <>
-      <Card spacing className="network-editor">
+      <Card className="network-editor">
         <ServiceSelector
           serviceName={serviceName}
           setServiceName={setServiceName}
@@ -31,7 +31,7 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
       {container && (
         <>
           <SubTitle>Public port mapping</SubTitle>
-          <Card spacing className="network-editor">
+          <Card className="network-editor">
             <PortsByService
               dnpName={container.dnpName}
               serviceName={container.serviceName}
@@ -40,7 +40,7 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
           </Card>
 
           <SubTitle>HTTPs domain mapping</SubTitle>
-          <Card spacing className="network-editor">
+          <Card className="network-editor">
             <HttpsMappings
               dnpName={container.dnpName}
               serviceName={container.serviceName}
