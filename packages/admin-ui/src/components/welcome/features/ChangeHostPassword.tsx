@@ -86,7 +86,6 @@ export default function ChangeHostPassword({
         onBack={onBack}
         onNext={isValid ? update : onNext}
         nextTag={isValid ? undefined : "Skip"}
-        nextVariant={isValid ? undefined : "outline-secondary"}
       />
     </>
   );

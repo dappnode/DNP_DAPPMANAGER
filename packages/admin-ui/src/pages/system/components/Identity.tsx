@@ -40,8 +40,7 @@ export default function Identity() {
             title: `Changing DAppNode Identity`,
             text: `Are you sure you want to change the current DAppNode's identity?`,
             label: "Yes",
-            onClick: resolve,
-            variant: "danger"
+            onClick: resolve
           })
         );
 
@@ -126,7 +125,6 @@ export default function Identity() {
               onClick={sendSeedPhrase}
               disabled={isOnProgress || !valid}
               style={{ marginRight: "1rem" }}
-              variant="dappnode"
             >
               Set identity
             </Button>

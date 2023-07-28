@@ -194,7 +194,6 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
               <div className="actions">
                 <Button
                   className="install"
-                  variant="dappnode"
                   onClick={onInstall}
                   disabled={disableInstallation || isUpdated}
                 >

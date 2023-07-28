@@ -51,12 +51,10 @@ const InstallerRoot: React.FC = () => {
           label: "Public DAppStore",
           buttons: [
             {
-              variant: "dappnode",
               label: "Cancel",
               onClick: () => reject()
             },
             {
-              variant: "danger",
               label: "I understand, take me to the public repo",
               onClick: () => resolve()
             }

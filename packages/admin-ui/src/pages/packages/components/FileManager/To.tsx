@@ -88,7 +88,7 @@ export function CopyFileTo({
         onValueChange={setToPath}
         onEnterPress={uploadFile}
         append={
-          <Button onClick={uploadFile} disabled={!file} variant="dappnode">
+          <Button onClick={uploadFile} disabled={!file}>
             Upload
           </Button>
         }

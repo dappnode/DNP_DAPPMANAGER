@@ -72,7 +72,7 @@ function DnpCardOk({
       {/* <div className="badge">New version available</div> */}
       <div className="description">{description}</div>
       {/* Show the button as disabled (gray) if it's updated */}
-      <Button className="action" variant="dappnode" disabled={isUpdated}>
+      <Button className="action" disabled={isUpdated}>
         {getTag(directoryItem)}
       </Button>
     </Card>
@@ -94,7 +94,7 @@ function DnpCardError({
       </div>
       <DnpNameVerified name={name} />
       <div className="description">{message}</div>
-      <Button className="action" variant="dappnode" disabled={true}>
+      <Button className="action" disabled={true}>
         ERROR
       </Button>
     </Card>

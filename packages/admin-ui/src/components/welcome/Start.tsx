@@ -14,11 +14,7 @@ export default function Start({
         <div className="description">Let's go ahead and set it up</div>
       </div>
 
-      <Button
-        className="big-centered-button"
-        onClick={onNext}
-        variant="dappnode"
-      >
+      <Button className="big-centered-button" onClick={onNext}>
         Start
       </Button>
     </>

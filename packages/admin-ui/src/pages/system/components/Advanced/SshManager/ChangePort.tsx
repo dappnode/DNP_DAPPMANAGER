@@ -53,7 +53,6 @@ export function SshManagerChangePort() {
               Fetch port
             </Button>
             <Button
-              variant="dappnode"
               disabled={!port || portIsSame || reqSetStatus.loading}
               onClick={updatePort}
             >

@@ -54,7 +54,6 @@ export default function RemoteSigner<T extends Network>({
                   `${getInstallerPath(signer.dnpName)}/${signer.dnpName}`
                 )
               }
-              variant="dappnode"
             >
               UPDATE
             </Button>

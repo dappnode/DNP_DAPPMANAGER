@@ -107,7 +107,6 @@ export function TelegramNotifications() {
               type="submit"
               className="register-button"
               onClick={updateTelegramToken}
-              variant="dappnode"
             >
               Submit
             </Button>

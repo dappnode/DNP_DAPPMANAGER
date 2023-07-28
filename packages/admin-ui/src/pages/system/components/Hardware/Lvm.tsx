@@ -135,12 +135,10 @@ You must read the DAppNode documentation about extending the filesystem with LVM
         label: "Extend filesystem",
         buttons: [
           {
-            variant: "dappnode",
             label: "Cancel",
             onClick: () => resolve
           },
           {
-            variant: "danger",
             label: "I understand, I want to extend the host filesystem",
             onClick: () => {
               if (automatic) {
@@ -170,12 +168,8 @@ You must read the DAppNode documentation about extending the filesystem with LVM
           </LinkDocs>
         </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
-          <Button onClick={() => disclaimer(true)} variant="dappnode">
-            Automatic expansion
-          </Button>
-          <Button onClick={() => disclaimer(false)} variant="outline-secondary">
-            Manual expansion
-          </Button>
+          <Button onClick={() => disclaimer(true)}>Automatic expansion</Button>
+          <Button onClick={() => disclaimer(false)}>Manual expansion</Button>
         </div>
       </div>
 

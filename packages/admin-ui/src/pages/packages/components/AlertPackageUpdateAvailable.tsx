@@ -30,7 +30,6 @@ export function AlertPackageUpdateAvailable({
       </div>
       <Button
         onClick={() => navigate(`${getInstallerPath(dnpName)}/${dnpName}`)}
-        variant="dappnode"
       >
         Update
       </Button>

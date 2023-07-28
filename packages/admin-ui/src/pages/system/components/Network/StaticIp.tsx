@@ -36,7 +36,6 @@ export function StaticIp() {
         append={
           <>
             <Button
-              variant="dappnode"
               disabled={
                 // Invalid input
                 !isIpv4(input) ||
@@ -48,12 +47,7 @@ export function StaticIp() {
               {staticIp ? "Update" : "Enable"}
             </Button>
             {staticIp && (
-              <Button
-                variant="outline-dappnode"
-                onClick={() => updateStaticIp("")}
-              >
-                Disable
-              </Button>
+              <Button onClick={() => updateStaticIp("")}>Disable</Button>
             )}
           </>
         }

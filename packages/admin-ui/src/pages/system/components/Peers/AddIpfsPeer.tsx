@@ -89,7 +89,6 @@ export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
           }}
           append={
             <Button
-              variant="dappnode"
               onClick={() => addIpfsPeer(peerInput)}
               disabled={addStat.loading || !peerInput}
             >

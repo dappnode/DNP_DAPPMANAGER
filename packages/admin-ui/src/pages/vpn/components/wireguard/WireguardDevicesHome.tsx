@@ -90,11 +90,7 @@ export function WireguardDevicesHome() {
           setInput("");
         }}
         append={
-          <Button
-            variant="dappnode"
-            onClick={() => addDevice(input)}
-            disabled={errors.length > 0}
-          >
+          <Button onClick={() => addDevice(input)} disabled={errors.length > 0}>
             Add device
           </Button>
         }
