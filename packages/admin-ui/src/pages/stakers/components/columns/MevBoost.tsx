@@ -41,7 +41,7 @@ export default function MevBoost<T extends Network>({
     <Card
       {...props}
       className={`mev-boost ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
+      raised={isSelected}
     >
       <div
         onClick={

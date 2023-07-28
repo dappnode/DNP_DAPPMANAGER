@@ -25,7 +25,7 @@ const Disclaimer: React.FC<DisclaimerProps> = ({
    */
 
   return (
-    <Card spacing divider>
+    <Card>
       {disclaimers.map(disclaimer => (
         <div key={disclaimer.name}>
           <div className="card-section-header">

@@ -91,7 +91,7 @@ export function LocalProxying() {
   return (
     <>
       {localProxyingStatus.data ? (
-        <Card spacing>
+        <Card>
           <p>
             If you are connected to the same router as your DAppNode you can use
             this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.

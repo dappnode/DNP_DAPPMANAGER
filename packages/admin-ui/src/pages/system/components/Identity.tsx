@@ -71,7 +71,7 @@ export default function Identity() {
       {identityAddress === null ? (
         <Loading steps={["Checking identity"]} />
       ) : identityAddress && !editorActive ? (
-        <Card spacing>
+        <Card>
           <StatusIcon
             success
             message={

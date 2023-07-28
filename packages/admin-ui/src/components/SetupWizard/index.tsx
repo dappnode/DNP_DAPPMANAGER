@@ -91,7 +91,7 @@ export function SetupWizard({
   }
 
   return (
-    <Card spacing noscroll className="setup-wizard">
+    <Card className="setup-wizard">
       {showAdvanced ? (
         <EditorAdvanced
           userSettings={userSettings}

@@ -158,7 +158,7 @@ You must read the DAppNode documentation about extending the filesystem with LVM
   }
 
   return (
-    <Card spacing>
+    <Card>
       <div>
         <p>
           Expand your DAppNode filesystem with another storage device. More

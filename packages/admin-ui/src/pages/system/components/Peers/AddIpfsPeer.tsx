@@ -70,7 +70,7 @@ export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
 
   return (
     <>
-      <Card spacing>
+      <Card>
         <div>
           Add an IPFS peer to your own boostrap list and immediately connect to
           it.

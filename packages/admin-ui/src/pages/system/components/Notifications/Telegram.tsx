@@ -76,7 +76,7 @@ export function TelegramNotifications() {
   }
 
   return (
-    <Card spacing>
+    <Card>
       <div>
         Receive important notifications directly to your telegram account. To
         get your own token from Telegram botfather follow{" "}

@@ -27,7 +27,7 @@ export default function RemoteSigner<T extends Network>({
     <Card
       {...props}
       className={`remote-signer ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
+      raised={isSelected}
     >
       <div onClick={() => setEnableWeb3signer(!isSelected)}>
         {signer.status === "ok" ? (

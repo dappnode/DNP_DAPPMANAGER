@@ -26,7 +26,7 @@ export default function SystemUpdateDetails() {
   const coreDeps = getCoreDeps(coreUpdateData.packages);
 
   return (
-    <Card className="system-update-grid" spacing>
+    <Card className="system-update-grid">
       {coreChangelog && <RenderMarkdown source={coreChangelog} />}
 
       {updateAlerts.map(({ from, to, message }) => (

@@ -23,7 +23,7 @@ export const FileManager = ({
   return (
     <>
       {containers.length > 1 && (
-        <Card spacing divider className="file-manager">
+        <Card className="file-manager">
           <ServiceSelector
             serviceName={serviceName}
             setServiceName={setServiceName}
@@ -35,12 +35,12 @@ export const FileManager = ({
       {container && (
         <>
           <SubTitle>Upload file</SubTitle>
-          <Card spacing divider className="file-manager">
+          <Card className="file-manager">
             <CopyFileTo container={container} toPathDefault={to} />
           </Card>
 
           <SubTitle>Download file</SubTitle>
-          <Card spacing divider className="file-manager">
+          <Card className="file-manager">
             <CopyFileFrom container={container} fromPathDefault={from} />
           </Card>
         </>

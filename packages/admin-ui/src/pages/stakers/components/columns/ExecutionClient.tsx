@@ -34,7 +34,7 @@ export default function ExecutionClient<T extends Network>({
             : () => setNewExecClient(executionClient)
           : undefined
       }
-      shadow={isSelected}
+      raised={isSelected}
     >
       {executionClient.status === "ok" ? (
         <div className="avatar">

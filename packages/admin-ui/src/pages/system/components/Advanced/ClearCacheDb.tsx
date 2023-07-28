@@ -23,7 +23,7 @@ export function ClearCacheDb() {
   }
 
   return (
-    <Card spacing>
+    <Card>
       <p>
         Remove the local cache of Aragon Package Manager (APM) entries,
         manifests, avatars. Also remove the user action logs shown in the

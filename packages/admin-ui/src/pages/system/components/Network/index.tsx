@@ -10,7 +10,7 @@ export function Network() {
   return (
     <>
       <SubTitle>HTTPs Portal</SubTitle>
-      <Card spacing className="network-editor">
+      <Card className="network-editor">
         <div>
           HTTPs portal allows you to expose services to the external internet
           with a valid TLS/SSL certificate. Only the services that are safe to
@@ -21,7 +21,7 @@ export function Network() {
       </Card>
 
       <SubTitle>Static IP</SubTitle>
-      <Card spacing className="network-editor">
+      <Card className="network-editor">
         <div>
           You can set a static IP for this DAppNode instead of using a dyndns.
           Only set a static IP if you are sure it is static, otherwise you may

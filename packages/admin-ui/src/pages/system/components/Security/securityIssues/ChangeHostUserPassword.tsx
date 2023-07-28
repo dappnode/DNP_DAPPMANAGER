@@ -23,7 +23,7 @@ export default function ChangeHostUserPassword() {
   }
 
   return (
-    <Card spacing>
+    <Card>
       <div>
         Please change the host user password. The current password is the
         factory insecure default. Changing it to a strong password will protect

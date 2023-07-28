@@ -310,7 +310,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       {progressLogs ? (
         <ProgressLogsView progressLogs={progressLogs} />
       ) : showSuccess ? (
-        <Card spacing>
+        <Card>
           <StatusIcon success={true} message="Successfully installed!" />
         </Card>
       ) : isInstalling ? (

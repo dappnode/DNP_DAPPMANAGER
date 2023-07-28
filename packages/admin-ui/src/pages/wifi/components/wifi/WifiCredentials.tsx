@@ -64,7 +64,7 @@ export default function WifiCredentials(): JSX.Element {
     <>
       {wifiCredentials.data ? (
         <>
-          <Card spacing>
+          <Card>
             <div>Change the WIFI credentials.</div>
 
             <InputForm

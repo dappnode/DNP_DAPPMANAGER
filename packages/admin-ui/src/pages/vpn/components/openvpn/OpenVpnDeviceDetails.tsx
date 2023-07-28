@@ -35,7 +35,7 @@ function OpenVpnDeviceDetailsLoaded({
   }, []);
 
   return (
-    <Card className="device-settings" spacing>
+    <Card className="device-settings">
       <header>
         <h5 className="card-title">{id || "Device not found"}</h5>
 
@@ -49,7 +49,7 @@ function OpenVpnDeviceDetailsLoaded({
         <Input
           lock={true}
           value={url || ""}
-          onValueChange={() => { }}
+          onValueChange={() => {}}
           className="copy-input"
           append={
             <>
@@ -83,7 +83,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.id || ""}
-                onValueChange={() => { }}
+                onValueChange={() => {}}
                 className="copy-input"
                 append={
                   <>
@@ -102,7 +102,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.password || ""}
-                onValueChange={() => { }}
+                onValueChange={() => {}}
                 className="copy-input"
                 append={
                   <>
@@ -131,7 +131,7 @@ function OpenVpnDeviceDetailsLoaded({
 }
 
 export const OpenVpnDeviceDetails: React.FC = () => {
-  const params = useParams()
+  const params = useParams();
   const id = params.id || "";
   const deviceCredentials = useApi.deviceCredentialsGet({ id });
 

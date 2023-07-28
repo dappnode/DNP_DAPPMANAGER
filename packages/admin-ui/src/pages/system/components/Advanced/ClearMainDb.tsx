@@ -23,7 +23,7 @@ export function ClearMainDb() {
   }
 
   return (
-    <Card spacing>
+    <Card>
       <p>
         Remove the local database which contains critical information about your
         DAppNode, such as the dyndns identity, Ips registry, telegram
