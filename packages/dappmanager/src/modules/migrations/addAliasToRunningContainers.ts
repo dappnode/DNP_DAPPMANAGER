@@ -29,45 +29,68 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * and do docker inspect.
  */
 export async function addAliasToRunningContainers(): Promise<void> {
-  for (const container of await listContainers()) {
-    const containerName = container.containerName;
-    const alias = getPrivateNetworkAlias(container);
+  try {
+    const containers = await listContainers();
 
-    try {
+    for (const container of containers) {
+      const containerName = container.containerName;
+      const alias = getPrivateNetworkAlias(container);
+      const compose = new ComposeFileEditor(container.dnpName, container.isCore);
+      const isSoloContainer = Object.keys(compose.services).length === 1;
+
+      // Migrate core network and alias in compose before checking aliases
       // Info from docker inspect and compose file might be not-syncrhnonyzed
       // So this function must be before the check hasAlias()
       migrateCoreNetworkAndAliasInCompose(container, alias);
 
-      const currentEndpointConfig = await ethereumClient.getEndpointConfig(
-        containerName
-      );
-      if (hasAlias(currentEndpointConfig, alias)) continue;
-      const endpointConfig: Partial<Dockerode.NetworkInfo> = {
-        ...currentEndpointConfig,
-        Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
-      };
+      // Get the current endpoint config using async/await
+      const currentEndpointConfig = await ethereumClient.getEndpointConfig(containerName);
 
-      // Wifi and VPN containers needs a refresh connect due to its own network configuration
-      if (
-        container.containerName === params.vpnContainerName ||
-        container.containerName === params.wifiContainerName
-      ) {
-        await shell(`docker rm ${containerName} --force`);
-        await dockerComposeUp(
-          getPath.dockerCompose(container.dnpName, container.isCore)
-        );
-      } else {
-        await dockerNetworkDisconnect(dncoreNetworkName, containerName);
-        await dockerNetworkConnect(
-          dncoreNetworkName,
-          containerName,
-          endpointConfig
-        );
+      // Check if the container already has the alias
+      if (!hasAlias(currentEndpointConfig, alias)) {
+        console.log("container " + containerName + " does not have alias " + alias) 
+        // Add the alias to the endpoint config
+        const endpointConfig: Partial<Dockerode.NetworkInfo> = {
+          ...currentEndpointConfig,
+          Aliases: [...(currentEndpointConfig?.Aliases || []), alias],
+        };
+      
+
+        // If the container is not a solo container (has multiple services), add root alias as well
+        if (!isSoloContainer && container.isMain) {
+          console.log(" AAAAAAAAAAAAAAA container " + containerName + " is not solo container and is main")
+          const containerempty = {
+            dnpName: container.dnpName,
+            serviceName: '',
+            isMain: true,
+          };
+          const rootalias = getPrivateNetworkAlias(containerempty);
+          migrateCoreNetworkAndAliasInCompose(container, rootalias);
+
+          // Check if the root alias is already present in the endpoint config
+          if (!hasAlias(currentEndpointConfig, rootalias)) {
+            endpointConfig.Aliases = [...(endpointConfig?.Aliases || []), rootalias];
+          }
+        }
+
+        // Wifi and VPN containers need a refresh connect due to their own network configuration
+        if (
+          container.containerName === params.vpnContainerName ||
+          container.containerName === params.wifiContainerName
+        ) {
+          await shell(`docker rm ${containerName} --force`);
+          await dockerComposeUp(getPath.dockerCompose(container.dnpName, container.isCore));
+        } else {
+          await dockerNetworkDisconnect(dncoreNetworkName, containerName);
+          console.log("new alias for: " + containerName)
+          await dockerNetworkConnect(dncoreNetworkName, containerName, endpointConfig);
+        }
+
+        logs.info(`Added alias to running container ${container.containerName}`);
       }
-      logs.info(`Added alias to running container ${container.containerName}`);
-    } catch (e) {
-      logs.error(`Error adding alias to container ${containerName}`, e);
     }
+  } catch (error) {
+    logs.error('Error adding alias to running containers:', error);
   }
 }
 
