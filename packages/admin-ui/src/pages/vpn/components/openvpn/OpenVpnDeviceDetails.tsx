@@ -17,7 +17,7 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
-import { GoClippy } from "react-icons/go";
+import { GoCopy } from "react-icons/go";
 import { urlJoin } from "utils/url";
 import { VpnDeviceCredentials } from "@dappnode/common";
 
@@ -49,12 +49,12 @@ function OpenVpnDeviceDetailsLoaded({
         <Input
           lock={true}
           value={url || ""}
-          onValueChange={() => { }}
+          onValueChange={() => {}}
           className="copy-input"
           append={
             <>
               <Button className="copy-input-copy" data-clipboard-text={url}>
-                <GoClippy />
+                <GoCopy />
               </Button>
               <Button className="copy-input-open">
                 <a href={url} {...newTabProps} className="no-a-style">
@@ -83,7 +83,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.id || ""}
-                onValueChange={() => { }}
+                onValueChange={() => {}}
                 className="copy-input"
                 append={
                   <>
@@ -91,7 +91,7 @@ function OpenVpnDeviceDetailsLoaded({
                       className="copy-input-copy"
                       data-clipboard-text={device.id}
                     >
-                      <GoClippy />
+                      <GoCopy />
                     </Button>
                   </>
                 }
@@ -102,7 +102,7 @@ function OpenVpnDeviceDetailsLoaded({
               <Input
                 lock={true}
                 value={device.password || ""}
-                onValueChange={() => { }}
+                onValueChange={() => {}}
                 className="copy-input"
                 append={
                   <>
@@ -110,7 +110,7 @@ function OpenVpnDeviceDetailsLoaded({
                       className="copy-input-copy"
                       data-clipboard-text={device.password}
                     >
-                      <GoClippy />
+                      <GoCopy />
                     </Button>
                   </>
                 }
@@ -131,7 +131,7 @@ function OpenVpnDeviceDetailsLoaded({
 }
 
 export const OpenVpnDeviceDetails: React.FC = () => {
-  const params = useParams()
+  const params = useParams();
   const id = params.id || "";
   const deviceCredentials = useApi.deviceCredentialsGet({ id });
 
