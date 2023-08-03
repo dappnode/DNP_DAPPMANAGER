@@ -153,16 +153,16 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             dnpName: "lukso-geth.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0"
           },
-          {
+          /*{
             dnpName: "lukso-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0"
-          }
+          }*/
         ],
         compatibleConsensus: [
-          {
+          /*{
             dnpName: "lighthouse-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0"
-          },
+          },*/
           {
             dnpName: "prysm-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0"
