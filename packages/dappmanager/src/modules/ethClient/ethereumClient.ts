@@ -12,7 +12,6 @@ import { parseServiceNetworks } from "../compose/networks.js";
 import params from "../../params.js";
 import {
   dockerComposeUpPackage,
-  dockerContainerInspect,
   dockerNetworkConnect,
   dockerNetworkDisconnect
 } from "../docker/index.js";
@@ -22,7 +21,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet
 } from "@dappnode/types";
-
+import { getDnCoreNetworkContainerAliases } from "../docker/api/network.js";
 export class EthereumClient {
   /**
    * Computes the current eth2ClientTarget based on:
@@ -146,7 +145,7 @@ export class EthereumClient {
       )?.containerName || previousEthClientPackage.containers[0].containerName;
 
     // Remove fullnode alias from endpoint config
-    const currentEndpointConfig = await this.getEndpointConfig(
+    const currentEndpointConfig = await getDnCoreNetworkContainerAliases(
       previousEthClientContainerName
     );
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
@@ -254,16 +253,6 @@ export class EthereumClient {
   // Utils
   // TODO: put private in the methods and find a way to test them
 
-  /** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
-  async getEndpointConfig(
-    containerName: string
-  ): Promise<Dockerode.NetworkInfo | null> {
-    const inspectInfo = await dockerContainerInspect(containerName);
-    return (
-      inspectInfo.NetworkSettings.Networks[params.DNP_PRIVATE_NETWORK_NAME] ??
-      null
-    );
-  }
 
   removeFullnodeAliasFromCompose(
     ethClientDnpName: string,
