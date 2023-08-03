@@ -33,6 +33,7 @@ import { listPackages } from "../../docker/list/listPackages.js";
  * TODO: add option to remove previous or not
  */
 export async function setStakerConfig<T extends Network>({
+  feeRecipient,
   network,
   executionClient,
   consensusClient,
@@ -49,7 +50,6 @@ export async function setStakerConfig<T extends Network>({
   const {
     executionClient: currentExecutionClient,
     consensusClient: currentConsensusClient,
-    feeRecipient
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await listPackages();
