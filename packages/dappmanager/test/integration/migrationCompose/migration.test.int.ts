@@ -2,7 +2,6 @@ import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/common";
 import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
-import { getDnCoreNetworkContainerConfig } from "../../../src/modules/docker/index.js";
 import params from "../../../src/params.js";
 import { mockContainer, shellSafe } from "../../testUtils.js";
 
