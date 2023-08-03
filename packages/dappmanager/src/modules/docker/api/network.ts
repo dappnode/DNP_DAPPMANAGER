@@ -65,7 +65,7 @@ export async function dockerListNetworks(): Promise<
 }
 
   /** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
-export async function getDnCoreNetworkContainerAliases(
+export async function getDnCoreNetworkContainerConfig(
     containerName: string
   ): Promise<Dockerode.NetworkInfo | null> {
     const inspectInfo = await dockerContainerInspect(containerName);

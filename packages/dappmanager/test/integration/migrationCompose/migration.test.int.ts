@@ -2,7 +2,7 @@ import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/common";
 import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
-import { getDnCoreNetworkContainerAliases } from "../../../src/modules/docker/index.js";
+import { getDnCoreNetworkContainerConfig } from "../../../src/modules/docker/index.js";
 import params from "../../../src/params.js";
 import { mockContainer, shellSafe } from "../../testUtils.js";
 
@@ -160,7 +160,7 @@ describe("get DN_CORE network config", () => {
     const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
     
     // Mock the dockerContainerInspect function
-    const result = await getDnCoreNetworkContainerAliases(containerName);
+    const result = await getDnCoreNetworkContainerConfig(containerName);
     expect(result).to.not.be.null;
 
     // "result" looks like:

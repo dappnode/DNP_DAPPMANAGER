@@ -21,7 +21,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet
 } from "@dappnode/types";
-import { getDnCoreNetworkContainerAliases } from "../docker/api/network.js";
+import { getDnCoreNetworkContainerConfig } from "../docker/api/network.js";
 export class EthereumClient {
   /**
    * Computes the current eth2ClientTarget based on:
@@ -145,7 +145,7 @@ export class EthereumClient {
       )?.containerName || previousEthClientPackage.containers[0].containerName;
 
     // Remove fullnode alias from endpoint config
-    const currentEndpointConfig = await getDnCoreNetworkContainerAliases(
+    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
       previousEthClientContainerName
     );
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
