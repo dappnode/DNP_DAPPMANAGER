@@ -21,44 +21,52 @@ const SystemRoot: React.FC = () => {
   const { usage } = React.useContext(UsageContext);
   const basicRoutes: {
     name: string;
+    subLink: string;
     subPath: string;
     component: React.ComponentType<any>;
     hideFromMenu?: boolean;
   }[] = [
     {
       name: "Info",
+      subLink: subPaths.info,
       subPath: subPaths.info,
       component: SystemInfo
     },
     {
       name: "Auto updates",
+      subLink: subPaths.autoUpdates,
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
     },
     {
       name: "Profile",
+      subLink: subPaths.profile,
       subPath: subPaths.profile,
       component: Profile
     },
     {
       name: "Power",
+      subLink: subPaths.power,
       subPath: subPaths.power,
       component: PowerManagment
     }
   ];
   const advancedRoutes: {
     name: string;
+    subLink: string;
     subPath: string;
     component: React.ComponentType<any>;
     hideFromMenu?: boolean;
   }[] = [
     {
       name: "Notifications",
+      subLink: subPaths.notifications,
       subPath: subPaths.notifications,
       component: Notifications
     },
     {
       name: "Identity",
+      subLink: subPaths.identity,
       subPath: subPaths.identity,
       component: Identity,
       hideFromMenu: true
@@ -66,32 +74,38 @@ const SystemRoot: React.FC = () => {
 
     {
       name: "Network",
+      subLink: subPaths.network,
       subPath: subPaths.network,
       component: Network
     },
     {
       name: "Update",
+      subLink: subPaths.update,
       subPath: subPaths.update,
       component: SystemUpdate
     },
 
     {
       name: "Peers",
-      subPath: subPaths.peers,
+      subLink: subPaths.peers,
+      subPath: subPaths.peers + "/*",
       component: Peers
     },
     {
       name: "Security",
+      subLink: subPaths.security,
       subPath: subPaths.security,
       component: Security
     },
     {
       name: "Hardware",
+      subLink: subPaths.hardware,
       subPath: subPaths.hardware,
       component: Hardware
     },
     {
       name: "Advanced",
+      subLink: subPaths.advanced,
       subPath: subPaths.advanced,
       component: Advanced
     }
@@ -110,7 +124,7 @@ const SystemRoot: React.FC = () => {
           .map(route => (
             <button key={route.subPath} className="item-container">
               <NavLink
-                to={route.subPath}
+                to={route.subLink}
                 className="item no-a-style"
                 style={{ whiteSpace: "nowrap" }}
               >
