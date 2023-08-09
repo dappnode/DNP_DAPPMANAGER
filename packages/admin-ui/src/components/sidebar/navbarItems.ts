@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
+import { GiRolledCloth } from "react-icons/gi";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
 import { relativePath as devicesRelativePath } from "pages/vpn";
@@ -28,6 +29,7 @@ import { relativePath as supportRelativePath } from "pages/support";
 import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
+import { relativePath as rollupsRelativePath } from "pages/rollups";
 import { relativePath as repositoryRelativePath } from "pages/repository";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
@@ -110,6 +112,11 @@ export const basicItems: {
     name: "Stakers",
     href: stakersRelativePath,
     icon: SiEthereum
+  },
+  {
+    name: "Rollups",
+    href: rollupsRelativePath,
+    icon: GiRolledCloth
   },
   {
     name: "Repository",
