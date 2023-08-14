@@ -166,7 +166,11 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           {
             dnpName: "prysm-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0"
-          }
+          },
+          {
+            dnpName: "teku-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
         ],
         compatibleSigner: {
           dnpName: "web3signer-lukso.dnp.dappnode.eth" as Signer<T>,

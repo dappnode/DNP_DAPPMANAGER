@@ -935,6 +935,35 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               },
               useCheckpointSync: true
             },
+            {
+              status: "ok",
+              dnpName: "teku-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+              isInstalled: false,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+
+                metadata: {
+                  name: "teku-lukso.dnp.dappnode.eth",
+                  description: "Teku consensus client",
+                  shortDescription: "Teku consensus client",
+                  version: "0.1.0"
+                }
+              },
+              useCheckpointSync: true
+            },
             /*{
               status: "ok",
               dnpName:
