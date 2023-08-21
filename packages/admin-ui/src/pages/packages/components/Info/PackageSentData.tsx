@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import ClipboardJS from "clipboard";
 import InputGroup from "react-bootstrap/esm/InputGroup";
 import Button from "components/Button";
-import { GoEye, GoEyeClosed, GoClippy } from "react-icons/go";
+import { GoEye, GoEyeClosed, GoCopy } from "react-icons/go";
 import { isSecret } from "utils/isSecret";
 import { api } from "api";
 import { withToastNoThrow } from "components/toast/Toast";
@@ -111,7 +111,7 @@ function SentDataRow({
             className="input-append-button copy-input-copy"
             data-clipboard-text={value}
           >
-            <GoClippy />
+            <GoCopy />
           </Button>
         </InputGroup.Append>
       )}

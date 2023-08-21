@@ -15,7 +15,7 @@ import Title from "components/Title";
 import { apiRoutes } from "api";
 // Icons
 import { FiDownload } from "react-icons/fi";
-import { GoClippy } from "react-icons/go";
+import { GoCopy } from "react-icons/go";
 import { FaQrcode } from "react-icons/fa";
 import { WireguardDeviceCredentials } from "@dappnode/common";
 // Utils
@@ -80,7 +80,7 @@ function WireguardDeviceDetailsLoaded({
 
         <Button data-clipboard-text={config}>
           <span>
-            <GoClippy />
+            <GoCopy />
             <span>Copy {configType} config</span>
           </span>
         </Button>
@@ -111,7 +111,7 @@ function WireguardDeviceDetailsLoaded({
 }
 
 export const WireguardDeviceDetails: React.FC = () => {
-  const params = useParams()
+  const params = useParams();
   const id = params.id || "";
   const device = useApi.wireguardDeviceGet(id);
 
