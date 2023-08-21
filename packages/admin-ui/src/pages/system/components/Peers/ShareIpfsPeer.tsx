@@ -9,7 +9,7 @@ import Button from "components/Button";
 import Input from "components/Input";
 import Ok from "components/Ok";
 // Icons
-import { GoClippy } from "react-icons/go";
+import { GoCopy } from "react-icons/go";
 // Selectors
 import { getDappnodeParams } from "services/dappnodeStatus/selectors";
 
@@ -109,7 +109,7 @@ export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {
                   className="copy-input-copy"
                   data-clipboard-text={addMyPeerUrl}
                 >
-                  <GoClippy />
+                  <GoCopy />
                 </Button>
               }
             />

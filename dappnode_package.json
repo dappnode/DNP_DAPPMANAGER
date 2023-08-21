@@ -1,6 +1,6 @@
 {
   "name": "dappmanager.dnp.dappnode.eth",
-  "version": "0.2.43",
+  "version": "0.2.71",
   "description": "Dappnode package responsible for providing the DappNode Package Manager",
   "type": "dncore",
   "architectures": ["linux/amd64", "linux/arm64"],

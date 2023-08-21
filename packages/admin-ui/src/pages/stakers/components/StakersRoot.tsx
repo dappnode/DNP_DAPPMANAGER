@@ -39,6 +39,16 @@ const StakersRoot: React.FC = () => {
           description:
             "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
         })
+    },
+    {
+      subPath: "lukso",
+      title: "Lukso",
+      component: () =>
+        StakerNetwork({
+          network: "lukso",
+          description:
+            "LUKSO blockchain provides creators and users with future-proof tools and standards to unleash their creative force in an open interoperable ecosystem."
+        })
     }
   ];
 
