@@ -194,14 +194,6 @@ function getChanges<T extends Network>({
             severity: "secondary"
         };
 
-    // Not allowed if no fee recipient
-    if (!newFeeRecipient)
-        return {
-            isAllowed: false,
-            reason: "A fee recipient must be set",
-            severity: "warning"
-        };
-
     // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
     if (isExecAndConsDeSelected && (newEnableWeb3signer || newMevBoost))
         return {
