@@ -36,6 +36,7 @@ import { listPackages } from "../../docker/list/listPackages.js";
  */
 export async function setStakerConfig<T extends Network>({
   network,
+  feeRecipient,
   executionClient,
   consensusClient,
   mevBoost,
@@ -51,7 +52,6 @@ export async function setStakerConfig<T extends Network>({
   const {
     executionClient: currentExecutionClient,
     consensusClient: currentConsensusClient,
-    feeRecipient
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await listPackages();
