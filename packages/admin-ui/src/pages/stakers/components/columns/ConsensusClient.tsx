@@ -94,17 +94,19 @@ export default function ConsensusClient<T extends Network>({
               </div>
             )}
             {consensusClient.useCheckpointSync !== undefined && (
-              <Switch
-                checked={useCheckpointSync}
-                onToggle={() => {
-                  setNewConsClient({
-                    ...consensusClient,
-                    useCheckpointSync: !useCheckpointSync
-                  });
-                  setUseCheckpointSync(!useCheckpointSync);
-                }}
-                label={"Use checksync"}
-              />
+              <div>
+                <Switch
+                  checked={useCheckpointSync}
+                  onToggle={() => {
+                    setNewConsClient({
+                      ...consensusClient,
+                      useCheckpointSync: !useCheckpointSync
+                    });
+                    setUseCheckpointSync(!useCheckpointSync);
+                  }}
+                  label={"Use checksync"}
+                />
+              </div>
             )}
           </>
         </>
