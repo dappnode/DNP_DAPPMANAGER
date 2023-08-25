@@ -207,7 +207,7 @@ export default function StakerNetwork<T extends Network>({
                 (consensusClient, i) => (
                   <ConsensusClient<T>
                     key={i}
-                    consensusClient={consensusClient}
+                    consensusClient={{...consensusClient, useCheckpointSync: true}}
                     setNewConsClient={setNewConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName

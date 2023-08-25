@@ -91,7 +91,7 @@ export const launchpadSteps = <T extends Network>({
         {stakerConfig.consensusClients.map((consensusClient, i) => (
           <ConsensusClient<T>
             key={i}
-            consensusClient={consensusClient}
+            consensusClient={{...consensusClient, useCheckpointSync: true}}
             setNewConsClient={setNewConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
           />
