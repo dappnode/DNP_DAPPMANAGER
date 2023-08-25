@@ -90,34 +90,34 @@ export function getConsensusUserSettings({
       environment:
         beaconServiceName === validatorServiceName
           ? {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : ""
-              }
+            [validatorServiceName]: {
+              // Fee recipient is set as global env, keep this for backwards compatibility
+              ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+              // Graffiti is a mandatory value
+              ["GRAFFITI"]: defaultDappnodeGraffiti,
+              // Checkpoint sync is an optional value
+              ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
+                ? getDefaultCheckpointSync(network)
+                : ""
             }
+          }
           : {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti
-              },
+            [validatorServiceName]: {
+              // Fee recipient is set as global env, keep this for backwards compatibility
+              ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+              // Graffiti is a mandatory value
+              ["GRAFFITI"]: defaultDappnodeGraffiti
+            },
 
-              [beaconServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : ""
-              }
+            [beaconServiceName]: {
+              // Fee recipient is set as global env, keep this for backwards compatibility
+              ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+              // Checkpoint sync is an optional value
+              ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
+                ? getDefaultCheckpointSync(network)
+                : ""
             }
+          }
     }
   };
 }
@@ -126,12 +126,12 @@ const getDefaultCheckpointSync = (network: Network): string =>
   network === "mainnet"
     ? "https://checkpoint-sync.dappnode.io"
     : network === "prater"
-    ? "https://checkpoint-sync-prater.dappnode.io"
-    : network === "gnosis"
-    ? "https://checkpoint-sync-gnosis.dappnode.io"
-    : network === "lukso"
-    ? "https://checkpoint-sync-lukso.dappnode.io"
-    : "";
+      ? "https://checkpoint-sync-prater.dappnode.io"
+      : network === "gnosis"
+        ? "https://checkpoint-sync-gnosis.dappnode.io"
+        : network === "lukso"
+          ? "https://checkpoints.mainnet.lukso.network"
+          : "";
 
 export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
   return {
