@@ -130,7 +130,7 @@ const getDefaultCheckpointSync = (network: Network): string =>
     : network === "gnosis"
     ? "https://checkpoint-sync-gnosis.dappnode.io"
     : network === "lukso"
-    ? "https://checkpoint-sync-lukso.dappnode.io"
+    ? "https://checkpoints.mainnet.lukso.network"
     : "";
 
 export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
