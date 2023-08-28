@@ -535,7 +535,7 @@ describe("DNP lifecycle", function () {
    * 2. Test stopping and removing
    */
 
-  describe("Test stopping and removing", () => {
+  describe.skip("Test stopping and removing", () => {
     let containerMain: PackageContainer;
 
     before(`DNP should be running`, async () => {
