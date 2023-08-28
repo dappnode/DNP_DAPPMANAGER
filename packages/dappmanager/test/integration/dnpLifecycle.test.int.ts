@@ -546,29 +546,16 @@ describe("DNP lifecycle", function () {
     });
 
     it("Should stop the DNP", async () => {
-      await calls.packageStartStop({ dnpName: dnpNameMain });
-    });
-
-    it(`DNP should be running`, async () => {
       const state = await getDnpState(dnpNameMain);
+      expect(state).to.equal("running");
+      await calls.packageStartStop({ dnpName: dnpNameMain });
       expect(state).to.equal("exited");
     });
 
     it("Should start the DNP", async () => {
+      const state = await getDnpState(dnpNameMain);
+      expect(state).to.equal("exited");
       await calls.packageStartStop({ dnpName: dnpNameMain });
-    });
-
-    it(`DNP should be running`, async () => {
-      const state = await getDnpState(dnpNameMain);
-      expect(state).to.equal("running");
-    });
-
-    it("Should restart the DNP", async () => {
-      await calls.packageRestart({ dnpName: dnpNameMain });
-    });
-
-    it(`DNP should be running`, async () => {
-      const state = await getDnpState(dnpNameMain);
       expect(state).to.equal("running");
     });
   });
