@@ -10,9 +10,11 @@ import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,
   ConsensusClientPrater,
+  ConsensusClientLukso,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
+  ExecutionClientLukso,
   Network
 } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
@@ -34,6 +36,7 @@ import { listPackages } from "../../docker/list/listPackages.js";
  */
 export async function setStakerConfig<T extends Network>({
   network,
+  feeRecipient,
   executionClient,
   consensusClient,
   mevBoost,
@@ -49,7 +52,6 @@ export async function setStakerConfig<T extends Network>({
   const {
     executionClient: currentExecutionClient,
     consensusClient: currentConsensusClient,
-    feeRecipient
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await listPackages();
@@ -153,6 +155,13 @@ async function setFeeRecipientOnDb<T extends Network>(
       )
         await db.feeRecipientPrater.set(feeRecipient);
       break;
+    case "lukso":
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientLukso.get() !== feeRecipient
+      )
+        await db.feeRecipientLukso.set(feeRecipient);
+      break;
     default:
       throw new Error(`Unsupported network: ${network}`);
   }
@@ -201,6 +210,19 @@ async function setStakerConfigOnDb<T extends Network>(
         );
       if (db.mevBoostPrater.get() !== Boolean(mevBoost))
         await db.mevBoostPrater.set(mevBoost ? true : false);
+      break;
+
+    case "lukso":
+      if (db.executionClientLukso.get() !== executionClient)
+        await db.executionClientLukso.set(
+          executionClient as ExecutionClientLukso
+        );
+      if (db.consensusClientLukso.get() !== consensusClient)
+        await db.consensusClientLukso.set(
+          consensusClient as ConsensusClientLukso
+        );
+      /*if (db.mevBoostLukso.get() !== Boolean(mevBoost))
+        await db.mevBoostLukso.set(mevBoost ? true : false);*/
       break;
     default:
       throw new Error(`Unsupported network: ${network}`);

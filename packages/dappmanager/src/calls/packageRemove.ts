@@ -137,6 +137,9 @@ async function removeStakerPkgFromDbIfSelected({
     case db.executionClientPrater.get():
       await db.executionClientPrater.set(undefined);
       break;
+    case db.executionClientLukso.get():
+      await db.executionClientLukso.set(undefined);
+      break;
     case db.consensusClientMainnet.get():
       await db.consensusClientMainnet.set(undefined);
       break;
@@ -145,6 +148,9 @@ async function removeStakerPkgFromDbIfSelected({
       break;
     case db.consensusClientPrater.get():
       await db.consensusClientPrater.set(undefined);
+      break;
+    case db.consensusClientLukso.get():
+      await db.consensusClientLukso.set(undefined);
       break;
     case mevBoostMainnet:
       await db.mevBoostMainnet.set(false);
