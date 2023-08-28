@@ -1,5 +1,7 @@
 import Dockerode from "dockerode";
 import { docker } from "./docker.js";
+import {dockerContainerInspect } from "../index.js"
+import params from "../../../params.js";
 
 /**
  * Connect a container to a network
@@ -61,3 +63,14 @@ export async function dockerListNetworks(): Promise<
 > {
   return await docker.listNetworks();
 }
+
+  /** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
+export async function getDnCoreNetworkContainerConfig(
+    containerName: string
+  ): Promise<Dockerode.NetworkInfo | null> {
+    const inspectInfo = await dockerContainerInspect(containerName);
+    return (
+      inspectInfo.NetworkSettings.Networks[params.DNP_PRIVATE_NETWORK_NAME] ??
+      null
+    );
+  }
