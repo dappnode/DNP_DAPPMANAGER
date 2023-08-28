@@ -26,7 +26,7 @@ export default function ConsensusClient<T extends Network>({
 }) {
   const navigate = useNavigate();
 
-  const [useCheckpointSync, checkpointSyncChecked] = useState(true);
+  const [checkpointSyncChecked, setCheckpointSyncChecked] = useState(true);
   return (
     <Card
       {...props}
@@ -91,13 +91,13 @@ export default function ConsensusClient<T extends Network>({
             )}
             {consensusClient.useCheckpointSync !== undefined && (
               <Switch
-                checked={useCheckpointSync}
+                checked={checkpointSyncChecked}
                 onToggle={() => {
                   setNewConsClient({
                     ...consensusClient,
-                    useCheckpointSync: !useCheckpointSync
+                    useCheckpointSync: !checkpointSyncChecked
                   });
-                  checkpointSyncChecked(!useCheckpointSync);
+                  setCheckpointSyncChecked(!checkpointSyncChecked);
                 }}
                 label={"Use checksync"}
               />
