@@ -63,6 +63,18 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
 }
 
 /**
+ * ===============
+ * Ethical Metrics
+ * ===============
+ */
+export interface EthicalMetricsConfig {
+  isRunning: boolean;
+  isRegistered: boolean;
+  instance: string;
+  email: string;
+}
+
+/**
  * ============
  * AUTH session
  * ============
@@ -1127,6 +1139,7 @@ export type NewFeatureId =
   | "repository"
   | "repository-fallback"
   | "system-auto-updates"
+  | "enable-ethical-metrics"
   | "change-host-password";
 
 /**

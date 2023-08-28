@@ -43,6 +43,7 @@ import {
   StakerConfigSet,
   StakerConfigGet,
   Eth2ClientTarget,
+  EthicalMetricsConfig,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -220,6 +221,32 @@ export interface Routes {
     deletePrevConsClient?: boolean;
     deletePrevConsClientVolumes?: boolean;
   }) => Promise<void>;
+
+  /**
+   * Enables ethical metrics notifications
+   * @param email
+   */
+  enableEthicalMetrics: (kwargs: { email: string }) => Promise<void>;
+
+  /**
+   * Disables ethical metrics notifications
+   */
+  disableEthicalMetrics: () => Promise<void>;
+
+  /**
+   * Returns the current ethical metrics config
+   */
+  getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig>;
+
+  /**
+   * Register to ethical metrics
+   */
+  registerEthicalMetrics: (kwargs: { email: string }) => Promise<void>;
+
+  /**
+   * Unregister from ethical metrics
+   */
+  unregisterEthicalMetrics: () => Promise<void>;
 
   /**
    * Return formated core update data
@@ -688,6 +715,11 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   diagnose: {},
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
+  enableEthicalMetrics: { log: true },
+  disableEthicalMetrics: { log: true },
+  getEthicalMetricsConfig: { log: true },
+  registerEthicalMetrics: { log: true },
+  unregisterEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},

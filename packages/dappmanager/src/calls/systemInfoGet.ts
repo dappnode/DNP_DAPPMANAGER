@@ -75,6 +75,10 @@ function getNewFeatureIds(): NewFeatureId[] {
   // change-host-password: Show only if insecure
   if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
 
+  // enable-ethical-metrics: Show only if not seen
+  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")
+    newFeatureIds.push("enable-ethical-metrics");
+
   // Filter out features that the user has already seen or set
   return newFeatureIds.filter(featureId => {
     const status = db.newFeatureStatus.get(featureId);
