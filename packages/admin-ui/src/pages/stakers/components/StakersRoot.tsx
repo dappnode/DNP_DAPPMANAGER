@@ -22,7 +22,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "gnosis",
-      title: "Gnosis chain",
+      title: "Gnosis Chain",
       component: () =>
         StakerNetwork({
           network: "gnosis",
