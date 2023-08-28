@@ -42,7 +42,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "lukso",
-      title: "Lukso",
+      title: "LUKSO",
       component: () =>
         StakerNetwork({
           network: "lukso",
