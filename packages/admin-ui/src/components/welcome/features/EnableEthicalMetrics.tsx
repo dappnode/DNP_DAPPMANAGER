@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
 import SwitchBig from "components/SwitchBig";
 import { api } from "api";
+import Input from "components/Input";
 
 export default function EnableEthicalMetrics({
   onBack,
@@ -10,19 +11,24 @@ export default function EnableEthicalMetrics({
   onBack?: () => void;
   onNext: () => void;
 }) {
-  // By default, activate system ethical metrics if user doesn't change anything
-  const [autoUpdateOn, setAutoUpdateOn] = useState(true);
-  const [email, setEmail] = useState("");
+  const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
+  const [mail, setMail] = useState("");
+  const [mailError, setMailError] = useState(false);
 
-  /**
-   * The only change it will persist is turning all auto-update settings on
-   * If the user does not toggle the switch, the settings will be left as they are
-   * which might be partially on / off
-   */
+  // regex for email validation
+  useEffect(() => {
+    const regex = /\S+@\S+\.\S+/;
+    if (regex.test(mail)) {
+      setMailError(false);
+    } else {
+      setMailError(true);
+    }
+  }, [mail]);
+
   function onSetEnanleEthicalMetrics() {
-    if (autoUpdateOn)
-      api.enable({ id, enabled: true }).catch(e => {
-        console.error(`Error on autoUpdateSettingsEdit ${id}: ${e.stack}`);
+    if (ethicalMetricsOn)
+      api.enableEthicalMetrics({ mail, sync: false }).catch(e => {
+        console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
       });
     onNext();
   }
@@ -30,20 +36,30 @@ export default function EnableEthicalMetrics({
   return (
     <>
       <div className="header">
-        <div className="title">Enable notifications</div>
+        <div className="title">Enable system notifications</div>
         <div className="description">
           Enable ethical metrics and receive alerts whenever your dappnode is
           down without loosing your privacy
         </div>
       </div>
 
+      <Input
+        prepend="Email"
+        value={mail}
+        onValueChange={setMail}
+        isInvalid={mailError}
+        required={true}
+        placeholder="example@email.com"
+      />
+
       {/* This top div prevents the card from stretching vertically */}
-      <div className="auto-updates-switch">
+      <div>
         <SwitchBig
-          checked={autoUpdateOn}
-          onChange={setAutoUpdateOn}
-          label="Enable system auto-updates"
-          id="auto-updates-switch"
+          disabled={mailError}
+          checked={ethicalMetricsOn}
+          onChange={setEthicalMetricsOn}
+          label="Enable system notifications"
+          id="enable-ethical-metrics"
         />
       </div>
 

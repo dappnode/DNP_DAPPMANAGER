@@ -68,10 +68,8 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
  * ===============
  */
 export interface EthicalMetricsConfig {
-  isRunning: boolean;
-  isRegistered: boolean;
-  instance: string;
-  email: string;
+  isEnabled: boolean;
+  mail: string;
 }
 
 /**

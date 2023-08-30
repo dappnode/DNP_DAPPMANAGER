@@ -72,12 +72,12 @@ function getNewFeatureIds(): NewFeatureId[] {
   if (!autoUpdateHelper.isCoreUpdateEnabled())
     newFeatureIds.push("system-auto-updates");
 
-  // change-host-password: Show only if insecure
-  if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
-
   // enable-ethical-metrics: Show only if not seen
   if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")
     newFeatureIds.push("enable-ethical-metrics");
+
+  // change-host-password: Show only if insecure
+  if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
 
   // Filter out features that the user has already seen or set
   return newFeatureIds.filter(featureId => {

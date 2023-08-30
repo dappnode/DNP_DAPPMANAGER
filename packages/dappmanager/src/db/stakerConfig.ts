@@ -139,7 +139,7 @@ export const feeRecipientPrater = interceptGlobalEnvOnSet(
   Object.keys({ FEE_RECIPIENT_PRATER })[0]
 );
 
-// Lukso
+// LUKSO
 
 const CONSENSUS_CLIENT_LUKSO = "consensus-client-lukso";
 const EXECUTION_CLIENT_LUKSO = "execution-client-lukso";

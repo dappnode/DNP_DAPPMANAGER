@@ -224,9 +224,13 @@ export interface Routes {
 
   /**
    * Enables ethical metrics notifications
-   * @param email
+   * @param mail
+   * @param sync
    */
-  enableEthicalMetrics: (kwargs: { email: string }) => Promise<void>;
+  enableEthicalMetrics: (kwargs: {
+    mail: string;
+    sync: boolean;
+  }) => Promise<void>;
 
   /**
    * Disables ethical metrics notifications
@@ -237,16 +241,6 @@ export interface Routes {
    * Returns the current ethical metrics config
    */
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig>;
-
-  /**
-   * Register to ethical metrics
-   */
-  registerEthicalMetrics: (kwargs: { email: string }) => Promise<void>;
-
-  /**
-   * Unregister from ethical metrics
-   */
-  unregisterEthicalMetrics: () => Promise<void>;
 
   /**
    * Return formated core update data
@@ -716,10 +710,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ethClientFallbackSet: { log: true },
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
-  disableEthicalMetrics: { log: true },
   getEthicalMetricsConfig: { log: true },
-  registerEthicalMetrics: { log: true },
-  unregisterEthicalMetrics: { log: true },
+  disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},

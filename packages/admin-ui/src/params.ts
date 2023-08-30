@@ -42,6 +42,7 @@ export const wifiEnvSSID = "SSID";
 export const adminUiLocalDomain = "http://dappnode.local";
 
 // DNP names
+export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";

@@ -28,7 +28,7 @@ interface EventTypes {
   requestPackages: void;
   requestSystemInfo: void;
   runEthClientInstaller: { useCheckpointSync?: boolean };
-  runEthicalMetricsInstaller: { email: string };
+  runEthicalMetricsInstaller: void;
   runNatRenewal: void;
   runStakerCacheUpdate: { dnpName: string };
 }

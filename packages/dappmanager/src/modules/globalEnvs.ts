@@ -10,7 +10,7 @@ import { ComposeFileEditor } from "./compose/editor.js";
 import { listContainers } from "./docker/list/index.js";
 
 type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
-type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
+type GlobalEnvsValues = (typeof params.GLOBAL_ENVS)[GlobalEnvsKeys];
 
 export type GlobalEnvs = {
   [K in keyof typeof params.GLOBAL_ENVS]: string;
