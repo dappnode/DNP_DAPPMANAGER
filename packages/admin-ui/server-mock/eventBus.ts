@@ -22,6 +22,7 @@ export const eventBus: EventBus = {
   requestPackages: emptySubscription,
   requestSystemInfo: emptySubscription,
   runEthClientInstaller: emptySubscription,
+  runEthicalMetricsInstaller: emptySubscription,
   runNatRenewal: emptySubscription,
   runStakerCacheUpdate: emptySubscription
 };

@@ -12,6 +12,11 @@ export { diagnose } from "./diagnose.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";
 export { ethClientFallbackSet } from "./ethClientFallbackSet.js";
+export {
+  disableEthicalMetrics,
+  enableEthicalMetrics,
+  getEthicalMetricsConfig
+} from "./ethicalMetrics.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
