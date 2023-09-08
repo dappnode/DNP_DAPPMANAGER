@@ -73,6 +73,9 @@ export async function setDefaultEthicalMetricsEmail(): Promise<void> {
   logs.info(`Setting default email to ${email}`);
   db.ethicalMetricsMail.set(email);
 
+  logs.info(`Setting ethical metrics status to enabled`);
+  db.ethicalMetricsStatus.set(true);
+
   logs.info(`Setting new feature ethical metrics notifications as seen`);
   db.newFeatureStatus.set("enable-ethical-metrics", "seen");
   // Notify the UI of the uiWelcomeStatus change
