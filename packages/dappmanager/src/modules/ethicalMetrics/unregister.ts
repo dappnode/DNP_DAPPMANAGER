@@ -4,20 +4,11 @@ import url from "url";
 /**
  * Unregister the instance in the Ethical Metrics server
  */
-export async function unregister({
-  instance
-}: {
-  instance: string;
-}): Promise<void> {
-  if (!instance) throw Error("instance must exist");
-
+export async function unregister(): Promise<void> {
   const response = await fetch(
     url.resolve(ethicalMetricsEndpoint, "/targets"),
     {
       method: "DELETE",
-      body: JSON.stringify({
-        instance: instance
-      }),
       headers: {
         "Content-Type": "application/json"
       }
