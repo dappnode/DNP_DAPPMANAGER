@@ -1,3 +1,4 @@
+import { ExecutionClientOptimism } from "@dappnode/types";
 import { dbMain } from "./dbFactory.js";
 
 const OP_HISTORICAL_GETH = "op-historical-geth";
@@ -14,7 +15,5 @@ export const opHistoricalErigon = dbMain.staticKey<boolean>(
   false
 );
 
-export const opExecutionClient = dbMain.staticKey<string | null>(
-  OP_EXECUTION_CLIENT,
-  null
-);
+export const opExecutionClient =
+  dbMain.staticKey<ExecutionClientOptimism | null>(OP_EXECUTION_CLIENT, null);

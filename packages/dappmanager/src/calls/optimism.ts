@@ -1,4 +1,11 @@
 import { OptimismConfigGet, OptimismConfigSet } from "@dappnode/common";
+import * as db from "../db/index.js";
+import { listPackageNoThrow } from "../modules/docker/list/listPackages.js";
+import { optimismNode } from "@dappnode/types";
+import { ComposeFileEditor } from "../modules/compose/editor.js";
+
+const rpcUrlEnvName = "L1_RPC";
+const serviceName = "op-node";
 
 /**
  * Enables Optimism with the given configuration
@@ -16,7 +23,29 @@ export async function optimismConfigSet({
 /**
  * Returns the current Optimism configuration
  */
-export async function optimismConfigGet(): Promise<OptimismConfigGet> {}
+export async function optimismConfigGet(): Promise<OptimismConfigGet> {
+  let mainnetRpcUrl = null;
+  const opNodePackage = await listPackageNoThrow({ dnpName: optimismNode });
+
+  if (opNodePackage) {
+    // get rpc url from environment variable
+
+    const userSettings = new ComposeFileEditor(
+      optimismNode,
+      false
+    ).getUserSettings();
+    mainnetRpcUrl = userSettings.environment
+      ? userSettings.environment[serviceName][rpcUrlEnvName]
+      : null;
+  }
+
+  return {
+    mainnetRpcUrl,
+    opHistoricalGeth: db.opHistoricalGeth.get(),
+    opHistoricalErigon: db.opHistoricalErigon.get(),
+    currentOpExecutionClient: db.opExecutionClient.get()
+  };
+}
 
 /**
  * Disables Optimism by stopping the packages envolved
