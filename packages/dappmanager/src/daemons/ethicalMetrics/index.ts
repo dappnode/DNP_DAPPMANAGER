@@ -9,7 +9,6 @@ import { dockerComposeUpPackage } from "../../modules/docker/index.js";
 import * as db from "../../db/index.js";
 import {
   ethicalMetricsDnpName,
-  getInstance,
   register
 } from "../../modules/ethicalMetrics/index.js";
 
@@ -78,8 +77,7 @@ async function checkEthicalMetricsStatus(): Promise<void> {
       }
 
       // Register instance
-      const instance = await getInstance();
-      await register({ instance, mail });
+      await register({ mail });
     }
   } catch (e) {
     logs.error("Error on ethical metrics check", e);
