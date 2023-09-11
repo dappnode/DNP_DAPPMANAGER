@@ -7,7 +7,6 @@ import { packageInstall } from "./packageInstall.js";
 import { logs } from "../logs.js";
 import {
   ethicalMetricsDnpName,
-  getInstance,
   register,
   unregister
 } from "../modules/ethicalMetrics/index.js";
@@ -28,8 +27,7 @@ export async function disableEthicalMetrics(): Promise<void> {
   db.ethicalMetricsStatus.set(false);
 
   // Unregister instance
-  const instance = await getInstance();
-  await unregister({ instance }).catch(() => {
+  await unregister().catch(() => {
     logs.error("Error unregistering ethical metrics instance");
   });
 
