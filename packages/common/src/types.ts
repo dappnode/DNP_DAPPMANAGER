@@ -22,6 +22,7 @@ import {
   SignerPrater,
   SignerGnosis,
   SignerLukso,
+  ExecutionClientOptimism,
 } from "@dappnode/types";
 
 /**
@@ -1331,6 +1332,25 @@ export interface StakerCompatibleVersionsByNetwork<T extends Network> {
     minVersion: string;
   };
   compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
+}
+
+/**
+ * =======
+ * ROLLUPS
+ * =======
+ */
+
+export interface OptimismConfigGet {
+  mainnetRpcUrl: string;
+  opHistoricalGeth: boolean | null;
+  opHistoricalErigon: boolean | null;
+  currentOpExecutionClient: ExecutionClientOptimism;
+}
+
+export interface OptimismConfigSet {
+  mainnetRpcUrl: string;
+  enableHistorical: boolean;
+  targetOpExecutionClient: ExecutionClientOptimism;
 }
 
 /**

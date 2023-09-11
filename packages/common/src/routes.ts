@@ -44,6 +44,8 @@ import {
   StakerConfigGet,
   Eth2ClientTarget,
   EthicalMetricsConfig,
+  OptimismConfigSet,
+  OptimismConfigGet,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -385,6 +387,21 @@ export interface Routes {
   notificationsTest: (kwargs: {
     notification?: PackageNotification;
   }) => Promise<void>;
+
+  /**
+   * Enables Optimism with the given config
+   */
+  optimismConfigSet: (kwargs: OptimismConfigSet) => Promise<void>;
+
+  /**
+   * Returns the current Optimism configuration
+   */
+  optimismConfigGet: () => Promise<OptimismConfigGet>;
+
+  /**
+   * Disables Optimism
+   */
+  optimismDisable: () => Promise<void>;
 
   /**
    * Installs a DAppNode Package.
@@ -737,6 +754,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
+  optimismConfigGet: {},
+  optimismConfigSet: { log: true },
+  optimismDisable: {},
   packageInstall: { log: true },
   packageGet: {},
   packagesGet: {},
