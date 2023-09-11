@@ -8,7 +8,6 @@ import { logs } from "../logs.js";
 import {
   ethicalMetricsDnpName,
   getInstance,
-  getIsRegistered,
   register,
   unregister
 } from "../modules/ethicalMetrics/index.js";
@@ -82,13 +81,11 @@ export async function enableEthicalMetrics({
 
     if (ethicalMetricsPkg.containers.some(c => c.state !== "running"))
       await packageRestart({ dnpName: ethicalMetricsPkg.dnpName });
+
     // Make sure the instance is registered
-    const instance = await getInstance();
-    if (!(await getIsRegistered({ instance })))
-      await register({
-        mail,
-        instance
-      });
+    await register({
+      mail
+    });
   }
 }
 
