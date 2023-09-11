@@ -39,7 +39,7 @@ export default function EnableEthicalMetrics({
         <div className="title">Enable system notifications</div>
         <div className="description">
           Enable ethical metrics and receive alerts whenever your dappnode is
-          down without loosing your privacy
+          down without losing your privacy
         </div>
       </div>
 
