@@ -93,7 +93,6 @@ export function startEthicalMetricsDaemon(signal: AbortSignal): void {
   const runEthicalMetricsTaskMemo = runOnlyOneSequentially(async () => {
     try {
       await checkEthicalMetricsStatus();
-      // TODO: register instance WITH EMAIL
     } catch (e) {
       logs.error("Error on ethical metrics installer daemon", e);
     }
@@ -104,7 +103,7 @@ export function startEthicalMetricsDaemon(signal: AbortSignal): void {
 
   runAtMostEvery(
     async () => runEthicalMetricsTaskMemo(),
-    params.AUTO_UPDATE_DAEMON_INTERVAL,
+    params.ETH_METRICS_DAEMON_INTERVAL,
     signal
   );
 }
