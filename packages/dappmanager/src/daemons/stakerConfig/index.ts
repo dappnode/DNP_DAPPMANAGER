@@ -1,9 +1,9 @@
 import { eventBus } from "../../eventBus.js";
 import * as db from "../../db/index.js";
 import { logs } from "../../logs.js";
-import { pickStakerItemData } from "../../modules/stakerConfig/utils.js";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { memoizeDebounce } from "../../utils/asyncFlows.js";
+import { pickPackageItemData } from "../../utils/getPkgItemData.js";
 
 async function runStakerCacheUpdate({
   dnpName
@@ -13,7 +13,7 @@ async function runStakerCacheUpdate({
   try {
     const releaseFetcher = new ReleaseFetcher();
     const repository = await releaseFetcher.getRelease(dnpName);
-    const dataDnp = pickStakerItemData(repository);
+    const dataDnp = pickPackageItemData(repository);
     db.stakerItemMetadata.set(dnpName, dataDnp);
   } catch (e) {
     logs.error("Error on staker cache update daemon", e);
