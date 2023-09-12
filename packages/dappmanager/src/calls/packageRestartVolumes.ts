@@ -16,6 +16,7 @@ import { listPackage } from "../modules/docker/list/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
+import { unregister } from "../modules/ethicalMetrics/unregister.js";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -53,6 +54,15 @@ export async function packageRestartVolumes({
   // Skip early to prevent calling dockerComposeUp
   if (volumesToRemove.length === 0) {
     return;
+  }
+
+  // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
+  if ((dnp.dnpName === "ethical-metrics.dnp.dappnode.eth" && !volumeName) || volumeName === "ethical-metricsdnpdappnodeeth_tor-hidden-service") {
+    try {
+      await unregister();
+    } catch (e) {
+      logs.error(`Error unregistering Ethical Metrics instance`, e);
+    }
   }
 
   const containersStatus = await getContainersStatus({ dnpName });
