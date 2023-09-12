@@ -6,8 +6,6 @@ import {
   optimismL2Geth,
   optimismNode
 } from "@dappnode/types";
-import { ComposeFileEditor } from "../compose/editor.js";
-import { opNodeRpcUrlEnvName, opNodeServiceName } from "./params.js";
 import { ReleaseFetcher } from "../release/index.js";
 import { getPkgData } from "../../utils/getPkgItemData.js";
 import {
@@ -16,6 +14,7 @@ import {
   getIsUpdated
 } from "../../calls/fetchDnpRequest.js";
 import { fileToGatewayUrl } from "../../utils/distributedFile.js";
+import { getOptimismNodeRpcUrl } from "./getOptimismNodeRpcUrl.js";
 
 export async function getOptimismConfig(): Promise<OptimismConfigGet> {
   try {
@@ -115,14 +114,4 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
   } catch (e) {
     throw Error(`Error getting Optimism config: ${e}`);
   }
-}
-
-function getOptimismNodeRpcUrl(): string {
-  const userSettings = new ComposeFileEditor(
-    optimismNode,
-    false
-  ).getUserSettings();
-  return userSettings.environment
-    ? userSettings.environment[opNodeServiceName][opNodeRpcUrlEnvName]
-    : "";
 }

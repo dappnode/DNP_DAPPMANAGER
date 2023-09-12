@@ -9,7 +9,7 @@ export async function getPkgData(
   releaseFetcher: ReleaseFetcher,
   dnpName: string
 ): Promise<PackageItemData> {
-  const cachedDnp = db.optimismItemMetadata.get(dnpName);
+  const cachedDnp = db.pkgItemMetadata.get(dnpName);
   if (cachedDnp) {
     // Update cache in the background
     eventBus.runStakerCacheUpdate.emit({ dnpName });
@@ -17,7 +17,7 @@ export async function getPkgData(
   } else {
     const repository = await releaseFetcher.getRelease(dnpName);
     const dataDnp = pickPackageItemData(repository);
-    db.optimismItemMetadata.set(dnpName, dataDnp);
+    db.pkgItemMetadata.set(dnpName, dataDnp);
     return dataDnp;
   }
 }
