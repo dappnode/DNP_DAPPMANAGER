@@ -255,8 +255,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   disableEthicalMetrics: async () => {},
   optimismConfigGet: async () => ({
     mainnetRpcUrl: "https://mainnet.optimism.io",
-    opHistoricalErigon: false,
-    opHistoricalGeth: false,
     currentOpExecutionClient: "op-geth.dnp.dappnode.eth"
   }),
   optimismConfigSet: async () => {},

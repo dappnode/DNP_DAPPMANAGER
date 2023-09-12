@@ -1,19 +1,18 @@
 import { ExecutionClientOptimism } from "@dappnode/types";
 import { dbMain } from "./dbFactory.js";
+import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
 
-const OP_HISTORICAL_GETH = "op-historical-geth";
-const OP_HISTORICAL_ERIGON = "op-historical-erigon";
 const OP_EXECUTION_CLIENT = "op-execution-client";
+const OP_ENABLE_HISTORICAL_RPC = "op-enable-historical-rpc";
 
-export const opHistoricalGeth = dbMain.staticKey<boolean>(
-  OP_HISTORICAL_GETH,
-  false
+// Global env to be in the op-node package
+export const opExecutionClient = interceptGlobalEnvOnSet(
+  dbMain.staticKey<ExecutionClientOptimism | null>(OP_EXECUTION_CLIENT, null),
+  Object.keys({ OP_EXECUTION_CLIENT })[0]
 );
 
-export const opHistoricalErigon = dbMain.staticKey<boolean>(
-  OP_HISTORICAL_ERIGON,
-  false
+// Global env to be in the op-execution packages
+export const opEnableHistoricalRpc = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(OP_ENABLE_HISTORICAL_RPC, false),
+  Object.keys({ OP_ENABLE_HISTORICAL_RPC })[0]
 );
-
-export const opExecutionClient =
-  dbMain.staticKey<ExecutionClientOptimism | null>(OP_EXECUTION_CLIENT, null);
