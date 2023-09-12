@@ -17,6 +17,7 @@ import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
 import { unregister } from "../modules/ethicalMetrics/unregister.js";
+import { ethicalMetricsDnpName, ethicalMetricsTorServiceVolume } from "../modules/ethicalMetrics/index.js";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -57,7 +58,7 @@ export async function packageRestartVolumes({
   }
 
   // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
-  if ((dnp.dnpName === "ethical-metrics.dnp.dappnode.eth" && !volumeName) || volumeName === "ethical-metricsdnpdappnodeeth_tor-hidden-service") {
+  if ((dnp.dnpName === ethicalMetricsDnpName && !volumeName) || volumeName === ethicalMetricsTorServiceVolume) {
     try {
       await unregister();
     } catch (e) {

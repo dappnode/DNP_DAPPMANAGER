@@ -15,7 +15,7 @@ import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js"
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
-import { unregister } from "../modules/ethicalMetrics/unregister.js";
+import { ethicalMetricsDnpName, unregister } from "../modules/ethicalMetrics/index.js";
 
 /**
  * Remove package data: docker down + disk files
@@ -66,7 +66,7 @@ export async function packageRemove({
   }
 
   // If Ethical Metrics is being removed, unregister the instance first
-  if (dnp.dnpName === "ethical-metrics.dnp.dappnode.eth") {
+  if (dnp.dnpName === ethicalMetricsDnpName) {
     try {
       await unregister();
     } catch (e) {
