@@ -117,29 +117,6 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
   }
 }
 
-/**
- *   let mainnetRpcUrl = null;
-  const opNodePackage = await listPackageNoThrow({ dnpName: optimismNode });
-
-  if (opNodePackage) {
-    // get rpc url from environment variable
-
-    const userSettings = new ComposeFileEditor(
-      optimismNode,
-      false
-    ).getUserSettings();
-    mainnetRpcUrl = userSettings.environment
-      ? userSettings.environment[opNodeServiceName][opNodeRpcUrlEnvName]
-      : null;
-  }
-
-  return {
-    mainnetRpcUrl,
-    historicalEnabled: db.opEnableHistoricalRpc.get(),
-    currentOpExecutionClient: db.opExecutionClient.get()
-  };
- */
-
 function getOptimismNodeRpcUrl(): string {
   const userSettings = new ComposeFileEditor(
     optimismNode,
