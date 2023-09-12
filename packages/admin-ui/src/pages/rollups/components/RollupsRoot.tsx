@@ -14,12 +14,19 @@ const RollupsRoot: React.FC = () => {
     {
       subPath: "optimism",
       title: "Optimism",
-      component: () => Optimism()
+      component: () =>
+        Optimism({
+          description: "Optimism is a Layer 2 scaling solution for Ethereum."
+        })
     },
     {
       subPath: "polygon",
       title: "Polygon",
-      component: () => Polygon()
+      component: () =>
+        Polygon({
+          description:
+            "Polygon is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks."
+        })
     }
   ];
 
