@@ -8,7 +8,7 @@ export * from "./ipfsClient.js";
 export * from "./fileTransferPath.js";
 export * from "./network.js";
 export * from "./notification.js";
-export * from "./optimism.js";
+export * from "./optimismConfig.js";
 export * from "./package.js";
 export * from "./registry.js";
 export * from "./releaseKeys.js";

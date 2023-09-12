@@ -14,7 +14,7 @@ async function runStakerCacheUpdate({
     const releaseFetcher = new ReleaseFetcher();
     const repository = await releaseFetcher.getRelease(dnpName);
     const dataDnp = pickPackageItemData(repository);
-    db.stakerItemMetadata.set(dnpName, dataDnp);
+    db.optimismItemMetadata.set(dnpName, dataDnp);
   } catch (e) {
     logs.error("Error on staker cache update daemon", e);
   }
