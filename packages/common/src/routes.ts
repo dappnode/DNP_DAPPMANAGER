@@ -399,11 +399,6 @@ export interface Routes {
   optimismConfigGet: () => Promise<OptimismConfigGet>;
 
   /**
-   * Disables Optimism
-   */
-  optimismDisable: () => Promise<void>;
-
-  /**
    * Installs a DAppNode Package.
    * Resolves dependencies, downloads release assets, loads the images to docker,
    * sets userSettings and starts the docker container for each package.
@@ -756,7 +751,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsTest: {},
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
-  optimismDisable: {},
   packageInstall: { log: true },
   packageGet: {},
   packagesGet: {},

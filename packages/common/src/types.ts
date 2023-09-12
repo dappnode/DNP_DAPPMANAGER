@@ -1342,6 +1342,7 @@ export interface StakerCompatibleVersionsByNetwork<T extends Network> {
 
 export interface OptimismConfigGet {
   mainnetRpcUrl: string | null;
+  historicalEnabled: boolean;
   currentOpExecutionClient: ExecutionClientOptimism | null;
 }
 
