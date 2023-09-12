@@ -18,14 +18,14 @@ import {
  * @param targetOpExecutionClient this is the client that will be used to connect to the Optimism network
  */
 export async function optimismConfigSet({
-  mainnetRpcUrl,
-  enableHistorical,
-  targetOpExecutionClient
+  archive,
+  executionClient,
+  rollup
 }: OptimismConfigSet): Promise<void> {
   await setOptimismConfig({
-    mainnetRpcUrl,
-    enableHistorical,
-    targetOpExecutionClient
+    archive,
+    executionClient,
+    rollup
   });
 }
 
