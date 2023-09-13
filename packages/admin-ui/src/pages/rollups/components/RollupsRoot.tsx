@@ -1,6 +1,5 @@
 import React from "react";
 import Optimism from "./Optimism";
-import Polygon from "./Polygon";
 import Title from "components/Title";
 import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
@@ -17,15 +16,6 @@ const RollupsRoot: React.FC = () => {
       component: () =>
         Optimism({
           description: "Optimism is a Layer 2 scaling solution for Ethereum."
-        })
-    },
-    {
-      subPath: "polygon",
-      title: "Polygon",
-      component: () =>
-        Polygon({
-          description:
-            "Polygon is a protocol and a framework for building and connecting Ethereum-compatible blockchain networks."
         })
     }
   ];
