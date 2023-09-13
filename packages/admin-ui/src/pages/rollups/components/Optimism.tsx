@@ -25,8 +25,6 @@ export default function Optimism({ description }: { description: string }) {
   const {
     reqStatus,
     setReqStatus,
-    ethRpcUrl,
-    setEthRpcUrl,
     ethRpcUrlError,
     setEthRpcUrlError,
     newExecClient,
@@ -57,13 +55,25 @@ export default function Optimism({ description }: { description: string }) {
 
           <>
             <Input
-              value={ethRpcUrl || ""}
-              onValueChange={setEthRpcUrl}
+              value={currentOptimismConfig?.rollup?.mainnetRpcUrl || ""}
+              onValueChange={
+                (value: string) => {
+                  if (currentOptimismConfig?.rollup){
+                    setCurrentOptimismConfig({
+                      ...currentOptimismConfig,
+                      rollup: {
+                        ...currentOptimismConfig.rollup,
+                        mainnetRpcUrl: value,
+                      },
+                    })
+                  }
+                }
+              }
               isInvalid={Boolean(ethRpcUrlError)}
               prepend="Ethereum RPC URL"
               placeholder="Ethereum mainnet RPC URL for Optimism node"
             />
-            {ethRpcUrl && ethRpcUrlError && (
+            {currentOptimismConfig?.rollup?.mainnetRpcUrl && ethRpcUrlError && (
               <Form.Text className="text-danger" as="span">
                 {ethRpcUrlError}
               </Form.Text>
