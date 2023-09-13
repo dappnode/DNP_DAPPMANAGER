@@ -103,6 +103,7 @@ export default function EthicalMetrics() {
                 className="register-button"
                 onClick={enableEthicalMetricsSync}
                 variant="dappnode"
+                disabled={ethicalMetricsConfig.data.mail === mail}
               >
                 Submit
               </Button>
