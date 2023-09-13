@@ -14,6 +14,10 @@ export const useOptimismConfig = (
 ) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  // Ethereum mainnet RPC url
+  // TODO: Store it and retrieve it from DB
+  const [ethRpcUrl, setEthRpcUrl] = useState<string | null>(null);
+
   // Error
   const [ethRpcUrlError, setEthRpcUrlError] = useState<string | null>(null);
   // New config
@@ -85,6 +89,8 @@ export const useOptimismConfig = (
   return {
     reqStatus,
     setReqStatus,
+    ethRpcUrl,
+    setEthRpcUrl,
     ethRpcUrlError,
     setEthRpcUrlError,
     newExecClient,

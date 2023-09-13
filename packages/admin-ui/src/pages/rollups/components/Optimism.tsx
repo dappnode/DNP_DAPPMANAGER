@@ -13,6 +13,8 @@ import LegacyGeth from "./columns/LegacyGeth";
 import OptimismNode from "./columns/OptimismNode";
 import { useOptimismConfig } from "./useOptimismConfig";
 import "./columns.scss";
+import { Alert, Button, Form } from "react-bootstrap";
+import Input from "components/Input";
 
 export default function Optimism({ description }: { description: string }) {
   const { theme } = React.useContext(ThemeContext);
@@ -23,6 +25,8 @@ export default function Optimism({ description }: { description: string }) {
   const {
     reqStatus,
     setReqStatus,
+    ethRpcUrl,
+    setEthRpcUrl,
     ethRpcUrlError,
     setEthRpcUrlError,
     newExecClient,
@@ -50,6 +54,21 @@ export default function Optimism({ description }: { description: string }) {
           <br />
 
           <p>{description}</p>
+
+          <>
+            <Input
+              value={ethRpcUrl || ""}
+              onValueChange={setEthRpcUrl}
+              isInvalid={Boolean(ethRpcUrlError)}
+              prepend="Ethereum RPC URL"
+              placeholder="Ethereum mainnet RPC URL for Optimism node"
+            />
+            {ethRpcUrl && ethRpcUrlError && (
+              <Form.Text className="text-danger" as="span">
+                {ethRpcUrlError}
+              </Form.Text>
+            )}
+          </>
 
           <Row className="staker-network">
             <Col>
@@ -95,7 +114,31 @@ export default function Optimism({ description }: { description: string }) {
 
           <hr />
 
-          <div></div>
+          <div>
+            <div className="staker-buttons">
+              <Button
+                variant="dappnode"
+                disabled={!changes.isAllowed || reqStatus.loading}
+                onClick={() => /* TODO */ console.log("TODO")}
+              >
+                Apply changes
+              </Button>
+            </div>
+
+            {!changes.isAllowed && changes.reason && (
+              <>
+                <br />
+                <br />
+                <Alert variant={changes.severity}>
+                  Cannot apply changes: <b>{changes.reason}</b>
+                </Alert>
+              </>
+            )}
+
+            {reqStatus.error && (
+              <ErrorView error={reqStatus.error} hideIcon red />
+            )}
+          </div>
         </Card>
       ) : currentOptimismConfigReq.error ? (
         <ErrorView error={currentOptimismConfigReq.error} hideIcon red />
