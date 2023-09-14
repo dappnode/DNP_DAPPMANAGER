@@ -301,10 +301,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
 
   function goBack() {
     const prevStep = availableRoutes[currentIndex - 1];
-    if (prevStep) navigate(`../${prevStep.subPath}`);
+    if (prevStep) navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
     else navigate("..");
   }
-
+  
   return (
     <>
       {progressLogs ? (
