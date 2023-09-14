@@ -83,6 +83,9 @@
     .status-badge.ok {
       background-color: var(--color-dark-card-hover);
     }
+    .status-badge.not-ok {
+      background-color: var(--color-dark-danger-background);
+    }
 
     .horizontal-navbar .item.active {
       color: var(--color-dark-maintext);
@@ -112,6 +115,10 @@
       background-color: rgba(0, 177, 244, 0.4);
       border-color: var(--color-dark-secondarytext);
       color: var(--color-dark-quaternarytext);
+    }
+
+    .alert-danger {
+      background-color: var(--color-dark-danger-background);
     }
 
     // INPUTS
