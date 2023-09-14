@@ -12,7 +12,7 @@ export const subPaths = {
   identity: "identity",
   security: "security",
   autoUpdates: "auto-updates",
-  repository: "eth",
+  repository: "/repository/eth",
   staticIp: "static-ip",
   network: "network",
   update: "update",
