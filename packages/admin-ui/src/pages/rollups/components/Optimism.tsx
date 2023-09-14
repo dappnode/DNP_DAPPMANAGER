@@ -73,12 +73,28 @@ export default function Optimism({ description }: { description: string }) {
         });
 
         setReqStatus({ loading: true });
-        // TODO: set new Optimism config
-        await withToast(() => api.optimismConfigSet({}), {
-          message: `Setting new Optimism configuration...`,
-          onSuccess: `Successfully set new Optimism configuration`,
-          onError: `Error setting new Optimism configuration`
-        });
+        await withToast(
+          () =>
+            api.optimismConfigSet({
+              archive: newArchive,
+              rollup: newRollup
+                ? {
+                    ...newRollup,
+                    mainnetRpcUrl: customMainnetRpcUrl
+                      ? customMainnetRpcUrl
+                      : newRollup?.mainnetRpcUrl
+                      ? newRollup?.mainnetRpcUrl
+                      : ""
+                  }
+                : undefined,
+              executionClient: newExecClient
+            }),
+          {
+            message: `Setting new Optimism configuration...`,
+            onSuccess: `Successfully set new Optimism configuration`,
+            onError: `Error setting new Optimism configuration`
+          }
+        );
         setReqStatus({ result: true });
       }
     } catch (e) {
