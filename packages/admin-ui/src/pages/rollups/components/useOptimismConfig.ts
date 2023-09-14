@@ -55,6 +55,8 @@ export const useOptimismConfig = (
       if (isOkSelectedInstalledAndRunning(archive) && archive.status === "ok")
         setNewArchive(archive);
 
+      if (rollup.mainnetRpcUrl) setCustomMainnetRpcUrl(rollup.mainnetRpcUrl);
+
       // Set the current config to be displayed in advance view
       setCurrentOptimismConfig({
         executionClient:
@@ -89,7 +91,7 @@ export const useOptimismConfig = (
     if (customMainnetRpcUrl) {
       setEthRpcUrlError(validateUrl(customMainnetRpcUrl));
     } else {
-      setEthRpcUrlError(null);
+      setEthRpcUrlError("You need to set an Ethereum mainnet full node in the Stakers menu (execution + consensus clients) or set a custom RPC URL)");
     }
   }, [customMainnetRpcUrl]);
 

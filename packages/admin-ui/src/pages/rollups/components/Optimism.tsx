@@ -1,7 +1,6 @@
 import React from "react";
 import { api, useApi } from "api";
 import { ThemeContext } from "App";
-import { responseInterface } from "swr";
 import Card from "components/Card";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
@@ -83,8 +82,6 @@ export default function Optimism({ description }: { description: string }) {
                     mainnetRpcUrl: customMainnetRpcUrl
                       ? customMainnetRpcUrl
                       : newRollup?.mainnetRpcUrl
-                      ? newRollup?.mainnetRpcUrl
-                      : ""
                   }
                 : undefined,
               executionClient: newExecClient
@@ -129,7 +126,7 @@ export default function Optimism({ description }: { description: string }) {
             <Input
               value={customMainnetRpcUrl || ""}
               onValueChange={(value: string) => setCustomMainnetRpcUrl(value)}
-              //isInvalid={Boolean(ethRpcUrlError)}
+              isInvalid={Boolean(ethRpcUrlError)}
               prepend="Ethereum RPC URL"
               placeholder="Ethereum mainnet RPC URL for Optimism node"
             />
