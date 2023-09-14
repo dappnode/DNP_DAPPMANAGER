@@ -36,7 +36,7 @@ function ChainCard(chain: ChainData) {
     <Card className="chain-card">
       <div className="name">
         <span className="text">{name || prettyDnpName(dnpName)}</span>
-        {help && <HelpTo url={help} />}
+        {help && <HelpTo url={`/repository/${help}`} />}
       </div>
 
       {syncing ? (
