@@ -14,9 +14,6 @@ export const useOptimismConfig = (
 ) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  // Ethereum mainnet RPC url
-  // TODO: Store it and retrieve it from DB
-  const [ethRpcUrl, setEthRpcUrl] = useState<string | null>(null);
 
   // Error
   const [ethRpcUrlError, setEthRpcUrlError] = useState<string | null>(null);
@@ -24,6 +21,7 @@ export const useOptimismConfig = (
   const [newExecClient, setNewExecClient] = useState<
     OptimismItemOk<"execution">
   >();
+  const [customMainnetRpcUrl, setCustomMainnetRpcUrl] = useState<string | null>(null);
   const [newRollup, setNewRollup] = useState<OptimismItemOk<"rollup">>();
   const [newArchive, setNewArchive] = useState<OptimismItemOk<"archive">>();
   const [currentOptimismConfig, setCurrentOptimismConfig] = useState<
@@ -86,21 +84,29 @@ export const useOptimismConfig = (
     ethRpcUrlError
   ]);
 
+  useEffect(() => {
+    // If the URL is null, then OP Node will use the corresponding RPC to _DAPPNODE_GLOBAL_EXECUTION_CLIENT_MAINNET
+    if (customMainnetRpcUrl) {
+      setEthRpcUrlError(validateUrl(customMainnetRpcUrl));
+    } else {
+      setEthRpcUrlError(null);
+    }
+  }, [customMainnetRpcUrl]);
+
   return {
     reqStatus,
     setReqStatus,
-    ethRpcUrl,
-    setEthRpcUrl,
     ethRpcUrlError,
     setEthRpcUrlError,
     newExecClient,
     setNewExecClient,
+    customMainnetRpcUrl,
+    setCustomMainnetRpcUrl,
     newRollup,
     setNewRollup,
     newArchive,
     setNewArchive,
     currentOptimismConfig,
-    setCurrentOptimismConfig,
     changes
   };
 };
@@ -153,6 +159,15 @@ function getChanges({
     };
 
   return { isAllowed: true };
+}
+
+function validateUrl(str: string): string | null {
+  try {
+    new URL(str);
+    return null;
+  } catch (_) {
+    return "Invalid URL";
+  }
 }
 
 function isOkSelectedInstalledAndRunning<T extends OptimismType>(

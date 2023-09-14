@@ -15,6 +15,9 @@ import { useOptimismConfig } from "./useOptimismConfig";
 import "./columns.scss";
 import { Alert, Button, Form } from "react-bootstrap";
 import Input from "components/Input";
+import { confirm } from "components/ConfirmDialog";
+import { disclaimer } from "../data";
+import { withToast } from "components/toast/Toast";
 
 export default function Optimism({ description }: { description: string }) {
   const { theme } = React.useContext(ThemeContext);
@@ -26,17 +29,70 @@ export default function Optimism({ description }: { description: string }) {
     reqStatus,
     setReqStatus,
     ethRpcUrlError,
-    setEthRpcUrlError,
     newExecClient,
     setNewExecClient,
+    customMainnetRpcUrl,
+    setCustomMainnetRpcUrl,
     newRollup,
     setNewRollup,
     newArchive,
     setNewArchive,
-    currentOptimismConfig,
-    setCurrentOptimismConfig,
     changes
   } = useOptimismConfig(currentOptimismConfigReq);
+
+  /**
+   * Set new Optimism config
+   */
+  async function setNewOptimismConfig() {
+    try {
+      if (changes) {
+        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+          confirm({
+            title: `Optimism configuration`,
+            text:
+              "Are you sure you want to implement this Optimism configuration?",
+            buttons: [
+              {
+                label: "Continue",
+                onClick: () => resolve(true)
+              }
+            ]
+          });
+        });
+        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+          confirm({
+            title: `Disclaimer`,
+            text: disclaimer,
+            buttons: [
+              {
+                label: "Continue",
+                onClick: () => resolve(true)
+              }
+            ]
+          });
+        });
+
+        setReqStatus({ loading: true });
+        // TODO: set new Optimism config
+        await withToast(() => api.optimismConfigSet({}), {
+          message: `Setting new Optimism configuration...`,
+          onSuccess: `Successfully set new Optimism configuration`,
+          onError: `Error setting new Optimism configuration`
+        });
+        setReqStatus({ result: true });
+      }
+    } catch (e) {
+      setReqStatus({ error: e });
+    } finally {
+      setReqStatus({ loading: true });
+      await withToast(() => currentOptimismConfigReq.revalidate(), {
+        message: `Getting new Optimism staker configuration`,
+        onSuccess: `Successfully loaded Optimism staker configuration`,
+        onError: `Error new loading Optimism staker configuration`
+      });
+      setReqStatus({ loading: false });
+    }
+  }
 
   return (
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
@@ -55,25 +111,13 @@ export default function Optimism({ description }: { description: string }) {
 
           <>
             <Input
-              value={currentOptimismConfig?.rollup?.mainnetRpcUrl || ""}
-              onValueChange={
-                (value: string) => {
-                  if (currentOptimismConfig?.rollup){
-                    setCurrentOptimismConfig({
-                      ...currentOptimismConfig,
-                      rollup: {
-                        ...currentOptimismConfig.rollup,
-                        mainnetRpcUrl: value,
-                      },
-                    })
-                  }
-                }
-              }
-              isInvalid={Boolean(ethRpcUrlError)}
+              value={customMainnetRpcUrl || ""}
+              onValueChange={(value: string) => setCustomMainnetRpcUrl(value)}
+              //isInvalid={Boolean(ethRpcUrlError)}
               prepend="Ethereum RPC URL"
               placeholder="Ethereum mainnet RPC URL for Optimism node"
             />
-            {currentOptimismConfig?.rollup?.mainnetRpcUrl && ethRpcUrlError && (
+            {customMainnetRpcUrl && ethRpcUrlError && (
               <Form.Text className="text-danger" as="span">
                 {ethRpcUrlError}
               </Form.Text>
@@ -129,7 +173,7 @@ export default function Optimism({ description }: { description: string }) {
               <Button
                 variant="dappnode"
                 disabled={!changes.isAllowed || reqStatus.loading}
-                onClick={() => /* TODO */ console.log("TODO")}
+                onClick={() => setNewOptimismConfig()}
               >
                 Apply changes
               </Button>
