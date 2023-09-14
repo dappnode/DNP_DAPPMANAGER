@@ -121,6 +121,11 @@
       background-color: var(--color-dark-danger-background);
     }
 
+    // ERROR VIEW
+    .error-view pre {
+      color: var(--color-dark-secondarytext);
+    }
+
     // INPUTS
     input[type="text"],
     input[type="number"],
