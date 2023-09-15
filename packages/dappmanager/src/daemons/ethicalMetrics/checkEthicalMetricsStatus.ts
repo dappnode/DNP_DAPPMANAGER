@@ -68,7 +68,7 @@ export async function checkEthicalMetricsStatus(): Promise<void> {
 async function ensureAllContainersRunning(pkg: InstalledPackageData): Promise<void> {
     for (const container of pkg.containers) {
         if (!container.running) {
-            await dockerContainerStart(container.name);
+            await dockerContainerStart(container.containerName);
         }
     }
 }
