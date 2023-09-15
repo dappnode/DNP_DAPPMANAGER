@@ -22,17 +22,23 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
 
     const currentOptimismExecutionClient = db.opExecutionClient.get();
     const enableHistorical = db.opEnableHistoricalRpc.get();
-    const mainnetRpcUrl = getOptimismNodeRpcUrl();
     const dnpList = await listPackages();
 
     return {
       executionClients: await Promise.all(
         executionClientsOptimism.map(async execClient => {
           try {
-            if (!(await releaseFetcher.repoExists(execClient)))
-              throw Error(`Repository ${execClient} does not exist`);
+            /**if (!(await releaseFetcher.repoExists(execClient)))
+              throw Error(`Repository ${execClient} does not exist`);*/
 
-            const pkgData = await getPkgData(releaseFetcher, execClient);
+            let hash = "";
+            if (execClient === "op-geth.dnp.dappnode.eth") {
+              hash = "/ipfs/QmURvP2uKPKyBFpkwFE8JstB8eDcQ2Xd9PmW9TMCPPKpSL";
+            } else {
+              hash = "/ipfs/QmcdDtv2n3ottwn3tvpMiBbLfVMSp1KCHzTzjyLRL6PdqL";
+            }
+
+            const pkgData = await getPkgData(releaseFetcher, hash);
 
             return {
               status: "ok",
@@ -58,9 +64,13 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       rollup: await new Promise<OptimismItem<"rollup">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(optimismNode)))
-              throw Error(`Repository ${optimismNode} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, optimismNode);
+            /**if (!(await releaseFetcher.repoExists(optimismNode)))
+              throw Error(`Repository ${optimismNode} does not exist`);*/
+
+            const hash = "/ipfs/QmT7tBCdPX6HLQXmQynuETkwAPCSeAqFbANVKaFJnnQ6nw";
+
+            const pkgData = await getPkgData(releaseFetcher, hash);
+            const mainnetRpcUrl = getOptimismNodeRpcUrl();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -78,7 +88,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
               status: "error",
               dnpName: optimismNode,
               error,
-              mainnetRpcUrl
+              mainnetRpcUrl: ""
             });
           }
         })();
@@ -87,9 +97,12 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       archive: await new Promise<OptimismItem<"archive">>(resolve => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(optimismL2Geth)))
-              throw Error(`Repository ${optimismL2Geth} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, optimismL2Geth);
+            /**if (!(await releaseFetcher.repoExists(optimismL2Geth)))
+              throw Error(`Repository ${optimismL2Geth} does not exist`);*/
+
+            const hash = "/ipfs/QmWm346aWuktihXB4jQ5QyBfyx1wPdcyXkrRbrq3tKyVnd";
+
+            const pkgData = await getPkgData(releaseFetcher, hash);
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
