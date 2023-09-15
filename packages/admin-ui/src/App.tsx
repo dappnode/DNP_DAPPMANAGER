@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { startApi, apiAuth, LoginStatus } from "api";
 // Components
 import { ToastContainer } from "react-toastify";
@@ -10,7 +10,7 @@ import Welcome from "components/welcome/Welcome";
 import SideBar from "components/sidebar/SideBar";
 import { TopBar } from "components/topbar/TopBar";
 // Pages
-import { pages, defaultPage } from "./pages";
+import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
@@ -19,12 +19,12 @@ import { Theme, UsageMode } from "types";
 
 export const UsageContext = React.createContext({
   usage: "advanced",
-  toggleUsage: () => { }
+  toggleUsage: () => {}
 });
 
 export const ThemeContext = React.createContext({
   theme: "light",
-  toggleTheme: () => { }
+  toggleTheme: () => {}
 });
 
 function MainApp({ username }: { username: string }) {
@@ -67,19 +67,10 @@ function MainApp({ username }: { username: string }) {
   }, [screenWidth]);
 
   // Scroll to top on pathname change
-  const location = useLocation();
+  const screenLocation = useLocation();
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  const RedirectToDefault = () => {
-    const navigate = useNavigate();
-    useEffect(() => {
-      navigate(defaultPage.rootPath);
-    }, [navigate]);
-
-    return null;
-  };
+  }, [screenLocation.pathname]);
 
   return (
     <UsageContext.Provider value={{ usage, toggleUsage }}>
@@ -108,9 +99,9 @@ function MainApp({ username }: { username: string }) {
                   }
                 />
               ))}
+              {/* Redirection for routes with hashes */}
               {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<RedirectToDefault />} />
-
+              <Route path="*" element={<DefaultRedirect />} />
             </Routes>
           </div>
 
@@ -121,6 +112,19 @@ function MainApp({ username }: { username: string }) {
       </ThemeContext.Provider>
     </UsageContext.Provider>
   );
+}
+
+function DefaultRedirect() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname === "/") {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [location, navigate]);
+
+  return null;
 }
 
 export default function App() {

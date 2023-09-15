@@ -3,6 +3,7 @@ import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
 import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
+import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -68,6 +69,17 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack
+    })
+  );
+
+  setDefaultEthicalMetricsEmail().catch(e =>
+    migrationErrors.push({
+      migration:
+        "set default email for ethical metrics if the package is installed",
+      coreVersion: "0.2.77",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack

@@ -4,10 +4,7 @@ import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  StakerConfigGet,
-  StakerConfigGetOk,
-} from "@dappnode/common";
+import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/common";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -60,7 +57,7 @@ export default function StakerNetwork<T extends Network>({
     setNewMevBoost,
     newEnableWeb3signer,
     setNewEnableWeb3signer,
-    changes,
+    changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
   /**
@@ -158,7 +155,7 @@ export default function StakerNetwork<T extends Network>({
             (2) Choose a Consensus Layer client (+ validator) <br />
             (3) Install the web3signer, which will hold the validator keys and
             sign <br />
-            {network !== "gnosis" && (
+            {network !== "gnosis" && network !== "lukso" && (
               <>
                 (4) Optional; delegate block-building capacities through the MEV
                 Boost network and potentially profit from MEV
@@ -207,7 +204,7 @@ export default function StakerNetwork<T extends Network>({
                 (consensusClient, i) => (
                   <ConsensusClient<T>
                     key={i}
-                    consensusClient={consensusClient}
+                    consensusClient={{...consensusClient, useCheckpointSync: true}}
                     setNewConsClient={setNewConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName
@@ -235,7 +232,7 @@ export default function StakerNetwork<T extends Network>({
                   setNewMevBoost={setNewMevBoost}
                   isSelected={
                     currentStakerConfigReq.data.mevBoost.dnpName ===
-                      newMevBoost?.dnpName
+                    newMevBoost?.dnpName
                       ? true
                       : false
                   }

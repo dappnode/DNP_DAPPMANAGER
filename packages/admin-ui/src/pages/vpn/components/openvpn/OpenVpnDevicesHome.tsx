@@ -1,8 +1,9 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { api, useApi } from "api";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 // Own module
-import { maxIdLength, rootPath, subPaths } from "../../data";
+import { maxIdLength } from "../../data";
 import coerceDeviceName from "../../helpers/coerceDeviceName";
 // Components
 import { confirm } from "components/ConfirmDialog";
@@ -16,15 +17,15 @@ import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
-import { urlJoin } from "utils/url";
 // Params
 import { vpnDnpName } from "params";
-import { rootPath as installedRootPath } from "pages/installer";
+import { getInstallerPath } from "pages/installer";
 
 export default function OpenVpnDevicesHome() {
   const [input, setInput] = useState("");
   const devicesReq = useApi.devicesList();
   const dnpsRequest = useApi.packagesGet();
+  const navigate = useNavigate();
 
   // Actions
 
@@ -82,11 +83,14 @@ export default function OpenVpnDevicesHome() {
   if (dnpsRequest.data) {
     const vpnDnp = dnpsRequest.data.find(dnp => dnp.dnpName === vpnDnpName);
     if (!vpnDnp) {
-      const url = `${installedRootPath}/${vpnDnpName}`;
+      const url = `${getInstallerPath(vpnDnpName)}/${vpnDnpName}`;
       return (
         <Alert variant="secondary">
-          You must <NavLink to={url}>install the OpenVPN package</NavLink> to
-          use this feature
+          You must
+          <a href="#" onClick={() => navigate(url)}>
+            install the OpenVPN package
+          </a>
+          to use this feature
         </Alert>
       );
     }
@@ -131,10 +135,7 @@ export default function OpenVpnDevicesHome() {
             .map(({ id, admin }) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
-                <NavLink
-                  to={urlJoin(rootPath, subPaths.openVpn, id)}
-                  className="no-a-style"
-                >
+                <NavLink to={id} className="no-a-style">
                   <Button className="get-link">Get</Button>
                 </NavLink>
 

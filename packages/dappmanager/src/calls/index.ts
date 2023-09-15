@@ -12,6 +12,11 @@ export { diagnose } from "./diagnose.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";
 export { ethClientFallbackSet } from "./ethClientFallbackSet.js";
+export {
+  disableEthicalMetrics,
+  enableEthicalMetrics,
+  getEthicalMetricsConfig
+} from "./ethicalMetrics.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
@@ -49,6 +54,7 @@ export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
+export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
 export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";

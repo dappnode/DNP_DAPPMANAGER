@@ -9,7 +9,7 @@ import Button from "components/Button";
 import Input from "components/Input";
 import Ok from "components/Ok";
 // Icons
-import { GoClippy } from "react-icons/go";
+import { GoCopy } from "react-icons/go";
 // Selectors
 import { getDappnodeParams } from "services/dappnodeStatus/selectors";
 
@@ -85,8 +85,8 @@ export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {
       ? encodeURIComponent(`${origin}/tcp/4001/ipfs/${peerId}`)
       : "";
 
-  // http://my.dappnode/#/system/add-ipfs-peer/%2Fip4%2F1.9.207.246%2Ftcp%2F4001%2Fipfs%2FQmQnwHU6nj1v47mZQWeej4rBtYYTPrMJft88vKp9BAV38L
-  const addMyPeerUrl = `http://my.dappnode/#${matchUrl}/${peerMultiAddressEncoded}`;
+  // http://my.dappnode/system/add-ipfs-peer/%2Fip4%2F1.9.207.246%2Ftcp%2F4001%2Fipfs%2FQmQnwHU6nj1v47mZQWeej4rBtYYTPrMJft88vKp9BAV38L
+  const addMyPeerUrl = `http://my.dappnode/${matchUrl}/${peerMultiAddressEncoded}`;
 
   return (
     <Card spacing>
@@ -109,7 +109,7 @@ export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {
                   className="copy-input-copy"
                   data-clipboard-text={addMyPeerUrl}
                 >
-                  <GoClippy />
+                  <GoCopy />
                 </Button>
               }
             />

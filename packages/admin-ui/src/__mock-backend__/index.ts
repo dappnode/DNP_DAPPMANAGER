@@ -179,6 +179,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
+  rebootHostIsRequiredGet: async () => false,
   seedPhraseSet: async () => {},
   setStaticIp: async () => {},
 
@@ -214,15 +215,19 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ethClientStatus: {
       ok: false,
       code: "STATE_CALL_ERROR",
-      error: { message: "Some Error", stack: "Some Error\nline 56 file.ts" }
+      error: {
+        message: "Some Error",
+        stack: "Some Error\nline 56 file.ts"
+      }
     },
     ethProvider: "http://geth.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
-      // "repository",
-      // "repository-fallback",
-      // "system-auto-updates",
-      // "change-host-password"
+      "repository",
+      "repository-fallback",
+      "system-auto-updates",
+      "enable-ethical-metrics",
+      "change-host-password"
     ]
   }),
   natRenewalEnable: async () => {},
@@ -241,7 +246,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
-  })
+  }),
+  enableEthicalMetrics: async ({ mail }) => {},
+  getEthicalMetricsConfig: async () => ({
+    mail: "@example.com",
+    isEnabled: true
+  }),
+  disableEthicalMetrics: async () => {}
 };
 
 export const calls: Routes = {

@@ -1,4 +1,4 @@
 import System from "./components/SystemRoot";
 
-export { rootPath } from "./data";
+export { rootPath, relativePath, pathName  } from "./data";
 export const RootComponent = System;

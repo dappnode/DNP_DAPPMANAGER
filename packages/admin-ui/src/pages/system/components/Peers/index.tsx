@@ -6,11 +6,13 @@ import ShareIpfsPeer from "./ShareIpfsPeer";
 import { docsUrl } from "params";
 import LinkDocs from "components/LinkDocs";
 import { useLocation } from "react-router-dom";
+import { subPaths } from "pages/system/data";
 
 const Peers: React.FC = () => {
   const location = useLocation();
-  const peerPath = location.pathname.split("/").pop();
-  const peerFromUrl = decodeURIComponent(peerPath || "");
+  const path = location.pathname;
+  const subPath = path.split("/add-ipfs-peer/")[1];
+  const peerFromUrl = subPath ? decodeURIComponent(subPath) : undefined;
 
   return (
     <>
@@ -19,11 +21,11 @@ const Peers: React.FC = () => {
         <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
       </p>
       <SubTitle>Share IPFS peer</SubTitle>
-      <ShareIpfsPeer matchUrl={"/"} />
+      <ShareIpfsPeer matchUrl={"system/" + subPaths.peers} />
       <SubTitle>Add IPFS peer</SubTitle>
       <AddIpfsPeer peerFromUrl={peerFromUrl} />
     </>
   );
-}
+};
 
 export default Peers;

@@ -11,13 +11,11 @@ import { MdRefresh, MdOpenInNew } from "react-icons/md";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { sortBy } from "lodash-es";
-import { rootPath as packagesRootPath } from "pages/packages";
 // Images
 import defaultAvatar from "img/defaultAvatar.png";
 import dappnodeIcon from "img/dappnode-logo-only.png";
 import { renderResponse } from "components/SwrRender";
 import { coreDnpName } from "params";
-import { urlJoin } from "utils/url";
 import "./packages.scss";
 
 export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
@@ -56,16 +54,10 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
                   // Display the broken image logo with no text
                   alt=" "
                 />
-                <NavLink
-                  className="name"
-                  to={urlJoin(packagesRootPath, dnp.dnpName)}
-                >
+                <NavLink className="name" to={`${dnp.dnpName}/info`}>
                   {prettyDnpName(dnp.dnpName)}
                 </NavLink>
-                <NavLink
-                  className="open"
-                  to={urlJoin(packagesRootPath, dnp.dnpName)}
-                >
+                <NavLink className="open" to={`${dnp.dnpName}/info`}>
                   <MdOpenInNew />
                 </NavLink>
                 <MdRefresh

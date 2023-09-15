@@ -22,17 +22,20 @@ export default function SwitchBig({
   id,
   label,
   checked,
-  onChange
+  onChange,
+  disabled
 }: {
   id: string;
   label: string;
   checked: boolean;
   onChange: (bool: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <label htmlFor={id} className="switch-big">
       <span>{label}</span>
       <Switch
+        disabled={disabled}
         checked={checked}
         onChange={onChange}
         uncheckedIcon={<div style={switchLabelProps}>OFF</div>}

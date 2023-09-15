@@ -6,7 +6,7 @@ import {
   Route,
   useNavigate,
   useLocation,
-  useParams,
+  useParams
 } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
@@ -22,7 +22,7 @@ import HorizontalStepper from "./HorizontalStepper";
 import Card from "components/Card";
 import StatusIcon from "components/StatusIcon";
 // External
-import { rootPath as packagesRootPath } from "pages/packages/data";
+import { relativePath as packagesRelativePath } from "pages/packages/data";
 import { ProgressLogs } from "types";
 import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
@@ -44,10 +44,10 @@ interface InstallDnpViewProps {
 
 const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   dnp,
-  progressLogs,
+  progressLogs
 }) => {
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
   const params = useParams();
 
   const [userSettings, setUserSettings] = useState({} as UserSettingsAllDnps);
@@ -132,7 +132,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
-            navigate(packagesRootPath + "/" + dnpName);
+            navigate("/" + packagesRelativePath + "/" + dnpName + "/info");
           }
         }, 1000);
       }
@@ -265,16 +265,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   ].filter(route => route.available);
 
   // Compute the route index for the stepper display
-  const currentSubRoute = (location.pathname.split(`${params.id}/`)[1] || "");
+  const currentSubRoute =
+    location.pathname.split(`${encodeURIComponent(params.id || "")}/`)[1] || "";
   const currentIndex = availableRoutes.findIndex(
     ({ subPath }) => subPath && currentSubRoute.includes(subPath)
   );
-
-  /* Redirect automatically to the first route. DO NOT hardcode 
-   to prevent typos and causing infinite loops */
-  useEffect(() => {
-    navigate(`${params.id}/${availableRoutes[0].subPath}`);
-  }, [navigate, params.id, availableRoutes]);
 
   /**
    * Logic to control which route requires a redirect and when
@@ -363,4 +358,4 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   );
 };
 
-export default (InstallDnpView);
+export default InstallDnpView;

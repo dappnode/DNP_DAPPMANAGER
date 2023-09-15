@@ -10,15 +10,18 @@ import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,
   ConsensusClientPrater,
+  ConsensusClientLukso,
   ExecutionClientGnosis,
   ExecutionClientMainnet,
   ExecutionClientPrater,
+  ExecutionClientLukso,
   MevBoostMainnet,
   MevBoostPrater,
   Network,
   SignerMainnet,
   SignerPrater,
   SignerGnosis,
+  SignerLukso,
 } from "@dappnode/types";
 
 /**
@@ -57,6 +60,16 @@ export interface ExposableServiceManifestInfo {
 
 export interface ExposableServiceMapping extends ExposableServiceInfo {
   exposed: boolean;
+}
+
+/**
+ * ===============
+ * Ethical Metrics
+ * ===============
+ */
+export interface EthicalMetricsConfig {
+  isEnabled: boolean;
+  mail: string;
 }
 
 /**
@@ -1124,6 +1137,7 @@ export type NewFeatureId =
   | "repository"
   | "repository-fallback"
   | "system-auto-updates"
+  | "enable-ethical-metrics"
   | "change-host-password";
 
 /**
@@ -1267,6 +1281,8 @@ export type ExecutionClient<T extends Network> = T extends "mainnet"
   ? ExecutionClientGnosis
   : T extends "prater"
   ? ExecutionClientPrater
+  : T extends "lukso"
+  ? ExecutionClientLukso
   : never;
 
 export type ConsensusClient<T extends Network> = T extends "mainnet"
@@ -1275,6 +1291,8 @@ export type ConsensusClient<T extends Network> = T extends "mainnet"
   ? ConsensusClientGnosis
   : T extends "prater"
   ? ConsensusClientPrater
+  : T extends "lukso"
+  ? ConsensusClientLukso
   : never;
 
 export type Signer<T extends Network> = T extends "mainnet"
@@ -1283,6 +1301,8 @@ export type Signer<T extends Network> = T extends "mainnet"
   ? SignerGnosis
   : T extends "prater"
   ? SignerPrater
+  : T extends "lukso"
+  ? SignerLukso
   : never;
 
 export type MevBoost<T extends Network> = T extends "mainnet"

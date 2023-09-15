@@ -10,7 +10,7 @@ import { ComposeFileEditor } from "./compose/editor.js";
 import { listContainers } from "./docker/list/index.js";
 
 type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
-type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
+type GlobalEnvsValues = (typeof params.GLOBAL_ENVS)[GlobalEnvsKeys];
 
 export type GlobalEnvs = {
   [K in keyof typeof params.GLOBAL_ENVS]: string;
@@ -53,7 +53,11 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_PRATER`]: db.consensusClientPrater.get(),
     [`${prefix}EXECUTION_CLIENT_PRATER`]: db.executionClientPrater.get(),
     [`${prefix}MEVBOOST_PRATER`]: db.mevBoostPrater.get(),
-    [`${prefix}FEE_RECIPIENT_PRATER`]: db.feeRecipientPrater.get()
+    [`${prefix}FEE_RECIPIENT_PRATER`]: db.feeRecipientLukso.get(),
+    [`${prefix}CONSENSUS_CLIENT_LUKSO`]: db.consensusClientLukso.get(),
+    [`${prefix}EXECUTION_CLIENT_LUKSO`]: db.executionClientLukso.get(),
+    [`${prefix}MEVBOOST_LUKSO`]: db.mevBoostLukso.get(),
+    [`${prefix}FEE_RECIPIENT_LUKSO`]: db.feeRecipientLukso.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }

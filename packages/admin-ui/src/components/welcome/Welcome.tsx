@@ -10,6 +10,7 @@ import SystemAutoUpdates from "./features/SystemAutoUpdates";
 import ChangeHostPassword from "./features/ChangeHostPassword";
 import Repository from "./features/Repository";
 import RepositoryFallback from "./features/RepositoryFallback";
+import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/common";
@@ -44,6 +45,8 @@ function getRouteIdComponent(
       return (props: RouteProps) => <Repository {...props} />;
     case "repository-fallback":
       return (props: RouteProps) => <RepositoryFallback {...props} />;
+    case "enable-ethical-metrics":
+      return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
     default:
       return undefined;
   }

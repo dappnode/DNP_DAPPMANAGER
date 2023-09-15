@@ -1,5 +1,6 @@
 // This will be used later in our root reducer and selectors
-export const rootPath = "/wifi";
+export const relativePath = "wireless-network/wifi"; // default redirect to wifi
+export const rootPath = "wireless-network/*";
 export const title = "Wi-Fi";
 
 // Additional data

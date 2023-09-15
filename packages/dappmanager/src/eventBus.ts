@@ -28,6 +28,7 @@ interface EventTypes {
   requestPackages: void;
   requestSystemInfo: void;
   runEthClientInstaller: { useCheckpointSync?: boolean };
+  runEthicalMetricsInstaller: void;
   runNatRenewal: void;
   runStakerCacheUpdate: { dnpName: string };
 }
@@ -50,6 +51,7 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   requestPackages: {},
   requestSystemInfo: {},
   runEthClientInstaller: {},
+  runEthicalMetricsInstaller: {},
   runNatRenewal: {},
   runStakerCacheUpdate: {}
 };

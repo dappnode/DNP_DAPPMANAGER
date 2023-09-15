@@ -3,8 +3,8 @@ import { NotFoundError } from "../types.js";
 import params from "../../../../params.js";
 
 const adminUiUrl = `http://my.dappnode/`;
-const adminUiInstallUrl = `${adminUiUrl}#/installer`;
-const adminUiPackagesUrl = `${adminUiUrl}#/packages`;
+const adminUiInstallUrl = `${adminUiUrl}/installer`;
+const adminUiPackagesUrl = `${adminUiUrl}/packages`;
 const ropstenName = "ropsten.dnp.dappnode.eth";
 const swarmName = "swarm.dnp.dappnode.eth";
 

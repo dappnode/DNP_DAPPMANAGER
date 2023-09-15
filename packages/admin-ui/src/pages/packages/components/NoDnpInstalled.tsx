@@ -1,22 +1,30 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 // Components
 import Button from "components/Button";
 // Modules
-import { rootPath as installerRootPath } from "pages/installer";
-import { rootPath as packagesRootPath } from "pages/packages";
+import {
+  relativePath as installedRelativePath,
+  getInstallerPath
+} from "pages/installer";
 // Utils
 import { prettyDnpName } from "utils/format";
 
-export const NoDnpInstalled = ({ id }: { id: string }) => (
-  <div className="centered-container">
-    <h4>{id} is not installed</h4>
-    <p>Go back to packages or click below to install it</p>
-    <Link style={{ margin: "0 10px" }} to={packagesRootPath}>
-      <Button style={{ textTransform: "capitalize" }}>Packages</Button>
-    </Link>
-    <Link style={{ margin: "0 10px" }} to={installerRootPath + "/" + id}>
-      <Button>Install {prettyDnpName(id)}</Button>
-    </Link>
-  </div>
-);
+export const NoDnpInstalled = ({ id }: { id: string }) => {
+  const navigate = useNavigate();
+  return (
+    <div className="centered-container">
+      <h4>{id} is not installed</h4>
+      <p>Go back to packages or click below to install it</p>
+      <Button
+        onClick={() => navigate("/" + installedRelativePath)}
+        style={{ textTransform: "capitalize" }}
+      >
+        Packages
+      </Button>
+      <Button onClick={() => navigate(getInstallerPath(id) + "/" + id)}>
+        Install {prettyDnpName(id)}
+      </Button>
+    </div>
+  );
+};

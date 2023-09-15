@@ -15,7 +15,9 @@ import {
 import { listPackage } from "../modules/docker/list/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
-import { containerNamePrefix } from "@dappnode/types";
+import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
+import { unregister } from "../modules/ethicalMetrics/unregister.js";
+import { ethicalMetricsDnpName, ethicalMetricsTorServiceVolume } from "../modules/ethicalMetrics/index.js";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -55,6 +57,15 @@ export async function packageRestartVolumes({
     return;
   }
 
+  // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
+  if ((dnp.dnpName === ethicalMetricsDnpName && !volumeName) || volumeName === ethicalMetricsTorServiceVolume) {
+    try {
+      await unregister();
+    } catch (e) {
+      logs.error(`Error unregistering Ethical Metrics instance`, e);
+    }
+  }
+
   const containersStatus = await getContainersStatus({ dnpName });
 
   let err: Error | null = null;
@@ -62,7 +73,11 @@ export async function packageRestartVolumes({
     for (const containerName of containersToRemove) {
       // get the service name from the container name
       const serviceName = containerName
-        .split(containerNamePrefix)[1]
+        .split(
+          containerName.includes(containerNamePrefix)
+            ? containerNamePrefix
+            : containerCoreNamePrefix
+        )[1]
         .split(".")[0];
       // only stop containers that are running
       if (containersStatus[serviceName]?.targetStatus === "running")
