@@ -1,7 +1,7 @@
 import { logs } from "../../logs.js";
 import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/listPackages.js";
-import { dockerComposeUpPackage } from "../../modules/docker/index.js";
+import { dockerComposeUpPackage, dockerContainerStart } from "../../modules/docker/index.js";
 import * as db from "../../db/index.js";
 import {
     ethicalMetricsDnpName,
@@ -66,12 +66,9 @@ export async function checkEthicalMetricsStatus(): Promise<void> {
 }
 
 async function ensureAllContainersRunning(pkg: InstalledPackageData): Promise<void> {
-    // If the package is already installed, ensure it's running
-    if (pkg.containers.some(c => !c.running))
-        await dockerComposeUpPackage(
-            { dnpName: pkg.dnpName },
-            {},
-            {},
-            true
-        );
+    for (const container of pkg.containers) {
+        if (!container.running) {
+            await dockerContainerStart(container.name);
+        }
+    }
 }
