@@ -26,61 +26,90 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * DAPPMANAGER updates from <= v0.2.38 must manually add aliases
  * to all running containers.
  * This will run every single time dappmanager restarts and will list al packages
- * and do docker inspect.
+ * and do docker inspect. This migration tries to assure that:
+ * Having a package name "example.dnp.dappnode.eth" the aliases should be:
+ * "example.dappnode" if the package is mono service
+ * "service1.example.dappnode" if the package is multiservice
+ * "service1.example.dappnode" and "example.dappnode" if the package is multiservice and has in manifest mainservice
  */
 export async function addAliasToRunningContainers(): Promise<void> {
-  for (const container of await listContainers()) {
-    const containerName = container.containerName;
-    const alias = getPrivateNetworkAlias(container);
+  try {
+    const containers = await listContainers();
+    for (const container of containers) {
+        const containerName = container.containerName;
 
-    try {
-      // Info from docker inspect and compose file might be not-syncrhnonyzed
-      // So this function must be before the check hasAlias()
-      migrateCoreNetworkAndAliasInCompose(container, alias);
+        // get alias with service name included if it is a multiservice package
+        const alias = getPrivateNetworkAlias(container);
+        // Migrate core network and alias in compose before checking aliases
+        // Info from docker inspect and compose file might be not synchronized
+        // So this function must be before the check hasAlias()
+        migrateCoreNetworkAndAliasInCompose(container, alias);
+        const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+        // Get the current endpoint config. This is necessary to access the current aliases of dncore_network
+        if (!hasAlias(currentEndpointConfig, alias)) {
+          const updatedConfig = updateEndpointConfig(currentEndpointConfig, alias);
+          await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
+          console.log(currentEndpointConfig?.Aliases)
+          logs.info(`alias ${alias} added to ${containerName}`);
 
-      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-        containerName
-      );
-      if (hasAlias(currentEndpointConfig, alias)) continue;
-      const endpointConfig: Partial<Dockerode.NetworkInfo> = {
-        ...currentEndpointConfig,
-        Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
-      };
+        }
+  
+        // Check if the container is the main service of a multiservice package. If so, add the root alias
+        const compose = new ComposeFileEditor(container.dnpName, container.isCore);
+        if (Object.keys(compose.services).length !== 1 && container.isMain) {
+          const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+          // const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName); 
+          // Get the root alias by calling with service name empty
+          const rootAlias = getPrivateNetworkAlias({ dnpName: container.dnpName, serviceName: '' });
+          migrateCoreNetworkAndAliasInCompose(container, rootAlias); 
+          if (!hasAlias(currentEndpointConfig, rootAlias)) {
+            const updatedConfig = updateEndpointConfig(currentEndpointConfig, rootAlias);
+            await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
+            console.log(currentEndpointConfig?.Aliases)
+            logs.info(`alias ${rootAlias} added to ${containerName}`);
 
-      // Wifi and VPN containers needs a refresh connect due to its own network configuration
-      if (
-        container.containerName === params.vpnContainerName ||
-        container.containerName === params.wifiContainerName
-      ) {
-        await shell(`docker rm ${containerName} --force`);
-        await dockerComposeUp(
-          getPath.dockerCompose(container.dnpName, container.isCore)
-        );
-      } else {
-        await dockerNetworkDisconnect(dncoreNetworkName, containerName);
-        await dockerNetworkConnect(
-          dncoreNetworkName,
-          containerName,
-          endpointConfig
-        );
+          }
+        }
       }
-      logs.info(`Added alias to running container ${container.containerName}`);
-    } catch (e) {
-      logs.error(`Error adding alias to container ${containerName}`, e);
-    }
+  } catch (error) {
+    logs.error('Error adding alias to running containers:', error);
   }
 }
 
-/** Return true if endpoint config exists and has alias */
+function updateEndpointConfig(currentEndpointConfig: Dockerode.NetworkInfo | null, alias: string) {
+  return {
+    ...currentEndpointConfig,
+    Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
+  };
+}
+
+async function updateContainerNetwork(networkName: string, container: any, endpointConfig: Partial<Dockerode.NetworkInfo>): Promise<void> {
+  const containerName = container.containerName;
+
+  // Wifi and VPN containers need a refresh connect due to their own network configuration
+  if (containerName === params.vpnContainerName || containerName === params.wifiContainerName) {
+    await shell(`docker rm ${containerName} --force`);
+    await dockerComposeUp(getPath.dockerCompose(container.dnpName, container.isCore));
+  } else {
+    await dockerNetworkDisconnect(networkName, containerName);
+    console.log(`new alias for: ${containerName}`);
+    await dockerNetworkConnect(networkName, containerName, endpointConfig);
+  }
+}
+
+/** Return true if endpoint config exists, has an array of Alisases and it contains the alias
+ * @param alias
+ * @returns boolean
+ */
 function hasAlias(
   endpointConfig: Dockerode.NetworkInfo | null,
   alias: string
 ): boolean {
   return Boolean(
     endpointConfig &&
-      endpointConfig.Aliases &&
-      Array.isArray(endpointConfig.Aliases) &&
-      endpointConfig.Aliases.includes(alias)
+    endpointConfig.Aliases &&
+    Array.isArray(endpointConfig.Aliases) &&
+    endpointConfig.Aliases.includes(alias)
   );
 }
 
