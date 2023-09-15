@@ -89,7 +89,8 @@ export async function setStakerConfig<T extends Network>({
     setExecutionClient<T>({
       currentExecutionClient,
       targetExecutionClient: executionClient,
-      currentExecClientPkg
+      currentExecClientPkg,
+      network
     }),
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     setConsensusClient<T>({
