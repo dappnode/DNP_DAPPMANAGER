@@ -44,7 +44,7 @@ export function ChangeDappnodeWebName() {
           onClick={() => onChangeDappNodeWebName()}
           variant="dappnode"
         >
-          Change dappnode Name
+          Change Dappnode Name
         </Button>
       </InputForm>
     </>
