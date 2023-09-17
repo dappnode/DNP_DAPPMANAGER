@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Script to detect and list possible mountpoints to be used in DAppNode as bind volumes.
+# Script to detect and list possible mountpoints to be used in Dappnode as bind volumes.
 #
 
 IFS=$'\n'
