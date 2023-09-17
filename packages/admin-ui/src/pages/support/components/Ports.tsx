@@ -16,16 +16,16 @@ export default function Ports() {
           {systemInfo.data.publicIp !== systemInfo.data.internalIp ? (
             <>
               {systemInfo.data.upnpAvailable ? (
-                <Ok ok={true} msg={"DAppNode has detected UPnP as enabled"} />
+                <Ok ok={true} msg={"Dappnode has detected UPnP as enabled"} />
               ) : (
                 <>
                   <Ok
                     ok={false}
-                    msg={"DAppNode has detected UPnP as disabled"}
+                    msg={"Dappnode has detected UPnP as disabled"}
                   />
                   <p>
                     Enable UPnP or manually open and associate the necessary
-                    ports in the router to the DAppNode local Ip:
+                    ports in the router to the Dappnode local IP:
                     <strong>{systemInfo.data.internalIp}</strong>
                   </p>
                   <br />
@@ -39,7 +39,7 @@ export default function Ports() {
             <Ok
               ok={true}
               msg={
-                "Public and local IPs are the same. Your DAppNode is directly exposed to the internet and does not require UPnP"
+                "Public and local IPs are the same. Your Dappnode is directly exposed to the internet and does not require UPnP"
               }
             />
           )}
