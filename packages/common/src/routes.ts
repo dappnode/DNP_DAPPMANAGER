@@ -387,7 +387,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Installs a DAppNode Package.
+   * Installs a Dappnode Package.
    * Resolves dependencies, downloads release assets, loads the images to docker,
    * sets userSettings and starts the docker container for each package.
    *
@@ -617,20 +617,20 @@ export interface Routes {
    */
   sshPortGet: () => Promise<number>;
   /**
-   * Change the SHH port on the DAppNode host
+   * Change the SHH port on the Dappnode host
    */
   sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
-   * Disable or enable SSH on the DAppNode host
+   * Disable or enable SSH on the Dappnode host
    */
   sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
   /**
-   * Check if SSH is enabled of disabled in the DAppNode host
+   * Check if SSH is enabled of disabled in the Dappnode host
    */
   sshStatusGet: () => Promise<ShhStatus>;
 
   /**
-   * Returns the current DAppNode system info
+   * Returns the current Dappnode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
 
