@@ -31,7 +31,7 @@ function check_requirements () {
   lvdisplay &>/dev/null || { echo "Error: LVM is not on host" | tee -a "$LOG_FILE"; exit 1; }
 }
 
-# Extends the space of the dappnode LVM with a given hard disk
+# Extends the space of the Dappnode LVM with a given hard disk
 # Must be called with the arguments:
 #   1) hard disk name
 #   2) Volume Group name
@@ -56,7 +56,7 @@ function extend_disk () {
   # 6. LVM extension check
 }
 
-# Returns disks names and its size detected in the dappnode
+# Returns disks names and its size detected in the Dappnode
 # e.g {"blockdevices": [{"name":"sda", "size":"3.6T"},{"name":"nvme0n1", "size":"3.6T"}]}
 function get_hard_disks () {
   # lsblk - list block devices
