@@ -53,7 +53,7 @@ export default function NotificationsView() {
       linkText: "Reboot",
       linkPath: systemPathName + "/" + systemSubPaths.power,
       body:
-        "**DAppNode host reboot required.** Click **Reboot** to reboot the host and apply the changes",
+        "**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes",
       active: rebootHostIsRequired
     },
     /**
@@ -65,7 +65,7 @@ export default function NotificationsView() {
       linkText: "Update",
       linkPath: systemPathName + "/" + systemSubPaths.update,
       body:
-        "**DAppNode system update available.** Click **Update** to review and approve it",
+        "**Dappnode system update available.** Click **Update** to review and approve it",
       active:
         coreUpdateAvailable &&
         !updatingCore &&
@@ -81,7 +81,7 @@ export default function NotificationsView() {
       linkText: "Change",
       linkPath: systemPathName + "/" + systemSubPaths.security,
       body:
-        "**Change the DAppNode WIFI credentials**, they are insecure default values.",
+        "**Change the Dappnode WiFi credentials**, they are insecure default values.",
       active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
     },
     /**
