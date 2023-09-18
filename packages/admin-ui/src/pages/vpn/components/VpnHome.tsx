@@ -24,7 +24,7 @@ export function VpnHome() {
       installed: boolean;
     }[] = [
       {
-        name: "OpenVpn",
+        name: "OpenVPN",
         subPath: subPaths.openVpn,
         subLink: "openvpn",
         component: OpenVpnDevicesRoot,
@@ -63,9 +63,9 @@ export function VpnHome() {
 
       <p>
         Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your DAppNode from an external network. Learn more about VPN at:{" "}
+        access your Dappnode from an external network. Learn more about VPN at:{" "}
         <LinkDocs href={docsUrl.connectVpn}>
-          How to connect to your DAppNode VPN
+          How to connect to your Dappnode VPN
         </LinkDocs>
       </p>
 

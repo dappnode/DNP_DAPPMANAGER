@@ -1,7 +1,7 @@
 import { logs } from "../../logs.js";
 import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/listPackages.js";
-import { dockerComposeUpPackage, dockerContainerStart } from "../../modules/docker/index.js";
+import { dockerContainerStart } from "../../modules/docker/index.js";
 import * as db from "../../db/index.js";
 import {
     ethicalMetricsDnpName,

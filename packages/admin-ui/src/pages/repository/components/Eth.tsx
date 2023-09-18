@@ -69,7 +69,7 @@ export default function Eth() {
    *
    * 2. if (!dnp.running)
    *    Package can be stopped because the user stopped it or
-   *    because the DAppNode is too full and auto-stop kicked in
+   *    because the Dappnode is too full and auto-stop kicked in
    *  > Show an error or something in the UI as
    *    "Alert!" you target is OFF, go to remote or install it again
    */
@@ -97,7 +97,7 @@ export default function Eth() {
     <Card className="dappnode-identity">
       <SubTitle>Ethereum</SubTitle>
       <div>
-        DAppNode uses smart contracts to access a decentralized repository of
+        Dappnode uses smart contracts to access a decentralized repository of
         DApps. Choose to connect to a remote network or use your own local node
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (

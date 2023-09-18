@@ -11,7 +11,7 @@ import "./sdk.scss";
 
 const subRoutes = [
   {
-    title: "Publish DAppNode Packages",
+    title: "Publish Dappnode Packages",
     subtitle: `To an Aragon's APM registry`,
     urlTag: "Publish",
     url: sdkPublishAppUrl
@@ -25,10 +25,10 @@ export default function SdkHome() {
       <SubTitle>What is the SDK?</SubTitle>
       <Card>
         <p>
-          The DAppNode Software Development Kit (dappnodesdk) is a tool to make
-          as simple as possible the creation of new dappnode packages. It helps
+          The Dappnode Software Development Kit (dappnodesdk) is a tool to make
+          as simple as possible the creation of new Dappnode packages. It helps
           to initialize and publish an Aragon Package Manager Repo in the
-          ethereum mainnet.
+          Ethereum mainnet.
         </p>
         <p>
           We have deployed a public APM (Aragon Package Manager) registry in
@@ -47,8 +47,8 @@ export default function SdkHome() {
         </div>
         <p>
           The dappnodesdk can be installed locally with npm. Then you can
-          initialize a DAppNode Package, build it's docker image and publish it
-          on the Aragon Package Manager (APM) on the ethereum mainnet
+          initialize a Dappnode Package, build it's docker image and publish it
+          on the Aragon Package Manager (APM) on the Ethereum mainnet
         </p>
 
         <a
