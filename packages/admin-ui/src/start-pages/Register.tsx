@@ -59,8 +59,8 @@ export function Register({
   return (
     <StandaloneContainer TopIcon={BsShieldLock} title="Register">
       <div className="text">
-        Welcome! To protect your DAppNode register an admin password. It is
-        recommended to use a password manager to set a very strong password
+        Welcome! To protect your Dappnode register an admin password. It is
+        recommended to use a password manager to set a strong password
       </div>
 
       <InputForm

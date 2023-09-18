@@ -17,8 +17,8 @@ export function ChangeDappnodeWebName() {
 
   function onChangeDappNodeWebName() {
     withToastNoThrow(() => api.dappnodeWebNameSet({ dappnodeWebName: input }), {
-      message: "Setting DAppNode name ...",
-      onSuccess: "DAppNode name changed correctly"
+      message: "Setting Dappnode name ...",
+      onSuccess: "Dappnode name changed correctly"
     }).then(() => {
       dispatch(fetchSystemInfo());
     });
@@ -44,7 +44,7 @@ export function ChangeDappnodeWebName() {
           onClick={() => onChangeDappNodeWebName()}
           variant="dappnode"
         >
-          Change dappnode Name
+          Change Dappnode Name
         </Button>
       </InputForm>
     </>

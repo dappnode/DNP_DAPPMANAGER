@@ -37,8 +37,8 @@ export default function Identity() {
       if (identityAddress)
         await new Promise<void>(resolve =>
           confirm({
-            title: `Changing DAppNode Identity`,
-            text: `Are you sure you want to change the current DAppNode's identity?`,
+            title: `Changing Dappnode Identity`,
+            text: `Are you sure you want to change the current Dappnode's identity?`,
             label: "Yes",
             onClick: resolve,
             variant: "danger"
@@ -88,7 +88,7 @@ export default function Identity() {
           <div>
             <p>
               Introduce the mnemonic seed phrase of the account holding your
-              DAppNode NFT.
+              Dappnode NFT.
             </p>
             <img
               className="ether-card-sample"
