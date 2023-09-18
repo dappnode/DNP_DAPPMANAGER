@@ -38,7 +38,7 @@ export function startEthicalMetricsDaemon(signal: AbortSignal): void {
 
   runAtMostEvery(
     async () => runEthicalMetricsTaskMemo(),
-    getRandomizedInterval(params.ETH_METRICS_DAEMON_INTERVAL, 10),
+    getRandomizedInterval(params.ETH_METRICS_DAEMON_INTERVAL, params.ETH_METRICS_DAEMON_INTERVAL_VARIATION),
     signal
   );
 }
