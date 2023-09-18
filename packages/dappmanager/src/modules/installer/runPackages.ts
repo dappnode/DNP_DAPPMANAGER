@@ -24,7 +24,7 @@ export async function runPackages(
   for (const pkg of packagesData) {
     // patch to prevent installer from crashing
     if (pkg.dnpName == params.dappmanagerDnpName) {
-      log(pkg.dnpName, "Resetting DAppNode... ");
+      log(pkg.dnpName, "Restarting Dappnode... ");
       await restartDappmanagerPatch({
         composePath: pkg.composePath,
         composeBackupPath: pkg.composeBackupPath,
