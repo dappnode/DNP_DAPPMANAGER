@@ -12,7 +12,7 @@ import { eventBus } from "../../eventBus.js";
  * It also sets the new feature ethical metrics notifications as seen if the email exist
  */
 export async function setDefaultEthicalMetricsEmail(): Promise<void> {
-  const apiContainerName = "api-ui";
+  const apiContainerName = "tor-hidden-service";
 
   // skip migration if the feature is already seen
   if (db.newFeatureStatus.get("enable-ethical-metrics") === "seen") {
@@ -52,7 +52,7 @@ export async function setDefaultEthicalMetricsEmail(): Promise<void> {
     return;
   }
 
-  // skip migration if the ethical metrics package doesn't have environment variables for api-ui
+  // skip migration if the ethical metrics package doesn't have environment variables for tor-hidden-service
   if (!environment[apiContainerName]) {
     logs.warn(
       `Ethical metrics package doesn't have environment variables for ${apiContainerName}, skipping setting default email`
