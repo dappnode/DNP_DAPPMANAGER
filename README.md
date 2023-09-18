@@ -1,22 +1,22 @@
 <p align="center"><a href="https://github.com/dappnode/DAppNode"><img width="400" title="DAPPMANAGER" src='banner-dappmanager.png' /></a></p>
 
-[![Website dappnode.io](https://img.shields.io/badge/Website-dappnode.io-brightgreen.svg)](https://dappnode.io/)
+[![Website dappnode.com](https://img.shields.io/badge/Website-dappnode.io-brightgreen.svg)](https://dappnode.com/)
 [![Documentation Wiki](https://img.shields.io/badge/Documentation-Wiki-brightgreen.svg)](https://docs.dappnode.io)
-[![GIVETH Campaign](https://img.shields.io/badge/GIVETH-Campaign-1e083c.svg)](https://donate.dappnode.io)
-[![Discord DAppNode](https://img.shields.io/discord/747647430450741309?label=Discord&logo=Discord&style=plastic)](https://discord.gg/g9k6vkW)
+[![GIVETH Campaign](https://img.shields.io/badge/GIVETH-Campaign-1e083c.svg)](https://giveth.io/project/dappnode)
+[![Discord Dappnode](https://img.shields.io/discord/747647430450741309?label=Discord&logo=Discord&style=plastic)](https://discord.gg/dappnode)
 [![Twitter Follow](https://img.shields.io/twitter/follow/espadrine.svg?style=social&label=Follow)](https://twitter.dappnode.io)
 
-The **DNP_DAPPMANAGER** handles the DAppNode core DNPs and any user installed DNPs. It also performs maintenance checks.
+The **DNP_DAPPMANAGER** handles the Dappnode core DNPs and any user installed DNPs. It also performs maintenance checks.
 
-- :bust_in_silhouette: For user / usage documentation go to the [user guide](https://dappnode.github.io/DAppNodeDocs/#i-am-a-user/)
-- :wrench: For developers check the [technical documentation](https://dappnode.github.io/DAppNodeDocs/#i-am-a-developer)
-- :speech_balloon: For feedback and reporting problems please [submit an issue](https://github.com/dappnode/dappnode/issues/new) or contact us on [Discord](https://discord.gg/g9k6vkW)
+- :bust_in_silhouette: For user / usage documentation go to the [user guide](https://docs.dappnode.io/docs/user/getting-started/choose-your-path)
+- :wrench: For developers check the [technical documentation](https://docs.dappnode.io/docs/dev)
+- :speech_balloon: For feedback and reporting problems please [submit an issue](https://github.com/dappnode/dappnode/issues/new) or contact us on [Discord](https://discord.gg/dappnode)
 
 It is an AragonApp whose repo is deployed at this address: [0x0c564ca7b948008fb324268d8baedaeb1bd47bce](https://etherscan.io/address/0x0c564ca7b948008fb324268d8baedaeb1bd47bce) and whose ENS address is: [dappmanager.dnp.dappnode.eth](https://etherscan.io/enslookup?q=dappmanager.dnp.dappnode.eth])
 
 ## Getting Started
 
-This repo is a single piece of DAppNode. To install and use DAppNode go to the [installation guide](https://github.com/dappnode/DAppNode/wiki/DAppNode-Installation-Guide).
+This repo is a single piece of Dappnode. To install and use Dappnode go to the [installation guide](https://docs.dappnode.io/docs/user/install/overview).
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
@@ -30,7 +30,7 @@ docker --version
 docker-compose --version
 ```
 
-Go to the [pre-requisites setup](https://docs.dappnode.io/user/quick-start/core/installation/#prerequisites) in our installation guide if any of the above commands return an error and need to be installed or has its own unmet dependencies.
+Go to the [installation overview](https://docs.dappnode.io/docs/user/install/overview) in our documentation for more information.
 
 ### Installing
 
@@ -48,7 +48,7 @@ npm i
 npm start
 ```
 
-The DNP_DAPPMANAGER expects to be in a DAppNode network to connect to its WAMP module, Ethereum node and IPFS node. If you wish to use a different providers for such services you can edit their urls in the [`build/src/src/params.js` file](build/src/src/params.js).
+The DNP_DAPPMANAGER expects to be in a Dappnode network to connect to its WAMP module, Ethereum node and IPFS node. If you wish to use a different providers for such services you can edit their urls in the [`build/src/src/params.js` file](build/src/src/params.js).
 
 ### Building
 
@@ -96,7 +96,7 @@ cd packages/admin-ui
 yarn mock
 ```
 
-3. Actual DAPPMANAGER: this mode will connect to your DAppNode's actual DAPPMANAGER, useful to develop and test functionality OS dependant such as the SSH manager, host password manager, etc. You must be connected to your DAppNode via VPN or WIFI.
+3. Actual DAPPMANAGER: this mode will connect to your Dappnode's actual DAPPMANAGER, useful to develop and test functionality OS dependant such as the SSH manager, host password manager, etc. You must be connected to your Dappnode via VPN or WiFi.
 
 ```
 cd packages/admin-ui

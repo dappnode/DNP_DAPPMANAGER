@@ -25,7 +25,7 @@ export interface IApiAuth {
 export interface IApiRoutes {
   /** Get URL to download a specific path with an HTTP GET req */
   fileDownloadUrl(data: { containerName: string; path: string }): string;
-  /** Download wireguard config */
+  /** Download Wireguard config */
   downloadWireguardConfig(data: { device: string; isLocal: boolean }): string;
   /** Legacy download file URL using both REST api and JSON RPC */
   downloadUrl(data: { fileId: string }): string;
@@ -33,7 +33,7 @@ export interface IApiRoutes {
   userActionLogsUrl(): string;
   /** Per container URL to download all of its logs */
   containerLogsUrl(data: { containerName: string }): string;
-  /** Upload file to DAppNode and get a fileId */
+  /** Upload file to Dappnode and get a fileId */
   uploadFile(
     file: File,
     onProgress: (data: { loaded: number; total: number }) => void

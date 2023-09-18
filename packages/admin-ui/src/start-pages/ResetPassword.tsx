@@ -42,7 +42,7 @@ export function ResetPassword({
         guide
         <br />
         <LinkDocs href={docsUrl.recoverPasswordGuide}>
-          Reset your DAppNode admin password
+          Reset your Dappnode admin password
         </LinkDocs>
       </Alert>
 
