@@ -20,8 +20,10 @@ export default function EnableEthicalMetrics({
     const regex = /\S+@\S+\.\S+/;
     if (regex.test(mail)) {
       setMailError(false);
+      setEthicalMetricsOn(false);
     } else {
       setMailError(true);
+      setEthicalMetricsOn(true);
     }
   }, [mail]);
 
