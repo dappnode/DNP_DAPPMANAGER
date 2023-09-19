@@ -1,4 +1,3 @@
-import { EthProviderError } from "../modules/ethClient/index.js";
 import * as logUserAction from "../logUserAction.js";
 import { logs } from "../logs.js";
 import {
@@ -6,7 +5,8 @@ import {
   Routes,
   LoggerMiddleware,
   Args,
-  Result
+  Result,
+  EthProviderError
 } from "@dappnode/common";
 
 export const routesLogger: LoggerMiddleware = {

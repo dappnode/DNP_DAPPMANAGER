@@ -2,7 +2,6 @@ import http from "http";
 import httpProxy from "http-proxy";
 import express from "express";
 import { params } from "@dappnode/params";
-import { EthProviderError } from "../../../modules/ethClient/index.js";
 import { ipfs } from "../../../modules/ipfs/index.js";
 import { urlJoin } from "../../../utils/url.js";
 import { logs } from "../../../logs.js";
@@ -14,6 +13,7 @@ import {
   NotFoundError,
   Content
 } from "./types.js";
+import { EthProviderError } from "@dappnode/common";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",

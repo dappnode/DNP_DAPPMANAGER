@@ -1,5 +1,5 @@
 import { eventBus } from "./eventBus.js";
-import params from "./params.js";
+import params from "@dappnode/params";
 import { logSafeObjects } from "./logSafeObjects.js";
 import { logs } from "./logs.js";
 // dappnode

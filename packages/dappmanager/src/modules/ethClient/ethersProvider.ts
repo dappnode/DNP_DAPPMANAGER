@@ -2,11 +2,9 @@ import { ethers } from "ethers";
 import * as db from "../../db/index.js";
 import { params } from "@dappnode/params";
 import { getMultiClientStatus } from "./clientStatus.js";
-import { EthClientStatusError } from "@dappnode/common";
+import { EthClientStatusError, EthProviderError } from "@dappnode/common";
 import { emitSyncedNotification } from "./syncedNotification.js";
 import { ethereumClient } from "./index.js";
-
-export class EthProviderError extends Error {}
 
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target

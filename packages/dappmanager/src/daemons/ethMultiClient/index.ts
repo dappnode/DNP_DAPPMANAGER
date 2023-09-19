@@ -10,10 +10,9 @@ import {
   serializeError
 } from "../../modules/ethClient/types.js";
 import { logs } from "../../logs.js";
-import { EthClientRemote } from "@dappnode/common";
+import { EthClientRemote, EthProviderError } from "@dappnode/common";
 import {
   ethereumClient,
-  EthProviderError,
   getLocalFallbackContentHash
 } from "../../modules/ethClient/index.js";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
