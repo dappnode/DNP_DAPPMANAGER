@@ -128,10 +128,8 @@ export function migrateCoreNetworkAndAliasInCompose(
   container: PackageContainer,
   alias: string
 ): void {
-  try {
-  console.log(container.isCore, container.dnpName)
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-  console.log("TEST: ", compose)
+
   // 1. Get compose network settings
   const composeNetwork = compose.getComposeNetwork(
     params.DNP_PRIVATE_NETWORK_NAME
@@ -178,10 +176,6 @@ export function migrateCoreNetworkAndAliasInCompose(
   );
 
   compose.write();
-}
-catch (error) {
-  logs.error('Error migrating core network and alias in compose:', error);
-}
 }
 
 function isComposeNetworkAndAliasMigrated(
