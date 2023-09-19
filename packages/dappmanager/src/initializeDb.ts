@@ -8,7 +8,7 @@ import getStaticIp from "./utils/getStaticIp.js";
 import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
 import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs.js";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
-import params from "./params.js";
+import { params } from "@dappnode/params";
 import ping from "./utils/ping.js";
 import { pause } from "./utils/asyncFlows.js";
 import retry from "async-retry";

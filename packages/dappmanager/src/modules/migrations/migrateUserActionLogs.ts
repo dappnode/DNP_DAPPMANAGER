@@ -2,7 +2,7 @@ import { orderBy } from "lodash-es";
 import { logs } from "../../logs.js";
 import { UserActionLog } from "@dappnode/common";
 import { isNotFoundError } from "../../utils/node.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import fs from "fs";
 import { get, set } from "../../logUserAction.js";
 

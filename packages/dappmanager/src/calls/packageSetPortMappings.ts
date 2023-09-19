@@ -1,5 +1,5 @@
 import { eventBus } from "../eventBus.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { listPackage } from "../modules/docker/list/index.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { PortMapping } from "@dappnode/common";

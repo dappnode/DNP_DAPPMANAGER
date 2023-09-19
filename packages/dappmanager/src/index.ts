@@ -11,7 +11,7 @@ import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger } from "./api/logger.js";
 import * as routes from "./api/routes/index.js";
 import { logs } from "./logs.js";
-import params from "./params.js";
+import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {
   getVersionData,

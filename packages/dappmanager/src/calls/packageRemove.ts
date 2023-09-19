@@ -1,6 +1,6 @@
 import fs from "fs";
 import { eventBus } from "../eventBus.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { dockerComposeDown } from "../modules/docker/compose/index.js";
 import {
   dockerContainerRemove,
@@ -15,7 +15,10 @@ import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js"
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
-import { ethicalMetricsDnpName, unregister } from "../modules/ethicalMetrics/index.js";
+import {
+  ethicalMetricsDnpName,
+  unregister
+} from "../modules/ethicalMetrics/index.js";
 
 /**
  * Remove package data: docker down + disk files

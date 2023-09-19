@@ -1,4 +1,4 @@
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { eventBus } from "../../eventBus.js";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { EthProviderError } from "../../modules/ethClient/index.js";

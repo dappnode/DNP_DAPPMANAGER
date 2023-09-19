@@ -1,7 +1,7 @@
 import retry from "async-retry";
 import { eventBus } from "../../eventBus.js";
 import * as db from "../../db/index.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { listContainers } from "../../modules/docker/list/index.js";
 import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
 import { runAtMostEveryIntervals } from "../../utils/asyncFlows.js";

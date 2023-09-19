@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { logs } from "../../logs.js";
 import { sha256File } from "../hostScripts/index.js";
 

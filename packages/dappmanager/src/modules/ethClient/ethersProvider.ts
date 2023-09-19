@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import * as db from "../../db/index.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { getMultiClientStatus } from "./clientStatus.js";
 import { EthClientStatusError } from "@dappnode/common";
 import { emitSyncedNotification } from "./syncedNotification.js";

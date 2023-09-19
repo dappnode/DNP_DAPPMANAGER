@@ -9,7 +9,7 @@ import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { parseServiceNetworks } from "../compose/networks.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import {
   dockerComposeUpPackage,
   dockerNetworkConnect,
@@ -252,7 +252,6 @@ export class EthereumClient {
 
   // Utils
   // TODO: put private in the methods and find a way to test them
-
 
   removeFullnodeAliasFromCompose(
     ethClientDnpName: string,

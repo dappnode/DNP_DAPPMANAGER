@@ -1,7 +1,7 @@
 import fs from "fs";
 import { mapKeys } from "lodash-es";
 import * as db from "../db/index.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { stringifyEnvironment } from "../modules/compose/index.js";
 import { PackageEnvs } from "@dappnode/types";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";

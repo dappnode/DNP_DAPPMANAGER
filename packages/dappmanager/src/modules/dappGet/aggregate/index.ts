@@ -1,5 +1,5 @@
 import { valid, lt } from "semver";
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 // Internal
 import { safeSemver } from "../utils/safeSemver.js";
 import aggregateDependencies from "./aggregateDependencies.js";

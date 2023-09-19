@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import crypto from "crypto";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { logs } from "../../logs.js";
 
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;

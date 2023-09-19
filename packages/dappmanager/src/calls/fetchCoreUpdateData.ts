@@ -1,5 +1,5 @@
 import { valid, satisfies } from "semver";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { listPackages } from "../modules/docker/list/index.js";

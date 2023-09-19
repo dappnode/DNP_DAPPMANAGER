@@ -2,7 +2,7 @@ import * as api from "../calls/index.js";
 import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { logs } from "../logs.js";
 
 export function startTestApi(): http.Server {

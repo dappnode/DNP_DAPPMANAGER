@@ -1,5 +1,5 @@
 import { eventBus } from "../../eventBus.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import {
   isUpdateDelayCompleted,
   flagCompletedUpdate,

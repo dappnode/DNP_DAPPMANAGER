@@ -4,7 +4,7 @@ import {
   dockerContainerStart
 } from "../modules/docker/index.js";
 import { eventBus } from "../eventBus.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { PackageContainer } from "@dappnode/common";

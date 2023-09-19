@@ -1,4 +1,4 @@
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import * as db from "../../db/index.js";
 import {
   packageRemove,

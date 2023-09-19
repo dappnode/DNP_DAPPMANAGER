@@ -1,6 +1,6 @@
 import * as db from "../../db/index.js";
 import { eventBus } from "../../eventBus.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";

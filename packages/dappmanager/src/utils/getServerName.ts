@@ -1,5 +1,5 @@
 import fs from "fs";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { logs } from "../logs.js";
 import { isNotFoundError } from "./node.js";
 

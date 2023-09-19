@@ -1,5 +1,5 @@
 import fs from "fs";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { Log } from "../../utils/logUi.js";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { logs } from "../../logs.js";

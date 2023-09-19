@@ -1,7 +1,7 @@
 import { httpsPortal } from "../../../calls/index.js";
 import { InstallPackageData } from "@dappnode/common";
 import { getExternalNetworkAlias } from "../../../domains.js";
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 import {
   dockerListNetworks,
   dockerCreateNetwork,

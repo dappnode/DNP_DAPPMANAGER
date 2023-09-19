@@ -1,5 +1,5 @@
 import path from "path";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { dockerComposeUp } from "../docker/compose/index.js";
 import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "../../utils/logUi.js";

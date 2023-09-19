@@ -8,7 +8,7 @@ import { logs } from "../logs.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { getVolumesOwnershipData } from "../modules/docker/volumesData.js";
 import { sortPackages } from "./packagesGet.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 /**
  * Get package detail information
