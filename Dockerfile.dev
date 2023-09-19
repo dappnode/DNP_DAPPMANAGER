@@ -54,11 +54,56 @@ COPY packages/dappmanager/package.json \
   packages/dappmanager/
 COPY packages/common/package.json \ 
   packages/common/
+COPY packages/params/package.json \ 
+  packages/params/
+COPY packages/utils/package.json \ 
+  packages/utils/
+COPY packages/eventBus/package.json \ 
+  packages/eventBus/
+COPY packages/logger/package.json \ 
+  packages/logger/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build common
-WORKDIR /tmp-app/packages/common/
+WORKDIR /app/packages/common/
 COPY packages/common/ .
+RUN yarn build
+# Results in dist/*
+
+# Build params
+WORKDIR /app/packages/params/
+COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build utils
+WORKDIR /app/packages/utils/
+COPY packages/utils/ .
+RUN yarn build
+# Results in dist/*
+
+# Build eventBus
+WORKDIR /app/packages/eventBus/
+COPY packages/eventBus/ .
+RUN yarn build
+# Results in dist/*
+
+# Build logger
+WORKDIR /app/packages/logger/
+COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build admin-ui
+WORKDIR /app/packages/admin-ui/
+COPY packages/admin-ui/ .
+ENV REACT_APP_API_URL /
+RUN yarn build
+# Results in build/*
+
+# Build dappmanager
+WORKDIR /app/packages/dappmanager/
+COPY packages/dappmanager/ .
 RUN yarn build
 # Results in dist/*
 
