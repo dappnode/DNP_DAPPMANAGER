@@ -35,50 +35,52 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
 export async function addAliasToRunningContainers(): Promise<void> {
   try {
     const containers = await listContainers();
-    // Check and update alias of all running containers
-    for (const container of containers) {
-        const containerName = container.containerName;
-        logs.info("checking container: ", containerName)
-        // get alias with service name included if it is a multiservice package
-        const alias = getPrivateNetworkAlias(container);
-
-        // Migrate core network and alias in compose before checking aliases
-        // Info from docker inspect and compose file might be not synchronized
-        // So this function must be before the check hasAlias()
-        migrateCoreNetworkAndAliasInCompose(container, alias);
-
-        const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
-        // Get the current endpoint config. This is necessary to access the current aliases of dncore_network
-        if (!hasAlias(currentEndpointConfig, alias)) {
-          const updatedConfig = updateEndpointConfig(currentEndpointConfig, alias);
-          await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
-
-          logs.info(`alias ${alias} added to ${containerName}`);
-
-        }
-  
-        // Check if the container is the main service of a multiservice package. If so, add the root alias
-        const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-        if (Object.keys(compose.services).length !== 1 && container.isMain) {
-          const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
-
-          // Get the root alias by calling with service name empty
-          const rootAlias = getPrivateNetworkAlias({ dnpName: container.dnpName, serviceName: '' });
-
-          migrateCoreNetworkAndAliasInCompose(container, rootAlias); 
-
-          if (!hasAlias(currentEndpointConfig, rootAlias)) {
-            const updatedConfig = updateEndpointConfig(currentEndpointConfig, rootAlias);
-            await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
-
-            logs.info(`alias ${rootAlias} added to ${containerName}`);
-
-          }
-        }
-      }
+    await addAliasToGivenContainers(containers);
   } catch (error) {
     logs.error('Error adding alias to running containers:', error);
   }
+}
+
+export async function addAliasToGivenContainers(containers: PackageContainer[] ): Promise<void> {
+    for (const container of containers) {
+      const containerName = container.containerName;
+      // get alias with service name included if it is a multiservice package
+      const alias = getPrivateNetworkAlias(container);
+      console.log(alias)
+      // Migrate core network and alias in compose before checking aliases
+      // Info from docker inspect and compose file might be not synchronized
+      // So this function must be before the check hasAlias()
+      migrateCoreNetworkAndAliasInCompose(container, alias);
+
+      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+      // Get the current endpoint config. This is necessary to access the current aliases of dncore_network
+      if (!hasAlias(currentEndpointConfig, alias)) {
+        const updatedConfig = updateEndpointConfig(currentEndpointConfig, alias);
+        await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
+
+        logs.info(`alias ${alias} added to ${containerName}`);
+      }
+
+      // Check if the container is the main service of a multiservice package. If so, add the root alias
+      // if(container.dnpName != container.dnpName || container.dnpName == "") {
+       const compose = new ComposeFileEditor(container.dnpName, container.isCore);
+       if (Object.keys(compose.services).length !== 1 && container.isMain) {
+        const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+
+        // Get the root alias by calling with service name empty
+        const rootAlias = getPrivateNetworkAlias({ dnpName: container.dnpName, serviceName: '' });
+
+        migrateCoreNetworkAndAliasInCompose(container, rootAlias);
+
+        if (!hasAlias(currentEndpointConfig, rootAlias)) {
+          const updatedConfig = updateEndpointConfig(currentEndpointConfig, rootAlias);
+          await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
+
+          logs.info(`alias ${rootAlias} added to ${containerName}`);
+
+        }
+      }
+    }
 }
 
 function updateEndpointConfig(currentEndpointConfig: Dockerode.NetworkInfo | null, alias: string) {
@@ -126,8 +128,10 @@ export function migrateCoreNetworkAndAliasInCompose(
   container: PackageContainer,
   alias: string
 ): void {
+  try {
+  console.log(container.isCore, container.dnpName)
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-
+  console.log("TEST: ", compose)
   // 1. Get compose network settings
   const composeNetwork = compose.getComposeNetwork(
     params.DNP_PRIVATE_NETWORK_NAME
@@ -174,6 +178,10 @@ export function migrateCoreNetworkAndAliasInCompose(
   );
 
   compose.write();
+}
+catch (error) {
+  logs.error('Error migrating core network and alias in compose:', error);
+}
 }
 
 function isComposeNetworkAndAliasMigrated(

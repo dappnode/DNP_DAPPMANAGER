@@ -1,5 +1,5 @@
 import "mocha";
-import { addAliasToRunningContainers } from "../../src/modules/migrations/addAliasToRunningContainers";
+import { addAliasToGivenContainers, addAliasToRunningContainers } from "../../src/modules/migrations/addAliasToRunningContainers";
 import { listContainers } from "../../src/modules/docker/list/index"
 import fs from "fs";
 import { docker } from "../../src/modules/docker/api/docker";
@@ -9,37 +9,49 @@ import params from "../../src/params.js";
 import { mockContainer, mockManifest, shellSafe } from "../testUtils.js";
 import { Manifest } from "@dappnode/types";
 import { sleep } from "../../src/utils/asyncFlows";
+import { getPrivateNetworkAlias } from "../../src/domains.js";
 
+  const dnpName = "logger.dnp.dappnode.eth";
+  const testAliasPath = process.cwd() + `/test/integration/test-alias/${dnpName}`;
+  const testDnpRepoPath = process.cwd() + `/test/integration/test-alias/`;
 
-const testAliasPath =
-  process.cwd() + "/test/integration/test-alias";
-
-describe("Add alias to running containers", () => {
-  // Example package
-  const dnpName = "prysm.dnp.dappnode.eth";
-  const dnpPrysmPath = process.cwd() + "/dnp_repo/" + dnpName;
-  const containerNameMain = "DAppNodeCore-logger-main.dnp.dappnode.eth";
-  const containerNameNotMain = "DAppNodeCore-logger-notmain.dnp.dappnode.eth";
+  const containerNameMain = "DAppNodeTest-logger.main.dnp.dappnode.eth";
+  const containerNameNotMain = "DAppNodeTest-logger.notmain.dnp.dappnode.eth";
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
-  const randomImage = "chentex/random-logger";
+  const loggerImage = "chentex/random-logger";
 
 
-  const container: PackageContainer = {
+  const containerMain: PackageContainer = {
     ...mockContainer,
-    containerName: "DAppNodeCore-logger.dnp.dappnode.eth",
-    dnpName: "test-alias",
-    serviceName: "logger.dnp.dappnode.eth",
+    containerName: "DAppNodeTest-logger.main.dnp.dappnode.eth",
+    dnpName: `${dnpName}`,
+    serviceName: "main",
+    isMain: true,
+    isCore: false,
   };
+
+  const containerNotMain: PackageContainer = {
+    ...mockContainer,
+    containerName: "DAppNodeTest-logger.notmain.dnp.dappnode.eth",
+    dnpName: `${dnpName}`,
+    serviceName: "notmain",
+    isMain: false,
+    isCore: false,
+  };
+
+  const containers = [containerMain, containerNotMain];
 
   const containerCompose = `
 version: '3.4'
 services:
-  logger-notmain:
+  notmainService:
     image: "chentex/random-logger"
-    container_name: DAppNodeCore-logger-notmain.dnp.dappnode.eth
-  logger-main:
+    container_name: DAppNodeTest-logger.notmain.dnp.dappnode.eth
+  mainService:
     image: "chentex/random-logger"
-    container_name: DAppNodeCore-logger-main.dnp.dappnode.eth
+    container_name: DAppNodeTest-logger.main.dnp.dappnode.eth
+    labels:
+      dappnode.dnp.isMain: 'true'
     `;
 
 
@@ -49,12 +61,15 @@ services:
     mainService: "logger-main",
   };
 
+describe("Add alias to running containers", () => {
+
+
   before("Run expected container", async () => {
     // Create compose
     await shellSafe(`mkdir ${testAliasPath}`);
     // Compose to be migrated
     fs.writeFileSync(
-      `${testAliasPath}/docker-compose-logger-main.yml`,
+      `${testAliasPath}/docker-compose.yml`,
       containerCompose
     );
     fs.writeFileSync(
@@ -62,11 +77,11 @@ services:
       containerCompose
     );
     // Redeclare global variables
-    params.DNCORE_DIR = testAliasPath;
-    params.REPO_DIR = testAliasPath;
+    //params.DNCORE_DIR = testAliasPath
+    params.REPO_DIR = testDnpRepoPath
     // Startup container
     await shellSafe(
-      `docker-compose -f ${testAliasPath}/docker-compose-logger-main.yml up -d`
+      `docker-compose -f ${testAliasPath}/docker-compose-logger.yml up -d`
     );
     const containerkExists = await shellSafe(
       `docker container ls --filter name=${containerNameMain}`
@@ -80,21 +95,23 @@ services:
       `docker network ls --filter name=${dncoreNetwork}`
     );
     
-    if (!containerkExists || !containerkExistsNotMain || !networkExists)
+    if (!containerkExists || !containerkExistsNotMain || !networkExists) {
       throw Error("Error creating container or/and dncore_network");
+    }
+      
+      await shellSafe(
+        `docker network connect ${dncoreNetwork} ${containerNameMain}`
+      );
+      await shellSafe(
+        `docker network connect ${dncoreNetwork} ${containerNameNotMain}`
+      );
+      console.log("connected to network")
   });
 
   it.only("check that both containers have expected aliases", async () => {
-    await shellSafe(
-      `docker network connect ${dncoreNetwork} ${containerNameMain}`
-    );
-    await shellSafe(
-      `docker network connect ${dncoreNetwork} ${containerNameNotMain}`
-    );
-    console.log("connected to network")
-    addAliasToRunningContainers();
-
-    console.log("sleeping")
+    // const aliasMain = getPrivateNetworkAlias(containerMain);
+    // const aliasNotMain = getPrivateNetworkAlias(containerNotMain);
+    addAliasToGivenContainers(containers);
 
   });
 
