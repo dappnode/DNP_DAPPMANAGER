@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import { logs } from "@dappnode/logger";
 import { mapValues } from "lodash-es";
 import {
   ChainData,
@@ -87,9 +86,11 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
       try {
         await listener(...args);
       } catch (e) {
-        logs.error(
+        // Do not use logger module to avoud cirucular dependencies
+        /**  logs.error(
           `Error on event '${eventName}': ${e.stack || e.message || e}`
         );
+        */
       }
     });
   },
