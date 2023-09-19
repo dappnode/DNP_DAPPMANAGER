@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
 import { EthClientSyncedNotificationStatus } from "../../../../src/types.js";
-import { EventBus, eventBus } from "../../../../src/eventBus.js";
+import { EventBus, eventBus } from "@dappnode/eventbus"; // TODO: consider moving to @dappnode/eventbus
 
 describe.skip("modules / ethClient / emitSyncedNotification", () => {
   it("Simulate notification cycle for ethClient synced status", async () => {
@@ -28,7 +28,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     const { emitSyncedNotification } = await rewiremock.around(
       () => import("../../../../src/modules/ethClient/syncedNotification"),
       mock => {
-        mock(() => import("../../../../src/eventBus"))
+        mock(() => import("@dappnode/eventbus"))
           .with({ eventBus: mockEventBus })
           .toBeUsed();
         mock(() => import("../../../../src/db"))

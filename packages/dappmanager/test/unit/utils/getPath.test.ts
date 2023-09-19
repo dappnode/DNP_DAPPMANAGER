@@ -5,7 +5,7 @@ import path from "path";
 chai.should();
 
 import * as getPath from "../../../src/utils/getPath.js";
-import params from "../../../src/params.js";
+import { params } from "@dappnode/params";
 
 const { REPO_DIR } = params;
 

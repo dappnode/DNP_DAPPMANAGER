@@ -11,7 +11,7 @@ import {
   cleanContainers,
   shellSafe
 } from "../testUtils.js";
-import params from "../../src/params.js";
+import { params } from "@dappnode/params";
 import { getDnpFromListPackages } from "./testPackageUtils.js";
 import {
   uploadManifestRelease,

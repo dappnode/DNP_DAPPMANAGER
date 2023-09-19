@@ -5,7 +5,7 @@ import { mapValues } from "lodash-es";
 import { ipfs } from "../../../src/modules/ipfs/index.js";
 import shell from "../../../src/utils/shell.js";
 import { yamlDump } from "../../../src/utils/yaml.js";
-import { getContainerName } from "../../../src/params.js";
+import { getContainerName } from "@dappnode/utils";
 import {
   Manifest,
   Compose,

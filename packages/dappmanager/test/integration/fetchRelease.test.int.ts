@@ -22,7 +22,7 @@ import * as validate from "../../src/utils/validate.js";
 import { dockerComposeUp } from "../../src/modules/docker/compose/index.js";
 import { ComposeEditor } from "../../src/modules/compose/editor.js";
 import { writeDefaultsToLabels } from "../../src/modules/compose/index.js";
-import { getContainerName } from "../../src/params.js";
+import { getContainerName } from "@dappnode/utils";
 import { RequestedDnp } from "@dappnode/common";
 
 describe("Fetch releases", () => {
