@@ -40,7 +40,7 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   TEST=true \
   REACT_APP_API_URL=http://172.33.1.7:5000/
 
-WORKDIR /tmp-app
+WORKDIR /app
 RUN apk add --no-cache python3 build-base bash git bind-tools docker \
   curl bind-dev xz libltdl miniupnpc zip unzip dbus bind tmux avahi-tools
 
