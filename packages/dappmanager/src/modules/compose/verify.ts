@@ -1,7 +1,11 @@
-import { maxPortNumber } from "../../params.js";
 import { Compose } from "@dappnode/types";
-import { applyRecursivelyToStringValues } from "../../utils/objects.js";
+import { applyRecursivelyToStringValues } from "@dappnode/utils";
 import { parsePortMappings } from "./ports.js";
+
+// Docker params
+// Max port number (included) Otherwise it fails with
+// Cannot create container for service ipfs.dnp.dappnode.eth: invalid port specification: "65536"
+const maxPortNumber = 65535;
 
 export function verifyCompose(compose: Compose): void {
   for (const serviceName in compose.services) {

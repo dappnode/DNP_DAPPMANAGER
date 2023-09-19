@@ -1,4 +1,4 @@
-import { EventBus } from "../eventBus.js";
+import { EventBus } from "@dappnode/eventbus";
 import { Routes, Subscriptions } from "@dappnode/common";
 
 export function mapSubscriptionsToEventBus(

@@ -1,6 +1,6 @@
 import util from "util";
 import * as child from "child_process";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 const exec = util.promisify(child.exec);
 

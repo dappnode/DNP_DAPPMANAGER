@@ -1,12 +1,12 @@
 import { valid, lt } from "semver";
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 // Internal
 import { safeSemver } from "../utils/safeSemver.js";
 import aggregateDependencies from "./aggregateDependencies.js";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps.js";
 import { PackageRequest } from "../../../types.js";
 import { DappGetDnps } from "../types.js";
-import { logs } from "../../../logs.js";
+import { logs } from "@dappnode/logger";
 import { DappGetFetcher } from "../fetch/DappGetFetcher.js";
 import { setVersion } from "../utils/dnpUtils.js";
 import {

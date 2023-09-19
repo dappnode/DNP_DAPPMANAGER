@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { urlJoin } from "../../utils/url.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { WireguardDeviceCredentials } from "@dappnode/common";

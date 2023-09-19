@@ -82,7 +82,7 @@ describe.skip("Call function: packageInstall", function () {
         mock(() => import("../../../src/modules/release"))
           .with({ ReleaseFetcher: ReleaseFetcherMock })
           .toBeUsed();
-        mock(() => import("../../../src/eventBus"))
+        mock(() => import("@dappnode/eventbus"))
           .with({ eventBus })
           .toBeUsed();
       }

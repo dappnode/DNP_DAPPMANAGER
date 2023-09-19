@@ -1,6 +1,6 @@
 import fs from "fs";
 import * as db from "../../db/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { wrapHandlerHtml } from "../utils.js";
 
 interface Params {

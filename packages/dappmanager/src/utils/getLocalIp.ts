@@ -1,6 +1,6 @@
 import shell from "./shell.js";
 import isIp from "is-ip";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import getDappmanagerImage from "./getDappmanagerImage.js";
 
 export default async function getLocalIp(options?: {

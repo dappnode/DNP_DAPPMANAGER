@@ -1,9 +1,10 @@
-import { eventBus } from "./eventBus.js";
-import params from "./params.js";
-import { UserActionLog } from "@dappnode/common";
-import { logSafeObjects } from "./utils/logs.js";
-import { JsonFileDb } from "./utils/fileDb.js";
+import { logSafeObjects } from "./logSafeObjects.js";
 import { logs } from "./logs.js";
+// dappnode
+import { JsonFileDb } from "@dappnode/utils";
+import { UserActionLog } from "@dappnode/common";
+import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
 
 /**
  * Max number of logs to prevent the log file from growing too big
@@ -26,16 +27,13 @@ type UserActionLogPartial = Omit<UserActionLog, "level" | "timestamp">;
  * Specific RPCs will have a ```userAction``` flag to indicate that the result
  * should be logged by this module.
  */
-export function push(
-  log: UserActionLogPartial,
-  level: UserActionLog["level"]
-): void {
+function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
   const userActionLog: UserActionLog = {
     level,
     timestamp: Date.now(),
     ...log,
     ...(log.args ? { args: logSafeObjects(log.args) } : {}),
-    ...(log.result ? { result: logSafeObjects(log.result) } : {})
+    ...(log.result ? { result: logSafeObjects(log.result) } : {}),
   };
 
   // Skip for logs greater than 3 KB

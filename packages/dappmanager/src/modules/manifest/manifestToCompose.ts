@@ -1,7 +1,8 @@
 import { pick } from "lodash-es";
 import { parseVolumeMappings } from "../compose/volumes.js";
 import { parseEnvironment } from "../compose/environment.js";
-import params, { getContainerName } from "../../params.js";
+import { getContainerName } from "@dappnode/utils";
+import { params } from "@dappnode/params";
 import { ManifestWithImage } from "../../types.js";
 import { Compose, ComposeVolumes, getImageTag } from "@dappnode/types";
 import { getIsCore } from "./getIsCore.js";

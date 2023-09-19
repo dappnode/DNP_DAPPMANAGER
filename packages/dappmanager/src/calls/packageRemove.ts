@@ -1,6 +1,6 @@
 import fs from "fs";
-import { eventBus } from "../eventBus.js";
-import params from "../params.js";
+import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
 import { dockerComposeDown } from "../modules/docker/compose/index.js";
 import {
   dockerContainerRemove,
@@ -9,13 +9,16 @@ import {
 import * as getPath from "../utils/getPath.js";
 import shell from "../utils/shell.js";
 import { listPackage } from "../modules/docker/list/index.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { getDockerTimeoutMax } from "../modules/docker/utils.js";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
-import { ethicalMetricsDnpName, unregister } from "../modules/ethicalMetrics/index.js";
+import {
+  ethicalMetricsDnpName,
+  unregister
+} from "../modules/ethicalMetrics/index.js";
 
 /**
  * Remove package data: docker down + disk files

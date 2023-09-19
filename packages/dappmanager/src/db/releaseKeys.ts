@@ -1,4 +1,4 @@
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { TrustedReleaseKey } from "@dappnode/common";
 import { dbMain } from "./dbFactory.js";
 

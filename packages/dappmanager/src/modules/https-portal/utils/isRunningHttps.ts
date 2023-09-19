@@ -1,4 +1,4 @@
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 import { listPackageNoThrow } from "../../docker/list/listPackages.js";
 
 /**

@@ -5,7 +5,7 @@ import {
   UserSettingsAllDnps
 } from "@dappnode/common";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
-import { logs } from "../../../logs.js";
+import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "../../docker/index.js";
 import { listPackageNoThrow } from "../../docker/list/index.js";
 import { getConsensusUserSettings } from "../utils.js";

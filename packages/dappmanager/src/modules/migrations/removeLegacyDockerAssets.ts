@@ -1,4 +1,4 @@
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import shell from "../../utils/shell.js";
 import {
   dockerVolumesList,

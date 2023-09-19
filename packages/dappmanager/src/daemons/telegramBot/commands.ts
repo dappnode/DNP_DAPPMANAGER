@@ -1,7 +1,7 @@
 import TelegramBot from "node-telegram-bot-api";
 import { uniq } from "lodash-es";
 import * as db from "../../db/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage.js";
 import { bold } from "./markdown.js";
 import {

@@ -6,7 +6,7 @@ import {
   ensureNotInstallWeb3signerIfPrysmLegacyIsInstalled
 } from "../../src/modules/installer/ensureEth2MigrationRequirements.js";
 import { mockPackageData, shellSafe } from "../testUtils.js";
-import params from "../../src/params.js";
+import { params } from "@dappnode/params";
 
 describe("ensureEth2MigrationRequirements", () => {
   const networkName = "dncore_network";

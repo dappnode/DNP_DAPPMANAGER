@@ -41,7 +41,7 @@ import {
   computeGlobalEnvsFromDb,
   getGlobalEnvsFilePath
 } from "../globalEnvs.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 
 export class ComposeServiceEditor {
   parent: ComposeEditor;

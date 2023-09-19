@@ -1,5 +1,6 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
-import params, { getContainerName } from "../../params.js";
+import { getContainerName } from "@dappnode/utils";
+import { params } from "@dappnode/params";
 import { getIsCore } from "../manifest/getIsCore.js";
 import { cleanCompose } from "./clean.js";
 import { parseEnvironment } from "./environment.js";

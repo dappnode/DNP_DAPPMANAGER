@@ -4,11 +4,11 @@ import { readManifestIfExists } from "../modules/manifest/index.js";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import * as db from "../db/index.js";
 import { InstalledPackageDetailData } from "@dappnode/common";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { getVolumesOwnershipData } from "../modules/docker/volumesData.js";
 import { sortPackages } from "./packagesGet.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 /**
  * Get package detail information

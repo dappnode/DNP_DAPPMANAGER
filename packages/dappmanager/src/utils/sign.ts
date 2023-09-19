@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 export function prepareMessageFromPackage({
   packageEnsName,

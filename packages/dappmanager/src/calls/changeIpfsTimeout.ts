@@ -1,4 +1,4 @@
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 /**
  * Used to test different IPFS timeout parameters live from the ADMIN UI.

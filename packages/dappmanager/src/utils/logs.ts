@@ -1,4 +1,4 @@
-import { applyRecursivelyToStringValues } from "./objects.js";
+import { applyRecursivelyToStringValues } from "@dappnode/utils";
 
 const secretKeyRegex = /(password|passphrase|secret|private)/i;
 export const maxLength = 100;
