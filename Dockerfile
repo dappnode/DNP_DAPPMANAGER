@@ -72,15 +72,15 @@ COPY packages/utils/ .
 RUN yarn build
 # Results in dist/*
 
-# Build logger
-WORKDIR /app/packages/logger/
-COPY packages/logger/ .
-RUN yarn build
-# Results in dist/*
-
 # Build eventBus
 WORKDIR /app/packages/eventBus/
 COPY packages/eventBus/ .
+RUN yarn build
+# Results in dist/*
+
+# Build logger
+WORKDIR /app/packages/logger/
+COPY packages/logger/ .
 RUN yarn build
 # Results in dist/*
 
