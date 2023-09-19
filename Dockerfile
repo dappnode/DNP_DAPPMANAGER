@@ -44,11 +44,43 @@ COPY packages/dappmanager/package.json \
   packages/dappmanager/
 COPY packages/common/package.json \ 
   packages/common/
+COPY packages/params/package.json \ 
+  packages/params/
+COPY packages/utils/package.json \ 
+  packages/utils/
+COPY packages/eventBus/package.json \ 
+  packages/eventBus/
+COPY packages/logger/package.json \ 
+  packages/logger/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build common
 WORKDIR /app/packages/common/
 COPY packages/common/ .
+RUN yarn build
+# Results in dist/*
+
+# Build params
+WORKDIR /app/packages/params/
+COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build utils
+WORKDIR /app/packages/utils/
+COPY packages/utils/ .
+RUN yarn build
+# Results in dist/*
+
+# Build logger
+WORKDIR /app/packages/logger/
+COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build eventBus
+WORKDIR /app/packages/eventBus/
+COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
@@ -114,8 +146,26 @@ COPY --from=build-deps /usr/src/app/package.json ./package.json
 COPY --from=build-deps /usr/src/app/packages/common/dist ./packages/common/dist
 COPY --from=build-deps /usr/src/app/packages/common/node_modules ./packages/common/node_modules
 COPY --from=build-deps /usr/src/app/packages/common/package.json ./packages/common/package.json
+# Copy params
+COPY --from=build-deps /usr/src/app/packages/params/dist ./packages/params/dist
+COPY --from=build-deps /usr/src/app/packages/params/node_modules ./packages/params/node_modules
+COPY --from=build-deps /usr/src/app/packages/params/package.json ./packages/params/package.json
+# Copy utils
+COPY --from=build-deps /usr/src/app/packages/utils/dist ./packages/utils/dist
+COPY --from=build-deps /usr/src/app/packages/utils/node_modules ./packages/utils/node_modules
+COPY --from=build-deps /usr/src/app/packages/utils/package.json ./packages/utils/package.json
+# Copy logger
+COPY --from=build-deps /usr/src/app/packages/logger/dist ./packages/logger/dist
+COPY --from=build-deps /usr/src/app/packages/logger/node_modules ./packages/logger/node_modules
+COPY --from=build-deps /usr/src/app/packages/logger/package.json ./packages/logger/package.json
+# Copy eventBus
+COPY --from=build-deps /usr/src/app/packages/eventBus/dist ./packages/eventBus/dist
+COPY --from=build-deps /usr/src/app/packages/eventBus/node_modules ./packages/eventBus/node_modules
+COPY --from=build-deps /usr/src/app/packages/eventBus/package.json ./packages/eventBus/package.json
 # Copy admin-ui
 COPY --from=build-deps /usr/src/app/packages/admin-ui/build ./packages/admin-ui/build
+COPY --from=build-deps /usr/src/app/packages/admin-ui/node_modules ./packages/admin-ui/node_modules
+COPY --from=build-deps /usr/src/app/packages/admin-ui/package.json ./packages/admin-ui/package.json
 # Copy dappmanager
 COPY --from=build-deps /usr/src/app/packages/dappmanager/dist /usr/src/app/packages/dappmanager/dist
 COPY --from=build-deps /usr/src/app/packages/dappmanager/node_modules /usr/src/app/packages/dappmanager/node_modules
