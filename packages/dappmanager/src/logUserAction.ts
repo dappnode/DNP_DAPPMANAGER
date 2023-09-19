@@ -2,7 +2,7 @@ import { eventBus } from "./eventBus.js";
 import params from "./params.js";
 import { UserActionLog } from "@dappnode/common";
 import { logSafeObjects } from "./utils/logs.js";
-import { JsonFileDb } from "./utils/fileDb.js";
+import { JsonFileDb } from "@dappnode/utils";
 import { logs } from "./logs.js";
 
 /**

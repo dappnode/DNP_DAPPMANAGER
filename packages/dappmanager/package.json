@@ -21,6 +21,8 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/params": "^0.1.0",
+    "@dappnode/utils": "^0.1.0",
     "@dappnode/common": "^0.1.0",
     "@dappnode/schemas": "^0.1.7",
     "@dappnode/toolkit": "^0.1.19",

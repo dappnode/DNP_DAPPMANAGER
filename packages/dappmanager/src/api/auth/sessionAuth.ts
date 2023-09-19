@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { PlainTextFileDb } from "../../utils/fileDb.js";
+import { PlainTextFileDb } from "@dappnode/utils";
 import { getRandomAlphanumericToken } from "../../utils/token.js";
 import { wrapHandler } from "../utils.js";
 import { SessionData, SessionsManager } from "../sessions/index.js";

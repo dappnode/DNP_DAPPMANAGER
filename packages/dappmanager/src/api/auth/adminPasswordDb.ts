@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { JsonFileDb } from "../../utils/fileDb.js";
+import { JsonFileDb } from "@dappnode/utils";
 import { getRandomAlphanumericToken } from "../../utils/token.js";
 
 export enum AdminPasswordDbError {

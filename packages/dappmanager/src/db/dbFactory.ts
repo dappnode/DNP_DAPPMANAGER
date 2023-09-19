@@ -1,6 +1,6 @@
 import * as validate from "../utils/validate.js";
 import { logs } from "../logs.js";
-import { JsonFileDb } from "../utils/fileDb.js";
+import { JsonFileDb } from "@dappnode/utils";
 import params from "../params.js";
 
 /**

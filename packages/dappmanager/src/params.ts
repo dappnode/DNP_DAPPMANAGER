@@ -1,6 +1,4 @@
 import path from "path";
-import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
-import { getContainerDomain } from "@dappnode/types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 
@@ -342,43 +340,3 @@ if (devMode) {
 }
 
 export default params;
-
-// Docker params
-// Max port number (included) Otherwise it fails with
-// Cannot create container for service ipfs.dnp.dappnode.eth: invalid port specification: "65536"
-export const maxPortNumber = 65535;
-
-/**
- * Link between an ethClientTarget keyword and its pacakge information
- * Declared above to use stronger typings
- */
-export const ethClientData: {
-  [P in EthClientTargetPackage]: {
-    dnpName: string; // "geth.dnp.dappnode.eth"
-    url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
-    version?: string;
-    userSettings?: UserSettings;
-  };
-} = {
-  geth: { dnpName: "geth.dnp.dappnode.eth" },
-  nethermind: { dnpName: "nethermind.public.dappnode.eth" },
-  besu: { dnpName: "besu.public.dappnode.eth" },
-  erigon: { dnpName: "erigon.dnp.dappnode.eth" }
-};
-
-// Naming
-
-export const getContainerName = ({
-  dnpName,
-  serviceName,
-  isCore
-}: {
-  dnpName: string;
-  serviceName: string;
-  isCore: boolean;
-}): string =>
-  // Note: _PREFIX variables already end with the character "-"
-  [
-    isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
-    getContainerDomain({ dnpName, serviceName })
-  ].join("");

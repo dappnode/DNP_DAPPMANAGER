@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import { PlainTextFileDb } from "../../utils/fileDb.js";
+import { PlainTextFileDb } from "@dappnode/utils";
 
 export class SessionsSecretDb {
   private filedb: PlainTextFileDb;

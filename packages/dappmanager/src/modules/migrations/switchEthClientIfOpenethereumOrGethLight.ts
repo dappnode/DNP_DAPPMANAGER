@@ -3,7 +3,25 @@ import { listPackageNoThrow } from "../docker/list/index.js";
 import { logs } from "../../logs.js";
 import { EthClientTarget } from "@dappnode/common";
 import { packageGet } from "../../calls/index.js";
-import { ethClientData } from "../../params.js";
+import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
+
+/**
+ * Link between an ethClientTarget keyword and its pacakge information
+ * Declared above to use stronger typings
+ */
+const ethClientData: {
+  [P in EthClientTargetPackage]: {
+    dnpName: string; // "geth.dnp.dappnode.eth"
+    url?: string; // Only provide a URL if it's not "http://geth.dappnode:8545"
+    version?: string;
+    userSettings?: UserSettings;
+  };
+} = {
+  geth: { dnpName: "geth.dnp.dappnode.eth" },
+  nethermind: { dnpName: "nethermind.public.dappnode.eth" },
+  besu: { dnpName: "besu.public.dappnode.eth" },
+  erigon: { dnpName: "erigon.dnp.dappnode.eth" }
+};
 
 /**
  * Switches ethClientTarget in the following preference order: geth > nethermind > remote
