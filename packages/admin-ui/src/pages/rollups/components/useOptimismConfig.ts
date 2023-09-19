@@ -152,11 +152,27 @@ function getChanges({
       severity: "secondary"
     };
 
-  // Not allowed if changes AND (Execution Client or Rollup deselected)
-  if (!newExecClient || !newRollup)
+  // Not allowed if only Rollup is selected
+  if (!newExecClient && newRollup)
     return {
       isAllowed: false,
-      reason: "Execution Client and Rollup are required",
+      reason: "OP Node selected without an Execution Client",
+      severity: "danger"
+    };
+
+  // Not allowed if Execution Client is selected without Rollup
+  if (newExecClient && !newRollup)
+    return {
+      isAllowed: false,
+      reason: "Execution Client selected without OP Node",
+      severity: "danger"
+    };
+
+  // Not allowed if Archive is selected without both Execution Client and Rollup
+  if (newArchive && (!newExecClient || !newRollup))
+    return {
+      isAllowed: false,
+      reason: "Execution Client and OP Node are required to select Archive",
       severity: "danger"
     };
 
