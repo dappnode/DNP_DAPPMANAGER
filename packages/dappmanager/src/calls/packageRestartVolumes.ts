@@ -2,7 +2,7 @@ import fs from "fs";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
 import { eventBus } from "../eventBus.js";
 import { params } from "@dappnode/params";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import * as getPath from "../utils/getPath.js";
 import {
   dockerContainerRemove,

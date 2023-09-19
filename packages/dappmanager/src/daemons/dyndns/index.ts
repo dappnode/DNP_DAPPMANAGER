@@ -4,7 +4,7 @@ import * as db from "../../db/index.js";
 import updateIp from "../../modules/dyndns/updateIp.js";
 import lookup from "../../utils/lookup.js";
 import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
 
 /**

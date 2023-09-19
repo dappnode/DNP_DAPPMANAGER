@@ -5,7 +5,7 @@ import { params } from "@dappnode/params";
 import { stringifyEnvironment } from "../modules/compose/index.js";
 import { PackageEnvs } from "@dappnode/types";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "./compose/editor.js";
 import { listContainers } from "./docker/list/index.js";
 

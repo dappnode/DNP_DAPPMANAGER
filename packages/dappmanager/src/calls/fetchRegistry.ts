@@ -4,7 +4,7 @@ import { listPackages } from "../modules/docker/list/index.js";
 import { eventBus } from "../eventBus.js";
 import { throttle } from "lodash-es";
 import { NoImageForArchError } from "../modules/release/errors.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";

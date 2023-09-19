@@ -2,7 +2,7 @@ import { eventBus } from "../../eventBus.js";
 import { params } from "@dappnode/params";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { checkEthicalMetricsStatus } from "./checkEthicalMetricsStatus.js";
 
 /**

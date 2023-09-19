@@ -10,7 +10,7 @@ import {
 } from "./compose/index.js";
 import { listPackageNoThrow } from "./list/index.js";
 import { getDockerTimeoutMax } from "./utils.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import {
   ContainersStatus,
   InstalledPackageData,

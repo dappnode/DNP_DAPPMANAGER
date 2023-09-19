@@ -9,7 +9,7 @@ import {
   EthClientInstallStatus,
   serializeError
 } from "../../modules/ethClient/types.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { EthClientRemote, EthProviderError } from "@dappnode/common";
 import {
   ethereumClient,

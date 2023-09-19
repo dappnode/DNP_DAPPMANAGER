@@ -5,7 +5,7 @@ import { params } from "@dappnode/params";
 import { listContainers } from "../../modules/docker/list/index.js";
 import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
 import { runAtMostEveryIntervals } from "../../utils/asyncFlows.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 
 const nsupdateInterval = params.NSUPDATE_DAEMON_INTERVAL || 60 * 60 * 1000;
 let firstRun = true;

@@ -6,7 +6,7 @@ import { listPackages } from "../modules/docker/list/index.js";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType.js";
 import { getCoreVersionId } from "../utils/coreVersionId.js";
 import { ErrorDappGetDowngrade } from "../modules/dappGet/errors.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 
 const coreName = params.coreDnpName;
 const defaultVersion = "*";

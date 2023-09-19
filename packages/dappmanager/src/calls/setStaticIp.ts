@@ -1,7 +1,7 @@
 import * as db from "../db/index.js";
 import * as dyndns from "../modules/dyndns/index.js";
 import { eventBus } from "../eventBus.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 
 /**
  * Sets the static IP

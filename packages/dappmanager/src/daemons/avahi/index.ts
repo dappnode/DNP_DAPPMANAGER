@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { initializeAvahiDaemon } from "../../modules/hostScripts/scripts/avahiDaemon.js";
 
 export async function startAvahiDaemon(): Promise<void> {

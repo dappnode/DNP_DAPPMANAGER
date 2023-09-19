@@ -3,7 +3,7 @@ import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { getPrivateNetworkAlias } from "../../domains.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
 import shell from "../../utils/shell.js";

@@ -5,7 +5,7 @@ import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "../../utils/logUi.js";
 import { copyFileTo } from "../../calls/copyFileTo.js";
 import { InstallPackageData } from "@dappnode/common";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "../docker/index.js";
 import { packageToInstallHasPid } from "../../utils/pid.js";
 import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";

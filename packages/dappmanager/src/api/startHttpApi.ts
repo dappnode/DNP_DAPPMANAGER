@@ -18,7 +18,7 @@ import {
   ClientSideCookiesParams
 } from "./sessions/index.js";
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
-import { Logs } from "../logs.js";
+import { Logs } from "@dappnode/logger";
 import { EventBus } from "../eventBus.js";
 import {
   Routes,

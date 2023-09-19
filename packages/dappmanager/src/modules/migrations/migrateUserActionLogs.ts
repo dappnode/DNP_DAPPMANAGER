@@ -1,10 +1,10 @@
 import { orderBy } from "lodash-es";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { UserActionLog } from "@dappnode/common";
 import { isNotFoundError } from "../../utils/node.js";
 import { params } from "@dappnode/params";
 import fs from "fs";
-import { get, set } from "../../logUserAction.js";
+import { logUserAction } from "@dappnode/logger";
 
 /**
  * Migrate winston .log JSON file to a lowdb
@@ -30,7 +30,13 @@ export async function migrateUserActionLogs(): Promise<void> {
       }
     }
 
-    set(orderBy([...get(), ...userActionLogs], log => log.timestamp, "desc"));
+    logUserAction.set(
+      orderBy(
+        [...logUserAction.get(), ...userActionLogs],
+        log => log.timestamp,
+        "desc"
+      )
+    );
     fs.unlinkSync(userActionLogLegacyFile);
 
     logs.info(`Migrated ${userActionLogs.length} userActionLogs`);

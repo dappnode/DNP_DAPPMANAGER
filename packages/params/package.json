@@ -17,7 +17,9 @@
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@dappnode/common": "^0.1.0"
+  },
   "devDependencies": {
     "@types/node": "^20.6.2",
     "ts-node": "^10.9.1",

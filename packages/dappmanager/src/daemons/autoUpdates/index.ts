@@ -8,7 +8,7 @@ import {
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";
 import { EthProviderError } from "@dappnode/common";

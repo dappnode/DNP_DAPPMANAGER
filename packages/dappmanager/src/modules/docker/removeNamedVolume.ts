@@ -1,7 +1,7 @@
 import { dockerVolumeRemove, dockerVolumeInspect } from "./api/index.js";
 import { shellHost } from "../../utils/shell.js";
 import { params } from "@dappnode/params";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 
 /**
  * Check if the volume is a different device / mountpoint as a bind

@@ -1,6 +1,6 @@
 import { eventBus } from "../../eventBus.js";
 import * as db from "../../db/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { pickStakerItemData } from "../../modules/stakerConfig/utils.js";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { memoizeDebounce } from "../../utils/asyncFlows.js";

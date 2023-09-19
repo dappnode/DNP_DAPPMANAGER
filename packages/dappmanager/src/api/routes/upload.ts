@@ -3,7 +3,7 @@ import path from "path";
 import crypto from "crypto";
 import { params } from "@dappnode/params";
 import * as db from "../../db/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { wrapHandler } from "../utils.js";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;

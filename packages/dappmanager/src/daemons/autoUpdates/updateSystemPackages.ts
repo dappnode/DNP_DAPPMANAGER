@@ -7,7 +7,7 @@ import {
   isCoreUpdateEnabled
 } from "../../utils/autoUpdateHelper.js";
 import { packageInstall } from "../../calls/index.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { getCoreUpdateData } from "../../calls/fetchCoreUpdateData.js";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
 import { sendUpdateSystemNotificationMaybe } from "./sendUpdateNotification.js";

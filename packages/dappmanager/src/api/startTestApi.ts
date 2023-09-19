@@ -3,7 +3,7 @@ import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import { params } from "@dappnode/params";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 
 export function startTestApi(): http.Server {
   const app = express();

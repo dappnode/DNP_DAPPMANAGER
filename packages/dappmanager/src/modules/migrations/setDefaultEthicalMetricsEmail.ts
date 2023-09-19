@@ -1,4 +1,4 @@
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { listPackageNoThrow } from "../docker/list/index.js";
 import { ethicalMetricsDnpName } from "../ethicalMetrics/index.js";
 import * as db from "../../db/index.js";

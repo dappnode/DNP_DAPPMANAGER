@@ -10,7 +10,7 @@ import {
   runOnlyOneSequentially
 } from "../../utils/asyncFlows.js";
 import { PackagePort } from "@dappnode/common";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { listContainers } from "../../modules/docker/list/index.js";
 
 let isFirstRunGlobal = true;

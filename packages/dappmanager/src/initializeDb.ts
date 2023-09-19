@@ -14,7 +14,7 @@ import { pause } from "./utils/asyncFlows.js";
 import retry from "async-retry";
 import shell from "./utils/shell.js";
 import { IdentityInterface } from "./types.js";
-import { logs } from "./logs.js";
+import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
 import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable.js";
 import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";

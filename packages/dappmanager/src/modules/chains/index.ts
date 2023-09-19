@@ -1,5 +1,5 @@
 import { ChainData } from "@dappnode/common";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { listPackages } from "../docker/list/index.js";
 import { parseChainErrors } from "./utils.js";
 import { runWithChainDriver } from "./drivers/index.js";

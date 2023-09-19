@@ -1,5 +1,5 @@
 import * as validate from "../utils/validate.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { JsonFileDb } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 

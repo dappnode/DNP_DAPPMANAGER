@@ -1,6 +1,6 @@
 import { eventBus } from "../eventBus.js";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { listPackages } from "../modules/docker/list/index.js";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";

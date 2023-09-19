@@ -2,7 +2,7 @@ import { isEqual } from "lodash-es";
 import { Eth2ClientTarget, EthClientRemote } from "@dappnode/common";
 import * as db from "../../db/index.js";
 import { eventBus } from "../../eventBus.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";

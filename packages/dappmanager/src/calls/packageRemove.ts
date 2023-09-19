@@ -9,7 +9,7 @@ import {
 import * as getPath from "../utils/getPath.js";
 import shell from "../utils/shell.js";
 import { listPackage } from "../modules/docker/list/index.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import { getDockerTimeoutMax } from "../modules/docker/utils.js";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";

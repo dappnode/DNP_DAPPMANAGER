@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { logs } from "./logs.js";
+import { logs } from "@dappnode/logger";
 import { mapValues } from "lodash-es";
 import {
   ChainData,

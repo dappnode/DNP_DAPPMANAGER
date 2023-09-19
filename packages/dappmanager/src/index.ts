@@ -8,9 +8,9 @@ import { postRestartPatch } from "./modules/installer/restartPatch.js";
 import { startDaemons } from "./daemons/index.js";
 import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
-import { routesLogger, subscriptionsLogger } from "./api/logger.js";
+import { routesLogger, subscriptionsLogger } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
-import { logs } from "./logs.js";
+import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {

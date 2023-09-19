@@ -6,7 +6,7 @@ import * as db from "../../db/index.js";
 import shell from "../../utils/shell.js";
 import { pause } from "../../utils/asyncFlows.js";
 import { params } from "@dappnode/params";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import {
   dockerContainerInspect,
