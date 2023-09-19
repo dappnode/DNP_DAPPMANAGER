@@ -1,5 +1,5 @@
 import * as db from "./db/index.js";
-import { eventBus } from "./eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
 import { generateKeyPair } from "./utils/publickeyEncryption.js";

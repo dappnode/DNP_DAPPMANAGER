@@ -20,7 +20,7 @@ import { getBeaconServiceName, pickStakerItemData } from "../utils.js";
 import { Network } from "@dappnode/types";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../index.js";
-import { eventBus } from "../../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import * as db from "../../../db/index.js";
 
 /**

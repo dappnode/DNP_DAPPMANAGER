@@ -1,7 +1,7 @@
 import { getEthersProvider } from "../modules/ethClient/index.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { listPackages } from "../modules/docker/list/index.js";
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
 import { NoImageForArchError } from "../modules/release/errors.js";
 import { logs } from "@dappnode/logger";

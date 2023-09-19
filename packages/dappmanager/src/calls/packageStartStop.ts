@@ -3,7 +3,7 @@ import {
   dockerContainerStop,
   dockerContainerStart
 } from "../modules/docker/index.js";
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";

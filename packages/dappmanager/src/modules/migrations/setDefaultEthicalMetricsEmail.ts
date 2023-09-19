@@ -3,7 +3,7 @@ import { listPackageNoThrow } from "../docker/list/index.js";
 import { ethicalMetricsDnpName } from "../ethicalMetrics/index.js";
 import * as db from "../../db/index.js";
 import { ComposeFileEditor } from "../compose/editor.js";
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 
 /**
  * Gets the email env from the ethical metrics package (if exists) and sets it

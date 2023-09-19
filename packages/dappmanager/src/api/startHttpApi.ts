@@ -19,7 +19,7 @@ import {
 } from "./sessions/index.js";
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
 import { Logs } from "@dappnode/logger";
-import { EventBus } from "../eventBus.js";
+import { EventBus } from "@dappnode/eventbus";
 import {
   Routes,
   RpcPayload,

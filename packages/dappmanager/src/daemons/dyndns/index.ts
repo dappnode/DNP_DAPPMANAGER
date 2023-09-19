@@ -1,4 +1,4 @@
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import * as db from "../../db/index.js";
 import updateIp from "../../modules/dyndns/updateIp.js";

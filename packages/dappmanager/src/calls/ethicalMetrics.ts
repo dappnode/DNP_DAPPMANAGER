@@ -1,5 +1,5 @@
 import { EthicalMetricsConfig } from "@dappnode/common";
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { listPackageNoThrow } from "../modules/docker/list/listPackages.js";
 import { packageRestart } from "./packageRestart.js";
 import * as db from "../db/index.js";

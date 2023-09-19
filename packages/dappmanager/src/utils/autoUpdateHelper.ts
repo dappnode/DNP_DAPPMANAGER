@@ -1,6 +1,6 @@
 import * as db from "../db/index.js";
 import { params } from "@dappnode/params";
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { pick, omit } from "lodash-es";
 import { isVersionIdUpdated } from "./coreVersionId.js";
 import {

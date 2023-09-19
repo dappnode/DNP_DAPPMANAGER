@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { formatNotification } from "./formatNotification.js";

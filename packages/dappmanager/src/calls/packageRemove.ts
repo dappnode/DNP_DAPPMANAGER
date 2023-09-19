@@ -1,5 +1,5 @@
 import fs from "fs";
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { dockerComposeDown } from "../modules/docker/compose/index.js";
 import {

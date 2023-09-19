@@ -1,4 +1,4 @@
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { PackageNotification, NotificationType } from "@dappnode/common";
 /**
  * Adds a notification to be shown the UI.

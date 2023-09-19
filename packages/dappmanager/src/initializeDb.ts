@@ -1,5 +1,5 @@
 import * as db from "./db/index.js";
-import { eventBus } from "./eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import * as dyndns from "./modules/dyndns/index.js";
 import getDappmanagerImage from "./utils/getDappmanagerImage.js";
 import getServerName from "./utils/getServerName.js";

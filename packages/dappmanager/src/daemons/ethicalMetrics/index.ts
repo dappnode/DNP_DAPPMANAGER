@@ -1,4 +1,4 @@
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";

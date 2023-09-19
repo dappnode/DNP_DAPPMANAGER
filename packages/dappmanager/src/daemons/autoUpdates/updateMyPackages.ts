@@ -1,7 +1,7 @@
 import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import { listPackages } from "../../modules/docker/list/index.js";
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { packageInstall } from "../../calls/index.js";
 import { logs } from "@dappnode/logger";

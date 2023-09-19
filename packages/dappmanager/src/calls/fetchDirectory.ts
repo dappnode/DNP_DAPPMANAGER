@@ -1,4 +1,4 @@
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { listPackages } from "../modules/docker/list/index.js";

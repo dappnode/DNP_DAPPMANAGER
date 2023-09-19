@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import * as db from "../../db/index.js";
 import { params } from "@dappnode/params";
 import { listContainers } from "../../modules/docker/list/index.js";

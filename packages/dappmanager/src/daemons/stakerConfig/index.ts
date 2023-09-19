@@ -1,4 +1,4 @@
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import * as db from "../../db/index.js";
 import { logs } from "@dappnode/logger";
 import { pickStakerItemData } from "../../modules/stakerConfig/utils.js";
