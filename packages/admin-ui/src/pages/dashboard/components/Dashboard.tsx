@@ -9,26 +9,24 @@ import SubTitle from "components/SubTitle";
 import Title from "components/Title";
 
 import "./dashboard.scss";
+import Modules from "./Modules";
 
 export default function Dashboard() {
   return (
     <>
       <Title title={title} />
 
-      <div className="dashboard-layout">
-        <div className="dashboard-right">
-          <SubTitle>Package updates</SubTitle>
-          <PackageUpdates />
-        </div>
+      <SubTitle>Package updates</SubTitle>
+      <PackageUpdates />
 
-        <div className="dashboard-left">
-          <SubTitle>Chains</SubTitle>
-          <ChainCards />
+      <SubTitle>Modules</SubTitle>
+      <Modules />
 
-          <SubTitle>Machine stats</SubTitle>
-          <HostStats />
-        </div>
-      </div>
+      <SubTitle>Chains</SubTitle>
+      <ChainCards />
+
+      <SubTitle>Machine stats</SubTitle>
+      <HostStats />
     </>
   );
 }
