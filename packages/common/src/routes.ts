@@ -629,20 +629,20 @@ export interface Routes {
    */
   sshPortGet: () => Promise<number>;
   /**
-   * Change the SHH port on the Dappnode host
+   * Change the SHH port on the DAppNode host
    */
   sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
-   * Disable or enable SSH on the Dappnode host
+   * Disable or enable SSH on the DAppNode host
    */
   sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
   /**
-   * Check if SSH is enabled of disabled in the Dappnode host
+   * Check if SSH is enabled of disabled in the DAppNode host
    */
   sshStatusGet: () => Promise<ShhStatus>;
 
   /**
-   * Returns the current Dappnode system info
+   * Returns the current DAppNode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
 
