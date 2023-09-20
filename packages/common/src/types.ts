@@ -1360,13 +1360,3 @@ export interface RpcResponse<R = any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error?: { code: number; message: string; data?: any };
 }
-
-/**
- * ==========
- * MODULES UI
- * ==========
- */
-
-export type UiModuleStatus = "enabled" | "disabled";
-
-export type UiModuleId = "stakers" | "rollups";

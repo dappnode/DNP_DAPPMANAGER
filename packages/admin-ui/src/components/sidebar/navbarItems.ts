@@ -54,71 +54,76 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
-export const advancedItems: {
+export const sidenavItems: {
   name: string;
   href: string;
   icon: (props: any) => JSX.Element;
-}[] = [
-  {
-    name: "Community",
-    href: communityRelativePath,
-    icon: MdPeople
-  },
-  {
-    name: "Sdk",
-    href: sdkRelativePath,
-    icon: MdBuild
-  },
-  {
-    name: "Support",
-    href: supportRelativePath,
-    icon: MdHelp
-  }
-];
-
-export const basicItems: {
-  name: string;
-  href: string;
-  icon: (props: any) => JSX.Element;
+  show: boolean;
 }[] = [
   {
     name: "Dashboard",
     href: dashboardRelativePath,
-    icon: MdDashboard
+    icon: MdDashboard,
+    show: true
   },
   {
     name: "Wi-Fi",
     href: wifiRelativePath,
-    icon: MdWifi
+    icon: MdWifi,
+    show: true
   },
   {
     name: "VPN",
     href: devicesRelativePath,
-    icon: MdDevices
+    icon: MdDevices,
+    show: true
   },
   {
     name: "DAppStore",
     href: installerRelativePath,
-    icon: MdCreateNewFolder
+    icon: MdCreateNewFolder,
+    show: true
   },
   {
     name: "Packages",
     href: packagesRelativePath,
-    icon: MdFolder
+    icon: MdFolder,
+    show: true
   },
   {
     name: "Stakers",
     href: stakersRelativePath,
-    icon: SiEthereum
+    icon: SiEthereum,
+    show: true
   },
   {
     name: "Repository",
     href: repositoryRelativePath,
-    icon: BiGitRepoForked
+    icon: BiGitRepoForked,
+    show: true
   },
   {
     name: "System",
     href: systemRelativePath,
-    icon: MdSettings
+    icon: MdSettings,
+    show: true
+  },
+  {
+    name: "Community",
+    href: communityRelativePath,
+    icon: MdPeople,
+    show: true
+  },
+  {
+    name: "Sdk",
+    href: sdkRelativePath,
+    icon: MdBuild,
+    show: true
+  },
+  {
+    name: "Support",
+    href: supportRelativePath,
+    icon: MdHelp,
+    show: true
   }
 ];
