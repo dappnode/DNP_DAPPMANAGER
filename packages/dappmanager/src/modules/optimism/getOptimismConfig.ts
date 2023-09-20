@@ -33,9 +33,9 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
 
             let hash = "";
             if (execClient === "op-geth.dnp.dappnode.eth") {
-              hash = "/ipfs/QmURvP2uKPKyBFpkwFE8JstB8eDcQ2Xd9PmW9TMCPPKpSL";
+              hash = "/ipfs/QmPyzdBbgpfccVFCiGh9kHsmbZe4pM1d4KdP6WAJED4TX9";
             } else {
-              hash = "/ipfs/QmcdDtv2n3ottwn3tvpMiBbLfVMSp1KCHzTzjyLRL6PdqL";
+              hash = "/ipfs/QmZW23WHWePEMe1o8NDedgoMzyWv4Jw6RbbZ4hACUCjozM";
             }
 
             const pkgData = await getPkgData(releaseFetcher, hash);
@@ -67,7 +67,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
             /**if (!(await releaseFetcher.repoExists(optimismNode)))
               throw Error(`Repository ${optimismNode} does not exist`);*/
 
-            const hash = "/ipfs/QmT7tBCdPX6HLQXmQynuETkwAPCSeAqFbANVKaFJnnQ6nw";
+            const hash = "/ipfs/QmVJV1ZbDyTNDReeNu6ykQfUXZ4SKXmLFiqULQ3S1JYcXG";
 
             const pkgData = await getPkgData(releaseFetcher, hash);
             const mainnetRpcUrl = getOptimismNodeRpcUrl();
