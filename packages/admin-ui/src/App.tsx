@@ -9,62 +9,63 @@ import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
 import SideBar from "components/sidebar/SideBar";
 import { TopBar } from "components/topbar/TopBar";
+import { rootPath as dashboardRootPath } from "./pages/dashboard";
 // Pages
 import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { Theme, UsageMode } from "types";
+import { AppContextIface } from "types";
 
-export const UsageContext = React.createContext({
-  usage: "advanced",
-  toggleUsage: () => {}
-});
-
-export const ThemeContext = React.createContext({
+export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
-  toggleTheme: () => {}
+  stakersModuleStatus: "enabled",
+  rollupsModuleStatus: "disabled",
+  toggleTheme: () => {},
+  toggleStakersModuleStatus: () => {},
+  toggleRollupsModuleStatus: () => {}
 });
+
+const useLocalStorage = (key: string, initialValue: string) => {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(key, JSON.stringify(storedValue));
+  }, [key, storedValue]);
+
+  return [storedValue, setStoredValue];
+};
 
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
-  const [screenWidth, setScreenWidth] = useState(window.screen.width);
-
-  //const storedUsage = localStorage.getItem("usage");
-  const storedTheme = localStorage.getItem("theme");
-  //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
-  const initialUsage = "advanced";
-  const initialTheme =
-    storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
-
-  const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [usage, setUsage] = useState<UsageMode>(initialUsage);
-
-  const toggleTheme = () => {
-    setTheme(curr => (curr === "light" ? "dark" : "light"));
-  };
-
-  const toggleUsage = () => {
-    setUsage(curr => (curr === "basic" ? "advanced" : "basic"));
-  };
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem("usage", usage);
-  }, [usage]);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [theme, setTheme] = useLocalStorage("theme", "light");
+  const [usage, setUsage] = useLocalStorage("usage", "advanced");
+  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage(
+    "stakersModuleStatus",
+    "enabled"
+  );
+  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage(
+    "rollupsModuleStatus",
+    "disabled"
+  );
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [screenWidth]);
+  }, []);
 
   // Scroll to top on pathname change
   const screenLocation = useLocation();
@@ -72,23 +73,62 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
+  const contextValue = {
+    theme,
+    usage,
+    stakersModuleStatus,
+    rollupsModuleStatus,
+    toggleTheme: () =>
+      setTheme((curr: string) => (curr === "light" ? "dark" : "light")),
+    toggleUsage: () =>
+      setUsage((curr: string) => (curr === "basic" ? "advanced" : "basic")),
+    toggleStakersModuleStatus: () =>
+      setStakersModuleStatus((curr: string) =>
+        curr === "enabled" ? "disabled" : "enabled"
+      ),
+    toggleRollupsModuleStatus: () =>
+      setRollupsModuleStatus((curr: string) =>
+        curr === "enabled" ? "disabled" : "enabled"
+      )
+  };
+
   return (
-    <UsageContext.Provider value={{ usage, toggleUsage }}>
-      <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <div className="body" id={theme}>
-          <SideBar screenWidth={screenWidth} />
-          <TopBar
-            username={username}
-            theme={theme}
-            toggleUsage={toggleUsage}
-            toggleTheme={toggleTheme}
-          />
-          <div id="main">
-            <ErrorBoundary>
-              <NotificationsMain />
-            </ErrorBoundary>
-            <Routes>
-              {Object.values(pages).map(({ RootComponent, rootPath }) => (
+    <AppContext.Provider value={contextValue}>
+      <div className="body" id={theme}>
+        <SideBar screenWidth={screenWidth} />
+        <TopBar
+          username={username}
+          theme={theme}
+          toggleUsage={contextValue.toggleUsage}
+          toggleTheme={contextValue.toggleTheme}
+        />
+        <div id="main">
+          <ErrorBoundary>
+            <NotificationsMain />
+          </ErrorBoundary>
+          <Routes>
+            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+            {Object.values(pages).map(({ RootComponent, rootPath }) =>
+              rootPath === dashboardRootPath ? (
+                <Route
+                  key={rootPath}
+                  path={rootPath}
+                  element={
+                    <ErrorBoundary>
+                      <RootComponent
+                        modulesContext={{
+                          stakersModuleStatus: contextValue.stakersModuleStatus,
+                          rollupsModuleStatus: contextValue.rollupsModuleStatus,
+                          toggleStakersModuleStatus:
+                            contextValue.toggleStakersModuleStatus,
+                          toggleRollupsModuleStatus:
+                            contextValue.toggleRollupsModuleStatus
+                        }}
+                      />
+                    </ErrorBoundary>
+                  }
+                />
+              ) : (
                 <Route
                   key={rootPath}
                   path={rootPath}
@@ -98,19 +138,19 @@ function MainApp({ username }: { username: string }) {
                     </ErrorBoundary>
                   }
                 />
-              ))}
-              {/* Redirection for routes with hashes */}
-              {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<DefaultRedirect />} />
-            </Routes>
-          </div>
-
-          {/* Place here non-page components */}
-          <Welcome />
-          <ToastContainer />
+              )
+            )}
+            {/* Redirection for routes with hashes */}
+            {/* 404 routes redirect to dashboard or default page */}
+            <Route path="*" element={<DefaultRedirect />} />
+          </Routes>
         </div>
-      </ThemeContext.Provider>
-    </UsageContext.Provider>
+
+        {/* Place here non-page components */}
+        <Welcome />
+        <ToastContainer />
+      </div>
+    </AppContext.Provider>
   );
 }
 

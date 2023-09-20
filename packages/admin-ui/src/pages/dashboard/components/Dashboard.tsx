@@ -7,26 +7,39 @@ import { PackageUpdates } from "./PackageUpdates";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
-
-import "./dashboard.scss";
 import Modules from "./Modules";
-
-export default function Dashboard() {
+import "./dashboard.scss";
+import { ModulesContext } from "types";
+export default function Dashboard({
+  modulesContext
+}: {
+  modulesContext?: ModulesContext;
+}) {
   return (
     <>
       <Title title={title} />
 
-      <SubTitle>Package updates</SubTitle>
-      <PackageUpdates />
+      <div className="dashboard-layout">
+        <div className="dashboard-right">
+          {modulesContext && (
+            <>
+              <SubTitle>Modules</SubTitle>
+              <Modules modulesContext={modulesContext} />{" "}
+            </>
+          )}
 
-      <SubTitle>Modules</SubTitle>
-      <Modules />
+          <SubTitle>Package updates</SubTitle>
+          <PackageUpdates />
+        </div>
 
-      <SubTitle>Chains</SubTitle>
-      <ChainCards />
+        <div className="dashboard-left">
+          <SubTitle>Chains</SubTitle>
+          <ChainCards />
 
-      <SubTitle>Machine stats</SubTitle>
-      <HostStats />
+          <SubTitle>Machine stats</SubTitle>
+          <HostStats />
+        </div>
+      </div>
     </>
   );
 }

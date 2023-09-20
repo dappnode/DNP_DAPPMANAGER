@@ -223,11 +223,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ethProvider: "http://geth.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
-      "repository",
-      "repository-fallback",
-      "system-auto-updates",
-      "enable-ethical-metrics",
-      "change-host-password"
+      //"repository",
+      //"repository-fallback",
+      //"system-auto-updates",
+      //"enable-ethical-metrics",
+      //"change-host-password"
     ]
   }),
   natRenewalEnable: async () => {},

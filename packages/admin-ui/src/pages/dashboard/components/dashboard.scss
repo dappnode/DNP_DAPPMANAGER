@@ -1,3 +1,23 @@
+.dashboard-layout {
+  display: grid;
+  grid-gap: var(--default-spacing);
+  grid-template-columns: 60% auto;
+  grid-template-rows: auto;
+  grid-template-areas: "left right";
+
+  @media screen and (max-width: 65rem) {
+    display: block;
+  }
+}
+
+.dashboard-right {
+  grid-area: right;
+}
+
+.dashboard-left {
+  grid-area: left;
+}
+
 .dashboard-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
@@ -10,6 +30,17 @@
   .package-updates {
     // Give the single card a max width that matches the other cards
     grid-column: 1 / 4;
+  }
+}
+
+/* Module card */
+.module-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .text {
+    margin-right: 3px;
   }
 }
 
