@@ -11,7 +11,7 @@ import { ComposeFileEditor } from "../compose/editor.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { dockerContainerStart, dockerContainerStop } from "../docker/index.js";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
-import { opNodeServiceName, opNodeRpcUrlEnvName } from "./params.js";
+import { opNodeServiceName, opNodeRpcUrlEnvName, historicalRpcUrl, opExecutionClientHistoricalRpcUrlEnvName, opClientToServiceMap } from "./params.js";
 
 export async function setOptimismConfig({
   archive,
@@ -45,11 +45,30 @@ export async function setOptimismConfig({
     const targetOpExecutionClientPackage = await listPackageNoThrow({
       dnpName: executionClient.dnpName
     });
+
+    const userSettings: UserSettings = {
+      environment: {
+        [opClientToServiceMap[executionClient.dnpName]]: {
+          [opExecutionClientHistoricalRpcUrlEnvName]: historicalRpcUrl // TODO: Empty if not archive?
+        }
+      }
+    };
+
     if (!targetOpExecutionClientPackage) {
+
       // make sure target package is installed
-      await packageInstall({ name: executionClient.dnpName });
+      await packageInstall({
+        name: executionClient.dnpName,
+        userSettings: { [executionClient.dnpName]: userSettings }
+      });
     } else {
+      await packageSetEnvironment({
+        dnpName: executionClient.dnpName,
+        environmentByService: userSettings.environment ? userSettings.environment : {}
+      });
+
       await startAllContainers(targetOpExecutionClientPackage);
+
     }
 
     await stopOtherOpExecutionClients(executionClient.dnpName);
@@ -58,6 +77,7 @@ export async function setOptimismConfig({
     // stop all op execution clients
     await stopPkgsByDnpNames([...executionClientsOptimism]);
   }
+
   // Set new target in db. Must go before op-node package install
   await db.opExecutionClient.set(executionClient?.dnpName);
 
@@ -104,7 +124,7 @@ export async function setOptimismConfig({
     }
   } else {
     if (opNodePackage)
-      stopAllContainers([opNodePackage]);
+      await stopAllContainers([opNodePackage]);
   }
 }
 
@@ -128,7 +148,7 @@ async function stopPkgsByDnpNames(
   );
 
   // Remove null values
-  stopAllContainers(pkgs.filter(Boolean) as InstalledPackageData[]);
+  await stopAllContainers(pkgs.filter(Boolean) as InstalledPackageData[]);
 }
 
 async function stopAllContainers(pkgs: InstalledPackageData[]): Promise<void> {
