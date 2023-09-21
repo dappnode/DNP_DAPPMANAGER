@@ -9,7 +9,6 @@ import Loading from "components/Loading";
 import Welcome from "components/welcome/Welcome";
 import SideBar from "components/sidebar/SideBar";
 import { TopBar } from "components/topbar/TopBar";
-import { rootPath as dashboardRootPath } from "./pages/dashboard";
 // Pages
 import { pages } from "./pages";
 import { Login } from "./start-pages/Login";
@@ -51,7 +50,6 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage("theme", "light");
-  const [usage, setUsage] = useLocalStorage("usage", "advanced");
   const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage(
     "stakersModuleStatus",
     "enabled"
@@ -73,15 +71,12 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
-  const contextValue = {
+  const appContext = {
     theme,
-    usage,
     stakersModuleStatus,
     rollupsModuleStatus,
     toggleTheme: () =>
       setTheme((curr: string) => (curr === "light" ? "dark" : "light")),
-    toggleUsage: () =>
-      setUsage((curr: string) => (curr === "basic" ? "advanced" : "basic")),
     toggleStakersModuleStatus: () =>
       setStakersModuleStatus((curr: string) =>
         curr === "enabled" ? "disabled" : "enabled"
@@ -93,53 +88,27 @@ function MainApp({ username }: { username: string }) {
   };
 
   return (
-    <AppContext.Provider value={contextValue}>
+    <AppContext.Provider value={appContext}>
       <div className="body" id={theme}>
         <SideBar screenWidth={screenWidth} />
-        <TopBar
-          username={username}
-          theme={theme}
-          toggleUsage={contextValue.toggleUsage}
-          toggleTheme={contextValue.toggleTheme}
-        />
+        <TopBar username={username} appContext={appContext} />
         <div id="main">
           <ErrorBoundary>
             <NotificationsMain />
           </ErrorBoundary>
           <Routes>
             {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
-            {Object.values(pages).map(({ RootComponent, rootPath }) =>
-              rootPath === dashboardRootPath ? (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent
-                        modulesContext={{
-                          stakersModuleStatus: contextValue.stakersModuleStatus,
-                          rollupsModuleStatus: contextValue.rollupsModuleStatus,
-                          toggleStakersModuleStatus:
-                            contextValue.toggleStakersModuleStatus,
-                          toggleRollupsModuleStatus:
-                            contextValue.toggleRollupsModuleStatus
-                        }}
-                      />
-                    </ErrorBoundary>
-                  }
-                />
-              ) : (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent />
-                    </ErrorBoundary>
-                  }
-                />
-              )
-            )}
+            {Object.values(pages).map(({ RootComponent, rootPath }) => (
+              <Route
+                key={rootPath}
+                path={rootPath}
+                element={
+                  <ErrorBoundary>
+                    <RootComponent />
+                  </ErrorBoundary>
+                }
+              />
+            ))}
             {/* Redirection for routes with hashes */}
             {/* 404 routes redirect to dashboard or default page */}
             <Route path="*" element={<DefaultRedirect />} />
