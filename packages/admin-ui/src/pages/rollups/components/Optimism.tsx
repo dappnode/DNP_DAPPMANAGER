@@ -150,7 +150,7 @@ export default function Optimism({ description }: { description: string }) {
                 <IoHelpCircleOutline
                   style={{
                     cursor: "pointer",
-                    fontSize: "1.5rem",
+                    fontSize: "2rem",
                     marginLeft: "1rem"
                   }}
                 />
