@@ -114,11 +114,14 @@ export default function Optimism({ description }: { description: string }) {
       {currentOptimismConfigReq.data ? (
         <Card>
           <p>
-            Set up your Optimism node configuration. You will need to: <br />
-            (1) Choose an Execution Layer client <br />
-            (2) Install the optimism node with an Ethereum RPC endpoint
+            Set up your Optimism node configuration: <br />
+            (1) <b>Choose</b> an <b>Execution Client</b> <br />
+            (2) <b>Select</b> the <b>Optimism Node</b> <br />
+            (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you
+            are already running an Ethereum mainnet node on this Dappnode)
             <br />
-            (3) Optional; activate/deactivate archive node for historical tx.
+            (4) [Optional] <b>Select Legacy Geth</b> to enable historical
+            transactions
           </p>
           <br />
 
