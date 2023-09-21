@@ -35,7 +35,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
             if (execClient === "op-geth.dnp.dappnode.eth") {
               hash = "/ipfs/QmPyzdBbgpfccVFCiGh9kHsmbZe4pM1d4KdP6WAJED4TX9";
             } else {
-              hash = "/ipfs/QmZW23WHWePEMe1o8NDedgoMzyWv4Jw6RbbZ4hACUCjozM";
+              hash = "/ipfs/QmcPhoAV9idcHUd3aifwHrvYv3v8695Hwenkys5rE6PB8v";
             }
 
             const pkgData = await getPkgData(releaseFetcher, hash);
