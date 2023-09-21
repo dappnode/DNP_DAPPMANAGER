@@ -11,6 +11,7 @@ if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { theme, rollupsModuleStatus, stakersModuleStatus } = React.useContext(
     AppContext
   );
