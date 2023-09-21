@@ -1,19 +1,18 @@
 import "mocha";
-import { addAliasToGivenContainers } from "../../src/modules/migrations/addAliasToRunningContainers";
+import { addAliasToGivenContainers } from "../../../../src/modules/migrations/addAliasToRunningContainers";
 import fs from "fs";
-import params from "../../src/params.js";
+import params from "../../../../src/params.js";
 import { expect } from "chai";
-import { mockContainer, shellSafe } from "../testUtils.js";
+import { mockContainer, shellSafe } from "../../../testUtils.js";
 import { PackageContainer } from "@dappnode/common";
 
 
 const DNP_NAME = "logger.dnp.dappnode.eth";
 const DNP_NAME_MONO = "logger-mono.dnp.dappnode.eth";
-
-params.REPO_DIR = `${process.cwd()}/test/integration/test-alias/`;
+params.REPO_DIR = `${process.cwd()}/test/unit/modules/docker/test-alias/`;
 params.DNP_PRIVATE_NETWORK_NAME = "dncore_network";
-const TEST_ALIAS_PATH = `${process.cwd()}/test/integration/test-alias/${DNP_NAME}`;
-const TEST_ALIAS_PATH_MONO = `${process.cwd()}/test/integration/test-alias/${DNP_NAME_MONO}`;
+const TEST_ALIAS_PATH = `${process.cwd()}/test/unit/modules/docker/test-alias/${DNP_NAME}`;
+const TEST_ALIAS_PATH_MONO = `${process.cwd()}/test/unit/modules/docker/test-alias/${DNP_NAME_MONO}`;
 
 const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
 
@@ -21,7 +20,7 @@ const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
 const monoContainer: PackageContainer = {
   ...mockContainer,
   containerName: "DAppNodeTest-logger.dnp.dappnode.eth",
-  dnpName: `${DNP_NAME}`,
+  dnpName: `${DNP_NAME_MONO}`,
   serviceName: "monoService",
   isCore: false,
 };
@@ -60,7 +59,7 @@ services:
 const MONO_COMPOSE = `
 version: '3.4'
 services:
-monoService:
+  monoService:
     image: "chentex/random-logger"
     container_name: ${monoContainer.containerName}
 `;
@@ -79,11 +78,18 @@ monoService:
 describe("Add alias to running containers", () => {
 
   before("Setup", async () => {
-    await shellSafe(`mkdir ${TEST_ALIAS_PATH}`);
-    fs.writeFileSync(`${TEST_ALIAS_PATH}/docker-compose.yml`, CONTAINER_COMPOSE);
+
+    if (!fs.existsSync(TEST_ALIAS_PATH)) {
+      fs.mkdirSync(TEST_ALIAS_PATH, { recursive: true });
+  }
+      fs.writeFileSync(`${TEST_ALIAS_PATH}/docker-compose.yml`, CONTAINER_COMPOSE);
     await shellSafe(`docker-compose -f ${TEST_ALIAS_PATH}/docker-compose.yml up -d`);
     
-    fs.writeFileSync(`${TEST_ALIAS_PATH_MONO}/mono-docker-compose.yml`, MONO_COMPOSE);
+
+    if (!fs.existsSync(TEST_ALIAS_PATH_MONO)) {
+      fs.mkdirSync(TEST_ALIAS_PATH_MONO, { recursive: true });
+  }
+    fs.writeFileSync(`${TEST_ALIAS_PATH_MONO}/docker-compose.yml`, MONO_COMPOSE);
     await shellSafe(`docker-compose -f ${TEST_ALIAS_PATH_MONO}/docker-compose.yml up -d`);
 
     const [containerMainExists, containerNotMainExists, monoContainerExists,  networkExists] = await Promise.all([
@@ -104,7 +110,7 @@ describe("Add alias to running containers", () => {
     ]);
   });
 
-  it("check that both containers have expected aliases", async () => {
+  it.only("check that both containers have expected aliases", async () => {
     // Add the aliases
     await addAliasToGivenContainers(containers);
 
@@ -118,7 +124,7 @@ describe("Add alias to running containers", () => {
     // Define the expected aliases. These should match the aliases added by the `addAliasToGivenContainers` function.
     const expectedMainAliases = ["mainService.logger.dappnode", "logger.dappnode"];
     const expectedNotMainAliases = ["notmainService.logger.dappnode"];
-    const expectedMonoContainerAliases = ["monoService.logger.dappnode"];
+    const expectedMonoContainerAliases = ["monoService.logger-mono.dappnode"];
 
     // Assert that the actual aliases match our expectations
     expect(containerMainAliases).to.include.members(expectedMainAliases);
@@ -128,18 +134,18 @@ describe("Add alias to running containers", () => {
 });
 
 
-  after("Cleanup", async () => {
-    await Promise.all([
-      shellSafe(`docker stop ${containerMain.containerName}`),
-      shellSafe(`docker stop ${containerNotMain.containerName}`),
-      shellSafe(`docker stop ${monoContainer.containerName}`),
-      shellSafe(`docker rm ${containerMain.containerName} --force`),
-      shellSafe(`docker rm ${containerNotMain.containerName} --force`),
-      shellSafe(`docker rm ${monoContainer.containerName} --force`),
+  // after("Cleanup", async () => {
+  //   await Promise.all([
+  //     shellSafe(`docker stop ${containerMain.containerName}`),
+  //     shellSafe(`docker stop ${containerNotMain.containerName}`),
+  //     shellSafe(`docker stop ${monoContainer.containerName}`),
+  //     shellSafe(`docker rm ${containerMain.containerName} --force`),
+  //     shellSafe(`docker rm ${containerNotMain.containerName} --force`),
+  //     shellSafe(`docker rm ${monoContainer.containerName} --force`),
 
-      shellSafe(`rm -rf ${TEST_ALIAS_PATH}`)
-    ]);
-  });
+  //     shellSafe(`rm -rf ${TEST_ALIAS_PATH}`)
+  //   ]);
+  // });
 
 });
 

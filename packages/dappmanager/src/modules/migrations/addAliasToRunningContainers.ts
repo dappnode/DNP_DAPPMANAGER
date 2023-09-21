@@ -46,7 +46,6 @@ export async function addAliasToGivenContainers(containers: PackageContainer[] )
       const containerName = container.containerName;
       // get alias with service name included if it is a multiservice package
       const alias = getPrivateNetworkAlias(container);
-      console.log(alias)
       // Migrate core network and alias in compose before checking aliases
       // Info from docker inspect and compose file might be not synchronized
       // So this function must be before the check hasAlias()
