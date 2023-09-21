@@ -15,7 +15,8 @@ const RollupsRoot: React.FC = () => {
       title: "Optimism",
       component: () =>
         Optimism({
-          description: "Optimism is a Layer 2 scaling solution for Ethereum."
+          description:
+            "Optimism is a layer-2 scaling solution for Ethereum. It aims to address the scalability and latency issues faced by the Ethereum mainnet by leveraging Optimistic Rollups"
         })
     }
   ];

@@ -12,12 +12,13 @@ import LegacyGeth from "./columns/LegacyGeth";
 import OptimismNode from "./columns/OptimismNode";
 import { useOptimismConfig } from "./useOptimismConfig";
 import "./columns.scss";
-import { Alert, Button, Form } from "react-bootstrap";
+import { Alert, Button, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
 import Input from "components/Input";
 import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "../data";
 import { withToast } from "components/toast/Toast";
 import OpCommunity from "./OpCommunity";
+import { IoHelpCircleOutline } from "react-icons/io5";
 
 export default function Optimism({ description }: { description: string }) {
   const { theme } = React.useContext(ThemeContext);
@@ -108,19 +109,54 @@ export default function Optimism({ description }: { description: string }) {
     }
   }
 
+  const renderTooltip = (props: any) => (
+    <Tooltip {...props}>
+      Set up your Optimism node configuration:
+      <br />
+      <br />
+      (1) <b>Choose</b> an <b>Execution Client</b>
+      <br />
+      <br />
+      (2) <b>Select</b> the <b>Optimism Node</b>
+      <br />
+      <br />
+      (3) <b>Input</b> the <b>Ethereum RPC URL</b> (not necessary you are
+      already running an Ethereum node in your Dappnode)
+      <br />
+      <br />
+      (4) [Optional] <b>Select L2 Geth</b> to enable historical txs
+    </Tooltip>
+  );
+
   return (
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
       <OpCommunity />
       {currentOptimismConfigReq.data ? (
         <Card>
-          <p>
-            Set up your Optimism node configuration. You will need to: <br />
-            (1) Choose an Execution Layer client <br />
-            (2) Install the optimism node with an Ethereum RPC endpoint
-            <br />
-            (3) Optional; activate/deactivate archive node for historical tx.
-          </p>
-          <br />
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between"
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <h3>Post-Bedrock Node</h3>
+              <OverlayTrigger
+                delay={{ show: 250, hide: 400 }}
+                overlay={renderTooltip}
+                placement="bottom"
+              >
+                <IoHelpCircleOutline
+                  style={{
+                    cursor: "pointer",
+                    fontSize: "1.5rem",
+                    marginLeft: "1rem"
+                  }}
+                />
+              </OverlayTrigger>
+            </div>
+          </div>
 
           <p>{description}</p>
 
