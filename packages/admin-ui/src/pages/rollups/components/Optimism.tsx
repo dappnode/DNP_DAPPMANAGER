@@ -17,6 +17,7 @@ import Input from "components/Input";
 import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "../data";
 import { withToast } from "components/toast/Toast";
+import OpCommunity from "./OpCommunity";
 
 export default function Optimism({ description }: { description: string }) {
   const { theme } = React.useContext(ThemeContext);
@@ -109,6 +110,7 @@ export default function Optimism({ description }: { description: string }) {
 
   return (
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
+      <OpCommunity />
       {currentOptimismConfigReq.data ? (
         <Card>
           <p>
