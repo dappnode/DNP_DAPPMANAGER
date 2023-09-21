@@ -1,149 +1,145 @@
 import "mocha";
-import { addAliasToGivenContainers, addAliasToRunningContainers } from "../../src/modules/migrations/addAliasToRunningContainers";
-import { listContainers } from "../../src/modules/docker/list/index"
+import { addAliasToGivenContainers } from "../../src/modules/migrations/addAliasToRunningContainers";
 import fs from "fs";
-import { docker } from "../../src/modules/docker/api/docker";
-import { PackageContainer } from "@dappnode/common";
-import { migrateCoreNetworkAndAliasInCompose } from "../../src/modules/migrations/addAliasToRunningContainers.js";
 import params from "../../src/params.js";
-import { mockContainer, mockManifest, shellSafe } from "../testUtils.js";
-import { Manifest } from "@dappnode/types";
-import { sleep } from "../../src/utils/asyncFlows";
-import { getPrivateNetworkAlias } from "../../src/domains.js";
-
-  const dnpName = "logger.dnp.dappnode.eth";
-  const testAliasPath = process.cwd() + `/test/integration/test-alias/${dnpName}`;
-  const testDnpRepoPath = process.cwd() + `/test/integration/test-alias/`;
-
-  const containerNameMain = "DAppNodeTest-logger.main.dnp.dappnode.eth";
-  const containerNameNotMain = "DAppNodeTest-logger.notmain.dnp.dappnode.eth";
-  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
-  const loggerImage = "chentex/random-logger";
+import { expect } from "chai";
+import { mockContainer, shellSafe } from "../testUtils.js";
+import { PackageContainer } from "@dappnode/common";
 
 
-  const containerMain: PackageContainer = {
-    ...mockContainer,
-    containerName: "DAppNodeTest-logger.main.dnp.dappnode.eth",
-    dnpName: `${dnpName}`,
-    serviceName: "main",
-    isMain: true,
-    isCore: false,
-  };
+const DNP_NAME = "logger.dnp.dappnode.eth";
+const DNP_NAME_MONO = "logger-mono.dnp.dappnode.eth";
 
-  const containerNotMain: PackageContainer = {
-    ...mockContainer,
-    containerName: "DAppNodeTest-logger.notmain.dnp.dappnode.eth",
-    dnpName: `${dnpName}`,
-    serviceName: "notmain",
-    isMain: false,
-    isCore: false,
-  };
+params.REPO_DIR = `${process.cwd()}/test/integration/test-alias/`;
+params.DNP_PRIVATE_NETWORK_NAME = "dncore_network";
+const TEST_ALIAS_PATH = `${process.cwd()}/test/integration/test-alias/${DNP_NAME}`;
+const TEST_ALIAS_PATH_MONO = `${process.cwd()}/test/integration/test-alias/${DNP_NAME_MONO}`;
 
-  const containers = [containerMain, containerNotMain];
+const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
 
-  const containerCompose = `
+
+const monoContainer: PackageContainer = {
+  ...mockContainer,
+  containerName: "DAppNodeTest-logger.dnp.dappnode.eth",
+  dnpName: `${DNP_NAME}`,
+  serviceName: "monoService",
+  isCore: false,
+};
+
+const containerMain: PackageContainer = {
+  ...mockContainer,
+  containerName: "DAppNodeTest-logger.main.dnp.dappnode.eth",
+  dnpName: `${DNP_NAME}`,
+  serviceName: "mainService",
+  isMain: true,
+  isCore: false,
+};
+
+const containerNotMain: PackageContainer = {
+  ...mockContainer,
+  containerName: "DAppNodeTest-logger.notmain.dnp.dappnode.eth",
+  dnpName: `${DNP_NAME}`,
+  serviceName: "notmainService",
+  isMain: false,
+  isCore: false,
+};
+
+const containers = [containerMain, containerNotMain, monoContainer];
+
+const CONTAINER_COMPOSE = `
 version: '3.4'
 services:
   notmainService:
     image: "chentex/random-logger"
-    container_name: DAppNodeTest-logger.notmain.dnp.dappnode.eth
+    container_name: ${containerNotMain.containerName}
   mainService:
     image: "chentex/random-logger"
-    container_name: DAppNodeTest-logger.main.dnp.dappnode.eth
-    labels:
-      dappnode.dnp.isMain: 'true'
-    `;
+    container_name: ${containerMain.containerName}
+`;
 
+const MONO_COMPOSE = `
+version: '3.4'
+services:
+monoService:
+    image: "chentex/random-logger"
+    container_name: ${monoContainer.containerName}
+`;
 
-  const manifest: Manifest = {
-    ...mockManifest,
-    name: "test-alias",
-    mainService: "logger-main",
-  };
+    // Inspect each container and fetch the aliases on the dncore network
+    async function getContainerAliasesOnNetwork(containerName: string, networkName: string) {
+      const inspectData = await shellSafe(`docker container inspect ${containerName}`);
+      if (!inspectData) throw new Error(`Error inspecting container ${containerName}`);
+      const parsedData = JSON.parse(inspectData);
+      
+      // Extract the aliases from the specified network
+      const aliases = parsedData[0]?.NetworkSettings?.Networks?.[networkName]?.Aliases || [];
+      return aliases;
+  }
 
 describe("Add alias to running containers", () => {
 
-
-  before("Run expected container", async () => {
-    // Create compose
-    await shellSafe(`mkdir ${testAliasPath}`);
-    // Compose to be migrated
-    fs.writeFileSync(
-      `${testAliasPath}/docker-compose.yml`,
-      containerCompose
-    );
-    fs.writeFileSync(
-      `${testAliasPath}/dappnode_package.json`,
-      containerCompose
-    );
-    // Redeclare global variables
-    //params.DNCORE_DIR = testAliasPath
-    params.REPO_DIR = testDnpRepoPath
-    // Startup container
-    await shellSafe(
-      `docker-compose -f ${testAliasPath}/docker-compose-logger.yml up -d`
-    );
-    const containerkExists = await shellSafe(
-      `docker container ls --filter name=${containerNameMain}`
-    );
-
-    const containerkExistsNotMain = await shellSafe(
-      `docker container ls --filter name=${containerNameNotMain}`
-    );
-
-    const networkExists = await shellSafe(
-      `docker network ls --filter name=${dncoreNetwork}`
-    );
+  before("Setup", async () => {
+    await shellSafe(`mkdir ${TEST_ALIAS_PATH}`);
+    fs.writeFileSync(`${TEST_ALIAS_PATH}/docker-compose.yml`, CONTAINER_COMPOSE);
+    await shellSafe(`docker-compose -f ${TEST_ALIAS_PATH}/docker-compose.yml up -d`);
     
-    if (!containerkExists || !containerkExistsNotMain || !networkExists) {
-      throw Error("Error creating container or/and dncore_network");
+    fs.writeFileSync(`${TEST_ALIAS_PATH_MONO}/mono-docker-compose.yml`, MONO_COMPOSE);
+    await shellSafe(`docker-compose -f ${TEST_ALIAS_PATH_MONO}/docker-compose.yml up -d`);
+
+    const [containerMainExists, containerNotMainExists, monoContainerExists,  networkExists] = await Promise.all([
+      shellSafe(`docker container ls --filter name=${containerMain.containerName}`),
+      shellSafe(`docker container ls --filter name=${containerNotMain.containerName}`),
+      shellSafe(`docker container ls --filter name=${monoContainer.containerName}`),
+      shellSafe(`docker network ls --filter name=${DNCORE_NETWORK}`)
+    ]);
+    
+    if (!containerMainExists || !containerNotMainExists || !monoContainerExists || !networkExists) {
+      throw new Error("Error creating container or/and DNCORE_NETWORK");
     }
-      
-      await shellSafe(
-        `docker network connect ${dncoreNetwork} ${containerNameMain}`
-      );
-      await shellSafe(
-        `docker network connect ${dncoreNetwork} ${containerNameNotMain}`
-      );
-      console.log("connected to network")
+
+    await Promise.all([
+      shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerMain.containerName}`),
+      shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerNotMain.containerName}`),
+      shellSafe(`docker network connect ${DNCORE_NETWORK} ${monoContainer.containerName}`)
+    ]);
   });
 
-  it.only("check that both containers have expected aliases", async () => {
-    // const aliasMain = getPrivateNetworkAlias(containerMain);
-    // const aliasNotMain = getPrivateNetworkAlias(containerNotMain);
-    addAliasToGivenContainers(containers);
+  it("check that both containers have expected aliases", async () => {
+    // Add the aliases
+    await addAliasToGivenContainers(containers);
 
+    const containerMainAliases = await getContainerAliasesOnNetwork(containerMain.containerName, DNCORE_NETWORK);
+    const containerNotMainAliases = await getContainerAliasesOnNetwork(containerNotMain.containerName, DNCORE_NETWORK);
+    const monoContainerAliases = await getContainerAliasesOnNetwork(monoContainer.containerName, DNCORE_NETWORK);
+
+    // console.log(containerMainAliases)
+    // console.log(containerNotMainAliases)
+    // console.log(monoContainerAliases)
+    // Define the expected aliases. These should match the aliases added by the `addAliasToGivenContainers` function.
+    const expectedMainAliases = ["mainService.logger.dappnode", "logger.dappnode"];
+    const expectedNotMainAliases = ["notmainService.logger.dappnode"];
+    const expectedMonoContainerAliases = ["monoService.logger.dappnode"];
+
+    // Assert that the actual aliases match our expectations
+    expect(containerMainAliases).to.include.members(expectedMainAliases);
+    expect(containerNotMainAliases).to.include.members(expectedNotMainAliases);
+    expect(monoContainerAliases).to.include.members(expectedMonoContainerAliases);
+
+});
+
+
+  after("Cleanup", async () => {
+    await Promise.all([
+      shellSafe(`docker stop ${containerMain.containerName}`),
+      shellSafe(`docker stop ${containerNotMain.containerName}`),
+      shellSafe(`docker stop ${monoContainer.containerName}`),
+      shellSafe(`docker rm ${containerMain.containerName} --force`),
+      shellSafe(`docker rm ${containerNotMain.containerName} --force`),
+      shellSafe(`docker rm ${monoContainer.containerName} --force`),
+
+      shellSafe(`rm -rf ${TEST_ALIAS_PATH}`)
+    ]);
   });
-
-  // after("Remove test setup", async () => {
-  //   console.log("removing test setup")
-  //   // // Disconnect from network
-  //   // await shellSafe(
-  //   //   `docker network disconnect ${dncoreNetwork} ${containerNameMain}`
-  //   // );
-  //   // await shellSafe(
-  //   //   `docker network disconnect ${dncoreNetwork} ${containerNameNotMain}`
-  //   // );
-  //   // // Remove network
-  //   // await shellSafe(`docker network rm dncore_network`);
-
-  //   // Remove container
-  //   await shellSafe(`docker stop ${containerNameMain}`);
-  //   await shellSafe(`docker stop ${containerNameNotMain}`);
-
-  //   // Remove container
-  //   await shellSafe(`docker rm ${containerNameMain} --force`);
-  //   await shellSafe(`docker rm ${containerNameNotMain} --force`);
-
-  //   // Remove image
-  //   await shellSafe(`docker image rm ${randomImage}`);
-  //   // Remove dir
-  //   await shellSafe(`rm -rf ${testAliasPath}`);
-
-  //   // Return global vars to tests normal values
-  //   params.DNCORE_DIR = "./DNCORE";
-  //   params.REPO_DIR = "./dnp_repo";
-  // });
 
 });
 
