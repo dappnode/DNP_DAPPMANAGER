@@ -126,7 +126,8 @@ export const params = {
   MOUNTPOINT_DEVICE_PREFIX: "dappnode-volumes",
 
   // Auto-update parameters
-  AUTO_UPDATE_DELAY: 1 * DAY,
+  AUTO_UPDATE_DELAY: 36 * HOUR,
+  AUTO_UPDATE_DELAY_VARIATION: 12 * HOUR,
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Watchers

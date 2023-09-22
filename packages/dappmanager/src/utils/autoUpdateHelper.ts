@@ -12,12 +12,13 @@ import {
   AutoUpdatePending,
   AutoUpdateFeedback
 } from "@dappnode/common";
+import { getRandomizedInterval } from "./getRandomizedInterval.js";
 
 // Groups of packages keys
 export const MY_PACKAGES = "my-packages";
 export const SYSTEM_PACKAGES = "system-packages";
 
-const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
+const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DAEMON_INTERVAL);
 const coreDnpName = params.coreDnpName;
 
 /**
