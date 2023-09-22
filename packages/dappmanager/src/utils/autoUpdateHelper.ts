@@ -17,8 +17,26 @@ import {
 export const MY_PACKAGES = "my-packages";
 export const SYSTEM_PACKAGES = "system-packages";
 
-const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
+export const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DAEMON_INTERVAL);
 const coreDnpName = params.coreDnpName;
+
+/**
+ * Randomize an interval
+ *
+ * Example:
+ * getRandomizedInterval(50, 10) // 50 +/- 10 = [40, 60]
+ *
+ * @param baseInterval
+ * @param variation
+ * @returns
+ */
+export function getRandomizedInterval(
+  baseInterval: number,
+  variation: number
+): number {
+  const randomAdjustment = Math.round((Math.random() * 2 - 1) * variation); // Random integer between -variation and +variation
+  return baseInterval + randomAdjustment;
+}
 
 /**
  * Define types
