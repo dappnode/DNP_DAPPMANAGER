@@ -71,6 +71,15 @@ async function getContainerAliasesOnNetwork(containerName: string, networkName: 
   return aliases;
 }
 
+// Check if a network exists, creates it if it doesn't
+async function checkOrCreateNetwork(networkName: string) {
+  const existingNetworks = await shellSafe(`docker network ls --filter name=${networkName}`) || '';
+  if (!existingNetworks.includes(networkName)) {
+    // Create the network if it doesn't exist
+    await shellSafe(`docker network create ${networkName}`);
+  }
+}
+
 describe("Add alias to running containers", function() {
   this.timeout(15000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
@@ -87,16 +96,17 @@ describe("Add alias to running containers", function() {
     fs.writeFileSync(`${TEST_ALIAS_PATH_MONO}/docker-compose.yml`, MONO_COMPOSE);
     await shellSafe(`docker-compose -f ${TEST_ALIAS_PATH_MONO}/docker-compose.yml up -d`);
 
-    const [containerMainExists, containerNotMainExists, monoContainerExists, networkExists] = await Promise.all([
+    const [containerMainExists, containerNotMainExists, monoContainerExists] = await Promise.all([
       shellSafe(`docker container ls --filter name=${containerMain.containerName}`),
       shellSafe(`docker container ls --filter name=${containerNotMain.containerName}`),
       shellSafe(`docker container ls --filter name=${monoContainer.containerName}`),
-      shellSafe(`docker network ls --filter name=${DNCORE_NETWORK}`)
     ]);
 
-    if (!containerMainExists || !containerNotMainExists || !monoContainerExists || !networkExists) {
-      throw new Error("Error creating container or/and DNCORE_NETWORK");
+    if (!containerMainExists || !containerNotMainExists || !monoContainerExists) {
+      throw new Error("Error creating containers");
     }
+
+    await checkOrCreateNetwork(DNCORE_NETWORK);
 
     await Promise.all([
       shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerMain.containerName}`),
