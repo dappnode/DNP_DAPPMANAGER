@@ -1,6 +1,6 @@
 import React from "react";
 import { api, useApi } from "api";
-import { ThemeContext } from "App";
+import { AppContext } from "App";
 import Card from "components/Card";
 import ErrorView from "components/ErrorView";
 import Loading from "components/Loading";
@@ -20,7 +20,7 @@ import { withToast } from "components/toast/Toast";
 import OpCommunity from "./OpCommunity";
 
 export default function Optimism({ description }: { description: string }) {
-  const { theme } = React.useContext(ThemeContext);
+  const { theme } = React.useContext(AppContext);
 
   const currentOptimismConfigReq = useApi.optimismConfigGet();
 
