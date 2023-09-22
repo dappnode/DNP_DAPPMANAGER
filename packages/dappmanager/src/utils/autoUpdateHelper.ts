@@ -17,7 +17,7 @@ import {
 export const MY_PACKAGES = "my-packages";
 export const SYSTEM_PACKAGES = "system-packages";
 
-const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DAEMON_INTERVAL);
+export const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DAEMON_INTERVAL);
 const coreDnpName = params.coreDnpName;
 
 /**
