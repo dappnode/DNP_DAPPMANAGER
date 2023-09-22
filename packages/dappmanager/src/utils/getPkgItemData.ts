@@ -1,9 +1,9 @@
 import { PackageItemData, PackageRelease } from "@dappnode/common";
-import { eventBus } from "../eventBus.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import * as db from "../db/index.js";
 import { pick } from "lodash-es";
 import { Manifest } from "@dappnode/types";
+import { eventBus } from "@dappnode/eventbus";
 
 export async function getPkgData(
   releaseFetcher: ReleaseFetcher,
