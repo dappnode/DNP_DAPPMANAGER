@@ -46,8 +46,6 @@ export interface DappnodeParams {
 
 export type Theme = "light" | "dark";
 
-export type UsageMode = "basic" | "advanced";
-
 export type UiModuleStatus = "enabled" | "disabled";
 
 export interface AppContextIface {

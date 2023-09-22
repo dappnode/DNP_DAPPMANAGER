@@ -15,7 +15,7 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { AppContextIface } from "types";
+import { AppContextIface, Theme, UiModuleStatus } from "types";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -26,18 +26,22 @@ export const AppContext = React.createContext<AppContextIface>({
   toggleRollupsModuleStatus: () => {}
 });
 
-const useLocalStorage = (key: string, initialValue: string) => {
-  const [storedValue, setStoredValue] = useState(() => {
+const useLocalStorage = <T extends string>(
+  key: string,
+  initialValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      // Assert that either the item or initialValue is of type T
+      return (item as T) || initialValue;
     } catch (error) {
       return initialValue;
     }
   });
 
   useEffect(() => {
-    window.localStorage.setItem(key, JSON.stringify(storedValue));
+    window.localStorage.setItem(key, storedValue);
   }, [key, storedValue]);
 
   return [storedValue, setStoredValue];
@@ -49,15 +53,13 @@ function MainApp({ username }: { username: string }) {
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-  const [theme, setTheme] = useLocalStorage("theme", "light");
-  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage(
-    "stakersModuleStatus",
-    "enabled"
-  );
-  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage(
-    "rollupsModuleStatus",
-    "disabled"
-  );
+  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<
+    UiModuleStatus
+  >("stakersModuleStatus", "enabled");
+  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<
+    UiModuleStatus
+  >("rollupsModuleStatus", "disabled");
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -71,18 +73,18 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
-  const appContext = {
+  const appContext: AppContextIface = {
     theme,
     stakersModuleStatus,
     rollupsModuleStatus,
     toggleTheme: () =>
-      setTheme((curr: string) => (curr === "light" ? "dark" : "light")),
+      setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
     toggleStakersModuleStatus: () =>
-      setStakersModuleStatus((curr: string) =>
+      setStakersModuleStatus((curr: UiModuleStatus) =>
         curr === "enabled" ? "disabled" : "enabled"
       ),
     toggleRollupsModuleStatus: () =>
-      setRollupsModuleStatus((curr: string) =>
+      setRollupsModuleStatus((curr: UiModuleStatus) =>
         curr === "enabled" ? "disabled" : "enabled"
       )
   };
