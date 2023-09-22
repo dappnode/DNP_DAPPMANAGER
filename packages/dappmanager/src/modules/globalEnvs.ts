@@ -57,7 +57,9 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_LUKSO`]: db.consensusClientLukso.get(),
     [`${prefix}EXECUTION_CLIENT_LUKSO`]: db.executionClientLukso.get(),
     [`${prefix}MEVBOOST_LUKSO`]: db.mevBoostLukso.get(),
-    [`${prefix}FEE_RECIPIENT_LUKSO`]: db.feeRecipientLukso.get()
+    [`${prefix}FEE_RECIPIENT_LUKSO`]: db.feeRecipientLukso.get(),
+    [`${prefix}OP_ENABLE_HISTORICAL_RPC`]: db.opEnableHistoricalRpc.get(),
+    [`${prefix}OP_EXECUTION_CLIENT`]: db.opExecutionClient.get(),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }

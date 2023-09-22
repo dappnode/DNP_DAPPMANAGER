@@ -252,7 +252,123 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     mail: "@example.com",
     isEnabled: true
   }),
-  disableEthicalMetrics: async () => {}
+  disableEthicalMetrics: async () => {},
+  optimismConfigGet: async () => ({
+    executionClients: [
+      {
+        status: "ok",
+        dnpName: "op-geth.dnp.dappnode.eth",
+        avatarUrl: "",
+        isInstalled: true,
+        isUpdated: true,
+        isRunning: true,
+        data: {
+          dnpName: "package",
+          reqVersion: "0.1.0",
+          semVersion: "0.1.0",
+          imageFile: {
+            hash: "QM..",
+            source: "ipfs",
+            size: 123
+          },
+          warnings: {},
+          signedSafe: true,
+          metadata: {
+            name: "geth.dnp.dappnode.eth",
+            description: "Go implementation of ethereum. Execution client",
+            shortDescription: "Go implementation of ethereum",
+            version: "0.1.0"
+          }
+        },
+        isSelected: true,
+        enableHistorical: true
+      },
+      {
+        status: "ok",
+        dnpName: "op-erigon.dnp.dappnode.eth",
+        avatarUrl: "",
+        isInstalled: true,
+        isUpdated: true,
+        isRunning: true,
+        data: {
+          dnpName: "package",
+          reqVersion: "0.1.0",
+          semVersion: "0.1.0",
+          imageFile: {
+            hash: "QM..",
+            source: "ipfs",
+            size: 123
+          },
+          warnings: {},
+          signedSafe: true,
+          metadata: {
+            name: "geth.dnp.dappnode.eth",
+            description: "Go implementation of ethereum. Execution client",
+            shortDescription: "Go implementation of ethereum",
+            version: "0.1.0"
+          }
+        },
+        isSelected: false,
+        enableHistorical: false
+      }
+    ],
+    rollup: {
+      status: "ok",
+      dnpName: "op-node.dnp.dappnode.eth",
+      avatarUrl: "",
+      isInstalled: false,
+      isUpdated: false,
+      isRunning: true,
+      data: {
+        dnpName: "package",
+        reqVersion: "0.1.0",
+        semVersion: "0.1.0",
+        imageFile: {
+          hash: "QM..",
+          source: "ipfs",
+          size: 123
+        },
+        warnings: {},
+        signedSafe: true,
+        metadata: {
+          name: "geth.dnp.dappnode.eth",
+          description: "Go implementation of ethereum. Execution client",
+          shortDescription: "Go implementation of ethereum",
+          version: "0.1.0"
+        }
+      },
+      isSelected: false,
+      mainnetRpcUrl: ""
+    },
+    archive: {
+      status: "ok",
+      dnpName: "op-l2geth.dnp.dappnode.eth",
+      avatarUrl: "",
+      isInstalled: false,
+      isUpdated: false,
+      isRunning: true,
+      data: {
+        dnpName: "package",
+        reqVersion: "0.1.0",
+        semVersion: "0.1.0",
+        imageFile: {
+          hash: "QM..",
+          source: "ipfs",
+          size: 123
+        },
+        warnings: {},
+        signedSafe: true,
+        metadata: {
+          name: "geth.dnp.dappnode.eth",
+          description: "Go implementation of ethereum. Execution client",
+          shortDescription: "Go implementation of ethereum",
+          version: "0.1.0"
+        }
+      },
+      isSelected: true
+    }
+  }),
+  optimismConfigSet: async () => {}
 };
 
 export const calls: Routes = {

@@ -44,6 +44,8 @@ import {
   StakerConfigGet,
   Eth2ClientTarget,
   EthicalMetricsConfig,
+  OptimismConfigSet,
+  OptimismConfigGet,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -387,7 +389,17 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
-   * Installs a Dappnode Package.
+   * Enables Optimism with the given config
+   */
+  optimismConfigSet: (kwargs: OptimismConfigSet) => Promise<void>;
+
+  /**
+   * Returns the current Optimism configuration
+   */
+  optimismConfigGet: () => Promise<OptimismConfigGet>;
+
+  /**
+   * Installs a DAppNode Package.
    * Resolves dependencies, downloads release assets, loads the images to docker,
    * sets userSettings and starts the docker container for each package.
    *
@@ -617,20 +629,20 @@ export interface Routes {
    */
   sshPortGet: () => Promise<number>;
   /**
-   * Change the SHH port on the Dappnode host
+   * Change the SHH port on the DAppNode host
    */
   sshPortSet: (kwargs: { port: number }) => Promise<void>;
   /**
-   * Disable or enable SSH on the Dappnode host
+   * Disable or enable SSH on the DAppNode host
    */
   sshStatusSet: (kwargs: { status: ShhStatus }) => Promise<void>;
   /**
-   * Check if SSH is enabled of disabled in the Dappnode host
+   * Check if SSH is enabled of disabled in the DAppNode host
    */
   sshStatusGet: () => Promise<ShhStatus>;
 
   /**
-   * Returns the current Dappnode system info
+   * Returns the current DAppNode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
 
@@ -737,6 +749,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
+  optimismConfigGet: {},
+  optimismConfigSet: { log: true },
   packageInstall: { log: true },
   packageGet: {},
   packagesGet: {},

@@ -22,6 +22,9 @@ import {
   SignerPrater,
   SignerGnosis,
   SignerLukso,
+  ExecutionClientOptimism,
+  OptimismL2Geth,
+  OptimismNode,
 } from "@dappnode/types";
 
 /**
@@ -1229,7 +1232,7 @@ export type StakerItemError<T extends Network, P extends StakerType> = {
 /**
  * Metadata of a staker item to be cached
  */
-export type StakerItemData = Pick<
+export type PackageItemData = Pick<
   PackageRelease,
   | "dnpName"
   | "reqVersion"
@@ -1248,7 +1251,7 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
-  data?: StakerItemData;
+  data?: PackageItemData;
   isSelected: boolean;
 } & StakerItemBasic<T, P>;
 
@@ -1331,6 +1334,67 @@ export interface StakerCompatibleVersionsByNetwork<T extends Network> {
     minVersion: string;
   };
   compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
+}
+
+/**
+ * =======
+ * ROLLUPS
+ * =======
+ */
+
+export type OptimismType = "archive" | "execution" | "rollup";
+export type OptimismItem<T extends OptimismType> =
+  | OptimismItemOk<T>
+  | OptimismItemError<T>;
+interface OptimismArchive {
+  dnpName: OptimismL2Geth;
+}
+interface OptimismExecution {
+  dnpName: ExecutionClientOptimism;
+  enableHistorical: boolean;
+}
+interface OptimismRollup {
+  dnpName: OptimismNode;
+  mainnetRpcUrl: string;
+}
+type OptimismItemBasic<T extends OptimismType> = T extends "archive"
+  ? OptimismArchive
+  : T extends "execution"
+  ? OptimismExecution
+  : T extends "rollup"
+  ? OptimismRollup
+  : never;
+
+export type OptimismItemError<T extends OptimismType> = {
+  status: "error";
+  error: string;
+} & OptimismItemBasic<T>;
+export type OptimismItemOk<T extends OptimismType> = {
+  status: "ok";
+  avatarUrl: string;
+  isInstalled: boolean;
+  isUpdated: boolean;
+  isRunning: boolean;
+  data?: PackageItemData;
+  isSelected: boolean;
+} & OptimismItemBasic<T>;
+
+export interface OptimismConfigGet {
+  archive: OptimismItem<"archive">;
+  executionClients: OptimismItem<"execution">[];
+  rollup: OptimismItem<"rollup">;
+}
+
+export interface OptimismConfigGetOk {
+  archive: OptimismItemOk<"archive">;
+  executionClients: OptimismItemOk<"execution">[];
+  rollup: OptimismItemOk<"rollup">;
+}
+
+export interface OptimismConfigSet {
+  archive?: OptimismItemOk<"archive">;
+  executionClient?: OptimismItemOk<"execution">;
+  rollup?: OptimismItemOk<"rollup">;
 }
 
 /**
