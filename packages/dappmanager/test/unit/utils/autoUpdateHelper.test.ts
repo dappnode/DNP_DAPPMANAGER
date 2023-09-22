@@ -3,7 +3,6 @@ import { expect } from "chai";
 import { params } from "@dappnode/params";
 import { getCoreVersionId } from "../../../src/utils/coreVersionId.js";
 
-const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day
 const coreDnpName = params.coreDnpName;
 
 import {
@@ -27,7 +26,8 @@ import {
   getDnpFeedbackMessage,
   getCoreFeedbackMessage,
   // Utils
-  getLastRegistryEntry
+  getLastRegistryEntry,
+  updateDelay
 } from "../../../src/utils/autoUpdateHelper.js";
 import { clearDbs, createTestDir } from "../../testUtils.js";
 
@@ -492,7 +492,7 @@ describe("Util: autoUpdateHelper", () => {
       );
 
       const timestampIsUpdated =
-        Date.now() - (24 * 60 * 60 * 1000 - microDelay);
+        Date.now() - (updateDelay - microDelay);
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestampIsUpdated);
 
       expect(getCoreFeedbackMessage(currentCorePackagesBefore)).to.deep.equal(
