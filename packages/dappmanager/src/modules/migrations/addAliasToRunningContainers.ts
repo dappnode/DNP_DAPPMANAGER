@@ -2,7 +2,7 @@ import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import { getPrivateNetworkAlias } from "../../domains.js";
+import { getPrivateNetworkAliases } from "../../domains.js";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
@@ -44,22 +44,15 @@ export async function addAliasToRunningContainers(): Promise<void> {
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {
   for (const container of containers) {
 
-    // Gets the main alias for the container.
-    // If mono service, it will be "dappnodename.dappnode"
-    // If multiservice, it will be "service.dappnodename.dappnode"
-    const aliasesToMigrate = [getPrivateNetworkAlias(container)];
-
-    // Adds "root" alias to multiservice container if it is the main service
-    // "root" alias is always "dappnodename.dappnode", as if it was a mono service
-    if (isMainServiceOfMultiServicePackage(container)) {
-      aliasesToMigrate.push(getPrivateNetworkAlias({ dnpName: container.dnpName, serviceName: '' }));
-    }
+    const isMain = container.isMain ?? false; // Set a default value of false if isMain is undefined
+    const service = { serviceName: container.serviceName, dnpName: container.dnpName, isMain }
+    const aliases = getPrivateNetworkAliases(service)
 
     // Adds aliases to the compose file that generated the container
-    migrateCoreNetworkAndAliasInCompose(container, aliasesToMigrate);
+    migrateCoreNetworkAndAliasInCompose(container, aliases);
 
     // Adds aliases to the container network
-    for (const alias of aliasesToMigrate) {
+    for (const alias of aliases) {
       const currentEndpointConfig = await getDnCoreNetworkContainerConfig(container.containerName);
       if (!hasAlias(currentEndpointConfig, alias)) {
         const updatedConfig = updateEndpointConfig(currentEndpointConfig, alias);
@@ -108,10 +101,6 @@ export function migrateCoreNetworkAndAliasInCompose(
     version: params.MINIMUM_COMPOSE_VERSION
   };
 
-  // This removes the old network "network", might not be necessary anymore
-  if (composeNetwork || serviceNetwork) {
-    compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
-  }
 
   // This adds the new network with the new aliases into the compose file
   compose.services()[container.serviceName].addNetwork(
@@ -123,12 +112,12 @@ export function migrateCoreNetworkAndAliasInCompose(
   compose.write();
 }
 
-function isMainServiceOfMultiServicePackage(container: PackageContainer): boolean {
-  const compose = new ComposeFileEditor(container.dnpName, container.isCore);
-  const services = compose.services(); // Invoke the services function
-  if (Object.keys(services).length > 1 && container.isMain) return true;
-  return false;
-}
+// function isMainServiceOfMultiServicePackage(container: PackageContainer): boolean {
+//   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
+//   const services = compose.services(); // Invoke the services function
+//   if (Object.keys(services).length > 1 && container.isMain) return true;
+//   return false;
+// }
 
 function updateEndpointConfig(currentEndpointConfig: Dockerode.NetworkInfo | null, alias: string) {
   return {

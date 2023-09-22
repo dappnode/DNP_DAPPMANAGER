@@ -21,7 +21,7 @@ export function stripBadDomainChars(s: string): string {
  * - "other.public.dappnode.eth" > "other"
  */
 export function shortUniqueDappnodeEns(dnpName: string): string {
-  for (const s of [".public.dappnode.eth",".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
+  for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
     if (dnpName.endsWith(s)) dnpName = dnpName.slice(0, -s.length);
   return stripCharacters(dnpName);
 }

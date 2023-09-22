@@ -4,15 +4,12 @@ import { expect } from "chai";
 import { PackageContainer } from "@dappnode/common";
 import { addAliasToGivenContainers } from "../../../../src/modules/migrations/addAliasToRunningContainers";
 import { mockContainer, shellSafe } from "../../../testUtils.js";
-import params from "../../../../src/params.js";
-
-params.REPO_DIR = `${process.cwd()}/test/unit/modules/docker/test-alias/`;
-params.DNP_PRIVATE_NETWORK_NAME = "dncore_network";
+import { params } from "../../../../../params/src/index.js";
 
 const DNP_NAME = "logger.dnp.dappnode.eth";
 const DNP_NAME_MONO = "logger-mono.dnp.dappnode.eth";
-const TEST_ALIAS_PATH = `${process.cwd()}/test/unit/modules/docker/test-alias/${DNP_NAME}`;
-const TEST_ALIAS_PATH_MONO = `${process.cwd()}/test/unit/modules/docker/test-alias/${DNP_NAME_MONO}`;
+const TEST_ALIAS_PATH = `dnp_repo/${DNP_NAME}`;
+const TEST_ALIAS_PATH_MONO = `dnp_repo/${DNP_NAME_MONO}`;
 
 const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
 
@@ -20,7 +17,7 @@ const monoContainer: PackageContainer = {
   ...mockContainer,
   containerName: "DAppNodeTest-logger.dnp.dappnode.eth",
   dnpName: `${DNP_NAME_MONO}`,
-  serviceName: "monoService",
+  serviceName: `${DNP_NAME_MONO}`,
   isCore: false,
 };
 
@@ -58,7 +55,7 @@ services:
 const MONO_COMPOSE = `
 version: '3.4'
 services:
-  monoService:
+  ${DNP_NAME_MONO}:
     image: "chentex/random-logger"
     container_name: ${monoContainer.containerName}
 `;
@@ -120,7 +117,7 @@ describe("Add alias to running containers", function() {
     // Define the expected aliases. These should match the aliases added by the `addAliasToGivenContainers` function.
     const expectedMainAliases = ["mainService.logger.dappnode", "logger.dappnode"];
     const expectedNotMainAliases = ["notmainService.logger.dappnode"];
-    const expectedMonoContainerAliases = ["monoService.logger-mono.dappnode"];
+    const expectedMonoContainerAliases = ["logger-mono.dappnode"];
 
     // Assert that the actual aliases match our expectations
     expect(containerMainAliases).to.include.members(expectedMainAliases);
