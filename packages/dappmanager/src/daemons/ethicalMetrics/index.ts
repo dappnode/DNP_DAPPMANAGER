@@ -4,7 +4,6 @@ import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
 import { logs } from "@dappnode/logger";
 import { checkEthicalMetricsStatus } from "./checkEthicalMetricsStatus.js";
-import { getRandomizedInterval } from "../../utils/getRandomizedInterval.js";
 
 /**
  * Run the Ethical metrics daemon.
@@ -24,10 +23,7 @@ export function startEthicalMetricsDaemon(signal: AbortSignal): void {
 
   runAtMostEvery(
     async () => runEthicalMetricsTaskMemo(),
-    getRandomizedInterval(
-      params.ETH_METRICS_DAEMON_INTERVAL,
-      params.ETH_METRICS_DAEMON_INTERVAL_VARIATION
-    ),
+    params.ETHICAL_METRICS_DAEMON_INTERVAL,
     signal
   );
 }
