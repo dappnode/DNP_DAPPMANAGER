@@ -2,7 +2,7 @@ import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { listPackages } from "../modules/docker/list/index.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import deepmerge from "deepmerge";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";

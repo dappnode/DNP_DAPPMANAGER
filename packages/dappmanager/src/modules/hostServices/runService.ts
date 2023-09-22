@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { shellHost } from "../../utils/shell.js";
 import { copyHostService } from "./copyHostService.js";
 import { reloadServices } from "./reloadServices.js";

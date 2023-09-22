@@ -1,4 +1,4 @@
-import { EventBus } from "@dappnode/dappmanager/src/eventBus";
+import { EventBus } from "@dappnode/eventbus";
 
 // Mock placeholder empty subscription object to allow compilation
 const emptySubscription = { on: () => {}, emit: () => {} };

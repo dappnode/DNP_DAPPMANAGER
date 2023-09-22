@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { shellHost } from "../../utils/shell.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 
 const hostScriptsDirFromHost = params.HOST_SCRIPTS_DIR_FROM_HOST;
 const hostScriptsDir = params.HOST_SCRIPTS_DIR;

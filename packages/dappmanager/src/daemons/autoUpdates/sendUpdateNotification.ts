@@ -1,7 +1,7 @@
 import { valid, lte } from "semver";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import * as db from "../../db/index.js";
-import { eventBus } from "../../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { prettyDnpName } from "../../utils/format.js";
 import { CoreUpdateDataAvailable } from "@dappnode/common";

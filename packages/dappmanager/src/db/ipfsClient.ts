@@ -1,6 +1,6 @@
 import { dbMain } from "./dbFactory.js";
 import { IpfsClientTarget } from "@dappnode/common";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 // User chosen properties
 const IPFS_CLIENT_TARGET = "ipfs-client-target";

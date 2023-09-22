@@ -12,7 +12,7 @@ import {
   isUpdateDelayCompleted,
   flagCompletedUpdate
 } from "../../../src/utils/autoUpdateHelper.js";
-import params from "../../../src/params.js";
+import { params } from "@dappnode/params";
 import rewiremock from "rewiremock/webpack";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";
 import { InstalledPackageData } from "@dappnode/common";

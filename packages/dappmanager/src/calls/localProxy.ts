@@ -4,7 +4,7 @@ import {
   startAvahiDaemon,
   getAvahiDaemonStatus
 } from "../modules/hostScripts/scripts/avahiDaemon.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { AvahiDaemonStatus, LocalProxyingStatus } from "@dappnode/common";
 import { packageSetEnvironment } from "./packageSetEnvironment.js";
 import { listPackageNoThrow } from "../modules/docker/list/index.js";

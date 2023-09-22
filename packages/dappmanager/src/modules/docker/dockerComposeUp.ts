@@ -1,5 +1,5 @@
 import fs from "fs";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import * as getPath from "../../utils/getPath.js";
 import { restartDappmanagerPatch } from "../installer/restartPatch.js";
 import { ComposeFileEditor } from "../compose/editor.js";
@@ -10,7 +10,7 @@ import {
 } from "./compose/index.js";
 import { listPackageNoThrow } from "./list/index.js";
 import { getDockerTimeoutMax } from "./utils.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import {
   ContainersStatus,
   InstalledPackageData,

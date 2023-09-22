@@ -1,5 +1,5 @@
 import { ContainerInfo } from "dockerode";
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 import {
   PackageContainer,
   VolumeMapping,

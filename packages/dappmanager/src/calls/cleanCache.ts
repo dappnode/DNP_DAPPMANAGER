@@ -1,4 +1,4 @@
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import { clearCacheDb } from "../db/index.js";
 // Utils
 import shell from "../utils/shell.js";

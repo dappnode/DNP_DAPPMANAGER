@@ -3,7 +3,7 @@ import pathUtil from "path";
 import { valid, validRange } from "semver";
 import { PackageRequest } from "../types.js";
 import * as isIPFS from "is-ipfs";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 
 const supportedDomains = ["eth"];
 

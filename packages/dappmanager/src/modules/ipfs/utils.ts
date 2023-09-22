@@ -1,7 +1,7 @@
 import { IPFSEntry, IPFSPath } from "./types.js";
 import { IpfsFileResult } from "../../types.js";
 import * as db from "../../db/index.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { IpfsClientTarget } from "@dappnode/common";
 
 /**

@@ -1,7 +1,7 @@
 import fs from "fs";
 import * as db from "../db/index.js";
-import params from "../params.js";
-import { logs } from "../logs.js";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import isIp from "is-ip";
 import { isNotFoundError } from "./node.js";
 

@@ -52,7 +52,7 @@ describe.skip("Call function: packageRemove", function () {
         mock(() => import("../../../src/modules/docker"))
           .with({ dockerContainerRemove })
           .toBeUsed();
-        mock(() => import("../../../src/eventBus"))
+        mock(() => import("@dappnode/eventbus"))
           .with({ eventBus })
           .toBeUsed();
         mock(() => import("../../../src/modules/docker/list"))

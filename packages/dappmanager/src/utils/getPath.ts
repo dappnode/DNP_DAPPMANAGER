@@ -1,7 +1,7 @@
 import fs from "fs";
 import { omit } from "lodash-es";
 import path from "path";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 /*
  * Generates file paths given a set of parameters. This tool helps

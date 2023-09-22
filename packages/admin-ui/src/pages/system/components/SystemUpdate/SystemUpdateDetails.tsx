@@ -73,7 +73,10 @@ export function getCoreDeps(
     // remove the warning on install for the core.dnp.dappnode.eth DNP
     // Alerts can be added via the conditional update alerts
     coreDnp.warningOnInstall = "";
-    return [coreDnp];
+
+    // instead create a new object with warningOnInstall removed
+    // otherwise there will be raised the error: `TypeError: Cannot add property warningOnInstall, object is not extensible`
+    return [{ ...coreDnp, warningOnInstall: "" }];
   }
 
   return [];

@@ -2,7 +2,7 @@ import { listPackages } from "../docker/list/index.js";
 // Internal
 import { PackageRequest } from "../../types.js";
 import shouldUpdate from "./utils/shouldUpdate.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetState } from "./types.js";
 import { DappGetFetcher } from "./fetch/index.js";
 

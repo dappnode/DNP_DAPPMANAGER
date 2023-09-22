@@ -1,12 +1,12 @@
-import { EthProviderError } from "../modules/ethClient/index.js";
-import * as logUserAction from "../logUserAction.js";
-import { logs } from "../logs.js";
+import * as logUserAction from "./logUserAction.js";
+import { logs } from "./logs.js";
 import {
   routesData,
   Routes,
   LoggerMiddleware,
   Args,
-  Result
+  Result,
+  EthProviderError,
 } from "@dappnode/common";
 
 export const routesLogger: LoggerMiddleware = {
@@ -20,7 +20,7 @@ export const routesLogger: LoggerMiddleware = {
         event: route,
         message: `${route} success`,
         result,
-        args
+        args,
       });
       logs.info("RPC success", route);
     } else {
@@ -42,10 +42,10 @@ export const routesLogger: LoggerMiddleware = {
         event: route,
         message: error.message,
         stack: error.stack,
-        args
+        args,
       });
     }
-  }
+  },
 };
 
 export const subscriptionsLogger: LoggerMiddleware = {
@@ -56,7 +56,7 @@ export const subscriptionsLogger: LoggerMiddleware = {
   onError: (route: string, error: Error, args: Args = []): void => {
     logs.error("Subscription error", route, error);
     logs.debug("Subscription error", route, args);
-  }
+  },
 };
 
 /**

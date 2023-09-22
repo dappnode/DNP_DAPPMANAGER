@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import stackTrace from "stack-trace";
 // "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
 import "source-map-support/register.js";
-import { logSafeObjects } from "./utils/logs.js";
+import { logSafeObjects } from "./logSafeObjects.js";
 import { inspect } from "util";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,7 +27,7 @@ const tags = {
   debug: "DEBUG",
   info: "INFO ",
   warn: "WARN ",
-  error: "ERROR"
+  error: "ERROR",
 };
 
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -62,7 +62,7 @@ export const logs: Logs = {
    * logs.error("error fetching", new Error("DAMNN"));
    * ```
    */
-  error: formatLogger(tags.error, console.error)
+  error: formatLogger(tags.error, console.error),
 };
 /* eslint-enable @typescript-eslint/no-empty-function */
 /* eslint-enable no-console */
@@ -90,7 +90,7 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
           if (!aIsError && bIsError) return -1;
           return 0;
         })
-        .map(item => {
+        .map((item) => {
           if (item instanceof ErrorNoStack) return item.message;
           if (item instanceof Error) return item;
           if (typeof item === "string") return item;

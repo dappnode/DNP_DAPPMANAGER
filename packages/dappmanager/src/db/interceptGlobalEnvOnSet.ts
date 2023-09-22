@@ -1,9 +1,9 @@
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import {
   updatePkgsWithGlobalEnvs,
   writeGlobalEnvsToEnvFile
 } from "../modules/globalEnvs.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 /**
  * Intercept all on set methods when any global env is set. When updating a global env there must be done:

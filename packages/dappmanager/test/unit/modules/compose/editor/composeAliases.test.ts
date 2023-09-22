@@ -4,7 +4,7 @@ import {
   ComposeFileEditor,
   ComposeServiceEditor
 } from "../../../../../src/modules/compose/editor.js";
-import params from "../../../../../src/params.js";
+import { params } from "@dappnode/params";
 import { shellSafe } from "../../../../testUtils.js";
 import fs from "fs";
 import { parseServiceNetworks } from "../../../../../src/modules/compose/networks.js";

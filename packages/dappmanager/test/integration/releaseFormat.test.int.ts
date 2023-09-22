@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { mapValues } from "lodash-es";
 import * as calls from "../../src/calls/index.js";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils.js";
-import params from "../../src/params.js";
+import { params } from "@dappnode/params";
 import shell from "../../src/utils/shell.js";
 import { TrustedReleaseKey } from "@dappnode/common";
 import {

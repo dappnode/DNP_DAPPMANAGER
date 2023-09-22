@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import params from "../../../src/params.js";
+import { params } from "@dappnode/params";
 import { getCoreVersionId } from "../../../src/utils/coreVersionId.js";
 
 const updateDelay = params.AUTO_UPDATE_DELAY || 24 * 60 * 60 * 1000; // 1 day

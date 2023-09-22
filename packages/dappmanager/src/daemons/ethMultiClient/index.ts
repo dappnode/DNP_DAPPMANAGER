@@ -1,6 +1,6 @@
 import * as db from "../../db/index.js";
-import { eventBus } from "../../eventBus.js";
-import params from "../../params.js";
+import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
@@ -9,11 +9,10 @@ import {
   EthClientInstallStatus,
   serializeError
 } from "../../modules/ethClient/types.js";
-import { logs } from "../../logs.js";
-import { EthClientRemote } from "@dappnode/common";
+import { logs } from "@dappnode/logger";
+import { EthClientRemote, EthProviderError } from "@dappnode/common";
 import {
   ethereumClient,
-  EthProviderError,
   getLocalFallbackContentHash
 } from "../../modules/ethClient/index.js";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";

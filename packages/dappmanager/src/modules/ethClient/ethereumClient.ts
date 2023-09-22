@@ -1,15 +1,15 @@
 import { isEqual } from "lodash-es";
 import { Eth2ClientTarget, EthClientRemote } from "@dappnode/common";
 import * as db from "../../db/index.js";
-import { eventBus } from "../../eventBus.js";
-import { logs } from "../../logs.js";
+import { eventBus } from "@dappnode/eventbus";
+import { logs } from "@dappnode/logger";
 import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { parseServiceNetworks } from "../compose/networks.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import {
   dockerComposeUpPackage,
   dockerNetworkConnect,
@@ -252,7 +252,6 @@ export class EthereumClient {
 
   // Utils
   // TODO: put private in the methods and find a way to test them
-
 
   removeFullnodeAliasFromCompose(
     ethClientDnpName: string,

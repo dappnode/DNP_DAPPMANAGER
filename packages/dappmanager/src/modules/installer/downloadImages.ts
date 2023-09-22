@@ -1,7 +1,7 @@
 import { InstallPackageData } from "@dappnode/common";
 import { Log } from "../../utils/logUi.js";
 import getImage, { verifyDockerImage } from "../release/getImage.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 
 /**
  * Download the .tar.xz docker image of each package in paralel

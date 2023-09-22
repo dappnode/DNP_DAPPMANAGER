@@ -2,7 +2,7 @@ import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/common";
 import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
-import params from "../../../src/params.js";
+import { params } from "@dappnode/params";
 import { mockContainer, shellSafe } from "../../testUtils.js";
 
 describe("Migration", () => {

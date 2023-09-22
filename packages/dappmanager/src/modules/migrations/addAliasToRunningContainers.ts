@@ -3,8 +3,8 @@ import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { getPrivateNetworkAlias } from "../../domains.js";
-import { logs } from "../../logs.js";
-import params from "../../params.js";
+import { logs } from "@dappnode/logger";
+import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
 import shell from "../../utils/shell.js";
 import { ComposeFileEditor } from "../compose/editor.js";
@@ -38,7 +38,9 @@ export async function addAliasToRunningContainers(): Promise<void> {
       // So this function must be before the check hasAlias()
       migrateCoreNetworkAndAliasInCompose(container, alias);
 
-      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
+        containerName
+      );
       if (hasAlias(currentEndpointConfig, alias)) continue;
       const endpointConfig: Partial<Dockerode.NetworkInfo> = {
         ...currentEndpointConfig,

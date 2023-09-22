@@ -1,5 +1,5 @@
 import path from "path";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { shellHost } from "../../utils/shell.js";
 
 const hostSystemdDir = params.HOST_SYSTEMD_DIR_FROM_HOST;
