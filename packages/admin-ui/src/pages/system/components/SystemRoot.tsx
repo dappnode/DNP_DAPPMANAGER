@@ -15,11 +15,9 @@ import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import { Notifications } from "./Notifications";
 import Hardware from "./Hardware";
-import { UsageContext } from "App";
 
 const SystemRoot: React.FC = () => {
-  const { usage } = React.useContext(UsageContext);
-  const basicRoutes: {
+  const availableRoutes: {
     name: string;
     subLink: string;
     subPath: string;
@@ -49,15 +47,7 @@ const SystemRoot: React.FC = () => {
       subLink: subPaths.power,
       subPath: subPaths.power,
       component: PowerManagment
-    }
-  ];
-  const advancedRoutes: {
-    name: string;
-    subLink: string;
-    subPath: string;
-    component: React.ComponentType<any>;
-    hideFromMenu?: boolean;
-  }[] = [
+    },
     {
       name: "Notifications",
       subLink: subPaths.notifications,
@@ -110,9 +100,6 @@ const SystemRoot: React.FC = () => {
       component: Advanced
     }
   ];
-
-  const availableRoutes =
-    usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
 
   return (
     <>

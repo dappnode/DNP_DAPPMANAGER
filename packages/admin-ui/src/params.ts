@@ -89,7 +89,9 @@ export const docsUrl = {
   httpsExplanation:
     "https://docs.dappnode.io/user/product-manual/system#networkk",
   ipfsPeersExplanation:
-    "https://docs.dappnode.io/user/product-manual/system#peers"
+    "https://docs.dappnode.io/user/product-manual/system#peers",
+  stakers: "https://docs.dappnode.io/docs/user/staking/overview",
+  rollups: "https://docs.dappnode.io/docs/user/rollups/overview"
 };
 
 export const forumUrl = {
