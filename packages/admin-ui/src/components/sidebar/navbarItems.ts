@@ -101,7 +101,8 @@ export const sidenavItems: {
   {
     name: "Rollups",
     href: rollupsRelativePath,
-    icon: GiRolledCloth
+    icon: GiRolledCloth,
+    show: true
   },
   {
     name: "Repository",
