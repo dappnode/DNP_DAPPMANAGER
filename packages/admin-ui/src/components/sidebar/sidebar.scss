@@ -23,28 +23,6 @@
   }
 }
 
-/* Define the fade transition */
-/* Slide & Fade Transition */
-
-/* Slide & Fade Transition for nav-item */
-
-.nav-item-enter,
-.nav-item-exit-active {
-  opacity: 0;
-  transform: translateX(-100%);
-}
-
-.nav-item-enter-active,
-.nav-item-exit {
-  opacity: 1;
-  transform: translateX(0);
-}
-
-.nav-item-enter-active,
-.nav-item-exit-active {
-  transition: opacity 500ms ease-in, transform 500ms ease-in-out;
-}
-
 /* 
  * ============
  * Sidenav-item
