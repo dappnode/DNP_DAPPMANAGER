@@ -43,14 +43,22 @@ export async function addAliasToRunningContainers(): Promise<void> {
 
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {
   for (const container of containers) {
+
+    // Gets the main alias for the container.
+    // If mono service, it will be "dappnodename.dappnode"
+    // If multiservice, it will be "service.dappnodename.dappnode"
     const aliasesToMigrate = [getPrivateNetworkAlias(container)];
 
+    // Adds "root" alias to multiservice container if it is the main service
+    // "root" alias is always "dappnodename.dappnode", as if it was a mono service
     if (isMainServiceOfMultiServicePackage(container)) {
       aliasesToMigrate.push(getPrivateNetworkAlias({ dnpName: container.dnpName, serviceName: '' }));
     }
 
+    // Adds aliases to the compose file that generated the container
     migrateCoreNetworkAndAliasInCompose(container, aliasesToMigrate);
 
+    // Adds aliases to the container network
     for (const alias of aliasesToMigrate) {
       const currentEndpointConfig = await getDnCoreNetworkContainerConfig(container.containerName);
       if (!hasAlias(currentEndpointConfig, alias)) {
@@ -62,36 +70,50 @@ export async function addAliasToGivenContainers(containers: PackageContainer[]):
   }
 }
 
+/** Gets the docker-compose.yml file of the given `container` and adds one or more alias 
+ * to the service that started `container`. All alias are added to the network defined by
+ * `params.DNP_PRIVATE_NETWORK_NAME`.
+ * 
+ * @param container PackageContainer
+ * @param aliases string[]
+ * @returns void
+ */
 export function migrateCoreNetworkAndAliasInCompose(
   container: PackageContainer,
   aliases: string[]
 ): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
-  // Extract existing service networks
+  // Gets all the networks defined in the service
   const serviceNetworks = parseServiceNetworks(
     compose.services()[container.serviceName].get().networks || {}
   );
+  
+  // Gets current aliases of "params.DNP_PRIVATE_NETWORK_NAME", usually dncore_network
+  const currentAliases = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.aliases || [];
 
-  const currentAliases = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE]?.aliases || [];
+  //add new aliases to current aliases set
   const newAliases = uniq([...currentAliases, ...aliases]);
 
   // Check if migration was done
   const composeNetwork = compose.getComposeNetwork(params.DNP_PRIVATE_NETWORK_NAME);
-  const serviceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] ?? null;
+  const serviceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
 
-  if (isComposeNetworkAndAliasMigrated(composeNetwork, serviceNetwork, compose.compose.version, newAliases)) return;
-
-  // Ensure compose file version 3.5
+  // Return if migration was done, compose is already updated
+  if (isComposeNetworkAndAliasMigrated(composeNetwork, serviceNetwork, compose.compose.version, newAliases)) return
+  
+  // Ensure/update compose file version 3.5
   compose.compose = {
     ...compose.compose,
     version: params.MINIMUM_COMPOSE_VERSION
   };
 
+  // This removes the old network "network", might not be necessary anymore
   if (composeNetwork || serviceNetwork) {
     compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
   }
 
+  // This adds the new network with the new aliases into the compose file
   compose.services()[container.serviceName].addNetwork(
     params.DNP_PRIVATE_NETWORK_NAME,
     { ...serviceNetwork, aliases: newAliases },
@@ -145,24 +167,31 @@ function hasAlias(
   );
 }
 
+/** Return true if docker-compose.yml file has already been updated with aliases, false otherwise.
+ * @param aliases
+ * @returns boolean
+ */
 function isComposeNetworkAndAliasMigrated(
   composeNetwork: ComposeNetwork | null,
   serviceNetwork: ComposeServiceNetwork | null,
   composeVersion: string,
   aliases: string[]
 ): boolean {
-  // 1. Migration undone for aliases or networks or both => return false
-  if (!composeNetwork || !serviceNetwork) return false; // Consider as not migrated if either composeNetwork or serviceNetwork are not present
+  // 1. Expected network is not present either in compose or in service => not migrated
+  if (!composeNetwork || !serviceNetwork) return false; 
 
-  // 2. Migration done for aliases and networks => return true
+  // 2. Aside from being at least version 3.5, to consider the docker-compose.yml file as migrated, the network defined in the compose file must:
+  //    - be external
+  //    - have the expected name
+  //    - have the expected aliases in each service
   if (
-    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check property name is defined
+    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check expected name
     composeNetwork?.external && // Check is external network
     gte(
       parseComposeSemver(composeVersion),
       parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5
-    aliases.every(alias => serviceNetwork.aliases?.includes(alias)) // Check every alias has been added
+    aliases.every(alias => serviceNetwork.aliases?.includes(alias)) // Check every alias is already present
   )
     return true;
 

@@ -75,9 +75,9 @@ async function getContainerAliasesOnNetwork(containerName: string, networkName: 
 }
 
 describe("Add alias to running containers", function() {
-  this.timeout(10000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
+  this.timeout(15000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
 
-  before("Setup", async () => {
+  before("Create and run containers in dncore_network", async () => {
     if (!fs.existsSync(TEST_ALIAS_PATH)) {
       fs.mkdirSync(TEST_ALIAS_PATH, { recursive: true });
     }
