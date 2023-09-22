@@ -492,7 +492,7 @@ describe("Util: autoUpdateHelper", () => {
       );
 
       const timestampIsUpdated =
-        Date.now() - (24 * 60 * 60 * 1000 - microDelay);
+        Date.now() - (updateDelay - microDelay);
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestampIsUpdated);
 
       expect(getCoreFeedbackMessage(currentCorePackagesBefore)).to.deep.equal(
