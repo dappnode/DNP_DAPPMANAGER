@@ -11,7 +11,6 @@ if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { theme, rollupsModuleStatus, stakersModuleStatus } = React.useContext(
     AppContext
   );
@@ -20,6 +19,11 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
   if (stakersItem) {
     if (stakersModuleStatus === "enabled") stakersItem.show = true;
     else stakersItem.show = false;
+  }
+  const rollupsItem = sidenavItems.find(item => item.name === "Rollups");
+  if (rollupsItem) {
+    if (rollupsModuleStatus === "enabled") rollupsItem.show = true;
+    else rollupsItem.show = false;
   }
 
   return (
