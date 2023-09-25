@@ -1344,15 +1344,10 @@
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.23.tgz#e349661f40402b31fa3cd8651f16aed0ca927a79"
   integrity sha512-24O6fVfKqQHuHOgaNHvA7sbEZzYjCWxyIpFXaxnJxl4da6NRAEd+wZgzNzRQsqC5lLIQkNEc4uS+V+utgSGJuw==
 
-"@dappnode/types@^0.1.26":
-  version "0.1.26"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.26.tgz#c75fc25cb831f2026a5f9f928f51ba6f71451ce1"
-  integrity sha512-SzKAXzXrdEDy8SEoy2e7aENH/kobzW4HM749823pQ4Dgrht2tH4Rg3nBWYz3w37uzj6hAj+mIcAKMTe6yMEuig==
-
-"@dappnode/types@^0.1.26":
-  version "0.1.26"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.26.tgz#c75fc25cb831f2026a5f9f928f51ba6f71451ce1"
-  integrity sha512-SzKAXzXrdEDy8SEoy2e7aENH/kobzW4HM749823pQ4Dgrht2tH4Rg3nBWYz3w37uzj6hAj+mIcAKMTe6yMEuig==
+"@dappnode/types@^0.1.27":
+  version "0.1.27"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.27.tgz#52e019687cf73a5673cc0c1a82be8a1b094878f0"
+  integrity sha512-WO2QFRUzb4LXHqxTFWOdO4XOAuqaBUDzTNyl6E4w6FXCunXaA+VU7tXE2JgLRZvkmQsO145lRujDFKeqAoJuKA==
 
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
