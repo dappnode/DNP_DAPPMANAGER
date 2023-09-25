@@ -73,6 +73,13 @@ const containerNotMainPublic: PackageContainer = {
   isCore: false,
 };
 
+//We check 6 possible containers: 
+// - monoContainer            --> container comming from a docker-compose with only 1 service. dnp
+// - monoContainerPublic      --> container comming from a docker-compose with only 1 service. public
+// - containerMain            --> container comming from a docker-compose with 2 services, it is maked as the main one. dnp
+// - containerNotMain         --> contaienr comming from a docker-compose with 2 services, it is not marked as the main one. dnp
+// - containerMainPublic      --> container comming from a docker-compose with 2 services, it is maked as the main one. public
+// - containerNotMainPublic   --> contaienr comming from a docker-compose with 2 services, it is not marked as the main one. public
 const containers = [containerMain, containerNotMain, monoContainer, containerMainPublic, containerNotMainPublic, monoContainerPublic];
 
 const CONTAINER_COMPOSE = `
@@ -195,11 +202,11 @@ describe("Add alias to running containers", function() {
     await addAliasToGivenContainers(containers);
 
     const containersToTest = [
-      { container: containerMain, expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"] },
-      { container: containerNotMain, expectedAliases: ["notmainService.logger.dappnode"] },
-      { container: monoContainer, expectedAliases: ["service.logger-mono.dappnode", "logger-mono.dappnode"] },
-      { container: monoContainerPublic, expectedAliases: ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"] },
-      { container: containerMainPublic, expectedAliases: ["mainService.logger.public.dappnode", "logger.public.dappnode"] },
+      { container: containerMain, expectedAliases:          ["mainService.logger.dappnode", "logger.dappnode"] },
+      { container: containerNotMain, expectedAliases:       ["notmainService.logger.dappnode"] },
+      { container: monoContainer, expectedAliases:          ["service.logger-mono.dappnode", "logger-mono.dappnode"] },
+      { container: monoContainerPublic, expectedAliases:    ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"] },
+      { container: containerMainPublic, expectedAliases:    ["mainService.logger.public.dappnode", "logger.public.dappnode"] },
       { container: containerNotMainPublic, expectedAliases: ["notmainService.logger.public.dappnode"] },
     ];
     
