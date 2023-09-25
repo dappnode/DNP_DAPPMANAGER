@@ -35,6 +35,7 @@ export { newFeatureStatusSet } from "./newFeatureStatusSet.js";
 export { notificationsGet } from "./notificationsGet.js";
 export { notificationsRemove } from "./notificationsRemove.js";
 export { notificationsTest } from "./notificationsTest.js";
+export { optimismConfigSet, optimismConfigGet } from "./optimismConfig.js";
 export { packageGet } from "./packageGet.js";
 export { packagesGet } from "./packagesGet.js";
 export { packageInstall } from "./packageInstall.js";

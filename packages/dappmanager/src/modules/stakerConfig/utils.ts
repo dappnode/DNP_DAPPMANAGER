@@ -1,14 +1,11 @@
 import {
   UserSettingsAllDnps,
-  StakerItemData,
-  PackageRelease,
   ConsensusClient,
   ExecutionClient,
   StakerConfigByNetwork
 } from "@dappnode/common";
-import { pick } from "lodash-es";
-import { Manifest, Network } from "@dappnode/types";
 import * as db from "../../db/index.js";
+import { Network } from "@dappnode/types";
 
 export function getStakerConfigByNetwork<T extends Network>(
   network: T
@@ -132,31 +129,3 @@ const getDefaultCheckpointSync = (network: Network): string =>
     : network === "lukso"
     ? "https://checkpoints.mainnet.lukso.network"
     : "";
-
-export function pickStakerItemData(pkgRelease: PackageRelease): StakerItemData {
-  return {
-    metadata: pickStakerManifestData(pkgRelease.metadata),
-    ...pick(pkgRelease, [
-      "dnpName",
-      "reqVersion",
-      "semVersion",
-      "imageFile",
-      "avatarFile",
-      "warnings",
-      "origin",
-      "signedSafe"
-    ] as const)
-  };
-}
-
-function pickStakerManifestData(manifest: Manifest): Manifest {
-  return pick(manifest, [
-    "name",
-    "version",
-    "shortDescription",
-    "avatar",
-    "links",
-    "chain",
-    "warnings"
-  ] as const);
-}

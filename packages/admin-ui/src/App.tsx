@@ -15,56 +15,57 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { Theme, UsageMode } from "types";
+import { AppContextIface, Theme, UiModuleStatus } from "types";
 
-export const UsageContext = React.createContext({
-  usage: "advanced",
-  toggleUsage: () => {}
-});
-
-export const ThemeContext = React.createContext({
+export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
-  toggleTheme: () => {}
+  stakersModuleStatus: "enabled",
+  rollupsModuleStatus: "disabled",
+  toggleTheme: () => {},
+  toggleStakersModuleStatus: () => {},
+  toggleRollupsModuleStatus: () => {}
 });
+
+const useLocalStorage = <T extends string>(
+  key: string,
+  initialValue: T
+): [T, React.Dispatch<React.SetStateAction<T>>] => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      // Assert that either the item or initialValue is of type T
+      return (item as T) || initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    window.localStorage.setItem(key, storedValue);
+  }, [key, storedValue]);
+
+  return [storedValue, setStoredValue];
+};
 
 function MainApp({ username }: { username: string }) {
   // App is the parent container of any other component.
   // If this re-renders, the whole app will. So DON'T RERENDER APP!
   // Check ONCE what is the status of the VPN and redirect to the login page.
 
-  const [screenWidth, setScreenWidth] = useState(window.screen.width);
-
-  //const storedUsage = localStorage.getItem("usage");
-  const storedTheme = localStorage.getItem("theme");
-  //const initialUsage = storedUsage === "advanced" ? "advanced" : "basic";
-  const initialUsage = "advanced";
-  const initialTheme =
-    storedTheme === "light" || storedTheme === "dark" ? storedTheme : "light";
-
-  const [theme, setTheme] = useState<Theme>(initialTheme);
-  const [usage, setUsage] = useState<UsageMode>(initialUsage);
-
-  const toggleTheme = () => {
-    setTheme(curr => (curr === "light" ? "dark" : "light"));
-  };
-
-  const toggleUsage = () => {
-    setUsage(curr => (curr === "basic" ? "advanced" : "basic"));
-  };
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem("usage", usage);
-  }, [usage]);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+  const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<
+    UiModuleStatus
+  >("stakersModuleStatus", "enabled");
+  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<
+    UiModuleStatus
+  >("rollupsModuleStatus", "disabled");
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [screenWidth]);
+  }, []);
 
   // Scroll to top on pathname change
   const screenLocation = useLocation();
@@ -72,45 +73,55 @@ function MainApp({ username }: { username: string }) {
     window.scrollTo(0, 0);
   }, [screenLocation.pathname]);
 
-  return (
-    <UsageContext.Provider value={{ usage, toggleUsage }}>
-      <ThemeContext.Provider value={{ theme, toggleTheme }}>
-        <div className="body" id={theme}>
-          <SideBar screenWidth={screenWidth} />
-          <TopBar
-            username={username}
-            theme={theme}
-            toggleUsage={toggleUsage}
-            toggleTheme={toggleTheme}
-          />
-          <div id="main">
-            <ErrorBoundary>
-              <NotificationsMain />
-            </ErrorBoundary>
-            <Routes>
-              {Object.values(pages).map(({ RootComponent, rootPath }) => (
-                <Route
-                  key={rootPath}
-                  path={rootPath}
-                  element={
-                    <ErrorBoundary>
-                      <RootComponent />
-                    </ErrorBoundary>
-                  }
-                />
-              ))}
-              {/* Redirection for routes with hashes */}
-              {/* 404 routes redirect to dashboard or default page */}
-              <Route path="*" element={<DefaultRedirect />} />
-            </Routes>
-          </div>
+  const appContext: AppContextIface = {
+    theme,
+    stakersModuleStatus,
+    rollupsModuleStatus,
+    toggleTheme: () =>
+      setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
+    toggleStakersModuleStatus: () =>
+      setStakersModuleStatus((curr: UiModuleStatus) =>
+        curr === "enabled" ? "disabled" : "enabled"
+      ),
+    toggleRollupsModuleStatus: () =>
+      setRollupsModuleStatus((curr: UiModuleStatus) =>
+        curr === "enabled" ? "disabled" : "enabled"
+      )
+  };
 
-          {/* Place here non-page components */}
-          <Welcome />
-          <ToastContainer />
+  return (
+    <AppContext.Provider value={appContext}>
+      <div className="body" id={theme}>
+        <SideBar screenWidth={screenWidth} />
+        <TopBar username={username} appContext={appContext} />
+        <div id="main">
+          <ErrorBoundary>
+            <NotificationsMain />
+          </ErrorBoundary>
+          <Routes>
+            {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
+            {Object.values(pages).map(({ RootComponent, rootPath }) => (
+              <Route
+                key={rootPath}
+                path={rootPath}
+                element={
+                  <ErrorBoundary>
+                    <RootComponent />
+                  </ErrorBoundary>
+                }
+              />
+            ))}
+            {/* Redirection for routes with hashes */}
+            {/* 404 routes redirect to dashboard or default page */}
+            <Route path="*" element={<DefaultRedirect />} />
+          </Routes>
         </div>
-      </ThemeContext.Provider>
-    </UsageContext.Provider>
+
+        {/* Place here non-page components */}
+        <Welcome />
+        <ToastContainer />
+      </div>
+    </AppContext.Provider>
   );
 }
 

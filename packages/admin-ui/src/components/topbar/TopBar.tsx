@@ -10,35 +10,33 @@ import "./topbar.scss";
 import "./notifications.scss";
 // import UsageSwitch from "./dropdownMenus/UsageSwitch";
 // Types
-import { Theme } from "types";
+import { AppContextIface } from "types";
+import Modules from "./dropdownMenus/Modules";
 
 export const TopBar = ({
   username,
-  theme,
-  toggleTheme,
-  toggleUsage
+  appContext
 }: {
   username: string;
-  theme: Theme;
-  toggleTheme: () => void;
-  toggleUsage: () => void;
+  appContext: AppContextIface;
 }) => (
   <div id="topbar">
     {/* Right justified items */}
 
-    {theme === "light" ? (
+    {appContext.theme === "light" ? (
       <div className="beta">
         <span>BETA</span>
         {/* Theme usage requires more feedback */}
         {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
-        <ThemeSwitch toggleTheme={toggleTheme} />
+        <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       </div>
     ) : (
-      <ThemeSwitch toggleTheme={toggleTheme} />
+      <ThemeSwitch toggleTheme={appContext.toggleTheme} />
     )}
 
     <DappnodeIdentity />
     <div className="topnav-icon-separator" />
+    <Modules modulesContext={appContext} />
     <ChainDataDropdown />
     <Notifications />
     <Profile username={username} />

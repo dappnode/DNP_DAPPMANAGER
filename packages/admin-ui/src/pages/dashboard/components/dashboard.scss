@@ -33,6 +33,17 @@
   }
 }
 
+/* Module card */
+.module-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .text {
+    margin-right: 3px;
+  }
+}
+
 /* Chain cards and  Stats cards */
 
 .chain-card .name,
