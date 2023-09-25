@@ -28,17 +28,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       executionClients: await Promise.all(
         executionClientsOptimism.map(async execClient => {
           try {
-            /**if (!(await releaseFetcher.repoExists(execClient)))
-              throw Error(`Repository ${execClient} does not exist`);*/
+            if (!(await releaseFetcher.repoExists(execClient)))
+              throw Error(`Repository ${execClient} does not exist`);
 
-            let hash = "";
-            if (execClient === "op-geth.dnp.dappnode.eth") {
-              hash = "/ipfs/QmPyzdBbgpfccVFCiGh9kHsmbZe4pM1d4KdP6WAJED4TX9";
-            } else {
-              hash = "/ipfs/QmcPhoAV9idcHUd3aifwHrvYv3v8695Hwenkys5rE6PB8v";
-            }
-
-            const pkgData = await getPkgData(releaseFetcher, hash);
+            const pkgData = await getPkgData(releaseFetcher, execClient);
 
             return {
               status: "ok",
@@ -64,12 +57,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       rollup: await new Promise<OptimismItem<"rollup">>(resolve => {
         (async () => {
           try {
-            /**if (!(await releaseFetcher.repoExists(optimismNode)))
-              throw Error(`Repository ${optimismNode} does not exist`);*/
+            if (!(await releaseFetcher.repoExists(optimismNode)))
+              throw Error(`Repository ${optimismNode} does not exist`);
 
-            const hash = "/ipfs/QmVJV1ZbDyTNDReeNu6ykQfUXZ4SKXmLFiqULQ3S1JYcXG";
-
-            const pkgData = await getPkgData(releaseFetcher, hash);
+            const pkgData = await getPkgData(releaseFetcher, optimismNode);
             const mainnetRpcUrl = getOptimismNodeRpcUrl();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -97,12 +88,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       archive: await new Promise<OptimismItem<"archive">>(resolve => {
         (async () => {
           try {
-            /**if (!(await releaseFetcher.repoExists(optimismL2Geth)))
-              throw Error(`Repository ${optimismL2Geth} does not exist`);*/
+            if (!(await releaseFetcher.repoExists(optimismL2Geth)))
+              throw Error(`Repository ${optimismL2Geth} does not exist`);
 
-            const hash = "/ipfs/QmWm346aWuktihXB4jQ5QyBfyx1wPdcyXkrRbrq3tKyVnd";
-
-            const pkgData = await getPkgData(releaseFetcher, hash);
+            const pkgData = await getPkgData(releaseFetcher, optimismL2Geth);
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
