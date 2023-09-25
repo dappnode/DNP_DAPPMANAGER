@@ -41,7 +41,10 @@ export default function EnableEthicalMetrics({
         <div className="title">Enable system notifications</div>
         <div className="description">
           Enable ethical metrics and receive alerts whenever your dappnode is
-          down without losing your privacy
+          down without losing your privacy.{" "}
+          <a href="https://docs.dappnode.io/docs/user/ethical-metrics/overview/">
+            Learn more
+          </a>
         </div>
       </div>
 
