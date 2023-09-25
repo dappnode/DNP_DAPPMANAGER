@@ -80,18 +80,22 @@ export const githubNewIssueDappnodeUrl =
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
+const docsBaseUrl = "https://docs.dappnode.io";
+
 export const docsUrl = {
-  main: "https://docs.dappnode.io",
-  recoverPasswordGuide: "https://docs.dappnode.io/user/faq/troubleshooting",
-  connectWifi: "https://docs.dappnode.io/user/guides/access/wifi",
-  connectLocalProxy: "https://docs.dappnode.io/user/guides/access/local",
-  connectVpn: "https://docs.dappnode.io/user/guides/access/vpn",
+  main: docsBaseUrl,
+  recoverPasswordGuide: `${docsBaseUrl}/docs/user/getting-started/register#troubleshooting`,
+  connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
+  connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
+  connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
   httpsExplanation:
-    "https://docs.dappnode.io/user/product-manual/system#networkk",
+    `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
   ipfsPeersExplanation:
-    "https://docs.dappnode.io/user/product-manual/system#peers",
-  stakers: "https://docs.dappnode.io/docs/user/staking/overview",
-  rollups: "https://docs.dappnode.io/docs/user/rollups/overview"
+    `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
+  stakers: `${docsBaseUrl}/docs/user/staking/overview`,
+  rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
+  ethicalMetricsOverview:
+    `${docsBaseUrl}/docs/user/ethical-metrics/overview`
 };
 
 export const forumUrl = {
