@@ -166,11 +166,9 @@ describe("Add alias to running containers", function() {
     );
     
     await Promise.all(connectToNetworkPromises);
-    
-
   });
 
-  it.only("check that all containers have expected aliases", async () => {
+  it("check that all containers have expected aliases", async () => {
     // Add the aliases
     await addAliasToGivenContainers(containers);
 
@@ -186,8 +184,6 @@ describe("Add alias to running containers", function() {
       const actualAliases = await getContainerAliasesOnNetwork(container.containerName, DNCORE_NETWORK);
       expect(actualAliases).to.include.members(expectedAliases);
     }
-    
-
   });
 
   after("Cleanup", async () => {
@@ -199,5 +195,4 @@ describe("Add alias to running containers", function() {
       removeDirectories(directoryPaths)
     ]);
   });
-
 });
