@@ -40,7 +40,7 @@ let dappnodeWebName = "Mock-DAppNode";
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () =>
     "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
-  backupRestore: async () => {},
+  backupRestore: async () => { },
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",
@@ -60,19 +60,19 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       progress: 0.83027522935
     }
   ],
-  changeIpfsTimeout: async () => {},
-  cleanCache: async () => {},
-  cleanDb: async () => {},
-  copyFileTo: async () => {},
+  changeIpfsTimeout: async () => { },
+  cleanCache: async () => { },
+  cleanDb: async () => { },
+  copyFileTo: async () => { },
   diagnose: async () => [],
-  ethClientFallbackSet: async () => {},
-  ethClientTargetSet: async () => {},
-  ipfsTest: async () => {},
+  ethClientFallbackSet: async () => { },
+  ethClientTargetSet: async () => { },
+  ipfsTest: async () => { },
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
 
-  packageSentDataDelete: async () => {},
+  packageSentDataDelete: async () => { },
 
   portsToOpenGet: async () => [
     {
@@ -120,7 +120,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-  dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
+  dappnodeWebNameSet: async ({ dappnodeWebName }) => { },
   statsCpuGet: async () => ({
     usedPercentage: 88
   }),
@@ -176,12 +176,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   ],
 
-  newFeatureStatusSet: async () => {},
-  poweroffHost: async () => {},
-  rebootHost: async () => {},
+  newFeatureStatusSet: async () => { },
+  poweroffHost: async () => { },
+  rebootHost: async () => { },
   rebootHostIsRequiredGet: async () => false,
-  seedPhraseSet: async () => {},
-  setStaticIp: async () => {},
+  seedPhraseSet: async () => { },
+  setStaticIp: async () => { },
 
   systemInfoGet: async () => ({
     versionData: {
@@ -230,7 +230,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       //"change-host-password"
     ]
   }),
-  natRenewalEnable: async () => {},
+  natRenewalEnable: async () => { },
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [
     { name: "sda", size: "3.7T" },
@@ -242,17 +242,17 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     { lv_name: "swap_1", vg_name: "rootvg", lv_size: "976.00m" }
   ],
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space",
-  ipfsClientTargetSet: async () => {},
+  ipfsClientTargetSet: async () => { },
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
   }),
-  enableEthicalMetrics: async ({ mail }) => {},
+  enableEthicalMetrics: async ({ mail }) => { },
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
     isEnabled: true
   }),
-  disableEthicalMetrics: async () => {},
+  disableEthicalMetrics: async () => { },
   optimismConfigGet: async () => ({
     executionClients: [
       {
@@ -283,7 +283,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isSelected: true,
         enableHistorical: true
       },
-      {
+      /*{
         status: "ok",
         dnpName: "op-erigon.dnp.dappnode.eth",
         avatarUrl: "",
@@ -310,7 +310,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         isSelected: false,
         enableHistorical: false
-      }
+      }*/
     ],
     rollup: {
       status: "ok",
@@ -368,7 +368,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isSelected: true
     }
   }),
-  optimismConfigSet: async () => {}
+  optimismConfigSet: async () => { }
 };
 
 export const calls: Routes = {
