@@ -18,7 +18,7 @@ export function stripBadDomainChars(s: string): string {
  * @param name "bitcoin.dnp.dappnode.eth"
  * @returns "bitcoin"
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin"
- * - "other.public.dappnode.eth" > "other"
+ * - "other.public.dappnode.eth" > "other.public"
  */
 export function shortUniqueDappnodeEns(dnpName: string): string {
   for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
