@@ -42,14 +42,16 @@ export function getPrivateNetworkAlias(container: ContainerNames): string {
 }
 
 export function getPrivateNetworkAliases(
-  container: ContainerNames & { isMain: boolean }
+  container: ContainerNames & { isMainOrMonoService: boolean }
 ): string[] {
   const aliases: string[] = [getPrivateNetworkAlias(container)];
 
-  if (container.isMain) {
+  // mono services will always be main.
+  // If mono service or multiserviceMain, add the root alias (alias without service name)
+  if (container.isMainOrMonoService) {
     const rootAlias = getPrivateNetworkAlias({
       dnpName: container.dnpName,
-      serviceName: container.dnpName
+      serviceName: ""
     });
     aliases.push(rootAlias);
   }

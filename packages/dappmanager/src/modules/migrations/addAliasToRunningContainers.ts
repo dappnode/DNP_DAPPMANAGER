@@ -44,10 +44,10 @@ export async function addAliasToRunningContainers(): Promise<void> {
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {
   for (const container of containers) {
 
-    const isMain = container.isMain ?? false; // Set a default value of false if isMain is undefined
-    const service = { serviceName: container.serviceName, dnpName: container.dnpName, isMain }
+    const isMainOrMonoService = container.isMain ?? false; // Set a default value of false if isMain is undefined
+    const service = { serviceName: container.serviceName, dnpName: container.dnpName, isMainOrMonoService }
     const aliases = getPrivateNetworkAliases(service)
-
+    
     // Adds aliases to the compose file that generated the container
     migrateCoreNetworkAndAliasInCompose(container, aliases);
 

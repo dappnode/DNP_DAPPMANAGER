@@ -7,12 +7,14 @@ import { mockContainer, shellSafe } from "../../../testUtils.js";
 import { params } from "@dappnode/params";
 
 const DNP_NAME = "logger.dnp.dappnode.eth";
-const DNP_NAME_MONO = "logger-mono.dnp.dappnode.eth";
 const DNP_NAME_PUBLIC = "logger.public.dappnode.eth";
+const DNP_NAME_MONO = "logger-mono.dnp.dappnode.eth"
+const DNP_NAME_MONO_PUBLIC = "logger-mono.public.dappnode.eth";
 
 const TEST_ALIAS_PATH = `dnp_repo/${DNP_NAME}`;
-const TEST_ALIAS_PATH_MONO = `dnp_repo/${DNP_NAME_MONO}`;
 const TEST_ALIAS_PATH_PUBLIC = `dnp_repo/${DNP_NAME_PUBLIC}`;
+const TEST_ALIAS_PATH_MONO = `dnp_repo/${DNP_NAME_MONO}`;
+const TEST_ALIAS_PATH_MONO_PUBLIC = `dnp_repo/${DNP_NAME_MONO_PUBLIC}`;
 
 
 const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
@@ -23,6 +25,16 @@ const monoContainer: PackageContainer = {
   dnpName: `${DNP_NAME_MONO}`,
   serviceName: `service`,
   isCore: false,
+  isMain: true,
+};
+
+const monoContainerPublic: PackageContainer = {
+  ...mockContainer,
+  containerName: "DAppNodeTest-logger.public.dappnode.eth",
+  dnpName: `${DNP_NAME_MONO_PUBLIC}`,
+  serviceName: `service`,
+  isCore: false,
+  isMain: true,
 };
 
 const containerMain: PackageContainer = {
@@ -61,7 +73,7 @@ const containerNotMainPublic: PackageContainer = {
   isCore: false,
 };
 
-const containers = [containerMain, containerNotMain, monoContainer, containerMainPublic, containerNotMainPublic];
+const containers = [containerMain, containerNotMain, monoContainer, containerMainPublic, containerNotMainPublic, monoContainerPublic];
 
 const CONTAINER_COMPOSE = `
 version: '3.4'
@@ -93,6 +105,14 @@ services:
     container_name: ${monoContainer.containerName}
 `;
 
+const MONO_COMPOSE_PUBLIC = `
+version: '3.4'
+services:
+  service:
+    image: "chentex/random-logger"
+    container_name: ${monoContainerPublic.containerName}
+`;
+
 // Inspect each container and fetch the aliases on the dncore network
 async function getContainerAliasesOnNetwork(containerName: string, networkName: string) {
   const inspectData = await shellSafe(`docker container inspect ${containerName}`);
@@ -120,13 +140,14 @@ async function removeDirectories(directoryPaths: string[]) {
 }
 
 describe("Add alias to running containers", function() {
-  this.timeout(60000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
+  this.timeout(1200000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
 
     const composeConfigs = [
       { path: TEST_ALIAS_PATH, content: CONTAINER_COMPOSE },
-      { path: TEST_ALIAS_PATH_MONO, content: MONO_COMPOSE },
       { path: TEST_ALIAS_PATH_PUBLIC, content: CONTAINER_COMPOSE_PUBLIC },
+      { path: TEST_ALIAS_PATH_MONO, content: MONO_COMPOSE },
+      { path: TEST_ALIAS_PATH_MONO_PUBLIC, content: MONO_COMPOSE_PUBLIC },
     ];
     
     for (const config of composeConfigs) {
@@ -144,9 +165,10 @@ describe("Add alias to running containers", function() {
     const containerNamesToCheck = [
       containerMain.containerName,
       containerNotMain.containerName,
-      monoContainer.containerName,
       containerMainPublic.containerName,
       containerNotMainPublic.containerName,
+      monoContainer.containerName,
+      monoContainerPublic.containerName
     ];
     
     // Check if all containers exist
@@ -169,13 +191,14 @@ describe("Add alias to running containers", function() {
   });
 
   it("check that all containers have expected aliases", async () => {
-    // Add the aliases
+    //o Add the aliases
     await addAliasToGivenContainers(containers);
 
     const containersToTest = [
       { container: containerMain, expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"] },
       { container: containerNotMain, expectedAliases: ["notmainService.logger.dappnode"] },
-      { container: monoContainer, expectedAliases: ["service.logger-mono.dappnode"] },
+      { container: monoContainer, expectedAliases: ["service.logger-mono.dappnode", "logger-mono.dappnode"] },
+      { container: monoContainerPublic, expectedAliases: ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"] },
       { container: containerMainPublic, expectedAliases: ["mainService.logger.public.dappnode", "logger.public.dappnode"] },
       { container: containerNotMainPublic, expectedAliases: ["notmainService.logger.public.dappnode"] },
     ];
@@ -188,7 +211,7 @@ describe("Add alias to running containers", function() {
 
   after("Cleanup", async () => {
     const containerNames = containers.map((container) => container.containerName);
-    const directoryPaths = [TEST_ALIAS_PATH, TEST_ALIAS_PATH_MONO, TEST_ALIAS_PATH_PUBLIC];
+    const directoryPaths = [TEST_ALIAS_PATH, TEST_ALIAS_PATH_MONO, TEST_ALIAS_PATH_PUBLIC, TEST_ALIAS_PATH_MONO_PUBLIC];
   
     await Promise.all([
       stopAndRemoveContainers(containerNames),
