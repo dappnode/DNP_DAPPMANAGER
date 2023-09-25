@@ -10,6 +10,7 @@ services:
       dncore_network:
         ipv4_address: 172.33.1.4
         aliases:
+          - "vpn.dnp.dappnode.eth.vpn.dappnode"
           - "vpn.dappnode"
     ports:
       - "1194:1194/udp"

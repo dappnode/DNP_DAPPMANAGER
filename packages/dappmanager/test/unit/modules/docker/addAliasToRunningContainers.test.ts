@@ -23,7 +23,7 @@ const monoContainer: PackageContainer = {
   ...mockContainer,
   containerName: "DAppNodeTest-logger.dnp.dappnode.eth",
   dnpName: `${DNP_NAME_MONO}`,
-  serviceName: `service`,
+  serviceName: `${DNP_NAME_MONO}`,
   isCore: false,
   isMain: true,
 };
@@ -107,7 +107,7 @@ services:
 const MONO_COMPOSE = `
 version: '3.4'
 services:
-  service:
+  ${DNP_NAME_MONO}:
     image: "chentex/random-logger"
     container_name: ${monoContainer.containerName}
 `;
@@ -204,7 +204,7 @@ describe("Add alias to running containers", function() {
     const containersToTest = [
       { container: containerMain, expectedAliases:          ["mainService.logger.dappnode", "logger.dappnode"] },
       { container: containerNotMain, expectedAliases:       ["notmainService.logger.dappnode"] },
-      { container: monoContainer, expectedAliases:          ["service.logger-mono.dappnode", "logger-mono.dappnode"] },
+      { container: monoContainer, expectedAliases:          ["logger-mono.dnp.dappnode.eth.logger-mono.dappnode", "logger-mono.dappnode"] },
       { container: monoContainerPublic, expectedAliases:    ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"] },
       { container: containerMainPublic, expectedAliases:    ["mainService.logger.public.dappnode", "logger.public.dappnode"] },
       { container: containerNotMainPublic, expectedAliases: ["notmainService.logger.public.dappnode"] },
