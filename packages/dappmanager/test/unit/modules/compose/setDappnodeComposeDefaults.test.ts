@@ -247,7 +247,7 @@ describe("setDappnodeComposeDefaults", () => {
           networks: {
             dncore_network: {
               ipv4_address: "172.33.1.7",
-              aliases: ["dappmanager.dappnode", "my.dappnode", "dappnode.local"]
+              aliases: ["dappmanager.dnp.dappnode.eth.dappmanager.dappnode", "dappmanager.dappnode", "my.dappnode", "dappnode.local"]
             }
           },
           volumes: [
