@@ -40,7 +40,7 @@ describe("modules > nsupdate", () => {
     for (const [name, domain] of Object.entries(cases)) {
       it(`Should get the domain of ${name}`, () => {
         expect(
-          getDotDappnodeDomain({ dnpName: name, serviceName: name })
+          getDotDappnodeDomain({ dnpName: name, serviceName: name }, true)
         ).to.equal(domain);
       });
     }

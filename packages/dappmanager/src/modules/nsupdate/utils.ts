@@ -2,7 +2,7 @@ import { isEmpty } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import {
-  getPrivateNetworkAlias,
+  determineNetworkAlias,
   stripCharacters,
   ContainerNames
 } from "../../domains.js";
@@ -96,8 +96,14 @@ export function getMyDotEthdomain(dnpName: string): string {
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin.dappnode"
  * - "other.public.dappnode.eth" > "other.public.dappnode"
  */
-export function getDotDappnodeDomain(container: ContainerNames): string {
-  return getPrivateNetworkAlias(container);
+export function getDotDappnodeDomain(container: ContainerNames, isMainOrMonoservice: boolean): string {
+  
+  const {dnpName,serviceName} = container;
+  return determineNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice
+  });
 }
 
 /**
@@ -144,10 +150,15 @@ export function getNsupdateTxts({
   for (const container of containersToUpdate) {
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
-    dappnode[getDotDappnodeDomain(container)] = container.ip;
+
+    const isMainOrMonoservice = container.isMain || false; //this is bad
+    
+    // it used to return sometimes the full alias and sometimes the short alias.
+    // we need to know if container is mono or multiservice, but "isMain" can be undefined
+    dappnode[getDotDappnodeDomain(container, isMainOrMonoservice)] = container.ip;
     // Add multilabel IPFS domains to the IPFS container IP
     if (container.dnpName === params.ipfsDnpName)
-      dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
+      dappnode[`*.${getDotDappnodeDomain(container, isMainOrMonoservice)}`] = container.ip;
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
@@ -156,7 +167,8 @@ export function getNsupdateTxts({
         serviceName: container.dnpName
       };
       eth[getMyDotEthdomain(getContainerDomain(rootNames))] = container.ip;
-      dappnode[getDotDappnodeDomain(rootNames)] = container.ip;
+      //this is okay, we always wanted to return the full alias here
+      dappnode[getDotDappnodeDomain(container, true)] = container.ip;
     }
   }
 

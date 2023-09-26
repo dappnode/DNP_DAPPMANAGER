@@ -1,4 +1,4 @@
-import { getPrivateNetworkAlias } from "../../domains.js";
+import { determineNetworkAlias } from "../../domains.js";
 import { getBeaconServiceName } from "../../modules/stakerConfig/utils.js";
 import { listPackageNoThrow } from "../docker/list/index.js";
 
@@ -14,12 +14,14 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
    * domain = "bitcoin.dappnode", "other.public.dappnode"
    * ```
    */
-  const domain = getPrivateNetworkAlias({
-    dnpName: dnpName,
-    serviceName: dnpName
+  
+  const containerDomain = determineNetworkAlias({
+    dnpName,
+    serviceName: "",
+    isMainOrMonoservice: true
   });
 
-  return `http://${domain}:${port}`;
+  return `http://${containerDomain}:${port}`;
 }
 
 /**
@@ -38,9 +40,10 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     dnp.chain.serviceName
   ) {
     port = dnp.chain.portNumber;
-    domain = getPrivateNetworkAlias({
+    domain = determineNetworkAlias({
       dnpName: dnpName,
-      serviceName: dnp.chain.serviceName
+      serviceName: dnp.chain.serviceName,
+      isMainOrMonoservice: false
     });
   } else {
     // Lighthouse, Teku and Prysm use 3500
@@ -48,9 +51,10 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     if (dnpName.includes("nimbus")) {
       port = 4500;
     }
-    domain = getPrivateNetworkAlias({
+    domain = determineNetworkAlias({
       dnpName: dnpName,
-      serviceName: getBeaconServiceName(dnpName)
+      serviceName: getBeaconServiceName(dnpName),
+      isMainOrMonoservice: false
     });
   }
   return `http://${domain}:${port}`;
