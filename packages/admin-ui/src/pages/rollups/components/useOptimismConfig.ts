@@ -21,7 +21,9 @@ export const useOptimismConfig = (
   const [newExecClient, setNewExecClient] = useState<
     OptimismItemOk<"execution">
   >();
-  const [customMainnetRpcUrl, setCustomMainnetRpcUrl] = useState<string | null>(null);
+  const [customMainnetRpcUrl, setCustomMainnetRpcUrl] = useState<string | null>(
+    null
+  );
   const [newRollup, setNewRollup] = useState<OptimismItemOk<"rollup">>();
   const [newArchive, setNewArchive] = useState<OptimismItemOk<"archive">>();
   const [currentOptimismConfig, setCurrentOptimismConfig] = useState<
@@ -75,7 +77,8 @@ export const useOptimismConfig = (
           newExecClient,
           newRollup,
           newArchive,
-          ethRpcUrlError
+          ethRpcUrlError,
+          customMainnetRpcUrl
         })
       );
   }, [
@@ -83,7 +86,8 @@ export const useOptimismConfig = (
     newExecClient,
     newRollup,
     newArchive,
-    ethRpcUrlError
+    ethRpcUrlError,
+    customMainnetRpcUrl
   ]);
 
   useEffect(() => {
@@ -91,7 +95,9 @@ export const useOptimismConfig = (
     if (customMainnetRpcUrl) {
       setEthRpcUrlError(validateUrl(customMainnetRpcUrl));
     } else {
-      setEthRpcUrlError("You need to set an Ethereum mainnet full node in the Stakers menu (execution + consensus clients) or set a custom RPC URL)");
+      setEthRpcUrlError(
+        "You need to set an Ethereum mainnet full node in the Stakers menu (execution + consensus clients) or set a custom RPC URL)"
+      );
     }
   }, [customMainnetRpcUrl]);
 
@@ -118,13 +124,15 @@ function getChanges({
   newExecClient,
   newRollup,
   newArchive,
-  ethRpcUrlError
+  ethRpcUrlError,
+  customMainnetRpcUrl
 }: {
   currentOptimismConfig: OptimismConfigSet;
   newExecClient?: OptimismItemOk<"execution">;
   newRollup?: OptimismItemOk<"rollup">;
   newArchive?: OptimismItemOk<"archive">;
   ethRpcUrlError?: string | null;
+  customMainnetRpcUrl?: string | null;
 }): {
   isAllowed: boolean;
   reason?: string;
@@ -144,7 +152,8 @@ function getChanges({
   if (
     executionClient?.dnpName === newExecClient?.dnpName &&
     Boolean(rollup) === Boolean(newRollup) &&
-    Boolean(archive) === Boolean(newArchive)
+    Boolean(archive) === Boolean(newArchive) &&
+    rollup?.mainnetRpcUrl === customMainnetRpcUrl
   )
     return {
       isAllowed: false,
