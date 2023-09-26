@@ -12,7 +12,7 @@ describe("domains", () => {
       {
         dnpName: "prysm.dnp.dappnode.eth",
         serviceName: "prysm.dnp.dappnode.eth",
-        domain: "prysm.dnp.dappnode.eth.prysm.dappnode"
+        domain: "prysm.dappnode"
       },
       {
         dnpName: "prysm.public.dappnode.eth",
