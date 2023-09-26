@@ -1344,11 +1344,6 @@
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.23.tgz#e349661f40402b31fa3cd8651f16aed0ca927a79"
   integrity sha512-24O6fVfKqQHuHOgaNHvA7sbEZzYjCWxyIpFXaxnJxl4da6NRAEd+wZgzNzRQsqC5lLIQkNEc4uS+V+utgSGJuw==
 
-"@dappnode/types@^0.1.27":
-  version "0.1.27"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.27.tgz#52e019687cf73a5673cc0c1a82be8a1b094878f0"
-  integrity sha512-WO2QFRUzb4LXHqxTFWOdO4XOAuqaBUDzTNyl6E4w6FXCunXaA+VU7tXE2JgLRZvkmQsO145lRujDFKeqAoJuKA==
-
 "@dappnode/types@^0.1.28":
   version "0.1.28"
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.28.tgz#46a2e1531789701b292e7deb1ae13b6c70e0f45b"
