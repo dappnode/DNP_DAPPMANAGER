@@ -28,6 +28,20 @@ export function shortUniqueDappnodeEns(dnpName: string): string {
 
 export type ContainerNames = { serviceName: string; dnpName: string };
 
+export function getContainerAlias(container: ContainerNames): string {
+  if (!container.serviceName || !container.dnpName) {
+    throw Error("serviceName and dnpName are required when setting alias")
+  }
+  else { 
+    const alias = `${container.serviceName}.${container.dnpName}`;
+    return `${shortUniqueDappnodeEns(alias)}.dappnode`;
+  }
+}
+
+export function getContainerRootAlias(dnpName: string): string {
+    return `${shortUniqueDappnodeEns(dnpName)}.dappnode`;
+  }
+
 /**
  * Returns base alias for a container of the dncore_network. 
  * - If the container is part of a multiservice package the alias will be "service1.example.dappnode"
@@ -44,15 +58,12 @@ export function getPrivateNetworkAlias(container: ContainerNames): string {
 export function getPrivateNetworkAliases(
   container: ContainerNames & { isMainOrMonoService: boolean }
 ): string[] {
-  const aliases: string[] = [getPrivateNetworkAlias(container)];
+  const aliases: string[] = [getContainerAlias(container)];
 
   // mono services will always be main.
   // If mono service or multiserviceMain, add the root alias (alias without service name)
   if (container.isMainOrMonoService) {
-    const rootAlias = getPrivateNetworkAlias({
-      dnpName: container.dnpName,
-      serviceName: ""
-    });
+    const rootAlias = getContainerRootAlias(container.dnpName);
     aliases.push(rootAlias);
   }
 
