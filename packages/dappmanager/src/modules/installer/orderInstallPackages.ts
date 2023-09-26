@@ -1,4 +1,4 @@
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { InstallPackageData } from "@dappnode/common";
 
 const dappmanager = params.dappmanagerDnpName;

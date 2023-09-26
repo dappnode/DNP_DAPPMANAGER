@@ -4,7 +4,7 @@ import shell from "../src/utils/shell.js";
 import { clearCacheDb, clearMainDb } from "../src/db/index.js";
 import { ManifestWithImage } from "../src/types.js";
 import { DockerApiSystemDfReturn } from "../src/modules/docker/api/index.js";
-import params from "../src/params.js";
+import { params } from "@dappnode/params";
 import { Compose, Manifest } from "@dappnode/types";
 import {
   PackageContainer,

@@ -1,6 +1,6 @@
 import async from "async";
 import memoize from "memoizee";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import _ from "lodash-es";
 
 /**

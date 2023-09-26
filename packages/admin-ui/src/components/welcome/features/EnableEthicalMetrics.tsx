@@ -3,6 +3,7 @@ import BottomButtons from "../BottomButtons";
 import SwitchBig from "components/SwitchBig";
 import { api } from "api";
 import Input from "components/Input";
+import { docsUrl } from "params";
 
 export default function EnableEthicalMetrics({
   onBack,
@@ -41,7 +42,8 @@ export default function EnableEthicalMetrics({
         <div className="title">Enable system notifications</div>
         <div className="description">
           Enable ethical metrics and receive alerts whenever your dappnode is
-          down without losing your privacy
+          down without losing your privacy.{" "}
+          <a href={docsUrl.ethicalMetricsOverview}>Learn more</a>
         </div>
       </div>
 

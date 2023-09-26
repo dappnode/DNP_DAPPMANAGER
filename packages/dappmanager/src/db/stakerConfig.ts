@@ -1,5 +1,4 @@
-import { StakerItemData } from "@dappnode/common";
-import { dbCache, dbMain } from "./dbFactory.js";
+import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
 import {
   ConsensusClientMainnet,
@@ -11,17 +10,6 @@ import {
   ConsensusClientLukso,
   ExecutionClientLukso
 } from "@dappnode/types";
-
-// Cache
-
-const STAKER_ITEM_METADATA = "staker-item-metadata";
-
-export const stakerItemMetadata = dbCache.indexedByKey<StakerItemData, string>({
-  rootKey: STAKER_ITEM_METADATA,
-  getKey: target => target,
-  validate: (id, metadata) =>
-    typeof id === "string" && typeof metadata === "object"
-});
 
 // Mainnet
 

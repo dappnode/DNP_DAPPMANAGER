@@ -1,4 +1,4 @@
-import { eventBus } from "../eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import { listPackage } from "../modules/docker/list/index.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import {

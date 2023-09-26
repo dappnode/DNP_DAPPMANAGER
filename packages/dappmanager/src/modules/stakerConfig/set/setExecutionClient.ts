@@ -4,7 +4,7 @@ import {
   InstalledPackageData
 } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
-import { logs } from "../../../logs.js";
+import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "../../docker/index.js";
 import { listPackageNoThrow } from "../../docker/list/index.js";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";

@@ -17,6 +17,7 @@ import {
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
+import { GiRolledCloth } from "react-icons/gi";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
 import { relativePath as devicesRelativePath } from "pages/vpn";
@@ -28,6 +29,7 @@ import { relativePath as supportRelativePath } from "pages/support";
 import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
+import { relativePath as rollupsRelativePath } from "pages/rollups";
 import { relativePath as repositoryRelativePath } from "pages/repository";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
@@ -54,71 +56,82 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
-export const advancedItems: {
+export const sidenavItems: {
   name: string;
   href: string;
   icon: (props: any) => JSX.Element;
-}[] = [
-  {
-    name: "Community",
-    href: communityRelativePath,
-    icon: MdPeople
-  },
-  {
-    name: "Sdk",
-    href: sdkRelativePath,
-    icon: MdBuild
-  },
-  {
-    name: "Support",
-    href: supportRelativePath,
-    icon: MdHelp
-  }
-];
-
-export const basicItems: {
-  name: string;
-  href: string;
-  icon: (props: any) => JSX.Element;
+  show: boolean;
 }[] = [
   {
     name: "Dashboard",
     href: dashboardRelativePath,
-    icon: MdDashboard
+    icon: MdDashboard,
+    show: true
   },
   {
     name: "Wi-Fi",
     href: wifiRelativePath,
-    icon: MdWifi
+    icon: MdWifi,
+    show: true
   },
   {
     name: "VPN",
     href: devicesRelativePath,
-    icon: MdDevices
+    icon: MdDevices,
+    show: true
   },
   {
     name: "DAppStore",
     href: installerRelativePath,
-    icon: MdCreateNewFolder
+    icon: MdCreateNewFolder,
+    show: true
   },
   {
     name: "Packages",
     href: packagesRelativePath,
-    icon: MdFolder
+    icon: MdFolder,
+    show: true
   },
   {
     name: "Stakers",
     href: stakersRelativePath,
-    icon: SiEthereum
+    icon: SiEthereum,
+    show: true
+  },
+  {
+    name: "Rollups",
+    href: rollupsRelativePath,
+    icon: GiRolledCloth,
+    show: true
   },
   {
     name: "Repository",
     href: repositoryRelativePath,
-    icon: BiGitRepoForked
+    icon: BiGitRepoForked,
+    show: true
   },
   {
     name: "System",
     href: systemRelativePath,
-    icon: MdSettings
+    icon: MdSettings,
+    show: true
+  },
+  {
+    name: "Community",
+    href: communityRelativePath,
+    icon: MdPeople,
+    show: true
+  },
+  {
+    name: "Sdk",
+    href: sdkRelativePath,
+    icon: MdBuild,
+    show: true
+  },
+  {
+    name: "Support",
+    href: supportRelativePath,
+    icon: MdHelp,
+    show: true
   }
 ];

@@ -1,4 +1,4 @@
-import { UpdateAvailable } from "@dappnode/common";
+import { PackageItemData, UpdateAvailable } from "@dappnode/common";
 import { dbCache } from "./dbFactory.js";
 import { stripDots } from "./dbUtils.js";
 
@@ -6,6 +6,14 @@ const PACKAGE_GETTING_STARTED_SHOW = "package-getting-started-show";
 const PACKAGE_INSTALL_TIME = "package-install-time";
 const PACKAGE_LATEST_KNOWN_VERSION = "package-latest-known-version";
 const PACKAGE_SENT_DATA = "package-sent-data";
+const PKG_ITEM_METADATA = "pkg-item-metadata";
+
+export const pkgItemMetadata = dbCache.indexedByKey<PackageItemData, string>({
+  rootKey: PKG_ITEM_METADATA,
+  getKey: target => target,
+  validate: (id, metadata) =>
+    typeof id === "string" && typeof metadata === "object"
+});
 
 export const packageGettingStartedShow = dbCache.indexedByKey<boolean, string>({
   rootKey: PACKAGE_GETTING_STARTED_SHOW,

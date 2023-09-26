@@ -1,6 +1,6 @@
 import { isEmpty } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import {
   getPrivateNetworkAlias,
   stripCharacters,

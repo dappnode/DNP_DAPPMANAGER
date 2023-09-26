@@ -56,9 +56,13 @@
         .text {
           flex: auto;
         }
-        .help {
-          font-size: 140%;
+        .title-actions {
           display: flex;
+          .help {
+            font-size: 140%;
+            display: flex;
+            margin-right: 10px;
+          }
         }
       }
     }
@@ -89,6 +93,9 @@
   }
   &.dappnodeidentity > .menu {
     right: -9.2rem;
+  }
+  &.modules > .menu {
+    right: -8rem;
   }
 
   // Regulate size of toggle icons

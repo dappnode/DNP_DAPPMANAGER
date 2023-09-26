@@ -5,9 +5,9 @@ import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
 import { parseEthersBlock, parseEthersSyncing } from "../../utils/ethers.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import fetch from "node-fetch";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,

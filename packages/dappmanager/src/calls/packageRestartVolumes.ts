@@ -1,8 +1,8 @@
 import fs from "fs";
 import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
-import { eventBus } from "../eventBus.js";
-import params from "../params.js";
-import { logs } from "../logs.js";
+import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import * as getPath from "../utils/getPath.js";
 import {
   dockerContainerRemove,
@@ -17,7 +17,10 @@ import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "../modules/compose/editor.js";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
 import { unregister } from "../modules/ethicalMetrics/unregister.js";
-import { ethicalMetricsDnpName, ethicalMetricsTorServiceVolume } from "../modules/ethicalMetrics/index.js";
+import {
+  ethicalMetricsDnpName,
+  ethicalMetricsTorServiceVolume
+} from "../modules/ethicalMetrics/index.js";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -58,7 +61,10 @@ export async function packageRestartVolumes({
   }
 
   // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
-  if ((dnp.dnpName === ethicalMetricsDnpName && !volumeName) || volumeName === ethicalMetricsTorServiceVolume) {
+  if (
+    (dnp.dnpName === ethicalMetricsDnpName && !volumeName) ||
+    volumeName === ethicalMetricsTorServiceVolume
+  ) {
     try {
       await unregister();
     } catch (e) {

@@ -7,7 +7,7 @@ import {
 import { pickBy, mapValues } from "lodash-es";
 import generateErrorMessage from "./generateErrorMessage.js";
 import { DappGetDnps, DappGetErrors } from "../types.js";
-import { logs } from "../../../logs.js";
+import { logs } from "@dappnode/logger";
 
 const timeoutMs = 10 * 1000; // ms
 

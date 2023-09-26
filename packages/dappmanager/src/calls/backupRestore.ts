@@ -1,8 +1,8 @@
 import path from "path";
 import fs from "fs";
 import * as db from "../db/index.js";
-import params from "../params.js";
-import { logs } from "../logs.js";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import { listPackage } from "../modules/docker/list/index.js";
 import { packageRestart } from "./packageRestart.js";
 import shell from "../utils/shell.js";

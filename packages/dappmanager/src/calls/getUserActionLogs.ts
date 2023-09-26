@@ -1,4 +1,4 @@
-import * as logUserAction from "../logUserAction.js";
+import { logUserAction } from "@dappnode/logger";
 import { UserActionLog } from "@dappnode/common";
 
 /**

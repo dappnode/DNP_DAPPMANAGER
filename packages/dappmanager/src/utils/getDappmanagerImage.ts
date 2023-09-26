@@ -1,5 +1,5 @@
 import { listContainers } from "../modules/docker/api/index.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 import memoize from "memoizee";
 
 const dmName = params.dappmanagerDnpName;

@@ -5,7 +5,7 @@ import {
   dockerNetworkDisconnect
 } from "../docker/index.js";
 import { listContainers } from "../docker/list/index.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 import { getExternalNetworkAlias } from "../../domains.js";
 import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
 import { HttpsPortalApiClient } from "./apiClient.js";

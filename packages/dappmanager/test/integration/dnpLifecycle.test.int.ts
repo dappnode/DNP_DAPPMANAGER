@@ -4,8 +4,8 @@ import path from "path";
 import { Compose, Manifest, PackageEnvs } from "@dappnode/types";
 import { mapValues, pick } from "lodash-es";
 import * as calls from "../../src/calls/index.js";
-import params from "../../src/params.js";
-import { logs } from "../../src/logs.js";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import { getDnpFromListPackages, getDnpState } from "./testPackageUtils.js";
 import {
   PortMapping,

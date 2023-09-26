@@ -12,7 +12,7 @@ import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "../../utils/timeout.js";
 import { ReleaseDownloadedContents } from "./types.js";
 import { getReleaseSignatureStatus } from "./releaseSignature.js";
-import params from "../../params.js";
+import { params } from "@dappnode/params";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

@@ -18,7 +18,7 @@ import Loading from "components/Loading";
 import { responseInterface } from "swr";
 import { Alert, Form } from "react-bootstrap";
 import "./columns.scss";
-import { ThemeContext } from "App";
+import { AppContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
 import Input from "components/Input";
@@ -33,7 +33,7 @@ export default function StakerNetwork<T extends Network>({
   description: string;
 }) {
   // Context
-  const { theme } = React.useContext(ThemeContext);
+  const { theme } = React.useContext(AppContext);
 
   const currentStakerConfigReq = useApi.stakerConfigGet(
     network
@@ -204,7 +204,10 @@ export default function StakerNetwork<T extends Network>({
                 (consensusClient, i) => (
                   <ConsensusClient<T>
                     key={i}
-                    consensusClient={{...consensusClient, useCheckpointSync: true}}
+                    consensusClient={{
+                      ...consensusClient,
+                      useCheckpointSync: true
+                    }}
                     setNewConsClient={setNewConsClient}
                     isSelected={
                       consensusClient.dnpName === newConsClient?.dnpName

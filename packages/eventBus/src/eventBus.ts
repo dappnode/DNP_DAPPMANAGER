@@ -1,5 +1,4 @@
 import { EventEmitter } from "events";
-import { logs } from "./logs.js";
 import { mapValues } from "lodash-es";
 import {
   ChainData,
@@ -7,7 +6,7 @@ import {
   ProgressLog,
   UserActionLog,
   PackageNotification,
-  DirectoryItem
+  DirectoryItem,
 } from "@dappnode/common";
 
 interface EventTypes {
@@ -53,7 +52,7 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   runEthClientInstaller: {},
   runEthicalMetricsInstaller: {},
   runNatRenewal: {},
-  runStakerCacheUpdate: {}
+  runStakerCacheUpdate: {},
 };
 
 const eventEmitter = new EventEmitter();
@@ -87,14 +86,16 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
       try {
         await listener(...args);
       } catch (e) {
-        logs.error(
+        // Do not use logger module to avoud cirucular dependencies
+        /**  logs.error(
           `Error on event '${eventName}': ${e.stack || e.message || e}`
         );
+        */
       }
     });
   },
 
   emit: (...args: EventArg[]): void => {
     eventEmitter.emit(eventName, ...args);
-  }
+  },
 }));

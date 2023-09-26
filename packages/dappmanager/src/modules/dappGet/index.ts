@@ -4,10 +4,9 @@ import { PackageRequest } from "../../types.js";
 import dappGetBasic from "./basic.js";
 import aggregate from "./aggregate/index.js";
 import { DappGetFetcher } from "./fetch/index.js";
-
 import resolve from "./resolve/index.js";
 import shouldUpdate from "./utils/shouldUpdate.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types.js";
 
 export interface DappgetOptions {

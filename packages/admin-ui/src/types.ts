@@ -46,4 +46,21 @@ export interface DappnodeParams {
 
 export type Theme = "light" | "dark";
 
-export type UsageMode = "basic" | "advanced";
+export type UiModuleStatus = "enabled" | "disabled";
+
+export interface AppContextIface {
+  theme: Theme;
+  stakersModuleStatus: UiModuleStatus;
+  rollupsModuleStatus: UiModuleStatus;
+  toggleTheme: () => void;
+  toggleStakersModuleStatus: () => void;
+  toggleRollupsModuleStatus: () => void;
+}
+
+export type ModulesContext = Pick<
+  AppContextIface,
+  | "stakersModuleStatus"
+  | "rollupsModuleStatus"
+  | "toggleStakersModuleStatus"
+  | "toggleRollupsModuleStatus"
+>;

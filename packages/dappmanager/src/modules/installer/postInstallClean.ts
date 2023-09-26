@@ -3,7 +3,7 @@ import path from "path";
 import * as db from "../../db/index.js";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { Log } from "../../utils/logUi.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { isNotFoundError } from "../../utils/node.js";
 import { dockerCleanOldImages } from "../docker/cleanOldImages.js";
 

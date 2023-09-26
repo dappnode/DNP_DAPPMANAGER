@@ -19,7 +19,7 @@ import {
   postInstallClean,
   afterInstall
 } from "../modules/installer/index.js";
-import { logs } from "../logs.js";
+import { logs } from "@dappnode/logger";
 import {
   ensureEth2MigrationRequirements,
   isPrysmLegacy

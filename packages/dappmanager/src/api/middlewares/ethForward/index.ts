@@ -1,5 +1,5 @@
 import express from "express";
-import params from "../../../params.js";
+import { params } from "@dappnode/params";
 import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
 import { ResolveDomainWithCache } from "./resolveDomain.js";
 

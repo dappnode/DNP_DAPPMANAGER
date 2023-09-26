@@ -1,5 +1,5 @@
 import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/common";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "../../modules/compose/editor.js";
 
 export default function getPortsToOpen(

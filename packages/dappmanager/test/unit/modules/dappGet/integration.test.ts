@@ -7,7 +7,7 @@ import { mockDnp } from "../../../testUtils.js";
 import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";
 import { mapValues, isEmpty } from "lodash-es";
-import { logs } from "../../../../src/logs.js";
+import { logs } from "@dappnode/logger";
 import { fileURLToPath } from "url";
 // Imports for types
 import dappGetType from "../../../../src/modules/dappGet/index.js";

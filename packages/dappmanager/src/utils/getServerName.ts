@@ -1,6 +1,6 @@
 import fs from "fs";
-import params from "../params.js";
-import { logs } from "../logs.js";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import { isNotFoundError } from "./node.js";
 
 const hostnamePath = params.HOSTNAME_PATH;

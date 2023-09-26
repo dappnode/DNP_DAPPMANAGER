@@ -7,7 +7,6 @@ import { PackageUpdates } from "./PackageUpdates";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
-
 import "./dashboard.scss";
 
 export default function Dashboard() {

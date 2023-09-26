@@ -2,7 +2,7 @@ import {
   InstalledPackageDataApiReturn,
   InstalledPackageData
 } from "@dappnode/common";
-import { logs } from "../../../logs.js";
+import { logs } from "@dappnode/logger";
 import { dockerContainerStop } from "../../docker/index.js";
 
 /**

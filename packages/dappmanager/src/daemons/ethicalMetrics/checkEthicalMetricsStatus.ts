@@ -1,11 +1,11 @@
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/listPackages.js";
 import { dockerContainerStart } from "../../modules/docker/index.js";
 import * as db from "../../db/index.js";
 import {
-    ethicalMetricsDnpName,
-    register
+  ethicalMetricsDnpName,
+  register
 } from "../../modules/ethicalMetrics/index.js";
 import { InstalledPackageData } from "@dappnode/common";
 
@@ -14,61 +14,63 @@ import { InstalledPackageData } from "@dappnode/common";
  * the packages exporter, DMS and Ethical metrics are installed and running
  */
 export async function checkEthicalMetricsStatus(): Promise<void> {
-    const exporterDnpName = "dappnode-exporter.dnp.dappnode.eth";
-    const dmsDnpName = "dms.dnp.dappnode.eth";
+  const exporterDnpName = "dappnode-exporter.dnp.dappnode.eth";
+  const dmsDnpName = "dms.dnp.dappnode.eth";
 
-    try {
-        const isEnabled = db.ethicalMetricsStatus.get();
-        if (isEnabled) {
-            const mail = db.ethicalMetricsMail.get();
-            if (!mail) throw Error("Email must exist for ethical metrics");
+  try {
+    const isEnabled = db.ethicalMetricsStatus.get();
+    if (isEnabled) {
+      const mail = db.ethicalMetricsMail.get();
+      if (!mail) throw Error("Email must exist for ethical metrics");
 
-            // First check for Ethical metrics, then for DMS and last for Exporter
-            // Ethical Metrics package has DMS as dependency, so it will be installed automatically
-            // DMS package has Exporter as dependency, so it will be installed automatically
+      // First check for Ethical metrics, then for DMS and last for Exporter
+      // Ethical Metrics package has DMS as dependency, so it will be installed automatically
+      // DMS package has Exporter as dependency, so it will be installed automatically
 
-            // Check ethical metrics pkg
-            const ethicalMetricsPkg = await listPackageNoThrow({
-                dnpName: ethicalMetricsDnpName
-            });
-            if (!ethicalMetricsPkg) {
-                await packageInstall({
-                    name: ethicalMetricsDnpName
-                });
-            } else {
-                ensureAllContainersRunning(ethicalMetricsPkg);
-            }
+      // Check ethical metrics pkg
+      const ethicalMetricsPkg = await listPackageNoThrow({
+        dnpName: ethicalMetricsDnpName
+      });
+      if (!ethicalMetricsPkg) {
+        await packageInstall({
+          name: ethicalMetricsDnpName
+        });
+      } else {
+        ensureAllContainersRunning(ethicalMetricsPkg);
+      }
 
-            // check dms package
-            const dmsPkg = await listPackageNoThrow({ dnpName: dmsDnpName });
-            if (!dmsPkg) {
-                await packageInstall({ name: dmsDnpName });
-            } else {
-                ensureAllContainersRunning(dmsPkg);
-            }
+      // check dms package
+      const dmsPkg = await listPackageNoThrow({ dnpName: dmsDnpName });
+      if (!dmsPkg) {
+        await packageInstall({ name: dmsDnpName });
+      } else {
+        ensureAllContainersRunning(dmsPkg);
+      }
 
-            // check exporter pkg
-            const exporterPkg = await listPackageNoThrow({
-                dnpName: exporterDnpName
-            });
-            if (!exporterPkg) {
-                await packageInstall({ name: exporterDnpName });
-            } else {
-                ensureAllContainersRunning(exporterPkg);
-            }
+      // check exporter pkg
+      const exporterPkg = await listPackageNoThrow({
+        dnpName: exporterDnpName
+      });
+      if (!exporterPkg) {
+        await packageInstall({ name: exporterDnpName });
+      } else {
+        ensureAllContainersRunning(exporterPkg);
+      }
 
-            // Register instance
-            await register({ mail });
-        }
-    } catch (e) {
-        logs.error("Error on ethical metrics check", e);
+      // Register instance
+      await register({ mail });
     }
+  } catch (e) {
+    logs.error("Error on ethical metrics check", e);
+  }
 }
 
-async function ensureAllContainersRunning(pkg: InstalledPackageData): Promise<void> {
-    for (const container of pkg.containers) {
-        if (!container.running) {
-            await dockerContainerStart(container.containerName);
-        }
+async function ensureAllContainersRunning(
+  pkg: InstalledPackageData
+): Promise<void> {
+  for (const container of pkg.containers) {
+    if (!container.running) {
+      await dockerContainerStart(container.containerName);
     }
+  }
 }

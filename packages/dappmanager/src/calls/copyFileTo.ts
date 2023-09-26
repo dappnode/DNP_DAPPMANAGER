@@ -7,7 +7,7 @@ import {
 // Utils
 import shell from "../utils/shell.js";
 import dataUriToFile from "../utils/dataUriToFile.js";
-import params from "../params.js";
+import { params } from "@dappnode/params";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 

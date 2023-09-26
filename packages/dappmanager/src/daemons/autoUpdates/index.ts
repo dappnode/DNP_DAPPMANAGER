@@ -1,7 +1,6 @@
-import params from "../../params.js";
-import { eventBus } from "../../eventBus.js";
+import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
 import { ReleaseFetcher } from "../../modules/release/index.js";
-import { EthProviderError } from "../../modules/ethClient/index.js";
 import { listPackages } from "../../modules/docker/list/index.js";
 import {
   clearPendingUpdates,
@@ -9,9 +8,10 @@ import {
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import { logs } from "../../logs.js";
+import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";
+import { EthProviderError } from "@dappnode/common";
 
 /**
  * Auto-update:

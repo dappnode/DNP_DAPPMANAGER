@@ -1,6 +1,6 @@
 import fs from "fs";
-import params from "../params.js";
-import { eventBus } from "../eventBus.js";
+import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
 import * as getPath from "../utils/getPath.js";
 import { dockerContainerRestart } from "../modules/docker/index.js";
 import { listPackage } from "../modules/docker/list/index.js";

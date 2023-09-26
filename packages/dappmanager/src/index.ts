@@ -1,5 +1,5 @@
 import * as db from "./db/index.js";
-import { eventBus } from "./eventBus.js";
+import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
 import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
 import { generateKeyPair } from "./utils/publickeyEncryption.js";
@@ -8,10 +8,10 @@ import { postRestartPatch } from "./modules/installer/restartPatch.js";
 import { startDaemons } from "./daemons/index.js";
 import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
-import { routesLogger, subscriptionsLogger } from "./api/logger.js";
+import { routesLogger, subscriptionsLogger } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
-import { logs } from "./logs.js";
-import params from "./params.js";
+import { logs } from "@dappnode/logger";
+import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {
   getVersionData,

@@ -1,18 +1,18 @@
 import "mocha";
 import { expect } from "chai";
-
-import { logSafeObjects, maxLength } from "../../../src/utils/logs.js";
+import { maxLength } from "../../src/params.js";
+import { logSafeObjects } from "../../src/logSafeObjects.js";
 
 describe("Util: logs", () => {
   it("Should trim a first level base64 string", () => {
     expect(
       logSafeObjects({
         normal: "normal",
-        dataurl: "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+        dataurl: "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D",
       })
     ).to.deep.equal({
       normal: "normal",
-      dataurl: "data:text/plain"
+      dataurl: "data:text/plain",
     });
   });
 
@@ -23,18 +23,18 @@ describe("Util: logs", () => {
         person: {
           name: "Mike",
           relative: {
-            avatar: "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
-          }
-        }
+            avatar: "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D",
+          },
+        },
       })
     ).to.deep.equal({
       normal: "normal",
       person: {
         name: "Mike",
         relative: {
-          avatar: "data:text/plain"
-        }
-      }
+          avatar: "data:text/plain",
+        },
+      },
     });
   });
 
@@ -44,13 +44,13 @@ describe("Util: logs", () => {
         RTL_PASSWORD: "super-password",
         SECRET_PHRASE: "black cheese robin door",
         PRIVATE_KEY: "8986182398162471627461892763891726398124123123213",
-        NORMAL: "value"
+        NORMAL: "value",
       })
     ).to.deep.equal({
       RTL_PASSWORD: "**********",
       SECRET_PHRASE: "**********",
       PRIVATE_KEY: "**********",
-      NORMAL: "value"
+      NORMAL: "value",
     });
   });
 
@@ -65,10 +65,10 @@ describe("Util: logs", () => {
             color: "blue",
             passwords: {
               FIRST_PASSWORD: "first",
-              SECOND_PASSWORD: "second"
-            }
-          }
-        }
+              SECOND_PASSWORD: "second",
+            },
+          },
+        },
       })
     ).to.deep.equal({
       PRIVATE_WORD: "**********",
@@ -79,34 +79,34 @@ describe("Util: logs", () => {
           color: "blue",
           passwords: {
             FIRST_PASSWORD: "**********",
-            SECOND_PASSWORD: "**********"
-          }
-        }
-      }
+            SECOND_PASSWORD: "**********",
+          },
+        },
+      },
     });
   });
 
   it("should should limit the size of the string object properties", () => {
     const obj = {
       longProp: "1".repeat(2 * maxLength),
-      shortProp: "1"
+      shortProp: "1",
     };
     expect(logSafeObjects(obj)).to.deep.equal({
       longProp: "1".repeat(maxLength),
-      shortProp: "1"
+      shortProp: "1",
     });
   });
 
   it("should keep an array of objects as an array", () => {
     const obj = {
       a: 1,
-      PRIVATE_WORD: "normal"
+      PRIVATE_WORD: "normal",
     };
     expect(logSafeObjects([obj])).to.deep.equal([
       {
         a: 1,
-        PRIVATE_WORD: "**********"
-      }
+        PRIVATE_WORD: "**********",
+      },
     ]);
   });
 });

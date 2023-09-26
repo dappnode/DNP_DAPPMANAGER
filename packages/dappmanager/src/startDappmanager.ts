@@ -4,8 +4,8 @@ import {
   AdminPasswordDb,
   AdminPasswordDbParams
 } from "./api/auth/adminPasswordDb.js";
-import { Logs } from "./logs.js";
-import { EventBus } from "./eventBus.js";
+import { Logs } from "@dappnode/logger";
+import { EventBus } from "@dappnode/eventbus";
 import { LoggerMiddleware, Routes } from "@dappnode/common";
 import { DeviceCalls } from "./calls/device/index.js";
 import { SshCalls } from "./calls/ssh/index.js";
