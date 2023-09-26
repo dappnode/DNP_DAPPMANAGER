@@ -29,30 +29,18 @@ export function determineNetworkAlias({
   dnpName,
   serviceName,
   isMainOrMonoservice,
-  isExternal
+  isExternal = false
 }: {
   dnpName: string;
   serviceName: string;
   isMainOrMonoservice: boolean;
-  isExternal: boolean;
+  isExternal?: boolean;
 }): string {
   const endDomain = isExternal ? "dappnode.external" : "dappnode";
 
   return isMainOrMonoservice
     ? `${getShortDnpName(dnpName)}.${endDomain}`
     : `${serviceName}.${getShortDnpName(dnpName)}.${endDomain}`;
-}
-
-/**
- * Get the private network alias.
- * if dnpName === serviceName || !serviceName => dnpName.split(".")[0].dappnode
- * else serviceName.dnpName.split(".").dappnode
- * @param container
- * @returns
- */
-export function getPrivateNetworkAlias(container: ContainerNames): string {
-  const fullEns = getContainerDomain(container);
-  return `${getShortDnpName(fullEns)}.dappnode`;
 }
 
 /**
@@ -63,18 +51,25 @@ export function getPrivateNetworkAlias(container: ContainerNames): string {
 export function getPrivateNetworkAliases(
   container: ContainerNames & { isMain: boolean }
 ): string[] {
-  const aliases: string[] = [getPrivateNetworkAlias(container)];
 
-  if (container.isMain) {
-    const rootAlias = getPrivateNetworkAlias({
-      dnpName: container.dnpName,
-      serviceName: container.dnpName
-    });
-    aliases.push(rootAlias);
-  }
+  const {
+    isMain,
+    dnpName,
+    serviceName
+  } = container;
+  
+  const aliases: string[] = [];
 
+  // push full alias
+  // The "isMainOrMonoservice" is false because we always want a full alias for each service (container)
+  aliases.push(determineNetworkAlias({dnpName, serviceName, isMainOrMonoservice: false}));
+
+  // push short alias
+  // if service is "isMain", we also want to add the short alias for it
+  if (isMain) aliases.push(determineNetworkAlias({dnpName, serviceName, isMainOrMonoservice: true}));
+  
   // Special unique alias for the Admin UI
-  if (container.dnpName === params.dappmanagerDnpName)
+  if (dnpName === params.dappmanagerDnpName)
     aliases.push(...params.DAPPMANAGER_ALIASES);
 
   // Ensure uniqueness
