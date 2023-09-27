@@ -88,9 +88,16 @@ services:
   notmainService:
     image: "chentex/random-logger"
     container_name: ${containerNotMain.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
   mainService:
     image: "chentex/random-logger"
     container_name: ${containerMain.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
+networks:
+  ${DNCORE_NETWORK}:
+    external: true
 `;
 
 const CONTAINER_COMPOSE_PUBLIC = `
@@ -99,9 +106,16 @@ services:
   notmainService:
     image: "chentex/random-logger"
     container_name: ${containerNotMainPublic.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
   mainService:
     image: "chentex/random-logger"
     container_name: ${containerMainPublic.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
+networks:
+  ${DNCORE_NETWORK}:
+    external: true
 `;
 
 const MONO_COMPOSE = `
@@ -110,6 +124,11 @@ services:
   ${DNP_NAME_MONO}:
     image: "chentex/random-logger"
     container_name: ${monoContainer.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
+networks:
+  ${DNCORE_NETWORK}:
+    external: true
 `;
 
 const MONO_COMPOSE_PUBLIC = `
@@ -118,13 +137,15 @@ services:
   service:
     image: "chentex/random-logger"
     container_name: ${monoContainerPublic.containerName}
+    networks:
+      - ${DNCORE_NETWORK}
+networks:
+  ${DNCORE_NETWORK}:
+    external: true
 `;
 
 async function ensureNetworkExists(networkName: string) {
-    const networks = await shellSafe(`docker network ls --filter name=${networkName} --format "{{.Name}}"`);
-    if (networks && !networks.includes(networkName)) {
-        await shellSafe(`docker network create ${networkName}`);
-    }
+        await shellSafe(`docker network create ${networkName}`);  
 }
 
 
@@ -198,22 +219,6 @@ describe("Add alias to running containers", function () {
         if (containerExistResults.some((result) => !result)) {
             throw new Error("Error creating containers");
         }
-
-        // Connect containers to the network
-        const connectToNetworkPromises = containerNamesToCheck.map(async (containerName) => {
-            await shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerName}`);
-            // Verification
-            const inspectData = await shellSafe(`docker container inspect ${containerName}`);
-            if (!inspectData) {
-                throw new Error(`Failed to get inspect data for container ${containerName}`);
-            }
-            const parsedData = JSON.parse(inspectData);
-            const networkData = parsedData[0]?.NetworkSettings?.Networks || {};
-            if (!networkData[DNCORE_NETWORK]) {
-                throw new Error(`Container ${containerName} is not connected to the network ${DNCORE_NETWORK}`);
-            }
-        });
-        await Promise.all(connectToNetworkPromises);
     });
 
     it("check that all containers have expected aliases", async () => {
