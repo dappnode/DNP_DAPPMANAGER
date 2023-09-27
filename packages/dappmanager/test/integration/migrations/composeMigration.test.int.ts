@@ -55,7 +55,7 @@ services:
   const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   const randomImage = "chentex/random-logger";
   const testMigrationPath =
-    process.cwd() + "/test/integration/migrationCompose";
+    process.cwd() + "/test/integration/migrations";
 
   before("Run random container", async () => {
     // Create compose

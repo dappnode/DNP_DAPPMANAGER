@@ -199,12 +199,20 @@ describe("Add alias to running containers", function () {
             throw new Error("Error creating containers");
         }
 
-
         // Connect containers to the network
-        const connectToNetworkPromises = containerNamesToCheck.map((containerName) =>
-            shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerName}`)
-        );
-
+        const connectToNetworkPromises = containerNamesToCheck.map(async (containerName) => {
+            await shellSafe(`docker network connect ${DNCORE_NETWORK} ${containerName}`);
+            // Verification
+            const inspectData = await shellSafe(`docker container inspect ${containerName}`);
+            if (!inspectData) {
+                throw new Error(`Failed to get inspect data for container ${containerName}`);
+            }
+            const parsedData = JSON.parse(inspectData);
+            const networkData = parsedData[0]?.NetworkSettings?.Networks || {};
+            if (!networkData[DNCORE_NETWORK]) {
+                throw new Error(`Container ${containerName} is not connected to the network ${DNCORE_NETWORK}`);
+            }
+        });
         await Promise.all(connectToNetworkPromises);
     });
 
