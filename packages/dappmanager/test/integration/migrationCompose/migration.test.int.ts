@@ -110,7 +110,7 @@ services:
 
     migrateCoreNetworkAndAliasInCompose(
       container,
-      "dappmanager.dnp.dappnode.eth.test-migration.dappnode"
+      ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"]
     );
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose.yml`,
@@ -122,7 +122,7 @@ services:
   it("Should do not do migration", async () => {
     migrateCoreNetworkAndAliasInCompose(
       container,
-      "dappmanager.dnp.dappnode.eth.test-migration.dappnode"
+      ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"]
     );
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose-migrated.yml`,
