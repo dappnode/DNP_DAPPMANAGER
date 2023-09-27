@@ -4,7 +4,7 @@ import { ManifestWithImage } from "../../../../src/types.js";
 import { Compose } from "@dappnode/types";
 import { mockManifestWithImage, mockCompose } from "../../../testUtils.js";
 import { manifestToCompose } from "../../../../src/modules/manifest/index.js";
-import { ComposeEditor } from "../../../../src/modules/compose/editor.js";
+import { ComposeEditor } from "@dappnode/dockercompose";
 
 describe("manifestToCompose", () => {
   const dnpName = "mock-dnp.dappnode.eth";

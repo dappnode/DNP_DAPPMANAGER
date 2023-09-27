@@ -1,4 +1,4 @@
-import { RegistryNewRepoEvent } from "../../types.js";
+import { RegistryNewRepoEvent } from "@dappnode/common";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry.js";
 import * as db from "../../db/index.js";

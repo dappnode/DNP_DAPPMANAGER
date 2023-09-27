@@ -2,8 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
-import * as getPath from "../../../src/utils/getPath.js";
-import * as validate from "../../../src/utils/validate.js";
+import { getDockerComposePath, validatePath } from "@dappnode/utils";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove.js";
@@ -13,7 +12,7 @@ import { getMockEventBus } from "./eventBus.js";
 
 describe.skip("Call function: packageRemove", function () {
   const dnpName = "test.dnp.dappnode.eth";
-  const dockerComposePath = getPath.dockerCompose(dnpName, false);
+  const dockerComposePath = getDockerComposePath(dnpName, false);
   const dockerComposeTemplate = `
   version: '3.5'
       services:
@@ -64,7 +63,7 @@ describe.skip("Call function: packageRemove", function () {
   });
 
   before(async () => {
-    validate.path(dockerComposePath);
+    validatePath(dockerComposePath);
     fs.writeFileSync(dockerComposePath, dockerComposeTemplate);
   });
 

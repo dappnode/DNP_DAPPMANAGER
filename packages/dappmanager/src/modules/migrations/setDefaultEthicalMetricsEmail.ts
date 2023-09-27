@@ -2,7 +2,7 @@ import { logs } from "@dappnode/logger";
 import { listPackageNoThrow } from "../docker/list/index.js";
 import { ethicalMetricsDnpName } from "../ethicalMetrics/index.js";
 import * as db from "../../db/index.js";
-import { ComposeFileEditor } from "../compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { eventBus } from "@dappnode/eventbus";
 
 /**

@@ -1,7 +1,5 @@
-import {
-  GlobalEnvs,
-  computeGlobalEnvsFromDb
-} from "../../modules/globalEnvs.js";
+import { GlobalEnvs } from "@dappnode/common";
+import { computeGlobalEnvsFromDb } from "../../modules/globalEnvs.js";
 import { wrapHandler } from "../utils.js";
 
 interface Params {

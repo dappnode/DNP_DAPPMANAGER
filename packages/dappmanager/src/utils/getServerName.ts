@@ -1,7 +1,7 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { isNotFoundError } from "./node.js";
+import { isNotFoundError } from "@dappnode/utils";
 
 const hostnamePath = params.HOSTNAME_PATH;
 const defaultName = "DAppNode_server";

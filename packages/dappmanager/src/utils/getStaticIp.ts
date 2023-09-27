@@ -3,7 +3,7 @@ import * as db from "../db/index.js";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import isIp from "is-ip";
-import { isNotFoundError } from "./node.js";
+import { isNotFoundError } from "@dappnode/utils";
 
 const staticIpPath = params.STATIC_IP_PATH;
 

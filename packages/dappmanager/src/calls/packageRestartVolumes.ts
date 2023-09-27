@@ -14,13 +14,14 @@ import {
 } from "../modules/docker/index.js";
 import { listPackage } from "../modules/docker/list/index.js";
 import { packageInstalledHasPid } from "../utils/pid.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
 import { unregister } from "../modules/ethicalMetrics/unregister.js";
 import {
   ethicalMetricsDnpName,
   ethicalMetricsTorServiceVolume
 } from "../modules/ethicalMetrics/index.js";
+import { getDockerComposePath } from "@dappnode/utils";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -47,7 +48,7 @@ export async function packageRestartVolumes({
   const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
   // Make sure the compose exists before deleting it's containers
-  const composePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
+  const composePath = getDockerComposePath(dnp.dnpName, dnp.isCore);
   if (!fs.existsSync(composePath))
     throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
 

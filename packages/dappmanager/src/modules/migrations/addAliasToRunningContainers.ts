@@ -2,22 +2,24 @@ import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import { getPrivateNetworkAlias } from "../../domains.js";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
 import shell from "../../utils/shell.js";
-import { ComposeFileEditor } from "../compose/editor.js";
-import { parseServiceNetworks } from "../compose/networks.js";
+import {
+  ComposeFileEditor,
+  parseServiceNetworks
+} from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
   dockerNetworkDisconnect,
   dockerNetworkConnect
 } from "../docker/index.js";
 import { listContainers } from "../docker/list/index.js";
-import * as getPath from "../../utils/getPath.js";
 import { gte } from "semver";
 import { getDnCoreNetworkContainerConfig } from "../docker/api/network.js";
+import { getDockerComposePath } from "@dappnode/utils";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -54,7 +56,7 @@ export async function addAliasToRunningContainers(): Promise<void> {
       ) {
         await shell(`docker rm ${containerName} --force`);
         await dockerComposeUp(
-          getPath.dockerCompose(container.dnpName, container.isCore)
+          getDockerComposePath(container.dnpName, container.isCore)
         );
       } else {
         await dockerNetworkDisconnect(dncoreNetworkName, containerName);

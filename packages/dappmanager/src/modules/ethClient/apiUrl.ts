@@ -1,4 +1,4 @@
-import { getPrivateNetworkAlias } from "../../domains.js";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { getBeaconServiceName } from "../../modules/stakerConfig/utils.js";
 import { listPackageNoThrow } from "../docker/list/index.js";
 

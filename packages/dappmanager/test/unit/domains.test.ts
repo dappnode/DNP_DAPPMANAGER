@@ -1,5 +1,6 @@
+import { ContainerNames } from "@dappnode/common";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { expect } from "chai";
-import { getPrivateNetworkAlias, ContainerNames } from "../../src/domains.js";
 
 describe("domains", () => {
   describe("getPrivateNetworkAlias", () => {

@@ -9,7 +9,7 @@ import { params } from "@dappnode/params";
 import { getExternalNetworkAlias } from "../../domains.js";
 import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
 import { HttpsPortalApiClient } from "./apiClient.js";
-import { ComposeEditor } from "../compose/editor.js";
+import { ComposeEditor } from "@dappnode/dockercompose";
 import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose.js";
 import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose.js";
 export { HttpsPortalApiClient };

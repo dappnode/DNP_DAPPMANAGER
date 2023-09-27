@@ -2,8 +2,8 @@
 import Client from "bitcoin-core";
 import { InstalledPackageData } from "@dappnode/common";
 import { dockerContainerInspect } from "../../docker/index.js";
-import { parseEnvironment } from "../../compose/index.js";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { parseEnvironment } from "@dappnode/dockercompose";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
 
 function getMinBlockDiffSync(dnpName: string): number {

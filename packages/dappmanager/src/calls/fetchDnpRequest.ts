@@ -8,8 +8,11 @@ import deepmerge from "deepmerge";
 import { fileToGatewayUrl } from "../utils/distributedFile.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { dockerInfoArchive } from "../modules/docker/api/index.js";
-import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor.js";
-import { parseSpecialPermissions } from "../modules/compose/specialPermissions.js";
+import {
+  ComposeEditor,
+  ComposeFileEditor,
+  parseSpecialPermissions
+} from "@dappnode/dockercompose";
 import {
   RequestedDnp,
   UserSettingsAllDnps,

@@ -7,8 +7,10 @@ import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
-import { ComposeFileEditor } from "../compose/editor.js";
-import { parseServiceNetworks } from "../compose/networks.js";
+import {
+  ComposeFileEditor,
+  parseServiceNetworks
+} from "@dappnode/dockercompose";
 import { params } from "@dappnode/params";
 import {
   dockerComposeUpPackage,

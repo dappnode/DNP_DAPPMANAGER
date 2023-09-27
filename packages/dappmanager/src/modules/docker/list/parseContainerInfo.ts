@@ -10,7 +10,7 @@ import {
   parsePortMappings,
   parseVolumeMappings,
   readContainerLabels
-} from "../../compose/index.js";
+} from "@dappnode/dockercompose";
 import { multiaddressToIpfsGatewayUrl } from "../../../utils/distributedFile.js";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus.js";
 import { ensureUniquePortsFromDockerApi } from "../utils.js";

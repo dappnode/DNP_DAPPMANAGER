@@ -1,11 +1,11 @@
 import fs from "fs";
 import { Log } from "../../utils/logUi.js";
-import * as validate from "../../utils/validate.js";
+import { validatePath } from "@dappnode/utils";
 import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "../docker/compose/index.js";
-import { ComposeEditor } from "../compose/editor.js";
+import { ComposeEditor } from "@dappnode/dockercompose";
 import { writeManifest } from "../manifest/manifestFile.js";
-import { isNotFoundError } from "../../utils/node.js";
+import { isNotFoundError } from "@dappnode/utils";
 
 /**
  * Write the new compose and test it with config
@@ -30,7 +30,7 @@ export async function writeAndValidateFiles(
     log(dnpName, "Writing files...");
 
     // Create the repoDir if necessary
-    validate.path(composePath);
+    validatePath(composePath);
 
     // Backup compose to be able to do a rollback. Only if compose exists
     copyIfExists(composePath, composeBackupPath);

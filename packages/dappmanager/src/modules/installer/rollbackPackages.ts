@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { Log } from "../../utils/logUi.js";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { isNotFoundError } from "../../utils/node.js";
+import { isNotFoundError } from "@dappnode/utils";
 import { dockerComposeRm, dockerComposeUpPackage } from "../docker/index.js";
 
 /**

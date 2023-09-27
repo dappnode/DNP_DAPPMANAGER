@@ -6,6 +6,7 @@ chai.should();
 
 import * as getPath from "../../../src/utils/getPath.js";
 import { params } from "@dappnode/params";
+import { getDockerComposePath, getRepoDirPath } from "@dappnode/utils";
 
 const { REPO_DIR } = params;
 
@@ -14,7 +15,7 @@ describe("Util: get paths", function () {
   const version = "0.2.0";
 
   it("return PACKAGE_REPO_DIR path", () => {
-    expect(getPath.packageRepoDir(dnpName, false)).to.equal(
+    expect(getRepoDirPath(dnpName, false)).to.equal(
       path.join(REPO_DIR, dnpName)
     );
   });
@@ -26,7 +27,7 @@ describe("Util: get paths", function () {
   });
 
   it("return DOCKERCOMPOSE path", () => {
-    expect(getPath.dockerCompose(dnpName, false)).to.equal(
+    expect(getDockerComposePath(dnpName, false)).to.equal(
       path.join(REPO_DIR, "some_package.dnp.dappnode.eth/docker-compose.yml")
     );
   });

@@ -52,17 +52,19 @@ COPY packages/eventBus/package.json \
   packages/eventBus/
 COPY packages/logger/package.json \ 
   packages/logger/
+COPY packages/dockerCompose/package.json \ 
+  packages/dockerCompose/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
-
-# Build common
-WORKDIR /app/packages/common/
-COPY packages/common/ .
-RUN yarn build
-# Results in dist/*
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build common
+WORKDIR /app/packages/common/
+COPY packages/common/ .
 RUN yarn build
 # Results in dist/*
 
@@ -78,9 +80,21 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
+RUN yarn build
+# Results in dist/*
+
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dappmanager
+WORKDIR /app/packages/dappmanager/
+COPY packages/dappmanager/ .
 RUN yarn build
 # Results in dist/*
 
@@ -90,12 +104,6 @@ COPY packages/admin-ui/ .
 ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
-
-# Build dappmanager
-WORKDIR /app/packages/dappmanager/
-COPY packages/dappmanager/ .
-RUN yarn build
-# Results in dist/*
 
 ##############
 # BUILD-DEPS #

@@ -1,6 +1,5 @@
 import "mocha";
 import { expect } from "chai";
-
 import { parseEthersSyncing } from "../../../../src/utils/ethers.js";
 import { parseEthereumState } from "../../../../src/modules/chains/drivers/ethereum.js";
 import { ChainDataResult } from "../../../../src/modules/chains/types.js";

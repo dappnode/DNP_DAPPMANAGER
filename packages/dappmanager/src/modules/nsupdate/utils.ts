@@ -1,12 +1,9 @@
 import { isEmpty } from "lodash-es";
-import { PackageContainer } from "@dappnode/common";
+import { ContainerNames, PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
-import {
-  getPrivateNetworkAlias,
-  stripCharacters,
-  ContainerNames
-} from "../../domains.js";
+import { stripCharacters } from "../../domains.js";
 import { getContainerDomain } from "@dappnode/types";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 
 const TTL = 60;
 const ethZone = "eth.";

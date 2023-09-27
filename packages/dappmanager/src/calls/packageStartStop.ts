@@ -6,7 +6,7 @@ import {
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "../utils/pid.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PackageContainer } from "@dappnode/common";
 
 const dnpsAllowedToStop = [
