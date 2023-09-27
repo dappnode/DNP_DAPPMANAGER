@@ -91,20 +91,23 @@ send
         ...mockContainer,
         dnpName: ipfsDnpName,
         serviceName: ipfsDnpName,
-        ip: "172.33.1.5"
+        ip: "172.33.1.5",
+        isMain: true
       },
       {
         ...mockContainer,
         dnpName: bitcoinDnpName,
         serviceName: bitcoinDnpName,
-        ip: "172.33.0.2"
+        ip: "172.33.0.2",
+        isMain: true
       },
       {
         ...mockContainer,
         dnpName: gethDnpName,
         serviceName: gethDnpName,
         ip: "172.33.0.3",
-        chain: "ethereum"
+        chain: "ethereum",
+        isMain: true
       },
       {
         ...mockContainer,
@@ -139,12 +142,18 @@ update delete my.app.pinner.dnp.dappnode.eth A
 update add my.app.pinner.dnp.dappnode.eth 60 A 172.33.0.5
 `,
         dappnode: `
-update delete ipfs.dappnode A
-update add ipfs.dappnode 60 A 172.33.1.5
+update delete ipfs.dnp.dappnode.eth.ipfs.dappnode A
+update add ipfs.dnp.dappnode.eth.ipfs.dappnode 60 A 172.33.1.5
 update delete *.ipfs.dappnode A
 update add *.ipfs.dappnode 60 A 172.33.1.5
+update delete ipfs.dappnode A
+update add ipfs.dappnode 60 A 172.33.1.5
+update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
+update add bitcoin.dnp.dappnode.eth.bitcoin.dappnode 60 A 172.33.0.2
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
+update delete geth.dnp.dappnode.eth.geth.dappnode A
+update add geth.dnp.dappnode.eth.geth.dappnode 60 A 172.33.0.3
 update delete geth.dappnode A
 update add geth.dappnode 60 A 172.33.0.3
 update delete cluster.pinner.dappnode A
@@ -173,9 +182,12 @@ update delete my.cluster.pinner.dnp.dappnode.eth A
 update delete my.app.pinner.dnp.dappnode.eth A
 `,
         dappnode: `
-update delete ipfs.dappnode A
+update delete ipfs.dnp.dappnode.eth.ipfs.dappnode A
 update delete *.ipfs.dappnode A
+update delete ipfs.dappnode A
+update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
 update delete bitcoin.dappnode A
+update delete geth.dnp.dappnode.eth.geth.dappnode A
 update delete geth.dappnode A
 update delete cluster.pinner.dappnode A
 update delete app.pinner.dappnode A
@@ -197,6 +209,8 @@ update delete my.bitcoin.dnp.dappnode.eth A
 update add my.bitcoin.dnp.dappnode.eth 60 A 172.33.0.2
 `,
         dappnode: `
+update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
+update add bitcoin.dnp.dappnode.eth.bitcoin.dappnode 60 A 172.33.0.2
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
 `
@@ -215,6 +229,7 @@ update add bitcoin.dappnode 60 A 172.33.0.2
         eth: `
 update delete my.bitcoin.dnp.dappnode.eth A`,
         dappnode: `
+update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
 update delete bitcoin.dappnode A`
       });
     });

@@ -147,18 +147,26 @@ export function getNsupdateTxts({
   const dappnode: DomainMap = {};
 
   // Add domains from installed package names
+
+  // container can have the following states:
+  // 1: monoservice || isMain => short alias
+  // 2: multiservice && !isMain => full alias
+  // 3: multiservice && isMain => full alias and short alias
+
+  // en cualquier caso, full siempre
+  // ademas es mainOrMonoservice, el short
   for (const container of containersToUpdate) {
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
 
-    const isMainOrMonoservice = container.isMain || false; //this is bad
-    
     // it used to return sometimes the full alias and sometimes the short alias.
     // we need to know if container is mono or multiservice, but "isMain" can be undefined
-    dappnode[getDotDappnodeDomain(container, isMainOrMonoservice)] = container.ip;
+    dappnode[getDotDappnodeDomain(container, false)] = container.ip;
+    
     // Add multilabel IPFS domains to the IPFS container IP
-    if (container.dnpName === params.ipfsDnpName)
-      dappnode[`*.${getDotDappnodeDomain(container, isMainOrMonoservice)}`] = container.ip;
+    if (container.dnpName === params.ipfsDnpName) {
+      dappnode[`*.${getDotDappnodeDomain(container, true)}`] = container.ip;
+    }
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
