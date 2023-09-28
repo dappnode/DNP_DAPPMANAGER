@@ -14,7 +14,7 @@ import {
   getIsUpdated
 } from "../../calls/fetchDnpRequest.js";
 import { fileToGatewayUrl } from "../../utils/distributedFile.js";
-import { getOptimismNodeRpcUrl } from "./getOptimismNodeRpcUrl.js";
+import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.js";
 
 export async function getOptimismConfig(): Promise<OptimismConfigGet> {
   try {
@@ -61,7 +61,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
               throw Error(`Repository ${optimismNode} does not exist`);
 
             const pkgData = await getPkgData(releaseFetcher, optimismNode);
-            const mainnetRpcUrl = getOptimismNodeRpcUrl();
+            const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",

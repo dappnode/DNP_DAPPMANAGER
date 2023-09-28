@@ -2,11 +2,11 @@ import { optimismNode } from "@dappnode/types";
 import { ComposeFileEditor } from "../compose/editor.js";
 import { opNodeRpcUrlEnvName, opNodeServiceName } from "./params.js";
 
-export function getOptimismNodeRpcUrl(): string {
-  const userSettings = new ComposeFileEditor(
+export function getOptimismNodeRpcUrlIfExists(): string {
+  const userSettings = ComposeFileEditor.getUserSettingsIfExist(
     optimismNode,
     false
-  ).getUserSettings();
+  );
   return userSettings.environment
     ? userSettings.environment[opNodeServiceName][opNodeRpcUrlEnvName]
     : "";
