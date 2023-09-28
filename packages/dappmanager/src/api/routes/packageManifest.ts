@@ -17,7 +17,7 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
   const dnp = await listPackage({ dnpName });
   const manifest = readManifestIfExists(dnp);
   if (!manifest) {
-    res.status(404).send("Manifest not found");
+    return res.status(404).send("Manifest not found");
   }
 
   // Filter manifest manually to not send new private properties
