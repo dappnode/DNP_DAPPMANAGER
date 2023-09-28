@@ -283,7 +283,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isSelected: true,
         enableHistorical: true
       },
-      /*{
+      {
         status: "ok",
         dnpName: "op-erigon.dnp.dappnode.eth",
         avatarUrl: "",
@@ -310,7 +310,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         isSelected: false,
         enableHistorical: false
-      }*/
+      }
     ],
     rollup: {
       status: "ok",
