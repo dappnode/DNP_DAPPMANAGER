@@ -108,6 +108,7 @@ export function stripBadDomainChars(s: string): string {
  * @returns "bitcoin"
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin"
  * - "other.public.dappnode.eth" > "other.public"
+ * - "other.eth" > "other"
  */
 function getShortDnpName(dnpName: string): string {
   for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
