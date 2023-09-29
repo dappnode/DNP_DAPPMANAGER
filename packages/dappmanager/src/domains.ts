@@ -53,7 +53,7 @@ export function getPrivateNetworkAliases(
 ): string[] {
 
   const {
-    isMainOrMonoservice: isMain,
+    isMainOrMonoservice,
     dnpName,
     serviceName
   } = container;
@@ -66,7 +66,7 @@ export function getPrivateNetworkAliases(
 
   // push short alias
   // if service is "isMain", we also want to add the short alias for it
-  if (isMain) aliases.push(buildNetworkAlias({ dnpName, serviceName, isMainOrMonoservice: true }));
+  if (isMainOrMonoservice) aliases.push(buildNetworkAlias({ dnpName, serviceName, isMainOrMonoservice: true }));
 
   // Special unique alias for the Admin UI
   if (dnpName === params.dappmanagerDnpName)

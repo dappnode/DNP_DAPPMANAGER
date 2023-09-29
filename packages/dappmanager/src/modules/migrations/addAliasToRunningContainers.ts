@@ -1,6 +1,6 @@
 import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
-import { uniq } from "lodash-es";
+import { isEmpty, uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { getPrivateNetworkAliases } from "../../domains.js";
 import { logs } from "@dappnode/logger";
@@ -82,47 +82,54 @@ export function migrateCoreNetworkAndAliasInCompose(
 ): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
-  // Gets all the networks defined in the service
-  const serviceNetworks = parseServiceNetworks(
-    compose.services()[container.serviceName].get().networks || {}
-  );
+  const rawServiceNetworks = compose.services()[container.serviceName].get().networks;
 
-  // Gets current aliases of "params.DNP_PRIVATE_NETWORK_NAME", usually dncore_network
-  const currentAliases = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.aliases || [];
+  if (rawServiceNetworks) {
+    // Gets all the networks defined in the service
+    const serviceNetworks = parseServiceNetworks(rawServiceNetworks);
 
-  //add new aliases to current aliases set
-  const newAliases = uniq([...currentAliases, ...aliases]);
+    const dncoreServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME];
 
-  // Gets the network "dncore_network" from the general compose file 
-  const composeNetwork = compose.getComposeNetwork(params.DNP_PRIVATE_NETWORK_NAME);
+    // Gets current aliases of "params.DNP_PRIVATE_NETWORK_NAME", usually dncore_network
+    const currentDncoreNetworkAliases = dncoreServiceNetwork.aliases || [];
 
-  // Gets the old network "network" from the service compose file. This is an old network that is to be removed".
-  // If it is already removed, return null
-  const serviceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE] ?? null;
+    //add new aliases to current aliases set
+    const newAliases = uniq([...currentDncoreNetworkAliases, ...aliases]);
 
-  // Return if migration was done, compose is already updated
-  if (isComposeNetworkAndAliasMigrated(composeNetwork, serviceNetwork, compose.compose.version, newAliases)) return
+    // Gets the network "dncore_network" from the general compose file 
+    const dncoreComposeNetwork = compose.getComposeNetwork(params.DNP_PRIVATE_NETWORK_NAME);
 
-  // Ensure/update compose file version 3.5
-  compose.compose = {
-    ...compose.compose,
-    version: params.MINIMUM_COMPOSE_VERSION
-  };
+    // Return if migration was done, compose is already updated
+    if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, compose.compose.version, newAliases)) return
 
-  // This tries to remove the old network called "network" from the container in the compose file
-  // It is only done if network "network" exists or the new network "dncore_network" exists
-  if (composeNetwork || serviceNetwork) {
-    compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
+    // Ensure/update compose file version 3.5
+    compose.compose = {
+      ...compose.compose,
+      version: params.MINIMUM_COMPOSE_VERSION
+    };
+
+    // Gets the old network "network" from the service compose file. This is an old network that is to be removed".
+    // If it is already removed, returns {}
+    const oldServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
+
+    // This tries to remove the old network called "network" from the container in the compose file
+    // It is only done if network "network" exists or the new network "dncore_network" exists
+    if (dncoreComposeNetwork || !isEmpty(oldServiceNetwork)) {
+      compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
+    }
+
+    // This adds the new network with the new aliases into the compose file
+    compose.services()[container.serviceName].addNetwork(
+      params.DNP_PRIVATE_NETWORK_NAME,
+      { ...oldServiceNetwork, aliases: newAliases },
+      { external: true, name: params.DNP_PRIVATE_NETWORK_NAME }
+    );
+
+    compose.write();
+  } else {
+    // Throw error if no networks defined in the service
+    throw Error(`No networks defined in ${container.serviceName} service`);
   }
-
-  // This adds the new network with the new aliases into the compose file
-  compose.services()[container.serviceName].addNetwork(
-    params.DNP_PRIVATE_NETWORK_NAME,
-    { ...serviceNetwork, aliases: newAliases },
-    { external: true, name: params.DNP_PRIVATE_NETWORK_NAME }
-  );
-
-  compose.write();
 }
 
 // function isMainServiceOfMultiServicePackage(container: PackageContainer): boolean {
@@ -174,27 +181,27 @@ function hasAlias(
  * @returns boolean
  */
 function isComposeNetworkAndAliasMigrated(
-  composeNetwork: ComposeNetwork | null,
-  serviceNetwork: ComposeServiceNetwork | null,
+  dncoreComposeNetwork: ComposeNetwork | null,
+  dncoreServiceNetwork: ComposeServiceNetwork | null,
   composeVersion: string,
   aliases: string[]
 ): boolean {
-  // 1. If we have not removed the old network "network" from the compose file, or
-  //    we have not implemented the new network "dncore_network" in the compose file, return false. Migration is not already done.
-  if (!composeNetwork || !serviceNetwork) return false;
+  // 1. If dncore_network is NOT defined both for the service we are checking 
+  // AND in the general compose file, return false. Migration is not already done.
+  if (!dncoreComposeNetwork || !dncoreServiceNetwork) return false;
 
   // 2. Aside from being at least version 3.5, to consider the docker-compose.yml file as migrated, the network defined in the compose file must:
   //    - be external
   //    - have the expected name
   //    - have the expected aliases in each service
   if (
-    composeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check expected name
-    composeNetwork?.external && // Check is external network
+    dncoreComposeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check expected name
+    dncoreComposeNetwork?.external && // Check is external network
     gte(
       parseComposeSemver(composeVersion),
       parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5
-    aliases.every(alias => serviceNetwork.aliases?.includes(alias)) // Check every alias is already present
+    aliases.every(alias => dncoreServiceNetwork.aliases?.includes(alias)) // Check every alias is already present
   )
     return true;
 
