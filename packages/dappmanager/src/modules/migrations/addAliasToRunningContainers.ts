@@ -2,7 +2,7 @@ import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import { ContainerNames, getPrivateNetworkAliases } from "../../domains.js";
+import { getPrivateNetworkAliases } from "../../domains.js";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
