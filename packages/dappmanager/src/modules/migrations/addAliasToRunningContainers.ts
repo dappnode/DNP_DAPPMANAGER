@@ -18,6 +18,7 @@ import { listContainers } from "../docker/list/index.js";
 import * as getPath from "../../utils/getPath.js";
 import { gte } from "semver";
 import { getDnCoreNetworkContainerConfig } from "../docker/api/network.js";
+import { logger } from "ethers";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -51,7 +52,7 @@ export async function addAliasToGivenContainers(containers: PackageContainer[]):
       isMain: isMainOrMonoService, // Add the isMain property here
     };
     const aliases = getPrivateNetworkAliases(service)
-    
+
     // Adds aliases to the compose file that generated the container
     migrateCoreNetworkAndAliasInCompose(container, aliases);
 
@@ -85,7 +86,7 @@ export function migrateCoreNetworkAndAliasInCompose(
   const serviceNetworks = parseServiceNetworks(
     compose.services()[container.serviceName].get().networks || {}
   );
-  
+
   // Gets current aliases of "params.DNP_PRIVATE_NETWORK_NAME", usually dncore_network
   const currentAliases = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.aliases || [];
 
@@ -101,7 +102,7 @@ export function migrateCoreNetworkAndAliasInCompose(
 
   // Return if migration was done, compose is already updated
   if (isComposeNetworkAndAliasMigrated(composeNetwork, serviceNetwork, compose.compose.version, newAliases)) return
-  
+
   // Ensure/update compose file version 3.5
   compose.compose = {
     ...compose.compose,
@@ -147,8 +148,8 @@ async function updateContainerNetwork(networkName: string, container: any, endpo
     await dockerComposeUp(getPath.dockerCompose(container.dnpName, container.isCore));
   } else {
     await dockerNetworkDisconnect(networkName, containerName);
-    console.log(`new alias for: ${containerName}`);
     await dockerNetworkConnect(networkName, containerName, endpointConfig);
+    logger.info(`Added new alias to ${containerName} in ${networkName} network`);
   }
 }
 
@@ -180,7 +181,7 @@ function isComposeNetworkAndAliasMigrated(
 ): boolean {
   // 1. If we have not removed the old network "network" from the compose file, or
   //    we have not implemented the new network "dncore_network" in the compose file, return false. Migration is not already done.
-  if (!composeNetwork || !serviceNetwork) return false; 
+  if (!composeNetwork || !serviceNetwork) return false;
 
   // 2. Aside from being at least version 3.5, to consider the docker-compose.yml file as migrated, the network defined in the compose file must:
   //    - be external
