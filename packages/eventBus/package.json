@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@dappnode/params": "^0.1.0",
-    "@dappnode/types": "^0.1.28",
+    "@dappnode/types": "^0.1.29",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
