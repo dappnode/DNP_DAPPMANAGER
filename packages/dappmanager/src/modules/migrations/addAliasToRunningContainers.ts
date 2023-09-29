@@ -2,7 +2,7 @@ import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import { getPrivateNetworkAliases } from "../../domains.js";
+import { ContainerNames, getPrivateNetworkAliases } from "../../domains.js";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
@@ -45,12 +45,12 @@ export async function addAliasToRunningContainers(): Promise<void> {
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {
   for (const container of containers) {
 
-    const isMainOrMonoService = container.isMain ?? false; // Set a default value of false if isMain is undefined
     const service = {
       serviceName: container.serviceName,
       dnpName: container.dnpName,
-      isMain: isMainOrMonoService, // Add the isMain property here
+      isMainOrMonoservice: container.isMain ?? false, // false if isMain is undefined
     };
+
     const aliases = getPrivateNetworkAliases(service)
 
     // Adds aliases to the compose file that generated the container

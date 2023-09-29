@@ -61,7 +61,7 @@ export function setDappnodeComposeDefaults(
             serviceName,
             dnpName,
             // The root pkg alias will be added to the main service or if it is a mono service
-            isMain: isMonoService || manifest.mainService === serviceName
+            isMainOrMonoservice: isMonoService || manifest.mainService === serviceName
           })
         });
       }
@@ -94,7 +94,7 @@ function ensureMinimumComposeVersion(composeFileVersion: string): string {
  */
 function setServiceNetworksWithAliases(
   serviceNetworks: ComposeServiceNetworks | undefined,
-  service: { serviceName: string; dnpName: string; isMain: boolean }
+  service: { serviceName: string; dnpName: string; isMainOrMonoservice: boolean }
 ): ComposeServiceNetworks {
   // Return service network dncore_network with aliases if not provided
   if (!serviceNetworks)
