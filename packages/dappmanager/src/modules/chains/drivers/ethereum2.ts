@@ -29,7 +29,7 @@ export async function ethereum2(
   const containerDomain = determineNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: true
+    isMainOrMonoservice: false
   });
 
   // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
