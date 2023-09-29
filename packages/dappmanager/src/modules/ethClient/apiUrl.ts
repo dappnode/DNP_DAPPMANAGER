@@ -1,4 +1,4 @@
-import { determineNetworkAlias } from "../../domains.js";
+import { buildNetworkAlias } from "../../domains.js";
 import { getBeaconServiceName } from "../../modules/stakerConfig/utils.js";
 import { listPackageNoThrow } from "../docker/list/index.js";
 
@@ -14,8 +14,8 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
    * domain = "bitcoin.dappnode", "other.public.dappnode"
    * ```
    */
-  
-  const containerDomain = determineNetworkAlias({
+
+  const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName: "",
     isMainOrMonoservice: true
@@ -40,7 +40,7 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     dnp.chain.serviceName
   ) {
     port = dnp.chain.portNumber;
-    domain = determineNetworkAlias({
+    domain = buildNetworkAlias({
       dnpName: dnpName,
       serviceName: dnp.chain.serviceName,
       isMainOrMonoservice: false
@@ -51,7 +51,7 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     if (dnpName.includes("nimbus")) {
       port = 4500;
     }
-    domain = determineNetworkAlias({
+    domain = buildNetworkAlias({
       dnpName: dnpName,
       serviceName: getBeaconServiceName(dnpName),
       isMainOrMonoservice: false

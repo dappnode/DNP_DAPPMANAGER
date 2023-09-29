@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { ChainDriverSpecs } from "@dappnode/types";
-import { determineNetworkAlias } from "../../../domains.js";
+import { buildNetworkAlias } from "../../../domains.js";
 import { urlJoin } from "../../../utils/url.js";
 import { InstalledPackageData } from "@dappnode/common";
 import { ChainDataResult } from "../types.js";
@@ -26,7 +26,7 @@ export async function ethereum2(
     return null; // OK to not be running, just ignore
   }
   const { dnpName } = beaconChainContainer;
-  const containerDomain = determineNetworkAlias({
+  const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
     isMainOrMonoservice: false

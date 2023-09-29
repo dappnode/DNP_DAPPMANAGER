@@ -2,7 +2,7 @@ import { isEmpty } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import {
-  determineNetworkAlias,
+  buildNetworkAlias,
   stripCharacters,
   ContainerNames
 } from "../../domains.js";
@@ -97,9 +97,9 @@ export function getMyDotEthdomain(dnpName: string): string {
  * - "other.public.dappnode.eth" > "other.public.dappnode"
  */
 export function getDotDappnodeDomain(container: ContainerNames, isMainOrMonoservice: boolean): string {
-  
-  const {dnpName,serviceName} = container;
-  return determineNetworkAlias({
+
+  const { dnpName, serviceName } = container;
+  return buildNetworkAlias({
     dnpName,
     serviceName,
     isMainOrMonoservice
@@ -162,7 +162,7 @@ export function getNsupdateTxts({
     // it used to return sometimes the full alias and sometimes the short alias.
     // we need to know if container is mono or multiservice, but "isMain" can be undefined
     dappnode[getDotDappnodeDomain(container, false)] = container.ip;
-    
+
     // Add multilabel IPFS domains to the IPFS container IP
     if (container.dnpName === params.ipfsDnpName) {
       dappnode[`*.${getDotDappnodeDomain(container, true)}`] = container.ip;

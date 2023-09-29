@@ -25,7 +25,7 @@ export type ContainerNames = { serviceName: string; dnpName: string };
  * @param short if true, it will return the short version of the dnpName otherwise the full network alias
  * @returns the root private network alias. It
  */
-export function determineNetworkAlias({
+export function buildNetworkAlias({
   dnpName,
   serviceName,
   isMainOrMonoservice,
@@ -49,25 +49,25 @@ export function determineNetworkAlias({
  * @returns
  */
 export function getPrivateNetworkAliases(
-  container: ContainerNames & { isMain: boolean }
+  container: ContainerNames & { isMainOrMonoservice: boolean }
 ): string[] {
 
   const {
-    isMain,
+    isMainOrMonoservice: isMain,
     dnpName,
     serviceName
   } = container;
-  
+
   const aliases: string[] = [];
 
   // push full alias
   // The "isMainOrMonoservice" is false because we always want a full alias for each service (container)
-  aliases.push(determineNetworkAlias({dnpName, serviceName, isMainOrMonoservice: false}));
+  aliases.push(buildNetworkAlias({ dnpName, serviceName, isMainOrMonoservice: false }));
 
   // push short alias
   // if service is "isMain", we also want to add the short alias for it
-  if (isMain) aliases.push(determineNetworkAlias({dnpName, serviceName, isMainOrMonoservice: true}));
-  
+  if (isMain) aliases.push(buildNetworkAlias({ dnpName, serviceName, isMainOrMonoservice: true }));
+
   // Special unique alias for the Admin UI
   if (dnpName === params.dappmanagerDnpName)
     aliases.push(...params.DAPPMANAGER_ALIASES);

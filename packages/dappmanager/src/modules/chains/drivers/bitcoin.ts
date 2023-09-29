@@ -3,15 +3,15 @@ import Client from "bitcoin-core";
 import { InstalledPackageData } from "@dappnode/common";
 import { dockerContainerInspect } from "../../docker/index.js";
 import { parseEnvironment } from "../../compose/index.js";
-import { determineNetworkAlias } from "../../../domains.js";
+import { buildNetworkAlias } from "../../../domains.js";
 import { ChainDataResult } from "../types.js";
 
 function getMinBlockDiffSync(dnpName: string): number {
   return dnpName.includes("bitcoin")
     ? // minTimeDiff = 30 min
-      30 / 10
+    30 / 10
     : // ZCash, Litecoin, etc
-      30 / 2.5;
+    30 / 2.5;
 }
 
 // Cache the blockIndex to prevent unnecessary calls
@@ -36,9 +36,9 @@ export async function bitcoin(
   const container = dnp.containers[0];
   if (!container) throw Error("no container");
 
-  const {dnpName,serviceName} = container;
-  
-  const containerDomain = determineNetworkAlias({
+  const { dnpName, serviceName } = container;
+
+  const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
     isMainOrMonoservice: true
