@@ -139,7 +139,7 @@ function updateEndpointConfig(currentEndpointConfig: Dockerode.NetworkInfo | nul
   };
 }
 
-async function updateContainerNetwork(networkName: string, container: any, endpointConfig: Partial<Dockerode.NetworkInfo>): Promise<void> {
+async function updateContainerNetwork(networkName: string, container: PackageContainer, endpointConfig: Partial<Dockerode.NetworkInfo>): Promise<void> {
   const containerName = container.containerName;
 
   // Wifi and VPN containers need a refresh connect due to their own network configuration
