@@ -21,8 +21,8 @@ describe("Migration", () => {
 version: '3.4'
 networks:
   dncore_network:
-    name: dncore_network
     external: true
+    name: dncore_network
 services:
   dappmanager.dnp.dappnode.eth:
     image: "chentex/random-logger"
@@ -36,11 +36,9 @@ services:
   const composeToBeMigratedBefore = `
 version: '3.4'
 networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
+  dncore_network:
+    name: dncore_network
+    external: true
 services:
   dappmanager.dnp.dappnode.eth:
     image: "chentex/random-logger"
@@ -48,7 +46,7 @@ services:
     restart: always
     dns: 172.33.1.2
     networks:
-      network:
+      dncore_network:
         ipv4_address: 172.33.1.7`;
 
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
@@ -94,8 +92,8 @@ services:
 version: '3.5'
 networks:
   dncore_network:
-    external: true
     name: dncore_network
+    external: true
 services:
   dappmanager.dnp.dappnode.eth:
     image: chentex/random-logger
@@ -107,11 +105,10 @@ services:
         ipv4_address: 172.33.1.7
         aliases:
           - dappmanager.dnp.dappnode.eth.test-migration.dappnode`;
-
-    migrateCoreNetworkAndAliasInCompose(
-      container,
-      ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"]
-    );
+          
+    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"];
+    migrateCoreNetworkAndAliasInCompose(container, aliases);
+    
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose.yml`,
       { encoding: "utf8" }
@@ -120,10 +117,9 @@ services:
   });
 
   it("Should do not do migration", async () => {
-    migrateCoreNetworkAndAliasInCompose(
-      container,
-      ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"]
-    );
+    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"];
+    migrateCoreNetworkAndAliasInCompose(container, aliases);
+    
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose-migrated.yml`,
       { encoding: "utf8" }

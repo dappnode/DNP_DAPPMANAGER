@@ -84,52 +84,53 @@ export function migrateCoreNetworkAndAliasInCompose(
 
   const rawServiceNetworks = compose.services()[container.serviceName].get().networks;
 
-  if (rawServiceNetworks) {
-    // Gets all the networks defined in the service
-    const serviceNetworks = parseServiceNetworks(rawServiceNetworks);
-
-    const dncoreServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME];
-
-    // Gets current aliases of "params.DNP_PRIVATE_NETWORK_NAME", usually dncore_network
-    const currentDncoreNetworkAliases = dncoreServiceNetwork.aliases || [];
-
-    //add new aliases to current aliases set
-    const newAliases = uniq([...currentDncoreNetworkAliases, ...aliases]);
-
-    // Gets the network "dncore_network" from the general compose file 
-    const dncoreComposeNetwork = compose.getComposeNetwork(params.DNP_PRIVATE_NETWORK_NAME);
-
-    // Return if migration was done, compose is already updated
-    if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, compose.compose.version, newAliases)) return
-
-    // Ensure/update compose file version 3.5
-    compose.compose = {
-      ...compose.compose,
-      version: params.MINIMUM_COMPOSE_VERSION
-    };
-
-    // Gets the old network "network" from the service compose file. This is an old network that is to be removed".
-    // If it is already removed, returns {}
-    const oldServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
-
-    // This tries to remove the old network called "network" from the container in the compose file
-    // It is only done if network "network" exists or the new network "dncore_network" exists
-    if (dncoreComposeNetwork || !isEmpty(oldServiceNetwork)) {
-      compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
-    }
-
-    // This adds the new network with the new aliases into the compose file
-    compose.services()[container.serviceName].addNetwork(
-      params.DNP_PRIVATE_NETWORK_NAME,
-      { ...oldServiceNetwork, aliases: newAliases },
-      { external: true, name: params.DNP_PRIVATE_NETWORK_NAME }
-    );
-
-    compose.write();
-  } else {
-    // Throw error if no networks defined in the service
-    throw Error(`No networks defined in ${container.serviceName} service`);
+  if (!rawServiceNetworks) {
+    throw Error(`No networks found in ${container.serviceName} service`);
   }
+
+  const serviceNetworks = parseServiceNetworks(rawServiceNetworks);
+
+  const dncoreServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME];
+
+  if (!dncoreServiceNetwork) {
+    throw Error(`No "dncore_network" found in ${container.serviceName} service`);
+  }
+
+  const currentDncoreNetworkAliases = dncoreServiceNetwork.aliases || [];
+
+  //add new aliases to current aliases set
+  const newAliases = uniq([...currentDncoreNetworkAliases, ...aliases]);
+
+  // Gets the network "dncore_network" from the general compose file 
+  const dncoreComposeNetwork = compose.getComposeNetwork(params.DNP_PRIVATE_NETWORK_NAME);
+
+  // Return if migration was done, compose is already updated
+  if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, compose.compose.version, newAliases)) return;
+  
+  // Ensure/update compose file version 3.5
+  compose.compose = {
+    ...compose.compose,
+    version: params.MINIMUM_COMPOSE_VERSION
+  };
+
+  // Gets the old network "network" from the service compose file. This is an old network that is to be removed".
+  // If it is already removed, returns {}
+  const oldServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
+
+  // This tries to remove the old network called "network" from the container in the compose file
+  // It is only done if network "network" exists or the new network "dncore_network" exists
+  if (dncoreComposeNetwork || !isEmpty(oldServiceNetwork)) {
+    compose.services()[container.serviceName].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
+  }
+
+  // This adds the new network with the new aliases into the compose file
+  compose.services()[container.serviceName].addNetwork(
+    params.DNP_PRIVATE_NETWORK_NAME,
+    { ...oldServiceNetwork, aliases: newAliases },
+    { external: true, name: params.DNP_PRIVATE_NETWORK_NAME }
+  );
+
+  compose.write();
 }
 
 // function isMainServiceOfMultiServicePackage(container: PackageContainer): boolean {
