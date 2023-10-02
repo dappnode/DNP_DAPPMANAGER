@@ -53,7 +53,9 @@ export async function ethereum(
   const provider = new ethers.providers.JsonRpcProvider(apiUrl);
   const [syncing, peersCount, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
-    provider.send("net_peerCount", []).then(parseInt),
+    // net_peerCount is not always available. OP Erigon does not support it
+    // Not logging error because it would flood the logs
+    provider.send("net_peerCount", []).then(parseInt).catch(() => undefined),
     provider.getBlockNumber()
   ]);
 
@@ -67,7 +69,7 @@ export async function ethereum(
 export function parseEthereumState(
   syncing: EthSyncing,
   blockNumber: number,
-  peersCount: number
+  peersCount?: number
 ): ChainDataResult {
   if (syncing) {
     const {
