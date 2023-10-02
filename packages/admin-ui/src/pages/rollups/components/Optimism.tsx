@@ -172,7 +172,7 @@ export default function Optimism({ description }: { description: string }) {
             </Col>
 
             <Col>
-              <SubTitle>Legacy Geth</SubTitle>
+              <SubTitle>Optional Modules</SubTitle>
               <LegacyGeth
                 archive={currentOptimismConfigReq.data.archive}
                 setNewArchive={setNewArchive}
