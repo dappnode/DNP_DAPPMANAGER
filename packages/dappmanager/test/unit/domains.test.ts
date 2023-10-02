@@ -1,12 +1,12 @@
 import { expect } from "chai";
-import { determineNetworkAlias } from "../../src/domains.js";
+import { buildNetworkAlias } from "../../src/domains.js";
 
 describe('determineNetworkAlias', () => {
 
   describe('DNP packages', () => {
     
     it('should return short network alias for main or monoservice, not external containers', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true
@@ -15,7 +15,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return full network alias for non-main or non-monoservice, not external containers', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false
@@ -24,7 +24,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return short network alias for main or monoservice, external containers', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true,
@@ -34,7 +34,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return full network alias for non-main or non-monoservice, external containers', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false,
@@ -48,7 +48,7 @@ describe('determineNetworkAlias', () => {
   describe('Public packages', () => {
 
     it('should return short network alias for main or monoservice, not external containers with ".public.dappnode.eth"', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true
@@ -57,7 +57,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return full network alias for non-main or non-monoservice, not external containers with ".public.dappnode.eth"', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false
@@ -66,7 +66,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return short network alias for main or monoservice, external containers with ".public.dappnode.eth"', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true,
@@ -76,7 +76,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should return full network alias for non-main or non-monoservice, external containers with ".public.dappnode.eth"', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false,
@@ -90,7 +90,7 @@ describe('determineNetworkAlias', () => {
   describe('Different dnpNames', () => {
 
     it('should handle different dnpName formats ending with .dappnode.eth', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "example.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false
@@ -99,7 +99,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should handle different dnpName formats ending with .eth', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "example.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false
@@ -108,7 +108,7 @@ describe('determineNetworkAlias', () => {
     });
 
     it('should handle dnpName with underscores', () => {
-      const result = determineNetworkAlias({
+      const result = buildNetworkAlias({
         dnpName: "example_name.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false
