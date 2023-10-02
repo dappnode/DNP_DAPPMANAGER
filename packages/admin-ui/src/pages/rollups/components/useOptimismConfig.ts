@@ -152,7 +152,7 @@ function getChanges({
   if (
     executionClient?.dnpName === newExecClient?.dnpName &&
     Boolean(rollup) === Boolean(newRollup) &&
-    Boolean(archive) === Boolean(newArchive) &&
+    Boolean(archive?.isSelected) === Boolean(newArchive) &&
     rollup?.mainnetRpcUrl === customMainnetRpcUrl
   )
     return {
