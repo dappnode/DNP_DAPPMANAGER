@@ -2,10 +2,6 @@ import { ContainerNames } from "@dappnode/common";
 import { getContainerDomain } from "@dappnode/types";
 import { shortUniqueDappnodeEns } from "@dappnode/utils";
 
-export function stripCharacters(s: string): string {
-  return s.replace(RegExp("_", "g"), "");
-}
-
 export function stripBadDomainChars(s: string): string {
   // eslint-disable-next-line no-useless-escape
   return s.replace(/[^a-zA-Z\-]+/g, "-");

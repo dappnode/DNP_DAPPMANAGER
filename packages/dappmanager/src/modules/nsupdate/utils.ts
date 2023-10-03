@@ -1,9 +1,8 @@
 import { isEmpty } from "lodash-es";
 import { ContainerNames, PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
-import { stripCharacters } from "../../domains.js";
 import { getContainerDomain } from "@dappnode/types";
-import { getPrivateNetworkAlias } from "@dappnode/utils";
+import { getPrivateNetworkAlias, removeUnderscores } from "@dappnode/utils";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -84,7 +83,7 @@ send
  * @returns "my.bitcoin.dnp.dappnode.eth"
  */
 export function getMyDotEthdomain(dnpName: string): string {
-  return "my." + stripCharacters(dnpName);
+  return "my." + removeUnderscores(dnpName);
 }
 
 /**

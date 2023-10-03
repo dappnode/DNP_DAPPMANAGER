@@ -11,7 +11,7 @@ export {
   getDockerComposePathSmart,
 } from "./getDockerComposePath.js";
 export { getRepoDirPath } from "./getRepoDirPath.js";
-export { stripCharacters } from "./stripCharacters.js";
+export { removeUnderscores } from "./removeUnderscores.js";
 export { shortUniqueDappnodeEns } from "./shortUniqueDappnodeEns.js";
 export {
   getPrivateNetworkAlias,
