@@ -5,7 +5,7 @@ import { InstallPackageDataPaths } from "@dappnode/common";
 import { Log } from "../../utils/logUi.js";
 import { logs } from "@dappnode/logger";
 import { isNotFoundError } from "@dappnode/utils";
-import { dockerCleanOldImages } from "../docker/cleanOldImages.js";
+import { dockerCleanOldImages } from "@dappnode/dockerapi";
 
 /**
  * [Post install clean] After a successful install, clean backup files

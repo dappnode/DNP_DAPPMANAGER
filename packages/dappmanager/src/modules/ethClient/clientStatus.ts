@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import * as db from "../../db/index.js";
 import { EthClientStatus } from "@dappnode/common";
-import { listPackageNoThrow } from "../../modules/docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
 import { parseEthersBlock, parseEthersSyncing } from "../../utils/ethers.js";

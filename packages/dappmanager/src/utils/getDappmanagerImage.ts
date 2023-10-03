@@ -1,4 +1,4 @@
-import { listContainers } from "../modules/docker/api/index.js";
+import { listContainers } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import memoize from "memoizee";
 

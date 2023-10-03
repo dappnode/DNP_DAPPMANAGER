@@ -1,6 +1,6 @@
 import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { getBeaconServiceName } from "../../modules/stakerConfig/utils.js";
-import { listPackageNoThrow } from "../docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
  * Computes the JSON RPC url of an Eth execution client package from its name

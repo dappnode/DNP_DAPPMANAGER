@@ -1,13 +1,13 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { listPackage } from "../modules/docker/list/index.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PortMapping } from "@dappnode/common";
 import { mapValues } from "lodash-es";
 import {
   getContainersStatus,
-  dockerComposeUpPackage
-} from "../modules/docker/index.js";
+  dockerComposeUpPackage,
+  listPackage
+} from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "../utils/pid.js";
 
 /**

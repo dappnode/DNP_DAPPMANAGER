@@ -2,7 +2,7 @@ import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath.js";
 import orderInstallPackages from "./orderInstallPackages.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
-import { getContainersStatus } from "../docker/index.js";
+import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
 import { parseTimeoutSeconds } from "../../utils/timeout.js";
 import {
   UserSettingsAllDnps,
@@ -11,7 +11,6 @@ import {
   InstallPackageData,
   ContainersStatus
 } from "@dappnode/common";
-import { listPackages } from "../docker/list/index.js";
 import { getDockerComposePath } from "@dappnode/utils";
 
 interface GetInstallerPackageDataArg {

@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import shellExec from "../../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
@@ -36,7 +36,7 @@ const thresholds = [
  */
 async function monitorDiskUsage(): Promise<void> {
   try {
-    const diskAvailable = await shellExec(`df -k / | awk 'NR>1 { print $4}'`);
+    const diskAvailable = await shell(`df -k / | awk 'NR>1 { print $4}'`);
     if (!diskAvailable || typeof diskAvailable !== "string")
       throw Error("diskAvailable return must be a string");
 
@@ -77,7 +77,7 @@ async function monitorDiskUsage(): Promise<void> {
         let names;
         const cmd = `docker stop $(docker ps ${threshold.filterCommand} --format "{{.Names}}")`;
         try {
-          names = await shellExec(cmd);
+          names = await shell(cmd);
         } catch (e) {
           if (e.message.includes("requires at least 1 argument")) {
             logs.warn(`No containers stopped by the "${cmd}" command`);

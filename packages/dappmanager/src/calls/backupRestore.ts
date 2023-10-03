@@ -3,9 +3,9 @@ import fs from "fs";
 import * as db from "../db/index.js";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { listPackage } from "../modules/docker/list/index.js";
+import { listPackage } from "@dappnode/dockerapi";
 import { packageRestart } from "./packageRestart.js";
-import shell from "../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import validateBackupArray from "../utils/validateBackupArray.js";
 import { PackageBackup } from "@dappnode/types";
 

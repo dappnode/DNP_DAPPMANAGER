@@ -1,5 +1,5 @@
 import { logs } from "@dappnode/logger";
-import { listPackageNoThrow } from "../docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { ethicalMetricsDnpName } from "../ethicalMetrics/index.js";
 import * as db from "../../db/index.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";

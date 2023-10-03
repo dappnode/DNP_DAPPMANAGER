@@ -3,7 +3,7 @@ import path from "path";
 import * as getPath from "../../utils/getPath.js";
 import { getDockerComposePath, validatePath } from "@dappnode/utils";
 import * as db from "../../db/index.js";
-import shell from "../../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { pause } from "../../utils/asyncFlows.js";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
@@ -12,7 +12,7 @@ import {
   dockerContainerInspect,
   logContainer,
   dockerContainerRemove
-} from "../docker/api/index.js";
+} from "@dappnode/dockerapi";
 import { getLogUi } from "../../utils/logUi.js";
 import { rollbackPackages } from "./rollbackPackages.js";
 import { postInstallClean } from "./postInstallClean.js";

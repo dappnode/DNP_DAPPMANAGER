@@ -1,8 +1,5 @@
-import { listPackage } from "../modules/docker/list/index.js";
-import {
-  dockerContainerStop,
-  dockerContainerStart
-} from "../modules/docker/index.js";
+import { listPackage } from "@dappnode/dockerapi";
+import { dockerContainerStop, dockerContainerStart } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "../utils/pid.js";

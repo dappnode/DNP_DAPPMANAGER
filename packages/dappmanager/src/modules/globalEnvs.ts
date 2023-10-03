@@ -9,7 +9,7 @@ import {
   ComposeFileEditor,
   stringifyEnvironment
 } from "@dappnode/dockercompose";
-import { listContainers } from "./docker/list/index.js";
+import { listPackageContainers } from "@dappnode/dockerapi";
 import { GlobalEnvs, GlobalEnvsPrefixed } from "@dappnode/common";
 
 export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
@@ -68,7 +68,7 @@ export async function updatePkgsWithGlobalEnvs(
   globalEnvKey: string,
   globEnvValue: string
 ): Promise<void> {
-  const packages = await listContainers();
+  const packages = await listPackageContainers();
 
   const pkgsWithGlobalEnv = packages.filter(
     pkg =>

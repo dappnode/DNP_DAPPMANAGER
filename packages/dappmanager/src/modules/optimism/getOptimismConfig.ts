@@ -1,6 +1,6 @@
 import { OptimismConfigGet, OptimismItem } from "@dappnode/common";
 import * as db from "../../db/index.js";
-import { listPackages } from "../docker/list/listPackages.js";
+import { listPackages } from "@dappnode/dockerapi";
 import {
   executionClientsOptimism,
   optimismL2Geth,
@@ -13,7 +13,7 @@ import {
   getIsRunning,
   getIsUpdated
 } from "../../calls/fetchDnpRequest.js";
-import { fileToGatewayUrl } from "../../utils/distributedFile.js";
+import { fileToGatewayUrl } from "@dappnode/utils";
 import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.js";
 
 export async function getOptimismConfig(): Promise<OptimismConfigGet> {

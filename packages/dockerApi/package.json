@@ -1,0 +1,38 @@
+{
+  "name": "@dappnode/dockerapi",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "dependencies": {
+    "@dappnode/common": "^0.1.0",
+    "@dappnode/types": "^0.1.29",
+    "@dappnode/utils": "^0.1.0",
+    "@dappnode/hostscripts": "^0.1.0",
+    "dockerode": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.6",
+    "@types/dockerode": "^3.2.1",
+    "@types/mocha": "^10.0.2",
+    "@types/node": "^20.6.2",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,11 +1,11 @@
 import { logs } from "@dappnode/logger";
-import shell from "../../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import {
   dockerVolumesList,
   dockerVolumeRemove,
-  dockerContainerRemove
-} from "../docker/index.js";
-import { listPackages } from "../docker/list/index.js";
+  dockerContainerRemove,
+  listPackages
+} from "@dappnode/dockerapi";
 import * as getPath from "../../utils/getPath.js";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";

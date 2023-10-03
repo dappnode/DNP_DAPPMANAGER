@@ -64,6 +64,8 @@ COPY packages/logger/package.json \
   packages/logger/
 COPY packages/dockerCompose/package.json \ 
   packages/dockerCompose/
+COPY packages/dockerApi/package.json \ 
+  packages/dockerApi/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -102,6 +104,12 @@ COPY packages/logger/ .
 RUN yarn build
 # Results in dist/*
 
+# Build dockerApi
+WORKDIR /app/packages/dockerApi/
+COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
 # Build dappmanager
 WORKDIR /app/packages/dappmanager/
 COPY packages/dappmanager/ .
@@ -128,8 +136,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy the src last as it's the layer most likely to change
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
+COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
 
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns

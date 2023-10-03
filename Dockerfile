@@ -54,6 +54,8 @@ COPY packages/logger/package.json \
   packages/logger/
 COPY packages/dockerCompose/package.json \ 
   packages/dockerCompose/
+COPY packages/dockerApi/package.json \ 
+  packages/dockerApi/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -89,6 +91,12 @@ RUN yarn build
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dockerApi
+WORKDIR /app/packages/dockerApi/
+COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
@@ -144,8 +152,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy scripts and services
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
+COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
 
 # Copy root app
 COPY --from=build-deps /usr/src/app/node_modules ./node_modules

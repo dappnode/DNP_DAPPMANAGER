@@ -4,7 +4,7 @@ import {
   UserSettings
 } from "@dappnode/common";
 import * as db from "../../db/index.js";
-import { listPackageNoThrow } from "../docker/list/listPackages.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import {
   optimismNode,
   optimismL2Geth,
@@ -13,7 +13,7 @@ import {
 } from "@dappnode/types";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { packageInstall } from "../../calls/packageInstall.js";
-import { dockerContainerStart, dockerContainerStop } from "../docker/index.js";
+import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
 import {
   opNodeServiceName,

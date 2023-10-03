@@ -3,9 +3,9 @@ import path from "path";
 import {
   dockerCopyFileTo,
   dockerGetContainerWorkingDir
-} from "../modules/docker/cli.js";
+} from "@dappnode/dockerapi";
 // Utils
-import shell from "../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import dataUriToFile from "../utils/dataUriToFile.js";
 import { params } from "@dappnode/params";
 

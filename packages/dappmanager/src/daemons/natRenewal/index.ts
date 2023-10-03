@@ -11,7 +11,7 @@ import {
 } from "../../utils/asyncFlows.js";
 import { PackagePort } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { listContainers } from "../../modules/docker/list/index.js";
+import { listPackageContainers } from "@dappnode/dockerapi";
 
 let isFirstRunGlobal = true;
 async function natRenewal(): Promise<void> {
@@ -52,7 +52,7 @@ async function natRenewal(): Promise<void> {
     }
 
     // Fetch portsToOpen and store them in the DB
-    const containers = await listContainers();
+    const containers = await listPackageContainers();
     const portsToOpen = getPortsToOpen(containers);
     db.portsToOpen.set(portsToOpen);
     if (isFirstRun)

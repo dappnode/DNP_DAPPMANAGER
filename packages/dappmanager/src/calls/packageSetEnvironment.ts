@@ -1,12 +1,15 @@
 import { eventBus } from "@dappnode/eventbus";
-import { listPackage } from "../modules/docker/list/index.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {
   getContainersStatus,
-  dockerComposeUpPackage
-} from "../modules/docker/index.js";
+  dockerComposeUpPackage,
+  listPackage
+} from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "../utils/pid.js";
 import { PackageEnvs } from "@dappnode/types";
+import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
+import { params } from "@dappnode/params";
+import { getDockerComposePath } from "@dappnode/utils";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it
@@ -38,9 +41,18 @@ export async function packageSetEnvironment({
   const containersStatus = await getContainersStatus({ dnpName });
   // Packages sharing PID or must be recreated:
   // - Packages sharing PID must be recreated to ensure startup order
-  await dockerComposeUpPackage({ dnpName }, containersStatus, {
-    forceRecreate: packageInstalledHasPid(compose.compose)
-  });
+  // DAPPMANAGER patch
+  if (dnpName === params.dappmanagerDnpName) {
+    // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+    await restartDappmanagerPatch({
+      composePath: getDockerComposePath(params.dappmanagerDnpName, true)
+    });
+    return;
+  } else {
+    await dockerComposeUpPackage({ dnpName }, containersStatus, {
+      forceRecreate: packageInstalledHasPid(compose.compose)
+    });
+  }
 
   // Emit packages update
   eventBus.requestPackages.emit();

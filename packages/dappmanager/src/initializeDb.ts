@@ -12,7 +12,7 @@ import { params } from "@dappnode/params";
 import ping from "./utils/ping.js";
 import { pause } from "./utils/asyncFlows.js";
 import retry from "async-retry";
-import shell from "./utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { IdentityInterface } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";

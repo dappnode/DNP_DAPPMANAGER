@@ -1,4 +1,4 @@
-import { listPackages } from "../docker/list/index.js";
+import { listPackages } from "@dappnode/dockerapi";
 // Internal
 import { PackageRequest } from "../../types.js";
 import shouldUpdate from "./utils/shouldUpdate.js";

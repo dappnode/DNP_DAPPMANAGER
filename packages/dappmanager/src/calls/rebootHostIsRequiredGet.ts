@@ -1,4 +1,4 @@
-import { shellHost } from "../utils/shell.js";
+import { shellHost } from "@dappnode/utils";
 
 /**
  * Checks weather or not the host machine needs to be rebooted
