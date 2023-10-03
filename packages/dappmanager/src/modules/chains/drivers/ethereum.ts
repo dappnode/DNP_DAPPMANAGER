@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { InstalledPackageData } from "@dappnode/common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers.js";
-import { getPrivateNetworkAlias } from "@dappnode/utils";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { ChainDriverSpecs } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
@@ -40,7 +40,13 @@ export async function ethereum(
   }
 
   const port = chainDriver.portNumber || 8545; // grab specified port in chainDriver and use default port if none specified
-  const containerDomain = getPrivateNetworkAlias(executionLayerContainer);
+
+  const { dnpName } = executionLayerContainer;
+  const containerDomain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: true
+  })
 
   const apiUrl = `http://${containerDomain}:${port}`;
 
