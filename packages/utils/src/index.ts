@@ -12,11 +12,11 @@ export {
 } from "./getDockerComposePath.js";
 export { getRepoDirPath } from "./getRepoDirPath.js";
 export { removeUnderscores } from "./removeUnderscores.js";
-export { shortUniqueDappnodeEns } from "./shortUniqueDappnodeEns.js";
+export { getShortUniqueDnp } from "./getShortUniqueDnp.js";
 export {
-  getPrivateNetworkAlias,
+  buildNetworkAlias,
   getPrivateNetworkAliases,
-} from "./getPrivateNetworkAlias.js";
+} from "./buildNetworkAlias.js";
 export { getIsCore } from "./getIsCore.js";
 export { shell, shellHost, ShellError } from "./shell.js";
 export { normalizeHash } from "./normalizeHash.js";
