@@ -18,6 +18,7 @@ import {
   cleanInstallationArtifacts
 } from "./integrationSpecs/index.js";
 import { ManifestWithImage } from "../../src/types.js";
+import { getDockerComposePath } from "@dappnode/utils";
 
 describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";
@@ -88,7 +89,7 @@ describe("Resilience features, when things go wrong", function () {
     });
 
     it("Remove the compose and then remove the package", async () => {
-      const composePath = getPath.dockerCompose(dnpName, false);
+      const composePath = getDockerComposePath(dnpName, false);
       fs.unlinkSync(composePath);
       await calls.packageRemove({ dnpName, deleteVolumes: true });
     });
@@ -104,7 +105,7 @@ describe("Resilience features, when things go wrong", function () {
     });
 
     it("Break the compose and then remove the package", async () => {
-      const composePath = getPath.dockerCompose(dnpName, false);
+      const composePath = getDockerComposePath(dnpName, false);
       const composeString = fs.readFileSync(composePath, "utf8");
       fs.writeFileSync(composePath, composeString + "BROKEN");
       await calls.packageRemove({ dnpName, deleteVolumes: true });

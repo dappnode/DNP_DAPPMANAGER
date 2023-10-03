@@ -1,6 +1,6 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
-import { isNotFoundError } from "../../utils/node.js";
+import { isNotFoundError } from "@dappnode/utils";
 
 /**
  * contentHashes = {

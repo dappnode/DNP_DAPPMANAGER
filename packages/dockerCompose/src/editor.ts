@@ -9,38 +9,41 @@ import {
   pull,
   uniq,
   concat,
-  omit
+  omit,
 } from "lodash-es";
-import * as getPath from "../../utils/getPath.js";
-import { ContainerLabelsRaw } from "../../types.js";
+import { ContainerLabelsRaw } from "./types.js";
 import {
   Compose,
   ComposeService,
   ComposeNetwork,
   ComposeServiceNetwork,
   PackageEnvs,
-  Manifest
+  Manifest,
 } from "@dappnode/types";
 import {
   stringifyPortMappings,
   parsePortMappings,
-  mergePortMappings
+  mergePortMappings,
 } from "./ports.js";
 import {
   parseEnvironment,
   mergeEnvs,
-  stringifyEnvironment
+  stringifyEnvironment,
 } from "./environment.js";
 import { parseServiceNetworks } from "./networks.js";
 import { verifyCompose } from "./verify.js";
-import { PortMapping, UserSettings } from "@dappnode/common";
-import { parseUserSettings, applyUserSettings } from "./userSettings.js";
-import { isNotFoundError } from "../../utils/node.js";
-import { yamlDump, yamlParse } from "../../utils/yaml.js";
 import {
-  computeGlobalEnvsFromDb,
-  getGlobalEnvsFilePath
-} from "../globalEnvs.js";
+  GlobalEnvsPrefixed,
+  PortMapping,
+  UserSettings,
+} from "@dappnode/common";
+import { parseUserSettings, applyUserSettings } from "./userSettings.js";
+import {
+  getDockerComposePath,
+  isNotFoundError,
+  yamlDump,
+  yamlParse,
+} from "@dappnode/utils";
 import { params } from "@dappnode/params";
 
 export class ComposeServiceEditor {
@@ -52,13 +55,19 @@ export class ComposeServiceEditor {
     this.serviceName = serviceName;
   }
 
+  private getGlobalEnvsFilePath(isCore: boolean): string {
+    return isCore
+      ? params.GLOBAL_ENVS_PATH_FOR_CORE
+      : params.GLOBAL_ENVS_PATH_FOR_DNP;
+  }
+
   private edit(
     serviceEditor: (service: ComposeService) => Partial<ComposeService>
   ): void {
     const service = this.parent.compose.services[this.serviceName];
     this.parent.compose.services[this.serviceName] = {
       ...service,
-      ...serviceEditor(service)
+      ...serviceEditor(service),
     };
   }
 
@@ -72,26 +81,26 @@ export class ComposeServiceEditor {
 
   setPortMapping(newPortMappings: PortMapping[]): void {
     this.edit(() => ({
-      ports: stringifyPortMappings(newPortMappings)
+      ports: stringifyPortMappings(newPortMappings),
     }));
   }
 
   mergePortMapping(newPortMappings: PortMapping[]): void {
-    this.edit(service => ({
+    this.edit((service) => ({
       ports: stringifyPortMappings(
         mergePortMappings(
           newPortMappings,
           parsePortMappings(service.ports || [])
         )
-      )
+      ),
     }));
   }
 
   mergeEnvs(newEnvs: PackageEnvs): void {
-    this.edit(service => ({
+    this.edit((service) => ({
       environment: stringifyEnvironment(
         mergeEnvs(newEnvs, parseEnvironment(service.environment || []))
-      )
+      ),
     }));
   }
 
@@ -100,7 +109,7 @@ export class ComposeServiceEditor {
     aliasesToRemove: string[],
     serviceNetwork: ComposeServiceNetwork
   ): void {
-    this.edit(service => {
+    this.edit((service) => {
       const networks = parseServiceNetworks(service.networks || {});
       // Network and service network aliases must exist
       if (!networks[networkName] || !serviceNetwork.aliases)
@@ -109,11 +118,11 @@ export class ComposeServiceEditor {
         );
 
       const serviceNetworNewAliases = serviceNetwork.aliases.filter(
-        item => !aliasesToRemove.includes(item)
+        (item) => !aliasesToRemove.includes(item)
       );
       const serviceNetworkUpdated = {
         ...serviceNetwork,
-        aliases: serviceNetworNewAliases
+        aliases: serviceNetworNewAliases,
       };
 
       return {
@@ -121,9 +130,9 @@ export class ComposeServiceEditor {
           ...networks,
           [networkName]: {
             ...(networks[networkName] || {}),
-            ...serviceNetworkUpdated
-          }
-        }
+            ...serviceNetworkUpdated,
+          },
+        },
       };
     });
   }
@@ -133,7 +142,7 @@ export class ComposeServiceEditor {
     newAliases: string[],
     serviceNetwork: ComposeServiceNetwork
   ): void {
-    this.edit(service => {
+    this.edit((service) => {
       const networks = parseServiceNetworks(service.networks || {});
       // Network and service network aliases must exist
       if (!networks[networkName] || !serviceNetwork)
@@ -142,11 +151,11 @@ export class ComposeServiceEditor {
         );
       const aliasesUpdated = uniq([
         ...(serviceNetwork.aliases || []),
-        ...newAliases
+        ...newAliases,
       ]);
       const serviceNetworkUpdated = {
         ...serviceNetwork,
-        aliases: aliasesUpdated
+        aliases: aliasesUpdated,
       };
 
       return {
@@ -154,9 +163,9 @@ export class ComposeServiceEditor {
           ...networks,
           [networkName]: {
             ...(networks[networkName] || {}),
-            ...serviceNetworkUpdated
-          }
-        }
+            ...serviceNetworkUpdated,
+          },
+        },
       };
     });
   }
@@ -172,6 +181,7 @@ export class ComposeServiceEditor {
    */
   setGlobalEnvs(
     manifestGlobalEnvs: Manifest["globalEnvs"],
+    globalEnvsFromDbPrefixed: GlobalEnvsPrefixed,
     isCore: boolean
   ): void {
     if (!manifestGlobalEnvs) return;
@@ -180,13 +190,12 @@ export class ComposeServiceEditor {
       for (const globEnv of manifestGlobalEnvs) {
         if (!globEnv.services.includes(this.serviceName)) continue;
         const globalEnvsFromManifestPrefixed = globEnv.envs.map(
-          env => `${params.GLOBAL_ENVS_PREFIX}${env}`
+          (env) => `${params.GLOBAL_ENVS_PREFIX}${env}`
         );
-        const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
 
         if (
           globalEnvsFromManifestPrefixed.some(
-            env => !(env in globalEnvsFromDbPrefixed)
+            (env) => !(env in globalEnvsFromDbPrefixed)
           )
         )
           throw Error(
@@ -201,13 +210,13 @@ export class ComposeServiceEditor {
       }
     } else if ((manifestGlobalEnvs || {}).all) {
       // Add global env_file on request
-      this.addEnvFile(getGlobalEnvsFilePath(isCore));
+      this.addEnvFile(this.getGlobalEnvsFilePath(isCore));
     }
   }
 
   addEnvFile(envFile: string): void {
-    this.edit(service => ({
-      env_file: uniq(concat(service.env_file || [], envFile))
+    this.edit((service) => ({
+      env_file: uniq(concat(service.env_file || [], envFile)),
     }));
   }
 
@@ -215,14 +224,14 @@ export class ComposeServiceEditor {
    * Remove the legacy .env file added per package
    */
   omitDnpEnvFile(): void {
-    this.edit(service => ({
-      env_file: pull(service.env_file || [], `${this.serviceName}.env`)
+    this.edit((service) => ({
+      env_file: pull(service.env_file || [], `${this.serviceName}.env`),
     }));
   }
 
   mergeLabels(labels: ContainerLabelsRaw): void {
-    this.edit(service => ({
-      labels: { ...service.labels, ...labels }
+    this.edit((service) => ({
+      labels: { ...service.labels, ...labels },
     }));
   }
 
@@ -236,16 +245,16 @@ export class ComposeServiceEditor {
     networkConfig?: ComposeNetwork
   ): void {
     // Add network to service
-    this.edit(service => {
+    this.edit((service) => {
       const networks = parseServiceNetworks(service.networks || {});
       return {
         networks: {
           ...networks,
           [networkName]: {
             ...(networks[networkName] || {}),
-            ...(serviceNetwork || {})
-          }
-        }
+            ...(serviceNetwork || {}),
+          },
+        },
       };
     });
 
@@ -253,7 +262,7 @@ export class ComposeServiceEditor {
     if (!this.parent.compose.networks) this.parent.compose.networks = {};
     if (!this.parent.compose.networks[networkName])
       this.parent.compose.networks[networkName] = networkConfig || {
-        external: true
+        external: true,
       };
   }
 
@@ -262,7 +271,7 @@ export class ComposeServiceEditor {
    */
   removeNetwork(networkName: string): void {
     // Remove network from service
-    this.edit(service => {
+    this.edit((service) => {
       const networks = parseServiceNetworks(service.networks || {});
       return { networks: omit(networks, [networkName]) };
     });
@@ -286,7 +295,7 @@ export class ComposeEditor {
   }
 
   static getComposePath(dnpName: string, isCore: boolean): string {
-    return getPath.dockerCompose(dnpName, isCore);
+    return getDockerComposePath(dnpName, isCore);
   }
 
   firstService(): ComposeServiceEditor {
@@ -312,7 +321,7 @@ export class ComposeEditor {
      * - Removes service first levels keys that are objects or arrays and
      *   are empty (environment, env_files, ports, volumes)
      */
-    this.compose.services = mapValues(this.compose.services, service => {
+    this.compose.services = mapValues(this.compose.services, (service) => {
       // To be backwards compatible write ENVs as array
       // Previous DAPPMANAGERs cannot in object form, blocking all docker actions + updates
       if (
@@ -321,9 +330,9 @@ export class ComposeEditor {
       )
         service.environment = stringifyEnvironment(service.environment);
       return {
-        ...omitBy(service, el => isObject(el) && isEmpty(el)),
+        ...omitBy(service, (el) => isObject(el) && isEmpty(el)),
         // Add mandatory properties for the ts compiler
-        ...pick(service, ["container_name", "image"])
+        ...pick(service, ["container_name", "image"]),
       };
     });
 

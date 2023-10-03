@@ -1,4 +1,4 @@
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {
   stopAvahiDaemon,
   startAvahiDaemon,

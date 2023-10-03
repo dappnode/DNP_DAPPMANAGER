@@ -1,4 +1,8 @@
-import { InstalledPackageData, OptimismConfigSet, UserSettings } from "@dappnode/common";
+import {
+  InstalledPackageData,
+  OptimismConfigSet,
+  UserSettings
+} from "@dappnode/common";
 import * as db from "../../db/index.js";
 import { listPackageNoThrow } from "../docker/list/listPackages.js";
 import {
@@ -7,11 +11,17 @@ import {
   executionClientsOptimism,
   ExecutionClientOptimism
 } from "@dappnode/types";
-import { ComposeFileEditor } from "../compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { dockerContainerStart, dockerContainerStop } from "../docker/index.js";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
-import { opNodeServiceName, opNodeRpcUrlEnvName, historicalRpcUrl, opExecutionClientHistoricalRpcUrlEnvName, opClientToServiceMap } from "./params.js";
+import {
+  opNodeServiceName,
+  opNodeRpcUrlEnvName,
+  historicalRpcUrl,
+  opExecutionClientHistoricalRpcUrlEnvName,
+  opClientToServiceMap
+} from "./params.js";
 
 export async function setOptimismConfig({
   archive,
@@ -33,8 +43,7 @@ export async function setOptimismConfig({
     if (db.opEnableHistoricalRpc.get() !== true)
       await db.opEnableHistoricalRpc.set(true);
   } else {
-    if (l2gethPackage)
-      await stopAllContainers([l2gethPackage]);
+    if (l2gethPackage) await stopAllContainers([l2gethPackage]);
 
     if (db.opEnableHistoricalRpc.get() !== false)
       await db.opEnableHistoricalRpc.set(false);
@@ -55,7 +64,6 @@ export async function setOptimismConfig({
     };
 
     if (!targetOpExecutionClientPackage) {
-
       // make sure target package is installed
       await packageInstall({
         name: executionClient.dnpName,
@@ -64,15 +72,15 @@ export async function setOptimismConfig({
     } else {
       await packageSetEnvironment({
         dnpName: executionClient.dnpName,
-        environmentByService: userSettings.environment ? userSettings.environment : {}
+        environmentByService: userSettings.environment
+          ? userSettings.environment
+          : {}
       });
 
       await startAllContainers(targetOpExecutionClientPackage);
-
     }
 
     await stopOtherOpExecutionClients(executionClient.dnpName);
-
   } else {
     // stop all op execution clients
     await stopPkgsByDnpNames([...executionClientsOptimism]);
@@ -98,7 +106,6 @@ export async function setOptimismConfig({
         userSettings: { [optimismNode]: userSettings }
       });
     } else {
-
       await startAllContainers(opNodePackage);
 
       // check if the current env is the same as the new one
@@ -109,7 +116,7 @@ export async function setOptimismConfig({
 
       if (
         opNodeUserSettings.environment?.[opNodeServiceName]?.[
-        opNodeRpcUrlEnvName
+          opNodeRpcUrlEnvName
         ] !== rollup.mainnetRpcUrl
       ) {
         await packageSetEnvironment({
@@ -123,8 +130,7 @@ export async function setOptimismConfig({
       }
     }
   } else {
-    if (opNodePackage)
-      await stopAllContainers([opNodePackage]);
+    if (opNodePackage) await stopAllContainers([opNodePackage]);
   }
 }
 
@@ -138,9 +144,7 @@ async function stopOtherOpExecutionClients(
   await stopPkgsByDnpNames(otherOpExecutionClientDnps);
 }
 
-async function stopPkgsByDnpNames(
-  dnpNames: ExecutionClientOptimism[]
-) {
+async function stopPkgsByDnpNames(dnpNames: ExecutionClientOptimism[]) {
   const pkgs: (InstalledPackageData | null)[] = await Promise.all(
     dnpNames.map(async dnpName => {
       return await listPackageNoThrow({ dnpName });
@@ -159,6 +163,5 @@ async function stopAllContainers(pkgs: InstalledPackageData[]): Promise<void> {
 
 async function startAllContainers(pkg: InstalledPackageData): Promise<void> {
   for (const container of pkg.containers)
-    if (!container.running)
-      await dockerContainerStart(container.containerName);
+    if (!container.running) await dockerContainerStart(container.containerName);
 }

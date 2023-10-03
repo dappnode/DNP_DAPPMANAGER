@@ -8,10 +8,11 @@ import {
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import { yamlParse, yamlDump } from "../../../../src/utils/yaml.js";
+import { yamlDump } from "../../../../src/utils/yaml.js";
 import { setupWizard1To2 } from "../../../../src/modules/setupWizard/setupWizard1To2.js";
 import { isNotFoundError } from "../../../../src/utils/node.js";
 import { fileURLToPath } from "url";
+import { yamlParse } from "@dappnode/utils";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

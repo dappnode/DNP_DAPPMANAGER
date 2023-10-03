@@ -1,6 +1,6 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import * as validate from "../../utils/validate.js";
+import { validatePath } from "@dappnode/utils";
 import verifyXz from "../../utils/verifyXz.js";
 import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
@@ -15,7 +15,7 @@ export default async function getImage(
   // Validate parameters
   if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
     throw Error(`Invalid path: "${path}"`);
-  validate.path(path);
+  validatePath(path);
 
   // Check if cache exist and validate it
   try {

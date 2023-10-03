@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { InstalledPackageData } from "@dappnode/common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
 import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers.js";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { ChainDriverSpecs } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";

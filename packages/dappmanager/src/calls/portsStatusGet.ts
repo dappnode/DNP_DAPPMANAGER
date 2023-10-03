@@ -4,9 +4,9 @@ import { performPortsScan } from "../modules/portsTable/performPortsScan.js";
 import {
   PortToOpen,
   UpnpTablePortStatus,
-  ApiTablePortStatus
+  ApiTablePortStatus,
+  UpnpPortMapping
 } from "@dappnode/common";
-import { UpnpPortMapping } from "../modules/upnpc/types.js";
 
 /**
  * API call that returns the ports status to be displayed in the ports table

@@ -2,17 +2,17 @@ import * as db from "../../db/index.js";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate.js";
 import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
-import { getIsCore } from "../manifest/getIsCore.js";
 import { parseMetadataFromManifest } from "../manifest/index.js";
-import { setDappnodeComposeDefaults } from "../compose/setDappnodeComposeDefaults.js";
-import { ComposeEditor } from "../compose/editor.js";
-import { writeMetadataToLabels } from "../compose/index.js";
+import { setDappnodeComposeDefaults } from "@dappnode/dockercompose";
+import { ComposeEditor, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { fileToMultiaddress } from "../../utils/distributedFile.js";
 import { sanitizeDependencies } from "../dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "../../utils/timeout.js";
 import { ReleaseDownloadedContents } from "./types.js";
 import { getReleaseSignatureStatus } from "./releaseSignature.js";
 import { params } from "@dappnode/params";
+import { getIsCore } from "@dappnode/utils";
+import { computeGlobalEnvsFromDb } from "../globalEnvs.js";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes
@@ -57,8 +57,13 @@ export async function getRelease({
   );
 
   const services = Object.values(compose.services());
+  const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
   for (const service of services) {
-    service.setGlobalEnvs(manifest.globalEnvs, isCore);
+    service.setGlobalEnvs(
+      manifest.globalEnvs,
+      globalEnvsFromDbPrefixed,
+      isCore
+    );
 
     service.mergeLabels(
       writeMetadataToLabels({

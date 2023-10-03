@@ -2,13 +2,14 @@ import "mocha";
 import { expect } from "chai";
 import {
   ComposeFileEditor,
-  ComposeServiceEditor
-} from "../../../../../src/modules/compose/editor.js";
+  ComposeServiceEditor,
+  parseServiceNetworks,
+} from "../../src/index.js";
 import { params } from "@dappnode/params";
-import { shellSafe } from "../../../../testUtils.js";
 import fs from "fs";
-import { parseServiceNetworks } from "../../../../../src/modules/compose/networks.js";
+import path from "path";
 import { ComposeServiceNetwork } from "@dappnode/types";
+import { GlobalEnvsPrefixed } from "@dappnode/common";
 
 describe("compose service editor", () => {
   const exampleCompose = `
@@ -49,11 +50,12 @@ networks:
   // Example package
   const dnpName = "example";
   const serviceName = "goerli-geth.dnp.dappnode.eth";
-  const dnpRepoExamplePath = process.cwd() + "/dnp_repo/example";
+  const dnpRepoExamplePath = path.join(process.cwd(), "dnp_repo", "example");
+  console.log("dnpRepoExamplePath", dnpRepoExamplePath);
 
   before("Create random compose to be edited", async () => {
     // Create necessary dir
-    await shellSafe(`mkdir -p ${dnpRepoExamplePath}`);
+    fs.mkdirSync(dnpRepoExamplePath, { recursive: true });
     // Create example compose
     fs.writeFileSync(
       `${dnpRepoExamplePath}/docker-compose.yml`,
@@ -64,7 +66,7 @@ networks:
   describe("Add/remove network aliases", () => {
     it("Should remove alias: example.dappnode", () => {
       const { compose, composeService, serviceNetwork } = {
-        ...getComposeEditors(dnpName, serviceName)
+        ...getComposeEditors(dnpName, serviceName),
       };
       // Edit existing compose
       composeService.removeNetworkAliases(
@@ -118,7 +120,7 @@ networks:
 
     it("Should add alias: goerli-geth.dappnode", () => {
       const { compose, composeService, serviceNetwork } = {
-        ...getComposeEditors(dnpName, serviceName)
+        ...getComposeEditors(dnpName, serviceName),
       };
       // Edit existing compose
       composeService.addNetworkAliases(
@@ -175,11 +177,11 @@ networks:
   describe("Setglobal envs", () => {
     it("Should add global env file", () => {
       const { compose, composeService } = {
-        ...getComposeEditors(dnpName, serviceName)
+        ...getComposeEditors(dnpName, serviceName),
       };
 
       // Edit existing compose
-      composeService.setGlobalEnvs({ all: true }, false);
+      composeService.setGlobalEnvs({ all: true }, {}, false);
       compose.write();
 
       // Get edited compose
@@ -229,7 +231,12 @@ networks:
 
     it("Should add selected global envs", () => {
       const { compose, composeService } = {
-        ...getComposeEditors(dnpName, serviceName)
+        ...getComposeEditors(dnpName, serviceName),
+      };
+
+      const GlobalEnvsPrefixed: GlobalEnvsPrefixed = {
+        _DAPPNODE_GLOBAL_ACTIVE: "true",
+        _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK: "false",
       };
 
       // Edit existing compose
@@ -237,9 +244,10 @@ networks:
         [
           {
             envs: ["ACTIVE", "NO_NAT_LOOPBACK"],
-            services: ["goerli-geth.dnp.dappnode.eth"]
-          }
+            services: ["goerli-geth.dnp.dappnode.eth"],
+          },
         ],
+        GlobalEnvsPrefixed,
         false
       );
       compose.write();
@@ -297,10 +305,6 @@ networks:
       exampleCompose
     );
   });
-
-  after("Remove setup", async () => {
-    await shellSafe(`rm -rf ${dnpRepoExamplePath}`);
-  });
 });
 
 function getComposeEditors(
@@ -322,6 +326,6 @@ function getComposeEditors(
   return {
     compose,
     composeService,
-    serviceNetwork
+    serviceNetwork,
   };
 }

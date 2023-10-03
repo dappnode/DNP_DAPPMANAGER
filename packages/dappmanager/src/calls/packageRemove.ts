@@ -6,7 +6,7 @@ import {
   dockerContainerRemove,
   dockerContainerStop
 } from "../modules/docker/index.js";
-import * as getPath from "../utils/getPath.js";
+import { getRepoDirPath, getDockerComposePath } from "@dappnode/utils";
 import shell from "../utils/shell.js";
 import { listPackage } from "../modules/docker/list/index.js";
 import { logs } from "@dappnode/logger";
@@ -78,8 +78,8 @@ export async function packageRemove({
   }
 
   // Only no-cores reach this block
-  const composePath = getPath.dockerCompose(dnp.dnpName, false);
-  const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
+  const composePath = getDockerComposePath(dnp.dnpName, false);
+  const packageRepoDir = getRepoDirPath(dnp.dnpName, false);
 
   // [NOTE] Not necessary to close the ports since they will just
   // not be renewed in the next interval

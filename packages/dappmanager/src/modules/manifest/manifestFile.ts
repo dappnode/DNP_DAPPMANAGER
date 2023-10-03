@@ -1,9 +1,7 @@
 import fs from "fs";
 import { Manifest } from "@dappnode/types";
 import * as getPath from "../../utils/getPath.js";
-import * as validate from "../../utils/validate.js";
-import { isNotFoundError } from "../../utils/node.js";
-import { yamlParse } from "../../utils/yaml.js";
+import { validatePath, yamlParse, isNotFoundError } from "@dappnode/utils";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
@@ -28,7 +26,7 @@ export function readManifestIfExists({
   dnpName: string;
   isCore: boolean;
 }): Manifest | null {
-  const manifestPath = validate.path(getPath.manifest(dnpName, isCore));
+  const manifestPath = validatePath(getPath.manifest(dnpName, isCore));
   try {
     return readManifest(manifestPath);
   } catch (e) {

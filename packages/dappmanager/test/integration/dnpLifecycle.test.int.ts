@@ -25,7 +25,7 @@ import {
 import {
   stringifyPortMappings,
   parseEnvironment
-} from "../../src/modules/compose/index.js";
+} from "@dappnode/dockercompose";
 import {
   dockerContainerInspect,
   dockerGetArchiveSingleFile

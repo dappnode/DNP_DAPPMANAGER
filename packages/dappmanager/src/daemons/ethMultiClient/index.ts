@@ -5,12 +5,13 @@ import { packageInstall } from "../../calls/index.js";
 import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import {
-  EthClientInstallStatus,
-  serializeError
-} from "../../modules/ethClient/types.js";
+import { serializeError } from "../../modules/ethClient/types.js";
 import { logs } from "@dappnode/logger";
-import { EthClientRemote, EthProviderError } from "@dappnode/common";
+import {
+  EthClientRemote,
+  EthProviderError,
+  EthClientInstallStatus
+} from "@dappnode/common";
 import {
   ethereumClient,
   getLocalFallbackContentHash

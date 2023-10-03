@@ -1,11 +1,13 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
-import { getContainerName } from "@dappnode/utils";
+import {
+  getContainerName,
+  getPrivateNetworkAliases,
+  getIsCore,
+} from "@dappnode/utils";
 import { params } from "@dappnode/params";
-import { getIsCore } from "../manifest/getIsCore.js";
 import { cleanCompose } from "./clean.js";
 import { parseEnvironment } from "./environment.js";
 import { parseServiceNetworks } from "./networks.js";
-import { getPrivateNetworkAliases } from "../../domains.js";
 import {
   Manifest,
   Compose,
@@ -13,7 +15,7 @@ import {
   ComposeServiceNetworks,
   ComposeNetworks,
   dockerComposeSafeKeys,
-  getImageTag
+  getImageTag,
 } from "@dappnode/types";
 import { lt } from "semver";
 
@@ -41,15 +43,15 @@ export function setDappnodeComposeDefaults(
             driver: "json-file",
             options: {
               "max-size": "10m",
-              "max-file": "3"
-            }
+              "max-file": "3",
+            },
           },
           restart: "unless-stopped",
 
           // SAFE KEYS: values that are whitelisted
           ...pick(
             serviceUnsafe,
-            dockerComposeSafeKeys.filter(safeKey => safeKey !== "build")
+            dockerComposeSafeKeys.filter((safeKey) => safeKey !== "build")
           ),
 
           // MANDATORY VALUES: values that will be overwritten with dappnode defaults
@@ -61,15 +63,15 @@ export function setDappnodeComposeDefaults(
             serviceName,
             dnpName,
             // The root pkg alias will be added to the main service or if it is a mono service
-            isMain: isMonoService || manifest.mainService === serviceName
-          })
+            isMain: isMonoService || manifest.mainService === serviceName,
+          }),
         });
       }
     ),
 
     volumes: composeUnsafe.volumes || {},
 
-    networks: setNetworks(composeUnsafe.networks)
+    networks: setNetworks(composeUnsafe.networks),
   });
 }
 
@@ -100,8 +102,8 @@ function setServiceNetworksWithAliases(
   if (!serviceNetworks)
     return {
       [params.DNP_PRIVATE_NETWORK_NAME]: {
-        aliases: getPrivateNetworkAliases(service)
-      }
+        aliases: getPrivateNetworkAliases(service),
+      },
     };
 
   // Return the service network dncore_network with the aliases added
@@ -110,8 +112,8 @@ function setServiceNetworksWithAliases(
     ...serviceNetworks,
     [params.DNP_PRIVATE_NETWORK_NAME]: {
       ...(serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || {}),
-      aliases: getPrivateNetworkAliases(service)
-    }
+      aliases: getPrivateNetworkAliases(service),
+    },
   };
 }
 
@@ -128,8 +130,8 @@ function setNetworks(
     return {
       ...networks,
       [params.DNP_PRIVATE_NETWORK_NAME]: {
-        external: true
-      }
+        external: true,
+      },
     };
 
   // Return the network dncore_network with the external: true added
@@ -138,8 +140,8 @@ function setNetworks(
       ...networks,
       [params.DNP_PRIVATE_NETWORK_NAME]: {
         ...dncoreNetwork,
-        external: true
-      }
+        external: true,
+      },
     };
 
   return networks;

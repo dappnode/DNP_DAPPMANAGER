@@ -22,6 +22,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "@dappnode/common": "^0.1.0",
+    "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/eventbus": "^0.1.0",
     "@dappnode/logger": "^0.1.0",
     "@dappnode/params": "^0.1.0",

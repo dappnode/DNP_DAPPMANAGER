@@ -8,10 +8,10 @@ import {
   UserSettings,
   InstalledPackageData,
   Eth2ClientTarget,
-  EthClientRemote
+  EthClientRemote,
+  EthClientInstallStatus
 } from "@dappnode/common";
 import { mockDnp, mockContainer } from "../../../testUtils.js";
-import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types.js";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet

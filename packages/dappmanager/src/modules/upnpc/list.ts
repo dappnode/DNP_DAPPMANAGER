@@ -1,6 +1,5 @@
 import upnpcCommand from "./upnpcCommand.js";
-import { PortProtocol } from "@dappnode/common";
-import { UpnpPortMapping } from "./types.js";
+import { PortProtocol, UpnpPortMapping } from "@dappnode/common";
 import { parseUpnpErrors } from "./upnpError.js";
 
 /**

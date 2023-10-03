@@ -1,3 +1,4 @@
+import { params } from "@dappnode/params";
 import {
   Manifest,
   SetupWizard,
@@ -209,6 +210,12 @@ export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
  * =========================
  */
 
+export interface RegistryNewRepoEvent {
+  txHash: string;
+  ensName: string;
+  timestamp: number;
+}
+
 export interface RegistryScanProgress {
   lastFetchedBlock: number;
   latestBlock: number;
@@ -347,6 +354,13 @@ export interface SetupWizardAllDnps {
 export enum PortProtocol {
   UDP = "UDP",
   TCP = "TCP",
+}
+
+export interface UpnpPortMapping {
+  protocol: PortProtocol;
+  exPort: string;
+  inPort: string;
+  ip: string;
 }
 
 interface BasicPortMapping {
@@ -1071,6 +1085,22 @@ export interface InstallPackageData extends PackageRelease {
  */
 
 /**
+ * DB types
+ */
+
+export type EthClientInstallStatus =
+  | { status: "TO_INSTALL" }
+  | { status: "INSTALLING" }
+  | { status: "INSTALLING_ERROR"; error: ErrorSerialized }
+  | { status: "INSTALLED" }
+  | { status: "UNINSTALLED" };
+
+export type EthClientSyncedNotificationStatus = {
+  execClientTarget: ExecutionClientMainnet;
+  status: "AwaitingSynced" | "Synced";
+} | null;
+
+/**
  * Eth provider / client types
  * Manage the Ethereum multi-client setup
  * TO BE DEPRECATED
@@ -1424,3 +1454,41 @@ export interface RpcResponse<R = any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   error?: { code: number; message: string; data?: any };
 }
+
+/**
+ * ==
+ * DB
+ * ==
+ */
+
+export interface IdentityInterface {
+  address: string;
+  privateKey: string;
+  publicKey: string;
+}
+
+/**
+ * ===========
+ * GLOBAL ENVS
+ * ===========
+ */
+
+type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
+type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
+
+export type GlobalEnvs = {
+  [K in keyof typeof params.GLOBAL_ENVS]: string;
+};
+
+// Create type GlobalEnvsPrefixed where the key may be any value from GlobalEnvsValues
+export type GlobalEnvsPrefixed = {
+  [K in GlobalEnvsValues]: string;
+};
+
+/**
+ * =====
+ * UTILS
+ * =====
+ */
+
+export type ContainerNames = { serviceName: string; dnpName: string };

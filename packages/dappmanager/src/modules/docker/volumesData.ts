@@ -1,6 +1,6 @@
 import { dockerDf, dockerVolumesList } from "./api/index.js";
 import { listContainers } from "./list/index.js";
-import { parseDevicePath } from "../compose/index.js";
+import { parseDevicePath } from "@dappnode/dockercompose";
 import {
   VolumeData,
   VolumeOwnershipData,

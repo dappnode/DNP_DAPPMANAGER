@@ -7,3 +7,8 @@ export * from "./userSettings.js";
 export * from "./validate.js";
 export * from "./verify.js";
 export * from "./volumes.js";
+export * from "./types.js";
+export * from "./editor.js";
+export * from "./clean.js";
+export * from "./networks.js";
+export * from "./specialPermissions.js";

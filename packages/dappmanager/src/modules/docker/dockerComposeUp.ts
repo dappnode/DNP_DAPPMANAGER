@@ -1,8 +1,7 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
-import * as getPath from "../../utils/getPath.js";
 import { restartDappmanagerPatch } from "../installer/restartPatch.js";
-import { ComposeFileEditor } from "../compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {
   dockerComposeDown,
   dockerComposeUp,
@@ -16,6 +15,7 @@ import {
   InstalledPackageData,
   PackageContainer
 } from "@dappnode/common";
+import { getDockerComposePathSmart } from "@dappnode/utils";
 
 interface ComposeUpArgs {
   dnpName: string;
@@ -33,7 +33,7 @@ export async function dockerComposeUpPackage(
   dockerComposeUpOptions: DockerComposeUpOptions = {},
   upAll = false
 ): Promise<void> {
-  if (!composePath) composePath = getPath.dockerComposeSmart(dnpName);
+  if (!composePath) composePath = getDockerComposePathSmart(dnpName);
   if (!fs.existsSync(composePath)) {
     throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
   }

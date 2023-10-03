@@ -1,4 +1,4 @@
-import { ContainerLabelsRaw, ContainerLabelTypes } from "../../types.js";
+import { ContainerLabelsRaw, ContainerLabelTypes } from "./types.js";
 import { stringifyEnvironment } from "./environment.js";
 import {
   ComposeService,
@@ -6,7 +6,7 @@ import {
   ChainDriverSpecs,
   ChainDriverType,
   chainDriversTypes,
-  Dependencies
+  Dependencies,
 } from "@dappnode/types";
 import { pick, omitBy, mapValues } from "lodash-es";
 
@@ -47,10 +47,10 @@ const labelParseFns: {
   "dappnode.dnp.version": parseString,
   "dappnode.dnp.serviceName": parseString,
   "dappnode.dnp.instanceName": parseString,
-  "dappnode.dnp.dependencies": value => parseJsonSafe(value) || {},
+  "dappnode.dnp.dependencies": (value) => parseJsonSafe(value) || {},
   "dappnode.dnp.avatar": parseString,
   "dappnode.dnp.origin": parseString,
-  "dappnode.dnp.chain": value => {
+  "dappnode.dnp.chain": (value) => {
     if (chainDriversTypes.includes(value as ChainDriverType)) {
       return value as ChainDriverType;
     }
@@ -67,9 +67,9 @@ const labelParseFns: {
   "dappnode.dnp.isCore": parseBool,
   "dappnode.dnp.isMain": parseBool,
   "dappnode.dnp.dockerTimeout": parseNumber,
-  "dappnode.dnp.default.environment": value => parseJsonSafe(value),
-  "dappnode.dnp.default.ports": value => parseJsonSafe(value),
-  "dappnode.dnp.default.volumes": value => parseJsonSafe(value)
+  "dappnode.dnp.default.environment": (value) => parseJsonSafe(value),
+  "dappnode.dnp.default.ports": (value) => parseJsonSafe(value),
+  "dappnode.dnp.default.volumes": (value) => parseJsonSafe(value),
 };
 
 const labelStringifyFns: {
@@ -84,7 +84,7 @@ const labelStringifyFns: {
   "dappnode.dnp.dependencies": writeJson,
   "dappnode.dnp.avatar": writeString,
   "dappnode.dnp.origin": writeString,
-  "dappnode.dnp.chain": value =>
+  "dappnode.dnp.chain": (value) =>
     value && chainDriversTypes.includes(value as ChainDriverType)
       ? writeString(value as ChainDriverType)
       : writeJson(value as ChainDriverSpecs),
@@ -93,7 +93,7 @@ const labelStringifyFns: {
   "dappnode.dnp.dockerTimeout": writeNumber,
   "dappnode.dnp.default.environment": writeJson,
   "dappnode.dnp.default.ports": writeJson,
-  "dappnode.dnp.default.volumes": writeJson
+  "dappnode.dnp.default.volumes": writeJson,
 };
 
 function parseContainerLabels(
@@ -114,7 +114,7 @@ function stringifyContainerLabels(
         labels[label as keyof ContainerLabelTypes]
       )
   ) as ContainerLabelsRaw;
-  return omitBy(labelsRaw, value => value === undefined);
+  return omitBy(labelsRaw, (value) => value === undefined);
 }
 
 type ServiceDefaultSettings = Pick<
@@ -125,7 +125,7 @@ type ServiceDefaultSettings = Pick<
 export function writeDefaultsToLabels({
   environment,
   ports,
-  volumes
+  volumes,
 }: ServiceDefaultSettings): ContainerLabelsRaw {
   return stringifyContainerLabels({
     "dappnode.dnp.default.environment":
@@ -134,11 +134,13 @@ export function writeDefaultsToLabels({
         ? environment
         : stringifyEnvironment(environment)),
     "dappnode.dnp.default.ports": ports,
-    "dappnode.dnp.default.volumes": volumes
+    "dappnode.dnp.default.volumes": volumes,
   });
 }
 
-export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
+export function readContainerLabels(
+  labelsRaw: ContainerLabelsRaw
+): Partial<{
   dnpName: string;
   version: string;
   serviceName: string;
@@ -169,7 +171,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
     dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
     defaultPorts: labelValues["dappnode.dnp.default.ports"],
-    defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
+    defaultVolumes: labelValues["dappnode.dnp.default.volumes"],
   };
 }
 
@@ -183,7 +185,7 @@ export function writeMetadataToLabels({
   origin,
   isCore,
   isMain,
-  dockerTimeout
+  dockerTimeout,
 }: {
   dnpName: string;
   version: string;
@@ -206,6 +208,6 @@ export function writeMetadataToLabels({
     "dappnode.dnp.chain": chain,
     "dappnode.dnp.isCore": isCore,
     "dappnode.dnp.isMain": isMain,
-    "dappnode.dnp.dockerTimeout": dockerTimeout
+    "dappnode.dnp.dockerTimeout": dockerTimeout,
   });
 }

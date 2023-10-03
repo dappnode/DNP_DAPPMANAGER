@@ -12,8 +12,7 @@ import {
   listContainers
 } from "../../../src/modules/docker/list/index.js";
 import { dockerContainerInspect } from "../../../src/modules/docker/api/index.js";
-import { ComposeEditor } from "../../../src/modules/compose/editor.js";
-
+import { ComposeEditor } from "@dappnode/dockercompose";
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,
  * a copy of it will still be around and may cause trouble

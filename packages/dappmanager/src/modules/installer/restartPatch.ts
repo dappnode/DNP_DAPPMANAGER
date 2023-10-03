@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import * as getPath from "../../utils/getPath.js";
-import * as validate from "../../utils/validate.js";
+import { getDockerComposePath, validatePath } from "@dappnode/utils";
 import * as db from "../../db/index.js";
 import shell from "../../utils/shell.js";
 import { pause } from "../../utils/asyncFlows.js";
@@ -18,7 +18,7 @@ import { rollbackPackages } from "./rollbackPackages.js";
 import { postInstallClean } from "./postInstallClean.js";
 import { afterInstall } from "./afterInstall.js";
 import { flagPackagesAreInstalling } from "./packageIsInstalling.js";
-import { ComposeEditor } from "../compose/editor.js";
+import { ComposeEditor } from "@dappnode/dockercompose";
 import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
 
 const restartId = params.restartDnpName;
@@ -50,7 +50,7 @@ export async function restartDappmanagerPatch({
   restartLaunchCommand?: string;
   packagesData?: InstallPackageData[];
 }): Promise<void> {
-  const composeRestartPath = getPath.dockerCompose(restartId, true);
+  const composeRestartPath = getDockerComposePath(restartId, true);
   if (!composeBackupPath) composeBackupPath = getPath.backupPath(composePath);
 
   // Must make sure that there is no restart container running previously
@@ -123,7 +123,7 @@ exit $UPEXIT
     }
   });
 
-  validate.path(composeRestartPath);
+  validatePath(composeRestartPath);
   composeRestart.writeTo(composeRestartPath);
 
   try {

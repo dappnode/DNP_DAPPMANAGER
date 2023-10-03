@@ -2,24 +2,15 @@ import fs from "fs";
 import { mapKeys } from "lodash-es";
 import * as db from "../db/index.js";
 import { params } from "@dappnode/params";
-import { stringifyEnvironment } from "../modules/compose/index.js";
 import { PackageEnvs } from "@dappnode/types";
 import { packageSetEnvironment } from "../calls/packageSetEnvironment.js";
 import { logs } from "@dappnode/logger";
-import { ComposeFileEditor } from "./compose/editor.js";
+import {
+  ComposeFileEditor,
+  stringifyEnvironment
+} from "@dappnode/dockercompose";
 import { listContainers } from "./docker/list/index.js";
-
-type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
-type GlobalEnvsValues = (typeof params.GLOBAL_ENVS)[GlobalEnvsKeys];
-
-export type GlobalEnvs = {
-  [K in keyof typeof params.GLOBAL_ENVS]: string;
-};
-
-// Create type GlobalEnvsPrefixed where the key may be any value from GlobalEnvsValues
-export type GlobalEnvsPrefixed = {
-  [K in GlobalEnvsValues]: string;
-};
+import { GlobalEnvs, GlobalEnvsPrefixed } from "@dappnode/common";
 
 export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
 
@@ -59,7 +50,7 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}MEVBOOST_LUKSO`]: db.mevBoostLukso.get(),
     [`${prefix}FEE_RECIPIENT_LUKSO`]: db.feeRecipientLukso.get(),
     [`${prefix}OP_ENABLE_HISTORICAL_RPC`]: db.opEnableHistoricalRpc.get(),
-    [`${prefix}OP_EXECUTION_CLIENT`]: db.opExecutionClient.get(),
+    [`${prefix}OP_EXECUTION_CLIENT`]: db.opExecutionClient.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }
@@ -115,12 +106,6 @@ export async function updatePkgsWithGlobalEnvs(
       logs.error(err);
     });
   }
-}
-
-export function getGlobalEnvsFilePath(isCore: boolean): string {
-  return isCore
-    ? params.GLOBAL_ENVS_PATH_FOR_CORE
-    : params.GLOBAL_ENVS_PATH_FOR_DNP;
 }
 
 /**

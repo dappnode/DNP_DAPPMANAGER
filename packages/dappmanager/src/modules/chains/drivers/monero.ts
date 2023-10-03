@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Daemon } from "monero-rpc";
 import { InstalledPackageData } from "@dappnode/common";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
 
 // Monero's average block time is 2 minutes

@@ -1,8 +1,8 @@
 import "mocha";
 import { expect } from "chai";
-import { mockCompose } from "../../../testUtils.js";
+import { mockCompose } from "../testUtils.js";
 import { Compose } from "@dappnode/types";
-import { validateCompose } from "../../../../src/modules/compose/index.js";
+import { validateCompose } from "../../src/index.js";
 
 describe("validateCompose", () => {
   it("Should validate a valid compose", () => {
@@ -11,7 +11,7 @@ describe("validateCompose", () => {
   });
 
   it("Should reject an empty compose", () => {
-    expect(function () {
+    expect(function() {
       validateCompose({} as Compose);
     }).to.throw("Invalid compose");
   });

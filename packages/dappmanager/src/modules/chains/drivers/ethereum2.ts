@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { ChainDriverSpecs } from "@dappnode/types";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { urlJoin } from "../../../utils/url.js";
 import { InstalledPackageData } from "@dappnode/common";
 import { ChainDataResult } from "../types.js";

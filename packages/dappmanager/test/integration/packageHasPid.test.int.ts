@@ -6,7 +6,7 @@ import {
   packageToInstallHasPid,
   getServicesSharingPid
 } from "../../src/utils/pid.js";
-import { ComposeFileEditor } from "../../src/modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { ComposeServicesSharingPid } from "../../src/types.js";
 
 describe("Module > compose > pid", () => {

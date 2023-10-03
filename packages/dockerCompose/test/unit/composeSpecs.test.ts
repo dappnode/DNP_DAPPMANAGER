@@ -3,23 +3,22 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 import { Manifest, Compose } from "@dappnode/types";
-import { yamlParse, yamlDump } from "../../../../src/utils/yaml.js";
+import { yamlParse, yamlDump, isNotFoundError } from "@dappnode/utils";
 import {
   setDappnodeComposeDefaults,
   validateCompose,
-  verifyCompose
-} from "../../../../src/modules/compose/index.js";
-import { isNotFoundError } from "../../../../src/utils/node.js";
+  verifyCompose,
+} from "../../src/index.js";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const specsDir = path.join(__dirname, "../releaseSpecs");
+const specsDir = path.join(__dirname, "./releaseSpecs");
 
 const paths = {
   manifest: "dappnode_package.json",
   compose: "docker-compose.yml",
-  composeParsed: "docker-compose.parsed.yml"
+  composeParsed: "docker-compose.parsed.yml",
 };
 
 describe("Compose specs, against real DNPs", () => {

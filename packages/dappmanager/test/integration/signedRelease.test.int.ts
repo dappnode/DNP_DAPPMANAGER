@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
-import { ComposeEditor } from "../../src/modules/compose/editor.js";
+import { ComposeEditor } from "@dappnode/dockercompose";
 import { ipfs } from "../../src/modules/ipfs/index.js";
 import { ReleaseFetcher } from "../../src/modules/release/index.js";
 import { getContainerName } from "@dappnode/utils";

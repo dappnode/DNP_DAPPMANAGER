@@ -1,6 +1,5 @@
 import { expect } from "chai";
-import { parseServiceNetworks } from "../../../../src/modules/compose/networks.js";
-import { ComposeEditor } from "../../../../src/modules/compose/editor.js";
+import { ComposeEditor, parseServiceNetworks } from "../../src/index.js";
 
 describe("modules / compose / networks", () => {
   describe("parseServiceNetworks", () => {
@@ -14,13 +13,13 @@ describe("modules / compose / networks", () => {
       {
         id: "From array to obj",
         from: ["dncore_network"],
-        to: { dncore_network: {} }
+        to: { dncore_network: {} },
       },
       {
         id: "Keep obj",
         from: { dncore_network: {} },
-        to: { dncore_network: {} }
-      }
+        to: { dncore_network: {} },
+      },
     ];
 
     for (const { id, from, to } of testCases) {
@@ -42,8 +41,8 @@ describe("modules / compose / networks", () => {
       const compose = new ComposeEditor({
         version: "3.5",
         services: {
-          [serviceName]: { container_name, image }
-        }
+          [serviceName]: { container_name, image },
+        },
       });
 
       compose.firstService().addNetwork(networkName, { aliases });
@@ -54,13 +53,13 @@ describe("modules / compose / networks", () => {
             container_name,
             image,
             networks: {
-              [networkName]: { aliases }
-            }
-          }
+              [networkName]: { aliases },
+            },
+          },
         },
         networks: {
-          [networkName]: { external: true }
-        }
+          [networkName]: { external: true },
+        },
       });
 
       compose.firstService().removeNetwork(networkName);
@@ -69,10 +68,10 @@ describe("modules / compose / networks", () => {
         services: {
           "sample.dnp.dappnode.eth": {
             container_name,
-            image
-          }
+            image,
+          },
         },
-        networks: {}
+        networks: {},
       });
     });
   });

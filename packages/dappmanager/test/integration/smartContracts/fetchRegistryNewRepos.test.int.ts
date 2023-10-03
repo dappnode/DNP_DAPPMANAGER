@@ -5,7 +5,7 @@ import * as calls from "../../../src/calls/index.js";
 import * as db from "../../../src/db/index.js";
 import { getRegistryOnRange } from "../../../src/modules/registry/index.js";
 import { clearDbs } from "../../testUtils.js";
-import { RegistryNewRepoEvent } from "../../../src/types.js";
+import { RegistryNewRepoEvent } from "@dappnode/common";
 
 describe.skip("APM Registry", () => {
   before("Clear DBs and set remote", async () => {
