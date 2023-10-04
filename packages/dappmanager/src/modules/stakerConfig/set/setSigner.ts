@@ -1,7 +1,7 @@
 import { InstalledPackageData } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage } from "../../docker/index.js";
+import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setSigner({

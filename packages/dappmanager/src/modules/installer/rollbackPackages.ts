@@ -3,8 +3,9 @@ import { params } from "@dappnode/params";
 import { Log } from "../../utils/logUi.js";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { isNotFoundError } from "../../utils/node.js";
-import { dockerComposeRm, dockerComposeUpPackage } from "../docker/index.js";
+import { isNotFoundError } from "@dappnode/utils";
+import { dockerComposeRm, dockerComposeUpPackage } from "@dappnode/dockerapi";
+import { restartDappmanagerPatch } from "./restartPatch.js";
 
 /**
  * [Rollback] Stop all new packages with the new compose
@@ -51,11 +52,18 @@ export async function rollbackPackages(
         // restartPatch failed before stopping the original container there's no need
         // to roll back, since the current container has the original version.
       } else if (pkg.isUpdate) {
-        await dockerComposeUpPackage(
-          { dnpName: pkg.dnpName, composePath: pkg.composePath },
-          pkg.containersStatus,
-          { timeout: pkg.dockerTimeout }
-        );
+        // DAPPMANAGER patch
+        if (pkg.dnpName === params.dappmanagerDnpName) {
+          // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+          await restartDappmanagerPatch({ composePath: pkg.composePath });
+          return;
+        } else {
+          await dockerComposeUpPackage(
+            { dnpName: pkg.dnpName, composePath: pkg.composePath },
+            pkg.containersStatus,
+            { timeout: pkg.dockerTimeout }
+          );
+        }
       } else {
         // Remove new containers that were NOT installed before this install call
         await dockerComposeRm(pkg.composePath);

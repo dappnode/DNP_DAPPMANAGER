@@ -3,9 +3,9 @@ import { expect } from "chai";
 import fs from "fs";
 import { createTestDir, cleanTestDir } from "../../../testUtils.js";
 import * as getPath from "../../../../src/utils/getPath.js";
-import * as validate from "../../../../src/utils/validate.js";
 import { yamlDump } from "../../../../src/utils/yaml.js";
 import { migrateLegacyEnvFile } from "../../../../src/modules/migrations/removeLegacyDockerAssets.js";
+import { getDockerComposePath, validatePath } from "@dappnode/utils";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {
@@ -16,13 +16,13 @@ describe("migrateLegacyEnvFiles", () => {
     const dnpName = "mock-dnp.dnp.dappnode.eth";
     const isCore = false;
     const envFilePath = getPath.envFile(dnpName, isCore);
-    const composePath = getPath.dockerCompose(dnpName, isCore);
+    const composePath = getDockerComposePath(dnpName, isCore);
     const compose = {
       version: "3.5",
       services: { [dnpName]: { image: `${dnpName}:0.2.0` } }
     };
     const composeString = yamlDump(compose);
-    validate.path(envFilePath);
+    validatePath(envFilePath);
     fs.writeFileSync(envFilePath, "");
     fs.writeFileSync(composePath, composeString);
 
@@ -42,7 +42,7 @@ describe("migrateLegacyEnvFiles", () => {
     const dnpName = "mock2-dnp.dnp.dappnode.eth";
     const isCore = false;
     const envFilePath = getPath.envFile(dnpName, isCore);
-    const composePath = getPath.dockerCompose(dnpName, isCore);
+    const composePath = getDockerComposePath(dnpName, isCore);
     const envsString = "NAME=VALUE";
     const composeString = yamlDump({
       version: "3.5",
@@ -53,7 +53,7 @@ describe("migrateLegacyEnvFiles", () => {
         }
       }
     });
-    validate.path(envFilePath);
+    validatePath(envFilePath);
     fs.writeFileSync(envFilePath, envsString);
     fs.writeFileSync(composePath, composeString);
 

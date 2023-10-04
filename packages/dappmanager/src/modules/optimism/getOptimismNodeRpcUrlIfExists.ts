@@ -1,5 +1,5 @@
 import { optimismNode } from "@dappnode/types";
-import { ComposeFileEditor } from "../compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { opNodeRpcUrlEnvName, opNodeServiceName } from "./params.js";
 
 export function getOptimismNodeRpcUrlIfExists(): string {

@@ -3,9 +3,11 @@ import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
 import fetch from "node-fetch";
-import { docker } from "../../src/modules/docker/api/docker.js";
-import { dockerGetArchiveSingleFile } from "../../src/modules/docker/api/getArchive.js";
-import { dockerPutArchiveSingleFile } from "../../src/modules/docker/api/putArchive.js";
+import {
+  docker,
+  dockerGetArchiveSingleFile,
+  dockerPutArchiveSingleFile
+} from "@dappnode/dockerapi";
 import { fileDownload } from "../../src/api/routes/fileDownload.js";
 import { URL } from "url";
 import { MemoryWritable } from "./testStreamUtils.js";

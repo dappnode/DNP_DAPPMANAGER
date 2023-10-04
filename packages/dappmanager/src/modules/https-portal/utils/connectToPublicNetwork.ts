@@ -5,9 +5,9 @@ import { params } from "@dappnode/params";
 import {
   dockerListNetworks,
   dockerCreateNetwork,
-  dockerNetworkConnect
-} from "../../docker/index.js";
-import { listPackageNoThrow } from "../../docker/list/index.js";
+  dockerNetworkConnect,
+  listPackageNoThrow
+} from "@dappnode/dockerapi";
 import { isRunningHttps } from "./isRunningHttps.js";
 
 /**

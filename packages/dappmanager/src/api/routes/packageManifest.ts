@@ -1,5 +1,5 @@
 import { pick } from "lodash-es";
-import { listPackage } from "../../modules/docker/list/index.js";
+import { listPackage } from "@dappnode/dockerapi";
 import { readManifestIfExists } from "../../modules/manifest/index.js";
 import { wrapHandler } from "../utils.js";
 

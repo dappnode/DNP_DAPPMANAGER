@@ -62,17 +62,23 @@ COPY packages/eventBus/package.json \
   packages/eventBus/
 COPY packages/logger/package.json \ 
   packages/logger/
+COPY packages/dockerCompose/package.json \ 
+  packages/dockerCompose/
+COPY packages/dockerApi/package.json \ 
+  packages/dockerApi/
+COPY packages/hostScripts/package.json \
+  packages/hostScripts/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
-
-# Build common
-WORKDIR /app/packages/common/
-COPY packages/common/ .
-RUN yarn build
-# Results in dist/*
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build common
+WORKDIR /app/packages/common/
+COPY packages/common/ .
 RUN yarn build
 # Results in dist/*
 
@@ -88,9 +94,33 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
+RUN yarn build
+# Results in dist/*
+
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScripts
+WORKDIR /app/packages/hostScripts/
+COPY packages/hostScripts/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dockerApi
+WORKDIR /app/packages/dockerApi/
+COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dappmanager
+WORKDIR /app/packages/dappmanager/
+COPY packages/dappmanager/ .
 RUN yarn build
 # Results in dist/*
 
@@ -100,12 +130,6 @@ COPY packages/admin-ui/ .
 ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
-
-# Build dappmanager
-WORKDIR /app/packages/dappmanager/
-COPY packages/dappmanager/ .
-RUN yarn build
-# Results in dist/*
 
 # Copy docker
 COPY docker/rndc.conf /etc/bind/
@@ -120,8 +144,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy the src last as it's the layer most likely to change
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
+COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
 
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns

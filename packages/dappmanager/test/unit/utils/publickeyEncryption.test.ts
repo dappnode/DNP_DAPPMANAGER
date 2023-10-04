@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { params } from "@dappnode/params";
-
 import {
   generateKeyPair,
   encrypt,

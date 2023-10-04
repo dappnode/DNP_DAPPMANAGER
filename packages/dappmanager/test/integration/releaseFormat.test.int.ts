@@ -4,7 +4,7 @@ import { mapValues } from "lodash-es";
 import * as calls from "../../src/calls/index.js";
 import { createTestDir, beforeAndAfter, cleanTestDir } from "../testUtils.js";
 import { params } from "@dappnode/params";
-import shell from "../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { TrustedReleaseKey } from "@dappnode/common";
 import {
   cleanInstallationArtifacts,

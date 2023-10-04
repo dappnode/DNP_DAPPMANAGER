@@ -1,12 +1,12 @@
 import { dbCache, dbMain } from "./dbFactory.js";
-import { EthClientSyncedNotificationStatus } from "../types.js";
-import { EthClientInstallStatus } from "../modules/ethClient/types.js";
 import { eventBus } from "@dappnode/eventbus";
 import {
   EthClientTarget,
   EthClientRemote,
   EthClientFallback,
-  EthClientStatus
+  EthClientStatus,
+  EthClientSyncedNotificationStatus,
+  EthClientInstallStatus
 } from "@dappnode/common";
 import {
   ExecutionClientMainnet,

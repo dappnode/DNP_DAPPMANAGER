@@ -7,21 +7,23 @@ import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
-import { ComposeFileEditor } from "../compose/editor.js";
-import { parseServiceNetworks } from "../compose/networks.js";
+import {
+  ComposeFileEditor,
+  parseServiceNetworks
+} from "@dappnode/dockercompose";
 import { params } from "@dappnode/params";
 import {
   dockerComposeUpPackage,
   dockerNetworkConnect,
-  dockerNetworkDisconnect
-} from "../docker/index.js";
+  dockerNetworkDisconnect,
+  listPackageNoThrow,
+  getDnCoreNetworkContainerConfig
+} from "@dappnode/dockerapi";
 import Dockerode from "dockerode";
-import { listPackageNoThrow } from "../docker/list/index.js";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet
 } from "@dappnode/types";
-import { getDnCoreNetworkContainerConfig } from "../docker/api/network.js";
 export class EthereumClient {
   /**
    * Computes the current eth2ClientTarget based on:

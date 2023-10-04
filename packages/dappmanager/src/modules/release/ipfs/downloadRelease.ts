@@ -16,12 +16,12 @@ import { isDirectoryRelease } from "./isDirectoryRelease.js";
 import { serializeIpfsDirectory } from "../releaseSignature.js";
 import { ReleaseDownloadedContents } from "../types.js";
 import { Manifest, releaseFiles } from "@dappnode/types";
-import { getIsCore } from "../../manifest/getIsCore.js";
 import { DistributedFile } from "@dappnode/common";
 import {
   validateManifestSchema,
   validateDappnodeCompose
 } from "@dappnode/schemas";
+import { getIsCore } from "@dappnode/utils";
 
 const source = "ipfs" as const;
 

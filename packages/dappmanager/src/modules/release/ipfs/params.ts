@@ -11,7 +11,7 @@ import {
 } from "@dappnode/types";
 import { ReleaseSignature } from "../../../types.js";
 import { validateManifestBasic } from "../../manifest/index.js";
-import { validateCompose } from "../../compose/index.js";
+import { validateCompose } from "@dappnode/dockercompose";
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets
 // that may be added in the future

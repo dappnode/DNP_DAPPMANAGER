@@ -71,7 +71,7 @@ export function isSemverRange(version: string): boolean {
   return Boolean(validRange(version));
 }
 
-export function path(filePath: string): string {
+export function validatePath(filePath: string): string {
   // shell.mkdir('-p', fullPath);
   // directory exists
   const parentPath = pathUtil.parse(filePath).dir;

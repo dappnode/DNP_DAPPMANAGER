@@ -1,4 +1,4 @@
-import { detectMountpoints } from "../modules/hostScripts/index.js";
+import { detectMountpoints } from "@dappnode/hostscripts";
 import { MountpointData } from "@dappnode/common";
 
 /**

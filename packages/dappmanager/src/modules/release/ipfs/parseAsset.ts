@@ -1,5 +1,5 @@
 import { FileFormat } from "../../../types.js";
-import { yamlParse } from "../../../utils/yaml.js";
+import { yamlParse } from "@dappnode/utils";
 
 export function parseAsset<T>(data: string, format: FileFormat): T {
   switch (format) {

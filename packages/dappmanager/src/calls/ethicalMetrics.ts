@@ -1,6 +1,6 @@
 import { EthicalMetricsConfig } from "@dappnode/common";
 import { eventBus } from "@dappnode/eventbus";
-import { listPackageNoThrow } from "../modules/docker/list/listPackages.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { packageRestart } from "./packageRestart.js";
 import * as db from "../db/index.js";
 import { packageInstall } from "./packageInstall.js";
@@ -10,10 +10,7 @@ import {
   register,
   unregister
 } from "../modules/ethicalMetrics/index.js";
-import {
-  dockerContainerStart,
-  dockerContainerStop
-} from "../modules/docker/index.js";
+import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 
 // TODO: handle uninstall package to unsubscribe from ethical metrics
 

@@ -1,15 +1,17 @@
 import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/types";
-import { listPackages } from "../modules/docker/list/index.js";
 import { params } from "@dappnode/params";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import deepmerge from "deepmerge";
-import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { fileToGatewayUrl } from "@dappnode/utils";
 import { ReleaseFetcher } from "../modules/release/index.js";
-import { dockerInfoArchive } from "../modules/docker/api/index.js";
-import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor.js";
-import { parseSpecialPermissions } from "../modules/compose/specialPermissions.js";
+import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
+import {
+  ComposeEditor,
+  ComposeFileEditor,
+  parseSpecialPermissions
+} from "@dappnode/dockercompose";
 import {
   RequestedDnp,
   UserSettingsAllDnps,

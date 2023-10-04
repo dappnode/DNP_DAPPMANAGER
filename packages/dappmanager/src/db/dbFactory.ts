@@ -1,4 +1,4 @@
-import * as validate from "../utils/validate.js";
+import { validatePath } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { JsonFileDb } from "@dappnode/utils";
 import { params } from "@dappnode/params";
@@ -37,7 +37,7 @@ export function dbFactory(dbPath: string): {
   clearDb: () => void;
 } {
   // Define dbPath and make sure it exists (mkdir -p)
-  validate.path(dbPath);
+  validatePath(dbPath);
   logs.info(`New DB instance at ${dbPath}`);
 
   // Initialize db

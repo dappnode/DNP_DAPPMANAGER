@@ -1,17 +1,16 @@
 import { logs } from "@dappnode/logger";
-import shell from "../../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import {
   dockerVolumesList,
   dockerVolumeRemove,
-  dockerContainerRemove
-} from "../docker/index.js";
-import { listPackages } from "../docker/list/index.js";
+  dockerContainerRemove,
+  listPackages
+} from "@dappnode/dockerapi";
 import * as getPath from "../../utils/getPath.js";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";
-import { isNotFoundError } from "../../utils/node.js";
-import { parseEnvironment } from "../compose/index.js";
-import { ComposeFileEditor } from "../compose/editor.js";
+import { getDockerComposePath, isNotFoundError } from "@dappnode/utils";
+import { parseEnvironment, ComposeFileEditor } from "@dappnode/dockercompose";
 
 const volumesToRemove = [
   // After core version 0.2.30 there will be an orphan volume of the
@@ -69,7 +68,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
 
         // Clean manifest and docker-compose
         for (const filepath of [
-          getPath.dockerCompose(dnpName, true),
+          getDockerComposePath(dnpName, true),
           getPath.manifest(dnpName, true)
         ])
           if (fs.existsSync(filepath)) fs.unlinkSync(filepath);

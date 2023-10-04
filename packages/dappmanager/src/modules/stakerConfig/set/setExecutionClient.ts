@@ -5,8 +5,10 @@ import {
 } from "@dappnode/common";
 import { packageInstall } from "../../../calls/index.js";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage } from "../../docker/index.js";
-import { listPackageNoThrow } from "../../docker/list/index.js";
+import {
+  dockerComposeUpPackage,
+  listPackageNoThrow
+} from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import { Network } from "@dappnode/types";
 

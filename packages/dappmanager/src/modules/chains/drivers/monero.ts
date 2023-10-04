@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Daemon } from "monero-rpc";
 import { InstalledPackageData } from "@dappnode/common";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
 
 // Monero's average block time is 2 minutes
@@ -25,7 +25,14 @@ export async function monero(
 ): Promise<ChainDataResult> {
   const container = dnp.containers[0];
   if (!container) throw Error("no container");
-  const containerDomain = getPrivateNetworkAlias(container);
+
+  const { dnpName, serviceName } = container;
+
+  const containerDomain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: true
+  });
 
   // http://monero.dappnode:18081
   const apiUrl = `http://${containerDomain}:18081`;

@@ -1,9 +1,9 @@
 import { eventBus } from "@dappnode/eventbus";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { listPackages } from "../modules/docker/list/index.js";
+import { listPackages } from "@dappnode/dockerapi";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
-import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { fileToGatewayUrl } from "@dappnode/utils";
 import { throttle } from "lodash-es";
 import { getEthProviderUrl } from "../modules/ethClient/index.js";
 import { ReleaseFetcher } from "../modules/release/index.js";

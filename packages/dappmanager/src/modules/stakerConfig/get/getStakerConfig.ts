@@ -12,8 +12,8 @@ import {
   StakerConfigGet,
   StakerItem
 } from "@dappnode/common";
-import { fileToGatewayUrl } from "../../../utils/distributedFile.js";
-import { listPackages } from "../../docker/list/index.js";
+import { fileToGatewayUrl } from "@dappnode/utils";
+import { listPackages } from "@dappnode/dockerapi";
 import { ReleaseFetcher } from "../../release/index.js";
 import { getBeaconServiceName } from "../utils.js";
 import { Network } from "@dappnode/types";

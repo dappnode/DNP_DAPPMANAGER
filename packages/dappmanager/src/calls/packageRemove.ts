@@ -1,16 +1,15 @@
 import fs from "fs";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { dockerComposeDown } from "../modules/docker/compose/index.js";
-import {
-  dockerContainerRemove,
-  dockerContainerStop
-} from "../modules/docker/index.js";
-import * as getPath from "../utils/getPath.js";
-import shell from "../utils/shell.js";
-import { listPackage } from "../modules/docker/list/index.js";
+import { getRepoDirPath, getDockerComposePath, shell } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import { getDockerTimeoutMax } from "../modules/docker/utils.js";
+import {
+  getDockerTimeoutMax,
+  dockerContainerRemove,
+  dockerContainerStop,
+  dockerComposeDown,
+  listPackage
+} from "@dappnode/dockerapi";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";
@@ -78,8 +77,8 @@ export async function packageRemove({
   }
 
   // Only no-cores reach this block
-  const composePath = getPath.dockerCompose(dnp.dnpName, false);
-  const packageRepoDir = getPath.packageRepoDir(dnp.dnpName, false);
+  const composePath = getDockerComposePath(dnp.dnpName, false);
+  const packageRepoDir = getRepoDirPath(dnp.dnpName, false);
 
   // [NOTE] Not necessary to close the ports since they will just
   // not be renewed in the next interval

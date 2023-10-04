@@ -1,17 +1,4 @@
-export type EthClientInstallStatus =
-  | { status: "TO_INSTALL" }
-  | { status: "INSTALLING" }
-  | { status: "INSTALLING_ERROR"; error: ErrorSerialized }
-  | { status: "INSTALLED" }
-  | { status: "UNINSTALLED" };
-
-// type ProviderStatusErrorCode = ProviderStatusError["code"];
-// type ProviderStatusErrorMessage = { [key in ProviderStatusErrorCode]: string };
-
-interface ErrorSerialized {
-  message: string;
-  stack?: string;
-}
+import { ErrorSerialized } from "@dappnode/common";
 
 /**
  * Serialize errors so the can be persisted in the db, a JSON to disk
