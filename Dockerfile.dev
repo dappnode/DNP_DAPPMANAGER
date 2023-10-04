@@ -66,6 +66,8 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
+COPY packages/hostScripts/package.json \
+  packages/hostScripts/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -101,6 +103,12 @@ RUN yarn build
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScripts
+WORKDIR /app/packages/hostScripts/
+COPY packages/hostScripts/ .
 RUN yarn build
 # Results in dist/*
 

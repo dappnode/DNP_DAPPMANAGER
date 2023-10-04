@@ -56,7 +56,12 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
+COPY packages/hostScripts/package.json \
+  packages/hostScripts/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
+
+# Build order must be as follows:
+# params > common > utils > eventBus > dockerCompose > logger > hostscripts > dockerApi > dappmanager > admin-ui
 
 # Build params
 WORKDIR /app/packages/params/
@@ -91,6 +96,12 @@ RUN yarn build
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScripts
+WORKDIR /app/packages/hostScripts/
+COPY packages/hostScripts/ .
 RUN yarn build
 # Results in dist/*
 
