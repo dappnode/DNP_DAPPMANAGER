@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { getDnCoreNetworkContainerConfig } from "../../src/index.js";
 
 // This test will only work if you have a running dappmanager container with DN_CORE network
-describe("get DN_CORE network config", () => {
+describe.skip("get DN_CORE network config", () => {
   // Test case: Should return the correct alias information when the network exists
   it("should return a 'not null' docker network when calling with dappmanager container", async () => {
     // Set dappmanager container name
