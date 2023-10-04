@@ -11,3 +11,4 @@ export * from "./logs.js";
 export * from "./network.js";
 export * from "./putArchive.js";
 export * from "./volume.js";
+export * from "./docker.js";

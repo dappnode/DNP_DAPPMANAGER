@@ -2,13 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock/webpack";
 
-describe.skip("getHostVolumeSizes", () => {
+describe("getHostVolumeSizes", () => {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   async function getMock(shellHost: (cmd: string) => Promise<string>) {
     const mock = await rewiremock.around(
-      () => import("../../../../src/modules/docker/getHostVolumeSizes"),
-      mock => {
-        mock(() => import("../../../../src/utils/shell"))
+      () => import("../../src/getHostVolumeSizes"),
+      (mock) => {
+        mock(() => import("@dappnode/utils"))
           .with({ shellHost })
           .toBeUsed();
       }
@@ -31,10 +31,10 @@ describe.skip("getHostVolumeSizes", () => {
     const volName = "bitcoin_data";
     const volDevicePaths = {
       [volName]:
-        "/mnt/volume_ams3_01/dappnode-volumes/bitcoin.dnp.dappnode.eth/bitcoin_data"
+        "/mnt/volume_ams3_01/dappnode-volumes/bitcoin.dnp.dappnode.eth/bitcoin_data",
     };
     const expectedVolSizes = {
-      [volName]: "824204410"
+      [volName]: "824204410",
     };
 
     const volSizes = await getHostVolumeSizes(volDevicePaths);

@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import {
   parseVolumeOwnershipData,
-  normalizeProjectName
-} from "../../../../src/modules/docker/volumesData.js";
+  normalizeProjectName,
+} from "../../src/index.js";
 import { PackageContainer, VolumeOwnershipData } from "@dappnode/common";
 
 describe("docker > volumes data", () => {
@@ -11,7 +11,7 @@ describe("docker > volumes data", () => {
     const cases: { [dnpName: string]: string } = {
       "main.dnp.dappnode.eth": "maindnpdappnodeeth",
       "dependency.dnp.dappnode.eth": "dependencydnpdappnodeeth",
-      "lightning-network.dnp.dappnode.eth": "lightning-networkdnpdappnodeeth"
+      "lightning-network.dnp.dappnode.eth": "lightning-networkdnpdappnodeeth",
     };
     for (const dnpName in cases) {
       it(`Normalize project name ${dnpName}`, () => {
@@ -39,20 +39,22 @@ describe("docker > volumes data", () => {
           ports: [],
           volumes: [
             {
-              host: "/var/lib/docker/volumes/maindnpdappnodeeth_changeme-main/_data",
+              host:
+                "/var/lib/docker/volumes/maindnpdappnodeeth_changeme-main/_data",
               container: "/temp",
-              name: "maindnpdappnodeeth_changeme-main"
+              name: "maindnpdappnodeeth_changeme-main",
             },
             {
               host: "/var/lib/docker/volumes/maindnpdappnodeeth_data/_data",
               container: "/usr",
-              name: "maindnpdappnodeeth_data"
+              name: "maindnpdappnodeeth_data",
             },
             {
-              host: "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
+              host:
+                "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
               container: "/usrdep",
-              name: "dependencydnpdappnodeeth_data"
-            }
+              name: "dependencydnpdappnodeeth_data",
+            },
           ],
           networks: [],
           state: "running",
@@ -61,7 +63,7 @@ describe("docker > volumes data", () => {
           dependencies: {},
           avatarUrl: "",
           origin: "QmQc7QS7n7311Sc9EhjPqLkpgGWMNNdC2kcYa5GSQUB4jf",
-          canBeFullnode: false
+          canBeFullnode: false,
         },
         {
           containerId:
@@ -79,14 +81,16 @@ describe("docker > volumes data", () => {
           ports: [],
           volumes: [
             {
-              host: "/home/lion/Code/dappnode/DNP_DAPPMANAGER/packages/dappmanager/test_mountpoints/dnplifecycle-dep/testBind",
-              container: "/temp"
+              host:
+                "/home/lion/Code/dappnode/DNP_DAPPMANAGER/packages/dappmanager/test_mountpoints/dnplifecycle-dep/testBind",
+              container: "/temp",
             },
             {
-              host: "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
+              host:
+                "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
               container: "/usr",
-              name: "dependencydnpdappnodeeth_data"
-            }
+              name: "dependencydnpdappnodeeth_data",
+            },
           ],
           networks: [],
           state: "running",
@@ -95,8 +99,8 @@ describe("docker > volumes data", () => {
           dependencies: {},
           avatarUrl: "",
           origin: "QmNpp6BbDd4MG5agdvNHwTnRew1uhPPehTUYyvtpbDLgEr",
-          canBeFullnode: false
-        }
+          canBeFullnode: false,
+        },
       ];
 
       const vol_dependencydnpdappnodeeth_data = {
@@ -105,18 +109,18 @@ describe("docker > volumes data", () => {
         Labels: {
           "com.docker.compose.project": "dependencydnpdappnodeeth",
           "com.docker.compose.version": "1.22.0",
-          "com.docker.compose.volume": "data"
+          "com.docker.compose.volume": "data",
         },
         Mountpoint:
           "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
         Name: "dependencydnpdappnodeeth_data",
         Options: null,
-        Scope: "local"
+        Scope: "local",
       };
 
       const expectedVolOwnershipData: VolumeOwnershipData = {
         name: "dependencydnpdappnodeeth_data",
-        owner: "dependency.dnp.dappnode.eth"
+        owner: "dependency.dnp.dappnode.eth",
       };
 
       const volOwnershipData = parseVolumeOwnershipData(

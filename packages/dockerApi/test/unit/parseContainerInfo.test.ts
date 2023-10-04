@@ -3,14 +3,14 @@ import { expect } from "chai";
 import { PackageContainer, PortProtocol } from "@dappnode/common";
 import {
   parseContainerInfo,
-  parseDnpNameFromContainerName
-} from "../../../../src/modules/docker/list/parseContainerInfo.js";
+  parseDnpNameFromContainerName,
+} from "../../src/index.js";
 import { dockerApiResponseContainers } from "./dockerApiSamples/containers.js";
 
 describe("modules / docker / parseDnpNameFromContainerName", () => {
   const testCases = {
     "DAppNodeCore-api.wireguard.dnp.dappnode.eth": "wireguard.dnp.dappnode.eth",
-    "DAppNodePackage-geth.dnp.dappnode.eth": "geth.dnp.dappnode.eth"
+    "DAppNodePackage-geth.dnp.dappnode.eth": "geth.dnp.dappnode.eth",
   };
 
   for (const [containerName, dnpName] of Object.entries(testCases)) {
@@ -20,7 +20,7 @@ describe("modules / docker / parseDnpNameFromContainerName", () => {
   }
 });
 
-describe("modules / docker / parseContainerInfo", function () {
+describe("modules / docker / parseContainerInfo", function() {
   it("should parse docker containers", async () => {
     const containers = dockerApiResponseContainers.map(parseContainerInfo);
     // console.log(JSON.stringify(containers, null, 2));
@@ -43,8 +43,8 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [],
         networks: [{ name: "dncore_network", ip: "172.33.0.9" }],
@@ -53,11 +53,11 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
-          "letsencrypt-nginx.dnp.dappnode.eth": "latest"
+          "letsencrypt-nginx.dnp.dappnode.eth": "latest",
         },
         defaultPorts: [],
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -77,39 +77,41 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 443,
             container: 443,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 80,
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
             host: "/root/certs",
-            container: "/etc/nginx/certs"
+            container: "/etc/nginx/certs",
           },
           {
             host: "",
             container: "/etc/nginx/dhparam",
-            name: "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b"
+            name:
+              "1f6ceacbdb011451622aa4a5904309765dc2bfb0f4affe163f4e22cba4f7725b",
           },
           {
-            host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+            host:
+              "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
-            name: "nginxproxydnpdappnodeeth_vhost.d"
+            name: "nginxproxydnpdappnodeeth_vhost.d",
           },
           {
             host: "/var/run/docker.sock",
-            container: "/tmp/docker.sock"
+            container: "/tmp/docker.sock",
           },
           {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
-            name: "nginxproxydnpdappnodeeth_html"
-          }
+            name: "nginxproxydnpdappnodeeth_html",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.6" }],
         state: "running",
@@ -117,7 +119,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -135,10 +137,11 @@ describe("modules / docker / parseContainerInfo", function () {
         ports: [],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/app/.ethchain",
-            name: "dncore_ethchaindnpdappnodeeth_data"
-          }
+            name: "dncore_ethchaindnpdappnodeeth_data",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.5" }],
         state: "running",
@@ -146,7 +149,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -165,8 +168,8 @@ describe("modules / docker / parseContainerInfo", function () {
         volumes: [
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock"
-          }
+            container: "/var/run/docker.sock",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "" }],
         state: "exited",
@@ -174,7 +177,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: 137,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -194,20 +197,21 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 8090,
             container: 8090,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/usr/www/openvpn/cred",
-            name: "dncore_vpndnpdappnodeeth_shared"
-          }
+            name: "dncore_vpndnpdappnodeeth_shared",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.9" }],
         state: "running",
@@ -215,7 +219,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -235,41 +239,43 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 1194,
             container: 1194,
             protocol: PortProtocol.UDP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_config/_data",
             container: "/etc/openvpn",
-            name: "dncore_vpndnpdappnodeeth_config"
+            name: "dncore_vpndnpdappnodeeth_config",
           },
           {
             host: "/etc/hostname",
-            container: "/etc/vpnname"
+            container: "/etc/vpnname",
           },
           {
             host: "/lib/modules",
-            container: "/lib/modules"
+            container: "/lib/modules",
           },
           {
             host: "/usr/src/dappnode/config",
-            container: "/usr/src/app/config"
+            container: "/usr/src/app/config",
           },
           {
             host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_data/_data",
             container: "/usr/src/app/secrets",
-            name: "dncore_vpndnpdappnodeeth_data"
+            name: "dncore_vpndnpdappnodeeth_data",
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock"
+            container: "/var/run/docker.sock",
           },
           {
-            host: "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_vpndnpdappnodeeth_shared/_data",
             container: "/var/spool/openvpn",
-            name: "dncore_vpndnpdappnodeeth_shared"
-          }
+            name: "dncore_vpndnpdappnodeeth_shared",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.4" }],
         state: "running",
@@ -277,7 +283,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -296,17 +302,18 @@ describe("modules / docker / parseContainerInfo", function () {
         volumes: [
           {
             host: "/usr/src/dappnode/DNCORE",
-            container: "/usr/src/app/DNCORE"
+            container: "/usr/src/app/DNCORE",
           },
           {
-            host: "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_dappmanagerdnpdappnodeeth_data/_data",
             container: "/usr/src/app/dnp_repo",
-            name: "dncore_dappmanagerdnpdappnodeeth_data"
+            name: "dncore_dappmanagerdnpdappnodeeth_data",
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock"
-          }
+            container: "/var/run/docker.sock",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.7" }],
         state: "running",
@@ -314,7 +321,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -333,15 +340,16 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 53,
             protocol: PortProtocol.UDP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_binddnpdappnodeeth_data/_data",
             container: "/etc/bind",
-            name: "dncore_binddnpdappnodeeth_data"
-          }
+            name: "dncore_binddnpdappnodeeth_data",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.2" }],
         state: "running",
@@ -349,7 +357,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -369,27 +377,28 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: false
+            deletable: false,
           },
           {
             host: 30303,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: false
+            deletable: false,
           },
           {
             host: 30304,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: false
-          }
+            deletable: false,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_ethchaindnpdappnodeeth_data/_data",
             container: "/root/.local/share/io.parity.ethereum",
-            name: "dncore_ethchaindnpdappnodeeth_data"
-          }
+            name: "dncore_ethchaindnpdappnodeeth_data",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.6" }],
         state: "running",
@@ -403,42 +412,42 @@ describe("modules / docker / parseContainerInfo", function () {
         defaultEnvironment: {
           EXTRA_OPTS: "--warp-barrier 8540000",
           EXTRA_OPTS_GETH: "",
-          DEFAULT_CLIENT: "PARITY"
+          DEFAULT_CLIENT: "PARITY",
         },
         defaultPorts: [
           {
             host: 30303,
             container: 30303,
-            protocol: PortProtocol.TCP
+            protocol: PortProtocol.TCP,
           },
           {
             host: 30303,
             container: 30303,
-            protocol: PortProtocol.UDP
+            protocol: PortProtocol.UDP,
           },
           {
             host: 30304,
             container: 30304,
-            protocol: PortProtocol.UDP
-          }
+            protocol: PortProtocol.UDP,
+          },
         ],
         defaultVolumes: [
           {
             host: "ethchaindnpdappnodeeth_data",
             container: "/root/.local/share/io.parity.ethereum",
-            name: "ethchaindnpdappnodeeth_data"
+            name: "ethchaindnpdappnodeeth_data",
           },
           {
             host: "ethchaindnpdappnodeeth_geth",
             container: "/root/.ethereum",
-            name: "ethchaindnpdappnodeeth_geth"
+            name: "ethchaindnpdappnodeeth_geth",
           },
           {
             host: "ethchaindnpdappnodeeth_identity",
             container: "/root/identity",
-            name: "ethchaindnpdappnodeeth_identity"
-          }
-        ]
+            name: "ethchaindnpdappnodeeth_identity",
+          },
+        ],
       },
       {
         containerId:
@@ -457,42 +466,44 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 5001,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             container: 8081,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 4001,
             container: 4001,
             protocol: PortProtocol.TCP,
-            deletable: false
+            deletable: false,
           },
           {
             host: 4002,
             container: 4002,
             protocol: PortProtocol.UDP,
-            deletable: false
-          }
+            deletable: false,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_data/_data",
             container: "/data/ipfs",
-            name: "dncore_ipfsdnpdappnodeeth_data"
+            name: "dncore_ipfsdnpdappnodeeth_data",
           },
           {
-            host: "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
+            host:
+              "/var/lib/docker/volumes/dncore_ipfsdnpdappnodeeth_export/_data",
             container: "/export",
-            name: "dncore_ipfsdnpdappnodeeth_export"
-          }
+            name: "dncore_ipfsdnpdappnodeeth_export",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.1.5" }],
         state: "running",
@@ -502,17 +513,17 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 4001,
             host: 4001,
-            protocol: PortProtocol.TCP
+            protocol: PortProtocol.TCP,
           },
           {
             container: 4002,
             host: 4002,
-            protocol: PortProtocol.UDP
-          }
+            protocol: PortProtocol.UDP,
+          },
         ],
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -535,7 +546,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -555,21 +566,21 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 30399,
             container: 30399,
             protocol: PortProtocol.UDP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
             host: "/var/lib/docker/volumes/swarmdnpdappnodeeth_swarm/_data",
             container: "/root/.ethereum",
-            name: "swarmdnpdappnodeeth_swarm"
-          }
+            name: "swarmdnpdappnodeeth_swarm",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.7" }],
         state: "running",
@@ -577,7 +588,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -596,32 +607,33 @@ describe("modules / docker / parseContainerInfo", function () {
         volumes: [
           {
             host: "/root/certs",
-            container: "/etc/nginx/certs"
+            container: "/etc/nginx/certs",
           },
           {
-            host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
+            host:
+              "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_vhost.d/_data",
             container: "/etc/nginx/vhost.d",
-            name: "nginxproxydnpdappnodeeth_vhost.d"
+            name: "nginxproxydnpdappnodeeth_vhost.d",
           },
           {
             host: "/var/lib/docker/volumes/nginxproxydnpdappnodeeth_html/_data",
             container: "/usr/share/nginx/html",
-            name: "nginxproxydnpdappnodeeth_html"
+            name: "nginxproxydnpdappnodeeth_html",
           },
           {
             host: "/var/run/docker.sock",
-            container: "/var/run/docker.sock"
-          }
+            container: "/var/run/docker.sock",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.8" }],
         state: "running",
         running: true,
         exitCode: null,
         dependencies: {
-          "nginx-proxy.dnp.dappnode.eth": "latest"
+          "nginx-proxy.dnp.dappnode.eth": "latest",
         },
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -639,10 +651,11 @@ describe("modules / docker / parseContainerInfo", function () {
         ports: [],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
+            host:
+              "/var/lib/docker/volumes/ipfsreplicatordnpdappnodeeth_pin-data/_data",
             container: "/usr/src/app/data",
-            name: "ipfsreplicatordnpdappnodeeth_pin-data"
-          }
+            name: "ipfsreplicatordnpdappnodeeth_pin-data",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.4" }],
         state: "running",
@@ -651,7 +664,7 @@ describe("modules / docker / parseContainerInfo", function () {
         dependencies: {},
         avatarUrl: "",
         origin: "/ipfs/QmYfVW2LNHH8ZXa6KJmfFAz5zCQ8YHh2ZPt6aQmezJcbL7",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -671,27 +684,28 @@ describe("modules / docker / parseContainerInfo", function () {
             host: 32769,
             container: 30303,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 32771,
             container: 30303,
             protocol: PortProtocol.UDP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 32770,
             container: 30304,
             protocol: PortProtocol.UDP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
+            host:
+              "/var/lib/docker/volumes/goerligethdnpdappnodeeth_goerli/_data",
             container: "/goerli",
-            name: "goerligethdnpdappnodeeth_goerli"
-          }
+            name: "goerligethdnpdappnodeeth_goerli",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.3" }],
         state: "running",
@@ -700,7 +714,7 @@ describe("modules / docker / parseContainerInfo", function () {
         dependencies: {},
         avatarUrl: "",
         chain: "ethereum",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -719,36 +733,37 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 80,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             host: 9735,
             container: 9735,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             container: 10009,
             protocol: PortProtocol.TCP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [
           {
-            host: "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
+            host:
+              "/var/lib/docker/volumes/lndnpdappnodeeth_lndconfig_data/_data",
             container: "/root/.lnd",
-            name: "lndnpdappnodeeth_lndconfig_data"
-          }
+            name: "lndnpdappnodeeth_lndconfig_data",
+          },
         ],
         networks: [{ name: "dncore_network", ip: "172.33.0.2" }],
         state: "running",
         running: true,
         exitCode: null,
         dependencies: {
-          "bitcoin.dnp.dappnode.eth": "latest"
+          "bitcoin.dnp.dappnode.eth": "latest",
         },
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         containerId:
@@ -767,13 +782,13 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: 8000,
             protocol: PortProtocol.TCP,
-            deletable: true
+            deletable: true,
           },
           {
             container: 8080,
             protocol: PortProtocol.TCP,
-            deletable: true
-          }
+            deletable: true,
+          },
         ],
         volumes: [],
         networks: [{ name: "dncore_network", ip: "172.33.1.8" }],
@@ -782,7 +797,7 @@ describe("modules / docker / parseContainerInfo", function () {
         exitCode: null,
         dependencies: {},
         avatarUrl: "",
-        canBeFullnode: false
+        canBeFullnode: false,
       },
       {
         avatarUrl: "/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
@@ -795,8 +810,8 @@ describe("modules / docker / parseContainerInfo", function () {
           {
             container: "/var/lib/grafana",
             host: "grafana_data",
-            name: "grafana_data"
-          }
+            name: "grafana_data",
+          },
         ],
         dependencies: {},
         dnpName: "dms.dnp.dappnode.eth",
@@ -810,16 +825,16 @@ describe("modules / docker / parseContainerInfo", function () {
         networks: [
           {
             ip: "172.33.0.3",
-            name: "dncore_network"
-          }
+            name: "dncore_network",
+          },
         ],
         ports: [
           {
             container: 3000,
             deletable: true,
 
-            protocol: PortProtocol.TCP
-          }
+            protocol: PortProtocol.TCP,
+          },
         ],
         running: true,
         serviceName: "grafana",
@@ -828,11 +843,12 @@ describe("modules / docker / parseContainerInfo", function () {
         volumes: [
           {
             container: "/var/lib/grafana",
-            host: "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
-            name: "dmsdnpdappnodeeth_grafana_data"
-          }
-        ]
-      }
+            host:
+              "/var/lib/docker/volumes/dmsdnpdappnodeeth_grafana_data/_data",
+            name: "dmsdnpdappnodeeth_grafana_data",
+          },
+        ],
+      },
     ];
 
     // Remove all values that are undefined

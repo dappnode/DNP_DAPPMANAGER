@@ -79,7 +79,7 @@ describe.skip("dappGet", function () {
         mock(() => import("../../../../src/modules/dappGet/resolve"))
           .withDefault(resolve)
           .toBeUsed();
-        mock(() => import("../../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackages })
           .toBeUsed();
       }

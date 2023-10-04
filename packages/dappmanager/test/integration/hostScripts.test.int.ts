@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 

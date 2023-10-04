@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { parseExitCodeFromStatus } from "../../../../src/modules/docker/list/parseExitCodeFromStatus.js";
+import { parseExitCodeFromStatus } from "../../src/index.js";
 
 describe("docker / parseExitCodeFromStatus", () => {
   const testCases: {
@@ -16,9 +16,9 @@ describe("docker / parseExitCodeFromStatus", () => {
     { id: "Empty", status: "", exitCode: null },
     {
       id: "Not a string",
-      status: undefined as unknown as string,
-      exitCode: null
-    }
+      status: (undefined as unknown) as string,
+      exitCode: null,
+    },
   ];
 
   for (const { id, status, exitCode } of testCases) {

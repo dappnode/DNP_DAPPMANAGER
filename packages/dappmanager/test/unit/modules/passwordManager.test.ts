@@ -10,8 +10,8 @@ function getPasswordManager(
   return rewiremock.around(
     () => import("../../../src/modules/passwordManager"),
     mock => {
-      mock(() => import("../../../src/utils/shell"))
-        .withDefault(shellMock)
+      mock(() => import("@dappnode/utils"))
+        .with({ shell: shellMock })
         .toBeUsed();
       mock(() => import("../../../src/utils/getDappmanagerImage"))
         .withDefault(async () => image)

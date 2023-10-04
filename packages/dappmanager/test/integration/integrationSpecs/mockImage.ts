@@ -1,6 +1,6 @@
 import path from "path";
 import { testDir } from "../../testUtils.js";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { fileURLToPath } from "url";
 import { getImageTag } from "@dappnode/types";
 import { validatePath } from "@dappnode/utils";

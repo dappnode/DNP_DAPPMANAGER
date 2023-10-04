@@ -3,10 +3,10 @@ import { expect } from "chai";
 import {
   getDockerTimeoutMax,
   ensureUniquePortsFromDockerApi,
-  stripDockerApiLogsHeaderAndAnsi
-} from "../../../../src/modules/docker/utils.js";
+  stripDockerApiLogsHeaderAndAnsi,
+} from "../../src/index.js";
 import { PackageContainer } from "@dappnode/common";
-import { mockContainer } from "../../../testUtils.js";
+import { mockContainer } from "../testUtils.js";
 import Dockerode from "dockerode";
 
 describe("docker API > utils", () => {
@@ -43,12 +43,12 @@ info Webserver on 80, /usr/src/app/dist`;
       const containers: PackageContainer[] = [
         {
           ...mockContainer,
-          dockerTimeout: 120
+          dockerTimeout: 120,
         },
         {
           ...mockContainer,
-          dockerTimeout: 60
-        }
+          dockerTimeout: 60,
+        },
       ];
       const timeout = getDockerTimeoutMax(containers);
       expect(timeout).to.equal(120);
@@ -62,50 +62,50 @@ info Webserver on 80, /usr/src/app/dist`;
           IP: "0.0.0.0",
           PrivatePort: 30303,
           PublicPort: 49969,
-          Type: "tcp"
+          Type: "tcp",
         },
         {
           IP: "::",
           PrivatePort: 30303,
           PublicPort: 49969,
-          Type: "tcp"
+          Type: "tcp",
         },
         {
           IP: "0.0.0.0",
           PrivatePort: 30303,
           PublicPort: 49939,
-          Type: "udp"
+          Type: "udp",
         },
         {
           IP: "::",
           PrivatePort: 30303,
           PublicPort: 49939,
-          Type: "udp"
+          Type: "udp",
         },
         {
           IP: "0.0.0.0",
           PrivatePort: 30304,
           PublicPort: 49968,
-          Type: "tcp"
+          Type: "tcp",
         },
         {
           IP: "::",
           PrivatePort: 30304,
           PublicPort: 49968,
-          Type: "tcp"
+          Type: "tcp",
         },
         {
           IP: "0.0.0.0",
           PrivatePort: 30304,
           PublicPort: 49938,
-          Type: "udp"
+          Type: "udp",
         },
         {
           IP: "::",
           PrivatePort: 30304,
           PublicPort: 49938,
-          Type: "udp"
-        }
+          Type: "udp",
+        },
       ];
 
       const expectedPorts = [
@@ -113,26 +113,26 @@ info Webserver on 80, /usr/src/app/dist`;
           host: 49969,
           container: 30303,
           protocol: "TCP",
-          deletable: true
+          deletable: true,
         },
         {
           host: 49939,
           container: 30303,
           protocol: "UDP",
-          deletable: true
+          deletable: true,
         },
         {
           host: 49968,
           container: 30304,
           protocol: "TCP",
-          deletable: true
+          deletable: true,
         },
         {
           host: 49938,
           container: 30304,
           protocol: "UDP",
-          deletable: true
-        }
+          deletable: true,
+        },
       ];
 
       const dockerApiPortsParsed = ensureUniquePortsFromDockerApi(

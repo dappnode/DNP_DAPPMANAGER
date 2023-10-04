@@ -80,7 +80,7 @@ describe.skip("dappGet integration test", async () => {
         const dappGetImport = await rewiremock.around(
           () => import("../../../../src/modules/dappGet"),
           mock => {
-            mock(() => import("../../../../src/modules/docker/list"))
+            mock(() => import("@dappnode/dockerapi"))
               .with({ listPackages })
               .toBeUsed();
           }

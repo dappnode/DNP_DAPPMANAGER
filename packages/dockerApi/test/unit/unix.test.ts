@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseDuOutput, DuResult } from "../../../src/utils/unix.js";
+import { parseDuOutput, DuResult } from "../../src/getHostVolumeSizes.js";
 
 describe("utils > unix", () => {
   describe("parseDuOutput", () => {
@@ -30,7 +30,7 @@ describe("utils > unix", () => {
         { size: "1980410", path: "test" },
         { size: "596410", path: "src/calls" },
         { size: "3224410", path: "src" },
-        { size: "659048410", path: "." }
+        { size: "659048410", path: "." },
       ];
 
       const result = parseDuOutput(output);
@@ -49,7 +49,7 @@ describe("utils > unix", () => {
       const expectedResult: DuResult[] = [
         { size: "824204410", path: "bitcoin.dnp.dappnode.eth/bitcoin_data" },
         { size: "824208410", path: "bitcoin.dnp.dappnode.eth" },
-        { size: "824212410", path: "." }
+        { size: "824212410", path: "." },
       ];
 
       const result = parseDuOutput(output, relativeFrom);
