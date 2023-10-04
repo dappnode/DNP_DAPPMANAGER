@@ -18,6 +18,25 @@ describe("Migration", () => {
   };
 
   const composeAlreadyMigrated = `
+version: '3.5'
+networks:
+  dncore_network:
+    name: dncore_network
+    external: true
+services:
+  dappmanager.dnp.dappnode.eth:
+    image: chentex/random-logger
+    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
+    restart: always
+    dns: 172.33.1.2
+    networks:
+      dncore_network:
+        ipv4_address: 172.33.1.7
+        aliases:
+          - dappmanager.dnp.dappnode.eth.test-migration.dappnode
+          - dappmanager.dappnode`;
+
+  const composeToBeMigratedBefore = `
 version: '3.4'
 networks:
   dncore_network:
@@ -33,29 +52,10 @@ services:
       dncore_network:
         ipv4_address: 172.33.1.7`;
 
-  const composeToBeMigratedBefore = `
-version: '3.4'
-networks:
-  network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.33.0.0/16
-services:
-  dappmanager.dnp.dappnode.eth:
-    image: "chentex/random-logger"
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    dns: 172.33.1.2
-    networks:
-      network:
-        ipv4_address: 172.33.1.7`;
-
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
   const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   const randomImage = "chentex/random-logger";
-  const testMigrationPath =
-    process.cwd() + "/test/integration/migrationCompose";
+  const testMigrationPath = process.cwd() + "/test/integration/migrations";
 
   before("Run random container", async () => {
     // Create compose
@@ -89,47 +89,16 @@ services:
       throw Error("Error creating container or/and dncore_network");
   });
 
-  it("Should do network and alias migration", async () => {
-    const composeMigratedExpected = `
-version: '3.5'
-networks:
-  dncore_network:
-    external: true
-    name: dncore_network
-services:
-  dappmanager.dnp.dappnode.eth:
-    image: chentex/random-logger
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    dns: 172.33.1.2
-    networks:
-      dncore_network:
-        ipv4_address: 172.33.1.7
-        aliases:
-          - dappmanager.dnp.dappnode.eth.test-migration.dappnode`;
+  it("Should do alias migration in compose", async () => {
+    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode", "dappmanager.dappnode"];
+    migrateCoreNetworkAndAliasInCompose(container, aliases);
 
-    migrateCoreNetworkAndAliasInCompose(
-      container,
-      "dappmanager.dnp.dappnode.eth.test-migration.dappnode"
-    );
     const composeAfter = fs.readFileSync(
       `${testMigrationPath}/test-migration/docker-compose.yml`,
       { encoding: "utf8" }
     );
-    expect(composeAfter.trim()).to.equal(composeMigratedExpected.trim());
-  });
-
-  it("Should do not do migration", async () => {
-    migrateCoreNetworkAndAliasInCompose(
-      container,
-      "dappmanager.dnp.dappnode.eth.test-migration.dappnode"
-    );
-    const composeAfter = fs.readFileSync(
-      `${testMigrationPath}/test-migration/docker-compose-migrated.yml`,
-      { encoding: "utf8" }
-    );
     expect(composeAfter.trim()).to.equal(composeAlreadyMigrated.trim());
-  });
+  });    
 
   after("Remove test setup", async () => {
     // Disconnect from network

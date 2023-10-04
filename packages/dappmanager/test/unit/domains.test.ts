@@ -1,48 +1,120 @@
-import { ContainerNames } from "@dappnode/common";
-import { getPrivateNetworkAlias } from "@dappnode/utils";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { expect } from "chai";
 
-describe("domains", () => {
-  describe("getPrivateNetworkAlias", () => {
-    const testCases: (ContainerNames & { domain: string })[] = [
-      {
-        dnpName: "prysm.dnp.dappnode.eth",
-        serviceName: "validator",
-        domain: "validator.prysm.dappnode"
-      },
-      {
-        dnpName: "prysm.dnp.dappnode.eth",
-        serviceName: "prysm.dnp.dappnode.eth",
-        domain: "prysm.dappnode"
-      },
-      {
-        dnpName: "prysm.dnp.dappnode.eth",
-        serviceName: "prysm.dnp.dappnode.eth",
-        domain: "prysm.dappnode"
-      },
-      {
-        dnpName: "prysm.public.dappnode.eth",
-        serviceName: "validator",
-        domain: "validator.prysm.public.dappnode"
-      },
-      {
-        dnpName: "prysm.some.repo.eth",
-        serviceName: "validator",
-        domain: "validator.prysm.some.repo.dappnode"
-      },
-      {
-        dnpName: "prysm.some.repo.io",
-        serviceName: "validator",
-        domain: "validator.prysm.some.repo.io.dappnode"
-      }
-    ];
+describe('determineNetworkAlias', () => {
 
-    for (const { domain, serviceName, dnpName } of testCases) {
-      it(`${serviceName} ${dnpName}`, () => {
-        expect(getPrivateNetworkAlias({ dnpName, serviceName })).to.equal(
-          domain
-        );
+  describe('DNP packages', () => {
+
+    it('should return short network alias for main or monoservice, not external containers', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: true
       });
-    }
+      expect(result).to.equal('dappmanager.dappnode');
+    });
+
+    it('should return full network alias for non-main or non-monoservice, not external containers', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false
+      });
+      expect(result).to.equal('serviceName.dappmanager.dappnode');
+    });
+
+    it('should return short network alias for main or monoservice, external containers', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: true,
+        isExternal: true
+      });
+      expect(result).to.equal('dappmanager.dappnode.external');
+    });
+
+    it('should return full network alias for non-main or non-monoservice, external containers', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.dnp.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false,
+        isExternal: true
+      });
+      expect(result).to.equal('serviceName.dappmanager.dappnode.external');
+    });
+
+  });
+
+  describe('Public packages', () => {
+
+    it('should return short network alias for main or monoservice, not external containers with ".public.dappnode.eth"', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.public.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: true
+      });
+      expect(result).to.equal('dappmanager.public.dappnode');
+    });
+
+    it('should return full network alias for non-main or non-monoservice, not external containers with ".public.dappnode.eth"', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.public.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false
+      });
+      expect(result).to.equal('serviceName.dappmanager.public.dappnode');
+    });
+
+    it('should return short network alias for main or monoservice, external containers with ".public.dappnode.eth"', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.public.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: true,
+        isExternal: true
+      });
+      expect(result).to.equal('dappmanager.public.dappnode.external');
+    });
+
+    it('should return full network alias for non-main or non-monoservice, external containers with ".public.dappnode.eth"', () => {
+      const result = buildNetworkAlias({
+        dnpName: "dappmanager.public.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false,
+        isExternal: true
+      });
+      expect(result).to.equal('serviceName.dappmanager.public.dappnode.external');
+    });
+
+  });
+
+  describe('Different dnpNames', () => {
+
+    it('should handle different dnpName formats ending with .dappnode.eth', () => {
+      const result = buildNetworkAlias({
+        dnpName: "example.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false
+      });
+      expect(result).to.equal('serviceName.example.dappnode');
+    });
+
+    it('should handle different dnpName formats ending with .eth', () => {
+      const result = buildNetworkAlias({
+        dnpName: "example.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false
+      });
+      expect(result).to.equal('serviceName.example.dappnode');
+    });
+
+    it('should handle dnpName with underscores', () => {
+      const result = buildNetworkAlias({
+        dnpName: "example_name.dnp.dappnode.eth",
+        serviceName: "serviceName",
+        isMainOrMonoservice: false
+      });
+      expect(result).to.equal('serviceName.examplename.dappnode');
+    });
+
   });
 });

@@ -1,9 +1,8 @@
 import { isEmpty } from "lodash-es";
 import { ContainerNames, PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
-import { stripCharacters } from "../../domains.js";
 import { getContainerDomain } from "@dappnode/types";
-import { getPrivateNetworkAlias } from "@dappnode/utils";
+import { buildNetworkAlias, removeUnderscores } from "@dappnode/utils";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -84,7 +83,7 @@ send
  * @returns "my.bitcoin.dnp.dappnode.eth"
  */
 export function getMyDotEthdomain(dnpName: string): string {
-  return "my." + stripCharacters(dnpName);
+  return "my." + removeUnderscores(dnpName);
 }
 
 /**
@@ -93,8 +92,16 @@ export function getMyDotEthdomain(dnpName: string): string {
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin.dappnode"
  * - "other.public.dappnode.eth" > "other.public.dappnode"
  */
-export function getDotDappnodeDomain(container: ContainerNames): string {
-  return getPrivateNetworkAlias(container);
+export function getDotDappnodeDomain(
+  container: ContainerNames,
+  isMainOrMonoservice: boolean
+): string {
+  const { dnpName, serviceName } = container;
+  return buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice
+  });
 }
 
 /**
@@ -138,13 +145,24 @@ export function getNsupdateTxts({
   const dappnode: DomainMap = {};
 
   // Add domains from installed package names
+
+  // container can have the following states:
+  // 1: monoservice => short + full alias
+  // 2: multiservice && !isMain => full alias
+  // 3: multiservice && isMain => short + full alias
+
   for (const container of containersToUpdate) {
     const fullEns = getContainerDomain(container);
     eth[getMyDotEthdomain(fullEns)] = container.ip;
-    dappnode[getDotDappnodeDomain(container)] = container.ip;
+
+    // it used to return sometimes the full alias and sometimes the short alias.
+    // we need to know if container is mono or multiservice, but "isMain" can be undefined
+    dappnode[getDotDappnodeDomain(container, false)] = container.ip;
+
     // Add multilabel IPFS domains to the IPFS container IP
-    if (container.dnpName === params.ipfsDnpName)
-      dappnode[`*.${getDotDappnodeDomain(container)}`] = container.ip;
+    if (container.dnpName === params.ipfsDnpName) {
+      dappnode[`*.${getDotDappnodeDomain(container, true)}`] = container.ip;
+    }
 
     // For multi-service DNPs, link the main container to the root URL
     if (container.isMain) {
@@ -153,7 +171,8 @@ export function getNsupdateTxts({
         serviceName: container.dnpName
       };
       eth[getMyDotEthdomain(getContainerDomain(rootNames))] = container.ip;
-      dappnode[getDotDappnodeDomain(rootNames)] = container.ip;
+      //this is okay, we always wanted to return the full alias here
+      dappnode[getDotDappnodeDomain(container, true)] = container.ip;
     }
   }
 

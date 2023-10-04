@@ -1,4 +1,4 @@
-import { stripCharacters } from "./stripCharacters.js";
+import { removeUnderscores } from "./removeUnderscores.js";
 
 /**
  * - Strip container prefix
@@ -10,8 +10,8 @@ import { stripCharacters } from "./stripCharacters.js";
  * - "bitcoin.dnp.dappnode.eth" > "bitcoin"
  * - "other.public.dappnode.eth" > "other.public"
  */
-export function shortUniqueDappnodeEns(dnpName: string): string {
+export function getShortUniqueDnp(dnpName: string): string {
   for (const s of [".dnp.dappnode.eth", ".dappnode.eth", ".eth"])
     if (dnpName.endsWith(s)) dnpName = dnpName.slice(0, -s.length);
-  return stripCharacters(dnpName);
+  return removeUnderscores(dnpName);
 }
