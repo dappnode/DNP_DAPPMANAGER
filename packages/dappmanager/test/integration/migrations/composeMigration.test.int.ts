@@ -21,11 +21,11 @@ describe("Migration", () => {
 version: '3.5'
 networks:
   dncore_network:
-    external: true
     name: dncore_network
+    external: true
 services:
   dappmanager.dnp.dappnode.eth:
-    image: "chentex/random-logger"
+    image: chentex/random-logger
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
     dns: 172.33.1.2
