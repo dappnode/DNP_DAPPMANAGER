@@ -31,7 +31,10 @@ services:
     dns: 172.33.1.2
     networks:
       dncore_network:
-        ipv4_address: 172.33.1.7`;
+        ipv4_address: 172.33.1.7
+        aliases:
+          - dappmanager.dnp.dappnode.eth.test-migration.dappnode
+          - dappmanager.dappnode`;
 
   const composeToBeMigratedBefore = `
 version: '3.4'
@@ -103,9 +106,10 @@ services:
       dncore_network:
         ipv4_address: 172.33.1.7
         aliases:
-          - dappmanager.dnp.dappnode.eth.test-migration.dappnode`;
+          - dappmanager.dnp.dappnode.eth.test-migration.dappnode
+          - dappmanager.dappnode`;
 
-    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"];
+    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode", "dappmanager.dappnode"];
     migrateCoreNetworkAndAliasInCompose(container, aliases);
 
     const composeAfter = fs.readFileSync(
@@ -115,8 +119,8 @@ services:
     expect(composeAfter.trim()).to.equal(composeMigratedExpected.trim());
   });
 
-  it("Should do not do migration", async () => {
-    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode"];
+  it("Should not do migration", async () => {
+    const aliases = ["dappmanager.dnp.dappnode.eth.test-migration.dappnode", "dappmanager.dappnode"];
     migrateCoreNetworkAndAliasInCompose(container, aliases);
 
     const composeAfter = fs.readFileSync(

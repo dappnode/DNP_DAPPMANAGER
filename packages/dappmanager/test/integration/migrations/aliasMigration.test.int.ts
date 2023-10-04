@@ -187,7 +187,7 @@ async function removeDirectories(directoryPaths: string[]) {
   }
 }
 
-describe.only("Add alias to running containers", function () {
+describe("Add alias to running containers", function () {
   this.timeout(1200000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
     await ensureNetworkExists(DNCORE_NETWORK);
