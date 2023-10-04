@@ -1,6 +1,6 @@
 import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
-import { isEmpty, uniq } from "lodash-es";
+import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
 import { getPrivateNetworkAliases } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
@@ -18,7 +18,7 @@ import {
   listPackageContainers,
   getDnCoreNetworkContainerConfig
 } from "@dappnode/dockerapi";
-import { gte } from "semver";
+import { gte, lt } from "semver";
 import { getDockerComposePath } from "@dappnode/utils";
 
 /** Alias for code succinctness */
@@ -35,46 +35,46 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * "service1.example.dappnode" and "example.dappnode" if the package is multiservice and has in manifest mainservice
  */
 export async function addAliasToRunningContainers(): Promise<void> {
-  try {
-    const containers = await listPackageContainers();
-    await addAliasToGivenContainers(containers);
-  } catch (error) {
-    logs.error("Error adding alias to running containers:", error);
-  }
+  const containers = await listPackageContainers();
+  await addAliasToGivenContainers(containers);
 }
 
 export async function addAliasToGivenContainers(
   containers: PackageContainer[]
 ): Promise<void> {
   for (const container of containers) {
-    const service = {
-      serviceName: container.serviceName,
-      dnpName: container.dnpName,
-      isMainOrMonoservice: container.isMain ?? false // false if isMain is undefined
-    };
+    try {
+      const service = {
+        serviceName: container.serviceName,
+        dnpName: container.dnpName,
+        isMainOrMonoservice: container.isMain ?? false // false if isMain is undefined
+      };
 
-    const aliases = getPrivateNetworkAliases(service);
+      const aliases = getPrivateNetworkAliases(service);
 
-    // Adds aliases to the compose file that generated the container
-    migrateCoreNetworkAndAliasInCompose(container, aliases);
+      // Adds aliases to the compose file that generated the container
+      migrateCoreNetworkAndAliasInCompose(container, aliases);
 
-    // Adds aliases to the container network
-    for (const alias of aliases) {
-      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-        container.containerName
-      );
-      if (!hasAlias(currentEndpointConfig, alias)) {
-        const updatedConfig = updateEndpointConfig(
-          currentEndpointConfig,
-          alias
+      // Adds aliases to the container network
+      for (const alias of aliases) {
+        const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
+          container.containerName
         );
-        await updateContainerNetwork(
-          dncoreNetworkName,
-          container,
-          updatedConfig
-        );
-        logs.info(`alias ${alias} added to ${container.containerName}`);
+        if (!hasAlias(currentEndpointConfig, alias)) {
+          const updatedConfig = updateEndpointConfig(
+            currentEndpointConfig,
+            alias
+          );
+          await updateContainerNetwork(
+            dncoreNetworkName,
+            container,
+            updatedConfig
+          );
+          logs.info(`alias ${alias} added to ${container.containerName}`);
+        }
       }
+    } catch (e) {
+      logs.error(`Error adding alias to ${container.containerName}`, e);
     }
   }
 }
@@ -133,31 +133,20 @@ export function migrateCoreNetworkAndAliasInCompose(
     return;
 
   // Ensure/update compose file version 3.5
-  compose.compose = {
-    ...compose.compose,
-    version: params.MINIMUM_COMPOSE_VERSION
-  };
+  // check if its lower than 3.5. Docker aliases was introduced in docker compose version 3.5
+  if (
+    lt(parseComposeSemver(compose.compose.version), parseComposeSemver("3.5"))
+  )
+    compose.compose = {
+      ...compose.compose,
+      version: params.MINIMUM_COMPOSE_VERSION
+    };
 
-  // Gets the old network "network" from the service compose file. This is an old network that is to be removed".
-  // If it is already removed, returns {}
-  const oldServiceNetwork =
-    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE];
-
-  // This tries to remove the old network called "network" from the container in the compose file
-  // It is only done if network "network" exists or the new network "dncore_network" exists
-  if (dncoreComposeNetwork || !isEmpty(oldServiceNetwork)) {
-    compose.services()[
-      // eslint-disable-next-line no-unexpected-multiline
-      container.serviceName
-    ].removeNetwork(params.DNP_PRIVATE_NETWORK_NAME_FROM_CORE);
-  }
-
-  // This adds the new network with the new aliases into the compose file
+  // Add aliases to service
   compose.services()[
     // eslint-disable-next-line no-unexpected-multiline
     container.serviceName
-  ].addNetwork(params.DNP_PRIVATE_NETWORK_NAME, { ...oldServiceNetwork, aliases: newAliases }, { external: true, name: params.DNP_PRIVATE_NETWORK_NAME });
-
+  ].addNetworkAliases(params.DNP_PRIVATE_NETWORK_NAME, newAliases, dncoreServiceNetwork);
   compose.write();
 }
 

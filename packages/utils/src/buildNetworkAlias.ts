@@ -1,5 +1,7 @@
 import { getShortUniqueDnp } from "./getShortUniqueDnp";
 
+// TODO: unit testing
+
 /**
  * This function return fullNetworkAlias or shortNetworkAlias:
  * - shortDnpName is dnpName.split(0)["."]. i.e dnpName = "dappmanager.dnp.dappnode.eth" => shortDnpName = "dappmanager"
@@ -26,7 +28,7 @@ export function buildNetworkAlias({
   dnpName,
   serviceName,
   isMainOrMonoservice,
-  isExternal = false
+  isExternal = false,
 }: {
   dnpName: string;
   serviceName: string;

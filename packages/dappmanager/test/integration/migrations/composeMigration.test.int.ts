@@ -52,8 +52,7 @@ services:
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
   const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   const randomImage = "chentex/random-logger";
-  const testMigrationPath =
-    process.cwd() + "/test/integration/migrations";
+  const testMigrationPath = process.cwd() + "/test/integration/migrations";
 
   before("Run random container", async () => {
     // Create compose
