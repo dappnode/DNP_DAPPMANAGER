@@ -2,7 +2,6 @@ import * as db from "../../db/index.js";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
-import { listPackageNoThrow } from "../../modules/docker/list/index.js";
 import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
 import { runAtMostEvery } from "../../utils/asyncFlows.js";
 import { serializeError } from "../../modules/ethClient/types.js";
@@ -18,7 +17,10 @@ import {
 } from "../../modules/ethClient/index.js";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
 import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
-import { dockerComposeUpPackage } from "../../modules/docker/index.js";
+import {
+  dockerComposeUpPackage,
+  listPackageNoThrow
+} from "@dappnode/dockerapi";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet

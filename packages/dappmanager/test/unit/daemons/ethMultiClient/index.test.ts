@@ -136,7 +136,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         mock(() => import("../../../../src/db"))
           .with(db)
           .toBeUsed();
-        mock(() => import("../../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackageNoThrow })
           .toBeUsed();
         mock(() => import("../../../../src/calls"))

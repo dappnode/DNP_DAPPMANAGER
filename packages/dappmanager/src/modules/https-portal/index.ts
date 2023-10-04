@@ -3,8 +3,8 @@ import {
   dockerListNetworks,
   dockerNetworkConnect,
   dockerNetworkDisconnect
-} from "../docker/index.js";
-import { listContainers } from "../docker/list/index.js";
+} from "@dappnode/dockerapi";
+import { listPackageContainers } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { getExternalNetworkAlias } from "../../domains.js";
 import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
@@ -28,7 +28,7 @@ export class HttpsPortal {
    * Expose an internal container to the external internet through the https-portal
    */
   async addMapping(mapping: HttpsPortalMapping): Promise<void> {
-    const containers = await listContainers();
+    const containers = await listPackageContainers();
     const container = await this.getContainerForMapping(mapping, containers);
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
@@ -88,7 +88,7 @@ export class HttpsPortal {
    * Remove an internal container from being exposed to the external internet
    */
   async removeMapping(mapping: HttpsPortalMapping): Promise<void> {
-    const containers = await listContainers();
+    const containers = await listPackageContainers();
     const container = await this.getContainerForMapping(mapping, containers);
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
@@ -124,7 +124,7 @@ export class HttpsPortal {
   async getMappings(
     containers?: PackageContainer[]
   ): Promise<HttpsPortalMapping[]> {
-    if (!containers) containers = await listContainers();
+    if (!containers) containers = await listPackageContainers();
 
     const entries = await this.httpsPortalApiClient.list();
 
@@ -168,7 +168,7 @@ export class HttpsPortal {
     mapping: HttpsPortalMapping,
     containers?: PackageContainer[]
   ): Promise<PackageContainer> {
-    if (!containers) containers = await listContainers();
+    if (!containers) containers = await listPackageContainers();
 
     const container = containers.find(
       c =>

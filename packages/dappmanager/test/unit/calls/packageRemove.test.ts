@@ -45,16 +45,16 @@ describe.skip("Call function: packageRemove", function () {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/packageRemove"),
       mock => {
-        mock(() => import("../../../src/modules/docker/compose"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ dockerComposeDown })
           .toBeUsed();
-        mock(() => import("../../../src/modules/docker"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ dockerContainerRemove })
           .toBeUsed();
         mock(() => import("@dappnode/eventbus"))
           .with({ eventBus })
           .toBeUsed();
-        mock(() => import("../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackage })
           .toBeUsed();
       }

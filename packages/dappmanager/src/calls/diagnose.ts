@@ -1,4 +1,4 @@
-import { getHostInfoMemoized } from "../modules/hostScripts/scripts/hostInfo.js";
+import { getHostInfoMemoized } from "@dappnode/hostscripts";
 import { HostDiagnoseItem } from "@dappnode/common";
 
 /**

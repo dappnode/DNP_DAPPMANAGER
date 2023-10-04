@@ -6,7 +6,7 @@ import {
 import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
 import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage } from "../../docker/index.js";
+import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setMevBoost<T extends Network>({

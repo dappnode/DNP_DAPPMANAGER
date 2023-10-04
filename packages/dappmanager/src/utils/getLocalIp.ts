@@ -1,4 +1,4 @@
-import shell from "./shell.js";
+import { shell } from "@dappnode/utils";
 import isIp from "is-ip";
 import { logs } from "@dappnode/logger";
 import getDappmanagerImage from "./getDappmanagerImage.js";

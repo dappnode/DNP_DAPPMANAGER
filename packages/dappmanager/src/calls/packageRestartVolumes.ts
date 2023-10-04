@@ -1,18 +1,17 @@
 import fs from "fs";
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
+import { removeNamedVolume } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import * as getPath from "../utils/getPath.js";
 import {
   dockerContainerRemove,
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
   getContainersAndVolumesToRemove,
-  dockerContainerStop
-} from "../modules/docker/index.js";
-import { listPackage } from "../modules/docker/list/index.js";
+  dockerContainerStop,
+  listPackage
+} from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
@@ -22,6 +21,7 @@ import {
   ethicalMetricsTorServiceVolume
 } from "../modules/ethicalMetrics/index.js";
 import { getDockerComposePath } from "@dappnode/utils";
+import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -100,11 +100,18 @@ export async function packageRestartVolumes({
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
-  await dockerComposeUpPackage(
-    { dnpName },
-    containersStatus,
-    (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
-  );
+  // DAPPMANAGER patch
+  if (dnpName === params.dappmanagerDnpName) {
+    // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+    await restartDappmanagerPatch({ composePath });
+    return;
+  } else {
+    await dockerComposeUpPackage(
+      { dnpName },
+      containersStatus,
+      (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
+    );
+  }
 
   if (err) {
     throw err;

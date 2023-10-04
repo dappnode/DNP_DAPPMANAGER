@@ -1,12 +1,11 @@
 import path from "path";
 import { params } from "@dappnode/params";
-import { dockerComposeUp } from "../docker/compose/index.js";
 import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "../../utils/logUi.js";
 import { copyFileTo } from "../../calls/copyFileTo.js";
 import { InstallPackageData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage } from "../docker/index.js";
+import { dockerComposeUpPackage, dockerComposeUp } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "../../utils/pid.js";
 import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";
 import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts.js";
@@ -77,10 +76,17 @@ export async function runPackages(
 
     // containersStatus captures the container status before updating
     // If previous container was exited with code === 0, do not start it
-    await dockerComposeUpPackage(
-      { dnpName: pkg.dnpName, composePath: pkg.composePath },
-      pkg.containersStatus
-    );
+    // DAPPMANAGER patch
+    if (pkg.dnpName === params.dappmanagerDnpName) {
+      // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+      await restartDappmanagerPatch({ composePath: pkg.composePath });
+      return;
+    } else {
+      await dockerComposeUpPackage(
+        { dnpName: pkg.dnpName, composePath: pkg.composePath },
+        pkg.containersStatus
+      );
+    }
 
     log(pkg.dnpName, "Package started");
 

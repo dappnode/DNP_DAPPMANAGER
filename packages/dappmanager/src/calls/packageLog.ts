@@ -1,4 +1,4 @@
-import { logContainer } from "../modules/docker/api/index.js";
+import { logContainer } from "@dappnode/dockerapi";
 
 /**
  * Returns the logs of the docker container of a package

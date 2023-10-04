@@ -2,7 +2,7 @@ import client from "prom-client";
 import { wrapHandler } from "../utils.js";
 import * as db from "../../db/index.js";
 import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
-import { listPackageNoThrow } from "../../modules/docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
 
@@ -100,7 +100,12 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso"] as Network[]) {
+      for (const network of [
+        "mainnet",
+        "prater",
+        "gnosis",
+        "lukso"
+      ] as Network[]) {
         const { executionClient, consensusClient, isMevBoostSelected } =
           getStakerConfigByNetwork(network);
 

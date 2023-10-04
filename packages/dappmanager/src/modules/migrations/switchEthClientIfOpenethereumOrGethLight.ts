@@ -1,5 +1,5 @@
 import * as db from "../../db/index.js";
-import { listPackageNoThrow } from "../docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { EthClientTarget } from "@dappnode/common";
 import { packageGet } from "../../calls/index.js";

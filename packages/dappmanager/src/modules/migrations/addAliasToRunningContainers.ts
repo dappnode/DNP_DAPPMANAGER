@@ -6,7 +6,7 @@ import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
-import shell from "../../utils/shell.js";
+import { shell } from "@dappnode/utils";
 import {
   ComposeFileEditor,
   parseServiceNetworks
@@ -14,11 +14,11 @@ import {
 import {
   dockerComposeUp,
   dockerNetworkDisconnect,
-  dockerNetworkConnect
-} from "../docker/index.js";
-import { listContainers } from "../docker/list/index.js";
+  dockerNetworkConnect,
+  listPackageContainers,
+  getDnCoreNetworkContainerConfig
+} from "@dappnode/dockerapi";
 import { gte } from "semver";
-import { getDnCoreNetworkContainerConfig } from "../docker/api/network.js";
 import { getDockerComposePath } from "@dappnode/utils";
 
 /** Alias for code succinctness */
@@ -31,7 +31,7 @@ const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
  * and do docker inspect.
  */
 export async function addAliasToRunningContainers(): Promise<void> {
-  for (const container of await listContainers()) {
+  for (const container of await listPackageContainers()) {
     const containerName = container.containerName;
     const alias = getPrivateNetworkAlias(container);
 

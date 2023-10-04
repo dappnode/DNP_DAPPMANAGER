@@ -1,5 +1,5 @@
 import { cleanRepos } from "../../testUtils.js";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 
 export async function cleanInstallationArtifacts(
   partialContainerName: string

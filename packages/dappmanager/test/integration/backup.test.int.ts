@@ -3,7 +3,7 @@ import { expect } from "chai";
 import * as fs from "fs";
 import * as path from "path";
 import * as db from "../../src/db/index.js";
-import shell from "../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import {
   testDir,
   cleanTestDir,

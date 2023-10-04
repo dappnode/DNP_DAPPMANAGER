@@ -1,7 +1,7 @@
 // @ts-ignore
 import Client from "bitcoin-core";
 import { InstalledPackageData } from "@dappnode/common";
-import { dockerContainerInspect } from "../../docker/index.js";
+import { dockerContainerInspect } from "@dappnode/dockerapi";
 import { parseEnvironment } from "@dappnode/dockercompose";
 import { getPrivateNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";

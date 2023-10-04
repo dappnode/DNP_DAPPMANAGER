@@ -23,7 +23,7 @@ import { setExecutionClient } from "./setExecutionClient.js";
 import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
-import { listPackages } from "../../docker/list/listPackages.js";
+import { listPackages } from "@dappnode/dockerapi";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -51,7 +51,7 @@ export async function setStakerConfig<T extends Network>({
 
   const {
     executionClient: currentExecutionClient,
-    consensusClient: currentConsensusClient,
+    consensusClient: currentConsensusClient
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await listPackages();

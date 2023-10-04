@@ -1,8 +1,7 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { dockerContainerRestart } from "../modules/docker/index.js";
-import { listPackage } from "../modules/docker/list/index.js";
+import { dockerContainerRestart, listPackage } from "@dappnode/dockerapi";
 import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
 import { getServicesSharingPid } from "../utils/pid.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";

@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import path from "path";
 import { createTestDir, cleanTestDir, testDir } from "../../testUtils.js";
 

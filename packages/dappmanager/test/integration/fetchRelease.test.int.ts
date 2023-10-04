@@ -17,8 +17,8 @@ import {
   uploadManifestRelease,
   uploadDirectoryRelease
 } from "./integrationSpecs/index.js";
-import shell from "../../src/utils/shell.js";
-import { dockerComposeUp } from "../../src/modules/docker/compose/index.js";
+import { shell } from "@dappnode/utils";
+import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor, writeDefaultsToLabels } from "@dappnode/dockercompose";
 import { getContainerName, validatePath } from "@dappnode/utils";
 import { RequestedDnp } from "@dappnode/common";

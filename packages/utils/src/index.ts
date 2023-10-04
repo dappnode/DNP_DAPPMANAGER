@@ -18,3 +18,6 @@ export {
   getPrivateNetworkAliases,
 } from "./getPrivateNetworkAlias.js";
 export { getIsCore } from "./getIsCore.js";
+export { shell, shellHost, ShellError } from "./shell.js";
+export { normalizeHash } from "./normalizeHash.js";
+export { fileToGatewayUrl } from "./fileToGatewayUrl.js";

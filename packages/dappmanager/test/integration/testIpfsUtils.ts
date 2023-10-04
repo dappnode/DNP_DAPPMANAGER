@@ -4,7 +4,7 @@ import { create, IPFSHTTPClient } from "ipfs-http-client";
 import { AddResult } from "ipfs-core-types/src/root";
 import { sleep } from "../../src/utils/asyncFlows.js";
 import all from "it-all";
-import shell from "../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { Manifest } from "@dappnode/types";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";

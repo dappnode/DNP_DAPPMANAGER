@@ -1,16 +1,15 @@
 import fs from "fs";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { dockerComposeDown } from "../modules/docker/compose/index.js";
-import {
-  dockerContainerRemove,
-  dockerContainerStop
-} from "../modules/docker/index.js";
-import { getRepoDirPath, getDockerComposePath } from "@dappnode/utils";
-import shell from "../utils/shell.js";
-import { listPackage } from "../modules/docker/list/index.js";
+import { getRepoDirPath, getDockerComposePath, shell } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import { getDockerTimeoutMax } from "../modules/docker/utils.js";
+import {
+  getDockerTimeoutMax,
+  dockerContainerRemove,
+  dockerContainerStop,
+  dockerComposeDown,
+  listPackage
+} from "@dappnode/dockerapi";
 import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
 import { httpsPortal } from "./httpsPortal.js";
 import * as db from "../db/index.js";

@@ -1,4 +1,4 @@
-import shell from "./shell.js";
+import { shell } from "@dappnode/utils";
 
 const count = 5;
 const max = 3;

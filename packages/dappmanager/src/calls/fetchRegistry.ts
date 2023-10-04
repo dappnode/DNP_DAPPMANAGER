@@ -1,12 +1,12 @@
 import { getEthersProvider } from "../modules/ethClient/index.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
-import { listPackages } from "../modules/docker/list/index.js";
+import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
 import { NoImageForArchError } from "../modules/release/errors.js";
 import { logs } from "@dappnode/logger";
 import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
-import { fileToGatewayUrl } from "../utils/distributedFile.js";
+import { fileToGatewayUrl } from "@dappnode/utils";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import {
   getShortDescription,
