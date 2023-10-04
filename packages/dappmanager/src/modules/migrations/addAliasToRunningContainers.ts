@@ -56,25 +56,24 @@ export async function addAliasToGivenContainers(
       migrateCoreNetworkAndAliasInCompose(container, aliases);
 
       // Adds aliases to the container network
-      for (const alias of aliases) {
-        const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-          container.containerName
+      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
+        container.containerName
+      );
+      if (!hasAliases(currentEndpointConfig, aliases)) {
+        const updatedConfig = updateEndpointConfig(
+          currentEndpointConfig,
+          aliases
         );
-        if (!hasAlias(currentEndpointConfig, alias)) {
-          const updatedConfig = updateEndpointConfig(
-            currentEndpointConfig,
-            alias
-          );
-          await updateContainerNetwork(
-            dncoreNetworkName,
-            container,
-            updatedConfig
-          );
-          logs.info(`alias ${alias} added to ${container.containerName}`);
-        }
+        await updateContainerNetwork(
+          dncoreNetworkName,
+          container,
+          updatedConfig
+        );
+        logs.info(`aliases ${aliases} added to ${container.containerName}`);
       }
-    } catch (e) {
-      logs.error(`Error adding alias to ${container.containerName}`, e);
+    }
+    catch (e) {
+      logs.error(`Error adding aliases to ${container.containerName}`, e);
     }
   }
 }
@@ -159,11 +158,11 @@ export function migrateCoreNetworkAndAliasInCompose(
 
 function updateEndpointConfig(
   currentEndpointConfig: Dockerode.NetworkInfo | null,
-  alias: string
+  aliases: string[]
 ) {
   return {
     ...currentEndpointConfig,
-    Aliases: [...(currentEndpointConfig?.Aliases || []), alias]
+    Aliases: [...(currentEndpointConfig?.Aliases || []), ...aliases]
   };
 }
 
@@ -190,19 +189,19 @@ async function updateContainerNetwork(
   }
 }
 
-/** Return true if endpoint config exists, has an array of Alisases and it contains the alias
- * @param alias
+/** Return true if endpoint config exists, has an array of Alisases and it contains all the aliases
+ * @param aliases
  * @returns boolean
  */
-function hasAlias(
+function hasAliases(
   endpointConfig: Dockerode.NetworkInfo | null,
-  alias: string
+  aliases: string[]
 ): boolean {
   return Boolean(
     endpointConfig &&
-      endpointConfig.Aliases &&
-      Array.isArray(endpointConfig.Aliases) &&
-      endpointConfig.Aliases.includes(alias)
+    endpointConfig.Aliases &&
+    Array.isArray(endpointConfig.Aliases) &&
+    aliases.every(alias => endpointConfig.Aliases?.includes(alias))
   );
 }
 
