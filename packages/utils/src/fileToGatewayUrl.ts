@@ -1,5 +1,5 @@
 import { DistributedFile } from "@dappnode/common";
-import { normalizeHash } from "./normalizeHash";
+import { normalizeHash } from "./normalizeHash.js";
 import { params } from "@dappnode/params";
 
 /**

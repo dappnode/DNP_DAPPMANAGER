@@ -196,5 +196,17 @@ COPY --from=build-deps /usr/src/app/packages/admin-ui/package.json ./packages/ad
 COPY --from=build-deps /usr/src/app/packages/dappmanager/dist /usr/src/app/packages/dappmanager/dist
 COPY --from=build-deps /usr/src/app/packages/dappmanager/node_modules /usr/src/app/packages/dappmanager/node_modules
 COPY --from=build-deps /usr/src/app/packages/dappmanager/package.json /usr/src/app/packages/dappmanager/package.json
+# Copy dockerApi
+COPY --from=build-deps /usr/src/app/packages/dockerApi/dist /usr/src/app/packages/dockerApi/dist
+COPY --from=build-deps /usr/src/app/packages/dockerApi/node_modules /usr/src/app/packages/dockerApi/node_modules
+COPY --from=build-deps /usr/src/app/packages/dockerApi/package.json /usr/src/app/packages/dockerApi/package.json
+# Copy dockerCompose
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/dist /usr/src/app/packages/dockerCompose/dist
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/node_modules /usr/src/app/packages/dockerCompose/node_modules
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src/app/packages/dockerCompose/package.json
+# Copy HostScripts
+COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
+COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
+COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]

@@ -1,6 +1,6 @@
 import { ContainerNames } from "@dappnode/common";
 import { params } from "@dappnode/params";
-import { buildNetworkAlias } from "./buildNetworkAlias";
+import { buildNetworkAlias } from "./buildNetworkAlias.js";
 
 // TODO: unit testing
 

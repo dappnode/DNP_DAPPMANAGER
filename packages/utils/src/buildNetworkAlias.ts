@@ -1,4 +1,4 @@
-import { getShortUniqueDnp } from "./getShortUniqueDnp";
+import { getShortUniqueDnp } from "./getShortUniqueDnp.js";
 
 // TODO: unit testing
 
