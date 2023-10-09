@@ -52,17 +52,26 @@ COPY packages/eventBus/package.json \
   packages/eventBus/
 COPY packages/logger/package.json \ 
   packages/logger/
+COPY packages/dockerCompose/package.json \ 
+  packages/dockerCompose/
+COPY packages/dockerApi/package.json \ 
+  packages/dockerApi/
+COPY packages/hostScripts/package.json \
+  packages/hostScripts/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
-# Build common
-WORKDIR /app/packages/common/
-COPY packages/common/ .
-RUN yarn build
-# Results in dist/*
+# Build order must be as follows:
+# params > common > utils > eventBus > dockerCompose > logger > hostscripts > dockerApi > dappmanager > admin-ui
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build common
+WORKDIR /app/packages/common/
+COPY packages/common/ .
 RUN yarn build
 # Results in dist/*
 
@@ -78,9 +87,33 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
+RUN yarn build
+# Results in dist/*
+
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScripts
+WORKDIR /app/packages/hostScripts/
+COPY packages/hostScripts/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dockerApi
+WORKDIR /app/packages/dockerApi/
+COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dappmanager
+WORKDIR /app/packages/dappmanager/
+COPY packages/dappmanager/ .
 RUN yarn build
 # Results in dist/*
 
@@ -90,12 +123,6 @@ COPY packages/admin-ui/ .
 ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
-
-# Build dappmanager
-WORKDIR /app/packages/dappmanager/
-COPY packages/dappmanager/ .
-RUN yarn build
-# Results in dist/*
 
 ##############
 # BUILD-DEPS #
@@ -136,8 +163,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy scripts and services
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
+COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
 
 # Copy root app
 COPY --from=build-deps /usr/src/app/node_modules ./node_modules
@@ -170,5 +196,17 @@ COPY --from=build-deps /usr/src/app/packages/admin-ui/package.json ./packages/ad
 COPY --from=build-deps /usr/src/app/packages/dappmanager/dist /usr/src/app/packages/dappmanager/dist
 COPY --from=build-deps /usr/src/app/packages/dappmanager/node_modules /usr/src/app/packages/dappmanager/node_modules
 COPY --from=build-deps /usr/src/app/packages/dappmanager/package.json /usr/src/app/packages/dappmanager/package.json
+# Copy dockerApi
+COPY --from=build-deps /usr/src/app/packages/dockerApi/dist /usr/src/app/packages/dockerApi/dist
+COPY --from=build-deps /usr/src/app/packages/dockerApi/node_modules /usr/src/app/packages/dockerApi/node_modules
+COPY --from=build-deps /usr/src/app/packages/dockerApi/package.json /usr/src/app/packages/dockerApi/package.json
+# Copy dockerCompose
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/dist /usr/src/app/packages/dockerCompose/dist
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/node_modules /usr/src/app/packages/dockerCompose/node_modules
+COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src/app/packages/dockerCompose/package.json
+# Copy HostScripts
+COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
+COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
+COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]

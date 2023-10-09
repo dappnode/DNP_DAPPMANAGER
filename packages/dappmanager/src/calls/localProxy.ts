@@ -1,13 +1,13 @@
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {
   stopAvahiDaemon,
   startAvahiDaemon,
   getAvahiDaemonStatus
-} from "../modules/hostScripts/scripts/avahiDaemon.js";
+} from "@dappnode/hostscripts";
 import { params } from "@dappnode/params";
 import { AvahiDaemonStatus, LocalProxyingStatus } from "@dappnode/common";
 import { packageSetEnvironment } from "./packageSetEnvironment.js";
-import { listPackageNoThrow } from "../modules/docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
  * Local proxying allows to access the admin UI through dappnode.local.

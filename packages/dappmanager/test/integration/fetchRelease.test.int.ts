@@ -17,12 +17,10 @@ import {
   uploadManifestRelease,
   uploadDirectoryRelease
 } from "./integrationSpecs/index.js";
-import shell from "../../src/utils/shell.js";
-import * as validate from "../../src/utils/validate.js";
-import { dockerComposeUp } from "../../src/modules/docker/compose/index.js";
-import { ComposeEditor } from "../../src/modules/compose/editor.js";
-import { writeDefaultsToLabels } from "../../src/modules/compose/index.js";
-import { getContainerName } from "@dappnode/utils";
+import { shell } from "@dappnode/utils";
+import { dockerComposeUp } from "@dappnode/dockerapi";
+import { ComposeEditor, writeDefaultsToLabels } from "@dappnode/dockercompose";
+import { getContainerName, validatePath } from "@dappnode/utils";
 import { RequestedDnp } from "@dappnode/common";
 
 describe("Fetch releases", () => {
@@ -341,7 +339,7 @@ describe("Fetch releases", () => {
 
       // Up mock docker packages
       const composePathMain = ComposeEditor.getComposePath(dnpNameMain, false);
-      validate.path(composePathMain);
+      validatePath(composePathMain);
       composeMain.writeTo(composePathMain);
       await dockerComposeUp(composePathMain);
 

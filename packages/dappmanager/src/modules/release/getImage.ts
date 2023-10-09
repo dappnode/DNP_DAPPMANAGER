@@ -1,10 +1,10 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import * as validate from "../../utils/validate.js";
+import { validatePath } from "@dappnode/utils";
 import verifyXz from "../../utils/verifyXz.js";
 import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
-import { dockerImageManifest } from "../docker/cli.js";
+import { dockerImageManifest } from "@dappnode/dockerapi";
 import { getImageTag } from "@dappnode/types";
 
 export default async function getImage(
@@ -15,7 +15,7 @@ export default async function getImage(
   // Validate parameters
   if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
     throw Error(`Invalid path: "${path}"`);
-  validate.path(path);
+  validatePath(path);
 
   // Check if cache exist and validate it
   try {

@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 
 describe("Util: shell", () => {
   it("should return an error when cating a non-existing file", async () => {

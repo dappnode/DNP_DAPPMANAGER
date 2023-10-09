@@ -1,9 +1,9 @@
 import { wrapHandlerHtml } from "../utils.js";
-import { dockerInfoArchive } from "../../modules/docker/index.js";
+import { dockerInfoArchive } from "@dappnode/dockerapi";
 import {
   dockerGetFileOrDirBasedOnExtension,
   dockerGetPathType
-} from "../../modules/docker/fileTransfer.js";
+} from "@dappnode/dockerapi";
 
 interface Params {
   containerName: string;

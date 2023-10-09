@@ -1,7 +1,7 @@
 import { orderBy } from "lodash-es";
 import { logs } from "@dappnode/logger";
 import { UserActionLog } from "@dappnode/common";
-import { isNotFoundError } from "../../utils/node.js";
+import { isNotFoundError } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import fs from "fs";
 import { logUserAction } from "@dappnode/logger";

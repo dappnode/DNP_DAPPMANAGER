@@ -8,10 +8,10 @@ import {
   UserSettings,
   InstalledPackageData,
   Eth2ClientTarget,
-  EthClientRemote
+  EthClientRemote,
+  EthClientInstallStatus
 } from "@dappnode/common";
 import { mockDnp, mockContainer } from "../../../testUtils.js";
-import { EthClientInstallStatus } from "../../../../src/modules/ethClient/types.js";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet
@@ -136,7 +136,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         mock(() => import("../../../../src/db"))
           .with(db)
           .toBeUsed();
-        mock(() => import("../../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackageNoThrow })
           .toBeUsed();
         mock(() => import("../../../../src/calls"))

@@ -1,12 +1,9 @@
-import { listPackage } from "../modules/docker/list/index.js";
-import {
-  dockerContainerStop,
-  dockerContainerStart
-} from "../modules/docker/index.js";
+import { listPackage } from "@dappnode/dockerapi";
+import { dockerContainerStop, dockerContainerStart } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { getServicesSharingPid } from "../utils/pid.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PackageContainer } from "@dappnode/common";
 
 const dnpsAllowedToStop = [

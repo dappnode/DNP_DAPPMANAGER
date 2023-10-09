@@ -2,7 +2,7 @@ import retry from "async-retry";
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "../../db/index.js";
 import { params } from "@dappnode/params";
-import { listContainers } from "../../modules/docker/list/index.js";
+import { listPackageContainers } from "@dappnode/dockerapi";
 import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
 import { runAtMostEveryIntervals } from "../../utils/asyncFlows.js";
 import { logs } from "@dappnode/logger";
@@ -18,7 +18,7 @@ async function runNsupdate({
   removeOnly?: boolean;
 }): Promise<void> {
   try {
-    const containers = await listContainers();
+    const containers = await listPackageContainers();
 
     // Load domain alias from db
     const domainAliases = {

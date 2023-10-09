@@ -3,7 +3,7 @@ import path from "path";
 import { ethers } from "ethers";
 import { mapValues } from "lodash-es";
 import { ipfs } from "../../../src/modules/ipfs/index.js";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import { yamlDump } from "../../../src/utils/yaml.js";
 import { getContainerName } from "@dappnode/utils";
 import {

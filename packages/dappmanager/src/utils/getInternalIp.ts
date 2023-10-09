@@ -1,5 +1,5 @@
 import isIp from "is-ip";
-import shell from "./shell.js";
+import { shell } from "@dappnode/utils";
 import getDappmanagerImage from "./getDappmanagerImage.js";
 
 export default async function getInternalIp(): Promise<string> {

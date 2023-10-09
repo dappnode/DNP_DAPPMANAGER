@@ -25,12 +25,12 @@ import {
 import {
   stringifyPortMappings,
   parseEnvironment
-} from "../../src/modules/compose/index.js";
+} from "@dappnode/dockercompose";
 import {
   dockerContainerInspect,
-  dockerGetArchiveSingleFile
-} from "../../src/modules/docker/api/index.js";
-import { listContainer } from "../../src/modules/docker/list/index.js";
+  dockerGetArchiveSingleFile,
+  listContainer
+} from "@dappnode/dockerapi";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { MemoryWritable } from "./testStreamUtils.js";
 

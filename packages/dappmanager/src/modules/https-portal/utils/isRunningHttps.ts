@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { listPackageNoThrow } from "../../docker/list/listPackages.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
  * Returns true if HTTPS package installed and running, otherwise return false

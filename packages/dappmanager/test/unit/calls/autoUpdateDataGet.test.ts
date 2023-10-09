@@ -62,7 +62,7 @@ describe.skip("Call function: autoUpdateDataGet", function () {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/autoUpdateDataGet"),
       mock => {
-        mock(() => import("../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackages })
           .toBeUsed();
       }

@@ -1,7 +1,7 @@
 import { InstallPackageData } from "@dappnode/common";
 import { lt, lte, valid, gt } from "semver";
 import { params } from "@dappnode/params";
-import { listPackageNoThrow } from "../docker/list/index.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 interface PrysmLegacySpec {
   prysmDnpName: string;

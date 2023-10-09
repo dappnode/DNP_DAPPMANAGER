@@ -1,7 +1,7 @@
 import { params } from "@dappnode/params";
 import { clearCacheDb } from "../db/index.js";
 // Utils
-import shell from "../utils/shell.js";
+import { shell } from "@dappnode/utils";
 
 /**
  * Cleans the cache files of the DAPPMANAGER:

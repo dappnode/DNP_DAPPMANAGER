@@ -1,6 +1,6 @@
 import * as db from "../db/index.js";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
-import { listPackages } from "../modules/docker/list/index.js";
+import { listPackages } from "@dappnode/dockerapi";
 import {
   InstalledPackageData,
   InstalledPackageDataApiReturn,

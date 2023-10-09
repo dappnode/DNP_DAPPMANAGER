@@ -1,4 +1,4 @@
-import shell from "./shell.js";
+import { shell } from "@dappnode/utils";
 
 /**
  * Verify a compressed .xz file

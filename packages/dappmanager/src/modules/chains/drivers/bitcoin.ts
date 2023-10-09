@@ -1,17 +1,17 @@
 // @ts-ignore
 import Client from "bitcoin-core";
 import { InstalledPackageData } from "@dappnode/common";
-import { dockerContainerInspect } from "../../docker/index.js";
-import { parseEnvironment } from "../../compose/index.js";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { dockerContainerInspect } from "@dappnode/dockerapi";
+import { parseEnvironment } from "@dappnode/dockercompose";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
 
 function getMinBlockDiffSync(dnpName: string): number {
   return dnpName.includes("bitcoin")
     ? // minTimeDiff = 30 min
-      30 / 10
+    30 / 10
     : // ZCash, Litecoin, etc
-      30 / 2.5;
+    30 / 2.5;
 }
 
 // Cache the blockIndex to prevent unnecessary calls
@@ -35,7 +35,15 @@ export async function bitcoin(
 ): Promise<ChainDataResult> {
   const container = dnp.containers[0];
   if (!container) throw Error("no container");
-  const containerDomain = getPrivateNetworkAlias(container);
+
+  const { dnpName, serviceName } = container;
+
+  const containerDomain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: true
+  });
+
   const apiUrl = containerDomain; // 'bitcoin.dappnode'
 
   // To initialize the bitcoin client, the RPC user and password are necessary

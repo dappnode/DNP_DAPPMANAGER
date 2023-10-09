@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { ChainDriverSpecs } from "@dappnode/types";
-import { getPrivateNetworkAlias } from "../../../domains.js";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { urlJoin } from "../../../utils/url.js";
 import { InstalledPackageData } from "@dappnode/common";
 import { ChainDataResult } from "../types.js";
@@ -26,7 +26,12 @@ export async function ethereum2(
     return null; // OK to not be running, just ignore
   }
 
-  const containerDomain = getPrivateNetworkAlias(beaconChainContainer);
+  const { dnpName } = beaconChainContainer;
+  const containerDomain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: false
+  });
 
   // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
   const port = chainDriver.portNumber || 3500;

@@ -3,7 +3,7 @@ import {
   InstalledPackageData
 } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { dockerContainerStop } from "../../docker/index.js";
+import { dockerContainerStop } from "@dappnode/dockerapi";
 
 /**
  * Stop all the containers from a given package dnpName

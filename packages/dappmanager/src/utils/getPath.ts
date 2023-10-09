@@ -1,7 +1,6 @@
-import fs from "fs";
 import { omit } from "lodash-es";
 import path from "path";
-import { params } from "@dappnode/params";
+import { getRepoDirPath } from "@dappnode/utils";
 
 /*
  * Generates file paths given a set of parameters. This tool helps
@@ -21,10 +20,6 @@ import { params } from "@dappnode/params";
 
 // Define paths
 
-export function packageRepoDir(dnpName: string, isCore: boolean): string {
-  return getRepoDirPath(dnpName, isCore);
-}
-
 export function manifest(dnpName: string, isCore: boolean): string {
   return path.join(
     getRepoDirPath(dnpName, isCore),
@@ -43,18 +38,6 @@ export function image(
   );
 }
 
-export function dockerCompose(dnpName: string, isCore: boolean): string {
-  return getDockerComposePath(dnpName, isCore);
-}
-
-export function dockerComposeSmart(dnpName: string): string {
-  // First check for core docker-compose
-  const DOCKERCOMPOSE_PATH = getDockerComposePath(dnpName, true);
-  if (fs.existsSync(DOCKERCOMPOSE_PATH)) return DOCKERCOMPOSE_PATH;
-  // Then check for dnp docker-compose
-  return getDockerComposePath(dnpName, false);
-}
-
 /**
  * DEPRECATED
  */
@@ -64,28 +47,11 @@ export function envFile(dnpName: string, isCore: boolean): string {
 
 // Helper functions
 
-function getDockerComposePath(dnpName: string, isCore: boolean): string {
-  return path.join(
-    getRepoDirPath(dnpName, isCore),
-    getDockerComposeName(dnpName, isCore)
-  );
-}
-
 /**
  * DEPRECATED
  */
 function getEnvFilePath(dnpName: string, isCore: boolean): string {
   return path.join(getRepoDirPath(dnpName, isCore), `${dnpName}.env`);
-}
-
-function getRepoDirPath(dnpName: string, isCore: boolean): string {
-  if (isCore) return params.DNCORE_DIR;
-  return path.join(params.REPO_DIR, dnpName);
-}
-
-function getDockerComposeName(dnpName: string, isCore: boolean): string {
-  if (isCore) return `docker-compose-${getShortName(dnpName)}.yml`;
-  else return "docker-compose.yml";
 }
 
 function getManifestName(dnpName: string, isCore: boolean): string {

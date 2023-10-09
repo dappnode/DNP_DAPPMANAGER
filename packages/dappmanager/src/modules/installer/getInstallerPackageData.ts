@@ -1,8 +1,8 @@
 import deepmerge from "deepmerge";
 import * as getPath from "../../utils/getPath.js";
 import orderInstallPackages from "./orderInstallPackages.js";
-import { ComposeEditor, ComposeFileEditor } from "../compose/editor.js";
-import { getContainersStatus } from "../docker/index.js";
+import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
+import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
 import { parseTimeoutSeconds } from "../../utils/timeout.js";
 import {
   UserSettingsAllDnps,
@@ -11,7 +11,7 @@ import {
   InstallPackageData,
   ContainersStatus
 } from "@dappnode/common";
-import { listPackages } from "../docker/list/index.js";
+import { getDockerComposePath } from "@dappnode/utils";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -63,7 +63,7 @@ function getInstallerPackageData(
   const { dnpName, semVersion, isCore, imageFile } = release;
 
   // Compute paths
-  const composePath = getPath.dockerCompose(dnpName, isCore);
+  const composePath = getDockerComposePath(dnpName, isCore);
   const composeBackupPath = getPath.backupPath(composePath);
   const manifestPath = getPath.manifest(dnpName, isCore);
   const manifestBackupPath = getPath.backupPath(manifestPath);
