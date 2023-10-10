@@ -160,9 +160,11 @@ function updateEndpointConfig(
   currentEndpointConfig: Dockerode.NetworkInfo | null,
   aliases: string[]
 ) {
+  const currentAliases = currentEndpointConfig?.Aliases || [];
+  const newAliases = uniq([...currentAliases, ...aliases]);
   return {
     ...currentEndpointConfig,
-    Aliases: [...(currentEndpointConfig?.Aliases || []), ...aliases]
+    Aliases: newAliases
   };
 }
 
