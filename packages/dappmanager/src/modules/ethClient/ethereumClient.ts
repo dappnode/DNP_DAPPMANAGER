@@ -1,9 +1,9 @@
 import { isEqual } from "lodash-es";
-import { Eth2ClientTarget, EthClientRemote } from "@dappnode/common";
+import { Eth2ClientTarget, EthClientRemote, ExecutionClient, InstalledPackageDetailData } from "@dappnode/common";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
-import { getConsensusUserSettings } from "../stakerConfig/utils.js";
+import { getConsensusUserSettings, getStakerConfigByNetwork } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
@@ -22,9 +22,16 @@ import {
 import Dockerode from "dockerode";
 import {
   ExecutionClientMainnet,
-  ConsensusClientMainnet
+  ConsensusClientMainnet,
+  Network
 } from "@dappnode/types";
+enum ComposeEditorAction {
+  ADD,
+  REMOVE
+}
+
 export class EthereumClient {
+
   /**
    * Computes the current eth2ClientTarget based on:
    * - remote
@@ -117,6 +124,75 @@ export class EthereumClient {
         );
     }
   }
+
+  /**
+ * Updates the fullnode.dappnode alias when the execution client changes.
+ * - For mainnet: fullnode.dappnode
+ * - For other networks: <network>.fullnode.dappnode
+ * 
+ * @param newExecClientDnpName - New execution client to set.
+ * @param network - Network to define the proper alias.
+ */
+  async updateFullnodeAlias<T extends Network>({
+    newExecClientDnpName,
+    network = "mainnet" as T
+  }: {
+    newExecClientDnpName: ExecutionClient<T>;
+    network?: T;
+  }): Promise<void> {
+
+    const fullnodeAlias = network === "mainnet" ? params.FULLNODE_ALIAS : `${network}.${params.FULLNODE_ALIAS}`;
+
+    const prevExecClient = getStakerConfigByNetwork(network).executionClient;
+
+    if (prevExecClient) {
+      await this.removeAliasFromPreviousExecClient({ execClientDnpName: prevExecClient, fullnodeAlias });
+    }
+
+    // TODO: Continue
+  }
+
+  private async removeAliasFromPreviousExecClient<T extends Network>({ execClientDnpName, fullnodeAlias }: { execClientDnpName: ExecutionClient<T>, fullnodeAlias: string }): Promise<void> {
+    const execClientPkg = await packageGet({ dnpName: execClientDnpName });
+
+    const serviceName = this.getServiceNameFromPackage(execClientPkg);
+    const containerName = this.getContainerNameFromService(execClientPkg, serviceName);
+
+    await this.removeContainerAliasFromDockerNetwork({ containerName, fullnodeAlias });
+
+    await this.removeFullnodeAliasFromCompose({ execClientDnpName, execClientServiceName: serviceName, fullnodeAlias });
+  }
+
+  private getServiceNameFromPackage(pkg: InstalledPackageDetailData): string {
+    return pkg.manifest?.mainService || pkg.containers[0].serviceName;
+  }
+
+  private getContainerNameFromService(pkg: InstalledPackageDetailData, serviceName: string): string {
+    return pkg.containers.find(container => container.serviceName === serviceName)?.containerName || pkg.containers[0].containerName;
+  }
+
+  private async removeContainerAliasFromDockerNetwork({ containerName, fullnodeAlias }: { containerName: string, fullnodeAlias: string }): Promise<void> {
+    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
+
+    const updatedAliases = (currentEndpointConfig?.Aliases || []).filter((alias: string) => alias !== params.FULLNODE_ALIAS);
+
+    const endpointConfig: Partial<Dockerode.NetworkInfo> = {
+      ...currentEndpointConfig,
+      Aliases: updatedAliases
+    };
+
+    await dockerNetworkDisconnect(
+      params.DNP_PRIVATE_NETWORK_NAME,
+      containerName
+    );
+    await dockerNetworkConnect(
+      params.DNP_PRIVATE_NETWORK_NAME,
+      containerName,
+      endpointConfig
+    );
+
+  }
+
 
   /**
    * Handles the Ethereum client fullnode.dappnode alias for the execution client
@@ -253,57 +329,70 @@ export class EthereumClient {
   }
 
   // Utils
-  // TODO: put private in the methods and find a way to test them
+  private editFullnodeAliasInCompose<T extends Network>({
+    action,
+    execClientDnpName,
+    execClientServiceName,
+    fullnodeAlias,
+  }: {
+    action: ComposeEditorAction,
+    execClientDnpName: ExecutionClient<T>,
+    execClientServiceName: string,
+    fullnodeAlias: string,
+  }): void {
+    const compose = new ComposeFileEditor(execClientDnpName, false);
+    const composeService = compose.services()[execClientServiceName];
+    const serviceNetworks = parseServiceNetworks(composeService.get().networks || {});
+    const serviceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || null;
 
-  removeFullnodeAliasFromCompose(
-    ethClientDnpName: string,
-    ethClientServiceName: string
-  ): void {
-    this.editComposeFullnodeAliasEthClient(
-      true,
-      ethClientDnpName,
-      ethClientServiceName
-    );
-  }
-
-  addFullnodeAliasToCompose(
-    ethClientDnpName: string,
-    ethClientServiceName: string
-  ): void {
-    this.editComposeFullnodeAliasEthClient(
-      false,
-      ethClientDnpName,
-      ethClientServiceName
-    );
-  }
-
-  editComposeFullnodeAliasEthClient(
-    removeAlias: boolean,
-    ethClientDnpName: string,
-    ethClientServiceName: string
-  ): void {
-    const compose = new ComposeFileEditor(ethClientDnpName, false);
-
-    const composeService = compose.services()[ethClientServiceName];
-    const serviceNetworks = parseServiceNetworks(
-      composeService.get().networks || {}
-    );
-    const serviceNetwork =
-      serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
-
-    if (removeAlias)
+    if (action === ComposeEditorAction.REMOVE) {
       composeService.removeNetworkAliases(
         params.DNP_PRIVATE_NETWORK_NAME,
-        [params.FULLNODE_ALIAS],
+        [fullnodeAlias],
         serviceNetwork
       );
-    else
+    } else {
       composeService.addNetworkAliases(
         params.DNP_PRIVATE_NETWORK_NAME,
-        [params.FULLNODE_ALIAS],
+        [fullnodeAlias],
         serviceNetwork
       );
+    }
 
     compose.write();
+  }
+
+  private removeFullnodeAliasFromCompose<T extends Network>({
+    execClientDnpName,
+    execClientServiceName,
+    fullnodeAlias,
+  }: {
+    execClientDnpName: ExecutionClient<T>,
+    execClientServiceName: string,
+    fullnodeAlias: string,
+  }): void {
+    this.editFullnodeAliasInCompose({
+      action: ComposeEditorAction.REMOVE,
+      execClientDnpName,
+      execClientServiceName,
+      fullnodeAlias,
+    });
+  }
+
+  private addFullnodeAliasToCompose<T extends Network>({
+    execClientDnpName,
+    execClientServiceName,
+    fullnodeAlias,
+  }: {
+    execClientDnpName: ExecutionClient<T>,
+    execClientServiceName: string,
+    fullnodeAlias: string,
+  }): void {
+    this.editFullnodeAliasInCompose({
+      action: ComposeEditorAction.ADD,
+      execClientDnpName,
+      execClientServiceName,
+      fullnodeAlias,
+    });
   }
 }
