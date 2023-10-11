@@ -40,6 +40,21 @@ export async function dockerNetworkDisconnect(
 }
 
 /**
+ * Disconnects and reconnects a container to a network
+ * @param networkName "dncore_network"
+ * @param containerName "3613f73ba0e4" or "fullcontainername"
+ * @param aliases `["network-alias"]`
+ */
+export async function dockerNetworkReconnect(
+  networkName: string,
+  containerName: string,
+  endpointConfig?: Partial<Dockerode.NetworkInfo>
+): Promise<void> {
+  await dockerNetworkDisconnect(networkName, containerName);
+  await dockerNetworkConnect(networkName, containerName, endpointConfig);
+}
+
+/**
  * Create a new docker network
  */
 export async function dockerCreateNetwork(networkName: string): Promise<void> {
