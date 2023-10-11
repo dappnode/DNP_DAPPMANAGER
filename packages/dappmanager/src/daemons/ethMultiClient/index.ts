@@ -156,7 +156,7 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
   const runEthMultiClientTaskMemo = runOnlyOneSequentially(
-    async (useCheckpointSync: boolean | undefined) => {
+    async (multiClientArgs: { useCheckpointSync?: boolean, prevExecClientDnpName?: ExecutionClientMainnet } | undefined) => {
       try {
         const execClient = db.executionClientMainnet.get();
         const consClient = db.consensusClientMainnet.get();
@@ -177,7 +177,7 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
           const next = await runEthClientInstaller(
             client,
             prev,
-            useCheckpointSync
+            multiClientArgs?.useCheckpointSync
           );
 
           if (!next) continue; // Package is uninstalled
@@ -197,7 +197,8 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
               // 2. Add network alias for docker DNS
               // TODO: Check if this is correct
               ethereumClient.updateFullnodeAlias({
-                newExecClientDnpName: execClient,
+                prevExecClientDnpName: multiClientArgs?.prevExecClientDnpName,
+                newExecClientDnpName: client,
                 network: "mainnet"
               });
             }
@@ -210,8 +211,8 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(({ useCheckpointSync }) =>
-    runEthMultiClientTaskMemo(useCheckpointSync)
+  eventBus.runEthClientInstaller.on(({ useCheckpointSync, prevExecClientDnpName }) =>
+    runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
   );
 
   runAtMostEvery(

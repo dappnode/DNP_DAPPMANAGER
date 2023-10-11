@@ -97,6 +97,7 @@ export class EthereumClient {
       if (!deletePrevExecClient && currentTarget !== "remote")
         await this.updateFullnodeAlias({
           network: "mainnet",
+          prevExecClientDnpName: currentTarget.execClient
         }).catch(e =>
           logs.error(
             "Error removing fullnode.dappnode alias from previous ETH exec client",
@@ -109,17 +110,19 @@ export class EthereumClient {
       await db.executionClientMainnet.set(execClient);
       await db.consensusClientMainnet.set(consClient);
       if (sync)
-        await this.changeEthClientSync(
+        await this.changeEthClientSync({
+          prevExecClient: currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
           useCheckpointSync
-        );
+        });
       else
-        await this.changeEthClientNotAsync(
+        await this.changeEthClientNotAsync({
+          prevExecClient: currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
           useCheckpointSync
-        );
+        });
     }
   }
 
@@ -132,25 +135,29 @@ export class EthereumClient {
  * @param network - Network to define the proper alias.
  */
   async updateFullnodeAlias<T extends Network>({
+    prevExecClientDnpName,
     newExecClientDnpName,
     network = "mainnet" as T
   }: {
+    prevExecClientDnpName?: ExecutionClient<T>;
     newExecClientDnpName?: ExecutionClient<T>;
     network?: T;
   }): Promise<void> {
 
     const fullnodeAlias = network === "mainnet" ? params.FULLNODE_ALIAS : `${network}.${params.FULLNODE_ALIAS}`;
 
-    const prevExecClient = getStakerConfigByNetwork(network).executionClient;
+    logs.info(`Updating fullnode alias (${fullnodeAlias}) for network ${network} from ${prevExecClientDnpName} to ${newExecClientDnpName}`);
 
-    if (prevExecClient === newExecClientDnpName) return;
+    if (prevExecClientDnpName === newExecClientDnpName) return;
 
-    if (prevExecClient) {
-      await this.removeAliasFromPreviousExecClient({ execClientDnpName: prevExecClient, fullnodeAlias });
+    if (prevExecClientDnpName) {
+      logs.info(`Removing fullnode alias (${fullnodeAlias}) from previous execution client for network ${network} (${prevExecClientDnpName})`);
+      await this.removeAliasFromPreviousExecClient({ execClientDnpName: prevExecClientDnpName, fullnodeAlias });
     }
 
     // New execution client can be undefined if the user sets remote Ethereum repository, for example
     if (newExecClientDnpName) {
+      logs.info(`Adding fullnode alias (${fullnodeAlias}) to new execution client for network ${network} (${newExecClientDnpName})`);
       this.addAliasToNewExecClient({ execClientDnpName: newExecClientDnpName, fullnodeAlias });
     }
 
@@ -225,25 +232,36 @@ export class EthereumClient {
   /**
    * Changes the ethereum client synchronously
    */
-  private async changeEthClientSync(
+  private async changeEthClientSync({
+    prevExecClient,
+    execClient,
+    consClient,
+    useCheckpointSync,
+  }: {
+    prevExecClient?: ExecutionClientMainnet,
     execClient: ExecutionClientMainnet,
     consClient: ConsensusClientMainnet,
-    useCheckpointSync?: boolean
-  ): Promise<void> {
+    useCheckpointSync?: boolean,
+  }): Promise<void> {
     try {
+
       // Install execution client and set default fullnode alias
       const execClientPackage = await listPackageNoThrow({
         dnpName: execClient
       });
+
       if (!execClientPackage) {
+        logs.info(`Installing execution client ${execClient}`);
         await packageInstall({ name: execClient }).then(
           async () =>
             await this.updateFullnodeAlias({
               network: "mainnet",
-              newExecClientDnpName: execClient
+              newExecClientDnpName: execClient,
+              prevExecClientDnpName: prevExecClient
             })
         );
       } else {
+        logs.info(`Starting execution client ${execClient}`);
         // Start pkg if not running
         if (execClientPackage.containers.some(c => c.state !== "running"))
           await dockerComposeUpPackage(
@@ -255,7 +273,8 @@ export class EthereumClient {
             async () =>
               await this.updateFullnodeAlias({
                 network: "mainnet",
-                newExecClientDnpName: execClient
+                newExecClientDnpName: execClient,
+                prevExecClientDnpName: prevExecClient
               })
           );
       }
@@ -286,18 +305,25 @@ export class EthereumClient {
   /**
    * Changes the ethereum client asynchronosly by triggering an event
    */
-  private async changeEthClientNotAsync(
+  private async changeEthClientNotAsync({
+    prevExecClient,
+    execClient,
+    consClient,
+    useCheckpointSync,
+  }: {
+    prevExecClient?: ExecutionClientMainnet,
     execClient: ExecutionClientMainnet,
     consClient: ConsensusClientMainnet,
-    useCheckpointSync: boolean
-  ): Promise<void> {
+    useCheckpointSync?: boolean,
+  }): Promise<void> {
+
     db.ethExecClientInstallStatus.set(execClient, {
       status: "TO_INSTALL"
     });
     db.ethConsClientInstallStatus.set(consClient, {
       status: "TO_INSTALL"
     });
-    eventBus.runEthClientInstaller.emit({ useCheckpointSync });
+    eventBus.runEthClientInstaller.emit({ useCheckpointSync, prevExecClientDnpName: prevExecClient });
   }
 
   // Utils
