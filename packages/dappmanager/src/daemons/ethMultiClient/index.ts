@@ -195,9 +195,10 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
               // 1. Domain for BIND package
               db.fullnodeDomainTarget.set(execClient);
               // 2. Add network alias for docker DNS
-              ethereumClient.setDefaultEthClientFullNode({
-                dnpName: execClient,
-                removeAlias: true
+              // TODO: Check if this is correct
+              ethereumClient.updateFullnodeAlias({
+                newExecClientDnpName: execClient,
+                network: "mainnet"
               });
             }
           }
