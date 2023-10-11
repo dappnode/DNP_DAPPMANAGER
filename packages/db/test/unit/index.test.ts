@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
-import { beforeAndAfter, createTestDir, testDir } from "../../testUtils.js";
-import { dbFactory } from "../../../src/db/dbFactory.js";
+import { beforeAndAfter, createTestDir, testDir } from "../testUtils.js";
+import { dbFactory } from "../../src/dbFactory.js";
 import { expect } from "chai";
 
 describe("db", () => {
@@ -19,7 +19,7 @@ describe("db", () => {
     const staticValue = staticKey(STATIC_VALUE_KEY, 1);
     const indexedValue = indexedByKey<number, string>({
       rootKey: INDEXED_VALUE_KEY,
-      getKey: arg => arg
+      getKey: (arg) => arg,
     });
 
     // staticValue
@@ -53,8 +53,8 @@ describe("db", () => {
         {
           [STATIC_VALUE_KEY]: 5,
           [INDEXED_VALUE_KEY]: {
-            a: 5
-          }
+            a: 5,
+          },
         },
         null,
         2

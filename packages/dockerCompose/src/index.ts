@@ -1,6 +1,5 @@
 export * from "./labelsDb.js";
 export * from "./devicePath.js";
-export * from "./environment.js";
 export * from "./ports.js";
 export * from "./setDappnodeComposeDefaults.js";
 export * from "./userSettings.js";
