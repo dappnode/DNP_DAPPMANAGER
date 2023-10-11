@@ -12,7 +12,7 @@ import { ReleaseDownloadedContents } from "./types.js";
 import { getReleaseSignatureStatus } from "./releaseSignature.js";
 import { params } from "@dappnode/params";
 import { getIsCore } from "@dappnode/utils";
-import { computeGlobalEnvsFromDb } from "../globalEnvs.js";
+import { computeGlobalEnvsFromDb } from "@dappnode/db";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

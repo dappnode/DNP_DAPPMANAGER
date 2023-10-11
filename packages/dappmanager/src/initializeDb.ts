@@ -6,7 +6,7 @@ import getServerName from "./utils/getServerName.js";
 import getInternalIp from "./utils/getInternalIp.js";
 import getStaticIp from "./utils/getStaticIp.js";
 import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
-import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs.js";
+import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
 import { params } from "@dappnode/params";
 import ping from "./utils/ping.js";

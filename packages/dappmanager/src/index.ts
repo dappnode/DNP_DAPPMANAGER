@@ -1,7 +1,6 @@
 import * as db from "./db/index.js";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
-import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
 import { generateKeyPair } from "./utils/publickeyEncryption.js";
 import { copyHostScripts } from "@dappnode/hostscripts";
 import { postRestartPatch } from "./modules/installer/restartPatch.js";
@@ -17,7 +16,7 @@ import {
   getVersionData,
   isNewDappmanagerVersion
 } from "./utils/getVersionData.js";
-import { shellHost } from "@dappnode/utils";
+import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startDappmanager } from "./startDappmanager.js";
 import { startAvahiDaemon } from "./daemons/avahi/index.js";
 import { executeMigrations } from "./modules/migrations/index.js";

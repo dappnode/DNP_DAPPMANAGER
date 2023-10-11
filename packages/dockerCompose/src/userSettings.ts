@@ -3,11 +3,11 @@ import { mapValues, pick, omitBy, isObject } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
-  parseEnvironment,
   parseVolumeMappings,
   parseDevicePathMountpoint,
-  getDevicePath
+  getDevicePath,
 } from "./index.js";
+import { parseEnvironment } from "@dappnode/utils";
 import { PortMapping, UserSettings, VolumeMapping } from "@dappnode/common";
 import { Compose } from "@dappnode/types";
 import { cleanCompose, isOmitable } from "./clean.js";
@@ -21,26 +21,26 @@ import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
  * volumes = ["/dev0/user-set-path:/usr/data"]
  */
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
-  "bitcoin.dnp.dappnode.eth": ["bitcoin_data:/root/.bitcoin"]
+  "bitcoin.dnp.dappnode.eth": ["bitcoin_data:/root/.bitcoin"],
 };
 
 export const parseUserSettingsFns: {
   [P in keyof Required<UserSettings>]: (compose: Compose) => UserSettings[P];
 } = {
-  environment: compose =>
-    mapValues(compose.services, service =>
+  environment: (compose) =>
+    mapValues(compose.services, (service) =>
       parseEnvironment(service.environment || [])
     ),
 
-  portMappings: compose =>
-    mapValues(compose.services, service => {
+  portMappings: (compose) =>
+    mapValues(compose.services, (service) => {
       const portMappings: { [containerPortAndType: string]: string } = {};
       for (const port of parsePortMappings(service.ports || []))
         portMappings[getPortMappingId(port)] = String(port.host || "");
       return portMappings;
     }),
 
-  namedVolumeMountpoints: compose => {
+  namedVolumeMountpoints: (compose) => {
     const namedVolumeMountpoints: { [volumeName: string]: string } = {};
     for (const [volumeName, volObj] of Object.entries(compose.volumes || {}))
       if (isComposeVolumeUsed(compose, volumeName))
@@ -60,7 +60,7 @@ export const parseUserSettingsFns: {
   // ##### <DEPRECATED> Kept for legacy compatibility
   // Check if there are any named volume mappings stored in the metadata tags
   // To be backwards compatible, a few key DNP named volume mappings are hardcoded
-  legacyBindVolumes: compose =>
+  legacyBindVolumes: (compose) =>
     mapValues(compose.services, (service, serviceName) => {
       const volumes = parseVolumeMappings(service.volumes || []);
       const labels = readContainerLabels(service.labels || {});
@@ -70,7 +70,7 @@ export const parseUserSettingsFns: {
       const legacyBindVolumes: { [volumeName: string]: string } = {};
       for (const { container, name } of parsedDefaultVolumes)
         if (name) {
-          const vol = volumes.find(v => v.container === container);
+          const vol = volumes.find((v) => v.container === container);
           if (vol && vol.host !== name) legacyBindVolumes[name] = vol.host;
         }
       return legacyBindVolumes;
@@ -79,7 +79,7 @@ export const parseUserSettingsFns: {
 
   allNamedVolumeMountpoint: () => undefined,
   domainAlias: () => undefined,
-  fileUploads: () => ({})
+  fileUploads: () => ({}),
 };
 
 /**
@@ -89,13 +89,13 @@ export const parseUserSettingsFns: {
  * user and which are not
  */
 export function parseUserSettings(compose: Compose): UserSettings {
-  const userSettings = mapValues(parseUserSettingsFns, parseUserSettingsFn =>
+  const userSettings = mapValues(parseUserSettingsFns, (parseUserSettingsFn) =>
     parseUserSettingsFn(compose)
   );
   // Ignore objects that are empty to make tests and payloads cleaner
   return omitBy(
     userSettings,
-    value =>
+    (value) =>
       isOmitable(value) ||
       // Remove nested empty objects
       (isObject(value) && Object.values(value).every(isOmitable))
@@ -134,24 +134,28 @@ export function applyUserSettings(
     );
 
     const nextPorts = stringifyPortMappings(
-      portMappings.map((portMapping): PortMapping => {
-        const portId = getPortMappingId(portMapping);
-        const userSetHost = parseInt(userSetPortMappings[portId]);
-        // Use `in` operator to tolerate empty hosts (= ephemeral port)
-        return portId in userSetPortMappings
-          ? { ...portMapping, host: userSetHost || undefined }
-          : portMapping;
-      })
+      portMappings.map(
+        (portMapping): PortMapping => {
+          const portId = getPortMappingId(portMapping);
+          const userSetHost = parseInt(userSetPortMappings[portId]);
+          // Use `in` operator to tolerate empty hosts (= ephemeral port)
+          return portId in userSetPortMappings
+            ? { ...portMapping, host: userSetHost || undefined }
+            : portMapping;
+        }
+      )
     );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
-      volumeMappings.map((vol): VolumeMapping => {
-        const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
-        return hostUserSet && path.isAbsolute(hostUserSet)
-          ? { host: hostUserSet, container: vol.container }
-          : vol;
-      })
+      volumeMappings.map(
+        (vol): VolumeMapping => {
+          const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
+          return hostUserSet && path.isAbsolute(hostUserSet)
+            ? { host: hostUserSet, container: vol.container }
+            : vol;
+        }
+      )
     );
     // ##### </DEPRECATED>
 
@@ -159,7 +163,7 @@ export function applyUserSettings(
       ...(service.labels || {}),
       ...writeDefaultsToLabels(
         pick(service, ["environment", "ports", "volumes"])
-      )
+      ),
     };
 
     return {
@@ -167,7 +171,7 @@ export function applyUserSettings(
       environment: nextEnvironment,
       ports: nextPorts,
       volumes: nextServiceVolumes,
-      labels: nextLabels
+      labels: nextLabels,
     };
   });
 
@@ -182,8 +186,8 @@ export function applyUserSettings(
           driver_opts: {
             type: "none",
             device: getDevicePath({ mountpoint, dnpName, volumeName }),
-            o: "bind"
-          }
+            o: "bind",
+          },
         }
       : vol;
   });
@@ -191,7 +195,7 @@ export function applyUserSettings(
   return cleanCompose({
     ...compose,
     services: nextServices,
-    volumes: nextVolumes
+    volumes: nextVolumes,
   });
 }
 
@@ -210,7 +214,7 @@ function getPortMappingId(portMapping: PortMapping): string {
  */
 function isComposeVolumeUsed(compose: Compose, volName: string): boolean {
   return Object.values(compose.services).some(
-    service =>
-      service.volumes && service.volumes.some(vol => vol.startsWith(volName))
+    (service) =>
+      service.volumes && service.volumes.some((vol) => vol.startsWith(volName))
   );
 }
