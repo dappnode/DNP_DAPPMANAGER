@@ -1,4 +1,4 @@
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate.js";
 import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";

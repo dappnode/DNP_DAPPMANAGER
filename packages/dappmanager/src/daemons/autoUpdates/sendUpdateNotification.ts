@@ -1,6 +1,6 @@
 import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { prettyDnpName } from "../../utils/format.js";

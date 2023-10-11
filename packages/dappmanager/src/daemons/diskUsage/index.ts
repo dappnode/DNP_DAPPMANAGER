@@ -1,4 +1,4 @@
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";

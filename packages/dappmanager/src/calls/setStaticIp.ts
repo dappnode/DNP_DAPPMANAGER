@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import * as dyndns from "../modules/dyndns/index.js";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";

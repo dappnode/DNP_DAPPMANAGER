@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getMultiClientStatus } from "./clientStatus.js";
 import { EthClientStatusError, EthProviderError } from "@dappnode/common";

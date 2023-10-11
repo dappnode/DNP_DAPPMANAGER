@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 
 /**
  * Marks notifications as view by deleting them from the db

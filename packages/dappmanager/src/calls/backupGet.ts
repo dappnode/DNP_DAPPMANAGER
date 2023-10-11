@@ -2,7 +2,7 @@ import fs from "fs";
 import crypto from "crypto";
 import path from "path";
 import { logs } from "@dappnode/logger";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 // Modules
 import { listPackage } from "@dappnode/dockerapi";

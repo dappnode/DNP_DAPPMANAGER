@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { params } from "@dappnode/params";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import { wrapHandler } from "../utils.js";
 

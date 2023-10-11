@@ -5,7 +5,7 @@ import {
   StakerConfigSet
 } from "@dappnode/common";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
-import * as db from "../../../db/index.js";
+import * as db from "@dappnode/db";
 import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,

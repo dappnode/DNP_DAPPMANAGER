@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { EthClientStatus } from "@dappnode/common";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";

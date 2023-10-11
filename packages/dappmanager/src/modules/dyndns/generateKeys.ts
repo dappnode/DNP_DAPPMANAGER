@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { params } from "@dappnode/params";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 
 const corruptedPrivateKeyMessage = `
