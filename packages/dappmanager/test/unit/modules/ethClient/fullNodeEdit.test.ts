@@ -12,12 +12,12 @@ describe("Edit fullnode in eth client", () => {
   const composeWithFullnodeAlias = `
 version: '3.5'
 services:
-  goerli-geth.dnp.dappnode.eth:
-    container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
+  geth.dnp.dappnode.eth:
+    container_name: DAppNodePackage-geth.dnp.dappnode.eth
     dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+    image: 'geth.dnp.dappnode.eth:0.4.12'
     logging:
       driver: json-file
       options:
@@ -26,7 +26,7 @@ services:
     networks:
       dncore_network:
         aliases:
-          - goerli-geth.dappnode
+          - geth.dappnode
           - fullnode.dappnode
     ports:
       - '30303'
@@ -34,12 +34,12 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - 'data:/data'
     labels:
-      dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
+      dappnode.dnp.dnpName: geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
 volumes:
-  goerli: {}
+  data: {}
 networks:
   dncore_network:
     external: true
@@ -48,12 +48,12 @@ networks:
   const composeWithOutFullnodeAlias = `
 version: '3.5'
 services:
-  goerli-geth.dnp.dappnode.eth:
-    container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
+  geth.dnp.dappnode.eth:
+    container_name: DAppNodePackage-geth.dnp.dappnode.eth
     dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+    image: 'geth.dnp.dappnode.eth:0.4.12'
     logging:
       driver: json-file
       options:
@@ -62,28 +62,28 @@ services:
     networks:
       dncore_network:
         aliases:
-          - goerli-geth.dappnode
+          - geth.dappnode
     ports:
       - '30303'
       - 30303/udp
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - 'data:/data'
     labels:
-      dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
+      dappnode.dnp.dnpName: geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
 volumes:
-  goerli: {}
+  data: {}
 networks:
   dncore_network:
     external: true
 `;
 
   // Example package
-  const dnpName = "example";
-  const serviceName = "goerli-geth.dnp.dappnode.eth";
-  const dnpRepoExamplePath = process.cwd() + "/dnp_repo/example";
+  const dnpName = "geth.dnp.dappnode.eth";
+  const serviceName = "geth.dnp.dappnode.eth";
+  const dnpRepoExamplePath = `${process.cwd()}/dnp_repo/${dnpName}`;
 
   before("Create random compose to be edited", async () => {
     // Create necessary dir
@@ -97,7 +97,7 @@ networks:
 
   it("Should remove alias: fullnode.dappnode", () => {
     // Edit existing compose
-    ethereumClient.removeFullnodeAliasFromCompose(dnpName, serviceName);
+    ethereumClient.removeFullnodeAliasFromCompose({ execClientDnpName: dnpName, execClientServiceName: serviceName });
 
     // Get edited compose
     const composeAfter = fs.readFileSync(
@@ -110,7 +110,7 @@ networks:
 
   it("Should add alias: fullnode.dappnode", () => {
     // Edit existing compose
-    ethereumClient.addFullnodeAliasToCompose(dnpName, serviceName);
+    ethereumClient.addFullnodeAliasToCompose({ execClientDnpName: dnpName, execClientServiceName: serviceName });
 
     // Get edited compose
     const composeAfter = fs.readFileSync(
