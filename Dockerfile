@@ -58,6 +58,8 @@ COPY packages/dockerApi/package.json \
   packages/dockerApi/
 COPY packages/hostScripts/package.json \
   packages/hostScripts/
+COPY packages/db/package.json \
+  packages/db/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -108,6 +110,12 @@ RUN yarn build
 # Build dockerApi
 WORKDIR /app/packages/dockerApi/
 COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
+# Build db
+WORKDIR /app/packages/db/
+COPY packages/db/ .
 RUN yarn build
 # Results in dist/*
 
