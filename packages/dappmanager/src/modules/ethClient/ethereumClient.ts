@@ -3,7 +3,7 @@ import { Eth2ClientTarget, EthClientRemote, ExecutionClient, InstalledPackageDet
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
-import { getConsensusUserSettings, getStakerConfigByNetwork } from "../stakerConfig/utils.js";
+import { getConsensusUserSettings } from "../stakerConfig/utils.js";
 import { packageGet } from "../../calls/packageGet.js";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { packageRemove } from "../../calls/packageRemove.js";
@@ -360,14 +360,15 @@ export class EthereumClient {
     compose.write();
   }
 
-  private removeFullnodeAliasFromCompose<T extends Network>({
+  // TODO: Function should be private
+  public removeFullnodeAliasFromCompose<T extends Network>({
     execClientDnpName,
     execClientServiceName,
     fullnodeAlias = params.FULLNODE_ALIAS,
   }: {
     execClientDnpName: ExecutionClient<T>,
     execClientServiceName: string,
-    fullnodeAlias: string,
+    fullnodeAlias?: string,
   }): void {
     this.editFullnodeAliasInCompose({
       action: ComposeEditorAction.REMOVE,
@@ -377,14 +378,15 @@ export class EthereumClient {
     });
   }
 
-  private addFullnodeAliasToCompose<T extends Network>({
+  // TODO: Function should be private
+  public addFullnodeAliasToCompose<T extends Network>({
     execClientDnpName,
     execClientServiceName,
     fullnodeAlias = params.FULLNODE_ALIAS,
   }: {
     execClientDnpName: ExecutionClient<T>,
     execClientServiceName: string,
-    fullnodeAlias: string,
+    fullnodeAlias?: string,
   }): void {
     this.editFullnodeAliasInCompose({
       action: ComposeEditorAction.ADD,
