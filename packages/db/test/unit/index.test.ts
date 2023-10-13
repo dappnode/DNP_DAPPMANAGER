@@ -1,14 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { beforeAndAfter, createTestDir, testDir } from "../testUtils.js";
 import { dbFactory } from "../../src/dbFactory.js";
 import { expect } from "chai";
 
-describe("db", () => {
-  beforeAndAfter("Clean files", async () => {
-    await createTestDir();
-  });
+const testDir = "./test_files/";
 
+describe("db", () => {
   it("Should read modify and write db", () => {
     const dbPath = path.join(testDir, "test-db.json");
     const { staticKey, indexedByKey } = dbFactory(dbPath);
