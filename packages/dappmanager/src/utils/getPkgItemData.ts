@@ -1,6 +1,6 @@
 import { PackageItemData, PackageRelease } from "@dappnode/common";
 import { ReleaseFetcher } from "../modules/release/index.js";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { pick } from "lodash-es";
 import { Manifest } from "@dappnode/types";
 import { eventBus } from "@dappnode/eventbus";

@@ -1,6 +1,6 @@
 import { isEqual } from "lodash-es";
 import { Eth2ClientTarget, EthClientRemote } from "@dappnode/common";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { getConsensusUserSettings } from "../stakerConfig/utils.js";

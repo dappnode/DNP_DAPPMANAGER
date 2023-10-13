@@ -1,6 +1,7 @@
 import { Compose } from "@dappnode/types";
 import { ComposeServicesSharingPid } from "../types.js";
 import { InstallPackageData, PackageContainer } from "@dappnode/common";
+import { packageInstalledHasPid } from "@dappnode/utils";
 
 /**
  * Check if a package that will be installed/updated
@@ -8,16 +9,6 @@ import { InstallPackageData, PackageContainer } from "@dappnode/common";
  */
 export function packageToInstallHasPid(pkg: InstallPackageData): boolean {
   for (const service of Object.values(pkg.compose.services)) {
-    if (service.pid) return true;
-  }
-  return false;
-}
-
-/**
- * Check if a compose contains pid
- */
-export function packageInstalledHasPid(compose: Compose): boolean {
-  for (const service of Object.values(compose.services)) {
     if (service.pid) return true;
   }
   return false;

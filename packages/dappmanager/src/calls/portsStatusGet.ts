@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import * as upnpc from "../modules/upnpc/index.js";
 import { performPortsScan } from "../modules/portsTable/performPortsScan.js";
 import {

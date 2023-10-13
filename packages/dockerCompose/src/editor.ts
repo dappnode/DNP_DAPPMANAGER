@@ -25,11 +25,6 @@ import {
   parsePortMappings,
   mergePortMappings,
 } from "./ports.js";
-import {
-  parseEnvironment,
-  mergeEnvs,
-  stringifyEnvironment,
-} from "./environment.js";
 import { parseServiceNetworks } from "./networks.js";
 import { verifyCompose } from "./verify.js";
 import {
@@ -43,6 +38,9 @@ import {
   isNotFoundError,
   yamlDump,
   yamlParse,
+  parseEnvironment,
+  mergeEnvs,
+  stringifyEnvironment,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 

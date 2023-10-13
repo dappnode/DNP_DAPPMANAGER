@@ -1,4 +1,4 @@
-import * as db from "./db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import * as dyndns from "./modules/dyndns/index.js";
 import getDappmanagerImage from "./utils/getDappmanagerImage.js";
@@ -6,7 +6,7 @@ import getServerName from "./utils/getServerName.js";
 import getInternalIp from "./utils/getInternalIp.js";
 import getStaticIp from "./utils/getStaticIp.js";
 import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
-import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs.js";
+import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
 import { params } from "@dappnode/params";
 import ping from "./utils/ping.js";

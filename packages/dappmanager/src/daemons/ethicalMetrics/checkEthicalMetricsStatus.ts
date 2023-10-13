@@ -1,7 +1,7 @@
 import { logs } from "@dappnode/logger";
 import { packageInstall } from "../../calls/index.js";
 import { dockerContainerStart, listPackageNoThrow } from "@dappnode/dockerapi";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import {
   ethicalMetricsDnpName,
   register

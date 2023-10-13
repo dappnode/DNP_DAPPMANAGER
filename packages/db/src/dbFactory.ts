@@ -1,6 +1,5 @@
-import { validatePath } from "@dappnode/utils";
+import { validatePath, JsonFileDb } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import { JsonFileDb } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 
 /**
@@ -15,7 +14,9 @@ export const dbMain = dbFactory(params.DB_MAIN_PATH);
  */
 export const dbCache = dbFactory(params.DB_CACHE_PATH);
 
-export function dbFactory(dbPath: string): {
+export function dbFactory(
+  dbPath: string
+): {
   staticKey: <T>(
     key: string,
     defaultValue: T
@@ -23,7 +24,7 @@ export function dbFactory(dbPath: string): {
   indexedByKey: <V, K>({
     rootKey,
     getKey,
-    validate
+    validate,
   }: {
     rootKey: string;
     getKey: (keyArg: K) => string;
@@ -63,7 +64,7 @@ export function dbFactory(dbPath: string): {
         const all = jsonFileDb.read();
         all[key] = newValue;
         jsonFileDb.write(all);
-      }
+      },
     };
   }
 
@@ -75,7 +76,7 @@ export function dbFactory(dbPath: string): {
   function indexedByKey<V, K>({
     rootKey,
     getKey,
-    validate
+    validate,
   }: {
     rootKey: string;
     getKey: (keyArg: K) => string;
@@ -114,7 +115,7 @@ export function dbFactory(dbPath: string): {
         delete root[getKey(keyArg)];
         all[rootKey] = root;
         jsonFileDb.write(all);
-      }
+      },
     };
   }
 
@@ -127,6 +128,6 @@ export function dbFactory(dbPath: string): {
   return {
     staticKey,
     indexedByKey,
-    clearDb
+    clearDb,
   };
 }

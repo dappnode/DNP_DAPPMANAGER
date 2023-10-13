@@ -3,7 +3,7 @@ import {
   OptimismConfigSet,
   UserSettings
 } from "@dappnode/common";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import {
   optimismNode,

@@ -19,7 +19,7 @@ export function parseEnvironment(
     return envsArray;
 
   return envsArray
-    .filter(row => (row || "").trim())
+    .filter((row) => (row || "").trim())
     .reduce((envs: PackageEnvs, row) => {
       const [key, value] = (row || "").trim().split(/=(.*)/);
       return key ? { ...envs, [key]: value || "" } : envs;
@@ -53,7 +53,7 @@ export function mergeEnvs(envs1: PackageEnvs, envs2: PackageEnvs): PackageEnvs {
   return pickBy(
     {
       ...envs2,
-      ...envs1
+      ...envs1,
     },
     (_0, key) => key
   );

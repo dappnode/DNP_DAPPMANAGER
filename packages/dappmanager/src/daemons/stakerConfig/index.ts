@@ -1,5 +1,5 @@
 import { eventBus } from "@dappnode/eventbus";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import { ReleaseFetcher } from "../../modules/release/index.js";
 import { memoizeDebounce } from "../../utils/asyncFlows.js";

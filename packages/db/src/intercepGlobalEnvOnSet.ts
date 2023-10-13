@@ -1,8 +1,6 @@
 import { logs } from "@dappnode/logger";
-import {
-  updatePkgsWithGlobalEnvs,
-  writeGlobalEnvsToEnvFile
-} from "../modules/globalEnvs.js";
+import { updatePkgsWithGlobalEnvs } from "./updatePkgsWithGlobalEnvs.js";
+import { writeGlobalEnvsToEnvFile } from "./globalEnvs.js";
 import { params } from "@dappnode/params";
 
 /**
@@ -26,7 +24,7 @@ export function interceptGlobalEnvOnSet<T, U>(
   return {
     ...dbSetter,
 
-    set: async function (globEnvValue: U): Promise<void> {
+    set: async function(globEnvValue: U): Promise<void> {
       // Must be with prefix _DAPPNODE_GLOBAL_
       if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
         globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
@@ -44,6 +42,6 @@ export function interceptGlobalEnvOnSet<T, U>(
           `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
         );
       }
-    }
+    },
   };
 }

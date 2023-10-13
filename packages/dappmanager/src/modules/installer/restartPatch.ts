@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import * as getPath from "../../utils/getPath.js";
 import { getDockerComposePath, validatePath } from "@dappnode/utils";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
 import { pause } from "../../utils/asyncFlows.js";
 import { params } from "@dappnode/params";

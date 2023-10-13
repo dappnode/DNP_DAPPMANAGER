@@ -1,5 +1,5 @@
 import fs from "fs";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import isIp from "is-ip";

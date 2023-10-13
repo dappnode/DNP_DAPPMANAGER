@@ -31,7 +31,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
         mock(() => import("@dappnode/eventbus"))
           .with({ eventBus: mockEventBus })
           .toBeUsed();
-        mock(() => import("../../../../src/db"))
+        mock(() => import("@dappnode/db"))
           .with({ ethClientSyncedNotificationStatus })
           .toBeUsed();
       }

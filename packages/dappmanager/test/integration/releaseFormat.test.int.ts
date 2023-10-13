@@ -11,7 +11,7 @@ import {
   uploadDirectoryRelease,
   uploadManifestRelease
 } from "./integrationSpecs/index.js";
-import * as db from "../../src/db/index.js";
+import * as db from "@dappnode/db";
 import { mockImageEnvNAME } from "./integrationSpecs/mockImage.js";
 
 /**

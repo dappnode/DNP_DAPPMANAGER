@@ -13,7 +13,7 @@ import {
   getFallBackCategories
 } from "./fetchDirectory.js";
 import { getRegistry } from "../modules/registry/index.js";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { DirectoryDnp } from "@dappnode/toolkit";
 
 const defaultEnsName = "public.dappnode.eth";

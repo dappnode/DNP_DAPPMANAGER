@@ -1,5 +1,5 @@
 import { PackageContainer } from "@dappnode/common";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import {
   signDataFromPackage,

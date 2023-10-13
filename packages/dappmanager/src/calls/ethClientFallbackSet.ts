@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { EthClientFallback } from "@dappnode/common";
 
 /**

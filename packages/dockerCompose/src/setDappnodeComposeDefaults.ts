@@ -3,10 +3,10 @@ import {
   getContainerName,
   getPrivateNetworkAliases,
   getIsCore,
+  parseEnvironment,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
-import { parseEnvironment } from "./environment.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
   Manifest,
@@ -63,7 +63,8 @@ export function setDappnodeComposeDefaults(
             serviceName,
             dnpName,
             // The root pkg alias will be added to the main service or if it is a mono service
-            isMainOrMonoservice: isMonoService || manifest.mainService === serviceName,
+            isMainOrMonoservice:
+              isMonoService || manifest.mainService === serviceName,
           }),
         });
       }
@@ -96,7 +97,11 @@ function ensureMinimumComposeVersion(composeFileVersion: string): string {
  */
 function setServiceNetworksWithAliases(
   serviceNetworks: ComposeServiceNetworks | undefined,
-  service: { serviceName: string; dnpName: string; isMainOrMonoservice: boolean }
+  service: {
+    serviceName: string;
+    dnpName: string;
+    isMainOrMonoservice: boolean;
+  }
 ): ComposeServiceNetworks {
   // Return service network dncore_network with aliases if not provided
   if (!serviceNetworks)

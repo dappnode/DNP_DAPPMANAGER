@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { clearCacheDb } from "../db/index.js";
+import { clearCacheDb } from "@dappnode/db";
 // Utils
 import { shell } from "@dappnode/utils";
 

@@ -1,7 +1,7 @@
 import * as upnpc from "../../modules/upnpc/index.js";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import getPortsToOpen from "./getPortsToOpen.js";
 import getLocalIp from "../../utils/getLocalIp.js";
 // Utils

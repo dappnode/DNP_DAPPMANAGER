@@ -1,6 +1,6 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { utils as ethersUtils } from "ethers";
 
 const privateKeyPath = params.PRIVATE_KEY_PATH;

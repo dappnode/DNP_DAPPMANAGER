@@ -1,5 +1,5 @@
 import { CID, create, IPFSHTTPClient } from "ipfs-http-client";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import {
   CatStreamToFsArgs,
