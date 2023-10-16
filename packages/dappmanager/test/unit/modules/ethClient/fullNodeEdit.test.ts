@@ -2,7 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import { shellSafe } from "../../../testUtils.js";
 import fs from "fs";
-import { ethereumClient } from "../../../../src/modules/ethClient/index.js";
+import { ethereumClient, ComposeAliasEditorAction } from "../../../../src/modules/ethClient/index.js";
+import { params } from "@dappnode/params";
 
 // The following test will wite a compose with the alias fullnode.dappnode:
 // 1. Then will remove such aslias and test it
@@ -97,7 +98,12 @@ networks:
 
   it("Should remove alias: fullnode.dappnode", () => {
     // Edit existing compose
-    ethereumClient.removeFullnodeAliasFromCompose({ execClientDnpName: dnpName, execClientServiceName: serviceName });
+    ethereumClient.editFullnodeAliasInCompose({
+      action: ComposeAliasEditorAction.REMOVE,
+      execClientDnpName: dnpName,
+      execClientServiceName: serviceName,
+      alias: params.FULLNODE_ALIAS,
+    });
 
     // Get edited compose
     const composeAfter = fs.readFileSync(
@@ -110,7 +116,12 @@ networks:
 
   it("Should add alias: fullnode.dappnode", () => {
     // Edit existing compose
-    ethereumClient.addFullnodeAliasToCompose({ execClientDnpName: dnpName, execClientServiceName: serviceName });
+    ethereumClient.editFullnodeAliasInCompose({
+      action: ComposeAliasEditorAction.ADD,
+      execClientDnpName: dnpName,
+      execClientServiceName: serviceName,
+      alias: params.FULLNODE_ALIAS,
+    });
 
     // Get edited compose
     const composeAfter = fs.readFileSync(

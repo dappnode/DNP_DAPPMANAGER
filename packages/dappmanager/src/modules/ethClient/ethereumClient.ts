@@ -24,7 +24,8 @@ import {
   ConsensusClientMainnet,
   Network
 } from "@dappnode/types";
-enum ComposeEditorAction {
+
+export enum ComposeAliasEditorAction {
   ADD,
   REMOVE
 }
@@ -169,9 +170,14 @@ export class EthereumClient {
     const serviceName = this.getServiceNameFromPackage(execClientPkg);
     const containerName = this.getContainerNameFromService(execClientPkg, serviceName);
 
-    await this.removeContainerAliasFromDockerNetwork({ containerName, fullnodeAlias });
+    await this.removeContainerAliasFromDockerNetwork({ containerName, aliasToRemove: fullnodeAlias });
 
-    this.removeFullnodeAliasFromCompose({ execClientDnpName, execClientServiceName: serviceName, fullnodeAlias });
+    this.editFullnodeAliasInCompose({
+      action: ComposeAliasEditorAction.REMOVE,
+      execClientDnpName,
+      execClientServiceName: serviceName,
+      alias: fullnodeAlias,
+    });
   }
 
   private async addAliasToNewExecClient<T extends Network>({ execClientDnpName, fullnodeAlias }: { execClientDnpName: ExecutionClient<T>, fullnodeAlias: string }): Promise<void> {
@@ -180,9 +186,14 @@ export class EthereumClient {
     const serviceName = this.getServiceNameFromPackage(execClientPkg);
     const containerName = this.getContainerNameFromService(execClientPkg, serviceName);
 
-    this.addContainerAliasToDockerNetwork({ containerName, fullnodeAlias });
+    this.addContainerAliasToDockerNetwork({ containerName, aliasToAdd: fullnodeAlias });
 
-    this.addFullnodeAliasToCompose({ execClientDnpName, execClientServiceName: serviceName, fullnodeAlias });
+    this.editFullnodeAliasInCompose({
+      action: ComposeAliasEditorAction.ADD,
+      execClientDnpName,
+      execClientServiceName: serviceName,
+      alias: fullnodeAlias,
+    });
   }
 
   private getServiceNameFromPackage(pkg: InstalledPackageDetailData): string {
@@ -193,10 +204,10 @@ export class EthereumClient {
     return pkg.containers.find(container => container.serviceName === serviceName)?.containerName || pkg.containers[0].containerName;
   }
 
-  private async removeContainerAliasFromDockerNetwork({ containerName, fullnodeAlias }: { containerName: string, fullnodeAlias: string }): Promise<void> {
+  private async removeContainerAliasFromDockerNetwork({ containerName, aliasToRemove }: { containerName: string, aliasToRemove: string }): Promise<void> {
     const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
 
-    const updatedAliases = (currentEndpointConfig?.Aliases || []).filter((alias: string) => alias !== fullnodeAlias);
+    const updatedAliases = (currentEndpointConfig?.Aliases || []).filter((alias: string) => alias !== aliasToRemove);
 
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
       ...currentEndpointConfig,
@@ -211,14 +222,14 @@ export class EthereumClient {
 
   }
 
-  private async addContainerAliasToDockerNetwork({ containerName, fullnodeAlias }: { containerName: string, fullnodeAlias: string }): Promise<void> {
+  private async addContainerAliasToDockerNetwork({ containerName, aliasToAdd }: { containerName: string, aliasToAdd: string }): Promise<void> {
     const currentEndpointConfig = await getDnCoreNetworkContainerConfig(containerName);
 
     const endpointConfig: Partial<Dockerode.NetworkInfo> = {
       ...currentEndpointConfig,
       Aliases: uniq([
         ...(currentEndpointConfig?.Aliases || []),
-        fullnodeAlias
+        aliasToAdd
       ])
     };
 
@@ -327,72 +338,38 @@ export class EthereumClient {
   }
 
   // Utils
-  private editFullnodeAliasInCompose<T extends Network>({
+
+  // TODO: Should be private
+  public editFullnodeAliasInCompose<T extends Network>({
     action,
     execClientDnpName,
     execClientServiceName,
-    fullnodeAlias = params.FULLNODE_ALIAS,
+    alias = params.FULLNODE_ALIAS,
   }: {
-    action: ComposeEditorAction,
+    action: ComposeAliasEditorAction,
     execClientDnpName: ExecutionClient<T>,
     execClientServiceName: string,
-    fullnodeAlias: string,
+    alias: string,
   }): void {
     const compose = new ComposeFileEditor(execClientDnpName, false);
     const composeService = compose.services()[execClientServiceName];
     const serviceNetworks = parseServiceNetworks(composeService.get().networks || {});
     const serviceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || null;
 
-    if (action === ComposeEditorAction.REMOVE) {
+    if (action === ComposeAliasEditorAction.REMOVE) {
       composeService.removeNetworkAliases(
         params.DNP_PRIVATE_NETWORK_NAME,
-        [fullnodeAlias],
+        [alias],
         serviceNetwork
       );
     } else {
       composeService.addNetworkAliases(
         params.DNP_PRIVATE_NETWORK_NAME,
-        [fullnodeAlias],
+        [alias],
         serviceNetwork
       );
     }
 
     compose.write();
-  }
-
-  // TODO: Function should be private
-  public removeFullnodeAliasFromCompose<T extends Network>({
-    execClientDnpName,
-    execClientServiceName,
-    fullnodeAlias = params.FULLNODE_ALIAS,
-  }: {
-    execClientDnpName: ExecutionClient<T>,
-    execClientServiceName: string,
-    fullnodeAlias?: string,
-  }): void {
-    this.editFullnodeAliasInCompose({
-      action: ComposeEditorAction.REMOVE,
-      execClientDnpName,
-      execClientServiceName,
-      fullnodeAlias,
-    });
-  }
-
-  // TODO: Function should be private
-  public addFullnodeAliasToCompose<T extends Network>({
-    execClientDnpName,
-    execClientServiceName,
-    fullnodeAlias = params.FULLNODE_ALIAS,
-  }: {
-    execClientDnpName: ExecutionClient<T>,
-    execClientServiceName: string,
-    fullnodeAlias?: string,
-  }): void {
-    this.editFullnodeAliasInCompose({
-      action: ComposeEditorAction.ADD,
-      execClientDnpName,
-      execClientServiceName,
-      fullnodeAlias,
-    });
   }
 }
