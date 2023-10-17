@@ -24,6 +24,7 @@ import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
+import { EthereumClient } from "../../ethClient/ethereumClient.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -91,6 +92,7 @@ export async function setStakerConfig<T extends Network>({
       targetExecutionClient: executionClient,
       currentExecClientPkg
     }),
+
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     setConsensusClient<T>({
       network: network,
@@ -114,6 +116,12 @@ export async function setStakerConfig<T extends Network>({
     consensusClient?.dnpName,
     mevBoost?.dnpName
   );
+
+  await new EthereumClient().updateFullnodeAlias({
+    network,
+    newExecClientDnpName: executionClient?.dnpName,
+    prevExecClientDnpName: currentExecutionClient || undefined
+  });
 
   // WEB3SIGNER
   // The web3signer deppends on the global envs EXECUTION_CLIENT and CONSENSUS_CLIENT
