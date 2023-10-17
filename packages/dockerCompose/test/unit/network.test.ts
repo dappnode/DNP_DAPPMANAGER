@@ -8,19 +8,19 @@ describe("modules / compose / networks", () => {
       from: Parameters<typeof parseServiceNetworks>[0];
       to: ReturnType<typeof parseServiceNetworks>;
     }[] = [
-      { id: "Empty array", from: [], to: {} },
-      { id: "Empty obj", from: {}, to: {} },
-      {
-        id: "From array to obj",
-        from: ["dncore_network"],
-        to: { dncore_network: {} },
-      },
-      {
-        id: "Keep obj",
-        from: { dncore_network: {} },
-        to: { dncore_network: {} },
-      },
-    ];
+        { id: "Empty array", from: [], to: {} },
+        { id: "Empty obj", from: {}, to: {} },
+        {
+          id: "From array to obj",
+          from: ["dncore_network"],
+          to: { dncore_network: {} },
+        },
+        {
+          id: "Keep obj",
+          from: { dncore_network: {} },
+          to: { dncore_network: {} },
+        },
+      ];
 
     for (const { id, from, to } of testCases) {
       it(id, () => {
@@ -72,6 +72,7 @@ describe("modules / compose / networks", () => {
           },
         },
         networks: {},
+        dns: undefined
       });
     });
   });

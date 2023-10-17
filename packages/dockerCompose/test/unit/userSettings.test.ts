@@ -38,7 +38,6 @@ const polkadotNewCompose = {
       },
       restart: "unless-stopped",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
-      dns: "172.33.1.2",
       networks: ["dncore_network"],
     },
   },
@@ -209,7 +208,6 @@ describe("parseUserSet", () => {
             DEFAULT_CLIENT: "PARITY",
           },
           ports: ["35353:30303", "35353:30303/udp", "35354:30304/udp"],
-          dns: "172.33.1.2",
           networks: {
             network: {
               ipv4_address: "172.33.1.6",
