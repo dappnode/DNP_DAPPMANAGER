@@ -23,7 +23,6 @@ services:
       - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
       - DISABLE_UPNP=
-    dns: 172.33.1.2
     networks:
       dncore_network:
         ipv4_address: 172.33.1.7
