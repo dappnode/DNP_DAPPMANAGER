@@ -139,23 +139,15 @@ ENV REACT_APP_API_URL /
 RUN yarn build
 # Results in build/*
 
-# Copy docker
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 # Copy binaries
-COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/nsupdate
 COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy the src last as it's the layer most likely to change
 COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
-
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 
 WORKDIR /app
 COPY docker/start_dev.sh /usr/src/app/start_dev.sh
