@@ -9,7 +9,6 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
  */
 export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
   /**
-   * Binded to the domain mapper module 'nsupdate'
    * ```
    * domain = "bitcoin.dappnode", "other.public.dappnode"
    * ```
