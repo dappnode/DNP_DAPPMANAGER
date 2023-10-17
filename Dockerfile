@@ -216,5 +216,9 @@ COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src
 COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
 COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
 COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
+# Copy db
+COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
+COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules
+COPY --from=build-deps /usr/src/app/packages/db/package.json /usr/src/app/packages/db/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
