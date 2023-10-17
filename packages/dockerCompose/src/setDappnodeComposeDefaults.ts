@@ -58,7 +58,6 @@ export function setDappnodeComposeDefaults(
           container_name: getContainerName({ dnpName, serviceName, isCore }),
           image: getImageTag({ serviceName, dnpName, version }),
           environment: parseEnvironment(serviceUnsafe.environment || {}),
-          dns: params.DNS_SERVICE, // Common DAppNode ENS
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
             dnpName,
