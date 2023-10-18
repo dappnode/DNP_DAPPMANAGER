@@ -211,7 +211,7 @@ export default async function initializeDb(): Promise<void> {
   // - Updates the domain: db.domain.set(domain);
   dyndns.generateKeys(); // Auto-checks if keys are already generated
 
-  // TODO: Replace this functionality by adding the dyndns domain as an alias to the dappmanager container (?)
+  // TODO: Move this functionality to Bind v2 package
   /**
    * Set the domain of this DAppNode to point to the internal IP for better UX
    * on Wifi connections, only if the internal IP !== public IP
@@ -219,7 +219,7 @@ export default async function initializeDb(): Promise<void> {
    * NOTE: Runs as a forked process with retry and a try / catch block
    * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
    */
-  /*try {
+  try {
     await retry(async function updateLocalDyndnsCall(): Promise<void> {
       const domain = db.domain.get();
       const publicIp = db.publicIp.get();
@@ -237,7 +237,7 @@ export default async function initializeDb(): Promise<void> {
     });
   } catch (e) {
     logs.error("Error on update local dyndns", e);
-  }*/
+  }
 
   /**
    * After initializing all the internal params (hostname, internal_ip, etc)
