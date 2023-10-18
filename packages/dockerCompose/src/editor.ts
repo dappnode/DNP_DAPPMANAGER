@@ -328,8 +328,8 @@ export class ComposeEditor {
       )
         service.environment = stringifyEnvironment(service.environment);
 
-        // Remove hardcoded DNS
-        service.dns = undefined;
+      // Remove hardcoded DNS
+      service.dns = undefined;
       return {
         ...omitBy(service, (el) => isObject(el) && isEmpty(el)),
         // Add mandatory properties for the ts compiler
