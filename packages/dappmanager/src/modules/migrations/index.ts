@@ -4,7 +4,7 @@ import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
 import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
-import { removeDnsFromComposeFiles } from "./removeDnsFromContainers.js";
+import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 
 export class MigrationError extends Error {
   migration: string;
