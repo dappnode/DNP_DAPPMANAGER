@@ -1,10 +1,12 @@
 import client from "prom-client";
+import memoize from "memoizee";
 import { wrapHandler } from "../utils.js";
 import * as db from "@dappnode/db";
 import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
+import { shellHost } from "@dappnode/utils";
 
 /**
  * Collect the metrics:
@@ -139,6 +141,28 @@ register.registerMetric(
         if (isMevBoostSelected) this.set({ mevBoost: network }, 1);
         else this.set({ mevBoost: network }, 0);
       }
+    }
+  })
+);
+
+// Docker version
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_docker_versions",
+    help: "docker engine version",
+    labelNames: ["dockerVersion"],
+    async collect() {
+      const getDockerVersionMemo = memoize(
+        async () => {
+          return await shellHost("docker info --format '{{.ServerVersion}}'");
+        },
+        {
+          maxAge: 1000 * 60 * 60 * 24, // cache results for 1 day
+          promise: true // Wait for Promises to resolve. Do not cache rejections
+        }
+      );
+      const dockerVersion = await getDockerVersionMemo();
+      this.set({ dockerVersion }, 1);
     }
   })
 );
