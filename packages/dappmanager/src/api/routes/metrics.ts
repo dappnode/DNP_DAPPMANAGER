@@ -161,9 +161,15 @@ register.registerMetric(
           promise: true // Wait for Promises to resolve. Do not cache rejections
         }
       );
-      const dockerVersion = await getDockerVersionMemo();
-      // set docker version as a label
-      this.set({ dockerVersion: dockerVersion }, 1);
+
+      try {
+        const dockerVersion = await getDockerVersionMemo();
+        // set docker version as a label
+        if (dockerVersion) this.set({ dockerVersion: dockerVersion }, 1);
+        else this.set({ dockerVersion: undefined }, 0);
+      } catch (e) {
+        this.set({ dockerVersion: undefined }, 0);
+      }
     }
   })
 );
