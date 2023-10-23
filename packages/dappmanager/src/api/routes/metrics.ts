@@ -1,12 +1,11 @@
 import client from "prom-client";
-import memoize from "memoizee";
 import { wrapHandler } from "../utils.js";
 import * as db from "@dappnode/db";
 import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
-import { shellHost } from "@dappnode/utils";
+import { getHostInfoMemoized } from "@dappnode/hostscripts";
 
 /**
  * Collect the metrics:
@@ -145,31 +144,35 @@ register.registerMetric(
   })
 );
 
-// Docker version
+// Host info metrics
 register.registerMetric(
   new client.Gauge({
-    name: "dappmanager_docker_version",
-    help: "docker engine version",
-    labelNames: ["dockerVersion"],
+    name: "dappmanager_host_info",
+    help: "host info: docker, docker-cli and docker-compose versions, os, kernel, version codename and architecture",
+    labelNames: [
+      "dockerServerVersion",
+      "dockerCliVersion",
+      "dockerComposeVersion",
+      "os",
+      "kernel",
+      "versionCodename",
+      "architecture"
+    ],
     async collect() {
-      const getDockerVersionMemo = memoize(
-        async () => {
-          return await shellHost("docker info --format '{{.ServerVersion}}'");
-        },
-        {
-          maxAge: 1000 * 60 * 60 * 24, // cache results for 1 day
-          promise: true // Wait for Promises to resolve. Do not cache rejections
-        }
-      );
+      const hostInfo = await getHostInfoMemoized();
 
-      try {
-        const dockerVersion = await getDockerVersionMemo();
-        // set docker version as a label
-        if (dockerVersion) this.set({ dockerVersion: dockerVersion }, 1);
-        else this.set({ dockerVersion: undefined }, 0);
-      } catch (e) {
-        this.set({ dockerVersion: undefined }, 0);
-      }
+      this.set(
+        {
+          dockerServerVersion: hostInfo.dockerServerVersion,
+          dockerCliVersion: hostInfo.dockerCliVersion,
+          dockerComposeVersion: hostInfo.dockerComposeVersion,
+          os: hostInfo.os,
+          kernel: hostInfo.kernel,
+          versionCodename: hostInfo.versionCodename,
+          architecture: hostInfo.architecture
+        },
+        1
+      );
     }
   })
 );
