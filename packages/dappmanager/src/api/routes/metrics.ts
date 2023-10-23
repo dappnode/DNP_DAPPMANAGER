@@ -148,7 +148,7 @@ register.registerMetric(
 // Docker version
 register.registerMetric(
   new client.Gauge({
-    name: "dappmanager_docker_versions",
+    name: "dappmanager_docker_version",
     help: "docker engine version",
     labelNames: ["dockerVersion"],
     async collect() {
@@ -162,7 +162,8 @@ register.registerMetric(
         }
       );
       const dockerVersion = await getDockerVersionMemo();
-      this.set({ dockerVersion }, 1);
+      // set docker version as a label
+      this.set({ dockerVersion: dockerVersion }, 1);
     }
   })
 );
