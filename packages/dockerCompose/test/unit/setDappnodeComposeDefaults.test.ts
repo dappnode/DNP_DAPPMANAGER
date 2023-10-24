@@ -106,7 +106,6 @@ describe("setDappnodeComposeDefaults", () => {
         "beacon-chain": {
           container_name:
             "DAppNodePackage-beacon-chain.teku-gnosis.dnp.dappnode.eth",
-          dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
             BEACON_API_PORT: "3500",
@@ -129,7 +128,6 @@ describe("setDappnodeComposeDefaults", () => {
         validator: {
           container_name:
             "DAppNodePackage-validator.teku-gnosis.dnp.dappnode.eth",
-          dns: "172.33.1.2",
           environment: {
             LOG_TYPE: "INFO",
             BEACON_NODE_ADDR: "http://beacon-chain.teku-gnosis.dappnode:3500",
@@ -232,7 +230,6 @@ describe("setDappnodeComposeDefaults", () => {
       services: {
         "dappmanager.dnp.dappnode.eth": {
           container_name: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
-          dns: "172.33.1.2",
           environment: {
             LOG_LEVEL: "info",
             ETH_MAINNET_RPC_URL_OVERRIDE: "",

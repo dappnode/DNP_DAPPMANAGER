@@ -13,7 +13,6 @@ services:
       HTTP_WEB3PROVIDER: "http://geth.dappnode:8545"
       CORSDOMAIN: "http://prysm.dappnode"
       EXTRA_OPTS: ""
-    dns: 172.33.1.2
     networks:
       dncore_network:
         aliases:
@@ -34,7 +33,6 @@ services:
       BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm.dappnode:3500"
       GRAFFITI: validating_from_DAppNode
       EXTRA_OPTS: ""
-    dns: 172.33.1.2
     networks:
       dncore_network:
         aliases:
