@@ -9,7 +9,7 @@ describe("Remove DNS from all compose files", () => {
     const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
     const serviceName = "dappmanager";
     const randomImage = "chentex/random-logger";
-    const composeDnsRemovalTestPath = process.cwd() + "/test/integration/composeDnsRemoval";
+    const composeDnsRemovalTestPath = process.cwd() + "/test/integration/migrations";
 
     const composeAlreadyMigrated = `
 version: '3.5'
