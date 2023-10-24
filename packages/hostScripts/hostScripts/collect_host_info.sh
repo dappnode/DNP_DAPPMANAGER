@@ -52,11 +52,18 @@ function get_docker_engine_version() {
 }
 
 function get_docker_compose_version() {
-  # Check if docker compose exists
-  if type docker-compose >/dev/null 2>&1; then
+  # Initialize DOCKER_COMPOSE_VERSION to an empty value
+  DOCKER_COMPOSE_VERSION=""
+
+  # Check if new 'docker compose' command exists
+  if type docker >/dev/null 2>&1 && docker compose version >/dev/null 2>&1; then
+    DOCKER_COMPOSE_VERSION=$(docker compose version --short)
+  # Check if older 'docker-compose' command exists if the new one doesn't
+  elif type docker-compose >/dev/null 2>&1; then
     DOCKER_COMPOSE_VERSION=$(docker-compose version --short)
   fi
 }
+
 
 #######################
 ###### MAIN LOOP ######
