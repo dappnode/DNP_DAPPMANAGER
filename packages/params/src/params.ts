@@ -265,6 +265,8 @@ export const params = {
     EXECUTION_CLIENT_PRATER: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_PRATER", // "goerli-geth.dnp.dappnode.eth"
     CONSENSUS_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_LUKSO", // "prysm-lukso.dnp.dappnode.eth"
     EXECUTION_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_LUKSO", // "lukso-geth.dnp.dappnode.eth",
+    CONSENSUS_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOLESKY", // "prysm-holesky.dnp.dappnode.eth"
+    EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "geth.dnp.dappnode.eth"
   },
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",

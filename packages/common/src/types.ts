@@ -26,6 +26,9 @@ import {
   ExecutionClientOptimism,
   OptimismL2Geth,
   OptimismNode,
+  ConsensusClientHolesky,
+  ExecutionClientHolesky,
+  SignerHolesky,
 } from "@dappnode/types";
 
 /**
@@ -1365,6 +1368,8 @@ export type ExecutionClient<T extends Network> = T extends "mainnet"
   ? ExecutionClientGnosis
   : T extends "prater"
   ? ExecutionClientPrater
+  : T extends "holesky"
+  ? ExecutionClientHolesky
   : T extends "lukso"
   ? ExecutionClientLukso
   : never;
@@ -1375,6 +1380,8 @@ export type ConsensusClient<T extends Network> = T extends "mainnet"
   ? ConsensusClientGnosis
   : T extends "prater"
   ? ConsensusClientPrater
+  : T extends "holesky"
+  ? ConsensusClientHolesky
   : T extends "lukso"
   ? ConsensusClientLukso
   : never;
@@ -1385,6 +1392,8 @@ export type Signer<T extends Network> = T extends "mainnet"
   ? SignerGnosis
   : T extends "prater"
   ? SignerPrater
+  : T extends "holesky"
+  ? SignerHolesky
   : T extends "lukso"
   ? SignerLukso
   : never;

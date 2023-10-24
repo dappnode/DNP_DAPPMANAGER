@@ -9,6 +9,8 @@ import {
   ExecutionClientPrater,
   ConsensusClientLukso,
   ExecutionClientLukso,
+  ConsensusClientHolesky,
+  ExecutionClientHolesky,
 } from "@dappnode/types";
 
 // Mainnet
@@ -125,6 +127,37 @@ export const mevBoostPrater = interceptGlobalEnvOnSet(
 export const feeRecipientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | null>(FEE_RECIPIENT_PRATER, null),
   Object.keys({ FEE_RECIPIENT_PRATER })[0]
+);
+
+// Holesky
+
+const CONSENSUS_CLIENT_HOLESKY = "consensus-client-holesky";
+const EXECUTION_CLIENT_HOLESKY = "execution-client-holesky";
+const FEE_RECIPIENT_HOLESKY = "fee-recipient-holesky";
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusClientHolesky = interceptGlobalEnvOnSet(
+  dbMain.staticKey<ConsensusClientHolesky | undefined | null>(
+    CONSENSUS_CLIENT_HOLESKY,
+    null
+  ),
+  Object.keys({ CONSENSUS_CLIENT_HOLESKY })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionClientHolesky = interceptGlobalEnvOnSet(
+  dbMain.staticKey<ExecutionClientHolesky | undefined | null>(
+    EXECUTION_CLIENT_HOLESKY,
+    null
+  ),
+  Object.keys({ EXECUTION_CLIENT_HOLESKY })[0]
+);
+
+export const feeRecipientHolesky = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | null>(FEE_RECIPIENT_HOLESKY, null),
+  Object.keys({ FEE_RECIPIENT_HOLESKY })[0]
 );
 
 // LUKSO

@@ -255,7 +255,7 @@ export default function StakerNetwork<T extends Network>({
               >
                 Apply changes
               </Button>
-              {network === "prater" && (
+              {(network === "prater" || network === "holesky") && (
                 <Button
                   disabled={!allStakerItemsOk}
                   onClick={() => setShowLaunchpadValidators(true)}
