@@ -4,58 +4,81 @@ import { PackageContainer } from "@dappnode/common";
 import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
 import { params } from "@dappnode/params";
 import { mockContainer, shellSafe } from "../../testUtils.js";
+import { removeDnsFromComposeFiles } from "../../../src/modules/migrations/removeDnsFromComposeFiles.js";
 
 describe("Migration", () => {
+  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
+  const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+  const serviceName = "dappmanager";
+  const randomImage = "chentex/random-logger";
+  const testMigrationPath = process.cwd() + "/test/integration/migrations";
+
   const container: PackageContainer = {
     ...mockContainer,
-    containerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+    containerName,
     dnpName: "test-migration",
-    serviceName: "dappmanager.dnp.dappnode.eth",
+    serviceName,
     networks: [
       { name: "random", ip: "10.0.1.1" },
-      { name: "dncore_network", ip: "172.33.1.7" }
+      { name: dncoreNetwork, ip: "172.33.1.7" }
     ]
   };
+
+  const composeAlreadyMigratedNoDns = `
+version: '3.5'
+networks:
+${dncoreNetwork}:
+  name: ${dncoreNetwork}
+  external: true
+services:
+${serviceName}:
+  image: ${randomImage}
+  container_name: ${containerName}
+  restart: always
+  networks:
+  ${dncoreNetwork}:
+      ipv4_address: 172.33.1.7
+      aliases:
+        - ${serviceName}.test-migration.dappnode
+        - ${serviceName}.dappnode`;
 
   const composeAlreadyMigrated = `
 version: '3.5'
 networks:
-  dncore_network:
-    name: dncore_network
-    external: true
+${dncoreNetwork}:
+  name: ${dncoreNetwork}
+  external: true
 services:
-  dappmanager.dnp.dappnode.eth:
-    image: chentex/random-logger
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    dns: 172.33.1.2
-    networks:
-      dncore_network:
-        ipv4_address: 172.33.1.7
-        aliases:
-          - dappmanager.dnp.dappnode.eth.test-migration.dappnode
-          - dappmanager.dappnode`;
+${serviceName}:
+  image: ${randomImage}
+  container_name: ${containerName}
+  restart: always
+  dns: 172.33.1.2
+  networks:
+  ${dncoreNetwork}:
+      ipv4_address: 172.33.1.7
+      aliases:
+        - ${serviceName}.test-migration.dappnode
+        - ${serviceName}.dappnode`;
 
   const composeToBeMigratedBefore = `
 version: '3.4'
 networks:
-  dncore_network:
-    name: dncore_network
-    external: true
+${dncoreNetwork}:
+  name: ${dncoreNetwork}
+  external: true
 services:
-  dappmanager.dnp.dappnode.eth:
-    image: "chentex/random-logger"
-    container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    restart: always
-    dns: 172.33.1.2
-    networks:
-      dncore_network:
-        ipv4_address: 172.33.1.7`;
-
-  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
-  const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
-  const randomImage = "chentex/random-logger";
-  const testMigrationPath = process.cwd() + "/test/integration/migrations";
+${serviceName}:
+  image: "${randomImage}"
+  container_name: ${containerName}
+  restart: always
+  dns: 172.33.1.2
+  networks:
+    ${dncoreNetwork}:
+      ipv4_address: 172.33.1.7
+      aliases:
+      - ${serviceName}.test-migration.dappnode
+      - ${serviceName}.dappnode`;
 
   before("Run random container", async () => {
     // Create compose
@@ -98,7 +121,18 @@ services:
       { encoding: "utf8" }
     );
     expect(composeAfter.trim()).to.equal(composeAlreadyMigrated.trim());
-  });    
+  });
+
+
+  it("Should remove DNS from compose file", async () => {
+    await removeDnsFromComposeFiles();
+
+    const composeAfter = fs.readFileSync(
+      `${testMigrationPath}/test-migration/docker-compose.yml`,
+      { encoding: "utf8" }
+    );
+    expect(composeAfter.trim()).to.equal(composeAlreadyMigratedNoDns.trim());
+  });
 
   after("Remove test setup", async () => {
     // Disconnect from network
