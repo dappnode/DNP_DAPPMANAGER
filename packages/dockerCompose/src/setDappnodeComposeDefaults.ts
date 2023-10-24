@@ -58,6 +58,8 @@ export function setDappnodeComposeDefaults(
           container_name: getContainerName({ dnpName, serviceName, isCore }),
           image: getImageTag({ serviceName, dnpName, version }),
           environment: parseEnvironment(serviceUnsafe.environment || {}),
+          // Overrides any DNS provided to use the default Docker DNS server
+          // Since Core v0.2.82, the bind package is not used anymore as DNS server for the containers
           dns: undefined,
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
