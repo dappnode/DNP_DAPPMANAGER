@@ -24,23 +24,23 @@ describe("Migration", () => {
     ]
   };
 
-  const composeAlreadyMigratedNoDns = `
-version: '3.5'
+  const composeNoDns = `
+version: '3.4'
 networks:
 ${dncoreNetwork}:
   name: ${dncoreNetwork}
   external: true
 services:
 ${serviceName}:
-  image: ${randomImage}
+  image: "${randomImage}"
   container_name: ${containerName}
   restart: always
   networks:
-  ${dncoreNetwork}:
+    ${dncoreNetwork}:
       ipv4_address: 172.33.1.7
       aliases:
-        - ${serviceName}.test-migration.dappnode
-        - ${serviceName}.dappnode`;
+      - ${serviceName}.test-migration.dappnode
+      - ${serviceName}.dappnode`;
 
   const composeAlreadyMigrated = `
 version: '3.5'
@@ -131,7 +131,7 @@ ${serviceName}:
       `${testMigrationPath}/test-migration/docker-compose.yml`,
       { encoding: "utf8" }
     );
-    expect(composeAfter.trim()).to.equal(composeAlreadyMigratedNoDns.trim());
+    expect(composeAfter.trim()).to.equal(composeNoDns.trim());
   });
 
   after("Remove test setup", async () => {
