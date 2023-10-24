@@ -18,7 +18,7 @@ export async function removeDnsFromComposeFiles(): Promise<void> {
     }
 }
 
-function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
+export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
     const compose = new ComposeFileEditor(dnpName, isCore);
     const services = compose.services();
 
