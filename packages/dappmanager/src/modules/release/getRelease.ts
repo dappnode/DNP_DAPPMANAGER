@@ -1,4 +1,4 @@
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate.js";
 import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
@@ -12,7 +12,7 @@ import { ReleaseDownloadedContents } from "./types.js";
 import { getReleaseSignatureStatus } from "./releaseSignature.js";
 import { params } from "@dappnode/params";
 import { getIsCore } from "@dappnode/utils";
-import { computeGlobalEnvsFromDb } from "../globalEnvs.js";
+import { computeGlobalEnvsFromDb } from "@dappnode/db";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

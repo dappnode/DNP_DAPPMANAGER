@@ -6,14 +6,17 @@ import {
   ContainerState,
 } from "@dappnode/common";
 import {
-  parseEnvironment,
   parsePortMappings,
   parseVolumeMappings,
   readContainerLabels,
 } from "@dappnode/dockercompose";
 import { parseExitCodeFromStatus } from "./parseExitCodeFromStatus.js";
 import { ensureUniquePortsFromDockerApi } from "../utils.js";
-import { fileToGatewayUrl, normalizeHash } from "@dappnode/utils";
+import {
+  fileToGatewayUrl,
+  normalizeHash,
+  parseEnvironment,
+} from "@dappnode/utils";
 
 const CONTAINER_NAME_PREFIX = params.CONTAINER_NAME_PREFIX;
 const CONTAINER_CORE_NAME_PREFIX = params.CONTAINER_CORE_NAME_PREFIX;

@@ -4,7 +4,7 @@ import {
   ExecutionClient,
   StakerConfigByNetwork
 } from "@dappnode/common";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { Network } from "@dappnode/types";
 
 export function getStakerConfigByNetwork<T extends Network>(

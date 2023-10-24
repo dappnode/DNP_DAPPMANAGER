@@ -1,5 +1,5 @@
 import { dbMain } from "./dbFactory.js";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const NO_NAT_LOOPBACK = "no-nat-loopback";
 const DOUBLE_NAT = "double-nat";

@@ -3,10 +3,10 @@ import {
   getContainerName,
   getPrivateNetworkAliases,
   getIsCore,
+  parseEnvironment,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
-import { parseEnvironment } from "./environment.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
   Manifest,
@@ -58,12 +58,15 @@ export function setDappnodeComposeDefaults(
           container_name: getContainerName({ dnpName, serviceName, isCore }),
           image: getImageTag({ serviceName, dnpName, version }),
           environment: parseEnvironment(serviceUnsafe.environment || {}),
-          dns: params.DNS_SERVICE, // Common DAppNode ENS
+          // Overrides any DNS provided to use the default Docker DNS server
+          // Since Core v0.2.82, the bind package is not used anymore as DNS server for the containers
+          dns: undefined,
           networks: setServiceNetworksWithAliases(serviceUnsafe.networks, {
             serviceName,
             dnpName,
             // The root pkg alias will be added to the main service or if it is a mono service
-            isMainOrMonoservice: isMonoService || manifest.mainService === serviceName,
+            isMainOrMonoservice:
+              isMonoService || manifest.mainService === serviceName,
           }),
         });
       }
@@ -96,7 +99,11 @@ function ensureMinimumComposeVersion(composeFileVersion: string): string {
  */
 function setServiceNetworksWithAliases(
   serviceNetworks: ComposeServiceNetworks | undefined,
-  service: { serviceName: string; dnpName: string; isMainOrMonoservice: boolean }
+  service: {
+    serviceName: string;
+    dnpName: string;
+    isMainOrMonoservice: boolean;
+  }
 ): ComposeServiceNetworks {
   // Return service network dncore_network with aliases if not provided
   if (!serviceNetworks)

@@ -1,4 +1,4 @@
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { HttpError, wrapHandler } from "../utils.js";
 import { getDnpFromIp } from "./sign.js";

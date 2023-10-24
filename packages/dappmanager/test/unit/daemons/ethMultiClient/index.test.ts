@@ -133,7 +133,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
     const { runEthClientInstaller } = await rewiremock.around(
       () => import("../../../../src/daemons/ethMultiClient"),
       mock => {
-        mock(() => import("../../../../src/db"))
+        mock(() => import("@dappnode/db"))
           .with(db)
           .toBeUsed();
         mock(() => import("@dappnode/dockerapi"))

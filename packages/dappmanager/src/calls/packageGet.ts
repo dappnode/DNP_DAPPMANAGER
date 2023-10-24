@@ -1,7 +1,7 @@
 import { omit } from "lodash-es";
 import { readManifestIfExists } from "../modules/manifest/index.js";
 import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { InstalledPackageDetailData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";

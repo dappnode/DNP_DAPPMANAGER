@@ -13,11 +13,16 @@ export {
 export { getRepoDirPath } from "./getRepoDirPath.js";
 export { removeUnderscores } from "./removeUnderscores.js";
 export { getShortUniqueDnp } from "./getShortUniqueDnp.js";
-export {
-  buildNetworkAlias,
-} from "./buildNetworkAlias.js";
-export { getPrivateNetworkAliases, } from "./getPrivateNetworkAliases.js";
+export { buildNetworkAlias } from "./buildNetworkAlias.js";
+export { getPrivateNetworkAliases } from "./getPrivateNetworkAliases.js";
 export { getIsCore } from "./getIsCore.js";
 export { shell, shellHost, ShellError } from "./shell.js";
 export { normalizeHash } from "./normalizeHash.js";
 export { fileToGatewayUrl } from "./fileToGatewayUrl.js";
+export { packageInstalledHasPid } from "./packageInstalledHasPid.js";
+export {
+  parseEnvironment,
+  stringifyEnvironment,
+  mergeEnvs,
+} from "./environment.js";
+export { writeEnvFile, createGlobalEnvsEnvFile } from "./globalEnvs.js";

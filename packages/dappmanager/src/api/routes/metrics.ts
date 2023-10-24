@@ -1,10 +1,11 @@
 import client from "prom-client";
 import { wrapHandler } from "../utils.js";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
+import { getHostInfoMemoized } from "@dappnode/hostscripts";
 
 /**
  * Collect the metrics:
@@ -139,6 +140,39 @@ register.registerMetric(
         if (isMevBoostSelected) this.set({ mevBoost: network }, 1);
         else this.set({ mevBoost: network }, 0);
       }
+    }
+  })
+);
+
+// Host info metrics
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_host_info",
+    help: "host info: docker, docker-cli and docker-compose versions, os, kernel, version codename and architecture",
+    labelNames: [
+      "dockerServerVersion",
+      "dockerCliVersion",
+      "dockerComposeVersion",
+      "os",
+      "kernel",
+      "versionCodename",
+      "architecture"
+    ],
+    async collect() {
+      const hostInfo = await getHostInfoMemoized();
+
+      this.set(
+        {
+          dockerServerVersion: hostInfo.dockerServerVersion,
+          dockerCliVersion: hostInfo.dockerCliVersion,
+          dockerComposeVersion: hostInfo.dockerComposeVersion,
+          os: hostInfo.os,
+          kernel: hostInfo.kernel,
+          versionCodename: hostInfo.versionCodename,
+          architecture: hostInfo.architecture
+        },
+        1
+      );
     }
   })
 );

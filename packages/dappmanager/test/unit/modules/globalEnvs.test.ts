@@ -3,11 +3,13 @@ import { expect } from "chai";
 import fs from "fs";
 import { createTestDir, cleanTestDir } from "../../testUtils.js";
 import {
-  createGlobalEnvsEnvFile,
-  globalEnvsFilePath,
   computeGlobalEnvsFromDb,
   writeGlobalEnvsToEnvFile
-} from "../../../src/modules/globalEnvs.js";
+} from "@dappnode/db";
+import { createGlobalEnvsEnvFile } from "@dappnode/utils";
+import { params } from "@dappnode/params";
+
+const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
 
 describe("Module > globalEnvs", function () {
   beforeEach(async () => {

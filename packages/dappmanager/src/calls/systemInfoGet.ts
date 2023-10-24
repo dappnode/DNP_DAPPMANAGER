@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { getVersionData } from "../utils/getVersionData.js";
 import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
 import { NewFeatureId, SystemInfo } from "@dappnode/common";

@@ -1,6 +1,6 @@
 import { dbMain } from "./dbFactory.js";
 import { IdentityInterface } from "@dappnode/common";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const PUBLIC_IP = "public-ip";
 const DOMAIN = "domain";

@@ -2,7 +2,6 @@ version: "3.5"
 services:
   dappmanager.dnp.dappnode.eth:
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       DISABLE_UPNP: ""
       ETH_MAINNET_RPC_URL_OVERRIDE: ""

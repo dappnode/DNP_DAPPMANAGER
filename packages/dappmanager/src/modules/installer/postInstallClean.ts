@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { Log } from "../../utils/logUi.js";
 import { logs } from "@dappnode/logger";

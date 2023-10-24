@@ -1,14 +1,11 @@
 import fs from "fs";
 import path from "path";
-import { beforeAndAfter, createTestDir, testDir } from "../../testUtils.js";
-import { dbFactory } from "../../../src/db/dbFactory.js";
+import { dbFactory } from "../../src/dbFactory.js";
 import { expect } from "chai";
 
-describe("db", () => {
-  beforeAndAfter("Clean files", async () => {
-    await createTestDir();
-  });
+const testDir = "./test_files/";
 
+describe("db", () => {
   it("Should read modify and write db", () => {
     const dbPath = path.join(testDir, "test-db.json");
     const { staticKey, indexedByKey } = dbFactory(dbPath);
@@ -19,7 +16,7 @@ describe("db", () => {
     const staticValue = staticKey(STATIC_VALUE_KEY, 1);
     const indexedValue = indexedByKey<number, string>({
       rootKey: INDEXED_VALUE_KEY,
-      getKey: arg => arg
+      getKey: (arg) => arg,
     });
 
     // staticValue
@@ -53,8 +50,8 @@ describe("db", () => {
         {
           [STATIC_VALUE_KEY]: 5,
           [INDEXED_VALUE_KEY]: {
-            a: 5
-          }
+            a: 5,
+          },
         },
         null,
         2

@@ -1,6 +1,6 @@
 import { dbCache, dbMain } from "./dbFactory.js";
 import { PackageVersionData } from "@dappnode/common";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const SERVER_NAME = "server-name";
 const FULLNODE_DOMAIN_TARGET = "fullnode-domain-target";
@@ -60,7 +60,7 @@ export const versionData = dbCache.staticKey<PackageVersionData>(
 
 export const diskUsageThreshold = dbCache.indexedByKey<boolean, string>({
   rootKey: DISK_USAGE_THRESHOLD,
-  getKey: id => id
+  getKey: (id) => id,
 });
 
 // DAppNode Name appears on the UI

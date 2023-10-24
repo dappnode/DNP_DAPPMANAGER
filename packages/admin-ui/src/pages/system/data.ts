@@ -12,7 +12,7 @@ export const subPaths = {
   identity: "identity",
   security: "security",
   autoUpdates: "auto-updates",
-  repository: "repository",
+  repository: "/repository",
   staticIp: "static-ip",
   network: "network",
   update: "update",
@@ -26,7 +26,7 @@ export const subPaths = {
 };
 
 // Computed paths
-export const activateFallbackPath = `${pathName}/${subPaths.repository}`;
+export const activateFallbackPath = `${subPaths.repository}/eth`;
 export const systemProfilePath = `${pathName}/${subPaths.profile}`;
 
 // DAppNode data
