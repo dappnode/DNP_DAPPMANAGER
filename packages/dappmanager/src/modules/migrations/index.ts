@@ -4,6 +4,7 @@ import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
 import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
+import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -12,9 +13,8 @@ export class MigrationError extends Error {
     super();
     this.migration = migration;
     this.coreVersion = coreVersion;
-    super.message = `Migration ${migration} ${coreVersion} failed: ${
-      super.message
-    }`;
+    super.message = `Migration ${migration} ${coreVersion} failed: ${super.message
+      }`;
   }
 }
 
@@ -80,6 +80,16 @@ export async function executeMigrations(): Promise<void> {
       migration:
         "set default email for ethical metrics if the package is installed",
       coreVersion: "0.2.77",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack
+    })
+  );
+
+  removeDnsFromComposeFiles().catch(e =>
+    migrationErrors.push({
+      migration: "remove bind DNS from docker compose files",
+      coreVersion: "0.2.82",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack

@@ -111,7 +111,6 @@ export const params = {
   WIREGUARD_DEVICES_ENVNAME: "PEERS",
 
   // Docker compose parameters
-  DNS_SERVICE: "172.33.1.2",
   DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",
   DNP_PRIVATE_NETWORK_NAME: "dncore_network",
   DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
