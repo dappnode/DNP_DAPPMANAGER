@@ -1,5 +1,5 @@
 import { isPasswordSecure } from "../modules/passwordManager.js";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 
 /**
  * Checks if the user `dappnode`'s password in the host machine

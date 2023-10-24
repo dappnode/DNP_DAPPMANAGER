@@ -13,8 +13,7 @@ import {
 } from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
-  dockerNetworkDisconnect,
-  dockerNetworkConnect,
+  dockerNetworkReconnect,
   listPackageContainers,
   getDnCoreNetworkContainerConfig
 } from "@dappnode/dockerapi";
@@ -185,8 +184,7 @@ async function updateContainerNetwork(
       getDockerComposePath(container.dnpName, container.isCore)
     );
   } else {
-    await dockerNetworkDisconnect(networkName, containerName);
-    await dockerNetworkConnect(networkName, containerName, endpointConfig);
+    await dockerNetworkReconnect(networkName, containerName, endpointConfig);
     logs.info(`Added new alias to ${containerName} in ${networkName} network`);
   }
 }

@@ -1,6 +1,6 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import updateIp from "../../modules/dyndns/updateIp.js";
 import lookup from "../../utils/lookup.js";
 import getPublicIpFromUrls from "../../utils/getPublicIpFromUrls.js";

@@ -1,7 +1,7 @@
 import path from "path";
 import fs from "fs";
 import { shell } from "@dappnode/utils";
-import { clearCacheDb, clearMainDb } from "../src/db/index.js";
+import { clearCacheDb, clearMainDb } from "@dappnode/db";
 import { ManifestWithImage } from "../src/types.js";
 import { DockerApiSystemDfReturn } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";

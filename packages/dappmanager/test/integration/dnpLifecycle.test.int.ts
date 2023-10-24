@@ -22,15 +22,13 @@ import {
   cleanContainers,
   sampleFile
 } from "../testUtils.js";
-import {
-  stringifyPortMappings,
-  parseEnvironment
-} from "@dappnode/dockercompose";
+import { stringifyPortMappings } from "@dappnode/dockercompose";
 import {
   dockerContainerInspect,
   dockerGetArchiveSingleFile,
   listContainer
 } from "@dappnode/dockerapi";
+import { parseEnvironment } from "@dappnode/utils";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { MemoryWritable } from "./testStreamUtils.js";
 

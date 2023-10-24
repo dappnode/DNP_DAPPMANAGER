@@ -1,5 +1,5 @@
 import { ContainerLabelsRaw, ContainerLabelTypes } from "./types.js";
-import { stringifyEnvironment } from "./environment.js";
+import { stringifyEnvironment } from "@dappnode/utils";
 import {
   ComposeService,
   ChainDriver,

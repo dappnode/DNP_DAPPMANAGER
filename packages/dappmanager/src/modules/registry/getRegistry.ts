@@ -1,7 +1,7 @@
 import { RegistryNewRepoEvent } from "@dappnode/common";
 import { ethers } from "ethers";
 import { abi } from "../../contracts/registry.js";
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { wrapError } from "../../utils/wrapError.js";
 import { DirectoryDnp } from "@dappnode/toolkit";
 

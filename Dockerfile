@@ -58,6 +58,8 @@ COPY packages/dockerApi/package.json \
   packages/dockerApi/
 COPY packages/hostScripts/package.json \
   packages/hostScripts/
+COPY packages/db/package.json \
+  packages/db/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -108,6 +110,12 @@ RUN yarn build
 # Build dockerApi
 WORKDIR /app/packages/dockerApi/
 COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
+# Build db
+WORKDIR /app/packages/db/
+COPY packages/db/ .
 RUN yarn build
 # Results in dist/*
 
@@ -208,5 +216,9 @@ COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src
 COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
 COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
 COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
+# Copy db
+COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
+COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules
+COPY --from=build-deps /usr/src/app/packages/db/package.json /usr/src/app/packages/db/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]

@@ -1,6 +1,6 @@
 import { storePrivateKeyFromSeed } from "../utils/seedPhrase.js";
 import { decrypt } from "../utils/publickeyEncryption.js";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 

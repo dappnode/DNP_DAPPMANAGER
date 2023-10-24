@@ -1,5 +1,5 @@
 import { dbMain } from "./dbFactory.js";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 import {
   ConsensusClientMainnet,
   ExecutionClientMainnet,
@@ -8,7 +8,7 @@ import {
   ConsensusClientPrater,
   ExecutionClientPrater,
   ConsensusClientLukso,
-  ExecutionClientLukso
+  ExecutionClientLukso,
 } from "@dappnode/types";
 
 // Mainnet

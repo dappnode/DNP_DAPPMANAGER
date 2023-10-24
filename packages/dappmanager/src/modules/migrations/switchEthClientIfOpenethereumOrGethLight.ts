@@ -1,4 +1,4 @@
-import * as db from "../../db/index.js";
+import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { EthClientTarget } from "@dappnode/common";

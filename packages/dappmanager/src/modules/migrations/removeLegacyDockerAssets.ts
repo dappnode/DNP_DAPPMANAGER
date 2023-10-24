@@ -9,8 +9,12 @@ import {
 import * as getPath from "../../utils/getPath.js";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";
-import { getDockerComposePath, isNotFoundError } from "@dappnode/utils";
-import { parseEnvironment, ComposeFileEditor } from "@dappnode/dockercompose";
+import {
+  getDockerComposePath,
+  isNotFoundError,
+  parseEnvironment
+} from "@dappnode/utils";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 const volumesToRemove = [
   // After core version 0.2.30 there will be an orphan volume of the

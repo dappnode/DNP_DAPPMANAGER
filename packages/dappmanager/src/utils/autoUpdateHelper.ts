@@ -1,4 +1,4 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { pick, omit } from "lodash-es";
@@ -17,7 +17,10 @@ import {
 export const MY_PACKAGES = "my-packages";
 export const SYSTEM_PACKAGES = "system-packages";
 
-export const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DELAY_VARIATION);
+export const updateDelay = getRandomizedInterval(
+  params.AUTO_UPDATE_DELAY,
+  params.AUTO_UPDATE_DELAY_VARIATION
+);
 const coreDnpName = params.coreDnpName;
 
 /**

@@ -887,23 +887,6 @@ export type LocalProxyingStatus =
   | "crashed"
   | "https missing";
 
-export interface DockerVersionsScript {
-  dockerComposeVersion: string;
-  dockerServerVersion: string;
-}
-
-export interface DockerUpdateStatus {
-  updated: boolean;
-  version: string;
-  requirements: UpdateRequirement[];
-}
-
-export interface UpdateRequirement {
-  title: string;
-  isFulFilled: boolean;
-  message: string;
-}
-
 /**
  * Aggregated DAppNode system info
  */

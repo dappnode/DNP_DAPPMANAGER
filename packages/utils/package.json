@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
@@ -26,6 +27,10 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.6",
+    "@types/mocha": "^10.0.2",
+    "chai": "^4.3.10",
+    "mocha": "^10.2.0",
     "@types/js-yaml": "^3.12.1",
     "@types/lodash-es": "^4.17.9",
     "@types/node": "^20.6.2",

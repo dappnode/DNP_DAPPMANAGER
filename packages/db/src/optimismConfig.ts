@@ -1,6 +1,6 @@
 import { ExecutionClientOptimism } from "@dappnode/types";
 import { dbMain } from "./dbFactory.js";
-import { interceptGlobalEnvOnSet } from "./interceptGlobalEnvOnSet.js";
+import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const OP_EXECUTION_CLIENT = "op-execution-client";
 const OP_ENABLE_HISTORICAL_RPC = "op-enable-historical-rpc";

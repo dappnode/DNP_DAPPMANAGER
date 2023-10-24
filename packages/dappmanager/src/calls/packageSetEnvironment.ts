@@ -5,7 +5,7 @@ import {
   dockerComposeUpPackage,
   listPackage
 } from "@dappnode/dockerapi";
-import { packageInstalledHasPid } from "../utils/pid.js";
+import { packageInstalledHasPid } from "@dappnode/utils";
 import { PackageEnvs } from "@dappnode/types";
 import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
 import { params } from "@dappnode/params";
