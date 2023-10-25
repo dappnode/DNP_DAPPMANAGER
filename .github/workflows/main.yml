@@ -1,10 +1,6 @@
 name: "Main"
 on:
   workflow_dispatch:
-    branches:
-      - "master"
-    paths-ignore:
-      - "README.md"
     inputs:
       bump:
         description: "Bump type, it must be: patch | minor | major"
