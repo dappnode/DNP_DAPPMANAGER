@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       # Setup node version 14 for node-sass 4.14 https://stackoverflow.com/questions/60394291/error-node-modules-node-sass-command-failed
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: "20"
       # Install dependencies

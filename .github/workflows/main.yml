@@ -21,33 +21,33 @@ env:
   BUMP_TYPE: ${{ github.event.inputs.bump }}
 
 jobs:
-  unit-test:
+  build-code:
+    name: Build code
     runs-on: ubuntu-latest
-    name: Unit tests
     steps:
       - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20"
       - run: yarn
       - run: yarn build
+
+  unit-test:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    needs: build-code
+    steps:
       - run: yarn test
       - run: yarn lint
       - run: yarn server-mock:check-types
         working-directory: packages/admin-ui
 
   integration-test:
-    runs-on: ubuntu-latest
     name: In app integration tests
+    runs-on: ubuntu-latest
+    needs: build-code
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: "20"
-      - run: yarn # Caching only saves 30s
-      - run: yarn build
       - run: yarn test:int
 
   release:
@@ -62,7 +62,7 @@ jobs:
           [[ "$BUMP_TYPE" == "major" ]] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
       - uses: actions/checkout@v3
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "20"
       - name: Publish
