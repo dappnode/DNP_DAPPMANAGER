@@ -1,4 +1,4 @@
-import { getEthersProvider } from "../modules/ethClient/index.js";
+import { getEthersProvider } from "@dappnode/installer";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";

@@ -7,7 +7,6 @@ import {
   getConsensusUserSettings
 } from "@dappnode/utils";
 import { runAtMostEvery } from "@dappnode/utils";
-import { serializeError } from "../../modules/ethClient/types.js";
 import { logs } from "@dappnode/logger";
 import {
   EthClientRemote,
@@ -17,8 +16,12 @@ import {
 import {
   ethereumClient,
   getLocalFallbackContentHash
-} from "../../modules/ethClient/index.js";
-import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
+} from "@dappnode/installer";
+import {
+  isExecClient,
+  isConsClient,
+  serializeError
+} from "@dappnode/installer";
 import {
   dockerComposeUpPackage,
   listPackageNoThrow

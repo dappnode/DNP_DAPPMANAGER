@@ -5,7 +5,7 @@ import dappGetBasic from "./basic.js";
 import aggregate from "./aggregate/index.js";
 import { DappGetFetcher } from "./fetch/index.js";
 import resolve from "./resolve/index.js";
-import shouldUpdate from "./utils/shouldUpdate.js";
+import { shouldUpdate } from "./index.js";
 import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types.js";
 
@@ -53,7 +53,7 @@ export interface DappgetOptions {
  *   Checked 256/256 possible states.'
  * }
  */
-export default async function dappGet(
+export async function dappGet(
   req: PackageRequest,
   options?: DappgetOptions,
   // For testing
@@ -75,7 +75,7 @@ export default async function dappGet(
     dnps = await aggregate({
       req,
       dnpList,
-      dappGetFetcher: dappGetFetcher || new DappGetFetcher()
+      dappGetFetcher: dappGetFetcher || new DappGetFetcher(),
     });
   } catch (e) {
     logs.debug("dappGet/aggregate error", e);
@@ -118,6 +118,6 @@ export default async function dappGet(
     message,
     state,
     alreadyUpdated,
-    currentVersions
+    currentVersions,
   };
 }

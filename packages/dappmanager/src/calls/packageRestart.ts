@@ -2,7 +2,7 @@ import fs from "fs";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { dockerContainerRestart, listPackage } from "@dappnode/dockerapi";
-import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
+import { restartDappmanagerPatch } from "@dappnode/installer";
 import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PackageContainer } from "@dappnode/common";

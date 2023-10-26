@@ -5,7 +5,7 @@ import { listPackages } from "@dappnode/dockerapi";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import { fileToGatewayUrl } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthProviderUrl } from "../modules/ethClient/index.js";
+import { getEthProviderUrl } from "@dappnode/installer";
 import { ReleaseFetcher } from "../modules/release/index.js";
 import { NoImageForArchError } from "../modules/release/errors.js";
 import { DappNodeDirectory } from "@dappnode/toolkit";

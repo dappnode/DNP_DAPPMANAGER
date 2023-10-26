@@ -1,7 +1,7 @@
 import { listPackages } from "@dappnode/dockerapi";
 // Internal
 import { PackageRequest } from "@dappnode/common";
-import shouldUpdate from "./utils/shouldUpdate.js";
+import { shouldUpdate } from "./index.js";
 import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetState } from "./types.js";
 import { DappGetFetcher } from "./fetch/index.js";

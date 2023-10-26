@@ -24,7 +24,7 @@ import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
-import { EthereumClient } from "../../ethClient/ethereumClient.js";
+import { EthereumClient } from "@dappnode/installer";
 
 /**
  *  Sets a new staker configuration based on user selection:

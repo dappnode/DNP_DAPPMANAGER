@@ -2,10 +2,9 @@ import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { params } from "@dappnode/params";
-import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import deepmerge from "deepmerge";
 import { fileToGatewayUrl } from "@dappnode/utils";
-import { ReleaseFetcher } from "../modules/release/index.js";
+import { ReleaseFetcher, shouldUpdate } from "@dappnode/installer";
 import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
 import {
   ComposeEditor,

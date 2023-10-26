@@ -7,3 +7,4 @@ export * from "./rollbackPackages.js";
 export * from "./runPackages.js";
 export * from "./writeAndValidateFiles.js";
 export * from "./copyFileTo.js";
+export * from "./restartPatch.js";
