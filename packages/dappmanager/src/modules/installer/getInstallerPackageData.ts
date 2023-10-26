@@ -1,5 +1,4 @@
 import deepmerge from "deepmerge";
-import * as getPath from "../../utils/getPath.js";
 import orderInstallPackages from "./orderInstallPackages.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
@@ -11,7 +10,12 @@ import {
   InstallPackageData,
   ContainersStatus
 } from "@dappnode/common";
-import { getDockerComposePath } from "@dappnode/utils";
+import {
+  getBackupPath,
+  getDockerComposePath,
+  getImagePath,
+  getManifestPath
+} from "@dappnode/utils";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -64,14 +68,14 @@ function getInstallerPackageData(
 
   // Compute paths
   const composePath = getDockerComposePath(dnpName, isCore);
-  const composeBackupPath = getPath.backupPath(composePath);
-  const manifestPath = getPath.manifest(dnpName, isCore);
-  const manifestBackupPath = getPath.backupPath(manifestPath);
+  const composeBackupPath = getBackupPath(composePath);
+  const manifestPath = getManifestPath(dnpName, isCore);
+  const manifestBackupPath = getBackupPath(manifestPath);
   // Prepend the hash to the version to make image files unique
   // Necessary for the image download cache to re-download different
   // images for the same semantic version
   const versionWithHash = `${semVersion}-${imageFile.hash}`;
-  const imagePath = getPath.image(dnpName, versionWithHash, isCore);
+  const imagePath = getImagePath(dnpName, versionWithHash, isCore);
 
   // If composePath does not exist, or is invalid: returns {}
   const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);

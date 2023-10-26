@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import { ipfs } from "../modules/ipfs/index.js";
+import { ipfs } from "@dappnode/ipfs";
 
 /** Well-known hash that should always be available */
 const hash = "QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB";

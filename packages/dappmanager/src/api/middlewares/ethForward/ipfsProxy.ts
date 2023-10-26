@@ -2,7 +2,7 @@ import http from "http";
 import httpProxy from "http-proxy";
 import express from "express";
 import { params } from "@dappnode/params";
-import { ipfs } from "../../../modules/ipfs/index.js";
+import { ipfs } from "@dappnode/ipfs";
 import { urlJoin } from "../../../utils/url.js";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";

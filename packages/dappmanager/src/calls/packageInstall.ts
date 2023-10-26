@@ -7,7 +7,6 @@ import {
   sanitizeRequestVersion
 } from "../utils/sanitize.js";
 import { ReleaseFetcher } from "../modules/release/index.js";
-import { PackageRequest } from "../types.js";
 import {
   downloadImages,
   loadImages,
@@ -24,7 +23,7 @@ import {
   ensureEth2MigrationRequirements,
   isPrysmLegacy
 } from "../modules/installer/ensureEth2MigrationRequirements.js";
-import { Routes } from "@dappnode/common";
+import { Routes, PackageRequest } from "@dappnode/common";
 
 /**
  * Installs a DAppNode Package.

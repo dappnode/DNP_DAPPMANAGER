@@ -2,14 +2,14 @@ import { ethers } from "ethers";
 import { base58btc } from "multiformats/bases/base58";
 import { base32 } from "multiformats/bases/base32";
 import { base64, base64url } from "multiformats/bases/base64";
-import { ReleaseSignature } from "../../types.js";
 import { ReleaseSignatureWithData } from "./types.js";
-import { IPFSEntry } from "../ipfs/index.js";
+import { IPFSEntry } from "@dappnode/ipfs";
 import {
   TrustedReleaseKey,
   ReleaseSignatureStatus,
   ReleaseSignatureStatusCode,
-  ReleaseSignatureProtocol
+  ReleaseSignatureProtocol,
+  ReleaseSignature
 } from "@dappnode/common";
 import { CID } from "ipfs-http-client";
 import { releaseFiles } from "@dappnode/types";

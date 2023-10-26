@@ -4,7 +4,6 @@ import { params } from "@dappnode/params";
 import { safeSemver } from "../utils/safeSemver.js";
 import aggregateDependencies from "./aggregateDependencies.js";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps.js";
-import { PackageRequest } from "../../../types.js";
 import { DappGetDnps } from "../types.js";
 import { logs } from "@dappnode/logger";
 import { DappGetFetcher } from "../fetch/DappGetFetcher.js";
@@ -14,7 +13,7 @@ import {
   ErrorDappGetNotSatisfyRange,
   ErrorDappGetNoVersions
 } from "../errors.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData, PackageRequest } from "@dappnode/common";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.

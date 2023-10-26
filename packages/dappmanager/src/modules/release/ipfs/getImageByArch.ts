@@ -1,4 +1,4 @@
-import { NodeArch } from "../../../types.js";
+import { NodeArch } from "@dappnode/common";
 import {
   Manifest,
   Architecture,

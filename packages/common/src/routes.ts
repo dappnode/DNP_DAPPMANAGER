@@ -311,7 +311,6 @@ export interface Routes {
    */
   ipfsClientTargetSet(kwargs: {
     ipfsRepository: IpfsRepository;
-    deleteLocalIpfsClient?: boolean;
   }): Promise<void>;
 
   /**

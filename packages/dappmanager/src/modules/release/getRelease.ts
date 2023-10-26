@@ -2,7 +2,7 @@ import * as db from "@dappnode/db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
 import { isEnsDomain, isIpfsHash } from "../../utils/validate.js";
 import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
-import { parseMetadataFromManifest } from "../manifest/index.js";
+import { parseMetadataFromManifest } from "@dappnode/manifest";
 import { setDappnodeComposeDefaults } from "@dappnode/dockercompose";
 import { ComposeEditor, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { fileToMultiaddress } from "../../utils/distributedFile.js";

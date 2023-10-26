@@ -1,7 +1,10 @@
 import fs from "fs";
 import path from "path";
-import * as getPath from "../../utils/getPath.js";
-import { getDockerComposePath, validatePath } from "@dappnode/utils";
+import {
+  getBackupPath,
+  getDockerComposePath,
+  validatePath
+} from "@dappnode/utils";
 import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
 import { pause } from "../../utils/asyncFlows.js";
@@ -51,7 +54,7 @@ export async function restartDappmanagerPatch({
   packagesData?: InstallPackageData[];
 }): Promise<void> {
   const composeRestartPath = getDockerComposePath(restartId, true);
-  if (!composeBackupPath) composeBackupPath = getPath.backupPath(composePath);
+  if (!composeBackupPath) composeBackupPath = getBackupPath(composePath);
 
   // Must make sure that there is no restart container running previously
   // If it's still running it will wait for a few seconds before killing it. If it working

@@ -1,4 +1,4 @@
-import { FileFormat } from "../../../types.js";
+import { FileFormat } from "@dappnode/common";
 import { yamlParse } from "@dappnode/utils";
 
 export function parseAsset<T>(data: string, format: FileFormat): T {

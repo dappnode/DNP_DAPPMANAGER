@@ -1,12 +1,11 @@
 import os from "os";
 import memoize from "memoizee";
-import { ipfs } from "../../ipfs/index.js";
+import { ipfs } from "@dappnode/ipfs";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 import {
   manifestToCompose,
   validateManifestWithImage
-} from "../../manifest/index.js";
-import { ManifestWithImage, NodeArch } from "../../../types.js";
+} from "@dappnode/manifest";
 import { NoImageForArchError } from "../errors.js";
 import { downloadDirectoryFiles } from "./downloadDirectoryFiles.js";
 import { getImageByArch } from "./getImageByArch.js";
@@ -16,7 +15,7 @@ import { isDirectoryRelease } from "./isDirectoryRelease.js";
 import { serializeIpfsDirectory } from "../releaseSignature.js";
 import { ReleaseDownloadedContents } from "../types.js";
 import { Manifest, releaseFiles } from "@dappnode/types";
-import { DistributedFile } from "@dappnode/common";
+import { DistributedFile, ManifestWithImage, NodeArch } from "@dappnode/common";
 import {
   validateManifestSchema,
   validateDappnodeCompose

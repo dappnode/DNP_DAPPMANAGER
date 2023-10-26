@@ -1,6 +1,6 @@
 import { pick } from "lodash-es";
 import { listPackage } from "@dappnode/dockerapi";
-import { readManifestIfExists } from "../../modules/manifest/index.js";
+import { readManifestIfExists } from "@dappnode/manifest";
 import { wrapHandler } from "../utils.js";
 
 interface Params {

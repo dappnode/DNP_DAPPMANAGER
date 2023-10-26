@@ -26,3 +26,7 @@ export {
   mergeEnvs,
 } from "./environment.js";
 export { writeEnvFile, createGlobalEnvsEnvFile } from "./globalEnvs.js";
+export { getManifestPath } from "./getManifestPath.js";
+export { getImagePath } from "./getImagePath.js";
+export { getEnvFilePath } from "./getEnvFilePath.js";
+export { getBackupPath } from "./getBackupPath.js";
