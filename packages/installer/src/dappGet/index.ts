@@ -1,6 +1,6 @@
 import { listPackages } from "@dappnode/dockerapi";
 // Internal
-import { PackageRequest } from "../../types.js";
+import { PackageRequest } from "@dappnode/common";
 import dappGetBasic from "./basic.js";
 import aggregate from "./aggregate/index.js";
 import { DappGetFetcher } from "./fetch/index.js";
@@ -75,7 +75,7 @@ export default async function dappGet(
     dnps = await aggregate({
       req,
       dnpList,
-      dappGetFetcher: dappGetFetcher || new DappGetFetcher()
+      dappGetFetcher: dappGetFetcher || new DappGetFetcher(),
     });
   } catch (e) {
     logs.debug("dappGet/aggregate error", e);
@@ -118,6 +118,6 @@ export default async function dappGet(
     message,
     state,
     alreadyUpdated,
-    currentVersions
+    currentVersions,
   };
 }

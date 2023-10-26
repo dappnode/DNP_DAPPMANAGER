@@ -1,7 +1,11 @@
 import { Compose } from "@dappnode/types";
-import { ComposeServicesSharingPid } from "../types.js";
 import { InstallPackageData, PackageContainer } from "@dappnode/common";
-import { packageInstalledHasPid } from "@dappnode/utils";
+import { packageInstalledHasPid } from "./packageInstalledHasPid.js";
+
+export interface ComposeServicesSharingPid {
+  targetPidServices: string[];
+  dependantPidServices: string[];
+}
 
 /**
  * Check if a package that will be installed/updated
@@ -18,7 +22,7 @@ export function isTargetPidServiceIncluded(
   targetContainers: PackageContainer[],
   targetPidServices: string[]
 ): boolean {
-  return targetContainers.some(tc =>
+  return targetContainers.some((tc) =>
     targetPidServices.includes(tc.serviceName)
   );
 }

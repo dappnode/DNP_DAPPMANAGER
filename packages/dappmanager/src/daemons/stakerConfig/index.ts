@@ -2,7 +2,7 @@ import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
 import { ReleaseFetcher } from "../../modules/release/index.js";
-import { memoizeDebounce } from "../../utils/asyncFlows.js";
+import { memoizeDebounce } from "@dappnode/utils";
 import { pickPackageItemData } from "../../utils/getPkgItemData.js";
 
 async function runStakerCacheUpdate({

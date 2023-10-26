@@ -1,19 +1,21 @@
 import fs from "fs";
 import path from "path";
-import * as getPath from "../../utils/getPath.js";
-import { getDockerComposePath, validatePath } from "@dappnode/utils";
+import {
+  getBackupPath,
+  getDockerComposePath,
+  validatePath,
+} from "@dappnode/utils";
 import * as db from "@dappnode/db";
-import { shell } from "@dappnode/utils";
-import { pause } from "../../utils/asyncFlows.js";
+import { shell, pause } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import {
   dockerContainerInspect,
   logContainer,
-  dockerContainerRemove
+  dockerContainerRemove,
 } from "@dappnode/dockerapi";
-import { getLogUi } from "../../utils/logUi.js";
+import { getLogUi } from "@dappnode/logger";
 import { rollbackPackages } from "./rollbackPackages.js";
 import { postInstallClean } from "./postInstallClean.js";
 import { afterInstall } from "./afterInstall.js";
@@ -42,7 +44,7 @@ export async function restartDappmanagerPatch({
   composeBackupPath,
   restartCommand,
   restartLaunchCommand,
-  packagesData
+  packagesData,
 }: {
   composePath: string;
   composeBackupPath?: string;
@@ -51,7 +53,7 @@ export async function restartDappmanagerPatch({
   packagesData?: InstallPackageData[];
 }): Promise<void> {
   const composeRestartPath = getDockerComposePath(restartId, true);
-  if (!composeBackupPath) composeBackupPath = getPath.backupPath(composePath);
+  if (!composeBackupPath) composeBackupPath = getBackupPath(composePath);
 
   // Must make sure that there is no restart container running previously
   // If it's still running it will wait for a few seconds before killing it. If it working
@@ -118,9 +120,9 @@ exit $UPEXIT
         volumes: params.restartDnpVolumes,
         // The entrypoint property in the docker-compose overwrites
         // both the CMD [ ] and ENTRYPOINT [ ] directive in the Dockerfile
-        entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`
-      }
-    }
+        entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`,
+      },
+    },
   });
 
   validatePath(composeRestartPath);
@@ -209,7 +211,7 @@ async function logRestartPatchStatus(
     const restartLogs = await logContainer(restartContainerName);
     const restartLogsIndented = restartLogs
       .split("\n")
-      .map(line => "\t" + line)
+      .map((line) => "\t" + line)
       .join("\n");
     logs.info(`Restart patch status:
   Finished: ${finishTime.toISOString()}, ${finishSecAgo} seconds ago
@@ -257,7 +259,7 @@ function parsePackageDataRaw(
     return packageData;
   }
 
-  const pre0235Data = packageData as unknown as {
+  const pre0235Data = (packageData as unknown) as {
     name: string;
     version: string;
   };
@@ -266,7 +268,7 @@ function parsePackageDataRaw(
     return {
       ...packageData,
       dnpName: pre0235Data.name,
-      semVersion: pre0235Data.version
+      semVersion: pre0235Data.version,
     };
   }
 

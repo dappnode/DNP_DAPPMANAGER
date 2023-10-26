@@ -1,4 +1,4 @@
-import { Log } from "../../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { httpsPortal } from "../../../calls/index.js";
 import { InstallPackageData, HttpsPortalMapping } from "@dappnode/common";
 import { prettyDnpName } from "../../../utils/format.js";

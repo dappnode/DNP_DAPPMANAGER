@@ -1,6 +1,6 @@
 import { listPackages } from "@dappnode/dockerapi";
 // Internal
-import { PackageRequest } from "../../types.js";
+import { PackageRequest } from "@dappnode/common";
 import shouldUpdate from "./utils/shouldUpdate.js";
 import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetState } from "./types.js";
@@ -23,7 +23,7 @@ export default async function dappGetBasic(
   // Add current request to pacakages to install
   const state = {
     ...dependencies,
-    [req.name]: req.ver
+    [req.name]: req.ver,
   };
   const alreadyUpdated: DappGetState = {};
   const currentVersions: DappGetState = {};
@@ -53,6 +53,6 @@ export default async function dappGetBasic(
     message: "dappGet basic resolved first level dependencies",
     state,
     alreadyUpdated: {},
-    currentVersions
+    currentVersions,
   };
 }

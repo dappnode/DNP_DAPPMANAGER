@@ -1,5 +1,4 @@
 import { DistributedFile } from "@dappnode/common";
-import { fileToGatewayUrl } from "@dappnode/utils";
 
 /**
  * Stringifies a distributed file type into a single multiaddress string
@@ -12,16 +11,6 @@ export function fileToMultiaddress(distributedFile?: DistributedFile): string {
   if (distributedFile.source === "ipfs")
     return `/ipfs/${normalizeHash(distributedFile.hash)}`;
   else return "";
-}
-
-/**
- * Return a queriable gateway url for a multiaddress
- * @param multiaddress "/ipfs/Qm"
- * @returns link to fetch file "http://ipfs-gateway/Qm7763518d4"
- */
-export function multiaddressToIpfsGatewayUrl(multiaddress: string): string {
-  const hash = normalizeHash(multiaddress);
-  return fileToGatewayUrl({ source: "ipfs", hash, size: 0 });
 }
 
 /**

@@ -2,8 +2,8 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import { runOnlyOneSequentially } from "@dappnode/utils";
+import { runAtMostEvery } from "@dappnode/utils";
 import { serializeError } from "../../modules/ethClient/types.js";
 import { logs } from "@dappnode/logger";
 import {
@@ -156,7 +156,14 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
   const runEthMultiClientTaskMemo = runOnlyOneSequentially(
-    async (multiClientArgs: { useCheckpointSync?: boolean, prevExecClientDnpName?: ExecutionClientMainnet } | undefined) => {
+    async (
+      multiClientArgs:
+        | {
+            useCheckpointSync?: boolean;
+            prevExecClientDnpName?: ExecutionClientMainnet;
+          }
+        | undefined
+    ) => {
       try {
         const execClient = db.executionClientMainnet.get();
         const consClient = db.consensusClientMainnet.get();
@@ -210,8 +217,9 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(({ useCheckpointSync, prevExecClientDnpName }) =>
-    runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
+  eventBus.runEthClientInstaller.on(
+    ({ useCheckpointSync, prevExecClientDnpName }) =>
+      runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
   );
 
   runAtMostEvery(

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { validatePath } from "@dappnode/utils";
 import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "@dappnode/dockerapi";

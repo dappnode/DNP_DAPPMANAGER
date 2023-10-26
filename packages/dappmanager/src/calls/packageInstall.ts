@@ -1,7 +1,6 @@
 import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData.js";
 import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths.js";
 // Utils
-import { getLogUi, logUiClear } from "../utils/logUi.js";
 import {
   sanitizeRequestName,
   sanitizeRequestVersion
@@ -18,7 +17,7 @@ import {
   postInstallClean,
   afterInstall
 } from "../modules/installer/index.js";
-import { logs } from "@dappnode/logger";
+import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import {
   ensureEth2MigrationRequirements,
   isPrysmLegacy

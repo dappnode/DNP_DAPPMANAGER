@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ApmRepoVersionReturn, ApmVersionRaw } from "./types.js";
-import * as repoContract from "../../contracts/repository.js";
+import * as repoContract from "../contracts/repository.js";
 import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils.js";
 import { valid } from "semver";
 

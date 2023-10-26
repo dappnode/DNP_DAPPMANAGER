@@ -1,12 +1,12 @@
 import path from "path";
 import { params } from "@dappnode/params";
 import { restartDappmanagerPatch } from "./restartPatch.js";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { copyFileTo } from "../../calls/copyFileTo.js";
 import { InstallPackageData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage, dockerComposeUp } from "@dappnode/dockerapi";
-import { packageToInstallHasPid } from "../../utils/pid.js";
+import { packageToInstallHasPid } from "@dappnode/utils";
 import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";
 import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts.js";
 

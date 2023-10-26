@@ -1,5 +1,5 @@
 import { InstallPackageData } from "@dappnode/common";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { loadImage, dockerImageManifest } from "@dappnode/dockerapi";
 
 /**

@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import * as db from "@dappnode/db";
 import { InstallPackageDataPaths } from "@dappnode/common";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { logs } from "@dappnode/logger";
 import { isNotFoundError } from "@dappnode/utils";
 import { dockerCleanOldImages } from "@dappnode/dockerapi";
@@ -22,7 +22,7 @@ export async function postInstallClean(
     semVersion,
     imagePath,
     manifestBackupPath,
-    composeBackupPath
+    composeBackupPath,
   } of packagesData) {
     db.addPackageInstalledMetadata(dnpName);
 

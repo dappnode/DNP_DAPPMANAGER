@@ -1,4 +1,4 @@
-import { PackageRequest } from "../../types.js";
+import { PackageRequest } from "@dappnode/common";
 
 export class DappGetError extends Error {}
 
@@ -19,7 +19,7 @@ export class ErrorDappGetDowngrade extends DappGetError {
 
   constructor({
     dnpName,
-    dnpVersion
+    dnpVersion,
   }: {
     dnpName: string;
     dnpVersion: string;

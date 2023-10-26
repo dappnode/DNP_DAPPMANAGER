@@ -1,5 +1,5 @@
 import { InstallPackageData } from "@dappnode/common";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { loadImage, dockerImageManifest } from "@dappnode/dockerapi";
 
 /**
@@ -13,9 +13,11 @@ export async function loadImages(
   log: Log
 ): Promise<void> {
   await Promise.all(
-    packagesData.map(async function ({ dnpName, imagePath }) {
+    packagesData.map(async function({ dnpName, imagePath }) {
       log(dnpName, "Loading image...");
-      await loadImageWithProgress(imagePath, message => log(dnpName, message));
+      await loadImageWithProgress(imagePath, (message) =>
+        log(dnpName, message)
+      );
       log(dnpName, "Package Loaded");
     })
   );
@@ -37,7 +39,7 @@ async function loadImageWithProgress(
   const seenLayers = new Set<string>();
   let lastPercent = -1;
 
-  await loadImage(imagePath, event => {
+  await loadImage(imagePath, (event) => {
     const { id: layerId, progressDetail } = event || {};
     const { current, total } = progressDetail || {};
 

@@ -1,6 +1,6 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { InstallPackageDataPaths } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { isNotFoundError } from "@dappnode/utils";
@@ -22,7 +22,7 @@ export async function rollbackPackages(
   for (const pkg of packagesData)
     for (const { from, to } of [
       { from: pkg.composeBackupPath, to: pkg.composePath },
-      { from: pkg.manifestBackupPath, to: pkg.manifestPath }
+      { from: pkg.manifestBackupPath, to: pkg.manifestPath },
     ])
       try {
         // Don't use rename as it fails if paths are in different file systems (docker volume / docker container)

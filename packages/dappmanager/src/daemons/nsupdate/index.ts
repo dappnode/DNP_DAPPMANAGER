@@ -4,7 +4,7 @@ import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
-import { runAtMostEveryIntervals } from "../../utils/asyncFlows.js";
+import { runAtMostEveryIntervals } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 
 const nsupdateInterval = params.NSUPDATE_DAEMON_INTERVAL || 60 * 60 * 1000;

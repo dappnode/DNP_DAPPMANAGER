@@ -1,12 +1,11 @@
 import async from "async";
 import memoize from "memoizee";
-import { logs } from "@dappnode/logger";
 import _ from "lodash-es";
 
 /**
  * Throw this error when an upstream abort signal aborts
  */
-export class ErrorAborted extends Error {
+class ErrorAborted extends Error {
   constructor(message?: string) {
     super(`Aborted ${message || ""}`);
   }
@@ -58,7 +57,7 @@ export function memoizeDebounce<F extends AnyFunction>(
   return wrappedFunction;
 }
 
-export interface MemoizeDebouncedFunction<F extends AnyFunction>
+interface MemoizeDebouncedFunction<F extends AnyFunction>
   extends _.DebouncedFunc<F> {
   (...args: Parameters<F>): ReturnType<F> | undefined;
   flush: (...args: Parameters<F>) => ReturnType<F> | undefined;
@@ -106,7 +105,7 @@ export async function runAtMostEveryIntervals(
   while (true) {
     lastRunMs = Date.now();
 
-    await fn().catch(e => {
+    await fn().catch((e) => {
       console.error("Callbacks in runAtMostEvery should never throw", e);
     });
 
@@ -173,7 +172,7 @@ export function runOnlyOneSequentially<A, R>(
   fn: (arg?: A) => Promise<R>
 ): (arg?: A) => void {
   // create a cargo object with an infinite payload
-  const cargo = async.cargo(function (
+  const cargo = async.cargo(function(
     tasks: { arg: A }[],
     callback: () => void
   ) {
@@ -181,8 +180,8 @@ export function runOnlyOneSequentially<A, R>(
       .then(() => {
         callback();
       })
-      .catch(e => {
-        logs.error(
+      .catch((e) => {
+        console.error(
           `WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks`,
           e
         );
@@ -190,7 +189,7 @@ export function runOnlyOneSequentially<A, R>(
   },
   1e9);
 
-  return function (arg?: A): void {
+  return function(arg?: A): void {
     cargo.push({ arg: arg as A });
   };
 }
@@ -218,7 +217,7 @@ export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
     promise: true,
     // Return the computed cached result to only waiting calls while the
     // result if being computed. Right as it is resolved, compute it again
-    maxAge: 1
+    maxAge: 1,
   });
 }
 

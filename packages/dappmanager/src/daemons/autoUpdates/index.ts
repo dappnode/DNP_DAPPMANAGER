@@ -7,7 +7,7 @@ import {
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";

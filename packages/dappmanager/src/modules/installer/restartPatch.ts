@@ -3,11 +3,11 @@ import path from "path";
 import {
   getBackupPath,
   getDockerComposePath,
-  validatePath
+  validatePath,
+  pause
 } from "@dappnode/utils";
 import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
-import { pause } from "../../utils/asyncFlows.js";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
@@ -16,7 +16,7 @@ import {
   logContainer,
   dockerContainerRemove
 } from "@dappnode/dockerapi";
-import { getLogUi } from "../../utils/logUi.js";
+import { getLogUi } from "@dappnode/logger";
 import { rollbackPackages } from "./rollbackPackages.js";
 import { postInstallClean } from "./postInstallClean.js";
 import { afterInstall } from "./afterInstall.js";

@@ -1,7 +1,6 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { validatePath } from "@dappnode/utils";
-import verifyXz from "../../utils/verifyXz.js";
+import { shell, validatePath } from "@dappnode/utils";
 import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
 import { dockerImageManifest } from "@dappnode/dockerapi";
@@ -36,7 +35,7 @@ export default async function getImage(
   }
 
   // Validate downloaded image
-  await validateTarImage(path).catch(e => {
+  await validateTarImage(path).catch((e) => {
     throw Error(
       `Downloaded image from ${imageFile.hash} to ${path} failed validation: ${e.message}`
     );
@@ -68,7 +67,7 @@ export async function validateTarImage(path: string): Promise<void> {
 export async function verifyDockerImage({
   imagePath,
   dnpName,
-  version
+  version,
 }: {
   imagePath: string;
   dnpName: string;
@@ -77,7 +76,7 @@ export async function verifyDockerImage({
   const expectedTagSuffix = getImageTag({
     dnpName,
     serviceName: dnpName,
-    version
+    version,
   });
   const images = await dockerImageManifest(imagePath);
   for (const image of images) {
@@ -86,4 +85,31 @@ export async function verifyDockerImage({
         throw Error(`Invalid image tag '${repoTag}' for ${dnpName} ${version}`);
     }
   }
+}
+
+/**
+ * Verify a compressed .xz file
+ *
+ * @param PATH file path: ./dir/file.tar.xz
+ * @returns:
+ * - If the `xz -t` succeeds, returns true
+ * - If the file is missing, returns false
+ * - If the file is not a .xz, returns false
+ * - If the file is corrupted, returns false
+ */
+function verifyXz(
+  xzFilePath: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> {
+  return shell(`xz -t ${xzFilePath}`)
+    .then(() => ({
+      success: true,
+      message: "",
+    }))
+    .catch((e: Error) => ({
+      success: false,
+      message: e.message,
+    }));
 }

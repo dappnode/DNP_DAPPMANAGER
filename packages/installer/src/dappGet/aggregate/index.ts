@@ -4,7 +4,6 @@ import { params } from "@dappnode/params";
 import { safeSemver } from "../utils/safeSemver.js";
 import aggregateDependencies from "./aggregateDependencies.js";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps.js";
-import { PackageRequest } from "../../../types.js";
 import { DappGetDnps } from "../types.js";
 import { logs } from "@dappnode/logger";
 import { DappGetFetcher } from "../fetch/DappGetFetcher.js";
@@ -12,9 +11,9 @@ import { setVersion } from "../utils/dnpUtils.js";
 import {
   ErrorDappGetDowngrade,
   ErrorDappGetNotSatisfyRange,
-  ErrorDappGetNoVersions
+  ErrorDappGetNoVersions,
 } from "../errors.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData, PackageRequest } from "@dappnode/common";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -63,7 +62,7 @@ import { InstalledPackageData } from "@dappnode/common";
 export default async function aggregate({
   req,
   dnpList,
-  dappGetFetcher
+  dappGetFetcher,
 }: {
   req: PackageRequest;
   dnpList: InstalledPackageData[];
@@ -79,7 +78,7 @@ export default async function aggregate({
     name: req.name,
     versionRange: req.ver,
     dnps,
-    dappGetFetcher // #### Injected dependency
+    dappGetFetcher, // #### Injected dependency
   });
 
   const relevantInstalledDnps = getRelevantInstalledDnps({
@@ -88,8 +87,8 @@ export default async function aggregate({
     // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
     // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
     installedDnps: dnpList.filter(
-      dnp => valid(dnp.version) && dnp.dnpName !== params.coreDnpName
-    )
+      (dnp) => valid(dnp.version) && dnp.dnpName !== params.coreDnpName
+    ),
   });
   // Add relevant installed dnps and their dependencies to the dnps object
   await Promise.all(
@@ -106,7 +105,7 @@ export default async function aggregate({
             name: dnpName,
             versionRange: `>=${version}`,
             dnps,
-            dappGetFetcher // #### Injected dependency
+            dappGetFetcher, // #### Injected dependency
           });
         }
       } catch (e) {
@@ -117,7 +116,7 @@ export default async function aggregate({
 
   // Label dnps. They are used to order versions
   for (const dnpName in dnps) {
-    const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
+    const dnp = dnpList.find((dnp) => dnp.dnpName === dnpName);
 
     // > Label isRequest + Enfore conditions:
     //   - requested DNP versions must match the provided versionRange

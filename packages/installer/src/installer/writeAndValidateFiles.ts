@@ -1,10 +1,10 @@
 import fs from "fs";
-import { Log } from "../../utils/logUi.js";
+import { Log } from "@dappnode/logger";
 import { validatePath } from "@dappnode/utils";
 import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { writeManifest } from "../manifest/manifestFile.js";
+import { writeManifest } from "@dappnode/manifest";
 import { isNotFoundError } from "@dappnode/utils";
 
 /**
@@ -25,7 +25,7 @@ export async function writeAndValidateFiles(
       composeBackupPath,
       metadata,
       manifestPath,
-      manifestBackupPath
+      manifestBackupPath,
     } = packageData;
     log(dnpName, "Writing files...");
 

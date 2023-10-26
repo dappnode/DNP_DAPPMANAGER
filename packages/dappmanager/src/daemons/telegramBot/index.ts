@@ -1,7 +1,7 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
+import { runOnlyOneSequentially } from "@dappnode/utils";
 import { formatNotification } from "./formatNotification.js";
 import { DappnodeTelegramBot } from "./commands.js";
 
