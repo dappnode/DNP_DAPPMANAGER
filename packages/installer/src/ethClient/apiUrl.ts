@@ -16,7 +16,7 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName: "",
-    isMainOrMonoservice: true
+    isMainOrMonoservice: true,
   });
 
   return `http://${containerDomain}:${port}`;
@@ -41,7 +41,7 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     domain = buildNetworkAlias({
       dnpName: dnpName,
       serviceName: dnp.chain.serviceName,
-      isMainOrMonoservice: false
+      isMainOrMonoservice: false,
     });
   } else {
     // Lighthouse, Teku and Prysm use 3500
@@ -52,7 +52,7 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
     domain = buildNetworkAlias({
       dnpName: dnpName,
       serviceName: getBeaconServiceName(dnpName),
-      isMainOrMonoservice: false
+      isMainOrMonoservice: false,
     });
   }
   return `http://${domain}:${port}`;

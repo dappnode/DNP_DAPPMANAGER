@@ -8,7 +8,7 @@ import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
-import { getConsensusUserSettings } from "../utils.js";
+import { getConsensusUserSettings } from "@dappnode/utils";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import { Network } from "@dappnode/types";
 

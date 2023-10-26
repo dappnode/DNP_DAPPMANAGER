@@ -1,8 +1,11 @@
 import { ethers } from "ethers";
 import { InstalledPackageData } from "@dappnode/common";
 import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
-import { EthSyncing, parseEthersSyncing } from "../../../utils/ethers.js";
-import { buildNetworkAlias } from "@dappnode/utils";
+import {
+  buildNetworkAlias,
+  EthSyncing,
+  parseEthersSyncing
+} from "@dappnode/utils";
 import { ChainDriverSpecs } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
@@ -46,7 +49,7 @@ export async function ethereum(
     dnpName,
     serviceName,
     isMainOrMonoservice: true
-  })
+  });
 
   const apiUrl = `http://${containerDomain}:${port}`;
 
@@ -55,7 +58,10 @@ export async function ethereum(
     provider.send("eth_syncing", []).then(parseEthersSyncing),
     // net_peerCount is not always available. OP Erigon does not support it
     // Not logging error because it would flood the logs
-    provider.send("net_peerCount", []).then(parseInt).catch(() => undefined),
+    provider
+      .send("net_peerCount", [])
+      .then(parseInt)
+      .catch(() => undefined),
     provider.getBlockNumber()
   ]);
 

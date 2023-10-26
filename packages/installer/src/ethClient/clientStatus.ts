@@ -12,7 +12,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
   executionClientsMainnet,
-  consensusClientsMainnet
+  consensusClientsMainnet,
 } from "@dappnode/types";
 
 /**
@@ -76,13 +76,13 @@ export async function getMultiClientStatus(
         return { ok: false, code: "IS_SYNCING" };
       } else {
         const _isApmStateCorrect = await isApmStateCorrect(execUrl).catch(
-          eFromTestCall => {
+          (eFromTestCall) => {
             // APM state call failed, syncing call succeeded and is not working
             // = Likely an error related to fetching state content
             return {
               ok: false,
               code: "STATE_CALL_ERROR",
-              error: serializeError(eFromTestCall)
+              error: serializeError(eFromTestCall),
             };
           }
         );
@@ -90,12 +90,12 @@ export async function getMultiClientStatus(
           // State contract is okey!!
           // Check is synced with consensus and remote execution
           if (
-            (await isSyncedWithConsensus(execUrl, consUrl).catch(e => {
+            (await isSyncedWithConsensus(execUrl, consUrl).catch((e) => {
               throw Error(
                 `Error while checking if synced with consensus: ${e.message}`
               );
             })) &&
-            (await isSyncedWithRemoteExecution(execUrl).catch(e => {
+            (await isSyncedWithRemoteExecution(execUrl).catch((e) => {
               // Do not throw if checking remote execution fails
               // Otherwise the fallback will be triggered and the remote node may not be available
               logs.error(
@@ -109,7 +109,7 @@ export async function getMultiClientStatus(
           // State is not correct, node is not synced but eth_syncing did not picked it up
           return {
             ok: false,
-            code: "STATE_NOT_SYNCED"
+            code: "STATE_NOT_SYNCED",
           };
         }
       }
@@ -125,47 +125,48 @@ export async function getMultiClientStatus(
           return {
             ok: false,
             code: "NOT_AVAILABLE",
-            error: serializeError(clientError)
+            error: serializeError(clientError),
           };
         } else {
           return {
             ok: false,
-            code: "NOT_RUNNING"
+            code: "NOT_RUNNING",
           };
         }
       } else {
         // DNP is not installed, figure out why
-        const installStatus =
-          db.ethExecClientInstallStatus.get(execClientDnpName);
+        const installStatus = db.ethExecClientInstallStatus.get(
+          execClientDnpName
+        );
         if (installStatus) {
           switch (installStatus.status) {
             case "TO_INSTALL":
             case "INSTALLING":
               return {
                 ok: false,
-                code: "INSTALLING"
+                code: "INSTALLING",
               };
             case "INSTALLING_ERROR":
               return {
                 ok: false,
                 code: "INSTALLING_ERROR",
-                error: installStatus.error
+                error: installStatus.error,
               };
             case "INSTALLED":
               return {
                 ok: false,
-                code: "UNINSTALLED"
+                code: "UNINSTALLED",
               };
             case "UNINSTALLED":
               return {
                 ok: false,
-                code: "NOT_INSTALLED"
+                code: "NOT_INSTALLED",
               };
           }
         } else {
           return {
             ok: false,
-            code: "NOT_INSTALLED"
+            code: "NOT_INSTALLED",
           };
         }
       }
@@ -174,7 +175,7 @@ export async function getMultiClientStatus(
     return {
       ok: false,
       code: "UNKNOWN_ERROR",
-      error: eGeneric
+      error: eGeneric,
     };
   }
 }
@@ -235,7 +236,8 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   // Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
   const testTxData = {
     to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
+    data:
+      "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023",
   };
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";

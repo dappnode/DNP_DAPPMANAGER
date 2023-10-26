@@ -2,7 +2,10 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
-import { runOnlyOneSequentially } from "@dappnode/utils";
+import {
+  runOnlyOneSequentially,
+  getConsensusUserSettings
+} from "@dappnode/utils";
 import { runAtMostEvery } from "@dappnode/utils";
 import { serializeError } from "../../modules/ethClient/types.js";
 import { logs } from "@dappnode/logger";
@@ -16,7 +19,6 @@ import {
   getLocalFallbackContentHash
 } from "../../modules/ethClient/index.js";
 import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
-import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
 import {
   dockerComposeUpPackage,
   listPackageNoThrow
