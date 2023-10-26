@@ -2,11 +2,11 @@ import {
   dockerCreateNetwork,
   dockerListNetworks,
   dockerNetworkConnect,
-  dockerNetworkDisconnect
+  dockerNetworkDisconnect,
 } from "@dappnode/dockerapi";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { getExternalNetworkAlias } from "../../domains.js";
+import { getExternalNetworkAlias } from "./domains.js";
 import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
 import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
@@ -36,13 +36,13 @@ export class HttpsPortal {
 
     // Ensure network exists
     const networks = await dockerListNetworks();
-    if (!networks.find(network => network.Name === externalNetworkName)) {
+    if (!networks.find((network) => network.Name === externalNetworkName)) {
       await dockerCreateNetwork(externalNetworkName);
     }
 
     // Ensure the HTTPs portal container is connected to `externalNetworkName`
     const httpsPortalContainer = containers.find(
-      c => c.dnpName === params.HTTPS_PORTAL_DNPNAME
+      (c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME
     );
     if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
     if (!this.isConnected(httpsPortalContainer)) {
@@ -56,14 +56,14 @@ export class HttpsPortal {
     // Check first is it's already connected, or dockerNetworkConnect throws
     if (!this.isConnected(container)) {
       await dockerNetworkConnect(externalNetworkName, container.containerName, {
-        Aliases: aliases
+        Aliases: aliases,
       });
     }
 
     // Call Http Portal API to add the mapping
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
-      toHost: `${externalNetworkAlias}:${mapping.port}`
+      toHost: `${externalNetworkAlias}:${mapping.port}`,
     });
 
     // Edit compose to persist the setting
@@ -79,7 +79,7 @@ export class HttpsPortal {
     if (editor.getComposeNetwork(externalNetworkName) === null) {
       const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
       addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [
-        httpsExternalAlias
+        httpsExternalAlias,
       ]);
     }
   }
@@ -96,13 +96,13 @@ export class HttpsPortal {
     // Call Http Portal API to remove the mapping
     await this.httpsPortalApiClient.remove({
       fromSubdomain: mapping.fromSubdomain,
-      toHost: externalNetworkAlias
+      toHost: externalNetworkAlias,
     });
 
     // If container still has mappings, don't disconnect from network
     const mappings = await this.getMappings(containers);
     const containerHasMappings = mappings.some(
-      mapping =>
+      (mapping) =>
         mapping.dnpName === container.dnpName &&
         mapping.serviceName === container.serviceName
     );
@@ -143,7 +143,7 @@ export class HttpsPortal {
           fromSubdomain,
           dnpName: container.dnpName,
           serviceName: container.serviceName,
-          port: parseInt(port) || 80
+          port: parseInt(port) || 80,
         });
       }
     }
@@ -171,7 +171,7 @@ export class HttpsPortal {
     if (!containers) containers = await listPackageContainers();
 
     const container = containers.find(
-      c =>
+      (c) =>
         c.dnpName === mapping.dnpName && c.serviceName === mapping.serviceName
     );
     if (!container)
@@ -183,6 +183,6 @@ export class HttpsPortal {
   }
 
   private isConnected(container: PackageContainer): boolean {
-    return container.networks.some(n => n.name === externalNetworkName);
+    return container.networks.some((n) => n.name === externalNetworkName);
   }
 }

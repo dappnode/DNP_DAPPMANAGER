@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import Ajv from "ajv";
 import querystring from "querystring";
-import { urlJoin } from "../../utils/url.js";
+import { urlJoin } from "@dappnode/utils";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -26,9 +26,9 @@ export const httpsPortalResponseSchema = {
     required: ["from", "to"],
     properties: {
       from: { type: "string" },
-      to: { type: "string" }
-    }
-  }
+      to: { type: "string" },
+    },
+  },
 };
 
 export class HttpsPortalApiClient {
@@ -57,7 +57,7 @@ export class HttpsPortalApiClient {
   async add({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
-      to: toHost
+      to: toHost,
     });
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
@@ -72,7 +72,7 @@ export class HttpsPortalApiClient {
   async remove({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
-      to: toHost
+      to: toHost,
     });
     await this.get(urlJoin(this.baseUrl, `/remove?${search}`));
   }
@@ -92,9 +92,9 @@ export class HttpsPortalApiClient {
       throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
     }
 
-    return entries.map(entry => ({
+    return entries.map((entry) => ({
       fromSubdomain: entry.from,
-      toHost: entry.to
+      toHost: entry.to,
     }));
   }
 

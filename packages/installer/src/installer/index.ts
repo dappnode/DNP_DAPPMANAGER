@@ -6,3 +6,4 @@ export * from "./postInstallClean.js";
 export * from "./rollbackPackages.js";
 export * from "./runPackages.js";
 export * from "./writeAndValidateFiles.js";
+export * from "./copyFileTo.js";

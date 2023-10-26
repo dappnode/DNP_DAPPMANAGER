@@ -21,6 +21,8 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/manifest": "^0.1.0",
+    "@dappnode/httpsportal": "^0.1.0",
     "@dappnode/ipfs": "^0.1.0",
     "@dappnode/db": "^0.1.0",
     "@dappnode/common": "^0.1.0",

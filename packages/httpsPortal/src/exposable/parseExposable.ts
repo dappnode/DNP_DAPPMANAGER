@@ -1,9 +1,9 @@
 import {
   ExposableServiceInfo,
   ExposableServiceManifestInfo,
-  InstalledPackageData
+  InstalledPackageData,
 } from "@dappnode/common";
-import { getPublicSubdomain, stripBadDomainChars } from "../../../domains.js";
+import { getPublicSubdomain, stripBadDomainChars } from "../domains.js";
 
 /**
  * Parse unsafe manifest.exposable property
@@ -26,7 +26,7 @@ export function parseExposableServiceManifest(
       const rootSubdomain = stripBadDomainChars(dnp.dnpName.split(".")[0]);
       const defaultFromSubdomain = getPublicSubdomain({
         dnpName: dnp.dnpName,
-        serviceName
+        serviceName,
       });
 
       if (info.fromSubdomain && !rootSubdomain.includes(info.fromSubdomain)) {
@@ -40,7 +40,7 @@ export function parseExposableServiceManifest(
         fromSubdomain: info.fromSubdomain || defaultFromSubdomain,
         dnpName: dnp.dnpName,
         serviceName,
-        port: info.port
+        port: info.port,
       });
     }
   }

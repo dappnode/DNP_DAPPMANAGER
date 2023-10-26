@@ -2,7 +2,11 @@ import * as db from "@dappnode/db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
 import { isEnsDomain } from "./validate.js";
 import { isIpfsHash } from "../utils.js";
-import { PackageRelease, ReleaseSignatureStatusCode } from "@dappnode/common";
+import {
+  PackageRelease,
+  ReleaseSignatureStatusCode,
+  DistributedFile,
+} from "@dappnode/common";
 import { parseMetadataFromManifest } from "@dappnode/manifest";
 import { setDappnodeComposeDefaults } from "@dappnode/dockercompose";
 import { ComposeEditor, writeMetadataToLabels } from "@dappnode/dockercompose";
@@ -13,7 +17,6 @@ import { getReleaseSignatureStatus } from "./releaseSignature.js";
 import { params } from "@dappnode/params";
 import { getIsCore } from "@dappnode/utils";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
-import { DistributedFile } from "@dappnode/common";
 
 /**
  * Should resolve a name/version into the manifest and all relevant hashes

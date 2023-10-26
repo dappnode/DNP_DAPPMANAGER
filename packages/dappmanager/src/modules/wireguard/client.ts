@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { urlJoin } from "../../utils/url.js";
+import { urlJoin } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";

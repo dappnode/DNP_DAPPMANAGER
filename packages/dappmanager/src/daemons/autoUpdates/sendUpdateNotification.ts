@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { ReleaseFetcher } from "../../modules/release/index.js";
-import { prettyDnpName } from "../../utils/format.js";
+import { prettyDnpName } from "@dappnode/utils";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   isCoreUpdateEnabled,

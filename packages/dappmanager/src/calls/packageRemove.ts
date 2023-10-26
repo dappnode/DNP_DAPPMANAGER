@@ -10,8 +10,8 @@ import {
   dockerComposeDown,
   listPackage
 } from "@dappnode/dockerapi";
-import { isRunningHttps } from "../modules/https-portal/utils/isRunningHttps.js";
-import { httpsPortal } from "./httpsPortal.js";
+import { isRunningHttps } from "@dappnode/httpsportal";
+import { httpsPortal } from "@dappnode/httpsportal";
 import * as db from "@dappnode/db";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import {

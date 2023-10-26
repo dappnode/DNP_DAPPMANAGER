@@ -1,12 +1,12 @@
-import { httpsPortal } from "../../../calls/index.js";
+import { httpsPortal } from "../index.js";
 import { InstallPackageData } from "@dappnode/common";
-import { getExternalNetworkAlias } from "../../../domains.js";
+import { getExternalNetworkAlias } from "../domains.js";
 import { params } from "@dappnode/params";
 import {
   dockerListNetworks,
   dockerCreateNetwork,
   dockerNetworkConnect,
-  listPackageNoThrow
+  listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { isRunningHttps } from "./isRunningHttps.js";
 
@@ -24,13 +24,13 @@ export async function connectToPublicNetwork(
 
   // create network if necessary
   const networks = await dockerListNetworks();
-  if (!networks.find(network => network.Name === externalNetworkName))
+  if (!networks.find((network) => network.Name === externalNetworkName))
     await dockerCreateNetwork(externalNetworkName);
 
   const containers =
     (
       await listPackageNoThrow({
-        dnpName: pkg.dnpName
+        dnpName: pkg.dnpName,
       })
     )?.containers || [];
 
@@ -43,10 +43,10 @@ export async function connectToPublicNetwork(
     ) {
       const alias = getExternalNetworkAlias({
         serviceName: container.serviceName,
-        dnpName: pkg.dnpName
+        dnpName: pkg.dnpName,
       });
 
-      if (!container.networks.find(n => n.name === externalNetworkName)) {
+      if (!container.networks.find((n) => n.name === externalNetworkName)) {
         await dockerNetworkConnect(
           externalNetworkName,
           container.containerName,

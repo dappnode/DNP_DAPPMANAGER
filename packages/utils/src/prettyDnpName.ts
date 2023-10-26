@@ -3,7 +3,7 @@
  * @param string = "hello world"
  * @returns "Hello world"
  */
-export function capitalize(s: string): string {
+function capitalize(s: string): string {
   if (!s || typeof s !== "string") return s;
   return s.charAt(0).toUpperCase() + s.slice(1);
 }

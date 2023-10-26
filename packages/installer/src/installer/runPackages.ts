@@ -2,13 +2,15 @@ import path from "path";
 import { params } from "@dappnode/params";
 import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "@dappnode/logger";
-import { copyFileTo } from "../../calls/copyFileTo.js";
+import { copyFileTo } from "./copyFileTo.js";
 import { InstallPackageData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage, dockerComposeUp } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
-import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";
-import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts.js";
+import {
+  connectToPublicNetwork,
+  exposeByDefaultHttpsPorts,
+} from "@dappnode/httpsportal";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 

@@ -2,7 +2,7 @@ import { startHttpApi } from "../../../src/api/startHttpApi.js";
 import fetch, { Response } from "node-fetch";
 import http from "http";
 import { expect } from "chai";
-import { urlJoin } from "../../../src/utils/url.js";
+import { urlJoin } from "@dappnode/utils";
 import { io } from "socket.io-client";
 
 interface RequestRes {

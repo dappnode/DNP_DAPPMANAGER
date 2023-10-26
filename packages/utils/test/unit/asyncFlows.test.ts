@@ -3,8 +3,8 @@ import { expect } from "chai";
 import {
   runOnlyOneSequentially,
   runOnlyOneReturnToAll,
-  pause
-} from "../../../src/utils/asyncFlows.js";
+  pause,
+} from "../../src/asyncFlows.js";
 
 describe("Util: asyncFlows", () => {
   describe("runOnlyOneSequentially", () => {
@@ -35,7 +35,7 @@ describe("Util: asyncFlows", () => {
         "Requesting 2",
         "Requesting 3",
         "success async 0",
-        "success async 1"
+        "success async 1",
       ]);
     });
 
@@ -59,7 +59,7 @@ describe("Util: asyncFlows", () => {
         "Requesting 0",
         "Requesting 1",
         "Requesting 2",
-        "Requesting 3"
+        "Requesting 3",
       ]);
     });
   });
@@ -131,8 +131,8 @@ Error 15: 0.616938341865086
       for (let i = 0; i < 100; i++) {
         log(`Requesting ${i}`);
         throttledCallback({ a: 9 })
-          .then(res => log(`Result ${i}: ${res}`))
-          .catch(e => log(`Error ${i}: ${e.message}`));
+          .then((res) => log(`Result ${i}: ${res}`))
+          .catch((e) => log(`Error ${i}: ${e.message}`));
         await pause(callDelay);
       }
     });
@@ -164,7 +164,7 @@ Error 15: 0.616938341865086
         "Requesting 1",
         "Requesting 2",
         "Requesting 3",
-        "success async 0"
+        "success async 0",
       ]);
     });
 
@@ -183,7 +183,7 @@ Error 15: 0.616938341865086
       });
       for (let i = 0; i < 4; i++) {
         log(`Requesting ${i}`);
-        throttledCallback().then(res => log(`${res} ${i}`));
+        throttledCallback().then((res) => log(`${res} ${i}`));
         await pause(callDelay);
       }
 
@@ -196,7 +196,7 @@ Error 15: 0.616938341865086
         "Requesting 2",
         "Requesting 3",
         "success async 2",
-        "success async 3"
+        "success async 3",
       ]);
     });
 
@@ -216,8 +216,8 @@ Error 15: 0.616938341865086
       for (let i = 0; i < 4; i++) {
         log(`Requesting ${i}`);
         throttledCallback().then(
-          res => log(`${res} ${i}`),
-          err => log(`${err.message} ${i}`)
+          (res) => log(`${res} ${i}`),
+          (err) => log(`${err.message} ${i}`)
         );
         await pause(callDelay);
       }
@@ -231,7 +231,7 @@ Error 15: 0.616938341865086
         "Requesting 2",
         "Requesting 3",
         "mock error async 2",
-        "mock error async 3"
+        "mock error async 3",
       ]);
     });
   });

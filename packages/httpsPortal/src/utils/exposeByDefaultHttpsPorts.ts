@@ -1,7 +1,7 @@
 import { Log } from "@dappnode/logger";
-import { httpsPortal } from "../../../calls/index.js";
+import { httpsPortal } from "../index.js";
 import { InstallPackageData, HttpsPortalMapping } from "@dappnode/common";
-import { prettyDnpName } from "../../../utils/format.js";
+import { prettyDnpName } from "@dappnode/utils";
 import { isRunningHttps } from "./isRunningHttps.js";
 
 /**
@@ -14,7 +14,7 @@ export async function exposeByDefaultHttpsPorts(
   const exposables = pkg.metadata.exposable;
 
   // Return if no exposable or not exposeByDefault
-  if (!exposables || !exposables.some(exp => exp.exposeByDefault)) return;
+  if (!exposables || !exposables.some((exp) => exp.exposeByDefault)) return;
 
   // Requires that https package exists and it is running
   if (!(await isRunningHttps()))
@@ -32,7 +32,7 @@ export async function exposeByDefaultHttpsPorts(
         dnpName: pkg.dnpName,
         serviceName:
           exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
-        port: exposable.port
+        port: exposable.port,
       };
 
       if (currentMappings.length > 0 && currentMappings.includes(portalMapping))
@@ -68,7 +68,7 @@ export async function exposeByDefaultHttpsPorts(
           // Remove all mappings and throw error to trigger package install rollback
           e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
           for (const mappingRollback of portMappinRollback) {
-            await httpsPortal.removeMapping(mappingRollback).catch(e => {
+            await httpsPortal.removeMapping(mappingRollback).catch((e) => {
               log(
                 pkg.dnpName,
                 `Error removing mapping ${JSON.stringify(mappingRollback)}, ${

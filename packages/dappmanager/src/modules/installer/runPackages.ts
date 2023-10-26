@@ -7,8 +7,10 @@ import { InstallPackageData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage, dockerComposeUp } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
-import { connectToPublicNetwork } from "../https-portal/utils/connectToPublicNetwork.js";
-import { exposeByDefaultHttpsPorts } from "../https-portal/utils/exposeByDefaultHttpsPorts.js";
+import {
+  exposeByDefaultHttpsPorts,
+  connectToPublicNetwork
+} from "@dappnode/httpsportal";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 

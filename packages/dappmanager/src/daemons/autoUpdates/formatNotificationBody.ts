@@ -3,8 +3,7 @@ import {
   adminUiInstallPackageUrl,
   adminUiUpdateCoreUrl
 } from "../../externalLinks.js";
-import { prettyDnpName } from "../../utils/format.js";
-import { urlJoin } from "../../utils/url.js";
+import { urlJoin, prettyDnpName } from "@dappnode/utils";
 import { enableAutoUpdatesCmd } from "../telegramBot/commands.js";
 
 export function formatPackageUpdateNotification({

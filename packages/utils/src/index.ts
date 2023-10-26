@@ -32,3 +32,5 @@ export { getEnvFilePath } from "./getEnvFilePath.js";
 export { getBackupPath } from "./getBackupPath.js";
 export * from "./asyncFlows.js";
 export * from "./pid.js";
+export { urlJoin } from "./urlJoin.js";
+export { prettyDnpName } from "./prettyDnpName.js";
