@@ -1,8 +1,7 @@
 import { RegistryNewRepoEvent } from "@dappnode/common";
 import { ethers } from "ethers";
-import { abi } from "../../contracts/registry.js";
+import { abi } from "../contracts/registry.js";
 import * as db from "@dappnode/db";
-import { wrapError } from "../../utils/wrapError.js";
 import { DirectoryDnp } from "@dappnode/toolkit";
 
 // Topic name
@@ -44,7 +43,7 @@ export async function getRegistry(
   function onEventsProgress(rangeEvents: RegistryNewRepoEvent[]): void {
     if (rangeEvents.length > 0) {
       const cachedLogs = db.registryEvents.get(registryEns) || [];
-      const cachedLogsStringify = cachedLogs.map(cachedLog =>
+      const cachedLogsStringify = cachedLogs.map((cachedLog) =>
         JSON.stringify(cachedLog)
       );
       for (const log of rangeEvents) {
@@ -103,9 +102,9 @@ export async function getRegistryOnRange(
           address: registryAddress,
           fromBlock: from,
           toBlock: to,
-          topics: [eventNewRepoTopic]
+          topics: [eventNewRepoTopic],
         })
-        .catch(e => {
+        .catch((e) => {
           e.message = `Error retrieving logs from ${registryEns} [${from},${to}]: ${e.message}`;
           throw e;
         })
@@ -130,7 +129,7 @@ export async function getRegistryOnRange(
     }
 
     const rangeEvents = await Promise.all(
-      logsResult.result.map(async log => {
+      logsResult.result.map(async (log) => {
         const event = registryInterface.parseLog(log);
         if (!log.blockNumber) {
           throw Error(`${eventNewRepo} log has no blockNumber`);
@@ -150,7 +149,7 @@ export async function getRegistryOnRange(
         return {
           ensName: `${name}.${registryEns}`,
           timestamp: block.timestamp,
-          txHash: log.transactionHash
+          txHash: log.transactionHash,
         };
       })
     );
@@ -184,7 +183,7 @@ function getTopicFromEvent(
   eventName: string
 ): string {
   const event = Object.values(iface.events).find(
-    eventValue => eventValue.name === eventName
+    (eventValue) => eventValue.name === eventName
   );
   if (!event) throw Error(`Event ${eventName} not found`);
   const topic = event.name;
@@ -207,7 +206,30 @@ function getMockData(registry: RegistryNewRepoEvent[]): DirectoryDnp[] {
       statusName: "Active",
       position: i,
       isFeatured: false,
-      featuredIndex: 0
+      featuredIndex: 0,
     };
   });
+}
+
+type Result<T> = { err: null; result: T } | { err: Error };
+
+/**
+ * Wraps a promise to return either an error or result
+ * Useful for SyncChain code that must ensure in a sample code
+ * ```ts
+ * try {
+ *   A()
+ * } catch (e) {
+ *   B()
+ * }
+ * ```
+ * only EITHER fn A() and fn B() are called, but never both. In the snipped above
+ * if A() throws, B() would be called.
+ */
+async function wrapError<T>(promise: Promise<T>): Promise<Result<T>> {
+  try {
+    return { err: null, result: await promise };
+  } catch (err) {
+    return { err: err as Error };
+  }
 }

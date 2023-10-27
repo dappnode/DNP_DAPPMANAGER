@@ -1,7 +1,7 @@
 import resolveReleaseName from "./resolveReleaseName.js";
 import { getRelease } from "./getRelease.js";
 import { getManifest } from "./getManifest.js";
-import dappGet, { DappgetOptions } from "../dappGet/index.js";
+import { DappgetOptions, dappGet } from "../dappGet/index.js";
 import { Apm } from "../apm/index.js";
 import { Manifest } from "@dappnode/types";
 import { DappGetState } from "../dappGet/types.js";
@@ -59,7 +59,7 @@ export class ReleaseFetcher extends Apm {
     const releases = await this.getReleases(result.state);
     return {
       ...result,
-      releases
+      releases,
     };
   }
 

@@ -1321,7 +1321,7 @@
     ajv-errors "^3.0.0"
     semver "^7.5.0"
 
-"@dappnode/toolkit@^0.1.19":
+"@dappnode/toolkit@^0.1.19", "@dappnode/toolkit@^0.1.20":
   version "0.1.20"
   resolved "https://registry.yarnpkg.com/@dappnode/toolkit/-/toolkit-0.1.20.tgz#d7015045d21f8b5c3735e9eeffac521f63985b7c"
   integrity sha512-KjycdvcAH4V9bwrOFB5yvxgKZWKO0ChzDAGTrdH5YM0dHRlcPOKcFLCSYFG/1He7yEzvQhQpOVZ1EDyasFTqgg==

@@ -1,6 +1,6 @@
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher } from "../../modules/release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import {
   clearPendingUpdates,

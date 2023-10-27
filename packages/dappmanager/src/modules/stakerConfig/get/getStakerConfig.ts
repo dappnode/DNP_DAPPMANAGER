@@ -14,7 +14,7 @@ import {
 } from "@dappnode/common";
 import { fileToGatewayUrl } from "@dappnode/utils";
 import { listPackages } from "@dappnode/dockerapi";
-import { ReleaseFetcher } from "../../release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { getBeaconServiceName } from "@dappnode/utils";
 import { Network } from "@dappnode/types";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";

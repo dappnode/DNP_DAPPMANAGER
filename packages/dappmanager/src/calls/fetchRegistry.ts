@@ -1,9 +1,12 @@
-import { getEthersProvider } from "@dappnode/installer";
-import { ReleaseFetcher } from "../modules/release/index.js";
+import {
+  getEthersProvider,
+  ReleaseFetcher,
+  NoImageForArchError,
+  getRegistry
+} from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
-import { NoImageForArchError } from "../modules/release/errors.js";
 import { logs } from "@dappnode/logger";
 import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
 import { fileToGatewayUrl } from "@dappnode/utils";
@@ -12,7 +15,6 @@ import {
   getShortDescription,
   getFallBackCategories
 } from "./fetchDirectory.js";
-import { getRegistry } from "../modules/registry/index.js";
 import * as db from "@dappnode/db";
 import { DirectoryDnp } from "@dappnode/toolkit";
 

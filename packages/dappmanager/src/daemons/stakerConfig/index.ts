@@ -1,7 +1,7 @@
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { ReleaseFetcher } from "../../modules/release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
 import { pickPackageItemData } from "../../utils/getPkgItemData.js";
 
