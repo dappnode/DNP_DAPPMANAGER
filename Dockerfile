@@ -60,6 +60,16 @@ COPY packages/hostScripts/package.json \
   packages/hostScripts/
 COPY packages/db/package.json \
   packages/db/
+COPY packages/manifest/package.json \
+  packages/manifest/
+COPY packages/ipfs/package.json \
+  packages/ipfs/
+COPY packages/installer/package.json \
+  packages/installer/
+COPY packages/ethicalMetrics/package.json \
+  packages/ethicalMetrics/
+COPY packages/httpsPortal/package.json \
+  packages/httpsPortal/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
