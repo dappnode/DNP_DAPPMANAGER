@@ -71,6 +71,12 @@ COPY packages/params/ .
 RUN yarn build
 # Results in dist/*
 
+# Build ethicalmetrics
+WORKDIR /app/packages/ethicalMetrics/
+COPY packages/ethicalMetrics/ .
+RUN yarn build
+# Results in dist/*
+
 # Build common
 WORKDIR /app/packages/common/
 COPY packages/common/ .
@@ -89,15 +95,15 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
-# Build dockerCompose
-WORKDIR /app/packages/dockerCompose/
-COPY packages/dockerCompose/ .
-RUN yarn build
-# Results in dist/*
-
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
 RUN yarn build
 # Results in dist/*
 
@@ -107,15 +113,39 @@ COPY packages/hostScripts/ .
 RUN yarn build
 # Results in dist/*
 
+# Build manifest
+WORKDIR /app/packages/manifest/
+COPY packages/manifest/ .
+RUN yarn build
+# Results in dist/*
+
 # Build dockerApi
 WORKDIR /app/packages/dockerApi/
 COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
+# Build httpsportal
+WORKDIR /app/packages/httpsPortal/
+COPY packages/httpsPortal/ .
+RUN yarn build
+# Results in dist/*
+
 # Build db
 WORKDIR /app/packages/db/
 COPY packages/db/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ipfs
+WORKDIR /app/packages/ipfs/
+COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build installer
+WORKDIR /app/packages/installer/
+COPY packages/installer/ .
 RUN yarn build
 # Results in dist/*
 
@@ -220,5 +250,25 @@ COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/a
 COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
 COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules
 COPY --from=build-deps /usr/src/app/packages/db/package.json /usr/src/app/packages/db/package.json
+# Copyt manifest
+COPY --from=build-deps /usr/src/app/packages/manifest/dist /usr/src/app/packages/manifest/dist
+COPY --from=build-deps /usr/src/app/packages/manifest/node_modules /usr/src/app/packages/manifest/node_modules
+COPY --from=build-deps /usr/src/app/packages/manifest/package.json /usr/src/app/packages/manifest/package.json
+# Copyt installer
+COPY --from=build-deps /usr/src/app/packages/installer/dist /usr/src/app/packages/installer/dist
+COPY --from=build-deps /usr/src/app/packages/installer/node_modules /usr/src/app/packages/installer/node_modules
+COPY --from=build-deps /usr/src/app/packages/installer/package.json /usr/src/app/packages/installer/package.json
+# Copyt httpsportal
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/dist /usr/src/app/packages/httpsPortal/dist
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/node_modules /usr/src/app/packages/httpsPortal/node_modules
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/package.json /usr/src/app/packages/httpsPortal/package.json
+# Copy ipfs
+COPY --from=build-deps /usr/src/app/packages/ipfs/dist /usr/src/app/packages/ipfs/dist
+COPY --from=build-deps /usr/src/app/packages/ipfs/node_modules /usr/src/app/packages/ipfs/node_modules
+COPY --from=build-deps /usr/src/app/packages/ipfs/package.json /usr/src/app/packages/ipfs/package.json
+# Copy ethicalmetrics
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/dist /usr/src/app/packages/ethicalMetrics/dist
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/node_modules /usr/src/app/packages/ethicalMetrics/node_modules
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/package.json /usr/src/app/packages/ethicalMetrics/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
