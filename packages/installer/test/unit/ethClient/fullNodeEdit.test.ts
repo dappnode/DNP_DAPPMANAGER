@@ -13,7 +13,7 @@ import { params } from "@dappnode/params";
 // 2. With the existing edited compose will add back again the alias: fullnode.dappnode and test it
 
 describe("Edit fullnode in eth client", () => {
-  beforeAll(() => {
+  before(() => {
     // create dnp_repo dir
     shellSafe("mkdir dnp_repo");
   });

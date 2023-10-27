@@ -120,15 +120,17 @@ describe.skip("dappGet/aggregate", () => {
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../../../src/dappGet/aggregate/index"),
+      () => import("../../../../src/dappGet/aggregate/index.js"),
       (mock) => {
         mock(() =>
-          import("../../../../src/dappGet/aggregate/getRelevantInstalledDnps")
+          import(
+            "../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js"
+          )
         )
           .withDefault(getRelevantInstalledDnps)
           .toBeUsed();
         mock(() =>
-          import("../../../../src/dappGet/aggregate/aggregateDependencies")
+          import("../../../../src/dappGet/aggregate/aggregateDependencies.js")
         )
           .withDefault(aggregateDependencies)
           .toBeUsed();
