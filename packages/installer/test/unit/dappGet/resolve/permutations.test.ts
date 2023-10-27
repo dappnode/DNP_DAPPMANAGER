@@ -1,6 +1,9 @@
 import "mocha";
 import { expect } from "chai";
-import { PermutationsTableInterface } from "../../../../../src/modules/dappGet/types.js";
+import {
+  PermutationInterface,
+  PermutationsTableInterface,
+} from "../../../../src/dappGet/types.js";
 
 /**
  * Purpose of the test. Make sure it is able to pick up relevant installed DNPs
@@ -15,7 +18,7 @@ import { PermutationsTableInterface } from "../../../../../src/modules/dappGet/t
  * Also should not crash due to a dependency loop
  */
 
-import * as permutations from "../../../../../src/modules/dappGet/resolve/permutations.js";
+import * as permutations from "../../../../src/dappGet/resolve/permutations.js";
 
 describe.skip("dappGet/resolve/permutations", () => {
   let permutationsTable: PermutationsTableInterface;
@@ -26,29 +29,29 @@ describe.skip("dappGet/resolve/permutations", () => {
       "dependency.dnp.dappnode.eth": {
         versions: {
           "0.1.0": {},
-          "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws": {}
-        }
+          "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws": {},
+        },
       },
       "letsencrypt-nginx.dnp.dappnode.eth": {
         isInstalled: true,
         versions: {
           "0.1.0": { "web.dnp.dappnode.eth": "latest" },
-          "0.1.1": { "web.dnp.dappnode.eth": "latest" }
-        }
+          "0.1.1": { "web.dnp.dappnode.eth": "latest" },
+        },
       },
       "nginx-proxy.dnp.dappnode.eth": {
         isRequest: true,
         versions: {
           "0.1.8": { "nginx-proxy.dnp.dappnode.eth": "latest" },
-          "0.1.7": { "nginx-proxy.dnp.dappnode.eth": "latest" }
-        }
+          "0.1.7": { "nginx-proxy.dnp.dappnode.eth": "latest" },
+        },
       },
       "web.dnp.dappnode.eth": {
         isInstalled: true,
         versions: {
-          "0.1.2": { "letsencrypt-nginx.dnp.dappnode.eth": "latest" }
-        }
-      }
+          "0.1.2": { "letsencrypt-nginx.dnp.dappnode.eth": "latest" },
+        },
+      },
     };
 
     permutationsTable = permutations.getPermutationsTable(dnps);
@@ -58,29 +61,29 @@ describe.skip("dappGet/resolve/permutations", () => {
         versions: [
           null,
           "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws",
-          "0.1.0"
+          "0.1.0",
         ],
         n: 3,
-        m: 1
+        m: 1,
       },
       {
         name: "letsencrypt-nginx.dnp.dappnode.eth",
         versions: ["0.1.0", "0.1.1"],
         n: 2,
-        m: 3
+        m: 3,
       },
       {
         name: "web.dnp.dappnode.eth",
         versions: ["0.1.2"],
         n: 1,
-        m: 6
+        m: 6,
       },
       {
         name: "nginx-proxy.dnp.dappnode.eth",
         versions: ["0.1.8", "0.1.7"],
         n: 2,
-        m: 6
-      }
+        m: 6,
+      },
     ]);
 
     permutationsNumber = permutations.getTotalPermutations(permutationsTable);
@@ -93,7 +96,7 @@ describe.skip("dappGet/resolve/permutations", () => {
       "dependency.dnp.dappnode.eth": null,
       "letsencrypt-nginx.dnp.dappnode.eth": "0.1.0",
       "web.dnp.dappnode.eth": "0.1.2",
-      "nginx-proxy.dnp.dappnode.eth": "0.1.8"
+      "nginx-proxy.dnp.dappnode.eth": "0.1.8",
     });
   });
 
@@ -102,12 +105,13 @@ describe.skip("dappGet/resolve/permutations", () => {
     const dnps = {
       A: { isRequest: true, versions: { "1.0.0": {}, "2.0.0": {} } },
       B: { isInstalled: true, versions: { "1.0.0": {}, "2.0.0": {} } },
-      C: { versions: { "1.0.0": {}, "2.0.0": {} } }
+      C: { versions: { "1.0.0": {}, "2.0.0": {} } },
     };
     const permutationsTable = permutations.getPermutationsTable(dnps);
-    const permutationsNumber =
-      permutations.getTotalPermutations(permutationsTable);
-    const _permutations = [];
+    const permutationsNumber = permutations.getTotalPermutations(
+      permutationsTable
+    );
+    const _permutations: PermutationInterface[] = [];
     for (let i = 0; i < permutationsNumber; i++) {
       _permutations.push(permutations.getPermutation(permutationsTable, i));
     }
@@ -123,7 +127,7 @@ describe.skip("dappGet/resolve/permutations", () => {
       { C: "1.0.0", B: "1.0.0", A: "1.0.0" },
       { C: null, B: "2.0.0", A: "1.0.0" },
       { C: "2.0.0", B: "2.0.0", A: "1.0.0" },
-      { C: "1.0.0", B: "2.0.0", A: "1.0.0" }
+      { C: "1.0.0", B: "2.0.0", A: "1.0.0" },
     ]);
   });
 });

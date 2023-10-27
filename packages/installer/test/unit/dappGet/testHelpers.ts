@@ -1,11 +1,8 @@
 import "mocha";
-import { safeSemver } from "../../../../src/modules/dappGet/utils/safeSemver.js";
-import { PackageRequest } from "../../../../src/types.js";
-import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch/index.js";
-import {
-  DappGetState,
-  DappGetDnps
-} from "../../../../src/modules/dappGet/types.js";
+import { safeSemver } from "../../../src/dappGet/utils/safeSemver.js";
+import { PackageRequest } from "@dappnode/common";
+import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
+import { DappGetState, DappGetDnps } from "../../../src/dappGet/types.js";
 import { Dependencies } from "@dappnode/types";
 
 export interface DappgetTestCase {
@@ -59,7 +56,7 @@ export class DappGetFetcherMock extends DappGetFetcher {
   async versions(name: string, versionRange: string): Promise<string[]> {
     const dnp = this.getDnp(name);
     const allVersions = Object.keys(dnp);
-    const validVersions = allVersions.filter(version =>
+    const validVersions = allVersions.filter((version) =>
       safeSemver.satisfies(version, versionRange)
     );
     if (!validVersions.length) {

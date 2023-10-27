@@ -3,15 +3,15 @@ import { expect } from "chai";
 import fs from "fs";
 import path from "path";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp } from "../../../testUtils.js";
+import { mockDnp } from "../../../../dappmanager/test/testUtils.js";
 import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";
 import { mapValues, isEmpty } from "lodash-es";
 import { logs } from "@dappnode/logger";
 import { fileURLToPath } from "url";
 // Imports for types
-import dappGetType from "../../../../src/modules/dappGet/index.js";
-import aggregateType from "../../../../src/modules/dappGet/aggregate/index.js";
+import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
+import aggregateType from "../../../src/dappGet/aggregate/index.js";
 
 /* eslint-disable no-console */
 
@@ -40,14 +40,14 @@ describe.skip("dappGet integration test", async () => {
     // Load the case data with ES6 import
     const caseData: DappgetTestCase = await import(
       path.join(casesFolder, casePath)
-    ).then(m => m.default);
+    ).then((m) => m.default);
 
     describe.skip(`Case: ${caseData.name}`, () => {
       // Prepare dependencies
 
       const dnpList: InstalledPackageData[] = Object.keys(caseData.dnps)
-        .filter(dnpName => caseData.dnps[dnpName].installed)
-        .map(dnpName => {
+        .filter((dnpName) => caseData.dnps[dnpName].installed)
+        .map((dnpName) => {
           const installedVersion = caseData.dnps[dnpName].installed || "";
           const dnp = caseData.dnps[dnpName].versions[installedVersion];
           if (!dnp)
@@ -60,7 +60,7 @@ describe.skip("dappGet integration test", async () => {
             dnpName: dnpName,
             version: installedVersion,
             origin: undefined,
-            dependencies: dnp || {}
+            dependencies: dnp || {},
           };
         });
 
@@ -70,7 +70,7 @@ describe.skip("dappGet integration test", async () => {
       }
 
       const dappGetFetcher = new DappGetFetcherMock(
-        mapValues(caseData.dnps, dnp => dnp.versions)
+        mapValues(caseData.dnps, (dnp) => dnp.versions)
       );
 
       let dappGet: typeof dappGetType;
@@ -78,17 +78,17 @@ describe.skip("dappGet integration test", async () => {
 
       before("Mock", async () => {
         const dappGetImport = await rewiremock.around(
-          () => import("../../../../src/modules/dappGet"),
-          mock => {
+          () => import("../../../src/dappGet/index.js"),
+          (mock) => {
             mock(() => import("@dappnode/dockerapi"))
               .with({ listPackages })
               .toBeUsed();
           }
         );
-        const aggregateImport = await rewiremock.around(
-          () => import("../../../../src/modules/dappGet/aggregate")
+        const aggregateImport = await rewiremock.around(() =>
+          import("../../../src/dappGet/aggregate/index.js")
         );
-        dappGet = dappGetImport.default;
+        dappGet = dappGetImport.dappGet;
         aggregate = aggregateImport.default;
       });
 
@@ -96,7 +96,7 @@ describe.skip("dappGet integration test", async () => {
         const dnps = await aggregate({
           req: caseData.req,
           dnpList,
-          dappGetFetcher
+          dappGetFetcher,
         });
         logBig("  Aggregated DNPs", JSON.stringify(dnps, null, 2));
         expectNotEmpty(dnps);

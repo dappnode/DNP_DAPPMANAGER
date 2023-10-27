@@ -3,11 +3,11 @@ import { expect } from "chai";
 import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
 // Import for types
-import dappGetType from "../../../../src/modules/dappGet/index.js";
+import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp } from "../../../testUtils.js";
-import { DappGetDnps } from "../../../../src/modules/dappGet/types.js";
-import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch/index.js";
+import { mockDnp } from "../../testUtils.js";
+import { DappGetDnps } from "../../../src/dappGet/types.js";
+import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 
 /* eslint-disable max-len */
 
@@ -15,7 +15,7 @@ import { DappGetFetcher } from "../../../../src/modules/dappGet/fetch/index.js";
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-describe.skip("dappGet", function () {
+describe.skip("dappGet", function() {
   this.timeout(5 * 1000); // For some reason the before step can last > 2s
   const listPackagesSpy = sinon.spy();
 
@@ -29,26 +29,26 @@ describe.skip("dappGet", function () {
           ...mockDnp,
           dependencies: {
             "nginx-proxy.dnp.dappnode.eth": "latest",
-            "letsencrypt-nginx.dnp.dappnode.eth": "latest"
+            "letsencrypt-nginx.dnp.dappnode.eth": "latest",
           },
           dnpName: "web.dnp.dappnode.eth",
           version: "0.1.0",
-          origin: undefined
+          origin: undefined,
         },
         {
           ...mockDnp,
           dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
           dnpName: "nginx-proxy.dnp.dappnode.eth",
           version: "0.0.3",
-          origin: undefined
+          origin: undefined,
         },
         {
           ...mockDnp,
           dependencies: { "web.dnp.dappnode.eth": "latest" },
           dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
           version: "0.0.4",
-          origin: "/ipfs/Qm1234"
-        }
+          origin: "/ipfs/Qm1234",
+        },
       ];
     }
 
@@ -65,18 +65,18 @@ describe.skip("dappGet", function () {
         state: {
           "nginx-proxy.dnp.dappnode.eth": "0.0.4",
           "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
-          "web.dnp.dappnode.eth": "0.1.0"
-        }
+          "web.dnp.dappnode.eth": "0.1.0",
+        },
       };
     }
 
     const mock = await rewiremock.around(
-      () => import("../../../../src/modules/dappGet"),
-      mock => {
-        mock(() => import("../../../../src/modules/dappGet/aggregate"))
+      () => import("../../../src/dappGet/index.js"),
+      (mock) => {
+        mock(() => import("../../../src/dappGet/aggregate/index.js"))
           .withDefault(aggregate)
           .toBeUsed();
-        mock(() => import("../../../../src/modules/dappGet/resolve"))
+        mock(() => import("../../../src/dappGet/resolve/index.js"))
           .withDefault(resolve)
           .toBeUsed();
         mock(() => import("@dappnode/dockerapi"))
@@ -84,7 +84,7 @@ describe.skip("dappGet", function () {
           .toBeUsed();
       }
     );
-    dappGet = mock.default;
+    dappGet = mock.dappGet;
   });
 
   it("Should add packages to the alreadyUpdated object", async () => {
@@ -93,18 +93,18 @@ describe.skip("dappGet", function () {
     const { state, alreadyUpdated } = await dappGet(
       {
         name: "nginx-proxy.dnp.dappnode.eth",
-        ver: "^0.1.0"
+        ver: "^0.1.0",
       },
       dappGetOptions,
       dappGetFetcher
     );
 
     expect(state).to.deep.equal({
-      "nginx-proxy.dnp.dappnode.eth": "0.0.4"
+      "nginx-proxy.dnp.dappnode.eth": "0.0.4",
     });
     expect(alreadyUpdated).to.deep.equal({
       "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
-      "web.dnp.dappnode.eth": "0.1.0"
+      "web.dnp.dappnode.eth": "0.1.0",
     });
   });
 
