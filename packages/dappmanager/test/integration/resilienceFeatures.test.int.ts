@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import * as getPath from "../../src/utils/getPath.js";
 import * as calls from "../../src/calls/index.js";
 import {
   createTestDir,

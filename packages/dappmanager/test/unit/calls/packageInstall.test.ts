@@ -1,16 +1,14 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { PackageRelease } from "@dappnode/common";
+import { PackageRelease, PackageRequest } from "@dappnode/common";
 import { getMockEventBus } from "./eventBus.js";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall.js";
-import { DappGetState } from "../../../src/modules/dappGet/types.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
-import { ReleaseFetcher } from "../../../src/modules/release/index.js";
+import { ReleaseFetcher, DappGetState } from "@dappnode/installer";
 import { Manifest } from "@dappnode/types";
-import { PackageRequest } from "../../../src/types.js";
 
 describe.skip("Call function: packageInstall", function () {
   // Pkg data
@@ -79,7 +77,7 @@ describe.skip("Call function: packageInstall", function () {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/packageInstall"),
       mock => {
-        mock(() => import("../../../src/modules/release"))
+        mock(() => import("@dappnode/installer"))
           .with({ ReleaseFetcher: ReleaseFetcherMock })
           .toBeUsed();
         mock(() => import("@dappnode/eventbus"))

@@ -1,4 +1,11 @@
-import { PackageContainer, InstalledPackageData } from "@dappnode/common";
+import {
+  PackageContainer,
+  InstalledPackageData,
+  InstallPackageData,
+  PackageRelease,
+  ReleaseSignatureStatusCode,
+} from "@dappnode/common";
+import { Compose } from "@dappnode/types";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";
@@ -40,4 +47,40 @@ export const mockDnp: InstalledPackageData = {
   origin: "",
   avatarUrl: "",
   containers: [mockContainer],
+};
+
+export const mockCompose: Compose = {
+  version: "3.5",
+  services: {
+    [mockDnpName]: {
+      image: `${mockDnpName}:${mockDnpVersion}`,
+      container_name: `DAppNodePackage-${mockDnpName}`,
+    },
+  },
+};
+
+export const mockRelease: PackageRelease = {
+  dnpName: mockDnpName,
+  reqVersion: mockDnpVersion,
+  semVersion: mockDnpVersion,
+  imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
+  avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
+  metadata: { name: mockDnpName, version: mockDnpVersion },
+  compose: mockCompose,
+  warnings: {},
+  isCore: false,
+  signedSafe: true,
+  signatureStatus: { status: ReleaseSignatureStatusCode.notSigned },
+};
+
+export const mockPackageData: InstallPackageData = {
+  ...mockRelease,
+  isUpdate: true,
+  imagePath: "mock/path/image",
+  composePath: "mock/path/compose",
+  composeBackupPath: "mock/path/compose.backup.yml",
+  manifestPath: "mock/path/manifest.json",
+  manifestBackupPath: "mock/path/manifest.backup.json",
+  dockerTimeout: undefined,
+  containersStatus: {},
 };

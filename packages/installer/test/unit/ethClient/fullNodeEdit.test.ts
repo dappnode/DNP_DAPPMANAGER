@@ -1,8 +1,11 @@
 import "mocha";
 import { expect } from "chai";
-import { shellSafe } from "../../../testUtils.js";
+import { shellSafe } from "@dappnode/utils";
 import fs from "fs";
-import { ethereumClient, ComposeAliasEditorAction } from "../../../../src/modules/ethClient/index.js";
+import {
+  ethereumClient,
+  ComposeAliasEditorAction,
+} from "../../../src/ethClient/index.js";
 import { params } from "@dappnode/params";
 
 // The following test will wite a compose with the alias fullnode.dappnode:

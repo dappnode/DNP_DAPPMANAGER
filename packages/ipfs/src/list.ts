@@ -18,7 +18,7 @@ export async function ls(
 ): Promise<IPFSEntry[]> {
   const files: IPFSEntry[] = [];
   for await (const file of ipfs.ls(hash, {
-    timeout: timeout
+    timeout: timeout,
   })) {
     files.push(file);
   }
@@ -42,14 +42,14 @@ export async function dagGet(
   const contentLinks: IpfsDagGet[] = content.value.Links;
   if (!contentLinks)
     throw Error(`hash ${hashSanitized} does not contain links`);
-  contentLinks.map(link => {
+  contentLinks.map((link) => {
     if (!cid) throw Error("Error getting cid");
     files.push({
       type: "file",
       cid: CID.parse(sanitizeIpfsPath(link.Hash.toString())),
       name: link.Name,
       path: path.join(link.Hash.toString(), link.Name),
-      size: link.Size
+      size: link.Size,
     });
   });
   return files;

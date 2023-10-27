@@ -12,7 +12,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
       get: (): EthClientSyncedNotificationStatus => notificationStatus,
       set: (newValue: EthClientSyncedNotificationStatus): void => {
         notificationStatus = newValue;
-      }
+      },
     };
 
     const notificationEmit = sinon.stub();
@@ -21,13 +21,13 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
       notification: {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         on: (): void => {},
-        emit: notificationEmit
-      }
+        emit: notificationEmit,
+      },
     };
 
     const { emitSyncedNotification } = await rewiremock.around(
-      () => import("../../../../src/modules/ethClient/syncedNotification"),
-      mock => {
+      () => import("../../../src/ethClient/syncedNotification.js"),
+      (mock) => {
         mock(() => import("@dappnode/eventbus"))
           .with({ eventBus: mockEventBus })
           .toBeUsed();
@@ -40,7 +40,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth"
+        consClient: "lighthouse.dnp.dappnode.eth",
       },
       { ok: false, code: "IS_SYNCING" }
     );
@@ -52,7 +52,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth"
+        consClient: "lighthouse.dnp.dappnode.eth",
       },
       { ok: true, url: "", dnpName: "" }
     );
@@ -64,7 +64,7 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth"
+        consClient: "lighthouse.dnp.dappnode.eth",
       },
       { ok: true, url: "", dnpName: "" }
     );
@@ -76,14 +76,14 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth"
+        consClient: "lighthouse.dnp.dappnode.eth",
       },
       { ok: false, code: "IS_SYNCING" }
     );
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth"
+        consClient: "lighthouse.dnp.dappnode.eth",
       },
       { ok: true, url: "", dnpName: "" }
     );
@@ -95,14 +95,14 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "nethermind.public.dappnode.eth",
-        consClient: "nimbus.dnp.dappnode.eth"
+        consClient: "nimbus.dnp.dappnode.eth",
       },
       { ok: false, code: "IS_SYNCING" }
     );
     emitSyncedNotification(
       {
         execClient: "nethermind.public.dappnode.eth",
-        consClient: "nimbus.dnp.dappnode.eth"
+        consClient: "nimbus.dnp.dappnode.eth",
       },
       { ok: true, url: "", dnpName: "" }
     );

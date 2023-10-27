@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import { findEntries } from "../../../../src/modules/release/ipfs/findEntries.js";
+import { findEntries } from "../../../src/release/ipfs/findEntries.js";
 import {
   releaseFilesToDownload,
-  DirectoryFiles
-} from "../../../../src/modules/release/ipfs/params.js";
-import { IpfsFileResult } from "../../../../src/types.js";
+  DirectoryFiles,
+} from "../../../src/release/ipfs/params.js";
+import { IpfsFileResult } from "@dappnode/ipfs";
 
 describe("validateTarImage", () => {
   it("Should find all release entries", () => {
@@ -23,12 +23,12 @@ describe("validateTarImage", () => {
       "host-grafana-dashboard.json",
       "prometheus-targets.json",
       "setup-wizard.json",
-      "signature.json"
-    ].map(name => ({
+      "signature.json",
+    ].map((name) => ({
       name,
       path: `Qm-root/${name}`,
       size: name.length,
-      hash: `Qm-${name}`
+      hash: `Qm-${name}`,
     }));
 
     const expectedResultWithNameOnly = {
@@ -44,8 +44,8 @@ describe("validateTarImage", () => {
       prometheusTargets: "prometheus-targets.json",
       grafanaDashboards: [
         "docker-grafana-dashboard.json",
-        "host-grafana-dashboard.json"
-      ]
+        "host-grafana-dashboard.json",
+      ],
     };
 
     const result = mapValues(releaseFilesToDownload, (fileConfig, _fileId) => {
@@ -53,8 +53,8 @@ describe("validateTarImage", () => {
       return findEntries(ipfsFiles, fileConfig, fileId);
     });
 
-    const resultWithNameOnly = mapValues(result, entry =>
-      Array.isArray(entry) ? entry.map(e => e.name) : entry?.name
+    const resultWithNameOnly = mapValues(result, (entry) =>
+      Array.isArray(entry) ? entry.map((e) => e.name) : entry?.name
     );
 
     expect(resultWithNameOnly).to.deep.equal(expectedResultWithNameOnly);

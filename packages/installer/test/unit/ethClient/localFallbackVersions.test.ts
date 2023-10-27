@@ -2,8 +2,8 @@ import "mocha";
 import { expect } from "chai";
 import {
   parseContentHashFile,
-  loadContentHashes
-} from "../../../../src/modules/ethClient/index.js";
+  loadContentHashes,
+} from "../../../src/ethClient/index.js";
 
 describe("apm > localFallbackVersions", () => {
   describe("parseContentHashFile", () => {
@@ -17,7 +17,7 @@ openethereum.dnp.dappnode.eth,/ipfs/QmbHRZTW9ubWUGp41wbCVnVXaUoUmyM9Tv689EvLbRTQ
         "geth.dnp.dappnode.eth":
           "/ipfs/QmNqDvqAyy3pN3PvymB6chM7S1FgYyive8LosVKUuaDdfd",
         "openethereum.dnp.dappnode.eth":
-          "/ipfs/QmbHRZTW9ubWUGp41wbCVnVXaUoUmyM9Tv689EvLbRTQCK"
+          "/ipfs/QmbHRZTW9ubWUGp41wbCVnVXaUoUmyM9Tv689EvLbRTQCK",
       };
 
       const contentHashes = parseContentHashFile(data);

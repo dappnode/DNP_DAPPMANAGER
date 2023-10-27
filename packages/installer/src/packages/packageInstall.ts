@@ -14,10 +14,6 @@ import {
   afterInstall,
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
-import {
-  ensureEth2MigrationRequirements,
-  isPrysmLegacy,
-} from "../installer/ensureEth2MigrationRequirements.js";
 import { Routes, PackageRequest } from "@dappnode/common";
 
 /**
@@ -87,9 +83,6 @@ export async function packageInstall({
     for (const dnpName of dnpNames)
       if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 
-    // Ensure Eth2 migration requirements
-    await ensureEth2MigrationRequirements(packagesData);
-
     try {
       flagPackagesAreInstalling(dnpNames);
 
@@ -102,16 +95,8 @@ export async function packageInstall({
       try {
         await runPackages(packagesData, log);
       } catch (e) {
-        // Bypass rollback if is Prysm legacy
-        if (!isPrysmLegacy(req.name, req.ver)) {
-          await rollbackPackages(packagesData, log);
-          throw e;
-        } else {
-          logs.error(
-            "Bypassing rollback due to client legacy version. ",
-            e.message
-          );
-        }
+        await rollbackPackages(packagesData, log);
+        throw e;
       }
 
       await postInstallClean(packagesData, log);

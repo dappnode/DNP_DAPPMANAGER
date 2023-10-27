@@ -39,3 +39,4 @@ export {
   getConsensusUserSettings,
 } from "./stakerUtils.js";
 export * from "./ethers.js";
+export { shellSafe } from "./shellSafe.js";

@@ -5,7 +5,7 @@ import { ManifestWithImage } from "../../../src/types.js";
 import { uploadManifestRelease } from "../integrationSpecs/buildReleaseManifest.js";
 import { uploadDirectoryRelease } from "../integrationSpecs/buildReleaseDirectory.js";
 import { ipfs } from "@dappnode/ipfs";
-import { getManifest } from "../../../src/modules/release/getManifest.js";
+import { getManifest } from "@dappnode/installer";
 
 describe("IPFS remote", function () {
   this.timeout(100000 * 5);

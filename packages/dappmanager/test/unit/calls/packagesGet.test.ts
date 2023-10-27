@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { sortPackages } from "../../../src/calls/packagesGet.js";
+import { sortPackages } from "@dappnode/installer";
 import { InstalledPackageData } from "@dappnode/common";
 import { mockContainer, mockDnp } from "../../testUtils.js";
 

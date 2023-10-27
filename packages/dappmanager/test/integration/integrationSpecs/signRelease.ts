@@ -1,9 +1,9 @@
 import { ethers } from "ethers";
 import { CID } from "ipfs-http-client";
 import { sortBy } from "lodash-es";
-import { Ipfs } from "../../../src/modules/ipfs/Ipfs.js";
-import { serializeIpfsDirectory } from "../../../src/modules/release/releaseSignature.js";
-import { ReleaseSignature } from "../../../src/types.js";
+import { Ipfs } from "@dappnode/ipfs";
+import { serializeIpfsDirectory } from "@dappnode/installer";
+import { ReleaseSignature } from "@dappnode/common";
 
 const signatureFilename = "signature.json";
 
