@@ -1,9 +1,9 @@
 import { isEqual } from "lodash-es";
 import { ipfs } from "@dappnode/ipfs";
 import { parseManifest } from "@dappnode/manifest";
-import { ManifestWithImage } from "../../../src/types.js";
 import { ipfsAddManifest, ipfsAddFileFromFs } from "../testIpfsUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";
+import { ManifestWithImage } from "@dappnode/common";
 
 /**
  * Release type: `Manifest-type`

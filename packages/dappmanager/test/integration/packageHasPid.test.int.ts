@@ -2,9 +2,12 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import { mockPackageData, shellSafe } from "../testUtils.js";
-import { packageToInstallHasPid, getServicesSharingPid } from "@dappnode/utils";
+import {
+  packageToInstallHasPid,
+  getServicesSharingPid,
+  ComposeServicesSharingPid
+} from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { ComposeServicesSharingPid } from "../../src/types.js";
 
 describe("Module > compose > pid", () => {
   // Example package

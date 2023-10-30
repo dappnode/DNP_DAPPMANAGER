@@ -16,8 +16,8 @@ import {
   uploadManifestRelease,
   cleanInstallationArtifacts
 } from "./integrationSpecs/index.js";
-import { ManifestWithImage } from "../../src/types.js";
 import { getDockerComposePath } from "@dappnode/utils";
+import { ManifestWithImage } from "@dappnode/common";
 
 describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";
