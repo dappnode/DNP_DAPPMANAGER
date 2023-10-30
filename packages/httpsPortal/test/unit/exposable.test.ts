@@ -5,7 +5,7 @@ import {
   ExposableServiceManifestInfo,
   InstalledPackageData,
 } from "@dappnode/common";
-import { mockContainer, mockDnp } from "../../../dappmanager/test/testUtils.js";
+import { mockDnp, mockContainer } from "../testUtils.js";
 
 describe("modules / https-portal / exposable", () => {
   it("Should parse manifest.exposable", () => {
