@@ -29,7 +29,7 @@
     "@dappnode/utils": "^0.1.0",
     "ajv": "6.10.2",
     "memoizee": "0.4.14",
-    "node-fetch": "2.6.0"
+    "node-fetch": "2.6.7"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",
