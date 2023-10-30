@@ -18,7 +18,7 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "node-fetch": "2.6.0"
+    "node-fetch": "2.6.7"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",
