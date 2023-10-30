@@ -1,5 +1,5 @@
 import { Eth2ClientTarget } from "@dappnode/common";
-import { ethereumClient } from "../modules/ethClient/index.js";
+import { ethereumClient } from "@dappnode/installer";
 
 /**
  * Changes the ethereum client used to fetch package data

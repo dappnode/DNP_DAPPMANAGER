@@ -1,10 +1,8 @@
 import * as db from "@dappnode/db";
-import { shell } from "@dappnode/utils";
+import { shell, runAtMostEvery, prettyDnpName } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import { prettyDnpName } from "../../utils/format.js";
 
 /**
  * Commands

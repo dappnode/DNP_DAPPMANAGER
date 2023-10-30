@@ -2,7 +2,7 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher } from "../../modules/release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { packageInstall } from "../../calls/index.js";
 import { logs } from "@dappnode/logger";
 import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification.js";

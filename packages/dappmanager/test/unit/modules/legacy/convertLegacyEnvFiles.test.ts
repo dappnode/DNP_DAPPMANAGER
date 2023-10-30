@@ -2,10 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import { createTestDir, cleanTestDir } from "../../../testUtils.js";
-import * as getPath from "../../../../src/utils/getPath.js";
-import { yamlDump } from "../../../../src/utils/yaml.js";
 import { migrateLegacyEnvFile } from "../../../../src/modules/migrations/removeLegacyDockerAssets.js";
-import { getDockerComposePath, validatePath } from "@dappnode/utils";
+import {
+  getDockerComposePath,
+  getEnvFilePath,
+  validatePath,
+  yamlDump
+} from "@dappnode/utils";
 
 describe("migrateLegacyEnvFiles", () => {
   before(async () => {
@@ -15,7 +18,7 @@ describe("migrateLegacyEnvFiles", () => {
   it("Should NOT break a compose for an empty .env file", () => {
     const dnpName = "mock-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(dnpName, isCore);
+    const envFilePath = getEnvFilePath(dnpName, isCore);
     const composePath = getDockerComposePath(dnpName, isCore);
     const compose = {
       version: "3.5",
@@ -41,7 +44,7 @@ describe("migrateLegacyEnvFiles", () => {
   it("Should merge existing envs", () => {
     const dnpName = "mock2-dnp.dnp.dappnode.eth";
     const isCore = false;
-    const envFilePath = getPath.envFile(dnpName, isCore);
+    const envFilePath = getEnvFilePath(dnpName, isCore);
     const composePath = getDockerComposePath(dnpName, isCore);
     const envsString = "NAME=VALUE";
     const composeString = yamlDump({

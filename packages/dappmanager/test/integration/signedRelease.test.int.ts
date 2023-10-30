@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { ipfs } from "../../src/modules/ipfs/index.js";
-import { ReleaseFetcher } from "../../src/modules/release/index.js";
+import { ipfs } from "@dappnode/ipfs";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { getContainerName } from "@dappnode/utils";
 import { ReleaseSignatureStatusCode } from "@dappnode/common";
 import { Manifest, getImageTag } from "@dappnode/types";

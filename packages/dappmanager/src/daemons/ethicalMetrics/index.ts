@@ -1,7 +1,6 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import { runOnlyOneSequentially, runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { checkEthicalMetricsStatus } from "./checkEthicalMetricsStatus.js";
 

@@ -967,6 +967,12 @@ export interface LocalIpResponse {
  * ====
  */
 
+export enum FileFormat {
+  JSON = "JSON",
+  YAML = "YAML",
+  TEXT = "TEXT",
+}
+
 export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
@@ -990,6 +996,68 @@ export enum IpfsClientTarget {
  * ========
  */
 
+// From https://nodejs.org/api/os.html#os_os_arch
+export type NodeArch =
+  | "arm"
+  | "arm64"
+  | "ia32"
+  | "mips"
+  | "mipsel"
+  | "ppc"
+  | "ppc64"
+  | "s390"
+  | "s390x"
+  | "x32"
+  | "x64";
+
+interface ManifestImage {
+  hash: string;
+  size: number;
+  path: string;
+  volumes?: string[];
+  ports?: string[];
+  environment?: string[];
+  /** FORBIDDEN FEATURE */
+  external_vol?: string[];
+  restart?: string;
+  privileged?: boolean;
+  cap_add?: string[];
+  cap_drop?: string[];
+  devices?: string[];
+  subnet?: string;
+  ipv4_address?: string;
+  network_mode?: string;
+  command?: string;
+  labels?: string[];
+}
+
+export interface ManifestWithImage extends Manifest {
+  image: ManifestImage;
+}
+
+export interface PackageRequest {
+  name: string;
+  ver: string;
+  req?: string;
+}
+
+export interface ReleaseSignature {
+  /** Version of the ReleaseSignature format */
+  version: 1;
+  /** Specs of the signed CIDs */
+  cid: {
+    version: 0 | 1;
+    base: "base58btc" | "base32" | "base64" | "base64url";
+  };
+  signature_protocol: ReleaseSignatureProtocol;
+  /**
+   * Signature of the serialized files in the directory
+   * ```
+   * 0x71b61418808a85c495f52bc9c781cbfeb0154c86aec8528c6cf7a83a26a0365f7ac4dea4eea7eea5e4ec14a10e01d8b8708d8c0c7c12420d152a272b69092b851b
+   * ```
+   */
+  signature: string;
+}
 interface ReleaseWarnings {
   /**
    * If a core package does not come from the DAppNode Package APM registry

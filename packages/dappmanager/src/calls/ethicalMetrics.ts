@@ -9,7 +9,7 @@ import {
   ethicalMetricsDnpName,
   register,
   unregister
-} from "../modules/ethicalMetrics/index.js";
+} from "@dappnode/ethicalmetrics";
 import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 
 // TODO: handle uninstall package to unsubscribe from ethical metrics

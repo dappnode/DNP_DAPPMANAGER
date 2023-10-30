@@ -24,6 +24,7 @@
     "@dappnode/types": "^0.1.29",
     "@dappnode/utils": "^0.1.0",
     "@types/lodash-es": "^4.17.9",
+    "dargs": "7.0.0",
     "dockerode": "^3.2.1",
     "lodash-es": "^4.17.21"
   },

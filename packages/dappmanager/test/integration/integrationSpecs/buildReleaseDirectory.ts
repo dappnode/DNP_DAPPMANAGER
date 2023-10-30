@@ -2,9 +2,9 @@ import fs from "fs";
 import path from "path";
 import { ethers } from "ethers";
 import { mapValues } from "lodash-es";
-import { ipfs } from "../../../src/modules/ipfs/index.js";
+import { ipfs } from "@dappnode/ipfs";
 import { shell } from "@dappnode/utils";
-import { yamlDump } from "../../../src/utils/yaml.js";
+import { yamlDump } from "@dappnode/utils";
 import { getContainerName } from "@dappnode/utils";
 import {
   Manifest,

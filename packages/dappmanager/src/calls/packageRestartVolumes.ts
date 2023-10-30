@@ -14,13 +14,13 @@ import {
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
-import { unregister } from "../modules/ethicalMetrics/unregister.js";
 import {
   ethicalMetricsDnpName,
-  ethicalMetricsTorServiceVolume
-} from "../modules/ethicalMetrics/index.js";
+  ethicalMetricsTorServiceVolume,
+  unregister
+} from "@dappnode/ethicalmetrics";
 import { getDockerComposePath, packageInstalledHasPid } from "@dappnode/utils";
-import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
+import { restartDappmanagerPatch } from "@dappnode/installer";
 
 /**
  * Removes a package volumes. The re-ups the package

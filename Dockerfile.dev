@@ -70,11 +70,27 @@ COPY packages/hostScripts/package.json \
   packages/hostScripts/
 COPY packages/db/package.json \
   packages/db/
+COPY packages/manifest/package.json \
+  packages/manifest/
+COPY packages/ipfs/package.json \
+  packages/ipfs/
+COPY packages/installer/package.json \
+  packages/installer/
+COPY packages/ethicalMetrics/package.json \
+  packages/ethicalMetrics/
+COPY packages/httpsPortal/package.json \
+  packages/httpsPortal/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ethicalmetrics
+WORKDIR /app/packages/ethicalMetrics/
+COPY packages/ethicalMetrics/ .
 RUN yarn build
 # Results in dist/*
 
@@ -96,15 +112,15 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
-# Build dockerCompose
-WORKDIR /app/packages/dockerCompose/
-COPY packages/dockerCompose/ .
-RUN yarn build
-# Results in dist/*
-
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
 RUN yarn build
 # Results in dist/*
 
@@ -114,15 +130,33 @@ COPY packages/hostScripts/ .
 RUN yarn build
 # Results in dist/*
 
+# Build manifest
+WORKDIR /app/packages/manifest/
+COPY packages/manifest/ .
+RUN yarn build
+# Results in dist/*
+
 # Build dockerApi
 WORKDIR /app/packages/dockerApi/
 COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
+# Build httpsportal
+WORKDIR /app/packages/httpsPortal/
+COPY packages/httpsPortal/ .
+RUN yarn build
+# Results in dist/*
+
 # Build db
 WORKDIR /app/packages/db/
 COPY packages/db/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ipfs
+WORKDIR /app/packages/ipfs/
+COPY packages/ipfs/ .
 RUN yarn build
 # Results in dist/*
 

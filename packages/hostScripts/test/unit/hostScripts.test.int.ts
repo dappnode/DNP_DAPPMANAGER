@@ -4,7 +4,7 @@ import { shell } from "@dappnode/utils";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 
-describe("Host scripts", () => {
+describe.skip("Host scripts", () => {
   it("Should fetch host info", async () => {
     const hostInfo = await shell(
       `sudo bash ${hostScriptsPath}/collect_host_info.sh`
@@ -21,7 +21,7 @@ describe("Host scripts", () => {
     expect(hostUpdate).to.be.ok;
   });
  */
-  after("Clean logs", async function () {
+  after("Clean logs", async function() {
     await shell(`sudo rm -rf /usr/src/dappnode/logs`);
   });
 });

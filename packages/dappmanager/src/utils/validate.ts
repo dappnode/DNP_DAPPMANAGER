@@ -1,13 +1,12 @@
 import fs from "fs";
 import pathUtil from "path";
 import { valid, validRange } from "semver";
-import { PackageRequest } from "../types.js";
 import * as isIPFS from "is-ipfs";
 import { logs } from "@dappnode/logger";
 
-const supportedDomains = ["eth"];
-
 export function isEnsDomain(ensDomain: string): boolean {
+  const supportedDomains = ["eth"];
+
   if (!ensDomain || typeof ensDomain !== "string") return false;
   if (ensDomain.includes("/")) return false;
   if (!ensDomain.includes(".")) return false;
@@ -41,18 +40,6 @@ export function isIpfsHash(hash: string): boolean {
 
   // Make sure hash if valid
   return isIPFS.cid(hash);
-}
-
-export function isIpfsRequest(req: PackageRequest): boolean {
-  if (req && typeof req === "object") {
-    return Boolean(
-      (req.name && isIpfsHash(req.name)) || (req.ver && isIpfsHash(req.ver))
-    );
-  } else if (req && typeof req === "string") {
-    return isIpfsHash(req);
-  } else {
-    return false;
-  }
 }
 
 /**
