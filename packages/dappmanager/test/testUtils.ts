@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import { shell } from "@dappnode/utils";
 import { clearCacheDb, clearMainDb } from "@dappnode/db";
-import { ManifestWithImage } from "../src/types.js";
 import { DockerApiSystemDfReturn } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { Compose, Manifest } from "@dappnode/types";
@@ -12,7 +11,8 @@ import {
   VolumeMapping,
   PackageRelease,
   ReleaseSignatureStatusCode,
-  InstallPackageData
+  InstallPackageData,
+  ManifestWithImage
 } from "@dappnode/common";
 
 export const testDir = "./test_files/";
