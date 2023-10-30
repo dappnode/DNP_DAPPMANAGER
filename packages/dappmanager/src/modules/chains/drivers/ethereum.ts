@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { InstalledPackageData } from "@dappnode/common";
-import { whyDoesGethTakesSoMuchToSync } from "../../../externalLinks.js";
 import {
   buildNetworkAlias,
   EthSyncing,
@@ -11,7 +10,8 @@ import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
 
 const MIN_BLOCK_DIFF_SYNC = 60;
-const gethSyncHelpUrl = whyDoesGethTakesSoMuchToSync;
+const gethSyncHelpUrl =
+  "https://github.com/ethereum/go-ethereum/issues/16218#issuecomment-371454280";
 
 /**
  * Returns a chain data object for an [ethereum] API

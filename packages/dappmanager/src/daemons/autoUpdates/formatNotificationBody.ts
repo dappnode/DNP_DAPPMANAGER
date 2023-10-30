@@ -1,10 +1,9 @@
 import { CoreUpdateDataAvailable } from "@dappnode/common";
-import {
-  adminUiInstallPackageUrl,
-  adminUiUpdateCoreUrl
-} from "../../externalLinks.js";
 import { urlJoin, prettyDnpName } from "@dappnode/utils";
 import { enableAutoUpdatesCmd } from "../telegramBot/commands.js";
+
+const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
+const adminUiInstallPackageUrl = "http://my.dappnode/installer";
 
 export function formatPackageUpdateNotification({
   dnpName,
