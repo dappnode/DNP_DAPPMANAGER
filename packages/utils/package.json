@@ -24,13 +24,15 @@
     "@dappnode/types": "^0.1.29",
     "ajv": "^6.10.2",
     "js-yaml": "^3.11.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "memoizee": "0.4.14"
   },
   "devDependencies": {
     "@types/async": "3.0.1",
     "@types/chai": "^4.3.6",
     "@types/js-yaml": "^3.12.1",
     "@types/lodash-es": "^4.17.9",
+    "@types/memoizee": "0.4.4",
     "@types/mocha": "^10.0.2",
     "@types/node": "^20.6.2",
     "chai": "^4.3.10",
