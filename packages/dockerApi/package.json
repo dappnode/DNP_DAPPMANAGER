@@ -26,13 +26,15 @@
     "@types/lodash-es": "^4.17.9",
     "dargs": "7.0.0",
     "dockerode": "^3.2.1",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "tar-stream": "2.1.4"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",
     "@types/dockerode": "^3.2.1",
     "@types/mocha": "^10.0.2",
     "@types/node": "^20.6.2",
+    "@types/tar-stream": "2.1.0",
     "chai": "^4.3.10",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",
