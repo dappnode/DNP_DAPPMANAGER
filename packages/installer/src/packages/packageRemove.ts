@@ -149,6 +149,9 @@ async function removeStakerPkgFromDbIfSelected({
     case db.executionClientLukso.get():
       await db.executionClientLukso.set(undefined);
       break;
+    case db.executionClientHolesky.get():
+      await db.executionClientHolesky.set(undefined);
+      break;
     case db.consensusClientMainnet.get():
       await db.consensusClientMainnet.set(undefined);
       break;
@@ -160,6 +163,9 @@ async function removeStakerPkgFromDbIfSelected({
       break;
     case db.consensusClientLukso.get():
       await db.consensusClientLukso.set(undefined);
+      break;
+    case db.consensusClientHolesky.get():
+      await db.consensusClientHolesky.set(undefined);
       break;
     case mevBoostMainnet:
       await db.mevBoostMainnet.set(false);

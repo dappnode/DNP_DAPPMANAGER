@@ -83,6 +83,8 @@ const getDefaultCheckpointSync = (network: Network): string =>
     ? "https://checkpoint-sync-prater.dappnode.io"
     : network === "gnosis"
     ? "https://checkpoint-sync-gnosis.dappnode.io"
+    : network === "holesky"
+    ? "https://checkpoint-sync-holesky.dappnode.io"
     : network === "lukso"
     ? "https://checkpoints.mainnet.lukso.network"
     : "";
