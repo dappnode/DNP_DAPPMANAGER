@@ -20,6 +20,7 @@ import {
   executionClientsMainnet,
   consensusClientsMainnet
 } from "@dappnode/types";
+import Input from "./Input";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
@@ -116,12 +117,16 @@ function EthMultiClients({
   target: selectedTarget,
   onTargetChange,
   showStats,
-  useCheckpointSync
+  useCheckpointSync,
+  remoteUrl,
+  setRemoteUrl
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
   showStats?: boolean;
   useCheckpointSync?: boolean;
+  remoteUrl: string | null;
+  setRemoteUrl: (newUrl: string) => void;
 }) {
   const clients: EthClientData[] = [
     {
@@ -200,6 +205,9 @@ function EthMultiClients({
                 <div className="tag">{stats.requirements}</div>
                 <div className="tag">{stats.trust}</div>
               </div>
+            )}
+            {options === "remote" && (
+              <Input value={remoteUrl || ""} onValueChange={setRemoteUrl} />
             )}
 
             {selected &&
@@ -326,7 +334,9 @@ export function EthMultiClientsAndFallback({
   setUseCheckpointSync,
   showStats,
   fallback,
-  onFallbackChange
+  onFallbackChange,
+  remoteEthUrl,
+  setRemoteEthUrl
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
@@ -335,6 +345,8 @@ export function EthMultiClientsAndFallback({
   showStats?: boolean;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
+  remoteEthUrl: string | null;
+  setRemoteEthUrl: (newUrl: string) => void;
 }) {
   return (
     <div className="eth-multi-clients-and-fallback">
@@ -343,6 +355,8 @@ export function EthMultiClientsAndFallback({
         onTargetChange={onTargetChange}
         showStats={showStats}
         useCheckpointSync={useCheckpointSync}
+        remoteUrl={remoteEthUrl}
+        setRemoteUrl={setRemoteEthUrl}
       />
 
       <EthMultiClientFallback
