@@ -31,6 +31,7 @@ export default function Eth() {
   const [useCheckpointSync, setUseCheckpointSync] = useState<
     boolean | undefined
   >(undefined);
+  const [remoteEthUrl, setRemoteEthUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (ethClientTarget) {
@@ -122,6 +123,8 @@ export default function Eth() {
         onFallbackChange={changeFallback}
         useCheckpointSync={useCheckpointSync}
         setUseCheckpointSync={setUseCheckpointSync}
+        remoteEthUrl={remoteEthUrl}
+        setRemoteEthUrl={setRemoteEthUrl}
       />
 
       <div style={{ textAlign: "end" }}>

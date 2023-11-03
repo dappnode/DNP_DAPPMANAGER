@@ -12,11 +12,13 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet
 } from "@dappnode/types";
+import { params } from "@dappnode/params";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";
 const ETH_CLIENT_FALLBACK = "eth-client-fallback";
 const ETH_CLIENT_REMOTE = "eth-client-remote";
+const ETH_CLIENT_REMOTE_URL = "eth-client-remote-url"
 // Cached status
 const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
 const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
@@ -54,6 +56,11 @@ export const ethClientTarget = {
  */
 export const ethClientRemote = interceptOnSet(
   dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null)
+);
+
+export const ethClientRemoteUrl = dbMain.staticKey<string>(
+  ETH_CLIENT_REMOTE_URL,
+  params.ETH_MAINNET_RPC_URL_REMOTE
 );
 
 export const ethClientFallback = interceptOnSet(
