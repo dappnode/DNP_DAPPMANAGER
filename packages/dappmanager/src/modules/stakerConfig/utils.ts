@@ -31,6 +31,13 @@ export function getStakerConfigByNetwork<T extends Network>(
         feeRecipient: db.feeRecipientPrater.get(),
         isMevBoostSelected: db.mevBoostPrater.get()
       };
+    case "holesky":
+      return {
+        executionClient: db.executionClientHolesky.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientHolesky.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientHolesky.get(),
+        isMevBoostSelected: false // holesky doesn't support mevBoost
+      };
     case "lukso":
       return {
         executionClient: db.executionClientLukso.get() as ExecutionClient<T>,

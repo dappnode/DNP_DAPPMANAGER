@@ -146,13 +146,57 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           minVersion: "0.1.0"
         }
       };
+    case "holesky":
+      return {
+        compatibleExecution: [
+          {
+            dnpName: "holesky-geth.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "holesky-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
+          }
+        ],
+        compatibleConsensus: [
+          {
+            dnpName:
+              "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "prysm-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "teku-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "nimbus-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "lodestar-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0"
+          }
+        ],
+        compatibleSigner: {
+          dnpName: "web3signer-holesky.dnp.dappnode.eth" as Signer<T>,
+          minVersion: "0.1.0"
+        },
+        compatibleMevBoost: {
+          dnpName: "mev-boost-holesky.dnp.dappnode.eth" as MevBoost<T>,
+          minVersion: "0.1.0"
+        }
+      };
     case "lukso":
       return {
         compatibleExecution: [
           {
             dnpName: "lukso-geth.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0"
-          },
+          }
           /*{
             dnpName: "lukso-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0"
@@ -170,7 +214,7 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           {
             dnpName: "teku-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0"
-          },
+          }
         ],
         compatibleSigner: {
           dnpName: "web3signer-lukso.dnp.dappnode.eth" as Signer<T>,

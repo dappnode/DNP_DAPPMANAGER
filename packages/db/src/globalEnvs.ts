@@ -18,6 +18,9 @@ import {
   mevBoostLukso,
   mevBoostMainnet,
   mevBoostPrater,
+  consensusClientHolesky,
+  executionClientHolesky,
+  feeRecipientHolesky,
 } from "./stakerConfig.js";
 import { serverName } from "./system.js";
 import { upnpAvailable } from "./upnp.js";
@@ -57,6 +60,9 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}EXECUTION_CLIENT_PRATER`]: executionClientPrater.get(),
     [`${prefix}MEVBOOST_PRATER`]: mevBoostPrater.get(),
     [`${prefix}FEE_RECIPIENT_PRATER`]: feeRecipientLukso.get(),
+    [`${prefix}CONSENSUS_CLIENT_HOLESKY`]: consensusClientHolesky.get(),
+    [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),
+    [`${prefix}FEE_RECIPIENT_HOLESKY`]: feeRecipientHolesky.get(),
     [`${prefix}CONSENSUS_CLIENT_LUKSO`]: consensusClientLukso.get(),
     [`${prefix}EXECUTION_CLIENT_LUKSO`]: executionClientLukso.get(),
     [`${prefix}MEVBOOST_LUKSO`]: mevBoostLukso.get(),
