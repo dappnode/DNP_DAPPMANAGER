@@ -868,6 +868,11 @@ export interface HostHardDisk {
   size: string;
 }
 
+export interface RebootRequiredScript {
+  rebootRequired: boolean;
+  pkgs: string;
+}
+
 export interface HostInfoScript {
   dockerComposeVersion: string;
   dockerServerVersion: string;
