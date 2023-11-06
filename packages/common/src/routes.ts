@@ -46,6 +46,7 @@ import {
   EthicalMetricsConfig,
   OptimismConfigSet,
   OptimismConfigGet,
+  RebootRequiredScript,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -571,7 +572,7 @@ export interface Routes {
   /**
    *  Returns true if a reboot is required
    */
-  rebootHostIsRequiredGet: () => Promise<boolean>;
+  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
 
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;

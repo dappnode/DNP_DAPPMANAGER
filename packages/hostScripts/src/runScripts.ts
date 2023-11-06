@@ -14,7 +14,8 @@ type ScriptName =
   | "detect_fs.sh"
   | "migrate_volume.sh"
   | "collect_host_info.sh"
-  | "avahi_daemon.sh";
+  | "avahi_daemon.sh"
+  | "reboot_required.sh";
 
 /**
  * Run a script for the hostScripts folder
