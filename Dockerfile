@@ -65,72 +65,17 @@ COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 # Copy docker and nsupdate binaries
 COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/docker /usr/local/bin/docker-compose /usr/local/bin/
 
-# Copy root app
-COPY --from=build-deps /usr/src/app/node_modules ./node_modules
-COPY --from=build-deps /usr/src/app/package.json ./package.json
-# Copy common
-COPY --from=build-deps /usr/src/app/packages/common/dist ./packages/common/dist
-COPY --from=build-deps /usr/src/app/packages/common/node_modules ./packages/common/node_modules
-COPY --from=build-deps /usr/src/app/packages/common/package.json ./packages/common/package.json
-# Copy params
-COPY --from=build-deps /usr/src/app/packages/params/dist ./packages/params/dist
-COPY --from=build-deps /usr/src/app/packages/params/node_modules ./packages/params/node_modules
-COPY --from=build-deps /usr/src/app/packages/params/package.json ./packages/params/package.json
-# Copy utils
-COPY --from=build-deps /usr/src/app/packages/utils/dist ./packages/utils/dist
-COPY --from=build-deps /usr/src/app/packages/utils/node_modules ./packages/utils/node_modules
-COPY --from=build-deps /usr/src/app/packages/utils/package.json ./packages/utils/package.json
-# Copy logger
-COPY --from=build-deps /usr/src/app/packages/logger/dist ./packages/logger/dist
-COPY --from=build-deps /usr/src/app/packages/logger/node_modules ./packages/logger/node_modules
-COPY --from=build-deps /usr/src/app/packages/logger/package.json ./packages/logger/package.json
-# Copy eventBus
-COPY --from=build-deps /usr/src/app/packages/eventBus/dist ./packages/eventBus/dist
-COPY --from=build-deps /usr/src/app/packages/eventBus/node_modules ./packages/eventBus/node_modules
-COPY --from=build-deps /usr/src/app/packages/eventBus/package.json ./packages/eventBus/package.json
-# Copy admin-ui
-COPY --from=build-deps /usr/src/app/packages/admin-ui/build ./packages/admin-ui/build
-COPY --from=build-deps /usr/src/app/packages/admin-ui/node_modules ./packages/admin-ui/node_modules
-COPY --from=build-deps /usr/src/app/packages/admin-ui/package.json ./packages/admin-ui/package.json
-# Copy dappmanager
-COPY --from=build-deps /usr/src/app/packages/dappmanager/dist /usr/src/app/packages/dappmanager/dist
-COPY --from=build-deps /usr/src/app/packages/dappmanager/node_modules /usr/src/app/packages/dappmanager/node_modules
-COPY --from=build-deps /usr/src/app/packages/dappmanager/package.json /usr/src/app/packages/dappmanager/package.json
-# Copy dockerApi
-COPY --from=build-deps /usr/src/app/packages/dockerApi/dist /usr/src/app/packages/dockerApi/dist
-COPY --from=build-deps /usr/src/app/packages/dockerApi/node_modules /usr/src/app/packages/dockerApi/node_modules
-COPY --from=build-deps /usr/src/app/packages/dockerApi/package.json /usr/src/app/packages/dockerApi/package.json
-# Copy dockerCompose
-COPY --from=build-deps /usr/src/app/packages/dockerCompose/dist /usr/src/app/packages/dockerCompose/dist
-COPY --from=build-deps /usr/src/app/packages/dockerCompose/node_modules /usr/src/app/packages/dockerCompose/node_modules
-COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src/app/packages/dockerCompose/package.json
-# Copy HostScripts
-COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
-COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
-COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
-# Copy db
-COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
-COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules
-COPY --from=build-deps /usr/src/app/packages/db/package.json /usr/src/app/packages/db/package.json
-# Copyt manifest
-COPY --from=build-deps /usr/src/app/packages/manifest/dist /usr/src/app/packages/manifest/dist
-COPY --from=build-deps /usr/src/app/packages/manifest/node_modules /usr/src/app/packages/manifest/node_modules
-COPY --from=build-deps /usr/src/app/packages/manifest/package.json /usr/src/app/packages/manifest/package.json
-# Copyt installer
-COPY --from=build-deps /usr/src/app/packages/installer/dist /usr/src/app/packages/installer/dist
-COPY --from=build-deps /usr/src/app/packages/installer/node_modules /usr/src/app/packages/installer/node_modules
-COPY --from=build-deps /usr/src/app/packages/installer/package.json /usr/src/app/packages/installer/package.json
-# Copyt httpsportal
-COPY --from=build-deps /usr/src/app/packages/httpsPortal/dist /usr/src/app/packages/httpsPortal/dist
-COPY --from=build-deps /usr/src/app/packages/httpsPortal/node_modules /usr/src/app/packages/httpsPortal/node_modules
-COPY --from=build-deps /usr/src/app/packages/httpsPortal/package.json /usr/src/app/packages/httpsPortal/package.json
-# Copy ipfs
-COPY --from=build-deps /usr/src/app/packages/ipfs/dist /usr/src/app/packages/ipfs/dist
-COPY --from=build-deps /usr/src/app/packages/ipfs/node_modules /usr/src/app/packages/ipfs/node_modules
-COPY --from=build-deps /usr/src/app/packages/ipfs/package.json /usr/src/app/packages/ipfs/package.json
-# Copy ethicalmetrics
-COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/dist /usr/src/app/packages/ethicalMetrics/dist
-COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/node_modules /usr/src/app/packages/ethicalMetrics/node_modules
-COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/package.json /usr/src/app/packages/ethicalMetrics/package.json
+# Copy compiled files
+COPY --from=build-src /app/node_modules ./node_modules
+COPY --from=build-src /app/package.json ./package.json
+
+# Copy packages dist
+COPY --from=build-src /app/packages/*/dist ./packages/
+
+# Copy packages node_modules
+COPY --from=build-src /app/packages/*/node_modules ./packages/
+
+# Copy packages package.json
+COPY --from=build-src /app/packages/*/package.json ./packages/
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
