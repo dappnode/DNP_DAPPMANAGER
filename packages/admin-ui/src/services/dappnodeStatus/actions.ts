@@ -24,7 +24,7 @@ const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 export const fetchRebootIsRequired = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
     dispatch(setRebootHostIsRequired(await api.rebootHostIsRequiredGet()));
-  }, "rebootIsRequired");
+  }, "rebootHostIsRequiredGet");
 
 export const fetchPasswordIsSecure = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
