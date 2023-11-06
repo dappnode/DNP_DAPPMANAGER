@@ -13,7 +13,10 @@ import {
   signerGnosis,
   signerMainnet,
   signerPrater,
-  signerLukso
+  signerLukso,
+  signerHolesky,
+  consensusClientsHolesky,
+  executionClientsHolesky
 } from "@dappnode/types";
 
 interface StakerDnpNamesByNetwork {
@@ -40,6 +43,13 @@ export function getStakerDnpNamesByNetwork(
         consensusClients: consensusClientsPrater,
         signer: signerPrater,
         mevBoost: mevBoostPrater
+      };
+    case "holesky":
+      return {
+        executionClients: executionClientsHolesky,
+        consensusClients: consensusClientsHolesky,
+        signer: signerHolesky,
+        mevBoost: ""
       };
     case "gnosis":
       return {
