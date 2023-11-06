@@ -14,7 +14,8 @@ import {
 
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
-export const setRebootHostIsRequired = dappnodeStatus.actions.rebootIsRequired;
+export const setRebootHostIsRequired =
+  dappnodeStatus.actions.rebootRequiredScript;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 
