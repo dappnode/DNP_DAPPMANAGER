@@ -160,6 +160,12 @@ COPY packages/ipfs/ .
 RUN yarn build
 # Results in dist/*
 
+# Build installer
+WORKDIR /app/packages/installer/
+COPY packages/installer/ .
+RUN yarn build
+# Results in dist/*
+
 # Build dappmanager
 WORKDIR /app/packages/dappmanager/
 COPY packages/dappmanager/ .
