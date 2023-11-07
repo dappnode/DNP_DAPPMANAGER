@@ -2,7 +2,6 @@ import path from "path";
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { shellHost } from "@dappnode/utils";
-import { copyHostService } from "./copyHostService.js";
 import { reloadServices } from "./reloadServices.js";
 
 /**
@@ -28,9 +27,6 @@ export async function runService(
     // Check if service exists
     if (!fs.existsSync(servicePath))
       throw Error(`Host service ${serviceName} not found`);
-
-    // Copy service into shared volume
-    await copyHostService(serviceName);
 
     // Reload services if necessary
     if (reload) await reloadServices();
