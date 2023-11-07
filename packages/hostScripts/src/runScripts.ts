@@ -15,7 +15,8 @@ type ScriptName =
   | "migrate_volume.sh"
   | "collect_host_info.sh"
   | "avahi_daemon.sh"
-  | "reboot_required.sh";
+  | "reboot_required.sh"
+  | "update_upgrade.sh";
 
 /**
  * Run a script for the hostScripts folder
