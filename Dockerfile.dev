@@ -66,8 +66,8 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
-COPY packages/hostScripts/package.json \
-  packages/hostScripts/
+COPY packages/hostScriptsServices/package.json \
+  packages/hostScriptsServices/
 COPY packages/db/package.json \
   packages/db/
 COPY packages/manifest/package.json \
@@ -124,9 +124,9 @@ COPY packages/dockerCompose/ .
 RUN yarn build
 # Results in dist/*
 
-# Build hostScripts
-WORKDIR /app/packages/hostScripts/
-COPY packages/hostScripts/ .
+# Build hostScriptsServices
+WORKDIR /app/packages/hostScriptsServices/
+COPY packages/hostScriptsServices/ .
 RUN yarn build
 # Results in dist/*
 
@@ -192,7 +192,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy the src last as it's the layer most likely to change
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostScriptsServices /usr/src/app/hostScriptsServices
 
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns

@@ -3,7 +3,7 @@ import {
   getHostVolumeGroups,
   getHostLogicalVolumes,
   extendHostDiskSpace
-} from "@dappnode/hostscripts";
+} from "@dappnode/hostscriptsservices";
 import {
   HostHardDisk,
   HostVolumeGroup,

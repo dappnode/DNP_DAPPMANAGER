@@ -56,8 +56,8 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
-COPY packages/hostScripts/package.json \
-  packages/hostScripts/
+COPY packages/hostScriptsServices/package.json \
+  packages/hostScriptsServices/
 COPY packages/db/package.json \
   packages/db/
 COPY packages/manifest/package.json \
@@ -73,7 +73,7 @@ COPY packages/httpsPortal/package.json \
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
-# params > common > utils > eventBus > dockerCompose > logger > hostscripts > dockerApi > dappmanager > admin-ui
+# params > common > utils > eventBus > dockerCompose > logger > hostscriptsServices > dockerApi > dappmanager > admin-ui
 
 # Build params
 WORKDIR /app/packages/params/
@@ -117,9 +117,9 @@ COPY packages/dockerCompose/ .
 RUN yarn build
 # Results in dist/*
 
-# Build hostScripts
-WORKDIR /app/packages/hostScripts/
-COPY packages/hostScripts/ .
+# Build hostScriptsServices
+WORKDIR /app/packages/hostScriptsServices/
+COPY packages/hostScriptsServices/ .
 RUN yarn build
 # Results in dist/*
 
@@ -211,7 +211,8 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy scripts and services
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostScripts /usr/src/app/hostsScripts
+COPY packages/hostScriptsServices/hostServices /usr/src/app/services
 
 # Copy root app
 COPY --from=build-deps /usr/src/app/node_modules ./node_modules
@@ -252,10 +253,10 @@ COPY --from=build-deps /usr/src/app/packages/dockerApi/package.json /usr/src/app
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/dist /usr/src/app/packages/dockerCompose/dist
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/node_modules /usr/src/app/packages/dockerCompose/node_modules
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src/app/packages/dockerCompose/package.json
-# Copy HostScripts
-COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
-COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
-COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
+# Copy HostScriptsServices
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/dist /usr/src/app/packages/hostScriptsServices/dist
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/node_modules /usr/src/app/packages/hostScriptsServices/node_modules
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/package.json /usr/src/app/packages/hostScriptsServices/package.json
 # Copy db
 COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
 COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules

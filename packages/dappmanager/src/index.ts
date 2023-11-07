@@ -2,7 +2,7 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
 import { generateKeyPair } from "./utils/publickeyEncryption.js";
-import { copyHostScripts } from "@dappnode/hostscripts";
+import { copyHostScripts } from "@dappnode/hostscriptsservices";
 import { postRestartPatch } from "@dappnode/installer";
 import { startDaemons } from "./daemons/index.js";
 import { SshManager } from "./modules/sshManager.js";

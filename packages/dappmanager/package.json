@@ -27,7 +27,7 @@
     "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/ethicalmetrics": "^0.1.0",
     "@dappnode/eventbus": "^0.1.0",
-    "@dappnode/hostscripts": "^0.1.0",
+    "@dappnode/hostscriptsservices": "^0.1.0",
     "@dappnode/httpsportal": "^0.1.0",
     "@dappnode/installer": "^0.1.0",
     "@dappnode/ipfs": "^0.1.0",

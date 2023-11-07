@@ -1,4 +1,4 @@
-import { updateUpgrade as executeUpdateUpgrade } from "@dappnode/hostscripts";
+import { updateUpgrade as executeUpdateUpgrade } from "@dappnode/hostscriptsservices";
 
 /**
  * Updates and upgrades the host machine
