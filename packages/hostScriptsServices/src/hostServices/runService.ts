@@ -2,8 +2,8 @@ import path from "path";
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { shellHost } from "@dappnode/utils";
-import { copyHostService } from "./copyHostService";
-import { reloadServices } from "./reloadServices";
+import { copyHostService } from "./copyHostService.js";
+import { reloadServices } from "./reloadServices.js";
 
 /**
  * Service runners. Helps ensure no typos
