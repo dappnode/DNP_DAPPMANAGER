@@ -10,7 +10,7 @@ export default function UpdateUpgrade() {
     await new Promise<void>(resolve =>
       confirm({
         title: `Updating and upgrading the host machine`,
-        text: `This action might update docker among other packages, you might loose connectivity to the dappnode.`,
+        text: `This action might update docker among other packages, you might loose connectivity temporarily to the dappnode.`,
         label: "Update and upgrade",
         onClick: resolve
       })
