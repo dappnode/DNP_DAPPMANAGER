@@ -43,7 +43,7 @@ export async function copyOnHost({
     }
   }
 
-  let message = "Successfully run copyHostScripts.";
+  let message = "Successfully run copyHost.";
   if (copied.length) message += ` Copied ${copied.join(", ")}.`;
   if (removed.length) message += ` Removed ${removed.join(", ")}.`;
   logs.info(message);
