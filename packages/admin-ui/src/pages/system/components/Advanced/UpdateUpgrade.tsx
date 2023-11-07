@@ -16,7 +16,7 @@ export default function UpdateUpgrade() {
       })
     );
 
-    await withToastNoThrow(() => api.cleanCache(), {
+    await withToastNoThrow(() => api.updateUpgrade(), {
       message: "Updating and upgrading...",
       onSuccess: "Updated and upgraded"
     });
