@@ -211,8 +211,8 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy scripts and services
-COPY packages/hostScriptsServices/hostScripts /usr/src/app/hostsScripts
-COPY packages/hostScriptsServices/hostServices /usr/src/app/services
+COPY packages/hostScriptsServices/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostServices /usr/src/app/hostServices
 
 # Copy root app
 COPY --from=build-deps /usr/src/app/node_modules ./node_modules
