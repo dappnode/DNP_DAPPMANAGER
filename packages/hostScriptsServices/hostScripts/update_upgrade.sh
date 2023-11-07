@@ -9,16 +9,16 @@ set -e
 export DEBIAN_FRONTEND=noninteractive
 
 # Update the package list
-sudo apt-get update -y
+apt-get update -y
 
 # Upgrade all installed packages
-sudo apt-get -y upgrade
+apt-get -y upgrade
 
 # Remove packages that are no longer required
-sudo apt-get -y autoremove
+apt-get -y autoremove
 
 # Clean up apt cache
-sudo apt-get clean
+apt-get clean
 
 # If the script hasn't exited by now, it was successful
 echo "System update and upgrade were successful."
