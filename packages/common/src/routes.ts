@@ -625,6 +625,11 @@ export interface Routes {
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
 
   /**
+   * Updates and upgrades the host machine
+   */
+  updateUpgrade: () => Promise<string>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -788,6 +793,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramStatusSet: { log: true },
   telegramTokenGet: {},
   telegramTokenSet: { log: true },
+  updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   volumeRemove: { log: true },

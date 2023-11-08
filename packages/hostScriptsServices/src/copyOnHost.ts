@@ -1,47 +1,49 @@
 import fs from "fs";
-import path from "path";
 import crypto from "crypto";
-import { params } from "@dappnode/params";
+import path from "path";
 import { logs } from "@dappnode/logger";
 
-const hostScriptsDir = params.HOST_SCRIPTS_DIR;
-const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
-
 /**
- * Copies the scripts to the host shared folder
- * - Add new scripts
- * - Update scripts by comparing sha256 hashes
- * - Remove scripts that are not here
+ * Copies the files to the host shared folder
+ * - Add new files
+ * - Update files by comparing sha256 hashes
+ * - Remove files that are not here
  * @returns For info and logging
  */
-export async function copyHostScripts(): Promise<void> {
+export async function copyOnHost({
+  hostDir,
+  hostDirSource,
+}: {
+  hostDir: string;
+  hostDirSource: string;
+}): Promise<void> {
   // Make sure the target scripts dir exists
-  fs.mkdirSync(hostScriptsDir, { recursive: true });
+  fs.mkdirSync(hostDir, { recursive: true });
 
   // Fetch list of scripts to diff them
-  const newScripts = fs.readdirSync(hostScriptsDirSource);
-  const oldScripts = fs.readdirSync(hostScriptsDir);
+  const newScripts = fs.readdirSync(hostDirSource);
+  const oldScripts = fs.readdirSync(hostDir);
   const removed: string[] = [];
   const copied: string[] = [];
 
   // Compute files to remove
   for (const name of oldScripts)
     if (!newScripts.includes(name)) {
-      fs.unlinkSync(path.join(hostScriptsDir, name));
+      fs.unlinkSync(path.join(hostDir, name));
       removed.push(name);
     }
 
   // Compute files to add
   for (const name of newScripts) {
-    const pathNew = path.join(hostScriptsDirSource, name);
-    const pathOld = path.join(hostScriptsDir, name);
+    const pathNew = path.join(hostDirSource, name);
+    const pathOld = path.join(hostDir, name);
     if (sha256File(pathNew) !== sha256File(pathOld)) {
       fs.copyFileSync(pathNew, pathOld);
       copied.push(name);
     }
   }
 
-  let message = "Successfully run copyHostScripts.";
+  let message = "Successfully run copyHost.";
   if (copied.length) message += ` Copied ${copied.join(", ")}.`;
   if (removed.length) message += ` Removed ${removed.join(", ")}.`;
   logs.info(message);
