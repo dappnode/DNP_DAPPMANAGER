@@ -156,6 +156,14 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           {
             dnpName: "holesky-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0"
+          },
+          {
+            dnpName: "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
+          },
+          {
+            dnpName: "holesky-besu.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0"
           }
         ],
         compatibleConsensus: [
