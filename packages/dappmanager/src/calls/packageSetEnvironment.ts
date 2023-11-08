@@ -7,7 +7,7 @@ import {
 } from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "@dappnode/utils";
 import { PackageEnvs } from "@dappnode/types";
-import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
+import { restartDappmanagerPatch } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { getDockerComposePath } from "@dappnode/utils";
 

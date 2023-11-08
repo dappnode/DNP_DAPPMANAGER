@@ -2,8 +2,11 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
 import { generateKeyPair } from "./utils/publickeyEncryption.js";
-import { copyHostScripts } from "@dappnode/hostscripts";
-import { postRestartPatch } from "./modules/installer/restartPatch.js";
+import {
+  copyHostScripts,
+  copyHostServices
+} from "@dappnode/hostscriptsservices";
+import { postRestartPatch } from "@dappnode/installer";
 import { startDaemons } from "./daemons/index.js";
 import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
@@ -65,7 +68,9 @@ startDaemons(controller.signal);
 
 Promise.all([
   // Copy host scripts
-  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
+  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)),
+  // Copy host services
+  copyHostServices().catch(e => logs.error("Error copying host services", e))
 ]).then(() =>
   // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))

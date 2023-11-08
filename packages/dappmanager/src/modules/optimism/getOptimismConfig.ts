@@ -6,7 +6,7 @@ import {
   optimismL2Geth,
   optimismNode
 } from "@dappnode/types";
-import { ReleaseFetcher } from "../release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { getPkgData } from "../../utils/getPkgItemData.js";
 import {
   getIsInstalled,

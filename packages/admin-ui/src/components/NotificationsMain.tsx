@@ -52,9 +52,8 @@ export default function NotificationsView() {
       id: "hostReboot",
       linkText: "Reboot",
       linkPath: systemPathName + "/" + systemSubPaths.power,
-      body:
-        "**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes",
-      active: rebootHostIsRequired
+      body: `**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes. The following packages will be updated: ${rebootHostIsRequired?.pkgs}`,
+      active: rebootHostIsRequired?.rebootRequired
     },
     /**
      * [SYSTEM-UPDATE]

@@ -6,7 +6,7 @@ import {
   VolumeOwnershipData,
   PackageContainer,
 } from "@dappnode/common";
-import { detectMountpoints } from "@dappnode/hostscripts";
+import { detectMountpoints } from "@dappnode/hostscriptsservices";
 
 /**
  * Normalizes a docker-compose project name 

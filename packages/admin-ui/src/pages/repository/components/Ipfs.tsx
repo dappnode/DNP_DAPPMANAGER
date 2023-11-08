@@ -34,8 +34,7 @@ export default function Ipfs() {
             ipfsRepository: {
               ipfsClientTarget: ipfsClientTarget,
               ipfsGateway: ipfsGatewayTarget
-            },
-            deleteLocalIpfsClient: false
+            }
           }),
         {
           message: `Setting IPFS mode ${ipfsClientTarget}...`,

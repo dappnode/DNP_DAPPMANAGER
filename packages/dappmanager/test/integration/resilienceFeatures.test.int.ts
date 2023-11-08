@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import * as getPath from "../../src/utils/getPath.js";
 import * as calls from "../../src/calls/index.js";
 import {
   createTestDir,
@@ -17,8 +16,8 @@ import {
   uploadManifestRelease,
   cleanInstallationArtifacts
 } from "./integrationSpecs/index.js";
-import { ManifestWithImage } from "../../src/types.js";
 import { getDockerComposePath } from "@dappnode/utils";
+import { ManifestWithImage } from "@dappnode/common";
 
 describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";

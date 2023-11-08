@@ -57,6 +57,8 @@ export const launchpadSteps = <T extends Network>({
               ? "https://launchpad.ethereum.org/"
               : network === "prater"
               ? "https://goerli.launchpad.ethereum.org/"
+              : network === "holesky"
+              ? "https://launchpad.holesky.ethereum.org/"
               : network === "gnosis"
               ? "https://launchpad.gnosis.gateway.fm/"
               : network === "lukso"
@@ -95,7 +97,7 @@ export const launchpadSteps = <T extends Network>({
         {stakerConfig.consensusClients.map((consensusClient, i) => (
           <ConsensusClient<T>
             key={i}
-            consensusClient={{...consensusClient, useCheckpointSync: true}}
+            consensusClient={{ ...consensusClient, useCheckpointSync: true }}
             setNewConsClient={setNewConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
           />

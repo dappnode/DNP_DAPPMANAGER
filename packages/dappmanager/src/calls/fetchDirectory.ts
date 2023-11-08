@@ -5,9 +5,11 @@ import { listPackages } from "@dappnode/dockerapi";
 import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
 import { fileToGatewayUrl } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthProviderUrl } from "../modules/ethClient/index.js";
-import { ReleaseFetcher } from "../modules/release/index.js";
-import { NoImageForArchError } from "../modules/release/errors.js";
+import {
+  getEthProviderUrl,
+  ReleaseFetcher,
+  NoImageForArchError
+} from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
 
 const loadThrottle = 500; // 0.5 seconds

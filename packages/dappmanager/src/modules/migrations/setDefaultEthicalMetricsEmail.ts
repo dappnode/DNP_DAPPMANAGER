@@ -1,6 +1,6 @@
 import { logs } from "@dappnode/logger";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
-import { ethicalMetricsDnpName } from "../ethicalMetrics/index.js";
+import { ethicalMetricsDnpName } from "@dappnode/ethicalmetrics";
 import * as db from "@dappnode/db";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { eventBus } from "@dappnode/eventbus";

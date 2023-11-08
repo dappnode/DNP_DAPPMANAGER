@@ -1,13 +1,13 @@
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher } from "../../modules/release/index.js";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import {
   clearPendingUpdates,
   clearRegistry,
   clearCompletedCoreUpdatesIfAny
 } from "../../utils/autoUpdateHelper.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
+import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";

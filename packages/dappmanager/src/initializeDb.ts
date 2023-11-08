@@ -10,7 +10,6 @@ import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
 import { params } from "@dappnode/params";
 import ping from "./utils/ping.js";
-import { pause } from "./utils/asyncFlows.js";
 import retry from "async-retry";
 import { shell } from "@dappnode/utils";
 import { IdentityInterface } from "@dappnode/common";
@@ -18,6 +17,7 @@ import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
 import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable.js";
 import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
+import { pause } from "@dappnode/utils";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);

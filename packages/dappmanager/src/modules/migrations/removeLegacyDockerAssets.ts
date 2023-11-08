@@ -1,12 +1,11 @@
 import { logs } from "@dappnode/logger";
-import { shell } from "@dappnode/utils";
+import { shell, getManifestPath, getEnvFilePath } from "@dappnode/utils";
 import {
   dockerVolumesList,
   dockerVolumeRemove,
   dockerContainerRemove,
   listPackages
 } from "@dappnode/dockerapi";
-import * as getPath from "../../utils/getPath.js";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";
 import {
@@ -73,7 +72,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
         // Clean manifest and docker-compose
         for (const filepath of [
           getDockerComposePath(dnpName, true),
-          getPath.manifest(dnpName, true)
+          getManifestPath(dnpName, true)
         ])
           if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
@@ -106,7 +105,7 @@ export function migrateLegacyEnvFile(
   dnpName: string,
   isCore: boolean
 ): boolean {
-  const envFilePath = getPath.envFile(dnpName, isCore);
+  const envFilePath = getEnvFilePath(dnpName, isCore);
   try {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
     const envsArray = envFileData.trim().split("\n");

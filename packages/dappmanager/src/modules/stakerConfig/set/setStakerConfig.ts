@@ -15,6 +15,8 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   ExecutionClientLukso,
+  ConsensusClientHolesky,
+  ExecutionClientHolesky,
   Network
 } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
@@ -24,7 +26,7 @@ import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
-import { EthereumClient } from "../../ethClient/ethereumClient.js";
+import { EthereumClient } from "@dappnode/installer";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -163,6 +165,14 @@ async function setFeeRecipientOnDb<T extends Network>(
       )
         await db.feeRecipientPrater.set(feeRecipient);
       break;
+    case "holesky":
+      if (
+        feeRecipient !== undefined &&
+        db.feeRecipientHolesky.get() !== feeRecipient
+      )
+        await db.feeRecipientHolesky.set(feeRecipient);
+      break;
+
     case "lukso":
       if (
         feeRecipient !== undefined &&
@@ -218,6 +228,17 @@ async function setStakerConfigOnDb<T extends Network>(
         );
       if (db.mevBoostPrater.get() !== Boolean(mevBoost))
         await db.mevBoostPrater.set(mevBoost ? true : false);
+      break;
+
+    case "holesky":
+      if (db.executionClientHolesky.get() !== executionClient)
+        await db.executionClientHolesky.set(
+          executionClient as ExecutionClientHolesky
+        );
+      if (db.consensusClientHolesky.get() !== consensusClient)
+        await db.consensusClientHolesky.set(
+          consensusClient as ConsensusClientHolesky
+        );
       break;
 
     case "lukso":

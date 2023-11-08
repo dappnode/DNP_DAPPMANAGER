@@ -2,9 +2,11 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { packageInstall } from "../../calls/index.js";
-import { runOnlyOneSequentially } from "../../utils/asyncFlows.js";
-import { runAtMostEvery } from "../../utils/asyncFlows.js";
-import { serializeError } from "../../modules/ethClient/types.js";
+import {
+  runOnlyOneSequentially,
+  getConsensusUserSettings
+} from "@dappnode/utils";
+import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import {
   EthClientRemote,
@@ -14,9 +16,12 @@ import {
 import {
   ethereumClient,
   getLocalFallbackContentHash
-} from "../../modules/ethClient/index.js";
-import { isExecClient, isConsClient } from "../../modules/ethClient/utils.js";
-import { getConsensusUserSettings } from "../../modules/stakerConfig/utils.js";
+} from "@dappnode/installer";
+import {
+  isExecClient,
+  isConsClient,
+  serializeError
+} from "@dappnode/installer";
 import {
   dockerComposeUpPackage,
   listPackageNoThrow
@@ -156,7 +161,14 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
   const runEthMultiClientTaskMemo = runOnlyOneSequentially(
-    async (multiClientArgs: { useCheckpointSync?: boolean, prevExecClientDnpName?: ExecutionClientMainnet } | undefined) => {
+    async (
+      multiClientArgs:
+        | {
+            useCheckpointSync?: boolean;
+            prevExecClientDnpName?: ExecutionClientMainnet;
+          }
+        | undefined
+    ) => {
       try {
         const execClient = db.executionClientMainnet.get();
         const consClient = db.consensusClientMainnet.get();
@@ -210,8 +222,9 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
   );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(({ useCheckpointSync, prevExecClientDnpName }) =>
-    runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
+  eventBus.runEthClientInstaller.on(
+    ({ useCheckpointSync, prevExecClientDnpName }) =>
+      runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
   );
 
   runAtMostEvery(

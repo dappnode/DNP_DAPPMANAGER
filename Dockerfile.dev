@@ -66,15 +66,31 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
-COPY packages/hostScripts/package.json \
-  packages/hostScripts/
+COPY packages/hostScriptsServices/package.json \
+  packages/hostScriptsServices/
 COPY packages/db/package.json \
   packages/db/
+COPY packages/manifest/package.json \
+  packages/manifest/
+COPY packages/ipfs/package.json \
+  packages/ipfs/
+COPY packages/installer/package.json \
+  packages/installer/
+COPY packages/ethicalMetrics/package.json \
+  packages/ethicalMetrics/
+COPY packages/httpsPortal/package.json \
+  packages/httpsPortal/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ethicalmetrics
+WORKDIR /app/packages/ethicalMetrics/
+COPY packages/ethicalMetrics/ .
 RUN yarn build
 # Results in dist/*
 
@@ -96,21 +112,27 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
-# Build dockerCompose
-WORKDIR /app/packages/dockerCompose/
-COPY packages/dockerCompose/ .
-RUN yarn build
-# Results in dist/*
-
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
 RUN yarn build
 # Results in dist/*
 
-# Build hostScripts
-WORKDIR /app/packages/hostScripts/
-COPY packages/hostScripts/ .
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScriptsServices
+WORKDIR /app/packages/hostScriptsServices/
+COPY packages/hostScriptsServices/ .
+RUN yarn build
+# Results in dist/*
+
+# Build manifest
+WORKDIR /app/packages/manifest/
+COPY packages/manifest/ .
 RUN yarn build
 # Results in dist/*
 
@@ -120,9 +142,27 @@ COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
+# Build httpsportal
+WORKDIR /app/packages/httpsPortal/
+COPY packages/httpsPortal/ .
+RUN yarn build
+# Results in dist/*
+
 # Build db
 WORKDIR /app/packages/db/
 COPY packages/db/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ipfs
+WORKDIR /app/packages/ipfs/
+COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build installer
+WORKDIR /app/packages/installer/
+COPY packages/installer/ .
 RUN yarn build
 # Results in dist/*
 
@@ -152,7 +192,7 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy the src last as it's the layer most likely to change
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostScriptsServices /usr/src/app/hostScriptsServices
 
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns

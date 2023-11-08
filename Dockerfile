@@ -56,18 +56,34 @@ COPY packages/dockerCompose/package.json \
   packages/dockerCompose/
 COPY packages/dockerApi/package.json \ 
   packages/dockerApi/
-COPY packages/hostScripts/package.json \
-  packages/hostScripts/
+COPY packages/hostScriptsServices/package.json \
+  packages/hostScriptsServices/
 COPY packages/db/package.json \
   packages/db/
+COPY packages/manifest/package.json \
+  packages/manifest/
+COPY packages/ipfs/package.json \
+  packages/ipfs/
+COPY packages/installer/package.json \
+  packages/installer/
+COPY packages/ethicalMetrics/package.json \
+  packages/ethicalMetrics/
+COPY packages/httpsPortal/package.json \
+  packages/httpsPortal/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
-# params > common > utils > eventBus > dockerCompose > logger > hostscripts > dockerApi > dappmanager > admin-ui
+# params > common > utils > eventBus > dockerCompose > logger > hostscriptsServices > dockerApi > dappmanager > admin-ui
 
 # Build params
 WORKDIR /app/packages/params/
 COPY packages/params/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ethicalmetrics
+WORKDIR /app/packages/ethicalMetrics/
+COPY packages/ethicalMetrics/ .
 RUN yarn build
 # Results in dist/*
 
@@ -89,21 +105,27 @@ COPY packages/eventBus/ .
 RUN yarn build
 # Results in dist/*
 
-# Build dockerCompose
-WORKDIR /app/packages/dockerCompose/
-COPY packages/dockerCompose/ .
-RUN yarn build
-# Results in dist/*
-
 # Build logger
 WORKDIR /app/packages/logger/
 COPY packages/logger/ .
 RUN yarn build
 # Results in dist/*
 
-# Build hostScripts
-WORKDIR /app/packages/hostScripts/
-COPY packages/hostScripts/ .
+# Build dockerCompose
+WORKDIR /app/packages/dockerCompose/
+COPY packages/dockerCompose/ .
+RUN yarn build
+# Results in dist/*
+
+# Build hostScriptsServices
+WORKDIR /app/packages/hostScriptsServices/
+COPY packages/hostScriptsServices/ .
+RUN yarn build
+# Results in dist/*
+
+# Build manifest
+WORKDIR /app/packages/manifest/
+COPY packages/manifest/ .
 RUN yarn build
 # Results in dist/*
 
@@ -113,9 +135,27 @@ COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
+# Build httpsportal
+WORKDIR /app/packages/httpsPortal/
+COPY packages/httpsPortal/ .
+RUN yarn build
+# Results in dist/*
+
 # Build db
 WORKDIR /app/packages/db/
 COPY packages/db/ .
+RUN yarn build
+# Results in dist/*
+
+# Build ipfs
+WORKDIR /app/packages/ipfs/
+COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build installer
+WORKDIR /app/packages/installer/
+COPY packages/installer/ .
 RUN yarn build
 # Results in dist/*
 
@@ -171,7 +211,8 @@ COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
 COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
 
 # Copy scripts and services
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostServices /usr/src/app/hostServices
 
 # Copy root app
 COPY --from=build-deps /usr/src/app/node_modules ./node_modules
@@ -212,13 +253,33 @@ COPY --from=build-deps /usr/src/app/packages/dockerApi/package.json /usr/src/app
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/dist /usr/src/app/packages/dockerCompose/dist
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/node_modules /usr/src/app/packages/dockerCompose/node_modules
 COPY --from=build-deps /usr/src/app/packages/dockerCompose/package.json /usr/src/app/packages/dockerCompose/package.json
-# Copy HostScripts
-COPY --from=build-deps /usr/src/app/packages/hostScripts/dist /usr/src/app/packages/hostScripts/dist
-COPY --from=build-deps /usr/src/app/packages/hostScripts/node_modules /usr/src/app/packages/hostScripts/node_modules
-COPY --from=build-deps /usr/src/app/packages/hostScripts/package.json /usr/src/app/packages/hostScripts/package.json
+# Copy HostScriptsServices
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/dist /usr/src/app/packages/hostScriptsServices/dist
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/node_modules /usr/src/app/packages/hostScriptsServices/node_modules
+COPY --from=build-deps /usr/src/app/packages/hostScriptsServices/package.json /usr/src/app/packages/hostScriptsServices/package.json
 # Copy db
 COPY --from=build-deps /usr/src/app/packages/db/dist /usr/src/app/packages/db/dist
 COPY --from=build-deps /usr/src/app/packages/db/node_modules /usr/src/app/packages/db/node_modules
 COPY --from=build-deps /usr/src/app/packages/db/package.json /usr/src/app/packages/db/package.json
+# Copyt manifest
+COPY --from=build-deps /usr/src/app/packages/manifest/dist /usr/src/app/packages/manifest/dist
+COPY --from=build-deps /usr/src/app/packages/manifest/node_modules /usr/src/app/packages/manifest/node_modules
+COPY --from=build-deps /usr/src/app/packages/manifest/package.json /usr/src/app/packages/manifest/package.json
+# Copyt installer
+COPY --from=build-deps /usr/src/app/packages/installer/dist /usr/src/app/packages/installer/dist
+COPY --from=build-deps /usr/src/app/packages/installer/node_modules /usr/src/app/packages/installer/node_modules
+COPY --from=build-deps /usr/src/app/packages/installer/package.json /usr/src/app/packages/installer/package.json
+# Copyt httpsportal
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/dist /usr/src/app/packages/httpsPortal/dist
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/node_modules /usr/src/app/packages/httpsPortal/node_modules
+COPY --from=build-deps /usr/src/app/packages/httpsPortal/package.json /usr/src/app/packages/httpsPortal/package.json
+# Copy ipfs
+COPY --from=build-deps /usr/src/app/packages/ipfs/dist /usr/src/app/packages/ipfs/dist
+COPY --from=build-deps /usr/src/app/packages/ipfs/node_modules /usr/src/app/packages/ipfs/node_modules
+COPY --from=build-deps /usr/src/app/packages/ipfs/package.json /usr/src/app/packages/ipfs/package.json
+# Copy ethicalmetrics
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/dist /usr/src/app/packages/ethicalMetrics/dist
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/node_modules /usr/src/app/packages/ethicalMetrics/node_modules
+COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/package.json /usr/src/app/packages/ethicalMetrics/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]

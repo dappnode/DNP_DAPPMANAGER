@@ -8,7 +8,7 @@ import getLocalIp from "../../utils/getLocalIp.js";
 import {
   runAtMostEveryIntervals,
   runOnlyOneSequentially
-} from "../../utils/asyncFlows.js";
+} from "@dappnode/utils";
 import { PackagePort } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { listPackageContainers } from "@dappnode/dockerapi";

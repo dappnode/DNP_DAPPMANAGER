@@ -1,0 +1,9 @@
+[Unit]
+Description=Update and upgrade DAppNode host
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/src/dappnode/DNCORE/scripts/host/update_upgrade.sh --install
+
+[Install]
+WantedBy=multi-user.target

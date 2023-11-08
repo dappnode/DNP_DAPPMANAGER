@@ -1,5 +1,4 @@
 import {
-  UserSettingsAllDnps,
   ConsensusClient,
   ExecutionClient,
   StakerConfigByNetwork
@@ -32,6 +31,13 @@ export function getStakerConfigByNetwork<T extends Network>(
         feeRecipient: db.feeRecipientPrater.get(),
         isMevBoostSelected: db.mevBoostPrater.get()
       };
+    case "holesky":
+      return {
+        executionClient: db.executionClientHolesky.get() as ExecutionClient<T>,
+        consensusClient: db.consensusClientHolesky.get() as ConsensusClient<T>,
+        feeRecipient: db.feeRecipientHolesky.get(),
+        isMevBoostSelected: false // holesky doesn't support mevBoost
+      };
     case "lukso":
       return {
         executionClient: db.executionClientLukso.get() as ExecutionClient<T>,
@@ -43,89 +49,3 @@ export function getStakerConfigByNetwork<T extends Network>(
       throw new Error(`Network ${network} not supported`);
   }
 }
-
-/**
- * Get the validator service name.
- * - Nimbus package is monoservice (beacon-validator)
- * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
- */
-function getValidatorServiceName(dnpName: string): string {
-  return dnpName.includes("nimbus") ? "beacon-validator" : "validator";
-}
-
-/**
- * Get the beacon service name
- * - Nimbus package is monoservice (beacon-validator)
- * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
- */
-export function getBeaconServiceName(dnpName: string): string {
-  return dnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain";
-}
-
-/**
- * Get the user settings for the consensus client.
- * It may be different depending if it is multiservice or monoservice and all the envs are
- * set in the same service
- */
-export function getConsensusUserSettings({
-  dnpName,
-  network,
-  feeRecipient,
-  useCheckpointSync
-}: {
-  dnpName: string;
-  network: Network;
-  feeRecipient: string;
-  useCheckpointSync?: boolean;
-}): UserSettingsAllDnps {
-  const validatorServiceName = getValidatorServiceName(dnpName);
-  const beaconServiceName = getBeaconServiceName(dnpName);
-  const defaultDappnodeGraffiti = "validating_from_DAppNode";
-  const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-  return {
-    [dnpName]: {
-      environment:
-        beaconServiceName === validatorServiceName
-          ? {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : ""
-              }
-            }
-          : {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti
-              },
-
-              [beaconServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : ""
-              }
-            }
-    }
-  };
-}
-
-const getDefaultCheckpointSync = (network: Network): string =>
-  network === "mainnet"
-    ? "https://checkpoint-sync.dappnode.io"
-    : network === "prater"
-    ? "https://checkpoint-sync-prater.dappnode.io"
-    : network === "gnosis"
-    ? "https://checkpoint-sync-gnosis.dappnode.io"
-    : network === "lukso"
-    ? "https://checkpoints.mainnet.lukso.network"
-    : "";

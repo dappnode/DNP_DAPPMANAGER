@@ -1,18 +1,11 @@
 import { HttpError } from "../utils.js";
 
-const ERROR_NOT_ADMIN_IP = "NOT_ADMIN_IP";
 const ERROR_NOT_REGISTERED = "NOT_REGISTERED";
 const ERROR_NOT_LOGGED_IN = "NOT_LOGGED_IN";
 const ERROR_NOT_LOGGED_IN_NO_COOKIE = "NOT_LOGGED_IN_NO_COOKIE";
 const ERROR_MISSING_CREDENTIALS = "MISSING_CREDENTIALS";
 const ERROR_WRONG_CREDENTIALS = "WRONG_CREDENTIALS";
 const ERROR_ALREADY_REGISTERED = "ALREADY_REGISTERED";
-
-export class NotAdminIpError extends HttpError {
-  constructor() {
-    super({ name: ERROR_NOT_ADMIN_IP, statusCode: 401 });
-  }
-}
 
 export class NotRegisteredError extends HttpError {
   constructor() {

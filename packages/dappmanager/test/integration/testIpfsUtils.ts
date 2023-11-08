@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import { create, IPFSHTTPClient } from "ipfs-http-client";
 import { AddResult } from "ipfs-core-types/src/root";
-import { sleep } from "../../src/utils/asyncFlows.js";
+import { sleep } from "@dappnode/utils";
 import all from "it-all";
 import { shell } from "@dappnode/utils";
 import { Manifest } from "@dappnode/types";

@@ -46,6 +46,7 @@ import {
   EthicalMetricsConfig,
   OptimismConfigSet,
   OptimismConfigGet,
+  RebootRequiredScript,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -311,7 +312,6 @@ export interface Routes {
    */
   ipfsClientTargetSet(kwargs: {
     ipfsRepository: IpfsRepository;
-    deleteLocalIpfsClient?: boolean;
   }): Promise<void>;
 
   /**
@@ -572,7 +572,7 @@ export interface Routes {
   /**
    *  Returns true if a reboot is required
    */
-  rebootHostIsRequiredGet: () => Promise<boolean>;
+  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
 
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
@@ -623,6 +623,11 @@ export interface Routes {
    * @param telegramToken new bot token
    */
   telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
+
+  /**
+   * Updates and upgrades the host machine
+   */
+  updateUpgrade: () => Promise<string>;
 
   /**
    * Return the current SSH port from sshd
@@ -788,6 +793,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   telegramStatusSet: { log: true },
   telegramTokenGet: {},
   telegramTokenSet: { log: true },
+  updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   volumeRemove: { log: true },

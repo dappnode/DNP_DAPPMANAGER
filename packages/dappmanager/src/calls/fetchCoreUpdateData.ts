@@ -1,11 +1,10 @@
 import { valid, satisfies } from "semver";
 import { params } from "@dappnode/params";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
-import { ReleaseFetcher } from "../modules/release/index.js";
 import { listPackages } from "@dappnode/dockerapi";
 import computeSemverUpdateType from "../utils/computeSemverUpdateType.js";
 import { getCoreVersionId } from "../utils/coreVersionId.js";
-import { ErrorDappGetDowngrade } from "../modules/dappGet/errors.js";
+import { ErrorDappGetDowngrade, ReleaseFetcher } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 
 const coreName = params.coreDnpName;
