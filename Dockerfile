@@ -143,12 +143,6 @@ COPY packages/httpsPortal/ .
 RUN yarn build
 # Results in dist/*
 
-# Build dyndns
-WORKDIR /app/packages/dyndns/
-COPY packages/dyndns/ .
-RUN yarn build
-# Results in dist/*
-
 # Build db
 WORKDIR /app/packages/db/
 COPY packages/db/ .
@@ -158,6 +152,12 @@ RUN yarn build
 # Build ipfs
 WORKDIR /app/packages/ipfs/
 COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dyndns
+WORKDIR /app/packages/dyndns/
+COPY packages/dyndns/ .
 RUN yarn build
 # Results in dist/*
 
