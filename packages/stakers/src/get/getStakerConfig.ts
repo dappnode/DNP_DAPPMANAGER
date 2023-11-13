@@ -1,25 +1,27 @@
-import { packageGet } from "../../../calls/index.js";
 import {
   getIsInstalled,
   getIsRunning,
-  getIsUpdated
-} from "../../../calls/fetchDnpRequest.js";
+  getIsUpdated,
+  fileToGatewayUrl,
+  getBeaconServiceName,
+} from "@dappnode/utils";
 import {
   ConsensusClient,
   ExecutionClient,
   MevBoost,
   Signer,
   StakerConfigGet,
-  StakerItem
+  StakerItem,
 } from "@dappnode/common";
-import { fileToGatewayUrl } from "@dappnode/utils";
 import { listPackages } from "@dappnode/dockerapi";
-import { ReleaseFetcher } from "@dappnode/installer";
-import { getBeaconServiceName } from "@dappnode/utils";
+import {
+  ReleaseFetcher,
+  packageGetData,
+  packageGet,
+} from "@dappnode/installer";
 import { Network } from "@dappnode/types";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../index.js";
-import { getPkgData } from "../../../utils/getPkgItemData.js";
 
 /**
  * Fetches the current staker configuration:
@@ -38,26 +40,30 @@ export async function getStakerConfig<T extends Network>(
   try {
     const releaseFetcher = new ReleaseFetcher();
 
-    const { executionClients, consensusClients, signer, mevBoost } =
-      getStakerDnpNamesByNetwork(network);
+    const {
+      executionClients,
+      consensusClients,
+      signer,
+      mevBoost,
+    } = getStakerDnpNamesByNetwork(network);
 
     const {
       executionClient: currentExecClient,
       consensusClient: currentConsClient,
       feeRecipient,
-      isMevBoostSelected
+      isMevBoostSelected,
     } = getStakerConfigByNetwork(network);
 
     const dnpList = await listPackages();
 
     return {
       executionClients: await Promise.all(
-        executionClients.map(async execClient => {
+        executionClients.map(async (execClient) => {
           try {
             if (!(await releaseFetcher.repoExists(execClient)))
               throw Error(`Repository ${execClient} does not exist`);
 
-            const pkgData = await getPkgData(releaseFetcher, execClient);
+            const pkgData = await packageGetData(releaseFetcher, execClient);
 
             return {
               status: "ok",
@@ -67,23 +73,23 @@ export async function getStakerConfig<T extends Network>(
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
-              isSelected: execClient === currentExecClient
+              isSelected: execClient === currentExecClient,
             };
           } catch (error) {
             return {
               status: "error",
               dnpName: execClient as ExecutionClient<T>,
-              error
+              error,
             };
           }
         })
       ),
       consensusClients: await Promise.all(
-        consensusClients.map(async consClient => {
+        consensusClients.map(async (consClient) => {
           try {
             if (!(await releaseFetcher.repoExists(consClient)))
               throw Error(`Repository ${consClient} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, consClient);
+            const pkgData = await packageGetData(releaseFetcher, consClient);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             let useCheckpointSync = false;
             if (isInstalled) {
@@ -106,23 +112,23 @@ export async function getStakerConfig<T extends Network>(
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
               isSelected: consClient === currentConsClient,
-              useCheckpointSync
+              useCheckpointSync,
             };
           } catch (error) {
             return {
               status: "error",
               dnpName: consClient as ConsensusClient<T>,
-              error
+              error,
             };
           }
         })
       ),
-      web3Signer: await new Promise<StakerItem<T, "signer">>(resolve => {
+      web3Signer: await new Promise<StakerItem<T, "signer">>((resolve) => {
         (async () => {
           try {
             if (!(await releaseFetcher.repoExists(signer)))
               throw Error(`Repository ${signer} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, signer);
+            const pkgData = await packageGetData(releaseFetcher, signer);
             const signerIsRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -132,23 +138,23 @@ export async function getStakerConfig<T extends Network>(
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning: signerIsRunning,
               data: pkgData,
-              isSelected: signerIsRunning
+              isSelected: signerIsRunning,
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: signer as Signer<T>,
-              error
+              error,
             });
           }
         })();
       }),
-      mevBoost: await new Promise<StakerItem<T, "mev-boost">>(resolve => {
+      mevBoost: await new Promise<StakerItem<T, "mev-boost">>((resolve) => {
         (async () => {
           try {
             if (!(await releaseFetcher.repoExists(mevBoost)))
               throw Error(`Repository ${mevBoost} does not exist`);
-            const pkgData = await getPkgData(releaseFetcher, mevBoost);
+            const pkgData = await packageGetData(releaseFetcher, mevBoost);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             const relays: string[] = [];
             if (isInstalled) {
@@ -157,7 +163,7 @@ export async function getStakerConfig<T extends Network>(
               if (pkgEnv) {
                 pkgEnv["mev-boost"]["RELAYS"]
                   .split(",")
-                  .forEach(relay => relays.push(relay));
+                  .forEach((relay) => relays.push(relay));
               }
             }
             resolve({
@@ -169,18 +175,18 @@ export async function getStakerConfig<T extends Network>(
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
               isSelected: Boolean(isMevBoostSelected),
-              relays
+              relays,
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: mevBoost as MevBoost<T>,
-              error
+              error,
             });
           }
         })();
       }),
-      feeRecipient
+      feeRecipient,
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);

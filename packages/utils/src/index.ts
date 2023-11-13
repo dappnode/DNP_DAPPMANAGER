@@ -40,3 +40,7 @@ export {
 } from "./stakerUtils.js";
 export * from "./ethers.js";
 export { shellSafe } from "./shellSafe.js";
+export { getIsInstalled } from "./getIsInstalled.js";
+export { getIsRunning } from "./getIsRunning.js";
+export { getIsUpdated } from "./getIsUpdated.js";
+export { shouldUpdate } from "./shouldUpdate.js";

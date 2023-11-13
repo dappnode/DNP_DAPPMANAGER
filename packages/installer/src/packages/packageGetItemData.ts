@@ -1,11 +1,14 @@
 import { PackageItemData, PackageRelease } from "@dappnode/common";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { ReleaseFetcher } from "../release/index.js";
 import * as db from "@dappnode/db";
 import { pick } from "lodash-es";
 import { Manifest } from "@dappnode/types";
 import { eventBus } from "@dappnode/eventbus";
 
-export async function getPkgData(
+// TODO: find a proper place for these functions. The functions inside this file
+// are not used as the other files within this same folder
+
+export async function packageGetData(
   releaseFetcher: ReleaseFetcher,
   dnpName: string
 ): Promise<PackageItemData> {
@@ -16,17 +19,17 @@ export async function getPkgData(
     return cachedDnp;
   } else {
     const repository = await releaseFetcher.getRelease(dnpName);
-    const dataDnp = pickPackageItemData(repository);
+    const dataDnp = packagePickItemData(repository);
     db.pkgItemMetadata.set(dnpName, dataDnp);
     return dataDnp;
   }
 }
 
-export function pickPackageItemData(
+export function packagePickItemData(
   pkgRelease: PackageRelease
 ): PackageItemData {
   return {
-    metadata: pickPackageManifestData(pkgRelease.metadata),
+    metadata: packagePickManifestData(pkgRelease.metadata),
     ...pick(pkgRelease, [
       "dnpName",
       "reqVersion",
@@ -35,12 +38,12 @@ export function pickPackageItemData(
       "avatarFile",
       "warnings",
       "origin",
-      "signedSafe"
-    ] as const)
+      "signedSafe",
+    ] as const),
   };
 }
 
-function pickPackageManifestData(manifest: Manifest): Manifest {
+function packagePickManifestData(manifest: Manifest): Manifest {
   return pick(manifest, [
     "name",
     "version",
@@ -48,6 +51,6 @@ function pickPackageManifestData(manifest: Manifest): Manifest {
     "avatar",
     "links",
     "chain",
-    "warnings"
+    "warnings",
   ] as const);
 }

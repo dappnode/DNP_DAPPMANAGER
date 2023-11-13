@@ -21,6 +21,8 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/stakers": "^0.1.0",
+    "@dappnode/optimism": "^0.1.0",
     "@dappnode/upnpc": "^0.1.0",
     "@dappnode/dyndns": "^0.1.0",
     "@dappnode/common": "^0.1.0",
