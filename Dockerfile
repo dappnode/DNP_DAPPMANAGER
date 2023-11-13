@@ -70,6 +70,8 @@ COPY packages/ethicalMetrics/package.json \
   packages/ethicalMetrics/
 COPY packages/httpsPortal/package.json \
   packages/httpsPortal/
+COPY packages/dyndns/package.json \
+  packages/dyndns/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -150,6 +152,12 @@ RUN yarn build
 # Build ipfs
 WORKDIR /app/packages/ipfs/
 COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dyndns
+WORKDIR /app/packages/dyndns/
+COPY packages/dyndns/ .
 RUN yarn build
 # Results in dist/*
 
