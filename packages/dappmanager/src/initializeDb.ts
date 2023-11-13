@@ -1,6 +1,6 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import * as dyndns from "./modules/dyndns/index.js";
+import { generateKeys } from "@dappnode/dyndns";
 import getDappmanagerImage from "./utils/getDappmanagerImage.js";
 import getServerName from "./utils/getServerName.js";
 import getInternalIp from "./utils/getInternalIp.js";
@@ -209,7 +209,7 @@ export default async function initializeDb(): Promise<void> {
   // Create VPN's address + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
-  dyndns.generateKeys(); // Auto-checks if keys are already generated
+  generateKeys(); // Auto-checks if keys are already generated
 
   /**
    * Set the domain of this DAppNode to point to the internal IP for better UX
