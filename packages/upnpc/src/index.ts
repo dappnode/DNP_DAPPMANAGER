@@ -21,3 +21,6 @@ import { list } from "./list.js";
 // - list
 
 export { open, close, list };
+
+export { getExternalUpnpIp } from "./getExternalUpnpIp.js";
+export { isUpnpAvailable } from "./isUpnpAvailable.js";

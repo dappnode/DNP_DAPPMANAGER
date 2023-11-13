@@ -2,7 +2,7 @@ import isIp from "is-ip";
 import upnpcCommand from "./upnpcCommand.js";
 import { parseUpnpErrors } from "./upnpError.js";
 
-export default async function getExternalIp(): Promise<string> {
+export async function getExternalUpnpIp(): Promise<string> {
   try {
     const res = await upnpcCommand("-l");
     const externalIp = ((res || "").match(

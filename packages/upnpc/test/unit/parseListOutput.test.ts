@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseListOutput } from "../../../../src/modules/upnpc/list.js";
+import { parseListOutput } from "../../src/list.js";
 
 describe("upnpn: parseListOutput", () => {
   const terminalOutputSuccess = `upnpc : miniupnpc library test client, version 2.0.
@@ -40,7 +40,7 @@ GetGenericPortMappingEntry() returned 713 (SpecifiedArrayIndexInvalid)
       { protocol: "UDP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
       { protocol: "TCP", exPort: "30303", inPort: "30303", ip: "192.168.1.42" },
       { protocol: "TCP", exPort: "4001", inPort: "4001", ip: "192.168.1.42" },
-      { protocol: "UDP", exPort: "4002", inPort: "4002", ip: "192.168.1.42" }
+      { protocol: "UDP", exPort: "4002", inPort: "4002", ip: "192.168.1.42" },
     ]);
   });
 });

@@ -1,6 +1,6 @@
 import isIp from "is-ip";
 import { shell } from "@dappnode/utils";
-import getDappmanagerImage from "./getDappmanagerImage.js";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
 
 export default async function getInternalIp(): Promise<string> {
   try {
