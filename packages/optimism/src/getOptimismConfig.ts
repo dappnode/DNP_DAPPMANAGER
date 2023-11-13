@@ -4,16 +4,15 @@ import { listPackages } from "@dappnode/dockerapi";
 import {
   executionClientsOptimism,
   optimismL2Geth,
-  optimismNode
+  optimismNode,
 } from "@dappnode/types";
-import { ReleaseFetcher } from "@dappnode/installer";
-import { getPkgData } from "../../utils/getPkgItemData.js";
+import { ReleaseFetcher, packageGetData } from "@dappnode/installer";
 import {
   getIsInstalled,
   getIsRunning,
-  getIsUpdated
-} from "../../calls/fetchDnpRequest.js";
-import { fileToGatewayUrl } from "@dappnode/utils";
+  getIsUpdated,
+  fileToGatewayUrl,
+} from "@dappnode/utils";
 import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.js";
 
 export async function getOptimismConfig(): Promise<OptimismConfigGet> {
@@ -26,12 +25,12 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
 
     return {
       executionClients: await Promise.all(
-        executionClientsOptimism.map(async execClient => {
+        executionClientsOptimism.map(async (execClient) => {
           try {
             if (!(await releaseFetcher.repoExists(execClient)))
               throw Error(`Repository ${execClient} does not exist`);
 
-            const pkgData = await getPkgData(releaseFetcher, execClient);
+            const pkgData = await packageGetData(releaseFetcher, execClient);
 
             return {
               status: "ok",
@@ -42,25 +41,25 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
               isSelected: execClient === currentOptimismExecutionClient,
-              enableHistorical
+              enableHistorical,
             };
           } catch (error) {
             return {
               status: "error",
               dnpName: execClient,
               error,
-              enableHistorical
+              enableHistorical,
             };
           }
         })
       ),
-      rollup: await new Promise<OptimismItem<"rollup">>(resolve => {
+      rollup: await new Promise<OptimismItem<"rollup">>((resolve) => {
         (async () => {
           try {
             if (!(await releaseFetcher.repoExists(optimismNode)))
               throw Error(`Repository ${optimismNode} does not exist`);
 
-            const pkgData = await getPkgData(releaseFetcher, optimismNode);
+            const pkgData = await packageGetData(releaseFetcher, optimismNode);
             const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -72,26 +71,29 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
               isRunning,
               data: pkgData,
               isSelected: isRunning,
-              mainnetRpcUrl
+              mainnetRpcUrl,
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: optimismNode,
               error,
-              mainnetRpcUrl: ""
+              mainnetRpcUrl: "",
             });
           }
         })();
       }),
 
-      archive: await new Promise<OptimismItem<"archive">>(resolve => {
+      archive: await new Promise<OptimismItem<"archive">>((resolve) => {
         (async () => {
           try {
             if (!(await releaseFetcher.repoExists(optimismL2Geth)))
               throw Error(`Repository ${optimismL2Geth} does not exist`);
 
-            const pkgData = await getPkgData(releaseFetcher, optimismL2Geth);
+            const pkgData = await packageGetData(
+              releaseFetcher,
+              optimismL2Geth
+            );
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -101,17 +103,17 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning,
               data: pkgData,
-              isSelected: isRunning && enableHistorical
+              isSelected: isRunning && enableHistorical,
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: optimismL2Geth,
-              error
+              error,
             });
           }
         })();
-      })
+      }),
     };
   } catch (e) {
     throw Error(`Error getting Optimism config: ${e}`);

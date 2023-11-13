@@ -84,6 +84,10 @@ COPY packages/dyndns/package.json \
   packages/dyndns/
 COPY packages/upnpc/package.json \
   packages/upnpc/
+COPY packages/stakers/package.json \
+  packages/stakers/
+COPY packages/optimism/package.json \
+  packages/optimism/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -179,6 +183,18 @@ RUN yarn build
 # Build installer
 WORKDIR /app/packages/installer/
 COPY packages/installer/ .
+RUN yarn build
+# Results in dist/*
+
+# Build optimism
+WORKDIR /app/packages/optimism/
+COPY packages/optimism/ .
+RUN yarn build
+# Results in dist/*
+
+# Build stakers
+WORKDIR /app/packages/stakers/
+COPY packages/stakers/ .
 RUN yarn build
 # Results in dist/*
 

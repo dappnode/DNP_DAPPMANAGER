@@ -3,8 +3,12 @@ import { valid, gt } from "semver";
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import deepmerge from "deepmerge";
-import { fileToGatewayUrl } from "@dappnode/utils";
-import { ReleaseFetcher, shouldUpdate } from "@dappnode/installer";
+import {
+  fileToGatewayUrl,
+  getIsUpdated,
+  getIsInstalled
+} from "@dappnode/utils";
+import { ReleaseFetcher } from "@dappnode/installer";
 import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
 import {
   ComposeEditor,
@@ -130,49 +134,6 @@ export async function fetchDnpRequest({
     signedSafe,
     signedSafeAll: Object.values(signedSafe).every(r => r.safe === true)
   };
-}
-
-/**
- * Helper to check if a package is installed
- */
-export function getIsInstalled(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  return !!dnpList.find(dnp => dnp.dnpName === dnpName);
-}
-
-/**
- * Helper to check if a package is update to the latest version
- */
-export function getIsUpdated(
-  { dnpName, reqVersion }: { dnpName: string; reqVersion: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
-  if (!dnp) return false;
-  return !shouldUpdate(dnp.version, reqVersion);
-}
-
-/**
- * Returns true if the package is running or false if not
- * For web3signer, it does not take into account the container "flyway" which may not be running
- */
-export function getIsRunning(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const flywayServiceName = "flyway";
-  const isSigner = dnpName.includes("web3signer");
-  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
-  if (dnp) {
-    if (isSigner)
-      return dnp.containers
-        .filter(c => c.serviceName !== flywayServiceName)
-        .every(c => c.running);
-    else return dnp.containers.every(c => c.running);
-  }
-  return false;
 }
 
 function getRequiresCoreUpdate(

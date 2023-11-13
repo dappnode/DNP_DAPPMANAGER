@@ -1,13 +1,13 @@
 import {
   ExecutionClient,
   StakerItemOk,
-  InstalledPackageData
+  InstalledPackageData,
 } from "@dappnode/common";
-import { packageInstall } from "../../../calls/index.js";
+import { packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import {
   dockerComposeUpPackage,
-  listPackageNoThrow
+  listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 import { Network } from "@dappnode/types";
@@ -15,7 +15,7 @@ import { Network } from "@dappnode/types";
 export async function setExecutionClient<T extends Network>({
   currentExecutionClient,
   targetExecutionClient,
-  currentExecClientPkg
+  currentExecClientPkg,
 }: {
   currentExecutionClient?: ExecutionClient<T> | null;
   targetExecutionClient?: StakerItemOk<T, "execution">;
@@ -31,7 +31,7 @@ export async function setExecutionClient<T extends Network>({
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
   } else if (targetExecutionClient?.dnpName && !currentExecutionClient) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient.dnpName
+      dnpName: targetExecutionClient.dnpName,
     });
     if (!targetExecClientPkg) {
       // Install new consensus client if not installed
@@ -43,7 +43,7 @@ export async function setExecutionClient<T extends Network>({
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      ).catch((err) => logs.error(err));
     }
   } else if (
     targetExecutionClient?.dnpName &&
@@ -58,14 +58,14 @@ export async function setExecutionClient<T extends Network>({
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      ).catch((err) => logs.error(err));
     }
   } else if (
     targetExecutionClient &&
     targetExecutionClient.dnpName !== currentExecutionClient
   ) {
     const targetExecClientPkg = await listPackageNoThrow({
-      dnpName: targetExecutionClient.dnpName
+      dnpName: targetExecutionClient.dnpName,
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
@@ -80,7 +80,7 @@ export async function setExecutionClient<T extends Network>({
         {},
         {},
         true
-      ).catch(err => logs.error(err));
+      ).catch((err) => logs.error(err));
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);

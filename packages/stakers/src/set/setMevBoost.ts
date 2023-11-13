@@ -4,7 +4,7 @@ import {
   InstalledPackageData
 } from "@dappnode/common";
 import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
-import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
+import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";

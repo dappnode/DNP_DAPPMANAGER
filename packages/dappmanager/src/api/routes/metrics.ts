@@ -1,7 +1,7 @@
 import client from "prom-client";
 import { wrapHandler } from "../utils.js";
 import * as db from "@dappnode/db";
-import { getStakerConfigByNetwork } from "../../modules/stakerConfig/index.js";
+import { getStakerConfigByNetwork } from "@dappnode/stakers";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";

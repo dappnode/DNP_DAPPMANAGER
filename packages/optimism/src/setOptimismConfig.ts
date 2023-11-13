@@ -1,36 +1,38 @@
 import {
   InstalledPackageData,
   OptimismConfigSet,
-  UserSettings
+  UserSettings,
 } from "@dappnode/common";
 import * as db from "@dappnode/db";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
 import {
   optimismNode,
   optimismL2Geth,
   executionClientsOptimism,
-  ExecutionClientOptimism
+  ExecutionClientOptimism,
 } from "@dappnode/types";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { packageInstall } from "../../calls/packageInstall.js";
-import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
-import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
+import {
+  dockerContainerStart,
+  dockerContainerStop,
+  listPackageNoThrow,
+} from "@dappnode/dockerapi";
+import { packageSetEnvironment, packageInstall } from "@dappnode/installer";
 import {
   opNodeServiceName,
   opNodeRpcUrlEnvName,
   historicalRpcUrl,
   opExecutionClientHistoricalRpcUrlEnvName,
-  opClientToServiceMap
+  opClientToServiceMap,
 } from "./params.js";
 
 export async function setOptimismConfig({
   archive,
   executionClient,
-  rollup
+  rollup,
 }: OptimismConfigSet): Promise<void> {
   // l2geth;
   const l2gethPackage = await listPackageNoThrow({
-    dnpName: optimismL2Geth
+    dnpName: optimismL2Geth,
   });
 
   if (archive) {
@@ -52,29 +54,29 @@ export async function setOptimismConfig({
   // op Execution clients: op-geth || op-erigon
   if (executionClient) {
     const targetOpExecutionClientPackage = await listPackageNoThrow({
-      dnpName: executionClient.dnpName
+      dnpName: executionClient.dnpName,
     });
 
     const userSettings: UserSettings = {
       environment: {
         [opClientToServiceMap[executionClient.dnpName]]: {
-          [opExecutionClientHistoricalRpcUrlEnvName]: historicalRpcUrl // TODO: Empty if not archive?
-        }
-      }
+          [opExecutionClientHistoricalRpcUrlEnvName]: historicalRpcUrl, // TODO: Empty if not archive?
+        },
+      },
     };
 
     if (!targetOpExecutionClientPackage) {
       // make sure target package is installed
       await packageInstall({
         name: executionClient.dnpName,
-        userSettings: { [executionClient.dnpName]: userSettings }
+        userSettings: { [executionClient.dnpName]: userSettings },
       });
     } else {
       await packageSetEnvironment({
         dnpName: executionClient.dnpName,
         environmentByService: userSettings.environment
           ? userSettings.environment
-          : {}
+          : {},
       });
 
       await startAllContainers(targetOpExecutionClientPackage);
@@ -96,14 +98,14 @@ export async function setOptimismConfig({
       const userSettings: UserSettings = {
         environment: {
           [opNodeServiceName]: {
-            [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl
-          }
-        }
+            [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl,
+          },
+        },
       };
       // make sure op-node is installed
       await packageInstall({
         name: optimismNode,
-        userSettings: { [optimismNode]: userSettings }
+        userSettings: { [optimismNode]: userSettings },
       });
     } else {
       await startAllContainers(opNodePackage);
@@ -123,9 +125,9 @@ export async function setOptimismConfig({
           dnpName: optimismNode,
           environmentByService: {
             [opNodeServiceName]: {
-              [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl
-            }
-          }
+              [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl,
+            },
+          },
         });
       }
     }
@@ -138,7 +140,7 @@ async function stopOtherOpExecutionClients(
   executionClient: ExecutionClientOptimism
 ): Promise<void> {
   const otherOpExecutionClientDnps = executionClientsOptimism.filter(
-    client => client !== executionClient
+    (client) => client !== executionClient
   );
 
   await stopPkgsByDnpNames(otherOpExecutionClientDnps);
@@ -146,7 +148,7 @@ async function stopOtherOpExecutionClients(
 
 async function stopPkgsByDnpNames(dnpNames: ExecutionClientOptimism[]) {
   const pkgs: (InstalledPackageData | null)[] = await Promise.all(
-    dnpNames.map(async dnpName => {
+    dnpNames.map(async (dnpName) => {
       return await listPackageNoThrow({ dnpName });
     })
   );
