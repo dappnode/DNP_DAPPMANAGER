@@ -20,12 +20,21 @@ jobs:
   build-code:
     name: Build code
     runs-on: ubuntu-latest
+    strategy:
+      # Add here any other node version or OS in which Dappmanager should be built and tested
+      matrix:
+        os: [ubuntu-latest]
+        node: [20]
+      # To run the jobs in parallel
+      fail-fast: false
     steps:
-      - uses: actions/checkout@v3
-      - name: Setup node
+      - uses: actions/checkout@v4
+      - name: Setup node ${{ matrix.node }}
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node }}
+          # To speed up the build
+          cache: "yarn"
       - run: yarn
       - run: yarn build
 
@@ -56,7 +65,7 @@ jobs:
         run: |
           [[ "$BUMP_TYPE" == "patch" ]] || [[ "$BUMP_TYPE" == "minor" ]] || \
           [[ "$BUMP_TYPE" == "major" ]] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup node
         uses: actions/setup-node@v3
         with:
