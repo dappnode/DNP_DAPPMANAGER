@@ -1,11 +1,11 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { generateKeys } from "@dappnode/dyndns";
-import getDappmanagerImage from "./utils/getDappmanagerImage.js";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
 import getServerName from "./utils/getServerName.js";
 import getInternalIp from "./utils/getInternalIp.js";
 import getStaticIp from "./utils/getStaticIp.js";
-import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
+import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
 import { params } from "@dappnode/params";
@@ -15,7 +15,6 @@ import { shell } from "@dappnode/utils";
 import { IdentityInterface } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
-import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable.js";
 import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
 import { pause } from "@dappnode/utils";
 

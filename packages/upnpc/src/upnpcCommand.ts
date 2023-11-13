@@ -1,5 +1,5 @@
 import { shell } from "@dappnode/utils";
-import getDappmanagerImage from "../../utils/getDappmanagerImage.js";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
 import { parseUpnpErrors } from "./upnpError.js";
 
 export default async function upnpcCommand(cmd: string): Promise<string> {

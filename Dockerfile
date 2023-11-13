@@ -72,6 +72,8 @@ COPY packages/httpsPortal/package.json \
   packages/httpsPortal/
 COPY packages/dyndns/package.json \
   packages/dyndns/
+COPY packages/upnpc/package.json \
+  packages/upnpc/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -134,6 +136,12 @@ RUN yarn build
 # Build dockerApi
 WORKDIR /app/packages/dockerApi/
 COPY packages/dockerApi/ .
+RUN yarn build
+# Results in dist/*
+
+# Build upnpc
+WORKDIR /app/packages/upnpc/
+COPY packages/upnpc/ .
 RUN yarn build
 # Results in dist/*
 
@@ -289,5 +297,13 @@ COPY --from=build-deps /usr/src/app/packages/ipfs/package.json /usr/src/app/pack
 COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/dist /usr/src/app/packages/ethicalMetrics/dist
 COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/node_modules /usr/src/app/packages/ethicalMetrics/node_modules
 COPY --from=build-deps /usr/src/app/packages/ethicalMetrics/package.json /usr/src/app/packages/ethicalMetrics/package.json
+# Copy dyndns
+COPY --from=build-deps /usr/src/app/packages/dyndns/dist /usr/src/app/packages/dyndns/dist
+COPY --from=build-deps /usr/src/app/packages/dyndns/node_modules /usr/src/app/packages/dyndns/node_modules
+COPY --from=build-deps /usr/src/app/packages/dyndns/package.json /usr/src/app/packages/dyndns/package.json
+# Copy upnpc
+COPY --from=build-deps /usr/src/app/packages/upnpc/dist /usr/src/app/packages/upnpc/dist
+COPY --from=build-deps /usr/src/app/packages/upnpc/node_modules /usr/src/app/packages/upnpc/node_modules
+COPY --from=build-deps /usr/src/app/packages/upnpc/package.json /usr/src/app/packages/upnpc/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]

@@ -1,7 +1,7 @@
 import { shell } from "@dappnode/utils";
 import isIp from "is-ip";
 import { logs } from "@dappnode/logger";
-import getDappmanagerImage from "./getDappmanagerImage.js";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
 
 export default async function getLocalIp(options?: {
   silent: boolean;

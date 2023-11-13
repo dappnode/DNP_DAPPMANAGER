@@ -1,4 +1,4 @@
-import { listContainers } from "@dappnode/dockerapi";
+import { listContainers } from "./api/index.js";
 import { params } from "@dappnode/params";
 import memoize from "memoizee";
 
@@ -19,6 +19,6 @@ const getDappmanagerImageMemoized = memoize(
  * Returns the image of the current dappmanager instance running
  * It's memoized since the image will not change until this app is reseted
  */
-export default async function getDappmanagerImage(): Promise<string> {
+export async function getDappmanagerImage(): Promise<string> {
   return getDappmanagerImageMemoized();
 }
