@@ -325,9 +325,9 @@ COPY --from=build-deps /usr/src/app/packages/upnpc/package.json /usr/src/app/pac
 COPY --from=build-deps /usr/src/app/packages/stakers/dist /usr/src/app/packages/stakers/dist
 COPY --from=build-deps /usr/src/app/packages/stakers/node_modules /usr/src/app/packages/stakers/node_modules
 COPY --from=build-deps /usr/src/app/packages/stakers/package.json /usr/src/app/packages/stakers/package.json
-# Copy stakers
-COPY --from=build-deps /usr/src/app/packages/ethprovider/dist /usr/src/app/packages/ethprovider/dist
-COPY --from=build-deps /usr/src/app/packages/ethprovider/node_modules /usr/src/app/packages/ethprovider/node_modules
-COPY --from=build-deps /usr/src/app/packages/ethprovider/package.json /usr/src/app/packages/ethprovider/package.json
+# Copy optimism
+COPY --from=build-deps /usr/src/app/packages/optimism/dist /usr/src/app/packages/optimism/dist
+COPY --from=build-deps /usr/src/app/packages/optimism/node_modules /usr/src/app/packages/optimism/node_modules
+COPY --from=build-deps /usr/src/app/packages/optimism/package.json /usr/src/app/packages/optimism/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
