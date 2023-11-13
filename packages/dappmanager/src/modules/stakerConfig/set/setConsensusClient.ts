@@ -4,7 +4,7 @@ import {
   InstalledPackageData,
   UserSettingsAllDnps
 } from "@dappnode/common";
-import { packageInstall, packageSetEnvironment } from "../../../calls/index.js";
+import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { listPackageNoThrow } from "@dappnode/dockerapi";

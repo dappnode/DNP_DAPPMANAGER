@@ -14,7 +14,7 @@ import {
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { packageInstall } from "../../calls/packageInstall.js";
 import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
-import { packageSetEnvironment } from "../../calls/packageSetEnvironment.js";
+import { packageSetEnvironment } from "@dappnode/installer";
 import {
   opNodeServiceName,
   opNodeRpcUrlEnvName,
