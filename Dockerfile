@@ -74,6 +74,10 @@ COPY packages/dyndns/package.json \
   packages/dyndns/
 COPY packages/upnpc/package.json \
   packages/upnpc/
+COPY packages/stakers/package.json \
+  packages/stakers/
+COPY packages/optimism/package.json \
+  packages/optimism/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -172,6 +176,18 @@ RUN yarn build
 # Build installer
 WORKDIR /app/packages/installer/
 COPY packages/installer/ .
+RUN yarn build
+# Results in dist/*
+
+# Build optimism
+WORKDIR /app/packages/optimism/
+COPY packages/optimism/ .
+RUN yarn build
+# Results in dist/*
+
+# Build stakers
+WORKDIR /app/packages/stakers/
+COPY packages/stakers/ .
 RUN yarn build
 # Results in dist/*
 
@@ -305,5 +321,13 @@ COPY --from=build-deps /usr/src/app/packages/dyndns/package.json /usr/src/app/pa
 COPY --from=build-deps /usr/src/app/packages/upnpc/dist /usr/src/app/packages/upnpc/dist
 COPY --from=build-deps /usr/src/app/packages/upnpc/node_modules /usr/src/app/packages/upnpc/node_modules
 COPY --from=build-deps /usr/src/app/packages/upnpc/package.json /usr/src/app/packages/upnpc/package.json
+# Copy stakers
+COPY --from=build-deps /usr/src/app/packages/stakers/dist /usr/src/app/packages/stakers/dist
+COPY --from=build-deps /usr/src/app/packages/stakers/node_modules /usr/src/app/packages/stakers/node_modules
+COPY --from=build-deps /usr/src/app/packages/stakers/package.json /usr/src/app/packages/stakers/package.json
+# Copy stakers
+COPY --from=build-deps /usr/src/app/packages/ethprovider/dist /usr/src/app/packages/ethprovider/dist
+COPY --from=build-deps /usr/src/app/packages/ethprovider/node_modules /usr/src/app/packages/ethprovider/node_modules
+COPY --from=build-deps /usr/src/app/packages/ethprovider/package.json /usr/src/app/packages/ethprovider/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
