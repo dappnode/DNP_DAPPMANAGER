@@ -1344,11 +1344,6 @@
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.23.tgz#e349661f40402b31fa3cd8651f16aed0ca927a79"
   integrity sha512-24O6fVfKqQHuHOgaNHvA7sbEZzYjCWxyIpFXaxnJxl4da6NRAEd+wZgzNzRQsqC5lLIQkNEc4uS+V+utgSGJuw==
 
-"@dappnode/types@^0.1.30":
-  version "0.1.30"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.30.tgz#51c3bf0032862dc2b3546d0e8cb7a574940e924f"
-  integrity sha512-4aH3csMNsXRoP1DQ5BPq1auWMipOj3pAZU3ZAyE6s1HQCak7ivCRz9RLjqbjSZxRJDd37ixOHWMgvDjJ2FuH4A==
-
 "@dappnode/types@^0.1.30", "@dappnode/types@^0.1.9":
   version "0.1.30"
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.30.tgz#51c3bf0032862dc2b3546d0e8cb7a574940e924f"
@@ -9619,6 +9614,13 @@ is-interactive@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-interactive/-/is-interactive-1.0.0.tgz#cea6e6ae5c870a7b0a0004070b7b587e0252912e"
   integrity sha512-2HvIEKRoqS62guEC+qBjpvRubdX910WCMuJTZ+I9yvqKU2/12eSL549HMwtabb4oupdj2sMP50k+XJfB/8JE6w==
+
+is-ip@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/is-ip/-/is-ip-3.0.0.tgz#832e44ba199436ee4d57c23adb8c4061f7989875"
+  integrity sha512-Xj8foQ21HBtI+g3LD9vOtedlZ88oN7s2eEFNs5UIHPvkneOU96m1g+mFf6ph5SJjXXGLJNvWhel0XgoI9KpnVQ==
+  dependencies:
+    ip-regex "^4.0.0"
 
 is-ip@^3.0.0, is-ip@^3.1.0:
   version "3.1.0"

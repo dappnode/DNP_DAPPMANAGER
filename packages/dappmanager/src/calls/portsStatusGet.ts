@@ -1,5 +1,5 @@
 import * as db from "@dappnode/db";
-import * as upnpc from "../modules/upnpc/index.js";
+import { list } from "@dappnode/upnpc";
 import { performPortsScan } from "../modules/portsTable/performPortsScan.js";
 import {
   PortToOpen,
@@ -17,7 +17,7 @@ export async function portsUpnpStatusGet({
 }: {
   portsToOpen: PortToOpen[];
 }): Promise<UpnpTablePortStatus[]> {
-  const upnpPortMappings: UpnpPortMapping[] = await upnpc.list(); // Ports opened, mapped with UPnP
+  const upnpPortMappings: UpnpPortMapping[] = await list(); // Ports opened, mapped with UPnP
 
   return portsToOpen.map(port => ({
     port: port.portNumber,

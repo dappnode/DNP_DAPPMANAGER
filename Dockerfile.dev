@@ -80,6 +80,10 @@ COPY packages/ethicalMetrics/package.json \
   packages/ethicalMetrics/
 COPY packages/httpsPortal/package.json \
   packages/httpsPortal/
+COPY packages/dyndns/package.json \
+  packages/dyndns/
+COPY packages/upnpc/package.json \
+  packages/upnpc/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -142,6 +146,12 @@ COPY packages/dockerApi/ .
 RUN yarn build
 # Results in dist/*
 
+# Build upnpc
+WORKDIR /app/packages/upnpc/
+COPY packages/upnpc/ .
+RUN yarn build
+# Results in dist/*
+
 # Build httpsportal
 WORKDIR /app/packages/httpsPortal/
 COPY packages/httpsPortal/ .
@@ -157,6 +167,12 @@ RUN yarn build
 # Build ipfs
 WORKDIR /app/packages/ipfs/
 COPY packages/ipfs/ .
+RUN yarn build
+# Results in dist/*
+
+# Build dyndns
+WORKDIR /app/packages/dyndns/
+COPY packages/dyndns/ .
 RUN yarn build
 # Results in dist/*
 
