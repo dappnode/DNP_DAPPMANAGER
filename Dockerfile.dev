@@ -39,8 +39,6 @@ COPY --from=build-binaries /usr/bin/docker /usr/libexec/docker/cli-plugins/docke
 RUN apk update && apk add --no-cache bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
 
-# python3 build-base
-
 # Copy docker
 COPY docker/rndc.conf /etc/bind/
 COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
@@ -56,7 +54,6 @@ COPY docker/start_dev.sh /usr/src/app/start_dev.sh
 # Build the src code:
 # Copy and install deps first to cache
 COPY package.json yarn.lock lerna.json tsconfig.json ./
-RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
 COPY packages/admin-ui/package.json \ 
   packages/admin-ui/
 COPY packages/dappmanager/package.json \ 
