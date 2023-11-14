@@ -371,7 +371,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isSelected: true
     }
   }),
-  optimismConfigSet: async () => {}
+  optimismConfigSet: async () => {},
+  updateUpgrade: async () => "Successfully updated"
 };
 
 export const calls: Routes = {

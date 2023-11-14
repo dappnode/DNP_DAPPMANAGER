@@ -9,8 +9,11 @@ import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
 import { logs } from "@dappnode/logger";
 import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
-import { fileToGatewayUrl } from "@dappnode/utils";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
+import {
+  fileToGatewayUrl,
+  getIsInstalled,
+  getIsUpdated
+} from "@dappnode/utils";
 import {
   getShortDescription,
   getFallBackCategories

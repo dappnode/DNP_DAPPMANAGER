@@ -1,4 +1,4 @@
-import * as upnpc from "../../modules/upnpc/index.js";
+import { list, open, close } from "@dappnode/upnpc";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
@@ -31,7 +31,7 @@ async function natRenewal(): Promise<void> {
     // 1. Get the list of ports and check there is a UPnP device
     // portMappings = [ {protocol: 'UDP', exPort: '500', inPort: '500'} ]
     try {
-      const portMappings = await upnpc.list();
+      const portMappings = await list();
       db.upnpAvailable.set(true);
       if (isFirstRun) {
         logs.info(
@@ -71,7 +71,7 @@ async function natRenewal(): Promise<void> {
       // If it's the first run, close any existing mapping
       if (isFirstRun) {
         try {
-          await upnpc.close(portToOpen);
+          await close(portToOpen);
         } catch (e) {
           // Errors while closing a port before openning do not matter.
           logs.debug(`Error closing port ${portId(portToOpen)}`, e);
@@ -80,7 +80,7 @@ async function natRenewal(): Promise<void> {
 
       try {
         // Run first open, and every interval to refresh the mapping.
-        await upnpc.open(portToOpen, localIp || "");
+        await open(portToOpen, localIp || "");
       } catch (e) {
         // Error stack of shell processes do not matter. The message contains all the info
         logs.error(`Error openning port ${portId(portToOpen)}: ${e.message}`);
@@ -89,7 +89,7 @@ async function natRenewal(): Promise<void> {
 
     // 4. Verify that the ports have been opened
     if (portsToOpen.length) {
-      const upnpPortMappings = await upnpc.list();
+      const upnpPortMappings = await list();
       db.upnpPortMappings.set(upnpPortMappings);
 
       for (const portToOpen of portsToOpen) {

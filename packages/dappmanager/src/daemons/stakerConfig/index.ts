@@ -1,9 +1,8 @@
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { ReleaseFetcher, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
-import { pickPackageItemData } from "../../utils/getPkgItemData.js";
 
 async function runStakerCacheUpdate({
   dnpName
@@ -13,7 +12,7 @@ async function runStakerCacheUpdate({
   try {
     const releaseFetcher = new ReleaseFetcher();
     const repository = await releaseFetcher.getRelease(dnpName);
-    const dataDnp = pickPackageItemData(repository);
+    const dataDnp = packagePickItemData(repository);
     db.pkgItemMetadata.set(dnpName, dataDnp);
   } catch (e) {
     logs.error("Error on staker cache update daemon", e);

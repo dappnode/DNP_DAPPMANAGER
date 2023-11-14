@@ -3,10 +3,10 @@ import {
   stopAvahiDaemon,
   startAvahiDaemon,
   getAvahiDaemonStatus
-} from "@dappnode/hostscripts";
+} from "@dappnode/hostscriptsservices";
 import { params } from "@dappnode/params";
 import { AvahiDaemonStatus, LocalProxyingStatus } from "@dappnode/common";
-import { packageSetEnvironment } from "./packageSetEnvironment.js";
+import { packageSetEnvironment } from "@dappnode/installer";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
