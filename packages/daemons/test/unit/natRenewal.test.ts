@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { PackageContainer, PortProtocol } from "@dappnode/common";
 // imports for typings
 import { mockContainer } from "../testUtils.js";
-import getPortsToOpen from "../../src/natRenewal/getPortsToOpen.js";
+import { getPortsToOpen } from "../../src/natRenewal/getPortsToOpen.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
 
 describe("daemons > natRenewal > getPortsToOpen", () => {
