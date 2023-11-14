@@ -13,7 +13,7 @@ const baseCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint=""`;
  *
  * @returns true = is secure / false = is not
  */
-async function isPasswordSecure(): Promise<boolean> {
+export async function isPasswordSecure(): Promise<boolean> {
   const image = await getDappmanagerImage();
   try {
     const res = await shell(
@@ -37,7 +37,7 @@ async function isPasswordSecure(): Promise<boolean> {
  *
  * @param newPassword = "super-secure-password"
  */
-async function changePassword(newPassword: string): Promise<void> {
+export async function changePassword(newPassword: string): Promise<void> {
   if (!newPassword) throw Error("newPassword must be defined");
   if (typeof newPassword !== "string")
     throw Error("newPassword must be a string");
