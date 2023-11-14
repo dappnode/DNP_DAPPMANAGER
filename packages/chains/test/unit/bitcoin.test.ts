@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { parseCredentialsFromEnvs } from "../../../../src/modules/chains/drivers/bitcoin.js";
+import { parseCredentialsFromEnvs } from "../../src/drivers/bitcoin.js";
 
 describe("Watchers > chains > bitcoin", () => {
   describe("parseCredentialsFromEnvs", () => {
@@ -9,12 +9,12 @@ describe("Watchers > chains > bitcoin", () => {
         "BTC_RPCUSER=dappnode",
         "BTC_RPCPASSWORD=dappnode",
         "BTC_TXINDEX=1",
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
       ];
       expect(parseCredentialsFromEnvs(envRows)).to.deep.equal({
         username: "dappnode",
         password: "dappnode",
-        port: null
+        port: null,
       });
     });
 
@@ -23,12 +23,12 @@ describe("Watchers > chains > bitcoin", () => {
         "ZCASH_RPCUSER=dappnode",
         "ZCASH_RPCPASSWORD=dappnode",
         "ZCASH_RPCPORT=8342",
-        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
       ];
       expect(parseCredentialsFromEnvs(envRows)).to.deep.equal({
         username: "dappnode",
         password: "dappnode",
-        port: 8342
+        port: 8342,
       });
     });
   });

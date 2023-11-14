@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { getChainsData } from "../modules/chains/index.js";
+import { getChainsData } from "@dappnode/chains";
 import { ChainData } from "@dappnode/common";
 
 // Memoize this call since multiple UIs could be requesting it at once
