@@ -2,11 +2,7 @@ module.exports = {
   extends: [
     "../../.eslintrc.cjs" // Uses the recommended rules from the @typescript-eslint/eslint-plugin
   ],
-  ignorePatterns: [
-    "/src/modules/chains/drivers/bitcoin.ts",
-    "src/modules/chains/drivers/monero.ts",
-    "src/modules/ipfs/writeStreamToFs.ts"
-  ],
+  ignorePatterns: ["src/modules/ipfs/writeStreamToFs.ts"],
   parserOptions: {
     ecmaVersion: 2019 // For target ES2019
   },
