@@ -64,7 +64,8 @@ RUN apk add --no-cache bind bind-dev bind-tools avahi-tools dbus miniupnpc
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 # Copy scripts
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+COPY packages/hostScriptsServices/hostScripts hostScripts
+COPY packages/hostScriptsServices/hostServices hostServices
 
 # Copy docker-specific files
 COPY docker/rndc.conf /etc/bind/

@@ -46,8 +46,9 @@ COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
-# Copy the src last as it's the layer most likely to change
-COPY packages/hostScripts/hostScripts /usr/src/app/hostScripts
+# Copy scripts
+COPY packages/hostScriptsServices/hostScripts hostScripts
+COPY packages/hostScriptsServices/hostServices hostServices
 
 COPY docker/start_dev.sh /usr/src/app/start_dev.sh
 
