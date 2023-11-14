@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { params } from "@dappnode/params";
-import { getCoreVersionId } from "../../../src/utils/coreVersionId.js";
+import { getCoreVersionId } from "@dappnode/utils";
 import * as db from "@dappnode/db";
 import {
   clearCompletedCoreUpdatesIfAny,
@@ -14,7 +14,7 @@ import {
   isCoreUpdateEnabled,
   isDnpUpdateEnabled,
   isUpdateDelayCompleted
-} from "../../../src/daemons/autoUpdates/index.js";
+} from "@dappnode/daemons";
 
 const coreDnpName = params.coreDnpName;
 
@@ -27,6 +27,8 @@ import {
 import { clearDbs, createTestDir } from "../../testUtils.js";
 
 const dnpName = "bitcoin.dnp.dappnode.eth";
+
+// TODO: move this test to daemons
 
 describe("Util: autoUpdateHelper", () => {
   before(async () => {
