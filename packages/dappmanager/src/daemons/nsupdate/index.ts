@@ -3,7 +3,8 @@ import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { listPackageContainers } from "@dappnode/dockerapi";
-import { getNsupdateTxts, execNsupdate } from "../../modules/nsupdate/index.js";
+import { execNsupdate } from "./execNsupdate.js";
+import { getNsupdateTxts } from "./utils.js";
 import { runAtMostEveryIntervals } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 
