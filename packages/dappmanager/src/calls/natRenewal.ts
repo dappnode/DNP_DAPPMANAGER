@@ -1,4 +1,4 @@
-import { throttledNatRenewal } from "../daemons/natRenewal/index.js";
+import { throttledNatRenewal } from "@dappnode/daemons";
 import * as db from "@dappnode/db";
 
 export async function natRenewalEnable({

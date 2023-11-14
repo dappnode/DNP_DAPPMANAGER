@@ -80,6 +80,8 @@ COPY packages/optimism/package.json \
   packages/optimism/
 COPY packages/chains/package.json \
   packages/chains/
+COPY packages/daemons/package.json \
+  packages/daemons/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build order must be as follows:
@@ -196,6 +198,12 @@ RUN yarn build
 # Build stakers
 WORKDIR /app/packages/stakers/
 COPY packages/stakers/ .
+RUN yarn build
+# Results in dist/*
+
+# Build daemons
+WORKDIR /app/packages/daemons/
+COPY packages/daemons/ .
 RUN yarn build
 # Results in dist/*
 
@@ -341,5 +349,9 @@ COPY --from=build-deps /usr/src/app/packages/optimism/package.json /usr/src/app/
 COPY --from=build-deps /usr/src/app/packages/chains/dist /usr/src/app/packages/chains/dist
 COPY --from=build-deps /usr/src/app/packages/chains/node_modules /usr/src/app/packages/chains/node_modules
 COPY --from=build-deps /usr/src/app/packages/chains/package.json /usr/src/app/packages/chains/package.json
+# Copy daemons
+COPY --from=build-deps /usr/src/app/packages/daemons/dist /usr/src/app/packages/daemons/dist
+COPY --from=build-deps /usr/src/app/packages/daemons/node_modules /usr/src/app/packages/daemons/node_modules
+COPY --from=build-deps /usr/src/app/packages/daemons/package.json /usr/src/app/packages/daemons/package.json
 
 CMD [ "node", "packages/dappmanager/dist/index" ]
