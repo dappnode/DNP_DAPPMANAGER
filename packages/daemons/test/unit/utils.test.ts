@@ -3,9 +3,9 @@ import { expect } from "chai";
 import {
   getMyDotEthdomain,
   getDotDappnodeDomain,
-  getNsupdateTxts
-} from "../../../../src/daemons/nsupdate/utils.js";
-import { mockContainer } from "../../../testUtils.js";
+  getNsupdateTxts,
+} from "../../src/nsupdate/utils.js";
+import { mockContainer } from "../testUtils.js";
 import { PackageContainer } from "@dappnode/common";
 
 describe("modules > nsupdate", () => {
@@ -17,7 +17,7 @@ describe("modules > nsupdate", () => {
       "ln-network.dnp.dappnode.eth": "my.ln-network.dnp.dappnode.eth",
       "with_under.dnp.dappnode.eth": "my.withunder.dnp.dappnode.eth",
       "service1.dappnodesdk.dnp.dappnode.eth":
-        "my.service1.dappnodesdk.dnp.dappnode.eth"
+        "my.service1.dappnodesdk.dnp.dappnode.eth",
     };
 
     for (const [name, domain] of Object.entries(cases)) {
@@ -34,7 +34,7 @@ describe("modules > nsupdate", () => {
       "artis.public.dappnode.eth": "artis.public.dappnode",
       "ln-network.dnp.dappnode.eth": "ln-network.dappnode",
       "with_under.dnp.dappnode.eth": "withunder.dappnode",
-      "service1.dappnodesdk.dnp.dappnode.eth": "service1.dappnodesdk.dappnode"
+      "service1.dappnodesdk.dnp.dappnode.eth": "service1.dappnodesdk.dappnode",
     };
 
     for (const [name, domain] of Object.entries(cases)) {
@@ -92,14 +92,14 @@ send
         dnpName: ipfsDnpName,
         serviceName: ipfsDnpName,
         ip: "172.33.1.5",
-        isMain: true
+        isMain: true,
       },
       {
         ...mockContainer,
         dnpName: bitcoinDnpName,
         serviceName: bitcoinDnpName,
         ip: "172.33.0.2",
-        isMain: true
+        isMain: true,
       },
       {
         ...mockContainer,
@@ -107,23 +107,23 @@ send
         serviceName: gethDnpName,
         ip: "172.33.0.3",
         chain: "ethereum",
-        isMain: true
+        isMain: true,
       },
       {
         ...mockContainer,
         dnpName: pinnerDnpName,
         serviceName: pinnerService1,
-        ip: "172.33.0.4"
+        ip: "172.33.0.4",
       },
       {
         ...mockContainer,
         dnpName: pinnerDnpName,
         serviceName: pinnerService2,
-        ip: "172.33.0.5"
-      }
+        ip: "172.33.0.5",
+      },
     ];
     const domainAliases = {
-      fullnode: gethDnpName
+      fullnode: gethDnpName,
     };
 
     it("Should get nsupdate.txt contents for a normal case", () => {
@@ -162,7 +162,7 @@ update delete app.pinner.dappnode A
 update add app.pinner.dappnode 60 A 172.33.0.5
 update delete fullnode.dappnode A
 update add fullnode.dappnode 60 A 172.33.0.3
-`
+`,
       });
     });
 
@@ -170,7 +170,7 @@ update add fullnode.dappnode 60 A 172.33.0.3
       const nsupdateTxts = getNsupdateTxts({
         containers,
         domainAliases,
-        removeOnly: true
+        removeOnly: true,
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
@@ -192,7 +192,7 @@ update delete geth.dappnode A
 update delete cluster.pinner.dappnode A
 update delete app.pinner.dappnode A
 update delete fullnode.dappnode A
-`
+`,
       });
     });
 
@@ -200,7 +200,7 @@ update delete fullnode.dappnode A
       const nsupdateTxts = getNsupdateTxts({
         containers,
         domainAliases,
-        dnpNames: [bitcoinDnpName]
+        dnpNames: [bitcoinDnpName],
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
@@ -213,7 +213,7 @@ update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
 update add bitcoin.dnp.dappnode.eth.bitcoin.dappnode 60 A 172.33.0.2
 update delete bitcoin.dappnode A
 update add bitcoin.dappnode 60 A 172.33.0.2
-`
+`,
       });
     });
 
@@ -222,7 +222,7 @@ update add bitcoin.dappnode 60 A 172.33.0.2
         containers,
         domainAliases,
         dnpNames: [bitcoinDnpName],
-        removeOnly: true
+        removeOnly: true,
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
@@ -230,7 +230,7 @@ update add bitcoin.dappnode 60 A 172.33.0.2
 update delete my.bitcoin.dnp.dappnode.eth A`,
         dappnode: `
 update delete bitcoin.dnp.dappnode.eth.bitcoin.dappnode A
-update delete bitcoin.dappnode A`
+update delete bitcoin.dappnode A`,
       });
     });
 
@@ -253,18 +253,18 @@ update delete bitcoin.dappnode A`
         networks: [
           {
             ip: "172.33.0.3",
-            name: "dncore_network"
-          }
+            name: "dncore_network",
+          },
         ],
 
         running: true,
         serviceName: "grafana",
-        state: "running"
+        state: "running",
       };
 
       const nsupdateTxts = getNsupdateTxts({
         containers: [grafanaContainer],
-        domainAliases: {}
+        domainAliases: {},
       });
 
       assertNsUpdateTxts(nsupdateTxts, {
@@ -278,7 +278,7 @@ update add my.dms.dnp.dappnode.eth 60 A 172.33.0.3
 update delete grafana.dms.dappnode A
 update add grafana.dms.dappnode 60 A 172.33.0.3
 update delete dms.dappnode A
-update add dms.dappnode 60 A 172.33.0.3`
+update add dms.dappnode 60 A 172.33.0.3`,
       });
     });
   });
