@@ -2,33 +2,28 @@ import "mocha";
 import { expect } from "chai";
 import { params } from "@dappnode/params";
 import { getCoreVersionId } from "../../../src/utils/coreVersionId.js";
+import * as db from "@dappnode/db";
+import {
+  clearCompletedCoreUpdatesIfAny,
+  clearPendingUpdates,
+  editCoreSetting,
+  editDnpSetting,
+  flagCompletedUpdate,
+  flagErrorUpdate,
+  updateDelay,
+  isCoreUpdateEnabled,
+  isDnpUpdateEnabled,
+  isUpdateDelayCompleted
+} from "../../../src/daemons/autoUpdates/index.js";
 
 const coreDnpName = params.coreDnpName;
 
 import {
-  // DNPs / my-packages
-  editDnpSetting,
-  isDnpUpdateEnabled,
-  // Core / system-packages
-  editCoreSetting,
-  isCoreUpdateEnabled,
-  getSettings,
-  // To keep a registry of performed updates
-  // + Enforce a delay before auto-updating
-  flagCompletedUpdate,
-  flagErrorUpdate,
-  isUpdateDelayCompleted,
-  clearPendingUpdates,
-  clearCompletedCoreUpdatesIfAny,
-  getRegistry,
-  // Pending updates
-  getPending,
   getDnpFeedbackMessage,
-  getCoreFeedbackMessage,
-  // Utils
   getLastRegistryEntry,
-  updateDelay
-} from "../../../src/utils/autoUpdateHelper.js";
+  getCoreFeedbackMessage
+} from "../../../src/calls/autoUpdateDataGet.js";
+
 import { clearDbs, createTestDir } from "../../testUtils.js";
 
 const dnpName = "bitcoin.dnp.dappnode.eth";
@@ -40,7 +35,10 @@ describe("Util: autoUpdateHelper", () => {
 
   beforeEach("Make sure the autosettings are restarted", async () => {
     clearDbs();
-    expect(getSettings()).to.deep.equal({}, "autoUpdateSettings are not empty");
+    expect(db.autoUpdateSettings.get()).to.deep.equal(
+      {},
+      "autoUpdateSettings are not empty"
+    );
   });
 
   describe("Auto update settings", () => {
@@ -83,7 +81,7 @@ describe("Util: autoUpdateHelper", () => {
       const timestamp = 1563373272397;
       flagCompletedUpdate(dnpName, version1, timestamp);
       flagCompletedUpdate(dnpName, version2, timestamp);
-      const registry = getRegistry();
+      const registry = db.autoUpdateRegistry.get();
       expect(registry).to.deep.equal({
         [dnpName]: {
           [version1]: { updated: timestamp, successful: true },
@@ -102,7 +100,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version,
@@ -128,7 +126,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version,
@@ -162,7 +160,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version,
@@ -179,7 +177,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should not allow on first check"
       );
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version: version2,
@@ -199,7 +197,7 @@ describe("Util: autoUpdateHelper", () => {
       const timestamp = 1563373272397;
       isUpdateDelayCompleted(dnpName, version, timestamp);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version,
@@ -215,7 +213,7 @@ describe("Util: autoUpdateHelper", () => {
       const errorMessage = "Mainnet is still thinking";
       flagErrorUpdate(dnpName, errorMessage);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [dnpName]: {
             version,
@@ -491,8 +489,7 @@ describe("Util: autoUpdateHelper", () => {
         "1. Should be empty"
       );
 
-      const timestampIsUpdated =
-        Date.now() - (updateDelay - microDelay);
+      const timestampIsUpdated = Date.now() - (updateDelay - microDelay);
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestampIsUpdated);
 
       expect(getCoreFeedbackMessage(currentCorePackagesBefore)).to.deep.equal(
@@ -552,7 +549,7 @@ describe("Util: autoUpdateHelper", () => {
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [coreDnpName]: {
             version: nextVersionId,
@@ -566,12 +563,12 @@ describe("Util: autoUpdateHelper", () => {
 
       clearCompletedCoreUpdatesIfAny(currentCorePackages, timestamp);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {},
         "Pending version should be removed"
       );
 
-      expect(getRegistry()).to.deep.equal(
+      expect(db.autoUpdateRegistry.get()).to.deep.equal(
         {
           [coreDnpName]: {
             [nextVersionId]: { updated: timestamp, successful: true }
@@ -595,7 +592,7 @@ describe("Util: autoUpdateHelper", () => {
 
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestamp);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [coreDnpName]: {
             version: nextVersionId,
@@ -609,7 +606,7 @@ describe("Util: autoUpdateHelper", () => {
 
       clearCompletedCoreUpdatesIfAny(currentCorePackages, timestamp);
 
-      expect(getPending()).to.deep.equal(
+      expect(db.autoUpdatePending.get()).to.deep.equal(
         {
           [coreDnpName]: {
             version: nextVersionId,
@@ -621,7 +618,7 @@ describe("Util: autoUpdateHelper", () => {
         "Pending version should still be there"
       );
 
-      expect(getRegistry()).to.deep.equal(
+      expect(db.autoUpdateRegistry.get()).to.deep.equal(
         {},
         "Registry should be empty, no new version added"
       );
