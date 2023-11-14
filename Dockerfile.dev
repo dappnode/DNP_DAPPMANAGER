@@ -90,6 +90,8 @@ COPY packages/optimism/package.json \
   packages/optimism/
 COPY packages/chains/package.json \
   packages/chains/
+COPY packages/daemons/package.json \
+  packages/daemons/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -203,6 +205,12 @@ RUN yarn build
 # Build stakers
 WORKDIR /app/packages/stakers/
 COPY packages/stakers/ .
+RUN yarn build
+# Results in dist/*
+
+# Build daemons
+WORKDIR /app/packages/daemons/
+COPY packages/daemons/ .
 RUN yarn build
 # Results in dist/*
 
