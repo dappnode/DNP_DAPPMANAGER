@@ -5100,20 +5100,6 @@ bitcoin-core@2.0.0:
     semver "^5.1.0"
     standard-error "^1.1.0"
 
-bitcoin-core@^2.0.0:
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/bitcoin-core/-/bitcoin-core-2.3.0.tgz#ad63de13e163f3dc05d0287eb191cb4578563cb1"
-  integrity sha512-SMbw2kFu09iBajicODSE4pn/K0tOibWyqct71TlzR8cYUBk+u7rkhqGY7US2iYz0HmP851IW7F7eXfXvz09yXA==
-  dependencies:
-    "@uphold/request-logger" "^2.0.0"
-    bluebird "^3.4.1"
-    debugnyan "^1.0.0"
-    json-bigint "^0.2.0"
-    lodash "^4.0.0"
-    request "^2.53.0"
-    semver "^5.1.0"
-    standard-error "^1.1.0"
-
 bl@^1.2.1:
   version "1.2.3"
   resolved "https://registry.yarnpkg.com/bl/-/bl-1.2.3.tgz#1e8dd80142eac80d7158c9dccc047fb620e035e7"
@@ -11996,7 +11982,7 @@ moment@^2.19.3:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
-monero-rpc@0.5.0, monero-rpc@^0.5.0:
+monero-rpc@0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/monero-rpc/-/monero-rpc-0.5.0.tgz#cb2f180d6ace597c0240b8db29e4af99b14beede"
   integrity sha512-Zqvk6V4iiRpWuc/ly0OFG81wnebjMk3Nd31LQUHzyj5EO+yr4gNPMJsQkWLnSksaOQ90TK1JgLukZHp77L6STw==
