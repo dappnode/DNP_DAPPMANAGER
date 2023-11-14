@@ -1339,15 +1339,15 @@
     semver "^7.5.0"
     yaml "^2.2.2"
 
+"@dappnode/types@0.1.30", "@dappnode/types@^0.1.30", "@dappnode/types@^0.1.9":
+  version "0.1.30"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.30.tgz#51c3bf0032862dc2b3546d0e8cb7a574940e924f"
+  integrity sha512-4aH3csMNsXRoP1DQ5BPq1auWMipOj3pAZU3ZAyE6s1HQCak7ivCRz9RLjqbjSZxRJDd37ixOHWMgvDjJ2FuH4A==
+
 "@dappnode/types@^0.1.19":
   version "0.1.23"
   resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.23.tgz#e349661f40402b31fa3cd8651f16aed0ca927a79"
   integrity sha512-24O6fVfKqQHuHOgaNHvA7sbEZzYjCWxyIpFXaxnJxl4da6NRAEd+wZgzNzRQsqC5lLIQkNEc4uS+V+utgSGJuw==
-
-"@dappnode/types@^0.1.30", "@dappnode/types@^0.1.9":
-  version "0.1.30"
-  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.30.tgz#51c3bf0032862dc2b3546d0e8cb7a574940e924f"
-  integrity sha512-4aH3csMNsXRoP1DQ5BPq1auWMipOj3pAZU3ZAyE6s1HQCak7ivCRz9RLjqbjSZxRJDd37ixOHWMgvDjJ2FuH4A==
 
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
@@ -5085,6 +5085,20 @@ bintrees@1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/bintrees/-/bintrees-1.0.2.tgz#49f896d6e858a4a499df85c38fb399b9aff840f8"
   integrity sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==
+
+bitcoin-core@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bitcoin-core/-/bitcoin-core-2.0.0.tgz#defcd4b3bfb6738ea88051b5fe5a944e32c09df0"
+  integrity sha512-I6I7ejzbXfyMtR5/z0BhfjTeN8PMQGD+1B1rpu6IoLcwqoybaSa+P4zYnja/p2xdqjdctmgbOtAaCaaqyVCycQ==
+  dependencies:
+    "@uphold/request-logger" "^2.0.0"
+    bluebird "^3.4.1"
+    debugnyan "^1.0.0"
+    json-bigint "^0.2.0"
+    lodash "^4.0.0"
+    request "^2.53.0"
+    semver "^5.1.0"
+    standard-error "^1.1.0"
 
 bitcoin-core@^2.0.0:
   version "2.3.0"
@@ -11982,7 +11996,7 @@ moment@^2.19.3:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.4.tgz#3dbe052889fe7c1b2ed966fcb3a77328964ef108"
   integrity sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==
 
-monero-rpc@^0.5.0:
+monero-rpc@0.5.0, monero-rpc@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/monero-rpc/-/monero-rpc-0.5.0.tgz#cb2f180d6ace597c0240b8db29e4af99b14beede"
   integrity sha512-Zqvk6V4iiRpWuc/ly0OFG81wnebjMk3Nd31LQUHzyj5EO+yr4gNPMJsQkWLnSksaOQ90TK1JgLukZHp77L6STw==

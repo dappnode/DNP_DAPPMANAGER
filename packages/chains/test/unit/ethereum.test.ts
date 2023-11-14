@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { parseEthereumState } from "../../../../src/modules/chains/drivers/ethereum.js";
-import { ChainDataResult } from "../../../../src/modules/chains/types.js";
+import { parseEthereumState } from "../../src/drivers/ethereum.js";
+import { ChainDataResult } from "../../src/types.js";
 import { parseEthersSyncing } from "@dappnode/utils";
 
 describe("Watchers > chains > ethereum", () => {
@@ -14,7 +14,7 @@ describe("Watchers > chains > ethereum", () => {
         highestBlock: "0x958116",
         startingBlock: "0x0",
         warpChunksAmount: "0x11a3",
-        warpChunksProcessed: "0x111f"
+        warpChunksProcessed: "0x111f",
       };
       const blockNumber = 0;
 
@@ -23,7 +23,7 @@ describe("Watchers > chains > ethereum", () => {
         error: false,
         message: "Syncing snapshot: 4383 / 4515",
         progress: 0.9707641196013289,
-        peers: 23
+        peers: 23,
       };
 
       const chainData = parseEthereumState(
@@ -41,7 +41,7 @@ describe("Watchers > chains > ethereum", () => {
         highestBlock: "0x958362",
         startingBlock: "0x947885",
         warpChunksAmount: null,
-        warpChunksProcessed: null
+        warpChunksProcessed: null,
       };
 
       const blockNumber = 0;
@@ -51,7 +51,7 @@ describe("Watchers > chains > ethereum", () => {
         error: false,
         message: "Blocks synced: 9730183 / 9798498",
         progress: 0.9930280130689418,
-        peers: 23
+        peers: 23,
       };
 
       const chainData = parseEthereumState(

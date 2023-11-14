@@ -88,6 +88,8 @@ COPY packages/stakers/package.json \
   packages/stakers/
 COPY packages/optimism/package.json \
   packages/optimism/
+COPY packages/chains/package.json \
+  packages/chains/
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
 # Build params
@@ -153,6 +155,12 @@ RUN yarn build
 # Build upnpc
 WORKDIR /app/packages/upnpc/
 COPY packages/upnpc/ .
+RUN yarn build
+# Results in dist/*
+
+# Build chains
+WORKDIR /app/packages/chains/
+COPY packages/chains/ .
 RUN yarn build
 # Results in dist/*
 
