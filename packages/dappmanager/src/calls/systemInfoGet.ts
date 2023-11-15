@@ -1,8 +1,8 @@
 import * as db from "@dappnode/db";
 import { getVersionData } from "../utils/getVersionData.js";
-import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
 import { NewFeatureId, SystemInfo } from "@dappnode/common";
 import { ethereumClient } from "@dappnode/installer";
+import { isCoreUpdateEnabled } from "@dappnode/daemons";
 
 /**
  * Returns the current DAppNode system info
@@ -69,8 +69,7 @@ function getNewFeatureIds(): NewFeatureId[] {
   }
 
   // auto-updates: Show only if all are disabled
-  if (!autoUpdateHelper.isCoreUpdateEnabled())
-    newFeatureIds.push("system-auto-updates");
+  if (!isCoreUpdateEnabled()) newFeatureIds.push("system-auto-updates");
 
   // enable-ethical-metrics: Show only if not seen
   if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")

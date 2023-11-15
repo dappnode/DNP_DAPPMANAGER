@@ -1,8 +1,5 @@
 import { OptimismConfigGet, OptimismConfigSet } from "@dappnode/common";
-import {
-  getOptimismConfig,
-  setOptimismConfig
-} from "../modules/optimism/index.js";
+import { getOptimismConfig, setOptimismConfig } from "@dappnode/optimism";
 
 /**
  * Enables Optimism with the given configuration:

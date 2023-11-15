@@ -2,8 +2,11 @@ import { eventBus } from "@dappnode/eventbus";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
-import { getIsInstalled, getIsUpdated } from "./fetchDnpRequest.js";
-import { fileToGatewayUrl } from "@dappnode/utils";
+import {
+  fileToGatewayUrl,
+  getIsInstalled,
+  getIsUpdated
+} from "@dappnode/utils";
 import { throttle } from "lodash-es";
 import {
   getEthProviderUrl,

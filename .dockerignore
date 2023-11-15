@@ -1,43 +1,45 @@
 # Prevent Dockerfile modifications to trigger layer recomputation
-build/Dockerfile
+Dockerfile
 
 # Dependencies
 node_modules/
-
-# Accelerate COPY build/src . command
 packages/*/node_modules/
-packages/*/tmp_dnp_repo/
-packages/*/dnp_repo/
-packages/*/DNCORE/
-packages/*/cache/
-packages/*/dappmanagerdb.json
+packages/*/npm-debug.log
+packages/*/yarn-error.log
+
+# Compiled files
+packages/*/build/
+packages/*/dist
 
 # Test artifacts
-test_build/
-test_build/*
-test_build/.git/
-test_build/.git/*
-packages/*/undefined/
-packages/*/test_files/
-packages/*/test_files/*
-packages/*/test_mountpoints_*/
-packages/*/test_mountpoints_*/*
-packages/*/.temp-transfer/
-packages/*/.temp-transfer/*
+packages/*/*test*
+packages/*/src/*test*
 
-# Test files
-packages/admin-ui/src/__tests__
-packages/dappmanager/test
+# Dev artifacts
+packages/*/.prettierrc*
+packages/*/.prettierignore
+#packages/*/.eslintrc*
+packages/*/.eslintignore
+packages/*/.mocharc*
+
+# README files
+README.md
+packages/*/README.md
 
 # Version data file
 .version.json
 
-# UI
-packages/*/node_modules
-packages/*/npm-debug.log
-
-# Mock server is only for developing
-packages/*/server-mock
-
 # Version builds
 build_*/
+
+# Package admin-ui files
+packages/admin-ui/server-mock
+packages/admin-ui/__mock-backend__
+packages/admin-ui/tsconfig.server-mock.json
+packages/admin-ui/nodemon.json
+
+# Package dappmanager files
+packages/dappmanager/dnp_repo
+packages/dappmanager/DNCORE
+packages/dappmanager/maindb.json
+packages/dappmanager/test_mountpoints

@@ -11,7 +11,7 @@ import {
   editCoreSetting,
   isUpdateDelayCompleted,
   flagCompletedUpdate
-} from "../../../src/utils/autoUpdateHelper.js";
+} from "@dappnode/daemons";
 import { params } from "@dappnode/params";
 import rewiremock from "rewiremock/webpack";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";

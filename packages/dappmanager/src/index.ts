@@ -7,7 +7,7 @@ import {
   copyHostServices
 } from "@dappnode/hostscriptsservices";
 import { postRestartPatch } from "@dappnode/installer";
-import { startDaemons } from "./daemons/index.js";
+import { startDaemons } from "@dappnode/daemons";
 import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger } from "@dappnode/logger";
@@ -21,7 +21,7 @@ import {
 } from "./utils/getVersionData.js";
 import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startDappmanager } from "./startDappmanager.js";
-import { startAvahiDaemon } from "./daemons/avahi/index.js";
+import { startAvahiDaemon } from "@dappnode/daemons";
 import { executeMigrations } from "./modules/migrations/index.js";
 import { startTestApi } from "./api/startTestApi.js";
 import {

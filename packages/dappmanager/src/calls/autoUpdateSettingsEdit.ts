@@ -1,9 +1,9 @@
 import {
-  MY_PACKAGES, // "my-packages"
-  SYSTEM_PACKAGES, // "system-packages"
-  editDnpSetting,
-  editCoreSetting
-} from "../utils/autoUpdateHelper.js";
+  editCoreSetting,
+  MY_PACKAGES,
+  SYSTEM_PACKAGES,
+  editDnpSetting
+} from "@dappnode/daemons";
 
 /**
  * Edits the auto-update settings
