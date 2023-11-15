@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { seedToPrivateKey } from "../../../src/utils/seedPhrase.js";
+import { seedToPrivateKey } from "../../../src/calls/seedPhraseSet.js";
 
 describe("Util > seedPhrase", () => {
   describe("seedToPrivateKey", () => {

@@ -10,7 +10,7 @@ import { shell } from "@dappnode/utils";
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-export default function verifyXz(xzFilePath: string): Promise<{
+export function verifyXz(xzFilePath: string): Promise<{
   success: boolean;
   message: string;
 }> {

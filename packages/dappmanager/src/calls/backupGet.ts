@@ -8,7 +8,7 @@ import { params } from "@dappnode/params";
 import { listPackage } from "@dappnode/dockerapi";
 // Utils
 import { shell } from "@dappnode/utils";
-import validateBackupArray from "../utils/validateBackupArray.js";
+import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;

@@ -6,7 +6,7 @@ import { logs } from "@dappnode/logger";
 import { listPackage } from "@dappnode/dockerapi";
 import { packageRestart } from "./packageRestart.js";
 import { shell } from "@dappnode/utils";
-import validateBackupArray from "../utils/validateBackupArray.js";
+import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;

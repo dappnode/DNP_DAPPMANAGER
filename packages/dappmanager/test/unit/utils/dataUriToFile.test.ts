@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import dataUriToFile from "../../../src/utils/dataUriToFile.js";
+import { dataUriToFile } from "../../../src/calls/copyFileTo.js";
 import { cleanTestDir, createTestDir } from "../../testUtils.js";
 
 const testDir = "test_files";

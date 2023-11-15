@@ -4,7 +4,7 @@ import { shell } from "@dappnode/utils";
 import path from "path";
 import { createTestDir, cleanTestDir, testDir } from "../../testUtils.js";
 
-import verifyXz from "../../../src/utils/verifyXz.js";
+import { verifyXz } from "../../../src/utils/index.js";
 
 const okFilePath = path.join(testDir, "ok-file.txt.xz");
 const okFilePreCompress = okFilePath.replace(".xz", "");

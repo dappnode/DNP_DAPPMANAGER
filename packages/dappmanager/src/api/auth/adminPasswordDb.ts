@@ -1,6 +1,6 @@
 import bcrypt from "bcryptjs";
 import { JsonFileDb } from "@dappnode/utils";
-import { getRandomAlphanumericToken } from "../../utils/token.js";
+import { getRandomAlphanumericToken } from "./token.js";
 
 export enum AdminPasswordDbError {
   PASSWORD_CHANGED = "ADMIN_PASSWORD_DB_ERROR_PASSWORD_CHANGED"
