@@ -1,4 +1,4 @@
-import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen.js";
+import { getPortsToOpen } from "@dappnode/daemons";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import { PackageContainer, PortToOpen } from "@dappnode/common";
 

@@ -44,3 +44,6 @@ export { getIsInstalled } from "./getIsInstalled.js";
 export { getIsRunning } from "./getIsRunning.js";
 export { getIsUpdated } from "./getIsUpdated.js";
 export { shouldUpdate } from "./shouldUpdate.js";
+export { getPublicIpFromUrls } from "./getPublicIpFromUrls.js";
+export { computeSemverUpdateType } from "./computeSemverUpdateType.js";
+export * from "./coreVersionId.js";

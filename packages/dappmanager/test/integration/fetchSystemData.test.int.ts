@@ -3,10 +3,7 @@ import { expect } from "chai";
 import * as calls from "../../src/calls/index.js";
 import { logs } from "@dappnode/logger";
 import { AutoUpdateSettings } from "@dappnode/common";
-import {
-  MY_PACKAGES,
-  SYSTEM_PACKAGES
-} from "../../src/utils/autoUpdateHelper.js";
+import { MY_PACKAGES, SYSTEM_PACKAGES } from "@dappnode/daemons";
 import { clearDbs } from "../testUtils.js";
 
 describe("Auto update data", () => {
