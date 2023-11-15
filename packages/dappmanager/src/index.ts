@@ -6,7 +6,6 @@ import {
   copyHostServices
 } from "@dappnode/hostscriptsservices";
 import { postRestartPatch } from "@dappnode/installer";
-import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -17,7 +16,7 @@ import {
   isNewDappmanagerVersion,
   generateKeyPair
 } from "./utils/index.js";
-import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
+import { createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startDappmanager } from "./startDappmanager.js";
 import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
@@ -31,7 +30,6 @@ import {
 const controller = new AbortController();
 
 const vpnApiClient = getVpnApiClient(params);
-const sshManager = new SshManager({ shellHost });
 
 // Start HTTP API
 const server = startDappmanager({
@@ -46,8 +44,7 @@ const server = startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion,
-  vpnApiClient,
-  sshManager
+  vpnApiClient
 });
 
 // Start Test API
