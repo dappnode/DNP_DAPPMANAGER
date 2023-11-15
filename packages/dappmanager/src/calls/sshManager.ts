@@ -1,10 +1,14 @@
 import { ShhStatus } from "@dappnode/common";
-import { ShellError } from "@dappnode/utils";
+import { ShellError, shellHost } from "@dappnode/utils";
 
-export type ShellHost = (cmd: string) => Promise<string>;
+type ShellHost = (cmd: string) => Promise<string>;
 
-export class SshManager {
-  readonly shellHost: ShellHost;
+class SshManager {
+  private readonly shellHost: ShellHost;
+
+  // ### TODO: Review these numbers
+  private readonly maxPortNumber = 32600;
+  private readonly minPortNumber = 22;
 
   constructor({ shellHost }: { shellHost: ShellHost }) {
     this.shellHost = shellHost;
@@ -13,7 +17,7 @@ export class SshManager {
   /**
    * Start and enable ssh.service (sshd)
    */
-  async enable(): Promise<void> {
+  private async enable(): Promise<void> {
     // Sample response if disabled
     // ---------------------------
     // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl enable ssh.service
@@ -31,7 +35,7 @@ export class SshManager {
   /**
    * Stop and disable ssh.service (sshd)
    */
-  async disable(): Promise<void> {
+  private async disable(): Promise<void> {
     // Sample response if disabled
     // ---------------------------
     // [root@DAppNodeLion:/usr/src/dappnode/DNCORE]# systemctl disable ssh.service
@@ -49,7 +53,7 @@ export class SshManager {
   /**
    * Call systemctl and check if ssh.service (sshd) is active
    */
-  async getStatus(): Promise<ShhStatus> {
+  private async getStatus(): Promise<ShhStatus> {
     // # Status
 
     // is-active PATTERN...
@@ -103,7 +107,7 @@ export class SshManager {
    * Change SSH port by modifing /etc/ssh/sshd_config
    * Then restarts ssh.service (sshd)
    */
-  async setPort(port: number): Promise<void> {
+  private async setPort(port: number): Promise<void> {
     if (isNaN(port)) throw Error(`Port is not a number: ${port}`);
     if (port <= 0) throw Error(`Port must be > 0: ${port}`);
     if (port >= 65536) throw Error(`Port must be < 65536: ${port}`);
@@ -122,7 +126,7 @@ export class SshManager {
    * ```
    * to get the current port
    */
-  async getPort(): Promise<number> {
+  private async getPort(): Promise<number> {
     const sshdConfig = await this.shellHost("cat /etc/ssh/sshd_config");
 
     const regexMatch = sshdConfig.match(/Port (\d+)/);
@@ -139,4 +143,63 @@ export class SshManager {
       `sed -- -i "s/.*PermitRootLogin .*/PermitRootLogin no/g" /etc/ssh/sshd_config`
     );
   }
+
+  // Public methods from SshCalls are added below:
+
+  public async sshStatusSet({
+    status
+  }: {
+    status: "enabled" | "disabled";
+  }): Promise<void> {
+    switch (status) {
+      case "enabled":
+        return await this.enable();
+      case "disabled":
+        return await this.disable();
+      default:
+        throw Error(`Unknown status ${status}`);
+    }
+  }
+
+  public async sshStatusGet(): Promise<ShhStatus> {
+    return await this.getStatus();
+  }
+
+  public async sshPortSet({ port }: { port: number }): Promise<void> {
+    if (isNaN(port) || !isFinite(port)) throw Error(`Invalid port ${port}`);
+    if (port > this.maxPortNumber)
+      throw Error(`Port ${port} over maxPortNumber ${this.maxPortNumber}`);
+    if (port < this.minPortNumber)
+      throw Error(`Port ${port} under minPortNumber ${this.minPortNumber}`);
+
+    await this.setPort(port);
+  }
+
+  public async sshPortGet(): Promise<number> {
+    return await this.getPort();
+  }
+}
+
+const sshManager = new SshManager({ shellHost });
+
+// CALLS
+
+export async function sshPortSet({ port }: { port: number }): Promise<void> {
+  return await sshManager.sshPortSet({ port });
+}
+
+export async function sshPortGet(): Promise<number> {
+  return await sshManager.sshPortGet();
+}
+
+export async function sshStatusSet({
+  status
+}: {
+  status: "enabled" | "disabled";
+}): Promise<void> {
+  return await sshManager.sshStatusSet({ status });
+}
+
+export async function sshStatusGet(): Promise<ShhStatus> {
+  return await sshManager.sshStatusGet();
 }

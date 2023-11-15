@@ -59,6 +59,7 @@ export * from "./releaseTrustedKey.js";
 export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { statsCpuGet } from "./statsCpuGet.js";
+export * from "./sshManager.js";
 export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";

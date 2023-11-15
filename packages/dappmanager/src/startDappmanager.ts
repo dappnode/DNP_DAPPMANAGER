@@ -8,10 +8,8 @@ import { Logs } from "@dappnode/logger";
 import { EventBus } from "@dappnode/eventbus";
 import { LoggerMiddleware, Routes } from "@dappnode/common";
 import { DeviceCalls } from "./calls/device/index.js";
-import { SshCalls } from "./calls/ssh/index.js";
 import { startHttpApi, HttpApiParams, HttpRoutes } from "./api/startHttpApi.js";
 import { VpnApiClient } from "./api/vpnApiClient.js";
-import { SshManager } from "./modules/sshManager.js";
 
 interface DappmanagerParams extends HttpApiParams, AdminPasswordDbParams {}
 
@@ -27,8 +25,7 @@ export function startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion,
-  vpnApiClient,
-  sshManager
+  vpnApiClient
 }: {
   params: DappmanagerParams;
   logs: Logs;
@@ -37,12 +34,11 @@ export function startDappmanager({
   counterViewsMiddleware: RequestHandler;
   ethForwardMiddleware: RequestHandler;
   routesLogger: LoggerMiddleware;
-  methods: Omit<Routes, keyof DeviceCalls | keyof SshCalls>;
+  methods: Omit<Routes, keyof DeviceCalls>;
   subscriptionsLogger: LoggerMiddleware;
   eventBus: EventBus;
   isNewDappmanagerVersion: () => boolean;
   vpnApiClient: VpnApiClient;
-  sshManager: SshManager;
 }): http.Server {
   const adminPasswordDb = new AdminPasswordDb(params);
   const deviceCalls = new DeviceCalls({
@@ -50,7 +46,6 @@ export function startDappmanager({
     adminPasswordDb,
     vpnApiClient
   });
-  const sshCalls = new SshCalls({ sshManager });
 
   // Start HTTP API
   return startHttpApi({
@@ -61,7 +56,7 @@ export function startDappmanager({
     counterViewsMiddleware,
     ethForwardMiddleware,
     routesLogger,
-    methods: { ...methods, ...deviceCalls, ...sshCalls },
+    methods: { ...methods, ...deviceCalls },
     subscriptionsLogger,
     adminPasswordDb,
     eventBus,
