@@ -1,10 +1,9 @@
 import { orderBy } from "lodash-es";
-import { logs } from "@dappnode/logger";
 import { UserActionLog } from "@dappnode/common";
 import { isNotFoundError } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import fs from "fs";
-import { logUserAction } from "@dappnode/logger";
+import { logUserAction, logs } from "@dappnode/logger";
 
 /**
  * Migrate winston .log JSON file to a lowdb
@@ -23,7 +22,7 @@ export async function migrateUserActionLogs(): Promise<void> {
         userActionLogs.push({
           ...winstonLog,
           args: winstonLog.args || [winstonLog.kwargs],
-          timestamp: new Date(winstonLog.timestamp).getTime()
+          timestamp: new Date(winstonLog.timestamp).getTime(),
         });
       } catch (e) {
         logs.debug(`Error parsing user action log row: ${e.message}\n${row}`);
@@ -33,7 +32,7 @@ export async function migrateUserActionLogs(): Promise<void> {
     logUserAction.set(
       orderBy(
         [...logUserAction.get(), ...userActionLogs],
-        log => log.timestamp,
+        (log) => log.timestamp,
         "desc"
       )
     );

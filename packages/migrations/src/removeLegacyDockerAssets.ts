@@ -1,17 +1,19 @@
 import { logs } from "@dappnode/logger";
-import { shell, getManifestPath, getEnvFilePath } from "@dappnode/utils";
 import {
   dockerVolumesList,
   dockerVolumeRemove,
   dockerContainerRemove,
-  listPackages
+  listPackages,
 } from "@dappnode/dockerapi";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/common";
 import {
   getDockerComposePath,
   isNotFoundError,
-  parseEnvironment
+  parseEnvironment,
+  shell,
+  getManifestPath,
+  getEnvFilePath,
 } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
@@ -23,7 +25,7 @@ const volumesToRemove = [
   // must be removed for the bind state to be reset
   "dncore_binddnpdappnodeeth_bind",
   // Volume shared between ADMIN and VPN to share credentials
-  "vpndnpdappnodeeth_shared"
+  "vpndnpdappnodeeth_shared",
 ];
 
 const dnpsToRemove = [
@@ -33,7 +35,7 @@ const dnpsToRemove = [
   "admin.dnp.dappnode.eth",
   // DNP_ETHFORWARD functionality has been moved to the DAPPMANAGER
   // The migration is just deleting the container and clearing it's assets
-  "ethforward.dnp.dappnode.eth"
+  "ethforward.dnp.dappnode.eth",
 ];
 
 /**
@@ -43,13 +45,13 @@ export async function removeLegacyDockerAssets(): Promise<void> {
   const dnpList = await listPackages();
   const volumes = await dockerVolumesList();
 
-  migrateLegacyEnvFiles(dnpList).catch(e =>
+  migrateLegacyEnvFiles(dnpList).catch((e) =>
     logs.error("Error migrate env_files", e)
   );
 
   // Remove legacy volumes
   for (const volName of volumesToRemove)
-    if (volumes.some(vol => vol.Name === volName))
+    if (volumes.some((vol) => vol.Name === volName))
       try {
         const users = await shell(`docker ps -aq --filter volume=${volName}`);
         // Delete only if has no users
@@ -62,7 +64,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
 
   // Remove legacy containers
   for (const dnpName of dnpsToRemove) {
-    const dnp = dnpList.find(d => d.dnpName === dnpName);
+    const dnp = dnpList.find((d) => d.dnpName === dnpName);
     if (dnp)
       try {
         // Remove / uninstall DNP
@@ -72,7 +74,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
         // Clean manifest and docker-compose
         for (const filepath of [
           getDockerComposePath(dnpName, true),
-          getManifestPath(dnpName, true)
+          getManifestPath(dnpName, true),
         ])
           if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 

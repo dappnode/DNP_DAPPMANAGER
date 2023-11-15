@@ -21,6 +21,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/migrations": "^0.1.0",
     "@dappnode/chains": "^0.1.0",
     "@dappnode/common": "^0.1.0",
     "@dappnode/daemons": "^0.1.0",

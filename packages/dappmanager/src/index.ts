@@ -22,7 +22,7 @@ import {
 import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startDappmanager } from "./startDappmanager.js";
 import { startAvahiDaemon } from "@dappnode/daemons";
-import { executeMigrations } from "./modules/migrations/index.js";
+import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
 import {
   getLimiter,

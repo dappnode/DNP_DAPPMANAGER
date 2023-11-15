@@ -2,23 +2,24 @@ import { ComposeNetwork, ComposeServiceNetwork } from "@dappnode/types";
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import { PackageContainer } from "@dappnode/common";
-import { getPrivateNetworkAliases } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import { parseComposeSemver } from "../../utils/sanitizeVersion.js";
-import { shell } from "@dappnode/utils";
 import {
   ComposeFileEditor,
-  parseServiceNetworks
+  parseServiceNetworks,
 } from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getDnCoreNetworkContainerConfig
+  getDnCoreNetworkContainerConfig,
 } from "@dappnode/dockerapi";
-import { gte, lt } from "semver";
-import { getDockerComposePath } from "@dappnode/utils";
+import { gte, lt, clean } from "semver";
+import {
+  getDockerComposePath,
+  getPrivateNetworkAliases,
+  shell,
+} from "@dappnode/utils";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
@@ -46,7 +47,7 @@ export async function addAliasToGivenContainers(
       const service = {
         serviceName: container.serviceName,
         dnpName: container.dnpName,
-        isMainOrMonoservice: container.isMain ?? false // false if isMain is undefined
+        isMainOrMonoservice: container.isMain ?? false, // false if isMain is undefined
       };
 
       const aliases = getPrivateNetworkAliases(service);
@@ -70,8 +71,7 @@ export async function addAliasToGivenContainers(
         );
         logs.info(`aliases ${aliases} added to ${container.containerName}`);
       }
-    }
-    catch (e) {
+    } catch (e) {
       logs.error(`Error adding aliases to ${container.containerName}`, e);
     }
   }
@@ -137,7 +137,7 @@ export function migrateCoreNetworkAndAliasInCompose(
   )
     compose.compose = {
       ...compose.compose,
-      version: params.MINIMUM_COMPOSE_VERSION
+      version: params.MINIMUM_COMPOSE_VERSION,
     };
 
   // Add aliases to service
@@ -163,7 +163,7 @@ function updateEndpointConfig(
   const newAliases = uniq([...currentAliases, ...aliases]);
   return {
     ...currentEndpointConfig,
-    Aliases: newAliases
+    Aliases: newAliases,
   };
 }
 
@@ -199,9 +199,9 @@ function hasAliases(
 ): boolean {
   return Boolean(
     endpointConfig &&
-    endpointConfig.Aliases &&
-    Array.isArray(endpointConfig.Aliases) &&
-    aliases.every(alias => endpointConfig.Aliases?.includes(alias))
+      endpointConfig.Aliases &&
+      Array.isArray(endpointConfig.Aliases) &&
+      aliases.every((alias) => endpointConfig.Aliases?.includes(alias))
   );
 }
 
@@ -230,9 +230,33 @@ function isComposeNetworkAndAliasMigrated(
       parseComposeSemver(composeVersion),
       parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
     ) && // Check version is at least 3.5
-    aliases.every(alias => dncoreServiceNetwork.aliases?.includes(alias)) // Check every alias is already present
+    aliases.every((alias) => dncoreServiceNetwork.aliases?.includes(alias)) // Check every alias is already present
   )
     return true;
 
   return false; // In other cases return false
+}
+
+// UTILS
+
+/**
+ * Return a version with low level of constraints that can be used by semver
+ * Or throw an error if cannot be cleaned
+ */
+function sanitizeVersion(version: string): string {
+  const sanitizedVersion = clean(version, {
+    loose: true,
+  });
+  if (!sanitizedVersion)
+    throw Error(`Error: ${version} cannot be used by semver`);
+  return sanitizedVersion;
+}
+
+/**
+ * A compose version has format `major.minor` (i.e. `3.5`) which is not valid semver.
+ * This function returns a valid semver by setting `patch = 0`, allowing to compare with semver fns,
+ * i.e. `semver.gt()`
+ */
+function parseComposeSemver(composeVersion: string): string {
+  return sanitizeVersion(composeVersion + ".0");
 }
