@@ -6,7 +6,7 @@ import { isNotFoundError } from "@dappnode/utils";
 const hostnamePath = params.HOSTNAME_PATH;
 const defaultName = "DAppNode_server";
 
-export default function getServerName(): string {
+export function getServerName(): string {
   try {
     const rawName = fs.readFileSync(hostnamePath, "utf-8");
     return rawName.trim() || defaultName;

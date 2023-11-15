@@ -26,7 +26,7 @@ function getInstallationStaticIp(): string {
   }
 }
 
-export default async function getStaticIp(): Promise<string> {
+export async function getStaticIp(): Promise<string> {
   if (db.importedInstallationStaticIp.get()) return db.staticIp.get();
 
   const staticIp = await getInstallationStaticIp();

@@ -1,27 +1,25 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
-import { generateKeyPair } from "./utils/publickeyEncryption.js";
 import {
   copyHostScripts,
   copyHostServices
 } from "@dappnode/hostscriptsservices";
 import { postRestartPatch } from "@dappnode/installer";
-import { startDaemons } from "@dappnode/daemons";
 import { SshManager } from "./modules/sshManager.js";
 import * as calls from "./calls/index.js";
-import { routesLogger, subscriptionsLogger } from "@dappnode/logger";
+import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
-import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
 import {
   getVersionData,
-  isNewDappmanagerVersion
-} from "./utils/getVersionData.js";
+  isNewDappmanagerVersion,
+  generateKeyPair
+} from "./utils/index.js";
 import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startDappmanager } from "./startDappmanager.js";
-import { startAvahiDaemon } from "@dappnode/daemons";
+import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
 import {

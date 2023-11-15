@@ -1,8 +1,9 @@
-import { storePrivateKeyFromSeed } from "../utils/seedPhrase.js";
-import { decrypt } from "../utils/publickeyEncryption.js";
+import { decrypt } from "../utils/index.js";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
+import fs from "fs";
+import { utils as ethersUtils } from "ethers";
 
 const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
 
@@ -34,4 +35,42 @@ export async function seedPhraseSet({
 
   // Notify the UI of the identityAddress and seedPhrase change
   eventBus.requestSystemInfo.emit();
+}
+
+// Utils
+
+const privateKeyPath = params.PRIVATE_KEY_PATH;
+const standardEthereumDerivationPath = "m/44'/60'/0'/0/0";
+
+interface EthereumKeys {
+  privateKey: string;
+  publicKey: string;
+  address: string;
+}
+
+export function seedToPrivateKey(seedPhrase: string): EthereumKeys {
+  const seedPhraseArray = seedPhrase.trim().split(/\s+/g);
+  if (seedPhraseArray.length !== 12)
+    throw Error("seed phrase must contain exactly 12 words");
+  const correctedSeedPhrase = seedPhraseArray.join(" ");
+
+  const masterNode = ethersUtils.HDNode.fromMnemonic(correctedSeedPhrase);
+  const { privateKey, publicKey, address } = masterNode.derivePath(
+    standardEthereumDerivationPath
+  );
+  return {
+    privateKey,
+    publicKey,
+    address
+  };
+}
+
+export function storePrivateKeyFromSeed(seedPhrase: string): void {
+  const keys = seedToPrivateKey(seedPhrase);
+  storePrivateKey(keys);
+}
+
+function storePrivateKey(keys: EthereumKeys): void {
+  fs.writeFileSync(privateKeyPath, keys.privateKey);
+  db.identityAddress.set(keys.address);
 }
