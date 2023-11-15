@@ -2,8 +2,8 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import { PackageContainer } from "@dappnode/common";
-import { addAliasToGivenContainers } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
-import { mockContainer, shellSafe } from "../../testUtils.js";
+import { addAliasToGivenContainers } from "../../src/addAliasToRunningContainers.js";
+import { mockContainer, shellSafe } from "../testUtils.js";
 import { params } from "@dappnode/params";
 
 const DNP_NAME = "logger.dnp.dappnode.eth";
@@ -24,7 +24,7 @@ const monoContainer: PackageContainer = {
   dnpName: `${DNP_NAME_MONO}`,
   serviceName: `${DNP_NAME_MONO}`,
   isCore: false,
-  isMain: true
+  isMain: true,
 };
 
 const monoContainerPublic: PackageContainer = {
@@ -33,7 +33,7 @@ const monoContainerPublic: PackageContainer = {
   dnpName: `${DNP_NAME_MONO_PUBLIC}`,
   serviceName: `service`,
   isCore: false,
-  isMain: true
+  isMain: true,
 };
 
 const containerMain: PackageContainer = {
@@ -42,7 +42,7 @@ const containerMain: PackageContainer = {
   dnpName: `${DNP_NAME}`,
   serviceName: "mainService",
   isMain: true,
-  isCore: false
+  isCore: false,
 };
 
 const containerNotMain: PackageContainer = {
@@ -51,7 +51,7 @@ const containerNotMain: PackageContainer = {
   dnpName: `${DNP_NAME}`,
   serviceName: "notmainService",
   isMain: false,
-  isCore: false
+  isCore: false,
 };
 
 const containerMainPublic: PackageContainer = {
@@ -60,7 +60,7 @@ const containerMainPublic: PackageContainer = {
   dnpName: `${DNP_NAME_PUBLIC}`,
   serviceName: "mainService",
   isMain: true,
-  isCore: false
+  isCore: false,
 };
 
 const containerNotMainPublic: PackageContainer = {
@@ -69,7 +69,7 @@ const containerNotMainPublic: PackageContainer = {
   dnpName: `${DNP_NAME_PUBLIC}`,
   serviceName: "notmainService",
   isMain: false,
-  isCore: false
+  isCore: false,
 };
 
 //We check 6 possible containers:
@@ -85,7 +85,7 @@ const containers = [
   monoContainer,
   containerMainPublic,
   containerNotMainPublic,
-  monoContainerPublic
+  monoContainerPublic,
 ];
 
 const CONTAINER_COMPOSE = `
@@ -187,7 +187,7 @@ async function removeDirectories(directoryPaths: string[]) {
   }
 }
 
-describe("Add alias to running containers", function () {
+describe("Add alias to running containers", function() {
   this.timeout(1200000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
     await ensureNetworkExists(DNCORE_NETWORK);
@@ -196,7 +196,7 @@ describe("Add alias to running containers", function () {
       { path: TEST_ALIAS_PATH, content: CONTAINER_COMPOSE },
       { path: TEST_ALIAS_PATH_PUBLIC, content: CONTAINER_COMPOSE_PUBLIC },
       { path: TEST_ALIAS_PATH_MONO, content: MONO_COMPOSE },
-      { path: TEST_ALIAS_PATH_MONO_PUBLIC, content: MONO_COMPOSE_PUBLIC }
+      { path: TEST_ALIAS_PATH_MONO_PUBLIC, content: MONO_COMPOSE_PUBLIC },
     ];
 
     for (const config of composeConfigs) {
@@ -217,17 +217,17 @@ describe("Add alias to running containers", function () {
       containerMainPublic.containerName,
       containerNotMainPublic.containerName,
       monoContainer.containerName,
-      monoContainerPublic.containerName
+      monoContainerPublic.containerName,
     ];
 
     // Check if all containers exist
-    const containerExistsPromises = containerNamesToCheck.map(containerName =>
+    const containerExistsPromises = containerNamesToCheck.map((containerName) =>
       shellSafe(`docker container ls --filter name=${containerName}`)
     );
 
     const containerExistResults = await Promise.all(containerExistsPromises);
 
-    if (containerExistResults.some(result => !result)) {
+    if (containerExistResults.some((result) => !result)) {
       throw new Error("Error creating containers");
     }
   });
@@ -239,37 +239,37 @@ describe("Add alias to running containers", function () {
     const containersToTest = [
       {
         container: containerMain,
-        expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"]
+        expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"],
       },
       {
         container: containerNotMain,
-        expectedAliases: ["notmainService.logger.dappnode"]
+        expectedAliases: ["notmainService.logger.dappnode"],
       },
       {
         container: monoContainer,
         expectedAliases: [
           "logger-mono.dnp.dappnode.eth.logger-mono.dappnode",
-          "logger-mono.dappnode"
-        ]
+          "logger-mono.dappnode",
+        ],
       },
       {
         container: monoContainerPublic,
         expectedAliases: [
           "service.logger-mono.public.dappnode",
-          "logger-mono.public.dappnode"
-        ]
+          "logger-mono.public.dappnode",
+        ],
       },
       {
         container: containerMainPublic,
         expectedAliases: [
           "mainService.logger.public.dappnode",
-          "logger.public.dappnode"
-        ]
+          "logger.public.dappnode",
+        ],
       },
       {
         container: containerNotMainPublic,
-        expectedAliases: ["notmainService.logger.public.dappnode"]
-      }
+        expectedAliases: ["notmainService.logger.public.dappnode"],
+      },
     ];
 
     for (const { container, expectedAliases } of containersToTest) {
@@ -282,17 +282,19 @@ describe("Add alias to running containers", function () {
   });
 
   after("Cleanup", async () => {
-    const containerNames = containers.map(container => container.containerName);
+    const containerNames = containers.map(
+      (container) => container.containerName
+    );
     const directoryPaths = [
       TEST_ALIAS_PATH,
       TEST_ALIAS_PATH_MONO,
       TEST_ALIAS_PATH_PUBLIC,
-      TEST_ALIAS_PATH_MONO_PUBLIC
+      TEST_ALIAS_PATH_MONO_PUBLIC,
     ];
 
     await Promise.all([
       stopAndRemoveContainers(containerNames),
-      removeDirectories(directoryPaths)
+      removeDirectories(directoryPaths),
     ]);
 
     // Remove the DNCORE_NETWORK if it exists

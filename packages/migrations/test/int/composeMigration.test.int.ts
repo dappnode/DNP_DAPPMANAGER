@@ -1,10 +1,10 @@
 import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/common";
-import { migrateCoreNetworkAndAliasInCompose } from "../../../src/modules/migrations/addAliasToRunningContainers.js";
-import { removeDnsFromPackageComposeFile } from "../../../src/modules/migrations/removeDnsFromComposeFiles.js";
+import { migrateCoreNetworkAndAliasInCompose } from "../../src/addAliasToRunningContainers.js";
+import { removeDnsFromPackageComposeFile } from "../../src/removeDnsFromComposeFiles.js";
 import { params } from "@dappnode/params";
-import { mockContainer, shellSafe } from "../../testUtils.js";
+import { mockContainer, shellSafe } from "../testUtils.js";
 
 describe("Migration", () => {
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
@@ -21,8 +21,8 @@ describe("Migration", () => {
     serviceName,
     networks: [
       { name: "random", ip: "10.0.1.1" },
-      { name: "dncore_network", ip: "172.33.1.7" }
-    ]
+      { name: "dncore_network", ip: "172.33.1.7" },
+    ],
   };
 
   const composeNoDns = `

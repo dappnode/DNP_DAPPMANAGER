@@ -1,9 +1,12 @@
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { EthClientTarget } from "@dappnode/common";
-import { packageGet } from "../../calls/index.js";
-import { EthClientTargetPackage, UserSettings } from "@dappnode/common";
+import { packageGet } from "@dappnode/installer";
+import {
+  EthClientTargetPackage,
+  UserSettings,
+  EthClientTarget,
+} from "@dappnode/common";
 
 /**
  * Link between an ethClientTarget keyword and its pacakge information
@@ -20,13 +23,15 @@ const ethClientData: {
   geth: { dnpName: "geth.dnp.dappnode.eth" },
   nethermind: { dnpName: "nethermind.public.dappnode.eth" },
   besu: { dnpName: "besu.public.dappnode.eth" },
-  erigon: { dnpName: "erigon.dnp.dappnode.eth" }
+  erigon: { dnpName: "erigon.dnp.dappnode.eth" },
 };
 
 /**
  * Switches ethClientTarget in the following preference order: geth > nethermind > remote
  */
-export async function switchEthClientIfOpenethereumOrGethLight(): Promise<void> {
+export async function switchEthClientIfOpenethereumOrGethLight(): Promise<
+  void
+> {
   const ethClientTarget = db.ethClientTarget.get() as
     | EthClientTarget
     | null
@@ -36,12 +41,12 @@ export async function switchEthClientIfOpenethereumOrGethLight(): Promise<void> 
   if (ethClientTarget === "openethereum") {
     // Check for geth
     const gethPackage = await listPackageNoThrow({
-      dnpName: ethClientData.geth.dnpName
+      dnpName: ethClientData.geth.dnpName,
     });
     if (gethPackage) {
       logs.info("Setting ethClientTarget to geth");
       const gethPackageData = await packageGet({
-        dnpName: ethClientData.geth.dnpName
+        dnpName: ethClientData.geth.dnpName,
       });
 
       const gethEnvironment = gethPackageData.userSettings?.environment;
@@ -54,7 +59,7 @@ export async function switchEthClientIfOpenethereumOrGethLight(): Promise<void> 
 
     // Check for nethermind
     const nethermindPackage = await listPackageNoThrow({
-      dnpName: ethClientData.nethermind.dnpName
+      dnpName: ethClientData.nethermind.dnpName,
     });
     if (nethermindPackage) {
       logs.info("Setting ethClientTarget to nethermind");
