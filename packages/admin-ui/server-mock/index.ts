@@ -4,7 +4,6 @@ import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
 import { LoggerMiddleware } from "@dappnode/common";
 import { MockVpnApiClient } from "./mockVpnClient";
 import { eventBus } from "./eventBus";
-import { MockSshManager } from "./mockSshManager";
 
 const testFileDir = "test_files";
 
@@ -70,6 +69,5 @@ startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion: () => false,
-  vpnApiClient: new MockVpnApiClient(),
-  sshManager: new MockSshManager()
+  vpnApiClient: new MockVpnApiClient()
 });
