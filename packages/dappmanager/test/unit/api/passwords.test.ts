@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { getRandomAlphanumericToken } from "../../../src/utils/token.js";
+import { getRandomAlphanumericToken } from "../../../src/api/auth/token.js";
 
 const passwordLength = 20;
 const saltLength = 10;
