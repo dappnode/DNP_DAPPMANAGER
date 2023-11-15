@@ -1,11 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { params } from "@dappnode/params";
-import {
-  generateKeyPair,
-  encrypt,
-  decrypt
-} from "../../../src/utils/publickeyEncryption.js";
+import { generateKeyPair, encrypt, decrypt } from "../../../src/utils/index.js";
 
 describe("Util > publickeyEncryption", () => {
   it("Should encrypt and decrypt a payload", () => {
