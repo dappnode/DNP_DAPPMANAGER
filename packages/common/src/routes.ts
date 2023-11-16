@@ -289,6 +289,13 @@ export interface Routes {
     after?: number;
   }) => Promise<UserActionLog[]>;
 
+  /**
+   * Returns the host uptime
+   * in format: up 3 weeks, 2 days, 8 hours, 40 minutes
+   * Use the command "uptime --pretty"
+   */
+  getHostUptime: () => Promise<String>;
+
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
@@ -735,6 +742,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistryProgress: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
+  getHostUptime: {log:true},
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},

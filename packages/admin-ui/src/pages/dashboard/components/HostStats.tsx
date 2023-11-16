@@ -52,17 +52,19 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
+  const hostUptime = useApi.getHostUptime();
 
   useEffect(() => {
     const interval = setInterval(() => {
       cpuStats.revalidate();
       diskStats.revalidate();
       memoryStats.revalidate();
+      hostUptime.revalidate();
     }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [cpuStats, diskStats, memoryStats]);
+  }, [cpuStats, diskStats, memoryStats, hostUptime]);
 
   return (
     <div className="dashboard-cards">
@@ -105,6 +107,16 @@ export function HostStats() {
           />
         ) : diskStats.error ? (
           <StatsCardError error={diskStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"uptime"}>
+        {hostUptime.data ? (
+          hostUptime.data
+        ) : hostUptime.error ? (
+          <StatsCardError error={hostUptime.error} />
         ) : (
           <StatsCardLoading />
         )}
