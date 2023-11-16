@@ -9,7 +9,7 @@
     "build": "tsc -p tsconfig.json",
     "watch-ts": "tsc -w",
     "file": "node",
-    "test": "npm run test:file \"./{,!(node_modules)/**}/*.test.ts\" ",
+    "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit",
     "test:file": "TEST=true mocha",
     "test:int": "npm run test:int:file \"./{,!(node_modules)/**}/*.test.int.ts\" ",
     "test:int:file": "TEST=true mocha --config ./test/integration/.mocharc.yaml --timeout 180000",
