@@ -3,7 +3,7 @@ import {shellHost, shell} from "@dappnode/utils";
 /**
  * Returns uptime of the host
  */
-export async function getHostUptime(): Promise<String> {
+export async function getHostUptime(): Promise<string> {
     try{
         const output = await shellHost("uptime -- -p");
         return output;
