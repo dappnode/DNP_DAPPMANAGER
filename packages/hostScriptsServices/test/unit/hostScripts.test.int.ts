@@ -4,11 +4,10 @@ import { shell } from "@dappnode/utils";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 
-describe.skip("Host scripts", () => {
-  it("Should fetch host info", async () => {
-    const hostInfo = await shell(
-      `sudo bash ${hostScriptsPath}/collect_host_info.sh`
-    );
+describe("Host scripts", () => {
+  it("Should fetch host sensors data", async () => {
+    const hostInfo = await shell(`sudo bash ${hostScriptsPath}/sensors.sh`);
+    console.log(hostInfo);
     expect(hostInfo).to.be.ok;
   });
 
