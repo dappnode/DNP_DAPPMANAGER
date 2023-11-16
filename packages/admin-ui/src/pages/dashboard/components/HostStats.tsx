@@ -14,11 +14,12 @@ function parseVariant(value: number) {
 const StatsCardContainer: React.FunctionComponent<{
   children: React.ReactNode;
   title: string;
-}> = ({ children, title }) => {
+  usage?: boolean;
+}> = ({ children, title, usage = true}) => {
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{title}</span> <span className="usage">usage</span>
+        <span className="id">{title}</span>{usage===true && <span className="usage">usage</span>} 
       </div>
       {children}
     </Card>
@@ -112,7 +113,7 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"uptime"}>
+      <StatsCardContainer title={"uptime"} usage={false}>
         {hostUptime.data ? (
           hostUptime.data
         ) : hostUptime.error ? (
