@@ -75,3 +75,4 @@ export { volumeRemove } from "./volumeRemove.js";
 export { volumesGet } from "./volumesGet.js";
 export * from "./wireguard.js";
 export * from "./wifi.js";
+export { getHostUptime } from "./getHostUptime.js";

@@ -372,7 +372,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   }),
   optimismConfigSet: async () => {},
-  updateUpgrade: async () => "Successfully updated"
+  updateUpgrade: async () => "Successfully updated",
+  getHostUptime: async () => "1 day, 2 hours, 3 minutes"
 };
 
 export const calls: Routes = {
