@@ -50,7 +50,6 @@ export async function getStakerConfig<T extends Network>(
     const {
       executionClient: currentExecClient,
       consensusClient: currentConsClient,
-      feeRecipient,
       isMevBoostSelected,
     } = getStakerConfigByNetwork(network);
 
@@ -186,7 +185,6 @@ export async function getStakerConfig<T extends Network>(
           }
         })();
       }),
-      feeRecipient,
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);

@@ -27,12 +27,10 @@ export function getBeaconServiceName(dnpName: string): string {
 export function getConsensusUserSettings({
   dnpName,
   network,
-  feeRecipient,
   useCheckpointSync,
 }: {
   dnpName: string;
   network: Network;
-  feeRecipient: string;
   useCheckpointSync?: boolean;
 }): UserSettingsAllDnps {
   const validatorServiceName = getValidatorServiceName(dnpName);
@@ -46,7 +44,7 @@ export function getConsensusUserSettings({
           ? {
               [validatorServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
@@ -58,14 +56,14 @@ export function getConsensusUserSettings({
           : {
               [validatorServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
               },
 
               [beaconServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: feeRecipient || defaultFeeRecipient,
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Checkpoint sync is an optional value
                 ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
                   ? getDefaultCheckpointSync(network)

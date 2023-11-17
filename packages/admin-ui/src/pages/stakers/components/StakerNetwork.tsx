@@ -16,12 +16,11 @@ import Button from "components/Button";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { responseInterface } from "swr";
-import { Alert, Form } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 import "./columns.scss";
 import { AppContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
-import Input from "components/Input";
 import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
@@ -45,11 +44,8 @@ export default function StakerNetwork<T extends Network>({
     showLaunchpadValidators,
     setShowLaunchpadValidators,
     allStakerItemsOk,
-    feeRecipientError,
     reqStatus,
     setReqStatus,
-    newFeeRecipient,
-    setNewFeeRecipient,
     newExecClient,
     setNewExecClient,
     newConsClient,
@@ -108,7 +104,6 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                feeRecipient: newFeeRecipient,
                 executionClient:
                   newExecClient?.status === "ok"
                     ? { ...newExecClient, data: undefined }
@@ -176,21 +171,6 @@ export default function StakerNetwork<T extends Network>({
             <br />
 
             <p>{description}</p>
-
-            <>
-              <Input
-                value={newFeeRecipient || ""}
-                onValueChange={setNewFeeRecipient}
-                isInvalid={Boolean(feeRecipientError)}
-                prepend="Default Fee Recipient"
-                placeholder="Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-              />
-              {newFeeRecipient && feeRecipientError && (
-                <Form.Text className="text-danger" as="span">
-                  {feeRecipientError}
-                </Form.Text>
-              )}
-            </>
 
             <Row className="staker-network">
               <Col>
@@ -302,15 +282,12 @@ export default function StakerNetwork<T extends Network>({
                 }
                 setNewConfig={setNewConfig}
                 setShowLaunchpadValidators={setShowLaunchpadValidators}
-                setNewFeeRecipient={setNewFeeRecipient}
-                newFeeRecipient={newFeeRecipient}
                 setNewExecClient={setNewExecClient}
                 setNewConsClient={setNewConsClient}
                 setNewMevBoost={setNewMevBoost}
                 newExecClient={newExecClient}
                 newConsClient={newConsClient}
                 newMevBoost={newMevBoost}
-                feeRecipientError={feeRecipientError}
               />
             )}
           </Card>
