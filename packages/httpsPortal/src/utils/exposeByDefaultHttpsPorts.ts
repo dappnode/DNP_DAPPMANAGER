@@ -1,5 +1,5 @@
 import { Log } from "@dappnode/logger";
-import { httpsPortal } from "../index.js";
+import { httpsPortal } from "../httpsPortal.js";
 import { InstallPackageData, HttpsPortalMapping } from "@dappnode/common";
 import { prettyDnpName } from "@dappnode/utils";
 import { isRunningHttps } from "./isRunningHttps.js";

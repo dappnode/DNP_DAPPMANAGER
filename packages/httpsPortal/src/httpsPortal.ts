@@ -12,12 +12,10 @@ import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose.js";
 import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose.js";
-export { HttpsPortalApiClient };
-export { getExposableServices } from "./exposable/index.js";
 
 const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
 
-export class HttpsPortal {
+class HttpsPortal {
   private httpsPortalApiClient: HttpsPortalApiClient;
 
   constructor(httpsPortalApiClient: HttpsPortalApiClient) {
@@ -186,3 +184,9 @@ export class HttpsPortal {
     return container.networks.some((n) => n.name === externalNetworkName);
   }
 }
+
+const httpsPortalApiClient = new HttpsPortalApiClient(
+  params.HTTPS_PORTAL_API_URL
+);
+
+export const httpsPortal = new HttpsPortal(httpsPortalApiClient);

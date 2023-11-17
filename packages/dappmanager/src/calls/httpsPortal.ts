@@ -5,7 +5,7 @@ import {
   httpsPortalMappingsGet as _httpsPortalMappingsGet,
   httpsPortalExposableServicesGet as _httpsPortalExposableServicesGet,
   httpsPortalMappingsRecreate as _httpsPortalMappingsRecreate
-} from "@dappnode/httpsportal";
+} from "@dappnode/httpsportal/calls";
 
 /**
  * HTTPs Portal: map a subdomain
@@ -40,7 +40,7 @@ export async function httpsPortalMappingsRecreate(): Promise<void> {
  * HTTPs Portal: get all mappings
  */
 export async function httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]> {
-  return _httpsPortalMappingsGet();
+  return _httpsPortalMappingsGet({});
 }
 
 /**

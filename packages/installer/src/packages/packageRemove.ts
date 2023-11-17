@@ -11,7 +11,10 @@ import {
   listPackage,
 } from "@dappnode/dockerapi";
 import { isRunningHttps } from "@dappnode/httpsportal";
-import { httpsPortal } from "@dappnode/httpsportal";
+import {
+  httpsPortalMappingsGet,
+  httpsPortalMappingRemove,
+} from "@dappnode/httpsportal/calls";
 import * as db from "@dappnode/db";
 import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
@@ -45,11 +48,12 @@ export async function packageRemove({
   // MUST removed before deleting containers
   try {
     if ((await isRunningHttps()) === true) {
-      const mappings = await httpsPortal.getMappings(dnp.containers);
+      const mappings = await httpsPortalMappingsGet({
+        containers: dnp.containers,
+      });
       for (const mapping of mappings) {
         if (mapping.dnpName === dnpName)
-          await httpsPortal
-            .removeMapping(mapping)
+          await httpsPortalMappingRemove({ mapping })
             // Bypass error to continue deleting mappings
             .catch((e) =>
               logs.error(`Error removing https mapping of ${dnp.dnpName}`, e)

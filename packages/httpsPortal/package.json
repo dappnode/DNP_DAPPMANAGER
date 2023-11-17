@@ -6,9 +6,15 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "exports": {
+    "./calls": {
+      "import": "./dist/calls/index.js",
+      "require": "./dist/calls/index.js",
+      "types": "./dist/calls/index.d.ts"
+    },
     ".": {
       "import": "./dist/index.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
     "./package.json": "./package.json"
   },
@@ -27,9 +33,10 @@
     "@dappnode/params": "^0.1.0",
     "@dappnode/types": "^0.1.30",
     "@dappnode/utils": "^0.1.0",
+    "@types/node-fetch": "^2.6.9",
     "ajv": "6.10.2",
     "memoizee": "0.4.14",
-    "node-fetch": "2.6.0"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",

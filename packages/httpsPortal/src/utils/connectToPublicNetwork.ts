@@ -1,4 +1,4 @@
-import { httpsPortal } from "../index.js";
+import { httpsPortal } from "../httpsPortal.js";
 import { InstallPackageData } from "@dappnode/common";
 import { getExternalNetworkAlias } from "../domains.js";
 import { params } from "@dappnode/params";
