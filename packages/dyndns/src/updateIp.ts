@@ -34,7 +34,7 @@ export default async function updateIp(): Promise<string | void> {
   const parameters = [
     `address=${wallet.address}`,
     `timestamp=${timestamp}`,
-    `sig=${signature}`
+    `sig=${signature}`,
   ];
   const url = `${dyndnsHost}/?${parameters.join("&")}`;
   try {
@@ -43,7 +43,8 @@ export default async function updateIp(): Promise<string | void> {
     const status = res.status;
     if (status !== 200) {
       try {
-        const bodyError: { message: string } = await res.json();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const bodyError: { message: string } = (await res.json()) as any;
         throw Error(`${status}, ${bodyError.message}`);
       } catch (e) {
         throw Error(`${status}, ${res.statusText}`);
@@ -54,7 +55,8 @@ export default async function updateIp(): Promise<string | void> {
       ip: string;
       domain: string;
       message: string;
-    } = await res.json();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = (await res.json()) as any;
 
     // Deal with the answer
     // Sample res:

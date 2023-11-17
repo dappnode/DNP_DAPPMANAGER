@@ -4,13 +4,15 @@ import fetch from "node-fetch";
 
 export async function getInstance(): Promise<string> {
   return (
-    await (
+    ((await (
       await fetch(url.resolve(ethicalMetricsEndpoint, "/instance"), {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       })
-    ).json()
-  ).instance;
+    )
+      // TODO: remove typecast
+      .json()) as { instance: string }).instance
+  );
 }

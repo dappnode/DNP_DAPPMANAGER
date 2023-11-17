@@ -1,6 +1,6 @@
 import async from "async";
-import memoize from "memoizee";
-import _ from "lodash-es";
+import memoize, { Options } from "memoizee";
+import { DebounceSettings, debounce, DebouncedFunc } from "lodash-es";
 
 /**
  * Throw this error when an upstream abort signal aborts
@@ -25,14 +25,12 @@ type AnyFunction = (...args: any[]) => any;
 export function memoizeDebounce<F extends AnyFunction>(
   func: F,
   wait = 0,
-  options: _.DebounceSettings = {},
-  resolver?: (...args: Parameters<F>) => unknown
+  options: DebounceSettings = {},
+  resolver?: Options<(...args: Parameters<F>) => DebouncedFunc<F>> | undefined
 ): MemoizeDebouncedFunction<F> {
-  const debounceMemo = _.memoize<
-    (...args: Parameters<F>) => _.DebouncedFunc<F>
-  >(
+  const debounceMemo = memoize<(...args: Parameters<F>) => _.DebouncedFunc<F>>(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    (..._args: Parameters<F>) => _.debounce(func, wait, options),
+    (..._args: Parameters<F>) => debounce(func, wait, options),
     resolver
   );
 
@@ -58,7 +56,7 @@ export function memoizeDebounce<F extends AnyFunction>(
 }
 
 interface MemoizeDebouncedFunction<F extends AnyFunction>
-  extends _.DebouncedFunc<F> {
+  extends DebouncedFunc<F> {
   (...args: Parameters<F>): ReturnType<F> | undefined;
   flush: (...args: Parameters<F>) => ReturnType<F> | undefined;
   cancel: (...args: Parameters<F>) => void;
