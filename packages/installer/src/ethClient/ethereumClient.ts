@@ -364,7 +364,6 @@ export class EthereumClient {
           dnpName: consClient,
           network: "mainnet",
           useCheckpointSync,
-          feeRecipient: db.feeRecipientMainnet.get() || "",
         });
         await packageInstall({ name: consClient, userSettings });
       } else {

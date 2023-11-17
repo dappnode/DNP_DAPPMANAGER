@@ -1349,7 +1349,6 @@ export interface StakerConfigGet<T extends Network> {
   consensusClients: StakerItem<T, "consensus">[];
   web3Signer: StakerItem<T, "signer">;
   mevBoost: StakerItem<T, "mev-boost">;
-  feeRecipient: string | null;
 }
 
 export interface StakerConfigGetOk<T extends Network> {
@@ -1360,7 +1359,6 @@ export interface StakerConfigGetOk<T extends Network> {
 }
 export interface StakerConfigSet<T extends Network> {
   network: T;
-  feeRecipient: string;
   executionClient?: StakerItemOk<T, "execution">;
   consensusClient?: StakerItemOk<T, "consensus">;
   mevBoost?: StakerItemOk<T, "mev-boost">;
@@ -1412,7 +1410,6 @@ export type MevBoost<T extends Network> = T extends "mainnet"
 export interface StakerConfigByNetwork<T extends Network> {
   executionClient: ExecutionClient<T> | undefined | null;
   consensusClient: ConsensusClient<T> | undefined | null;
-  feeRecipient: string | null;
   isMevBoostSelected: boolean;
 }
 export interface StakerCompatibleVersionsByNetwork<T extends Network> {

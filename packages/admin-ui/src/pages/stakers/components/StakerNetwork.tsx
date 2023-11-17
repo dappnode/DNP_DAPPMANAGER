@@ -45,11 +45,8 @@ export default function StakerNetwork<T extends Network>({
     showLaunchpadValidators,
     setShowLaunchpadValidators,
     allStakerItemsOk,
-    feeRecipientError,
     reqStatus,
     setReqStatus,
-    newFeeRecipient,
-    setNewFeeRecipient,
     newExecClient,
     setNewExecClient,
     newConsClient,
@@ -108,7 +105,6 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                feeRecipient: newFeeRecipient,
                 executionClient:
                   newExecClient?.status === "ok"
                     ? { ...newExecClient, data: undefined }
@@ -176,21 +172,6 @@ export default function StakerNetwork<T extends Network>({
             <br />
 
             <p>{description}</p>
-
-            <>
-              <Input
-                value={newFeeRecipient || ""}
-                onValueChange={setNewFeeRecipient}
-                isInvalid={Boolean(feeRecipientError)}
-                prepend="Default Fee Recipient"
-                placeholder="Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-              />
-              {newFeeRecipient && feeRecipientError && (
-                <Form.Text className="text-danger" as="span">
-                  {feeRecipientError}
-                </Form.Text>
-              )}
-            </>
 
             <Row className="staker-network">
               <Col>
@@ -302,15 +283,12 @@ export default function StakerNetwork<T extends Network>({
                 }
                 setNewConfig={setNewConfig}
                 setShowLaunchpadValidators={setShowLaunchpadValidators}
-                setNewFeeRecipient={setNewFeeRecipient}
-                newFeeRecipient={newFeeRecipient}
                 setNewExecClient={setNewExecClient}
                 setNewConsClient={setNewConsClient}
                 setNewMevBoost={setNewMevBoost}
                 newExecClient={newExecClient}
                 newConsClient={newConsClient}
                 newMevBoost={newMevBoost}
-                feeRecipientError={feeRecipientError}
               />
             )}
           </Card>

@@ -2,7 +2,7 @@ import {
   ConsensusClient,
   ExecutionClient,
   MevBoost,
-  StakerConfigSet
+  StakerConfigSet,
 } from "@dappnode/common";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "@dappnode/db";
@@ -17,7 +17,7 @@ import {
   ExecutionClientLukso,
   ConsensusClientHolesky,
   ExecutionClientHolesky,
-  Network
+  Network,
 } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
@@ -39,36 +39,35 @@ import { EthereumClient } from "@dappnode/installer";
  */
 export async function setStakerConfig<T extends Network>({
   network,
-  feeRecipient,
   executionClient,
   consensusClient,
   mevBoost,
-  enableWeb3signer
+  enableWeb3signer,
 }: StakerConfigSet<T>): Promise<void> {
   const {
     compatibleExecution,
     compatibleConsensus,
     compatibleSigner,
-    compatibleMevBoost
+    compatibleMevBoost,
   } = getStakerCompatibleVersionsByNetwork(network);
 
   const {
     executionClient: currentExecutionClient,
-    consensusClient: currentConsensusClient
+    consensusClient: currentConsensusClient,
   } = getStakerConfigByNetwork(network);
 
   const pkgs = await listPackages();
   const currentExecClientPkg = pkgs.find(
-    pkg => pkg.dnpName === currentExecutionClient
+    (pkg) => pkg.dnpName === currentExecutionClient
   );
   const currentConsClientPkg = pkgs.find(
-    pkg => pkg.dnpName === currentConsensusClient
+    (pkg) => pkg.dnpName === currentConsensusClient
   );
   const currentWeb3signerPkg = pkgs.find(
-    pkg => pkg.dnpName === compatibleSigner.dnpName
+    (pkg) => pkg.dnpName === compatibleSigner.dnpName
   );
   const currentMevBoostPkg = pkgs.find(
-    pkg => pkg.dnpName === compatibleMevBoost?.dnpName
+    (pkg) => pkg.dnpName === compatibleMevBoost?.dnpName
   );
 
   // Ensure requirements
@@ -81,10 +80,8 @@ export async function setStakerConfig<T extends Network>({
     compatibleSigner,
     currentExecClientPkg,
     currentConsClientPkg,
-    currentWeb3signerPkg
+    currentWeb3signerPkg,
   });
-  // Set fee recipient on db
-  await setFeeRecipientOnDb(network, feeRecipient || undefined);
 
   // Set staker config pkgs and its configurations
   await Promise.all([
@@ -92,23 +89,22 @@ export async function setStakerConfig<T extends Network>({
     setExecutionClient<T>({
       currentExecutionClient,
       targetExecutionClient: executionClient,
-      currentExecClientPkg
+      currentExecClientPkg,
     }),
 
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     setConsensusClient<T>({
       network: network,
-      feeRecipient: feeRecipient,
       currentConsensusClient,
       targetConsensusClient: consensusClient,
-      currentConsClientPkg
+      currentConsClientPkg,
     }),
     // MEVBOOST
     setMevBoost({
       mevBoost: compatibleMevBoost?.dnpName,
       targetMevBoost: mevBoost,
-      currentMevBoostPkg
-    })
+      currentMevBoostPkg,
+    }),
   ]);
 
   // Set staker config on db
@@ -122,7 +118,7 @@ export async function setStakerConfig<T extends Network>({
   await new EthereumClient().updateFullnodeAlias({
     network,
     newExecClientDnpName: executionClient?.dnpName,
-    prevExecClientDnpName: currentExecutionClient || undefined
+    prevExecClientDnpName: currentExecutionClient || undefined,
   });
 
   // WEB3SIGNER
@@ -131,58 +127,8 @@ export async function setStakerConfig<T extends Network>({
   await setSigner({
     enableWeb3signer,
     web3signerDnpName: compatibleSigner.dnpName,
-    web3signerPkg: currentWeb3signerPkg
+    web3signerPkg: currentWeb3signerPkg,
   });
-}
-
-/**
- * Sets the staker configuration on db for a given network
- * IMPORTANT: check the values are different before setting them so the interceptGlobalOnSet is not called
- */
-async function setFeeRecipientOnDb<T extends Network>(
-  network: T,
-  feeRecipient?: string
-): Promise<void> {
-  switch (network) {
-    case "mainnet":
-      if (
-        feeRecipient !== undefined &&
-        db.feeRecipientMainnet.get() !== feeRecipient
-      )
-        await db.feeRecipientMainnet.set(feeRecipient);
-      break;
-    case "gnosis":
-      if (
-        feeRecipient !== undefined &&
-        db.feeRecipientGnosis.get() !== feeRecipient
-      )
-        await db.feeRecipientGnosis.set(feeRecipient);
-      break;
-    case "prater":
-      if (
-        feeRecipient !== undefined &&
-        db.feeRecipientPrater.get() !== feeRecipient
-      )
-        await db.feeRecipientPrater.set(feeRecipient);
-      break;
-    case "holesky":
-      if (
-        feeRecipient !== undefined &&
-        db.feeRecipientHolesky.get() !== feeRecipient
-      )
-        await db.feeRecipientHolesky.set(feeRecipient);
-      break;
-
-    case "lukso":
-      if (
-        feeRecipient !== undefined &&
-        db.feeRecipientLukso.get() !== feeRecipient
-      )
-        await db.feeRecipientLukso.set(feeRecipient);
-      break;
-    default:
-      throw new Error(`Unsupported network: ${network}`);
-  }
 }
 
 async function setStakerConfigOnDb<T extends Network>(

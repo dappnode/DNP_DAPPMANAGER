@@ -16,13 +16,11 @@ import { Network } from "@dappnode/types";
 
 export async function setConsensusClient<T extends Network>({
   network,
-  feeRecipient,
   currentConsensusClient,
   targetConsensusClient,
   currentConsClientPkg,
 }: {
   network: Network;
-  feeRecipient: string | null;
   currentConsensusClient?: ConsensusClient<T> | null;
   targetConsensusClient?: StakerItemOk<T, "consensus">;
   currentConsClientPkg?: InstalledPackageData;
@@ -47,7 +45,6 @@ export async function setConsensusClient<T extends Network>({
   const userSettings: UserSettingsAllDnps = getConsensusUserSettings({
     dnpName: targetConsensusClient.dnpName,
     network,
-    feeRecipient: feeRecipient || "",
     useCheckpointSync: targetConsensusClient.useCheckpointSync,
   });
 
