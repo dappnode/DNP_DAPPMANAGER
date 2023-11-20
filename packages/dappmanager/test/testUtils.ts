@@ -11,8 +11,7 @@ import {
   VolumeMapping,
   PackageRelease,
   ReleaseSignatureStatusCode,
-  InstallPackageData,
-  ManifestWithImage
+  InstallPackageData
 } from "@dappnode/common";
 
 export const testDir = "./test_files/";
@@ -27,12 +26,6 @@ export const beforeAndAfter = (
 ): void => {
   before(...args);
   after(...args);
-};
-
-export const getTestMountpoint = (id: string): string => {
-  const mountpointPath = path.join(testMountpoint, id);
-  fs.mkdirSync(mountpointPath, { recursive: true });
-  return mountpointPath;
 };
 
 export function clearDbs(): void {
@@ -134,15 +127,6 @@ export const mockManifest: Manifest = {
   avatar: mockHash,
   dependencies: {},
   license: "Mock-license"
-};
-
-export const mockManifestWithImage: ManifestWithImage = {
-  ...mockManifest,
-  image: {
-    hash: mockHash,
-    path: "mock/mock/mock.mock",
-    size: mockSize
-  }
 };
 
 export const mockVolume: VolumeMapping = {

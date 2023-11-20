@@ -46,7 +46,6 @@ export type DirectoryFiles = {
 export function joinFilesInManifest(files: DirectoryFiles): Manifest {
   const manifest = files.manifest;
 
-  // Note: setupWizard1To2 conversion is done on parseMetadataFromManifest
   if (files.setupWizard) manifest.setupWizard = files.setupWizard;
   if (files.setupSchema) manifest.setupSchema = files.setupSchema;
   if (files.setupTarget) manifest.setupTarget = files.setupTarget;

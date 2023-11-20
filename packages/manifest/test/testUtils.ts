@@ -1,4 +1,3 @@
-import { ManifestWithImage } from "@dappnode/common";
 import { Compose, Manifest } from "@dappnode/types";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
@@ -25,13 +24,4 @@ export const mockManifest: Manifest = {
   avatar: mockHash,
   dependencies: {},
   license: "Mock-license",
-};
-
-export const mockManifestWithImage: ManifestWithImage = {
-  ...mockManifest,
-  image: {
-    hash: mockHash,
-    path: "mock/mock/mock.mock",
-    size: mockSize,
-  },
 };

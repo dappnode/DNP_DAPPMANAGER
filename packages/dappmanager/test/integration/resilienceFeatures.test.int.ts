@@ -4,7 +4,6 @@ import fs from "fs";
 import * as calls from "../../src/calls/index.js";
 import {
   createTestDir,
-  mockManifestWithImage,
   beforeAndAfter,
   cleanRepos,
   cleanContainers,
@@ -12,20 +11,12 @@ import {
 } from "../testUtils.js";
 import { params } from "@dappnode/params";
 import { getDnpFromListPackages } from "./testPackageUtils.js";
-import {
-  uploadManifestRelease,
-  cleanInstallationArtifacts
-} from "./integrationSpecs/index.js";
+import { cleanInstallationArtifacts } from "./integrationSpecs/index.js";
 import { getDockerComposePath } from "@dappnode/utils";
-import { ManifestWithImage } from "@dappnode/common";
 
 describe("Resilience features, when things go wrong", function () {
   const testMockPrefix = "testmock-";
   const dnpName = testMockPrefix + "resilience-features.dnp.dappnode.eth";
-  const manifest: ManifestWithImage = {
-    ...mockManifestWithImage,
-    name: dnpName
-  };
   let releaseHash: string;
   const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
 
@@ -44,10 +35,6 @@ describe("Resilience features, when things go wrong", function () {
 
   after("Remove dncore_network", async () => {
     await shellSafe(`docker network rm ${dncoreNetwork}`);
-  });
-
-  before("Upload a vanilla package", async () => {
-    releaseHash = await uploadManifestRelease(manifest);
   });
 
   afterEach("Clean environment", async () => {
@@ -118,17 +105,6 @@ describe("Resilience features, when things go wrong", function () {
         name: dnpName,
         version: releaseHash,
         options: { BYPASS_SIGNED_RESTRICTION: true }
-      });
-    });
-
-    before("Upload the bad release", async () => {
-      brokenReleaseHash = await uploadManifestRelease({
-        ...manifest,
-        image: {
-          ...manifest.image,
-          // Intentional error to make the installation fail
-          ports: ["0:0"]
-        }
       });
     });
 
