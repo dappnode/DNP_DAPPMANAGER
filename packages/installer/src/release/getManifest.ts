@@ -1,19 +1,11 @@
 import { ipfs, IPFSEntry } from "@dappnode/ipfs";
 import { parseManifest, validateManifestBasic } from "@dappnode/manifest";
 import { Manifest, releaseFiles } from "@dappnode/types";
-import { isDirectoryRelease } from "./ipfs/isDirectoryRelease.js";
 import { IpfsClientTarget } from "@dappnode/common";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
-  let data: string;
-
   const ipfsEntries = await ipfs.list(contentUri);
-  const isDirectory = await isDirectoryRelease(ipfsEntries);
-  if (isDirectory) {
-    data = await getManifestFromDir(ipfsEntries, contentUri);
-  } else {
-    data = await ipfs.writeFileToMemory(contentUri);
-  }
+  const data = await getManifestFromDir(ipfsEntries, contentUri);
 
   return validateManifestBasic(parseManifest(data));
 }

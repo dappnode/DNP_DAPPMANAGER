@@ -1039,6 +1039,7 @@ interface ManifestImage {
   labels?: string[];
 }
 
+// TODO: completely remove this interface and its usage
 export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
 }

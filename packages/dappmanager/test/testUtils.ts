@@ -11,8 +11,7 @@ import {
   VolumeMapping,
   PackageRelease,
   ReleaseSignatureStatusCode,
-  InstallPackageData,
-  ManifestWithImage
+  InstallPackageData
 } from "@dappnode/common";
 
 export const testDir = "./test_files/";
@@ -134,15 +133,6 @@ export const mockManifest: Manifest = {
   avatar: mockHash,
   dependencies: {},
   license: "Mock-license"
-};
-
-export const mockManifestWithImage: ManifestWithImage = {
-  ...mockManifest,
-  image: {
-    hash: mockHash,
-    path: "mock/mock/mock.mock",
-    size: mockSize
-  }
 };
 
 export const mockVolume: VolumeMapping = {

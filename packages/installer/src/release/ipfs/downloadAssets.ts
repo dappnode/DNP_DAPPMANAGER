@@ -30,7 +30,7 @@ export async function downloadAsset<T>(
   }
 }
 
-export async function downloadAssetRequired<T>(
+async function downloadAssetRequired<T>(
   hash: string,
   config: FileConfig,
   fileId: keyof DirectoryFiles

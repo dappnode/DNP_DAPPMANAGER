@@ -1,5 +1,4 @@
 import { omit } from "lodash-es";
-import { setupWizard1To2 } from "./setupWizard1To2.js";
 import { ManifestWithImage } from "@dappnode/common";
 import { Manifest } from "@dappnode/types";
 
@@ -11,17 +10,11 @@ import { Manifest } from "@dappnode/types";
  * @param manifest
  */
 export function parseMetadataFromManifest(manifest: Manifest): Manifest {
-  const setupWizard = manifest.setupWizard
-    ? manifest.setupWizard
-    : manifest.setupSchema && manifest.setupTarget
-    ? setupWizard1To2(
-        manifest.setupSchema,
-        manifest.setupTarget,
-        manifest.setupUiJson || {}
-      )
-    : undefined;
+  const setupWizard = manifest.setupWizard ? manifest.setupWizard : undefined;
 
   return {
+    // TODO: research if this omit can be removed since none packages should have been publish with this
+    // format from long time ago
     ...omit(manifest as ManifestWithImage, [
       "avatar",
       "image",
