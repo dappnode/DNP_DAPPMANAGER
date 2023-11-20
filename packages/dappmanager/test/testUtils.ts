@@ -28,6 +28,12 @@ export const beforeAndAfter = (
   after(...args);
 };
 
+export const getTestMountpoint = (id: string): string => {
+  const mountpointPath = path.join(testMountpoint, id);
+  fs.mkdirSync(mountpointPath, { recursive: true });
+  return mountpointPath;
+};
+
 export function clearDbs(): void {
   clearCacheDb();
   clearMainDb();

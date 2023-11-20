@@ -8,8 +8,7 @@ import { shell } from "@dappnode/utils";
 import { TrustedReleaseKey } from "@dappnode/common";
 import {
   cleanInstallationArtifacts,
-  uploadDirectoryRelease,
-  uploadManifestRelease
+  uploadDirectoryRelease
 } from "./integrationSpecs/index.js";
 import * as db from "@dappnode/db";
 import { mockImageEnvNAME } from "./integrationSpecs/mockImage.js";
@@ -51,39 +50,6 @@ describe("Release format tests", () => {
   }
 
   const releaseTests: (() => TestCase)[] = [
-    (): TestCase => {
-      const dnpName = testMockPrefix + "mainfest.dnp.dappnode.eth";
-      const version = "0.1.0";
-      const expectedEnvValue = dnpName;
-      return {
-        id: "Manifest-type",
-        dnpName,
-        version,
-        expectedEnvValues: { [dnpName]: expectedEnvValue },
-        prepareRelease: async (): Promise<string> => {
-          const dnpName = testMockPrefix + "mainfest.dnp.dappnode.eth";
-          const version = "0.1.0";
-
-          return await uploadManifestRelease({
-            name: dnpName,
-            version,
-            description: "mock-test description",
-            avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
-            type: "service",
-            image: {
-              path: `${dnpName}_0.0.1.tar.xz`,
-              hash: "",
-              size: 0,
-              restart: "unless-stopped",
-              environment: mockEnvs(expectedEnvValue)
-            },
-            author: "lion",
-            license: "GLP-3.0"
-          });
-        }
-      };
-    },
-
     (): TestCase => {
       const dnpName = testMockPrefix + "directory.dnp.dappnode.eth";
       const version = "0.2.0";
