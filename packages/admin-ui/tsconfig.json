@@ -3,9 +3,6 @@
   "compilerOptions": {
     /* Modules */
     "baseUrl": "src",
-    "paths": {
-      "@dappnode/common": ["../../common/src"]
-    },
 
     /* Emit */
     "noEmit": true,
