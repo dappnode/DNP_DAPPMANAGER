@@ -1,8 +1,9 @@
 import fs from "fs";
-import { rimraf } from "rimraf";
+import { shell } from "@dappnode/utils";
 
 export const testDir = "test_files";
-export function cleanTestDir(): void {
-  rimraf.sync(testDir);
+
+export async function cleanTestDir(): Promise<void> {
+  await shell(`rm -rf ${testDir}`);
   fs.mkdirSync(testDir, { recursive: true });
 }
