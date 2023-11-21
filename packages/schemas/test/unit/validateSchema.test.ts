@@ -13,6 +13,7 @@ describe("schemaValidation", () => {
   describe("manifest", () => {
     beforeEach(() => {
       cleanTestDir();
+      fs.mkdirSync(testDir, { recursive: true });
     });
     it("validateManifest globalEnvs as array of objects", () => {
       const manifest: Manifest = {
@@ -87,6 +88,7 @@ describe("schemaValidation", () => {
     describe("compose", () => {
       beforeEach(() => {
         cleanTestDir();
+        fs.mkdirSync(testDir, { recursive: true });
       });
       it("should validate a valid compose", async () => {
         const validCompose = `version: "3.4"
@@ -187,6 +189,7 @@ volumes:
     describe("setupWizard", () => {
       beforeEach(() => {
         cleanTestDir();
+        fs.mkdirSync(testDir, { recursive: true });
       });
       it("should validate a valid setupWizard", () => {
         const validSetupWizard: SetupWizard = {
