@@ -3,10 +3,10 @@ import {
   validateComposeSchema,
   validateManifestSchema,
   validateSetupWizardSchema,
-} from "../src/index.js";
+} from "../../src/index.js";
 import fs from "fs";
 import path from "path";
-import { cleanTestDir, testDir } from "./testUtils.js";
+import { cleanTestDir, testDir } from "../testUtils.js";
 import { Manifest, SetupWizard } from "@dappnode/types";
 
 describe("schemaValidation", () => {
@@ -308,7 +308,7 @@ volumes:
       });
 
       it("should throw error with an empty service array in setupWizard", () => {
-        const invalidSetupWizard: SetupWizard = {
+        const invalidSetupWizard: SetupWizard = ({
           version: "2",
           fields: [
             {
@@ -324,7 +324,7 @@ volumes:
                 "Add a string to your proposed blocks, which will be seen on the block explorer",
             },
           ],
-        } as unknown as SetupWizard;
+        } as unknown) as SetupWizard;
 
         expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
       });
