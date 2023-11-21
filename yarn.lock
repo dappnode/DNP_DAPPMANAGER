@@ -1311,16 +1311,6 @@
   resolved "https://registry.yarnpkg.com/@csstools/selector-specificity/-/selector-specificity-2.2.0.tgz#2cbcf822bf3764c9658c4d2e568bd0c0cb748016"
   integrity sha512-+OJ9konv95ClSTOJCmMZqpd5+YGsB2S+x6w3E1oaM8UuR5j8nTNHYSz8c9BEPGDOCMQYIEEGlVPj/VY64iTbGw==
 
-"@dappnode/schemas@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@dappnode/schemas/-/schemas-0.1.8.tgz#59f28648282abf5717eecc5510f260047e280831"
-  integrity sha512-hSQy4vyAKJe5RwTMy9GfP+Eb/EF5bmHGnkFKpFIcEecUrVN8yFieHWR9D9bmrHU4zNKyhEzDljbxqvHZ5Lz9Iw==
-  dependencies:
-    "@dappnode/types" "^0.1.9"
-    ajv "^8.12.0"
-    ajv-errors "^3.0.0"
-    semver "^7.5.0"
-
 "@dappnode/toolkit@^0.1.19", "@dappnode/toolkit@^0.1.20":
   version "0.1.20"
   resolved "https://registry.yarnpkg.com/@dappnode/toolkit/-/toolkit-0.1.20.tgz#d7015045d21f8b5c3735e9eeffac521f63985b7c"
@@ -3227,6 +3217,13 @@
     "@tufjs/canonical-json" "1.0.0"
     minimatch "^9.0.0"
 
+"@types/ajv-errors@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@types/ajv-errors/-/ajv-errors-2.0.1.tgz#8b6731ebd2abd3a2a4ccc23c04b2ba2b886adb51"
+  integrity sha512-rKqoLTrSQc0L5BzAINukDAHf9D9bVvIasKXCFkCzIXOn4SQFAMYcwl9oQyPKia8nkw4HnJzuoupKolniSDGicg==
+  dependencies:
+    ajv-errors "*"
+
 "@types/async-retry@^1.4.2":
   version "1.4.5"
   resolved "https://registry.yarnpkg.com/@types/async-retry/-/async-retry-1.4.5.tgz#02680eb366739a327550f6ad38bb898a5571a095"
@@ -4397,7 +4394,7 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
-ajv-errors@^3.0.0:
+ajv-errors@*, ajv-errors@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/ajv-errors/-/ajv-errors-3.0.0.tgz#e54f299f3a3d30fe144161e5f0d8d51196c527bc"
   integrity sha512-V3wD15YHfHz6y0KdhYFjyy9vWtEVALT9UrxfN3zqlI6dMioHnJrqOYfyPKol3oqrnCM9uwkcdCwkJ0WUcbLMTQ==
