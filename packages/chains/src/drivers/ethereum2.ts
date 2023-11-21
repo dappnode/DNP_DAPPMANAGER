@@ -1,7 +1,6 @@
 import fetch from "node-fetch";
-import { ChainDriverSpecs } from "@dappnode/types";
 import { buildNetworkAlias, urlJoin } from "@dappnode/utils";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData, ChainDriverSpecs } from "@dappnode/common";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
 
@@ -16,7 +15,7 @@ export async function ethereum2(
   // 1. Get network alias from the beacon chain service (use the default beaconchain service name if not specified)
   const serviceName = chainDriver.serviceName || "beacon-chain";
   const beaconChainContainer = dnp.containers.find(
-    container => container.serviceName === serviceName
+    (container) => container.serviceName === serviceName
   );
   if (!beaconChainContainer) {
     throw Error(`${serviceName} service not found`);
@@ -29,7 +28,7 @@ export async function ethereum2(
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: false
+    isMainOrMonoservice: false,
   });
 
   // 2. Get the port number from the beacon chain service (use the default beaconchain port number if not specified)
@@ -41,7 +40,7 @@ export async function ethereum2(
   try {
     const [nodeSyncing, peersCount] = await Promise.all([
       fetchNodeSyncingStatus(apiUrl),
-      fetchNodePeersCount(apiUrl).then(parseNodePeersCount)
+      fetchNodePeersCount(apiUrl).then(parseNodePeersCount),
     ]);
 
     return parseNodeSyncingResponse(nodeSyncing, peersCount);
@@ -50,7 +49,7 @@ export async function ethereum2(
     return {
       syncing: false,
       message: `Could not connect to RPC. ${e.message}`,
-      error: true
+      error: true,
     };
   }
 }
@@ -74,7 +73,7 @@ export function parseNodeSyncingResponse(
       syncing: false,
       message: "No node syncing data",
       error: true,
-      progress: 0
+      progress: 0,
     };
 
   const { head_slot, sync_distance, is_syncing } = nodeSyncing.data;
@@ -89,7 +88,7 @@ export function parseNodeSyncingResponse(
       syncing: false,
       error: false,
       message: `Synced #${headSlot}`,
-      peers: peersCount
+      peers: peersCount,
     };
   } else {
     // Return syncing state
@@ -98,7 +97,7 @@ export function parseNodeSyncingResponse(
       message: `Blocks synced ${headSlot} / ${highestBlock}`,
       progress: progress,
       error: false,
-      peers: peersCount
+      peers: peersCount,
     };
   }
 }
@@ -108,7 +107,7 @@ export function parseNodeSyncingResponse(
  * https://ethereum.github.io/beacon-APIs/#/Node/getSyncingStatus
  */
 async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
-  return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then(res =>
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then((res) =>
     res.json()
   );
 }
@@ -118,7 +117,7 @@ async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
  * https://ethereum.github.io/beacon-APIs/#/Node/getPeerCount
  */
 async function fetchNodePeersCount(baseUrl: string): Promise<NodePeersCount> {
-  return await fetch(urlJoin(baseUrl, "/eth/v1/node/peer_count")).then(res =>
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/peer_count")).then((res) =>
     res.json()
   );
 }

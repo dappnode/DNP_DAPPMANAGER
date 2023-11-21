@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/types";
+import { Compose } from "@dappnode/common";
 import { applyRecursivelyToStringValues } from "@dappnode/utils";
 import { parsePortMappings } from "./ports.js";
 

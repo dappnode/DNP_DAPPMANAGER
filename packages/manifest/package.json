@@ -19,11 +19,10 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/common": "^0.1.0",
+    "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/eventbus": "^0.1.0",
     "@dappnode/params": "^0.1.0",
-    "@dappnode/types": "^0.1.30",
     "@dappnode/utils": "^0.1.0",
     "deepmerge": "2.2.1",
     "lodash-es": "4.17.21"

@@ -1,6 +1,12 @@
 import { ethers } from "ethers";
 import * as db from "@dappnode/db";
-import { EthClientStatus } from "@dappnode/common";
+import {
+  EthClientStatus,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
+  executionClientsMainnet,
+  consensusClientsMainnet,
+} from "@dappnode/common";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
@@ -8,12 +14,6 @@ import { parseEthersBlock, parseEthersSyncing } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import fetch from "node-fetch";
 import { params } from "@dappnode/params";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet,
-} from "@dappnode/types";
 
 /**
  * 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022

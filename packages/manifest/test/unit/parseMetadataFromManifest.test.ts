@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 import { parseMetadataFromManifest } from "../../src/index.js";
 
 describe("parseMetadataFromManifest", () => {

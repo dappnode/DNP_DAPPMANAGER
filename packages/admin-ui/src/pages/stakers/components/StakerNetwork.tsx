@@ -21,7 +21,7 @@ import "./columns.scss";
 import { AppContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
-import { Network } from "@dappnode/types";
+import { Network } from "@dappnode/common";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 

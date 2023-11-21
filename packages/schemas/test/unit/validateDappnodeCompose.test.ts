@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { validateDappnodeCompose } from "../../src/index.js";
-import { Manifest, Compose } from "@dappnode/types";
+import { Manifest, Compose } from "@dappnode/common";
 
 describe("files / compose / validateDappnodeCompose", () => {
   const manifest: Manifest = {

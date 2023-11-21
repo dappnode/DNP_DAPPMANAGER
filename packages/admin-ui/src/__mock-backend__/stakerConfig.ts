@@ -3,9 +3,9 @@ import {
   ExecutionClient,
   MevBoost,
   Routes,
-  Signer
+  Signer,
+  Network
 } from "@dappnode/common";
-import { Network } from "@dappnode/types";
 
 export const stakerConfig: Pick<
   Routes,

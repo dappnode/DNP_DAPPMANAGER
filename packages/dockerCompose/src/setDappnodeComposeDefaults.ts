@@ -4,6 +4,7 @@ import {
   getPrivateNetworkAliases,
   getIsCore,
   parseEnvironment,
+  getImageTag,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
@@ -15,8 +16,7 @@ import {
   ComposeServiceNetworks,
   ComposeNetworks,
   dockerComposeSafeKeys,
-  getImageTag,
-} from "@dappnode/types";
+} from "@dappnode/common";
 import { lt } from "semver";
 
 /**

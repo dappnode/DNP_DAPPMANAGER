@@ -43,7 +43,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.9",
+    "@dappnode/common": "^0.1.0",
     "ajv": "^8.12.0",
     "ajv-errors": "^3.0.0",
     "semver": "^7.5.0"

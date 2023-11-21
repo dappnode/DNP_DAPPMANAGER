@@ -1,35 +1,14 @@
 import { params } from "@dappnode/params";
+import { PackageEnvs, Compose } from "./compose.js";
 import {
   Manifest,
-  SetupWizard,
-  Compose,
-  ChainDriver,
-  ManifestUpdateAlert,
-  PackageBackup,
   Dependencies,
-  PackageEnvs,
-  ConsensusClientGnosis,
-  ConsensusClientMainnet,
-  ConsensusClientPrater,
-  ConsensusClientLukso,
-  ExecutionClientGnosis,
-  ExecutionClientMainnet,
-  ExecutionClientPrater,
-  ExecutionClientLukso,
-  MevBoostMainnet,
-  MevBoostPrater,
-  Network,
-  SignerMainnet,
-  SignerPrater,
-  SignerGnosis,
-  SignerLukso,
-  ExecutionClientOptimism,
-  OptimismL2Geth,
-  OptimismNode,
-  ConsensusClientHolesky,
-  ExecutionClientHolesky,
-  SignerHolesky,
-} from "@dappnode/types";
+  ChainDriver,
+  PackageBackup,
+  ManifestUpdateAlert,
+} from "./manifest.js";
+import { SetupWizard } from "./setupWizard.js";
+import { ExecutionClientMainnet, ConsensusClientMainnet } from "./stakers.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -975,12 +954,6 @@ export interface LocalIpResponse {
  * ====
  */
 
-export enum FileFormat {
-  JSON = "JSON",
-  YAML = "YAML",
-  TEXT = "TEXT",
-}
-
 export type DistributedFileSource = "ipfs" | "swarm";
 export interface DistributedFile {
   hash: string;
@@ -1042,12 +1015,6 @@ interface ManifestImage {
 // TODO: completely remove this interface and its usage
 export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
-}
-
-export interface PackageRequest {
-  name: string;
-  ver: string;
-  req?: string;
 }
 
 export interface ReleaseSignature {
@@ -1269,225 +1236,6 @@ export interface TrustedReleaseKey {
   dnpNameSuffix: string;
   /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
   key: string;
-}
-
-/**
- * =======
- * STAKERS
- * =======
- */
-
-export type StakerType = "execution" | "consensus" | "signer" | "mev-boost";
-
-export type StakerItem<T extends Network, P extends StakerType> =
-  | StakerItemOk<T, P>
-  | StakerItemError<T, P>;
-
-interface StakerExecution<T extends Network> {
-  dnpName: ExecutionClient<T>;
-}
-
-interface StakerConsensus<T extends Network> {
-  dnpName: ConsensusClient<T>;
-  useCheckpointSync?: boolean;
-}
-
-interface StakerSigner<T extends Network> {
-  dnpName: Signer<T>;
-}
-
-interface StakerMevBoost<T extends Network> {
-  dnpName: MevBoost<T>;
-  relays?: string[];
-}
-
-type StakerItemBasic<
-  T extends Network,
-  P extends StakerType
-> = P extends "execution"
-  ? StakerExecution<T>
-  : P extends "consensus"
-  ? StakerConsensus<T>
-  : P extends "signer"
-  ? StakerSigner<T>
-  : P extends "mev-boost"
-  ? StakerMevBoost<T>
-  : never;
-
-export type StakerItemError<T extends Network, P extends StakerType> = {
-  status: "error";
-  error: string;
-} & StakerItemBasic<T, P>;
-
-/**
- * Metadata of a staker item to be cached
- */
-export type PackageItemData = Pick<
-  PackageRelease,
-  | "dnpName"
-  | "reqVersion"
-  | "semVersion"
-  | "imageFile"
-  | "avatarFile"
-  | "metadata"
-  | "warnings"
-  | "origin"
-  | "signedSafe"
->;
-
-export type StakerItemOk<T extends Network, P extends StakerType> = {
-  status: "ok";
-  avatarUrl: string;
-  isInstalled: boolean;
-  isUpdated: boolean;
-  isRunning: boolean;
-  data?: PackageItemData;
-  isSelected: boolean;
-} & StakerItemBasic<T, P>;
-
-export interface StakerConfigGet<T extends Network> {
-  executionClients: StakerItem<T, "execution">[];
-  consensusClients: StakerItem<T, "consensus">[];
-  web3Signer: StakerItem<T, "signer">;
-  mevBoost: StakerItem<T, "mev-boost">;
-}
-
-export interface StakerConfigGetOk<T extends Network> {
-  executionClients: StakerItemOk<T, "execution">[];
-  consensusClients: StakerItemOk<T, "consensus">[];
-  web3signer: StakerItemOk<T, "signer">;
-  mevBoost: StakerItemOk<T, "mev-boost">;
-}
-export interface StakerConfigSet<T extends Network> {
-  network: T;
-  executionClient?: StakerItemOk<T, "execution">;
-  consensusClient?: StakerItemOk<T, "consensus">;
-  mevBoost?: StakerItemOk<T, "mev-boost">;
-  enableWeb3signer?: boolean;
-}
-
-export type ExecutionClient<T extends Network> = T extends "mainnet"
-  ? ExecutionClientMainnet
-  : T extends "gnosis"
-  ? ExecutionClientGnosis
-  : T extends "prater"
-  ? ExecutionClientPrater
-  : T extends "holesky"
-  ? ExecutionClientHolesky
-  : T extends "lukso"
-  ? ExecutionClientLukso
-  : never;
-
-export type ConsensusClient<T extends Network> = T extends "mainnet"
-  ? ConsensusClientMainnet
-  : T extends "gnosis"
-  ? ConsensusClientGnosis
-  : T extends "prater"
-  ? ConsensusClientPrater
-  : T extends "holesky"
-  ? ConsensusClientHolesky
-  : T extends "lukso"
-  ? ConsensusClientLukso
-  : never;
-
-export type Signer<T extends Network> = T extends "mainnet"
-  ? SignerMainnet
-  : T extends "gnosis"
-  ? SignerGnosis
-  : T extends "prater"
-  ? SignerPrater
-  : T extends "holesky"
-  ? SignerHolesky
-  : T extends "lukso"
-  ? SignerLukso
-  : never;
-
-export type MevBoost<T extends Network> = T extends "mainnet"
-  ? MevBoostMainnet
-  : T extends "prater"
-  ? MevBoostPrater
-  : never;
-
-export interface StakerConfigByNetwork<T extends Network> {
-  executionClient: ExecutionClient<T> | undefined | null;
-  consensusClient: ConsensusClient<T> | undefined | null;
-  isMevBoostSelected: boolean;
-}
-export interface StakerCompatibleVersionsByNetwork<T extends Network> {
-  compatibleExecution: {
-    dnpName: ExecutionClient<T>;
-    minVersion: string;
-  }[];
-  compatibleConsensus: {
-    dnpName: ConsensusClient<T>;
-    minVersion: string;
-  }[];
-  compatibleSigner: {
-    dnpName: Signer<T>;
-    minVersion: string;
-  };
-  compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
-}
-
-/**
- * =======
- * ROLLUPS
- * =======
- */
-
-export type OptimismType = "archive" | "execution" | "rollup";
-export type OptimismItem<T extends OptimismType> =
-  | OptimismItemOk<T>
-  | OptimismItemError<T>;
-interface OptimismArchive {
-  dnpName: OptimismL2Geth;
-}
-interface OptimismExecution {
-  dnpName: ExecutionClientOptimism;
-  enableHistorical: boolean;
-}
-interface OptimismRollup {
-  dnpName: OptimismNode;
-  mainnetRpcUrl: string;
-}
-type OptimismItemBasic<T extends OptimismType> = T extends "archive"
-  ? OptimismArchive
-  : T extends "execution"
-  ? OptimismExecution
-  : T extends "rollup"
-  ? OptimismRollup
-  : never;
-
-export type OptimismItemError<T extends OptimismType> = {
-  status: "error";
-  error: string;
-} & OptimismItemBasic<T>;
-export type OptimismItemOk<T extends OptimismType> = {
-  status: "ok";
-  avatarUrl: string;
-  isInstalled: boolean;
-  isUpdated: boolean;
-  isRunning: boolean;
-  data?: PackageItemData;
-  isSelected: boolean;
-} & OptimismItemBasic<T>;
-
-export interface OptimismConfigGet {
-  archive: OptimismItem<"archive">;
-  executionClients: OptimismItem<"execution">[];
-  rollup: OptimismItem<"rollup">;
-}
-
-export interface OptimismConfigGetOk {
-  archive: OptimismItemOk<"archive">;
-  executionClients: OptimismItemOk<"execution">[];
-  rollup: OptimismItemOk<"rollup">;
-}
-
-export interface OptimismConfigSet {
-  archive?: OptimismItemOk<"archive">;
-  executionClient?: OptimismItemOk<"execution">;
-  rollup?: OptimismItemOk<"rollup">;
 }
 
 /**

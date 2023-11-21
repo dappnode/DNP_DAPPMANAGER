@@ -7,7 +7,7 @@ import {
   listPackageContainers,
 } from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "@dappnode/utils";
-import { PackageEnvs } from "@dappnode/types";
+import { PackageEnvs } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 

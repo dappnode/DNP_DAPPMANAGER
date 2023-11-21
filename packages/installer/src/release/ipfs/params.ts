@@ -1,4 +1,5 @@
 import {
+  ReleaseSignature,
   SetupWizard,
   SetupSchema,
   GrafanaDashboard,
@@ -6,12 +7,13 @@ import {
   SetupTarget,
   SetupUiJson,
   Manifest,
-  releaseFiles,
   Compose,
-} from "@dappnode/types";
-import { ReleaseSignature } from "@dappnode/common";
+} from "@dappnode/common";
 import { validateManifestBasic } from "@dappnode/manifest";
 import { validateCompose } from "@dappnode/dockercompose";
+import { releaseFiles } from "../releaseFiles.js";
+
+export const defaultArch = "linux/amd64" as const;
 
 // Re-declare releaseFilesToDownload to prevent downloading un-wanted assets
 // that may be added in the future

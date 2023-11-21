@@ -2,6 +2,7 @@ import {
   ConsensusClient,
   StakerItemOk,
   InstalledPackageData,
+  Network,
   UserSettingsAllDnps,
 } from "@dappnode/common";
 import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
@@ -12,7 +13,6 @@ import {
 } from "@dappnode/dockerapi";
 import { getConsensusUserSettings } from "@dappnode/utils";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import { Network } from "@dappnode/types";
 
 export async function setConsensusClient<T extends Network>({
   network,

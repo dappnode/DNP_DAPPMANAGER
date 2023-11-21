@@ -1,6 +1,6 @@
 import Ajv from "ajv";
 import { mapValues } from "lodash-es";
-import { Args, LoggerMiddleware } from "../../types";
+import { Args, LoggerMiddleware } from "../../types/index.js";
 import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
 
 const ajv = new Ajv({ allErrors: true });
@@ -61,7 +61,7 @@ export function subscriptionsFactory(
         }
       },
       on: (handler: (...args: Args) => void | Promise<void>): void => {
-        io.on(route, async function (...args: Args): Promise<void> {
+        io.on(route, async function(...args: Args): Promise<void> {
           // Use try / catch and await to be safe for async and sync methods
           try {
             if (onCall) onCall(`on - ${route}`, args);

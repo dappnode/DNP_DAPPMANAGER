@@ -4,14 +4,15 @@ import { shell } from "@dappnode/utils";
 import { clearCacheDb, clearMainDb } from "@dappnode/db";
 import { DockerApiSystemDfReturn } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { Compose, Manifest } from "@dappnode/types";
 import {
   PackageContainer,
   InstalledPackageData,
   VolumeMapping,
   PackageRelease,
   ReleaseSignatureStatusCode,
-  InstallPackageData
+  InstallPackageData,
+  Compose,
+  Manifest
 } from "@dappnode/common";
 
 export const testDir = "./test_files/";

@@ -3,10 +3,6 @@ import {
   ExecutionClient,
   MevBoost,
   StakerConfigSet,
-} from "@dappnode/common";
-import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
-import * as db from "@dappnode/db";
-import {
   ConsensusClientGnosis,
   ConsensusClientMainnet,
   ConsensusClientPrater,
@@ -18,7 +14,9 @@ import {
   ConsensusClientHolesky,
   ExecutionClientHolesky,
   Network,
-} from "@dappnode/types";
+} from "@dappnode/common";
+import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
+import * as db from "@dappnode/db";
 import { getStakerConfigByNetwork } from "../index.js";
 import { setConsensusClient } from "./setConsensusClient.js";
 import { setExecutionClient } from "./setExecutionClient.js";

@@ -5,7 +5,7 @@ import { AddResult } from "ipfs-core-types/src/root";
 import { sleep } from "@dappnode/utils";
 import all from "it-all";
 import { shell } from "@dappnode/utils";
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";
 const ipfsTestContainerName = "dappnode_ipfs_host";

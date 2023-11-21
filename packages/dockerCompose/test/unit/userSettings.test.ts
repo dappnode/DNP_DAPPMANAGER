@@ -1,8 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { pick } from "lodash-es";
-import { Compose, ComposeService } from "@dappnode/types";
-import { UserSettings } from "@dappnode/common";
+import { UserSettings, Compose, ComposeService } from "@dappnode/common";
 import { parseUserSettings, applyUserSettings } from "../../src/index.js";
 
 const bitcoinVolumeName = "bitcoin_data";

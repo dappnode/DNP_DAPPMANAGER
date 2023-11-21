@@ -2,9 +2,9 @@ import {
   ConsensusClient,
   ExecutionClient,
   StakerConfigByNetwork,
+  Network,
 } from "@dappnode/common";
 import * as db from "@dappnode/db";
-import { Network } from "@dappnode/types";
 
 export function getStakerConfigByNetwork<T extends Network>(
   network: T

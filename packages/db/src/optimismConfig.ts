@@ -1,4 +1,4 @@
-import { ExecutionClientOptimism } from "@dappnode/types";
+import { ExecutionClientOptimism } from "@dappnode/common";
 import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 

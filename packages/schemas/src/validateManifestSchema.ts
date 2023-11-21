@@ -2,7 +2,7 @@ import { ajv } from "./ajv.js";
 import { CliError } from "./error.js";
 import { processError } from "./utils.js";
 import manifestSchema from "./schemas/manifest.schema.json" assert { type: "json" };
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 
 /**
  * Validates manifest file with schema

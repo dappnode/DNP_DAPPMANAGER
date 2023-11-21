@@ -3,9 +3,9 @@ import {
   InstalledPackageData,
   InstallPackageData,
   PackageRelease,
+  Compose,
   ReleaseSignatureStatusCode,
 } from "@dappnode/common";
-import { Compose } from "@dappnode/types";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";

@@ -1,6 +1,7 @@
 import {
   ExecutionClient,
   StakerItemOk,
+  Network,
   InstalledPackageData,
 } from "@dappnode/common";
 import { packageInstall } from "@dappnode/installer";
@@ -10,7 +11,6 @@ import {
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import { Network } from "@dappnode/types";
 
 export async function setExecutionClient<T extends Network>({
   currentExecutionClient,

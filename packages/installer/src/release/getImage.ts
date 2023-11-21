@@ -1,10 +1,9 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { shell, validatePath } from "@dappnode/utils";
+import { shell, validatePath, getImageTag } from "@dappnode/utils";
 import downloadImage from "./ipfs/downloadImage.js";
 import { DistributedFile } from "@dappnode/common";
 import { dockerImageManifest } from "@dappnode/dockerapi";
-import { getImageTag } from "@dappnode/types";
 
 export default async function getImage(
   imageFile: DistributedFile,

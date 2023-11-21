@@ -3,10 +3,10 @@ import {
   ExecutionClient,
   StakerItemOk,
   ConsensusClient,
-  Signer
+  Signer,
+  Network,
 } from "@dappnode/common";
 import { lt } from "semver";
-import { Network } from "@dappnode/types";
 
 export function ensureSetRequirements<T extends Network>({
   network,
@@ -17,7 +17,7 @@ export function ensureSetRequirements<T extends Network>({
   compatibleSigner,
   currentExecClientPkg,
   currentConsClientPkg,
-  currentWeb3signerPkg
+  currentWeb3signerPkg,
 }: {
   network: Network;
   executionClient: StakerItemOk<T, "execution"> | undefined;
@@ -42,7 +42,7 @@ export function ensureSetRequirements<T extends Network>({
   if (
     executionClient &&
     !compatibleExecution
-      .map(exCl => exCl.dnpName)
+      .map((exCl) => exCl.dnpName)
       .includes(executionClient.dnpName)
   )
     throw Error(
@@ -52,7 +52,7 @@ export function ensureSetRequirements<T extends Network>({
   if (
     consensusClient &&
     !compatibleConsensus
-      .map(coCl => coCl.dnpName)
+      .map((coCl) => coCl.dnpName)
       .includes(consensusClient.dnpName)
   )
     throw Error(
@@ -62,7 +62,7 @@ export function ensureSetRequirements<T extends Network>({
   // Ensure Execution clients DNP's versions names are valid
   if (currentExecClientPkg) {
     const execClient = compatibleExecution.find(
-      exCl => exCl.dnpName === currentExecClientPkg.dnpName
+      (exCl) => exCl.dnpName === currentExecClientPkg.dnpName
     );
     if (
       execClient?.minVersion &&
@@ -76,7 +76,7 @@ export function ensureSetRequirements<T extends Network>({
   // Ensure Execution clients DNP's versions names are valid
   if (currentConsClientPkg) {
     const consClient = compatibleConsensus.find(
-      exCl => exCl.dnpName === currentConsClientPkg.dnpName
+      (exCl) => exCl.dnpName === currentConsClientPkg.dnpName
     );
     if (
       consClient?.minVersion &&

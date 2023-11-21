@@ -2,7 +2,7 @@ import { InstalledPackageDetailData, PackageContainer } from "@dappnode/common";
 import { sampleContainer, sampleDnp } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
-import { getContainerName, getImageTag } from "@dappnode/types";
+import { getImageTag, getContainerName } from "@dappnode/utils";
 
 function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   const dnpName = dnp.metadata.name;

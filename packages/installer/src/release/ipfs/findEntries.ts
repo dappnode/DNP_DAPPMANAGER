@@ -1,4 +1,4 @@
-import { releaseFiles } from "@dappnode/types";
+import { releaseFiles } from "../releaseFiles.js";
 import { FileConfig, IPFSEntryName } from "../types.js";
 
 type ReleaseFiles = typeof releaseFiles;
@@ -22,7 +22,7 @@ export function findEntries<T extends IPFSEntryName>(
   config: Omit<FileConfig, "format">,
   fileId: string
 ): T[] | T | undefined {
-  const matches = files.filter(file => config.regex.test(file.name));
+  const matches = files.filter((file) => config.regex.test(file.name));
 
   if (matches.length === 0 && config.required)
     throw Error(`No ${fileId} found`);

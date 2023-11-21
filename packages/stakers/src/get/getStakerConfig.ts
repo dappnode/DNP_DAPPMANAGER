@@ -12,6 +12,7 @@ import {
   Signer,
   StakerConfigGet,
   StakerItem,
+  Network,
 } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
 import {
@@ -19,7 +20,6 @@ import {
   packageGetData,
   packageGet,
 } from "@dappnode/installer";
-import { Network } from "@dappnode/types";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../index.js";
 

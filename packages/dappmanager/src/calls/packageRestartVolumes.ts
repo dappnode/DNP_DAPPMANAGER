@@ -13,7 +13,6 @@ import {
   listPackage
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { containerNamePrefix, containerCoreNamePrefix } from "@dappnode/types";
 import {
   ethicalMetricsDnpName,
   ethicalMetricsTorServiceVolume,
@@ -80,9 +79,9 @@ export async function packageRestartVolumes({
       // get the service name from the container name
       const serviceName = containerName
         .split(
-          containerName.includes(containerNamePrefix)
-            ? containerNamePrefix
-            : containerCoreNamePrefix
+          containerName.includes(params.CONTAINER_NAME_PREFIX)
+            ? params.CONTAINER_NAME_PREFIX
+            : params.CONTAINER_CORE_NAME_PREFIX
         )[1]
         .split(".")[0];
       // only stop containers that are running

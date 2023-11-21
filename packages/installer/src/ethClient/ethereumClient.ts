@@ -30,7 +30,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
   Network,
-} from "@dappnode/types";
+} from "@dappnode/common";
 
 export enum ComposeAliasEditorAction {
   ADD,
