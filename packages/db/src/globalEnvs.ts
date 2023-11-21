@@ -5,14 +5,11 @@ import { opEnableHistoricalRpc, opExecutionClient } from "./optimismConfig.js";
 import {
   consensusClientMainnet,
   executionClientMainnet,
-  feeRecipientMainnet,
   consensusClientGnosis,
   executionClientGnosis,
   mevBoostGnosis,
-  feeRecipientGnosis,
   consensusClientPrater,
   executionClientPrater,
-  feeRecipientLukso,
   consensusClientLukso,
   executionClientLukso,
   mevBoostLukso,
@@ -20,7 +17,6 @@ import {
   mevBoostPrater,
   consensusClientHolesky,
   executionClientHolesky,
-  feeRecipientHolesky,
 } from "./stakerConfig.js";
 import { serverName } from "./system.js";
 import { upnpAvailable } from "./upnp.js";
