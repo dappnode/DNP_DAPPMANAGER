@@ -73,5 +73,6 @@ export { updateUpgrade } from "./updateUpgrade.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";
 export { volumeRemove } from "./volumeRemove.js";
 export { volumesGet } from "./volumesGet.js";
+export { sensorsDataGet } from "./sensorsDataGet.js";
 export * from "./wireguard.js";
 export * from "./wifi.js";

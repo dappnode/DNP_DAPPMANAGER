@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
+import { IpfsClientTarget, PortProtocol, Routes, Sensors } from "@dappnode/common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -372,7 +372,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   }),
   optimismConfigSet: async () => {},
-  updateUpgrade: async () => "Successfully updated"
+  updateUpgrade: async () => "Successfully updated",
+  sensorsDataGet: async () => ({})
 };
 
 export const calls: Routes = {

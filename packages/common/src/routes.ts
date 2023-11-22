@@ -47,6 +47,7 @@ import {
   OptimismConfigSet,
   OptimismConfigGet,
   RebootRequiredScript,
+  Sensors,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -630,6 +631,11 @@ export interface Routes {
   updateUpgrade: () => Promise<string>;
 
   /**
+   * Return data of the sensors
+   */
+  sensorsDataGet: () => Promise<Sensors>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -780,6 +786,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
   seedPhraseSet: { log: true },
+  sensorsDataGet: {log:true},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},

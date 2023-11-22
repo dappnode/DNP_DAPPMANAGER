@@ -52,17 +52,19 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
+  const sensorsData = useApi.sensorsDataGet();
 
   useEffect(() => {
     const interval = setInterval(() => {
       cpuStats.revalidate();
       diskStats.revalidate();
       memoryStats.revalidate();
+      sensorsData.revalidate();
     }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [cpuStats, diskStats, memoryStats]);
+  }, [cpuStats, diskStats, memoryStats, sensorsData]);
 
   return (
     <div className="dashboard-cards">
@@ -94,6 +96,23 @@ export function HostStats() {
       </StatsCardContainer>
 
       <StatsCardContainer title={"disk"}>
+        {diskStats.data ? (
+          <StatsCardOk
+            percent={diskStats.data.usedPercentage}
+            text={
+              humanFileSize(diskStats.data.used) +
+              " / " +
+              humanFileSize(diskStats.data.total)
+            }
+          />
+        ) : diskStats.error ? (
+          <StatsCardError error={diskStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"cpu temperature"}>
         {diskStats.data ? (
           <StatsCardOk
             percent={diskStats.data.usedPercentage}
