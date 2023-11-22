@@ -1,8 +1,7 @@
 import { RegistryNewRepoEvent } from "@dappnode/common";
 import { ethers } from "ethers";
-import { abi } from "../contracts/registry.js";
 import * as db from "@dappnode/db";
-import { DirectoryDnp } from "@dappnode/toolkit";
+import { DirectoryDnp, registryAbi } from "@dappnode/toolkit";
 
 // Topic name
 const eventNewRepo = "NewRepo";
@@ -82,7 +81,7 @@ export async function getRegistryOnRange(
     throw Error(`Registry ENS ${registryEns} does not exist`);
   }
 
-  const registryInterface = new ethers.utils.Interface(abi);
+  const registryInterface = new ethers.utils.Interface(registryAbi);
   const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
 
   const events: RegistryNewRepoEvent[] = [];

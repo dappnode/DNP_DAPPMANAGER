@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ApmRepoVersionReturn, ApmVersionRaw } from "./types.js";
-import * as repoContract from "../contracts/repository.js";
+import { repositoryAbi } from "@dappnode/toolkit";
 import { parseApmVersionReturn, toApmVersionArray } from "./apmUtils.js";
 import { valid } from "semver";
 
@@ -14,7 +14,7 @@ export async function fetchVersion(
   dnpName: string,
   version?: string
 ): Promise<ApmVersionRaw> {
-  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
+  const repo = new ethers.Contract(dnpName, repositoryAbi, provider);
 
   const res: ApmRepoVersionReturn =
     version && valid(version)

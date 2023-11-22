@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import { ApmVersionState } from "./types.js";
-import * as repoContract from "../contracts/repository.js";
+import { repositoryAbi } from "@dappnode/toolkit";
 import { parseApmVersionReturn, linspace } from "./apmUtils.js";
 
 /**
@@ -13,7 +13,7 @@ export async function fetchApmVersionsState(
   dnpName: string,
   lastVersionId = 0
 ): Promise<ApmVersionState[]> {
-  const repo = new ethers.Contract(dnpName, repoContract.abi, provider);
+  const repo = new ethers.Contract(dnpName, repositoryAbi, provider);
 
   const versionCount: number = await repo.getVersionsCount().then(parseFloat);
 
