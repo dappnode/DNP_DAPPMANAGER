@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/utils": "^0.1.0",
     "@dappnode/dappmanager": "^0.1.0",
     "@dappnode/eventbus": "^0.1.0",
     "@reduxjs/toolkit": "^1.3.5",
