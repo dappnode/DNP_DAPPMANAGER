@@ -1,0 +1,69 @@
+{
+  "name": "@dappnode/toolkit",
+  "type": "module",
+  "version": "0.1.20",
+  "description": "The DappNode Toolkit is a collection of shared smart contracts, types, and utility functions that can be used across various DappNode projects. This toolkit aims to simplify development by providing reusable code and a consistent set of interfaces and types. The package includes modules for ACL, APM, Apps, EVMScript, Params, Registry, and Types, each with their own set of submodules and functionalities. The toolkit is designed to be extensible, allowing for the easy addition of new modules as needed. Additionally, the toolkit includes comprehensive testing functionality and documentation to ensure the quality and usability of the code.",
+  "main": "dist/index.js",
+  "scripts": {
+    "tag-and-publish": "yarn version patch && git push --follow-tags",
+    "clean": "rimraf dist",
+    "build": "yarn run clean && yarn run truffle:compile:v0.4 && yarn run truffle:compile:v0.5 && yarn run typechain && tsc",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "typechain": "typechain --node16-modules --target ethers-v6 --out-dir ./src/typechain './truffle/contracts_build/contracts*/*.json'",
+    "test": "mocha --config .mocharc.yml test/**/*.test.ts",
+    "truffle:compile:v0.4": "truffle compile --config ./truffle/truffle-config-v0.4.cjs",
+    "truffle:compile:v0.5": "truffle compile --config ./truffle/truffle-config-v0.5.cjs",
+    "truffle:develop:v0.5": "truffle develop --config ./truffle/truffle-config-v0.5.cjs",
+    "truffle:test:v0.4": "truffle test --config ./truffle/truffle-config-v0.4.cjs",
+    "truffle:test:v0.5": "truffle test --config ./truffle/truffle-config-v0.5.cjs",
+    "truffle:migrate:v0.4": "truffle migrate --config ./truffle/truffle-config-v0.4.cjs --reset --network development",
+    "truffle:migrate:v0.5": "truffle migrate --config ./truffle/truffle-config-v0.5.cjs --reset --network development"
+  },
+  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+  "contributors": [
+    "Pablo Mendez <mendez4a@gmail.com> (https://github.com/pablomendezroyo)"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "@typechain/ethers-v6": "^0.3.3",
+    "@types/chai": "^4.3.4",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.1.1",
+    "@types/semver": "^7.3.13",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.5",
+    "chai": "^4.3.7",
+    "eslint": "^8.38.0",
+    "eslint-plugin-import": "^2.27.5",
+    "mocha": "^10.2.0",
+    "prettier": "^2.8.7",
+    "rimraf": "^5.0.0",
+    "truffle": "^5.9.0",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typechain": "^8.3.2",
+    "typescript": "^5.0.4"
+  },
+  "dependencies": {
+    "@dappnode/types": "^0.1.19",
+    "@ipld/car": "^5.1.1",
+    "esm": "^3.2.25",
+    "ethers": "^6.8.1",
+    "graphql": "^16.6.0",
+    "graphql-request": "^6.0.0",
+    "ipfs-unixfs-exporter": "^13.1.5",
+    "is-ipfs": "^8.0.1",
+    "kubo-rpc-client": "^3.0.1",
+    "multiformats": "^11.0.2",
+    "semver": "^7.5.0",
+    "yaml": "^2.2.2"
+  },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "stream": false,
+    "util": false
+  }
+}
