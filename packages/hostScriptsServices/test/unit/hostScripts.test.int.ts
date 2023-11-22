@@ -1,14 +1,27 @@
 import "mocha";
 import { expect } from "chai";
-import { shell } from "@dappnode/utils";
+import { shell, shellHost } from "@dappnode/utils";
+import { syncBuiltinESMExports } from "module";
+import { sensors } from "../../src/hostScripts/scripts/sensors.js";
+import { runScript } from "../../src/hostScripts/runScripts.js";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
-
-describe.skip("Host scripts", () => {
+/*
+describe("Host scripts", () => {
   it("Should fetch host info", async () => {
     const hostInfo = await shell(
       `sudo bash ${hostScriptsPath}/collect_host_info.sh`
     );
+    expect(hostInfo).to.be.ok;
+  });
+  */
+
+describe("Sensor scripts", () => {
+  it("Should fetch host sensors data", async () => {
+    //const hostInfo = await sensors();
+    //const hostInfo = await runScript("sensors.sh");
+    const hostInfo = await shellHost(`sudo bash ${hostScriptsPath}/sensors.sh`);
+    console.log(hostInfo);
     expect(hostInfo).to.be.ok;
   });
 
