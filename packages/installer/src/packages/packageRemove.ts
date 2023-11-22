@@ -13,7 +13,7 @@ import {
 import { isRunningHttps } from "@dappnode/httpsportal";
 import { httpsPortal } from "@dappnode/httpsportal";
 import * as db from "@dappnode/db";
-import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
+import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/common";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
 
 /**

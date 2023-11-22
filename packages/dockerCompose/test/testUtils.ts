@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/types";
+import { Compose } from "@dappnode/common";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";

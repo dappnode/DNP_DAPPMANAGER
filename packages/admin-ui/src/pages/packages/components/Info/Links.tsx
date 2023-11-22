@@ -2,7 +2,7 @@ import React from "react";
 import newTabProps from "utils/newTabProps";
 import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { AiFillBug } from "react-icons/ai";
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 
 export function Links({
   links,

@@ -11,6 +11,8 @@ import {
   EthClientRemote,
   EthProviderError,
   EthClientInstallStatus,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
 } from "@dappnode/common";
 import {
   ethereumClient,
@@ -24,10 +26,6 @@ import {
   dockerComposeUpPackage,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-} from "@dappnode/types";
 
 /**
  * Check status of the Ethereum client and do next actions

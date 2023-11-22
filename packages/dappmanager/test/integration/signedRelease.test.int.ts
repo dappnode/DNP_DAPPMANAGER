@@ -3,9 +3,8 @@ import { ethers } from "ethers";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { ipfs } from "@dappnode/ipfs";
 import { ReleaseFetcher } from "@dappnode/installer";
-import { getContainerName } from "@dappnode/utils";
-import { ReleaseSignatureStatusCode } from "@dappnode/common";
-import { Manifest, getImageTag } from "@dappnode/types";
+import { getContainerName, getImageTag } from "@dappnode/utils";
+import { ReleaseSignatureStatusCode, Manifest } from "@dappnode/common";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { signRelease } from "./integrationSpecs/signRelease.js";
 

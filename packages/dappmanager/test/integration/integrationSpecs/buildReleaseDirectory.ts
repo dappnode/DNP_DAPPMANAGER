@@ -5,14 +5,13 @@ import { mapValues } from "lodash-es";
 import { ipfs } from "@dappnode/ipfs";
 import { shell } from "@dappnode/utils";
 import { yamlDump } from "@dappnode/utils";
-import { getContainerName } from "@dappnode/utils";
+import { getContainerName, getImageTag } from "@dappnode/utils";
 import {
   Manifest,
   Compose,
   SetupWizard,
-  getImageTag,
   ComposeService
-} from "@dappnode/types";
+} from "@dappnode/common";
 import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
 import { ipfsAddAll } from "../testIpfsUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";

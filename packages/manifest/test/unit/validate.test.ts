@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { mockManifest } from "../testUtils.js";
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 import { validateManifestBasic } from "../../src/index.js";
 
 describe("validateManifestBasic", () => {

@@ -1,7 +1,6 @@
 import "mocha";
 import { expect } from "chai";
 import { omit } from "lodash-es";
-import { Manifest, SetupWizard, getImageTag } from "@dappnode/types";
 import * as calls from "../../src/calls/index.js";
 import {
   clearDbs,
@@ -14,7 +13,8 @@ import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { getContainerName, validatePath } from "@dappnode/utils";
-import { RequestedDnp } from "@dappnode/common";
+import { RequestedDnp, Manifest, SetupWizard } from "@dappnode/common";
+import { getImageTag } from "@dappnode/utils";
 
 describe("Fetch releases", () => {
   const dnpNameMain = "main.dnp.dappnode.eth";

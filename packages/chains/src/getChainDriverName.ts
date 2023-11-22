@@ -1,5 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
-import { ChainDriver } from "@dappnode/types";
+import { InstalledPackageData, ChainDriver } from "@dappnode/common";
 
 /**
  * Get ChainDriver for a given dnp
@@ -13,7 +12,7 @@ export function getChainDriverName(
 
 const knownChains: { [dnpName: string]: ChainDriver } = {
   // Pending: https://github.com/dappnode/DAppNodePackage-prysm/pull/65
-  "prysm.dnp.dappnode.eth": "ethereum-beacon-chain"
+  "prysm.dnp.dappnode.eth": "ethereum-beacon-chain",
   // ===============================
   // DO NOT ADD ANY NEW PACKAGE HERE
   // ===============================

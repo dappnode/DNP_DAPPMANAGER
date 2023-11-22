@@ -47,8 +47,10 @@ import {
   OptimismConfigSet,
   OptimismConfigGet,
   RebootRequiredScript,
-} from "./types";
-import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
+  Network,
+  PackageBackup,
+  PackageEnvs,
+} from "./types/index.js";
 
 export interface Routes {
   /**

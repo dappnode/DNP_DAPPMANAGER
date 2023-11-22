@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { ReqStatus } from "types";
-import { Network } from "@dappnode/types";
 import {
   StakerConfigGet,
   StakerConfigSet,
   StakerItemOk,
   StakerType,
-  StakerItem
+  StakerItem,
+  Network
 } from "@dappnode/common";
 import { responseInterface } from "swr";
 

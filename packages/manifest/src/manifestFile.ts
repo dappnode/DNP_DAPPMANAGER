@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 import {
   validatePath,
   yamlParse,

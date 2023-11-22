@@ -1,6 +1,5 @@
 import { omit } from "lodash-es";
-import { ManifestWithImage } from "@dappnode/common";
-import { Manifest } from "@dappnode/types";
+import { ManifestWithImage, Manifest } from "@dappnode/common";
 
 /**
  * Sanitize metadata from the manifest.

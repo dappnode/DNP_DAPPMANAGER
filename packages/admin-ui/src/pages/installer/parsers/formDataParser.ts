@@ -7,7 +7,7 @@ import {
   SetupWizardAllDnps
 } from "@dappnode/common";
 import { SetupWizardFormDataReturn } from "../types";
-import { SetupSchema } from "@dappnode/types";
+import { SetupSchema } from "@dappnode/common";
 import { SetupTargetAllDnps } from "types";
 
 const ajv = new Ajv({ allErrors: true });

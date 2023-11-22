@@ -1,6 +1,5 @@
 import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
-import { Manifest, SetupWizardField } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import deepmerge from "deepmerge";
 import {
@@ -23,7 +22,9 @@ import {
   PackageRelease,
   CompatibleDnps,
   InstalledPackageData,
-  ReleaseSignatureStatusCode
+  ReleaseSignatureStatusCode,
+  Manifest,
+  SetupWizardField
 } from "@dappnode/common";
 
 export async function fetchDnpRequest({

@@ -1,9 +1,8 @@
 import "mocha";
 import { safeSemver } from "../../../src/dappGet/utils/safeSemver.js";
-import { PackageRequest } from "@dappnode/common";
+import { PackageRequest, Dependencies } from "@dappnode/common";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 import { DappGetState, DappGetDnps } from "../../../src/dappGet/types.js";
-import { Dependencies } from "@dappnode/types";
 
 export interface DappgetTestCase {
   // Data for test

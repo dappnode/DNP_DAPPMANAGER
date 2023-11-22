@@ -3,9 +3,8 @@ import { getRelease } from "./getRelease.js";
 import { getManifest } from "./getManifest.js";
 import { DappgetOptions, dappGet } from "../dappGet/index.js";
 import { Apm } from "../apm/index.js";
-import { Manifest } from "@dappnode/types";
 import { DappGetState } from "../dappGet/types.js";
-import { PackageRelease, PackageRequest } from "@dappnode/common";
+import { PackageRelease, PackageRequest, Manifest } from "@dappnode/common";
 
 export class ReleaseFetcher extends Apm {
   /**

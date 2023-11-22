@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
 import { AiFillInfoCircle } from "react-icons/ai";
-import { Network } from "@dappnode/types";
 
 interface RelayIface {
   operator: string;

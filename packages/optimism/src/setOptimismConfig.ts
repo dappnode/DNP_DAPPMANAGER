@@ -2,14 +2,12 @@ import {
   InstalledPackageData,
   OptimismConfigSet,
   UserSettings,
-} from "@dappnode/common";
-import * as db from "@dappnode/db";
-import {
   optimismNode,
   optimismL2Geth,
   executionClientsOptimism,
   ExecutionClientOptimism,
-} from "@dappnode/types";
+} from "@dappnode/common";
+import * as db from "@dappnode/db";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {
   dockerContainerStart,

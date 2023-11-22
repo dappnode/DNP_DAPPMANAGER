@@ -1,5 +1,5 @@
 import { packageSetEnvironment as pkgSetEnvironment } from "@dappnode/installer";
-import { PackageEnvs } from "@dappnode/types";
+import { PackageEnvs } from "@dappnode/common";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it

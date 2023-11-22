@@ -25,7 +25,6 @@
     "@dappnode/logger": "^0.1.0",
     "@dappnode/manifest": "^0.1.0",
     "@dappnode/params": "^0.1.0",
-    "@dappnode/types": "^0.1.30",
     "@dappnode/utils": "^0.1.0",
     "ajv": "6.10.2",
     "memoizee": "0.4.14",

@@ -1,8 +1,7 @@
-import { PackageItemData, PackageRelease } from "@dappnode/common";
+import { PackageItemData, PackageRelease, Manifest } from "@dappnode/common";
 import { ReleaseFetcher } from "../release/index.js";
 import * as db from "@dappnode/db";
 import { pick } from "lodash-es";
-import { Manifest } from "@dappnode/types";
 import { eventBus } from "@dappnode/eventbus";
 
 // TODO: find a proper place for these functions. The functions inside this file

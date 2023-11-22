@@ -1,13 +1,8 @@
-import { NodeArch } from "@dappnode/common";
-import {
-  Manifest,
-  Architecture,
-  defaultArch,
-  getImagePath,
-  getLegacyImagePath,
-} from "@dappnode/types";
+import { NodeArch, Manifest, Architecture } from "@dappnode/common";
+import { getImageName, getLegacyImageName } from "@dappnode/utils";
 import { NoImageForArchError } from "../errors.js";
 import { IPFSEntryName } from "../types.js";
+import { defaultArch } from "./params.js";
 
 export function getImageByArch<T extends IPFSEntryName>(
   manifest: Manifest,
@@ -17,11 +12,11 @@ export function getImageByArch<T extends IPFSEntryName>(
   const arch = parseNodeArch(nodeArch);
   const { name, version } = manifest;
   const imageAsset =
-    files.find((file) => file.name === getImagePath(name, version, arch)) ||
+    files.find((file) => file.name === getImageName(name, version, arch)) ||
     (arch === defaultArch
       ? // New DAppNodes should load old single arch packages,
         // and consider their single image as amd64
-        files.find((file) => file.name === getLegacyImagePath(name, version))
+        files.find((file) => file.name === getLegacyImageName(name, version))
       : undefined);
 
   if (!imageAsset) {

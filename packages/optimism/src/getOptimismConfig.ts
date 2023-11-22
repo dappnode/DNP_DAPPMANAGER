@@ -1,11 +1,12 @@
-import { OptimismConfigGet, OptimismItem } from "@dappnode/common";
-import * as db from "@dappnode/db";
-import { listPackages } from "@dappnode/dockerapi";
 import {
+  OptimismConfigGet,
+  OptimismItem,
   executionClientsOptimism,
   optimismL2Geth,
   optimismNode,
-} from "@dappnode/types";
+} from "@dappnode/common";
+import * as db from "@dappnode/db";
+import { listPackages } from "@dappnode/dockerapi";
 import { ReleaseFetcher, packageGetData } from "@dappnode/installer";
 import {
   getIsInstalled,

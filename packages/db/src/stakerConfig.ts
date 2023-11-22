@@ -11,7 +11,7 @@ import {
   ExecutionClientLukso,
   ConsensusClientHolesky,
   ExecutionClientHolesky,
-} from "@dappnode/types";
+} from "@dappnode/common";
 
 // Mainnet
 
