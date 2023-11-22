@@ -13,12 +13,8 @@ import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { getContainerName, validatePath } from "@dappnode/utils";
-import {
-  RequestedDnp,
-  Manifest,
-  SetupWizard,
-  getImageTag
-} from "@dappnode/common";
+import { RequestedDnp, Manifest, SetupWizard } from "@dappnode/common";
+import { getImageTag } from "@dappnode/utils";
 
 describe("Fetch releases", () => {
   const dnpNameMain = "main.dnp.dappnode.eth";
