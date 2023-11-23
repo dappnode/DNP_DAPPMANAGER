@@ -373,16 +373,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   optimismConfigSet: async () => {},
   updateUpgrade: async () => "Successfully updated",
-  /*
-  sensorsDataGet: async () => ({
-    "k10temp-pci-00c3": {
-      Adapter: "PCI Adapter",
-      temp1_input: 86,
-      temp1_max: 100,
-      temp1_min: 0
-    }
-  })
-  */
+  
  sensorsDataGet: async () => ({
     temp1_input: 86,
     temp1_max: 100,

@@ -2,8 +2,6 @@ import "mocha";
 import { expect } from "chai";
 import { shell, shellHost } from "@dappnode/utils";
 import { syncBuiltinESMExports } from "module";
-import { sensors } from "../../src/hostScripts/scripts/sensors.js";
-import { runScript } from "../../src/hostScripts/runScripts.js";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
 
