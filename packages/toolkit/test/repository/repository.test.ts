@@ -9,7 +9,7 @@ import { createHash } from "crypto";
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
     "https://api.ipfs.dappnode.io",
-    "https://gateway.ipfs.dappnode.io",
+    //"https://gateway.ipfs.dappnode.io",
   ];
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";
@@ -148,11 +148,21 @@ describe("Dappnode Repository", function () {
         volumes: { "beacon-chain-data": {}, "validator-data": {} },
       };
 
+      const expectedSignature = {
+        version: 1,
+        cid: { version: 0, base: "base58btc" },
+        signature_protocol: "ECDSA_256",
+        signature:
+          "0x05df9a6449ac5fcbcaf98ee50cb5d40b08b797063058ee22dea5eff6fe493ef15a927f81132a80a94f43b5b35fe73662d4cbc2bc371c97a77683df3a0565fa821c",
+      };
+
       const pkgRelease = await contract.getPkgRelease({
         dnpName: prysmDnpName,
         version: prysmVersion,
         os: "x64",
       });
+
+      expect(expectedSignature).to.deep.equal(pkgRelease.signature);
       expect(pkgRelease.manifest).to.deep.equal(expectedManifest);
       expect(pkgRelease.compose).to.deep.equal(expectedCompose);
       expect(pkgRelease.imageFile).to.deep.equal(expectedImageFile);

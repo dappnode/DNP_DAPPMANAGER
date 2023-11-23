@@ -3,26 +3,12 @@ import {
   GrafanaDashboard,
   Manifest,
   PrometheusTarget,
-} from "@dappnode/types";
+} from "@dappnode/common";
 import { CID } from "kubo-rpc-client";
 
 /**
  * IPFS
  */
-
-// From https://nodejs.org/api/os.html#os_os_arch
-export type NodeArch =
-  | "arm"
-  | "arm64"
-  | "ia32"
-  | "mips"
-  | "mipsel"
-  | "ppc"
-  | "ppc64"
-  | "s390"
-  | "s390x"
-  | "x32"
-  | "x64";
 
 /**
  * TODO: the interface IPFSEntry is not properly exported by library ipfs-core-types. If importing it directly then the compiler throws an error. Version: 0.14.0
@@ -57,7 +43,7 @@ export interface PkgRelease extends DirectoryFiles {
 export type DirectoryFiles = {
   manifest: Manifest;
   compose: Compose;
-  signature?: ReleaseSignatureWithData;
+  signature?: ReleaseSignature;
   disclaimer?: string;
   gettingStarted?: string;
   prometheusTargets?: PrometheusTarget[];
@@ -90,11 +76,6 @@ interface ReleaseSignature {
    */
   signature: string;
 }
-
-type ReleaseSignatureWithData = {
-  signature: ReleaseSignature;
-  signedData: string;
-};
 
 type DistributedFileSource = "ipfs" | "swarm";
 

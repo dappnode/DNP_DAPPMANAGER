@@ -7,8 +7,7 @@ import { getImageByArch } from "./getImageByArch.js";
 import { findEntries } from "./findEntries.js";
 import { serializeIpfsDirectory } from "../releaseSignature.js";
 import { ReleaseDownloadedContents } from "../types.js";
-import { releaseFiles } from "../releaseFiles.js";
-import { DistributedFile, NodeArch } from "@dappnode/common";
+import { DistributedFile, NodeArch, releaseFiles } from "@dappnode/common";
 import {
   validateManifestSchema,
   validateDappnodeCompose,

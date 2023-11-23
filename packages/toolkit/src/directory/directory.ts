@@ -5,7 +5,7 @@ import {
 } from "../typechain/index.js";
 import { DirectoryDnp, directoryDnpStatus } from "./types.js";
 import { directoryAddress } from "./params.js";
-import { isEnsDomain } from "@dappnode/types";
+import { isEnsDomain } from "../utils.js";
 
 /**
  * DappNodeDirectory is a class to interact with the DAppNode Directory Contract.

@@ -3,7 +3,6 @@ import {
   PkgRelease,
   FileConfig,
   FileFormat,
-  NodeArch,
   DistributedFile,
   IPFSEntry,
 } from "./types.js";
@@ -19,13 +18,13 @@ import {
   Architecture,
   Manifest,
   defaultArch,
-  getImagePath,
-  getLegacyImagePath,
   releaseFiles,
   releaseFilesToDownload,
-} from "@dappnode/types";
+} from "@dappnode/common";
+import { getImageName, getLegacyImageName } from "@dappnode/utils";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
+import { IPFSPath } from "kubo-rpc-client/dist/src/types.js";
 
 const source = "ipfs" as const;
 
@@ -59,6 +58,18 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
+   * Pins a hash to the IPFS node. Do not throw errors.
+   * @param hash
+   */
+  private async pinAddNoThrow(hash: IPFSPath): Promise<void> {
+    try {
+      await this.ipfs.pin.add(hash);
+    } catch (e) {
+      console.error(`Error pinning ${hash}`, e);
+    }
+  }
+
+  /**
    * Get multiple release assets for multiple requests
    * @param packages - A dictionary of packages and their versions
    * @returns - An array of release packages
@@ -67,7 +78,7 @@ export class DappnodeRepository extends ApmRepository {
     packages: {
       [name: string]: string;
     },
-    os?: NodeArch
+    os?: NodeJS.Architecture
   ): Promise<PkgRelease[]> {
     return await Promise.all(
       Object.entries(packages).map(
@@ -92,13 +103,15 @@ export class DappnodeRepository extends ApmRepository {
     version,
   }: {
     dnpName: string;
-    os?: NodeArch;
+    os?: NodeJS.Architecture;
     version?: string;
   }): Promise<PkgRelease> {
     const { contentUri } = await this.getVersionAndIpfsHash({
       dnpName,
       version,
     });
+    // pin hash
+    await this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri)))
       throw Error(`Invalid IPFS hash ${contentUri}`);
 
@@ -135,7 +148,7 @@ export class DappnodeRepository extends ApmRepository {
             releaseFilesToDownload.signature,
             this.getAssetIpfsEntry(
               ipfsEntries,
-              releaseFilesToDownload.manifest
+              releaseFilesToDownload.signature
             )?.cid.toString() || ""
           )
         : undefined,
@@ -143,28 +156,28 @@ export class DappnodeRepository extends ApmRepository {
         releaseFilesToDownload.disclaimer,
         this.getAssetIpfsEntry(
           ipfsEntries,
-          releaseFilesToDownload.manifest
+          releaseFilesToDownload.disclaimer
         )?.cid.toString() || ""
       ),
       gettingStarted: await this.getPkgAsset(
         releaseFilesToDownload.gettingStarted,
         this.getAssetIpfsEntry(
           ipfsEntries,
-          releaseFilesToDownload.manifest
+          releaseFilesToDownload.gettingStarted
         )?.cid.toString() || ""
       ),
       prometheusTargets: await this.getPkgAsset(
         releaseFilesToDownload.prometheusTargets,
         this.getAssetIpfsEntry(
           ipfsEntries,
-          releaseFilesToDownload.manifest
+          releaseFilesToDownload.prometheusTargets
         )?.cid.toString() || ""
       ),
       grafanaDashboards: await this.getPkgAsset(
         releaseFilesToDownload.grafanaDashboards,
         this.getAssetIpfsEntry(
           ipfsEntries,
-          releaseFilesToDownload.manifest
+          releaseFilesToDownload.grafanaDashboards
         )?.cid.toString() || ""
       ),
     };
@@ -445,7 +458,7 @@ export class DappnodeRepository extends ApmRepository {
   private getImageByArch(
     manifest: Manifest,
     files: IPFSEntry[],
-    nodeArch: NodeArch
+    nodeArch: NodeJS.Architecture
   ): DistributedFile {
     let arch: Architecture;
     switch (nodeArch) {
@@ -463,11 +476,11 @@ export class DappnodeRepository extends ApmRepository {
 
     const { name, version } = manifest;
     const imageAsset =
-      files.find((file) => file.name === getImagePath(name, version, arch)) ||
+      files.find((file) => file.name === getImageName(name, version, arch)) ||
       (arch === defaultArch
         ? // New DAppNodes should load old single arch packages,
           // and consider their single image as amd64
-          files.find((file) => file.name === getLegacyImagePath(name, version))
+          files.find((file) => file.name === getLegacyImageName(name, version))
         : undefined);
 
     if (!imageAsset) {

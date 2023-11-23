@@ -3,8 +3,8 @@ import { ipfs } from "@dappnode/ipfs";
 import { IPFSEntry } from "ipfs-core-types/src/root";
 import { parseAsset } from "./parseAsset.js";
 import { FileConfig } from "../types.js";
-import { validateAsset, DirectoryFiles } from "./params.js";
-import { FileFormat } from "@dappnode/common";
+import { validateAsset } from "./params.js";
+import { FileFormat, DirectoryFiles } from "@dappnode/common";
 
 export async function downloadAsset<T>(
   file: IPFSEntry[] | IPFSEntry | undefined,

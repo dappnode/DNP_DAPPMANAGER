@@ -1,4 +1,4 @@
-import { Manifest } from "@dappnode/types";
+import { Manifest } from "@dappnode/common";
 
 /**
  * ==========================

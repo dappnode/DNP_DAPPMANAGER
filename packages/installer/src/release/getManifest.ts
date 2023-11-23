@@ -1,7 +1,6 @@
 import { ipfs, IPFSEntry } from "@dappnode/ipfs";
 import { parseManifest, validateManifestBasic } from "@dappnode/manifest";
-import { IpfsClientTarget, Manifest } from "@dappnode/common";
-import { releaseFiles } from "./releaseFiles";
+import { IpfsClientTarget, Manifest, releaseFiles } from "@dappnode/common";
 
 export async function getManifest(contentUri: string): Promise<Manifest> {
   const ipfsEntries = await ipfs.list(contentUri);

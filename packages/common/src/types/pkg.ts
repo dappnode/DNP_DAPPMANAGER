@@ -1,5 +1,11 @@
 import { Compose } from "./compose.js";
 import { GrafanaDashboard, Manifest, PrometheusTarget } from "./manifest.js";
+import {
+  SetupWizard,
+  SetupSchema,
+  SetupTarget,
+  SetupUiJson,
+} from "./setupWizard.js";
 
 /**
  * IPFS
@@ -31,7 +37,8 @@ export interface ReleasePkgAssets extends DirectoryFiles {
 export type DirectoryFiles = {
   manifest: Manifest;
   compose: Compose;
-  signature?: ReleaseSignatureWithData;
+  signature?: ReleaseSignature;
+  setupWizard?: SetupWizard;
   disclaimer?: string;
   gettingStarted?: string;
   prometheusTargets?: PrometheusTarget[];
