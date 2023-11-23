@@ -6,7 +6,7 @@ import { sensors } from "../../src/hostScripts/scripts/sensors.js";
 import { runScript } from "../../src/hostScripts/runScripts.js";
 
 const hostScriptsPath = process.cwd() + "/hostScripts";
-/*
+
 describe("Host scripts", () => {
   it("Should fetch host info", async () => {
     const hostInfo = await shell(
@@ -14,7 +14,8 @@ describe("Host scripts", () => {
     );
     expect(hostInfo).to.be.ok;
   });
-  */
+});
+  
 
 describe("Sensor scripts", () => {
   it("Should fetch host sensors data", async () => {
