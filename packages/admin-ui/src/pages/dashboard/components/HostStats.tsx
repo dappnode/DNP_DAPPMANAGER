@@ -15,11 +15,11 @@ const StatsCardContainer: React.FunctionComponent<{
   children: React.ReactNode;
   title: string;
   usage?: boolean;
-}> = ({ children, title, usage = true}) => {
+}> = ({ children, title }) => {
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{title}</span>{usage===true && <span className="usage">usage</span>} 
+        <span className="id">{title}</span>
       </div>
       {children}
     </Card>
@@ -113,7 +113,7 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"uptime"} usage={false}>
+      <StatsCardContainer title={"uptime"}>
         {hostUptime.data ? (
           hostUptime.data
         ) : hostUptime.error ? (
