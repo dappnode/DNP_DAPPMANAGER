@@ -47,7 +47,6 @@ import {
   OptimismConfigSet,
   OptimismConfigGet,
   RebootRequiredScript,
-  Sensors,
 } from "./types";
 import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
 
@@ -633,7 +632,7 @@ export interface Routes {
   /**
    * Return data of the sensors
    */
-  sensorsDataGet: () => Promise<Sensors>;
+  sensorsDataGet: () => Promise<number>;
 
   /**
    * Return the current SSH port from sshd

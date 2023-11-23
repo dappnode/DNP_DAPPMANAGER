@@ -13,14 +13,16 @@ describe("Host scripts", () => {
     expect(hostInfo).to.be.ok;
   });
 });
-  
 
 describe("Sensor scripts", () => {
   it("Should fetch host sensors data", async () => {
-    const hostInfo = await shellHost(`sudo bash ${hostScriptsPath}/sensors.sh`);
+    const hostInfo = await shellHost(
+      `sudo bash ${hostScriptsPath}/getCpuTemperature.sh`
+    );
     const temp = parseFloat(hostInfo);
-    console.log(temp);
-    expect(temp).to.be.a('number');
+    expect(temp).to.be.a("number");
+    expect(temp).to.be.at.least(0);
+    expect(temp).to.be.below(200);
   });
 
   // host_update.sh script not able to tested on github action

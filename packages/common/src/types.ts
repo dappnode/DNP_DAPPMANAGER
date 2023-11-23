@@ -944,12 +944,6 @@ export interface HostStatMemory {
   usedPercentage: number;
 }
 
-export type Sensors = {
-  temp1_input: number;
-  temp1_max: number; //If not present set 100
-  temp1_min: number; //If not present set 0
-};
-
 /**
  * Host machine Disk stats: filesystem, used, available, etc
  */

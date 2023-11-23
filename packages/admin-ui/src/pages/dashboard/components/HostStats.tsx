@@ -14,12 +14,11 @@ function parseVariant(value: number) {
 const StatsCardContainer: React.FunctionComponent<{
   children: React.ReactNode;
   title: string;
-  usage?: boolean
-}> = ({ children, title, usage = true }) => {
+}> = ({ children, title }) => {
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{title}</span> {usage &&<span className="usage">usage</span>}
+        <span className="id">{title}</span>{" "}
       </div>
       {children}
     </Card>
@@ -113,16 +112,17 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"cpu temperature"} usage={false}>
+      <StatsCardContainer title={"cpu temperature"} >
         {sensorsData.data ? (
           <StatsCardOk
-          percent={sensorsData.data.temp1_input / (sensorsData.data.temp1_max-sensorsData.data.temp1_min) * 100}
-          text={
-            sensorsData.data.temp1_input + "°C" +
-            " / " +
-            sensorsData.data.temp1_max + "°C"
-          }
-           />
+            percent={
+              sensorsData.data}
+            text={
+              sensorsData.data + "°C" + 
+              " / " +
+              "100 °C"
+            }
+          />
         ) : sensorsData.error ? (
           <StatsCardError error={sensorsData.error} />
         ) : (
