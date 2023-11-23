@@ -1,17 +1,20 @@
 import { params } from "@dappnode/params";
-import { DappnodeRepository } from "@dappnode/toolkit";
+import { DappnodeRepository, PkgRelease } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
+  Compose,
   DappGetState,
-  DirectoryFiles,
+  DistributedFile,
   Eth2ClientTarget,
   EthClientRemote,
   EthClientStatusError,
   EthProviderError,
+  GrafanaDashboard,
   IpfsClientTarget,
   Manifest,
-  PackageRelease,
   PackageRequest,
+  SetupWizard,
+  PrometheusTarget,
 } from "@dappnode/common";
 import { getMultiClientStatus } from "./ethClient/clientStatus";
 import { emitSyncedNotification } from "./ethClient/syncedNotification";
@@ -20,6 +23,16 @@ import {
   validateDappnodeCompose,
   validateManifestSchema,
 } from "@dappnode/schemas";
+import {
+  ComposeEditor,
+  setDappnodeComposeDefaults,
+  writeMetadataToLabels,
+} from "@dappnode/dockercompose";
+import { computeGlobalEnvsFromDb } from "@dappnode/db";
+import { getIsCore } from "@dappnode/utils";
+import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
+import { parseTimeoutSeconds } from "./utils.js";
+import { parseMetadataFromManifest } from "@dappnode/manifest";
 
 /**
  * Computes the current eth2ClientTarget based on:
@@ -157,18 +170,82 @@ export class DappnodeInstaller extends DappnodeRepository {
     super.changeIpfsProvider(newIpfsUrl);
   }
 
-  private joinFilesInManifest(files: DirectoryFiles): Manifest {
-    const manifest = files.manifest;
+  /**
+   * Get release assets for a request
+   */
+  async getRelease(name: string, version?: string): Promise<PkgRelease> {
+    await this.updateProviders();
 
-    if (files.setupWizard) manifest.setupWizard = files.setupWizard;
-    if (files.disclaimer) manifest.disclaimer = { message: files.disclaimer };
-    if (files.gettingStarted) manifest.gettingStarted = files.gettingStarted;
-    if (files.prometheusTargets)
-      manifest.prometheusTargets = files.prometheusTargets;
-    if (files.grafanaDashboards && files.grafanaDashboards.length > 0)
-      manifest.grafanaDashboards = files.grafanaDashboards;
+    const pkgRelease = await this.getPkgRelease({
+      dnpNameOrHash: name,
+      trustedKeys: db.releaseKeysTrusted.get(),
+      os: process.arch,
+      version,
+    });
 
-    return manifest;
+    // validate manifest and compose files
+    this.validateManifestAndComposeSchemas(pkgRelease);
+
+    // join metadata files in manifest
+    pkgRelease.manifest = this.joinFilesInManifest({
+      manifest: pkgRelease.manifest,
+      disclaimer: pkgRelease.disclaimer,
+      gettingStarted: pkgRelease.gettingStarted,
+      grafanaDashboards: pkgRelease.grafanaDashboards,
+      prometheusTargets: pkgRelease.prometheusTargets,
+    });
+
+    // set compose to custom dappnode compose in release
+    pkgRelease.compose = this.addCustomDefaultsAndLabels(
+      pkgRelease.compose,
+      pkgRelease.manifest,
+      pkgRelease.avatarFile
+    );
+
+    return pkgRelease;
+  }
+
+  /**
+   * Get multiple release assets for multiple requests
+   */
+  async getReleases(packages: {
+    [name: string]: string;
+  }): Promise<PkgRelease[]> {
+    await this.updateProviders();
+
+    const pkgReleases = await this.getPkgsReleases(
+      packages,
+      db.releaseKeysTrusted.get(),
+      process.arch
+    );
+
+    // validate manifest and compose files
+    pkgReleases.forEach((pkgRelease) => {
+      this.validateManifestAndComposeSchemas(pkgRelease);
+    });
+
+    // join metadata files in manifest
+    pkgReleases.forEach((pkgRelease) => {
+      pkgRelease.manifest = this.joinFilesInManifest({
+        manifest: pkgRelease.manifest,
+        SetupWizard: pkgRelease.setupWizard,
+        disclaimer: pkgRelease.disclaimer,
+        gettingStarted: pkgRelease.gettingStarted,
+        grafanaDashboards: pkgRelease.grafanaDashboards,
+        prometheusTargets: pkgRelease.prometheusTargets,
+      });
+    });
+
+    // set compose to custom dappnode compose in each release
+    pkgReleases.forEach((pkgRelease) => {
+      pkgRelease.compose = this.addCustomDefaultsAndLabels(
+        pkgRelease.compose,
+        pkgRelease.manifest,
+        pkgRelease.avatarFile
+      );
+    });
+
+    return pkgReleases;
   }
 
   /**
@@ -178,39 +255,131 @@ export class DappnodeInstaller extends DappnodeRepository {
     req: PackageRequest,
     options?: DappgetOptions
   ): Promise<{
-    releases: PackageRelease[];
+    releases: PkgRelease[];
     message: string;
     state: DappGetState;
     alreadyUpdated: DappGetState;
     currentVersions: DappGetState;
   }> {
-    await this.updateProviders();
-
-    const os = process.arch;
-
     const result = await dappGet(req, options);
+    const releases = await this.getReleases(result.state);
+    return {
+      ...result,
+      releases,
+    };
+  }
 
-    // join all files in manifest
-    const pkgsReleases = (await this.getPkgsReleases(result.state, os)).map(
-      (pkgRelease) => {
-        return {
-          ...pkgRelease,
-          manifest: this.joinFilesInManifest(pkgRelease),
-        };
-      }
+  private joinFilesInManifest({
+    manifest,
+    SetupWizard,
+    disclaimer,
+    gettingStarted,
+    prometheusTargets,
+    grafanaDashboards,
+  }: {
+    manifest: Manifest;
+    SetupWizard?: SetupWizard;
+    disclaimer?: string;
+    gettingStarted?: string;
+    prometheusTargets?: PrometheusTarget[];
+    grafanaDashboards?: GrafanaDashboard[];
+  }): Manifest {
+    if (SetupWizard) manifest.setupWizard = SetupWizard;
+    if (disclaimer) manifest.disclaimer = { message: disclaimer };
+    if (gettingStarted) manifest.gettingStarted = gettingStarted;
+    if (prometheusTargets) manifest.prometheusTargets = prometheusTargets;
+    if (grafanaDashboards && grafanaDashboards.length > 0)
+      manifest.grafanaDashboards = grafanaDashboards;
+
+    return manifest;
+  }
+
+  /**
+   * Validates manifest and compose schemas
+   */
+  private validateManifestAndComposeSchemas(pkgRelease: PkgRelease): void {
+    validateManifestSchema(pkgRelease.manifest);
+    validateDappnodeCompose(pkgRelease.compose, pkgRelease.manifest);
+  }
+
+  /**
+   * Adds custom labels to the compose
+   */
+  private addCustomDefaultsAndLabels(
+    compose: Compose,
+    manifest: Manifest,
+    avatarFile: DistributedFile | undefined
+  ): Compose {
+    const customCompose = new ComposeEditor(
+      setDappnodeComposeDefaults(compose, manifest)
     );
 
-    // validate manifests and composes schemas
-    pkgsReleases.forEach((pkgRelease) => {
-      validateManifestSchema(pkgRelease.manifest);
-      validateDappnodeCompose(pkgRelease.compose, pkgRelease.manifest);
-    });
+    const services = Object.values(customCompose.services());
+    const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
+    const isCore = getIsCore(manifest);
+    const metadata = parseMetadataFromManifest(manifest);
+    for (const service of services) {
+      service.setGlobalEnvs(
+        manifest.globalEnvs,
+        globalEnvsFromDbPrefixed,
+        isCore
+      );
 
-    // get release signature status
-    // Verify release signature if available
-    const trustedKeys = db.releaseKeysTrusted.get();
-    // add release signature status to each release
-    pkgsReleases.forEach((pkgRelease) => {
+      service.mergeLabels(
+        writeMetadataToLabels({
+          dnpName: manifest.name,
+          version: manifest.version,
+          serviceName: service.serviceName,
+          dependencies: sanitizeDependencies(metadata.dependencies || {}),
+          avatar: this.fileToMultiaddress(avatarFile),
+          chain: metadata.chain,
+          origin,
+          isCore,
+          isMain:
+            // If developer chooses this service as main
+            metadata.mainService === service.serviceName ||
+            // Or if there is a single service
+            services.length === 1
+              ? true
+              : undefined,
+          dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout),
+        })
+      );
+    }
+    return customCompose.compose;
+  }
 
+  /**
+   * Stringifies a distributed file type into a single multiaddress string
+   * @param distributedFile
+   * @returns multiaddress "/ipfs/Qm"
+   */
+  private fileToMultiaddress(distributedFile?: DistributedFile): string {
+    if (!distributedFile || !distributedFile.hash) return "";
+
+    if (distributedFile.source === "ipfs")
+      return `/ipfs/${this.normalizeHash(distributedFile.hash)}`;
+    else return "";
+  }
+
+  /**
+   * Normalizes a hash removing it's prefixes
+   * - Remove any number of trailing slashes
+   * - Split by non alphanumeric character and return the last string
+   * "/ipfs/Qm" => "Qm"
+   * "ipfs"
+   * @param hash "/ipfs/Qm" | "ipfs:Qm" | "Qm"
+   * @returns "Qm"
+   */
+  private normalizeHash(hash: string): string {
+    return (
+      hash
+        // remove any number of trailing slashes
+        .replace(/\/+$/, "")
+        .trim()
+        //
+        .split(/[^a-zA-Z\d]/)
+        .slice(-1)[0]
+    );
   }
 }

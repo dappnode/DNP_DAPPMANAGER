@@ -1,6 +1,5 @@
 import * as db from "@dappnode/db";
 import { downloadReleaseIpfs } from "./ipfs/downloadRelease.js";
-import { isEnsDomain } from "./validate.js";
 import { isIpfsHash } from "../utils.js";
 import {
   PackageRelease,
@@ -15,7 +14,7 @@ import { parseTimeoutSeconds } from "../utils.js";
 import { ReleaseDownloadedContents } from "./types.js";
 import { getReleaseSignatureStatus } from "./releaseSignature.js";
 import { params } from "@dappnode/params";
-import { getIsCore } from "@dappnode/utils";
+import { getIsCore, isEnsDomain } from "@dappnode/utils";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 
 /**
@@ -39,13 +38,8 @@ export async function getRelease({
   name?: string;
   origin?: string;
 }): Promise<PackageRelease> {
-  const {
-    imageFile,
-    avatarFile,
-    manifest,
-    composeUnsafe,
-    signature,
-  } = await downloadRelease(hash, reqName || hash);
+  const { imageFile, avatarFile, manifest, composeUnsafe, signature } =
+    await downloadRelease(hash, reqName || hash);
 
   // TODO: improve this error handling
   if (

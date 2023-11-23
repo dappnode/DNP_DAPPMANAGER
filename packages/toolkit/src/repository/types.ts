@@ -3,6 +3,9 @@ import {
   GrafanaDashboard,
   Manifest,
   PrometheusTarget,
+  ReleaseSignatureStatus,
+  ReleaseWarnings,
+  SetupWizard,
 } from "@dappnode/common";
 import { CID } from "kubo-rpc-client";
 
@@ -36,13 +39,23 @@ export interface FileConfig {
 }
 
 export interface PkgRelease extends DirectoryFiles {
+  dnpName: string;
+  reqVersion: string;
+  semVersion: string;
+  isCore: boolean;
+  origin?: string;
   imageFile: DistributedFile;
   avatarFile?: DistributedFile;
+  warnings: ReleaseWarnings;
+  /** Release is from safe origin OR has trusted signature */
+  signedSafe: boolean;
+  signatureStatus: ReleaseSignatureStatus;
 }
 
 export type DirectoryFiles = {
   manifest: Manifest;
   compose: Compose;
+  setupWizard?: SetupWizard;
   signature?: ReleaseSignature;
   disclaimer?: string;
   gettingStarted?: string;
@@ -92,6 +105,10 @@ export interface DistributedFile {
 export interface ApmVersionRaw {
   version: string;
   contentUri: string;
+}
+
+export interface ApmVersionRawAndOrigin extends ApmVersionRaw {
+  origin?: string;
 }
 
 export interface ApmRepoVersionReturn {

@@ -1,6 +1,5 @@
 /**
  * Checks if a domain name is a valid ENS domain.
- * TODO: find a way to join this function the the one from validate
  * @param ensDomain - The domain name to check.
  * @returns - True if the domain name is valid, false otherwise.
  */

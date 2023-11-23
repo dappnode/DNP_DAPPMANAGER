@@ -1,8 +1,9 @@
 import { ethers } from "ethers";
-import { valid, parse } from "semver";
+import { valid, parse, validRange } from "semver";
 import { Repo__factory, Repo } from "../typechain/index.js";
-import { ApmRepoVersionReturn, ApmVersionRaw } from "./types.js";
-import { isEnsDomain } from "../utils.js";
+import { ApmRepoVersionReturn, ApmVersionRawAndOrigin } from "./types.js";
+import * as isIPFS from "is-ipfs";
+import { isEnsDomain } from "@dappnode/utils";
 
 /**
  * ApmRepository is a class to interact with the DAppNode APM Repository Contract.
@@ -49,30 +50,64 @@ export class ApmRepository {
   /**
    * Fetches the version and IPFS hash of a package.
    * If the version is not specified, it returns the latest version.
-   * @param dnpName - The name of the DNP.
+   * @param dnpNameOrHash - The name of the DNP or the IPFS hash.
    * @param version - The version of the DNP (optional).
    * @returns - A promise that resolves to the raw APM version.
    */
   public async getVersionAndIpfsHash({
-    dnpName,
-    version,
+    dnpNameOrHash,
+    version = "*",
   }: {
-    dnpName: string;
+    dnpNameOrHash: string;
     version?: string;
-  }): Promise<ApmVersionRaw> {
-    const repoContract = await this.getRepoContract(dnpName);
-    const res =
-      version && valid(version)
-        ? await repoContract.getBySemanticVersion(
-            this.toApmVersionArray(version)
-          )
-        : await repoContract.getLatest();
+  }): Promise<ApmVersionRawAndOrigin> {
+    // Correct version
+    if (version === "latest") version = "*";
 
-    return this.parseApmVersionReturn({
-      semanticVersion: res[0].map((v) => parseInt(v.toString())),
-      contractAddress: res[1],
-      contentURI: res[2],
-    });
+    // Normal cases:
+    // - name = eth domain & ver = semverVersion
+    // - name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
+    if (
+      isEnsDomain(dnpNameOrHash) &&
+      (this.isSemver(version) || this.isSemverRange(version))
+    ) {
+      const repoContract = await this.getRepoContract(dnpNameOrHash);
+      const res =
+        version && valid(version)
+          ? await repoContract.getBySemanticVersion(
+              this.toApmVersionArray(version)
+            )
+          : await repoContract.getLatest();
+
+      return this.parseApmVersionReturn({
+        semanticVersion: res[0].map((v) => parseInt(v.toString())),
+        contractAddress: res[1],
+        contentURI: res[2],
+      });
+    }
+
+    // IPFS normal case, name = eth domain & ver = IPFS hash
+    if (isEnsDomain(dnpNameOrHash) && this.isIpfsHash(version)) {
+      return {
+        version,
+        contentUri: version,
+        origin: version,
+      };
+    }
+
+    // When requesting IPFS hashes for the first time, their name is unknown
+    // name = IPFS hash, ver = null
+    if (this.isIpfsHash(dnpNameOrHash))
+      return {
+        version,
+        contentUri: dnpNameOrHash,
+        origin: dnpNameOrHash,
+      };
+
+    // All other cases are invalid
+    if (isEnsDomain(dnpNameOrHash))
+      throw Error(`Invalid version, must be a semver or a hash: ${version}`);
+    else throw Error(`Invalid DNP name, must be a ENS domain: ${name}`);
   }
 
   /**
@@ -117,5 +152,46 @@ export class ApmRepository {
     if (!dnpName.endsWith(".dappnode.eth"))
       throw Error(`Invalid dnpName ${dnpName}`);
     return dnpName;
+  }
+
+  /**
+   * Checks if the given string is a valid IPFS CID or path
+   *
+   * isIPFS.cid('QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o') // true (CIDv0)
+   * isIPFS.cid('zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7') // true (CIDv1)
+   * isIPFS.cid('noop') // false
+   *
+   * @param hash
+   * @returns
+   */
+  private isIpfsHash(hash: string): boolean {
+    if (!hash || typeof hash !== "string") return false;
+    // Correct hash prefix
+
+    // Remove `ipfs/` or `/ipfs/` prefix
+    hash = hash.split("ipfs/")[1] || hash;
+    // Remove trailing and leading slashes
+    hash = hash.replace(/\/+$/, "").replace(/^\/+/, "");
+    // Ignore any subpath after the hash
+    hash = hash.split("/")[0];
+
+    // Make sure hash if valid
+    return isIPFS.cid(hash);
+  }
+
+  /**
+   * Must accept regular semvers and "*"
+   * @param version
+   */
+  private isSemver(version: string): boolean {
+    return Boolean(valid(version));
+  }
+
+  /**
+   * Must accept regular semvers and "*"
+   * @param version
+   */
+  private isSemverRange(version: string): boolean {
+    return Boolean(validRange(version));
   }
 }

@@ -1017,24 +1017,7 @@ export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
 }
 
-export interface ReleaseSignature {
-  /** Version of the ReleaseSignature format */
-  version: 1;
-  /** Specs of the signed CIDs */
-  cid: {
-    version: 0 | 1;
-    base: "base58btc" | "base32" | "base64" | "base64url";
-  };
-  signature_protocol: ReleaseSignatureProtocol;
-  /**
-   * Signature of the serialized files in the directory
-   * ```
-   * 0x71b61418808a85c495f52bc9c781cbfeb0154c86aec8528c6cf7a83a26a0365f7ac4dea4eea7eea5e4ec14a10e01d8b8708d8c0c7c12420d152a272b69092b851b
-   * ```
-   */
-  signature: string;
-}
-interface ReleaseWarnings {
+export interface ReleaseWarnings {
   /**
    * If a core package does not come from the DAppNode Package APM registry
    */
@@ -1206,6 +1189,24 @@ export type NewFeatureId =
  * ==========
  */
 
+export interface ReleaseSignature {
+  /** Version of the ReleaseSignature format */
+  version: 1;
+  /** Specs of the signed CIDs */
+  cid: {
+    version: 0 | 1;
+    base: "base58btc" | "base32" | "base64" | "base64url";
+  };
+  signature_protocol: ReleaseSignatureProtocol;
+  /**
+   * Signature of the serialized files in the directory
+   * ```
+   * 0x71b61418808a85c495f52bc9c781cbfeb0154c86aec8528c6cf7a83a26a0365f7ac4dea4eea7eea5e4ec14a10e01d8b8708d8c0c7c12420d152a272b69092b851b
+   * ```
+   */
+  signature: string;
+}
+
 export enum ReleaseSignatureStatusCode {
   notSigned = "notSigned",
   signedByKnownKey = "signedByKnownKey",
@@ -1220,6 +1221,11 @@ export type ReleaseSignatureStatus =
       signatureProtocol: string;
       key: string;
     };
+
+export type ReleaseSignatureWithData = {
+  signature: ReleaseSignature;
+  signedData: string;
+};
 
 /** TODO: Add RSA_2048, OpenPGP */
 export type ReleaseSignatureProtocol = "ECDSA_256";
@@ -1285,7 +1291,7 @@ export interface IdentityInterface {
  */
 
 type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
-type GlobalEnvsValues = typeof params.GLOBAL_ENVS[GlobalEnvsKeys];
+type GlobalEnvsValues = (typeof params.GLOBAL_ENVS)[GlobalEnvsKeys];
 
 export type GlobalEnvs = {
   [K in keyof typeof params.GLOBAL_ENVS]: string;

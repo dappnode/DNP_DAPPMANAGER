@@ -1,6 +1,7 @@
 import { Apm } from "../apm/index.js";
 import { isIpfsHash } from "../utils.js";
-import { isEnsDomain, isSemver, isSemverRange } from "./validate.js";
+import { isSemver, isSemverRange } from "./validate.js";
+import { isEnsDomain } from "@dappnode/utils";
 
 export default async function resolveReleaseName(
   apm: Apm,

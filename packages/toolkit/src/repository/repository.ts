@@ -17,14 +17,28 @@ import util from "util";
 import {
   Architecture,
   Manifest,
+  ReleaseSignature,
+  ReleaseSignatureWithData,
+  TrustedReleaseKey,
   defaultArch,
   releaseFiles,
+  ReleaseSignatureStatusCode,
   releaseFilesToDownload,
 } from "@dappnode/common";
-import { getImageName, getLegacyImageName } from "@dappnode/utils";
+import {
+  getImageName,
+  getIsCore,
+  getLegacyImageName,
+  isEnsDomain,
+} from "@dappnode/utils";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
 import { IPFSPath } from "kubo-rpc-client/dist/src/types.js";
+import {
+  getReleaseSignatureStatus,
+  serializeIpfsDirectory,
+} from "./releaseSignature.js";
+import { params } from "@dappnode/params";
 
 const source = "ipfs" as const;
 
@@ -78,13 +92,15 @@ export class DappnodeRepository extends ApmRepository {
     packages: {
       [name: string]: string;
     },
+    trustedKeys: TrustedReleaseKey[],
     os?: NodeJS.Architecture
   ): Promise<PkgRelease[]> {
     return await Promise.all(
       Object.entries(packages).map(
         async ([name, version]) =>
           await this.getPkgRelease({
-            dnpName: name,
+            dnpNameOrHash: name,
+            trustedKeys,
             os,
             version,
           })
@@ -98,16 +114,18 @@ export class DappnodeRepository extends ApmRepository {
    * @returns - The release package for the request
    */
   public async getPkgRelease({
-    dnpName,
+    dnpNameOrHash,
+    trustedKeys,
     os = "x64",
     version,
   }: {
-    dnpName: string;
+    dnpNameOrHash: string;
+    trustedKeys: TrustedReleaseKey[];
     os?: NodeJS.Architecture;
     version?: string;
   }): Promise<PkgRelease> {
-    const { contentUri } = await this.getVersionAndIpfsHash({
-      dnpName,
+    const { contentUri, origin } = await this.getVersionAndIpfsHash({
+      dnpNameOrHash,
       version,
     });
     // pin hash
@@ -127,13 +145,45 @@ export class DappnodeRepository extends ApmRepository {
         releaseFilesToDownload.manifest
       )?.cid.toString() || ""
     );
+    const dnpName = manifest.name;
+    const isCore = getIsCore(manifest);
     const avatar = this.getAssetIpfsEntry(ipfsEntries, releaseFiles.avatar);
+
+    const signature = await this.getPkgAsset<ReleaseSignature>(
+      releaseFilesToDownload.signature,
+      this.getAssetIpfsEntry(
+        ipfsEntries,
+        releaseFilesToDownload.signature
+      )?.cid.toString() || ""
+    );
+    const signatureWithData: ReleaseSignatureWithData = {
+      signature,
+      signedData: serializeIpfsDirectory(ipfsEntries, signature.cid),
+    };
+    const signatureStatus = getReleaseSignatureStatus(
+      manifest.name,
+      signatureWithData,
+      trustedKeys
+    );
+
     return {
+      dnpName,
+      reqVersion: origin || manifest.version,
+      semVersion: manifest.version,
+      isCore,
+      origin,
       imageFile: this.getImageByArch(manifest, ipfsEntries, os),
       avatarFile: avatar
         ? { hash: avatar.cid.toString(), size: avatar.size, source }
         : undefined,
       manifest,
+      setupWizard: await this.getPkgAsset(
+        releaseFilesToDownload.setupWizard,
+        this.getAssetIpfsEntry(
+          ipfsEntries,
+          releaseFilesToDownload.setupWizard
+        )?.cid.toString() || ""
+      ),
       compose: await this.getPkgAsset(
         releaseFilesToDownload.compose,
         this.getAssetIpfsEntry(
@@ -141,17 +191,17 @@ export class DappnodeRepository extends ApmRepository {
           releaseFilesToDownload.compose
         )?.cid.toString() || ""
       ),
-      signature: ipfsEntries.find((ipfsEntry) =>
-        releaseFilesToDownload.signature.regex.test(ipfsEntry.name)
-      )
-        ? await this.getPkgAsset(
-            releaseFilesToDownload.signature,
-            this.getAssetIpfsEntry(
-              ipfsEntries,
-              releaseFilesToDownload.signature
-            )?.cid.toString() || ""
-          )
-        : undefined,
+      signature,
+      signatureStatus,
+      // consider adding to sifnedSafe !origin ||
+      signedSafe:
+        signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey,
+      warnings: {
+        coreFromForeignRegistry:
+          isCore && !dnpName.endsWith(params.DAPPNODE_REGISTRY),
+        requestNameMismatch:
+          isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName,
+      },
       disclaimer: await this.getPkgAsset(
         releaseFilesToDownload.disclaimer,
         this.getAssetIpfsEntry(

@@ -1,10 +1,10 @@
-import { ethers } from "ethers";
 import { expect } from "chai";
 import { DappnodeRepository } from "../../src/repository/index.js";
 import { cleanTestDir, testDir } from "../testUtils.js";
 import path from "path";
 import fs from "fs";
 import { createHash } from "crypto";
+import { TrustedReleaseKey } from "@dappnode/common";
 
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
@@ -14,6 +14,12 @@ describe("Dappnode Repository", function () {
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";
   const prysmVersion = "3.0.8";
+  const dappnodeTrustedKey: TrustedReleaseKey = {
+    name: "dappnode",
+    signatureProtocol: "ECDSA_256",
+    dnpNameSuffix: ".dnp.dappnode.eth",
+    key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+  };
 
   before(() => {
     cleanTestDir();
@@ -32,7 +38,7 @@ describe("Dappnode Repository", function () {
         contentUri: "/ipfs/QmZrZeQwMBBfSb6FQUcKdnB9epGmUzqarmkw2RbwTVQgbZ",
       };
       const result = await contract.getVersionAndIpfsHash({
-        dnpName: prysmDnpName,
+        dnpNameOrHash: prysmDnpName,
         version: prysmVersion,
       });
       expect(result).to.deep.equal(expectedVersionAndIpfsHash);
@@ -157,7 +163,8 @@ describe("Dappnode Repository", function () {
       };
 
       const pkgRelease = await contract.getPkgRelease({
-        dnpName: prysmDnpName,
+        dnpNameOrHash: prysmDnpName,
+        trustedKeys: [dappnodeTrustedKey],
         version: prysmVersion,
         os: "x64",
       });
@@ -177,6 +184,7 @@ describe("Dappnode Repository", function () {
           "geth.dnp.dappnode.eth": "0.1.40",
           "swarm.public.dappnode.eth": "1.0.17",
         },
+        [dappnodeTrustedKey],
         "x64"
       );
       expect(pkgReleases).to.be.ok;
