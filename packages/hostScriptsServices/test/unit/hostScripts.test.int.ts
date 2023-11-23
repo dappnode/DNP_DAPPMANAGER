@@ -18,11 +18,10 @@ describe("Host scripts", () => {
 
 describe("Sensor scripts", () => {
   it("Should fetch host sensors data", async () => {
-    //const hostInfo = await sensors();
-    //const hostInfo = await runScript("sensors.sh");
     const hostInfo = await shellHost(`sudo bash ${hostScriptsPath}/sensors.sh`);
-    console.log(hostInfo);
-    expect(hostInfo).to.be.ok;
+    const temp = parseFloat(hostInfo);
+    console.log(temp);
+    expect(temp).to.be.a('number');
   });
 
   // host_update.sh script not able to tested on github action

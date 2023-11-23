@@ -944,30 +944,10 @@ export interface HostStatMemory {
   usedPercentage: number;
 }
 
-/**
- * Host temperature stats
- *
- * IMPORTANT: if more than 1 element inside adapter
- */
-
-type TemperatureReading = {
-  [key: string]: {
-    temp1_input: number;
-    temp1_min: number; // if not present set 0
-    temp1_max: number; // if not present set 100
-    temp1_crit?: number;
-    temp1_crit_alarm?: number;
-  };
-};
-
-type Sensor = {
-  Adapter: string;
-} & {
-  [tempKey: string]: TemperatureReading;
-};
-
 export type Sensors = {
-  [sensorKey: string]: Sensor;
+  temp1_input: number;
+  temp1_max: number; //If not present set 100
+  temp1_min: number; //If not present set 0
 };
 
 /**

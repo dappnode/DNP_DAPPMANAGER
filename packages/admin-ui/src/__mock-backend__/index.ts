@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes, Sensors } from "@dappnode/common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -373,7 +373,21 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   optimismConfigSet: async () => {},
   updateUpgrade: async () => "Successfully updated",
-  sensorsDataGet: async () => ({})
+  /*
+  sensorsDataGet: async () => ({
+    "k10temp-pci-00c3": {
+      Adapter: "PCI Adapter",
+      temp1_input: 86,
+      temp1_max: 100,
+      temp1_min: 0
+    }
+  })
+  */
+ sensorsDataGet: async () => ({
+    temp1_input: 86,
+    temp1_max: 100,
+    temp1_min: 0
+ })
 };
 
 export const calls: Routes = {

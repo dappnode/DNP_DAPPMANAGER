@@ -6,7 +6,11 @@ import { Sensors } from "@dappnode/common";
  * Use the command "sensors"
  */
 export async function sensors(): Promise<Sensors> {
-    const sensorsInfo = await runScript("sensors.sh");
-    const parsedInfo: Sensors = JSON.parse(sensorsInfo);
-    return parsedInfo;
+    const sensorsTemp = await runScript("sensors.sh");
+    const sensor = {
+        temp1_input: parseFloat(sensorsTemp),
+        temp1_max: 100, 
+        temp1_min: 0 
+      };
+      return sensor;
 }
