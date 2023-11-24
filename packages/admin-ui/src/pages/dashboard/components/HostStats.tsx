@@ -25,15 +25,17 @@ const StatsCardContainer: React.FunctionComponent<{
   );
 };
 
-function StatsCardOk({ percent, text }: { percent: number; text?: string }) {
-  const value = Math.round(percent);
+function StatsCardOk({ value, text, valueType }: { value: number; text?: string; valueType: "percentage" | "temperature" }) {
+  const valueBar = Math.round(value);
 
   return (
     <>
       <ProgressBar
         variant={parseVariant(value)}
-        now={value}
-        label={value + "%"}
+        now={valueBar}
+        label={ valueType==="percentage" ? valueBar + "%"
+          : valueType==="temperature" ? valueBar + "°C"
+          : valueBar }
       />
       {text ? <div className="text">{text}</div> : null}
     </>
@@ -70,7 +72,10 @@ export function HostStats() {
     <div className="dashboard-cards">
       <StatsCardContainer title={"cpu"}>
         {cpuStats.data ? (
-          <StatsCardOk percent={cpuStats.data.usedPercentage} />
+          <StatsCardOk
+            value={cpuStats.data.usedPercentage}
+            valueType="percentage"
+          />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
         ) : (
@@ -81,12 +86,13 @@ export function HostStats() {
       <StatsCardContainer title={"memory"}>
         {memoryStats.data ? (
           <StatsCardOk
-            percent={memoryStats.data.usedPercentage}
+            value={memoryStats.data.usedPercentage}
             text={
               humanFileSize(memoryStats.data.used) +
               " / " +
               humanFileSize(memoryStats.data.total)
             }
+            valueType="percentage"
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
@@ -98,12 +104,13 @@ export function HostStats() {
       <StatsCardContainer title={"disk"}>
         {diskStats.data ? (
           <StatsCardOk
-            percent={diskStats.data.usedPercentage}
+            value={diskStats.data.usedPercentage}
             text={
               humanFileSize(diskStats.data.used) +
               " / " +
               humanFileSize(diskStats.data.total)
             }
+            valueType="percentage"
           />
         ) : diskStats.error ? (
           <StatsCardError error={diskStats.error} />
@@ -115,15 +122,10 @@ export function HostStats() {
       {sensorsData.error ? null : (
         <StatsCardContainer title={"cpu temperature"}>
           {sensorsData.data ? (
-            <StatsCardOk
-              percent={sensorsData.data}
-              text={
-                sensorsData.data + "°C" +
-                " / " +
-                 "100 °C"
-              }
-            />
-          ) : <StatsCardLoading />}
+            <StatsCardOk value={sensorsData.data} valueType="temperature" />
+          ) : (
+            <StatsCardLoading />
+          )}
         </StatsCardContainer>
       )}
     </div>
