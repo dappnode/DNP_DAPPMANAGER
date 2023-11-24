@@ -5,7 +5,7 @@ import { runScript } from "../runScripts.js";
  * Use the command "sensors"
  */
 export async function getCpuTemperature(): Promise<number> {
-  const sensorsTemp = await runScript("sensors.sh");
+  const sensorsTemp = await runScript("getCpuTemperature.sh");
   const temperature = parseFloat(sensorsTemp);
   return temperature;
 }
