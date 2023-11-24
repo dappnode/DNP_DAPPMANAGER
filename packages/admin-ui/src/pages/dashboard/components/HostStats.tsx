@@ -112,23 +112,16 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"cpu temperature"} >
-        {sensorsData.data ? (
-          <StatsCardOk
-            percent={
-              sensorsData.data}
-            text={
-              sensorsData.data + "°C" + 
-              " / " +
-              "100 °C"
-            }
-          />
-        ) : sensorsData.error ? (
-          <StatsCardError error={sensorsData.error} />
-        ) : (
-          <StatsCardLoading />
-        )}
-      </StatsCardContainer>
+      {sensorsData.error ? null : (
+        <StatsCardContainer title={"cpu temperature"}>
+          {sensorsData.data ? (
+            <StatsCardOk
+              percent={sensorsData.data}
+              text={sensorsData.data + "°C" + " / " + "100 °C"}
+            />
+          ) : <StatsCardLoading />}
+        </StatsCardContainer>
+      )}
     </div>
   );
 }
