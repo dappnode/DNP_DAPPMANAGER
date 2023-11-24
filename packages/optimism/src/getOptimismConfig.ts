@@ -7,7 +7,7 @@ import {
 } from "@dappnode/common";
 import * as db from "@dappnode/db";
 import { listPackages } from "@dappnode/dockerapi";
-import { ReleaseFetcher, packageGetData } from "@dappnode/installer";
+import { dappnodeInstaller, packageGetData } from "@dappnode/installer";
 import {
   getIsInstalled,
   getIsRunning,
@@ -18,8 +18,6 @@ import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.j
 
 export async function getOptimismConfig(): Promise<OptimismConfigGet> {
   try {
-    const releaseFetcher = new ReleaseFetcher();
-
     const currentOptimismExecutionClient = db.opExecutionClient.get();
     const enableHistorical = db.opEnableHistoricalRpc.get();
     const dnpList = await listPackages();
@@ -28,10 +26,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       executionClients: await Promise.all(
         executionClientsOptimism.map(async (execClient) => {
           try {
-            if (!(await releaseFetcher.repoExists(execClient)))
-              throw Error(`Repository ${execClient} does not exist`);
+            // make sure the repo exists
+            await dappnodeInstaller.getRepoContract(execClient);
 
-            const pkgData = await packageGetData(releaseFetcher, execClient);
+            const pkgData = await packageGetData(execClient);
 
             return {
               status: "ok",
@@ -57,10 +55,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       rollup: await new Promise<OptimismItem<"rollup">>((resolve) => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(optimismNode)))
-              throw Error(`Repository ${optimismNode} does not exist`);
+            // make sure the repo exists
+            await dappnodeInstaller.getRepoContract(optimismNode);
 
-            const pkgData = await packageGetData(releaseFetcher, optimismNode);
+            const pkgData = await packageGetData(optimismNode);
             const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -88,13 +86,10 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
       archive: await new Promise<OptimismItem<"archive">>((resolve) => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(optimismL2Geth)))
-              throw Error(`Repository ${optimismL2Geth} does not exist`);
+            // make sure the repo exists
+            await dappnodeInstaller.getRepoContract(optimismL2Geth);
 
-            const pkgData = await packageGetData(
-              releaseFetcher,
-              optimismL2Geth
-            );
+            const pkgData = await packageGetData(optimismL2Geth);
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",

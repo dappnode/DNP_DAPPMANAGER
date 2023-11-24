@@ -1,6 +1,6 @@
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { getEthUrl } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
@@ -18,18 +18,17 @@ import { clearRegistry } from "./clearRegistry.js";
  */
 async function checkAutoUpdates(): Promise<void> {
   try {
-    const releaseFetcher = new ReleaseFetcher();
     // Make sure the eth client provider is available before checking each package
     // Do it once and return for expected errors to reduce cluttering
     try {
-      await releaseFetcher.getProvider();
+      await getEthUrl();
     } catch (e) {
       if (e instanceof EthProviderError) return;
       logs.warn("Error getting eth provider", e);
     }
 
     try {
-      await checkNewPackagesVersion(releaseFetcher);
+      await checkNewPackagesVersion();
     } catch (e) {
       logs.error("Error on updateMyPackages", e);
     }
@@ -51,7 +50,7 @@ async function checkAutoUpdates(): Promise<void> {
  */
 async function checkForCompletedCoreUpdates(): Promise<void> {
   const dnps = await listPackages();
-  const currentCorePackages = dnps.filter(d => d.isCore);
+  const currentCorePackages = dnps.filter((d) => d.isCore);
   clearCompletedCoreUpdatesIfAny(currentCorePackages);
 }
 
@@ -66,7 +65,7 @@ export function startAutoUpdatesDaemon(signal: AbortSignal): void {
     }
   });
 
-  checkForCompletedCoreUpdates().catch(e => {
+  checkForCompletedCoreUpdates().catch((e) => {
     logs.error("Error on checkForCompletedCoreUpdates", e);
   });
 

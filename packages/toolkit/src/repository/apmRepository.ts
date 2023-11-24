@@ -1,9 +1,14 @@
 import { ethers } from "ethers";
 import { valid, parse, validRange } from "semver";
 import { Repo__factory, Repo } from "../typechain/index.js";
-import { ApmRepoVersionReturn, ApmVersionRawAndOrigin } from "./types.js";
+import {
+  ApmRepoVersionReturn,
+  ApmVersionRawAndOrigin,
+  ApmVersionState,
+} from "./types.js";
 import * as isIPFS from "is-ipfs";
 import { isEnsDomain } from "@dappnode/utils";
+import { repositoryAbi } from "./params.js";
 
 /**
  * ApmRepository is a class to interact with the DAppNode APM Repository Contract.
@@ -122,6 +127,48 @@ export class ApmRepository {
   }
 
   /**
+   * Fetch all versions of an APM repo
+   * If provided version request range, only returns satisfying versions
+   * @param dnpName "bitcoin.dnp.dappnode.eth"
+   */
+  public async fetchApmVersionsState(
+    dnpName: string,
+    lastVersionId = 0
+  ): Promise<ApmVersionState[]> {
+    const repo = new ethers.Contract(dnpName, repositoryAbi, this.ethProvider);
+
+    const versionCount: number = await repo.getVersionsCount().then(parseFloat);
+
+    /**
+     * Versions called by id are ordered in ascending order.
+     * The min version = 1 and the latest = versionCount
+     *
+     *  i | semanticVersion
+     * ---|------------------
+     *  1 | [ '0', '1', '0' ]
+     *  2 | [ '0', '1', '1' ]
+     *  3 | [ '0', '1', '2' ]
+     *  4 | [ '0', '2', '0' ]
+     *
+     * versionIndexes = [1, 2, 3, 4, 5, ...]
+     */
+    // Guard against bugs that can cause // negative values
+    if (isNaN(lastVersionId) || lastVersionId < 0) lastVersionId = 0;
+    const versionIndexes = this.linspace(lastVersionId + 1, versionCount);
+    return await Promise.all(
+      versionIndexes.map(async (i): Promise<ApmVersionState> => {
+        const versionData = await repo
+          .getByVersionId(i)
+          .then(this.parseApmVersionReturn);
+        return {
+          ...versionData,
+          versionId: i,
+        };
+      })
+    );
+  }
+
+  /**
    * Parses the raw version response from an APM repo.
    * @param res - The raw version response from the APM repo.
    * @returns - The parsed APM version.
@@ -193,5 +240,21 @@ export class ApmRepository {
    */
   private isSemverRange(version: string): boolean {
     return Boolean(validRange(version));
+  }
+
+  /**
+   * Return evenly spaced numbers over a specified interval.
+   * @param from 1
+   * @param to 5
+   * @param step 2
+   * @returns [1, 3, 5]
+   */
+  private linspace(from: number, to: number, step = 1): number[] {
+    // Guard against bugs that can cause // -Infinity
+    if (!isFinite(from)) throw Error(`linspace 'from' is not finite: ${from}`);
+    if (!isFinite(to)) throw Error(`linspace 'to' is not finite: ${to}`);
+    const arr: number[] = [];
+    for (let i = from; i <= to; i += step) arr.push(i);
+    return arr;
   }
 }

@@ -2,7 +2,7 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher, packageInstall } from "@dappnode/installer";
+import { dappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification.js";
 import { computeSemverUpdateType } from "@dappnode/utils";
@@ -17,9 +17,7 @@ import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
  * - Send notification once per package and version
  * - Auto-update the package if allowed
  */
-export async function checkNewPackagesVersion(
-  releaseFetcher: ReleaseFetcher
-): Promise<void> {
+export async function checkNewPackagesVersion(): Promise<void> {
   const dnps = await listPackages();
 
   for (const { dnpName, version: currentVersion } of dnps) {
@@ -37,14 +35,17 @@ export async function checkNewPackagesVersion(
 
       // MUST exist an APM repo with the package dnpName
       // Check here instead of the if statement to be inside the try / catch
-      const repoExists = await releaseFetcher.repoExists(dnpName);
-      if (!repoExists) {
+      try {
+        await dappnodeInstaller.getRepoContract(dnpName);
+      } catch (e) {
+        logs.warn(`Error checking ${dnpName} version`, e);
         continue;
       }
 
-      const { version: newVersion } = await releaseFetcher.fetchVersion(
-        dnpName
-      );
+      const { version: newVersion } =
+        await dappnodeInstaller.getVersionAndIpfsHash({
+          dnpNameOrHash: dnpName,
+        });
 
       // This version is not an update
       if (lte(newVersion, currentVersion)) {
@@ -54,7 +55,7 @@ export async function checkNewPackagesVersion(
       const updateData = { dnpName, currentVersion, newVersion };
 
       // Will try to resolve the IPFS release content, so await it to ensure it resolves
-      await sendUpdatePackageNotificationMaybe(releaseFetcher, updateData);
+      await sendUpdatePackageNotificationMaybe(updateData);
 
       await autoUpdatePackageMaybe(updateData);
     } catch (e) {
@@ -72,7 +73,7 @@ export async function checkNewPackagesVersion(
 async function autoUpdatePackageMaybe({
   dnpName,
   currentVersion,
-  newVersion
+  newVersion,
 }: {
   dnpName: string;
   currentVersion: string;

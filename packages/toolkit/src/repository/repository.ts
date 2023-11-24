@@ -1,11 +1,5 @@
 import * as isIPFS from "is-ipfs";
-import {
-  PkgRelease,
-  FileConfig,
-  FileFormat,
-  DistributedFile,
-  IPFSEntry,
-} from "./types.js";
+import { IPFSEntry } from "./types.js";
 import { CID, IPFSHTTPClient, create } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
@@ -24,6 +18,11 @@ import {
   releaseFilesToDownload,
   Compose,
   ReleaseSignatureStatus,
+  DistributedFile,
+  FileConfig,
+  FileFormat,
+  PackageRelease,
+  releaseFiles,
 } from "@dappnode/common";
 import {
   getImageName,
@@ -94,7 +93,7 @@ export class DappnodeRepository extends ApmRepository {
     },
     trustedKeys: TrustedReleaseKey[],
     os?: NodeJS.Architecture
-  ): Promise<PkgRelease[]> {
+  ): Promise<PackageRelease[]> {
     return await Promise.all(
       Object.entries(packages).map(
         async ([name, version]) =>
@@ -106,6 +105,29 @@ export class DappnodeRepository extends ApmRepository {
           })
       )
     );
+  }
+
+  public async getManifestFromDir(
+    dnpName: string,
+    version?: string
+  ): Promise<Manifest> {
+    const { contentUri } = await this.getVersionAndIpfsHash({
+      dnpNameOrHash: dnpName,
+      version,
+    });
+
+    const ipfsEntries = await this.list(contentUri);
+
+    // get manifest
+    const manifest = await this.getPkgAsset<Manifest>(
+      releaseFilesToDownload.manifest,
+      ipfsEntries
+    );
+
+    if (!manifest)
+      throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
+
+    return manifest;
   }
 
   /**
@@ -123,7 +145,7 @@ export class DappnodeRepository extends ApmRepository {
     trustedKeys: TrustedReleaseKey[];
     os?: NodeJS.Architecture;
     version?: string;
-  }): Promise<PkgRelease> {
+  }): Promise<PackageRelease> {
     const { contentUri, origin } = await this.getVersionAndIpfsHash({
       dnpNameOrHash,
       version,
@@ -176,7 +198,7 @@ export class DappnodeRepository extends ApmRepository {
       signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
     const avatarEntry = ipfsEntries.find((file) =>
-      releaseFilesToDownload.avatar.regex.test(file.name)
+      releaseFiles.avatar.regex.test(file.name)
     );
     const avatarFile: DistributedFile | undefined = avatarEntry
       ? {

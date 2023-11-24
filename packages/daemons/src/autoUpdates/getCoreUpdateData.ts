@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
 import { getCoreVersionId, computeSemverUpdateType } from "@dappnode/utils";
-import { ErrorDappGetDowngrade, ReleaseFetcher } from "@dappnode/installer";
+import { ErrorDappGetDowngrade, dappnodeInstaller } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 
 const coreName = params.coreDnpName;
@@ -20,13 +20,12 @@ export async function getCoreUpdateData(
    * With the list of deps to install, compute the higher updateType
    * - Check that all core DNPs to be updated have exactly an updateType of "patch"
    */
-  const releaseFetcher = new ReleaseFetcher();
 
   let releases: PackageRelease[];
   try {
-    const dappgetResult = await releaseFetcher.getReleasesResolved({
+    const dappgetResult = await dappnodeInstaller.getReleasesResolved({
       name: coreName,
-      ver: coreVersion
+      ver: coreVersion,
     });
     releases = dappgetResult.releases;
   } catch (e) {
@@ -50,14 +49,14 @@ export async function getCoreUpdateData(
    * If the core.dnp.dappnode.eth is not installed,
    * Ignore it to compute the update type
    */
-  const coreDnp = dnpList.find(_dnp => _dnp.dnpName === coreName);
+  const coreDnp = dnpList.find((_dnp) => _dnp.dnpName === coreName);
   const coreDnpsToBeInstalled = releases.filter(
     ({ dnpName }) => coreDnp || dnpName !== coreName
   );
 
-  const packages = coreDnpsToBeInstalled.map(release => {
-    const dnp = dnpList.find(_dnp => _dnp.dnpName === release.dnpName);
-    const { metadata: depManifest } = release;
+  const packages = coreDnpsToBeInstalled.map((release) => {
+    const dnp = dnpList.find((_dnp) => _dnp.dnpName === release.dnpName);
+    const { manifest: depManifest } = release;
     return {
       name: release.dnpName,
       from: dnp ? dnp.version : undefined,
@@ -65,7 +64,7 @@ export async function getCoreUpdateData(
       warningOnInstall:
         depManifest.warnings && depManifest.warnings.onInstall
           ? depManifest.warnings.onInstall
-          : undefined
+          : undefined,
     };
   });
 
@@ -90,13 +89,13 @@ export async function getCoreUpdateData(
    */
   const coreRelease =
     releases.find(({ dnpName }) => dnpName === coreName) ||
-    (await releaseFetcher.getRelease(coreName, coreVersion));
-  const { metadata: coreManifest } = coreRelease;
-  const dnpCore = dnpList.find(dnp => dnp.dnpName === coreName);
+    (await dappnodeInstaller.getRelease(coreName, coreVersion));
+  const { manifest: coreManifest } = coreRelease;
+  const dnpCore = dnpList.find((dnp) => dnp.dnpName === coreName);
   const from = dnpCore ? dnpCore.version : "";
   const to = coreManifest.version;
   const updateAlerts = (coreManifest.updateAlerts || []).filter(
-    updateAlert =>
+    (updateAlert) =>
       valid(from) &&
       valid(to) &&
       updateAlert.message &&
@@ -117,6 +116,6 @@ export async function getCoreUpdateData(
     changelog: coreManifest.changelog || "",
     updateAlerts,
     versionId,
-    coreVersion: coreManifest.version
+    coreVersion: coreManifest.version,
   };
 }

@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { ethers } from "ethers";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { ipfs } from "@dappnode/ipfs";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { dappnodeInstaller } from "@dappnode/installer";
 import { getContainerName, getImageTag } from "@dappnode/utils";
 import { ReleaseSignatureStatusCode, Manifest } from "@dappnode/common";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
@@ -52,8 +52,7 @@ describe("Sign release", () => {
     const wallet = new ethers.Wallet(privateKey);
     const newReleaseHash = await signRelease(wallet, ipfs, dnpReleaseHash);
 
-    const releaseFetcher = new ReleaseFetcher();
-    const mainRelease = await releaseFetcher.getRelease(newReleaseHash);
+    const mainRelease = await dappnodeInstaller.getRelease(newReleaseHash);
 
     const expectedSignatureStatus: typeof mainRelease.signatureStatus = {
       status: ReleaseSignatureStatusCode.signedByUnknownKey,

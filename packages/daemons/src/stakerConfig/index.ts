@@ -1,17 +1,16 @@
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { ReleaseFetcher, packagePickItemData } from "@dappnode/installer";
+import { dappnodeInstaller, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
 
 async function runStakerCacheUpdate({
-  dnpName
+  dnpName,
 }: {
   dnpName: string;
 }): Promise<void> {
   try {
-    const releaseFetcher = new ReleaseFetcher();
-    const repository = await releaseFetcher.getRelease(dnpName);
+    const repository = await dappnodeInstaller.getRelease(dnpName);
     const dataDnp = packagePickItemData(repository);
     db.pkgItemMetadata.set(dnpName, dataDnp);
   } catch (e) {

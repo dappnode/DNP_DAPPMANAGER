@@ -9,5 +9,4 @@ export const releaseFilesToDownload = {
   gettingStarted: releaseFiles.gettingStarted,
   prometheusTargets: releaseFiles.prometheusTargets,
   grafanaDashboards: releaseFiles.grafanaDashboards,
-  avatar: releaseFiles.avatar,
 };

@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { PackageEnvs, Compose } from "./compose.js";
+import { PackageEnvs } from "./compose.js";
 import {
   Manifest,
   Dependencies,
@@ -9,6 +9,7 @@ import {
 } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
 import { ExecutionClientMainnet, ConsensusClientMainnet } from "./stakers.js";
+import { ContainerState } from "./pkg.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -296,7 +297,7 @@ export interface RequestedDnp {
   isUpdated: boolean;
   isInstalled: boolean;
   // Decoupled metadata
-  metadata: Manifest;
+  manifest: Manifest;
   specialPermissions: SpecialPermissionAllDnps;
   // Request status and dependencies
   compatible: {
@@ -455,30 +456,6 @@ export interface VolumeData extends VolumeOwnershipData {
   mountpoint: string; // "/dev1/data",
   // Mountpoint extended data
   fileSystem?: MountpointData;
-}
-
-/**
- * =========
- * CONTAINER
- * =========
- */
-
-export type ContainerState =
-  | "created" // created A container that has been created(e.g.with docker create) but not started
-  | "restarting" // restarting A container that is in the process of being restarted
-  | "running" // running A currently running container
-  | "paused" // paused A container whose processes have been paused
-  | "exited" // exited A container that ran and completed("stopped" in other contexts, although a created container is technically also "stopped")
-  | "dead" // dead A container that the daemon tried and failed to stop(usually due to a busy device or resource used by the container)
-  | "removing"; // removing A container that is in the process of being removed
-
-export interface ContainersStatus {
-  [serviceName: string]: ContainerStatus;
-}
-
-export interface ContainerStatus {
-  targetStatus: "stopped" | "running";
-  dockerTimeout: number | undefined;
 }
 
 /**
@@ -1017,17 +994,6 @@ export interface ManifestWithImage extends Manifest {
   image: ManifestImage;
 }
 
-export interface ReleaseWarnings {
-  /**
-   * If a core package does not come from the DAppNode Package APM registry
-   */
-  coreFromForeignRegistry?: boolean;
-  /**
-   * If the requested name does not match the manifest name
-   */
-  requestNameMismatch?: boolean;
-}
-
 export interface SpecialPermission {
   name: string; // "Short description",
   details: string; // "Long description of the capabilitites"
@@ -1036,56 +1002,6 @@ export interface SpecialPermission {
 
 export interface SpecialPermissionAllDnps {
   [dnpName: string]: SpecialPermission[];
-}
-
-export interface PackageRelease {
-  dnpName: string;
-  reqVersion: string; // origin or semver: "/ipfs/Qm611" | "0.2.3"
-  semVersion: string; // Always a semver: "0.2.3"
-  // File info for downloads
-  imageFile: DistributedFile;
-  avatarFile?: DistributedFile;
-  // Data for release processing
-  metadata: Manifest;
-  compose: Compose;
-  // Aditional
-  warnings: ReleaseWarnings;
-  origin?: string;
-  isCore: boolean;
-  // Signed release
-  /** Release is from safe origin OR has trusted signature */
-  signedSafe: boolean;
-  signatureStatus: ReleaseSignatureStatus;
-}
-
-export type InstallPackageDataPaths = Pick<
-  InstallPackageData,
-  | "dnpName"
-  | "semVersion"
-  | "composePath"
-  | "composeBackupPath"
-  | "manifestPath"
-  | "manifestBackupPath"
-  | "imagePath"
-  | "isUpdate"
-  | "dockerTimeout"
-  | "containersStatus"
->;
-
-export interface InstallPackageData extends PackageRelease {
-  isUpdate: boolean;
-  // Paths
-  imagePath: string;
-  composePath: string;
-  composeBackupPath: string;
-  manifestPath: string;
-  manifestBackupPath: string;
-  // Data to write
-  compose: Compose;
-  // User settings to be applied after running
-  fileUploads?: { [serviceName: string]: { [containerPath: string]: string } };
-  dockerTimeout: number | undefined;
-  containersStatus: ContainersStatus;
 }
 
 /**
@@ -1182,67 +1098,6 @@ export type NewFeatureId =
   | "system-auto-updates"
   | "enable-ethical-metrics"
   | "change-host-password";
-
-/**
- * ==========
- * SIGNATURES
- * ==========
- */
-
-export interface ReleaseSignature {
-  /** Version of the ReleaseSignature format */
-  version: 1;
-  /** Specs of the signed CIDs */
-  cid: {
-    version: 0 | 1;
-    base: "base58btc" | "base32" | "base64" | "base64url";
-  };
-  signature_protocol: ReleaseSignatureProtocol;
-  /**
-   * Signature of the serialized files in the directory
-   * ```
-   * 0x71b61418808a85c495f52bc9c781cbfeb0154c86aec8528c6cf7a83a26a0365f7ac4dea4eea7eea5e4ec14a10e01d8b8708d8c0c7c12420d152a272b69092b851b
-   * ```
-   */
-  signature: string;
-}
-
-export enum ReleaseSignatureStatusCode {
-  notSigned = "notSigned",
-  signedByKnownKey = "signedByKnownKey",
-  signedByUnknownKey = "signedByUnknownKey",
-}
-
-export type ReleaseSignatureStatus =
-  | { status: ReleaseSignatureStatusCode.notSigned }
-  | { status: ReleaseSignatureStatusCode.signedByKnownKey; keyName: string }
-  | {
-      status: ReleaseSignatureStatusCode.signedByUnknownKey;
-      signatureProtocol: string;
-      key: string;
-    };
-
-export type ReleaseSignatureWithData = {
-  signature: ReleaseSignature;
-  signedData: string;
-};
-
-/** TODO: Add RSA_2048, OpenPGP */
-export type ReleaseSignatureProtocol = "ECDSA_256";
-// NOTE: Must list all available protocols to be shown in the UI select component
-export const releaseSignatureProtocols: ReleaseSignatureProtocol[] = [
-  "ECDSA_256",
-];
-
-export interface TrustedReleaseKey {
-  /** Metadata name to identify this key: `DAppnode association` */
-  name: string;
-  signatureProtocol: ReleaseSignatureProtocol;
-  /** `.dnp.dappnode.eth` */
-  dnpNameSuffix: string;
-  /** `0x14791697260E4c9A71f18484C9f997B308e59325` */
-  key: string;
-}
 
 /**
  * =======

@@ -29,9 +29,9 @@ export default function orderInstallPackages(
   // The requested package can provide an order to up the packages
   // runOrder: ["core.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"]
   // Which will overwrite the basic order in the trailing part
-  const requestPkg = packagesData.find(pkg => pkg.dnpName === requestName);
-  if (requestPkg && requestPkg.metadata.runOrder) {
-    const runOrder = requestPkg.metadata.runOrder;
+  const requestPkg = packagesData.find((pkg) => pkg.dnpName === requestName);
+  if (requestPkg && requestPkg.manifest.runOrder) {
+    const runOrder = requestPkg.manifest.runOrder;
     return basicOrder.sort(
       (a, b) => runOrder.indexOf(a.dnpName) - runOrder.indexOf(b.dnpName)
     );

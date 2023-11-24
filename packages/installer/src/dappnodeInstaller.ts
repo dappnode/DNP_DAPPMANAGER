@@ -104,7 +104,7 @@ function parseClientStatusError(statusError: EthClientStatusError): string {
  * If the package target is not active it returns the remote URLs
  * @returns ethProvier http://geth.dappnode:8545
  */
-async function getEthUrl(): Promise<string> {
+export async function getEthUrl(): Promise<string> {
   if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
     return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 
@@ -146,7 +146,7 @@ async function getEthUrl(): Promise<string> {
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
  */
-function getIpfsUrl(): string {
+export function getIpfsUrl(): string {
   // Fort testing
   if (params.IPFS_HOST) return params.IPFS_HOST;
 
@@ -158,7 +158,7 @@ function getIpfsUrl(): string {
   return db.ipfsGateway.get();
 }
 
-export class DappnodeInstaller extends DappnodeRepository {
+class DappnodeInstaller extends DappnodeRepository {
   constructor(ipfsUrl: string, ethUrl: string, timeout?: number) {
     super(ipfsUrl, ethUrl, timeout);
   }
@@ -383,3 +383,8 @@ export class DappnodeInstaller extends DappnodeRepository {
     );
   }
 }
+
+export const dappnodeInstaller = new DappnodeInstaller(
+  getIpfsUrl(),
+  await getEthUrl()
+);

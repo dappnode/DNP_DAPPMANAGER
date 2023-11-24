@@ -1,8 +1,8 @@
 import {
   getEthersProvider,
-  ReleaseFetcher,
   NoImageForArchError,
-  getRegistry
+  getRegistry,
+  dappnodeInstaller
 } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
@@ -75,7 +75,6 @@ export async function fetchRegistry({
 async function fetchRegistryIpfsData(
   registry: DirectoryDnp[]
 ): Promise<DirectoryItem[]> {
-  const releaseFetcher = new ReleaseFetcher();
   const dnpList = await listPackages();
 
   const registryPublicDnps: DirectoryItem[] = [];
@@ -103,18 +102,18 @@ async function fetchRegistryIpfsData(
       };
       try {
         // Now resolve the last version of the package
-        const release = await releaseFetcher.getRelease(name);
-        const { metadata, avatarFile } = release;
+        const release = await dappnodeInstaller.getRelease(name);
+        const { manifest, avatarFile } = release;
 
         pushRegistryItem({
           ...registryItemBasic,
           status: "ok",
-          description: getShortDescription(metadata),
+          description: getShortDescription(manifest),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, dnpList),
           isUpdated: getIsUpdated(release, dnpList),
-          featuredStyle: metadata.style,
-          categories: metadata.categories || getFallBackCategories(name) || []
+          featuredStyle: manifest.style,
+          categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
         if (e instanceof NoImageForArchError) {

@@ -1,7 +1,6 @@
 import { getInstallerPackagesData } from "../installer/getInstallerPackageData.js";
 import createVolumeDevicePaths from "../installer/createVolumeDevicePaths.js";
 // Utils
-import { ReleaseFetcher } from "../release/index.js";
 import {
   downloadImages,
   loadImages,
@@ -15,6 +14,7 @@ import {
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes, PackageRequest } from "@dappnode/common";
+import { dappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**
  * Installs a DAppNode Package.
@@ -44,12 +44,8 @@ export async function packageInstall({
 
   try {
     log(id, "Resolving dependencies...");
-    const releaseFetcher = new ReleaseFetcher();
-    const {
-      state,
-      currentVersions,
-      releases,
-    } = await releaseFetcher.getReleasesResolved(req, options);
+    const { state, currentVersions, releases } =
+      await dappnodeInstaller.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
 
     // Throw any errors found in the release

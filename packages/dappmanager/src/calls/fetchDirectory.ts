@@ -9,8 +9,8 @@ import {
 } from "@dappnode/utils";
 import { throttle } from "lodash-es";
 import {
+  dappnodeInstaller,
   getEthProviderUrl,
-  ReleaseFetcher,
   NoImageForArchError
 } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
@@ -23,8 +23,6 @@ const loadThrottle = 500; // 0.5 seconds
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
   const providerUrl = await getEthProviderUrl();
   const directory = new DappNodeDirectory(providerUrl);
-
-  const releaseFetcher = new ReleaseFetcher();
 
   const installedDnpList = await listPackages();
 
@@ -52,18 +50,18 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
       const directoryItemBasic = { index, name, whitelisted, isFeatured };
       try {
         // Now resolve the last version of the package
-        const release = await releaseFetcher.getRelease(name);
-        const { metadata, avatarFile } = release;
+        const release = await dappnodeInstaller.getRelease(name);
+        const { manifest, avatarFile } = release;
 
         pushDirectoryItem({
           ...directoryItemBasic,
           status: "ok",
-          description: getShortDescription(metadata),
+          description: getShortDescription(manifest),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, installedDnpList),
           isUpdated: getIsUpdated(release, installedDnpList),
-          featuredStyle: metadata.style,
-          categories: metadata.categories || getFallBackCategories(name) || []
+          featuredStyle: manifest.style,
+          categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
         if (e instanceof NoImageForArchError) {

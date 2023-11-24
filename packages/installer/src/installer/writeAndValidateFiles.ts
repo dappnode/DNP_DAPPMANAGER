@@ -23,7 +23,7 @@ export async function writeAndValidateFiles(
       dnpName,
       composePath,
       composeBackupPath,
-      metadata,
+      manifest,
       manifestPath,
       manifestBackupPath,
     } = packageData;
@@ -42,7 +42,7 @@ export async function writeAndValidateFiles(
 
     // Backup manifest to be able to do a rollback. Only if manifest exists
     copyIfExists(manifestPath, manifestBackupPath);
-    writeManifest(manifestPath, metadata);
+    writeManifest(manifestPath, manifest);
   }
 }
 

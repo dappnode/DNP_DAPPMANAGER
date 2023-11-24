@@ -7,7 +7,7 @@ import {
   getIsUpdated,
   getIsInstalled
 } from "@dappnode/utils";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { dappnodeInstaller } from "@dappnode/installer";
 import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
 import {
   ComposeEditor,
@@ -32,9 +32,7 @@ export async function fetchDnpRequest({
 }: {
   id: string;
 }): Promise<RequestedDnp> {
-  const releaseFetcher = new ReleaseFetcher();
-
-  const mainRelease = await releaseFetcher.getRelease(id);
+  const mainRelease = await dappnodeInstaller.getRelease(id);
 
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
@@ -44,7 +42,7 @@ export async function fetchDnpRequest({
   const dnpList = await listPackages();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
-    const { dnpName, metadata, compose, isCore } = release;
+    const { dnpName, manifest, compose, isCore } = release;
 
     const dnp = dnpList.find(d => d.dnpName === dnpName);
 
@@ -57,14 +55,14 @@ export async function fetchDnpRequest({
 
     specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
-    if (metadata.setupWizard) {
+    if (manifest.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
-      for (const field of metadata.setupWizard.fields) {
+      for (const field of manifest.setupWizard.fields) {
         if (await shouldAddSetupWizardField(field, dnp))
           activeSetupWizardFields.push(field);
       }
       setupWizard[dnpName] = {
-        ...metadata.setupWizard,
+        ...manifest.setupWizard,
         fields: activeSetupWizardFields
       };
     }
@@ -84,7 +82,7 @@ export async function fetchDnpRequest({
   try {
     const { dnpName, reqVersion } = mainRelease;
     const { state, currentVersions, releases } =
-      await releaseFetcher.getReleasesResolved({
+      await dappnodeInstaller.getReleasesResolved({
         name: dnpName,
         ver: reqVersion
       });
@@ -115,7 +113,7 @@ export async function fetchDnpRequest({
     isUpdated: getIsUpdated(mainRelease, dnpList),
     isInstalled: getIsInstalled(mainRelease, dnpList),
     // Prevent sending duplicated data
-    metadata: omit(mainRelease.metadata, ["setupWizard"]),
+    manifest: omit(mainRelease.manifest, ["setupWizard"]),
     specialPermissions, // Decoupled metadata
     // Settings must include the previous user settings
     settings,
@@ -138,17 +136,17 @@ export async function fetchDnpRequest({
 }
 
 function getRequiresCoreUpdate(
-  { metadata }: { metadata: Manifest },
+  { manifest }: { manifest: Manifest },
   dnpList: InstalledPackageData[]
 ): boolean {
   const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;
   const coreVersion = coreDnp.version;
-  const minDnVersion = metadata.requirements
-    ? metadata.requirements.minimumDappnodeVersion
+  const minDnVersion = manifest.requirements
+    ? manifest.requirements.minimumDappnodeVersion
     : "";
   return Boolean(
-    metadata.requirements &&
+    manifest.requirements &&
       valid(minDnVersion) &&
       valid(coreVersion) &&
       gt(minDnVersion, coreVersion)

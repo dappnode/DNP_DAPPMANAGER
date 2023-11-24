@@ -107,7 +107,7 @@ export async function getRelease({
     isCore,
     imageFile,
     avatarFile,
-    metadata,
+    manifest: metadata,
     compose: compose.output(),
     // Generates an object of warnings so other components can
     // decide to throw an error or just show a warning in the UI
