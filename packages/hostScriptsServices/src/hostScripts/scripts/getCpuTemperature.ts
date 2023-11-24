@@ -7,5 +7,8 @@ import { runScript } from "../runScripts.js";
 export async function getCpuTemperature(): Promise<number> {
   const sensorsTemp = await runScript("getCpuTemperature.sh");
   const temperature = parseFloat(sensorsTemp);
+  if(isNaN(temperature)){
+    throw Error("Unable to get CPU Temperature");
+  }
   return temperature;
 }
