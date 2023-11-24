@@ -4,21 +4,24 @@ import { cleanTestDir, testDir } from "../testUtils.js";
 import path from "path";
 import fs from "fs";
 import { createHash } from "crypto";
-import { TrustedReleaseKey } from "@dappnode/common";
+import {
+  ReleaseSignatureStatusCode,
+  TrustedReleaseKey,
+} from "@dappnode/common";
 
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
     "https://api.ipfs.dappnode.io",
-    //"https://gateway.ipfs.dappnode.io",
+    "https://gateway.ipfs.dappnode.io",
   ];
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";
   const prysmVersion = "3.0.8";
   const dappnodeTrustedKey: TrustedReleaseKey = {
-    name: "dappnode",
+    name: "DAppNode Association",
     signatureProtocol: "ECDSA_256",
     dnpNameSuffix: ".dnp.dappnode.eth",
-    key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+    key: "0xF35960302a07022aBa880DFFaEC2Fdd64d5BF1c1",
   };
 
   before(() => {
@@ -169,11 +172,21 @@ describe("Dappnode Repository", function () {
         os: "x64",
       });
 
+      console.log(pkgRelease.signedSafe);
+      console.log(pkgRelease.signatureStatus.status);
+      // expected files exist
       expect(expectedSignature).to.deep.equal(pkgRelease.signature);
       expect(pkgRelease.manifest).to.deep.equal(expectedManifest);
       expect(pkgRelease.compose).to.deep.equal(expectedCompose);
       expect(pkgRelease.imageFile).to.deep.equal(expectedImageFile);
       expect(pkgRelease.avatarFile).to.deep.equal(expectedAvatarFile);
+      // expected to be signed
+      expect(pkgRelease.signedSafe).to.be.true;
+      // expected to be signed by a known key
+      expect(
+        pkgRelease.signatureStatus.status ===
+          ReleaseSignatureStatusCode.signedByKnownKey
+      );
     });
 
     it(`[${ipfsUrl}] Should get multiple pkgs releases: `, async () => {
