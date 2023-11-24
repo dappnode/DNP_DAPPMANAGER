@@ -117,7 +117,11 @@ export function HostStats() {
           {sensorsData.data ? (
             <StatsCardOk
               percent={sensorsData.data}
-              text={sensorsData.data + "°C" + " / " + "100 °C"}
+              text={
+                sensorsData.data + "°C" +
+                " / " +
+                 "100 °C"
+              }
             />
           ) : <StatsCardLoading />}
         </StatsCardContainer>
