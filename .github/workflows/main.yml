@@ -36,6 +36,8 @@ jobs:
       - run: yarn lint
       - run: yarn server-mock:check-types
         working-directory: packages/admin-ui
+    env:
+      INFURA_MAINNET_KEY: ${{ secrets.INFURA_MAINNET_KEY }}
 
   integration-test:
     runs-on: ubuntu-latest
