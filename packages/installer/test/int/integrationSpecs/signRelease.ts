@@ -2,8 +2,9 @@ import { ethers } from "ethers";
 import { CID } from "ipfs-http-client";
 import { sortBy } from "lodash-es";
 import { Ipfs } from "@dappnode/ipfs";
-import { serializeIpfsDirectory } from "@dappnode/installer";
+import { serializeIpfsDirectory } from "@dappnode/toolkit";
 import { ReleaseSignature } from "@dappnode/common";
+import { dappnodeInstaller } from "@dappnode/installer";
 
 const signatureFilename = "signature.json";
 
@@ -12,7 +13,7 @@ export async function signRelease(
   ipfs: Ipfs,
   dnpReleaseHash: string
 ): Promise<string> {
-  const releaseFiles = await ipfs.list(dnpReleaseHash);
+  const releaseFiles = await dappnodeInstaller.list(dnpReleaseHash);
 
   const cidOpts: ReleaseSignature["cid"] = { version: 0, base: "base58btc" };
   const signedData = serializeIpfsDirectory(releaseFiles, cidOpts);

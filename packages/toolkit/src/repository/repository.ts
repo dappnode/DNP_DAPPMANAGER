@@ -291,7 +291,7 @@ export class DappnodeRepository extends ApmRepository {
    * @see catString
    * @see catCarReaderToMemory
    */
-  private async writeFileToMemory(
+  public async writeFileToMemory(
     hash: string,
     maxLength?: number
   ): Promise<string> {

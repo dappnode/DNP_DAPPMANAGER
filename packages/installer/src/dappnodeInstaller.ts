@@ -5,10 +5,6 @@ import {
   Compose,
   DappGetState,
   DistributedFile,
-  Eth2ClientTarget,
-  EthClientRemote,
-  EthClientStatusError,
-  EthProviderError,
   GrafanaDashboard,
   IpfsClientTarget,
   Manifest,
@@ -17,8 +13,6 @@ import {
   PrometheusTarget,
   PackageRelease,
 } from "@dappnode/common";
-import { getMultiClientStatus } from "./ethClient/clientStatus";
-import { emitSyncedNotification } from "./ethClient/syncedNotification";
 import { DappgetOptions, dappGet } from "./dappGet/index.js";
 import {
   validateDappnodeCompose,
@@ -34,115 +28,7 @@ import { getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
 import { parseMetadataFromManifest } from "@dappnode/manifest";
-
-/**
- * Computes the current eth2ClientTarget based on:
- * - remote
- * - executionClient
- * - consensusClient
- */
-function computeEthereumTarget(): Eth2ClientTarget {
-  const executionClient = db.executionClientMainnet.get();
-  const consensusClient = db.consensusClientMainnet.get();
-  const remote = db.ethClientRemote.get();
-  switch (remote) {
-    case null:
-    case EthClientRemote.on:
-      return "remote";
-
-    case EthClientRemote.off:
-      if (!executionClient || !consensusClient) return "remote";
-
-      return {
-        execClient: executionClient,
-        consClient: consensusClient,
-      };
-  }
-}
-
-/**
- * Parse client status errors to a single string line
- *
- * Note: MUST NOT have undefined as a valid return type so typescript
- *       enforces that all possible states are covered
- */
-function parseClientStatusError(statusError: EthClientStatusError): string {
-  switch (statusError.code) {
-    case "UNKNOWN_ERROR":
-      return `Unknown error: ${statusError.error.message}`;
-
-    case "STATE_NOT_SYNCED":
-      return "State is not synced";
-
-    case "STATE_CALL_ERROR":
-      return `State call error: ${statusError.error.message}`;
-
-    case "IS_SYNCING":
-      return "Is syncing";
-
-    case "NOT_AVAILABLE":
-      return `Not available: ${statusError.error.message}`;
-
-    case "NOT_RUNNING":
-      return "Not running";
-
-    case "NOT_INSTALLED":
-      return "Not installed";
-
-    case "INSTALLING":
-      return "Is installing";
-
-    case "INSTALLING_ERROR":
-      return `Install error: ${statusError.error.message}`;
-
-    case "UNINSTALLED":
-      return `Package is uninstalled`;
-  }
-}
-
-/**
- * Returns the url of the JSON RPC an Eth multi-client status and target
- * If the package target is not active it returns the remote URLs
- * @returns ethProvier http://geth.dappnode:8545
- */
-export async function getEthUrl(): Promise<string> {
-  if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
-    return params.ETH_MAINNET_RPC_URL_OVERRIDE;
-
-  const target = computeEthereumTarget();
-  const fallback = db.ethClientFallback.get();
-
-  // Initial case where the user has not selected any client yet
-  if (!target) throw new EthProviderError(`No ethereum client selected yet`);
-
-  // Remote is selected, just return remote
-  if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
-
-  // Full node is selected, ensure client is not empty
-  if (!target.execClient) throw Error("No execution client selected yet");
-  if (!target.consClient) throw Error("No consensus client selected yet");
-
-  const status = await getMultiClientStatus(
-    target.execClient,
-    target.consClient
-  );
-  db.ethExecClientStatus.set(target.execClient, status);
-  emitSyncedNotification(target, status);
-
-  if (status.ok) {
-    // Package test succeeded return its url
-    return status.url;
-  } else {
-    if (fallback === "on") {
-      // Fallback on, ignore error and return remote
-      return params.ETH_MAINNET_RPC_URL_REMOTE;
-    } else {
-      // Fallback off, throw nice error
-      const message = parseClientStatusError(status);
-      throw new EthProviderError(`Node not available: ${message}`);
-    }
-  }
-}
+import { getEthUrl } from "./ethClient/index.js";
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance

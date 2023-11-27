@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { expect } from "chai";
-import { ipfs } from "@dappnode/ipfs";
+import { dappnodeInstaller } from "@dappnode/installer";
 import { cleanTestDir, testDir } from "../../../testUtils.js";
 import { ipfsAddAll } from "../../../integration/testIpfsUtils.js";
 
@@ -35,7 +35,7 @@ describe("ipfs / integration test", function () {
   });
 
   it("List directory files", async () => {
-    const files = await ipfs.list(dirHash);
+    const files = await dappnodeInstaller.list(dirHash);
 
     expect(files.map(file => file.name)).to.deep.equal([
       path.parse(filepath).base
@@ -44,23 +44,17 @@ describe("ipfs / integration test", function () {
   });
 
   it("Download file to FS", async () => {
-    await ipfs.writeFileToFs({ hash: fileHash, path: filePathResult });
+    await dappnodeInstaller.writeFileToFs({
+      hash: fileHash,
+      path: filePathResult
+    });
     const result = fs.readFileSync(filePathResult, "utf8");
     expect(result).to.equal(fileContents, "Wrong downloaded file contents");
   });
 
   it("Download file to memory", async () => {
-    const result = await ipfs.writeFileToMemory(fileHash);
+    const result = await dappnodeInstaller.writeFileToMemory(fileHash);
     expect(result).to.equal(fileContents, "Wrong downloaded file contents");
-  });
-
-  it("Pin file", async () => {
-    await ipfs.pinAdd(fileHash);
-  });
-
-  it("objectSize", async () => {
-    const data = await ipfs.objectGet(dirHash);
-    expect(data.Data?.length).to.be.a("number");
   });
 });
 
@@ -76,7 +70,7 @@ describe("ipfs / hash format", () => {
 
   for (const hash of hashes) {
     it(`Should download getting started page from ${hash}`, async () => {
-      const data = await ipfs.writeFileToMemory(hash);
+      const data = await dappnodeInstaller.writeFileToMemory(hash);
       expect(data).to.include(content);
     });
   }

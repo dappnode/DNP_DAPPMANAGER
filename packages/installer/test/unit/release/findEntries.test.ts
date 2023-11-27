@@ -1,13 +1,20 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import { IPFSEntry, IpfsFileResult } from "@dappnode/ipfs";
+import { IPFSEntry } from "@dappnode/toolkit";
 import {
   releaseFilesToDownload,
   DirectoryFiles,
   FileConfig,
   releaseFiles,
 } from "@dappnode/common";
+
+interface IpfsFileResult {
+  name: string; // 'avatar.png',
+  path: string; // 'QmR7ALYdVQCSfdob9tzE8mvPn3KJk653maMqLeqMo7eeTg/avatar.png',
+  size: number; // 9305,
+  hash: string; // 'QmRFfqN93JN5hDfqWhxaY6M16dafS6t9qzRCAKzzNT9ved',
+}
 
 type IPFSEntryName = Pick<IPFSEntry, "name">;
 
