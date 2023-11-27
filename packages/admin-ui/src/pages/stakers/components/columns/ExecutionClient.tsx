@@ -73,7 +73,7 @@ export default function ExecutionClient<T extends Network>({
         <div className="description">
           {isSelected &&
             executionClient.data &&
-            executionClient.data.metadata.shortDescription}
+            executionClient.data.manifest.shortDescription}
         </div>
       )}
     </Card>

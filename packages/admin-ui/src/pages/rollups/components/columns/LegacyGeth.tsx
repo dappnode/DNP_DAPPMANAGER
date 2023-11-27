@@ -70,7 +70,7 @@ export default function LegacyGeth({
 
       {archive.status === "ok" && (
         <div className="description">
-          {isSelected && archive.data && archive.data.metadata.shortDescription}
+          {isSelected && archive.data && archive.data.manifest.shortDescription}
         </div>
       )}
     </Card>
