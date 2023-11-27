@@ -1,5 +1,5 @@
 import deepmerge from "deepmerge";
-import orderInstallPackages from "./orderInstallPackages.js";
+import { orderInstallPackages } from "./orderInstallPackages.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
 import { parseTimeoutSeconds } from "../utils.js";

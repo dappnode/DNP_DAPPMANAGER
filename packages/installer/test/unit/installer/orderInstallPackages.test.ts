@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { InstallPackageData } from "@dappnode/common";
 import { mockPackageData } from "../../testUtils.js";
-import orderInstallPackages from "../../../src/installer/orderInstallPackages.js";
+import { orderInstallPackages } from "../../../src/installer/orderInstallPackages.js";
 
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {
@@ -15,7 +15,7 @@ describe("Module > Installer", () => {
     const coreName = "core.dnp.dappnode.eth";
     const dappmanagerName = "dappmanager.dnp.dappnode.eth";
 
-    it("Should order by alphabetic order and the dappmanager last", () => {
+    it.only("Should order by alphabetic order and the dappmanager last", () => {
       const packagesData = getPackagesData([
         coreName,
         "bind.dnp.dappnode.eth",

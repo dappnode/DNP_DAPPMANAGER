@@ -65,7 +65,7 @@ export const mockRelease: PackageRelease = {
   semVersion: mockDnpVersion,
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
-  metadata: { name: mockDnpName, version: mockDnpVersion },
+  manifest: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
   isCore: false,
