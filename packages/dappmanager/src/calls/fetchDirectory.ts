@@ -8,7 +8,7 @@ import {
   getIsUpdated
 } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthProviderUrl, dappnodeInstaller } from "@dappnode/installer";
+import { getEthUrl, dappnodeInstaller } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
 
 const loadThrottle = 500; // 0.5 seconds
@@ -17,7 +17,7 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const providerUrl = await getEthProviderUrl();
+  const providerUrl = await getEthUrl();
   const directory = new DappNodeDirectory(providerUrl);
 
   const installedDnpList = await listPackages();
