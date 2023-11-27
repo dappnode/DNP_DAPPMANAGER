@@ -15,7 +15,7 @@ describe("Module > Installer", () => {
     const coreName = "core.dnp.dappnode.eth";
     const dappmanagerName = "dappmanager.dnp.dappnode.eth";
 
-    it.only("Should order by alphabetic order and the dappmanager last", () => {
+    it("Should order by alphabetic order and the dappmanager last", () => {
       const packagesData = getPackagesData([
         coreName,
         "bind.dnp.dappnode.eth",
