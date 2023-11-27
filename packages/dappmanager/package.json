@@ -33,7 +33,6 @@
     "@dappnode/hostscriptsservices": "^0.1.0",
     "@dappnode/httpsportal": "^0.1.0",
     "@dappnode/installer": "^0.1.0",
-    "@dappnode/ipfs": "^0.1.0",
     "@dappnode/logger": "^0.1.0",
     "@dappnode/manifest": "^0.1.0",
     "@dappnode/migrations": "^0.1.0",
