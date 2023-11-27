@@ -1,14 +1,14 @@
 import "mocha";
 import { expect } from "chai";
 import { omit } from "lodash-es";
-import * as calls from "../../src/calls/index.js";
+import * as calls from "../../../dappmanager/src/calls/index.js";
 import {
   clearDbs,
   createTestDir,
   cleanRepos,
   cleanContainers,
-  shellSafe
-} from "../testUtils.js";
+  shellSafe,
+} from "../../../dappmanager/test/testUtils.js";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
@@ -52,7 +52,7 @@ describe("Fetch releases", () => {
       description: "Main DNP",
       license: "GPL-3.0",
       type: "service",
-      avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt"
+      avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
     };
 
     const composeMain = new ComposeEditor({
@@ -62,15 +62,15 @@ describe("Fetch releases", () => {
           container_name: getContainerName({
             dnpName: dnpNameMain,
             serviceName: dnpNameMain,
-            isCore: false
+            isCore: false,
           }),
           image: getImageTag({
             dnpName: dnpNameMain,
             serviceName: dnpNameMain,
-            version: mainVersion
-          })
-        }
-      }
+            version: mainVersion,
+          }),
+        },
+      },
     });
 
     const setupWizard: SetupWizard = {
@@ -80,9 +80,9 @@ describe("Fetch releases", () => {
           id: "mockVar",
           target: { type: "environment", name: "MOCK_VAR" },
           title: "Mock var",
-          description: "Mock var description"
-        }
-      ]
+          description: "Mock var description",
+        },
+      ],
     };
 
     const disclaimer = "Warning!\n\nThis is really dangerous";
@@ -93,7 +93,7 @@ describe("Fetch releases", () => {
         manifest: mainDnpManifest,
         compose: composeMain.output(),
         setupWizard,
-        disclaimer
+        disclaimer,
       });
 
       // Up mock docker packages
@@ -111,15 +111,15 @@ describe("Fetch releases", () => {
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
         avatarUrl: "/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
-        metadata: {
+        manifest: {
           description: "Main DNP",
           license: "GPL-3.0",
           name: dnpNameMain,
           version: mainVersion,
           type: "service",
           disclaimer: {
-            message: disclaimer
-          }
+            message: disclaimer,
+          },
         },
         specialPermissions: { [dnpNameMain]: [] },
 
@@ -129,7 +129,7 @@ describe("Fetch releases", () => {
         isUpdated: false,
         isInstalled: true,
         settings: {
-          [dnpNameMain]: {}
+          [dnpNameMain]: {},
         },
         compatible: {
           requiresCoreUpdate: false,
@@ -137,19 +137,19 @@ describe("Fetch releases", () => {
           isCompatible: true,
           error: "",
           dnps: {
-            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
-          }
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash },
+          },
         },
         available: {
           isAvailable: true,
-          message: ""
+          message: "",
         },
         // Mock, ommited below
         imageSize: 0,
         signedSafeAll: false,
         signedSafe: {
-          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" }
-        }
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" },
+        },
       };
 
       expect(omit(result, ["imageSize"])).to.deep.equal(

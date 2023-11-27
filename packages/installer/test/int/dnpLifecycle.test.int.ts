@@ -2,10 +2,13 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import { mapValues, pick } from "lodash-es";
-import * as calls from "../../src/calls/index.js";
+import * as calls from "../../../dappmanager/src/calls/index.js";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { getDnpFromListPackages, getDnpState } from "./testPackageUtils.js";
+import {
+  getDnpFromListPackages,
+  getDnpState,
+} from "../../../dappmanager/test/integration/testPackageUtils.js";
 import {
   PortMapping,
   UserSettingsAllDnps,
@@ -14,7 +17,7 @@ import {
   PortProtocol,
   Compose,
   Manifest,
-  PackageEnvs
+  PackageEnvs,
 } from "@dappnode/common";
 import {
   clearDbs,
@@ -22,17 +25,17 @@ import {
   shellSafe,
   cleanRepos,
   cleanContainers,
-  sampleFile
-} from "../testUtils.js";
+  sampleFile,
+} from "../../../dappmanager/test/testUtils.js";
 import { stringifyPortMappings } from "@dappnode/dockercompose";
 import {
   dockerContainerInspect,
   dockerGetArchiveSingleFile,
-  listContainer
+  listContainer,
 } from "@dappnode/dockerapi";
 import { parseEnvironment } from "@dappnode/utils";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
-import { MemoryWritable } from "./testStreamUtils.js";
+import { MemoryWritable } from "../../../dappmanager/test/integration/testStreamUtils.js";
 
 // This mountpoints have files inside created by docker with the root
 // user group, so they can't be cleaned by other tests.
@@ -65,17 +68,17 @@ describe("DNP lifecycle", function () {
     ENV_TO_CHANGE: {
       key: "ENV_TO_CHANGE",
       value: "ORIGINAL",
-      newValue: "NEW_VALUE"
+      newValue: "NEW_VALUE",
     },
-    ENV_DEFAULT: { key: "ENV_DEFAULT", value: "ORIGINAL" }
+    ENV_DEFAULT: { key: "ENV_DEFAULT", value: "ORIGINAL" },
   };
   const envsDep = {
     ENV_DEP_TO_CHANGE: {
       key: "ENV_DEP_TO_CHANGE",
       value: "ORIGINAL_DEP",
-      newValue: "NEW_VALUE_DEP"
+      newValue: "NEW_VALUE_DEP",
     },
-    ENV_DEP_DEFAULT: { key: "ENV_DEP_DEFAULT", value: "ORIGINAL_DEP" }
+    ENV_DEP_DEFAULT: { key: "ENV_DEP_DEFAULT", value: "ORIGINAL_DEP" },
   };
   const toEnvironment = (envs: {
     [id: string]: { key: string; value: string };
@@ -92,29 +95,29 @@ describe("DNP lifecycle", function () {
   const addPortId = (obj: {
     [id: string]: PortMappingWithNew;
   }): { [id: string]: PortMappingForTest } =>
-    mapValues(obj, p => ({ ...p, portId: `${p.container}/${p.protocol}` }));
+    mapValues(obj, (p) => ({ ...p, portId: `${p.container}/${p.protocol}` }));
   const portsMain = addPortId({
     // Unchanged
     one: {
       host: 1111,
       container: 1111,
       protocol: PortProtocol.UDP,
-      newHost: 1111
+      newHost: 1111,
     },
     // Change from a host port to a different
     two: {
       host: 2222,
       container: 2222,
       protocol: PortProtocol.TCP,
-      newHost: 2220
-    }
+      newHost: 2220,
+    },
   });
   const volumesMain = {
     changeme: {
       name: "changeme-main",
       newHost: path.resolve(testMountpointDnpLifeCycleMain, "testMountpoint"),
-      container: "/temp"
-    }
+      container: "/temp",
+    },
   };
   const portsDep = addPortId({
     // Change from ephemeral to a defined host port
@@ -122,26 +125,26 @@ describe("DNP lifecycle", function () {
       host: undefined,
       container: 3333,
       protocol: PortProtocol.UDP,
-      newHost: 3330
+      newHost: 3330,
     },
     // Change from a defined host port to ephemeral
     four: {
       host: 4444,
       container: 4444,
       protocol: PortProtocol.TCP,
-      newHost: ""
-    }
+      newHost: "",
+    },
   });
   const volumesDep = {
     changeme: {
       name: "changeme-dep",
       newHost: path.resolve(testMountpointDnpLifeCycleDep, "testBind"),
-      container: "/temp"
-    }
+      container: "/temp",
+    },
   };
   const staticVolume = {
     name: "data",
-    container: "/usr"
+    container: "/usr",
   };
 
   const manifestMain: Manifest = {
@@ -149,7 +152,7 @@ describe("DNP lifecycle", function () {
     description: "Main DNP",
     type: "service",
     license: "GPL-3.0",
-    version: "0.1.0"
+    version: "0.1.0",
   };
   const composeMain: Compose = {
     version: "3.5",
@@ -160,15 +163,15 @@ describe("DNP lifecycle", function () {
         environment: toEnvironment(envsMain),
         volumes: [
           `${staticVolume.name}:${staticVolume.container}`,
-          `${volumesMain.changeme.name}:${volumesMain.changeme.container}`
+          `${volumesMain.changeme.name}:${volumesMain.changeme.container}`,
         ],
-        ports: stringifyPortMappings(Object.values(portsMain))
-      }
+        ports: stringifyPortMappings(Object.values(portsMain)),
+      },
     },
     volumes: {
       [staticVolume.name]: {},
-      [volumesMain.changeme.name]: {}
-    }
+      [volumesMain.changeme.name]: {},
+    },
   };
 
   const manifestDep: Manifest = {
@@ -176,7 +179,7 @@ describe("DNP lifecycle", function () {
     description: "Main DNP",
     type: "service",
     license: "GPL-3.0",
-    version: "0.1.0"
+    version: "0.1.0",
   };
   const composeDep: Compose = {
     version: "3.5",
@@ -187,15 +190,15 @@ describe("DNP lifecycle", function () {
         environment: toEnvironment(envsDep),
         volumes: [
           `${staticVolume.name}:${staticVolume.container}`,
-          `${volumesDep.changeme.name}:${volumesDep.changeme.container}`
+          `${volumesDep.changeme.name}:${volumesDep.changeme.container}`,
         ],
-        ports: stringifyPortMappings(Object.values(portsDep))
-      }
+        ports: stringifyPortMappings(Object.values(portsDep)),
+      },
     },
     volumes: {
       [staticVolume.name]: {},
-      [volumesDep.changeme.name]: {}
-    }
+      [volumesDep.changeme.name]: {},
+    },
   };
 
   const toDaraUrl = (s: string): string =>
@@ -209,46 +212,46 @@ describe("DNP lifecycle", function () {
     [dnpNameMain]: {
       environment: {
         [dnpNameMain]: {
-          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue
-        }
+          [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
+        },
       },
       portMappings: {
         [dnpNameMain]: {
-          [portsMain.two.portId]: String(portsMain.two.newHost)
-        }
+          [portsMain.two.portId]: String(portsMain.two.newHost),
+        },
       },
       namedVolumeMountpoints: {
-        [volumesMain.changeme.name]: volumesMain.changeme.newHost
+        [volumesMain.changeme.name]: volumesMain.changeme.newHost,
       },
       fileUploads: {
         [dnpNameMain]: {
-          [demoFilePath]: fileDataUrlMain
-        }
-      }
+          [demoFilePath]: fileDataUrlMain,
+        },
+      },
     },
     [dnpNameDep]: {
       environment: {
         [dnpNameDep]: {
-          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue
-        }
+          [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
+        },
       },
       portMappings: {
         [dnpNameDep]: {
           [portsDep.three.portId]: String(portsDep.three.newHost),
-          [portsDep.four.portId]: String(portsDep.four.newHost)
-        }
+          [portsDep.four.portId]: String(portsDep.four.newHost),
+        },
       },
       legacyBindVolumes: {
         [dnpNameDep]: {
-          [volumesDep.changeme.name]: volumesDep.changeme.newHost
-        }
+          [volumesDep.changeme.name]: volumesDep.changeme.newHost,
+        },
       },
       fileUploads: {
         [dnpNameDep]: {
-          [demoFilePath]: fileDataUrlDep
-        }
-      }
-    }
+          [demoFilePath]: fileDataUrlDep,
+        },
+      },
+    },
   };
 
   let mainDnpReleaseHash: string;
@@ -281,21 +284,21 @@ describe("DNP lifecycle", function () {
       // Prepare a package release with dependencies
       const depDnpReleaseHash = await uploadDirectoryRelease({
         manifest: manifestDep,
-        compose: composeDep
+        compose: composeDep,
       });
       mainDnpReleaseHash = await uploadDirectoryRelease({
         manifest: {
           ...manifestMain,
-          dependencies: { [dnpNameDep]: depDnpReleaseHash }
+          dependencies: { [dnpNameDep]: depDnpReleaseHash },
         },
-        compose: composeMain
+        compose: composeMain,
       });
     }
   );
 
   before("Should resolve a request", async () => {
     const result = await calls.fetchDnpRequest({
-      id: mainDnpReleaseHash
+      id: mainDnpReleaseHash,
     });
     console.log(result);
     expect(result.dnpName, "Wrong result name").to.equal(dnpNameMain);
@@ -311,7 +314,7 @@ describe("DNP lifecycle", function () {
       name: dnpNameMain,
       version: mainDnpReleaseHash,
       userSettings,
-      options: { BYPASS_SIGNED_RESTRICTION: true }
+      options: { BYPASS_SIGNED_RESTRICTION: true },
     });
   });
 
@@ -340,17 +343,17 @@ describe("DNP lifecycle", function () {
         { containerName: containerMain.containerName },
         {
           [envsMain.ENV_TO_CHANGE.key]: envsMain.ENV_TO_CHANGE.newValue,
-          [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value
+          [envsMain.ENV_DEFAULT.key]: envsMain.ENV_DEFAULT.value,
         }
       );
     });
 
     it(`${dnpNameMain} port mappings`, () => {
       const port1111 = containerMain.ports.find(
-        port => port.container === portsMain.one.container
+        (port) => port.container === portsMain.one.container
       );
       const port2222 = containerMain.ports.find(
-        port => port.container === portsMain.two.container
+        (port) => port.container === portsMain.two.container
       );
       if (!port1111) throw Error(`Port 1111 not found`);
       if (!port2222) throw Error(`Port 2222 not found`);
@@ -358,19 +361,19 @@ describe("DNP lifecycle", function () {
         host: portsMain.one.host,
         container: portsMain.one.container,
         protocol: portsMain.one.protocol,
-        deletable: false
+        deletable: false,
       });
       expect(port2222).to.deep.equal({
         host: portsMain.two.newHost,
         container: portsMain.two.container,
         protocol: portsMain.two.protocol,
-        deletable: false
+        deletable: false,
       });
     });
 
     it(`${dnpNameMain} name volume paths`, () => {
       const changemeVolume = containerMain.volumes.find(
-        vol => vol.container === volumesMain.changeme.container
+        (vol) => vol.container === volumesMain.changeme.container
       );
 
       if (!changemeVolume) throw Error(`Volume changeme not found`);
@@ -387,7 +390,7 @@ describe("DNP lifecycle", function () {
     it(`${dnpNameMain} fileuploads`, async () => {
       const result = await copyFileFrom({
         containerName: containerMain.containerName,
-        fromPath: demoFilePath
+        fromPath: demoFilePath,
       });
       expect(toDaraUrl(result)).to.equal(fileDataUrlMain);
     });
@@ -397,7 +400,7 @@ describe("DNP lifecycle", function () {
         { containerName: containerDep.containerName },
         {
           [envsDep.ENV_DEP_TO_CHANGE.key]: envsDep.ENV_DEP_TO_CHANGE.newValue,
-          [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value
+          [envsDep.ENV_DEP_DEFAULT.key]: envsDep.ENV_DEP_DEFAULT.value,
         }
       );
     });
@@ -405,11 +408,11 @@ describe("DNP lifecycle", function () {
     it(`${dnpNameDep} port mappings`, () => {
       // Change from ephemeral to a defined host port
       const port3333 = containerDep.ports.find(
-        port => port.container === portsDep.three.container
+        (port) => port.container === portsDep.three.container
       );
       // Change from a defined host port to ephemeral
       const port4444 = containerDep.ports.find(
-        port => port.container === portsDep.four.container
+        (port) => port.container === portsDep.four.container
       );
 
       // Make sure port 4444 is ephemeral
@@ -423,7 +426,7 @@ describe("DNP lifecycle", function () {
 
     it(`${dnpNameDep} name volume paths`, () => {
       const changemeVolume = containerDep.volumes.find(
-        vol => vol.container === volumesDep.changeme.container
+        (vol) => vol.container === volumesDep.changeme.container
       );
       if (!changemeVolume) throw Error(`Volume changeme not found`);
       expect(changemeVolume.host).to.equal(volumesDep.changeme.newHost);
@@ -432,7 +435,7 @@ describe("DNP lifecycle", function () {
     it(`${dnpNameDep} fileuploads`, async () => {
       const result = await copyFileFrom({
         containerName: containerDep.containerName,
-        fromPath: demoFilePath
+        fromPath: demoFilePath,
       });
       expect(toDaraUrl(result)).to.equal(fileDataUrlDep);
     });
@@ -456,14 +459,14 @@ describe("DNP lifecycle", function () {
 
     it(`Should call logPackage for ${dnpNameMain}`, async () => {
       const result = await calls.packageLog({
-        containerName: containerMain.containerName
+        containerName: containerMain.containerName,
       });
       expect(result).to.be.a("string");
     });
 
     it(`Should call logPackage for ${dnpNameDep}`, async () => {
       const result = await calls.packageLog({
-        containerName: containerDep.containerName
+        containerName: containerDep.containerName,
       });
       expect(result).to.be.a("string");
     });
@@ -481,24 +484,24 @@ describe("DNP lifecycle", function () {
 
     it("Should update DNP envs and reset", async () => {
       const dnpPrevEnvs = await getContainerEnvironment({
-        containerName: containerMain.containerName
+        containerName: containerMain.containerName,
       });
 
       // Use randomize value, different on each run
       const envValue = String(Date.now());
       await calls.packageSetEnvironment({
         dnpName: dnpNameMain,
-        environmentByService: { [dnpNameMain]: { time: envValue } }
+        environmentByService: { [dnpNameMain]: { time: envValue } },
       });
 
       const dnpNextEnvs = await getContainerEnvironment({
-        containerName: containerMain.containerName
+        containerName: containerMain.containerName,
       });
       expect(
         pick(dnpNextEnvs, ["time", ...Object.keys(dnpPrevEnvs)])
       ).to.deep.equal({
         ...dnpPrevEnvs,
-        time: envValue
+        time: envValue,
       });
     });
 
@@ -506,18 +509,18 @@ describe("DNP lifecycle", function () {
       const portNumber = 13131;
       const protocol = PortProtocol.TCP;
       const portMappings: PortMapping[] = [
-        { host: portNumber, container: portNumber, protocol }
+        { host: portNumber, container: portNumber, protocol },
       ];
       await calls.packageSetPortMappings({
         dnpName: dnpNameMain,
-        portMappingsByService: { [dnpNameMain]: portMappings }
+        portMappingsByService: { [dnpNameMain]: portMappings },
       });
 
       const dnp = await getDnpFromListPackages(dnpNameMain);
       if (!dnp) throw Error(`${dnpNameMain} is not found running`);
 
       const addedPort = dnp.containers[0].ports.find(
-        p => p.container === portNumber
+        (p) => p.container === portNumber
       );
       if (!addedPort)
         throw Error(`Added port on ${portNumber} ${protocol} not found`);
@@ -526,7 +529,7 @@ describe("DNP lifecycle", function () {
         host: portNumber,
         container: portNumber,
         protocol,
-        deletable: true
+        deletable: true,
       });
     });
   });
@@ -594,7 +597,7 @@ describe("DNP lifecycle", function () {
         containerName: containerMain.containerName,
         dataUri: sampleFile.dataUri,
         filename: sampleFile.filename,
-        toPath: sampleFile.containerPath
+        toPath: sampleFile.containerPath,
       });
     });
 
@@ -602,7 +605,7 @@ describe("DNP lifecycle", function () {
     it("Should copy the file FROM the container", async () => {
       const result = await copyFileFrom({
         containerName: containerMain.containerName,
-        fromPath: sampleFile.containerPath
+        fromPath: sampleFile.containerPath,
       });
       expect(toDaraUrl(result)).to.equal(sampleFile.dataUri, "Wrong dataUri");
     });
@@ -652,7 +655,7 @@ describe("DNP lifecycle", function () {
  * @param containerNameOrId
  */
 async function getContainerEnvironment({
-  containerName
+  containerName,
 }: {
   containerName: string;
 }): Promise<PackageEnvs> {
@@ -679,7 +682,7 @@ async function assertEnvironment(
  */
 async function copyFileFrom({
   containerName,
-  fromPath
+  fromPath,
 }: {
   containerName: string;
   fromPath: string;
