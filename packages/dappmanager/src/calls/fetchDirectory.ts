@@ -8,11 +8,7 @@ import {
   getIsUpdated
 } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import {
-  dappnodeInstaller,
-  getEthProviderUrl,
-  NoImageForArchError
-} from "@dappnode/installer";
+import { getEthProviderUrl, dappnodeInstaller } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
 
 const loadThrottle = 500; // 0.5 seconds
@@ -64,16 +60,12 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        if (e instanceof NoImageForArchError) {
-          logs.debug(`Package ${name} is not available in current arch`);
-        } else {
-          logs.error(`Error fetching ${name} release`, e);
-          pushDirectoryItem({
-            ...directoryItemBasic,
-            status: "error",
-            message: e.message
-          });
-        }
+        logs.error(`Error fetching ${name} release`, e);
+        pushDirectoryItem({
+          ...directoryItemBasic,
+          status: "error",
+          message: e.message
+        });
       }
     })
   );

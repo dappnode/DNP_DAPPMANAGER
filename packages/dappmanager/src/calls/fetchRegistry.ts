@@ -1,6 +1,5 @@
 import {
   getEthersProvider,
-  NoImageForArchError,
   getRegistry,
   dappnodeInstaller
 } from "@dappnode/installer";
@@ -116,16 +115,12 @@ async function fetchRegistryIpfsData(
           categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        if (e instanceof NoImageForArchError) {
-          logs.debug(`Package ${name} is not available in current arch`);
-        } else {
-          logs.error(`Error fetching ${name} release`, e);
-          pushRegistryItem({
-            ...registryItemBasic,
-            status: "error",
-            message: e.message
-          });
-        }
+        logs.error(`Error fetching ${name} release`, e);
+        pushRegistryItem({
+          ...registryItemBasic,
+          status: "error",
+          message: e.message
+        });
       }
     })
   );

@@ -11,7 +11,7 @@ export async function exposeByDefaultHttpsPorts(
   pkg: InstallPackageData,
   log: Log
 ): Promise<void> {
-  const exposables = pkg.metadata.exposable;
+  const exposables = pkg.manifest.exposable;
 
   // Return if no exposable or not exposeByDefault
   if (!exposables || !exposables.some((exp) => exp.exposeByDefault)) return;

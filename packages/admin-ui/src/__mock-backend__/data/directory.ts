@@ -6,16 +6,16 @@ function getDirectoryDnp(dnp: MockDnp, index: number): DirectoryItemOk {
   return {
     index,
     status: "ok",
-    name: dnp.metadata.name,
+    name: dnp.manifest.name,
     description:
-      dnp.metadata.shortDescription || dnp.metadata.description || "",
+      dnp.manifest.shortDescription || dnp.manifest.description || "",
     avatarUrl: dnp.avatar || "",
     isFeatured: false,
     isInstalled: Boolean(dnp.installedData),
     isUpdated: false,
     whitelisted: true,
-    featuredStyle: dnp.metadata.style,
-    categories: dnp.metadata.categories || []
+    featuredStyle: dnp.manifest.style,
+    categories: dnp.manifest.categories || []
   };
 }
 

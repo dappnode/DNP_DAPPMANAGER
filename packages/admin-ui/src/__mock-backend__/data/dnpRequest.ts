@@ -17,24 +17,24 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
   const compatibleDnps: CompatibleDnps = {};
 
   for (const dep of [dnp, ...(dnp.dependencies || [])]) {
-    const dnpName = dep.metadata.name;
+    const dnpName = dep.manifest.name;
     if (dep.userSettings) settings[dnpName] = dep.userSettings;
     if (dep.setupWizard) setupWizard[dnpName] = dep.setupWizard;
     if (dep.specialPermissions)
       specialPermissions[dnpName] = dep.specialPermissions;
     compatibleDnps[dnpName] = {
       from: dep.installedData?.version,
-      to: dep.metadata.version
+      to: dep.manifest.version
     };
   }
 
   return {
     ...sampleRequestState,
-    dnpName: dnp.metadata.name,
-    reqVersion: dnp.metadata.version,
-    semVersion: dnp.metadata.version,
+    dnpName: dnp.manifest.name,
+    reqVersion: dnp.manifest.version,
+    semVersion: dnp.manifest.version,
     avatarUrl: dnp.avatar || "",
-    metadata: dnp.metadata,
+    manifest: dnp.manifest,
 
     imageSize: 19872630,
     isUpdated: false,
@@ -68,7 +68,7 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
 export const dnpRequests = mockDnps.reduce(
   (obj, mockDnp) => ({
     ...obj,
-    [mockDnp.metadata.name]: getRequestDnp(mockDnp)
+    [mockDnp.manifest.name]: getRequestDnp(mockDnp)
   }),
   {} as { [dnpName: string]: RequestedDnp }
 );

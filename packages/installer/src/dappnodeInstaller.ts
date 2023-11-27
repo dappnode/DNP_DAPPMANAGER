@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { DappnodeRepository, PkgRelease } from "@dappnode/toolkit";
+import { DappnodeRepository } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
   Compose,
@@ -15,6 +15,7 @@ import {
   PackageRequest,
   SetupWizard,
   PrometheusTarget,
+  PackageRelease,
 } from "@dappnode/common";
 import { getMultiClientStatus } from "./ethClient/clientStatus";
 import { emitSyncedNotification } from "./ethClient/syncedNotification";
@@ -158,7 +159,7 @@ export function getIpfsUrl(): string {
   return db.ipfsGateway.get();
 }
 
-class DappnodeInstaller extends DappnodeRepository {
+export class DappnodeInstaller extends DappnodeRepository {
   constructor(ipfsUrl: string, ethUrl: string, timeout?: number) {
     super(ipfsUrl, ethUrl, timeout);
   }
@@ -173,7 +174,7 @@ class DappnodeInstaller extends DappnodeRepository {
   /**
    * Get release assets for a request
    */
-  async getRelease(name: string, version?: string): Promise<PkgRelease> {
+  async getRelease(name: string, version?: string): Promise<PackageRelease> {
     await this.updateProviders();
 
     const pkgRelease = await this.getPkgRelease({
@@ -210,7 +211,7 @@ class DappnodeInstaller extends DappnodeRepository {
    */
   async getReleases(packages: {
     [name: string]: string;
-  }): Promise<PkgRelease[]> {
+  }): Promise<PackageRelease[]> {
     await this.updateProviders();
 
     const pkgReleases = await this.getPkgsReleases(
@@ -255,7 +256,7 @@ class DappnodeInstaller extends DappnodeRepository {
     req: PackageRequest,
     options?: DappgetOptions
   ): Promise<{
-    releases: PkgRelease[];
+    releases: PackageRelease[];
     message: string;
     state: DappGetState;
     alreadyUpdated: DappGetState;
@@ -297,7 +298,7 @@ class DappnodeInstaller extends DappnodeRepository {
   /**
    * Validates manifest and compose schemas
    */
-  private validateManifestAndComposeSchemas(pkgRelease: PkgRelease): void {
+  private validateManifestAndComposeSchemas(pkgRelease: PackageRelease): void {
     validateManifestSchema(pkgRelease.manifest);
     validateDappnodeCompose(pkgRelease.compose, pkgRelease.manifest);
   }

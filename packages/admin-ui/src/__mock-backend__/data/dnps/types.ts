@@ -9,7 +9,7 @@ import {
 } from "@dappnode/common";
 
 export interface MockDnp {
-  metadata: Manifest;
+  manifest: Manifest;
   avatar?: string;
   userSettings?: UserSettings;
   setupWizard?: SetupWizard;

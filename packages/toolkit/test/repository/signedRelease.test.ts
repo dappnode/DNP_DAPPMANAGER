@@ -3,15 +3,15 @@ import { CID } from "ipfs-http-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
 import {
-  serializeIpfsDirectory,
-  getReleaseSignatureStatus,
-} from "../../../src/release/releaseSignature.js";
-import {
   ReleaseSignature,
   ReleaseSignatureStatusCode,
   TrustedReleaseKey,
 } from "@dappnode/common";
 import { IPFSEntry } from "@dappnode/ipfs";
+import {
+  serializeIpfsDirectory,
+  getReleaseSignatureStatus,
+} from "../../src/repository/releaseSignature.js";
 
 describe("modules / release / verifyReleaseSignature", () => {
   const files: IPFSEntry[] = [
