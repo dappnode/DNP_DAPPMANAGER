@@ -12,6 +12,7 @@ import {
   SetupWizard,
   PrometheusTarget,
   PackageRelease,
+  ManifestWithImage,
 } from "@dappnode/common";
 import { DappgetOptions, dappGet } from "./dappGet/index.js";
 import {
@@ -27,8 +28,34 @@ import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
-import { parseMetadataFromManifest } from "@dappnode/manifest";
 import { getEthUrl } from "./ethClient/index.js";
+import { omit } from "lodash-es";
+
+/**
+ * Sanitize metadata from the manifest.
+ * Since metadata is not used for critical purposes, it can just
+ * be copied over
+ *
+ * @param manifest
+ */
+export function parseMetadataFromManifest(manifest: Manifest): Manifest {
+  const setupWizard = manifest.setupWizard ? manifest.setupWizard : undefined;
+
+  return {
+    // TODO: research if this omit can be removed since none packages should have been publish with this
+    // format from long time ago
+    ...omit(manifest as ManifestWithImage, [
+      "avatar",
+      "image",
+      "setupSchema",
+      "setupTarget",
+      "setupUiJson",
+    ]),
+    ...(setupWizard ? { setupWizard } : {}),
+    // ##### Is this necessary? Correct manifest: type missing
+    type: manifest.type || "service",
+  };
+}
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance

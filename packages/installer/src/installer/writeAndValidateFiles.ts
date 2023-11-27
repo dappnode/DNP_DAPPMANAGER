@@ -4,7 +4,7 @@ import { validatePath } from "@dappnode/utils";
 import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { writeManifest } from "@dappnode/manifest";
+import { writeManifest } from "@dappnode/utils";
 import { isNotFoundError } from "@dappnode/utils";
 
 /**

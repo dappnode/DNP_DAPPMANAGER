@@ -1,17 +1,15 @@
 import fs from "fs";
 import { Manifest } from "@dappnode/common";
-import {
-  validatePath,
-  yamlParse,
-  isNotFoundError,
-  getManifestPath,
-} from "@dappnode/utils";
+import { getManifestPath } from "./getManifestPath.js";
+import { isNotFoundError } from "./isNotFoundError.js";
+import { validatePath } from "./validatePath.js";
+import { yamlParse } from "./yaml.js";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
  * Without this error renaming, it's very hard to debug parsing errors
  */
-export function parseManifest(manifestString: string): Manifest {
+function parseManifest(manifestString: string): Manifest {
   try {
     return yamlParse(manifestString);
   } catch (e) {
@@ -37,8 +35,4 @@ export function readManifestIfExists({
     if (!isNotFoundError(e)) throw e;
     return null;
   }
-}
-
-export function writeManifest(manfiestPath: string, manifest: Manifest): void {
-  fs.writeFileSync(manfiestPath, JSON.stringify(manifest, null, 2));
 }

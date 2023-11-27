@@ -1,6 +1,5 @@
 import { omit } from "lodash-es";
-import { readManifestIfExists } from "@dappnode/manifest";
-import { shouldUpdate } from "@dappnode/utils";
+import { shouldUpdate, readManifestIfExists } from "@dappnode/utils";
 import * as db from "@dappnode/db";
 import { InstalledPackageDetailData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";

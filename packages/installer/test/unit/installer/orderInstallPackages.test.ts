@@ -64,8 +64,8 @@ describe("Module > Installer", () => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
-            metadata: {
-              ...pkg.metadata,
+            manifest: {
+              ...pkg.manifest,
               runOrder,
             },
           };
@@ -118,8 +118,8 @@ describe("Module > Installer", () => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
-            metadata: {
-              ...pkg.metadata,
+            manifest: {
+              ...pkg.manifest,
               runOrder,
             },
           };

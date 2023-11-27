@@ -146,7 +146,7 @@ async function verifyDockerImage({
  * 2. Checks the file at path has a size > 0 bytes
  * 3. Runs the command `xz -t` which does a compression validation
  */
-async function validateTarImage(path: string): Promise<void> {
+export async function validateTarImage(path: string): Promise<void> {
   // Verify that the file exists
   if (!fs.existsSync(path)) throw Error("File not found");
 
