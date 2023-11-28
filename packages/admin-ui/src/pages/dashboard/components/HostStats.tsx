@@ -60,12 +60,20 @@ export function HostStats() {
       cpuStats.revalidate();
       diskStats.revalidate();
       memoryStats.revalidate();
-      hostUptime.revalidate();
     }, 5 * 1000);
     return () => {
       clearInterval(interval);
     };
   }, [cpuStats, diskStats, memoryStats, hostUptime]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      hostUptime.revalidate();
+    }, 60 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [hostUptime]);
 
   return (
     <div className="dashboard-cards">
