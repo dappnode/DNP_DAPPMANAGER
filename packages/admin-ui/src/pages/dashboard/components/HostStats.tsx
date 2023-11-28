@@ -25,7 +25,7 @@ const StatsCardContainer: React.FunctionComponent<{
   );
 };
 
-function StatsCardOk({ value, text, valueType }: { value: number; text?: string; valueType: "percentage" | "temperature" }) {
+function StatsCardOk({ value, text, valueType }: { value: number; text?: string; valueType: string }) {
   const valueBar = Math.round(value);
 
   return (
@@ -33,9 +33,7 @@ function StatsCardOk({ value, text, valueType }: { value: number; text?: string;
       <ProgressBar
         variant={parseVariant(value)}
         now={valueBar}
-        label={ valueType==="percentage" ? valueBar + "%"
-          : valueType==="temperature" ? valueBar + "°C"
-          : valueBar }
+        label={ valueBar + valueType }
       />
       {text ? <div className="text">{text}</div> : null}
     </>
@@ -74,7 +72,7 @@ export function HostStats() {
         {cpuStats.data ? (
           <StatsCardOk
             value={cpuStats.data.usedPercentage}
-            valueType="percentage"
+            valueType="%"
           />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
@@ -92,7 +90,7 @@ export function HostStats() {
               " / " +
               humanFileSize(memoryStats.data.total)
             }
-            valueType="percentage"
+            valueType="%"
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
@@ -110,7 +108,7 @@ export function HostStats() {
               " / " +
               humanFileSize(diskStats.data.total)
             }
-            valueType="percentage"
+            valueType="%"
           />
         ) : diskStats.error ? (
           <StatsCardError error={diskStats.error} />
@@ -122,7 +120,7 @@ export function HostStats() {
       {sensorsData.data !== null && (
         <StatsCardContainer title={"cpu temperature"}>
           {sensorsData.data ? (
-            <StatsCardOk value={sensorsData.data} valueType="temperature" />
+            <StatsCardOk value={sensorsData.data} valueType="°C" />
           ) : (
             <StatsCardLoading />
           )}
