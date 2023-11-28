@@ -119,7 +119,7 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      {sensorsData.error ? null : (
+      {sensorsData.data !== null && (
         <StatsCardContainer title={"cpu temperature"}>
           {sensorsData.data ? (
             <StatsCardOk value={sensorsData.data} valueType="temperature" />

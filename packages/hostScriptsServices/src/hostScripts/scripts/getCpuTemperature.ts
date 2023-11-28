@@ -2,7 +2,8 @@ import { runScript } from "../runScripts.js";
 
 /**
  * Get temperature of the cpu
- * Uses a script in bash return a numeric value
+ * Uses a bash script that return a numeric value
+ * If the script fails, throws an Error
  */
 export async function getCpuTemperature(): Promise<number> {
   try {

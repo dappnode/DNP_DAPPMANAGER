@@ -632,7 +632,7 @@ export interface Routes {
   /**
    * Return data of the sensors
    */
-  sensorsDataGet: () => Promise<number>;
+  sensorsDataGet: () => Promise<number | null>;
 
   /**
    * Return the current SSH port from sshd
