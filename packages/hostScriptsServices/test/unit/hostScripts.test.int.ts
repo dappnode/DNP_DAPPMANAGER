@@ -17,7 +17,7 @@ describe("Host scripts", () => {
 describe("Sensor scripts", () => {
   it("Should fetch host sensors data", async () => {
     const hostInfo = await shellHost(
-      `sudo bash ${hostScriptsPath}/getCpuTemperature.sh`
+      `sudo bash ${hostScriptsPath}/get_cpu_temperature.sh`
     );
     const temp = parseFloat(hostInfo);
 

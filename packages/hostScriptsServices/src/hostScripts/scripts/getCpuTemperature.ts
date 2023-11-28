@@ -1,14 +1,15 @@
 import { runScript } from "../runScripts.js";
 
 /**
- * Get temperature of the cpu cores
- * Use the command "sensors"
+ * Get temperature of the cpu
+ * Uses a script in bash return a numeric value
  */
 export async function getCpuTemperature(): Promise<number> {
-  const sensorsTemp = await runScript("getCpuTemperature.sh");
-  const temperature = parseFloat(sensorsTemp);
-  if(isNaN(temperature)){
+  try {
+    const sensorsTemp = await runScript("get_cpu_temperature.sh");
+    const temperature = parseFloat(sensorsTemp);
+    return temperature;
+  } catch (e) {
     throw Error("Unable to get CPU Temperature");
   }
-  return temperature;
 }

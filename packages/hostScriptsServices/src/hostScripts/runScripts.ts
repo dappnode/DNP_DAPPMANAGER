@@ -17,7 +17,7 @@ type ScriptName =
   | "avahi_daemon.sh"
   | "reboot_required.sh"
   | "update_upgrade.sh"
-  | "getCpuTemperature.sh";
+  | "get_cpu_temperature.sh";
 
 /**
  * Run a script for the hostScripts folder
