@@ -742,7 +742,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistryProgress: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
-  getHostUptime: {log:true},
+  getHostUptime: { log: true },
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
