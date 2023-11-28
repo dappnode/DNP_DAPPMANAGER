@@ -67,6 +67,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   diagnose: async () => [],
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
+  getHostUptime: async() => "1 week, 1 day, 5 hours, 10 minutes",
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
