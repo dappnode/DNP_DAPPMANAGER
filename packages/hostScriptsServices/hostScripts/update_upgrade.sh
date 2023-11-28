@@ -2,9 +2,6 @@
 
 # This script will perform an update and upgrade of the system.
 
-# Exit on error and any unset variables
-set -e
-
 # Set noninteractive frontend (useful for automated scripts)
 export DEBIAN_FRONTEND=noninteractive
 
