@@ -12,22 +12,20 @@ describe("Host scripts", () => {
     );
     expect(hostInfo).to.be.ok;
   });
-});
 
-describe("Sensor scripts", () => {
-  it("Should fetch host sensors data", async () => {
+  // get_cpu_temperature.sh not able to be tested on Github Action
+  // works locally
+  /*   it("Should fetch host sensors data", async () => {
     const hostInfo = await shellHost(
       `sudo bash ${hostScriptsPath}/get_cpu_temperature.sh`
     );
     const temp = parseFloat(hostInfo);
 
-    //If temp is NaN, skip the test
-    if (!isNaN(temp)) {
       expect(temp).to.be.a("number");
       expect(temp).to.be.at.least(0);
       expect(temp).to.be.below(200);
-    }
   });
+ */
 
   // host_update.sh script not able to tested on github action
   // works locally
