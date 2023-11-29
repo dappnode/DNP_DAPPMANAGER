@@ -9,11 +9,7 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { getConsensusUserSettings } from "@dappnode/utils";
-import {
-  packageInstall,
-  packageGet,
-  packageRemove,
-} from "../packages/index.js";
+import { packageInstall, packageGet, packageRemove } from "../calls/index.js";
 import {
   ComposeFileEditor,
   parseServiceNetworks,
@@ -31,6 +27,7 @@ import {
   ConsensusClientMainnet,
   Network,
 } from "@dappnode/common";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export enum ComposeAliasEditorAction {
   ADD,
@@ -71,6 +68,7 @@ export class EthereumClient {
    * @param deletePrevConsClient If set delete previous cons client
    */
   async changeEthClient(
+    dappnodeInstaller: DappnodeInstaller,
     nextTarget: Eth2ClientTarget,
     sync: boolean,
     useCheckpointSync: boolean,
@@ -118,6 +116,7 @@ export class EthereumClient {
       await db.consensusClientMainnet.set(consClient);
       if (sync)
         await this.changeEthClientSync({
+          dappnodeInstaller,
           prevExecClient:
             currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
@@ -309,11 +308,13 @@ export class EthereumClient {
    * Changes the ethereum client synchronously
    */
   private async changeEthClientSync({
+    dappnodeInstaller,
     prevExecClient,
     execClient,
     consClient,
     useCheckpointSync,
   }: {
+    dappnodeInstaller: DappnodeInstaller;
     prevExecClient?: ExecutionClientMainnet;
     execClient: ExecutionClientMainnet;
     consClient: ConsensusClientMainnet;
@@ -327,7 +328,7 @@ export class EthereumClient {
 
       if (!execClientPackage) {
         logs.info(`Installing execution client ${execClient}`);
-        await packageInstall({ name: execClient }).then(
+        await packageInstall(dappnodeInstaller, { name: execClient }).then(
           async () =>
             await this.updateFullnodeAlias({
               network: "mainnet",
@@ -365,7 +366,10 @@ export class EthereumClient {
           network: "mainnet",
           useCheckpointSync,
         });
-        await packageInstall({ name: consClient, userSettings });
+        await packageInstall(dappnodeInstaller, {
+          name: consClient,
+          userSettings,
+        });
       } else {
         // Start pkg if not running
         if (consClientPkg.containers.some((c) => c.state !== "running"))

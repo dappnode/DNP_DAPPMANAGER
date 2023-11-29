@@ -5,7 +5,12 @@ import {
   copyHostScripts,
   copyHostServices
 } from "@dappnode/hostscriptsservices";
-import { postRestartPatch } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  getEthUrl,
+  getIpfsUrl,
+  postRestartPatch
+} from "@dappnode/installer";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -57,6 +62,12 @@ executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
 initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch(e => logs.error("Error inititializing Database", e));
+
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(
+  getIpfsUrl(),
+  await getEthUrl()
+);
 
 // Start daemons
 startDaemons(controller.signal);

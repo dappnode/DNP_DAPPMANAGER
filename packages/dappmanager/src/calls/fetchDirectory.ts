@@ -8,8 +8,9 @@ import {
   getIsUpdated
 } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthUrl, dappnodeInstaller } from "@dappnode/installer";
+import { getEthUrl } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
+import { dappnodeInstaller } from "../index.js";
 
 const loadThrottle = 500; // 0.5 seconds
 

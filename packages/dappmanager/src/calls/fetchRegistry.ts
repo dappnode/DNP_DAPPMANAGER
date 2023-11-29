@@ -1,8 +1,4 @@
-import {
-  getEthersProvider,
-  getRegistry,
-  dappnodeInstaller
-} from "@dappnode/installer";
+import { getEthersProvider, getRegistry } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
@@ -19,6 +15,7 @@ import {
 } from "./fetchDirectory.js";
 import * as db from "@dappnode/db";
 import { DirectoryDnp } from "@dappnode/toolkit";
+import { dappnodeInstaller } from "../index.js";
 
 const defaultEnsName = "public.dappnode.eth";
 const minDeployBlock = 6312046;

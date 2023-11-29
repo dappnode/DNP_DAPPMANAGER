@@ -1,6 +1,6 @@
 import { Dependencies } from "@dappnode/common";
 import { validRange, satisfies, valid } from "semver";
-import { dappnodeInstaller } from "../../dappnodeInstaller.js";
+import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
 export class DappGetFetcher {
   /**
@@ -8,7 +8,11 @@ export class DappGetFetcher {
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
-  async dependencies(name: string, version: string): Promise<Dependencies> {
+  async dependencies(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    version: string
+  ): Promise<Dependencies> {
     const manifest = await dappnodeInstaller.getManifestFromDir(name, version);
     return manifest.dependencies || {};
   }
@@ -26,7 +30,11 @@ export class DappGetFetcher {
    * }
    * @returns set of versions
    */
-  async versions(name: string, versionRange: string): Promise<string[]> {
+  async versions(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    versionRange: string
+  ): Promise<string[]> {
     if (validRange(versionRange)) {
       if (versionRange === "*") {
         // ##### TODO: Case 0. Force "*" to strictly fetch the last version only

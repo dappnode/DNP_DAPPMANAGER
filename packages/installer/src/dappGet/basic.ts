@@ -5,6 +5,7 @@ import { PackageRequest } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetState } from "./types.js";
 import { DappGetFetcher } from "./fetch/index.js";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**
  * Simple version of `dappGet`, since its resolver may cause errors.
@@ -14,10 +15,15 @@ import { DappGetFetcher } from "./fetch/index.js";
  * If `BYPASS_RESOLVER == true`, fetch first level dependencies only
  */
 export default async function dappGetBasic(
+  dappnodeInstaller: DappnodeInstaller,
   req: PackageRequest
 ): Promise<DappGetResult> {
   const dappGetFetcher = new DappGetFetcher();
-  const dependencies = await dappGetFetcher.dependencies(req.name, req.ver);
+  const dependencies = await dappGetFetcher.dependencies(
+    dappnodeInstaller,
+    req.name,
+    req.ver
+  );
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install

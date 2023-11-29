@@ -151,7 +151,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     alreadyUpdated: DappGetState;
     currentVersions: DappGetState;
   }> {
-    const result = await dappGet(req, options);
+    const result = await dappGet(this, req, options);
     const releases = await this.getReleases(result.state);
     return {
       ...result,
@@ -300,8 +300,3 @@ export class DappnodeInstaller extends DappnodeRepository {
     };
   }
 }
-
-export const dappnodeInstaller = new DappnodeInstaller(
-  getIpfsUrl(),
-  await getEthUrl()
-);

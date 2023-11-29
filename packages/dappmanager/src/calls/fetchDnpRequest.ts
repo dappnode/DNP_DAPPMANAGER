@@ -7,7 +7,7 @@ import {
   getIsUpdated,
   getIsInstalled
 } from "@dappnode/utils";
-import { dappnodeInstaller } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
 import {
   ComposeEditor,

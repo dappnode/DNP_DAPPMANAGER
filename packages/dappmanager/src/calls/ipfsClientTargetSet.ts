@@ -1,7 +1,7 @@
 import { IpfsRepository, IpfsClientTarget } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
-import { dappnodeInstaller } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Changes the IPFS client

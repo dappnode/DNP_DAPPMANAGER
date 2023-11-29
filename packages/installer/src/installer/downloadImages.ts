@@ -4,7 +4,7 @@ import { InstallPackageData, DistributedFile } from "@dappnode/common";
 import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath, getImageTag } from "@dappnode/utils";
 import { dockerImageManifest } from "@dappnode/dockerapi";
-import { dappnodeInstaller } from "../dappnodeInstaller.js";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**
  * Download the .tar.xz docker image of each package in paralel
@@ -12,6 +12,7 @@ import { dappnodeInstaller } from "../dappnodeInstaller.js";
  * only the expected image layers
  */
 export async function downloadImages(
+  dappnodeInstaller: DappnodeInstaller,
   packagesData: InstallPackageData[],
   log: Log
 ): Promise<void> {
@@ -27,7 +28,7 @@ export async function downloadImages(
       }
 
       try {
-        await getImage(imageFile, imagePath, onProgress);
+        await getImage(dappnodeInstaller, imageFile, imagePath, onProgress);
       } catch (e) {
         e.message = `Can't download ${dnpName} image: ${e.message}`;
         throw e; // Use this format to keep the stack trace
@@ -63,6 +64,7 @@ export async function downloadImages(
  */
 
 export async function downloadImage(
+  dappnodeInstaller: DappnodeInstaller,
   hash: string,
   path: string,
   fileSize: number,
@@ -76,6 +78,7 @@ export async function downloadImage(
 }
 
 export async function getImage(
+  dappnodeInstaller: DappnodeInstaller,
   imageFile: DistributedFile,
   path: string,
   progress: (n: number) => void
@@ -97,7 +100,7 @@ export async function getImage(
 
   switch (imageFile.source) {
     case "ipfs":
-      await downloadImage(hash, path, size, progress);
+      await downloadImage(dappnodeInstaller, hash, path, size, progress);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);

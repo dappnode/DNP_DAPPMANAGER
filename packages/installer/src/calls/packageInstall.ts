@@ -14,7 +14,7 @@ import {
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes, PackageRequest } from "@dappnode/common";
-import { dappnodeInstaller } from "../dappnodeInstaller.js";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**
  * Installs a DAppNode Package.
@@ -28,12 +28,15 @@ import { dappnodeInstaller } from "../dappnodeInstaller.js";
  * - BYPASS_RESOLVER {bool}: Skips dappGet to only fetche first level dependencies
  * - BYPASS_CORE_RESTRICTION {bool}: Allows unverified core DNPs (from IPFS)
  */
-export async function packageInstall({
-  name: reqName,
-  version: reqVersion,
-  userSettings = {},
-  options = {},
-}: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
+export async function packageInstall(
+  dappnodeInstaller: DappnodeInstaller,
+  {
+    name: reqName,
+    version: reqVersion,
+    userSettings = {},
+    options = {},
+  }: Parameters<Routes["packageInstall"]>[0]
+): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
     name: sanitizeRequestName(reqName),
@@ -82,7 +85,7 @@ export async function packageInstall({
     try {
       flagPackagesAreInstalling(dnpNames);
 
-      await downloadImages(packagesData, log);
+      await downloadImages(dappnodeInstaller, packagesData, log);
       await loadImages(packagesData, log);
 
       await createVolumeDevicePaths(packagesData);

@@ -2,12 +2,13 @@ import { PackageItemData, PackageRelease, Manifest } from "@dappnode/common";
 import * as db from "@dappnode/db";
 import { pick } from "lodash-es";
 import { eventBus } from "@dappnode/eventbus";
-import { dappnodeInstaller } from "../dappnodeInstaller.js";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 // TODO: find a proper place for these functions. The functions inside this file
 // are not used as the other files within this same folder
 
 export async function packageGetData(
+  dappnodeInstaller: DappnodeInstaller,
   dnpName: string
 ): Promise<PackageItemData> {
   const cachedDnp = db.pkgItemMetadata.get(dnpName);
@@ -23,9 +24,7 @@ export async function packageGetData(
   }
 }
 
-export function packagePickItemData(
-  pkgRelease: PackageRelease
-): PackageItemData {
+function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
   return {
     manifest: packagePickManifestData(pkgRelease.manifest),
     ...pick(pkgRelease, [
