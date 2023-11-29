@@ -12,7 +12,7 @@ import {
 } from "@dappnode/common";
 import { CID } from "kubo-rpc-client";
 import { releaseFiles } from "@dappnode/common";
-import { IPFSEntry } from "kubo-rpc-client/dist/src/types";
+import { IPFSEntry } from "./types.js";
 
 export function getReleaseSignatureStatus(
   dnpName: string,

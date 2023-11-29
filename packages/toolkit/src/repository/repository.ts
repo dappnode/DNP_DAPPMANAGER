@@ -32,7 +32,6 @@ import {
 } from "@dappnode/utils";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
-import { IPFSPath } from "kubo-rpc-client/dist/src/types.js";
 import {
   getReleaseSignatureStatus,
   serializeIpfsDirectory,
@@ -74,7 +73,7 @@ export class DappnodeRepository extends ApmRepository {
    * Pins a hash to the IPFS node. Do not throw errors.
    * @param hash
    */
-  private async pinAddNoThrow(hash: IPFSPath): Promise<void> {
+  private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
     } catch (e) {
