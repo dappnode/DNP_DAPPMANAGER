@@ -32,32 +32,6 @@ import { getEthUrl } from "./ethClient/index.js";
 import { omit } from "lodash-es";
 
 /**
- * Sanitize metadata from the manifest.
- * Since metadata is not used for critical purposes, it can just
- * be copied over
- *
- * @param manifest
- */
-export function parseMetadataFromManifest(manifest: Manifest): Manifest {
-  const setupWizard = manifest.setupWizard ? manifest.setupWizard : undefined;
-
-  return {
-    // TODO: research if this omit can be removed since none packages should have been publish with this
-    // format from long time ago
-    ...omit(manifest as ManifestWithImage, [
-      "avatar",
-      "image",
-      "setupSchema",
-      "setupTarget",
-      "setupUiJson",
-    ]),
-    ...(setupWizard ? { setupWizard } : {}),
-    // ##### Is this necessary? Correct manifest: type missing
-    type: manifest.type || "service",
-  };
-}
-
-/**
  * Returns the ipfsUrl to initialize the ipfs instance
  */
 export function getIpfsUrl(): string {
@@ -113,7 +87,8 @@ export class DappnodeInstaller extends DappnodeRepository {
     pkgRelease.compose = this.addCustomDefaultsAndLabels(
       pkgRelease.compose,
       pkgRelease.manifest,
-      pkgRelease.avatarFile
+      pkgRelease.avatarFile,
+      pkgRelease.origin
     );
 
     return pkgRelease;
@@ -155,7 +130,8 @@ export class DappnodeInstaller extends DappnodeRepository {
       pkgRelease.compose = this.addCustomDefaultsAndLabels(
         pkgRelease.compose,
         pkgRelease.manifest,
-        pkgRelease.avatarFile
+        pkgRelease.avatarFile,
+        pkgRelease.origin
       );
     });
 
@@ -222,7 +198,8 @@ export class DappnodeInstaller extends DappnodeRepository {
   private addCustomDefaultsAndLabels(
     compose: Compose,
     manifest: Manifest,
-    avatarFile: DistributedFile | undefined
+    avatarFile: DistributedFile | undefined,
+    origin?: string
   ): Compose {
     const customCompose = new ComposeEditor(
       setDappnodeComposeDefaults(compose, manifest)
@@ -231,7 +208,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     const services = Object.values(customCompose.services());
     const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
     const isCore = getIsCore(manifest);
-    const metadata = parseMetadataFromManifest(manifest);
+    const metadata = this.parseMetadataFromManifest(manifest);
     for (const service of services) {
       service.setGlobalEnvs(
         manifest.globalEnvs,
@@ -295,6 +272,32 @@ export class DappnodeInstaller extends DappnodeRepository {
         .split(/[^a-zA-Z\d]/)
         .slice(-1)[0]
     );
+  }
+
+  /**
+   * Sanitize metadata from the manifest.
+   * Since metadata is not used for critical purposes, it can just
+   * be copied over
+   *
+   * @param manifest
+   */
+  private parseMetadataFromManifest(manifest: Manifest): Manifest {
+    const setupWizard = manifest.setupWizard ? manifest.setupWizard : undefined;
+
+    return {
+      // TODO: research if this omit can be removed since none packages should have been publish with this
+      // format from long time ago
+      ...omit(manifest as ManifestWithImage, [
+        "avatar",
+        "image",
+        "setupSchema",
+        "setupTarget",
+        "setupUiJson",
+      ]),
+      ...(setupWizard ? { setupWizard } : {}),
+      // ##### Is this necessary? Correct manifest: type missing
+      type: manifest.type || "service",
+    };
   }
 }
 
