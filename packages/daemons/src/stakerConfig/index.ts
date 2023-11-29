@@ -18,15 +18,16 @@ async function runStakerCacheUpdate({
   }
 }
 
-// Create a cache key for memoize based on the dnpName
-const memoizeDebounceCacheUpdateResolver = ({ dnpName }: { dnpName: string }) =>
-  dnpName;
+// Define the memoize options with a normalizer function
+const memoizeOptions = {
+  normalizer: ([{ dnpName }]: [{ dnpName: string }]) => dnpName,
+};
 
 const memoizeDebouncedCacheUpdate = memoizeDebounce(
   runStakerCacheUpdate,
-  60 * 1000 * 30,
+  60 * 1000 * 30, // 30 minutes
   { maxWait: 60 * 1000 * 30, leading: true, trailing: false },
-  memoizeDebounceCacheUpdateResolver
+  memoizeOptions // Pass the options object
 );
 
 /**
