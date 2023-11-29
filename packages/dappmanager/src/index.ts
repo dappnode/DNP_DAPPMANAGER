@@ -70,7 +70,7 @@ export const dappnodeInstaller = new DappnodeInstaller(
 );
 
 // Start daemons
-startDaemons(controller.signal);
+startDaemons(dappnodeInstaller, controller.signal);
 
 Promise.all([
   // Copy host scripts

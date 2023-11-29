@@ -1,14 +1,16 @@
 import { InstalledPackageData } from "@dappnode/common";
-import { packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setSigner({
+  dappnodeInstaller,
   web3signerDnpName,
   web3signerPkg,
   enableWeb3signer,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   web3signerDnpName: string;
   web3signerPkg: InstalledPackageData | undefined;
   enableWeb3signer?: boolean;
@@ -28,6 +30,6 @@ export async function setSigner({
   } // Web3signer not installed and enable => make sure its installed
   else if (!web3signerPkg && enableWeb3signer) {
     logs.info("Installing Web3Signer");
-    await packageInstall({ name: web3signerDnpName });
+    await packageInstall(dappnodeInstaller, { name: web3signerDnpName });
   }
 }
