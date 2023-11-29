@@ -16,7 +16,7 @@ const maxBlocksBehind = 100;
 
 /** Return the newRepos from registry not cached already scanning the chain if necessary. */
 export async function getRegistry(
-  provider: ethers.providers.Provider,
+  provider: ethers.Provider,
   registryEns: string,
   fromBlock: number
 ): Promise<DirectoryDnp[]> {
@@ -65,7 +65,7 @@ export async function getRegistry(
 }
 
 export async function getRegistryOnRange(
-  provider: ethers.providers.Provider,
+  provider: ethers.Provider,
   registryEns: string,
   _fromBlock: number,
   _toBlock: number,
@@ -81,7 +81,7 @@ export async function getRegistryOnRange(
     throw Error(`Registry ENS ${registryEns} does not exist`);
   }
 
-  const registryInterface = new ethers.utils.Interface(registryAbi);
+  const registryInterface = new ethers.Interface(registryAbi);
   const eventNewRepoTopic = getTopicFromEvent(registryInterface, eventNewRepo);
 
   const events: RegistryNewRepoEvent[] = [];
@@ -129,7 +129,10 @@ export async function getRegistryOnRange(
 
     const rangeEvents = await Promise.all(
       logsResult.result.map(async (log) => {
-        const event = registryInterface.parseLog(log);
+        const event = registryInterface.parseLog({
+          topics: [...log.topics],
+          data: log.data,
+        });
         if (!log.blockNumber) {
           throw Error(`${eventNewRepo} log has no blockNumber`);
         }
@@ -138,7 +141,7 @@ export async function getRegistryOnRange(
             `${eventNewRepo} log at ${log.blockNumber} has no txHash`
           );
         }
-        if (!event.args) {
+        if (!event?.args) {
           throw Error(
             `${eventNewRepo} event at ${log.blockNumber} has no args`
           );
@@ -147,7 +150,7 @@ export async function getRegistryOnRange(
         const block = await provider.getBlock(log.blockNumber);
         return {
           ensName: `${name}.${registryEns}`,
-          timestamp: block.timestamp,
+          timestamp: block?.timestamp,
           txHash: log.transactionHash,
         };
       })
@@ -177,24 +180,23 @@ function getRegistryCached(registryEns: string): DirectoryDnp[] {
 // Utils
 
 /** Get a topic in hex format from a given event, if either event or topic does not exist then error */
-function getTopicFromEvent(
-  iface: ethers.utils.Interface,
-  eventName: string
-): string {
-  const event = Object.values(iface.events).find(
-    (eventValue) => eventValue.name === eventName
-  );
+function getTopicFromEvent(iface: ethers.Interface, eventName: string): string {
+  const event = iface.getEvent(eventName);
   if (!event) throw Error(`Event ${eventName} not found`);
   const topic = event.name;
   if (!topic) throw Error(`Topic not found on event ${event}`);
-  return iface.getEventTopic(event);
+  return topic;
 }
 
-/** Sort packages in descendent order by timestamp (newest first) */
+/** Sort packages in descendent order by timestamp (newest first), and tthe ones without timestamp last */
 function sortPackagesByTimestamp(
   packages: RegistryNewRepoEvent[]
 ): RegistryNewRepoEvent[] {
-  return packages.sort((a, b) => b.timestamp - a.timestamp);
+  return packages.sort((a, b) => {
+    if (!a.timestamp) return 1;
+    if (!b.timestamp) return -1;
+    return b.timestamp - a.timestamp;
+  });
 }
 
 /** Creates mock data for DnpDirectory */

@@ -196,7 +196,7 @@ export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 export interface RegistryNewRepoEvent {
   txHash: string;
   ensName: string;
-  timestamp: number;
+  timestamp?: number;
 }
 
 export interface RegistryScanProgress {

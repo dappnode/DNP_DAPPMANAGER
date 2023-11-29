@@ -107,8 +107,10 @@ export function parseNodeSyncingResponse(
  * https://ethereum.github.io/beacon-APIs/#/Node/getSyncingStatus
  */
 async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
-  return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then((res) =>
-    res.json()
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/syncing")).then(
+    (res) =>
+      // TODO: do better type checking
+      res.json() as any
   );
 }
 
@@ -117,8 +119,10 @@ async function fetchNodeSyncingStatus(baseUrl: string): Promise<NodeSyncing> {
  * https://ethereum.github.io/beacon-APIs/#/Node/getPeerCount
  */
 async function fetchNodePeersCount(baseUrl: string): Promise<NodePeersCount> {
-  return await fetch(urlJoin(baseUrl, "/eth/v1/node/peer_count")).then((res) =>
-    res.json()
+  return await fetch(urlJoin(baseUrl, "/eth/v1/node/peer_count")).then(
+    (res) =>
+      // TODO: do better type checking
+      res.json() as any
   );
 }
 
