@@ -24,7 +24,7 @@ export async function packageGetData(
   }
 }
 
-function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
+export function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
   return {
     manifest: packagePickManifestData(pkgRelease.manifest),
     ...pick(pkgRelease, [

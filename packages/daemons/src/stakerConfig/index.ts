@@ -1,12 +1,14 @@
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { dappnodeInstaller, packagePickItemData } from "@dappnode/installer";
+import { DappnodeInstaller, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
 
 async function runStakerCacheUpdate({
+  dappnodeInstaller,
   dnpName,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
 }): Promise<void> {
   try {
@@ -34,8 +36,8 @@ const memoizeDebouncedCacheUpdate = memoizeDebounce(
  * StakerConfig daemon.
  * Makes sure the staker config cache is executed maximum 1 per 30 mins
  */
-export function startStakerDaemon(): void {
+export function startStakerDaemon(dappnodeInstaller: DappnodeInstaller): void {
   eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
-    memoizeDebouncedCacheUpdate({ dnpName });
+    memoizeDebouncedCacheUpdate({ dappnodeInstaller, dnpName });
   });
 }

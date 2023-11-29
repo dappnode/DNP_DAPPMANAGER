@@ -7,7 +7,7 @@ import {
 } from "@dappnode/common";
 import * as db from "@dappnode/db";
 import { listPackages } from "@dappnode/dockerapi";
-import { dappnodeInstaller, packageGetData } from "@dappnode/installer";
+import {  DappnodeInstaller, packageGetData } from "@dappnode/installer";
 import {
   getIsInstalled,
   getIsRunning,
@@ -16,7 +16,9 @@ import {
 } from "@dappnode/utils";
 import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.js";
 
-export async function getOptimismConfig(): Promise<OptimismConfigGet> {
+export async function getOptimismConfig(
+  dappnodeInstaller: DappnodeInstaller
+): Promise<OptimismConfigGet> {
   try {
     const currentOptimismExecutionClient = db.opExecutionClient.get();
     const enableHistorical = db.opEnableHistoricalRpc.get();
@@ -29,7 +31,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(execClient);
 
-            const pkgData = await packageGetData(execClient);
+            const pkgData = await packageGetData(dappnodeInstaller, execClient);
 
             return {
               status: "ok",
@@ -58,7 +60,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismNode);
 
-            const pkgData = await packageGetData(optimismNode);
+            const pkgData = await packageGetData(dappnodeInstaller, optimismNode);
             const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -89,7 +91,7 @@ export async function getOptimismConfig(): Promise<OptimismConfigGet> {
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismL2Geth);
 
-            const pkgData = await packageGetData(optimismL2Geth);
+            const pkgData = await packageGetData(dappnodeInstaller, optimismL2Geth);
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",

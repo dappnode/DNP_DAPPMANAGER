@@ -2,7 +2,7 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import { dappnodeInstaller } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
@@ -13,10 +13,12 @@ import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
 export async function sendUpdatePackageNotificationMaybe({
+  dappnodeInstaller,
   dnpName,
   currentVersion,
   newVersion,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
   currentVersion: string;
   newVersion: string;

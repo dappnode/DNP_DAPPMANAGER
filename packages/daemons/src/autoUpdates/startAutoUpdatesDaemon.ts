@@ -1,6 +1,6 @@
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { getEthUrl } from "@dappnode/installer";
+import { DappnodeInstaller, getEthUrl } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
@@ -16,7 +16,9 @@ import { clearRegistry } from "./clearRegistry.js";
  * All code is sequential, to not perform more than one update at once.
  * One of the update might be the core and crash the other updates.
  */
-async function checkAutoUpdates(): Promise<void> {
+async function checkAutoUpdates(
+  dappnodeInstaller: DappnodeInstaller
+): Promise<void> {
   try {
     // Make sure the eth client provider is available before checking each package
     // Do it once and return for expected errors to reduce cluttering
@@ -28,13 +30,13 @@ async function checkAutoUpdates(): Promise<void> {
     }
 
     try {
-      await checkNewPackagesVersion();
+      await checkNewPackagesVersion(dappnodeInstaller);
     } catch (e) {
       logs.error("Error on updateMyPackages", e);
     }
 
     try {
-      await checkSystemPackagesVersion();
+      await checkSystemPackagesVersion(dappnodeInstaller);
     } catch (e) {
       logs.error("Error on updateSystemPackages", e);
     }
@@ -57,7 +59,10 @@ async function checkForCompletedCoreUpdates(): Promise<void> {
 /**
  * Auto updates daemon, run at most every interval
  */
-export function startAutoUpdatesDaemon(signal: AbortSignal): void {
+export function startAutoUpdatesDaemon(
+  dappnodeInstaller: DappnodeInstaller,
+  signal: AbortSignal
+): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
     for (const dnpName of dnpNames) {
       if (removed) clearPendingUpdates(dnpName);
@@ -69,5 +74,9 @@ export function startAutoUpdatesDaemon(signal: AbortSignal): void {
     logs.error("Error on checkForCompletedCoreUpdates", e);
   });
 
-  runAtMostEvery(checkAutoUpdates, params.AUTO_UPDATE_DAEMON_INTERVAL, signal);
+  runAtMostEvery(
+    () => checkAutoUpdates(dappnodeInstaller),
+    params.AUTO_UPDATE_DAEMON_INTERVAL,
+    signal
+  );
 }

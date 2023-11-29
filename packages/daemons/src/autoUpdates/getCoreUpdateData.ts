@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { CoreUpdateData, PackageRelease } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
 import { getCoreVersionId, computeSemverUpdateType } from "@dappnode/utils";
-import { ErrorDappGetDowngrade, dappnodeInstaller } from "@dappnode/installer";
+import { DappnodeInstaller, ErrorDappGetDowngrade } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 
 const coreName = params.coreDnpName;
@@ -13,6 +13,7 @@ const defaultVersion = "*";
  * Fetches the core update data, if available
  */
 export async function getCoreUpdateData(
+  dappnodeInstaller: DappnodeInstaller,
   coreVersion: string = defaultVersion
 ): Promise<CoreUpdateData> {
   /**

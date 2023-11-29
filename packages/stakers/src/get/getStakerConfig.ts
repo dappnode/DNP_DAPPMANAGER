@@ -16,9 +16,9 @@ import {
 } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
 import {
-  dappnodeInstaller,
   packageGetData,
   packageGet,
+  DappnodeInstaller,
 } from "@dappnode/installer";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../index.js";
@@ -35,6 +35,7 @@ import { getStakerConfigByNetwork } from "../index.js";
  * @param network
  */
 export async function getStakerConfig<T extends Network>(
+  dappnodeInstaller: DappnodeInstaller,
   network: Network
 ): Promise<StakerConfigGet<T>> {
   try {
@@ -56,7 +57,7 @@ export async function getStakerConfig<T extends Network>(
             // make sure repo exists
             await dappnodeInstaller.getRepoContract(execClient);
 
-            const pkgData = await packageGetData(execClient);
+            const pkgData = await packageGetData(dappnodeInstaller, execClient);
 
             return {
               status: "ok",
@@ -82,7 +83,7 @@ export async function getStakerConfig<T extends Network>(
           try {
             // make sure repo exists
             await dappnodeInstaller.getRepoContract(consClient);
-            const pkgData = await packageGetData(consClient);
+            const pkgData = await packageGetData(dappnodeInstaller, consClient);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             let useCheckpointSync = false;
             if (isInstalled) {
@@ -121,7 +122,7 @@ export async function getStakerConfig<T extends Network>(
           try {
             // make sure repo exists
             await dappnodeInstaller.getRepoContract(signer);
-            const pkgData = await packageGetData(signer);
+            const pkgData = await packageGetData(dappnodeInstaller, signer);
             const signerIsRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -147,7 +148,7 @@ export async function getStakerConfig<T extends Network>(
           try {
             // make sure repo exists
             await dappnodeInstaller.getRepoContract(mevBoost);
-            const pkgData = await packageGetData(mevBoost);
+            const pkgData = await packageGetData(dappnodeInstaller, mevBoost);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             const relays: string[] = [];
             if (isInstalled) {

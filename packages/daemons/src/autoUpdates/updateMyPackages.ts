@@ -2,7 +2,7 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
-import { dappnodeInstaller, packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { sendUpdatePackageNotificationMaybe } from "./sendUpdateNotification.js";
 import { computeSemverUpdateType } from "@dappnode/utils";
@@ -17,7 +17,9 @@ import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
  * - Send notification once per package and version
  * - Auto-update the package if allowed
  */
-export async function checkNewPackagesVersion(): Promise<void> {
+export async function checkNewPackagesVersion(
+  dappnodeInstaller: DappnodeInstaller
+): Promise<void> {
   const dnps = await listPackages();
 
   for (const { dnpName, version: currentVersion } of dnps) {
@@ -55,9 +57,12 @@ export async function checkNewPackagesVersion(): Promise<void> {
       const updateData = { dnpName, currentVersion, newVersion };
 
       // Will try to resolve the IPFS release content, so await it to ensure it resolves
-      await sendUpdatePackageNotificationMaybe(updateData);
+      await sendUpdatePackageNotificationMaybe({
+        dappnodeInstaller,
+        ...updateData,
+      });
 
-      await autoUpdatePackageMaybe(updateData);
+      await autoUpdatePackageMaybe({ dappnodeInstaller, ...updateData });
     } catch (e) {
       logs.error(`Error checking ${dnpName} version`, e);
     }
@@ -71,10 +76,12 @@ export async function checkNewPackagesVersion(): Promise<void> {
  * - The update delay is completed
  */
 async function autoUpdatePackageMaybe({
+  dappnodeInstaller,
   dnpName,
   currentVersion,
   newVersion,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
   currentVersion: string;
   newVersion: string;
@@ -94,7 +101,10 @@ async function autoUpdatePackageMaybe({
   logs.info(`Auto-updating ${dnpName} to ${newVersion}...`);
 
   try {
-    await packageInstall({ name: dnpName, version: newVersion });
+    await packageInstall(dappnodeInstaller, {
+      name: dnpName,
+      version: newVersion,
+    });
 
     flagCompletedUpdate(dnpName, newVersion);
     logs.info(`Successfully auto-updated system packages`);
