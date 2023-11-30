@@ -3,6 +3,7 @@ import { safeSemver } from "../../../src/dappGet/utils/safeSemver.js";
 import { PackageRequest, Dependencies } from "@dappnode/common";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 import { DappGetState, DappGetDnps } from "../../../src/dappGet/types.js";
+import { DappnodeInstaller } from "../../../src/dappnodeInstaller.js";
 
 export interface DappgetTestCase {
   // Data for test
@@ -44,7 +45,11 @@ export class DappGetFetcherMock extends DappGetFetcher {
     return dnp;
   }
 
-  async dependencies(name: string, version: string): Promise<Dependencies> {
+  async dependencies(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    version: string
+  ): Promise<Dependencies> {
     const dnp = this.getDnp(name);
     const dependencies = dnp[version];
     if (!dependencies)
@@ -52,7 +57,11 @@ export class DappGetFetcherMock extends DappGetFetcher {
     return dependencies;
   }
 
-  async versions(name: string, versionRange: string): Promise<string[]> {
+  async versions(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    versionRange: string
+  ): Promise<string[]> {
     const dnp = this.getDnp(name);
     const allVersions = Object.keys(dnp);
     const validVersions = allVersions.filter((version) =>
