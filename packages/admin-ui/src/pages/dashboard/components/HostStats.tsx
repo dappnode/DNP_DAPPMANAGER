@@ -14,11 +14,12 @@ function parseVariant(value: number) {
 const StatsCardContainer: React.FunctionComponent<{
   children: React.ReactNode;
   title: string;
+  usage?: boolean;
 }> = ({ children, title }) => {
   return (
     <Card className="stats-card">
       <div className="header">
-        <span className="id">{title}</span> <span className="usage">usage</span>
+        <span className="id">{title}</span>
       </div>
       {children}
     </Card>
@@ -52,6 +53,7 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
+  const hostUptime = useApi.getHostUptime();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -62,7 +64,16 @@ export function HostStats() {
     return () => {
       clearInterval(interval);
     };
-  }, [cpuStats, diskStats, memoryStats]);
+  }, [cpuStats, diskStats, memoryStats, hostUptime]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      hostUptime.revalidate();
+    }, 60 * 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [hostUptime]);
 
   return (
     <div className="dashboard-cards">
@@ -105,6 +116,16 @@ export function HostStats() {
           />
         ) : diskStats.error ? (
           <StatsCardError error={diskStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"uptime"}>
+        {hostUptime.data ? (
+          hostUptime.data
+        ) : hostUptime.error ? (
+          <StatsCardError error={hostUptime.error} />
         ) : (
           <StatsCardLoading />
         )}
