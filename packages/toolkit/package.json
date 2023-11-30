@@ -7,7 +7,7 @@
   "scripts": {
     "tag-and-publish": "yarn version patch && git push --follow-tags",
     "clean": "rimraf dist",
-    "build": "yarn run clean && yarn run truffle:compile:v0.4 && yarn run truffle:compile:v0.5 && tsc",
+    "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "typechain": "typechain --node16-modules --target ethers-v6 --out-dir ./src/typechain './truffle/contracts_build/contracts*/*.json' && node fixTypesImports.js",
