@@ -1,5 +1,5 @@
 import "mocha";
-import { CID } from "ipfs-http-client";
+import { CID } from "kubo-rpc-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
 import {
