@@ -374,7 +374,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   optimismConfigSet: async () => {},
   updateUpgrade: async () => "Successfully updated",
-  setStaticLocalIp: async () => {}
+  setStaticLocalIp: async () => {},
+  getLocalIpAddress: async () => "192.168.1.60"
 };
 
 export const calls: Routes = {
