@@ -1,8 +1,7 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { ipfs } from "@dappnode/ipfs";
-import { dappnodeInstaller } from "@dappnode/installer";
+import { dappnodeInstaller } from "../testUtils.js";
 import { getContainerName, getImageTag } from "@dappnode/utils";
 import { ReleaseSignatureStatusCode, Manifest } from "@dappnode/common";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
@@ -22,7 +21,7 @@ describe("Sign release", () => {
       version,
       description: "Main DNP",
       type: "service",
-      license: "GPL-3.0"
+      license: "GPL-3.0",
     };
 
     const composeMain = new ComposeEditor({
@@ -32,32 +31,32 @@ describe("Sign release", () => {
           container_name: getContainerName({
             dnpName: dnpName,
             serviceName: dnpName,
-            isCore: false
+            isCore: false,
           }),
           image: getImageTag({
             dnpName: dnpName,
             serviceName: dnpName,
-            version
-          })
-        }
-      }
+            version,
+          }),
+        },
+      },
     });
 
     // Create release
     const dnpReleaseHash = await uploadDirectoryRelease({
       manifest: mainDnpManifest,
-      compose: composeMain.output()
+      compose: composeMain.output(),
     });
 
     const wallet = new ethers.Wallet(privateKey);
-    const newReleaseHash = await signRelease(wallet, ipfs, dnpReleaseHash);
+    const newReleaseHash = await signRelease(wallet, dnpReleaseHash);
 
     const mainRelease = await dappnodeInstaller.getRelease(newReleaseHash);
 
     const expectedSignatureStatus: typeof mainRelease.signatureStatus = {
       status: ReleaseSignatureStatusCode.signedByUnknownKey,
       signatureProtocol: "ECDSA_256",
-      key: wallet.address
+      key: wallet.address,
     };
     expect(mainRelease.signatureStatus).to.deep.equal(expectedSignatureStatus);
   });

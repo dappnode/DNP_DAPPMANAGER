@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { ethers } from "ethers";
 import { mapValues } from "lodash-es";
-import { ipfs } from "@dappnode/ipfs";
 import { shell } from "@dappnode/utils";
 import { yamlDump } from "@dappnode/utils";
 import { getContainerName, getImageTag } from "@dappnode/utils";
@@ -10,10 +9,15 @@ import {
   Manifest,
   Compose,
   SetupWizard,
-  ComposeService
+  ComposeService,
 } from "@dappnode/common";
-import { testDir, manifestFileName, composeFileName } from "../../testUtils.js";
-import { ipfsAddAll } from "../testIpfsUtils.js";
+import {
+  testDir,
+  manifestFileName,
+  composeFileName,
+  ipfs,
+} from "../../testUtils.js";
+import { ipfsAddAll } from "../../testUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";
 import { saveMockAvatarTo } from "./mockAvatar.js";
 import { signRelease } from "./signRelease.js";
@@ -40,7 +44,7 @@ export async function uploadDirectoryRelease({
   compose,
   setupWizard,
   disclaimer,
-  signReleaseWithPrivKey
+  signReleaseWithPrivKey,
 }: {
   manifest: Manifest;
   compose: ComposeUncomplete;
@@ -76,15 +80,18 @@ export async function uploadDirectoryRelease({
   const rootHash = addResults[addResults.length - 2].cid.toString();
 
   // Verify the uploaded files
-  const files = await ipfs.list(rootHash);
-  const fileNames = files.map(file => file.name);
+  const asyncIterable = ipfs.ls(rootHash);
+  const filesNames: string[] = [];
+  for await (const file of asyncIterable) {
+    filesNames.push(file.name);
+  }
   for (const fileToCheck of [manifestFileName, composeFileName])
-    if (!fileNames.includes(fileToCheck))
+    if (!filesNames.includes(fileToCheck))
       throw Error(`No ${fileToCheck} uploaded`);
 
   if (signReleaseWithPrivKey) {
     const wallet = new ethers.Wallet(signReleaseWithPrivKey);
-    return await signRelease(wallet, ipfs, rootHash);
+    return await signRelease(wallet, rootHash);
   } else {
     return rootHash;
   }
@@ -106,7 +113,7 @@ export function completeCompose(
     services: mapValues(composeUncomplete.services, (service, serviceName) => ({
       container_name: getContainerName({ dnpName, serviceName, isCore }),
       image: getImageTag({ dnpName, serviceName, version }),
-      ...service
-    }))
+      ...service,
+    })),
   };
 }

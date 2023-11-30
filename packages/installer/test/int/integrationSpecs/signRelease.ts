@@ -1,16 +1,14 @@
 import { ethers } from "ethers";
-import { CID } from "ipfs-http-client";
 import { sortBy } from "lodash-es";
-import { Ipfs } from "@dappnode/ipfs";
 import { serializeIpfsDirectory } from "@dappnode/toolkit";
 import { ReleaseSignature } from "@dappnode/common";
-import { dappnodeInstaller } from "@dappnode/installer";
+import { dappnodeInstaller, ipfs } from "../../testUtils.js";
+import { CID } from "kubo-rpc-client";
 
 const signatureFilename = "signature.json";
 
 export async function signRelease(
   wallet: ethers.Wallet,
-  ipfs: Ipfs,
   dnpReleaseHash: string
 ): Promise<string> {
   const releaseFiles = await dappnodeInstaller.list(dnpReleaseHash);
@@ -24,14 +22,12 @@ export async function signRelease(
     version: 1,
     cid: cidOpts,
     signature_protocol: "ECDSA_256",
-    signature: flatSig
+    signature: flatSig,
   };
 
-  const signatureIpfsEntry = await ipfs.ipfs.add(
-    JSON.stringify(signature, null, 2)
-  );
+  const signatureIpfsEntry = await ipfs.add(JSON.stringify(signature, null, 2));
 
-  const getRes: IpfsDagGetResult<IpfsDagPbValue> = await ipfs.ipfs.dag.get(
+  const getRes: IpfsDagGetResult<IpfsDagPbValue> = await ipfs.dag.get(
     CID.parse(dnpReleaseHash)
   );
 
@@ -40,23 +36,27 @@ export async function signRelease(
   getRes.value.Links.push({
     Hash: signatureIpfsEntry.cid,
     Name: signatureFilename,
-    Tsize: signatureIpfsEntry.size
+    Tsize: signatureIpfsEntry.size,
   });
 
   // DAG-PB form (links must be sorted by Name bytes)
   getRes.value.Links = sortBy(getRes.value.Links, ["Name", "Tsize"]);
 
-  const newReleaseCid = await ipfs.ipfs.dag.put(getRes.value, {
+  const newReleaseCid = await ipfs.dag.put(getRes.value, {
     storeCodec: "dag-pb",
-    hashAlg: "sha2-256"
+    hashAlg: "sha2-256",
   });
 
   // Validate that the new release hash contains all previous files + signature
-  const newReleaseFiles = await ipfs.list(newReleaseCid.toString());
-  const filesNamesStr = serializeDir(newReleaseFiles.map(file => file.name));
+  const newReleaseFiles = ipfs.ls(newReleaseCid.toString());
+  const dirFilesNames: string[] = [];
+  for await (const file of newReleaseFiles) {
+    dirFilesNames.push(file.name);
+  }
+  const filesNamesStr = serializeDir(dirFilesNames);
   const expectedFns = serializeDir([
-    ...releaseFiles.map(file => file.name),
-    signatureFilename
+    ...releaseFiles.map((file) => file.name),
+    signatureFilename,
   ]);
   if (filesNamesStr !== expectedFns) {
     throw Error(

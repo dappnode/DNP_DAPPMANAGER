@@ -1,4 +1,4 @@
-import { dappnodeInstaller } from "@dappnode/installer";
+import { dappnodeInstaller } from "../testUtils.js";
 import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils.js";
 
 export const mochaHooks = {
