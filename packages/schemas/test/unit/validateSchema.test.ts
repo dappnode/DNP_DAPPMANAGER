@@ -88,7 +88,7 @@ describe("schemaValidation", () => {
 
   describe("compose", () => {
     before(() => {
-      cleanTestDir();
+      //cleanTestDir();
       fs.mkdirSync(testDir, { recursive: true });
     });
     it("should validate a valid compose", async () => {
