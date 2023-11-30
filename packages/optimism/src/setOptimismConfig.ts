@@ -14,7 +14,11 @@ import {
   dockerContainerStop,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
-import { packageSetEnvironment, packageInstall } from "@dappnode/installer";
+import {
+  packageSetEnvironment,
+  packageInstall,
+  DappnodeInstaller,
+} from "@dappnode/installer";
 import {
   opNodeServiceName,
   opNodeRpcUrlEnvName,
@@ -23,11 +27,10 @@ import {
   opClientToServiceMap,
 } from "./params.js";
 
-export async function setOptimismConfig({
-  archive,
-  executionClient,
-  rollup,
-}: OptimismConfigSet): Promise<void> {
+export async function setOptimismConfig(
+  dappnodeInstaller: DappnodeInstaller,
+  { archive, executionClient, rollup }: OptimismConfigSet
+): Promise<void> {
   // l2geth;
   const l2gethPackage = await listPackageNoThrow({
     dnpName: optimismL2Geth,
@@ -36,7 +39,7 @@ export async function setOptimismConfig({
   if (archive) {
     // Install l2geth
     if (!l2gethPackage) {
-      await packageInstall({ name: optimismL2Geth });
+      await packageInstall(dappnodeInstaller, { name: optimismL2Geth });
     } else {
       await startAllContainers(l2gethPackage);
     }
@@ -65,7 +68,7 @@ export async function setOptimismConfig({
 
     if (!targetOpExecutionClientPackage) {
       // make sure target package is installed
-      await packageInstall({
+      await packageInstall(dappnodeInstaller, {
         name: executionClient.dnpName,
         userSettings: { [executionClient.dnpName]: userSettings },
       });
@@ -101,7 +104,7 @@ export async function setOptimismConfig({
         },
       };
       // make sure op-node is installed
-      await packageInstall({
+      await packageInstall(dappnodeInstaller, {
         name: optimismNode,
         userSettings: { [optimismNode]: userSettings },
       });

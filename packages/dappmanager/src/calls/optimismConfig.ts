@@ -1,5 +1,6 @@
 import { OptimismConfigGet, OptimismConfigSet } from "@dappnode/common";
 import { getOptimismConfig, setOptimismConfig } from "@dappnode/optimism";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Enables Optimism with the given configuration:
@@ -19,7 +20,7 @@ export async function optimismConfigSet({
   executionClient,
   rollup
 }: OptimismConfigSet): Promise<void> {
-  await setOptimismConfig({
+  await setOptimismConfig(dappnodeInstaller, {
     archive,
     executionClient,
     rollup
@@ -30,5 +31,5 @@ export async function optimismConfigSet({
  * Returns the current Optimism configuration
  */
 export async function optimismConfigGet(): Promise<OptimismConfigGet> {
-  return await getOptimismConfig();
+  return await getOptimismConfig(dappnodeInstaller);
 }

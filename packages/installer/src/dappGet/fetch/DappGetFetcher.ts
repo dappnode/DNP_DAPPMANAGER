@@ -1,21 +1,19 @@
 import { Dependencies } from "@dappnode/common";
 import { validRange, satisfies, valid } from "semver";
-import { ReleaseFetcher } from "../../release/index.js";
+import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
 export class DappGetFetcher {
-  private releaseFetcher: ReleaseFetcher;
-
-  constructor() {
-    this.releaseFetcher = new ReleaseFetcher();
-  }
-
   /**
    * Fetches the dependencies of a given DNP name and version
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
-  async dependencies(name: string, version: string): Promise<Dependencies> {
-    const manifest = await this.releaseFetcher.getManifest(name, version);
+  async dependencies(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    version: string
+  ): Promise<Dependencies> {
+    const manifest = await dappnodeInstaller.getManifestFromDir(name, version);
     return manifest.dependencies || {};
   }
 
@@ -32,21 +30,28 @@ export class DappGetFetcher {
    * }
    * @returns set of versions
    */
-  async versions(name: string, versionRange: string): Promise<string[]> {
+  async versions(
+    dappnodeInstaller: DappnodeInstaller,
+    name: string,
+    versionRange: string
+  ): Promise<string[]> {
     if (validRange(versionRange)) {
       if (versionRange === "*") {
         // ##### TODO: Case 0. Force "*" to strictly fetch the last version only
         // If "*" is interpreted as any version, many old manifests are not well
         // hosted and delay the resolution too much because all old versions have
         // to timeout in order to proceed
-        const latestVersion = await this.releaseFetcher.fetchVersion(name);
-        return [latestVersion.version];
+        const { version: latestVersion } =
+          await dappnodeInstaller.getVersionAndIpfsHash({
+            dnpNameOrHash: name,
+          });
+        return [latestVersion];
       } else if (valid(versionRange)) {
         // Case 1. Valid semver version (not range): Return that version
         return [versionRange];
       } else {
         // Case 1. Valid semver range: Fetch the valid versions from APM
-        const requestedVersions = await this.releaseFetcher.fetchApmVersionsState(
+        const requestedVersions = await dappnodeInstaller.fetchApmVersionsState(
           name
         );
         return Object.values(requestedVersions)

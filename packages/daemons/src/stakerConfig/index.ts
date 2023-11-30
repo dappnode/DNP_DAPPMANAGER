@@ -1,17 +1,18 @@
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { ReleaseFetcher, packagePickItemData } from "@dappnode/installer";
+import { DappnodeInstaller, packagePickItemData } from "@dappnode/installer";
 import { memoizeDebounce } from "@dappnode/utils";
 
 async function runStakerCacheUpdate({
-  dnpName
+  dappnodeInstaller,
+  dnpName,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
 }): Promise<void> {
   try {
-    const releaseFetcher = new ReleaseFetcher();
-    const repository = await releaseFetcher.getRelease(dnpName);
+    const repository = await dappnodeInstaller.getRelease(dnpName);
     const dataDnp = packagePickItemData(repository);
     db.pkgItemMetadata.set(dnpName, dataDnp);
   } catch (e) {
@@ -19,23 +20,24 @@ async function runStakerCacheUpdate({
   }
 }
 
-// Create a cache key for memoize based on the dnpName
-const memoizeDebounceCacheUpdateResolver = ({ dnpName }: { dnpName: string }) =>
-  dnpName;
+// Define the memoize options with a normalizer function
+const memoizeOptions = {
+  normalizer: ([{ dnpName }]: [{ dnpName: string }]) => dnpName,
+};
 
 const memoizeDebouncedCacheUpdate = memoizeDebounce(
   runStakerCacheUpdate,
-  60 * 1000 * 30,
+  60 * 1000 * 30, // 30 minutes
   { maxWait: 60 * 1000 * 30, leading: true, trailing: false },
-  memoizeDebounceCacheUpdateResolver
+  memoizeOptions // Pass the options object
 );
 
 /**
  * StakerConfig daemon.
  * Makes sure the staker config cache is executed maximum 1 per 30 mins
  */
-export function startStakerDaemon(): void {
+export function startStakerDaemon(dappnodeInstaller: DappnodeInstaller): void {
   eventBus.runStakerCacheUpdate.on(({ dnpName }) => {
-    memoizeDebouncedCacheUpdate({ dnpName });
+    memoizeDebouncedCacheUpdate({ dappnodeInstaller, dnpName });
   });
 }

@@ -4,6 +4,10 @@
     /* Modules */
     "types": ["node"],
 
+    /* Required for JSON schemas */
+    "module": "ESNext",
+    "moduleResolution": "node",
+
     /* Emit */
     "outDir": "dist",
     "sourceMap": true,

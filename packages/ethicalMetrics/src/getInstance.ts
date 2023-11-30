@@ -4,13 +4,17 @@ import fetch from "node-fetch";
 
 export async function getInstance(): Promise<string> {
   return (
-    await (
-      await fetch(url.resolve(ethicalMetricsEndpoint, "/instance"), {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-    ).json()
-  ).instance;
+    (
+      (await (
+        await fetch(url.resolve(ethicalMetricsEndpoint, "/instance"), {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        })
+      )
+        // TODO: do better type checking
+        .json()) as any
+    ).instance
+  );
 }

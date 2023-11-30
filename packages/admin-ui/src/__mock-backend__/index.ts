@@ -277,7 +277,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           },
           warnings: {},
           signedSafe: true,
-          metadata: {
+          manifest: {
             name: "geth.dnp.dappnode.eth",
             description: "Go implementation of ethereum. Execution client",
             shortDescription: "Go implementation of ethereum",
@@ -305,7 +305,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           },
           warnings: {},
           signedSafe: true,
-          metadata: {
+          manifest: {
             name: "geth.dnp.dappnode.eth",
             description: "Go implementation of ethereum. Execution client",
             shortDescription: "Go implementation of ethereum",
@@ -334,7 +334,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         warnings: {},
         signedSafe: true,
-        metadata: {
+        manifest: {
           name: "geth.dnp.dappnode.eth",
           description: "Go implementation of ethereum. Execution client",
           shortDescription: "Go implementation of ethereum",
@@ -362,7 +362,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         warnings: {},
         signedSafe: true,
-        metadata: {
+        manifest: {
           name: "geth.dnp.dappnode.eth",
           description: "Go implementation of ethereum. Execution client",
           shortDescription: "Go implementation of ethereum",

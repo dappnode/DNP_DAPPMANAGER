@@ -12,6 +12,7 @@ import { fileURLToPath } from "url";
 // Imports for types
 import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
 import aggregateType from "../../../src/dappGet/aggregate/index.js";
+import { dappnodeInstaller } from "../../testUtils.js";
 
 /* eslint-disable no-console */
 
@@ -85,8 +86,8 @@ describe.skip("dappGet integration test", async () => {
               .toBeUsed();
           }
         );
-        const aggregateImport = await rewiremock.around(() =>
-          import("../../../src/dappGet/aggregate/index.js")
+        const aggregateImport = await rewiremock.around(
+          () => import("../../../src/dappGet/aggregate/index.js")
         );
         dappGet = dappGetImport.dappGet;
         aggregate = aggregateImport.default;
@@ -94,6 +95,7 @@ describe.skip("dappGet integration test", async () => {
 
       it("Agreggate dnps for the integration test", async () => {
         const dnps = await aggregate({
+          dappnodeInstaller,
           req: caseData.req,
           dnpList,
           dappGetFetcher,
@@ -110,7 +112,12 @@ describe.skip("dappGet integration test", async () => {
       });
 
       it("Should return the expect result", async () => {
-        const result = await dappGet(caseData.req, {}, dappGetFetcher);
+        const result = await dappGet(
+          dappnodeInstaller,
+          caseData.req,
+          {},
+          dappGetFetcher
+        );
         const { state, alreadyUpdated } = result;
         logBig("  DNPs result", JSON.stringify(result, null, 2));
 

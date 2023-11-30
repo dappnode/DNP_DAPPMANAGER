@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
 import aggregateDependencies from "../../../../src/dappGet/aggregate/aggregateDependencies.js";
+import { dappnodeInstaller } from "../../../testUtils.js";
 
 /**
  * Purpose of the test. Make sure it is able recursively fetch a DNP's dependencies
@@ -47,6 +48,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
     const versionRange = "0.1.0";
     const dnps = {};
     await aggregateDependencies({
+      dappnodeInstaller,
       name: dnpName,
       versionRange,
       dnps,
@@ -87,6 +89,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
     const versionRange = "0.1.0";
     const dnps = {};
     await aggregateDependencies({
+      dappnodeInstaller,
       name: dnpName,
       versionRange,
       dnps,

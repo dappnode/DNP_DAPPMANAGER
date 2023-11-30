@@ -1,9 +1,10 @@
 import path from "path";
 import { calls } from "../src/__mock-backend__";
-import { startDappmanager } from "@dappnode/dappmanager/src/startDappmanager";
+import { startHttpApi } from "@dappnode/dappmanager/src/api/startHttpApi";
 import { LoggerMiddleware } from "@dappnode/common";
-import { MockVpnApiClient } from "./mockVpnClient";
 import { eventBus } from "./eventBus";
+import { AdminPasswordDb } from "@dappnode/dappmanager/src/api/auth/adminPasswordDb";
+import { DeviceCalls } from "@dappnode/dappmanager/src/calls/device/index.js";
 
 const testFileDir = "test_files";
 
@@ -32,7 +33,7 @@ const subscriptionsLogger: LoggerMiddleware = {
   onError: (route, error) => console.log("Subscription error", route, error)
 };
 
-startDappmanager({
+const adminPasswordDb = startHttpApi({
   params,
   logs: {
     debug: console.log,
@@ -69,5 +70,5 @@ startDappmanager({
   subscriptionsLogger,
   eventBus,
   isNewDappmanagerVersion: () => false,
-  vpnApiClient: new MockVpnApiClient()
+  adminPasswordDb: new AdminPasswordDb(params)
 });

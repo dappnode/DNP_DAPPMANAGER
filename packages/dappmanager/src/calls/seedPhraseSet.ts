@@ -3,7 +3,7 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import fs from "fs";
-import { utils as ethersUtils } from "ethers";
+import { ethers } from "ethers";
 
 const adminPublicKey = params.ADMIN_NACL_PUBLIC_KEY;
 
@@ -54,7 +54,7 @@ export function seedToPrivateKey(seedPhrase: string): EthereumKeys {
     throw Error("seed phrase must contain exactly 12 words");
   const correctedSeedPhrase = seedPhraseArray.join(" ");
 
-  const masterNode = ethersUtils.HDNode.fromMnemonic(correctedSeedPhrase);
+  const masterNode = ethers.utils.HDNode.fromMnemonic(correctedSeedPhrase);
   const { privateKey, publicKey, address } = masterNode.derivePath(
     standardEthereumDerivationPath
   );

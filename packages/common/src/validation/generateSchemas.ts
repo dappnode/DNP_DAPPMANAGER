@@ -35,6 +35,7 @@ for (const typeName of typesToSchema) {
   console.log(`Generating .schema.json of ${typeName}`);
   const schema = TJS.generateSchema(program, typeName, {
     required: true,
+    esModuleInterop: true,
   });
   if (!schema) throw Error(`Error generating ${typeName} schema`);
 

@@ -4,6 +4,7 @@ export * from "./subscriptions.js";
 export * from "./transport/jsonRpc/index.js";
 export * from "./transport/socketIo/index.js";
 export * from "./errors.js";
+export * from "./releaseFiles/index.js";
 export { dockerComposeSafeKeys } from "./dockerComposeSafeKeys.js";
 
 // Schemas

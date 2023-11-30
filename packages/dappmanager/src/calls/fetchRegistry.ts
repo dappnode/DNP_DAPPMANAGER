@@ -1,9 +1,4 @@
-import {
-  getEthersProvider,
-  ReleaseFetcher,
-  NoImageForArchError,
-  getRegistry
-} from "@dappnode/installer";
+import { getEthersProvider, getRegistry } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 import { throttle } from "lodash-es";
@@ -20,6 +15,7 @@ import {
 } from "./fetchDirectory.js";
 import * as db from "@dappnode/db";
 import { DirectoryDnp } from "@dappnode/toolkit";
+import { dappnodeInstaller } from "../index.js";
 
 const defaultEnsName = "public.dappnode.eth";
 const minDeployBlock = 6312046;
@@ -75,7 +71,6 @@ export async function fetchRegistry({
 async function fetchRegistryIpfsData(
   registry: DirectoryDnp[]
 ): Promise<DirectoryItem[]> {
-  const releaseFetcher = new ReleaseFetcher();
   const dnpList = await listPackages();
 
   const registryPublicDnps: DirectoryItem[] = [];
@@ -103,30 +98,26 @@ async function fetchRegistryIpfsData(
       };
       try {
         // Now resolve the last version of the package
-        const release = await releaseFetcher.getRelease(name);
-        const { metadata, avatarFile } = release;
+        const release = await dappnodeInstaller.getRelease(name);
+        const { manifest, avatarFile } = release;
 
         pushRegistryItem({
           ...registryItemBasic,
           status: "ok",
-          description: getShortDescription(metadata),
+          description: getShortDescription(manifest),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, dnpList),
           isUpdated: getIsUpdated(release, dnpList),
-          featuredStyle: metadata.style,
-          categories: metadata.categories || getFallBackCategories(name) || []
+          featuredStyle: manifest.style,
+          categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        if (e instanceof NoImageForArchError) {
-          logs.debug(`Package ${name} is not available in current arch`);
-        } else {
-          logs.error(`Error fetching ${name} release`, e);
-          pushRegistryItem({
-            ...registryItemBasic,
-            status: "error",
-            message: e.message
-          });
-        }
+        logs.error(`Error fetching ${name} release`, e);
+        pushRegistryItem({
+          ...registryItemBasic,
+          status: "error",
+          message: e.message
+        });
       }
     })
   );

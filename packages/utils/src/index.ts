@@ -53,3 +53,6 @@ export { shouldUpdate } from "./shouldUpdate.js";
 export { getPublicIpFromUrls } from "./getPublicIpFromUrls.js";
 export { computeSemverUpdateType } from "./computeSemverUpdateType.js";
 export * from "./coreVersionId.js";
+export { isEnsDomain } from "./isEnsDomain.js";
+export { writeManifest } from "./writeManifest.js";
+export { readManifestIfExists } from "./readManifestIfExists.js";

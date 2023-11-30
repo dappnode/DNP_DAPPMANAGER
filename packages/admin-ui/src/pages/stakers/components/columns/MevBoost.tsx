@@ -96,7 +96,7 @@ export default function MevBoost<T extends Network>({
         <div className="description">
           {isSelected &&
             mevBoost.data &&
-            mevBoost.data.metadata.shortDescription}
+            mevBoost.data.manifest.shortDescription}
         </div>
       )}
     </Card>

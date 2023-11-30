@@ -21,6 +21,7 @@ import {
   isConsClient,
   serializeError,
   packageInstall,
+  DappnodeInstaller,
 } from "@dappnode/installer";
 import {
   dockerComposeUpPackage,
@@ -40,6 +41,7 @@ import {
  * It also retries each step automatically without added logic
  */
 export async function runEthClientInstaller(
+  dappnodeInstaller: DappnodeInstaller,
   target: ExecutionClientMainnet | ConsensusClientMainnet | "remote",
   status: EthClientInstallStatus | undefined,
   useCheckpointSync?: boolean
@@ -81,7 +83,7 @@ export async function runEthClientInstaller(
 
           try {
             if (isConsClient(target))
-              await packageInstall({
+              await packageInstall(dappnodeInstaller, {
                 name: target,
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
@@ -89,7 +91,7 @@ export async function runEthClientInstaller(
                   useCheckpointSync,
                 }),
               });
-            else await packageInstall({ name: target });
+            else await packageInstall(dappnodeInstaller, { name: target });
           } catch (e) {
             // When installing DAppNode for the first time, if the user selects a
             // non-remote target and disabled fallback, there must be a way to
@@ -99,7 +101,10 @@ export async function runEthClientInstaller(
             if (e instanceof EthProviderError) {
               const contentHash = getLocalFallbackContentHash(target);
               if (!contentHash) throw Error(`No local version for ${target}`);
-              await packageInstall({ name: target, version: contentHash });
+              await packageInstall(dappnodeInstaller, {
+                name: target,
+                version: contentHash,
+              });
             } else {
               throw e;
             }
@@ -152,7 +157,10 @@ function verifyInitialStatusIsNotInstalling(): void {
  * - after changing the client
  * - after completing a run if the status has changed
  */
-export function startEthMultiClientDaemon(signal: AbortSignal): void {
+export function startEthMultiClientDaemon(
+  dappnodeInstaller: DappnodeInstaller,
+  signal: AbortSignal
+): void {
   verifyInitialStatusIsNotInstalling();
 
   const runEthMultiClientTaskMemo = runOnlyOneSequentially(
@@ -182,6 +190,7 @@ export function startEthMultiClientDaemon(signal: AbortSignal): void {
             ? db.ethExecClientInstallStatus.get(client)
             : db.ethConsClientInstallStatus.get(client);
           const next = await runEthClientInstaller(
+            dappnodeInstaller,
             client,
             prev,
             multiClientArgs?.useCheckpointSync

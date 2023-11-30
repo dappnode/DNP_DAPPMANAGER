@@ -1,5 +1,6 @@
 import { Eth2ClientTarget } from "@dappnode/common";
 import { ethereumClient } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -24,6 +25,7 @@ export async function ethClientTargetSet({
   if (!target) throw Error(`Argument target must be defined`);
 
   await ethereumClient.changeEthClient(
+    dappnodeInstaller,
     target,
     sync,
     useCheckpointSync,

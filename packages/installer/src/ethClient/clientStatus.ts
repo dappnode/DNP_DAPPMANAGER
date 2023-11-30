@@ -135,9 +135,8 @@ export async function getMultiClientStatus(
         }
       } else {
         // DNP is not installed, figure out why
-        const installStatus = db.ethExecClientInstallStatus.get(
-          execClientDnpName
-        );
+        const installStatus =
+          db.ethExecClientInstallStatus.get(execClientDnpName);
         if (installStatus) {
           switch (installStatus.status) {
             case "TO_INSTALL":
@@ -189,11 +188,11 @@ export async function getMultiClientStatus(
 async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
   if (db.ethClientFallback.get() === "off") return true;
   // Check is synced with remote execution
-  const latestLocalBlock = await new ethers.providers.JsonRpcProvider(localUrl)
+  const latestLocalBlock = await new ethers.JsonRpcProvider(localUrl)
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
-  const latestRemoteBlock = await new ethers.providers.JsonRpcProvider(
+  const latestRemoteBlock = await new ethers.JsonRpcProvider(
     params.ETH_MAINNET_RPC_URL_REMOTE
   )
     .send("eth_blockNumber", [])
@@ -209,7 +208,7 @@ async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
  * @param url "http://geth.dappnode:8545"
  */
 async function isSyncing(url: string): Promise<boolean> {
-  const provider = new ethers.providers.JsonRpcProvider(url);
+  const provider = new ethers.JsonRpcProvider(url);
   const syncing = await provider
     .send("eth_syncing", [])
     .then(parseEthersSyncing);
@@ -236,13 +235,12 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   // Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
   const testTxData = {
     to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-    data:
-      "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023",
+    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023",
   };
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";
 
-  const provider = new ethers.providers.JsonRpcProvider(url);
+  const provider = new ethers.JsonRpcProvider(url);
 
   const res = await provider.send("eth_call", [testTxData, "latest"]);
   return res === result;
@@ -259,12 +257,14 @@ async function isSyncedWithConsensus(
   execUrl: string,
   consUrl: string
 ): Promise<boolean> {
-  const provider = new ethers.providers.JsonRpcProvider(execUrl);
+  const provider = new ethers.JsonRpcProvider(execUrl);
   const execBlockNumber = await provider.getBlockNumber();
   const execBlockHeadersResponse = await fetch(
     consUrl + "/eth/v2/beacon/blocks/head"
   );
-  const consBlockHeadersResponseParsed = await execBlockHeadersResponse.json();
+  // TODO: do better type checking
+  const consBlockHeadersResponseParsed =
+    (await execBlockHeadersResponse.json()) as any;
   const consBlockNumber =
     consBlockHeadersResponseParsed.data.message.body.execution_payload
       .block_number;

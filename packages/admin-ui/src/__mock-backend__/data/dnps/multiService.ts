@@ -12,7 +12,7 @@ const serviceNames = {
 export const multiService: MockDnp = {
   avatar: "https://icon-library.com/images/multiple-icon/multiple-icon-15.jpg",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.2.0",
     description: "Sample package with two services.",
