@@ -1,11 +1,5 @@
-import fs from "fs";
-import path from "path";
-import { create, IPFSHTTPClient } from "ipfs-http-client";
-import { AddResult } from "ipfs-core-types/src/root";
-import { sleep } from "@dappnode/utils";
-import all from "it-all";
-import { shell } from "@dappnode/utils";
-import { Manifest } from "@dappnode/common";
+import { create } from "kubo-rpc-client";
+import { sleep, shell } from "@dappnode/utils";
 
 const ipfsRemoteUrl = "https://api.ipfs.dappnode.io";
 const ipfsTestContainerName = "dappnode_ipfs_host";
@@ -19,19 +13,16 @@ export const ipfsApiUrl = `${ipfsLocalUrl}:${ipfsApiPort}`;
 
 // IPFS remote node for Integration tests
 
-export const remoteIpfsApi: IPFSHTTPClient = create({
+export const remoteIpfsApi = create({
   url: ipfsRemoteUrl,
   timeout
 });
 
 // IPFS local node for Integration tests
 
-export const localIpfsApi: IPFSHTTPClient = create({
-  url: ipfsApiUrl,
-  timeout
-});
+export const localIpfsApi = create({ url: ipfsApiUrl, timeout });
 
-export const localIpfsGateway: IPFSHTTPClient = create({
+export const localIpfsGateway = create({
   url: ipfsGatewayUrl,
   timeout
 });
@@ -88,43 +79,4 @@ async function isIpfsNodeAvailable(): Promise<boolean> {
     console.error(e);
     return false;
   }
-}
-
-// IPFS utils
-
-/**
- * Upload multiple files to a directory
- * dir is the first result: https://github.com/ipfs/js-ipfs/blob/master/docs/core-api/FILES.md#ipfsaddallsource-options
- * @param path
- * @returns
- */
-export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
-  if (!fs.existsSync(dirPath))
-    throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
-  const files = fs.readdirSync(dirPath).map(file => {
-    return {
-      path: path.join(dirPath, file),
-      content: fs.readFileSync(path.join(dirPath, file))
-    };
-  });
-  return all(localIpfsApi.addAll(files));
-}
-
-/**
- * Uploads a manifest from memory
- * This should be part of the `DAppNodeSDK`
- */
-export async function ipfsAddManifest(manifest: Manifest): Promise<string> {
-  const content = Buffer.from(JSON.stringify(manifest, null, 2), "utf8");
-  const addResult = await localIpfsApi.add(content);
-  return addResult.cid.toString();
-}
-
-/**
- * Uploads a file from the file system
- */
-export async function ipfsAddFileFromFs(path: string): Promise<AddResult> {
-  if (!fs.existsSync(path))
-    throw Error(`ipfsAddFileFromFs error. Not file found at path ${path}`);
-  return await localIpfsApi.add(fs.readFileSync(path));
 }

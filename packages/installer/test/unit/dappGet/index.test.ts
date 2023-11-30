@@ -5,7 +5,7 @@ import rewiremock from "rewiremock/webpack";
 // Import for types
 import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
 import { InstalledPackageData } from "@dappnode/common";
-import { mockDnp } from "../../testUtils.js";
+import { dappnodeInstaller, mockDnp } from "../../testUtils.js";
 import { DappGetDnps } from "../../../src/dappGet/types.js";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 
@@ -15,7 +15,7 @@ import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
 
-describe.skip("dappGet", function() {
+describe.skip("dappGet", function () {
   this.timeout(5 * 1000); // For some reason the before step can last > 2s
   const listPackagesSpy = sinon.spy();
 
@@ -91,6 +91,7 @@ describe.skip("dappGet", function() {
     const dappGetOptions = {};
     const dappGetFetcher = new DappGetFetcher();
     const { state, alreadyUpdated } = await dappGet(
+      dappnodeInstaller,
       {
         name: "nginx-proxy.dnp.dappnode.eth",
         ver: "^0.1.0",

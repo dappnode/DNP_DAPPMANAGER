@@ -74,7 +74,7 @@ export default function ExecutionClient({
         <div className="description">
           {isSelected &&
             executionClient.data &&
-            executionClient.data.metadata.shortDescription}
+            executionClient.data.manifest.shortDescription}
         </div>
       )}
     </Card>

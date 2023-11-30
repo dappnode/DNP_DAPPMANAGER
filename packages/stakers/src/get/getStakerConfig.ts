@@ -16,9 +16,9 @@ import {
 } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
 import {
-  ReleaseFetcher,
   packageGetData,
   packageGet,
+  DappnodeInstaller,
 } from "@dappnode/installer";
 import { getStakerDnpNamesByNetwork } from "./getStakerDnpNamesByNetwork.js";
 import { getStakerConfigByNetwork } from "../index.js";
@@ -35,17 +35,12 @@ import { getStakerConfigByNetwork } from "../index.js";
  * @param network
  */
 export async function getStakerConfig<T extends Network>(
+  dappnodeInstaller: DappnodeInstaller,
   network: Network
 ): Promise<StakerConfigGet<T>> {
   try {
-    const releaseFetcher = new ReleaseFetcher();
-
-    const {
-      executionClients,
-      consensusClients,
-      signer,
-      mevBoost,
-    } = getStakerDnpNamesByNetwork(network);
+    const { executionClients, consensusClients, signer, mevBoost } =
+      getStakerDnpNamesByNetwork(network);
 
     const {
       executionClient: currentExecClient,
@@ -59,10 +54,10 @@ export async function getStakerConfig<T extends Network>(
       executionClients: await Promise.all(
         executionClients.map(async (execClient) => {
           try {
-            if (!(await releaseFetcher.repoExists(execClient)))
-              throw Error(`Repository ${execClient} does not exist`);
+            // make sure repo exists
+            await dappnodeInstaller.getRepoContract(execClient);
 
-            const pkgData = await packageGetData(releaseFetcher, execClient);
+            const pkgData = await packageGetData(dappnodeInstaller, execClient);
 
             return {
               status: "ok",
@@ -86,9 +81,9 @@ export async function getStakerConfig<T extends Network>(
       consensusClients: await Promise.all(
         consensusClients.map(async (consClient) => {
           try {
-            if (!(await releaseFetcher.repoExists(consClient)))
-              throw Error(`Repository ${consClient} does not exist`);
-            const pkgData = await packageGetData(releaseFetcher, consClient);
+            // make sure repo exists
+            await dappnodeInstaller.getRepoContract(consClient);
+            const pkgData = await packageGetData(dappnodeInstaller, consClient);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             let useCheckpointSync = false;
             if (isInstalled) {
@@ -125,9 +120,9 @@ export async function getStakerConfig<T extends Network>(
       web3Signer: await new Promise<StakerItem<T, "signer">>((resolve) => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(signer)))
-              throw Error(`Repository ${signer} does not exist`);
-            const pkgData = await packageGetData(releaseFetcher, signer);
+            // make sure repo exists
+            await dappnodeInstaller.getRepoContract(signer);
+            const pkgData = await packageGetData(dappnodeInstaller, signer);
             const signerIsRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -151,9 +146,9 @@ export async function getStakerConfig<T extends Network>(
       mevBoost: await new Promise<StakerItem<T, "mev-boost">>((resolve) => {
         (async () => {
           try {
-            if (!(await releaseFetcher.repoExists(mevBoost)))
-              throw Error(`Repository ${mevBoost} does not exist`);
-            const pkgData = await packageGetData(releaseFetcher, mevBoost);
+            // make sure repo exists
+            await dappnodeInstaller.getRepoContract(mevBoost);
+            const pkgData = await packageGetData(dappnodeInstaller, mevBoost);
             const isInstalled = getIsInstalled(pkgData, dnpList);
             const relays: string[] = [];
             if (isInstalled) {

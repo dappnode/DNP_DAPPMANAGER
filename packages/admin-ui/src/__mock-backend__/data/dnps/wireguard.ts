@@ -5,7 +5,7 @@ const dnpName = "wireguard.dnp.dappnode.eth";
 export const wireguard: MockDnp = {
   avatar: "",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.1.0",
     description: "Wireguard",

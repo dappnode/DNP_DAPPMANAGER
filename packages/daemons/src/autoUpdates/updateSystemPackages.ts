@@ -1,6 +1,6 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { getCoreUpdateData } from "./getCoreUpdateData.js";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
@@ -17,20 +17,22 @@ const coreDnpName = params.coreDnpName;
  * - Send notification if this specific DNP_CORE version has not been seen
  * - Auto-update system according if DNP_CORE or any dependency is not updated
  */
-export async function checkSystemPackagesVersion(): Promise<void> {
-  const coreUpdateData = await getCoreUpdateData();
+export async function checkSystemPackagesVersion(
+  dappnodeInstaller: DappnodeInstaller
+): Promise<void> {
+  const coreUpdateData = await getCoreUpdateData(dappnodeInstaller);
 
   if (!coreUpdateData.available) return;
 
   sendUpdateSystemNotificationMaybe(coreUpdateData);
 
-  await autoUpdateSystemPackages(coreUpdateData);
+  await autoUpdateSystemPackages(dappnodeInstaller, coreUpdateData);
 }
 
-export async function autoUpdateSystemPackages({
-  type,
-  versionId
-}: CoreUpdateDataAvailable): Promise<void> {
+export async function autoUpdateSystemPackages(
+  dappnodeInstaller: DappnodeInstaller,
+  { type, versionId }: CoreUpdateDataAvailable
+): Promise<void> {
   if (!isCoreUpdateEnabled()) return;
 
   // If there is not update available or the type is not patch, return early
@@ -43,9 +45,9 @@ export async function autoUpdateSystemPackages({
   logs.info(`Auto-updating system packages...`);
 
   try {
-    await packageInstall({
+    await packageInstall(dappnodeInstaller, {
       name: coreDnpName,
-      options: { BYPASS_RESOLVER: true }
+      options: { BYPASS_RESOLVER: true },
     });
 
     /**

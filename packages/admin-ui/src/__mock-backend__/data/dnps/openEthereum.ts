@@ -5,7 +5,7 @@ const dnpName = "open-ethereum.dnp.dappnode.eth";
 const serviceName = dnpName;
 
 export const openEthereum: MockDnp = {
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.2.6",
     description:

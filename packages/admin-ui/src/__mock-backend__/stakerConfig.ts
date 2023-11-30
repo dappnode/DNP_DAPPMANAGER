@@ -36,7 +36,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "geth.dnp.dappnode.eth",
                   description:
                     "Go implementation of ethereum. Execution client",
@@ -65,7 +65,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "nethermind.dnp.dappnode.eth",
                   description: "Nethermind execution client",
                   shortDescription: "Nethermind execution client",
@@ -93,7 +93,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "besu.public.dappnode.eth",
                   description: "Besu execution client",
                   shortDescription: "Besu execution client",
@@ -121,7 +121,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "erigon.dnp.dappnode.eth",
                   description: "Erigon execution client",
                   shortDescription: "Erigon execution client",
@@ -151,7 +151,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "prysm.dnp.dappnode.eth",
                   description: "Prysm consensus client",
                   shortDescription: "Prysm consensus client",
@@ -180,7 +180,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "lighthouse.dnp.dappnode.eth",
                   description: "Lighthouse consensus client",
                   shortDescription: "Lighthouse consensus client",
@@ -209,7 +209,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "teku.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
@@ -237,7 +237,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "nimbus.dnp.dappnode.eth",
                   description: "Nimbus consensus client",
                   shortDescription: "Nimbus consensus client",
@@ -265,7 +265,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "lodestar.dnp.dappnode.eth",
                   description: "Lodestar consensus client",
                   shortDescription: "Lodestar consensus client",
@@ -294,7 +294,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "web3signer.dnp.dappnode.eth",
                 description: "Web3Signer",
                 shortDescription: "Web3Signer",
@@ -326,7 +326,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "mevboost.dnp.dappnode.eth",
                 description: "MEV Boost",
                 shortDescription: "MEV Boost",
@@ -359,7 +359,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "geth.dnp.dappnode.eth",
                   description: "Geth execution client",
                   shortDescription: "Geth execution client",
@@ -389,7 +389,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "nethermind.dnp.dappnode.eth",
                   description: "Nethermind execution client",
                   shortDescription: "Nethermind execution client",
@@ -416,7 +416,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "besu.dnp.dappnode.eth",
                   description: "Besu execution client",
                   shortDescription: "Besu execution client",
@@ -444,7 +444,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "erigon.dnp.dappnode.eth",
                   description: "Erigon execution client",
                   shortDescription: "Erigon execution client",
@@ -474,7 +474,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "prysm.dnp.dappnode.eth",
                   description: "Prysm consensus client",
                   shortDescription: "Prysm consensus client",
@@ -505,7 +505,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "lighthouse.dnp.dappnode.eth",
                   description: "Lighthouse consensus client",
                   shortDescription: "Lighthouse consensus client",
@@ -534,7 +534,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "teku.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
@@ -562,7 +562,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "nimbus.dnp.dappnode.eth",
                   description: "Nimbus consensus client",
                   shortDescription: "Nimbus consensus client",
@@ -591,7 +591,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "web3signer.dnp.dappnode.eth",
                 description: "Web3Signer",
                 shortDescription: "Web3Signer",
@@ -626,7 +626,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "mevboost.dnp.dappnode.eth",
                 description: "MEV Boost",
                 shortDescription: "MEV Boost",
@@ -659,7 +659,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "geth.dnp.dappnode.eth",
                   description: "Geth execution client",
                   shortDescription: "Geth execution client",
@@ -689,7 +689,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "nethermind.dnp.dappnode.eth",
                   description: "Nethermind execution client",
                   shortDescription: "Nethermind execution client",
@@ -716,7 +716,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "besu.dnp.dappnode.eth",
                   description: "Besu execution client",
                   shortDescription: "Besu execution client",
@@ -744,7 +744,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "erigon.dnp.dappnode.eth",
                   description: "Erigon execution client",
                   shortDescription: "Erigon execution client",
@@ -774,7 +774,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "prysm.dnp.dappnode.eth",
                   description: "Prysm consensus client",
                   shortDescription: "Prysm consensus client",
@@ -805,7 +805,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "lighthouse.dnp.dappnode.eth",
                   description: "Lighthouse consensus client",
                   shortDescription: "Lighthouse consensus client",
@@ -834,7 +834,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "teku.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
@@ -862,7 +862,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "nimbus.dnp.dappnode.eth",
                   description: "Nimbus consensus client",
                   shortDescription: "Nimbus consensus client",
@@ -891,7 +891,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "web3signer.dnp.dappnode.eth",
                 description: "Web3Signer",
                 shortDescription: "Web3Signer",
@@ -926,7 +926,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "mevboost.dnp.dappnode.eth",
                 description: "MEV Boost",
                 shortDescription: "MEV Boost",
@@ -959,7 +959,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "geth.dnp.dappnode.eth",
                   description: "Geth execution client",
                   shortDescription: "Geth execution client",
@@ -991,7 +991,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "prysm.dnp.dappnode.eth",
                   description: "Prysm consensus client",
                   shortDescription: "Prysm consensus client",
@@ -1021,7 +1021,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "lighthouse.dnp.dappnode.eth",
                   description: "Lighthouse consensus client",
                   shortDescription: "Lighthouse consensus client",
@@ -1050,7 +1050,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "teku.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
@@ -1079,7 +1079,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "nimbus.dnp.dappnode.eth",
                   description: "Nimbus consensus client",
                   shortDescription: "Nimbus consensus client",
@@ -1108,7 +1108,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "web3signer.dnp.dappnode.eth",
                 description: "Web3Signer",
                 shortDescription: "Web3Signer",
@@ -1140,7 +1140,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "mevboost.dnp.dappnode.eth",
                 description: "MEV Boost",
                 shortDescription: "MEV Boost",
@@ -1173,7 +1173,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "lukso-geth.dnp.dappnode.eth",
                   description: "Lukso geth execution client",
                   shortDescription: "Lukso geth execution client",
@@ -1201,7 +1201,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "lukso-erigon.dnp.dappnode.eth",
                   description: "Lukso erigon execution client",
                   shortDescription: "Lukso erigon execution client",
@@ -1231,7 +1231,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "prysm-lukso.dnp.dappnode.eth",
                   description: "Prysm consensus client",
                   shortDescription: "Prysm consensus client",
@@ -1260,7 +1260,7 @@ export const stakerConfig: Pick<
                 warnings: {},
                 signedSafe: true,
 
-                metadata: {
+                manifest: {
                   name: "teku-lukso.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
@@ -1289,7 +1289,7 @@ export const stakerConfig: Pick<
                 },
                 warnings: {},
                 signedSafe: true,
-                metadata: {
+                manifest: {
                   name: "lighthouse-lukso.dnp.dappnode.eth",
                   description: "Lighthouse consensus client",
                   shortDescription: "Lighthouse consensus client",
@@ -1318,7 +1318,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "web3signer-lukso.dnp.dappnode.eth",
                 description: "Web3Signer",
                 shortDescription: "Web3Signer",
@@ -1350,7 +1350,7 @@ export const stakerConfig: Pick<
               },
               warnings: {},
               signedSafe: true,
-              metadata: {
+              manifest: {
                 name: "mevboost-lukso.dnp.dappnode.eth",
                 description: "MEV Boost Lukso",
                 shortDescription: "MEV Boost Lukso",

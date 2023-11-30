@@ -1,5 +1,6 @@
 import { Routes } from "@dappnode/common";
 import { packageInstall as pkgInstall } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Installs a DAppNode Package.
@@ -19,7 +20,7 @@ export async function packageInstall({
   userSettings = {},
   options = {}
 }: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
-  await pkgInstall({
+  await pkgInstall(dappnodeInstaller, {
     name: reqName,
     version: reqVersion,
     userSettings,

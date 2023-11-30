@@ -1,3 +1,4 @@
+import { DappnodeInstaller } from "@dappnode/installer";
 import { startAutoUpdatesDaemon } from "./autoUpdates/index.js";
 import { startDiskUsageDaemon } from "./diskUsage/index.js";
 import { startDynDnsDaemon } from "./dyndns/index.js";
@@ -10,15 +11,18 @@ import { startTelegramBotDaemon } from "./telegramBot/index.js";
 
 // DAEMONS EXPORT
 
-export function startDaemons(signal: AbortSignal): void {
-  startAutoUpdatesDaemon(signal);
+export function startDaemons(
+  dappnodeInstaller: DappnodeInstaller,
+  signal: AbortSignal
+): void {
+  startAutoUpdatesDaemon(dappnodeInstaller, signal);
   startDiskUsageDaemon(signal);
   startDynDnsDaemon(signal);
-  startEthMultiClientDaemon(signal);
-  startEthicalMetricsDaemon(signal);
+  startEthMultiClientDaemon(dappnodeInstaller, signal);
+  startEthicalMetricsDaemon(dappnodeInstaller, signal);
   startNatRenewalDaemon(signal);
   startNsUpdateDaemon(signal);
-  startStakerDaemon();
+  startStakerDaemon(dappnodeInstaller);
   startTelegramBotDaemon();
 }
 

@@ -5,7 +5,12 @@ import {
   copyHostScripts,
   copyHostServices
 } from "@dappnode/hostscriptsservices";
-import { postRestartPatch } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  getEthUrl,
+  getIpfsUrl,
+  postRestartPatch
+} from "@dappnode/installer";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -17,7 +22,6 @@ import {
   generateKeyPair
 } from "./utils/index.js";
 import { createGlobalEnvsEnvFile } from "@dappnode/utils";
-import { startDappmanager } from "./startDappmanager.js";
 import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
@@ -26,13 +30,23 @@ import {
   getViewsCounterMiddleware,
   getEthForwardMiddleware
 } from "./api/middlewares/index.js";
+import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
+import { DeviceCalls } from "./calls/device/index.js";
+import { startHttpApi } from "./api/startHttpApi.js";
 
 const controller = new AbortController();
 
+// TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
+const adminPasswordDb = new AdminPasswordDb(params);
+const deviceCalls = new DeviceCalls({
+  eventBus,
+  adminPasswordDb,
+  vpnApiClient
+});
 
 // Start HTTP API
-const server = startDappmanager({
+const server = startHttpApi({
   params,
   logs,
   routes,
@@ -40,11 +54,11 @@ const server = startDappmanager({
   counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
-  methods: calls,
+  methods: { ...calls, ...deviceCalls },
   subscriptionsLogger,
+  adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion,
-  vpnApiClient
+  isNewDappmanagerVersion
 });
 
 // Start Test API
@@ -58,8 +72,14 @@ initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch(e => logs.error("Error inititializing Database", e));
 
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(
+  getIpfsUrl(),
+  await getEthUrl()
+);
+
 // Start daemons
-startDaemons(controller.signal);
+startDaemons(dappnodeInstaller, controller.signal);
 
 Promise.all([
   // Copy host scripts
@@ -75,6 +95,7 @@ Promise.all([
 createGlobalEnvsEnvFile();
 
 // Create local keys for NACL public encryption
+// TODO: research why the below code cannot be moved into the initialized db
 if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
   const { publicKey, secretKey } = generateKeyPair();
   db.naclPublicKey.set(publicKey);
@@ -88,6 +109,7 @@ eventBus.notification.on(notification => {
 });
 
 // Initial calls to check this DAppNode's status
+// TODO: find a proper place for this. Consider having a initial calls health check
 calls
   .passwordIsSecure()
   .then(isSecure =>

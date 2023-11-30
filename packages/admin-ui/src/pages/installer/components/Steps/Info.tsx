@@ -67,7 +67,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     compatible,
     signedSafe,
     signedSafeAll,
-    metadata,
+    manifest,
     isUpdated,
     isInstalled,
     avatarUrl,
@@ -82,12 +82,12 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     author = "Unknown",
     version,
     upstreamVersion
-  } = metadata;
+  } = manifest;
 
   const tagDisplay = isUpdated ? "UPDATED" : isInstalled ? "UPDATE" : "INSTALL";
 
   // If the repoSlug is invalid, it will be returned as null
-  const repoSlug = getRepoSlugFromManifest(metadata);
+  const repoSlug = getRepoSlugFromManifest(manifest);
 
   // Resolution status
   const isCompatible = compatible.isCompatible;

@@ -14,6 +14,12 @@ import {
   Compose,
   Manifest
 } from "@dappnode/common";
+import { DappnodeInstaller } from "@dappnode/installer";
+
+export const dappnodeInstaller = new DappnodeInstaller(
+  "https://api.ipfs.dappnode.io",
+  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+);
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";
@@ -231,7 +237,7 @@ export const mockRelease: PackageRelease = {
   semVersion: mockDnpVersion,
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
-  metadata: { name: mockDnpName, version: mockDnpVersion },
+  manifest: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
   isCore: false,

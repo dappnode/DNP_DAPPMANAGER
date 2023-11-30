@@ -5,7 +5,11 @@ import {
   Network,
   UserSettingsAllDnps,
 } from "@dappnode/common";
-import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  packageInstall,
+  packageSetEnvironment,
+} from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import {
   dockerComposeUpPackage,
@@ -15,11 +19,13 @@ import { getConsensusUserSettings } from "@dappnode/utils";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setConsensusClient<T extends Network>({
+  dappnodeInstaller,
   network,
   currentConsensusClient,
   targetConsensusClient,
   currentConsClientPkg,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   network: Network;
   currentConsensusClient?: ConsensusClient<T> | null;
   targetConsensusClient?: StakerItemOk<T, "consensus">;
@@ -54,7 +60,7 @@ export async function setConsensusClient<T extends Network>({
     });
     if (!targetConsClientPkg) {
       // Install new consensus client if not installed
-      await packageInstall({
+      await packageInstall(dappnodeInstaller, {
         name: targetConsensusClient.dnpName,
         userSettings,
       });
@@ -75,7 +81,7 @@ export async function setConsensusClient<T extends Network>({
   } else if (targetConsensusClient.dnpName === currentConsensusClient) {
     if (!currentConsClientPkg) {
       logs.info("Installing consensus client " + targetConsensusClient);
-      await packageInstall({
+      await packageInstall(dappnodeInstaller, {
         name: targetConsensusClient.dnpName,
         userSettings,
       });
@@ -99,7 +105,7 @@ export async function setConsensusClient<T extends Network>({
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
-      await packageInstall({
+      await packageInstall(dappnodeInstaller, {
         name: targetConsensusClient.dnpName,
         userSettings,
       });

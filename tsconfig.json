@@ -6,8 +6,8 @@
     "useUnknownInCatchVariables": false,
 
     /* Modules */
-    "module": "ESNext",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
 
     /* Emit */

@@ -24,7 +24,7 @@ import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
-import { EthereumClient } from "@dappnode/installer";
+import { DappnodeInstaller, EthereumClient } from "@dappnode/installer";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -35,13 +35,16 @@ import { EthereumClient } from "@dappnode/installer";
  * @param stakerConfig
  * TODO: add option to remove previous or not
  */
-export async function setStakerConfig<T extends Network>({
-  network,
-  executionClient,
-  consensusClient,
-  mevBoost,
-  enableWeb3signer,
-}: StakerConfigSet<T>): Promise<void> {
+export async function setStakerConfig<T extends Network>(
+  dappnodeInstaller: DappnodeInstaller,
+  {
+    network,
+    executionClient,
+    consensusClient,
+    mevBoost,
+    enableWeb3signer,
+  }: StakerConfigSet<T>
+): Promise<void> {
   const {
     compatibleExecution,
     compatibleConsensus,
@@ -85,6 +88,7 @@ export async function setStakerConfig<T extends Network>({
   await Promise.all([
     // EXECUTION CLIENT
     setExecutionClient<T>({
+      dappnodeInstaller,
       currentExecutionClient,
       targetExecutionClient: executionClient,
       currentExecClientPkg,
@@ -92,6 +96,7 @@ export async function setStakerConfig<T extends Network>({
 
     // CONSENSUS CLIENT (+ Fee recipient address + Graffiti + Checkpointsync)
     setConsensusClient<T>({
+      dappnodeInstaller,
       network: network,
       currentConsensusClient,
       targetConsensusClient: consensusClient,
@@ -99,6 +104,7 @@ export async function setStakerConfig<T extends Network>({
     }),
     // MEVBOOST
     setMevBoost({
+      dappnodeInstaller,
       mevBoost: compatibleMevBoost?.dnpName,
       targetMevBoost: mevBoost,
       currentMevBoostPkg,
@@ -123,6 +129,7 @@ export async function setStakerConfig<T extends Network>({
   // The web3signer deppends on the global envs EXECUTION_CLIENT and CONSENSUS_CLIENT
   // so it is convenient to set it at the end once the db is updated
   await setSigner({
+    dappnodeInstaller,
     enableWeb3signer,
     web3signerDnpName: compatibleSigner.dnpName,
     web3signerPkg: currentWeb3signerPkg,

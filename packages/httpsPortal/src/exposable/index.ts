@@ -1,7 +1,7 @@
 import memoizee from "memoizee";
 import { ExposableServiceInfo, InstalledPackageData } from "@dappnode/common";
 import { listPackages } from "@dappnode/dockerapi";
-import { readManifestIfExists } from "@dappnode/manifest";
+import { readManifestIfExists } from "@dappnode/utils";
 import { exposablePredefined } from "./predefined.js";
 import { parseExposableServiceManifest } from "./parseExposable.js";
 
@@ -21,7 +21,7 @@ const getExposableServicesByDnpMemo = memoizee(
   {
     max: 50,
     maxAge: 60 * 60 * 1000,
-    normalizer: ([dnp]) => dnp.dnpName + dnp.version
+    normalizer: ([dnp]) => dnp.dnpName + dnp.version,
   }
 );
 

@@ -11,13 +11,13 @@ import { Manifest, SetupWizard } from "@dappnode/common";
 
 describe("schemaValidation", () => {
   describe("manifest", () => {
-    beforeEach(() => {
+    before(() => {
       cleanTestDir();
       fs.mkdirSync(testDir, { recursive: true });
     });
     it("validateManifest globalEnvs as array of objects", () => {
       const manifest: Manifest = {
-        name: "",
+        name: "example.dnp.dappnode.eth",
         version: "1.0.0",
         description: "",
         type: "dncore",
@@ -84,14 +84,15 @@ describe("schemaValidation", () => {
 
       expect(() => validateManifestSchema(manifest as Manifest)).to.throw();
     });
+  });
 
-    describe("compose", () => {
-      beforeEach(() => {
-        cleanTestDir();
-        fs.mkdirSync(testDir, { recursive: true });
-      });
-      it("should validate a valid compose", async () => {
-        const validCompose = `version: "3.4"
+  describe("compose", () => {
+    before(() => {
+      //cleanTestDir();
+      fs.mkdirSync(testDir, { recursive: true });
+    });
+    it("should validate a valid compose", async () => {
+      const validCompose = `version: "3.4"
 services:
   beacon-chain:
     image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
@@ -122,15 +123,15 @@ services:
 volumes:
   beacon-chain-data: {}
   validator-data: {}`;
-        const validComposePath = path.join(testDir, "valid-docker-compose.yml");
-        fs.writeFileSync(validComposePath, validCompose);
-        expect(
-          async () => await validateComposeSchema(validComposePath)
-        ).to.not.throw();
-      });
+      const validComposePath = path.join(testDir, "valid-docker-compose.yml");
+      fs.writeFileSync(validComposePath, validCompose);
+      expect(
+        async () => await validateComposeSchema(validComposePath)
+      ).to.not.throw();
+    });
 
-      it("should throw error with an invalid compose", async () => {
-        const invalidCompose = `version: "3.5"
+    it("should throw error with an invalid compose", async () => {
+      const invalidCompose = `version: "3.5"
 services:
   ui:
     image: "ui.web3signer-gnosis.dnp.dappnode.eth:0.1.0"
@@ -172,165 +173,162 @@ volumes:
   web3signer_data: {}
   postgres_data: {}
   postgres_migrations: {}`;
-        const invalidComposePath = path.join(
-          testDir,
-          "invalid-docker-compose.yml"
-        );
-        fs.writeFileSync(invalidComposePath, invalidCompose);
+      const invalidComposePath = path.join(
+        testDir,
+        "invalid-docker-compose.yml"
+      );
+      fs.writeFileSync(invalidComposePath, invalidCompose);
 
-        const error = await validateComposeSchema(invalidComposePath).catch(
-          (e) => e
-        );
-        console.log(error);
-        const expectedErrorMessage = `Invalid compose`;
-        expect(error.message).to.include(expectedErrorMessage);
-      });
+      const error = await validateComposeSchema(invalidComposePath).catch(
+        (e) => e
+      );
+      console.log(error);
+      const expectedErrorMessage = `Invalid compose`;
+      expect(error.message).to.include(expectedErrorMessage);
     });
-    describe("setupWizard", () => {
-      beforeEach(() => {
-        cleanTestDir();
-        fs.mkdirSync(testDir, { recursive: true });
-      });
-      it("should validate a valid setupWizard", () => {
-        const validSetupWizard: SetupWizard = {
-          version: "2",
-          fields: [
-            {
-              id: "GRAFFITI",
-              target: {
-                type: "environment",
-                name: "GRAFFITI",
-                service: "validator",
-              },
-              title: "Graffiti",
-              maxLength: 32,
-              description:
-                "Add a string to your proposed blocks, which will be seen on the block explorer",
+  });
+  describe("setupWizard", () => {
+    before(() => {
+      cleanTestDir();
+      fs.mkdirSync(testDir, { recursive: true });
+    });
+    it("should validate a valid setupWizard", () => {
+      const validSetupWizard: SetupWizard = {
+        version: "2",
+        fields: [
+          {
+            id: "GRAFFITI",
+            target: {
+              type: "environment",
+              name: "GRAFFITI",
+              service: "validator",
             },
-            {
-              id: "HTTP_WEB3PROVIDER",
-              target: {
-                type: "environment",
-                name: "HTTP_WEB3PROVIDER",
-                service: ["validator", "beacon-chain"],
-              },
-              title: "Eth1.x node URL",
-              description: "URL to the Eth1.x node need for the Beacon chain.",
+            title: "Graffiti",
+            maxLength: 32,
+            description:
+              "Add a string to your proposed blocks, which will be seen on the block explorer",
+          },
+          {
+            id: "HTTP_WEB3PROVIDER",
+            target: {
+              type: "environment",
+              name: "HTTP_WEB3PROVIDER",
+              service: ["validator", "beacon-chain"],
             },
-            {
-              id: "web3Backup",
-              target: {
-                type: "environment",
-                name: "WEB3_BACKUP",
-                service: "beacon-chain",
-              },
-              title: "Add a backup web3 provider",
-              description:
-                "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-              required: false,
+            title: "Eth1.x node URL",
+            description: "URL to the Eth1.x node need for the Beacon chain.",
+          },
+          {
+            id: "web3Backup",
+            target: {
+              type: "environment",
+              name: "WEB3_BACKUP",
+              service: "beacon-chain",
             },
-            {
-              id: "checkpointSyncUrl",
-              target: {
-                type: "environment",
-                name: "CHECKPOINT_SYNC_URL",
-                service: "beacon-chain",
-              },
-              title: "Checkpoint for fast sync",
-              description:
-                "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-              required: false,
+            title: "Add a backup web3 provider",
+            description:
+              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+            required: false,
+          },
+          {
+            id: "checkpointSyncUrl",
+            target: {
+              type: "environment",
+              name: "CHECKPOINT_SYNC_URL",
+              service: "beacon-chain",
             },
-          ],
-        } as SetupWizard;
+            title: "Checkpoint for fast sync",
+            description:
+              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+            required: false,
+          },
+        ],
+      } as SetupWizard;
 
-        expect(() =>
-          validateSetupWizardSchema(validSetupWizard)
-        ).to.not.throw();
-      });
+      expect(() => validateSetupWizardSchema(validSetupWizard)).to.not.throw();
+    });
 
-      it("should throw error with an invalid setupWizard", () => {
-        const invalidSetupWizardString: SetupWizard = {
-          version: "2",
-          fields: [
-            {
-              id: "GRAFFITI",
-              target: {
-                type: "environment",
-                name: "GRAFFITI",
-                service: "validator",
-              },
-              title: "Graffiti",
-              maxLength: 32,
-              description:
-                "Add a string to your proposed blocks, which will be seen on the block explorer",
+    it("should throw error with an invalid setupWizard", () => {
+      const invalidSetupWizardString: SetupWizard = {
+        version: "2",
+        fields: [
+          {
+            id: "GRAFFITI",
+            target: {
+              type: "environment",
+              name: "GRAFFITI",
+              service: "validator",
             },
-            {
-              id: "HTTP_WEB3PROVIDER",
-              target: {
-                type: "environment",
-                name: "HTTP_WEB3PROVIDER",
-                service: "beacon-chain",
-              },
-              title: "Eth1.x node URL",
-              description: "URL to the Eth1.x node need for the Beacon chain.",
+            title: "Graffiti",
+            maxLength: 32,
+            description:
+              "Add a string to your proposed blocks, which will be seen on the block explorer",
+          },
+          {
+            id: "HTTP_WEB3PROVIDER",
+            target: {
+              type: "environment",
+              name: "HTTP_WEB3PROVIDER",
+              service: "beacon-chain",
             },
-            {
-              id: "web3Backup",
-              target: {
-                type: "environment",
-                name: "WEB3_BACKUP",
-                service: "beacon-chain",
-              },
-              title: "Add a backup web3 provider",
-              description:
-                "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-              required: false,
+            title: "Eth1.x node URL",
+            description: "URL to the Eth1.x node need for the Beacon chain.",
+          },
+          {
+            id: "web3Backup",
+            target: {
+              type: "environment",
+              name: "WEB3_BACKUP",
+              service: "beacon-chain",
             },
-            {
-              id: "checkpointSyncUrl",
-              target: {
-                type: "environment",
-                name: "CHECKPOINT_SYNC_URL",
-                service: "beacon-chain",
-              },
-              title: "Checkpoint for fast sync",
-              description:
-                "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-              required: false,
+            title: "Add a backup web3 provider",
+            description:
+              "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+            required: false,
+          },
+          {
+            id: "checkpointSyncUrl",
+            target: {
+              type: "environment",
+              name: "CHECKPOINT_SYNC_URL",
+              service: "beacon-chain",
             },
-            {
-              notAllowed: "random",
-            },
-          ],
-        } as SetupWizard;
+            title: "Checkpoint for fast sync",
+            description:
+              "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
+            required: false,
+          },
+          {
+            notAllowed: "random",
+          },
+        ],
+      } as SetupWizard;
 
-        expect(() =>
-          validateSetupWizardSchema(invalidSetupWizardString)
-        ).to.throw();
-      });
+      expect(() =>
+        validateSetupWizardSchema(invalidSetupWizardString)
+      ).to.throw();
+    });
 
-      it("should throw error with an empty service array in setupWizard", () => {
-        const invalidSetupWizard: SetupWizard = ({
-          version: "2",
-          fields: [
-            {
-              id: "GRAFFITI",
-              target: {
-                type: "environment",
-                name: "GRAFFITI",
-                service: [],
-              },
-              title: "Graffiti",
-              maxLength: 32,
-              description:
-                "Add a string to your proposed blocks, which will be seen on the block explorer",
+    it("should throw error with an empty service array in setupWizard", () => {
+      const invalidSetupWizard: SetupWizard = {
+        version: "2",
+        fields: [
+          {
+            id: "GRAFFITI",
+            target: {
+              type: "environment",
+              name: "GRAFFITI",
+              service: [],
             },
-          ],
-        } as unknown) as SetupWizard;
+            title: "Graffiti",
+            maxLength: 32,
+            description:
+              "Add a string to your proposed blocks, which will be seen on the block explorer",
+          },
+        ],
+      } as unknown as SetupWizard;
 
-        expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
-      });
+      expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
     });
   });
 });

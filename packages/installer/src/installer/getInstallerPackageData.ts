@@ -1,5 +1,5 @@
 import deepmerge from "deepmerge";
-import orderInstallPackages from "./orderInstallPackages.js";
+import { orderInstallPackages } from "./orderInstallPackages.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { getContainersStatus, listPackages } from "@dappnode/dockerapi";
 import { parseTimeoutSeconds } from "../utils.js";
@@ -85,7 +85,7 @@ function getInstallerPackageData(
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
 
-  const dockerTimeout = parseTimeoutSeconds(release.metadata.dockerTimeout);
+  const dockerTimeout = parseTimeoutSeconds(release.manifest.dockerTimeout);
 
   return {
     ...release,

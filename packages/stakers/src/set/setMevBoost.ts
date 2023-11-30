@@ -6,16 +6,22 @@ import {
   MevBoostPrater,
   Network,
 } from "@dappnode/common";
-import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  packageInstall,
+  packageSetEnvironment,
+} from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setMevBoost<T extends Network>({
+  dappnodeInstaller,
   mevBoost,
   targetMevBoost,
   currentMevBoostPkg,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageData;
@@ -59,7 +65,7 @@ export async function setMevBoost<T extends Network>({
   } // MevBoost not installed and enable => make sure its installed
   else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
-    await packageInstall({ name: mevBoost, userSettings });
+    await packageInstall(dappnodeInstaller, { name: mevBoost, userSettings });
   }
 }
 

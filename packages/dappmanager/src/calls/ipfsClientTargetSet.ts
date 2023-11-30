@@ -1,7 +1,7 @@
 import { IpfsRepository, IpfsClientTarget } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
-import { ipfs } from "@dappnode/ipfs";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Changes the IPFS client
@@ -39,14 +39,14 @@ async function changeIpfsClient(
 
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
-      ipfs.changeHost(params.IPFS_LOCAL, IpfsClientTarget.local);
+      dappnodeInstaller.changeIpfsProvider(params.IPFS_LOCAL);
     } else {
       // Set new values in db
       db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
-      ipfs.changeHost(db.ipfsGateway.get(), IpfsClientTarget.remote);
+      dappnodeInstaller.changeIpfsProvider(db.ipfsGateway.get());
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);
