@@ -1,23 +1,23 @@
 import { expect } from "chai";
-import { sortPackages } from "@dappnode/installer";
 import { InstalledPackageData } from "@dappnode/common";
 import { mockContainer, mockDnp } from "../../testUtils.js";
+import { sortPackages } from "../../../src/calls/packagesGet.js";
 
 describe("sortPackages for UI display", () => {
   it("Should sort packages", () => {
     const sampleDnps: MockDnp[] = [
       {
         dnpName: "b",
-        containers: []
+        containers: [],
       },
       {
         dnpName: "a",
         containers: [
           { serviceName: "c", isMain: false },
           { serviceName: "b", isMain: true },
-          { serviceName: "a", isMain: false }
-        ]
-      }
+          { serviceName: "a", isMain: false },
+        ],
+      },
     ];
 
     const expectedSortedDnps: MockDnp[] = [
@@ -26,13 +26,13 @@ describe("sortPackages for UI display", () => {
         containers: [
           { serviceName: "b", isMain: true },
           { serviceName: "a", isMain: false },
-          { serviceName: "c", isMain: false }
-        ]
+          { serviceName: "c", isMain: false },
+        ],
       },
       {
         dnpName: "b",
-        containers: []
-      }
+        containers: [],
+      },
     ];
 
     const sortedDnps = sortPackages(fromSampleDnps(sampleDnps));
@@ -48,23 +48,23 @@ describe("sortPackages for UI display", () => {
   }
 
   function fromSampleDnps(sampleDnps: MockDnp[]): InstalledPackageData[] {
-    return sampleDnps.map(dnp => ({
+    return sampleDnps.map((dnp) => ({
       ...mockDnp,
       ...dnp,
-      containers: dnp.containers.map(container => ({
+      containers: dnp.containers.map((container) => ({
         ...mockContainer,
-        ...container
-      }))
+        ...container,
+      })),
     }));
   }
 
   function toSampleDnps(dnps: InstalledPackageData[]): MockDnp[] {
-    return dnps.map(dnp => ({
+    return dnps.map((dnp) => ({
       dnpName: dnp.dnpName,
-      containers: dnp.containers.map(container => ({
+      containers: dnp.containers.map((container) => ({
         serviceName: container.serviceName,
-        isMain: container.isMain ?? false
-      }))
+        isMain: container.isMain ?? false,
+      })),
     }));
   }
 });

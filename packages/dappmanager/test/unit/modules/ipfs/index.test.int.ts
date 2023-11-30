@@ -1,8 +1,11 @@
 import fs from "fs";
 import path from "path";
 import { expect } from "chai";
-import { dappnodeInstaller } from "@dappnode/installer";
-import { cleanTestDir, testDir } from "../../../testUtils.js";
+import {
+  cleanTestDir,
+  dappnodeInstaller,
+  testDir
+} from "../../../testUtils.js";
 import { ipfsAddAll } from "../../../integration/testIpfsUtils.js";
 
 describe("ipfs / integration test", function () {
