@@ -373,7 +373,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   }),
   optimismConfigSet: async () => {},
-  updateUpgrade: async () => "Successfully updated"
+  updateUpgrade: async () => "Successfully updated",
+  setStaticLocalIp: async () => {}
 };
 
 export const calls: Routes = {

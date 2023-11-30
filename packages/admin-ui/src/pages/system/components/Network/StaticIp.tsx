@@ -9,8 +9,9 @@ import Button from "components/Button";
 // External
 import { getStaticIp } from "services/dappnodeStatus/selectors";
 
-export function StaticIp() {
+export function StaticIp({ type }: { type: "local" | "public" }) {
   const staticIp = useSelector(getStaticIp);
+  //const staticLocalIp = get Local IP (Static ?)
   const [input, setInput] = useState(staticIp);
 
   useEffect(() => {
@@ -24,6 +25,13 @@ export function StaticIp() {
     });
   }
 
+  function updateStaticLocalIp(newStaticIp: string) {
+    withToastNoThrow(() => api.setStaticLocalIp(staticIp), {
+      message: "Setting static local ip...",
+      onSuccess: "Set static local ip"
+    });
+  }
+
   return (
     <div className="input-group">
       <Input
@@ -31,7 +39,11 @@ export function StaticIp() {
         value={input}
         onValueChange={setInput}
         onEnterPress={() => {
-          if (isIpv4(input)) updateStaticIp(input);
+          if (isIpv4(input)) {
+            type === "public"
+              ? updateStaticIp(input)
+              : updateStaticLocalIp(input);
+          }
         }}
         append={
           <>
@@ -43,7 +55,11 @@ export function StaticIp() {
                 // Input is the same as previous IP
                 (Boolean(staticIp) && staticIp === input)
               }
-              onClick={() => updateStaticIp(input)}
+              onClick={() =>
+                type === "public"
+                  ? updateStaticIp(input)
+                  : updateStaticLocalIp(input)
+              }
             >
               {staticIp ? "Update" : "Enable"}
             </Button>
