@@ -11,13 +11,13 @@ import { Manifest, SetupWizard } from "@dappnode/common";
 
 describe("schemaValidation", () => {
   describe("manifest", () => {
-    beforeEach(() => {
+    before(() => {
       cleanTestDir();
       fs.mkdirSync(testDir, { recursive: true });
     });
     it("validateManifest globalEnvs as array of objects", () => {
       const manifest: Manifest = {
-        name: "",
+        name: "example.dnp.dappnode.eth",
         version: "1.0.0",
         description: "",
         type: "dncore",
@@ -86,7 +86,7 @@ describe("schemaValidation", () => {
     });
 
     describe("compose", () => {
-      beforeEach(() => {
+      before(() => {
         cleanTestDir();
         fs.mkdirSync(testDir, { recursive: true });
       });
@@ -187,7 +187,7 @@ volumes:
       });
     });
     describe("setupWizard", () => {
-      beforeEach(() => {
+      before(() => {
         cleanTestDir();
         fs.mkdirSync(testDir, { recursive: true });
       });
@@ -311,7 +311,7 @@ volumes:
       });
 
       it("should throw error with an empty service array in setupWizard", () => {
-        const invalidSetupWizard: SetupWizard = ({
+        const invalidSetupWizard: SetupWizard = {
           version: "2",
           fields: [
             {
@@ -327,7 +327,7 @@ volumes:
                 "Add a string to your proposed blocks, which will be seen on the block explorer",
             },
           ],
-        } as unknown) as SetupWizard;
+        } as unknown as SetupWizard;
 
         expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
       });

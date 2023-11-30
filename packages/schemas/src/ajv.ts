@@ -6,6 +6,7 @@ const Ajv = _Ajv as unknown as typeof _Ajv.default;
 // https://github.com/ajv-validator/ajv/issues/2132
 
 export const ajv = new Ajv({
+  strict: false,
   logger: false,
   allErrors: true,
   coerceTypes: true,
