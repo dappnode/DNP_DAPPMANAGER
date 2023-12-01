@@ -61,9 +61,7 @@
     "semver": "^7.3.8",
     "socket.io-client": "^4.5.1",
     "styled-components": "^4.2.0",
-    "swr": "^0.2.0",
-    "tweetnacl": "^1.0.1",
-    "tweetnacl-util": "^0.15.0"
+    "swr": "^0.2.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",

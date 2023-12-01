@@ -296,7 +296,7 @@ export interface Routes {
    * in format: up 3 weeks, 2 days, 8 hours, 40 minutes
    * Use the command "uptime --pretty"
    */
-  getHostUptime: () => Promise<String>;
+  getHostUptime: () => Promise<string>;
 
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
@@ -591,15 +591,6 @@ export interface Routes {
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
   /**
-   * Receives an encrypted message containing the seed phrase of
-   * 12 word mnemonic ethereum account. The extra layer of encryption
-   * slightly increases the security of the exchange while the WAMP
-   * module works over HTTP.
-   * @param seedPhraseEncrypted tweetnacl base64 box with nonce
-   */
-  seedPhraseSet: (kwargs: { seedPhraseEncrypted: string }) => Promise<void>;
-
-  /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
@@ -789,7 +780,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
-  seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},

@@ -12,7 +12,6 @@ export * from "./optimismConfig.js";
 export * from "./package.js";
 export * from "./registry.js";
 export * from "./releaseKeys.js";
-export * from "./secrets.js";
 export * from "./stakerConfig.js";
 export * from "./system.js";
 export * from "./systemFlags.js";

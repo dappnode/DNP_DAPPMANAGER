@@ -16,11 +16,7 @@ import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
 import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
-import {
-  getVersionData,
-  isNewDappmanagerVersion,
-  generateKeyPair
-} from "./utils/index.js";
+import { getVersionData, isNewDappmanagerVersion } from "./utils/index.js";
 import { createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
@@ -93,14 +89,6 @@ Promise.all([
 
 // Create the global env file
 createGlobalEnvsEnvFile();
-
-// Create local keys for NACL public encryption
-// TODO: research why the below code cannot be moved into the initialized db
-if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
-  const { publicKey, secretKey } = generateKeyPair();
-  db.naclPublicKey.set(publicKey);
-  db.naclSecretKey.set(secretKey);
-}
 
 // TODO: find a proper place for this
 // Store pushed notifications in DB

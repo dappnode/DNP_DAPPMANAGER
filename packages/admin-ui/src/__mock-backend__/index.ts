@@ -67,7 +67,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   diagnose: async () => [],
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
-  getHostUptime: async() => "1 week, 1 day, 5 hours, 10 minutes",
+  getHostUptime: async () => "1 week, 1 day, 5 hours, 10 minutes",
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
@@ -184,7 +184,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     rebootRequired: true,
     pkgs: "docker"
   }),
-  seedPhraseSet: async () => {},
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -208,7 +207,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     alertToOpenPorts: false,
     internalIp: "192.168.0.1",
     publicIp: "85.84.83.82",
-    dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
     eth2ClientTarget: {
