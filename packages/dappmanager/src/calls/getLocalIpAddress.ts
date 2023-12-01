@@ -4,7 +4,7 @@ import { shellHost } from "@dappnode/utils";
 /**
  * returns the local static ip adress
  */
-export async function getLocalIpAddress(): Promise<void> {
-  const command = "ip -o -f inet addr show $interface | awk '{split($4, a, \"/\"); print a[1]}'"
-  await shellHost(command);
+export async function getLocalIpAddress(): Promise<string> {
+  const command = "ip route get 1 | grep -oP 'src \\K\\S+'"
+  return await shellHost(command);
 }
