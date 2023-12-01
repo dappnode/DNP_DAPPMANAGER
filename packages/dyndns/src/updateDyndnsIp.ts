@@ -13,7 +13,7 @@ const dyndnsHost = params.DYNDNS_HOST;
  * @returns the domain, from the server.
  * Example: 1234abcd1234acbd.dyndns.dappnode.io
  */
-export default async function updateIp(): Promise<string | void> {
+export async function updateDyndnsIp(): Promise<string | void> {
   const privateKey = db.dyndnsIdentity.get().privateKey;
   if (!privateKey) {
     logs.warn("dyndns: Private key not initialized");
@@ -24,13 +24,13 @@ export default async function updateIp(): Promise<string | void> {
 
   // Using ethers as a raw signer (without '\x19Ethereum Signed Message:\n' prefix) to mimic previous EthCrypto signature
   const wallet = new ethers.Wallet(privateKey);
-  const signingKey = new ethers.utils.SigningKey(privateKey);
-  const signDigest = signingKey.signDigest.bind(signingKey);
-  const hash = ethers.utils.solidityKeccak256(
+  const signingKey = new ethers.SigningKey(privateKey);
+  const signDigest = signingKey.sign.bind(signingKey);
+  const hash = ethers.solidityPackedKeccak256(
     ["string"],
     [timestamp.toString()]
   );
-  const signature = ethers.utils.joinSignature(signDigest(hash));
+  const signature = ethers.Signature.from(signDigest(hash));
   const parameters = [
     `address=${wallet.address}`,
     `timestamp=${timestamp}`,
