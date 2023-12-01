@@ -21,3 +21,6 @@ This package contains the implementation used to interact with the router via UP
 - [ ] Consider renaming this module to **ports** and include all the logic in the dappmanager calls `portsStatusGet` and `portsOpenGet` to such module. Also the logic from the nat renewal daemon function `getPortsToOpen` should be moved to this module.
 
 ## Contact
+
+- Responsibles:
+  - @dappnodedev

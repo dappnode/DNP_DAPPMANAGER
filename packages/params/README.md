@@ -15,3 +15,6 @@ In this module there are all the params used accross multiple modules.
 - [ ] Move as much as possible the params from this module to its corresponding module if possible.
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo

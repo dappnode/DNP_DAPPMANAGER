@@ -15,3 +15,6 @@ The dappmanager also performs long running tasks which are named **daemons**. Th
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo

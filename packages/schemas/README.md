@@ -9,3 +9,7 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo
+  - @darkda567

@@ -16,3 +16,6 @@ This package contains a number of utility functions that are used throughout the
 - [ ] Add unit testing to every function in this package
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo

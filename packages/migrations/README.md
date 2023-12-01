@@ -17,3 +17,7 @@ This package contains migrations that are executed on dappmanager startup.
 - [ ] Try to remove the `Dockerode` dependency, it should be located only in `docker` modules.
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo
+  - @Marketen
