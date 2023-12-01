@@ -325,12 +325,24 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x9D055dd23de15114EC95921208c741873eDE8558",
     },
-    {
+    { 
       name: "ETC Cooperative",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xfB737B2bb2067C3f9E1448AA2D70D32Db4fb51C4",
     },
+    {
+      name: "Besu Ethereum client team (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
+    },
+    {
+      name: "Besu Ethereum client team (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
+    }
   ],
 };
 
