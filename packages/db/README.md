@@ -9,3 +9,6 @@
 ## Testing
 
 ## Contact
+
+- Responsibles:
+  - @dappnodedev

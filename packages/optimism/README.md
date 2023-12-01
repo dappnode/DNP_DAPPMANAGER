@@ -17,3 +17,7 @@
 - [ ] Review how much time it takes each call, and try to optimize it.
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo
+  - @dappnodedev

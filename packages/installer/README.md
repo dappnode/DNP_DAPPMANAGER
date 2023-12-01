@@ -9,3 +9,6 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo

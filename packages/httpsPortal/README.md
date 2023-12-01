@@ -9,3 +9,7 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @dappnodedev
+  - @3alpha

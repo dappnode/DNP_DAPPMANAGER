@@ -50,3 +50,9 @@ We welcome contributions to the DappNode Toolkit. Please refer to the `CONTRIBUT
 ## License
 
 The DappNode Toolkit is released under the MIT License. For more information, please refer to the `LICENSE` file.
+
+- Responsibles:
+  - @pablomendezroyo
+  - @dappnodedev
+  - @Marketen
+  - @3alpha

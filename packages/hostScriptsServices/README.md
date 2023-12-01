@@ -7,3 +7,7 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @kdelap00
+  - @pablomendezroyo

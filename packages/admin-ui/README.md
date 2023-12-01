@@ -7,3 +7,7 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @pablomendezroyo
+  - @GiselleNessi

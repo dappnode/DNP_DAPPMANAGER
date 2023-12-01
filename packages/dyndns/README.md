@@ -7,3 +7,6 @@
 ## Todo
 
 ## Contact
+
+- Responsibles:
+  - @3alpha
