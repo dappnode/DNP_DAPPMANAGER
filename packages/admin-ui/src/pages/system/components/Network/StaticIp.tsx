@@ -7,11 +7,13 @@ import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
 import Button from "components/Button";
 // External
-import { getStaticIp } from "services/dappnodeStatus/selectors";
+import { getLocalStaticIp, getStaticIp } from "services/dappnodeStatus/selectors";
 
 export function StaticIp({ type }: { type: "local" | "public" }) {
-  const staticIp = useSelector(getStaticIp);
-  //const staticLocalIp = get Local IP (Static ?)
+  let staticIpSelector;
+  if (type === "public") staticIpSelector = getStaticIp;
+  else staticIpSelector = getLocalStaticIp;
+  const staticIp = useSelector(staticIpSelector);
   const [input, setInput] = useState(staticIp);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
   }
 
   function updateStaticLocalIp(newStaticIp: string) {
-    withToastNoThrow(() => api.setStaticLocalIp(staticIp), {
+    withToastNoThrow(() => api.setStaticLocalIp(newStaticIp), {
       message: "Setting static local ip...",
       onSuccess: "Set static local ip"
     });

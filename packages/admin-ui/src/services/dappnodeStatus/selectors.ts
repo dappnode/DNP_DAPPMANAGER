@@ -76,6 +76,9 @@ export const getDappnodeName = (state: RootState) =>
 export const getStaticIp = (state: RootState) =>
   (getSystemInfo(state) || {}).staticIp || "";
 
+  export const getLocalStaticIp = (state: RootState) =>
+  (getSystemInfo(state) || {}).internalIp || "";
+
 function isWifiFirstContainerRunning(state: RootState): boolean {
   const installedPackages = getDnpInstalled(state);
   const wifiDnp = installedPackages.find(dnp => dnp.dnpName === wifiDnpName);
