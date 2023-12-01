@@ -325,7 +325,7 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x9D055dd23de15114EC95921208c741873eDE8558",
     },
-    { 
+    {
       name: "ETC Cooperative",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
