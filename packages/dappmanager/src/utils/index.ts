@@ -3,7 +3,6 @@ export { getServerName } from "./getServerName.js";
 export { getStaticIp } from "./getStaticIp.js";
 export { getVersionData, isNewDappmanagerVersion } from "./getVersionData.js";
 export { ping } from "./ping.js";
-export { generateKeyPair, encrypt, decrypt } from "./publickeyEncryption.js";
 export {
   prepareMessageFromPackage,
   hashMessage,

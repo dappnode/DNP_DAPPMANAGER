@@ -26,11 +26,6 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     internalIp: db.internalIp.get(),
     // publicIp is used to check for internet connection after installation
     publicIp: db.publicIp.get(),
-    // Public key of nacl's asymmetric encryption, used by the ADMIN UI
-    // to send sensitive data in a slightly more protected way
-    dappmanagerNaclPublicKey: db.naclPublicKey.get(),
-    // From seedPhrase: If it's not stored yet, it's an empty string
-    identityAddress: db.identityAddress.get(),
     // Eth provider configured URL
     eth2ClientTarget,
     ethClientStatus:

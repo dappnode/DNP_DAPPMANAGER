@@ -57,7 +57,6 @@ export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
 export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
-export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { statsCpuGet } from "./statsCpuGet.js";
 export {
