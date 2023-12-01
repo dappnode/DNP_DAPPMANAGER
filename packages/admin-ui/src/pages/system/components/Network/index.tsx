@@ -32,7 +32,7 @@ export function Network() {
 
       <SubTitle>Static Local IP</SubTitle>
       <Card spacing className="network-editor">
-        <div>You can set a static local IP for this DAppNode</div>
+        <div>You can set a static local IP for this DAppNode It is recommended to set the current IP address as static</div>
         <StaticIp type="local" />
       </Card>
     </>

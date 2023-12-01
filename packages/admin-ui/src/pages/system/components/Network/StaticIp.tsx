@@ -68,7 +68,11 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
             {staticIp && (
               <Button
                 variant="outline-dappnode"
-                onClick={() => updateStaticIp("")}
+                onClick={() =>
+                  type === "public"
+                  ? updateStaticIp("")
+                  : updateStaticLocalIp("")
+                }
               >
                 Disable
               </Button>
