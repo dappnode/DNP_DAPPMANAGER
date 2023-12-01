@@ -1,7 +1,7 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
-import { updateIp } from "@dappnode/dyndns";
+import { updateDyndnsIp } from "@dappnode/dyndns";
 import { lookup } from "./lookup.js";
 import { logs } from "@dappnode/logger";
 import { runAtMostEvery, getPublicIpFromUrls } from "@dappnode/utils";
@@ -80,7 +80,7 @@ async function checkIpAndUpdateIfNecessary(): Promise<void> {
     if (isStaticIpSet) return;
 
     const ipShouldBeUpdated = Boolean(await shouldUpdate());
-    if (ipShouldBeUpdated) await updateIp();
+    if (ipShouldBeUpdated) await updateDyndnsIp();
   } catch (e) {
     logs.error("Error on dyndns interval", e);
   }
