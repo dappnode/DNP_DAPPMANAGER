@@ -34,7 +34,6 @@ import {
   WifiReport,
   CurrentWifiCredentials,
   LocalProxyingStatus,
-  RegistryScanProgress,
   HostHardDisk,
   HostVolumeGroup,
   HostLogicalVolume,
@@ -260,19 +259,7 @@ export interface Routes {
   /**
    * Fetch registry summary
    */
-  fetchRegistry: (kwargs: {
-    addressOrEnsName?: string;
-    fromBlock?: number;
-  }) => Promise<DirectoryItem[]>;
-
-  /**
-   * Fetch registry scan progress
-   * scanned x / y blocks
-   */
-  fetchRegistryProgress: (kwargs: {
-    addressOrEnsName?: string;
-    fromBlock?: number;
-  }) => Promise<RegistryScanProgress>;
+  fetchRegistry: () => Promise<DirectoryItem[]>;
 
   /**
    * Fetch extended info about a new DNP
@@ -732,7 +719,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
-  fetchRegistryProgress: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
   getHostUptime: { log: true },

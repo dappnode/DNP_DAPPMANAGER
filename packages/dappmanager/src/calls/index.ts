@@ -21,7 +21,6 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
 export { fetchRegistry } from "./fetchRegistry.js";
-export { fetchRegistryProgress } from "./fetchRegistry.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export * from "./httpsPortal.js";

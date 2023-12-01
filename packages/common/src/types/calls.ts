@@ -187,23 +187,6 @@ export interface DirectoryItemError extends DirectoryItemBasic {
 
 export type DirectoryItem = DirectoryItemOk | DirectoryItemError;
 
-/**
- * =========================
- * SMART CONTRACT - REGISTRY
- * =========================
- */
-
-export interface RegistryNewRepoEvent {
-  txHash: string;
-  ensName: string;
-  timestamp?: number;
-}
-
-export interface RegistryScanProgress {
-  lastFetchedBlock: number;
-  latestBlock: number;
-}
-
 export interface RequestStatus {
   loading?: boolean;
   error?: string;
