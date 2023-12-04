@@ -85,7 +85,7 @@ export default function RemoteSigner<T extends Network>({
 
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected && signer.data && signer.data.manifest.shortDescription}
+          {isSelected && signer.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

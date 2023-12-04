@@ -72,9 +72,7 @@ export default function ExecutionClient({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected &&
-            executionClient.data &&
-            executionClient.data.manifest.shortDescription}
+          {isSelected && executionClient.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

@@ -73,7 +73,7 @@ export default function OptimismNode({
 
       {rollup.status === "ok" && (
         <div className="description">
-          {isSelected && rollup.data && rollup.data.manifest.shortDescription}
+          {isSelected && rollup.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>
