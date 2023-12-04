@@ -9,7 +9,7 @@ import {
 // TODO: graphs must be published in the graph, preferably arbitrum network
 // also the logic in the registry would have to be updated to take into account the Arbitrum network
 
-describe.only("Dappnode Registry", function () {
+describe("Dappnode Registry", function () {
   this.timeout(100000);
 
   it(`should get dnp newRepos`, async () => {
