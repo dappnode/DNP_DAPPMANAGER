@@ -42,7 +42,7 @@ export class DappNodeRegistry {
     );
 
     this.nameSuffix =
-      this.registry === "dnp" ? ".dnp.dappnode.eth" : "public.dappnode.eth";
+      this.registry === "dnp" ? ".dnp.dappnode.eth" : ".public.dappnode.eth";
   }
 
   /**
