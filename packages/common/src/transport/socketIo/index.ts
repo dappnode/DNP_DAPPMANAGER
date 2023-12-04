@@ -1,9 +1,9 @@
-import Ajv from "ajv";
+import Ajv, { ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
 import { Args, LoggerMiddleware } from "../../types/index.js";
 import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, strict: false });
 
 interface SocketIsh {
   /**
@@ -61,7 +61,7 @@ export function subscriptionsFactory(
         }
       },
       on: (handler: (...args: Args) => void | Promise<void>): void => {
-        io.on(route, async function(...args: Args): Promise<void> {
+        io.on(route, async function (...args: Args): Promise<void> {
           // Use try / catch and await to be safe for async and sync methods
           try {
             if (onCall) onCall(`on - ${route}`, args);
@@ -81,7 +81,7 @@ export function subscriptionsFactory(
 }
 
 function formatErrors(
-  errors: Array<Ajv.ErrorObject> | null | undefined,
+  errors: Array<ErrorObject> | null | undefined,
   route: string
 ): string {
   const dataVar = `root_prop`;
