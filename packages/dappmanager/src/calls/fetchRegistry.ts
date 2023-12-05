@@ -1,9 +1,6 @@
-import { getEthersProvider, getRegistry } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
-import { eventBus } from "@dappnode/eventbus";
-import { throttle } from "lodash-es";
 import { logs } from "@dappnode/logger";
-import { DirectoryItem, RegistryScanProgress } from "@dappnode/common";
+import { DirectoryItem } from "@dappnode/common";
 import {
   fileToGatewayUrl,
   getIsInstalled,
@@ -13,54 +10,19 @@ import {
   getShortDescription,
   getFallBackCategories
 } from "./fetchDirectory.js";
-import * as db from "@dappnode/db";
-import { DirectoryDnp } from "@dappnode/toolkit";
-import { dappnodeInstaller } from "../index.js";
-
-const defaultEnsName = "public.dappnode.eth";
-const minDeployBlock = 6312046;
+import { throttle } from "lodash-es";
+import { PublicRegistryEntry } from "@dappnode/toolkit";
+import { dappnodeInstaller, publicRegistry } from "../index.js";
+import { eventBus } from "@dappnode/eventbus";
 
 const loadThrottle = 500; // 0.5 seconds
 
 /**
- * Return last block and last fetched block
- * to show progress in the UI
- */
-export async function fetchRegistryProgress({
-  addressOrEnsName = defaultEnsName,
-  fromBlock = minDeployBlock
-}: {
-  addressOrEnsName?: string;
-  fromBlock?: number;
-}): Promise<RegistryScanProgress> {
-  const lastFetchedBlock =
-    db.registryLastFetchedBlock.get(addressOrEnsName) || fromBlock;
-
-  let latestBlock = db.registryLastProviderBlock.get();
-  if (!latestBlock) {
-    const provider = await getEthersProvider();
-    latestBlock = await provider.getBlockNumber();
-  }
-
-  return {
-    lastFetchedBlock,
-    latestBlock
-  };
-}
-
-/**
  * Fetches new repos from registry by scanning the chain
  */
-export async function fetchRegistry({
-  addressOrEnsName = defaultEnsName,
-  fromBlock = minDeployBlock
-}: {
-  addressOrEnsName?: string;
-  fromBlock?: number;
-}): Promise<DirectoryItem[]> {
-  const provider = await getEthersProvider();
-  const registry = await getRegistry(provider, addressOrEnsName, fromBlock);
-  return await fetchRegistryIpfsData(registry);
+export async function fetchRegistry(): Promise<DirectoryItem[]> {
+  const publicPackages = await publicRegistry.queryGraphNewRepos<"public">();
+  return await fetchRegistryIpfsData(publicPackages);
 }
 
 // Utils
@@ -69,14 +31,13 @@ export async function fetchRegistry({
  *  Get IPFS data from registry packages
  */
 async function fetchRegistryIpfsData(
-  registry: DirectoryDnp[]
+  registry: PublicRegistryEntry[]
 ): Promise<DirectoryItem[]> {
   const dnpList = await listPackages();
 
   const registryPublicDnps: DirectoryItem[] = [];
-
   let registryDnpsPending: DirectoryItem[] = [];
-  // Prevent sending way to many updates in case the fetching process is fast
+
   const emitRegistryUpdate = throttle(() => {
     eventBus.registry.emit(registryDnpsPending);
     registryDnpsPending = [];
@@ -89,12 +50,12 @@ async function fetchRegistryIpfsData(
   }
 
   await Promise.all(
-    registry.map(async ({ name, isFeatured }, index): Promise<void> => {
+    registry.map(async ({ name }, index): Promise<void> => {
       const registryItemBasic = {
         index,
         name,
         whitelisted: true,
-        isFeatured
+        isFeatured: false
       };
       try {
         // Now resolve the last version of the package
@@ -112,7 +73,8 @@ async function fetchRegistryIpfsData(
           categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        logs.error(`Error fetching ${name} release`, e);
+        // Avoid spamming the terminal, there could be too many packages validation errors in the public registry
+        logs.debug(`Error fetching ${name} release`, e);
         pushRegistryItem({
           ...registryItemBasic,
           status: "error",
@@ -122,5 +84,5 @@ async function fetchRegistryIpfsData(
     })
   );
 
-  return registryPublicDnps;
+  return registryPublicDnps.sort((a, b) => a.index - b.index);
 }

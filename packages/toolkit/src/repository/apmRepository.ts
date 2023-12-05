@@ -112,7 +112,8 @@ export class ApmRepository {
     // All other cases are invalid
     if (isEnsDomain(dnpNameOrHash))
       throw Error(`Invalid version, must be a semver or a hash: ${version}`);
-    else throw Error(`Invalid DNP name, must be a ENS domain: ${name}`);
+    else
+      throw Error(`Invalid DNP name, must be a ENS domain: ${dnpNameOrHash}`);
   }
 
   /**

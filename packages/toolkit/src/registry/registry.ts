@@ -18,6 +18,7 @@ export class DappNodeRegistry {
   private contractAddress: string;
   private registry: Registry;
   private graphEndpoint: string;
+  private nameSuffix: string;
   private registryContract: APMRegistry;
 
   /**
@@ -39,6 +40,9 @@ export class DappNodeRegistry {
       this.contractAddress,
       new ethers.JsonRpcProvider(ethUrl, "mainnet")
     );
+
+    this.nameSuffix =
+      this.registry === "dnp" ? ".dnp.dappnode.eth" : ".public.dappnode.eth";
   }
 
   /**
@@ -50,7 +54,13 @@ export class DappNodeRegistry {
   > {
     const query = this.constructGraphQLQuery();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return ((await request(this.graphEndpoint, query)) as any).newRepos;
+    const result = ((await request(this.graphEndpoint, query)) as any).newRepos;
+
+    // Append suffix
+    return result.map((repo: DNPRegistryEntry | PublicRegistryEntry) => {
+      repo.name = repo.name + this.nameSuffix;
+      return repo;
+    });
   }
 
   /**

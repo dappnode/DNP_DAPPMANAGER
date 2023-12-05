@@ -9,10 +9,10 @@ import {
 // TODO: graphs must be published in the graph, preferably arbitrum network
 // also the logic in the registry would have to be updated to take into account the Arbitrum network
 
-describe.skip("Dappnode Registry", function () {
+describe("Dappnode Registry", function () {
   this.timeout(100000);
 
-  it.skip(`should get dnp newRepos`, async () => {
+  it(`should get dnp newRepos`, async () => {
     const expectedResult: DNPRegistryEntry[] = [
       {
         id: "0x014a26511e1a8896e6b60002f82de526ee2e3452e5a170b74bc97c01fc4864f9f8000000",

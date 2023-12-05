@@ -10,7 +10,6 @@ export * from "./network.js";
 export * from "./notification.js";
 export * from "./optimismConfig.js";
 export * from "./package.js";
-export * from "./registry.js";
 export * from "./releaseKeys.js";
 export * from "./stakerConfig.js";
 export * from "./system.js";
