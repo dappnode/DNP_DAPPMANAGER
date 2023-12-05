@@ -33,6 +33,7 @@
     "src/schemas"
   ],
   "devDependencies": {
+    "@dappnode/params": "^0.1.0",
     "@types/chai": "^4.3.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.2",
