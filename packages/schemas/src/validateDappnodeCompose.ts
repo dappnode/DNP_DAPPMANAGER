@@ -138,7 +138,9 @@ function validateComposeService(
       `service ${serviceName} has network_mode: host but is not a core package`
     );
 
-  validateComposeServiceNetworks(compose, isCore, serviceName);
+  // TODO: remove this bypass once bind is published
+  if (dnpName !== params.bindDnpName)
+    validateComposeServiceNetworks(compose, isCore, serviceName);
 
   if (
     volumes &&
