@@ -6,12 +6,10 @@ import {
   EthClientFallback,
   EthClientStatus,
   EthClientSyncedNotificationStatus,
-  EthClientInstallStatus
-} from "@dappnode/common";
-import {
+  EthClientInstallStatus,
   ExecutionClientMainnet,
-  ConsensusClientMainnet
-} from "@dappnode/types";
+  ConsensusClientMainnet,
+} from "@dappnode/common";
 
 // User chosen properties
 const ETH_CLIENT_TARGET = "eth-client-target";
@@ -43,7 +41,7 @@ const _ethClientTarget = interceptOnSet(
  */
 export const ethClientTarget = {
   get: _ethClientTarget.get,
-  set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue)
+  set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue),
 };
 
 /**
@@ -68,9 +66,9 @@ export const ethClientFallback = interceptOnSet(
 export const ethExecClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, ExecutionClientMainnet>({
     rootKey: ETH_EXEC_CLIENT_INSTALL_STATUS,
-    getKey: target => target,
+    getKey: (target) => target,
     validate: (id, installStatus) =>
-      typeof id === "string" && typeof installStatus === "object"
+      typeof id === "string" && typeof installStatus === "object",
   })
 );
 
@@ -80,9 +78,9 @@ export const ethExecClientInstallStatus = interceptOnSet(
 export const ethConsClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, ConsensusClientMainnet>({
     rootKey: ETH_CONS_CLIENT_INSTALL_STATUS,
-    getKey: target => target,
+    getKey: (target) => target,
     validate: (id, installStatus) =>
-      typeof id === "string" && typeof installStatus === "object"
+      typeof id === "string" && typeof installStatus === "object",
   })
 );
 
@@ -92,9 +90,9 @@ export const ethConsClientInstallStatus = interceptOnSet(
 export const ethExecClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, ExecutionClientMainnet>({
     rootKey: ETH_EXEC_CLIENT_STATUS,
-    getKey: target => target,
+    getKey: (target) => target,
     validate: (id, status) =>
-      typeof id === "string" && typeof status === "object"
+      typeof id === "string" && typeof status === "object",
   })
 );
 
@@ -104,9 +102,9 @@ export const ethExecClientStatus = interceptOnSet(
 export const ethConsClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, ConsensusClientMainnet>({
     rootKey: ETH_CONS_CLIENT_STATUS,
-    getKey: target => target,
+    getKey: (target) => target,
     validate: (id, status) =>
-      typeof id === "string" && typeof status === "object"
+      typeof id === "string" && typeof status === "object",
   })
 );
 
@@ -116,9 +114,9 @@ export const ethConsClientStatus = interceptOnSet(
 export const ethClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, EthClientTarget>({
     rootKey: ETH_CLIENT_STATUS,
-    getKey: target => target,
+    getKey: (target) => target,
     validate: (id, status) =>
-      typeof id === "string" && typeof status === "object"
+      typeof id === "string" && typeof status === "object",
   })
 );
 
@@ -139,18 +137,16 @@ function interceptOnSet<
     ...dbSetter,
     // Arguments are not used, so their type is not relevant
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    set: function (...args: any[]): void {
+    set: function(...args: any[]): void {
       dbSetter.set(...args);
       eventBus.requestSystemInfo.emit();
-    }
+    },
   };
 }
 
 /**
  * Cache the status of the eth client install loop
  */
-export const ethClientSyncedNotificationStatus =
-  dbCache.staticKey<EthClientSyncedNotificationStatus>(
-    ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
-    null
-  );
+export const ethClientSyncedNotificationStatus = dbCache.staticKey<
+  EthClientSyncedNotificationStatus
+>(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);

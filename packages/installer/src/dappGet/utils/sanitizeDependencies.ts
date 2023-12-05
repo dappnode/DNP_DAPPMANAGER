@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/types";
+import { Dependencies } from "@dappnode/common";
 import { mapValues } from "lodash-es";
 
 /**
@@ -17,7 +17,7 @@ export function sanitizeDependencies(dependencies: Dependencies): Dependencies {
     );
   }
 
-  return mapValues(dependencies, version =>
+  return mapValues(dependencies, (version) =>
     version === "latest" ? "*" : version
   );
 }

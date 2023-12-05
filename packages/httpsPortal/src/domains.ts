@@ -1,6 +1,5 @@
 import { ContainerNames } from "@dappnode/common";
-import { getContainerDomain } from "@dappnode/types";
-import { getShortUniqueDnp } from "@dappnode/utils";
+import { getShortUniqueDnp, getContainerDomain } from "@dappnode/utils";
 
 export function stripBadDomainChars(s: string): string {
   // eslint-disable-next-line no-useless-escape

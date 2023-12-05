@@ -20,7 +20,7 @@ describe.skip("Test server auth", function () {
   async function parseRes(res: Response): Promise<RequestRes> {
     return {
       code: res.status,
-      body: await res.json()
+      body: (await res.json()) as any
     };
   }
 

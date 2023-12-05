@@ -3,6 +3,7 @@ import { sanitizeVersions } from "../utils/sanitizeVersions.js";
 import { sanitizeDependencies } from "../utils/sanitizeDependencies.js";
 import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
+import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -22,12 +23,14 @@ import { DappGetFetcher } from "../fetch/index.js";
  */
 
 export default async function aggregateDependencies({
+  dappnodeInstaller,
   name,
   versionRange,
   dnps,
   recursiveCount,
-  dappGetFetcher
+  dappGetFetcher,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   name: string;
   versionRange: string;
   dnps: DappGetDnps;
@@ -45,18 +48,18 @@ export default async function aggregateDependencies({
   // 1. Fetch versions of "name" that match this request
   //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
   const versions = await dappGetFetcher
-    .versions(name, versionRange)
+    .versions(dappnodeInstaller, name, versionRange)
     .then(sanitizeVersions);
 
   await Promise.all(
-    versions.map(async version => {
+    versions.map(async (version) => {
       // Already checked, skip. Otherwise lock request to prevent duplicate fetches
       if (hasVersion(dnps, name, version)) return;
       else setVersion(dnps, name, version, {});
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
       const dependencies = await dappGetFetcher
-        .dependencies(name, version)
+        .dependencies(dappnodeInstaller, name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
           e.message += `Error fetching ${name}@${version}`;
@@ -67,13 +70,14 @@ export default async function aggregateDependencies({
       setVersion(dnps, name, version, dependencies);
       // 4. Fetch sub-dependencies recursively
       await Promise.all(
-        Object.keys(dependencies).map(async dependencyName => {
+        Object.keys(dependencies).map(async (dependencyName) => {
           await aggregateDependencies({
+            dappnodeInstaller,
             name: dependencyName,
             versionRange: dependencies[dependencyName],
             dnps,
             recursiveCount,
-            dappGetFetcher
+            dappGetFetcher,
           });
         })
       );

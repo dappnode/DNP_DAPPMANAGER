@@ -1,14 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { PackageRelease, PackageRequest } from "@dappnode/common";
+import { PackageRelease, PackageRequest, Manifest } from "@dappnode/common";
 import { getMockEventBus } from "./eventBus.js";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
-import { ReleaseFetcher, DappGetState } from "@dappnode/installer";
-import { Manifest } from "@dappnode/types";
+import { DappGetState, DappnodeInstaller } from "@dappnode/installer";
 
 describe.skip("Call function: packageInstall", function () {
   // Pkg data
@@ -21,7 +20,7 @@ describe.skip("Call function: packageInstall", function () {
   };
   const pkgPkg: PackageRelease = {
     ...mockRelease,
-    metadata: pkgManifest,
+    manifest: pkgManifest,
     dnpName: pkgName,
     reqVersion: pkgVer
   };
@@ -36,7 +35,7 @@ describe.skip("Call function: packageInstall", function () {
   };
   const depPkg: PackageRelease = {
     ...mockRelease,
-    metadata: depManifest,
+    manifest: depManifest,
     dnpName: depName,
     reqVersion: depVer
   };
@@ -50,7 +49,7 @@ describe.skip("Call function: packageInstall", function () {
 
   const dappGetSpy = sinon.spy();
 
-  class ReleaseFetcherMock extends ReleaseFetcher {
+  class DappnodeInstallerMock extends DappnodeInstaller {
     async getReleasesResolved(req: PackageRequest): Promise<{
       releases: PackageRelease[];
       message: string;
@@ -78,7 +77,7 @@ describe.skip("Call function: packageInstall", function () {
       () => import("../../../src/calls/packageInstall"),
       mock => {
         mock(() => import("@dappnode/installer"))
-          .with({ ReleaseFetcher: ReleaseFetcherMock })
+          .with({ DappnodeInstaller: DappnodeInstallerMock })
           .toBeUsed();
         mock(() => import("@dappnode/eventbus"))
           .with({ eventBus })

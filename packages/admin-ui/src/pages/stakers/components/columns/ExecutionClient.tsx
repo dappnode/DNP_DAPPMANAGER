@@ -2,13 +2,12 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/common";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
-import { Network } from "@dappnode/types";
 
 export default function ExecutionClient<T extends Network>({
   executionClient,
@@ -72,9 +71,7 @@ export default function ExecutionClient<T extends Network>({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected &&
-            executionClient.data &&
-            executionClient.data.metadata.shortDescription}
+          {isSelected && executionClient.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

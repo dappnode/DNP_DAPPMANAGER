@@ -22,18 +22,17 @@
     "@dappnode/common": "^0.1.0",
     "@dappnode/dockerapi": "^0.1.0",
     "@dappnode/logger": "^0.1.0",
-    "@dappnode/types": "0.1.30",
     "@dappnode/utils": "^0.1.0",
     "bitcoin-core": "2.0.0",
-    "ethers": "5.7.2",
+    "ethers": "^6.9.0",
     "monero-rpc": "0.5.0",
-    "node-fetch": "2.6.0"
+    "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "@types/chai": "^4.3.6",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.2",
-    "@types/node-fetch": "2.5.1",
+    "@types/node-fetch": "^2.6.9",
     "chai": "^4.3.8",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",

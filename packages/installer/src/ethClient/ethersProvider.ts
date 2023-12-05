@@ -11,11 +11,11 @@ import { ethereumClient } from "./index.js";
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(): Promise<ethers.providers.JsonRpcProvider> {
-  const url = await getEthProviderUrl();
+export async function getEthersProvider(): Promise<ethers.JsonRpcProvider> {
+  const url = await getEthUrl();
   // Store (just for UI / info purposes) the latest used url
   db.ethProviderUrl.set(url);
-  return new ethers.providers.JsonRpcProvider(url);
+  return new ethers.JsonRpcProvider(url);
 }
 
 /**
@@ -23,7 +23,7 @@ export async function getEthersProvider(): Promise<ethers.providers.JsonRpcProvi
  * If the package target is not active it returns the remote URLs
  * @returns ethProvier http://geth.dappnode:8545
  */
-export async function getEthProviderUrl(): Promise<string> {
+export async function getEthUrl(): Promise<string> {
   if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
     return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 

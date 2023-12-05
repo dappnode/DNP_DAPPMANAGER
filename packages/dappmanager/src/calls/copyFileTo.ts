@@ -6,7 +6,8 @@ import {
 } from "@dappnode/dockerapi";
 // Utils
 import { shell } from "@dappnode/utils";
-import dataUriToFile from "../utils/dataUriToFile.js";
+import fs from "fs";
+import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
@@ -76,4 +77,15 @@ export async function copyFileTo({
 
   // Clean intermediate file
   await shell(`rm -rf ${fromPath}`);
+}
+
+/**
+ * Converts a data URI feeded from the server to a downloadable blob
+ *
+ * @param dataUri = data:application/zip;base64,UEsDBBQAAAg...
+ * @param pathTo = DNCORE/tempfile
+ */
+export function dataUriToFile(dataUri: string, pathTo: string): void {
+  const decodedBuffer = dataUriToBuffer(dataUri);
+  fs.writeFileSync(pathTo, decodedBuffer);
 }

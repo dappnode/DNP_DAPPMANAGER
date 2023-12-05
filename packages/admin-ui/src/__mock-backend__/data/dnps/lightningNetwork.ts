@@ -10,7 +10,7 @@ export const lightningNetwork: MockDnp = {
 
   avatar: dnpName,
 
-  metadata: {
+  manifest: {
     name: "lightning-network.dnp.dappnode.eth",
     version: "0.0.3",
     upstreamVersion: "0.6.1-beta",

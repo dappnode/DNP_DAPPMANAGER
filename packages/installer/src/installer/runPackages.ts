@@ -29,8 +29,8 @@ export async function runPackages(
       await restartDappmanagerPatch({
         composePath: pkg.composePath,
         composeBackupPath: pkg.composeBackupPath,
-        restartCommand: pkg.metadata.restartCommand,
-        restartLaunchCommand: pkg.metadata.restartLaunchCommand,
+        restartCommand: pkg.manifest.restartCommand,
+        restartLaunchCommand: pkg.manifest.restartLaunchCommand,
         packagesData,
       });
 

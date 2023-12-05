@@ -1,8 +1,11 @@
 import { isEmpty } from "lodash-es";
 import { ContainerNames, PackageContainer } from "@dappnode/common";
 import { params } from "@dappnode/params";
-import { getContainerDomain } from "@dappnode/types";
-import { buildNetworkAlias, removeUnderscores } from "@dappnode/utils";
+import {
+  buildNetworkAlias,
+  removeUnderscores,
+  getContainerDomain,
+} from "@dappnode/utils";
 
 const TTL = 60;
 const ethZone = "eth.";
@@ -100,7 +103,7 @@ export function getDotDappnodeDomain(
   return buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice
+    isMainOrMonoservice,
   });
 }
 
@@ -122,7 +125,7 @@ export function getNsupdateTxts({
   containers,
   domainAliases,
   dnpNames,
-  removeOnly = false
+  removeOnly = false,
 }: {
   containers: PackageContainer[];
   domainAliases: AliasMap;
@@ -168,7 +171,7 @@ export function getNsupdateTxts({
     if (container.isMain) {
       const rootNames = {
         dnpName: container.dnpName,
-        serviceName: container.dnpName
+        serviceName: container.dnpName,
       };
       eth[getMyDotEthdomain(getContainerDomain(rootNames))] = container.ip;
       //this is okay, we always wanted to return the full alias here
@@ -186,7 +189,7 @@ export function getNsupdateTxts({
   // Add .dappnode domain alias from db (such as fullnode.dappnode)
   for (const [alias, dnpName] of Object.entries(domainAliases)) {
     const container = containersToUpdate.find(
-      c => dnpName && c.dnpName === dnpName
+      (c) => dnpName && c.dnpName === dnpName
     );
     if (container) dappnode[aliasToDappnodeDomain(alias)] = container.ip;
   }
@@ -194,7 +197,7 @@ export function getNsupdateTxts({
   return (
     [
       { zone: ethZone, domains: eth },
-      { zone: dappnodeZone, domains: dappnode }
+      { zone: dappnodeZone, domains: dappnode },
     ]
       // Only process zones that have domains / entries
       .filter(({ domains }) => !isEmpty(domains))

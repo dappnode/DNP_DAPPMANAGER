@@ -4,7 +4,6 @@ import { shell } from "@dappnode/utils";
 import { clearCacheDb, clearMainDb } from "@dappnode/db";
 import { DockerApiSystemDfReturn } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { Compose, Manifest } from "@dappnode/types";
 import {
   PackageContainer,
   InstalledPackageData,
@@ -12,8 +11,15 @@ import {
   PackageRelease,
   ReleaseSignatureStatusCode,
   InstallPackageData,
-  ManifestWithImage
+  Compose,
+  Manifest
 } from "@dappnode/common";
+import { DappnodeInstaller } from "@dappnode/installer";
+
+export const dappnodeInstaller = new DappnodeInstaller(
+  "https://api.ipfs.dappnode.io",
+  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+);
 
 export const testDir = "./test_files/";
 const testMountpoint = "./test_mountpoints";
@@ -136,15 +142,6 @@ export const mockManifest: Manifest = {
   license: "Mock-license"
 };
 
-export const mockManifestWithImage: ManifestWithImage = {
-  ...mockManifest,
-  image: {
-    hash: mockHash,
-    path: "mock/mock/mock.mock",
-    size: mockSize
-  }
-};
-
 export const mockVolume: VolumeMapping = {
   host: "mock/mock/mock",
   container: "mock/mock/mock"
@@ -240,7 +237,7 @@ export const mockRelease: PackageRelease = {
   semVersion: mockDnpVersion,
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
-  metadata: { name: mockDnpName, version: mockDnpVersion },
+  manifest: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
   isCore: false,

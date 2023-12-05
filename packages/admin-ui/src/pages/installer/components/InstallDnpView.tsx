@@ -63,15 +63,15 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     dnpName,
     reqVersion,
     settings,
-    metadata,
+    manifest,
     setupWizard,
     isInstalled
   } = dnp;
   const isWarningUpdate =
-    metadata.warnings?.onMajorUpdate ||
-    metadata.warnings?.onMinorUpdate ||
-    metadata.warnings?.onPatchUpdate;
-  const isCore = metadata.type === "dncore";
+    manifest.warnings?.onMajorUpdate ||
+    manifest.warnings?.onMinorUpdate ||
+    manifest.warnings?.onPatchUpdate;
+  const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
   const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
@@ -158,10 +158,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       message:
         "This package has been developed by a third party. DAppNode association is not maintaining this package and has not performed any audit on its content. Use it at your own risk. DAppNode will not be liable for any loss or damage produced by the use of this package"
     });
-  if (metadata.disclaimer)
+  if (manifest.disclaimer)
     disclaimers.push({
       name: prettyDnpName(dnpName),
-      message: metadata.disclaimer.message
+      message: manifest.disclaimer.message
     });
 
   /**
@@ -237,12 +237,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         <Warnings
           goNext={goNext}
           goBack={goBack}
-          warnings={metadata.warnings || {}}
+          warnings={manifest.warnings || {}}
           isInstalled={isInstalled}
         />
       ),
       available:
-        metadata.warnings?.onInstall || (isInstalled && isWarningUpdate)
+        manifest.warnings?.onInstall || (isInstalled && isWarningUpdate)
     },
     {
       name: "Disclaimer",
@@ -301,10 +301,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
 
   function goBack() {
     const prevStep = availableRoutes[currentIndex - 1];
-    if (prevStep) navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
+    if (prevStep)
+      navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
     else navigate("..");
   }
-  
+
   return (
     <>
       {progressLogs ? (

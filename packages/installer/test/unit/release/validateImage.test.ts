@@ -7,7 +7,7 @@ import {
   createTestDir,
   cleanTestDir,
 } from "../../../../dappmanager/test/testUtils.js";
-import { validateTarImage } from "../../../src/release/getImage.js";
+import { validateTarImage } from "../../../src/installer/downloadImages.js";
 
 describe("validateTarImage", () => {
   before(async () => {

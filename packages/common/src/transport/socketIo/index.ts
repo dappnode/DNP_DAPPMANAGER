@@ -1,9 +1,9 @@
-import Ajv from "ajv";
+import Ajv, { ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
-import { Args, LoggerMiddleware } from "../../types";
+import { Args, LoggerMiddleware } from "../../types/index.js";
 import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, strict: false });
 
 interface SocketIsh {
   /**
@@ -81,7 +81,7 @@ export function subscriptionsFactory(
 }
 
 function formatErrors(
-  errors: Array<Ajv.ErrorObject> | null | undefined,
+  errors: Array<ErrorObject> | null | undefined,
   route: string
 ): string {
   const dataVar = `root_prop`;

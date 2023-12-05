@@ -1,5 +1,5 @@
 import { InstalledPackageDetailData } from "@dappnode/common";
-import { packageGet as pkgGet } from "@dappnode/installer";
+import { packageGet as _packageGet } from "@dappnode/installer";
 
 /**
  * Get package detail information
@@ -9,5 +9,5 @@ export async function packageGet({
 }: {
   dnpName: string;
 }): Promise<InstalledPackageDetailData> {
-  return await pkgGet({ dnpName });
+  return await _packageGet({ dnpName });
 }

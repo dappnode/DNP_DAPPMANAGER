@@ -1,4 +1,4 @@
-import { optimismNode } from "@dappnode/types";
+import { optimismNode } from "@dappnode/common";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { opNodeRpcUrlEnvName, opNodeServiceName } from "./params.js";
 

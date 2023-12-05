@@ -1,11 +1,14 @@
-import { InstalledPackageData } from "@dappnode/common";
+import {
+  InstalledPackageData,
+  ChainDriver,
+  ChainDriverSpecs,
+} from "@dappnode/common";
 import { ChainDataResult } from "../types.js";
 // Drivers
 import { bitcoin } from "./bitcoin.js";
 import { ethereum } from "./ethereum.js";
 import { ethereum2 } from "./ethereum2.js";
 import { monero } from "./monero.js";
-import { ChainDriver, ChainDriverSpecs } from "@dappnode/types";
 
 /**
  * Returns chain data given a driver and api URL
@@ -21,7 +24,7 @@ export async function runWithChainDriver(
   let chainDriverSpecs: ChainDriverSpecs;
   if (typeof chainDriver === "string") {
     chainDriverSpecs = {
-      driver: chainDriver
+      driver: chainDriver,
     };
   } else {
     chainDriverSpecs = chainDriver;

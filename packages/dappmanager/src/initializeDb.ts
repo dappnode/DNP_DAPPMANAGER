@@ -1,14 +1,16 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import { generateKeys } from "@dappnode/dyndns";
+import { generateKeysIfNotExistOrNotValid } from "@dappnode/dyndns";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
-import getServerName from "./utils/getServerName.js";
-import getInternalIp from "./utils/getInternalIp.js";
-import getStaticIp from "./utils/getStaticIp.js";
+import {
+  getInternalIp,
+  getServerName,
+  getStaticIp,
+  ping
+} from "./utils/index.js";
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import ping from "./utils/ping.js";
 import retry from "async-retry";
 import { IdentityInterface } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
@@ -206,7 +208,7 @@ export default async function initializeDb(): Promise<void> {
   // Create VPN's address + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
-  generateKeys(); // Auto-checks if keys are already generated
+  generateKeysIfNotExistOrNotValid(); // Auto-checks if keys are already generated
 
   /**
    * Set the domain of this DAppNode to point to the internal IP for better UX

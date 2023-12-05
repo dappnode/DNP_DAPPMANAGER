@@ -4,7 +4,7 @@ import { listPackageContainers } from "@dappnode/dockerapi";
 import {
   signDataFromPackage,
   getAddressFromPrivateKey
-} from "../../utils/sign.js";
+} from "../../utils/index.js";
 import { HttpError, wrapHandler } from "../utils.js";
 
 type Params = Record<string, unknown>;

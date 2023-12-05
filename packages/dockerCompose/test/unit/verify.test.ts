@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { Compose, ComposeService } from "@dappnode/types";
+import { Compose, ComposeService } from "@dappnode/common";
 import { verifyCompose } from "../../src/index.js";
 
 describe("verify compose", () => {

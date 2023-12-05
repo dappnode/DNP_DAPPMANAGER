@@ -52,3 +52,7 @@ packages/*/package-lock.json
 packages/dappmanager/dist
 packages/dappmanager/DNCORE
 packages/dappmanager/dnp_repo
+
+# Specific from toolkit
+#packages/toolkit/src/typechain/*
+packages/toolkit/truffle/contracts_build/*

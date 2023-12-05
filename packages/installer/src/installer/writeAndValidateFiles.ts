@@ -4,7 +4,7 @@ import { validatePath } from "@dappnode/utils";
 import { InstallPackageData } from "@dappnode/common";
 import { dockerComposeConfig } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { writeManifest } from "@dappnode/manifest";
+import { writeManifest } from "@dappnode/utils";
 import { isNotFoundError } from "@dappnode/utils";
 
 /**
@@ -23,7 +23,7 @@ export async function writeAndValidateFiles(
       dnpName,
       composePath,
       composeBackupPath,
-      metadata,
+      manifest,
       manifestPath,
       manifestBackupPath,
     } = packageData;
@@ -42,7 +42,7 @@ export async function writeAndValidateFiles(
 
     // Backup manifest to be able to do a rollback. Only if manifest exists
     copyIfExists(manifestPath, manifestBackupPath);
-    writeManifest(manifestPath, metadata);
+    writeManifest(manifestPath, manifest);
   }
 }
 

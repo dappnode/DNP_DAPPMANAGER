@@ -8,12 +8,9 @@ import {
   getIsUpdated
 } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import {
-  getEthProviderUrl,
-  ReleaseFetcher,
-  NoImageForArchError
-} from "@dappnode/installer";
+import { getEthUrl } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
+import { dappnodeInstaller } from "../index.js";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -21,10 +18,8 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const providerUrl = await getEthProviderUrl();
+  const providerUrl = await getEthUrl();
   const directory = new DappNodeDirectory(providerUrl);
-
-  const releaseFetcher = new ReleaseFetcher();
 
   const installedDnpList = await listPackages();
 
@@ -52,30 +47,26 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
       const directoryItemBasic = { index, name, whitelisted, isFeatured };
       try {
         // Now resolve the last version of the package
-        const release = await releaseFetcher.getRelease(name);
-        const { metadata, avatarFile } = release;
+        const release = await dappnodeInstaller.getRelease(name);
+        const { manifest, avatarFile } = release;
 
         pushDirectoryItem({
           ...directoryItemBasic,
           status: "ok",
-          description: getShortDescription(metadata),
+          description: getShortDescription(manifest),
           avatarUrl: fileToGatewayUrl(avatarFile), // Must be URL to a resource in a DAPPMANAGER API
           isInstalled: getIsInstalled(release, installedDnpList),
           isUpdated: getIsUpdated(release, installedDnpList),
-          featuredStyle: metadata.style,
-          categories: metadata.categories || getFallBackCategories(name) || []
+          featuredStyle: manifest.style,
+          categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        if (e instanceof NoImageForArchError) {
-          logs.debug(`Package ${name} is not available in current arch`);
-        } else {
-          logs.error(`Error fetching ${name} release`, e);
-          pushDirectoryItem({
-            ...directoryItemBasic,
-            status: "error",
-            message: e.message
-          });
-        }
+        logs.warn(`Error fetching ${name} release`, e);
+        pushDirectoryItem({
+          ...directoryItemBasic,
+          status: "error",
+          message: e.message
+        });
       }
     })
   );

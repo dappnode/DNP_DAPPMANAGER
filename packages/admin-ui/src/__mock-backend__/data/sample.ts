@@ -11,7 +11,7 @@ export const sampleRequestState: RequestedDnp = {
   semVersion: "0.0.0",
   reqVersion: "0.0.0",
   avatarUrl: "",
-  metadata: { name: dnpName, version: "0.0.0", description: "demo" },
+  manifest: { name: dnpName, version: "0.0.0", description: "demo" },
   specialPermissions: {},
   imageSize: 10000000,
   isUpdated: false,

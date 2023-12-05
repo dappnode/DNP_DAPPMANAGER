@@ -8,7 +8,7 @@ import {
   UserActionLog,
   VolumeData,
   VpnDevice,
-} from "./types";
+} from "./types/index.js";
 
 export interface SubscriptionsTypes {
   /**

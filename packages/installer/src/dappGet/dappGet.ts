@@ -7,6 +7,7 @@ import resolve from "./resolve/index.js";
 import { shouldUpdate } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetDnps, DappGetState } from "./types.js";
+import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export interface DappgetOptions {
   BYPASS_RESOLVER?: boolean;
@@ -53,6 +54,7 @@ export interface DappgetOptions {
  * }
  */
 export async function dappGet(
+  dappnodeInstaller: DappnodeInstaller,
   req: PackageRequest,
   options?: DappgetOptions,
   // For testing
@@ -63,7 +65,8 @@ export async function dappGet(
    * It will not use the fetch or resolver module and only
    * fetch the first level dependencies of the request
    */
-  if (options && options.BYPASS_RESOLVER) return await dappGetBasic(req);
+  if (options && options.BYPASS_RESOLVER)
+    return await dappGetBasic(dappnodeInstaller, req);
 
   const dnpList = await listPackages();
 
@@ -72,6 +75,7 @@ export async function dappGet(
   try {
     // Minimal dependency injection (fetch). Proxyquire does not support subdependencies
     dnps = await aggregate({
+      dappnodeInstaller,
       req,
       dnpList,
       dappGetFetcher: dappGetFetcher || new DappGetFetcher(),
