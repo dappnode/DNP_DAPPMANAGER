@@ -3,7 +3,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { HttpError, wrapHandler } from "../utils.js";
 import { getDnpFromIp } from "./sign.js";
 
-const MAX_LENGTH = 512;
+const MAX_LENGTH = 700;
 const MAX_KEYS = 20;
 
 /**
