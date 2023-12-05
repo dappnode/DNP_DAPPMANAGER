@@ -10,8 +10,12 @@ import {
   getShortDescription,
   getFallBackCategories
 } from "./fetchDirectory.js";
+import { throttle } from "lodash-es";
 import { PublicRegistryEntry } from "@dappnode/toolkit";
 import { dappnodeInstaller, publicRegistry } from "../index.js";
+import { eventBus } from "@dappnode/eventbus";
+
+const loadThrottle = 500; // 0.5 seconds
 
 /**
  * Fetches new repos from registry by scanning the chain
@@ -32,11 +36,17 @@ async function fetchRegistryIpfsData(
   const dnpList = await listPackages();
 
   const registryPublicDnps: DirectoryItem[] = [];
-  const registryDnpsPending: DirectoryItem[] = [];
+  let registryDnpsPending: DirectoryItem[] = [];
+
+  const emitRegistryUpdate = throttle(() => {
+    eventBus.registry.emit(registryDnpsPending);
+    registryDnpsPending = [];
+  }, loadThrottle);
 
   function pushRegistryItem(item: DirectoryItem): void {
     registryPublicDnps.push(item);
     registryDnpsPending.push(item);
+    emitRegistryUpdate();
   }
 
   await Promise.all(
@@ -63,7 +73,8 @@ async function fetchRegistryIpfsData(
           categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        logs.error(`Error fetching ${name} release`, e);
+        // Avoid spamming the terminal, there could be too many packages validation errors in the public registry
+        logs.debug(`Error fetching ${name} release`, e);
         pushRegistryItem({
           ...registryItemBasic,
           status: "error",
@@ -73,5 +84,5 @@ async function fetchRegistryIpfsData(
     })
   );
 
-  return registryPublicDnps;
+  return registryPublicDnps.sort((a, b) => a.index - b.index);
 }

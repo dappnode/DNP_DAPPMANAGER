@@ -77,7 +77,8 @@ export class DappnodeRepository extends ApmRepository {
     try {
       await this.ipfs.pin.add(hash);
     } catch (e) {
-      console.error(`Error pinning ${hash}`, e);
+      // Do not spam the terminal
+      // console.error(`Error pinning ${hash}`, e);
     }
   }
 
