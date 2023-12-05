@@ -6,6 +6,7 @@ import {
   dockerComposeSafeKeys,
 } from "@dappnode/common";
 import { dockerParams } from "./params.js";
+import { params } from "../../params/dist/params.js";
 
 let aggregatedError: string[];
 
@@ -29,7 +30,8 @@ export function validateDappnodeCompose(
   // COMPOSE TOP LEVEL restrictions
 
   validateComposeVersion(compose);
-  validateComposeNetworks(compose);
+  // TODO: remove this bypass once bind is published
+  if (manifest.name !== params.bindDnpName) validateComposeNetworks(compose);
 
   // SERVICE LEVEL restrictions
 
