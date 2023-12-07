@@ -3,7 +3,9 @@ import { params } from "@dappnode/params";
 import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
 import { ResolveDomainWithCache } from "./resolveDomain.js";
 
-export function getEthForwardMiddleware(): express.RequestHandler {
+export function getEthForwardMiddleware(
+  authMiddleware: express.RequestHandler
+): express.RequestHandler {
   // Create a domain resolver with cache
   const resolveDomain = ResolveDomainWithCache();
   // Start ethforward http proxy: Resolves .eth domains
@@ -20,19 +22,23 @@ export function getEthForwardMiddleware(): express.RequestHandler {
 
   return (req, res, next): void => {
     try {
-      const domain = parseEthDomainHost(req);
-      if (domain !== null) {
-        ethForwardHandler(req, res, domain);
-        return;
-      }
+      // First, apply the auth middleware
+      authMiddleware(req, res, () => {
+        // After authMiddleware, continue with original logic
+        const domain = parseEthDomainHost(req);
+        if (domain !== null) {
+          ethForwardHandler(req, res, domain);
+          return;
+        }
 
-      const hash = parseIpfsGatewayProxyReqHash(req.url);
-      if (hash !== null) {
-        ipfsGatewayProxydHandler(req, res, hash);
-        return;
-      }
+        const hash = parseIpfsGatewayProxyReqHash(req.url);
+        if (hash !== null) {
+          ipfsGatewayProxydHandler(req, res, hash);
+          return;
+        }
 
-      next();
+        next();
+      });
     } catch (e) {
       next(e);
     }

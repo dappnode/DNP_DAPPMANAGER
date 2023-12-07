@@ -28,6 +28,7 @@ import {
   subscriptionsFactory
 } from "@dappnode/common";
 import { getRpcHandler } from "./handler/index.js";
+import { getEthForwardMiddleware } from "./middlewares/index.js";
 
 export interface HttpApiParams
   extends ClientSideCookiesParams,
@@ -68,7 +69,6 @@ export function startHttpApi({
   routes,
   limiterMiddleware,
   counterViewsMiddleware,
-  ethForwardMiddleware,
   routesLogger,
   methods,
   subscriptionsLogger,
@@ -81,7 +81,6 @@ export function startHttpApi({
   routes: HttpRoutes;
   limiterMiddleware: express.RequestHandler;
   counterViewsMiddleware: express.RequestHandler;
-  ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
   methods: Routes;
   subscriptionsLogger: LoggerMiddleware;
@@ -117,11 +116,12 @@ export function startHttpApi({
   const sessions = new ClientSideCookies(params);
   app.use(sessions.handler);
 
-  // Intercept decentralized website requests
-  app.use(ethForwardMiddleware);
-
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
+
+  // Intercept decentralized website requests
+  const ethForwardMiddleware = getEthForwardMiddleware(auth.onlyAdmin);
+  app.use(ethForwardMiddleware);
 
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
