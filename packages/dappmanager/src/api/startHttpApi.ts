@@ -100,8 +100,6 @@ export function startHttpApi({
   const rpcHandler = getRpcHandler(methods, routesLogger);
 
   app.use(helmetConf());
-  // Intercept decentralized website requests first
-  app.use(ethForwardMiddleware);
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th
@@ -118,6 +116,9 @@ export function startHttpApi({
   // Sessions
   const sessions = new ClientSideCookies(params);
   app.use(sessions.handler);
+
+  // Intercept decentralized website requests
+  app.use(ethForwardMiddleware);
 
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
