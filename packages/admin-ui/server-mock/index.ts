@@ -4,7 +4,6 @@ import { startHttpApi } from "@dappnode/dappmanager/src/api/startHttpApi";
 import { LoggerMiddleware } from "@dappnode/common";
 import { eventBus } from "./eventBus";
 import { AdminPasswordDb } from "@dappnode/dappmanager/src/api/auth/adminPasswordDb";
-import { DeviceCalls } from "@dappnode/dappmanager/src/calls/device/index.js";
 
 const testFileDir = "test_files";
 
