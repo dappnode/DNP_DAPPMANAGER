@@ -62,9 +62,6 @@ const adminPasswordDb = startHttpApi({
   counterViewsMiddleware: (req, res, next) => {
     next();
   },
-  ethForwardMiddleware: (req, res, next) => {
-    next();
-  },
   methods: calls,
   routesLogger,
   subscriptionsLogger,
