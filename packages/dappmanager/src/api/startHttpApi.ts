@@ -119,10 +119,6 @@ export function startHttpApi({
   // Auth
   const auth = new AuthPasswordSession(sessions, adminPasswordDb, params);
 
-  // Intercept decentralized website requests
-  const ethForwardMiddleware = getEthForwardMiddleware(auth.onlyAdmin);
-  app.use(ethForwardMiddleware);
-
   // sessionHandler will mutate socket.handshake attaching .session object
   // Then, onlyAdmin will reject if socket.handshake.session.isAdmin !== true
   io.use(toSocketIoHandler(sessions.handler));
@@ -157,6 +153,10 @@ export function startHttpApi({
   app.post("/change-pass", auth.changeAdminPassword);
   app.post("/register", auth.registerAdmin);
   app.post("/recover-pass", auth.recoverAdminPassword);
+
+  // Intercept decentralized website requests
+  const ethForwardMiddleware = getEthForwardMiddleware(auth.onlyAdmin);
+  app.use(ethForwardMiddleware);
 
   // Limit requests per IP for NON AUTH methods
   // TODO: implement a more sophisticated rate limiter for auth methods
