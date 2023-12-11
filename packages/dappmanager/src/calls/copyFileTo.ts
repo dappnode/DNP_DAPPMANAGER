@@ -46,6 +46,12 @@ export async function copyFileTo({
   // if (!toPath) throw Error("Argument toPath must be defined")
   if (filename.includes("/"))
     throw Error(`filename must not be a path: ${filename}`);
+  if (!/^[a-zA-Z0-9._-]+$/.test(containerName))
+    throw Error(`Invalid container name: ${containerName}`);
+  // Validate file name and path to prevent directory traversal or command execution
+  if (/[^a-zA-Z0-9._/-]/.test(toPath)) throw Error(`Invalid path: ${toPath}`);
+  if (/[^a-zA-Z0-9._/-]/.test(filename))
+    throw Error(`Invalid file name: ${filename}`);
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect
