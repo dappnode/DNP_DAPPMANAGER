@@ -11,6 +11,5 @@ ln -s /usr/src/app/dnp_repo/ /app/packages/dappmanager
 ln -s /usr/src/app/DNCORE/ /app/packages/dappmanager
 
 # execute the scripts in background and wait
-cd /app/packages/dappmanager && yarn dev &
-cd /app/packages/admin-ui && yarn dev &
+yarn dev &
 wait
