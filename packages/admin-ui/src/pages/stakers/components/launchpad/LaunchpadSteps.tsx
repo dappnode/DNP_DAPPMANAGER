@@ -3,34 +3,25 @@ import React from "react";
 import ConsensusClient from "../columns/ConsensusClient";
 import ExecutionClient from "../columns/ExecutionClient";
 import MevBoost from "../columns/MevBoost";
-import { StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
+import { StakerConfigGetOk, StakerItemOk, Network } from "@dappnode/common";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
-import { InputForm } from "components/InputForm";
-import Input from "components/Input";
-import { Network } from "@dappnode/types";
-
 export const launchpadSteps = <T extends Network>({
   network,
   stakerConfig,
   setNewConfig,
   setShowLaunchpadValidators,
-  setNewFeeRecipient,
-  newFeeRecipient,
   setNewExecClient,
   newExecClient,
   setNewConsClient,
   newConsClient,
   setNewMevBoost,
-  newMevBoost,
-  feeRecipientError
+  newMevBoost
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
   setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
-  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string>>;
-  newFeeRecipient: string;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;
@@ -43,7 +34,6 @@ export const launchpadSteps = <T extends Network>({
   setNewMevBoost: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
-  feeRecipientError: string | null;
 }) => [
   {
     title: "Create the validator keystores and do the deposit",
@@ -106,28 +96,6 @@ export const launchpadSteps = <T extends Network>({
     )
   },
   {
-    title: "Set the default Fee Recipient",
-    description:
-      "Set the default fee recipient for the validator(s). The fee recipient is the address that will receive the validator's fees. You can change it at any time.",
-    component: (
-      <InputForm
-        fields={[
-          {
-            label: `Default Fee Recipient`,
-            labelId: "new-feeRecipient",
-            name: "new-fee-recipient",
-            autoComplete: "new-feeRecipient",
-            value: newFeeRecipient || "",
-            onValueChange: setNewFeeRecipient,
-            error: feeRecipientError,
-            placeholder:
-              "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-          }
-        ]}
-      />
-    )
-  },
-  {
     title: "Enable MEV boost and select its relays",
     description:
       "Select the MEV boost relays you want to use to run the validator node. The MEV boost relays are the software that executes the Ethereum 2.0 consensus protocol.",
@@ -146,13 +114,6 @@ export const launchpadSteps = <T extends Network>({
     description: `This is a summary of the staker configuration you have selected. If you are happy with it, click on the "next" button.`,
     component: (
       <div className="launchpad-summary">
-        {newFeeRecipient && (
-          <Input
-            aria-disabled={true}
-            value={newFeeRecipient}
-            onValueChange={() => {}}
-          />
-        )}
         {newExecClient && (
           <ExecutionClient<T>
             executionClient={newExecClient}
@@ -189,7 +150,7 @@ export const launchpadSteps = <T extends Network>({
         </div>
         <Button
           variant="dappnode"
-          disabled={!newExecClient || !newConsClient || !newFeeRecipient}
+          disabled={!newExecClient || !newConsClient}
           onClick={() => {
             setNewConfig(true);
             setShowLaunchpadValidators(false);

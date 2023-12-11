@@ -1,11 +1,10 @@
 import { ethers } from "ethers";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData, ChainDriverSpecs } from "@dappnode/common";
 import {
   buildNetworkAlias,
   EthSyncing,
-  parseEthersSyncing
+  parseEthersSyncing,
 } from "@dappnode/utils";
-import { ChainDriverSpecs } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
 
@@ -33,7 +32,7 @@ export async function ethereum(
   // Get serviceName from chainDriverSpec and use normal method if no serviceName is defined in chainDriver
   const serviceName = chainDriver.serviceName || dnp.containers[0].serviceName;
   const executionLayerContainer = dnp.containers.find(
-    container => container.serviceName === serviceName
+    (container) => container.serviceName === serviceName
   );
   if (!executionLayerContainer) {
     throw Error(`${serviceName} service not found`);
@@ -48,12 +47,12 @@ export async function ethereum(
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: true
+    isMainOrMonoservice: true,
   });
 
   const apiUrl = `http://${containerDomain}:${port}`;
 
-  const provider = new ethers.providers.JsonRpcProvider(apiUrl);
+  const provider = new ethers.JsonRpcProvider(apiUrl);
   const [syncing, peersCount, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
     // net_peerCount is not always available. OP Erigon does not support it
@@ -62,7 +61,7 @@ export async function ethereum(
       .send("net_peerCount", [])
       .then(parseInt)
       .catch(() => undefined),
-    provider.getBlockNumber()
+    provider.getBlockNumber(),
   ]);
 
   return parseEthereumState(syncing, blockNumber, peersCount);
@@ -87,7 +86,7 @@ export function parseEthereumState(
       knownStates,
       // Open Ethereum variables
       warpChunksProcessed,
-      warpChunksAmount
+      warpChunksAmount,
     } = syncing;
     // Syncing but very close
     const currentBlockDiff = highestBlock - currentBlock;
@@ -96,7 +95,7 @@ export function parseEthereumState(
         syncing: false,
         error: false,
         message: `Synced #${blockNumber}`,
-        peers: peersCount
+        peers: peersCount,
       };
 
     // Geth sync with states
@@ -107,10 +106,10 @@ export function parseEthereumState(
         // Render multiline status in the UI
         message: [
           `Blocks synced: ${currentBlock} / ${highestBlock}`,
-          `States synced: ${pulledStates} / ${knownStates}`
+          `States synced: ${pulledStates} / ${knownStates}`,
         ].join("\n\n"),
         help: gethSyncHelpUrl,
-        peers: peersCount
+        peers: peersCount,
       };
     }
 
@@ -124,7 +123,7 @@ export function parseEthereumState(
         error: false,
         message: `Syncing snapshot: ${warpChunksProcessed} / ${warpChunksAmount}`,
         progress: safeProgress(warpChunksProcessed / warpChunksAmount),
-        peers: peersCount
+        peers: peersCount,
       };
     }
 
@@ -134,7 +133,7 @@ export function parseEthereumState(
       error: false,
       message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
       progress: safeProgress(currentBlock / highestBlock),
-      peers: peersCount
+      peers: peersCount,
     };
   } else {
     if (!blockNumber || blockNumber === 0) {
@@ -143,14 +142,14 @@ export function parseEthereumState(
         syncing: true,
         error: false,
         message: `Syncing...`,
-        progress: 0
+        progress: 0,
       };
     } else {
       return {
         syncing: false,
         error: false,
         message: `Synced #${blockNumber}`,
-        peers: peersCount
+        peers: peersCount,
       };
     }
   }

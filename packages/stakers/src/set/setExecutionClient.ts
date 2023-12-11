@@ -1,22 +1,24 @@
 import {
   ExecutionClient,
   StakerItemOk,
+  Network,
   InstalledPackageData,
 } from "@dappnode/common";
-import { packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import {
   dockerComposeUpPackage,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
-import { Network } from "@dappnode/types";
 
 export async function setExecutionClient<T extends Network>({
+  dappnodeInstaller,
   currentExecutionClient,
   targetExecutionClient,
   currentExecClientPkg,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   currentExecutionClient?: ExecutionClient<T> | null;
   targetExecutionClient?: StakerItemOk<T, "execution">;
   currentExecClientPkg?: InstalledPackageData;
@@ -35,7 +37,9 @@ export async function setExecutionClient<T extends Network>({
     });
     if (!targetExecClientPkg) {
       // Install new consensus client if not installed
-      await packageInstall({ name: targetExecutionClient.dnpName });
+      await packageInstall(dappnodeInstaller, {
+        name: targetExecutionClient.dnpName,
+      });
     } else {
       // Start new consensus client if not running
       await dockerComposeUpPackage(
@@ -51,7 +55,9 @@ export async function setExecutionClient<T extends Network>({
   ) {
     if (!currentExecClientPkg) {
       logs.info("Installing execution client " + targetExecutionClient);
-      await packageInstall({ name: targetExecutionClient.dnpName });
+      await packageInstall(dappnodeInstaller, {
+        name: targetExecutionClient.dnpName,
+      });
     } else {
       await dockerComposeUpPackage(
         { dnpName: currentExecClientPkg.dnpName },
@@ -69,7 +75,9 @@ export async function setExecutionClient<T extends Network>({
     });
     if (!targetExecClientPkg) {
       // Install new client if not installed
-      await packageInstall({ name: targetExecutionClient.dnpName });
+      await packageInstall(dappnodeInstaller, {
+        name: targetExecutionClient.dnpName,
+      });
       // Stop old client
       if (currentExecClientPkg)
         await stopAllPkgContainers(currentExecClientPkg);

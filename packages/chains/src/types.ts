@@ -1,5 +1,4 @@
-import { ChainData } from "@dappnode/common";
-import { ChainDriver } from "@dappnode/types";
+import { ChainData, ChainDriver } from "@dappnode/common";
 
 export interface Chain {
   dnpName: string; // geth.dnp.dappnode.eth

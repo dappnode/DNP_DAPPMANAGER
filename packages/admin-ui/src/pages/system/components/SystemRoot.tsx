@@ -8,7 +8,6 @@ import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
 import Peers from "./Peers";
-import Identity from "./Identity";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
@@ -54,14 +53,6 @@ const SystemRoot: React.FC = () => {
       subPath: subPaths.notifications,
       component: Notifications
     },
-    {
-      name: "Identity",
-      subLink: subPaths.identity,
-      subPath: subPaths.identity,
-      component: Identity,
-      hideFromMenu: true
-    },
-
     {
       name: "Network",
       subLink: subPaths.network,

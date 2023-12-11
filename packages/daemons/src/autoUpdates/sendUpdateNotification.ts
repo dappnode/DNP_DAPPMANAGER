@@ -2,28 +2,27 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import { ReleaseFetcher } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
 import { CoreUpdateDataAvailable } from "@dappnode/common";
 import {
   formatPackageUpdateNotification,
-  formatSystemUpdateNotification
+  formatSystemUpdateNotification,
 } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
-export async function sendUpdatePackageNotificationMaybe(
-  releaseFetcher: ReleaseFetcher,
-  {
-    dnpName,
-    currentVersion,
-    newVersion
-  }: {
-    dnpName: string;
-    currentVersion: string;
-    newVersion: string;
-  }
-): Promise<void> {
+export async function sendUpdatePackageNotificationMaybe({
+  dappnodeInstaller,
+  dnpName,
+  currentVersion,
+  newVersion,
+}: {
+  dappnodeInstaller: DappnodeInstaller;
+  dnpName: string;
+  currentVersion: string;
+  newVersion: string;
+}): Promise<void> {
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (
@@ -34,8 +33,8 @@ export async function sendUpdatePackageNotificationMaybe(
     return; // Already emitted update available for this version
 
   // Ensure the release resolves on IPFS
-  const release = await releaseFetcher.getRelease(dnpName, newVersion);
-  const upstreamVersion = release.metadata.upstreamVersion;
+  const release = await dappnodeInstaller.getRelease(dnpName, newVersion);
+  const upstreamVersion = release.manifest.upstreamVersion;
 
   // Emit notification about new version available
   eventBus.notification.emit({
@@ -47,8 +46,8 @@ export async function sendUpdatePackageNotificationMaybe(
       newVersion,
       upstreamVersion,
       currentVersion,
-      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
-    })
+      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName),
+    }),
   });
 
   // Register version to prevent sending notification again
@@ -78,8 +77,8 @@ export async function sendUpdateSystemNotificationMaybe(
     title: "System update available",
     body: formatSystemUpdateNotification({
       packages: data.packages,
-      autoUpdatesEnabled: isCoreUpdateEnabled()
-    })
+      autoUpdatesEnabled: isCoreUpdateEnabled(),
+    }),
   });
 
   data.packages;

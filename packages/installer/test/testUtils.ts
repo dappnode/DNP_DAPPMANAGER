@@ -3,9 +3,52 @@ import {
   InstalledPackageData,
   InstallPackageData,
   PackageRelease,
+  Compose,
   ReleaseSignatureStatusCode,
 } from "@dappnode/common";
-import { Compose } from "@dappnode/types";
+import { DappnodeInstaller } from "../src/dappnodeInstaller.js";
+import { params } from "@dappnode/params";
+import { shell } from "@dappnode/utils";
+import { create } from "kubo-rpc-client";
+import all from "it-all";
+import { AddResult } from "ipfs-core-types/src/root";
+import fs from "fs";
+import path from "path";
+
+// TODO setup a local ipfs node for these tests
+
+export const ipfs = create({
+  url: "https://api.ipfs.dappnode.io",
+});
+
+/**
+ * Upload multiple files to a directory
+ * dir is the first result: https://github.com/ipfs/js-ipfs/blob/master/docs/core-api/FILES.md#ipfsaddallsource-options
+ * @param path
+ * @returns
+ */
+export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
+  if (!fs.existsSync(dirPath))
+    throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
+  const files = fs.readdirSync(dirPath).map((file) => {
+    return {
+      path: path.join(dirPath, file),
+      content: fs.readFileSync(path.join(dirPath, file)),
+    };
+  });
+  return all(ipfs.addAll(files));
+}
+
+export const dappnodeInstaller = new DappnodeInstaller(
+  "https://api.ipfs.dappnode.io",
+  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+);
+
+export const testDir = "./test_files/";
+
+// Default file names
+export const manifestFileName = "dappnode_package.json";
+export const composeFileName = "docker-compose.yml";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";
@@ -65,7 +108,7 @@ export const mockRelease: PackageRelease = {
   semVersion: mockDnpVersion,
   imageFile: { hash: mockHash, size: mockSize, source: "ipfs" },
   avatarFile: { hash: mockHash, size: mockSize, source: "ipfs" },
-  metadata: { name: mockDnpName, version: mockDnpVersion },
+  manifest: { name: mockDnpName, version: mockDnpVersion },
   compose: mockCompose,
   warnings: {},
   isCore: false,
@@ -84,3 +127,7 @@ export const mockPackageData: InstallPackageData = {
   dockerTimeout: undefined,
   containersStatus: {},
 };
+
+export async function cleanRepos(): Promise<void> {
+  await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
+}

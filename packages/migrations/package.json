@@ -1,0 +1,42 @@
+{
+  "name": "@dappnode/migrations",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test:int": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/int --timeout 180000",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "dependencies": {
+    "@dappnode/common": "^0.1.0",
+    "@dappnode/db": "^0.1.0",
+    "@dappnode/dockerapi": "^0.1.0",
+    "@dappnode/dockercompose": "^0.1.0",
+    "@dappnode/ethicalmetrics": "^0.1.0",
+    "@dappnode/eventbus": "^0.1.0",
+    "@dappnode/installer": "^0.1.0",
+    "@dappnode/logger": "^0.1.0",
+    "@dappnode/params": "^0.1.0",
+    "@dappnode/utils": "^0.1.0",
+    "dockerode": "^3.2.1",
+    "lodash-es": "^4.17.21",
+    "semver": "^7.3.8"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.2.2",
+    "@types/lodash-es": "^4.17.6",
+    "@types/node": "^20.6.2",
+    "@types/semver": "^7.3.13"
+  }
+}

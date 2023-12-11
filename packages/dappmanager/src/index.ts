@@ -1,42 +1,49 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
-import { generateKeyPair } from "./utils/publickeyEncryption.js";
 import {
   copyHostScripts,
   copyHostServices
 } from "@dappnode/hostscriptsservices";
-import { postRestartPatch } from "@dappnode/installer";
-import { startDaemons } from "@dappnode/daemons";
-import { SshManager } from "./modules/sshManager.js";
+import {
+  DappnodeInstaller,
+  getEthUrl,
+  getIpfsUrl,
+  postRestartPatch
+} from "@dappnode/installer";
 import * as calls from "./calls/index.js";
-import { routesLogger, subscriptionsLogger } from "@dappnode/logger";
+import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
-import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
-import {
-  getVersionData,
-  isNewDappmanagerVersion
-} from "./utils/getVersionData.js";
-import { shellHost, createGlobalEnvsEnvFile } from "@dappnode/utils";
-import { startDappmanager } from "./startDappmanager.js";
-import { startAvahiDaemon } from "@dappnode/daemons";
-import { executeMigrations } from "./modules/migrations/index.js";
+import { getVersionData, isNewDappmanagerVersion } from "./utils/index.js";
+import { createGlobalEnvsEnvFile } from "@dappnode/utils";
+import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
+import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
 import {
   getLimiter,
   getViewsCounterMiddleware,
   getEthForwardMiddleware
 } from "./api/middlewares/index.js";
+import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
+import { DeviceCalls } from "./calls/device/index.js";
+import { startHttpApi } from "./api/startHttpApi.js";
+import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
 
+// TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
-const sshManager = new SshManager({ shellHost });
+const adminPasswordDb = new AdminPasswordDb(params);
+const deviceCalls = new DeviceCalls({
+  eventBus,
+  adminPasswordDb,
+  vpnApiClient
+});
 
 // Start HTTP API
-const server = startDappmanager({
+const server = startHttpApi({
   params,
   logs,
   routes,
@@ -44,12 +51,11 @@ const server = startDappmanager({
   counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
-  methods: calls,
+  methods: { ...calls, ...deviceCalls },
   subscriptionsLogger,
+  adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion,
-  vpnApiClient,
-  sshManager
+  isNewDappmanagerVersion
 });
 
 // Start Test API
@@ -63,8 +69,15 @@ initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch(e => logs.error("Error inititializing Database", e));
 
+const ethUrl = await getEthUrl();
+
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(getIpfsUrl(), ethUrl);
+
+export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
+
 // Start daemons
-startDaemons(controller.signal);
+startDaemons(dappnodeInstaller, controller.signal);
 
 Promise.all([
   // Copy host scripts
@@ -79,13 +92,6 @@ Promise.all([
 // Create the global env file
 createGlobalEnvsEnvFile();
 
-// Create local keys for NACL public encryption
-if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
-  const { publicKey, secretKey } = generateKeyPair();
-  db.naclPublicKey.set(publicKey);
-  db.naclSecretKey.set(secretKey);
-}
-
 // TODO: find a proper place for this
 // Store pushed notifications in DB
 eventBus.notification.on(notification => {
@@ -93,6 +99,7 @@ eventBus.notification.on(notification => {
 });
 
 // Initial calls to check this DAppNode's status
+// TODO: find a proper place for this. Consider having a initial calls health check
 calls
   .passwordIsSecure()
   .then(isSecure =>

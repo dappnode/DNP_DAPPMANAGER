@@ -1,14 +1,15 @@
-import { Manifest, SetupWizard } from "@dappnode/types";
 import {
   UserSettings,
   SpecialPermission,
   InstalledPackageDetailData,
   PackageContainer,
-  RequestedDnp
+  RequestedDnp,
+  Manifest,
+  SetupWizard
 } from "@dappnode/common";
 
 export interface MockDnp {
-  metadata: Manifest;
+  manifest: Manifest;
   avatar?: string;
   userSettings?: UserSettings;
   setupWizard?: SetupWizard;

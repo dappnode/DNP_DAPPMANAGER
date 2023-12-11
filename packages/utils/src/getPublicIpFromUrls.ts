@@ -24,17 +24,34 @@ export async function getPublicIpFromUrls(options?: {
   const retries = options?.retries || 10;
 
   const errors = [];
+
   for (const url of urls) {
     try {
       const ip = await retry(
-        () => fetch(url, { timeout }).then((res) => res.text()),
+        async () => {
+          const controller = new AbortController();
+          const signal = controller.signal;
+
+          // Set a timeout to abort the fetch
+          const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+          try {
+            const response = await fetch(url, { signal });
+            clearTimeout(timeoutId); // Clear timeout on successful fetch
+            return await response.text();
+          } catch (error) {
+            clearTimeout(timeoutId); // Clear timeout on fetch error
+            throw error;
+          }
+        },
         { retries }
       );
       if (isIp(ip)) return ip;
-      else throw Error(`Invalid IP format: ${ip}`);
+      else throw new Error(`Invalid IP format: ${ip}`);
     } catch (e) {
       errors.push(`${url}: ${e.message}`);
     }
   }
-  throw Error(`Error fetching public IP\n${errors.join("\n")}`);
+
+  throw new Error(`Error fetching public IP\n${errors.join("\n")}`);
 }

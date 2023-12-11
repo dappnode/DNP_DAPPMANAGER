@@ -1,4 +1,5 @@
-import { packageRemove as pkgRemove } from "@dappnode/installer";
+import { packageRemove as _packageRemove } from "@dappnode/installer";
+
 /**
  * Remove package data: docker down + disk files
  *
@@ -12,5 +13,5 @@ export async function packageRemove({
   dnpName: string;
   deleteVolumes?: boolean;
 }): Promise<void> {
-  await pkgRemove({ dnpName, deleteVolumes });
+  return await _packageRemove({ dnpName, deleteVolumes });
 }

@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { InstallPackageData } from "@dappnode/common";
 import { mockPackageData } from "../../testUtils.js";
-import orderInstallPackages from "../../../src/installer/orderInstallPackages.js";
+import { orderInstallPackages } from "../../../src/installer/orderInstallPackages.js";
 
 describe("Module > Installer", () => {
   describe("orderInstallPackages", () => {
@@ -64,8 +64,8 @@ describe("Module > Installer", () => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
-            metadata: {
-              ...pkg.metadata,
+            manifest: {
+              ...pkg.manifest,
               runOrder,
             },
           };
@@ -118,8 +118,8 @@ describe("Module > Installer", () => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
-            metadata: {
-              ...pkg.metadata,
+            manifest: {
+              ...pkg.manifest,
               runOrder,
             },
           };

@@ -43,3 +43,8 @@ packages/dappmanager/dnp_repo
 packages/dappmanager/DNCORE
 packages/dappmanager/maindb.json
 packages/dappmanager/test_mountpoints
+
+# toolkit files
+packages/toolkit/truffle/*
+packages/toolkit/theGraph/*
+packages/toolkit/fixTypesImports.js

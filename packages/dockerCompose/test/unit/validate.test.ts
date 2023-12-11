@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { mockCompose } from "../testUtils.js";
-import { Compose } from "@dappnode/types";
+import { Compose } from "@dappnode/common";
 import { validateCompose } from "../../src/index.js";
 
 describe("validateCompose", () => {

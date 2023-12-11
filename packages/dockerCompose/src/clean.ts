@@ -1,5 +1,5 @@
 import { mapValues, omitBy, isObject, isEmpty, pick } from "lodash-es";
-import { Compose } from "@dappnode/types";
+import { Compose } from "@dappnode/common";
 
 /**
  * Cleans empty or null properties
@@ -13,11 +13,11 @@ export function cleanCompose(compose: Compose): Compose {
   return {
     version: compose.version,
     ...omitBy(compose, isOmitable),
-    services: mapValues(compose.services, service => ({
+    services: mapValues(compose.services, (service) => ({
       ...omitBy(service, isOmitable),
       // Add mandatory properties for the ts compiler
-      ...pick(service, ["container_name", "image"])
-    }))
+      ...pick(service, ["container_name", "image"]),
+    })),
   };
 }
 

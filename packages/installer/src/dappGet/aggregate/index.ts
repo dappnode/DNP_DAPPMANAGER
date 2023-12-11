@@ -14,6 +14,7 @@ import {
   ErrorDappGetNoVersions,
 } from "../errors.js";
 import { InstalledPackageData, PackageRequest } from "@dappnode/common";
+import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
 /**
  * Aggregates all relevant packages and their info given a specific request.
@@ -60,10 +61,12 @@ import { InstalledPackageData, PackageRequest } from "@dappnode/common";
  * };
  */
 export default async function aggregate({
+  dappnodeInstaller,
   req,
   dnpList,
   dappGetFetcher,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   req: PackageRequest;
   dnpList: InstalledPackageData[];
   dappGetFetcher: DappGetFetcher;
@@ -75,6 +78,7 @@ export default async function aggregate({
   if (req.ver === "latest") req.ver = "*";
 
   await aggregateDependencies({
+    dappnodeInstaller,
     name: req.name,
     versionRange: req.ver,
     dnps,
@@ -102,6 +106,7 @@ export default async function aggregate({
           setVersion(dnps, dnpName, version, dnp.dependencies);
         } else {
           await aggregateDependencies({
+            dappnodeInstaller,
             name: dnpName,
             versionRange: `>=${version}`,
             dnps,

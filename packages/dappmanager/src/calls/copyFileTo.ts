@@ -6,7 +6,8 @@ import {
 } from "@dappnode/dockerapi";
 // Utils
 import { shell } from "@dappnode/utils";
-import dataUriToFile from "../utils/dataUriToFile.js";
+import fs from "fs";
+import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
@@ -39,9 +40,18 @@ export async function copyFileTo({
   filename: string;
   toPath: string;
 }): Promise<void> {
+  // Validate arguments
   if (!containerName) throw Error("Argument containerName must be defined");
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");
+  // Allow only alphanumeric, underscores, hyphens, and dots to prevent command injection
+  if (!/^[a-zA-Z0-9._-]+$/.test(containerName))
+    throw Error(`Invalid container name: ${containerName}`);
+  // Validate file name and path to prevent directory traversal or command execution
+  if (/[^a-zA-Z0-9._/-]/.test(toPath)) throw Error(`Invalid path: ${toPath}`);
+  if (/[^a-zA-Z0-9._/-]/.test(filename))
+    throw Error(`Invalid file name: ${filename}`);
+
   // toPath is allowed to be empty, it will default to WORKDIR
   // if (!toPath) throw Error("Argument toPath must be defined")
   if (filename.includes("/"))
@@ -76,4 +86,15 @@ export async function copyFileTo({
 
   // Clean intermediate file
   await shell(`rm -rf ${fromPath}`);
+}
+
+/**
+ * Converts a data URI feeded from the server to a downloadable blob
+ *
+ * @param dataUri = data:application/zip;base64,UEsDBBQAAAg...
+ * @param pathTo = DNCORE/tempfile
+ */
+export function dataUriToFile(dataUri: string, pathTo: string): void {
+  const decodedBuffer = dataUriToBuffer(dataUri);
+  fs.writeFileSync(pathTo, decodedBuffer);
 }

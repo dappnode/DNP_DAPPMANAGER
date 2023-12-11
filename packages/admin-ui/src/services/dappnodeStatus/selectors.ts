@@ -17,8 +17,6 @@ export const getPasswordIsSecure = (state: RootState) =>
   state.dappnodeStatus.passwordIsSecure;
 export const getRebootIsRequired = (state: RootState) =>
   state.dappnodeStatus.rebootRequiredScript;
-export const getIdentityAddress = (state: RootState) =>
-  (getSystemInfo(state) || {}).identityAddress;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
 
 // Sub-sub local properties
@@ -30,8 +28,6 @@ export const getEthClientStatus = (state: RootState) =>
   (getSystemInfo(state) || {}).ethClientStatus;
 export const getNewFeatureIds = (state: RootState) =>
   (getSystemInfo(state) || {}).newFeatureIds;
-export const getDappmanagerNaclPublicKey = (state: RootState) =>
-  (getSystemInfo(state) || {}).dappmanagerNaclPublicKey;
 
 /**
  * Returns a pretty warning about the eth client only if the user has to see it

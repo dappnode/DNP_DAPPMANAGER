@@ -34,7 +34,6 @@ import {
   WifiReport,
   CurrentWifiCredentials,
   LocalProxyingStatus,
-  RegistryScanProgress,
   HostHardDisk,
   HostVolumeGroup,
   HostLogicalVolume,
@@ -47,8 +46,10 @@ import {
   OptimismConfigSet,
   OptimismConfigGet,
   RebootRequiredScript,
-} from "./types";
-import { Network, PackageBackup, PackageEnvs } from "@dappnode/types";
+  Network,
+  PackageBackup,
+  PackageEnvs,
+} from "./types/index.js";
 
 export interface Routes {
   /**
@@ -258,19 +259,7 @@ export interface Routes {
   /**
    * Fetch registry summary
    */
-  fetchRegistry: (kwargs: {
-    addressOrEnsName?: string;
-    fromBlock?: number;
-  }) => Promise<DirectoryItem[]>;
-
-  /**
-   * Fetch registry scan progress
-   * scanned x / y blocks
-   */
-  fetchRegistryProgress: (kwargs: {
-    addressOrEnsName?: string;
-    fromBlock?: number;
-  }) => Promise<RegistryScanProgress>;
+  fetchRegistry: () => Promise<DirectoryItem[]>;
 
   /**
    * Fetch extended info about a new DNP
@@ -288,6 +277,13 @@ export interface Routes {
     first?: number;
     after?: number;
   }) => Promise<UserActionLog[]>;
+
+  /**
+   * Returns the host uptime
+   * in format: up 3 weeks, 2 days, 8 hours, 40 minutes
+   * Use the command "uptime --pretty"
+   */
+  getHostUptime: () => Promise<string>;
 
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
@@ -582,15 +578,6 @@ export interface Routes {
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
   /**
-   * Receives an encrypted message containing the seed phrase of
-   * 12 word mnemonic ethereum account. The extra layer of encryption
-   * slightly increases the security of the exchange while the WAMP
-   * module works over HTTP.
-   * @param seedPhraseEncrypted tweetnacl base64 box with nonce
-   */
-  seedPhraseSet: (kwargs: { seedPhraseEncrypted: string }) => Promise<void>;
-
-  /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
@@ -704,11 +691,11 @@ interface RouteData {
 
 export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateDataGet: {},
-  autoUpdateSettingsEdit: { log: true },
+  autoUpdateSettingsEdit: {},
   backupGet: {},
-  backupRestore: { log: true },
+  backupRestore: {},
   chainDataGet: {},
-  changeIpfsTimeout: { log: true },
+  changeIpfsTimeout: {},
   cleanCache: {},
   cleanDb: {},
   copyFileTo: { log: true },
@@ -724,7 +711,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
-  ethClientFallbackSet: { log: true },
+  ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
   getEthicalMetricsConfig: { log: true },
@@ -732,9 +719,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
-  fetchRegistryProgress: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
+  getHostUptime: {},
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
@@ -763,8 +750,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   packageLog: {},
   packageRemove: { log: true },
   packageRestart: { log: true },
-  packageRestartVolumes: { log: true },
-  packageSentDataDelete: { log: true },
+  packageRestartVolumes: {},
+  packageSentDataDelete: {},
   packageSetEnvironment: { log: true },
   packageSetPortMappings: { log: true },
   packageStartStop: { log: true },
@@ -779,7 +766,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
-  seedPhraseSet: { log: true },
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},

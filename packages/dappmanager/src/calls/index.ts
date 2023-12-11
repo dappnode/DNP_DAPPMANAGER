@@ -21,8 +21,8 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
 export { fetchRegistry } from "./fetchRegistry.js";
-export { fetchRegistryProgress } from "./fetchRegistry.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
+export { getHostUptime } from "./getHostUptime.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
@@ -56,9 +56,14 @@ export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
 export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
-export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { statsCpuGet } from "./statsCpuGet.js";
+export {
+  sshPortGet,
+  sshPortSet,
+  sshStatusGet,
+  sshStatusSet
+} from "./sshManager.js";
 export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";

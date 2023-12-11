@@ -22,7 +22,6 @@
     "@dappnode/common": "^0.1.0",
     "@dappnode/hostscriptsservices": "^0.1.0",
     "@dappnode/params": "^0.1.0",
-    "@dappnode/types": "^0.1.30",
     "@dappnode/utils": "^0.1.0",
     "@types/lodash-es": "^4.17.9",
     "dargs": "7.0.0",
@@ -32,15 +31,9 @@
     "tar-stream": "2.1.4"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.6",
     "@types/dockerode": "^3.2.1",
     "@types/memoizee": "0.4.4",
-    "@types/mocha": "^10.0.2",
     "@types/node": "^20.6.2",
-    "@types/tar-stream": "2.1.0",
-    "chai": "^4.3.10",
-    "mocha": "^10.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/tar-stream": "2.1.0"
   }
 }

@@ -1,0 +1,44 @@
+{
+  "name": "@dappnode/schemas",
+  "type": "module",
+  "version": "0.1.0",
+  "description": "A shared TypeScript JSON schemas and its validation functions for the manifest and setup wizard dappnode files",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "keywords": [
+    "schemas",
+    "dappnode",
+    "ethereum"
+  ],
+  "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+  "contributors": [
+    "Pablo Mendez <mendez4a@gmail.com> (https://github.com/pablomendezroyo)"
+  ],
+  "license": "GPL-3.0",
+  "files": [
+    "dist",
+    "src/schemas"
+  ],
+  "devDependencies": {
+    "@dappnode/params": "^0.1.0",
+    "@types/node": "^20.6.2"
+  },
+  "dependencies": {
+    "@dappnode/common": "^0.1.0",
+    "ajv": "^8.12.0",
+    "semver": "^7.5.0"
+  }
+}

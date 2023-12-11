@@ -7,19 +7,17 @@ import {
   EthClientFallback,
   EthClientStatus,
   EthClientStatusError,
-  Eth2ClientTarget
+  Eth2ClientTarget,
+  ExecutionClientMainnet,
+  ConsensusClientMainnet,
+  executionClientsMainnet,
+  consensusClientsMainnet
 } from "@dappnode/common";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
 import { prettyDnpName } from "utils/format";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet
-} from "@dappnode/types";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;

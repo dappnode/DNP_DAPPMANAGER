@@ -7,7 +7,7 @@ import {
   ChainDriverType,
   chainDriversTypes,
   Dependencies,
-} from "@dappnode/types";
+} from "@dappnode/common";
 import { pick, omitBy, mapValues } from "lodash-es";
 
 /**

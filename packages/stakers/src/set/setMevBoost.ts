@@ -1,19 +1,27 @@
 import {
   StakerItemOk,
   UserSettingsAllDnps,
-  InstalledPackageData
+  InstalledPackageData,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network,
 } from "@dappnode/common";
-import { MevBoostMainnet, MevBoostPrater, Network } from "@dappnode/types";
-import { packageInstall, packageSetEnvironment } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  packageInstall,
+  packageSetEnvironment,
+} from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { stopAllPkgContainers } from "./stopAllPkgContainers.js";
 
 export async function setMevBoost<T extends Network>({
+  dappnodeInstaller,
   mevBoost,
   targetMevBoost,
-  currentMevBoostPkg
+  currentMevBoostPkg,
 }: {
+  dappnodeInstaller: DappnodeInstaller;
   mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageData;
@@ -34,7 +42,7 @@ export async function setMevBoost<T extends Network>({
 
   // User settings object: RELAYS
   const userSettings: UserSettingsAllDnps = getMevBoostUserSettings({
-    targetMevBoost
+    targetMevBoost,
   });
 
   // MevBoost installed and enable => make sure its running
@@ -43,21 +51,21 @@ export async function setMevBoost<T extends Network>({
     // Update env if needed
     await updateMevBoostEnv({
       targetMevBoost,
-      userSettings
+      userSettings,
     });
     await dockerComposeUpPackage(
       { dnpName: currentMevBoostPkg.dnpName },
       {},
       {},
       true
-    ).catch(err => logs.error(err));
+    ).catch((err) => logs.error(err));
   } // MevBoost installed and disabled => make sure its stopped
   else if (currentMevBoostPkg && !targetMevBoost.dnpName) {
     await stopAllPkgContainers(currentMevBoostPkg);
   } // MevBoost not installed and enable => make sure its installed
   else if (!currentMevBoostPkg && targetMevBoost.dnpName) {
     logs.info("Installing MevBoost");
-    await packageInstall({ name: mevBoost, userSettings });
+    await packageInstall(dappnodeInstaller, { name: mevBoost, userSettings });
   }
 }
 
@@ -67,7 +75,7 @@ export async function setMevBoost<T extends Network>({
  */
 async function updateMevBoostEnv<T extends Network>({
   targetMevBoost,
-  userSettings
+  userSettings,
 }: {
   targetMevBoost: StakerItemOk<T, "mev-boost">;
   userSettings: UserSettingsAllDnps;
@@ -79,7 +87,7 @@ async function updateMevBoostEnv<T extends Network>({
       logs.info("Updating environment for " + targetMevBoost.dnpName);
       await packageSetEnvironment({
         dnpName: targetMevBoost.dnpName,
-        environmentByService: serviceEnv
+        environmentByService: serviceEnv,
       });
     }
   }
@@ -89,7 +97,7 @@ async function updateMevBoostEnv<T extends Network>({
  * Get the user settings for the mev boost
  */
 function getMevBoostUserSettings<T extends Network>({
-  targetMevBoost
+  targetMevBoost,
 }: {
   targetMevBoost: StakerItemOk<T, "mev-boost">;
 }): UserSettingsAllDnps {
@@ -101,9 +109,9 @@ function getMevBoostUserSettings<T extends Network>({
             targetMevBoost.relays
               ?.join(",")
               .trim()
-              .replace(/(^,)|(,$)/g, "") || ""
-        }
-      }
-    }
+              .replace(/(^,)|(,$)/g, "") || "",
+        },
+      },
+    },
   };
 }

@@ -3,11 +3,7 @@ import { directory, registry, dnpRequests } from "./data";
 
 export const fetchPkgsData: Pick<
   Routes,
-  | "fetchCoreUpdateData"
-  | "fetchDirectory"
-  | "fetchDnpRequest"
-  | "fetchRegistry"
-  | "fetchRegistryProgress"
+  "fetchCoreUpdateData" | "fetchDirectory" | "fetchDnpRequest" | "fetchRegistry"
 > = {
   fetchCoreUpdateData: async () => sampleCoreUpdateData,
   fetchDirectory: async () => directory,
@@ -17,12 +13,6 @@ export const fetchPkgsData: Pick<
         resolve(registry);
       }, 10000);
     });
-  },
-  fetchRegistryProgress: async () => {
-    return {
-      lastFetchedBlock: 6200000,
-      latestBlock: 13000000
-    };
   },
   fetchDnpRequest: async ({ id }) => {
     const dnpRequest = dnpRequests[id];

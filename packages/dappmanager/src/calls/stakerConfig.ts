@@ -1,6 +1,6 @@
-import { Network } from "@dappnode/types";
 import { getStakerConfig, setStakerConfig } from "@dappnode/stakers";
-import { StakerConfigGet, StakerConfigSet } from "@dappnode/common";
+import { StakerConfigGet, StakerConfigSet, Network } from "@dappnode/common";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Sets the staker configuration: execution and consensus clients, remote signer,
@@ -11,7 +11,7 @@ export async function stakerConfigSet<T extends Network>({
 }: {
   stakerConfig: StakerConfigSet<T>;
 }): Promise<void> {
-  await setStakerConfig<T>({ ...stakerConfig });
+  await setStakerConfig<T>(dappnodeInstaller, { ...stakerConfig });
 }
 
 /**
@@ -21,5 +21,5 @@ export async function stakerConfigSet<T extends Network>({
 export async function stakerConfigGet<T extends Network>(
   network: Network
 ): Promise<StakerConfigGet<T>> {
-  return await getStakerConfig<T>(network);
+  return await getStakerConfig<T>(dappnodeInstaller, network);
 }

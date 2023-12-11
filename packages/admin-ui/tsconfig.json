@@ -2,10 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     /* Modules */
+    "module": "ESNext",
+    "moduleResolution": "node",
+
     "baseUrl": "src",
-    "paths": {
-      "@dappnode/common": ["../../common/src"]
-    },
 
     /* Emit */
     "noEmit": true,

@@ -1,4 +1,2 @@
-import updateIp from "./updateIp.js";
-import generateKeys from "./generateKeys.js";
-
-export { updateIp, generateKeys };
+export { updateDyndnsIp } from "./updateDyndnsIp.js";
+export { generateKeysIfNotExistOrNotValid } from "./generateKeysIfNotExistOrNotValid.js";

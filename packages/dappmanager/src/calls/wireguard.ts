@@ -1,7 +1,7 @@
 import fetch from "node-fetch";
 import { urlJoin } from "@dappnode/utils";
 import { params } from "@dappnode/params";
-import { packageSetEnvironment } from "@dappnode/installer";
+import { packageSetEnvironment } from "./packageSetEnvironment.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { WireguardDeviceCredentials } from "@dappnode/common";
 

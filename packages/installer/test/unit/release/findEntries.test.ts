@@ -1,12 +1,57 @@
 import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
-import { findEntries } from "../../../src/release/ipfs/findEntries.js";
+import { IPFSEntry } from "@dappnode/toolkit";
 import {
   releaseFilesToDownload,
   DirectoryFiles,
-} from "../../../src/release/ipfs/params.js";
-import { IpfsFileResult } from "@dappnode/ipfs";
+  FileConfig,
+  releaseFiles,
+} from "@dappnode/common";
+
+interface IpfsFileResult {
+  name: string; // 'avatar.png',
+  path: string; // 'QmR7ALYdVQCSfdob9tzE8mvPn3KJk653maMqLeqMo7eeTg/avatar.png',
+  size: number; // 9305,
+  hash: string; // 'QmRFfqN93JN5hDfqWhxaY6M16dafS6t9qzRCAKzzNT9ved',
+}
+
+type IPFSEntryName = Pick<IPFSEntry, "name">;
+
+type ReleaseFiles = typeof releaseFiles;
+
+// Overload to strictly type the return according to the fildId
+export function findEntries<
+  T extends IPFSEntryName,
+  K extends keyof ReleaseFiles
+>(
+  files: T[],
+  config: Omit<FileConfig, "format">,
+  fileId: K
+): ReleaseFiles[K] extends { multiple: true }
+  ? T[]
+  : ReleaseFiles[K] extends { required: true }
+  ? T
+  : T | undefined;
+
+export function findEntries<T extends IPFSEntryName>(
+  files: T[],
+  config: Omit<FileConfig, "format">,
+  fileId: string
+): T[] | T | undefined {
+  const matches = files.filter((file) => config.regex.test(file.name));
+
+  if (matches.length === 0 && config.required)
+    throw Error(`No ${fileId} found`);
+
+  if (config.multiple) {
+    return matches;
+  } else {
+    if (matches.length > 1)
+      throw Error(`Multiple possible entries found for ${fileId}`);
+    return matches[0];
+  }
+}
 
 describe("validateTarImage", () => {
   it("Should find all release entries", () => {
@@ -35,9 +80,6 @@ describe("validateTarImage", () => {
       manifest: "dappnode_package.json",
       compose: "docker-compose.yml",
       setupWizard: "setup-wizard.json",
-      setupSchema: undefined,
-      setupTarget: undefined,
-      setupUiJson: undefined,
       signature: "signature.json",
       disclaimer: "disclaimer.md",
       gettingStarted: "getting-started.md",

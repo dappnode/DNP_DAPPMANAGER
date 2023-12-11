@@ -1,6 +1,0 @@
-{
-  "ui:order": ["netstats_enable", "*"],
-  "password": {
-    "ui:widget": "password"
-  }
-}
