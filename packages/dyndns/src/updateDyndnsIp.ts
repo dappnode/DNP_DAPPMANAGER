@@ -16,7 +16,6 @@ interface DyndnsResponse {
  * Gets the keys from the local file or creates new ones and stores them.
  * Then it does a GET request to the dyndns server to update the record
  *
- * @returns the domain, from the server.
  * Example: 1234abcd1234acbd.dyndns.dappnode.io
  */
 export async function updateDyndnsIp(): Promise<void> {
