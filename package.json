@@ -14,7 +14,6 @@
     ]
   },
   "scripts": {
-    "dev": "lerna run dev --include-dependencies --stream",
     "build": "lerna run build --include-dependencies --stream",
     "test": "lerna run test --stream",
     "lint": "lerna run lint --stream",
