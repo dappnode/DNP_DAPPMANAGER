@@ -179,7 +179,8 @@ describe("Fetch releases", () => {
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
-        avatarUrl: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
+        avatarUrl:
+          "https://gateway.ipfs.dappnode.io/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
         metadata: {
           name: dnpNameMain,
           version: mainVersion,
@@ -350,7 +351,8 @@ describe("Fetch releases", () => {
         reqVersion: mainDnpReleaseHash,
         semVersion: mainVersion,
         origin: mainDnpReleaseHash,
-        avatarUrl: "/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
+        avatarUrl:
+          "https://gateway.ipfs.dappnode.io/ipfs/QmQZ9sohpdB7NDDXcPfuPtpJ5TrMGxLWATpQUiaifUhrd2",
         metadata: {
           description: "Main DNP",
           license: "GPL-3.0",
