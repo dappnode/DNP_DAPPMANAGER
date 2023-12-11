@@ -45,7 +45,10 @@ describe("Dyndns", () => {
   });
 
   it("Should update a dyndns identity", async () => {
-    console.log("identity.privateKey", identity.privateKey);
     const result = await updateDyndnsIpFromPrivateKey(identity.privateKey);
-  })
+    expect(result).to.be.an("object");
+    expect(result).to.have.property("ip");
+    expect(result).to.have.property("domain");
+    expect(result).to.have.property("message");
+  });
 });
