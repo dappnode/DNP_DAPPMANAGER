@@ -42,16 +42,12 @@
     "timestring": "6.0.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.6",
     "@types/dockerode": "3.2.1",
     "@types/lodash-es": "4.17.6",
-    "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.2",
     "@types/node-fetch": "^2.6.9",
     "@types/sinon": "7.0.13",
-    "chai": "^4.3.8",
     "it-all": "^3.0.4",
-    "mocha": "^10.2.0",
     "rewiremock": "3.13.7",
     "sinon": "5.0.10"
   }

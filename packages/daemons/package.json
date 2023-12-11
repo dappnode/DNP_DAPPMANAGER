@@ -39,14 +39,10 @@
   },
   "devDependencies": {
     "@types/async-retry": "^1.4.2",
-    "@types/chai": "^4.3.6",
     "@types/lodash-es": "^4.17.6",
-    "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.2",
     "@types/node-telegram-bot-api": "^0.50.4",
     "@types/semver": "^7.3.13",
-    "chai": "^4.3.8",
-    "mocha": "^10.2.0",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10"
   }
