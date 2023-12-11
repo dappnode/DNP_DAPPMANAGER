@@ -19,6 +19,17 @@ export async function updateDyndnsIp(): Promise<string | void> {
     logs.warn("dyndns: Private key not initialized");
     return;
   }
+  return await updateDyndnsIpFromPrivateKey(privateKey);
+}
+
+export async function updateDyndnsIpFromPrivateKey(
+  privateKey: string
+): Promise<string | void> {
+  // privateKey must be 64 chars length otherwise it will raise with the error
+  // Error: 400, Signing error: Expected signature to be an Uint8Array with length 64
+  // Server side error: https://github.com/dappnode/dyndns-server/blob/7fde48fb19c7d7c19bfb43cac6d56dcc7116d32b/api/src/server.js#L64
+  // TODO: consider bumping server side libs eth-crypto
+  //if (privateKey.startsWith("0x")) privateKey = privateKey.slice(2);
 
   const timestamp = Math.floor(Date.now() / 1000);
 
@@ -31,46 +42,41 @@ export async function updateDyndnsIp(): Promise<string | void> {
     [timestamp.toString()]
   );
   const signature = ethers.Signature.from(signDigest(hash));
-  const parameters = [
-    `address=${wallet.address}`,
-    `timestamp=${timestamp}`,
-    `sig=${signature}`,
-  ];
-  const url = `${dyndnsHost}/?${parameters.join("&")}`;
-  try {
-    const res = await fetch(url);
+  // create a uint8array from the ethers signature
 
-    const status = res.status;
-    if (status !== 200) {
-      try {
-        // TODO: do better type checking
-        const bodyError: { message: string } = (await res.json()) as any;
-        throw Error(`${status}, ${bodyError.message}`);
-      } catch (e) {
-        throw Error(`${status}, ${res.statusText}`);
-      }
-    }
+  const res = await fetch(
+    `${dyndnsHost}/?${[
+      `address=${wallet.address}`,
+      `timestamp=${timestamp}`,
+      `sig=${signature}`,
+    ].join("&")}`
+  );
 
+  if (res.status !== 200) {
     // TODO: do better type checking
-    const bodyData: {
-      ip: string;
-      domain: string;
-      message: string;
-    } = (await res.json()) as any;
-
-    // Deal with the answer
-    // Sample res:
-    // res.data = {
-    //     'ip': '63.84.220.164',
-    //     'domain': '1234abcd1234acbd.dyndns.dappnode.io',
-    //     'message': 'Your dynamic domain 1234abcd1234acbd.dyndns.dappnode.io
-    //          has been updated to 63.11.22.164',
-    // };
-
-    logs.info(`dyndns: Updated IP successfully: ${bodyData.message}`);
-    db.domain.set(bodyData.domain);
-    return bodyData.domain;
-  } catch (e) {
-    logs.error("Dyndns error", e);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const bodyError: { message: string } = (await res.json()) as any;
+    throw Error(`${res.status}, ${bodyError.message}`);
   }
+
+  // TODO: do better type checking
+  const bodyData: {
+    ip: string;
+    domain: string;
+    message: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } = (await res.json()) as any;
+
+  // Deal with the answer
+  // Sample res:
+  // res.data = {
+  //     'ip': '63.84.220.164',
+  //     'domain': '1234abcd1234acbd.dyndns.dappnode.io',
+  //     'message': 'Your dynamic domain 1234abcd1234acbd.dyndns.dappnode.io
+  //          has been updated to 63.11.22.164',
+  // };
+
+  logs.info(`dyndns: Updated IP successfully: ${bodyData.message}`);
+  db.domain.set(bodyData.domain);
+  return bodyData.domain;
 }

@@ -7,6 +7,7 @@ import {
 } from "../../src/generateKeysIfNotExistOrNotValid.js";
 import { ethers } from "ethers";
 import { params } from "@dappnode/params";
+import { updateDyndnsIpFromPrivateKey } from "../../src/updateDyndnsIp.js";
 
 describe("Dyndns", () => {
   let identity: ethers.HDNodeWallet;
@@ -42,4 +43,9 @@ describe("Dyndns", () => {
     if (domain.length !== 35)
       throw new Error(`Domain length is not 35: ${domain.length}`);
   });
+
+  it("Should update a dyndns identity", async () => {
+    console.log("identity.privateKey", identity.privateKey);
+    const result = await updateDyndnsIpFromPrivateKey(identity.privateKey);
+  })
 });
