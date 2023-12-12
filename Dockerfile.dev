@@ -23,8 +23,6 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   TEST=true \
   REACT_APP_API_URL=http://172.33.1.7:5000/
 WORKDIR /app
-COPY --from=build-binaries /usr/bin/docker /usr/libexec/docker/cli-plugins/docker-cli-compose \ 
-  /usr/bin/curl /usr/bin/zip /usr/bin/unzip /usr/bin/xz /usr/bin/
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl
 RUN apk update && apk add --no-cache bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
