@@ -16,7 +16,7 @@ async function execDockerCompose(
 ): Promise<string> {
   // Usage: subcommand [options] [--scale SERVICE=NUM...] [SERVICE...]
   return shell([
-    "docker-compose",
+    "docker compose",
     "-f",
     dcPath,
     subcommand,

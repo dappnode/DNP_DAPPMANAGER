@@ -7,22 +7,14 @@ ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 
 # Initial stage to gather git data
 FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as git-data
-
 WORKDIR /usr/src/app
 RUN apk add --no-cache git
-
 COPY .git dappnode_package.json docker/getGitData.js ./
-
 RUN node getGitData /usr/src/app/.git-data.json
 
-# Build binaries (nsupdate, docker, docker-compose)
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as build-binaries
-
-RUN apk update && apk add --no-cache docker curl docker-compose xz zip unzip libltdl
 
 # Build + Prod stage
 FROM node:${NODE_VERSION}-alpine
-
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
@@ -30,13 +22,8 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
   REACT_APP_API_URL=http://172.33.1.7:5000/
-
 WORKDIR /app
-
-COPY --from=build-binaries /usr/bin/docker /usr/libexec/docker/cli-plugins/docker-compose \ 
-  /usr/bin/curl /usr/bin/zip /usr/bin/unzip /usr/bin/xz /usr/bin/
-
-RUN apk update && apk add --no-cache bash git bind bind-tools bind-dev \ 
+RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
 
 # Copy docker
