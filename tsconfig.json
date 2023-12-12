@@ -12,6 +12,8 @@
 
     /* Emit */
     "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
 
     /* Interop Constraints */
     "esModuleInterop": true,

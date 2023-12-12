@@ -5,9 +5,7 @@
     "types": ["mocha", "node"],
 
     /* Emit */
-    "declaration": false /* TODO: Should be removed when code is fixed */,
     "outDir": "dist",
-    "sourceMap": true,
 
     /* Language and Environment */
     "target": "ES2019",
