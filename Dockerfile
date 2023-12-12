@@ -33,10 +33,9 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=/usr/src/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json 
 WORKDIR /usr/src/app
-RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl
 # TODO: Remove bind modules when we don't use Bind package?
 # These packages create several files
-RUN apk add --no-cache bind bind-dev bind-tools avahi-tools dbus miniupnpc
+RUN apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bind bind-dev bind-tools avahi-tools dbus miniupnpc
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
