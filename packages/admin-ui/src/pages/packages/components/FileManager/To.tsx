@@ -37,7 +37,7 @@ export function CopyFileTo({
 
         await withToast(
           () =>
-            api.copyFileTo({
+            api.copyFileToDockerContainer({
               containerName: container.containerName,
               dataUri,
               filename: name || "",

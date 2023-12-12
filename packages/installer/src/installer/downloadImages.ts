@@ -3,7 +3,7 @@ import { isAbsolute } from "path";
 import { InstallPackageData, DistributedFile } from "@dappnode/common";
 import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath, getImageTag } from "@dappnode/utils";
-import { dockerImageManifest } from "@dappnode/dockerapi";
+import { getDockerImageManifest } from "@dappnode/dockerapi";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**
@@ -133,7 +133,7 @@ async function verifyDockerImage({
     serviceName: dnpName,
     version,
   });
-  const images = await dockerImageManifest(imagePath);
+  const images = await getDockerImageManifest(imagePath);
   for (const image of images) {
     for (const repoTag of image.RepoTags) {
       if (!repoTag.endsWith(expectedTagSuffix))

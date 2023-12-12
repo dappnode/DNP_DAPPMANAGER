@@ -1,13 +1,9 @@
 import path from "path";
-// Modules
-import {
-  dockerCopyFileTo,
-  dockerGetContainerWorkingDir
-} from "@dappnode/dockerapi";
 // Utils
 import fs from "fs";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
+import { shell } from "@dappnode/utils";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -28,11 +24,11 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   Same for relative paths to directories.
  * - If empty, defaults to $WORKDIR
  */
-export async function copyFileTo({
+export async function copyFileToDockerContainer({
   containerName,
   dataUri,
   filename,
-  toPath
+  toPath,
 }: {
   containerName: string;
   dataUri: string;
@@ -89,6 +85,18 @@ export async function copyFileTo({
   // Clean intermediate file
   if (fs.existsSync(fromPath))
     fs.rmSync(fromPath, { recursive: true, force: true });
+}
+
+function dockerCopyFileTo(
+  id: string,
+  fromPath: string,
+  toPath: string
+): Promise<string> {
+  return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
+}
+
+function dockerGetContainerWorkingDir(id: string): Promise<string> {
+  return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
 }
 
 /**
