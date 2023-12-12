@@ -21,7 +21,6 @@ import {
   listPackageNoThrow,
   getDnCoreNetworkContainerConfig,
 } from "@dappnode/dockerapi";
-import Dockerode from "dockerode";
 import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
@@ -269,7 +268,7 @@ export class EthereumClient {
       (alias: string) => alias !== aliasToRemove
     );
 
-    const endpointConfig: Partial<Dockerode.NetworkInfo> = {
+    const endpointConfig = {
       ...currentEndpointConfig,
       Aliases: updatedAliases,
     };
@@ -292,7 +291,7 @@ export class EthereumClient {
       containerName
     );
 
-    const endpointConfig: Partial<Dockerode.NetworkInfo> = {
+    const endpointConfig = {
       ...currentEndpointConfig,
       Aliases: uniq([...(currentEndpointConfig?.Aliases || []), aliasToAdd]),
     };
