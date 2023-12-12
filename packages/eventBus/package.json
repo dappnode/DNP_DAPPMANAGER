@@ -25,8 +25,6 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.9",
-    "@types/node": "^20.6.2",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.6.2"
   }
 }
