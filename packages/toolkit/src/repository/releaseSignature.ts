@@ -34,7 +34,8 @@ export function getReleaseSignatureStatus(
     if (
       dnpName.endsWith(trustedKey.dnpNameSuffix) &&
       trustedKey.signatureProtocol === signature.signature_protocol &&
-      trustedKey.key === signingKey
+      // TODO: research for a better way to compare keys
+      trustedKey.key.toLowerCase() === signingKey.toLowerCase()
     ) {
       return {
         status: ReleaseSignatureStatusCode.signedByKnownKey,
