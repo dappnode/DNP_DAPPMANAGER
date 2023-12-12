@@ -105,7 +105,7 @@ function dockerGetContainerWorkingDir(id: string): Promise<string> {
  * @param dataUri = data:application/zip;base64,UEsDBBQAAAg...
  * @param pathTo = DNCORE/tempfile
  */
-function dataUriToFile(dataUri: string, pathTo: string): void {
+export function dataUriToFile(dataUri: string, pathTo: string): void {
   const decodedBuffer = dataUriToBuffer(dataUri);
   fs.writeFileSync(pathTo, decodedBuffer);
 }
