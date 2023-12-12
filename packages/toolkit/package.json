@@ -7,6 +7,7 @@
   "scripts": {
     "tag-and-publish": "yarn version patch && git push --follow-tags",
     "clean": "rimraf dist",
+    "dev": "tsc -w",
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
