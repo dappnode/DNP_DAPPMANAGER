@@ -68,7 +68,6 @@ export function startHttpApi({
   routes,
   limiterMiddleware,
   counterViewsMiddleware,
-  ethForwardMiddleware,
   routesLogger,
   methods,
   subscriptionsLogger,
@@ -81,7 +80,6 @@ export function startHttpApi({
   routes: HttpRoutes;
   limiterMiddleware: express.RequestHandler;
   counterViewsMiddleware: express.RequestHandler;
-  ethForwardMiddleware: express.RequestHandler;
   routesLogger: LoggerMiddleware;
   methods: Routes;
   subscriptionsLogger: LoggerMiddleware;
@@ -100,9 +98,6 @@ export function startHttpApi({
   const rpcHandler = getRpcHandler(methods, routesLogger);
 
   app.use(helmetConf());
-  // Intercept decentralized website requests first
-  // TODO: research how to use auth in the proxy
-  // app.use(ethForwardMiddleware);
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));
   // CORS config follows https://stackoverflow.com/questions/50614397/value-of-the-access-control-allow-origin-header-in-the-response-must-not-be-th

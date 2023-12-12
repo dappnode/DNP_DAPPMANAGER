@@ -23,8 +23,7 @@ import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
 import {
   getLimiter,
-  getViewsCounterMiddleware,
-  getEthForwardMiddleware
+  getViewsCounterMiddleware
 } from "./api/middlewares/index.js";
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
@@ -49,7 +48,6 @@ const server = startHttpApi({
   routes,
   limiterMiddleware: getLimiter(),
   counterViewsMiddleware: getViewsCounterMiddleware(),
-  ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
   methods: { ...calls, ...deviceCalls },
   subscriptionsLogger,
