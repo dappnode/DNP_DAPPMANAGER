@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon -w src -e js,ts,json --require dotenv/config -x 'node --loader ts-node/esm' src/index.ts",
+    "dev": "nodemon -w src $(find .. -path '*/node_modules/*' -prune -o -name dist -type d -print | sed 's/^/-w /') -e js,ts,json --require dotenv/config -x 'node --loader ts-node/esm' src/index.ts",
     "build": "tsc -p tsconfig.json",
     "watch-ts": "tsc -w",
     "file": "node",
@@ -43,7 +43,6 @@
     "@dappnode/utils": "^0.1.0",
     "@types/async-retry": "^1.4.2",
     "@types/bcryptjs": "^2.4.2",
-    "@types/chai": "^4.2.0",
     "@types/compression": "^1.7.0",
     "@types/cookie-session": "^2.0.41",
     "@types/cors": "^2.8.6",
@@ -53,7 +52,6 @@
     "@types/http-proxy": "^1.17.4",
     "@types/lodash-es": "^4.17.6",
     "@types/memoizee": "^0.4.4",
-    "@types/mocha": "^10.0.1",
     "@types/multicodec": "^1.0.0",
     "@types/node": "^18.15.11",
     "@types/node-os-utils": "^1.2.0",
@@ -66,9 +64,8 @@
     "compression": "^1.7.4",
     "cookie-session": "^1.4.0",
     "cors": "^2.8.5",
-    "data-uri-to-buffer": "^2.0.0",
     "deepmerge": "^2.2.1",
-    "ethers": "5.7.2",
+    "ethers": "^6.9.0",
     "express": "^4.17.1",
     "express-fileupload": "^1.4.0",
     "express-rate-limit": "^6.7.0",
@@ -87,16 +84,11 @@
   },
   "devDependencies": {
     "@types/node": "^18.15.11",
-    "chai": "^4.1.2",
     "dotenv": "^8.2.0",
     "kubo-rpc-client": "^3.0.2",
-    "mocha": "^10.2.0",
-    "nodemon": "^2.0.22",
     "prettier": "^2.3.2",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10",
-    "socket.io-client": "^4.5.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^4.7.3"
+    "socket.io-client": "^4.5.1"
   }
 }

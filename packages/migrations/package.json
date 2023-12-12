@@ -29,20 +29,13 @@
     "@dappnode/logger": "^0.1.0",
     "@dappnode/params": "^0.1.0",
     "@dappnode/utils": "^0.1.0",
-    "dockerode": "^3.2.1",
     "lodash-es": "^4.17.21",
     "semver": "^7.3.8"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.6",
-    "@types/dockerode": "^3.2.2",
+    "@types/dockerode": "^3.3.23",
     "@types/lodash-es": "^4.17.6",
-    "@types/mocha": "^10.0.1",
     "@types/node": "^20.6.2",
-    "@types/semver": "^7.3.13",
-    "chai": "^4.3.8",
-    "mocha": "^10.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/semver": "^7.3.13"
   }
 }

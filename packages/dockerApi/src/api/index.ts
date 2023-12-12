@@ -12,3 +12,4 @@ export * from "./network.js";
 export * from "./putArchive.js";
 export * from "./volume.js";
 export * from "./docker.js";
+export * from "./copyFileTo.js";

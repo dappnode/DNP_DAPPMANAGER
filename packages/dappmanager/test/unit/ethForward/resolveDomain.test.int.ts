@@ -19,7 +19,7 @@ import { resolveDomain } from "../../../src/api/middlewares/ethForward/resolveDo
  */
 
 describe("ethForward > resolveDomain", () => {
-  const provider = new ethers.providers.InfuraProvider();
+  const provider = new ethers.InfuraProvider();
 
   describe("resolveDomain with stable mainnet domains", () => {
     const ensDomains: { [hash: string]: Content } = {
@@ -33,7 +33,7 @@ describe("ethForward > resolveDomain", () => {
       }
     };
 
-    const provider = new ethers.providers.InfuraProvider();
+    const provider = new ethers.InfuraProvider();
 
     for (const [domain, expectedContent] of Object.entries(ensDomains)) {
       it(`should return the IPFS hash of ${domain}`, async () => {
@@ -66,7 +66,7 @@ describe("ethForward > resolveDomain", () => {
       "my.admin.dnp.dappnode.eth": "RESOLVERNOTFOUND"
     };
 
-    const provider = new ethers.providers.InfuraProvider();
+    const provider = new ethers.InfuraProvider();
 
     for (const [domain, expectedErrorCode] of Object.entries(ensDomains)) {
       it(`should error resolving ${domain}`, async () => {

@@ -32,15 +32,9 @@
   "devDependencies": {
     "@types/async": "^3.0.1",
     "@types/async-retry": "^1.4.2",
-    "@types/chai": "^4.3.6",
     "@types/js-yaml": "^3.12.1",
     "@types/lodash-es": "^4.17.9",
     "@types/memoizee": "0.4.4",
-    "@types/mocha": "^10.0.2",
-    "@types/node": "^20.6.2",
-    "chai": "^4.3.10",
-    "mocha": "^10.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.6.2"
   }
 }

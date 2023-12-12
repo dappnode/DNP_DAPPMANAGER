@@ -7,7 +7,7 @@ export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";
 export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
-export { copyFileTo } from "./copyFileTo.js";
+export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";

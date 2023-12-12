@@ -125,7 +125,11 @@ const stakerMainnetCard: DirectoryItemOk = {
   isFeatured: true,
   status: "ok",
   description: "Easily set-up your Ethereum node and validator",
-  avatarUrl: "/ipfs/QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y", // Ethereum image logo
+  avatarUrl: fileToGatewayUrl({
+    hash: "QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y",
+    source: "ipfs",
+    size: 0
+  }), // Ethereum image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {
@@ -143,7 +147,11 @@ const stakerGnosisCard: DirectoryItemOk = {
   isFeatured: true,
   status: "ok",
   description: "Easily set-up your Gnosis Chain node and validator",
-  avatarUrl: "/ipfs/QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS", // Gnosis image logo
+  avatarUrl: fileToGatewayUrl({
+    hash: "QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS",
+    source: "ipfs",
+    size: 0
+  }), // Gnosis image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {
@@ -162,7 +170,11 @@ const stakeHouseCard: DirectoryItemOk = {
   status: "ok",
   description:
     "Join or create an LSD Network and stake a validator with 4 ETH.",
-  avatarUrl: "/ipfs/QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw", // Stakehouse image logo
+  avatarUrl: fileToGatewayUrl({
+    hash: "QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw",
+    source: "ipfs",
+    size: 0
+  }), // Stakehouse image logo
   isInstalled: false,
   isUpdated: false,
   featuredStyle: {

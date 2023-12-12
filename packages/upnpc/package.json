@@ -20,17 +20,11 @@
   },
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/utils": "^0.1.0",
     "@dappnode/dockerapi": "^0.1.0",
+    "@dappnode/utils": "^0.1.0",
     "is-ip": "3.0.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.6",
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.6.2",
-    "chai": "^4.3.8",
-    "mocha": "^10.2.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.2.2"
+    "@types/node": "^20.6.2"
   }
 }

@@ -1,6 +1,6 @@
 import { InstallPackageData } from "@dappnode/common";
 import { Log } from "@dappnode/logger";
-import { loadImage, dockerImageManifest } from "@dappnode/dockerapi";
+import { loadImage, getDockerImageManifest } from "@dappnode/dockerapi";
 
 /**
  * Load the docker image .tar.xz. file of each package
@@ -13,7 +13,7 @@ export async function loadImages(
   log: Log
 ): Promise<void> {
   await Promise.all(
-    packagesData.map(async function({ dnpName, imagePath }) {
+    packagesData.map(async function ({ dnpName, imagePath }) {
       log(dnpName, "Loading image...");
       await loadImageWithProgress(imagePath, (message) =>
         log(dnpName, message)
@@ -31,7 +31,7 @@ async function loadImageWithProgress(
   imagePath: string,
   log: (message: string) => void
 ): Promise<void> {
-  const imageManifests = await dockerImageManifest(imagePath);
+  const imageManifests = await getDockerImageManifest(imagePath);
   let totalLayers = 0;
   for (const manifest of imageManifests)
     totalLayers += (manifest.Layers || []).length;

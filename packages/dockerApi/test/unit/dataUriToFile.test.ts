@@ -1,14 +1,13 @@
 import "mocha";
 import { expect } from "chai";
 import fs from "fs";
-import { dataUriToFile } from "../../../src/calls/copyFileTo.js";
-import { cleanTestDir, createTestDir } from "../../testUtils.js";
+import { dataUriToFile } from "../../src/api/copyFileTo.js";
 
 const testDir = "test_files";
 
-describe("Util: dataUriToFile", () => {
-  before(async () => {
-    await createTestDir();
+describe.only("Util: dataUriToFile", () => {
+  beforeEach(() => {
+    if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
   });
 
   it("should convert a PNG dataUri to a valid image", () => {
@@ -37,11 +36,7 @@ describe("Util: dataUriToFile", () => {
     const jsonData = JSON.parse(fs.readFileSync(pathTo, "utf8"));
     expect(jsonData).to.deep.equal({
       name: "Adam",
-      age: 23
+      age: 23,
     });
-  });
-
-  after(async () => {
-    await cleanTestDir();
   });
 });

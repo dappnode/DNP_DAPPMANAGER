@@ -10,7 +10,6 @@
 
     /* Emit */
     "outDir": "dist",
-    "sourceMap": true,
 
     /* Language and Environment */
     "lib": ["DOM", "ESNext"]

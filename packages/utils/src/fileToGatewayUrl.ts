@@ -1,5 +1,6 @@
 import { DistributedFile } from "@dappnode/common";
 import { normalizeHash } from "./normalizeHash.js";
+import url from "url";
 import { params } from "@dappnode/params";
 
 /**
@@ -13,7 +14,10 @@ export function fileToGatewayUrl(distributedFile?: DistributedFile): string {
 
   switch (distributedFile.source) {
     case "ipfs":
-      return `${params.IPFS_GATEWAY}${normalizeHash(distributedFile.hash)}`;
+      return url.resolve(
+        url.resolve(params.IPFS_REMOTE, params.IPFS_GATEWAY),
+        normalizeHash(distributedFile.hash)
+      );
     default:
       throw Error(`Source not supported: ${distributedFile.source}`);
   }

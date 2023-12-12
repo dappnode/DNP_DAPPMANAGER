@@ -30,12 +30,12 @@ const restartScriptPath = path.join(params.DNCORE_DIR, "restart-dappnode.sh");
 const timeoutWaitForRestart = 60 * 1000;
 
 /**
- * The DAPPMANAGER is unable to reset itself. When it calls docker-compose up it
+ * The DAPPMANAGER is unable to reset itself. When it calls docker compose up it
  * will first stop the current package which cancels the call and the container
  * stays exited forcing the user to ssh into the server to start the DAppNode again.
  *
  * This package spins a secondary container with the sole purpose of calling
- * docker-compose up on the DAPPMANAGER. Then it will end execution and remain exited
+ * docker compose up on the DAPPMANAGER. Then it will end execution and remain exited
  * The name of the container is DAppNodeTool-restart.dnp.dappnode.eth so it doesn't
  * shows up in the ADMIN UI's package list
  */
@@ -80,13 +80,13 @@ export async function restartDappmanagerPatch({
    *   restart patch must copy the previous compose to the backup path.
    * - Records to exit code to exit with it latter in case the original DAPPMANAGER
    *   it is still running, it will be able to capture the error.
-   * - If the first docker-compose up fails at the start stage, and the original container
+   * - If the first docke -compose up fails at the start stage, and the original container
    *   is left renamed to `${shortId}_${name}`. To correct the name, the container is
    *   force recreated.
    * [NOTE]: This script MUST exit with code > 0 for postRestartPatch() to know when to rollback
    */
   const restartScript = `
-docker-compose -f ${composePath} up -d --force-recreate
+docker compose -f ${composePath} up -d --force-recreate
 UPEXIT=$?
 if [ $UPEXIT -ne 0 ]
 then
@@ -94,10 +94,10 @@ then
     if [ "$(docker ps -aq -f status=running -f name=${dappmanagerName})" ]
     then
         echo "${dappmanagerName} is still running"
-        docker-compose -f ${composeBackupPath} up -d
+        docker compose -f ${composeBackupPath} up -d
     else
         echo "${dappmanagerName} is not running, using --force-recreate"
-        docker-compose -f ${composeBackupPath} up -d --force-recreate
+        docker compose -f ${composeBackupPath} up -d --force-recreate
     fi
 fi
 exit $UPEXIT
@@ -118,7 +118,7 @@ exit $UPEXIT
         // network that may conflict with future restart containers (it has happen in Dec 2019)
         network_mode: "none",
         volumes: params.restartDnpVolumes,
-        // The entrypoint property in the docker-compose overwrites
+        // The entrypoint property in the docker compose overwrites
         // both the CMD [ ] and ENTRYPOINT [ ] directive in the Dockerfile
         entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`,
       },
@@ -140,7 +140,7 @@ exit $UPEXIT
     // the new DAPPMANAGER / CORE manifest, as an extra safety measure
     await shell(
       restartLaunchCommand ||
-        `docker-compose -f ${composeRestartPath} up --force-recreate <&-`
+        `docker compose -f ${composeRestartPath} up --force-recreate <&-`
     );
 
     if (packagesData) db.coreUpdatePackagesData.set(null);
@@ -259,7 +259,7 @@ function parsePackageDataRaw(
     return packageData;
   }
 
-  const pre0235Data = (packageData as unknown) as {
+  const pre0235Data = packageData as unknown as {
     name: string;
     version: string;
   };

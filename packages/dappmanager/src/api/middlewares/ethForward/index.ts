@@ -1,5 +1,4 @@
 import express from "express";
-import { params } from "@dappnode/params";
 import { getIpfsProxyHandler, ProxyType } from "./ipfsProxy.js";
 import { ResolveDomainWithCache } from "./resolveDomain.js";
 
@@ -12,23 +11,11 @@ export function getEthForwardMiddleware(): express.RequestHandler {
     async (_req, domain) => await resolveDomain(domain)
   );
 
-  // Start IPFS gateway proxy: Serve IPFS content from the DAPPMANAGER
-  const ipfsGatewayProxydHandler = getIpfsProxyHandler<string>(
-    ProxyType.IPFS_GATEWAY,
-    async (_req, hash) => ({ location: "ipfs", hash })
-  );
-
   return (req, res, next): void => {
     try {
       const domain = parseEthDomainHost(req);
       if (domain !== null) {
         ethForwardHandler(req, res, domain);
-        return;
-      }
-
-      const hash = parseIpfsGatewayProxyReqHash(req.url);
-      if (hash !== null) {
-        ipfsGatewayProxydHandler(req, res, hash);
         return;
       }
 
@@ -50,23 +37,4 @@ function parseEthDomainHost(req: express.Request): string | null {
     !domain.endsWith("dnp.dappnode.eth")
     ? domain
     : null;
-}
-
-/**
- * @param reqUrl Must be the parsed path, i.e. `/ipfs-gateway-proxy/Qm`
- */
-export function parseIpfsGatewayProxyReqHash(reqUrl: string): string | null {
-  // Check if this request is for the IFPS gateway proxy,
-  // - my.dappnode/ipfs-gateway-proxy/Qm -> true
-  // - my.dappnode -> false
-  // - decentral.eth -> false
-  if (typeof reqUrl !== "string") return null;
-
-  let pathname = reqUrl;
-  if (!pathname.startsWith("/")) pathname = "/" + pathname;
-  if (pathname.startsWith(params.IPFS_GATEWAY)) {
-    return pathname.slice(params.IPFS_GATEWAY.length);
-  } else {
-    return null;
-  }
 }

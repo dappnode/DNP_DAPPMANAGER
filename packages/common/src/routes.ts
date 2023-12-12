@@ -124,7 +124,7 @@ export interface Routes {
    *   Same for relative paths to directories.
    * - If empty, defaults to $WORKDIR
    */
-  copyFileTo: (kwargs: {
+  copyFileToDockerContainer: (kwargs: {
     containerName: string;
     dataUri: string;
     filename: string;
@@ -691,14 +691,14 @@ interface RouteData {
 
 export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateDataGet: {},
-  autoUpdateSettingsEdit: { log: true },
+  autoUpdateSettingsEdit: {},
   backupGet: {},
-  backupRestore: { log: true },
+  backupRestore: {},
   chainDataGet: {},
-  changeIpfsTimeout: { log: true },
+  changeIpfsTimeout: {},
   cleanCache: {},
   cleanDb: {},
-  copyFileTo: { log: true },
+  copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
   dappnodeWebNameSet: { log: true },
@@ -711,7 +711,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
-  ethClientFallbackSet: { log: true },
+  ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
   getEthicalMetricsConfig: { log: true },
@@ -721,7 +721,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistry: {},
   fetchDnpRequest: {},
   getUserActionLogs: {},
-  getHostUptime: { log: true },
+  getHostUptime: {},
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
@@ -750,8 +750,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   packageLog: {},
   packageRemove: { log: true },
   packageRestart: { log: true },
-  packageRestartVolumes: { log: true },
-  packageSentDataDelete: { log: true },
+  packageRestartVolumes: {},
+  packageSentDataDelete: {},
   packageSetEnvironment: { log: true },
   packageSetPortMappings: { log: true },
   packageStartStop: { log: true },

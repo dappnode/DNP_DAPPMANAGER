@@ -2,10 +2,13 @@ import path from "path";
 import { params } from "@dappnode/params";
 import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "@dappnode/logger";
-import { copyFileTo } from "./copyFileTo.js";
 import { InstallPackageData } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
-import { dockerComposeUpPackage, dockerComposeUp } from "@dappnode/dockerapi";
+import {
+  dockerComposeUpPackage,
+  dockerComposeUp,
+  copyFileToDockerContainer,
+} from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
 import {
   connectToPublicNetwork,
@@ -70,7 +73,12 @@ export async function runPackages(
           const containerName = service.container_name;
           if (!containerName)
             throw Error(`No container name for ${serviceName}`);
-          await copyFileTo({ containerName, dataUri, filename, toPath });
+          await copyFileToDockerContainer({
+            containerName,
+            dataUri,
+            filename,
+            toPath,
+          });
         }
     }
 
