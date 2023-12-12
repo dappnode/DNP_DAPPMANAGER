@@ -65,7 +65,7 @@ export default function RemoteSigner<T extends Network>({
       {signer.status === "ok" &&
         isSelected &&
         signer.isInstalled &&
-        signer.data?.manifest.links?.ui && (
+        signer.data?.manifest?.links?.ui && (
           <div
             style={{
               alignItems: "center",
