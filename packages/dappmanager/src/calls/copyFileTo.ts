@@ -5,9 +5,9 @@ import {
   dockerGetContainerWorkingDir
 } from "@dappnode/dockerapi";
 // Utils
-import { shell } from "@dappnode/utils";
 import dataUriToFile from "../utils/dataUriToFile.js";
 import { params } from "@dappnode/params";
+import fs from "fs";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -63,9 +63,14 @@ export async function copyFileTo({
   }
 
   // Intermediate step, the file is in local file system
-  await shell(`mkdir -p ${tempTransferDir}`); // Never throws
+  if (!fs.existsSync(tempTransferDir))
+    fs.mkdirSync(tempTransferDir, { recursive: true });
+
   const fromPath = path.join(tempTransferDir, filename);
-  await shell(`rm -rf ${fromPath}`); // Just to be sure it's clean
+
+  // Remove existing file if it exists
+  if (fs.existsSync(fromPath))
+    fs.rmSync(fromPath, { recursive: true, force: true });
 
   /**
    * Convert dataUri to local file
@@ -81,5 +86,6 @@ export async function copyFileTo({
   await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
-  await shell(`rm -rf ${fromPath}`);
+  if (fs.existsSync(fromPath))
+    fs.rmSync(fromPath, { recursive: true, force: true });
 }
