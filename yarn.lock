@@ -4062,25 +4062,10 @@
     "@types/node" "*"
     "@types/ssh2" "*"
 
-"@types/dockerode@3.2.1":
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/@types/dockerode/-/dockerode-3.2.1.tgz#f713a8f6f1017c227845ab33239383da721207b9"
-  integrity sha512-AeZpdQMNqM8dtrEaaP81CbjdRVKNmFIMzgz5IlKIeS5uWEmjlEmENP444AGTEEF71r5TFuY9E4SkzZAO8lOF1A==
-  dependencies:
-    "@types/node" "*"
-
-"@types/dockerode@^3.2.1":
-  version "3.3.20"
-  resolved "https://registry.yarnpkg.com/@types/dockerode/-/dockerode-3.3.20.tgz#2ddf878d85094104502119821c2951f0a9c41ef9"
-  integrity sha512-Q+1e3z6SPWXR/Sk+WIyJFVsSDg78S7MDaGcwAh1WKlveO1tVO8TF1rOzJir5GLnqzEdUbclFKlw/4rhwESxwPw==
-  dependencies:
-    "@types/docker-modem" "*"
-    "@types/node" "*"
-
-"@types/dockerode@^3.2.2":
-  version "3.3.19"
-  resolved "https://registry.yarnpkg.com/@types/dockerode/-/dockerode-3.3.19.tgz#59eb07550a102b397a9504083a6c50d811eed04c"
-  integrity sha512-7CC5yIpQi+bHXwDK43b/deYXteP3Lem9gdocVVHJPSRJJLMfbiOchQV3rDmAPkMw+n3GIVj7m1six3JW+VcwwA==
+"@types/dockerode@^3.3.23":
+  version "3.3.23"
+  resolved "https://registry.yarnpkg.com/@types/dockerode/-/dockerode-3.3.23.tgz#07b2084013d01e14d5d97856446f4d9c9f27c223"
+  integrity sha512-Lz5J+NFgZS4cEVhquwjIGH4oQwlVn2h7LXD3boitujBnzOE5o7s9H8hchEjoDK2SlRsJTogdKnQeiJgPPKLIEw==
   dependencies:
     "@types/docker-modem" "*"
     "@types/node" "*"
@@ -5770,7 +5755,7 @@ asn1.js@^5.2.0:
     minimalistic-assert "^1.0.0"
     safer-buffer "^2.1.0"
 
-asn1@^0.2.6, asn1@~0.2.0, asn1@~0.2.3:
+asn1@^0.2.6, asn1@~0.2.3:
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/asn1/-/asn1-0.2.6.tgz#0d3a7bb6e64e02a90c0303b31f292868ea09a08d"
   integrity sha512-ix/FxPn0MDjeyJ7i/yoHGFt/EX6LyNbxSEhPPXODPL+KB0VPk86UYfL0lMdy+KCnv+fmvIzySwaK5COwqVbWTQ==
@@ -8238,41 +8223,23 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docker-modem@^2.1.0:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/docker-modem/-/docker-modem-2.1.4.tgz#54ec1079287624a8d30cc3c55ab0e1201e7c46c9"
-  integrity sha512-vDTzZjjO1sXMY7m0xKjGdFMMZL7vIUerkC3G4l6rnrpOET2M6AOufM8ajmQoOB+6RfSn6I/dlikCUq/Y91Q1sQ==
-  dependencies:
-    debug "^4.1.1"
-    readable-stream "^3.5.0"
-    split-ca "^1.0.1"
-    ssh2 "^0.8.7"
-
-docker-modem@^3.0.0:
-  version "3.0.8"
-  resolved "https://registry.yarnpkg.com/docker-modem/-/docker-modem-3.0.8.tgz#ef62c8bdff6e8a7d12f0160988c295ea8705e77a"
-  integrity sha512-f0ReSURdM3pcKPNS30mxOHSbaFLcknGmQjwSfmbcdOw1XWKXVhukM3NJHhr7NpY9BIyyWQb0EBo3KQvvuU5egQ==
+docker-modem@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/docker-modem/-/docker-modem-5.0.1.tgz#106bab0886d4df4ed1ea9053f1863ade4adbe846"
+  integrity sha512-vqrE/nrweCyzmCpVpdFRC41qS+tfTF+IoUKlTZr52O82urbUqdfyJBGWMvT01pYUprWepLr8IkyVTEWJKRTQSg==
   dependencies:
     debug "^4.1.1"
     readable-stream "^3.5.0"
     split-ca "^1.0.1"
     ssh2 "^1.11.0"
 
-dockerode@3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/dockerode/-/dockerode-3.2.1.tgz#4a2222e3e1df536bf595e78e76d3cfbf6d4d93b9"
-  integrity sha512-XsSVB5Wu5HWMg1aelV5hFSqFJaKS5x1aiV/+sT7YOzOq1IRl49I/UwV8Pe4x6t0iF9kiGkWu5jwfvbkcFVupBw==
-  dependencies:
-    docker-modem "^2.1.0"
-    tar-fs "~2.0.1"
-
-dockerode@^3.2.1:
-  version "3.3.5"
-  resolved "https://registry.yarnpkg.com/dockerode/-/dockerode-3.3.5.tgz#7ae3f40f2bec53ae5e9a741ce655fff459745629"
-  integrity sha512-/0YNa3ZDNeLr/tSckmD69+Gq+qVNhvKfAHNeZJBnp7EOP6RGKV8ORrJHkUn20So5wU+xxT7+1n5u8PjHbfjbSA==
+dockerode@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/dockerode/-/dockerode-4.0.0.tgz#9c9c66926da77f6f894ad54057737a0bc7d34712"
+  integrity sha512-3LF7/3MPz5+9RsUo91rD0MCcx0yxjC9bnbtgtVjOLKyKxlZSJ7/Kk3OPAgARlwlWHqXwAGYhmkAHYx7IwD0tJQ==
   dependencies:
     "@balena/dockerignore" "^1.0.2"
-    docker-modem "^3.0.0"
+    docker-modem "^5.0.0"
     tar-fs "~2.0.1"
 
 doctrine@^2.1.0:
@@ -18537,22 +18504,6 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==
 
-ssh2-streams@~0.4.10:
-  version "0.4.10"
-  resolved "https://registry.yarnpkg.com/ssh2-streams/-/ssh2-streams-0.4.10.tgz#48ef7e8a0e39d8f2921c30521d56dacb31d23a34"
-  integrity sha512-8pnlMjvnIZJvmTzUIIA5nT4jr2ZWNNVHwyXfMGdRJbug9TpI3kd99ffglgfSWqujVv/0gxwMsDn9j9RVst8yhQ==
-  dependencies:
-    asn1 "~0.2.0"
-    bcrypt-pbkdf "^1.0.2"
-    streamsearch "~0.1.2"
-
-ssh2@^0.8.7:
-  version "0.8.9"
-  resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-0.8.9.tgz#54da3a6c4ba3daf0d8477a538a481326091815f3"
-  integrity sha512-GmoNPxWDMkVpMFa9LVVzQZHF6EW3WKmBwL+4/GeILf2hFmix5Isxm7Amamo8o7bHiU0tC+wXsGcUXOxp8ChPaw==
-  dependencies:
-    ssh2-streams "~0.4.10"
-
 ssh2@^1.11.0:
   version "1.14.0"
   resolved "https://registry.yarnpkg.com/ssh2/-/ssh2-1.14.0.tgz#8f68440e1b768b66942c9e4e4620b2725b3555bb"
@@ -18665,11 +18616,6 @@ streamsearch@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-1.1.0.tgz#404dd1e2247ca94af554e841a8ef0eaa238da764"
   integrity sha512-Mcc5wHehp9aXz1ax6bZUyY5afg9u2rv5cqQI3mRrYkGC8rW2hM02jWuwjtL++LS5qinSyhj2QfLyNsuc+VsExg==
-
-streamsearch@~0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/streamsearch/-/streamsearch-0.1.2.tgz#808b9d0e56fc273d809ba57338e929919a1a9f1a"
-  integrity sha512-jos8u++JKm0ARcSUTAZXOVC0mSox7Bhn6sBgty73P1f3JGf7yG2clTbBNHUdde/kdvP2FESam+vM6l8jBrNxHA==
 
 strict-uri-encode@^1.0.0:
   version "1.1.0"

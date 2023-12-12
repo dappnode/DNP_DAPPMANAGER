@@ -259,7 +259,7 @@ function parsePackageDataRaw(
     return packageData;
   }
 
-  const pre0235Data = (packageData as unknown) as {
+  const pre0235Data = packageData as unknown as {
     name: string;
     version: string;
   };

@@ -32,7 +32,6 @@
     "@dappnode/toolkit": "^0.1.0",
     "@dappnode/utils": "^0.1.0",
     "deepmerge": "2.2.1",
-    "dockerode": "3.2.1",
     "ethers": "^6.9.0",
     "is-ipfs": "8.0.1",
     "lodash-es": "4.17.21",
@@ -41,7 +40,7 @@
     "timestring": "6.0.0"
   },
   "devDependencies": {
-    "@types/dockerode": "3.2.1",
+    "@types/dockerode": "^3.3.23",
     "@types/lodash-es": "4.17.6",
     "@types/node": "^20.6.2",
     "@types/node-fetch": "^2.6.9",
