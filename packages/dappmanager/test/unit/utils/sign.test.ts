@@ -46,7 +46,7 @@ test.dnp.dappnode.eth
 
       const message = prepareMessageFromPackage({ packageEnsName, data });
       const digest = hashMessage(message);
-      const address = ethers.utils.recoverAddress(digest, signature);
+      const address = ethers.recoverAddress(digest, signature);
 
       expect(address).to.deep.equal(
         wallet.address,
