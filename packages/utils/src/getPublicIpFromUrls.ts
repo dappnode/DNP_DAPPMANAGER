@@ -30,18 +30,15 @@ export async function getPublicIpFromUrls(options?: {
       const ip = await retry(
         async () => {
           const controller = new AbortController();
-          const signal = controller.signal;
 
           // Set a timeout to abort the fetch
           const timeoutId = setTimeout(() => controller.abort(), timeout);
 
           try {
-            const response = await fetch(url, { signal });
-            clearTimeout(timeoutId); // Clear timeout on successful fetch
+            const response = await fetch(url, { signal: controller.signal });
             return await response.text();
-          } catch (error) {
-            clearTimeout(timeoutId); // Clear timeout on fetch error
-            throw error;
+          } finally {
+            clearTimeout(timeoutId); // Clear timeout on successful fetch
           }
         },
         { retries }
