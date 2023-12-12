@@ -124,7 +124,7 @@ export interface Routes {
    *   Same for relative paths to directories.
    * - If empty, defaults to $WORKDIR
    */
-  copyFileTo: (kwargs: {
+  copyFileToDockerContainer: (kwargs: {
     containerName: string;
     dataUri: string;
     filename: string;
@@ -698,7 +698,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   changeIpfsTimeout: {},
   cleanCache: {},
   cleanDb: {},
-  copyFileTo: { log: true },
+  copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
   dappnodeWebNameSet: { log: true },

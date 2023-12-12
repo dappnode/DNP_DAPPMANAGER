@@ -5,6 +5,5 @@ export * from "./packageIsInstalling.js";
 export * from "./postInstallClean.js";
 export * from "./rollbackPackages.js";
 export * from "./runPackages.js";
-export * from "./writeAndValidateFiles.js";
-export * from "./copyFileTo.js";
 export * from "./restartPatch.js";
+export * from "./writeAndValidateFiles.js";

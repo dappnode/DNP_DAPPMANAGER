@@ -1,4 +1,4 @@
-export * from "./cli.js";
+export * from "./getDockerImageManifest.js";
 export * from "./compose/index.js";
 export * from "./dockerComposeUp.js";
 export * from "./getContainersAndVolumesToRemove.js";

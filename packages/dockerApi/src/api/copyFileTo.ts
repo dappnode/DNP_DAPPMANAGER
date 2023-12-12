@@ -1,13 +1,9 @@
 import path from "path";
-// Modules
-import {
-  dockerCopyFileTo,
-  dockerGetContainerWorkingDir
-} from "@dappnode/dockerapi";
 // Utils
 import fs from "fs";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
+import { shell } from "@dappnode/utils";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
@@ -28,11 +24,11 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
  *   Same for relative paths to directories.
  * - If empty, defaults to $WORKDIR
  */
-export async function copyFileTo({
+export async function copyFileToDockerContainer({
   containerName,
   dataUri,
   filename,
-  toPath
+  toPath,
 }: {
   containerName: string;
   dataUri: string;
@@ -91,13 +87,25 @@ export async function copyFileTo({
     fs.rmSync(fromPath, { recursive: true, force: true });
 }
 
+function dockerCopyFileTo(
+  id: string,
+  fromPath: string,
+  toPath: string
+): Promise<string> {
+  return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
+}
+
+function dockerGetContainerWorkingDir(id: string): Promise<string> {
+  return shell(`docker inspect --format='{{json .Config.WorkingDir}}' ${id}`);
+}
+
 /**
  * Converts a data URI feeded from the server to a downloadable blob
  *
  * @param dataUri = data:application/zip;base64,UEsDBBQAAAg...
  * @param pathTo = DNCORE/tempfile
  */
-export function dataUriToFile(dataUri: string, pathTo: string): void {
+function dataUriToFile(dataUri: string, pathTo: string): void {
   const decodedBuffer = dataUriToBuffer(dataUri);
   fs.writeFileSync(pathTo, decodedBuffer);
 }
