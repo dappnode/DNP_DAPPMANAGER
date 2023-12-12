@@ -14,9 +14,8 @@ export async function cleanCache(): Promise<void> {
     params.userActionLogsFilename,
     params.TEMP_TRANSFER_DIR
   ];
-  for (const path of pathsToDelete) {
-    await shell(`rm -rf ${path}`);
-  }
+
+  await shell(`rm -rf ${pathsToDelete.join(" ")}`);
 
   // Clear cache DBs in friendly manner
   clearCacheDb();
