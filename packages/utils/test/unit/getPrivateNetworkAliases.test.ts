@@ -2,7 +2,7 @@ import { expect } from "chai";
 import { getPrivateNetworkAliases } from "../../src/index.js";
 import { params } from "@dappnode/params";
 
-describe.only("getPrivateNetworkAliases", () => {
+describe("getPrivateNetworkAliases", () => {
     it("should always return full network alias", () => {
         const container = {
             dnpName: "example.dnp.dappnode.eth",
