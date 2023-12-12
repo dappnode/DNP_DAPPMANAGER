@@ -3,7 +3,7 @@ import { getPublicIpFromUrls } from "../../src";
 import isIp from "is-ip";
 
 describe("getPublicIpFromUrls", () => {
-    it.only("should return the public IP of the Dappnode", async () => {
+    it("should return the public IP of the Dappnode", async () => {
         const publicIp = await getPublicIpFromUrls();
         // Result should be an IP
         expect(isIp(publicIp)).to.be.true;
