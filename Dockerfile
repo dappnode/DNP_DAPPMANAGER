@@ -44,10 +44,6 @@ COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 COPY packages/hostScriptsServices/hostScripts hostScripts
 COPY packages/hostScriptsServices/hostServices hostServices
 
-# Copy docker-specific files
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
 COPY package.json ./ 
 COPY --from=build-src /app/packages ./packages
 COPY --from=build-src /app/node_modules ./node_modules

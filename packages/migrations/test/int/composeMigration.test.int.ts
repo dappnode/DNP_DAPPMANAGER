@@ -54,7 +54,6 @@ services:
     image: ${randomImage}
     container_name: ${containerName}
     restart: always
-    dns: 172.33.1.2
     networks:
       ${dncoreNetwork}:
         ipv4_address: 172.33.1.7
@@ -73,7 +72,6 @@ services:
     image: ${randomImage}
     container_name: ${containerName}
     restart: always
-    dns: 172.33.1.2
     networks:
       ${dncoreNetwork}:
         ipv4_address: 172.33.1.7`;

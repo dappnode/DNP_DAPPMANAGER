@@ -5,7 +5,6 @@ import { startDynDnsDaemon } from "./dyndns/index.js";
 import { startEthMultiClientDaemon } from "./ethMultiClient/index.js";
 import { startEthicalMetricsDaemon } from "./ethicalMetrics/index.js";
 import { startNatRenewalDaemon } from "./natRenewal/index.js";
-import { startNsUpdateDaemon } from "./nsupdate/index.js";
 import { startStakerDaemon } from "./stakerConfig/index.js";
 import { startTelegramBotDaemon } from "./telegramBot/index.js";
 
@@ -21,7 +20,6 @@ export function startDaemons(
   startEthMultiClientDaemon(dappnodeInstaller, signal);
   startEthicalMetricsDaemon(dappnodeInstaller, signal);
   startNatRenewalDaemon(signal);
-  startNsUpdateDaemon(signal);
   startStakerDaemon(dappnodeInstaller);
   startTelegramBotDaemon();
 }
