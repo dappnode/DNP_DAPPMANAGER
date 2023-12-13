@@ -19,33 +19,38 @@ export function CopyFileTo({
   container: PackageContainer;
   toPathDefault?: string;
 }) {
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>(null);
   const [toPath, setToPath] = useState("");
+
+  // File change handler
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files ? e.target.files[0] : null;
+    if (selectedFile) setFile(selectedFile);
+  };
 
   useEffect(() => {
     if (toPathDefault) setToPath(toPathDefault);
   }, [toPathDefault]);
 
-  const { name, size } = file || {};
+  // Updated file change handler
 
   async function uploadFile() {
     const prettyName = prettyFullName(container);
     if (file)
       try {
         const dataUri = await fileToDataUri(file);
-        const filename = name || "";
 
         await withToast(
           () =>
             api.copyFileToDockerContainer({
               containerName: container.containerName,
               dataUri,
-              filename: name || "",
+              filename: file.name,
               toPath
             }),
           {
-            message: `Copying file ${filename} to ${prettyName} ${toPath}...`,
-            onSuccess: `Copied file ${filename} to ${prettyName} ${toPath}`
+            message: `Copying file ${file.name} to ${prettyName} ${toPath}...`,
+            onSuccess: `Copied file ${file.name} to ${prettyName} ${toPath}`
           }
         );
       } catch (e) {
@@ -63,18 +68,17 @@ export function CopyFileTo({
           <input
             type="file"
             className="custom-file-input"
-            onChange={e => {
-              if (e && e.target && e.target.files && e.target.files[0])
-                setFile(e.target.files[0]);
-            }}
+            onChange={handleFileChange}
           />
           <label className="custom-file-label" htmlFor="inputGroupFile01">
-            {name ? `${name} (${humanFileSize(size || 0)})` : "Choose file"}
+            {file
+              ? `${file.name} (${humanFileSize(file.size || 0)})`
+              : "Choose file"}
           </label>
         </div>
       </div>
 
-      {name && size && size > fileSizeWarning && (
+      {file && file.name && file.size && file.size > fileSizeWarning && (
         <div className="alert alert-secondary">
           Note that this tool is not meant for large file transfers. Expect
           unstable behaviour.
