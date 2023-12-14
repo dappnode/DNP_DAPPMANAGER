@@ -20,14 +20,20 @@ export function Network() {
         <HttpsMappings />
       </Card>
 
-      <SubTitle>Static IP</SubTitle>
+      <SubTitle>Static Public IP</SubTitle>
       <Card spacing className="network-editor">
         <div>
           You can set a static IP for this DAppNode instead of using a dyndns.
           Only set a static IP if you are sure it is static, otherwise you may
           not be able to connect to its VPN.
         </div>
-        <StaticIp />
+        <StaticIp type="public" />
+      </Card>
+
+      <SubTitle>Static Local IP</SubTitle>
+      <Card spacing className="network-editor">
+        <div>You can set a static local IP for this DAppNode It is recommended to set the current IP address as static</div>
+        <StaticIp type="local" />
       </Card>
     </>
   );

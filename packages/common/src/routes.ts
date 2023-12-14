@@ -583,6 +583,12 @@ export interface Routes {
    */
   setStaticIp: (kwargs: { staticIp: string }) => Promise<void>;
 
+  /**
+   * Sets the static local IP
+   * @param staticIp New static IP
+   */
+  setStaticLocalIp: (staticIp: string) => Promise<void>;
+
   statsCpuGet: () => Promise<HostStatCpu>;
 
   statsMemoryGet: () => Promise<HostStatMemory>;
@@ -767,6 +773,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
   setStaticIp: { log: true },
+  setStaticLocalIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},
   statsMemoryGet: {},

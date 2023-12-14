@@ -7,20 +7,30 @@ import { withToastNoThrow } from "components/toast/Toast";
 import Input from "components/Input";
 import Button from "components/Button";
 // External
-import { getStaticIp } from "services/dappnodeStatus/selectors";
+import { getLocalStaticIp, getStaticIp } from "services/dappnodeStatus/selectors";
 
-export function StaticIp() {
-  const staticIp = useSelector(getStaticIp);
+export function StaticIp({ type }: { type: "local" | "public" }) {
+  let staticIpSelector;
+  if (type === "public") staticIpSelector = getStaticIp;
+  else staticIpSelector = getLocalStaticIp;
+  const staticIp = useSelector(staticIpSelector);
   const [input, setInput] = useState(staticIp);
 
   useEffect(() => {
     setInput(staticIp);
   }, [staticIp]);
 
-  function updateStaticIp(newStaticIp: string) {
+  function updateStaticPublicIp(newStaticIp: string) {
     withToastNoThrow(() => api.setStaticIp({ staticIp: newStaticIp }), {
       message: "Setting static ip...",
       onSuccess: "Set static ip"
+    });
+  }
+
+  function updateStaticLocalIp(newStaticIp: string) {
+    withToastNoThrow(() => api.setStaticLocalIp(newStaticIp), {
+      message: "Setting static local ip...",
+      onSuccess: "Set static local ip"
     });
   }
 
@@ -31,7 +41,11 @@ export function StaticIp() {
         value={input}
         onValueChange={setInput}
         onEnterPress={() => {
-          if (isIpv4(input)) updateStaticIp(input);
+          if (isIpv4(input)) {
+            type === "public"
+              ? updateStaticPublicIp(input)
+              : updateStaticLocalIp(input);
+          }
         }}
         append={
           <>
@@ -43,14 +57,22 @@ export function StaticIp() {
                 // Input is the same as previous IP
                 (Boolean(staticIp) && staticIp === input)
               }
-              onClick={() => updateStaticIp(input)}
+              onClick={() =>
+                type === "public"
+                  ? updateStaticPublicIp(input)
+                  : updateStaticLocalIp(input)
+              }
             >
               {staticIp ? "Update" : "Enable"}
             </Button>
             {staticIp && (
               <Button
                 variant="outline-dappnode"
-                onClick={() => updateStaticIp("")}
+                onClick={() =>
+                  type === "public"
+                  ? updateStaticPublicIp("")
+                  : updateStaticLocalIp("") // Can disable?
+                }
               >
                 Disable
               </Button>
