@@ -20,7 +20,7 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
     setInput(staticIp);
   }, [staticIp]);
 
-  function updateStaticIp(newStaticIp: string) {
+  function updateStaticPublicIp(newStaticIp: string) {
     withToastNoThrow(() => api.setStaticIp({ staticIp: newStaticIp }), {
       message: "Setting static ip...",
       onSuccess: "Set static ip"
@@ -43,7 +43,7 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
         onEnterPress={() => {
           if (isIpv4(input)) {
             type === "public"
-              ? updateStaticIp(input)
+              ? updateStaticPublicIp(input)
               : updateStaticLocalIp(input);
           }
         }}
@@ -59,7 +59,7 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
               }
               onClick={() =>
                 type === "public"
-                  ? updateStaticIp(input)
+                  ? updateStaticPublicIp(input)
                   : updateStaticLocalIp(input)
               }
             >
@@ -70,8 +70,8 @@ export function StaticIp({ type }: { type: "local" | "public" }) {
                 variant="outline-dappnode"
                 onClick={() =>
                   type === "public"
-                  ? updateStaticIp("")
-                  : updateStaticLocalIp("")
+                  ? updateStaticPublicIp("")
+                  : updateStaticLocalIp("") // Can disable?
                 }
               >
                 Disable

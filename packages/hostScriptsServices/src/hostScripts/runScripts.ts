@@ -17,7 +17,7 @@ type ScriptName =
   | "avahi_daemon.sh"
   | "reboot_required.sh"
   | "update_upgrade.sh"
-  | "set_static_ip.sh";
+  | "set_static_local_ip.sh";
 
 /**
  * Run a script for the hostScripts folder
