@@ -70,7 +70,6 @@ export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
 export { setStaticLocalIp } from "./setStaticLocalIp.js";
-export { getLocalIpAddress } from "./getLocalIpAddress.js";
 export * from "./telegram.js";
 export { updateUpgrade } from "./updateUpgrade.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";

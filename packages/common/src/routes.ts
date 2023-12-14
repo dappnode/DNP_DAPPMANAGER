@@ -298,11 +298,6 @@ export interface Routes {
    */
   getHostUptime: () => Promise<String>;
 
-  /**
-   * Returns the local Ip Address
-   */
-  getLocalIpAddress: () => Promise<string>;
-
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
@@ -748,7 +743,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
   getEthicalMetricsConfig: { log: true },
-  getLocalIpAddress: { log: true },
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
