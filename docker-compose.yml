@@ -25,7 +25,6 @@ services:
       - DISABLE_UPNP=
     networks:
       dncore_network:
-        ipv4_address: 172.33.1.7
         aliases:
           - dappmanager.dappnode
           - my.dappnode
