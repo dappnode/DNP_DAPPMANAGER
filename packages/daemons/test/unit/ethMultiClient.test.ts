@@ -13,7 +13,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
 } from "@dappnode/common";
-import { mockDnp, mockContainer } from "../testUtils.js";
+import { mockDnp, mockContainer, dappnodeInstaller } from "../testUtils.js";
 
 interface State {
   target: Eth2ClientTarget;
@@ -123,10 +123,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
       return dnpList.find((d) => d.dnpName === dnpName) || null;
     }
 
-    const packageInstall = sinon
-      .mock()
-      .atLeast(2)
-      .resolves({ message: "" });
+    const packageInstall = sinon.mock().atLeast(2).resolves({ message: "" });
     // async function packageInstall(): Promise<{ message: string }> {
     //   return { message: "" };
     // }
@@ -155,6 +152,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         const { execClient, consClient } = target;
         for (const client of [consClient, execClient]) {
           const nextStatus = await runEthClientInstaller(
+            dappnodeInstaller,
             client,
             state.status[client]
           );
