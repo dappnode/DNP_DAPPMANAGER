@@ -43,7 +43,7 @@ import {
 export async function runEthClientInstaller(
   dappnodeInstaller: DappnodeInstaller,
   target: ExecutionClientMainnet | ConsensusClientMainnet | "remote",
-  status: EthClientInstallStatus | undefined,
+  status?: EthClientInstallStatus,
   useCheckpointSync?: boolean
 ): Promise<EthClientInstallStatus | null> {
   // Re-check just in case, on run the installer for local target clients

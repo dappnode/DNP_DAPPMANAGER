@@ -11,7 +11,6 @@ import {
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import retry from "async-retry";
 import { IdentityInterface } from "@dappnode/common";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
@@ -170,7 +169,7 @@ export default async function initializeDb(): Promise<void> {
   //   and the external IP from UPnP command succeeded
   const upnpAvailable =
     Boolean(publicIp && externalIp && internalIp !== publicIp) &&
-    (await isUpnpAvailable())
+      (await isUpnpAvailable())
       ? true
       : false;
 
@@ -209,33 +208,6 @@ export default async function initializeDb(): Promise<void> {
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
   generateKeysIfNotExistOrNotValid(); // Auto-checks if keys are already generated
-
-  /**
-   * Set the domain of this DAppNode to point to the internal IP for better UX
-   * on Wifi connections, only if the internal IP !== public IP
-   * MUST be run after key generation `dyndns.generateKeys()`
-   * NOTE: Runs as a forked process with retry and a try / catch block
-   * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
-   */
-  try {
-    await retry(async function updateLocalDyndnsCall(): Promise<void> {
-      const domain = db.domain.get();
-      const publicIp = db.publicIp.get();
-      const internalIp = db.internalIp.get();
-      if (internalIp !== publicIp && internalIp && domain) {
-        try {
-          await shell(`update_local_dyndns ${domain} ${internalIp}`);
-          logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
-        } catch (e) {
-          // Log the error in each attempt for transparency / debugging
-          logs.warn(`Error on updateLocalDyndns attempt: ${e.message}`);
-          throw e;
-        }
-      }
-    });
-  } catch (e) {
-    logs.error("Error on update local dyndns", e);
-  }
 
   /**
    * After initializing all the internal params (hostname, internal_ip, etc)

@@ -1,4 +1,10 @@
 import { PackageContainer, InstalledPackageData } from "@dappnode/common";
+import { DappnodeInstaller } from "@dappnode/installer";
+
+export const dappnodeInstaller = new DappnodeInstaller(
+  "https://api.ipfs.dappnode.io",
+  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+);
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";

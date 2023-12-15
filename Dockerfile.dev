@@ -26,10 +26,6 @@ WORKDIR /app
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
 
-# Copy docker
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
