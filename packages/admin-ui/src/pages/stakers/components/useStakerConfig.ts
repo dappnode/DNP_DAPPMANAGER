@@ -168,12 +168,15 @@ function getChanges<T extends Network>({
   const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
 
+  // Order and compare relays, returns true if changes were made
+  const mevBoostRelaysChanged = (newMevBoost?.relays || []).sort().join(',') !== (mevBoost?.relays || []).sort().join(',');
+
   // Not allowed if no changes
   if (
     executionClient?.dnpName === newExecClient?.dnpName &&
     consensusClient?.dnpName === newConsClient?.dnpName &&
     mevBoost?.dnpName === newMevBoost?.dnpName &&
-    newMevBoost?.relays?.length === mevBoost?.relays?.length &&
+    !mevBoostRelaysChanged &&
     currentStakerConfig.consensusClient?.useCheckpointSync ===
       newConsClient?.useCheckpointSync &&
     enableWeb3signer === newEnableWeb3signer
@@ -212,6 +215,7 @@ function getChanges<T extends Network>({
 
   return { isAllowed: true };
 }
+
 
 function isOkSelectedInstalledAndRunning<
   T extends Network,
