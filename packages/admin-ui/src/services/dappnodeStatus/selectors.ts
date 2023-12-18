@@ -6,7 +6,7 @@ import {
 import { ChainData } from "@dappnode/common";
 import { activateFallbackPath } from "pages/system/data";
 import { getDnpInstalled } from "services/dnpInstalled/selectors";
-import { wifiDnpName } from "params";
+import { wifiDnpName, vpnDnpName } from "params";
 
 // Service > dappnodeStatus
 
@@ -90,6 +90,19 @@ export const getWifiStatus = (state: RootState) => ({
   ssid: state.dappnodeStatus.wifiCredentials?.ssid
 });
 
+function isOpenVpnContainerRunning(state: RootState): boolean {
+  const installedPackages = getDnpInstalled(state);
+  const openVpnDnp = installedPackages.find(dnp => dnp.dnpName === vpnDnpName);
+  if (!openVpnDnp) return false;
+
+  const openVpnContainer = openVpnDnp.containers[0];
+  if (!openVpnContainer) return false;
+
+  return openVpnContainer.running;
+}
+
+export const getIsOpenVpnActive = (state: RootState) => { return isOpenVpnContainerRunning(state); }
+
 /**
  * Returns a partial ChainData object with repository source status
  * To be shown alongside other chain data
@@ -101,11 +114,11 @@ export function getRepositorySourceChainItem(
   const repositoryResult = _getRepositorySourceChainItem(state);
   return repositoryResult
     ? {
-        ...repositoryResult,
-        dnpName: "repository-source",
-        name: "Repository source",
-        help: activateFallbackPath
-      }
+      ...repositoryResult,
+      dnpName: "repository-source",
+      name: "Repository source",
+      help: activateFallbackPath
+    }
     : null;
 }
 

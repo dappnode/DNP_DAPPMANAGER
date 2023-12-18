@@ -12,12 +12,14 @@ import {
 import {
   getWifiStatus,
   getPasswordIsSecure,
-  getRebootIsRequired
+  getRebootIsRequired,
+  getIsOpenVpnActive
 } from "services/dappnodeStatus/selectors";
 import {
   pathName as systemPathName,
   subPaths as systemSubPaths
 } from "pages/system/data";
+import { relativePath as vpnPathName } from "pages/vpn/data";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
@@ -34,6 +36,7 @@ export default function NotificationsView() {
   const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
   const rebootHostIsRequired = useSelector(getRebootIsRequired);
+  const isOpenVpnActive = useSelector(getIsOpenVpnActive);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -94,6 +97,17 @@ export default function NotificationsView() {
       body:
         "**Change the host 'dappnode' user password**, it's an insecure default.",
       active: passwordIsSecure === false
+    },
+    /**
+     * [VPN-MIGRATION-TO-WIREGUARD]
+     */
+    {
+      id: "vpnMigrationToWireguard",
+      linkText: "Migrate",
+      linkPath: vpnPathName,
+      body:
+        "**Migrate to WireGuard VPN**. OpenVPN is about to be deprecated by Dappnode. Click **Migrate** to get the WireGuard credentials.",
+      active: isOpenVpnActive
     }
   ];
 
