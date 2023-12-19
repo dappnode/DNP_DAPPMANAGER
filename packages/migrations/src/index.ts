@@ -5,6 +5,7 @@ import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpe
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
+import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -13,8 +14,9 @@ export class MigrationError extends Error {
     super();
     this.migration = migration;
     this.coreVersion = coreVersion;
-    super.message = `Migration ${migration} ${coreVersion} failed: ${super.message
-      }`;
+    super.message = `Migration ${migration} ${coreVersion} failed: ${
+      super.message
+    }`;
   }
 }
 
@@ -24,75 +26,85 @@ export class MigrationError extends Error {
 export async function executeMigrations(): Promise<void> {
   const migrationErrors: MigrationError[] = [];
 
-  removeLegacyDockerAssets().catch(e =>
+  removeLegacyDockerAssets().catch((e) =>
     migrationErrors.push({
       migration: "bundle legacy ops to prevent spamming the docker API",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  migrateUserActionLogs().catch(e =>
+  migrateUserActionLogs().catch((e) =>
     migrationErrors.push({
       migration: "migrate winston .log JSON file to a lowdb",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  addAliasToRunningContainers().catch(e =>
+  addAliasToRunningContainers().catch((e) =>
     migrationErrors.push({
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  switchEthClientIfOpenethereumOrGethLight().catch(e =>
+  switchEthClientIfOpenethereumOrGethLight().catch((e) =>
     migrationErrors.push({
       migration:
         "switch client if the current selected is geth-light or openethereum",
       coreVersion: "0.2.58",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  pruneUserActionLogs().catch(e =>
+  pruneUserActionLogs().catch((e) =>
     migrationErrors.push({
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  setDefaultEthicalMetricsEmail().catch(e =>
+  setDefaultEthicalMetricsEmail().catch((e) =>
     migrationErrors.push({
       migration:
         "set default email for ethical metrics if the package is installed",
       coreVersion: "0.2.77",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
     })
   );
 
-  removeDnsFromComposeFiles().catch(e =>
+  removeDnsFromComposeFiles().catch((e) =>
     migrationErrors.push({
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
       name: "MIGRATION_ERROR",
       message: e.message,
-      stack: e.stack
+      stack: e.stack,
+    })
+  );
+
+  ensureDockerNetworkConfig().catch((e) =>
+    migrationErrors.push({
+      migration: "ensure docker network configuration",
+      coreVersion: "0.2.85",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
     })
   );
 

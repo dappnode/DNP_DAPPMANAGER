@@ -4,6 +4,25 @@ import { dockerContainerInspect } from "../index.js";
 import { params } from "@dappnode/params";
 
 /**
+ * Disconnect all docker containers from a docker network
+ * @param networkName "dncore_network"
+ */
+export async function disconnectAllContainersFromNetwork(
+  networkName: string
+): Promise<void> {
+  const network = docker.getNetwork(networkName);
+  const containers = ((await network.inspect()) as Dockerode.NetworkInspectInfo)
+    .Containers;
+  if (containers)
+    await Promise.all(
+      Object.values(containers).map(
+        async (c) =>
+          await network.disconnect({ Container: c.Name, Force: true })
+      )
+    );
+}
+
+/**
  * Connect a container to a network
  * @param networkName "dncore_network"
  * @param containerName "3613f73ba0e4" or "fullcontainername"
@@ -17,8 +36,36 @@ export async function dockerNetworkConnect(
   const network = docker.getNetwork(networkName);
   await network.connect({
     Container: containerName,
-    EndpointConfig: endpointConfig
+    EndpointConfig: endpointConfig,
   });
+}
+
+/**
+ * Connect a container to a network
+ * @param networkName "dncore_network"
+ * @param containerName "3613f73ba0e4" or "fullcontainername"
+ * @param aliases `["network-alias"]`
+ */
+export async function dockerNetworkConnectNotThrow(
+  networkName: string,
+  containerName: string,
+  endpointConfig?: Partial<Dockerode.NetworkInfo>
+): Promise<void> {
+  try {
+    await dockerNetworkConnect(networkName, containerName, endpointConfig);
+  } catch (e) {
+    if (e.statusCode === 403) {
+      // Error: (HTTP code 403) unexpected - endpoint with name DAppNodeCore-dappmanager.dnp.dappnode.eth already exists in network dncore_network
+      // container already exists in the network
+      // bypass error
+    } else if (
+      e.statusCode === 500 &&
+      e.message.includes("could not find a network matching network mode")
+    ) {
+      // Error: (HTTP code 500) server error - could not find a network matching network mode dncore_network: network dncore_network not found
+      console.error(e);
+    } else throw e;
+  }
 }
 
 /**
@@ -35,7 +82,7 @@ export async function dockerNetworkDisconnect(
   await network.disconnect({
     Container: containerName,
     // Force the container to disconnect from the network
-    Force: true
+    Force: true,
   });
 }
 
@@ -69,7 +116,7 @@ export async function dockerCreateNetwork(networkName: string): Promise<void> {
     // collisions.
     CheckDuplicate: true,
     // Default plugin
-    Driver: "bridge"
+    Driver: "bridge",
   });
 }
 

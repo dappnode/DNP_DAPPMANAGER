@@ -192,6 +192,7 @@ export const params = {
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
+  bindContainerName: "DAppNodeCore-bind.dnp.dappnode.eth",
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
   dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
@@ -334,14 +335,14 @@ export const params = {
       name: "Besu Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
     },
     {
       name: "Besu Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
-    }
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+    },
   ],
 };
 
