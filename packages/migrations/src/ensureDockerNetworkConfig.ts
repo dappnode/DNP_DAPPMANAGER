@@ -90,16 +90,8 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
         // Error: (HTTP code 403) unexpected - Pool overlaps with other one on this address space
         if (e.statusCode === 403) {
           logs.warn(`Another docker network already has subnet assigned: ${e}`);
-          const dockerNetworks = await docker.listNetworks();
-          const dockerNetworkToRemoveName = dockerNetworks.find((n) => {
-            const nConfig = n.IPAM?.Config;
-            return (
-              nConfig &&
-              nConfig.length > 0 &&
-              "Subnet" in nConfig[0] &&
-              nConfig[0].Subnet === dncoreNetworkSubnet
-            );
-          })?.Name;
+          const dockerNetworkToRemoveName =
+            await getDockerNetworkNameFromSubnet();
           if (!dockerNetworkToRemoveName)
             throw Error(
               `could not be found the docker network with subnet ${dncoreNetworkSubnet}`
@@ -114,6 +106,22 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
       }
     } else throw e;
   }
+}
+
+/**
+ * Get the docker network using the subnet dncoreNetworkSubnet
+ */
+async function getDockerNetworkNameFromSubnet(): Promise<string | undefined> {
+  const dockerNetworks = await docker.listNetworks();
+  return dockerNetworks.find((n) => {
+    const nConfig = n.IPAM?.Config;
+    return (
+      nConfig &&
+      nConfig.length > 0 &&
+      "Subnet" in nConfig[0] &&
+      nConfig[0].Subnet === dncoreNetworkSubnet
+    );
+  })?.Name;
 }
 
 /**
