@@ -54,7 +54,7 @@ export async function dockerNetworkConnectNotThrow(
   try {
     await dockerNetworkConnect(networkName, containerName, endpointConfig);
   } catch (e) {
-    if (e.statusCode === 403) {
+    if (e.statusCode === 403 && e.message.includes("already exists")) {
       // Error: (HTTP code 403) unexpected - endpoint with name DAppNodeCore-dappmanager.dnp.dappnode.eth already exists in network dncore_network
       // container already exists in the network
       // bypass error
