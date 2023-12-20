@@ -46,28 +46,7 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
         logs.info(
           `docker network ${dncoreNetworkName} has invalid subnet ${dncoreNetworkIpamConfig[0].Subnet} it should be ${dncoreNetworkSubnet}, migrating`
         );
-        // disconnect all the containers
-        logs.info(`disconnecting all containers from ${dncoreNetworkName}`);
-        await disconnectAllContainersFromNetwork(dncoreNetworkName);
-        // delete network with invalid ip range
-        logs.info(`removing docker network ${dncoreNetworkName}`);
-        await dncoreNetwork.remove();
-        // create network with valid range
-        logs.info(
-          `creating docker networtk ${dncoreNetworkName} with valid ip range`
-        );
-        await docker.createNetwork({
-          Name: dncoreNetworkName,
-          Driver: "bridge",
-          IPAM: {
-            Driver: "default",
-            Config: [
-              {
-                Subnet: dncoreNetworkSubnet,
-              },
-            ],
-          },
-        });
+        await recreateDockerNetwork(dncoreNetwork);
       } else {
         // IMPORTANT: this is the loop that must be entered if not migration
         // valid ip range
@@ -79,23 +58,7 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
       logs.error(
         `docker network ${dncoreNetworkName} does not have network config`
       );
-      // Disconnect all the containers
-      await disconnectAllContainersFromNetwork(dncoreNetworkName);
-      // delete network
-      await dncoreNetwork.remove();
-      // create network again with valid range
-      await docker.createNetwork({
-        Name: dncoreNetworkName,
-        Driver: "bridge",
-        IPAM: {
-          Driver: "default",
-          Config: [
-            {
-              Subnet: dncoreNetworkSubnet,
-            },
-          ],
-        },
-      });
+      await recreateDockerNetwork(dncoreNetwork);
     }
 
     // connect all containers
@@ -139,32 +102,55 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
           })?.Name;
           if (!dockerNetworkToRemoveName)
             throw Error(
-              `Could not be found the docker network with subnet ${dncoreNetworkSubnet}`
+              `could not be found the docker network with subnet ${dncoreNetworkSubnet}`
             );
           logs.warn(`docker network to remove: ${dockerNetworkToRemoveName}`);
-          // disconnect containers from network
-          await disconnectAllContainersFromNetwork(dockerNetworkToRemoveName);
-          // remove conflictive network
-          await docker.getNetwork(dockerNetworkToRemoveName).remove();
-          // try to create docker network again
-          await docker.createNetwork({
-            Name: dncoreNetworkName,
-            Driver: "bridge",
-            IPAM: {
-              Driver: "default",
-              Config: [
-                {
-                  Subnet: dncoreNetworkSubnet,
-                },
-              ],
-            },
-          });
+          await recreateDockerNetwork(
+            docker.getNetwork(dockerNetworkToRemoveName)
+          );
           // connect all containers
           await connectContainersToNetworkWithPrio(dncoreNetworkName);
         } else throw e;
       }
     } else throw e;
   }
+}
+
+/**
+ * Recreates the docker network with the following network configuration:
+ * - name: dncoreNetworkName
+ * - Driver: "bridge"
+ * - IPAM:
+ *  - Driver: "default"
+ *  - subnet: dncoreNetworkSubnet
+ *
+ * @param dockerNetworkToRemove docker network to remove
+ */
+async function recreateDockerNetwork(
+  dockerNetworkToRemove: Dockerode.Network
+): Promise<void> {
+  // disconnect all the containers
+  logs.info(`disconnecting all containers from ${dncoreNetworkName}`);
+  await disconnectAllContainersFromNetwork(dncoreNetworkName);
+  // delete network with invalid ip range
+  logs.info(`removing docker network ${dncoreNetworkName}`);
+  await dockerNetworkToRemove.remove();
+  // create network with valid range
+  logs.info(
+    `creating docker networtk ${dncoreNetworkName} with valid ip range`
+  );
+  await docker.createNetwork({
+    Name: dncoreNetworkName,
+    Driver: "bridge",
+    IPAM: {
+      Driver: "default",
+      Config: [
+        {
+          Subnet: dncoreNetworkSubnet,
+        },
+      ],
+    },
+  });
 }
 
 /**
