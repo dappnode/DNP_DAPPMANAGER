@@ -10,9 +10,9 @@ import { params } from "@dappnode/params";
  * Ensure compose hardcoded IPs are in valid IP range
  * depending on the subnet for:
  * - bind
- * - dappmanager
  *
  * It should completely remove for other core containers:
+ * - dappmanager
  * - ipfs
  * - wifi
  * - wireguard
