@@ -16,7 +16,7 @@ const TEST_ALIAS_PATH_PUBLIC = `dnp_repo/${DNP_NAME_PUBLIC}`;
 const TEST_ALIAS_PATH_MONO = `dnp_repo/${DNP_NAME_MONO}`;
 const TEST_ALIAS_PATH_MONO_PUBLIC = `dnp_repo/${DNP_NAME_MONO_PUBLIC}`;
 
-const DNCORE_NETWORK = params.DNP_PRIVATE_NETWORK_NAME;
+const DNCORE_NETWORK = params.DOCKER_PRIVATE_NETWORK_NAME;
 
 const monoContainer: PackageContainer = {
   ...mockContainer,
@@ -187,7 +187,7 @@ async function removeDirectories(directoryPaths: string[]) {
   }
 }
 
-describe("Add alias to running containers", function() {
+describe("Add alias to running containers", function () {
   this.timeout(1200000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
     await ensureNetworkExists(DNCORE_NETWORK);

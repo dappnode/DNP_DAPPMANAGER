@@ -15,7 +15,7 @@ import {
   exposeByDefaultHttpsPorts,
 } from "@dappnode/httpsportal";
 
-const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
+const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 
 /**
  * Create and run each package container in series

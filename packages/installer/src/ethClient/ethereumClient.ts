@@ -274,7 +274,7 @@ export class EthereumClient {
     };
 
     await dockerNetworkReconnect(
-      params.DNP_PRIVATE_NETWORK_NAME,
+      params.DOCKER_PRIVATE_NETWORK_NAME,
       containerName,
       endpointConfig
     );
@@ -297,7 +297,7 @@ export class EthereumClient {
     };
 
     await dockerNetworkReconnect(
-      params.DNP_PRIVATE_NETWORK_NAME,
+      params.DOCKER_PRIVATE_NETWORK_NAME,
       containerName,
       endpointConfig
     );
@@ -425,17 +425,17 @@ export class EthereumClient {
       composeService.get().networks || {}
     );
     const serviceNetwork =
-      serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || null;
+      serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || null;
 
     if (action === ComposeAliasEditorAction.REMOVE) {
       composeService.removeNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         [alias],
         serviceNetwork
       );
     } else {
       composeService.addNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         [alias],
         serviceNetwork
       );
