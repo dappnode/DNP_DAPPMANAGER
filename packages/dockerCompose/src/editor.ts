@@ -102,27 +102,6 @@ export class ComposeServiceEditor {
     }));
   }
 
-  editNetworkIp(networkName: string, newIp?: string): void {
-    this.edit((service) => {
-      const serviceNetworks = parseServiceNetworks(service.networks || {});
-      // Network and service network aliases must exist
-      if (!serviceNetworks[networkName])
-        throw Error(
-          `Error editing network ip: Network or serviceNetwork for ${networkName} does not exist`
-        );
-
-      return {
-        networks: {
-          ...serviceNetworks,
-          [networkName]: {
-            ...(serviceNetworks[networkName] || {}),
-            ipv4_address: newIp,
-          },
-        },
-      };
-    });
-  }
-
   removeNetworkAliases(
     networkName: string,
     aliasesToRemove: string[],

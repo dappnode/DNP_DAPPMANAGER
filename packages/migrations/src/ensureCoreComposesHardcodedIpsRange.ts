@@ -1,4 +1,7 @@
-import { ComposeFileEditor } from "@dappnode/dockercompose";
+import {
+  ComposeFileEditor,
+  parseServiceNetworks,
+} from "@dappnode/dockercompose";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 
@@ -23,12 +26,20 @@ export async function ensureCoreComposesHardcodedIpsRange(): Promise<void> {
     { dnpName: params.bindDnpName, ip: params.BIND_IP },
   ]) {
     const compose = new ComposeFileEditor(core.dnpName, true);
-    for (const service of Object.values(compose.services())) {
-      logs.info(`editing service ${core.dnpName} ip to ${core.ip}`);
-      service.editNetworkIp(params.DOCKER_PRIVATE_NETWORK_NAME, core.ip);
+    for (const service of Object.values(compose.compose.services)) {
+      if (service.networks) {
+        const serviceCoreNetwork = parseServiceNetworks(service.networks);
+        const coreNetwork =
+          serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
+        if (coreNetwork.ipv4_address !== core.ip) {
+          logs.info(
+            `editing service ${core.dnpName} ip from ${coreNetwork.ipv4_address} to ${core.ip}`
+          );
+          coreNetwork.ipv4_address = core.ip;
+          compose.write();
+        }
+      }
     }
-
-    compose.write();
   }
 
   for (const core of [
@@ -39,12 +50,17 @@ export async function ensureCoreComposesHardcodedIpsRange(): Promise<void> {
     "wireguard.dnp.dappnode.eth",
   ]) {
     const compose = new ComposeFileEditor(core, true);
-    compose.services();
-    for (const service of Object.values(compose.services())) {
-      logs.info(`removing ip from ${core}`);
-      service.editNetworkIp(params.DOCKER_PRIVATE_NETWORK_NAME);
+    for (const service of Object.values(compose.compose.services)) {
+      if (service.networks) {
+        const serviceCoreNetwork = parseServiceNetworks(service.networks);
+        const coreNetwork =
+          serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
+        if (coreNetwork.ipv4_address) {
+          logs.info(`removing ip ${coreNetwork.ipv4_address} from ${core}`);
+          coreNetwork.ipv4_address = undefined;
+          compose.write();
+        }
+      }
     }
-
-    compose.write();
   }
 }
