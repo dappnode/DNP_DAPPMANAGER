@@ -5,7 +5,7 @@ import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpe
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
-import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
+import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 
