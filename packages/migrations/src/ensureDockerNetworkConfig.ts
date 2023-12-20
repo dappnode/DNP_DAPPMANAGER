@@ -5,17 +5,14 @@ import {
   dockerNetworkDisconnect,
   disconnectAllContainersFromNetwork,
 } from "@dappnode/dockerapi";
-import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import Dockerode from "dockerode";
 
-const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
-//const dncoreNetworkName = "dncore_test";
-//const dncoreNetworkSubnet = params.DNP_PRIVATE_NETWORK_SUBNET;
-const dncoreNetworkSubnet = "10.20.0.0/24"; // "172.33.0.0/16";
-const dappmanagerIp = "10.20.0.7"; // "172.33.1.7";
-const bindIp = "10.20.0.2"; // "172.33.1.2";
+const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
+const dncoreNetworkSubnet = params.DOCKER_NETWORK_SUBNET;
+const dappmanagerIp = params.DAPPMANAGER_IP;
+const bindIp = params.BIND_IP;
 
 // TODO: make sure hardcoded ips are CORRECT: dappmanager and bind
 // TODO: publish core packages without hardcoded IPs??
@@ -31,12 +28,6 @@ const bindIp = "10.20.0.2"; // "172.33.1.2";
  */
 export async function ensureDockerNetworkConfig(): Promise<void> {
   const dncoreNetwork = docker.getNetwork(dncoreNetworkName);
-
-  try {
-    ensureCoreComposesHardcodedIpsRange();
-  } catch (e) {
-    logs.error(e);
-  }
 
   try {
     // make sure docker network exists
@@ -173,52 +164,6 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
         } else throw e;
       }
     } else throw e;
-  }
-}
-
-/**
- * Ensure compose hardcoded IPs are in valid IP range
- * depending on the subnet for:
- * - bind
- * - dappmanager
- *
- * It should completely remove for other core containers:
- * - ipfs
- * - wifi
- * - wireguard
- * - https
- * - openvpn
- *
- * This prevents from unexpected starts of core contaiers from docker-compose.yml files
- */
-function ensureCoreComposesHardcodedIpsRange(): void {
-  params.DNCORE_DIR;
-  const coreToEditHardcodedIp = [
-    { dnpName: "dappmanager.dnp.dappnode.eth", ip: dappmanagerIp },
-    { dnpName: "bind.dnp.dappnode.eth", ip: bindIp },
-  ];
-  for (const core of coreToEditHardcodedIp) {
-    const compose = new ComposeFileEditor(core.dnpName, true);
-    for (const service of Object.values(compose.services()))
-      service.editNetworkIp(dncoreNetworkName, core.ip);
-
-    compose.write();
-  }
-
-  const coreToDeleteHardcodedIp = [
-    "ipfs.dnp.dappnode.eth",
-    "wireguard.dnp.dappnode.eth",
-    "vpn.dnp.dappnode.eth",
-    "https.dnp.dappnode.eth",
-    "wifi.dnp.dappnode.eth",
-  ];
-  for (const core of coreToDeleteHardcodedIp) {
-    const compose = new ComposeFileEditor(core, true);
-    compose.services();
-    for (const service of Object.values(compose.services()))
-      service.editNetworkIp(core);
-
-    compose.write();
   }
 }
 
