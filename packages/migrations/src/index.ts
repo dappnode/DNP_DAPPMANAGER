@@ -6,6 +6,7 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
+import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacy.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -92,6 +93,16 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  recreateContainersIfLegacyDns().catch((e) =>
+    migrationErrors.push({
+      migration: "remove legacy dns from running containers",
+      coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
