@@ -28,7 +28,7 @@ export class MigrationError extends Error {
 export async function executeMigrations(): Promise<void> {
   const migrationErrors: MigrationError[] = [];
 
-  removeLegacyDockerAssets().catch((e) =>
+  await removeLegacyDockerAssets().catch((e) =>
     migrationErrors.push({
       migration: "bundle legacy ops to prevent spamming the docker API",
       coreVersion: "0.2.30",
@@ -38,7 +38,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  migrateUserActionLogs().catch((e) =>
+  await migrateUserActionLogs().catch((e) =>
     migrationErrors.push({
       migration: "migrate winston .log JSON file to a lowdb",
       coreVersion: "0.2.30",
@@ -48,17 +48,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  addAliasToRunningContainers().catch((e) =>
-    migrationErrors.push({
-      migration: "add docker alias to running containers",
-      coreVersion: "0.2.80",
-      name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
-    })
-  );
-
-  switchEthClientIfOpenethereumOrGethLight().catch((e) =>
+  await switchEthClientIfOpenethereumOrGethLight().catch((e) =>
     migrationErrors.push({
       migration:
         "switch client if the current selected is geth-light or openethereum",
@@ -69,7 +59,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  pruneUserActionLogs().catch((e) =>
+  await pruneUserActionLogs().catch((e) =>
     migrationErrors.push({
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
@@ -79,7 +69,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  setDefaultEthicalMetricsEmail().catch((e) =>
+  await setDefaultEthicalMetricsEmail().catch((e) =>
     migrationErrors.push({
       migration:
         "set default email for ethical metrics if the package is installed",
@@ -90,7 +80,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  removeDnsFromComposeFiles().catch((e) =>
+  await removeDnsFromComposeFiles().catch((e) =>
     migrationErrors.push({
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
@@ -100,7 +90,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  ensureCoreComposesHardcodedIpsRange().catch((e) =>
+  await ensureCoreComposesHardcodedIpsRange().catch((e) =>
     migrationErrors.push({
       migration:
         "ensure core composes files has correct hardcoded IPs in range",
@@ -111,7 +101,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  recreateContainersIfLegacyDns().catch((e) =>
+  await recreateContainersIfLegacyDns().catch((e) =>
     migrationErrors.push({
       migration: "remove legacy dns from running containers",
       coreVersion: "0.2.85",
@@ -121,10 +111,20 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  ensureDockerNetworkConfig().catch((e) =>
+  await ensureDockerNetworkConfig().catch((e) =>
     migrationErrors.push({
       migration: "ensure docker network configuration",
       coreVersion: "0.2.85",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  await addAliasToRunningContainers().catch((e) =>
+    migrationErrors.push({
+      migration: "add docker alias to running containers",
+      coreVersion: "0.2.80",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
