@@ -7,6 +7,7 @@ import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.j
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacy.js";
+import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -93,6 +94,17 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  ensureCoreComposesHardcodedIpsRange().catch((e) =>
+    migrationErrors.push({
+      migration:
+        "ensure core composes files has correct hardcoded IPs in range",
+      coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
