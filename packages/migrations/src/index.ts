@@ -6,7 +6,7 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
-import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacy.js";
+import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 
 export class MigrationError extends Error {
