@@ -63,7 +63,6 @@ export async function dockerNetworkConnectNotThrow(
       e.message.includes("could not find a network matching network mode")
     ) {
       // Error: (HTTP code 500) server error - could not find a network matching network mode dncore_network: network dncore_network not found
-      console.error(e);
     } else throw e;
   }
 }
