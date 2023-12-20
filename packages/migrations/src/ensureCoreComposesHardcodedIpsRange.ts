@@ -1,3 +1,4 @@
+import { listPackages } from "@dappnode/dockerapi";
 import {
   ComposeFileEditor,
   parseServiceNetworks,
@@ -21,34 +22,37 @@ import { params } from "@dappnode/params";
  * This prevents from unexpected starts of core contaiers from docker-compose.yml files
  */
 export async function ensureCoreComposesHardcodedIpsRange(): Promise<void> {
-  for (const core of [
-    { dnpName: params.dappmanagerDnpName, ip: params.DAPPMANAGER_IP },
-    { dnpName: params.bindDnpName, ip: params.BIND_IP },
-  ]) {
-    const compose = new ComposeFileEditor(core.dnpName, true);
-    for (const service of Object.values(compose.compose.services)) {
-      if (service.networks) {
-        const serviceCoreNetwork = parseServiceNetworks(service.networks);
-        const coreNetwork =
-          serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
-        if (coreNetwork.ipv4_address !== core.ip) {
-          logs.info(
-            `editing service ${core.dnpName} ip from ${coreNetwork.ipv4_address} to ${core.ip}`
-          );
-          coreNetwork.ipv4_address = core.ip;
-          compose.write();
-        }
+  const bindCompose = new ComposeFileEditor(params.bindDnpName, true);
+  for (const service of Object.values(bindCompose.compose.services)) {
+    if (service.networks) {
+      const serviceCoreNetwork = parseServiceNetworks(service.networks);
+      const coreNetwork =
+        serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
+      if (coreNetwork.ipv4_address !== params.BIND_IP) {
+        logs.info(
+          `editing service ${params.bindDnpName} ip from ${coreNetwork.ipv4_address} to ${params.BIND_IP}`
+        );
+        coreNetwork.ipv4_address = params.BIND_IP;
+        bindCompose.write();
       }
     }
   }
 
-  for (const core of [
+  const pkgsToRemoveHardcodedIps = [
+    params.dappmanagerDnpName,
     params.wifiDnpName,
     params.ipfsDnpName,
-    params.vpnDnpName,
-    params.HTTPS_PORTAL_DNPNAME,
-    "wireguard.dnp.dappnode.eth",
-  ]) {
+  ];
+  const pkgs = await listPackages();
+  // Optional pkgs
+  if (pkgs.find((pkg) => pkg.dnpName === params.HTTPS_PORTAL_DNPNAME))
+    pkgsToRemoveHardcodedIps.push(params.HTTPS_PORTAL_DNPNAME);
+  if (pkgs.find((pkg) => pkg.dnpName === params.WIREGUARD_DNP_NAME))
+    pkgsToRemoveHardcodedIps.push(params.WIREGUARD_DNP_NAME);
+  if (pkgs.find((pkg) => pkg.dnpName === params.vpnDnpName))
+    pkgsToRemoveHardcodedIps.push(params.vpnDnpName);
+
+  for (const core of pkgsToRemoveHardcodedIps) {
     const compose = new ComposeFileEditor(core, true);
     for (const service of Object.values(compose.compose.services)) {
       if (service.networks) {
