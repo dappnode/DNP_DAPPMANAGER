@@ -44,7 +44,7 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
         // IMPORTANT: this is the loop that must be entered when migrating IP range
         // invalid ip range
         logs.info(
-          `docker network ${dncoreNetworkName} has invalid subnet ${dncoreNetworkSubnet}, migrating`
+          `docker network ${dncoreNetworkName} has invalid subnet ${dncoreNetworkIpamConfig[0].Subnet} it should be ${dncoreNetworkSubnet}, migrating`
         );
         // disconnect all the containers
         logs.info(`disconnecting all containers from ${dncoreNetworkName}`);
