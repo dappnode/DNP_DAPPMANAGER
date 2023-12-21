@@ -4,7 +4,7 @@ import { recreateDockerNetwork } from "../../../src/ensureDockerNetworkConfig/re
 import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
 import Dockerode from "dockerode";
 
-describe.only("Migration => ensure docker network", () => {
+describe("Ensure docker network config migration => recreateDockerNetwork", () => {
   const dockerNetworkName = "dncore_test";
   const dockerNetworkSubnet = "172.30.0.0/16";
   const dockerImageTest = "alpine";

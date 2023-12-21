@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { getDockerNetworkNameFromSubnet } from "../../../src/ensureDockerNetworkConfig/getDockerNetworkNameFromSubnet.js";
 import { docker } from "@dappnode/dockerapi";
 
-describe("getDockerNetworkNameFromSubnet", () => {
+describe("Ensure docker network config migration => getDockerNetworkNameFromSubnet", () => {
   const dockerNetworkName = "dncore_test";
   const dockerNetworkSubnet = "172.30.0.0/16";
 

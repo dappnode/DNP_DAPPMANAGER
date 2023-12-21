@@ -1,15 +1,10 @@
 import {
   listPackages,
   dockerNetworkConnectNotThrow,
-  docker,
-  dockerNetworkDisconnect,
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import Dockerode from "dockerode";
-
-const dappmanagerIp = params.DAPPMANAGER_IP;
-const bindIp = params.BIND_IP;
+import { connectContaierRetryOnIpInUsed } from "./connectContaierRetryOnIpInUsed.js";
 
 /**
  * Connect all dappnode containers to a network giving priority
@@ -19,9 +14,15 @@ const bindIp = params.BIND_IP;
  *
  * @param networkName "dncore_network" docker network to connect to the docker containers
  */
-export async function connectContainersToNetworkWithPrio(
-  networkName: string
-): Promise<void> {
+export async function connectContainersToNetworkWithPrio({
+  networkName,
+  dappmanagerIp,
+  bindIp,
+}: {
+  networkName: string;
+  dappmanagerIp: string;
+  bindIp: string;
+}): Promise<void> {
   logs.info(`connecting dappnode containers to docker network ${networkName}`);
 
   // list packages return pkg data based on naming and not on docker networking
@@ -32,26 +33,20 @@ export async function connectContainersToNetworkWithPrio(
   const { dappmanagerContainerName, bindContainerName } =
     getDappmanagerAndBindContainerNames(containerNames);
 
-  await ensureDappmanagerAndBindIpsAreFree({
-    networkName,
-    dappmanagerContainerName,
-    bindContainerName,
-    dappmanagerIp,
-    bindIp,
-  });
-
   // connect first dappmanager and bind
   // dappmanager must resolve to the hardcoded ip to use the ip as fallback ot access UI
-  await dockerNetworkConnectNotThrow(networkName, dappmanagerContainerName, {
-    IPAMConfig: {
-      IPv4Address: dappmanagerIp,
-    },
+  await connectContaierRetryOnIpInUsed({
+    networkName,
+    containerName: dappmanagerContainerName,
+    maxAttempts: containerNames.length,
+    ip: dappmanagerIp,
   });
   // bind must resolve to hardcoded ip cause its used as dns in vpn creds
-  await dockerNetworkConnectNotThrow(networkName, bindContainerName, {
-    IPAMConfig: {
-      IPv4Address: bindIp,
-    },
+  await connectContaierRetryOnIpInUsed({
+    networkName,
+    containerName: bindContainerName,
+    maxAttempts: containerNames.length,
+    ip: bindIp,
   });
   // connect rest of containers
   await Promise.all(
@@ -61,59 +56,7 @@ export async function connectContainersToNetworkWithPrio(
   );
 }
 
-async function ensureDappmanagerAndBindIpsAreFree({
-  networkName,
-  dappmanagerContainerName,
-  bindContainerName,
-  dappmanagerIp,
-  bindIp,
-}: {
-  networkName: string;
-  dappmanagerContainerName: string;
-  bindContainerName: string;
-  dappmanagerIp: string;
-  bindIp: string;
-}): Promise<void> {
-  const containers = (
-    (await docker
-      .getNetwork(networkName)
-      .inspect()) as Dockerode.NetworkInspectInfo
-  ).Containers;
-  if (containers) {
-    const containerUsingDappmanagerIp = Object.values(containers).find(
-      (c) =>
-        c.Name !== dappmanagerContainerName && c.IPv4Address === dappmanagerIp
-    );
-    if (containerUsingDappmanagerIp) {
-      logs.info(
-        `the container ${containerUsingDappmanagerIp} is using dappmanager IP ${dappmanagerIp}, disconnecting it`
-      );
-      await dockerNetworkDisconnect(
-        networkName,
-        containerUsingDappmanagerIp.Name
-      );
-      await dockerNetworkConnectNotThrow(
-        networkName,
-        containerUsingDappmanagerIp.Name
-      );
-    }
-    const containerUsingBindIp = Object.values(containers).find(
-      (c) => c.Name !== bindContainerName && c.IPv4Address === bindIp
-    );
-    if (containerUsingBindIp) {
-      logs.info(
-        `the container ${containerUsingBindIp} is using dappmanager IP ${bindIp}, disconnecting it`
-      );
-      await dockerNetworkDisconnect(networkName, containerUsingBindIp.Name);
-      await dockerNetworkConnectNotThrow(
-        networkName,
-        containerUsingBindIp.Name
-      );
-    }
-  }
-}
-
-function getDappmanagerAndBindContainerNames(containerNames: string[]): {
+export function getDappmanagerAndBindContainerNames(containerNames: string[]): {
   dappmanagerContainerName: string;
   bindContainerName: string;
 } {

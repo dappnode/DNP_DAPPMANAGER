@@ -115,6 +115,8 @@ export async function executeMigrations(): Promise<void> {
   await ensureDockerNetworkConfig({
     dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
     dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
+    dappmanagerIp: params.DAPPMANAGER_IP,
+    bindIp: params.BIND_IP,
   }).catch((e) =>
     migrationErrors.push({
       migration: "ensure docker network configuration",

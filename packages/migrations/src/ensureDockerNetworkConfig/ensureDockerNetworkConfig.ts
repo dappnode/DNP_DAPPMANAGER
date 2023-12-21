@@ -17,9 +17,13 @@ import { connectContainersToNetworkWithPrio } from "./connectContainersToNetwork
 export async function ensureDockerNetworkConfig({
   dockerNetworkName,
   dockerNetworkSubnet,
+  dappmanagerIp,
+  bindIp,
 }: {
   dockerNetworkName: string;
   dockerNetworkSubnet: string;
+  dappmanagerIp: string;
+  bindIp: string;
 }): Promise<void> {
   const dncoreNetwork = docker.getNetwork(dockerNetworkName);
 
@@ -62,7 +66,11 @@ export async function ensureDockerNetworkConfig({
     }
 
     // connect all containers
-    await connectContainersToNetworkWithPrio(dockerNetworkName);
+    await connectContainersToNetworkWithPrio({
+      networkName: dockerNetworkName,
+      dappmanagerIp,
+      bindIp,
+    });
   } catch (e) {
     // Error: (HTTP code 404) no such network - network dncore_network not found
     if (e.statusCode === 404) {
@@ -84,7 +92,11 @@ export async function ensureDockerNetworkConfig({
           },
         });
         // connect all containers
-        await connectContainersToNetworkWithPrio(dockerNetworkName);
+        await connectContainersToNetworkWithPrio({
+          networkName: dockerNetworkName,
+          dappmanagerIp,
+          bindIp,
+        });
       } catch (e) {
         // Error when creating docker network with overlapping address space:
         // Error: (HTTP code 403) unexpected - Pool overlaps with other one on this address space
@@ -102,7 +114,11 @@ export async function ensureDockerNetworkConfig({
             dockerNetworkSubnet: dockerNetworkSubnet,
           });
           // connect all containers
-          await connectContainersToNetworkWithPrio(dockerNetworkName);
+          await connectContainersToNetworkWithPrio({
+            networkName: dockerNetworkName,
+            dappmanagerIp,
+            bindIp,
+          });
         } else throw e;
       }
     } else throw e;
