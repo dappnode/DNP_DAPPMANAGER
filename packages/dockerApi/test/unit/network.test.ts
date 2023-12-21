@@ -8,10 +8,9 @@ import {
   dockerNetworkConnect,
 } from "../../src/index.js";
 import Dockerode from "dockerode";
-import { shell } from "@dappnode/utils";
 
 // This test will only work if you have a running dappmanager container with DN_CORE network
-describe.only("dockerApi => network", () => {
+describe("dockerApi => network", () => {
   const dockerNetworkName = "dncore_test";
   const dockerImageTest = "alpine";
   const containerNames = [

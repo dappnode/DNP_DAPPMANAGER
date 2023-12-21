@@ -8,6 +8,7 @@ import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
+import { params } from "@dappnode/params";
 
 export class MigrationError extends Error {
   migration: string;
@@ -111,7 +112,10 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  await ensureDockerNetworkConfig().catch((e) =>
+  await ensureDockerNetworkConfig({
+    dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
+    dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
+  }).catch((e) =>
     migrationErrors.push({
       migration: "ensure docker network configuration",
       coreVersion: "0.2.85",

@@ -1,16 +1,9 @@
 import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { params } from "@dappnode/params";
 import Dockerode from "dockerode";
 import { getDockerNetworkNameFromSubnet } from "./getDockerNetworkNameFromSubnet.js";
 import { recreateDockerNetwork } from "./recreateDockerNetwork.js";
 import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio.js";
-
-const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
-const dncoreNetworkSubnet = params.DOCKER_NETWORK_SUBNET;
-
-// TODO: make sure hardcoded ips are CORRECT: dappmanager and bind
-// TODO: publish core packages without hardcoded IPs??
 
 /**
  * Ensures the docker network defined has the following config:
@@ -21,8 +14,14 @@ const dncoreNetworkSubnet = params.DOCKER_NETWORK_SUBNET;
  * - All docker containers prefixed with "DAppnNodeCore-" || "DAppnodePackage-" are connected to it
  * - dappmanager and bind
  */
-export async function ensureDockerNetworkConfig(): Promise<void> {
-  const dncoreNetwork = docker.getNetwork(dncoreNetworkName);
+export async function ensureDockerNetworkConfig({
+  dockerNetworkName,
+  dockerNetworkSubnet,
+}: {
+  dockerNetworkName: string;
+  dockerNetworkSubnet: string;
+}): Promise<void> {
+  const dncoreNetwork = docker.getNetwork(dockerNetworkName);
 
   try {
     // make sure docker network exists
@@ -35,75 +34,75 @@ export async function ensureDockerNetworkConfig(): Promise<void> {
     // check network config exists
     if (dncoreNetworkIpamConfig && "Subnet" in dncoreNetworkIpamConfig[0]) {
       // validate ip rage
-      if (dncoreNetworkIpamConfig[0].Subnet !== dncoreNetworkSubnet) {
+      if (dncoreNetworkIpamConfig[0].Subnet !== dockerNetworkSubnet) {
         // IMPORTANT: this is the loop that must be entered when migrating IP range
         // invalid ip range
         logs.info(
-          `docker network ${dncoreNetworkName} has invalid subnet ${dncoreNetworkIpamConfig[0].Subnet} it should be ${dncoreNetworkSubnet}, migrating`
+          `docker network ${dockerNetworkName} has invalid subnet ${dncoreNetworkIpamConfig[0].Subnet} it should be ${dockerNetworkSubnet}, migrating`
         );
         await recreateDockerNetwork({
-          dockerNetworkName: dncoreNetworkName,
-          dockerNetworkSubnet: dncoreNetworkSubnet,
+          dockerNetworkName: dockerNetworkName,
+          dockerNetworkSubnet: dockerNetworkSubnet,
         });
       } else {
         // IMPORTANT: this is the loop that must be entered if not migration
         // valid ip range
         logs.info(
-          `docker network ${dncoreNetworkName} has valid subnet ${dncoreNetworkSubnet}`
+          `docker network ${dockerNetworkName} has valid subnet ${dockerNetworkSubnet}`
         );
       }
     } else {
       logs.error(
-        `docker network ${dncoreNetworkName} does not have network config`
+        `docker network ${dockerNetworkName} does not have network config`
       );
       await recreateDockerNetwork({
-        dockerNetworkName: dncoreNetworkName,
-        dockerNetworkSubnet: dncoreNetworkSubnet,
+        dockerNetworkName: dockerNetworkName,
+        dockerNetworkSubnet: dockerNetworkSubnet,
       });
     }
 
     // connect all containers
-    await connectContainersToNetworkWithPrio(dncoreNetworkName);
+    await connectContainersToNetworkWithPrio(dockerNetworkName);
   } catch (e) {
     // Error: (HTTP code 404) no such network - network dncore_network not found
     if (e.statusCode === 404) {
       try {
         // dncore_network does not exist create it
         logs.warn(
-          `docker network ${dncoreNetworkName} not found, creating it...`
+          `docker network ${dockerNetworkName} not found, creating it...`
         );
         await docker.createNetwork({
-          Name: dncoreNetworkName,
+          Name: dockerNetworkName,
           Driver: "bridge",
           IPAM: {
             Driver: "default",
             Config: [
               {
-                Subnet: dncoreNetworkSubnet,
+                Subnet: dockerNetworkSubnet,
               },
             ],
           },
         });
         // connect all containers
-        await connectContainersToNetworkWithPrio(dncoreNetworkName);
+        await connectContainersToNetworkWithPrio(dockerNetworkName);
       } catch (e) {
         // Error when creating docker network with overlapping address space:
         // Error: (HTTP code 403) unexpected - Pool overlaps with other one on this address space
         if (e.statusCode === 403) {
           logs.warn(`Another docker network already has subnet assigned: ${e}`);
           const dockerNetworkToRemoveName =
-            await getDockerNetworkNameFromSubnet(dncoreNetworkSubnet);
+            await getDockerNetworkNameFromSubnet(dockerNetworkSubnet);
           if (!dockerNetworkToRemoveName)
             throw Error(
-              `could not be found the docker network with subnet ${dncoreNetworkSubnet}`
+              `could not be found the docker network with subnet ${dockerNetworkSubnet}`
             );
           logs.warn(`docker network to remove: ${dockerNetworkToRemoveName}`);
           await recreateDockerNetwork({
             dockerNetworkName: dockerNetworkToRemoveName,
-            dockerNetworkSubnet: dncoreNetworkSubnet,
+            dockerNetworkSubnet: dockerNetworkSubnet,
           });
           // connect all containers
-          await connectContainersToNetworkWithPrio(dncoreNetworkName);
+          await connectContainersToNetworkWithPrio(dockerNetworkName);
         } else throw e;
       }
     } else throw e;
