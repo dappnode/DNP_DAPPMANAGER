@@ -7,6 +7,7 @@ import Dockerode from "dockerode";
 import { getDockerNetworkNameFromSubnet } from "./getDockerNetworkNameFromSubnet.js";
 import { recreateDockerNetwork } from "./recreateDockerNetwork.js";
 import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio.js";
+import { params } from "@dappnode/params";
 
 // TODO: every docker.network.connect should have the docker aliases
 
@@ -30,6 +31,7 @@ export async function ensureDockerNetworkConfig({
   dappmanagerIp: string;
   bindIp: string;
 }): Promise<void> {
+  let restartWireguardIsRequired = false;
   const dncoreNetwork = docker.getNetwork(dockerNetworkName);
 
   try {
@@ -46,6 +48,7 @@ export async function ensureDockerNetworkConfig({
       if (dncoreNetworkIpamConfig[0].Subnet !== dockerNetworkSubnet) {
         // IMPORTANT: this is the loop that must be entered when migrating IP range
         // invalid ip range
+        restartWireguardIsRequired = true;
         logs.info(
           `docker network ${dockerNetworkName} has invalid subnet ${dncoreNetworkIpamConfig[0].Subnet} it should be ${dockerNetworkSubnet}, migrating`
         );
@@ -143,5 +146,21 @@ export async function ensureDockerNetworkConfig({
         } else throw e;
       }
     } else throw e;
+  } finally {
+    // restart wireguard if required
+    if (restartWireguardIsRequired) {
+      await docker
+        .getContainer(params.WIREGUARD_CONTAINER_NAME)
+        .restart()
+        .catch((e) => {
+          if (e.statusCode === 404) {
+            // wireguard container does not exist
+            logs.info(`${params.WIREGUARD_CONTAINER_NAME} not found`);
+          } else throw e;
+        });
+      logs.info(
+        `restarted ${params.WIREGUARD_CONTAINER_NAME} container to reroute requests`
+      );
+    }
   }
 }
