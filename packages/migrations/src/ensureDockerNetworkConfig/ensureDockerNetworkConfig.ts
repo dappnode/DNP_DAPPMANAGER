@@ -150,16 +150,16 @@ export async function ensureDockerNetworkConfig({
     // restart wireguard if required
     if (restartWireguardIsRequired) {
       await docker
-        .getContainer(params.WIREGUARD_CONTAINER_NAME)
+        .getContainer(params.wireguardContainerName)
         .restart()
         .catch((e) => {
           if (e.statusCode === 404) {
             // wireguard container does not exist
-            logs.info(`${params.WIREGUARD_CONTAINER_NAME} not found`);
+            logs.info(`${params.wireguardContainerName} not found`);
           } else throw e;
         });
       logs.info(
-        `restarted ${params.WIREGUARD_CONTAINER_NAME} container to reroute requests`
+        `restarted ${params.wireguardContainerName} container to reroute requests`
       );
     }
   }

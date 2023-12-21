@@ -208,6 +208,7 @@ export const params = {
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+  wireguardContainerName: "DAppNodeCore-wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [
     "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
