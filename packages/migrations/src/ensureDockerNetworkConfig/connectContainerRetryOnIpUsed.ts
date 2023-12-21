@@ -33,16 +33,17 @@ export async function connectContainerRetryOnIpUsed({
 
   while (attemptCount < maxAttempts) {
     try {
+      const aliases = aliasesMap.get(containerName) ?? [];
       await network.connect({
         Container: containerName,
         EndpointConfig: {
           IPAMConfig: {
             IPv4Address: ip,
           },
-          Aliases: aliasesMap.get(containerName) ?? [],
+          Aliases: aliases,
         },
       });
-      logs.info(`successfully connected ${containerName} with ip ${ip}`);
+      logs.info(`Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`);
       // If any container was disconnected, reconnect it
       if (disconnectedContainers.length > 0)
         for (const dc of disconnectedContainers)

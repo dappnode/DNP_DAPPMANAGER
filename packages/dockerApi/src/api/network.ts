@@ -1,6 +1,7 @@
 import Dockerode from "dockerode";
 import { docker } from "./docker.js";
 import { dockerContainerInspect } from "../index.js";
+import { logs } from "@dappnode/logger";
 
 /**
  * Returns a map of container names to their network aliases
@@ -15,7 +16,11 @@ export async function getNetworkAliasesMap(
 
   const containersInfo = Object.values(networkInfo.Containers ?? []);
 
-  return await getContainerAliasesForNetwork(containersInfo, networkName);
+  const aliasesMap = await getContainerAliasesForNetwork(containersInfo, networkName);
+
+  logs.info(`Retrieved current container aliases for network ${networkName}: ${JSON.stringify(aliasesMap)}`);
+
+  return aliasesMap;
 }
 
 async function getContainerAliasesForNetwork(containersInfo: Dockerode.NetworkContainer[], networkName: string): Promise<Map<string, string[]>> {
