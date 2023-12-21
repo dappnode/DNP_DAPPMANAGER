@@ -27,7 +27,7 @@ export async function connectContaierRetryOnIpInUsed({
     );
   const network = docker.getNetwork(networkName);
   let attemptCount = 0;
-  let disconnectedContainer: Dockerode.NetworkContainer | null = null;
+  const disconnectedContainers: Dockerode.NetworkContainer[] = [];
 
   while (attemptCount < maxAttempts) {
     try {
@@ -40,11 +40,15 @@ export async function connectContaierRetryOnIpInUsed({
         },
       });
       logs.info(`successfully connected ${containerName} with ip ${ip}`);
-      // If a container was disconnected, reconnect it
-      if (disconnectedContainer)
-        await network.connect({
-          Container: disconnectedContainer.Name,
-        });
+      // If any container was disconnected, reconnect it
+      if (disconnectedContainers.length > 0)
+        for (const dc of disconnectedContainers)
+          await network
+            .connect({
+              Container: dc.Name,
+            })
+            // bypass error
+            .catch((e) => logs.error(`error connecting ${dc.Name}: ${e}`));
 
       return; // Connection successful, exit the function
     } catch (error) {
@@ -58,7 +62,7 @@ export async function connectContaierRetryOnIpInUsed({
           logs.info(
             `address ${ip} already in used by ${conflictingContainer.Name}, freeing it`
           );
-          disconnectedContainer = conflictingContainer;
+          disconnectedContainers.push(conflictingContainer);
           await network.disconnect({ Container: conflictingContainer.Name });
         } else throw new Error("Conflicting container not found.");
       } else throw error; // Rethrow other errors

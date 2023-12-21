@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
 import { connectContaierRetryOnIpInUsed } from "../../../src/ensureDockerNetworkConfig/connectContaierRetryOnIpInUsed.js";
+import Dockerode from "dockerode";
 
 describe("Ensure docker network config migration => connectContaierRetryOnIpInUsed", () => {
   const networkName = "dncore_test";
@@ -72,8 +73,16 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
     const ipResult = (
       await docker.getContainer(dappmanagerContainerName).inspect()
     ).NetworkSettings.Networks[networkName].IPAddress;
-    // verify bind container with expected ip
+    // verify dappmanager container with expected ip
     expect(ipResult).to.deep.equal(dappmanagerIp);
+    const containers = (
+      (await docker
+        .getNetwork(networkName)
+        .inspect()) as Dockerode.NetworkInspectInfo
+    ).Containers;
+    if (!containers) throw Error("containers not exist");
+    const containerNames = Object.values(containers).map((c) => c.Name);
+    expect(containerNames).to.include(containerUsingDappmanagerIp);
   });
 
   it(`should disconnect the container ${containerUsingBindIp}, connect ${bindContainerName} and finally reconnect the first one`, async () => {
@@ -87,6 +96,14 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
       .NetworkSettings.Networks[networkName].IPAddress;
     // verify bind container with expected ip
     expect(ipResult).to.deep.equal(bindIp);
+    const containers = (
+      (await docker
+        .getNetwork(networkName)
+        .inspect()) as Dockerode.NetworkInspectInfo
+    ).Containers;
+    if (!containers) throw Error("containers not exist");
+    const containerNames = Object.values(containers).map((c) => c.Name);
+    expect(containerNames).to.include(containerUsingBindIp);
   });
 
   after(async () => {

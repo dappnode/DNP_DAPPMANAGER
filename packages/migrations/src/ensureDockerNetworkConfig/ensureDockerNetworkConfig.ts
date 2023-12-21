@@ -1,9 +1,14 @@
-import { docker } from "@dappnode/dockerapi";
+import {
+  disconnectAllContainersFromNetwork,
+  docker,
+} from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { getDockerNetworkNameFromSubnet } from "./getDockerNetworkNameFromSubnet.js";
 import { recreateDockerNetwork } from "./recreateDockerNetwork.js";
 import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio.js";
+
+// TODO: every docker.network.connect should have the docker aliases
 
 /**
  * Ensures the docker network defined has the following config:
@@ -73,6 +78,7 @@ export async function ensureDockerNetworkConfig({
     });
   } catch (e) {
     // Error: (HTTP code 404) no such network - network dncore_network not found
+    // TODO: consider comparing also e.message
     if (e.statusCode === 404) {
       try {
         // dncore_network does not exist create it
@@ -100,6 +106,7 @@ export async function ensureDockerNetworkConfig({
       } catch (e) {
         // Error when creating docker network with overlapping address space:
         // Error: (HTTP code 403) unexpected - Pool overlaps with other one on this address space
+        // TODO: consider comparing also error.message
         if (e.statusCode === 403) {
           logs.warn(`Another docker network already has subnet assigned: ${e}`);
           const dockerNetworkToRemoveName =
@@ -108,10 +115,24 @@ export async function ensureDockerNetworkConfig({
             throw Error(
               `could not be found the docker network with subnet ${dockerNetworkSubnet}`
             );
-          logs.warn(`docker network to remove: ${dockerNetworkToRemoveName}`);
-          await recreateDockerNetwork({
-            dockerNetworkName: dockerNetworkToRemoveName,
-            dockerNetworkSubnet: dockerNetworkSubnet,
+          // disconnect all the containers
+          logs.info(`disconnecting all containers from ${dockerNetworkName}`);
+          await disconnectAllContainersFromNetwork(dockerNetworkToRemoveName);
+          // delete network with invalid ip range
+          logs.info(`removing docker network ${dockerNetworkToRemoveName}`);
+          await docker.getNetwork(dockerNetworkToRemoveName).remove();
+          // create again docker network
+          await docker.createNetwork({
+            Name: dockerNetworkName,
+            Driver: "bridge",
+            IPAM: {
+              Driver: "default",
+              Config: [
+                {
+                  Subnet: dockerNetworkSubnet,
+                },
+              ],
+            },
           });
           // connect all containers
           await connectContainersToNetworkWithPrio({
