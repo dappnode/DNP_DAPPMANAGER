@@ -4,7 +4,8 @@ import {
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import { connectContaierRetryOnIpInUsed } from "./connectContaierRetryOnIpInUsed.js";
+import { connectContainerRetryOnIpUsed } from "./connectContainerRetryOnIpUsed.js";
+import Dockerode from "dockerode";
 
 /**
  * Connect all dappnode containers to a network giving priority
@@ -18,10 +19,12 @@ export async function connectContainersToNetworkWithPrio({
   networkName,
   dappmanagerIp,
   bindIp,
+  aliasesMap,
 }: {
   networkName: string;
   dappmanagerIp: string;
   bindIp: string;
+  aliasesMap: Map<string, string[]>;
 }): Promise<void> {
   logs.info(`connecting dappnode containers to docker network ${networkName}`);
 
@@ -35,24 +38,29 @@ export async function connectContainersToNetworkWithPrio({
 
   // connect first dappmanager and bind
   // dappmanager must resolve to the hardcoded ip to use the ip as fallback ot access UI
-  await connectContaierRetryOnIpInUsed({
+  await connectContainerRetryOnIpUsed({
     networkName,
     containerName: dappmanagerContainerName,
     maxAttempts: containerNames.length,
     ip: dappmanagerIp,
+    aliasesMap,
   });
   // bind must resolve to hardcoded ip cause its used as dns in vpn creds
-  await connectContaierRetryOnIpInUsed({
+  await connectContainerRetryOnIpUsed({
     networkName,
     containerName: bindContainerName,
     maxAttempts: containerNames.length,
     ip: bindIp,
+    aliasesMap,
   });
   // connect rest of containers
   await Promise.all(
     containerNames
       .filter((c) => c !== bindContainerName && c !== dappmanagerContainerName)
-      .map((c) => dockerNetworkConnectNotThrow(networkName, c))
+      .map((c) => {
+        const networkConfig: Partial<Dockerode.NetworkInfo> = { Aliases: aliasesMap.get(c) ?? [] };
+        dockerNetworkConnectNotThrow(networkName, c, networkConfig)
+      })
   );
 }
 

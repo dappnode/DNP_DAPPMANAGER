@@ -81,7 +81,7 @@ export async function dockerNetworkConnect(
 export async function dockerNetworkConnectNotThrow(
   networkName: string,
   containerName: string,
-  endpointConfig?: Partial<Dockerode.NetworkInfo>
+  endpointConfig?: Partial<Dockerode.NetworkInfo>,
 ): Promise<void> {
   try {
     await dockerNetworkConnect(networkName, containerName, endpointConfig);

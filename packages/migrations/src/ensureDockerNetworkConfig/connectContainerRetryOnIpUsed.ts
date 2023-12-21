@@ -9,16 +9,18 @@ import Dockerode from "dockerode";
  * @param endpointConfig Configuration options for the network connection.
  * @param maxAttempts The maximum number of attempts to connect the container.
  */
-export async function connectContaierRetryOnIpInUsed({
+export async function connectContainerRetryOnIpUsed({
   networkName,
   containerName,
   maxAttempts,
   ip,
+  aliasesMap
 }: {
   networkName: string;
   containerName: string;
   maxAttempts: number; // Default to 5 attempts if not specified
   ip: string;
+  aliasesMap: Map<string, string[]>;
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 200)
@@ -37,6 +39,7 @@ export async function connectContaierRetryOnIpInUsed({
           IPAMConfig: {
             IPv4Address: ip,
           },
+          Aliases: aliasesMap.get(containerName) ?? [],
         },
       });
       logs.info(`successfully connected ${containerName} with ip ${ip}`);
@@ -46,6 +49,9 @@ export async function connectContaierRetryOnIpInUsed({
           await network
             .connect({
               Container: dc.Name,
+              EndpointConfig: {
+                Aliases: aliasesMap.get(dc.Name) ?? [],
+              },
             })
             // bypass error
             .catch((e) => logs.error(`error connecting ${dc.Name}: ${e}`));

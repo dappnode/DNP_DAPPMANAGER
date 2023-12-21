@@ -1,6 +1,7 @@
 import {
   disconnectAllContainersFromNetwork,
   docker,
+  getNetworkAliasesMap,
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
@@ -33,6 +34,7 @@ export async function ensureDockerNetworkConfig({
 }): Promise<void> {
   let restartWireguardIsRequired = false;
   const dncoreNetwork = docker.getNetwork(dockerNetworkName);
+  const aliasesMap = await getNetworkAliasesMap(dockerNetworkName);
 
   try {
     // make sure docker network exists
@@ -78,6 +80,7 @@ export async function ensureDockerNetworkConfig({
       networkName: dockerNetworkName,
       dappmanagerIp,
       bindIp,
+      aliasesMap
     });
   } catch (e) {
     // Error: (HTTP code 404) no such network - network dncore_network not found
@@ -105,6 +108,7 @@ export async function ensureDockerNetworkConfig({
           networkName: dockerNetworkName,
           dappmanagerIp,
           bindIp,
+          aliasesMap
         });
       } catch (e) {
         // Error when creating docker network with overlapping address space:
@@ -142,6 +146,7 @@ export async function ensureDockerNetworkConfig({
             networkName: dockerNetworkName,
             dappmanagerIp,
             bindIp,
+            aliasesMap
           });
         } else throw e;
       }
