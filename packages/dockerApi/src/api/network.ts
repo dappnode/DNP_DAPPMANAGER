@@ -12,30 +12,48 @@ export async function getNetworkAliasesMap(
   networkName: string
 ): Promise<Map<string, string[]>> {
   const network = docker.getNetwork(networkName);
-  const networkInfo: Dockerode.NetworkInspectInfo = (await network.inspect() as Dockerode.NetworkInspectInfo);
+  const networkInfo: Dockerode.NetworkInspectInfo =
+    (await network.inspect()) as Dockerode.NetworkInspectInfo;
 
   const containersInfo = Object.values(networkInfo.Containers ?? []);
 
-  const aliasesMap = await getContainerAliasesForNetwork(containersInfo, networkName);
+  const aliasesMap = await getContainerAliasesForNetwork(
+    containersInfo,
+    networkName
+  );
 
-  logs.info(`Retrieved current container aliases for network ${networkName}: ${JSON.stringify(aliasesMap)}`);
+  logs.info(
+    `Retrieved current container aliases for network ${networkName}: ${JSON.stringify(
+      aliasesMap
+    )}`
+  );
 
   return aliasesMap;
 }
 
-async function getContainerAliasesForNetwork(containersInfo: Dockerode.NetworkContainer[], networkName: string): Promise<Map<string, string[]>> {
+async function getContainerAliasesForNetwork(
+  containersInfo: Dockerode.NetworkContainer[],
+  networkName: string
+): Promise<Map<string, string[]>> {
   const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
     try {
-      const aliases = (await getNetworkContainerConfig(containerInfo.Name, networkName))?.Aliases ?? [];
+      const aliases =
+        (await getNetworkContainerConfig(containerInfo.Name, networkName))
+          ?.Aliases ?? [];
       return { name: containerInfo.Name, aliases };
     } catch (error) {
-      console.error(`Failed to get aliases for container ${containerInfo.Name}:`, error);
+      console.error(
+        `Failed to get aliases for container ${containerInfo.Name}:`,
+        error
+      );
       return { name: containerInfo.Name, aliases: [] };
     }
   });
 
   const containersAliases = await Promise.all(fetchAliasesTasks);
-  const aliasMap = new Map(containersAliases.map(({ name, aliases }) => [name, aliases]));
+  const aliasMap = new Map(
+    containersAliases.map(({ name, aliases }) => [name, aliases])
+  );
 
   return aliasMap;
 }
@@ -86,21 +104,12 @@ export async function dockerNetworkConnect(
 export async function dockerNetworkConnectNotThrow(
   networkName: string,
   containerName: string,
-  endpointConfig?: Partial<Dockerode.NetworkInfo>,
+  endpointConfig?: Partial<Dockerode.NetworkInfo>
 ): Promise<void> {
   try {
     await dockerNetworkConnect(networkName, containerName, endpointConfig);
   } catch (e) {
-    if (e.statusCode === 403 && e.message.includes("already exists")) {
-      // Error: (HTTP code 403) unexpected - endpoint with name DAppNodeCore-dappmanager.dnp.dappnode.eth already exists in network dncore_network
-      // container already exists in the network
-      // bypass error
-    } else if (
-      e.statusCode === 500 &&
-      e.message.includes("could not find a network matching network mode")
-    ) {
-      // Error: (HTTP code 500) server error - could not find a network matching network mode dncore_network: network dncore_network not found
-    } else throw e;
+    logs.error(e);
   }
 }
 
@@ -170,8 +179,5 @@ export async function getNetworkContainerConfig(
   networkName: string
 ): Promise<Dockerode.NetworkInfo | null> {
   const inspectInfo = await dockerContainerInspect(containerName);
-  return (
-    inspectInfo.NetworkSettings.Networks[networkName] ??
-    null
-  );
+  return inspectInfo.NetworkSettings.Networks[networkName] ?? null;
 }
