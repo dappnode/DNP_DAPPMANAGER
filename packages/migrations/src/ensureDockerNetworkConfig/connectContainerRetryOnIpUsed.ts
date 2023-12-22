@@ -11,13 +11,13 @@ import { sanitizeIpFromNetworkInspectContainers } from "./sanitizeIpFromNetworkI
  * @param maxAttempts The maximum number of attempts to connect the container.
  */
 export async function connectContainerRetryOnIpUsed({
-  networkName,
+  network,
   containerName,
   maxAttempts,
   ip,
   aliasesMap,
 }: {
-  networkName: string;
+  network: Dockerode.Network;
   containerName: string;
   maxAttempts: number;
   ip: string;
@@ -26,7 +26,6 @@ export async function connectContainerRetryOnIpUsed({
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
 
-  const network = docker.getNetwork(networkName);
   let attemptCount = 0;
   const disconnectedContainers: Dockerode.NetworkContainer[] = [];
 
@@ -65,7 +64,7 @@ export async function connectContainerRetryOnIpUsed({
         error.message.includes("Address already in use")
       ) {
         // Error: (HTTP code 403) unexpected - Address already in use
-        const conflictingContainer = await findContainerWithIP(networkName, ip);
+        const conflictingContainer = await findContainerWithIP(network.id, ip);
         if (conflictingContainer) {
           logs.info(
             `address ${ip} already in used by ${conflictingContainer.Name}, freeing it`
@@ -83,9 +82,9 @@ export async function connectContainerRetryOnIpUsed({
       ) {
         // IP is not right, reconnect container with proper IP
         logs.warn(
-          `container ${containerName} already connected to network ${networkName} with wrong IP`
+          `container ${containerName} already connected to network ${network.id} with wrong IP`
         );
-        await docker.getNetwork(networkName).disconnect({
+        await network.disconnect({
           Container: containerName,
         });
 
