@@ -1,6 +1,7 @@
 import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
+import { sanitizeIpFromNetworkInspectContainers } from "./sanitizeIpFromNetworkInspectContainers.js";
 
 /**
  * Connect a container to a network, handling IP conflicts with retries.
@@ -14,19 +15,17 @@ export async function connectContainerRetryOnIpUsed({
   containerName,
   maxAttempts,
   ip,
-  aliasesMap
+  aliasesMap,
 }: {
   networkName: string;
   containerName: string;
-  maxAttempts: number; // Default to 5 attempts if not specified
+  maxAttempts: number;
   ip: string;
   aliasesMap: Map<string, string[]>;
 }): Promise<void> {
   // prevent function from running too many times
-  if (maxAttempts > 200)
-    throw Error(
-      `connectContaierRetryOnIpInUsed() function cannot be called more than 200`
-    );
+  if (maxAttempts > 100) maxAttempts = 100;
+
   const network = docker.getNetwork(networkName);
   let attemptCount = 0;
   const disconnectedContainers: Dockerode.NetworkContainer[] = [];
@@ -43,7 +42,9 @@ export async function connectContainerRetryOnIpUsed({
           Aliases: aliases,
         },
       });
-      logs.info(`Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`);
+      logs.info(
+        `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
+      );
       // If any container was disconnected, reconnect it
       if (disconnectedContainers.length > 0)
         for (const dc of disconnectedContainers)
@@ -71,14 +72,21 @@ export async function connectContainerRetryOnIpUsed({
           );
           disconnectedContainers.push(conflictingContainer);
           await network.disconnect({ Container: conflictingContainer.Name });
-        } else throw new Error("Conflicting container not found.");
-      } else throw error; // Rethrow other errors
+        } else {
+          logs.error("Conflicting container not found.");
+          return;
+        }
+      } else {
+        logs.error(error);
+        return;
+      }
     }
     attemptCount++;
   }
-  throw new Error(
+  logs.error(
     `Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`
   );
+  return;
 }
 
 /**
@@ -96,17 +104,11 @@ async function findContainerWithIP(
   const containers = networkInfo.Containers;
   if (!containers) return null;
   for (const container of Object.values(containers))
-    if (sanitizeIPAddress(container.IPv4Address) === ipAddress)
+    if (
+      sanitizeIpFromNetworkInspectContainers(container.IPv4Address) ===
+      ipAddress
+    )
       return container;
 
   return null;
-}
-
-/**
- * Sanitizes an IP address by removing the subnet information.
- * @param ipWithSubnet The IP address with subnet information (e.g., '172.30.0.7/16').
- * @returns The sanitized IP address without subnet (e.g., '172.30.0.7').
- */
-function sanitizeIPAddress(ipWithSubnet: string) {
-  return ipWithSubnet.split("/")[0];
 }
