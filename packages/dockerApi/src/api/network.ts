@@ -1,7 +1,44 @@
 import Dockerode from "dockerode";
 import { docker } from "./docker.js";
 import { dockerContainerInspect } from "../index.js";
-import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
+
+/**
+ * Returns a map of container names to their network aliases
+ * @param networkName "dncore_network"
+ * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"] }
+ */
+export async function getNetworkAliasesMap(
+  networkName: string
+): Promise<Map<string, string[]>> {
+  const network = docker.getNetwork(networkName);
+  const networkInfo: Dockerode.NetworkInspectInfo = (await network.inspect() as Dockerode.NetworkInspectInfo);
+
+  const containersInfo = Object.values(networkInfo.Containers ?? []);
+
+  const aliasesMap = await getContainerAliasesForNetwork(containersInfo, networkName);
+
+  logs.info(`Retrieved current container aliases for network ${networkName}: ${JSON.stringify(aliasesMap)}`);
+
+  return aliasesMap;
+}
+
+async function getContainerAliasesForNetwork(containersInfo: Dockerode.NetworkContainer[], networkName: string): Promise<Map<string, string[]>> {
+  const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
+    try {
+      const aliases = (await getNetworkContainerConfig(containerInfo.Name, networkName))?.Aliases ?? [];
+      return { name: containerInfo.Name, aliases };
+    } catch (error) {
+      console.error(`Failed to get aliases for container ${containerInfo.Name}:`, error);
+      return { name: containerInfo.Name, aliases: [] };
+    }
+  });
+
+  const containersAliases = await Promise.all(fetchAliasesTasks);
+  const aliasMap = new Map(containersAliases.map(({ name, aliases }) => [name, aliases]));
+
+  return aliasMap;
+}
 
 /**
  * Disconnect all docker containers from a docker network
@@ -49,7 +86,7 @@ export async function dockerNetworkConnect(
 export async function dockerNetworkConnectNotThrow(
   networkName: string,
   containerName: string,
-  endpointConfig?: Partial<Dockerode.NetworkInfo>
+  endpointConfig?: Partial<Dockerode.NetworkInfo>,
 ): Promise<void> {
   try {
     await dockerNetworkConnect(networkName, containerName, endpointConfig);
@@ -125,13 +162,16 @@ export async function dockerListNetworks(): Promise<
   return await docker.listNetworks();
 }
 
-/** Get endpoint config for DOCKER_PRIVATE_NETWORK_NAME */
-export async function getDnCoreNetworkContainerConfig(
-  containerName: string
+/**
+ * Returns the network configuration for a container in a specific network
+ */
+export async function getNetworkContainerConfig(
+  containerName: string,
+  networkName: string
 ): Promise<Dockerode.NetworkInfo | null> {
   const inspectInfo = await dockerContainerInspect(containerName);
   return (
-    inspectInfo.NetworkSettings.Networks[params.DOCKER_PRIVATE_NETWORK_NAME] ??
+    inspectInfo.NetworkSettings.Networks[networkName] ??
     null
   );
 }

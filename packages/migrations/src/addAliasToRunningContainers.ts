@@ -15,7 +15,7 @@ import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getDnCoreNetworkContainerConfig,
+  getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
 import { gte, lt, clean } from "semver";
 import {
@@ -59,8 +59,9 @@ export async function addAliasToGivenContainers(
       migrateCoreNetworkAndAliasInCompose(container, aliases);
 
       // Adds aliases to the container network
-      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-        container.containerName
+      const currentEndpointConfig = await getNetworkContainerConfig(
+        container.containerName,
+        params.DOCKER_PRIVATE_NETWORK_NAME
       );
       if (!hasAliases(currentEndpointConfig, aliases)) {
         const updatedConfig = updateEndpointConfig(
@@ -203,9 +204,9 @@ function hasAliases(
 ): boolean {
   return Boolean(
     endpointConfig &&
-      endpointConfig.Aliases &&
-      Array.isArray(endpointConfig.Aliases) &&
-      aliases.every((alias) => endpointConfig.Aliases?.includes(alias))
+    endpointConfig.Aliases &&
+    Array.isArray(endpointConfig.Aliases) &&
+    aliases.every((alias) => endpointConfig.Aliases?.includes(alias))
   );
 }
 

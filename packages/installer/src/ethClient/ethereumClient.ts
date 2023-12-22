@@ -19,7 +19,7 @@ import {
   dockerComposeUpPackage,
   dockerNetworkReconnect,
   listPackageNoThrow,
-  getDnCoreNetworkContainerConfig,
+  getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
 import {
   ExecutionClientMainnet,
@@ -260,8 +260,9 @@ export class EthereumClient {
     containerName: string;
     aliasToRemove: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-      containerName
+    const currentEndpointConfig = await getNetworkContainerConfig(
+      containerName,
+      params.DOCKER_PRIVATE_NETWORK_NAME
     );
 
     const updatedAliases = (currentEndpointConfig?.Aliases || []).filter(
@@ -287,8 +288,9 @@ export class EthereumClient {
     containerName: string;
     aliasToAdd: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-      containerName
+    const currentEndpointConfig = await getNetworkContainerConfig(
+      containerName,
+      params.DOCKER_PRIVATE_NETWORK_NAME
     );
 
     const endpointConfig = {
