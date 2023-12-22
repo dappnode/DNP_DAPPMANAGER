@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
-import { connectContaierRetryOnIpInUsed } from "../../../src/ensureDockerNetworkConfig/connectContaierRetryOnIpInUsed.js";
+import { connectContainerRetryOnIpUsed } from "../../../src/ensureDockerNetworkConfig/connectContainerRetryOnIpUsed.js";
 import Dockerode from "dockerode";
 
 describe("Ensure docker network config migration => connectContaierRetryOnIpInUsed", () => {
@@ -22,6 +22,8 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
     containerUsingBindIp,
   ];
 
+  let network: Dockerode.Network;
+
   before(async () => {
     // get alpine docker images
     await docker.getImage(dockerImageTest).get();
@@ -37,7 +39,7 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
       })
     );
     // create docker network
-    await docker.createNetwork({
+    network = await docker.createNetwork({
       Name: networkName,
       Driver: "bridge",
       IPAM: {
@@ -48,7 +50,7 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
           },
         ],
       },
-    });
+    }) as Dockerode.Network;
     // connect duplicate of dappmanager
     await dockerNetworkConnect(networkName, containerUsingDappmanagerIp, {
       IPAMConfig: {
@@ -64,11 +66,12 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
   });
 
   it(`should disconnect the container ${containerUsingDappmanagerIp}, connect ${dappmanagerContainerName} and finally reconnect the first one`, async () => {
-    await connectContaierRetryOnIpInUsed({
-      networkName,
+    await connectContainerRetryOnIpUsed({
+      network,
       containerName: dappmanagerContainerName,
       maxAttempts: 2,
       ip: dappmanagerIp,
+      aliasesMap: new Map<string, string[]>(),
     });
     const ipResult = (
       await docker.getContainer(dappmanagerContainerName).inspect()
@@ -86,11 +89,12 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
   });
 
   it(`should disconnect the container ${containerUsingBindIp}, connect ${bindContainerName} and finally reconnect the first one`, async () => {
-    await connectContaierRetryOnIpInUsed({
-      networkName,
+    await connectContainerRetryOnIpUsed({
+      network,
       containerName: bindContainerName,
       maxAttempts: 2,
       ip: bindIp,
+      aliasesMap: new Map<string, string[]>(),
     });
     const ipResult = (await docker.getContainer(bindContainerName).inspect())
       .NetworkSettings.Networks[networkName].IPAddress;
