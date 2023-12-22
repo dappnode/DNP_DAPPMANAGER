@@ -76,6 +76,35 @@ export async function connectContainerRetryOnIpUsed({
           logs.error("Conflicting container not found.");
           return;
         }
+      } else if (
+        error.statusCode === 403 &&
+        //endpoint with name <containerName> already exists in
+        error.message.includes("already exists")
+      ) {
+        // IP is not right, reconnect container with proper IP
+        logs.warn(
+          `container ${containerName} already connected to network ${networkName} with wrong IP`
+        );
+        await docker.getNetwork(networkName).disconnect({
+          Container: containerName,
+        });
+
+        // Retry connection with new IP
+        const aliases = aliasesMap.get(containerName) ?? [];
+        await network.connect({
+          Container: containerName,
+          EndpointConfig: {
+            IPAMConfig: {
+              IPv4Address: ip,
+            },
+            Aliases: aliases,
+          },
+        });
+
+        logs.info(
+          `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
+        );
+
       } else {
         logs.error(error);
         return;
