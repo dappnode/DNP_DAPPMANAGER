@@ -43,8 +43,6 @@ export async function getNetworkOverridingOthers({
             // dncore_network does not exist, create it
             logs.warn(`docker network ${networkName} not found, creating it...`);
 
-            // CHATGPT: This will need to restart wireguard
-
             await removeAnyNetworkOverlappingSubnet(networkSubnet);
             const network = await docker.createNetwork(networkOptions);
             return { network, isNetworkRecreated: true };
