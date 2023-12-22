@@ -46,9 +46,7 @@ export async function ensureDockerNetworkConfig({
     // TODO: What do we do here?
     throw e;
   } finally {
-    if (isNetworkRecreated) {
-      await restartWireguard();
-    }
+    if (isNetworkRecreated) await restartWireguard();
   }
 }
 
