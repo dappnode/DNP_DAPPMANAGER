@@ -1,4 +1,3 @@
-import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { sanitizeIpFromNetworkInspectContainers } from "./sanitizeIpFromNetworkInspectContainers.js";
@@ -26,85 +25,55 @@ export async function connectContainerRetryOnIpUsed({
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
 
+  const aliases = aliasesMap.get(containerName) ?? [];
+
+  const networkOptions = {
+    Container: containerName,
+    EndpointConfig: {
+      IPAMConfig: {
+        IPv4Address: ip,
+      },
+      Aliases: aliases,
+    },
+  };
+
   let attemptCount = 0;
-  const disconnectedContainers: Dockerode.NetworkContainer[] = [];
 
   while (attemptCount < maxAttempts) {
     try {
-      const aliases = aliasesMap.get(containerName) ?? [];
-      await network.connect({
-        Container: containerName,
-        EndpointConfig: {
-          IPAMConfig: {
-            IPv4Address: ip,
-          },
-          Aliases: aliases,
-        },
-      });
+      await network.connect(networkOptions);
       logs.info(
         `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
       );
-      // If any container was disconnected, reconnect it
-      if (disconnectedContainers.length > 0)
-        for (const dc of disconnectedContainers)
-          await network
-            .connect({
-              Container: dc.Name,
-              EndpointConfig: {
-                Aliases: aliasesMap.get(dc.Name) ?? [],
-              },
-            })
-            // bypass error
-            .catch((e) => logs.error(`error connecting ${dc.Name}: ${e}`));
 
-      return; // Connection successful, exit the function
+      // The disconnected containers will be reconnected later (in the IP range migration)
+      return;
     } catch (error) {
       if (
         error.statusCode === 403 &&
         error.message.includes("Address already in use")
       ) {
-        // Error: (HTTP code 403) unexpected - Address already in use
-        const conflictingContainer = await findContainerWithIP(network.id, ip);
-        if (conflictingContainer) {
-          logs.info(
-            `address ${ip} already in used by ${conflictingContainer.Name}, freeing it`
-          );
-          disconnectedContainers.push(conflictingContainer);
-          await network.disconnect({ Container: conflictingContainer.Name });
-        } else {
-          logs.error("Conflicting container not found.");
-          return;
-        }
+        await disconnectConflictingContainer(network, ip);
+
       } else if (
         error.statusCode === 403 &&
-        //endpoint with name <containerName> already exists in
+        // endpoint with name <containerName> already exists in
         error.message.includes("already exists")
       ) {
         // IP is not right, reconnect container with proper IP
         logs.warn(
           `container ${containerName} already connected to network ${network.id} with wrong IP`
         );
+
+        // TODO: What if this fails?
         await network.disconnect({
           Container: containerName,
         });
 
-        // Retry connection with new IP
-        const aliases = aliasesMap.get(containerName) ?? [];
-        await network.connect({
-          Container: containerName,
-          EndpointConfig: {
-            IPAMConfig: {
-              IPv4Address: ip,
-            },
-            Aliases: aliases,
-          },
-        });
-
-        logs.info(
-          `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
-        );
+        // The container will be reconnected in the next iteration
 
       } else {
+        // TODO: What if we cannot connect dappmanager because of this error?
         logs.error(error);
         return;
       }
@@ -114,7 +83,6 @@ export async function connectContainerRetryOnIpUsed({
   logs.error(
     `Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`
   );
-  return;
 }
 
 /**
@@ -123,11 +91,10 @@ export async function connectContainerRetryOnIpUsed({
  * @param ipAddress The IP address to search for.
  * @returns The container using the specified IP, if found.
  */
-async function findContainerWithIP(
-  networkName: string,
+async function findContainerByIP(
+  network: Dockerode.Network,
   ipAddress: string
 ): Promise<Dockerode.NetworkContainer | null> {
-  const network = docker.getNetwork(networkName);
   const networkInfo: Dockerode.NetworkInspectInfo = await network.inspect();
   const containers = networkInfo.Containers;
   if (!containers) return null;
@@ -139,4 +106,24 @@ async function findContainerWithIP(
       return container;
 
   return null;
+}
+
+/**
+ * Disconnects any container with the specified IP address from the network.
+ * @param network dncore_network
+ * @param ipAddress 171.33.1.7
+ */
+async function disconnectConflictingContainer(
+  network: Dockerode.Network,
+  ipAddress: string
+): Promise<void> {
+  const conflictingContainer = await findContainerByIP(network, ipAddress);
+  if (conflictingContainer) {
+    logs.info(
+      `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
+    );
+    await network.disconnect({ Container: conflictingContainer.Name });
+  } else {
+    logs.error("Conflicting container not found.");
+  }
 }
