@@ -47,17 +47,21 @@ export async function ensureDockerNetworkConfig({
     throw e;
   } finally {
     if (isNetworkRecreated) {
-      await docker
-        .getContainer(params.wireguardContainerName)
-        .restart()
-        .catch((e) => {
-          if (e.statusCode === 404) {
-            logs.info(`${params.wireguardContainerName} not found`);
-          } else throw e; // TODO: What do we do here?
-        });
-      logs.info(
-        `restarted ${params.wireguardContainerName} container to reroute requests`
-      );
+      await restartWireguard();
     }
   }
+}
+
+async function restartWireguard(): Promise<void> {
+  await docker
+    .getContainer(params.wireguardContainerName)
+    .restart()
+    .catch((e) => {
+      logs.error(
+        `Failed to restart ${params.wireguardContainerName} container: ${e}`
+      );
+    });
+  logs.info(
+    `restarted ${params.wireguardContainerName} container to reroute requests`
+  );
 }
