@@ -32,6 +32,7 @@ export async function getNetworkOverridingOthers({
             logs.info(`docker network ${networkName} has correct subnet`);
             return { network: dncoreNetwork, isNetworkRecreated: false };
         } else {
+            logs.warn(`docker network ${networkName} has incorrect subnet. Recreating it...`);
             await removeAnyNetworkOverlappingSubnet(networkSubnet);
             const network = await recreateDockerNetwork(dncoreNetwork, networkOptions);
             return { network, isNetworkRecreated: true };
@@ -82,6 +83,8 @@ async function removeAnyNetworkOverlappingSubnet(networkSubnet: string): Promise
     const networks = await docker.listNetworks();
 
     const overlappingNetworks = networks.filter((network) => isNetworkOverlappingSubnet(network, networkSubnet));
+
+    logs.info(`Found ${overlappingNetworks.length} networks to remove (overlapping subnet)`);
 
     const removeNetworkTasks = overlappingNetworks.map((networkInfo) => {
         const networkName = networkInfo.Name;
