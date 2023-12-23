@@ -6,6 +6,7 @@ import {
   docker,
   dockerCreateNetwork,
   dockerNetworkConnect,
+  getNetworkAliasesMapNotThrow,
 } from "../../src/index.js";
 import Dockerode from "dockerode";
 
@@ -47,7 +48,10 @@ describe("dockerApi => network", function () {
   it("should connect multiple docker containers to a docker network", async () => {
     await Promise.all(
       containerNames.map(
-        async (cn) => await dockerNetworkConnect(dockerNetworkName, cn)
+        async (cn) =>
+          await dockerNetworkConnect(dockerNetworkName, cn, {
+            Aliases: [cn],
+          })
       )
     );
 
@@ -60,6 +64,26 @@ describe("dockerApi => network", function () {
       (c) => c.Name
     );
     expect(containersNames).to.have.deep.members(containerNames);
+  });
+
+  it("should get network aliases for every connected container", async () => {
+    const aliases = await getNetworkAliasesMapNotThrow(dockerNetworkName);
+
+    containerNames.forEach((containerName) => {
+      // Assert that the aliases map contains an entry for this container
+      expect(aliases.has(containerName)).to.be.true;
+
+      // Retrieve the aliases array for this container
+      const containerAliases = aliases.get(containerName);
+
+      // Assert that the containerAliases array is not empty and contains expected values
+      expect(containerAliases).to.be.an("array").that.is.not.empty;
+      expect(containerAliases).to.include(containerName); // Check for the full alias
+
+      // If you have specific expectations for the second alias, you can add checks here
+      // For example, if you know the pattern of the second alias, you can assert it
+      // Example: expect(containerAliases[1]).to.match(/some-regex-pattern/);
+    });
   });
 
   it("should disconnect all docker containers from a docker network", async () => {
