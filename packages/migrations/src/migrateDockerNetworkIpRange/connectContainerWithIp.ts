@@ -1,6 +1,5 @@
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import { params } from "@dappnode/params";
 
 /**
  * Connect a container to a docker network with an IP.
@@ -49,7 +48,7 @@ export async function connectContainerWithIp({
 
     await connectContainerRetryOnIpUsed({
       network,
-      containerName: params.dappmanagerContainerName,
+      containerName,
       maxAttempts: networkContainersNamesAndIps.length,
       ip: containerIp,
       aliasesMap,

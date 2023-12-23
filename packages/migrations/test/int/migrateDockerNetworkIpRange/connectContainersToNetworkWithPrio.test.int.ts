@@ -1,19 +1,24 @@
 import "mocha";
 import { expect } from "chai";
-import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
-import { connectContainerRetryOnIpUsed } from "../../../src/ensureDockerNetworkConfig/connectContainerRetryOnIpUsed.js";
+import {
+  docker,
+  dockerNetworkConnect,
+  getNetworkAliasesMapNotThrow,
+} from "@dappnode/dockerapi";
+import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio.js";
 import Dockerode from "dockerode";
 
-describe("Ensure docker network config migration => connectContaierRetryOnIpInUsed", () => {
+describe("Ensure docker network config migration =>  connectContainersToNetworkWithPrio", () => {
   const networkName = "dncore_test";
   const dockerNetworkSubnet = "172.30.0.0/16";
   const dockerImageTest = "alpine";
-  const dappmanagerContainerName = "test_container_1";
+  const dappmanagerContainerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
   const dappmanagerIp = "172.30.0.7";
-  const bindContainerName = "test_container_2";
+  const bindContainerName = "DAppNodeCore-bind.dnp.dappnode.eth";
   const bindIp = "172.30.0.2";
-  const containerUsingDappmanagerIp = "test_container_3";
-  const containerUsingBindIp = "test_container_4";
+  const containerUsingDappmanagerIp =
+    "DAppNodePackage-validator.web3signer.dnp.dappnode.eth";
+  const containerUsingBindIp = "DAppNodePackage-rotki.dnp.dappnode.eth";
 
   const containerNames = [
     dappmanagerContainerName,
@@ -39,7 +44,7 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
       })
     );
     // create docker network
-    network = await docker.createNetwork({
+    network = (await docker.createNetwork({
       Name: networkName,
       Driver: "bridge",
       IPAM: {
@@ -50,7 +55,7 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
           },
         ],
       },
-    }) as Dockerode.Network;
+    })) as Dockerode.Network;
     // connect duplicate of dappmanager
     await dockerNetworkConnect(networkName, containerUsingDappmanagerIp, {
       IPAMConfig: {
@@ -65,36 +70,20 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
     });
   });
 
-  it(`should disconnect the container ${containerUsingDappmanagerIp}, connect ${dappmanagerContainerName} and finally reconnect the first one`, async () => {
-    await connectContainerRetryOnIpUsed({
-      network,
-      containerName: dappmanagerContainerName,
-      maxAttempts: 2,
-      ip: dappmanagerIp,
-      aliasesMap: new Map<string, string[]>(),
-    });
-    const ipResult = (
-      await docker.getContainer(dappmanagerContainerName).inspect()
-    ).NetworkSettings.Networks[networkName].IPAddress;
-    // verify dappmanager container with expected ip
-    expect(ipResult).to.deep.equal(dappmanagerIp);
-    const containers = (
-      (await docker
-        .getNetwork(networkName)
-        .inspect()) as Dockerode.NetworkInspectInfo
-    ).Containers;
-    if (!containers) throw Error("containers not exist");
-    const containerNames = Object.values(containers).map((c) => c.Name);
-    expect(containerNames).to.include(containerUsingDappmanagerIp);
-  });
+  it(`should connect all containers with prio to dappmanager and bind, freeing IPs used`, async () => {
+    const aliasesMap = await getNetworkAliasesMapNotThrow(networkName);
 
-  it(`should disconnect the container ${containerUsingBindIp}, connect ${bindContainerName} and finally reconnect the first one`, async () => {
-    await connectContainerRetryOnIpUsed({
+    await connectContainersToNetworkWithPrio({
       network,
-      containerName: bindContainerName,
-      maxAttempts: 2,
-      ip: bindIp,
-      aliasesMap: new Map<string, string[]>(),
+      dappmanagerContainer: {
+        name: dappmanagerContainerName,
+        ip: dappmanagerIp,
+      },
+      bindContainer: {
+        name: bindContainerName,
+        ip: bindIp,
+      },
+      aliasesMap,
     });
     const ipResult = (await docker.getContainer(bindContainerName).inspect())
       .NetworkSettings.Networks[networkName].IPAddress;
@@ -108,6 +97,9 @@ describe("Ensure docker network config migration => connectContaierRetryOnIpInUs
     if (!containers) throw Error("containers not exist");
     const containerNames = Object.values(containers).map((c) => c.Name);
     expect(containerNames).to.include(containerUsingBindIp);
+    expect(containerNames).to.include(containerUsingBindIp);
+    expect(containerNames).to.include(dappmanagerContainerName);
+    expect(containerNames).to.include(bindContainerName);
   });
 
   after(async () => {

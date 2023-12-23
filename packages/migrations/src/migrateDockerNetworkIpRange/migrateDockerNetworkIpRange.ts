@@ -16,13 +16,19 @@ import { restartWireguardNotThrow } from "./restartWireguardNotThrow.js";
 export async function migrateDockerNetworkIpRange({
   dockerNetworkName,
   dockerNetworkSubnet,
-  dappmanagerIp,
-  bindIp,
+  dappmanagerContainer,
+  bindContainer,
 }: {
   dockerNetworkName: string;
   dockerNetworkSubnet: string;
-  dappmanagerIp: string;
-  bindIp: string;
+  dappmanagerContainer: {
+    name: string;
+    ip: string;
+  };
+  bindContainer: {
+    name: string;
+    ip: string;
+  };
 }): Promise<void> {
   const aliasesMap = await getNetworkAliasesMapNotThrow(dockerNetworkName);
 
@@ -34,8 +40,8 @@ export async function migrateDockerNetworkIpRange({
   try {
     await connectContainersToNetworkWithPrio({
       network,
-      dappmanagerIp,
-      bindIp,
+      dappmanagerContainer,
+      bindContainer,
       aliasesMap,
     });
   } catch (e) {

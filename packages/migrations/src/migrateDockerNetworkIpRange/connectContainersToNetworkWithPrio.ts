@@ -20,13 +20,19 @@ import Dockerode from "dockerode";
  */
 export async function connectContainersToNetworkWithPrio({
   network,
-  dappmanagerIp,
-  bindIp,
+  dappmanagerContainer,
+  bindContainer,
   aliasesMap,
 }: {
   network: Dockerode.Network;
-  dappmanagerIp: string;
-  bindIp: string;
+  dappmanagerContainer: {
+    name: string;
+    ip: string;
+  };
+  bindContainer: {
+    name: string;
+    ip: string;
+  };
   aliasesMap: Map<string, string[]>;
 }): Promise<void> {
   logs.info(`connecting dappnode containers to docker network ${network.id}`);
@@ -39,8 +45,8 @@ export async function connectContainersToNetworkWithPrio({
   await connectContainerWithIp({
     network,
     networkContainersNamesAndIps,
-    containerName: params.dappmanagerContainerName,
-    containerIp: dappmanagerIp,
+    containerName: dappmanagerContainer.name,
+    containerIp: dappmanagerContainer.ip,
     aliasesMap,
   });
 
@@ -48,8 +54,8 @@ export async function connectContainersToNetworkWithPrio({
   await connectContainerWithIp({
     network,
     networkContainersNamesAndIps,
-    containerName: params.bindContainerName,
-    containerIp: bindIp,
+    containerName: bindContainer.name,
+    containerIp: bindContainer.ip,
     aliasesMap,
   });
 
@@ -67,12 +73,12 @@ export async function connectContainersToNetworkWithPrio({
             c !== params.bindContainerName &&
             c !== params.dappmanagerContainerName
         )
-        .map((c) => {
+        .map(async (c) => {
           const networkConfig: Partial<Dockerode.NetworkInfo> = {
             Aliases: aliasesMap.get(c) ?? [],
           };
 
-          dockerNetworkConnectNotThrow(network, c, networkConfig);
+          await dockerNetworkConnectNotThrow(network, c, networkConfig);
         })
     );
   }
@@ -87,9 +93,11 @@ async function getContainersNamesNotConnected(
 
   const containerNamesAndIps = await getNetworkContainerNamesAndIps(network);
 
-  return containerNames.filter(
+  const containerNamesNotConnected = containerNames.filter(
     (name) => !containerNamesAndIps.some((c) => c.name === name)
   );
+
+  return containerNamesNotConnected;
 }
 
 async function getNetworkContainerNamesAndIps(
