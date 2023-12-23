@@ -10,7 +10,9 @@ import {
 import Dockerode from "dockerode";
 
 // This test will only work if you have a running dappmanager container with DN_CORE network
-describe("dockerApi => network", () => {
+describe("dockerApi => network", function () {
+  this.timeout(5 * 1000);
+
   const dockerNetworkName = "dncore_test";
   const dockerImageTest = "alpine";
   const containerNames = [
@@ -61,18 +63,15 @@ describe("dockerApi => network", () => {
   });
 
   it("should disconnect all docker containers from a docker network", async () => {
-    await disconnectAllContainersFromNetwork(dockerNetworkName);
+    await disconnectAllContainersFromNetwork(
+      docker.getNetwork(dockerNetworkName)
+    );
   });
 
   after(async () => {
     // remove containers
-    await Promise.all([
-      containerNames.map((cn) => docker.getContainer(cn).kill()),
-    ]);
-
-    await Promise.all([
-      containerNames.map((cn) => docker.getContainer(cn).remove()),
-    ]);
+    for (const cn of containerNames)
+      await docker.getContainer(cn).remove({ force: true });
 
     // remove docker network
     await docker.getNetwork(dockerNetworkName).remove();
