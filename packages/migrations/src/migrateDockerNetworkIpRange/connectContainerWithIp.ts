@@ -1,15 +1,71 @@
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import { sanitizeIpFromNetworkInspectContainers } from "./sanitizeIpFromNetworkInspectContainers.js";
+import { params } from "@dappnode/params";
+
+/**
+ * Connect a container to a docker network with an IP.
+ *
+ * - If the container is already connected to the given network
+ * and is connected with the correct IP then will return.
+ *
+ * - If it is not connected or is connected with the wrong IP
+ * then it will connectContainerRetryOnIpUsed function which will
+ * try to connect the container with the IP and freeing the IP if
+ * needed.
+ *
+ * @param network dockerode network instance container must be connected to
+ * @param networkContainersNamesAndIps containers names and IPs connected to the network
+ * @param containerName containername of the container to be connected to
+ * @param containerIp container IP fo the container to be connected with
+ * @param aliasesMap aliases
+ */
+export async function connectContainerWithIp({
+  network,
+  networkContainersNamesAndIps,
+  containerName,
+  containerIp,
+  aliasesMap,
+}: {
+  network: Dockerode.Network;
+  networkContainersNamesAndIps: { name: string; ip: string }[];
+  containerName: string;
+  containerIp: string;
+  aliasesMap: Map<string, string[]>;
+}) {
+  const hasContainerRightIp = networkContainersNamesAndIps.some(
+    (c) =>
+      c.name === containerName &&
+      sanitizeIpFromNetworkInspectContainers(c.ip) === containerIp
+  );
+
+  if (hasContainerRightIp)
+    logs.info(
+      `container ${containerName} has right IP and is connected to docker network`
+    );
+  else {
+    logs.info(
+      `container ${containerName} does not have right IP and/or is not connected to docker network`
+    );
+
+    await connectContainerRetryOnIpUsed({
+      network,
+      containerName: params.dappmanagerContainerName,
+      maxAttempts: networkContainersNamesAndIps.length,
+      ip: containerIp,
+      aliasesMap,
+    });
+  }
+}
 
 /**
  * Connect a container to a network, handling IP conflicts with retries.
+ *
  * @param networkName The name of the network.
  * @param containerName The name or ID of the container.
  * @param endpointConfig Configuration options for the network connection.
  * @param maxAttempts The maximum number of attempts to connect the container.
  */
-export async function connectContainerRetryOnIpUsed({
+async function connectContainerRetryOnIpUsed({
   network,
   containerName,
   maxAttempts,
@@ -24,9 +80,8 @@ export async function connectContainerRetryOnIpUsed({
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
-
   const aliases = aliasesMap.get(containerName) ?? [];
-
+  let attemptCount = 0;
   const networkOptions = {
     Container: containerName,
     EndpointConfig: {
@@ -37,25 +92,21 @@ export async function connectContainerRetryOnIpUsed({
     },
   };
 
-  let attemptCount = 0;
-
   while (attemptCount < maxAttempts) {
     try {
       await network.connect(networkOptions);
       logs.info(
         `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
       );
-
       // The disconnected containers will be reconnected later (in the IP range migration)
       return;
     } catch (error) {
       if (
         error.statusCode === 403 &&
         error.message.includes("Address already in use")
-      ) {
+      )
         await disconnectConflictingContainer(network, ip);
-
-      } else if (
+      else if (
         error.statusCode === 403 &&
         // endpoint with name <containerName> already exists in
         error.message.includes("already exists")
@@ -71,7 +122,6 @@ export async function connectContainerRetryOnIpUsed({
         });
 
         // The container will be reconnected in the next iteration
-
       } else {
         // TODO: What if we cannot connect dappmanager because of this error?
         logs.error(error);
@@ -123,7 +173,17 @@ async function disconnectConflictingContainer(
       `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
     );
     await network.disconnect({ Container: conflictingContainer.Name });
-  } else {
-    logs.error("Conflicting container not found.");
-  }
+  } else logs.error("Conflicting container not found.");
+}
+
+/**
+ * Sanitizes an IP address by removing the subnet information. It MUST be used
+ * for the output of docker.getNetwork().inspect().Containers info, where the ip
+ * has the subnet injected.
+ *
+ * @param ipWithSubnet The IP address with subnet information (e.g., '172.30.0.7/16').
+ * @returns The sanitized IP address without subnet (e.g., '172.30.0.7').
+ */
+function sanitizeIpFromNetworkInspectContainers(ipWithSubnet: string) {
+  return ipWithSubnet.split("/")[0];
 }

@@ -5,7 +5,7 @@ import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpe
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
-import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
+import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { params } from "@dappnode/params";
@@ -112,7 +112,7 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  await ensureDockerNetworkConfig({
+  await migrateDockerNetworkIpRange({
     dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
     dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
     dappmanagerIp: params.DAPPMANAGER_IP,

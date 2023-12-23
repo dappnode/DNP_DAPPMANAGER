@@ -8,7 +8,7 @@ import { logs } from "@dappnode/logger";
  * @param networkName "dncore_network"
  * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"] }
  */
-export async function getNetworkAliasesMap(
+export async function getNetworkAliasesMapNotThrow(
   networkName: string
 ): Promise<Map<string, string[]>> {
   try {
