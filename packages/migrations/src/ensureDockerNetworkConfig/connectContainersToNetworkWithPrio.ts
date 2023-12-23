@@ -1,7 +1,6 @@
 import {
   listPackages,
   dockerNetworkConnectNotThrow,
-  docker,
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
@@ -19,94 +18,127 @@ import { sanitizeIpFromNetworkInspectContainers } from "./sanitizeIpFromNetworkI
  * @throw DOES NOT THROW ERROR
  */
 export async function connectContainersToNetworkWithPrio({
-  networkName,
+  network,
   dappmanagerIp,
   bindIp,
   aliasesMap,
 }: {
-  networkName: string;
+  network: Dockerode.Network;
   dappmanagerIp: string;
   bindIp: string;
   aliasesMap: Map<string, string[]>;
 }): Promise<void> {
-  logs.info(`connecting dappnode containers to docker network ${networkName}`);
+  logs.info(`connecting dappnode containers to docker network ${network.id}`);
 
-  // list packages return pkg data based on naming and not on docker networking
-  const containerNames = (await listPackages())
-    .map((pkg) => pkg.containers.map((c) => c.containerName))
-    .flat();
+  const networkContainersNamesAndIps = await getNetworkContainerNamesAndIps(network);
 
-  const networkContainers = (
-    (await docker
-      .getNetwork(networkName)
-      .inspect()) as Dockerode.NetworkInspectInfo
-  ).Containers;
-  if (networkContainers) {
-    // connect first dappmanager and bind
-    const networkContainerNamesAndIps: { name: string; ip: string }[] =
-      Object.values(networkContainers).map((c) => {
-        return {
-          name: c.Name,
-          ip: c.IPv4Address,
+  // 1. Connect Dappmanager container
+  await ensureContainerHasRightIp({
+    network,
+    networkContainersNamesAndIps,
+    containerName: params.dappmanagerContainerName,
+    containerIp: dappmanagerIp,
+    aliasesMap,
+  });
+
+  // 2. Connect bind container
+  await ensureContainerHasRightIp({
+    network,
+    networkContainersNamesAndIps,
+    containerName: params.bindContainerName,
+    containerIp: bindIp,
+    aliasesMap,
+  });
+
+  // 3. Connect rest of containers
+  const pkgContainerNames = await getPkgContainerNames();
+
+  // Connecting bind and dappmanager might have disconnected other containers, so we need to get the {name, ip} list again
+  const namesAndIpsAfterDisconnection = await getNetworkContainerNamesAndIps(network);
+
+  const containersNotConnected = pkgContainerNames.filter(
+    (name) => !namesAndIpsAfterDisconnection.some((c) => c.name === name)
+  );
+
+  logs.info(`Reconnecting disconnected containers: ${containersNotConnected}`);
+
+  await Promise.all(
+    containersNotConnected
+      .filter(
+        (c) =>
+          c !== params.bindContainerName &&
+          c !== params.dappmanagerContainerName
+      )
+      .map((c) => {
+        const networkConfig: Partial<Dockerode.NetworkInfo> = {
+          Aliases: aliasesMap.get(c) ?? [],
         };
-      });
-    const isDappmanagerConnectedWithRightIp = networkContainerNamesAndIps.some(
-      (c) =>
-        c.name === params.dappmanagerContainerName &&
-        sanitizeIpFromNetworkInspectContainers(c.ip) === dappmanagerIp
-    );
-    if (!isDappmanagerConnectedWithRightIp) {
-      logs.info(
-        `container ${params.dappmanagerContainerName} does not have right IP and/or is not connected to docker network`
-      );
-      // dappmanager must resolve to the hardcoded ip to use the ip as fallback ot access UI
-      await connectContainerRetryOnIpUsed({
-        networkName,
-        containerName: params.dappmanagerContainerName,
-        maxAttempts: containerNames.length,
-        ip: dappmanagerIp,
-        aliasesMap,
-      });
-    }
 
-    const isBindConnectedWithRightIp = networkContainerNamesAndIps.some(
-      (c) =>
-        c.name === params.bindContainerName &&
-        sanitizeIpFromNetworkInspectContainers(c.ip) === bindIp
-    );
-    if (!isBindConnectedWithRightIp) {
-      logs.info(
-        `container ${params.bindContainerName} does not have right IP and/or is not connected to docker network`
-      );
-      // bind must resolve to hardcoded ip cause its used as dns in vpn creds
-      await connectContainerRetryOnIpUsed({
-        networkName,
-        containerName: params.bindContainerName,
-        maxAttempts: containerNames.length,
-        ip: bindIp,
-        aliasesMap,
-      });
-    }
+        dockerNetworkConnectNotThrow(network, c, networkConfig);
+      })
+  );
 
-    // connect rest of containers
-    const containersNotConnected = containerNames.filter(
-      (name) => !networkContainerNamesAndIps.some((c) => c.name === name)
-    );
-    logs.info(`containers not connected ${containersNotConnected}`);
-    await Promise.all(
-      containersNotConnected
-        .filter(
-          (c) =>
-            c !== params.bindContainerName &&
-            c !== params.dappmanagerContainerName
-        )
-        .map((c) => {
-          const networkConfig: Partial<Dockerode.NetworkInfo> = {
-            Aliases: aliasesMap.get(c) ?? [],
-          };
+}
 
-          dockerNetworkConnectNotThrow(networkName, c, networkConfig);
-        })
+/**
+ * Gets container names from all packages (based on naming and not on docker networking)
+ * @returns An array like ["DAppNodeCore-dappmanager.dnp.dappnode.eth", "DAppNodeCore-bind.dnp.dappnode.eth"...] 
+ */
+async function getPkgContainerNames(): Promise<string[]> {
+  const packages = await listPackages();
+
+  return packages.map((pkg) => pkg.containers.map((c) => c.containerName)).flat();
+}
+
+async function getNetworkContainerNamesAndIps(network: Dockerode.Network): Promise<{ name: string; ip: string }[]> {
+  const networkInfo: Dockerode.NetworkInspectInfo = await network.inspect();
+  const containers = networkInfo.Containers;
+
+  // Should not happen
+  if (!containers) return [];
+
+  return Object.values(containers).map((c) => {
+    return {
+      name: c.Name,
+      ip: c.IPv4Address,
+    };
+  });
+}
+
+async function ensureContainerHasRightIp({
+  network,
+  networkContainersNamesAndIps,
+  containerName,
+  containerIp,
+  aliasesMap,
+}: {
+  network: Dockerode.Network;
+  networkContainersNamesAndIps: { name: string; ip: string }[];
+  containerName: string;
+  containerIp: string;
+  aliasesMap: Map<string, string[]>;
+}) {
+  const hasContainerRightIp = networkContainersNamesAndIps.some(
+    (c) =>
+      c.name === containerName &&
+      sanitizeIpFromNetworkInspectContainers(c.ip) === containerIp
+  );
+
+  if (hasContainerRightIp) {
+    logs.info(
+      `container ${containerName} has right IP and is connected to docker network`
     );
+  } else {
+    logs.info(
+      `container ${containerName} does not have right IP and/or is not connected to docker network`
+    );
+
+    await connectContainerRetryOnIpUsed({
+      network,
+      containerName: params.dappmanagerContainerName,
+      maxAttempts: networkContainersNamesAndIps.length,
+      ip: containerIp,
+      aliasesMap,
+    });
   }
 }

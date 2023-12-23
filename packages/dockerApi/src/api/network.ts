@@ -11,24 +11,30 @@ import { logs } from "@dappnode/logger";
 export async function getNetworkAliasesMap(
   networkName: string
 ): Promise<Map<string, string[]>> {
-  const network = docker.getNetwork(networkName);
-  const networkInfo: Dockerode.NetworkInspectInfo =
-    (await network.inspect()) as Dockerode.NetworkInspectInfo;
+  try {
+    const network = docker.getNetwork(networkName);
+    const networkInfo: Dockerode.NetworkInspectInfo =
+      (await network.inspect()) as Dockerode.NetworkInspectInfo;
 
-  const containersInfo = Object.values(networkInfo.Containers ?? []);
+    const containersInfo = Object.values(networkInfo.Containers ?? []);
 
-  const aliasesMap = await getContainerAliasesForNetwork(
-    containersInfo,
-    networkName
-  );
+    const aliasesMap = await getContainerAliasesForNetwork(
+      containersInfo,
+      networkName
+    );
 
-  logs.info(
-    `Retrieved current container aliases for network ${networkName}: ${JSON.stringify(
-      aliasesMap
-    )}`
-  );
+    logs.info(
+      `Retrieved current container aliases for network ${networkName}: ${JSON.stringify(
+        aliasesMap
+      )}`
+    );
 
-  return aliasesMap;
+    return aliasesMap;
+  } catch (e) {
+    // This should not stop migration, as it is not critical
+    logs.error(`Aliases map could not be generated for network ${networkName}`);
+    return new Map<string, string[]>();
+  }
 }
 
 async function getContainerAliasesForNetwork(
@@ -60,12 +66,11 @@ async function getContainerAliasesForNetwork(
 
 /**
  * Disconnect all docker containers from a docker network
- * @param networkName "dncore_network"
+ * @param network "dncore_network"
  */
 export async function disconnectAllContainersFromNetwork(
-  networkName: string
+  network: Dockerode.Network
 ): Promise<void> {
-  const network = docker.getNetwork(networkName);
   const containers = ((await network.inspect()) as Dockerode.NetworkInspectInfo)
     .Containers;
   if (containers)
@@ -102,12 +107,15 @@ export async function dockerNetworkConnect(
  * @param aliases `["network-alias"]`
  */
 export async function dockerNetworkConnectNotThrow(
-  networkName: string,
+  network: Dockerode.Network,
   containerName: string,
   endpointConfig?: Partial<Dockerode.NetworkInfo>
 ): Promise<void> {
   try {
-    await dockerNetworkConnect(networkName, containerName, endpointConfig);
+    await network.connect({
+      Container: containerName,
+      EndpointConfig: endpointConfig,
+    });
   } catch (e) {
     logs.error(e);
   }
