@@ -4,6 +4,7 @@ import {
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
+import { subnetsOverlap } from "./subnetsOverlap.js";
 
 /**
  * Ensures a docker network configuration for a given parameters:
@@ -112,11 +113,14 @@ async function removeNetworksOverlappingSubnetIfNeeded(
 
 function isNetworkOverlappingSubnet(
   network: Dockerode.NetworkInspectInfo,
-  networkSubnet: string
+  subnet: string
 ): boolean {
-  // TODO: This only checks if the first subnet is the same, but it could be that the network has more than one subnet
-  // TODO: The network could be different, but the subnets could overlap
-  return network.IPAM?.Config?.[0]?.Subnet === networkSubnet;
+
+  const networkSubnet = network.IPAM?.Config?.[0]?.Subnet;
+
+  if (!networkSubnet) return false;
+
+  return subnetsOverlap(networkSubnet, subnet);
 }
 
 /**

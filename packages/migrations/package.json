@@ -15,6 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test:int": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/int --timeout 180000",
+    "test:unit": "mocha --config ./.mocharc.yaml --recursive ./test/unit --timeout 180000",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
