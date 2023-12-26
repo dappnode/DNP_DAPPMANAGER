@@ -5,6 +5,7 @@ import {
   getIsCore,
   parseEnvironment,
   getImageTag,
+  getIsMonoService,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
@@ -160,11 +161,4 @@ function setNetworks(
  */
 function sortServiceKeys(service: ComposeService): ComposeService {
   return fromPairs(sortBy(toPairs(service), "0")) as ComposeService;
-}
-
-/**
- * Returns true if there is only one service in the compose file
- */
-function getIsMonoService(compose: Compose): boolean {
-  return Object.keys(compose.services).length === 1;
 }
