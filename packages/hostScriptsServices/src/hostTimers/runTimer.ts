@@ -14,7 +14,7 @@ type TimerName = "check-docker-network.timer";
  * @param timer "update-docker-engine.timer"
  * sytemd timer info: https://manpages.debian.org/testing/systemd/systemd.timer.5.en.html
  */
-export async function runTimer(timer: TimerName, args = ""): Promise<string> {
+export async function runTimer(timer: TimerName): Promise<string> {
   const timerPath = path.resolve(params.HOST_TIMERS_SOURCE_DIR, timer);
   try {
     // Check if timer exists
@@ -26,7 +26,7 @@ export async function runTimer(timer: TimerName, args = ""): Promise<string> {
     // Enable timer
     await shellHost(`systemctl enable ${timer}`);
     // Run timer
-    return await shellHost(`systemctl start ${timer} ${args}`);
+    return await shellHost(`systemctl start ${timer}`);
   } catch (e) {
     e.message = `Error running timer ${timer}: ${e.message}`;
     throw e;
