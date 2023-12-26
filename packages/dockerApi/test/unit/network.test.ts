@@ -1,6 +1,4 @@
-// getDnCoreNetworkConfig.test.js
 import { expect } from "chai";
-import mocha from "mocha";
 import {
   disconnectAllContainersFromNetwork,
   docker,
