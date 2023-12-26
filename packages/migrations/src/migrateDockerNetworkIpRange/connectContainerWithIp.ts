@@ -34,7 +34,7 @@ export async function connectContainerWithIp({
   const hasContainerRightIp = networkContainersNamesAndIps.some(
     (c) =>
       c.name === containerName &&
-      sanitizeIpFromNetworkInspectContainers(c.ip) === containerIp
+      removeCidrSuffix(c.ip) === containerIp
   );
 
   if (hasContainerRightIp)
@@ -149,7 +149,7 @@ async function findContainerByIP(
   if (!containers) return null;
   for (const container of Object.values(containers))
     if (
-      sanitizeIpFromNetworkInspectContainers(container.IPv4Address) ===
+      removeCidrSuffix(container.IPv4Address) ===
       ipAddress
     )
       return container;
@@ -176,13 +176,14 @@ async function disconnectConflictingContainer(
 }
 
 /**
- * Sanitizes an IP address by removing the subnet information. It MUST be used
- * for the output of docker.getNetwork().inspect().Containers info, where the ip
- * has the subnet injected.
+ * Removes the CIDR suffix from an IP address. This function is useful for processing
+ * the output of `docker.getNetwork().inspect().Containers` information, where the IP
+ * address includes the CIDR suffix.
  *
- * @param ipWithSubnet The IP address with subnet information (e.g., '172.30.0.7/16').
- * @returns The sanitized IP address without subnet (e.g., '172.30.0.7').
+ * @param ipWithCidr The IP address with CIDR suffix (e.g., '172.30.0.7/16').
+ * @returns The IP address without the CIDR suffix (e.g., '172.30.0.7').
  */
-function sanitizeIpFromNetworkInspectContainers(ipWithSubnet: string) {
-  return ipWithSubnet.split("/")[0];
+function removeCidrSuffix(ipWithCidr: string): string {
+  return ipWithCidr.split('/')[0];
 }
+
