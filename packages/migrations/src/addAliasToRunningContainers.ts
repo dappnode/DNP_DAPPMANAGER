@@ -20,6 +20,7 @@ import {
 import { gte, lt, clean } from "semver";
 import {
   getDockerComposePath,
+  getIsMonoService,
   getPrivateNetworkAliases,
   shell,
 } from "@dappnode/utils";
@@ -50,7 +51,10 @@ export async function addAliasToGivenContainers(
       const service = {
         serviceName: container.serviceName,
         dnpName: container.dnpName,
-        isMainOrMonoservice: container.isMain ?? false, // false if isMain is undefined
+        isMainOrMonoservice:
+          getIsMonoService(
+            new ComposeFileEditor(container.dnpName, container.isCore).compose
+          ) || Boolean(container.isMain),
       };
 
       const aliases = getPrivateNetworkAliases(service);
@@ -204,9 +208,9 @@ function hasAliases(
 ): boolean {
   return Boolean(
     endpointConfig &&
-    endpointConfig.Aliases &&
-    Array.isArray(endpointConfig.Aliases) &&
-    aliases.every((alias) => endpointConfig.Aliases?.includes(alias))
+      endpointConfig.Aliases &&
+      Array.isArray(endpointConfig.Aliases) &&
+      aliases.every((alias) => endpointConfig.Aliases?.includes(alias))
   );
 }
 
