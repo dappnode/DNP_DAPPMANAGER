@@ -5,7 +5,7 @@ import { dataUriToFile } from "../../src/api/copyFileTo.js";
 
 const testDir = "test_files";
 
-describe.only("Util: dataUriToFile", () => {
+describe("Util: dataUriToFile", () => {
   beforeEach(() => {
     if (!fs.existsSync(testDir)) fs.mkdirSync(testDir);
   });

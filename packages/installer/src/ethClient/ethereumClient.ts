@@ -19,7 +19,7 @@ import {
   dockerComposeUpPackage,
   dockerNetworkReconnect,
   listPackageNoThrow,
-  getDnCoreNetworkContainerConfig,
+  getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
 import {
   ExecutionClientMainnet,
@@ -260,8 +260,9 @@ export class EthereumClient {
     containerName: string;
     aliasToRemove: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-      containerName
+    const currentEndpointConfig = await getNetworkContainerConfig(
+      containerName,
+      params.DOCKER_PRIVATE_NETWORK_NAME
     );
 
     const updatedAliases = (currentEndpointConfig?.Aliases || []).filter(
@@ -274,7 +275,7 @@ export class EthereumClient {
     };
 
     await dockerNetworkReconnect(
-      params.DNP_PRIVATE_NETWORK_NAME,
+      params.DOCKER_PRIVATE_NETWORK_NAME,
       containerName,
       endpointConfig
     );
@@ -287,8 +288,9 @@ export class EthereumClient {
     containerName: string;
     aliasToAdd: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-      containerName
+    const currentEndpointConfig = await getNetworkContainerConfig(
+      containerName,
+      params.DOCKER_PRIVATE_NETWORK_NAME
     );
 
     const endpointConfig = {
@@ -297,7 +299,7 @@ export class EthereumClient {
     };
 
     await dockerNetworkReconnect(
-      params.DNP_PRIVATE_NETWORK_NAME,
+      params.DOCKER_PRIVATE_NETWORK_NAME,
       containerName,
       endpointConfig
     );
@@ -425,17 +427,17 @@ export class EthereumClient {
       composeService.get().networks || {}
     );
     const serviceNetwork =
-      serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || null;
+      serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || null;
 
     if (action === ComposeAliasEditorAction.REMOVE) {
       composeService.removeNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         [alias],
         serviceNetwork
       );
     } else {
       composeService.addNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         [alias],
         serviceNetwork
       );

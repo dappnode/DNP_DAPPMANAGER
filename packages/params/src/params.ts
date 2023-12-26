@@ -110,11 +110,15 @@ export const params = {
   WIREGUARD_API_URL: "http://api.wireguard.dappnode",
   WIREGUARD_DEVICES_ENVNAME: "PEERS",
 
+  // Docker network parameters
+  DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
+  DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
+  DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+  DOCKER_LEGACY_DNS: "172.33.1.2",
+  BIND_IP: "172.33.1.2", // "10.20.0.2"
+  DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
+
   // Docker compose parameters
-  DNP_PRIVATE_NETWORK_SUBNET: "172.33.0.0/16",
-  DNP_PRIVATE_NETWORK_NAME: "dncore_network",
-  DNP_PRIVATE_NETWORK_NAME_FROM_CORE: "network",
-  DNP_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   // Use of new compose file feature: network name
   MINIMUM_COMPOSE_VERSION: "3.5",
 
@@ -188,10 +192,15 @@ export const params = {
   ],
 
   // DAPPMANAGER alias
-  DAPPMANAGER_ALIASES: ["my.dappnode", "dappnode.local"],
+  DAPPMANAGER_ALIASES: [
+    "dappmanager.dappnode",
+    "my.dappnode",
+    "dappnode.local",
+  ],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
+  bindContainerName: "DAppNodeCore-bind.dnp.dappnode.eth",
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
   dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
@@ -203,6 +212,7 @@ export const params = {
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
+  wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
   restartDnpVolumes: [
     "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
@@ -334,14 +344,14 @@ export const params = {
       name: "Besu Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
     },
     {
       name: "Besu Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
-    }
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+    },
   ],
 };
 

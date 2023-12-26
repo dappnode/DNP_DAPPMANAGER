@@ -7,7 +7,7 @@ import { params } from "@dappnode/params";
 import { mockContainer, shellSafe } from "../testUtils.js";
 
 describe("Migration", () => {
-  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
+  const dncoreNetwork = params.DOCKER_PRIVATE_NETWORK_NAME;
   const serviceName = "test";
   const containerName = "DAppNodePackage-test.dnp.dappnode.eth";
   const randomImage = "chentex/random-logger";
