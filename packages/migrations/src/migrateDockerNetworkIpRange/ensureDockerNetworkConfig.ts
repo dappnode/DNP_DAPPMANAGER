@@ -57,7 +57,7 @@ export async function ensureDockerNetworkConfig({
       return { network: dncoreNetwork, isNetworkRecreated: false };
     } else {
       logs.warn(
-        `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0]}, it should be ${networkSubnet}. Recreating it...`
+        `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0].Subnet}, it should be ${networkSubnet}. Recreating it...`
       );
       await removeNetworksOverlappingSubnetIfNeeded(networkSubnet);
       const network = await recreateDockerNetwork(
@@ -121,9 +121,12 @@ function isNetworkOverlappingSubnet(
   network: Dockerode.NetworkInspectInfo,
   subnet: string
 ): boolean {
-  const networkSubnets = network.IPAM?.Config?.map(config => config.Subnet) ?? [];
+  const networkSubnets =
+    network.IPAM?.Config?.map((config) => config.Subnet) ?? [];
 
-  return networkSubnets.some(networkSubnet => networkSubnet && subnetsOverlap(networkSubnet, subnet));
+  return networkSubnets.some(
+    (networkSubnet) => networkSubnet && subnetsOverlap(networkSubnet, subnet)
+  );
 }
 
 /**
