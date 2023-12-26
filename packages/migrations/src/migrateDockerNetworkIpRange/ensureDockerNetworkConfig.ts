@@ -111,16 +111,19 @@ async function removeNetworksOverlappingSubnetIfNeeded(
   } else logs.info(`No overlapping network found`);
 }
 
+/**
+ * Checks if a given subnet overlaps with any of the subnets in a Docker network.
+ * @param network - Docker network information as provided by Dockerode.
+ * @param subnet - A string representing the subnet in CIDR notation to check for overlap.
+ * @returns True if there is an overlap with any of the network's subnets, false otherwise.
+ */
 function isNetworkOverlappingSubnet(
   network: Dockerode.NetworkInspectInfo,
   subnet: string
 ): boolean {
+  const networkSubnets = network.IPAM?.Config?.map(config => config.Subnet) ?? [];
 
-  const networkSubnet = network.IPAM?.Config?.[0]?.Subnet;
-
-  if (!networkSubnet) return false;
-
-  return subnetsOverlap(networkSubnet, subnet);
+  return networkSubnets.some(networkSubnet => networkSubnet && subnetsOverlap(networkSubnet, subnet));
 }
 
 /**
