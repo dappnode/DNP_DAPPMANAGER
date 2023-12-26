@@ -63,6 +63,10 @@ export const params = {
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
   HOST_SERVICES_SOURCE_DIR: "hostServices",
+  // Host timer paths
+  HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
+  HOST_TIMERS_DIR: "DNCORE/timers/host",
+  HOST_TIMERS_SOURCE_DIR: "hostTimers",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
