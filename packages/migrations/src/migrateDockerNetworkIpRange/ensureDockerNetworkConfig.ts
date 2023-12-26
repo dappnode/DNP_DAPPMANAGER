@@ -4,6 +4,7 @@ import {
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
+import { subnetsOverlap } from "./subnetsOverlap.js";
 
 /**
  * Ensures a docker network configuration for a given parameters:
@@ -110,13 +111,19 @@ async function removeNetworksOverlappingSubnetIfNeeded(
   } else logs.info(`No overlapping network found`);
 }
 
+/**
+ * Checks if a given subnet overlaps with any of the subnets in a Docker network.
+ * @param network - Docker network information as provided by Dockerode.
+ * @param subnet - A string representing the subnet in CIDR notation to check for overlap.
+ * @returns True if there is an overlap with any of the network's subnets, false otherwise.
+ */
 function isNetworkOverlappingSubnet(
   network: Dockerode.NetworkInspectInfo,
-  networkSubnet: string
+  subnet: string
 ): boolean {
-  // TODO: This only checks if the first subnet is the same, but it could be that the network has more than one subnet
-  // TODO: The network could be different, but the subnets could overlap
-  return network.IPAM?.Config?.[0]?.Subnet === networkSubnet;
+  const networkSubnets = network.IPAM?.Config?.map(config => config.Subnet) ?? [];
+
+  return networkSubnets.some(networkSubnet => networkSubnet && subnetsOverlap(networkSubnet, subnet));
 }
 
 /**
