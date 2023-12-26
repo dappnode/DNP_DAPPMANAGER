@@ -32,9 +32,7 @@ export async function connectContainerWithIp({
   aliasesMap: Map<string, string[]>;
 }) {
   const hasContainerRightIp = networkContainersNamesAndIps.some(
-    (c) =>
-      c.name === containerName &&
-      removeCidrSuffix(c.ip) === containerIp
+    (c) => c.name === containerName && removeCidrSuffix(c.ip) === containerIp
   );
 
   if (hasContainerRightIp)
@@ -45,11 +43,10 @@ export async function connectContainerWithIp({
     logs.info(
       `container ${containerName} does not have right IP and/or is not connected to docker network`
     );
-
     await connectContainerRetryOnIpUsed({
       network,
       containerName,
-      maxAttempts: networkContainersNamesAndIps.length,
+      maxAttempts: 20,
       ip: containerIp,
       aliasesMap,
     });
@@ -79,6 +76,7 @@ async function connectContainerRetryOnIpUsed({
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
+  if (maxAttempts < 1) maxAttempts = 1;
   const aliases = aliasesMap.get(containerName) ?? [];
   let attemptCount = 0;
   const networkOptions = {
@@ -148,11 +146,7 @@ async function findContainerByIP(
   const containers = networkInfo.Containers;
   if (!containers) return null;
   for (const container of Object.values(containers))
-    if (
-      removeCidrSuffix(container.IPv4Address) ===
-      ipAddress
-    )
-      return container;
+    if (removeCidrSuffix(container.IPv4Address) === ipAddress) return container;
 
   return null;
 }
@@ -184,6 +178,5 @@ async function disconnectConflictingContainer(
  * @returns The IP address without the CIDR suffix (e.g., '172.30.0.7').
  */
 function removeCidrSuffix(ipWithCidr: string): string {
-  return ipWithCidr.split('/')[0];
+  return ipWithCidr.split("/")[0];
 }
-
