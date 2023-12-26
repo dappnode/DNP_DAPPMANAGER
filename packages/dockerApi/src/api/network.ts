@@ -24,9 +24,7 @@ export async function getNetworkAliasesMapNotThrow(
     );
 
     logs.info(
-      `Retrieved current container aliases for network ${networkName}: ${JSON.stringify(
-        aliasesMap
-      )}`
+      `Retrieved current container aliases for network ${networkName}: ${JSON.stringify([...aliasesMap])}`
     );
 
     return aliasesMap;
