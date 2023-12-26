@@ -15,7 +15,7 @@ describe("dockerApi => network", function () {
   this.timeout(5 * 1000);
 
   const dockerNetworkName = "dncore_test";
-  const dockerImageTest = "alpine";
+  const dockerImageTest = "alpine:latest";
   const containerNames = [
     "test_container_1",
     "test_container_2",
@@ -23,7 +23,22 @@ describe("dockerApi => network", function () {
   ]; // Define container names
 
   before(async () => {
-    await docker.getImage(dockerImageTest).get();
+    // Pull image and wait for completion
+    await new Promise<void>((resolve, reject) => {
+      docker.pull(dockerImageTest, (err: Error, stream: NodeJS.ReadableStream) => {
+        if (err) {
+          reject(err);
+        } else {
+          docker.modem.followProgress(stream, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }
+      });
+    });
     await Promise.all(
       containerNames.map(async (cn) => {
         const container = await docker.createContainer({

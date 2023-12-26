@@ -5,7 +5,7 @@ import { docker, getNetworkAliasesMapNotThrow } from "@dappnode/dockerapi";
 describe("Ensure docker network config migration => getDockerNetworkNameFromSubnet", () => {
   const testNetworkName = "docker_network_test";
   const testNetworkSubnet = "172.40.0.0/16";
-  const testImage = "alpine";
+  const testImage = "alpine:latest";
   const testContainerNames = [
     "test_container_1",
     "test_container_2",
@@ -26,18 +26,33 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       },
     });
 
-    // Pull image and create containers
-    await docker.pull(testImage);
+    // Pull image and wait for completion
+    await new Promise<void>((resolve, reject) => {
+      docker.pull(testImage, (err: Error, stream: NodeJS.ReadableStream) => {
+        if (err) {
+          reject(err);
+        } else {
+          docker.modem.followProgress(stream, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
+        }
+      });
+    });
+
     const containerPromises = testContainerNames.map(async (cn) => {
       const container = await docker.createContainer({
-        Image: testImage,
-        Cmd: ["sleep", "infinity"],
+        Image: testImage, // Ensure the image is correctly referenced
+        Cmd: ["sleep", "infinity"], // Use a command that is available in alpine
         name: cn,
       });
       await container.start();
-
       return container;
     });
+
 
     // Connect containers to network
     await Promise.all(
@@ -68,6 +83,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
         `Container ${containerName} should have alias ${expectedAlias}`
       );
     });
+
   });
 
   after(async () => {
@@ -81,7 +97,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
         const container = docker.getContainer(cn);
         if (container) {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
-          await container.remove({ force: true }).catch(() => {});
+          await container.remove({ force: true }).catch(() => { });
         }
       })
     );
@@ -89,7 +105,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
     // Remove docker network
     if (testNetwork) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      await testNetwork.remove().catch(() => {});
+      await testNetwork.remove().catch(() => { });
     }
   }
 });
