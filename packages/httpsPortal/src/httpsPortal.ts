@@ -15,7 +15,7 @@ import { removeNetworkAliasCompose } from "./utils/removeNetworkAliasCompose.js"
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable/index.js";
 
-const externalNetworkName = params.DNP_EXTERNAL_NETWORK_NAME;
+const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 
 export class HttpsPortal {
   private httpsPortalApiClient: HttpsPortalApiClient;

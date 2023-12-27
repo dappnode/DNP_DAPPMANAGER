@@ -7,7 +7,7 @@ import { params } from "@dappnode/params";
 import { mockContainer, shellSafe } from "../testUtils.js";
 
 describe("Migration", () => {
-  const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
+  const dncoreNetwork = params.DOCKER_PRIVATE_NETWORK_NAME;
   const serviceName = "test";
   const containerName = "DAppNodePackage-test.dnp.dappnode.eth";
   const randomImage = "chentex/random-logger";
@@ -54,7 +54,6 @@ services:
     image: ${randomImage}
     container_name: ${containerName}
     restart: always
-    dns: 172.33.1.2
     networks:
       ${dncoreNetwork}:
         ipv4_address: 172.33.1.7
@@ -73,7 +72,6 @@ services:
     image: ${randomImage}
     container_name: ${containerName}
     restart: always
-    dns: 172.33.1.2
     networks:
       ${dncoreNetwork}:
         ipv4_address: 172.33.1.7`;

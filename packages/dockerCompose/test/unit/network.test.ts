@@ -46,6 +46,7 @@ describe("modules / compose / networks", () => {
       });
 
       compose.firstService().addNetwork(networkName, { aliases });
+      console.log(compose.output());
       expect(compose.output()).to.deep.equal({
         version: "3.5",
         services: {
@@ -55,6 +56,7 @@ describe("modules / compose / networks", () => {
             networks: {
               [networkName]: { aliases },
             },
+            dns: undefined,
           },
         },
         networks: {
@@ -63,12 +65,14 @@ describe("modules / compose / networks", () => {
       });
 
       compose.firstService().removeNetwork(networkName);
+      console.log(compose.output());
       expect(compose.output()).to.deep.equal({
         version: "3.5",
         services: {
           "sample.dnp.dappnode.eth": {
             container_name,
             image,
+            dns: undefined,
           },
         },
         networks: {},

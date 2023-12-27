@@ -16,7 +16,6 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -69,7 +68,7 @@ networks:
       };
       // Edit existing compose
       composeService.removeNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         ["goerli-geth.dappnode"],
         serviceNetwork
       );
@@ -86,7 +85,6 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -123,7 +121,7 @@ networks:
       };
       // Edit existing compose
       composeService.addNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         ["example.dappnode"],
         serviceNetwork
       );
@@ -140,7 +138,6 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -194,7 +191,6 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
@@ -262,7 +258,6 @@ version: '3.5'
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
       - _DAPPNODE_GLOBAL_ACTIVE=true
@@ -321,7 +316,7 @@ function getComposeEditors(
     composeService.get().networks || {}
   );
   const serviceNetwork =
-    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
+    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] ?? null;
   return {
     compose,
     composeService,

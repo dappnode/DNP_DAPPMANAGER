@@ -22,7 +22,6 @@ version: '3.5'
 services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'geth.dnp.dappnode.eth:0.4.12'
@@ -58,7 +57,6 @@ version: '3.5'
 services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth
-    dns: 172.33.1.2
     environment:
       - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
     image: 'geth.dnp.dappnode.eth:0.4.12'

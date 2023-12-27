@@ -15,17 +15,18 @@ import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getDnCoreNetworkContainerConfig,
+  getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
 import { gte, lt, clean } from "semver";
 import {
   getDockerComposePath,
+  getIsMonoService,
   getPrivateNetworkAliases,
   shell,
 } from "@dappnode/utils";
 
 /** Alias for code succinctness */
-const dncoreNetworkName = params.DNP_PRIVATE_NETWORK_NAME;
+const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
 
 /**
  * DAPPMANAGER updates from <= v0.2.38 must manually add aliases
@@ -50,7 +51,10 @@ export async function addAliasToGivenContainers(
       const service = {
         serviceName: container.serviceName,
         dnpName: container.dnpName,
-        isMainOrMonoservice: container.isMain ?? false, // false if isMain is undefined
+        isMainOrMonoservice:
+          getIsMonoService(
+            new ComposeFileEditor(container.dnpName, container.isCore).compose
+          ) || Boolean(container.isMain),
       };
 
       const aliases = getPrivateNetworkAliases(service);
@@ -59,8 +63,9 @@ export async function addAliasToGivenContainers(
       migrateCoreNetworkAndAliasInCompose(container, aliases);
 
       // Adds aliases to the container network
-      const currentEndpointConfig = await getDnCoreNetworkContainerConfig(
-        container.containerName
+      const currentEndpointConfig = await getNetworkContainerConfig(
+        container.containerName,
+        params.DOCKER_PRIVATE_NETWORK_NAME
       );
       if (!hasAliases(currentEndpointConfig, aliases)) {
         const updatedConfig = updateEndpointConfig(
@@ -81,7 +86,7 @@ export async function addAliasToGivenContainers(
 }
 /** Gets the docker-compose.yml file of the given `container` and adds one or more alias
  * to the service that started `container`. All alias are added to the network defined by
- * `params.DNP_PRIVATE_NETWORK_NAME`.
+ * `params.DOCKER_PRIVATE_NETWORK_NAME`.
  *
  * @param container PackageContainer
  * @param aliases string[]
@@ -104,7 +109,8 @@ export function migrateCoreNetworkAndAliasInCompose(
 
   const serviceNetworks = parseServiceNetworks(rawServiceNetworks);
 
-  const dncoreServiceNetwork = serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME];
+  const dncoreServiceNetwork =
+    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME];
 
   if (!dncoreServiceNetwork) {
     throw Error(
@@ -119,7 +125,7 @@ export function migrateCoreNetworkAndAliasInCompose(
 
   // Gets the network "dncore_network" from the general compose file
   const dncoreComposeNetwork = compose.getComposeNetwork(
-    params.DNP_PRIVATE_NETWORK_NAME
+    params.DOCKER_PRIVATE_NETWORK_NAME
   );
 
   // Return if migration was done, compose is already updated
@@ -147,7 +153,7 @@ export function migrateCoreNetworkAndAliasInCompose(
   compose.services()[
     // eslint-disable-next-line no-unexpected-multiline
     container.serviceName
-  ].addNetworkAliases(params.DNP_PRIVATE_NETWORK_NAME, newAliases, dncoreServiceNetwork);
+  ].addNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, newAliases, dncoreServiceNetwork);
   compose.write();
 }
 
@@ -227,7 +233,7 @@ function isComposeNetworkAndAliasMigrated(
   //    - have the expected name
   //    - have the expected aliases in each service
   if (
-    dncoreComposeNetwork?.name === params.DNP_PRIVATE_NETWORK_NAME && // Check expected name
+    dncoreComposeNetwork?.name === params.DOCKER_PRIVATE_NETWORK_NAME && // Check expected name
     dncoreComposeNetwork?.external && // Check is external network
     gte(
       parseComposeSemver(composeVersion),

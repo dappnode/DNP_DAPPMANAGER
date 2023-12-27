@@ -109,7 +109,11 @@ async function natRenewal(): Promise<void> {
       }
     }
   } catch (e) {
-    logs.error("Error on NAT renewal interval", e);
+    if (e.typeUpnpError === 2) {
+      // this is the most common upnp error for when UPnP is not present in the host machine
+      // do not print the whole error message to avoid spamming the console
+      logs.warn(`Seems like UPnP is not present/available $${e.message}`);
+    } else logs.error("Error on NAT renewal interval", e);
   }
 }
 
