@@ -29,11 +29,6 @@ RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
-# Copy scripts
-COPY packages/hostScriptsServices/hostScripts hostScripts
-COPY packages/hostScriptsServices/hostServices hostServices
-COPY packages/hostScriptsServices/hostTimers hostTimers
-
 COPY docker/start_dev.sh /usr/src/app/start_dev.sh
 
 # Build the src code:

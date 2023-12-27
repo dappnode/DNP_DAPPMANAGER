@@ -8,7 +8,7 @@ import { copyHostService } from "./copyHostService.js";
 /**
  * Service runners. Helps ensure no typos
  */
-type ServiceName =
+export type ServiceName =
   | "update-upgrade-host.service"
   | "check-docker-network.service";
 
