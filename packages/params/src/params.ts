@@ -57,12 +57,22 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
-  HOST_SCRIPTS_SOURCE_DIR: "hostScripts",
+  HOST_SCRIPTS_SOURCE_DIR: process.env.TEST
+    ? "/app/packages/hostScriptsServices/hostScripts"
+    : "hostScripts",
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
-  HOST_SERVICES_SOURCE_DIR: "hostServices",
+  HOST_SERVICES_SOURCE_DIR: process.env.TEST
+    ? "/app/packages/hostScriptsServices/hostServices"
+    : "hostServices",
+  // Host timer paths
+  HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
+  HOST_TIMERS_DIR: "DNCORE/timers/host",
+  HOST_TIMERS_SOURCE_DIR: process.env.TEST
+    ? "/app/packages/hostScriptsServices/hostTimers"
+    : "hostTimers",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
