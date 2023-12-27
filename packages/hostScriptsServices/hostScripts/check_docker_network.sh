@@ -32,7 +32,7 @@ check_and_create_network() {
                 echo "Failed to create Docker network with subnet. Attempting to create without subnet..."
                 if ! docker network create --driver bridge "$network_name"; then
                     echo "Failed to create Docker network without subnet. Exiting."
-                    return 1
+                    exit 1
                 fi
             fi
 
