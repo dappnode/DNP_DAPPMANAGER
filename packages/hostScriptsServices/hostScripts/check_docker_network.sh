@@ -17,14 +17,14 @@ check_and_create_network() {
             echo "core version retrieved $core_version"
 
             # Compare with 0.2.30 using sort
-            if printf '0.2.30\n%s\n' "$core_version" | sort -V | head -n 1 | grep -q '0.2.30'; then
+            if printf '0.3.0\n%s\n' "$core_version" | sort -V | head -n 1 | grep -q '0.3.0'; then
                 subnet="10.20.0.0/24"
                 # core_version is greater than or equal to 0.2.30
                 echo "Core version is greater than or equal to 0.2.30, using subnet $subnet"
             else
                 subnet="172.33.0.0/16"
                 # core_version is less than 0.2.30
-                echo "Core version is less than 0.2.30, using subnet $subnet"
+                echo "Core version is less than 0.3.0, using subnet $subnet"
             fi
 
             # Attempt to create docker network with subnet
