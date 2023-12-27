@@ -9,7 +9,6 @@ check_and_create_network() {
     for ((i=0; i<max_retries; i++)); do
         if docker network inspect "$network_name" &> /dev/null; then
             echo "Docker network '$network_name' exists."
-            docker network inspect "$network_name"
             return 0
         else
             echo "ATTENTION! Docker network '$network_name' does not exist. Creating it..."
@@ -19,17 +18,25 @@ check_and_create_network() {
 
             # Compare with 0.2.30 using sort
             if printf '0.2.30\n%s\n' "$core_version" | sort -V | head -n 1 | grep -q '0.2.30'; then
-                subnet="172.33.0.0/16"
+                subnet="10.20.0.0/24"
                 # core_version is greater than or equal to 0.2.30
                 echo "Core version is greater than or equal to 0.2.30, using subnet $subnet"
             else
-                subnet="10.20.0.0/24"
+                subnet="172.33.0.0/16"
                 # core_version is less than 0.2.30
                 echo "Core version is less than 0.2.30, using subnet $subnet"
             fi
 
-            # create docker network
-            docker network create --driver bridge --subnet "$subnet" "$network_name"
+            # Attempt to create docker network with subnet
+            if ! docker network create --driver bridge --subnet "$subnet" "$network_name"; then
+                echo "Failed to create Docker network with subnet. Attempting to create without subnet..."
+                if ! docker network create --driver bridge "$network_name"; then
+                    echo "Failed to create Docker network without subnet. Exiting."
+                    return 1
+                fi
+            fi
+
+            echo "Docker network '$network_name' with subnet '$subnet' created successfully."
 
             # start dappnode core and dappnode non-core containers
             DNCORE_YMLS=$(find "/usr/src/dappnode/DNCORE" -name "docker-compose-*.yml" -printf "-f %p ")
