@@ -61,7 +61,8 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
           categories: manifest.categories || getFallBackCategories(name) || []
         });
       } catch (e) {
-        logs.warn(`Error fetching ${name} release`, e);
+        // This error might spam the console, print only the message
+        logs.warn(`Error fetching ${name} release: ${e.message}`);
         pushDirectoryItem({
           ...directoryItemBasic,
           status: "error",
