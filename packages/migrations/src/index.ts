@@ -1,7 +1,6 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
-import { switchEthClientIfOpenethereumOrGethLight } from "./switchEthClientIfOpenethereumOrGethLight.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
@@ -43,17 +42,6 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "migrate winston .log JSON file to a lowdb",
       coreVersion: "0.2.30",
-      name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
-    })
-  );
-
-  await switchEthClientIfOpenethereumOrGethLight().catch((e) =>
-    migrationErrors.push({
-      migration:
-        "switch client if the current selected is geth-light or openethereum",
-      coreVersion: "0.2.58",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
