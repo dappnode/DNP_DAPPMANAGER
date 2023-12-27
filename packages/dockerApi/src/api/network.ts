@@ -18,16 +18,7 @@ export async function getNetworkAliasesMapNotThrow(
 
     const containersInfo = Object.values(networkInfo.Containers ?? []);
 
-    const aliasesMap = await getContainerAliasesForNetwork(
-      containersInfo,
-      networkName
-    );
-
-    logs.info(
-      `Retrieved current container aliases for network ${networkName}: ${JSON.stringify([...aliasesMap])}`
-    );
-
-    return aliasesMap;
+    return await getContainerAliasesForNetwork(containersInfo, networkName);
   } catch (e) {
     // This should not stop migration, as it is not critical
     logs.error(`Aliases map could not be generated for network ${networkName}`);
