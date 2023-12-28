@@ -58,7 +58,10 @@ export async function ensureDockerNetworkConfig({
       logs.warn(
         `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0].Subnet}, it should be ${networkSubnet}. Recreating it...`
       );
-      await removeNetworksOverlappingSubnetIfNeeded(networkSubnet);
+      await removeNetworksOverlappingSubnetIfNeeded(networkSubnet).catch((e) =>
+        logs.error(`error removing overlapping networks: ${e}`)
+      );
+      // CRITICAL: if this step fails migration failure
       const network = await recreateDockerNetwork(
         dncoreNetwork,
         networkOptions
@@ -70,7 +73,10 @@ export async function ensureDockerNetworkConfig({
       // docker network not found, create it
       logs.warn(`docker network ${networkName} not found, creating it...`);
 
-      await removeNetworksOverlappingSubnetIfNeeded(networkSubnet);
+      await removeNetworksOverlappingSubnetIfNeeded(networkSubnet).catch((e) =>
+        logs.error(`error removing overlapping networks: ${e}`)
+      );
+      // CRITICAL: if this step fails migration failure
       const network = await docker.createNetwork(networkOptions);
       return { network, isNetworkRecreated: true };
     } else {

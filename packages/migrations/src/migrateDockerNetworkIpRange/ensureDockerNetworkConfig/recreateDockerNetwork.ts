@@ -34,13 +34,14 @@ export async function recreateDockerNetwork(
   );
 
   logs.info(`removing docker network ${networkToRemove.id}`);
+  // CRITICAL: if this step fails migration failure
   await networkToRemove.remove();
 
   // create network with valid range
   logs.info(
     `creating docker network ${newNetworkOptions.Name} with valid IP range`
   );
-
+  // CRITICAL: if this step fails migration failure
   return await docker.createNetwork(newNetworkOptions);
 }
 
