@@ -5,7 +5,7 @@ import {
   dockerNetworkConnect,
   getNetworkAliasesMapNotThrow,
 } from "@dappnode/dockerapi";
-import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio.js";
+import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio/index.js";
 import Dockerode from "dockerode";
 
 describe("Ensure docker network config migration =>  connectContainersToNetworkWithPrio", () => {

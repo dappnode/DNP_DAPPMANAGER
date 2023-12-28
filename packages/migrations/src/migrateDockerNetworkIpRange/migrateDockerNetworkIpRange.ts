@@ -1,7 +1,7 @@
 import { getNetworkAliasesMapNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio.js";
-import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
+import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio/index.js";
+import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
 import { restartWireguardNotThrow } from "./restartWireguardNotThrow.js";
 
 /**
