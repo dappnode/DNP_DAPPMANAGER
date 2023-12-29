@@ -5,6 +5,7 @@ import {
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { isEmpty } from "lodash-es";
+import { restoreContainersToNetwork } from "../restoreContainersToNetwork/index.js";
 
 /**
  * Recreates the docker network with the configuration defined in networkOptions:
@@ -18,7 +19,12 @@ import { isEmpty } from "lodash-es";
  */
 export async function recreateDockerNetwork(
   networkToRemove: Dockerode.Network,
-  newNetworkOptions: Dockerode.NetworkCreateOptions
+  newNetworkOptions: Dockerode.NetworkCreateOptions,
+  aliasesMap: Map<string, string[]>,
+    networkContainersNamesAndIps: {
+    name: string;
+    ip: string;
+  }[]
 ): Promise<{
   network: Dockerode.Network;
   containersToRestart: string[];
@@ -39,11 +45,14 @@ export async function recreateDockerNetwork(
       logs.error(
         `error removing docker network, reconnecting all docker containers`
       );
-      await Promise.all(
-        Object.values(containers).map(
-          async (c) => await networkToRemove.connect({ Container: c.Name })
-        )
-      );
+
+      await restoreContainersToNetwork({
+        containersToRestart,
+        network: networkToRemove,
+        aliasesMap,
+        networkContainersNamesAndIps,
+        containersToRecreate,
+      });
     }
 
     throw e;
@@ -79,21 +88,25 @@ async function cleanDockerNetworkBeforeRemoval(
       )
     );
 
+    const containersToRestart = await stopConnectedContainersIfAny(
+      networkToRemove
+    ).catch((e) => {
+      logs.error(`error stopping pending connected containers: ${e.message}`);
+      return [];
+    });
+
+    const containersToRecreate = await removeConnectedContainersIfAny(
+      networkToRemove
+    ).catch((e) => {
+      logs.error(
+        `error removing pending containers, the docker network removal might fail!: ${e}`
+      );
+      return [];
+    });
+
     return {
-      containersToRestart: await stopConnectedContainersIfAny(
-        networkToRemove
-      ).catch((e) => {
-        logs.error(`error stopping pending connected containers: ${e.message}`);
-        return [];
-      }),
-      containersToRecreate: await removeConnectedContainersIfAny(
-        networkToRemove
-      ).catch((e) => {
-        logs.error(
-          `error removing pending containers, the docker network removal might fail!: ${e}`
-        );
-        return [];
-      }),
+      containersToRestart,
+      containersToRecreate,
     };
   }
   return {

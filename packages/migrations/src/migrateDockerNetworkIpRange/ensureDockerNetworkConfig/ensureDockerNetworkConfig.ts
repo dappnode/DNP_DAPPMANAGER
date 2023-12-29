@@ -22,9 +22,16 @@ import { removeNetworksOverlappingSubnetIfNeeded } from "./removeNetworksOverlap
 export async function ensureDockerNetworkConfig({
   networkName,
   networkSubnet,
+  aliasesMap,
+  networkContainersNamesAndIps,
 }: {
   networkName: string;
   networkSubnet: string;
+  aliasesMap: Map<string, string[]>;
+  networkContainersNamesAndIps: {
+    name: string;
+    ip: string;
+  }[];
 }): Promise<{
   network: Dockerode.Network;
   isNetworkRecreated: boolean;
@@ -53,6 +60,7 @@ export async function ensureDockerNetworkConfig({
 
     logs.info(`docker network ${networkName} exists`);
 
+    // TODO check that actually is the same
     if (isNetworkOverlappingSubnet(networkInspect, networkSubnet)) {
       // network subnet is as expected
       logs.info(
@@ -73,7 +81,12 @@ export async function ensureDockerNetworkConfig({
       );
       // CRITICAL: if this step fails migration failure
       const { network, containersToRestart, containersToRecreate } =
-        await recreateDockerNetwork(dncoreNetwork, networkOptions);
+        await recreateDockerNetwork(
+          dncoreNetwork,
+          networkOptions,
+          aliasesMap,
+          networkContainersNamesAndIps
+        );
       return {
         network,
         containersToRestart,
@@ -90,9 +103,8 @@ export async function ensureDockerNetworkConfig({
         logs.error(`error removing overlapping networks: ${e}`)
       );
       // CRITICAL: if this step fails migration failure
-      const network = await docker.createNetwork(networkOptions);
       return {
-        network,
+        network: await docker.createNetwork(networkOptions),
         containersToRestart: [],
         containersToRecreate: [],
         isNetworkRecreated: true,
