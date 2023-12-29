@@ -25,7 +25,12 @@ export async function ensureDockerNetworkConfig({
 }: {
   networkName: string;
   networkSubnet: string;
-}): Promise<{ network: Dockerode.Network; isNetworkRecreated: boolean }> {
+}): Promise<{
+  network: Dockerode.Network;
+  isNetworkRecreated: boolean;
+  containersToRestart: string[];
+  containersToRecreate: string[];
+}> {
   const networkOptions: Dockerode.NetworkCreateOptions = {
     Name: networkName,
     Driver: "bridge",
@@ -53,7 +58,12 @@ export async function ensureDockerNetworkConfig({
       logs.info(
         `docker network ${networkName} has correct subnet ${networkSubnet}`
       );
-      return { network: dncoreNetwork, isNetworkRecreated: false };
+      return {
+        network: dncoreNetwork,
+        containersToRestart: [],
+        containersToRecreate: [],
+        isNetworkRecreated: false,
+      };
     } else {
       logs.warn(
         `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0].Subnet}, it should be ${networkSubnet}. Recreating it...`
@@ -62,11 +72,14 @@ export async function ensureDockerNetworkConfig({
         logs.error(`error removing overlapping networks: ${e}`)
       );
       // CRITICAL: if this step fails migration failure
-      const network = await recreateDockerNetwork(
-        dncoreNetwork,
-        networkOptions
-      );
-      return { network, isNetworkRecreated: true };
+      const { network, containersToRestart, containersToRecreate } =
+        await recreateDockerNetwork(dncoreNetwork, networkOptions);
+      return {
+        network,
+        containersToRestart,
+        containersToRecreate,
+        isNetworkRecreated: true,
+      };
     }
   } catch (e) {
     if (e.statusCode === 404) {
@@ -78,7 +91,12 @@ export async function ensureDockerNetworkConfig({
       );
       // CRITICAL: if this step fails migration failure
       const network = await docker.createNetwork(networkOptions);
-      return { network, isNetworkRecreated: true };
+      return {
+        network,
+        containersToRestart: [],
+        containersToRecreate: [],
+        isNetworkRecreated: true,
+      };
     } else {
       // TODO: What do we do here?
       throw e;

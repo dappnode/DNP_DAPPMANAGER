@@ -1,6 +1,8 @@
 import {
   listPackages,
   dockerNetworkConnectNotThrow,
+  docker,
+  dockerComposeUp,
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
@@ -23,6 +25,8 @@ export async function connectContainersToNetworkWithPrio({
   dappmanagerContainer,
   bindContainer,
   aliasesMap,
+  containersToRestart,
+  containersToRecreate,
 }: {
   network: Dockerode.Network;
   dappmanagerContainer: {
@@ -34,6 +38,8 @@ export async function connectContainersToNetworkWithPrio({
     ip: string;
   };
   aliasesMap: Map<string, string[]>;
+  containersToRestart: string[];
+  containersToRecreate: string[];
 }): Promise<void> {
   logs.info(`connecting dappnode containers to docker network ${network.id}`);
 
@@ -65,21 +71,51 @@ export async function connectContainersToNetworkWithPrio({
     logs.info(
       `Reconnecting disconnected containers: ${containersNotConnected}`
     );
+    await Promise.all(
+      filterContainers(containersNotConnected).map(async (c) => {
+        const networkConfig: Partial<Dockerode.NetworkInfo> = {
+          Aliases: aliasesMap.get(c) ?? [],
+        };
+
+        await dockerNetworkConnectNotThrow(network, c, networkConfig);
+      })
+    );
+  }
+
+  if (containersToRestart.length > 0) {
+    logs.info(
+      `Restarting docker containers that require to be restarted: ${containersToRestart}`
+    );
 
     await Promise.all(
-      containersNotConnected
-        .filter(
-          (c) =>
-            c !== params.bindContainerName &&
-            c !== params.dappmanagerContainerName
-        )
-        .map(async (c) => {
-          const networkConfig: Partial<Dockerode.NetworkInfo> = {
-            Aliases: aliasesMap.get(c) ?? [],
-          };
+      filterContainers(containersToRestart).map(async (cn) => {
+        await docker.getContainer(cn).restart();
+      })
+    );
+  }
 
-          await dockerNetworkConnectNotThrow(network, c, networkConfig);
+  if (containersToRecreate.length > 0) {
+    logs.info(
+      `Recreating docker containers that require to be recreated: ${containersToRestart}`
+    );
+    const composeFilesPathsToRecreate = (
+      await Promise.all(
+        filterContainers(containersToRecreate).map(async (cn) => {
+          // get the compose file path
+          return (await docker.getContainer(cn).inspect()).Config.Labels[
+            "com.docker.compose.project.config_files"
+          ];
         })
+      )
+    ).filter((path, index, self) => {
+      // filter out duplicates
+      return self.indexOf(path) === index;
+    });
+
+    await Promise.all(
+      composeFilesPathsToRecreate.map(
+        async (dcPath) => await dockerComposeUp(dcPath)
+      )
     );
   }
 }
@@ -115,4 +151,11 @@ async function getNetworkContainerNamesAndIps(
       ip: c.IPv4Address,
     };
   });
+}
+
+function filterContainers(containers: string[]): string[] {
+  return containers.filter(
+    (c) =>
+      c !== params.bindContainerName && c !== params.dappmanagerContainerName
+  );
 }

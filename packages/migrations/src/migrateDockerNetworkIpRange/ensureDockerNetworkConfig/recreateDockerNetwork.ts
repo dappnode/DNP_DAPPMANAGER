@@ -19,19 +19,13 @@ import { isEmpty } from "lodash-es";
 export async function recreateDockerNetwork(
   networkToRemove: Dockerode.Network,
   newNetworkOptions: Dockerode.NetworkCreateOptions
-): Promise<Dockerode.Network> {
-  logs.info(`disconnecting all containers from ${networkToRemove.id}`);
-  await disconnectAllContainersFromNetwork(networkToRemove).catch((e) =>
-    logs.error(
-      `error while disconnecting all containers from the network: ${e.message}`
-    )
-  );
-
-  await removeConnectedContainersIfAny(networkToRemove).catch((e) =>
-    logs.error(
-      `error removing pending containers, the docker network removal might fail: ${e}`
-    )
-  );
+): Promise<{
+  network: Dockerode.Network;
+  containersToRestart: string[];
+  containersToRecreate: string[];
+}> {
+  const { containersToRestart, containersToRecreate } =
+    await cleanDockerNetworkBeforeRemoval(networkToRemove);
 
   logs.info(`removing docker network ${networkToRemove.id}`);
   // CRITICAL: if this step fails migration failure
@@ -42,7 +36,73 @@ export async function recreateDockerNetwork(
     `creating docker network ${newNetworkOptions.Name} with valid IP range`
   );
   // CRITICAL: if this step fails migration failure
-  return await docker.createNetwork(newNetworkOptions);
+  return {
+    network: await docker.createNetwork(newNetworkOptions),
+    containersToRestart,
+    containersToRecreate,
+  };
+}
+
+async function cleanDockerNetworkBeforeRemoval(
+  networkToRemove: Dockerode.Network
+): Promise<{ containersToRestart: string[]; containersToRecreate: string[] }> {
+  const containers = (
+    (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
+  ).Containers;
+
+  if (containers && !isEmpty(containers)) {
+    logs.info(
+      `disconnecting containers from docker network before removing it`
+    );
+    await disconnectAllContainersFromNetwork(networkToRemove).catch((e) =>
+      logs.error(
+        `error while disconnecting all containers from the network: ${e.message}`
+      )
+    );
+
+    return {
+      containersToRestart: await stopConnectedContainersIfAny(
+        networkToRemove
+      ).catch((e) => {
+        logs.error(`error stopping pending connected containers: ${e.message}`);
+        return [];
+      }),
+      containersToRecreate: await removeConnectedContainersIfAny(
+        networkToRemove
+      ).catch((e) => {
+        logs.error(
+          `error removing pending containers, the docker network removal might fail!: ${e}`
+        );
+        return [];
+      }),
+    };
+  }
+  return {
+    containersToRecreate: [],
+    containersToRestart: [],
+  };
+}
+
+/**
+ * Stops connected containers if any to the docker network
+ *
+ * @param networkToRemove dockerode network to remove
+ */
+async function stopConnectedContainersIfAny(
+  networkToRemove: Dockerode.Network
+): Promise<string[]> {
+  const containers = (
+    (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
+  ).Containers;
+
+  if (!isEmpty(containers)) {
+    const containersNames = Object.values(containers).map((c) => c.Name);
+    await Promise.all(
+      containersNames.map(async (cn) => await docker.getContainer(cn).stop())
+    );
+    return containersNames;
+  }
+  return [];
 }
 
 /**
@@ -53,19 +113,19 @@ export async function recreateDockerNetwork(
  */
 async function removeConnectedContainersIfAny(
   networkToRemove: Dockerode.Network
-): Promise<void> {
+): Promise<string[]> {
   const containers = (
     (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
   ).Containers;
 
   if (!isEmpty(containers)) {
-    logs.warn(
-      `Unable to disconnect all containers from network, removing them`
-    );
+    const containersNames = Object.values(containers).map((c) => c.Name);
     await Promise.all(
-      Object.values(containers).map(
-        async (c) => await docker.getContainer(c.Name).remove({ force: true })
+      containersNames.map(
+        async (cn) => await docker.getContainer(cn).remove({ force: true })
       )
     );
+    return containersNames;
   }
+  return [];
 }

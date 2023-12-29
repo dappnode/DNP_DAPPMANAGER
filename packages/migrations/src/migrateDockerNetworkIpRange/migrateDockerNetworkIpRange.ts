@@ -32,7 +32,12 @@ export async function migrateDockerNetworkIpRange({
 }): Promise<void> {
   const aliasesMap = await getNetworkAliasesMapNotThrow(dockerNetworkName);
 
-  const { network, isNetworkRecreated } = await ensureDockerNetworkConfig({
+  const {
+    network,
+    containersToRestart,
+    containersToRecreate,
+    isNetworkRecreated,
+  } = await ensureDockerNetworkConfig({
     networkName: dockerNetworkName,
     networkSubnet: dockerNetworkSubnet,
   });
@@ -43,6 +48,8 @@ export async function migrateDockerNetworkIpRange({
       dappmanagerContainer,
       bindContainer,
       aliasesMap,
+      containersToRestart,
+      containersToRecreate,
     });
   } catch (e) {
     logs.error(`Failed to connect containers to network ${dockerNetworkName}`);
