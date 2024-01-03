@@ -1,8 +1,7 @@
 import { logs } from "@dappnode/logger";
 import { connectContainerWithIp } from "./connectContainerWithIp.js";
 import Dockerode from "dockerode";
-import { restoreContainersToNetwork } from "../restoreContainersToNetwork/index.js";
-import { getNetworkContainerNamesAndIps } from "../getNetworkContainerNamesAndIps.js";
+import { restoreContainersToNetworkNotThrow } from "../restoreContainersToNetwork/index.js";
 
 /**
  * Connect all dappnode containers to a network giving priority
@@ -19,10 +18,9 @@ export async function connectContainersToNetworkWithPrio({
   network,
   dappmanagerContainer,
   bindContainer,
-  aliasesMap,
+  aliasesIpsMap,
   containersToRestart,
   containersToRecreate,
-  networkContainersNamesAndIps,
 }: {
   network: Dockerode.Network;
   dappmanagerContainer: {
@@ -33,39 +31,38 @@ export async function connectContainersToNetworkWithPrio({
     name: string;
     ip: string;
   };
-  aliasesMap: Map<string, string[]>;
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >;
   containersToRestart: string[];
   containersToRecreate: string[];
-  networkContainersNamesAndIps: {
-    name: string;
-    ip: string;
-  }[];
 }): Promise<void> {
   logs.info(`connecting dappnode containers to docker network ${network.id}`);
 
   // 1. Connect Dappmanager container
   await connectContainerWithIp({
     network,
-    networkContainersNamesAndIps,
     containerName: dappmanagerContainer.name,
     containerIp: dappmanagerContainer.ip,
-    aliasesMap,
+    aliasesIpsMap,
   });
 
   // 2. Connect bind container
   await connectContainerWithIp({
     network,
-    networkContainersNamesAndIps,
     containerName: bindContainer.name,
     containerIp: bindContainer.ip,
-    aliasesMap,
+    aliasesIpsMap,
   });
 
-  await restoreContainersToNetwork({
+  await restoreContainersToNetworkNotThrow({
     containersToRestart,
     network,
-    aliasesMap,
-    networkContainersNamesAndIps,
+    aliasesIpsMap,
     containersToRecreate,
   });
 }

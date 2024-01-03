@@ -5,7 +5,7 @@ import {
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { isEmpty } from "lodash-es";
-import { restoreContainersToNetwork } from "../restoreContainersToNetwork/index.js";
+import { restoreContainersToNetworkNotThrow } from "../restoreContainersToNetwork/index.js";
 
 /**
  * Recreates the docker network with the configuration defined in networkOptions:
@@ -16,15 +16,18 @@ import { restoreContainersToNetwork } from "../restoreContainersToNetwork/index.
  *
  * @param networkToRemove dockerode network to remove
  * @param newNetworkOptions dockerorde create options object
+ * @param aliasesIpsMap
  */
 export async function recreateDockerNetwork(
   networkToRemove: Dockerode.Network,
   newNetworkOptions: Dockerode.NetworkCreateOptions,
-  aliasesMap: Map<string, string[]>,
-    networkContainersNamesAndIps: {
-    name: string;
-    ip: string;
-  }[]
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >
 ): Promise<{
   network: Dockerode.Network;
   containersToRestart: string[];
@@ -46,11 +49,10 @@ export async function recreateDockerNetwork(
         `error removing docker network, reconnecting all docker containers`
       );
 
-      await restoreContainersToNetwork({
+      await restoreContainersToNetworkNotThrow({
         containersToRestart,
         network: networkToRemove,
-        aliasesMap,
-        networkContainersNamesAndIps,
+        aliasesIpsMap,
         containersToRecreate,
       });
     }

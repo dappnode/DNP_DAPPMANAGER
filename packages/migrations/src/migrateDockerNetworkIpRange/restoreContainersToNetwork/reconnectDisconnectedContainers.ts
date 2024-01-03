@@ -4,18 +4,20 @@ import {
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import { filterContainers } from "./filterContainers.js";
+import { excludeDappmanagerAndBind } from "./excludeDappmanagerAndBind.js";
 
 export async function reconnectDisconnectedContainers(
   network: Dockerode.Network,
-  aliasesMap: Map<string, string[]>,
-  networkContainersNamesAndIps: {
-    name: string;
-    ip: string;
-  }[]
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >
 ): Promise<void> {
   const containersNotConnected = await getContainersNamesNotConnected(
-    networkContainersNamesAndIps
+    aliasesIpsMap
   );
 
   if (containersNotConnected.length > 0) {
@@ -23,9 +25,9 @@ export async function reconnectDisconnectedContainers(
       `Reconnecting disconnected containers: ${containersNotConnected}`
     );
     await Promise.all(
-      filterContainers(containersNotConnected).map(async (c) => {
+      excludeDappmanagerAndBind(containersNotConnected).map(async (c) => {
         const networkConfig: Partial<Dockerode.NetworkInfo> = {
-          Aliases: aliasesMap.get(c) ?? [],
+          Aliases: aliasesIpsMap.get(c) ?? [],
         };
 
         await dockerNetworkConnectNotThrow(network, c, networkConfig);
@@ -35,18 +37,20 @@ export async function reconnectDisconnectedContainers(
 }
 
 async function getContainersNamesNotConnected(
-  networkContainersNamesAndIps: {
-    name: string;
-    ip: string;
-  }[]
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >
 ): Promise<string[]> {
   const containerNames = (await listPackages())
     .map((pkg) => pkg.containers.map((c) => c.containerName))
     .flat();
 
-  const containerNamesNotConnected = containerNames.filter(
-    (name) => !networkContainersNamesAndIps.some((c) => c.name === name)
+  // return container names not connected
+  return containerNames.filter(
+    (name) => ![...aliasesIpsMap.keys()].some((cn) => cn === name)
   );
-
-  return containerNamesNotConnected;
 }

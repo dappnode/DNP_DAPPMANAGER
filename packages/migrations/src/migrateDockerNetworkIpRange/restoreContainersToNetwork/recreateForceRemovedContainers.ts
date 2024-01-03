@@ -1,8 +1,8 @@
 import { docker, dockerComposeUp } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { filterContainers } from "./filterContainers.js";
+import { excludeDappmanagerAndBind } from "./excludeDappmanagerAndBind.js";
 
-export async function recreateContainersToRecreate(
+export async function recreateForceRemovedContainers(
   containersToRecreate: string[]
 ): Promise<void> {
   if (containersToRecreate.length > 0) {
@@ -11,7 +11,7 @@ export async function recreateContainersToRecreate(
     );
     const composeFilesPathsToRecreate = (
       await Promise.all(
-        filterContainers(containersToRecreate).map(async (cn) => {
+        excludeDappmanagerAndBind(containersToRecreate).map(async (cn) => {
           // get the compose file path
           return (await docker.getContainer(cn).inspect()).Config.Labels[
             "com.docker.compose.project.config_files"

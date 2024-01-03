@@ -1,1 +1,1 @@
-export { restoreContainersToNetwork } from "./restoreContainersToNetwork.js";
+export { restoreContainersToNetworkNotThrow } from "./restoreContainersToNetworkNotThrow.js";

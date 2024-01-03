@@ -26,8 +26,7 @@ export async function removeNetworksOverlappingSubnetIfNeeded(
 
     await Promise.all(
       overlappingNetworks.map(async (networkInfo) => {
-        const networkName = networkInfo.Name;
-        const network = docker.getNetwork(networkName);
+        const network = docker.getNetwork(networkInfo.Name);
         await disconnectAllContainersFromNetwork(network);
         await network.remove();
       })

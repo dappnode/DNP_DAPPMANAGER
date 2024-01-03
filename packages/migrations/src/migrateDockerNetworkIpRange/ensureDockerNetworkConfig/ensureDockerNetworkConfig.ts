@@ -18,20 +18,22 @@ import { removeNetworksOverlappingSubnetIfNeeded } from "./removeNetworksOverlap
  *
  * @param networkName "dncore_network"
  * @param networkSubnet "172.33.0.1/16"
+ * @param aliasesIpsMap
  */
 export async function ensureDockerNetworkConfig({
   networkName,
   networkSubnet,
-  aliasesMap,
-  networkContainersNamesAndIps,
+  aliasesIpsMap,
 }: {
   networkName: string;
   networkSubnet: string;
-  aliasesMap: Map<string, string[]>;
-  networkContainersNamesAndIps: {
-    name: string;
-    ip: string;
-  }[];
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >;
 }): Promise<{
   network: Dockerode.Network;
   isNetworkRecreated: boolean;
@@ -60,8 +62,11 @@ export async function ensureDockerNetworkConfig({
 
     logs.info(`docker network ${networkName} exists`);
 
-    // TODO check that actually is the same
-    if (isNetworkOverlappingSubnet(networkInspect, networkSubnet)) {
+    const networkSubnets =
+      networkInspect.IPAM?.Config?.map((config) => config.Subnet) ?? [];
+
+    // Check subnet is as expected
+    if (networkSubnets.some((subnet) => subnet === networkSubnet)) {
       // network subnet is as expected
       logs.info(
         `docker network ${networkName} has correct subnet ${networkSubnet}`
@@ -84,8 +89,7 @@ export async function ensureDockerNetworkConfig({
         await recreateDockerNetwork(
           dncoreNetwork,
           networkOptions,
-          aliasesMap,
-          networkContainersNamesAndIps
+          aliasesIpsMap
         );
       return {
         network,

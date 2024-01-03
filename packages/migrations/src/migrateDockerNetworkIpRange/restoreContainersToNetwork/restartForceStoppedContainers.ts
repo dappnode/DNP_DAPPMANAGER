@@ -1,8 +1,8 @@
 import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { filterContainers } from "./filterContainers.js";
+import { excludeDappmanagerAndBind } from "./excludeDappmanagerAndBind.js";
 
-export async function restartContainersToRestart(
+export async function restartForceStoppedContainers(
   containersToRestart: string[]
 ): Promise<void> {
   if (containersToRestart.length > 0) {
@@ -11,7 +11,7 @@ export async function restartContainersToRestart(
     );
 
     await Promise.all(
-      filterContainers(containersToRestart).map(async (cn) => {
+      excludeDappmanagerAndBind(containersToRestart).map(async (cn) => {
         await docker.getContainer(cn).restart();
       })
     );
