@@ -17,7 +17,8 @@ export async function reconnectDisconnectedContainers(
   >
 ): Promise<void> {
   const containersNotConnected = await getContainersNamesNotConnected(
-    aliasesIpsMap
+    Array.from(Object.keys(aliasesIpsMap)),
+    network
   );
 
   if (containersNotConnected.length > 0) {
@@ -27,7 +28,7 @@ export async function reconnectDisconnectedContainers(
     await Promise.all(
       excludeDappmanagerAndBind(containersNotConnected).map(async (c) => {
         const networkConfig: Partial<Dockerode.NetworkInfo> = {
-          Aliases: aliasesIpsMap.get(c) ?? [],
+          Aliases: aliasesIpsMap.get(c)?.aliases ?? [],
         };
 
         await dockerNetworkConnectNotThrow(network, c, networkConfig);
@@ -37,20 +38,22 @@ export async function reconnectDisconnectedContainers(
 }
 
 async function getContainersNamesNotConnected(
-  aliasesIpsMap: Map<
-    string,
-    {
-      aliases: string[];
-      ip: string;
-    }
-  >
+  containerNames: string[],
+  network: Dockerode.Network
 ): Promise<string[]> {
-  const containerNames = (await listPackages())
+  const connectedContainers = (
+    (await network.inspect()) as Dockerode.NetworkInspectInfo
+  ).Containers;
+  const containerNamesList = (await listPackages())
     .map((pkg) => pkg.containers.map((c) => c.containerName))
     .flat();
 
-  // return container names not connected
-  return containerNames.filter(
-    (name) => ![...aliasesIpsMap.keys()].some((cn) => cn === name)
-  );
+  // push to containerNames  the containers from containerNamesList that are not in containerNames
+  containerNamesList.forEach((c) => {
+    if (!containerNames.includes(c)) containerNames.push(c);
+  });
+
+  // return all the containers from containerNames that are not connected to the network
+  if (!connectedContainers) return containerNames;
+  return containerNames.filter((c) => !connectedContainers[c]?.Name);
 }
