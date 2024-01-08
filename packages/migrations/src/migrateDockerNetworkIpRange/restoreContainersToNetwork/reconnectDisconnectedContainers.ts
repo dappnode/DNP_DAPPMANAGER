@@ -5,6 +5,7 @@ import {
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { excludeDappmanagerAndBind } from "./excludeDappmanagerAndBind.js";
+import { isEmpty } from "lodash-es";
 
 export async function reconnectDisconnectedContainers(
   network: Dockerode.Network,
@@ -54,6 +55,10 @@ async function getContainersNamesNotConnected(
   });
 
   // return all the containers from containerNames that are not connected to the network
-  if (!connectedContainers) return containerNames;
-  return containerNames.filter((c) => !connectedContainers[c]?.Name);
+  if (!connectedContainers || isEmpty(connectedContainers))
+    return containerNamesList;
+
+  return containerNames.filter(
+    (c) => !Object.values(connectedContainers).find((cc) => cc.Name === c)
+  );
 }
