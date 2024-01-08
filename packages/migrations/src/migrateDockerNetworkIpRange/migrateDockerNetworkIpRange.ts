@@ -2,7 +2,7 @@ import { getNetworkAliasesIpsMapNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio/index.js";
 import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
-import { restartWireguardNotThrow } from "./restartWireguardNotThrow.js";
+import { restartVpnsNotThrow } from "./restartVpnsNotThrow.js";
 
 /**
  * Ensures the docker network defined has the following config:
@@ -58,6 +58,6 @@ export async function migrateDockerNetworkIpRange({
     // TODO: What do we do here?
     throw e;
   } finally {
-    if (isNetworkRecreated) await restartWireguardNotThrow();
+    if (isNetworkRecreated) await restartVpnsNotThrow();
   }
 }
