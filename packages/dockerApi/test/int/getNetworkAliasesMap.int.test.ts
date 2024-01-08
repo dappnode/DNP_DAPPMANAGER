@@ -1,6 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import { docker, getNetworkAliasesMapNotThrow } from "@dappnode/dockerapi";
+import { docker } from "../../src/index.js";
+import { getNetworkAliasesIpsMapNotThrow } from "../../src/api/network.js";
 
 describe("Ensure docker network config migration => getDockerNetworkNameFromSubnet", () => {
   const testNetworkName = "docker_network_test";
@@ -53,7 +54,6 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       return container;
     });
 
-
     // Connect containers to network
     await Promise.all(
       containerPromises.map(async (containerPromise) => {
@@ -72,18 +72,20 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
   });
 
   it("should return a map of the containers and aliases connected to the test network", async () => {
-    const aliasMap = await getNetworkAliasesMapNotThrow(testNetworkName);
-
+    const aliasMap = await getNetworkAliasesIpsMapNotThrow(testNetworkName);
     expect(aliasMap.size).to.equal(testContainerNames.length);
-    testContainerNames.forEach((containerName) => {
-      const expectedAlias = `alias_${containerName}`;
-      const aliases = aliasMap.get(containerName);
-      expect(aliases).to.include(
-        expectedAlias,
-        `Container ${containerName} should have alias ${expectedAlias}`
-      );
-    });
 
+    // Iterate through the map
+    aliasMap.forEach((value, key) => {
+      // Check if the key (container name) is in the list of expected container names
+      expect(testContainerNames).to.include(key);
+
+      // Check if the aliases array contains an alias starting with 'alias_test'
+      const hasTestAlias = value.aliases.some((alias) =>
+        alias.startsWith("alias_test")
+      );
+      expect(hasTestAlias).to.be.true;
+    });
   });
 
   after(async () => {
@@ -97,7 +99,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
         const container = docker.getContainer(cn);
         if (container) {
           // eslint-disable-next-line @typescript-eslint/no-empty-function
-          await container.remove({ force: true }).catch(() => { });
+          await container.remove({ force: true }).catch(() => {});
         }
       })
     );
@@ -105,7 +107,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
     // Remove docker network
     if (testNetwork) {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
-      await testNetwork.remove().catch(() => { });
+      await testNetwork.remove().catch(() => {});
     }
   }
 });

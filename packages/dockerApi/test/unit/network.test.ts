@@ -4,7 +4,7 @@ import {
   docker,
   dockerCreateNetwork,
   dockerNetworkConnect,
-  getNetworkAliasesMapNotThrow,
+  getNetworkAliasesIpsMapNotThrow,
 } from "../../src/index.js";
 import Dockerode from "dockerode";
 
@@ -23,19 +23,22 @@ describe("dockerApi => network", function () {
   before(async () => {
     // Pull image and wait for completion
     await new Promise<void>((resolve, reject) => {
-      docker.pull(dockerImageTest, (err: Error, stream: NodeJS.ReadableStream) => {
-        if (err) {
-          reject(err);
-        } else {
-          docker.modem.followProgress(stream, (err) => {
-            if (err) {
-              reject(err);
-            } else {
-              resolve();
-            }
-          });
+      docker.pull(
+        dockerImageTest,
+        (err: Error, stream: NodeJS.ReadableStream) => {
+          if (err) {
+            reject(err);
+          } else {
+            docker.modem.followProgress(stream, (err) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          }
         }
-      });
+      );
     });
     await Promise.all(
       containerNames.map(async (cn) => {
@@ -79,16 +82,14 @@ describe("dockerApi => network", function () {
     expect(containersNames).to.have.deep.members(containerNames);
   });
 
-  it("should get network aliases for every connected container", async () => {
-    const aliases = await getNetworkAliasesMapNotThrow(dockerNetworkName);
+  it("should get network aliases and IPs for every connected container", async () => {
+    const aliasesIps = await getNetworkAliasesIpsMapNotThrow(dockerNetworkName);
 
     containerNames.forEach((containerName) => {
-      // Assert that the aliases map contains an entry for this container
-      expect(aliases.has(containerName)).to.be.true;
-
       // Retrieve the aliases array for this container
-      const containerAliases = aliases.get(containerName);
-
+      const containerAliases = aliasesIps.get(containerName)?.aliases;
+      // Assert that the aliases map contains an entry for this container
+      expect(containerAliases?.includes(containerName)).to.be.true;
       // Assert that the containerAliases array is not empty and contains expected values
       expect(containerAliases).to.be.an("array").that.is.not.empty;
       expect(containerAliases).to.include(containerName); // Check for the full alias
