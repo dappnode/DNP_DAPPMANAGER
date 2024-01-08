@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { ensureDockerNetworkConfig } from "../../../src/migrateDockerNetworkIpRange/ensureDockerNetworkConfig.js";
+import { ensureDockerNetworkConfig } from "../../../src/migrateDockerNetworkIpRange/ensureDockerNetworkConfig/index.js";
 import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
 import Dockerode from "dockerode";
 

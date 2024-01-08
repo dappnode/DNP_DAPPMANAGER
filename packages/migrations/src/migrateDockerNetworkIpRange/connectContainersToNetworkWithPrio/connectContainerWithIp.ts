@@ -13,27 +13,30 @@ import Dockerode from "dockerode";
  * needed.
  *
  * @param network dockerode network instance container must be connected to
- * @param networkContainersNamesAndIps containers names and IPs connected to the network
  * @param containerName containername of the container to be connected to
  * @param containerIp container IP fo the container to be connected with
- * @param aliasesMap aliases
+ * @param aliasesIpsMap aliases
  */
 export async function connectContainerWithIp({
   network,
-  networkContainersNamesAndIps,
   containerName,
   containerIp,
-  aliasesMap,
+  aliasesIpsMap,
 }: {
   network: Dockerode.Network;
-  networkContainersNamesAndIps: { name: string; ip: string }[];
   containerName: string;
   containerIp: string;
-  aliasesMap: Map<string, string[]>;
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >;
 }) {
-  const hasContainerRightIp = networkContainersNamesAndIps.some(
-    (c) => c.name === containerName && removeCidrSuffix(c.ip) === containerIp
-  );
+  const hasContainerRightIp =
+    removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") ===
+    containerIp;
 
   if (hasContainerRightIp)
     logs.info(
@@ -48,7 +51,7 @@ export async function connectContainerWithIp({
       containerName,
       maxAttempts: 20,
       ip: containerIp,
-      aliasesMap,
+      aliasesIpsMap,
     });
   }
 }
@@ -66,18 +69,24 @@ async function connectContainerRetryOnIpUsed({
   containerName,
   maxAttempts,
   ip,
-  aliasesMap,
+  aliasesIpsMap,
 }: {
   network: Dockerode.Network;
   containerName: string;
   maxAttempts: number;
   ip: string;
-  aliasesMap: Map<string, string[]>;
+  aliasesIpsMap: Map<
+    string,
+    {
+      aliases: string[];
+      ip: string;
+    }
+  >;
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
-  const aliases = aliasesMap.get(containerName) ?? [];
+  const aliases = aliasesIpsMap.get(containerName)?.aliases ?? [];
   let attemptCount = 0;
   const networkOptions = {
     Container: containerName,

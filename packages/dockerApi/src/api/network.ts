@@ -6,11 +6,11 @@ import { logs } from "@dappnode/logger";
 /**
  * Returns a map of container names to their network aliases
  * @param networkName "dncore_network"
- * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"] }
+ * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": { aliases: ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"], ip: "172.33.1.7"} }
  */
-export async function getNetworkAliasesMapNotThrow(
+export async function getNetworkAliasesIpsMapNotThrow(
   networkName: string
-): Promise<Map<string, string[]>> {
+): Promise<Map<string, { aliases: string[]; ip: string }>> {
   try {
     const network = docker.getNetwork(networkName);
     const networkInfo: Dockerode.NetworkInspectInfo =
@@ -18,39 +18,41 @@ export async function getNetworkAliasesMapNotThrow(
 
     const containersInfo = Object.values(networkInfo.Containers ?? []);
 
-    return await getContainerAliasesForNetwork(containersInfo, networkName);
+    return await getContainerAliasesIpsForNetwork(containersInfo, networkName);
   } catch (e) {
     // This should not stop migration, as it is not critical
     logs.error(`Aliases map could not be generated for network ${networkName}`);
-    return new Map<string, string[]>();
+    return new Map<string, { aliases: string[]; ip: string }>();
   }
 }
 
-async function getContainerAliasesForNetwork(
+async function getContainerAliasesIpsForNetwork(
   containersInfo: Dockerode.NetworkContainer[],
   networkName: string
-): Promise<Map<string, string[]>> {
+): Promise<Map<string, { aliases: string[]; ip: string }>> {
   const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
     try {
-      const aliases =
+      const aliases: string[] =
         (await getNetworkContainerConfig(containerInfo.Name, networkName))
           ?.Aliases ?? [];
-      return { name: containerInfo.Name, aliases };
+      return {
+        name: containerInfo.Name,
+        aliases,
+        ip: containerInfo.IPv4Address,
+      };
     } catch (error) {
       console.error(
         `Failed to get aliases for container ${containerInfo.Name}:`,
         error
       );
-      return { name: containerInfo.Name, aliases: [] };
+      return { name: containerInfo.Name, aliases: [], ip: "" };
     }
   });
 
   const containersAliases = await Promise.all(fetchAliasesTasks);
-  const aliasMap = new Map(
-    containersAliases.map(({ name, aliases }) => [name, aliases])
+  return new Map(
+    containersAliases.map(({ name, aliases, ip }) => [name, { aliases, ip }])
   );
-
-  return aliasMap;
 }
 
 /**

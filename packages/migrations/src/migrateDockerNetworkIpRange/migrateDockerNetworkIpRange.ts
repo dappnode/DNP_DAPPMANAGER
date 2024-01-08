@@ -1,7 +1,7 @@
-import { getNetworkAliasesMapNotThrow } from "@dappnode/dockerapi";
+import { getNetworkAliasesIpsMapNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio.js";
-import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig.js";
+import { connectContainersToNetworkWithPrio } from "./connectContainersToNetworkWithPrio/index.js";
+import { ensureDockerNetworkConfig } from "./ensureDockerNetworkConfig/index.js";
 import { restartWireguardNotThrow } from "./restartWireguardNotThrow.js";
 
 /**
@@ -30,11 +30,18 @@ export async function migrateDockerNetworkIpRange({
     ip: string;
   };
 }): Promise<void> {
-  const aliasesMap = await getNetworkAliasesMapNotThrow(dockerNetworkName);
-
-  const { network, isNetworkRecreated } = await ensureDockerNetworkConfig({
+  const aliasesIpsMap = await getNetworkAliasesIpsMapNotThrow(
+    dockerNetworkName
+  );
+  const {
+    network,
+    containersToRestart,
+    containersToRecreate,
+    isNetworkRecreated,
+  } = await ensureDockerNetworkConfig({
     networkName: dockerNetworkName,
     networkSubnet: dockerNetworkSubnet,
+    aliasesIpsMap,
   });
 
   try {
@@ -42,7 +49,9 @@ export async function migrateDockerNetworkIpRange({
       network,
       dappmanagerContainer,
       bindContainer,
-      aliasesMap,
+      aliasesIpsMap,
+      containersToRestart,
+      containersToRecreate,
     });
   } catch (e) {
     logs.error(`Failed to connect containers to network ${dockerNetworkName}`);

@@ -3,9 +3,9 @@ import { expect } from "chai";
 import {
   docker,
   dockerNetworkConnect,
-  getNetworkAliasesMapNotThrow,
+  getNetworkAliasesIpsMapNotThrow,
 } from "@dappnode/dockerapi";
-import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio.js";
+import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio/index.js";
 import Dockerode from "dockerode";
 
 describe("Ensure docker network config migration =>  connectContainersToNetworkWithPrio", () => {
@@ -71,7 +71,7 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
   });
 
   it(`should connect all containers with prio to dappmanager and bind, freeing IPs used`, async () => {
-    const aliasesMap = await getNetworkAliasesMapNotThrow(networkName);
+    const aliasesIpsMap = await getNetworkAliasesIpsMapNotThrow(networkName);
 
     await connectContainersToNetworkWithPrio({
       network,
@@ -83,7 +83,9 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
         name: bindContainerName,
         ip: bindIp,
       },
-      aliasesMap,
+      aliasesIpsMap,
+      containersToRestart: [],
+      containersToRecreate: [],
     });
     const ipResult = (await docker.getContainer(bindContainerName).inspect())
       .NetworkSettings.Networks[networkName].IPAddress;
