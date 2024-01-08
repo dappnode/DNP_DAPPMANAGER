@@ -1,7 +1,6 @@
 import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import { isNetworkOverlappingSubnet } from "./isNetworkOverlappingSubnet.js";
 import { recreateDockerNetwork } from "./recreateDockerNetwork.js";
 import { removeNetworksOverlappingSubnetIfNeeded } from "./removeNetworksOverlappingSubnetIfNeeded.js";
 
