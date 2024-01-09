@@ -116,7 +116,6 @@ function setServiceNetworksWithAliases(
 
   // Return the service network dncore_network with the aliases added
   serviceNetworks = parseServiceNetworks(serviceNetworks);
-  const ip = serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME].ipv4_address;
   return {
     ...serviceNetworks,
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
