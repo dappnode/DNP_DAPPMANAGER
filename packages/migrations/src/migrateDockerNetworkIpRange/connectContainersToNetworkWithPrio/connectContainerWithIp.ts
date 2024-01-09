@@ -1,8 +1,15 @@
+import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
+import { params } from "@dappnode/params";
 import Dockerode from "dockerode";
 
 /**
  * Connect a container to a docker network with an IP.
+ *
+ * - If there are any docker containers connected to the network with that IP
+ * then it will disconnect them.
+ *
+ * - If the container is not running it will restart it.
  *
  * - If the container is already connected to the given network
  * and is connected with the correct IP then will return.
@@ -34,6 +41,20 @@ export async function connectContainerWithIp({
     }
   >;
 }) {
+  // check if there are any docker containers connected to the network with that IP
+  await disconnectConflictingContainerIfAny(network, containerIp);
+
+  // check target container is running, otherwise the docker network connect might not take effect
+  const targetContainer = docker.getContainer(containerName);
+  const containerInfo = await targetContainer.inspect();
+  if (
+    !containerInfo.State.Running &&
+    containerName !== params.dappmanagerContainerName
+  ) {
+    logs.warn(`container ${containerName} is not running, restarting it`);
+    await targetContainer.restart();
+  }
+
   const hasContainerRightIp =
     removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") ===
     containerIp;
@@ -111,7 +132,7 @@ async function connectContainerRetryOnIpUsed({
         error.statusCode === 403 &&
         error.message.includes("Address already in use")
       )
-        await disconnectConflictingContainer(network, ip);
+        await disconnectConflictingContainerIfAny(network, ip);
       else if (
         error.statusCode === 403 &&
         // endpoint with name <containerName> already exists in
@@ -165,7 +186,7 @@ async function findContainerByIP(
  * @param network dncore_network
  * @param ipAddress 171.33.1.7
  */
-async function disconnectConflictingContainer(
+async function disconnectConflictingContainerIfAny(
   network: Dockerode.Network,
   ipAddress: string
 ): Promise<void> {
@@ -175,7 +196,7 @@ async function disconnectConflictingContainer(
       `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
     );
     await network.disconnect({ Container: conflictingContainer.Name });
-  } else logs.error("Conflicting container not found.");
+  } else logs.info("Conflicting container not found.");
 }
 
 /**
