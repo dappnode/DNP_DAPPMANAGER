@@ -122,21 +122,10 @@ function setServiceNetworksWithAliases(
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
       ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
       aliases: getPrivateNetworkAliases(service),
-      ipv4_address: ip ? ensureOnlyBindHasIp(ip, service.dnpName) : undefined,
+      ipv4_address:
+        service.dnpName === params.bindDnpName ? params.BIND_IP : undefined,
     },
   };
-}
-
-/**
- * Erase hardcoded IP address if is different than bind package
- * Ensures the bind package has the right IP address
- */
-function ensureOnlyBindHasIp(ip: string, dnpName: string): string | undefined {
-  if (dnpName === params.bindDnpName) {
-    if (ip === params.BIND_IP) return ip;
-    else return params.BIND_IP;
-  }
-  return undefined;
 }
 
 /**
