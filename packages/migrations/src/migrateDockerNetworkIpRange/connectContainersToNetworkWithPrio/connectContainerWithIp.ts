@@ -41,8 +41,12 @@ export async function connectContainerWithIp({
     }
   >;
 }) {
-  // check if there are any docker containers connected to the network with that IP
-  await disconnectConflictingContainerIfAny(network, containerIp);
+  // check if there are any docker containers connected to the network with that IP different than the container requested
+  const conflictingContainerName = (
+    await findContainerByIP(network, containerIp)
+  )?.Name;
+  if (conflictingContainerName && conflictingContainerName !== containerName)
+    await disconnectConflictingContainerIfAny(network, containerIp);
 
   // check target container is running, otherwise the docker network connect might not take effect
   const targetContainer = docker.getContainer(containerName);
