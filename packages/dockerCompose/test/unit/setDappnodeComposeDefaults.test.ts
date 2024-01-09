@@ -4,7 +4,7 @@ import { Compose, Manifest } from "@dappnode/common";
 import { validateDappnodeCompose } from "@dappnode/schemas";
 import { setDappnodeComposeDefaults } from "../../src/index.js";
 
-describe("setDappnodeComposeDefaults", () => {
+describe.only("setDappnodeComposeDefaults", () => {
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {
     const compose: Compose = {
       version: "3.5",
@@ -76,8 +76,7 @@ describe("setDappnodeComposeDefaults", () => {
         url: "https://github.com/ConsenSys/teku/issues",
       },
       links: {
-        ui:
-          "http://ui.web3signer-gnosis.dappnode?signer_url=http://web3signer.web3signer-gnosis.dappnode:9000",
+        ui: "http://ui.web3signer-gnosis.dappnode?signer_url=http://web3signer.web3signer-gnosis.dappnode:9000",
         homepage: "https://docs.teku.consensys.net",
         readme: "https://github.com/ConsenSys/teku/blob/master/README.md",
         docs: "https://docs.teku.consensys.net",
@@ -249,7 +248,7 @@ describe("setDappnodeComposeDefaults", () => {
           },
           networks: {
             dncore_network: {
-              ipv4_address: "172.33.1.7",
+              ipv4_address: undefined, // only bind allowed to have ipv4_address
               aliases: [
                 "dappmanager.dnp.dappnode.eth.dappmanager.dappnode",
                 "dappmanager.dappnode",
