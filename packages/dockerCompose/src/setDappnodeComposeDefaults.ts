@@ -121,6 +121,8 @@ function setServiceNetworksWithAliases(
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
       ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
       aliases: getPrivateNetworkAliases(service),
+      ipv4_address:
+        service.dnpName === params.bindDnpName ? params.BIND_IP : undefined,
     },
   };
 }
