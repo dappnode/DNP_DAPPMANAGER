@@ -2,8 +2,6 @@ import { ContainerNames } from "@dappnode/common";
 import { params } from "@dappnode/params";
 import { buildNetworkAlias } from "./buildNetworkAlias.js";
 
-// TODO: unit testing
-
 /**
  * It returns an array of aliases which includes at lease the private network alias
  * @param container

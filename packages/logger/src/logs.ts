@@ -97,7 +97,7 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
           if (typeof item === "object") return logSafeObjects(item);
           return item;
         });
-      logger(tag, `[${caller}]`, ...data);
+      logger(tag, `${process.env.TEST ? "[" + caller + "]" : ""}`, ...data);
     } catch (e) {
       /* eslint-disable-next-line no-console */
       console.error("ERROR LOGGING ITEMS", e);

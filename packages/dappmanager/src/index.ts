@@ -2,8 +2,10 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import initializeDb from "./initializeDb.js";
 import {
+  checkDockerNetwork,
   copyHostScripts,
-  copyHostServices
+  copyHostServices,
+  copyHostTimers
 } from "@dappnode/hostscriptsservices";
 import {
   DappnodeInstaller,
@@ -83,11 +85,17 @@ Promise.all([
   // Copy host scripts
   copyHostScripts().catch(e => logs.error("Error copying host scripts", e)),
   // Copy host services
-  copyHostServices().catch(e => logs.error("Error copying host services", e))
-]).then(() =>
+  copyHostServices().catch(e => logs.error("Error copying host services", e)),
+  // Copy host timers
+  copyHostTimers().catch(e => logs.error("Error copying host timers", e))
+]).then(() => {
   // avahiDaemon uses a host script that must be copied before been initialized
-  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
-);
+  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e));
+  // start check-docker-network service with timer
+  checkDockerNetwork().catch(e =>
+    logs.error("Error starting service docker network checker", e)
+  );
+});
 
 // Create the global env file
 createGlobalEnvsEnvFile();

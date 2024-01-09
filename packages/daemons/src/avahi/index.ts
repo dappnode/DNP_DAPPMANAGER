@@ -8,6 +8,8 @@ export async function startAvahiDaemon(): Promise<void> {
     if (db.avahiPublishCmdShouldNotRun.get()) return;
     await initializeAvahiDaemon();
   } catch (e) {
-    logs.error("Error on initializing avahi daemon", e);
+    // avahi daemon is not suitable for many cases such as dappnode running on cloud
+    // avoid spamming the console by printing a small error message
+    logs.warn(`Error on initializing avahi daemon: ${e.message}`);
   }
 }

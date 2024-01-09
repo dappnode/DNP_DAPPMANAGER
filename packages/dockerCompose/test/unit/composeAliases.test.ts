@@ -68,7 +68,7 @@ networks:
       };
       // Edit existing compose
       composeService.removeNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         ["goerli-geth.dappnode"],
         serviceNetwork
       );
@@ -121,7 +121,7 @@ networks:
       };
       // Edit existing compose
       composeService.addNetworkAliases(
-        params.DNP_PRIVATE_NETWORK_NAME,
+        params.DOCKER_PRIVATE_NETWORK_NAME,
         ["example.dappnode"],
         serviceNetwork
       );
@@ -316,7 +316,7 @@ function getComposeEditors(
     composeService.get().networks || {}
   );
   const serviceNetwork =
-    serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] ?? null;
+    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] ?? null;
   return {
     compose,
     composeService,

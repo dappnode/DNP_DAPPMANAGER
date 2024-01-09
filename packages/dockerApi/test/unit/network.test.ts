@@ -1,38 +1,117 @@
-// getDnCoreNetworkConfig.test.js
 import { expect } from "chai";
-import { getDnCoreNetworkContainerConfig } from "../../src/index.js";
+import {
+  disconnectAllContainersFromNetwork,
+  docker,
+  dockerCreateNetwork,
+  dockerNetworkConnect,
+  getNetworkAliasesIpsMapNotThrow,
+} from "../../src/index.js";
+import Dockerode from "dockerode";
 
 // This test will only work if you have a running dappmanager container with DN_CORE network
-describe.skip("get DN_CORE network config", () => {
-  // Test case: Should return the correct alias information when the network exists
-  it("should return a 'not null' docker network when calling with dappmanager container", async () => {
-    // Set dappmanager container name
-    const containerName = "DAppNodeCore-dappmanager.dnp.dappnode.eth";
+describe("dockerApi => network", function () {
+  this.timeout(5 * 1000);
 
-    // Mock the dockerContainerInspect function
-    const result = await getDnCoreNetworkContainerConfig(containerName);
-    expect(result).to.not.be.null;
+  const dockerNetworkName = "dncore_test";
+  const dockerImageTest = "alpine:latest";
+  const containerNames = [
+    "test_container_1",
+    "test_container_2",
+    "test_container_3",
+  ]; // Define container names
 
-    // "result" looks like:
-    // const mockNetwork = {
-    //   IPAMConfig: { IPv4Address: '172.33.1.7' },
-    //   Links: null,
-    //   Aliases: [
-    //     'DAppNodeCore-dappmanager.dnp.dappnode.eth',
-    //     'dappmanager.dnp.dappnode.eth',
-    //     'dappmanager.dappnode',
-    //     'd6a8fb11b1a4'
-    //   ],
-    //   NetworkID: '8997fa230b182a0f75d331acf04dca440eb948af8d39966baab02f5ae0a3f566',
-    //   EndpointID: '2b3728a7d08b5e41da432bcac054e366d6c88def3bfac12749b87c37eae98836',
-    //   Gateway: '172.33.0.1',
-    //   IPAddress: '172.33.1.7',
-    //   IPPrefixLen: 16,
-    //   IPv6Gateway: '',
-    //   GlobalIPv6Address: '',
-    //   GlobalIPv6PrefixLen: 0,
-    //   MacAddress: '02:42:ac:21:01:07',
-    //   DriverOpts: null
-    // };
+  before(async () => {
+    // Pull image and wait for completion
+    await new Promise<void>((resolve, reject) => {
+      docker.pull(
+        dockerImageTest,
+        (err: Error, stream: NodeJS.ReadableStream) => {
+          if (err) {
+            reject(err);
+          } else {
+            docker.modem.followProgress(stream, (err) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          }
+        }
+      );
+    });
+    await Promise.all(
+      containerNames.map(async (cn) => {
+        const container = await docker.createContainer({
+          Image: dockerImageTest,
+          Cmd: ["tail", "-f", "/dev/null"], // Keep the container running
+          name: cn,
+        });
+        await container.start();
+      })
+    );
+  });
+
+  it("should create a docker network with default plugin bridge", async () => {
+    await dockerCreateNetwork(dockerNetworkName);
+
+    const network = docker.getNetwork(dockerNetworkName);
+    const networkInspect =
+      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+    expect(networkInspect.Name).to.deep.equal(dockerNetworkName);
+  });
+
+  it("should connect multiple docker containers to a docker network", async () => {
+    await Promise.all(
+      containerNames.map(
+        async (cn) =>
+          await dockerNetworkConnect(dockerNetworkName, cn, {
+            Aliases: [cn],
+          })
+      )
+    );
+
+    const network = docker.getNetwork(dockerNetworkName);
+    const networkInspect =
+      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+    const containersInNetwork = networkInspect.Containers;
+    if (!containersInNetwork) throw Error(`Expected containers in network`);
+    const containersNames = Object.values(containersInNetwork).map(
+      (c) => c.Name
+    );
+    expect(containersNames).to.have.deep.members(containerNames);
+  });
+
+  it("should get network aliases and IPs for every connected container", async () => {
+    const aliasesIps = await getNetworkAliasesIpsMapNotThrow(dockerNetworkName);
+
+    containerNames.forEach((containerName) => {
+      // Retrieve the aliases array for this container
+      const containerAliases = aliasesIps.get(containerName)?.aliases;
+      // Assert that the aliases map contains an entry for this container
+      expect(containerAliases?.includes(containerName)).to.be.true;
+      // Assert that the containerAliases array is not empty and contains expected values
+      expect(containerAliases).to.be.an("array").that.is.not.empty;
+      expect(containerAliases).to.include(containerName); // Check for the full alias
+
+      // If you have specific expectations for the second alias, you can add checks here
+      // For example, if you know the pattern of the second alias, you can assert it
+      // Example: expect(containerAliases[1]).to.match(/some-regex-pattern/);
+    });
+  });
+
+  it("should disconnect all docker containers from a docker network", async () => {
+    await disconnectAllContainersFromNetwork(
+      docker.getNetwork(dockerNetworkName)
+    );
+  });
+
+  after(async () => {
+    // remove containers
+    for (const cn of containerNames)
+      await docker.getContainer(cn).remove({ force: true });
+
+    // remove docker network
+    await docker.getNetwork(dockerNetworkName).remove();
   });
 });

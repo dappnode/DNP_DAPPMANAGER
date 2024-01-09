@@ -43,6 +43,7 @@ COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 # Copy scripts
 COPY packages/hostScriptsServices/hostScripts hostScripts
 COPY packages/hostScriptsServices/hostServices hostServices
+COPY packages/hostScriptsServices/hostTimers hostTimers
 
 COPY package.json ./ 
 COPY --from=build-src /app/packages ./packages

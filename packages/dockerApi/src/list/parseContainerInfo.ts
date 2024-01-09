@@ -69,7 +69,7 @@ export function parseContainerInfo(container: ContainerInfo): PackageContainer {
     // Docker data
     created: container.Created,
     image: container.Image,
-    ip: containerNetworks[params.DNP_PRIVATE_NETWORK_NAME]?.IPAddress,
+    ip: containerNetworks[params.DOCKER_PRIVATE_NETWORK_NAME]?.IPAddress,
     ports: ensureUniquePortsFromDockerApi(container.Ports, defaultPorts),
     volumes: container.Mounts.map(
       ({ Name, Source, Destination }): VolumeMapping => ({

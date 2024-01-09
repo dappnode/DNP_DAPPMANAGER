@@ -5,6 +5,7 @@ import {
   getIsCore,
   parseEnvironment,
   getImageTag,
+  getIsMonoService,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
@@ -108,7 +109,7 @@ function setServiceNetworksWithAliases(
   // Return service network dncore_network with aliases if not provided
   if (!serviceNetworks)
     return {
-      [params.DNP_PRIVATE_NETWORK_NAME]: {
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         aliases: getPrivateNetworkAliases(service),
       },
     };
@@ -117,8 +118,8 @@ function setServiceNetworksWithAliases(
   serviceNetworks = parseServiceNetworks(serviceNetworks);
   return {
     ...serviceNetworks,
-    [params.DNP_PRIVATE_NETWORK_NAME]: {
-      ...(serviceNetworks[params.DNP_PRIVATE_NETWORK_NAME] || {}),
+    [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+      ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
       aliases: getPrivateNetworkAliases(service),
     },
   };
@@ -131,12 +132,12 @@ function setServiceNetworksWithAliases(
 function setNetworks(
   networks: ComposeNetworks | undefined = {}
 ): ComposeNetworks {
-  const dncoreNetwork = networks[params.DNP_PRIVATE_NETWORK_NAME];
+  const dncoreNetwork = networks[params.DOCKER_PRIVATE_NETWORK_NAME];
   // Return network dncore_network with external: true if not provided
   if (!dncoreNetwork)
     return {
       ...networks,
-      [params.DNP_PRIVATE_NETWORK_NAME]: {
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         external: true,
       },
     };
@@ -145,7 +146,7 @@ function setNetworks(
   if (!dncoreNetwork.external)
     return {
       ...networks,
-      [params.DNP_PRIVATE_NETWORK_NAME]: {
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         ...dncoreNetwork,
         external: true,
       },
@@ -160,11 +161,4 @@ function setNetworks(
  */
 function sortServiceKeys(service: ComposeService): ComposeService {
   return fromPairs(sortBy(toPairs(service), "0")) as ComposeService;
-}
-
-/**
- * Returns true if there is only one service in the compose file
- */
-function getIsMonoService(compose: Compose): boolean {
-  return Object.keys(compose.services).length === 1;
 }

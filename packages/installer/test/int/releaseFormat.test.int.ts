@@ -169,7 +169,7 @@ describe("Release format tests", () => {
   ];
 
   before("Create DAppNode docker network", async () => {
-    const dncoreNetwork = params.DNP_PRIVATE_NETWORK_NAME;
+    const dncoreNetwork = params.DOCKER_PRIVATE_NETWORK_NAME;
     const networkExists = await shell(
       `docker network ls --filter name=${dncoreNetwork} -q`
     );
@@ -255,7 +255,7 @@ describe("Release format tests", () => {
   }
 
   after("Remove DAppNode docker network", async () => {
-    await shell(`docker network remove ${params.DNP_PRIVATE_NETWORK_NAME}`);
+    await shell(`docker network remove ${params.DOCKER_PRIVATE_NETWORK_NAME}`);
     await cleanTestDir();
   });
 });

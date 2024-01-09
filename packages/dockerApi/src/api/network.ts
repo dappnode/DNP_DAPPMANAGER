@@ -1,7 +1,77 @@
 import Dockerode from "dockerode";
 import { docker } from "./docker.js";
 import { dockerContainerInspect } from "../index.js";
-import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
+
+/**
+ * Returns a map of container names to their network aliases
+ * @param networkName "dncore_network"
+ * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": { aliases: ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"], ip: "172.33.1.7"} }
+ */
+export async function getNetworkAliasesIpsMapNotThrow(
+  networkName: string
+): Promise<Map<string, { aliases: string[]; ip: string }>> {
+  try {
+    const network = docker.getNetwork(networkName);
+    const networkInfo: Dockerode.NetworkInspectInfo =
+      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+
+    const containersInfo = Object.values(networkInfo.Containers ?? []);
+
+    return await getContainerAliasesIpsForNetwork(containersInfo, networkName);
+  } catch (e) {
+    // This should not stop migration, as it is not critical
+    logs.error(`Aliases map could not be generated for network ${networkName}`);
+    return new Map<string, { aliases: string[]; ip: string }>();
+  }
+}
+
+async function getContainerAliasesIpsForNetwork(
+  containersInfo: Dockerode.NetworkContainer[],
+  networkName: string
+): Promise<Map<string, { aliases: string[]; ip: string }>> {
+  const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
+    try {
+      const aliases: string[] =
+        (await getNetworkContainerConfig(containerInfo.Name, networkName))
+          ?.Aliases ?? [];
+      return {
+        name: containerInfo.Name,
+        aliases,
+        ip: containerInfo.IPv4Address,
+      };
+    } catch (error) {
+      console.error(
+        `Failed to get aliases for container ${containerInfo.Name}:`,
+        error
+      );
+      return { name: containerInfo.Name, aliases: [], ip: "" };
+    }
+  });
+
+  const containersAliases = await Promise.all(fetchAliasesTasks);
+  return new Map(
+    containersAliases.map(({ name, aliases, ip }) => [name, { aliases, ip }])
+  );
+}
+
+/**
+ * Disconnect all docker containers from a docker network
+ * @param network "dncore_network"
+ */
+export async function disconnectAllContainersFromNetwork(
+  network: Dockerode.Network
+): Promise<void> {
+  const containers = ((await network.inspect()) as Dockerode.NetworkInspectInfo)
+    .Containers;
+  if (containers)
+    await Promise.all(
+      Object.values(containers).map(
+        async (c) =>
+          await network.disconnect({ Container: c.Name, Force: true })
+      )
+    );
+}
 
 /**
  * Connect a container to a network
@@ -17,8 +87,29 @@ export async function dockerNetworkConnect(
   const network = docker.getNetwork(networkName);
   await network.connect({
     Container: containerName,
-    EndpointConfig: endpointConfig
+    EndpointConfig: endpointConfig,
   });
+}
+
+/**
+ * Connect a container to a network
+ * @param networkName "dncore_network"
+ * @param containerName "3613f73ba0e4" or "fullcontainername"
+ * @param aliases `["network-alias"]`
+ */
+export async function dockerNetworkConnectNotThrow(
+  network: Dockerode.Network,
+  containerName: string,
+  endpointConfig?: Partial<Dockerode.NetworkInfo>
+): Promise<void> {
+  try {
+    await network.connect({
+      Container: containerName,
+      EndpointConfig: endpointConfig,
+    });
+  } catch (e) {
+    logs.error(e);
+  }
 }
 
 /**
@@ -35,7 +126,7 @@ export async function dockerNetworkDisconnect(
   await network.disconnect({
     Container: containerName,
     // Force the container to disconnect from the network
-    Force: true
+    Force: true,
   });
 }
 
@@ -69,7 +160,7 @@ export async function dockerCreateNetwork(networkName: string): Promise<void> {
     // collisions.
     CheckDuplicate: true,
     // Default plugin
-    Driver: "bridge"
+    Driver: "bridge",
   });
 }
 
@@ -79,13 +170,13 @@ export async function dockerListNetworks(): Promise<
   return await docker.listNetworks();
 }
 
-/** Get endpoint config for DNP_PRIVATE_NETWORK_NAME */
-export async function getDnCoreNetworkContainerConfig(
-  containerName: string
+/**
+ * Returns the network configuration for a container in a specific network
+ */
+export async function getNetworkContainerConfig(
+  containerName: string,
+  networkName: string
 ): Promise<Dockerode.NetworkInfo | null> {
   const inspectInfo = await dockerContainerInspect(containerName);
-  return (
-    inspectInfo.NetworkSettings.Networks[params.DNP_PRIVATE_NETWORK_NAME] ??
-    null
-  );
+  return inspectInfo.NetworkSettings.Networks[networkName] ?? null;
 }
