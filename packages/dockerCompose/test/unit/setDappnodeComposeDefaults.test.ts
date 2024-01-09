@@ -4,7 +4,7 @@ import { Compose, Manifest } from "@dappnode/common";
 import { validateDappnodeCompose } from "@dappnode/schemas";
 import { setDappnodeComposeDefaults } from "../../src/index.js";
 
-describe.only("setDappnodeComposeDefaults", () => {
+describe("setDappnodeComposeDefaults", () => {
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {
     const compose: Compose = {
       version: "3.5",
