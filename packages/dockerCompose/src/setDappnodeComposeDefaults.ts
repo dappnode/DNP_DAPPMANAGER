@@ -116,13 +116,37 @@ function setServiceNetworksWithAliases(
 
   // Return the service network dncore_network with the aliases added
   serviceNetworks = parseServiceNetworks(serviceNetworks);
+  const ip = serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME].ipv4_address;
   return {
     ...serviceNetworks,
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
       ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
       aliases: getPrivateNetworkAliases(service),
+      ipv4_address: ip
+        ? ensureNotUsingReservedIp(ip, service.dnpName)
+        : undefined,
     },
   };
+}
+
+/**
+ * Erase hardcoded IP address if is different than dappmanager and bind package
+ * and is using their ip address
+ */
+function ensureNotUsingReservedIp(
+  ip: string,
+  dnpName: string
+): string | undefined {
+  for (const { dnpNameReserved, ipReserved } of [
+    {
+      dnpNameReserved: params.dappmanagerDnpName,
+      ipReserved: params.DAPPMANAGER_IP,
+    },
+    { dnpNameReserved: params.bindDnpName, ipReserved: params.BIND_IP },
+  ]) {
+    if (dnpNameReserved !== dnpName && ip === ipReserved) return undefined;
+  }
+  return ip;
 }
 
 /**
