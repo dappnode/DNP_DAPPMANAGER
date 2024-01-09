@@ -248,7 +248,6 @@ describe("setDappnodeComposeDefaults", () => {
           },
           networks: {
             dncore_network: {
-              ipv4_address: undefined, // only bind allowed to have ipv4_address
               aliases: [
                 "dappmanager.dnp.dappnode.eth.dappmanager.dappnode",
                 "dappmanager.dappnode",

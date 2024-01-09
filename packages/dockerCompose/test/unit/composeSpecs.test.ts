@@ -21,7 +21,7 @@ const paths = {
   composeParsed: "docker-compose.parsed.yml",
 };
 
-describe.only("Compose specs, against real DNPs", () => {
+describe("Compose specs, against real DNPs", () => {
   const files = fs.readdirSync(specsDir);
   for (const dirName of files) {
     describe(`${dirName}`, () => {
