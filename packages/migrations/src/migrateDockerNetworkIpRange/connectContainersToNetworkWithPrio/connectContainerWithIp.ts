@@ -1,5 +1,6 @@
 import { docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
+import { params } from "@dappnode/params";
 import Dockerode from "dockerode";
 
 /**
@@ -46,7 +47,10 @@ export async function connectContainerWithIp({
   // check target container is running, otherwise the docker network connect might not take effect
   const targetContainer = docker.getContainer(containerName);
   const containerInfo = await targetContainer.inspect();
-  if (!containerInfo.State.Running) {
+  if (
+    !containerInfo.State.Running &&
+    containerName !== params.dappmanagerContainerName
+  ) {
     logs.warn(`container ${containerName} is not running, restarting it`);
     await targetContainer.restart();
   }
