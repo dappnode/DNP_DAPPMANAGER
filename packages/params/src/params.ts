@@ -1,6 +1,7 @@
 import path from "path";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
+
 const MINUTE = 60 * 1000; // miliseconds
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;

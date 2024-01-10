@@ -13,6 +13,7 @@ services:
       driver: journald
     networks:
       dncore_network:
+        ipv4_address: 172.33.1.7
         aliases:
           - "dappmanager.dnp.dappnode.eth.dappmanager.dappnode"
           - "dappmanager.dappnode"
