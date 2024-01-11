@@ -115,21 +115,17 @@ function setServiceNetworksWithAliases(
     };
 
   serviceNetworks = parseServiceNetworks(serviceNetworks);
-
-  // Return the service network dncore_network with the aliases added
-  const privateNetworkConfig = {
-    ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
-    aliases: getPrivateNetworkAliases(service),
-  };
-
-  // only allow bind to have ipv4_address hardcoded
-  if (service.dnpName === params.bindDnpName)
-    privateNetworkConfig.ipv4_address = params.BIND_IP;
-  else delete privateNetworkConfig.ipv4_address;
-
+  const dncoreServiceNetwork =
+    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {};
+  // do not allow to set hardcoded IPs
+  // TODO: allow bind in the future, after 0.3.0
+  if (dncoreServiceNetwork.ipv4_address)
+    delete dncoreServiceNetwork.ipv4_address;
   return {
-    ...serviceNetworks,
-    [params.DOCKER_PRIVATE_NETWORK_NAME]: privateNetworkConfig,
+    [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+      ...dncoreServiceNetwork,
+      aliases: getPrivateNetworkAliases(service),
+    },
   };
 }
 
