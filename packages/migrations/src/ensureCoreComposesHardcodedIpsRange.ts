@@ -61,7 +61,7 @@ export async function ensureCoreComposesHardcodedIpsRange(): Promise<void> {
           serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
         if (coreNetwork.ipv4_address) {
           logs.info(`removing ip ${coreNetwork.ipv4_address} from ${core}`);
-          coreNetwork.ipv4_address = undefined;
+          delete coreNetwork.ipv4_address;
           compose.write();
         }
       }
