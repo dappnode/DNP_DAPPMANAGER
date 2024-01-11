@@ -15,7 +15,7 @@ export async function getEthersProvider(): Promise<ethers.JsonRpcProvider> {
   const url = await getEthUrl();
   // Store (just for UI / info purposes) the latest used url
   db.ethProviderUrl.set(url);
-  return new ethers.JsonRpcProvider(url);
+  return new ethers.JsonRpcProvider(url, "mainnet", { staticNetwork: true });
 }
 
 /**
