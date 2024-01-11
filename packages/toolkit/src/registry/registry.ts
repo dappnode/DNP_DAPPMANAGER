@@ -38,7 +38,7 @@ export class DappNodeRegistry {
 
     this.registryContract = APMRegistry__factory.connect(
       this.contractAddress,
-      new ethers.JsonRpcProvider(ethUrl, "mainnet")
+      new ethers.JsonRpcProvider(ethUrl, "mainnet", { staticNetwork: true })
     );
 
     this.nameSuffix =
