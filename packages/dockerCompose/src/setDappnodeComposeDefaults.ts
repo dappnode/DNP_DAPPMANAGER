@@ -122,6 +122,7 @@ function setServiceNetworksWithAliases(
   if (dncoreServiceNetwork.ipv4_address)
     delete dncoreServiceNetwork.ipv4_address;
   return {
+    ...serviceNetworks,
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
       ...dncoreServiceNetwork,
       aliases: getPrivateNetworkAliases(service),
