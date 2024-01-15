@@ -1,6 +1,11 @@
-import { docker } from "@dappnode/dockerapi";
+import {
+  disconnectConflictingContainerIfAny,
+  docker,
+  findContainerByIP,
+} from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
+import { removeCidrSuffix } from "@dappnode/utils";
 import Dockerode from "dockerode";
 
 /**
@@ -164,53 +169,4 @@ async function connectContainerRetryOnIpUsed({
   logs.error(
     `Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`
   );
-}
-
-/**
- * Find a container in a network using a specific IP address.
- * @param networkName The name of the network.
- * @param ipAddress The IP address to search for.
- * @returns The container using the specified IP, if found.
- */
-async function findContainerByIP(
-  network: Dockerode.Network,
-  ipAddress: string
-): Promise<Dockerode.NetworkContainer | null> {
-  const networkInfo: Dockerode.NetworkInspectInfo = await network.inspect();
-  const containers = networkInfo.Containers;
-  if (!containers) return null;
-  for (const container of Object.values(containers))
-    if (removeCidrSuffix(container.IPv4Address) === ipAddress) return container;
-
-  return null;
-}
-
-/**
- * Disconnects any container with the specified IP address from the network.
- * @param network dncore_network
- * @param ipAddress 171.33.1.7
- */
-async function disconnectConflictingContainerIfAny(
-  network: Dockerode.Network,
-  ipAddress: string
-): Promise<void> {
-  const conflictingContainer = await findContainerByIP(network, ipAddress);
-  if (conflictingContainer) {
-    logs.info(
-      `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
-    );
-    await network.disconnect({ Container: conflictingContainer.Name });
-  } else logs.info("Conflicting container not found.");
-}
-
-/**
- * Removes the CIDR suffix from an IP address. This function is useful for processing
- * the output of `docker.getNetwork().inspect().Containers` information, where the IP
- * address includes the CIDR suffix.
- *
- * @param ipWithCidr The IP address with CIDR suffix (e.g., '172.30.0.7/16').
- * @returns The IP address without the CIDR suffix (e.g., '172.30.0.7').
- */
-function removeCidrSuffix(ipWithCidr: string): string {
-  return ipWithCidr.split("/")[0];
 }
