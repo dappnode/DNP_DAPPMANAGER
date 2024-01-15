@@ -1,7 +1,7 @@
 import {
   docker,
-  findContainerByIP,
   dockerComposeUp,
+  disconnectConflictingContainerIfAny,
 } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
@@ -10,13 +10,10 @@ import Dockerode from "dockerode";
 
 async function disconnectConflictingContainerAndStartBind(): Promise<void> {
   const network = docker.getNetwork(params.DOCKER_PRIVATE_NETWORK_NAME);
-  const conflictingContainer = await findContainerByIP(network, params.BIND_IP);
-  if (conflictingContainer) {
-    logs.info(
-      `address ${params.BIND_IP} already in used by ${conflictingContainer.Name}, freeing it`
-    );
-    await network.disconnect({ Container: conflictingContainer.Name });
-  }
+  const conflictingContainer = await disconnectConflictingContainerIfAny(
+    network,
+    params.BIND_IP
+  );
   logs.info(`Starting ${params.bindContainerName} container`);
   // The docker compose will start the container with the right IP
   await dockerComposeUp(getDockerComposePath(params.bindDnpName, true));
