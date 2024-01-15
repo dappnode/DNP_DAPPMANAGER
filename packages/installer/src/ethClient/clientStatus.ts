@@ -218,7 +218,7 @@ async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
  * @param url "http://geth.dappnode:8545"
  */
 async function isSyncing(url: string): Promise<boolean> {
-  const provider = new ethers.JsonRpcProvider(url, undefined, {
+  const provider = new ethers.JsonRpcProvider(url, "mainnet", {
     staticNetwork: true,
   });
   const syncing = await provider
