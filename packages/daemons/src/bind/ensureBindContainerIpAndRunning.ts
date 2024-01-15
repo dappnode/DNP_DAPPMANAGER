@@ -42,7 +42,7 @@ export async function ensureBindContainerIpAndRunning(): Promise<void> {
     await disconnectConflictingContainerAndStartBind();
   } else {
     // check is connected to dncore_network
-    const isConnectToNetwork = Object.values(
+    const isConnectedToNetwork = Object.values(
       (
         (await docker
           .getNetwork(params.DOCKER_PRIVATE_NETWORK_NAME)
@@ -50,7 +50,7 @@ export async function ensureBindContainerIpAndRunning(): Promise<void> {
       ).Containers ?? []
     ).some((container) => container.Name === params.bindContainerName);
 
-    if (!isConnectToNetwork) {
+    if (!isConnectedToNetwork) {
       logs.info(
         `${params.bindContainerName} container is not connected to ${params.DOCKER_PRIVATE_NETWORK_NAME} network`
       );
