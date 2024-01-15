@@ -52,7 +52,7 @@ export async function ethereum(
 
   const apiUrl = `http://${containerDomain}:${port}`;
 
-  const provider = new ethers.JsonRpcProvider(apiUrl);
+  const provider = new ethers.JsonRpcProvider(apiUrl, undefined, { staticNetwork: true });
   const [syncing, peersCount, blockNumber] = await Promise.all([
     provider.send("eth_syncing", []).then(parseEthersSyncing),
     // net_peerCount is not always available. OP Erigon does not support it
