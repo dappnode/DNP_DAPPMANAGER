@@ -7,6 +7,7 @@ import { startEthicalMetricsDaemon } from "./ethicalMetrics/index.js";
 import { startNatRenewalDaemon } from "./natRenewal/index.js";
 import { startStakerDaemon } from "./stakerConfig/index.js";
 import { startTelegramBotDaemon } from "./telegramBot/index.js";
+import { startBindDaemon } from "./bind/index.js";
 
 // DAEMONS EXPORT
 
@@ -22,6 +23,7 @@ export function startDaemons(
   startNatRenewalDaemon(signal);
   startStakerDaemon(dappnodeInstaller);
   startTelegramBotDaemon();
+  startBindDaemon(signal);
 }
 
 export { startAvahiDaemon } from "./avahi/index.js";
