@@ -6,8 +6,8 @@ retry_delay=60
 
 # Function to check and create network with retry logic
 check_and_create_network() {
-    for ((i=0; i<max_retries; i++)); do
-        if docker network inspect "$network_name" &> /dev/null; then
+    for ((i = 0; i < max_retries; i++)); do
+        if docker network inspect "$network_name" &>/dev/null; then
             echo "Docker network '$network_name' exists."
             return 0
         else
@@ -16,14 +16,14 @@ check_and_create_network() {
             core_version="$(docker image ls --filter reference="core.dnp.dappnode.eth" --format '{{.Tag}}' | sort -V | tail -n 1)"
             echo "core version retrieved $core_version"
 
-            # Compare with 0.2.30 using sort
+            # Compare with 0.3.0 using sort
             if printf '0.3.0\n%s\n' "$core_version" | sort -V | head -n 1 | grep -q '0.3.0'; then
                 subnet="10.20.0.0/24"
-                # core_version is greater than or equal to 0.2.30
-                echo "Core version is greater than or equal to 0.2.30, using subnet $subnet"
+                # core_version is greater than or equal to 0.3.0
+                echo "Core version is greater than or equal to 0.3.0, using subnet $subnet"
             else
                 subnet="172.33.0.0/16"
-                # core_version is less than 0.2.30
+                # core_version is less than 0.3.0
                 echo "Core version is less than 0.3.0, using subnet $subnet"
             fi
 
