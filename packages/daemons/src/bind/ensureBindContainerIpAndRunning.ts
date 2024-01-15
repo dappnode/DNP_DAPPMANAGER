@@ -16,7 +16,9 @@ async function disconnectConflictingContainerAndStartBind(): Promise<void> {
   );
   logs.info(`Starting ${params.bindContainerName} container`);
   // The docker compose will start the container with the right IP
-  await dockerComposeUp(getDockerComposePath(params.bindDnpName, true));
+  await dockerComposeUp(getDockerComposePath(params.bindDnpName, true), {
+    forceRecreate: true,
+  });
   // connect back the conflicting container to the network
   if (conflictingContainer) {
     logs.info(
