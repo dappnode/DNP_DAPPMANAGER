@@ -35,6 +35,13 @@ import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
 
+const ethUrl = await getEthUrl();
+
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(getIpfsUrl(), ethUrl);
+
+export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
+
 // TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
 const adminPasswordDb = new AdminPasswordDb(params);
@@ -70,13 +77,6 @@ executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
 initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch(e => logs.error("Error inititializing Database", e));
-
-const ethUrl = await getEthUrl();
-
-// Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(getIpfsUrl(), ethUrl);
-
-export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
 
 // Start daemons
 startDaemons(dappnodeInstaller, controller.signal);
