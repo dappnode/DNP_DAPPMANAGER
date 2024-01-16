@@ -35,10 +35,24 @@ import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
 
-const ethUrl = await getEthUrl();
+const ethUrl = await getEthUrl().catch(e => {
+  logs.error(
+    `Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`,
+    e
+  );
+  return params.ETH_MAINNET_RPC_URL_REMOTE;
+});
+
+let ipfsUrl = "";
+try {
+  ipfsUrl = getIpfsUrl();
+} catch (e) {
+  logs.error(`Error getting ipfsUrl, using default ${params.IPFS_LOCAL}`, e);
+  ipfsUrl = params.IPFS_LOCAL;
+}
 
 // Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(getIpfsUrl(), ethUrl);
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, ethUrl);
 
 export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
 
