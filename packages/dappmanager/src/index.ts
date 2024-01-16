@@ -43,12 +43,11 @@ const ethUrl = await getEthUrl().catch(e => {
   return params.ETH_MAINNET_RPC_URL_REMOTE;
 });
 
-let ipfsUrl = "";
+let ipfsUrl = params.IPFS_LOCAL;
 try {
-  ipfsUrl = getIpfsUrl();
+  ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
 } catch (e) {
-  logs.error(`Error getting ipfsUrl, using default ${params.IPFS_LOCAL}`, e);
-  ipfsUrl = params.IPFS_LOCAL;
+  logs.error(`Error getting ipfsUrl: ${e.message}. Using default: ${ipfsUrl}`);
 }
 
 // Required db to be initialized
