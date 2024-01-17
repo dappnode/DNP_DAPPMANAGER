@@ -117,9 +117,11 @@ function setServiceNetworksWithAliases(
   serviceNetworks = parseServiceNetworks(serviceNetworks);
   const dncoreServiceNetwork =
     serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {};
-  // do not allow to set hardcoded IPs
-  // TODO: allow bind in the future, after 0.3.0
-  if (dncoreServiceNetwork.ipv4_address)
+  // do not allow to set hardcoded IPs except for bind
+  if (
+    dncoreServiceNetwork.ipv4_address &&
+    service.dnpName !== params.bindDnpName
+  )
     delete dncoreServiceNetwork.ipv4_address;
   return {
     ...serviceNetworks,
