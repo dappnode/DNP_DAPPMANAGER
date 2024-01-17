@@ -2,6 +2,7 @@ import { params } from "@dappnode/params";
 import { runAtMostEvery } from "@dappnode/utils";
 import { ensureBindComposeIp } from "./ensureBindComposeIp.js";
 import { ensureBindContainerIpAndRunning } from "./ensureBindContainerIpAndRunning.js";
+import { logs } from "@dappnode/logger";
 
 /**
  * Ensures the Bind the docker network config is correct:
@@ -10,8 +11,12 @@ import { ensureBindContainerIpAndRunning } from "./ensureBindContainerIpAndRunni
  * - bind container running
  */
 async function ensureBindNetworkConfig(): Promise<void> {
-  ensureBindComposeIp();
-  await ensureBindContainerIpAndRunning();
+  try {
+    ensureBindComposeIp();
+    await ensureBindContainerIpAndRunning();
+  } catch (e) {
+    logs.warn("Error ensuring bind network config", e);
+  }
 }
 
 /**
