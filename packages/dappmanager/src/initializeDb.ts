@@ -42,7 +42,7 @@ function returnNullIfError(
  * - Get network status variables
  * - Trigger a dyndns loop
  */
-export default async function initializeDb(): Promise<void> {
+export async function initializeDb(): Promise<void> {
   /**
    * ipfsClientTarget
    */

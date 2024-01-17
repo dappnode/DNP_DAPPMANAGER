@@ -1,6 +1,6 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import initializeDb from "./initializeDb.js";
+import { initializeDb } from "./initializeDb.js";
 import {
   checkDockerNetwork,
   copyHostScripts,
@@ -34,6 +34,11 @@ import { startHttpApi } from "./api/startHttpApi.js";
 import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
+
+// Initialize DB must be the first step so the db has the required values
+initializeDb()
+  .then(() => logs.info("Initialized Database"))
+  .catch(e => logs.error("Error inititializing Database", e));
 
 const ethUrl = await getEthUrl().catch(e => {
   logs.error(
@@ -85,11 +90,6 @@ if (params.TEST) startTestApi();
 
 // Execute migrations
 executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
-
-// Initialize DB
-initializeDb()
-  .then(() => logs.info("Initialized Database"))
-  .catch(e => logs.error("Error inititializing Database", e));
 
 // Start daemons
 startDaemons(dappnodeInstaller, controller.signal);
