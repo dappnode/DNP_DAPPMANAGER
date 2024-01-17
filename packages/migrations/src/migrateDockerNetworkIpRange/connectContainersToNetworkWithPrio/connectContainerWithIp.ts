@@ -91,34 +91,14 @@ export async function connectContainerWithIp({
   } catch (e) {
     // check if container does not exist 404
     if (containerName === params.bindContainerName && e.statusCode === 404) {
-      logs.warn(`container ${containerName} does not exist`);
-      // check if there are intermedium containes with different names and remove them, then do docker compose up of the container
-      // look for the intermedium container by looking for any docker container that has in its name the container name.
-      try {
-        const containers = await docker.listContainers({
-          all: true,
-        });
-        // check if there are any intermedium containers
-        const intermediumContainer = containers.find((container) =>
-          container.Names.some((name) => name.includes(containerName))
-        );
-        if (intermediumContainer) {
-          logs.warn(
-            `intermedium container ${intermediumContainer.Names} found, removing it`
-          );
-          await docker.getContainer(intermediumContainer.Id).remove({
-            force: true,
-          });
-        }
-      } catch (e) {
-        logs.error(`error removing intermedium container: ${e}`);
-      }
-
-      // start original container with compose
+      logs.warn(
+        `container ${params.bindContainerName} not found and it might be in an intermedium state`
+      );
+      // the container might be in intermedium state with different name
       // TODO: what if there is a docker container already using this IP.
       // This would be extremley dangerous once the migration to the private ip range is done
       // and less ips are available.
-      logs.info(`starting container ${containerName}`);
+      logs.info(`recreating container ${containerName} with compose up`);
       await dockerComposeUp(getDockerComposePath(params.bindDnpName, true), {
         forceRecreate: true,
       });
