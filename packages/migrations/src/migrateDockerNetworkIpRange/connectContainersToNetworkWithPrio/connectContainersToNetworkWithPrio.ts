@@ -49,7 +49,11 @@ export async function connectContainersToNetworkWithPrio({
     containerName: dappmanagerContainer.name,
     containerIp: dappmanagerContainer.ip,
     aliasesIpsMap,
-  });
+  }).catch((e) =>
+    logs.error(
+      `Failed to connect container ${dappmanagerContainer.name} to network ${network.id}: ${e}`
+    )
+  );
 
   // 2. Connect bind container
   await connectContainerWithIp({
@@ -57,12 +61,18 @@ export async function connectContainersToNetworkWithPrio({
     containerName: bindContainer.name,
     containerIp: bindContainer.ip,
     aliasesIpsMap,
-  });
+  }).catch((e) =>
+    logs.error(
+      `Failed to connect container ${bindContainer.name} to network ${network.id}: ${e}`
+    )
+  );
 
   await restoreContainersToNetworkNotThrow({
     containersToRestart,
     network,
     aliasesIpsMap,
     containersToRecreate,
-  });
+  }).catch((e) =>
+    logs.error(`Failed to restore containers to network ${network.id}: ${e}`)
+  );
 }
