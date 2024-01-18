@@ -218,6 +218,7 @@ export interface Routes {
    */
   ethClientTargetSet: (kwargs: {
     target: Eth2ClientTarget;
+    ethRemoteRpc?: string;
     sync?: boolean;
     useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
