@@ -18,6 +18,7 @@ import { FaDatabase } from "react-icons/fa";
 import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
 import { prettyDnpName } from "utils/format";
+import Input from "./Input";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
@@ -113,11 +114,15 @@ interface EthClientDataStats {
 function EthMultiClients({
   target: selectedTarget,
   onTargetChange,
+  newEthRemoteRpc,
+  setNewEthRemoteRpc,
   showStats,
   useCheckpointSync
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
+  newEthRemoteRpc: string;
+  setNewEthRemoteRpc: (newEthRemoteRpc: string) => void;
   showStats?: boolean;
   useCheckpointSync?: boolean;
 }) {
@@ -187,6 +192,13 @@ function EthMultiClients({
           >
             <div className="title">{title}</div>
             <div className="description">{description}</div>
+
+            {options === "remote" && (
+              <Input
+                value={newEthRemoteRpc}
+                onValueChange={setNewEthRemoteRpc}
+              />
+            )}
 
             {showStats && <hr></hr>}
             {showStats && (
@@ -320,6 +332,8 @@ function EthMultiClientFallback({
 export function EthMultiClientsAndFallback({
   target,
   onTargetChange,
+  newEthRemoteRpc,
+  setNewEthRemoteRpc,
   useCheckpointSync,
   setUseCheckpointSync,
   showStats,
@@ -328,6 +342,8 @@ export function EthMultiClientsAndFallback({
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
+  newEthRemoteRpc: string;
+  setNewEthRemoteRpc: (newEthRemoteRpc: string) => void;
   useCheckpointSync?: boolean;
   setUseCheckpointSync?: (newUseCheckpointSync: boolean) => void;
   showStats?: boolean;
@@ -339,6 +355,8 @@ export function EthMultiClientsAndFallback({
       <EthMultiClients
         target={target}
         onTargetChange={onTargetChange}
+        newEthRemoteRpc={newEthRemoteRpc}
+        setNewEthRemoteRpc={setNewEthRemoteRpc}
         showStats={showStats}
         useCheckpointSync={useCheckpointSync}
       />

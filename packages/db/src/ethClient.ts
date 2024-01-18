@@ -19,7 +19,6 @@ const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
 const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
 const ETH_EXEC_CLIENT_STATUS = "eth-exec-client-status";
 const ETH_CONS_CLIENT_STATUS = "eth-cons-client-status";
-const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
 const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
   "eth-client-synced-notification-status";
@@ -88,10 +87,6 @@ export const ethConsClientStatus = interceptOnSet(
     validate: (id, status) =>
       typeof id === "string" && typeof status === "object",
   })
-);
-
-export const ethProviderUrl = interceptOnSet(
-  dbCache.staticKey<string>(ETH_PROVIDER_URL, "")
 );
 
 /**

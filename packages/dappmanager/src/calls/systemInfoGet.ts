@@ -34,7 +34,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
         ? db.ethExecClientStatus.get(eth2ClientTarget.execClient)
         : null,
     ethClientFallback: db.ethClientFallback.get(),
-    ethProvider: db.ethProviderUrl.get(),
+    ethRemoteRpc,
     // Domain map
     fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
     // UI stats

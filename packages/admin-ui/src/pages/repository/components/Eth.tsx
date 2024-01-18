@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   getEthClientTarget,
   getEthClientStatus,
-  getEthClientFallback
+  getEthClientFallback,
+  getEthRemoteRpc
 } from "services/dappnodeStatus/selectors";
 import { EthClientFallback, Eth2ClientTarget } from "@dappnode/types";
 import { changeEthClientTarget } from "pages/system/actions";
@@ -21,6 +22,7 @@ import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash-es";
 
 export default function Eth() {
+  const ethRemoteRpc = useSelector(getEthRemoteRpc);
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
@@ -31,6 +33,11 @@ export default function Eth() {
   const [useCheckpointSync, setUseCheckpointSync] = useState<
     boolean | undefined
   >(undefined);
+  const [newEthRemoteRpc, setNewEthRemoteRpc] = useState<string>("");
+
+  useEffect(() => {
+    if (ethRemoteRpc) setNewEthRemoteRpc(ethRemoteRpc);
+  }, [ethRemoteRpc]);
 
   useEffect(() => {
     if (ethClientTarget) {
@@ -118,6 +125,8 @@ export default function Eth() {
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        newEthRemoteRpc={newEthRemoteRpc}
+        setNewEthRemoteRpc={setNewEthRemoteRpc}
         fallback={ethClientFallback || "off"}
         onFallbackChange={changeFallback}
         useCheckpointSync={useCheckpointSync}
