@@ -195,6 +195,7 @@ function EthMultiClients({
 
             {options === "remote" && (
               <Input
+                placeholder="https://web3.dappnode.net"
                 value={newEthRemoteRpc}
                 onValueChange={setNewEthRemoteRpc}
               />
