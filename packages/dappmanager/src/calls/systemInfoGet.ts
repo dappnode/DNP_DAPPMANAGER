@@ -8,7 +8,8 @@ import { isCoreUpdateEnabled } from "@dappnode/daemons";
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const eth2ClientTarget = ethereumClient.computeEthereumTarget();
+  const { target: eth2ClientTarget, ethRemoteRpc } =
+    ethereumClient.computeEthereumTarget();
 
   return {
     // Git version data

@@ -40,21 +40,22 @@ export class EthereumClient {
    * - executionClient
    * - consensusClient
    */
-  computeEthereumTarget(): Eth2ClientTarget {
+  computeEthereumTarget(): { target: Eth2ClientTarget; ethRemoteRpc: string } {
     const executionClient = db.executionClientMainnet.get();
     const consensusClient = db.consensusClientMainnet.get();
     const remote = db.ethClientRemote.get();
     switch (remote) {
       case null:
       case EthClientRemote.on:
-        return "remote";
+        return { target: "remote", ethRemoteRpc: db.ethRemoteRpc.get() };
 
       case EthClientRemote.off:
-        if (!executionClient || !consensusClient) return "remote";
+        if (!executionClient || !consensusClient)
+          return { target: "remote", ethRemoteRpc: db.ethRemoteRpc.get() };
 
         return {
-          execClient: executionClient,
-          consClient: consensusClient,
+          target: { execClient: executionClient, consClient: consensusClient },
+          ethRemoteRpc: db.ethRemoteRpc.get(),
         };
     }
   }
@@ -66,19 +67,35 @@ export class EthereumClient {
    * @param deletePrevExecClient If set delete previous exec client
    * @param deletePrevConsClient If set delete previous cons client
    */
-  async changeEthClient(
-    dappnodeInstaller: DappnodeInstaller,
-    nextTarget: Eth2ClientTarget,
-    sync: boolean,
-    useCheckpointSync: boolean,
-    deletePrevExecClient: boolean,
-    deletePrevExecClientVolumes: boolean,
-    deletePrevConsClient: boolean,
-    deletePrevConsClientVolumes: boolean
-  ): Promise<void> {
-    const currentTarget = this.computeEthereumTarget();
+  async changeEthClient({
+    dappnodeInstaller,
+    nextTarget,
+    sync,
+    useCheckpointSync,
+    deletePrevExecClient,
+    deletePrevExecClientVolumes,
+    deletePrevConsClient,
+    deletePrevConsClientVolumes,
+    ethRemoteRpc,
+  }: {
+    dappnodeInstaller: DappnodeInstaller;
+    nextTarget: Eth2ClientTarget;
+    sync: boolean;
+    useCheckpointSync: boolean;
+    deletePrevExecClient: boolean;
+    deletePrevExecClientVolumes: boolean;
+    deletePrevConsClient: boolean;
+    deletePrevConsClientVolumes: boolean;
+    ethRemoteRpc?: string;
+  }): Promise<void> {
+    const { target: currentTarget, ethRemoteRpc: currentEthRemoteRpc } =
+      this.computeEthereumTarget();
     // Return if the target is the same
-    if (isEqual(nextTarget, currentTarget)) return;
+    if (
+      isEqual(nextTarget, currentTarget) &&
+      ethRemoteRpc === currentEthRemoteRpc
+    )
+      return;
     // Remove clients if currentTarge is !== remote
     if (currentTarget !== "remote") {
       // Remove Execution client
@@ -96,7 +113,12 @@ export class EthereumClient {
     }
 
     if (nextTarget === "remote") {
+      if (!ethRemoteRpc)
+        throw Error(
+          `Argument ethRemoteRpc must be defined if target is remote`
+        );
       db.ethClientRemote.set(EthClientRemote.on);
+      db.ethRemoteRpc.set(ethRemoteRpc);
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
       if (!deletePrevExecClient && currentTarget !== "remote")
         await this.updateFullnodeAlias({
