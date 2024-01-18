@@ -1004,13 +1004,6 @@ export type EthClientSyncedNotificationStatus = {
   status: "AwaitingSynced" | "Synced";
 } | null;
 
-/**
- * Eth provider / client types
- * Manage the Ethereum multi-client setup
- * TO BE DEPRECATED
- */
-export type EthClientTargetPackage = "geth" | "nethermind" | "besu" | "erigon";
-export type EthClientTarget = EthClientTargetPackage | "remote";
 export type Eth2ClientTarget =
   | {
       execClient: ExecutionClientMainnet;

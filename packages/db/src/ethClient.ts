@@ -1,7 +1,6 @@
 import { dbCache, dbMain } from "./dbFactory.js";
 import { eventBus } from "@dappnode/eventbus";
 import {
-  EthClientTarget,
   EthClientRemote,
   EthClientFallback,
   EthClientStatus,
@@ -12,37 +11,17 @@ import {
 } from "@dappnode/common";
 
 // User chosen properties
-const ETH_CLIENT_TARGET = "eth-client-target";
 const ETH_CLIENT_FALLBACK = "eth-client-fallback";
 const ETH_CLIENT_REMOTE = "eth-client-remote";
 // Cached status
 const ETH_EXEC_CLIENT_INSTALL_STATUS = "eth-exec-client-install-status";
 const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
-const ETH_CLIENT_STATUS = "eth-client-status";
 const ETH_EXEC_CLIENT_STATUS = "eth-exec-client-status";
 const ETH_CONS_CLIENT_STATUS = "eth-cons-client-status";
 const ETH_PROVIDER_URL = "eth-provider-url";
 // Cached temp status
 const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
   "eth-client-synced-notification-status";
-
-// Re-export to consider the first value (when it's not set)
-// but do not allow to set null again. Using to express intentionality
-const _ethClientTarget = interceptOnSet(
-  dbMain.staticKey<EthClientTarget | null>(ETH_CLIENT_TARGET, null)
-);
-
-/**
- * To be DEPRECATED from dappmanager v0.2.54
- * The ethclientTarget will be splitted into:
- * - consensusClientMainnet, executionClientMainnet and ethClientRemote
- * - users can use the stakers UI in mainnet while using the "remote" option
- * - whenever a user switches the EC and/or CC then consensusClientMainnet, executionClientMainnet will change as well
- */
-export const ethClientTarget = {
-  get: _ethClientTarget.get,
-  set: (newValue: EthClientTarget): void => _ethClientTarget.set(newValue),
-};
 
 /**
  * New introduced in dappmanager v0.2.54
@@ -108,18 +87,6 @@ export const ethConsClientStatus = interceptOnSet(
   })
 );
 
-/**
- * Cache the general status of the eth client, if it's available or not
- */
-export const ethClientStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientStatus, EthClientTarget>({
-    rootKey: ETH_CLIENT_STATUS,
-    getKey: (target) => target,
-    validate: (id, status) =>
-      typeof id === "string" && typeof status === "object",
-  })
-);
-
 export const ethProviderUrl = interceptOnSet(
   dbCache.staticKey<string>(ETH_PROVIDER_URL, "")
 );
@@ -137,7 +104,7 @@ function interceptOnSet<
     ...dbSetter,
     // Arguments are not used, so their type is not relevant
     /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-    set: function(...args: any[]): void {
+    set: function (...args: any[]): void {
       dbSetter.set(...args);
       eventBus.requestSystemInfo.emit();
     },
@@ -147,6 +114,8 @@ function interceptOnSet<
 /**
  * Cache the status of the eth client install loop
  */
-export const ethClientSyncedNotificationStatus = dbCache.staticKey<
-  EthClientSyncedNotificationStatus
->(ETH_CLIENT_SYNCED_NOTIFICATION_STATUS, null);
+export const ethClientSyncedNotificationStatus =
+  dbCache.staticKey<EthClientSyncedNotificationStatus>(
+    ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
+    null
+  );
