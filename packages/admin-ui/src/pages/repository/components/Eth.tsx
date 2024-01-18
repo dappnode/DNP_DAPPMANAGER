@@ -55,7 +55,10 @@ export default function Eth() {
   }, [target, ethClientTarget]);
 
   function changeClient() {
-    if (target) dispatch(changeEthClientTarget(target, useCheckpointSync));
+    if (target)
+      dispatch(
+        changeEthClientTarget(target, newEthRemoteRpc, useCheckpointSync)
+      );
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
@@ -137,7 +140,11 @@ export default function Eth() {
         <Button
           variant="dappnode"
           onClick={changeClient}
-          disabled={!target || isEqual(ethClientTarget, target)}
+          disabled={
+            !target ||
+            (isEqual(ethClientTarget, target) &&
+              ethRemoteRpc === newEthRemoteRpc)
+          }
         >
           Change
         </Button>
