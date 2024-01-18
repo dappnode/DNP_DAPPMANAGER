@@ -136,6 +136,8 @@ export default function Eth() {
         setUseCheckpointSync={setUseCheckpointSync}
       />
 
+      <br />
+
       <div style={{ textAlign: "end" }}>
         <Button
           variant="dappnode"
