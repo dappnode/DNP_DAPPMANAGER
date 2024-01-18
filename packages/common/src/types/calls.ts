@@ -861,7 +861,7 @@ export interface SystemInfo {
   // - undefined = status of current target has not been defined yet
   // - null = current target is remote and has no status
   ethClientStatus: EthClientStatus | undefined | null;
-  ethProvider: string;
+  ethRemoteRpc: string;
   // Domain maps
   fullnodeDomainTarget: string;
   // UI stats
