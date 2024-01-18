@@ -16,7 +16,7 @@ export async function ethClientTargetSet({
   deletePrevConsClientVolumes = false
 }: {
   target: Eth2ClientTarget;
-  ethRemoteRpc?: string;
+  ethRemoteRpc: string;
   sync?: boolean;
   useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
