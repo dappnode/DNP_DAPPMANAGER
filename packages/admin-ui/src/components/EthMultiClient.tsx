@@ -129,7 +129,7 @@ function EthMultiClients({
   const clients: EthClientData[] = [
     {
       title: "Remote",
-      description: "Public node API mantained by DAppNode",
+      description: `Public node API mantained by DAppNode: https://web3.dappnode.net. Or choose your own.`,
       options: "remote",
       stats: {
         syncTime: "Instant",

@@ -64,6 +64,8 @@ export default function Ipfs() {
             onGatewayTargetChange={setIpfsGatewayTarget}
           />
 
+          <br />
+
           <div style={{ textAlign: "end" }}>
             <Button
               variant="dappnode"
