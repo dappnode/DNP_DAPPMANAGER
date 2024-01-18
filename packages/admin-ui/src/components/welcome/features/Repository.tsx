@@ -45,6 +45,7 @@ export default function Repository({
       api
         .ethClientTargetSet({
           target,
+          ethRemoteRpc: newEthRemoteRpc,
           useCheckpointSync
         })
         .catch(e => {
