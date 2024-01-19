@@ -74,6 +74,10 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "1.0.18",
           },
+          {
+            dnpName: "erigon-gnosis.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0",
+          },
         ],
         compatibleConsensus: [
           {
@@ -158,7 +162,8 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             minVersion: "0.1.0",
           },
           {
-            dnpName: "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
+            dnpName:
+              "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0",
           },
           {
@@ -168,9 +173,8 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
         ],
         compatibleConsensus: [
           {
-            dnpName: "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<
-              T
-            >,
+            dnpName:
+              "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0",
           },
           {
