@@ -42,7 +42,7 @@ export async function fetchDnpRequest({
   const dnpList = await listPackages();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
-    const { dnpName, manifest, compose, isCore } = release;
+    const { dnpName, compose, isCore } = release;
 
     const dnp = dnpList.find(d => d.dnpName === dnpName);
 
@@ -55,14 +55,14 @@ export async function fetchDnpRequest({
 
     specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
-    if (manifest.setupWizard) {
+    if (release.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
-      for (const field of manifest.setupWizard.fields) {
+      for (const field of release.setupWizard.fields) {
         if (await shouldAddSetupWizardField(field, dnp))
           activeSetupWizardFields.push(field);
       }
       setupWizard[dnpName] = {
-        ...manifest.setupWizard,
+        ...release.setupWizard,
         fields: activeSetupWizardFields
       };
     }
