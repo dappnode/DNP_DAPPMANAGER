@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       packageName:
-        description: "Package Name (schemas, types, toolkit)"
+        description: "Package Name (schemas, common, toolkit)"
         required: true
       version:
         description: "Version to publish (e.g., 1.0.0)"
@@ -20,7 +20,7 @@ jobs:
 
       - name: Validate package name
         run: |
-          if [[ ${{ github.event.inputs.packageName }} != "schemas" && ${{ github.event.inputs.packageName }} != "types" && ${{ github.event.inputs.packageName }} != "toolkit" ]]; then
+          if [[ ${{ github.event.inputs.packageName }} != "schemas" && ${{ github.event.inputs.packageName }} != "common" && ${{ github.event.inputs.packageName }} != "toolkit" ]]; then
             echo "Error: Invalid package name"
             exit 1
           fi
