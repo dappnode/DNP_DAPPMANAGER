@@ -132,8 +132,8 @@ export async function executeMigrations(): Promise<void> {
   await addDappnodePeerToLocalIpfsNode().catch(
     (e: { message: any; stack: any }) =>
       migrationErrors.push({
-        migration: "dapp Dappnode peer to local IPFS node",
-        coreVersion: "",
+        migration: "add Dappnode peer to local IPFS node",
+        coreVersion: "0.2.88",
         name: "MIGRATION_ERROR",
         message: e.message,
         stack: e.stack,
