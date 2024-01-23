@@ -1,0 +1,48 @@
+name: NPM Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageName:
+        description: "Package Name (schemas, types, toolkit)"
+        required: true
+      version:
+        description: "Version to publish (e.g., 1.0.0)"
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate package name
+        run: |
+          if [[ ${{ github.event.inputs.packageName }} != "schemas" && ${{ github.event.inputs.packageName }} != "types" && ${{ github.event.inputs.packageName }} != "toolkit" ]]; then
+            echo "Error: Invalid package name"
+            exit 1
+          fi
+
+      - name: Validate version
+        run: |
+          if ! [[ ${{ github.event.inputs.version }} =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Invalid version format"
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build and Publish
+        run: |
+          cd packages/${{ github.event.inputs.packageName }}
+          yarn publish --new-version ${{ github.event.inputs.version }} --access public --non-interactive --no-git-tag-version
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
