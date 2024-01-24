@@ -11,6 +11,7 @@ import ChangeHostPassword from "./features/ChangeHostPassword";
 import Repository from "./features/Repository";
 import RepositoryFallback from "./features/RepositoryFallback";
 import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
+import SmoothWelcome from "./features/SmoothWelcome";
 // Utils
 import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/common";
@@ -47,6 +48,8 @@ function getRouteIdComponent(
       return (props: RouteProps) => <RepositoryFallback {...props} />;
     case "enable-ethical-metrics":
       return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+    case "smooth-welcome":
+      return (props: RouteProps) => <SmoothWelcome {...props} />;
     default:
       return undefined;
   }

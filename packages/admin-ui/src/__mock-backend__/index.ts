@@ -230,6 +230,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       //"system-auto-updates",
       //"enable-ethical-metrics",
       //"change-host-password"
+      //"smooth-welcome"
     ]
   }),
   natRenewalEnable: async () => {},

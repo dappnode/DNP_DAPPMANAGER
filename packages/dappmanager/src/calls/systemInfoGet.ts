@@ -70,6 +70,10 @@ function getNewFeatureIds(): NewFeatureId[] {
   if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")
     newFeatureIds.push("enable-ethical-metrics");
 
+  // smooth-welcome: Show only if not seen
+  if (db.newFeatureStatus.get("smooth-welcome") !== "seen")
+    newFeatureIds.push("smooth-welcome");
+
   // change-host-password: Show only if insecure
   if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
 

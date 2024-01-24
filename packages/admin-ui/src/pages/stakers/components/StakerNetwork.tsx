@@ -151,6 +151,20 @@ export default function StakerNetwork<T extends Network>({
         </AlertDismissible>
       )}
 
+{(network === "prater" || network === "mainnet") && (
+        <AlertDismissible variant="warning">
+          <p>
+            Smooth is out! Check it out{" "}
+            <b>
+              <a href="https://docs.dappnode.io/docs/smooth" target="_blank" rel="noopener noreferrer">
+              here!
+              </a>
+            </b>
+          Smooth is a MEV Smoothing Pool. It enables solo validators to pool their MEV rewards and earn higher rewards consistently. Subscribing is as easy as changing your fee recipient!
+          </p>
+        </AlertDismissible>
+      )}
+
       <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
         {currentStakerConfigReq.data ? (
           <Card>
