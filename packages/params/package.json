@@ -17,7 +17,6 @@
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/mocha": "10.0.2",
     "@types/node": "^20.6.2"

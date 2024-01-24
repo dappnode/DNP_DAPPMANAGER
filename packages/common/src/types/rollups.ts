@@ -6,7 +6,7 @@ export const executionClientsOptimism = Object.freeze([
   "op-geth.dnp.dappnode.eth",
   "op-erigon.dnp.dappnode.eth",
 ] as const);
-export type ExecutionClientOptimism = typeof executionClientsOptimism[number];
+export type ExecutionClientOptimism = (typeof executionClientsOptimism)[number];
 
 export type OptimismNode = "op-node.dnp.dappnode.eth";
 export const optimismNode: OptimismNode = "op-node.dnp.dappnode.eth";
@@ -70,3 +70,55 @@ export interface OptimismConfigSet {
 }
 
 // TODO: Polygon
+
+// ZK-EVM
+
+export const executionClientsZKEVM = Object.freeze([
+  "zkevm-geth.dnp.dappnode.eth",
+] as const);
+export type ExecutionClientZKEVM = (typeof executionClientsZKEVM)[number];
+
+export type ZKEVMNode = "zkevm-node.dnp.dappnode.eth";
+export const zkevmNode: ZKEVMNode = "zkevm-node.dnp.dappnode.eth";
+
+export type ZKEMVL2Geth = "zkevm-l2geth.dnp.dappnode.eth";
+export const zkevmL2Geth: ZKEMVL2Geth = "zkevm-l2geth.dnp.dappnode.eth";
+
+export type ZKEVMType = "rollup";
+export type ZKEVMItem<T extends ZKEVMType> = ZKEVMItemOk<T> | ZKEVMItemError<T>;
+
+interface ZKEVMTokenWithdrawals {
+  dnpName: ZKEMVL2Geth;
+  // Add other properties specific to token withdrawals as needed
+}
+
+type ZKEVMItemBasic<T extends ZKEVMType> = T extends "rollup"
+  ? ZKEVMTokenWithdrawals
+  : never;
+
+export type ZKEVMItemError<T extends ZKEVMType> = {
+  status: "error";
+  error: string;
+} & ZKEVMItemBasic<T>;
+
+export type ZKEVMItemOk<T extends ZKEVMType> = {
+  status: "ok";
+  avatarUrl: string;
+  isInstalled: boolean;
+  isUpdated: boolean;
+  isRunning: boolean;
+  data?: PackageItemData;
+  isSelected: boolean;
+} & ZKEVMItemBasic<T>;
+
+export interface ZkevmConfigGet {
+  rollup: ZKEVMItem<"rollup">;
+}
+
+export interface ZkevmConfigGetOk {
+  rollup: ZKEVMItemOk<"rollup">;
+}
+
+export interface ZkevmConfigSet {
+  rollup?: ZKEVMItemOk<"rollup">;
+}
