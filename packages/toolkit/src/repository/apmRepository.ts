@@ -7,7 +7,7 @@ import {
   ApmVersionState,
 } from "./types.js";
 import * as isIPFS from "is-ipfs";
-import { isEnsDomain } from "@dappnode/utils";
+import { isEnsDomain } from "../isEnsDomain.js";
 import { repositoryAbi } from "./params.js";
 
 /**

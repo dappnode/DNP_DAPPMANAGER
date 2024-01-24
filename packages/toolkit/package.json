@@ -43,7 +43,6 @@
   },
   "dependencies": {
     "@dappnode/common": "^0.1.0",
-    "@dappnode/utils": "^0.1.0",
     "@ipld/car": "^5.1.1",
     "esm": "^3.2.25",
     "ethers": "^6.9.0",
