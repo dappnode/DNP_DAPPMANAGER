@@ -9,7 +9,6 @@ export default function SmoothWelcome({
   onBack?: () => void;
   onNext: () => void;
 }) {
-  console.log("RENDERING SMOOTH WELCOME")
 
   return (
     <>
