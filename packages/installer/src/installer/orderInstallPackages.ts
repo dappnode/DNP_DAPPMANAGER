@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { InstallPackageData } from "@dappnode/common";
+import { InstallPackageData } from "@dappnode/types";
 
 const dappmanager = params.dappmanagerDnpName;
 

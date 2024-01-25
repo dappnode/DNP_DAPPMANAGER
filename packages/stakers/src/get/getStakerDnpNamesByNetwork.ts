@@ -17,7 +17,7 @@ import {
   signerHolesky,
   consensusClientsHolesky,
   executionClientsHolesky,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 interface StakerDnpNamesByNetwork {
   executionClients: readonly string[];

@@ -1,4 +1,4 @@
-import { Routes } from "@dappnode/common";
+import { Routes } from "@dappnode/types";
 import { packageInstall as pkgInstall } from "@dappnode/installer";
 import { dappnodeInstaller } from "../index.js";
 

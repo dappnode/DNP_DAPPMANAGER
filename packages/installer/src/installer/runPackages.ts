@@ -2,7 +2,7 @@ import path from "path";
 import { params } from "@dappnode/params";
 import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "@dappnode/logger";
-import { InstallPackageData } from "@dappnode/common";
+import { InstallPackageData } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import {
   dockerComposeUpPackage,

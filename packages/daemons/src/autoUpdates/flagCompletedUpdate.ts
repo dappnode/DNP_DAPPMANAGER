@@ -1,4 +1,4 @@
-import { AutoUpdateRegistryEntry } from "@dappnode/common";
+import { AutoUpdateRegistryEntry } from "@dappnode/types";
 import { eventBus } from "@dappnode/eventbus";
 import * as db from "@dappnode/db";
 import { omit } from "lodash-es";
@@ -18,7 +18,7 @@ export function flagCompletedUpdate(
 ): void {
   setRegistry(dnpName, version, {
     updated: timestamp || Date.now(),
-    successful: true
+    successful: true,
   });
 
   clearPendingUpdatesOfDnp(dnpName);
@@ -45,9 +45,9 @@ function setRegistry(
       ...(registry[dnpName] || {}),
       [version]: {
         ...((registry[dnpName] || {})[version] || {}),
-        ...data
-      }
-    }
+        ...data,
+      },
+    },
   });
 
   eventBus.requestAutoUpdateData.emit();

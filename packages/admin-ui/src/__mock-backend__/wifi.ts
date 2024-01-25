@@ -1,4 +1,4 @@
-import { Routes } from "@dappnode/common";
+import { Routes } from "@dappnode/types";
 
 export const wifi: Pick<Routes, "wifiCredentialsGet" | "wifiReportGet"> = {
   wifiCredentialsGet: async () => {

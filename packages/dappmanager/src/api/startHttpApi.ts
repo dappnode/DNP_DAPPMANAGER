@@ -20,13 +20,13 @@ import {
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
 import { Logs } from "@dappnode/logger";
 import { EventBus } from "@dappnode/eventbus";
+import { subscriptionsFactory } from "@dappnode/common";
 import {
-  Routes,
   RpcPayload,
   RpcResponse,
   LoggerMiddleware,
-  subscriptionsFactory
-} from "@dappnode/common";
+  Routes
+} from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
 
 export interface HttpApiParams

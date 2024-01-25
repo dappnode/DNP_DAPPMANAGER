@@ -1,4 +1,4 @@
-import { InstalledPackageDataApiReturn } from "@dappnode/common";
+import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { packagesGet as _packagesGet } from "@dappnode/installer";
 
 /**

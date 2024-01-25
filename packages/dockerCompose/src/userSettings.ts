@@ -9,11 +9,11 @@ import {
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
 import {
+  Compose,
   PortMapping,
   UserSettings,
   VolumeMapping,
-  Compose,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { cleanCompose, isOmitable } from "./clean.js";
 import { stringifyVolumeMappings } from "./volumes.js";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
@@ -138,28 +138,24 @@ export function applyUserSettings(
     );
 
     const nextPorts = stringifyPortMappings(
-      portMappings.map(
-        (portMapping): PortMapping => {
-          const portId = getPortMappingId(portMapping);
-          const userSetHost = parseInt(userSetPortMappings[portId]);
-          // Use `in` operator to tolerate empty hosts (= ephemeral port)
-          return portId in userSetPortMappings
-            ? { ...portMapping, host: userSetHost || undefined }
-            : portMapping;
-        }
-      )
+      portMappings.map((portMapping): PortMapping => {
+        const portId = getPortMappingId(portMapping);
+        const userSetHost = parseInt(userSetPortMappings[portId]);
+        // Use `in` operator to tolerate empty hosts (= ephemeral port)
+        return portId in userSetPortMappings
+          ? { ...portMapping, host: userSetHost || undefined }
+          : portMapping;
+      })
     );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
-      volumeMappings.map(
-        (vol): VolumeMapping => {
-          const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
-          return hostUserSet && path.isAbsolute(hostUserSet)
-            ? { host: hostUserSet, container: vol.container }
-            : vol;
-        }
-      )
+      volumeMappings.map((vol): VolumeMapping => {
+        const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
+        return hostUserSet && path.isAbsolute(hostUserSet)
+          ? { host: hostUserSet, container: vol.container }
+          : vol;
+      })
     );
     // ##### </DEPRECATED>
 

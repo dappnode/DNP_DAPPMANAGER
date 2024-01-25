@@ -5,7 +5,7 @@ import {
 } from "../typechain/index.js";
 import { DirectoryDnp, directoryDnpStatus } from "./types.js";
 import { directoryAddress } from "./params.js";
-import { isEnsDomain } from "@dappnode/utils";
+import { isEnsDomain } from "../isEnsDomain.js";
 
 /**
  * DappNodeDirectory is a class to interact with the DAppNode Directory Contract.
@@ -20,7 +20,7 @@ export class DappNodeDirectory {
   constructor(ethUrl: string) {
     this.directoryContract = DAppNodePackageDirectory__factory.connect(
       directoryAddress,
-      new ethers.JsonRpcProvider(ethUrl, "mainnet")
+      new ethers.JsonRpcProvider(ethUrl, "mainnet", { staticNetwork: true })
     );
   }
 

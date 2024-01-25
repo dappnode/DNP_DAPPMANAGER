@@ -1,5 +1,5 @@
-import { ethers } from "ethers";
-import { InstalledPackageData, ChainDriverSpecs } from "@dappnode/common";
+import fetch from "node-fetch";
+import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import {
   buildNetworkAlias,
   EthSyncing,
@@ -52,16 +52,29 @@ export async function ethereum(
 
   const apiUrl = `http://${containerDomain}:${port}`;
 
-  const provider = new ethers.JsonRpcProvider(apiUrl);
+  async function fetchJsonRpc(method: string, params = []) {
+    const response = await fetch(apiUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        method: method,
+        params: params,
+        id: 1,
+      }),
+    });
+    const data = (await response.json()) as any;
+    return data.result;
+  }
+
   const [syncing, peersCount, blockNumber] = await Promise.all([
-    provider.send("eth_syncing", []).then(parseEthersSyncing),
-    // net_peerCount is not always available. OP Erigon does not support it
-    // Not logging error because it would flood the logs
-    provider
-      .send("net_peerCount", [])
-      .then(parseInt)
+    fetchJsonRpc("eth_syncing").then(parseEthersSyncing), // Make sure parseEthersSyncing is compatible with direct JSON-RPC responses
+    fetchJsonRpc("net_peerCount")
+      .then((result) => parseInt(result, 16))
       .catch(() => undefined),
-    provider.getBlockNumber(),
+    fetchJsonRpc("eth_blockNumber").then((result) => parseInt(result, 16)),
   ]);
 
   return parseEthereumState(syncing, blockNumber, peersCount);

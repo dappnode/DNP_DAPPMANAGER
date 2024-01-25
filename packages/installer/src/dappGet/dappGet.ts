@@ -1,5 +1,5 @@
 import { listPackages } from "@dappnode/dockerapi";
-import { PackageRequest } from "@dappnode/common";
+import { PackageRequest } from "@dappnode/types";
 import dappGetBasic from "./basic.js";
 import aggregate from "./aggregate/index.js";
 import { DappGetFetcher } from "./fetch/index.js";

@@ -1,6 +1,6 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import initializeDb from "./initializeDb.js";
+import { initializeDb } from "./initializeDb.js";
 import {
   checkDockerNetwork,
   copyHostScripts,
@@ -35,6 +35,31 @@ import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
 
+// Initialize DB must be the first step so the db has the required values
+initializeDb()
+  .then(() => logs.info("Initialized Database"))
+  .catch(e => logs.error("Error inititializing Database", e));
+
+const ethUrl = await getEthUrl().catch(e => {
+  logs.error(
+    `Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`,
+    e
+  );
+  return params.ETH_MAINNET_RPC_URL_REMOTE;
+});
+
+let ipfsUrl = params.IPFS_LOCAL;
+try {
+  ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
+} catch (e) {
+  logs.error(`Error getting ipfsUrl: ${e.message}. Using default: ${ipfsUrl}`);
+}
+
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, ethUrl);
+
+export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
+
 // TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
 const adminPasswordDb = new AdminPasswordDb(params);
@@ -65,18 +90,6 @@ if (params.TEST) startTestApi();
 
 // Execute migrations
 executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
-
-// Initialize DB
-initializeDb()
-  .then(() => logs.info("Initialized Database"))
-  .catch(e => logs.error("Error inititializing Database", e));
-
-const ethUrl = await getEthUrl();
-
-// Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(getIpfsUrl(), ethUrl);
-
-export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
 
 // Start daemons
 startDaemons(dappnodeInstaller, controller.signal);

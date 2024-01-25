@@ -1,5 +1,5 @@
 import { uniq } from "lodash-es";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { isVolumeOwner } from "./volumesData.js";
 import { DockerVolumeListItem } from "./api/index.js";
 

@@ -1,5 +1,5 @@
 import filterDirectory from "pages/installer/helpers/filterDirectory";
-import { DirectoryItem } from "@dappnode/common";
+import { DirectoryItem } from "@dappnode/types";
 import { SelectedCategories } from "pages/installer/types";
 
 const sampleDirectoryState: DirectoryItem = {

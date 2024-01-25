@@ -1,7 +1,7 @@
 import { omit } from "lodash-es";
 import { shouldUpdate, readManifestIfExists } from "@dappnode/utils";
 import * as db from "@dappnode/db";
-import { InstalledPackageDetailData } from "@dappnode/common";
+import { InstalledPackageDetailData } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { getVolumesOwnershipData, listPackages } from "@dappnode/dockerapi";

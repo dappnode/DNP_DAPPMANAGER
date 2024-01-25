@@ -1,4 +1,4 @@
-import { InstalledPackageDetailData, Routes } from "@dappnode/common";
+import { InstalledPackageDetailData, Routes } from "@dappnode/types";
 import { dnpInstalled } from "./data";
 import { sampleContainer, sampleDnp } from "./data/sample";
 import { pause } from "./utils/pause";

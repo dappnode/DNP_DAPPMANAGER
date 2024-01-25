@@ -1,13 +1,13 @@
 import { ContainerLabelsRaw, ContainerLabelTypes } from "./types.js";
 import { stringifyEnvironment } from "@dappnode/utils";
 import {
+  Dependencies,
   ComposeService,
   ChainDriver,
   ChainDriverSpecs,
   ChainDriverType,
   chainDriversTypes,
-  Dependencies,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { pick, omitBy, mapValues } from "lodash-es";
 
 /**
@@ -138,9 +138,7 @@ export function writeDefaultsToLabels({
   });
 }
 
-export function readContainerLabels(
-  labelsRaw: ContainerLabelsRaw
-): Partial<{
+export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
   dnpName: string;
   version: string;
   serviceName: string;

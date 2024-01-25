@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/common";
+import { Compose } from "@dappnode/types";
 
 /**
  * Check if a compose contains pid

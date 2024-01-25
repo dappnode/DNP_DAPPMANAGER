@@ -1,5 +1,5 @@
 import osu from "node-os-utils";
-import { HostStatCpu } from "@dappnode/common";
+import { HostStatCpu } from "@dappnode/types";
 
 /**
  * Returns the cpu use percentage in string

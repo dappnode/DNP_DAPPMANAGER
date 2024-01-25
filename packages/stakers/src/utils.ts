@@ -3,7 +3,7 @@ import {
   ExecutionClient,
   StakerConfigByNetwork,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import * as db from "@dappnode/db";
 
 export function getStakerConfigByNetwork<T extends Network>(

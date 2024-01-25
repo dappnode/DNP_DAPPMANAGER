@@ -2,8 +2,8 @@ import { dbCache, dbMain } from "./dbFactory.js";
 import {
   AutoUpdateSettings,
   AutoUpdatePending,
-  AutoUpdateRegistry
-} from "@dappnode/common";
+  AutoUpdateRegistry,
+} from "@dappnode/types";
 
 export const AUTO_UPDATE_SETTINGS = "auto-update-settings";
 const AUTO_UPDATE_REGISTRY = "auto-update-registry";

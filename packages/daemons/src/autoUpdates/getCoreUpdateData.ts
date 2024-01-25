@@ -1,6 +1,6 @@
 import { valid, satisfies } from "semver";
 import { params } from "@dappnode/params";
-import { CoreUpdateData, PackageRelease } from "@dappnode/common";
+import { CoreUpdateData, PackageRelease } from "@dappnode/types";
 import { listPackages } from "@dappnode/dockerapi";
 import { getCoreVersionId, computeSemverUpdateType } from "@dappnode/utils";
 import { DappnodeInstaller, ErrorDappGetDowngrade } from "@dappnode/installer";

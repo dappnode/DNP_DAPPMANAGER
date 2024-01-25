@@ -3,7 +3,7 @@ import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { dockerContainerStart, listPackageNoThrow } from "@dappnode/dockerapi";
 import * as db from "@dappnode/db";
 import { ethicalMetricsDnpName, register } from "@dappnode/ethicalmetrics";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * Make sure that on Ethical metrics enabled and existing email,

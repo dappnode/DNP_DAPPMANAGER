@@ -1,4 +1,5 @@
-import { PackageVersionData, SetupTarget } from "@dappnode/common";
+import { PackageVersionData } from "@dappnode/types";
+import { SetupTarget } from "@dappnode/types";
 
 export interface WifiCredentials {
   ssid: string;

@@ -13,7 +13,7 @@ import {
   StakerConfigGet,
   StakerItem,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { listPackages } from "@dappnode/dockerapi";
 import {
   packageGetData,

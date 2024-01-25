@@ -13,7 +13,7 @@ import RepositoryFallback from "./features/RepositoryFallback";
 import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
-import { NewFeatureId } from "@dappnode/common";
+import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
 

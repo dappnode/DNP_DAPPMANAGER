@@ -1,10 +1,10 @@
 import semver from "semver";
 import {
   Compose,
-  Manifest,
   ComposeService,
+  Manifest,
   dockerComposeSafeKeys,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { dockerParams } from "./params.js";
 import { params } from "../../params/dist/params.js";
 

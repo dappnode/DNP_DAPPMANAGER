@@ -1,5 +1,5 @@
 import { eventBus } from "@dappnode/eventbus";
-import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
+import { DirectoryItem, DirectoryItemOk } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
 import {

@@ -1,5 +1,5 @@
 import upnpcCommand from "./upnpcCommand.js";
-import { PackagePort } from "@dappnode/common";
+import { PackagePort } from "@dappnode/types";
 
 /**
  * Close port = deletes the map requested port to host

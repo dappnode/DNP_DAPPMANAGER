@@ -1,4 +1,4 @@
-import { DirectoryItem } from "@dappnode/common";
+import { DirectoryItem } from "@dappnode/types";
 import { mockPublicDnps } from "./publicDnps";
 
 export const registry: DirectoryItem[] = [

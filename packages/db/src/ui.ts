@@ -1,8 +1,5 @@
 import { dbMain } from "./dbFactory.js";
-import {
-  NewFeatureId,
-  NewFeatureStatus,
-} from "@dappnode/common";
+import { NewFeatureId, NewFeatureStatus } from "@dappnode/types";
 
 const NEW_FEATURE_STATUS = "new-feature-status";
 
@@ -11,6 +8,5 @@ export const newFeatureStatus = dbMain.indexedByKey<
   NewFeatureId
 >({
   rootKey: NEW_FEATURE_STATUS,
-  getKey: featureId => featureId
+  getKey: (featureId) => featureId,
 });
-

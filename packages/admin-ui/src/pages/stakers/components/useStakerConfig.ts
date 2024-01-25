@@ -7,7 +7,7 @@ import {
   StakerType,
   StakerItem,
   Network
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { responseInterface } from "swr";
 
 export const useStakerConfig = <T extends Network>(
@@ -169,7 +169,9 @@ function getChanges<T extends Network>({
   const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
 
   // Order and compare relays, returns true if changes were made
-  const mevBoostRelaysChanged = (newMevBoost?.relays || []).sort().join(',') !== (mevBoost?.relays || []).sort().join(',');
+  const mevBoostRelaysChanged =
+    (newMevBoost?.relays || []).sort().join(",") !==
+    (mevBoost?.relays || []).sort().join(",");
 
   // Not allowed if no changes
   if (
@@ -215,7 +217,6 @@ function getChanges<T extends Network>({
 
   return { isAllowed: true };
 }
-
 
 function isOkSelectedInstalledAndRunning<
   T extends Network,

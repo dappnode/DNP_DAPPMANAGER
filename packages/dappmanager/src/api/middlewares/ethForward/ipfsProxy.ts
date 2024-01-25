@@ -12,7 +12,7 @@ import {
   NotFoundError,
   Content
 } from "./types.js";
-import { EthProviderError } from "@dappnode/common";
+import { EthProviderError } from "@dappnode/types";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",

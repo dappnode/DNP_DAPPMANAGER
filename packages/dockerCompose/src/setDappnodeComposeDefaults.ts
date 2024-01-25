@@ -11,13 +11,13 @@ import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
-  Manifest,
   Compose,
+  ComposeNetworks,
   ComposeService,
   ComposeServiceNetworks,
-  ComposeNetworks,
   dockerComposeSafeKeys,
-} from "@dappnode/common";
+  Manifest,
+} from "@dappnode/types";
 import { lt } from "semver";
 
 /**
@@ -115,21 +115,20 @@ function setServiceNetworksWithAliases(
     };
 
   serviceNetworks = parseServiceNetworks(serviceNetworks);
-
-  // Return the service network dncore_network with the aliases added
-  const privateNetworkConfig = {
-    ...(serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {}),
-    aliases: getPrivateNetworkAliases(service),
-  };
-
-  // only allow bind to have ipv4_address hardcoded
-  if (service.dnpName === params.bindDnpName)
-    privateNetworkConfig.ipv4_address = params.BIND_IP;
-  else delete privateNetworkConfig.ipv4_address;
-
+  const dncoreServiceNetwork =
+    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || {};
+  // do not allow to set hardcoded IPs except for bind
+  if (
+    dncoreServiceNetwork.ipv4_address &&
+    service.dnpName !== params.bindDnpName
+  )
+    delete dncoreServiceNetwork.ipv4_address;
   return {
     ...serviceNetworks,
-    [params.DOCKER_PRIVATE_NETWORK_NAME]: privateNetworkConfig,
+    [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+      ...dncoreServiceNetwork,
+      aliases: getPrivateNetworkAliases(service),
+    },
   };
 }
 

@@ -1,6 +1,12 @@
-import { docker } from "@dappnode/dockerapi";
+import {
+  disconnectConflictingContainerIfAny,
+  docker,
+  dockerComposeUp,
+  findContainerByIP,
+} from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
+import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
 import Dockerode from "dockerode";
 
 /**
@@ -50,34 +56,53 @@ export async function connectContainerWithIp({
 
   // check target container is running, otherwise the docker network connect might not take effect
   const targetContainer = docker.getContainer(containerName);
-  const containerInfo = await targetContainer.inspect();
-  if (
-    !containerInfo.State.Running &&
-    containerName !== params.dappmanagerContainerName
-  ) {
-    logs.warn(`container ${containerName} is not running, restarting it`);
-    await targetContainer.restart();
-  }
+  try {
+    // There has been edge cases where docker containers are in an intermedium state with a different docker container name
+    // i.e b7903a289091_DAppNodeCore-bind.dnp.dappnode.eth instead of DAppNodeCore-bind.dnp.dappnode.eth
+    const containerInfo = await targetContainer.inspect();
+    if (
+      !containerInfo.State.Running &&
+      containerName !== params.dappmanagerContainerName
+    ) {
+      logs.warn(`container ${containerName} is not running, restarting it`);
+      await targetContainer.restart();
+    }
 
-  const hasContainerRightIp =
-    removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") ===
-    containerIp;
+    const hasContainerRightIp =
+      removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") ===
+      containerIp;
 
-  if (hasContainerRightIp)
-    logs.info(
-      `container ${containerName} has right IP and is connected to docker network`
-    );
-  else {
-    logs.info(
-      `container ${containerName} does not have right IP and/or is not connected to docker network`
-    );
-    await connectContainerRetryOnIpUsed({
-      network,
-      containerName,
-      maxAttempts: 20,
-      ip: containerIp,
-      aliasesIpsMap,
-    });
+    if (hasContainerRightIp)
+      logs.info(
+        `container ${containerName} has right IP and is connected to docker network`
+      );
+    else {
+      logs.info(
+        `container ${containerName} does not have right IP and/or is not connected to docker network`
+      );
+      await connectContainerRetryOnIpUsed({
+        network,
+        containerName,
+        maxAttempts: 20,
+        ip: containerIp,
+        aliasesIpsMap,
+      });
+    }
+  } catch (e) {
+    // check if container does not exist 404
+    if (containerName === params.bindContainerName && e.statusCode === 404) {
+      logs.warn(
+        `container ${params.bindContainerName} not found and it might be in an intermedium state`
+      );
+      // the container might be in intermedium state with different name
+      // TODO: what if there is a docker container already using this IP.
+      // This would be extremley dangerous once the migration to the private ip range is done
+      // and less ips are available.
+      logs.info(`recreating container ${containerName} with compose up`);
+      await dockerComposeUp(getDockerComposePath(params.bindDnpName, true), {
+        forceRecreate: true,
+      });
+    } else throw e;
   }
 }
 
@@ -164,53 +189,4 @@ async function connectContainerRetryOnIpUsed({
   logs.error(
     `Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`
   );
-}
-
-/**
- * Find a container in a network using a specific IP address.
- * @param networkName The name of the network.
- * @param ipAddress The IP address to search for.
- * @returns The container using the specified IP, if found.
- */
-async function findContainerByIP(
-  network: Dockerode.Network,
-  ipAddress: string
-): Promise<Dockerode.NetworkContainer | null> {
-  const networkInfo: Dockerode.NetworkInspectInfo = await network.inspect();
-  const containers = networkInfo.Containers;
-  if (!containers) return null;
-  for (const container of Object.values(containers))
-    if (removeCidrSuffix(container.IPv4Address) === ipAddress) return container;
-
-  return null;
-}
-
-/**
- * Disconnects any container with the specified IP address from the network.
- * @param network dncore_network
- * @param ipAddress 171.33.1.7
- */
-async function disconnectConflictingContainerIfAny(
-  network: Dockerode.Network,
-  ipAddress: string
-): Promise<void> {
-  const conflictingContainer = await findContainerByIP(network, ipAddress);
-  if (conflictingContainer) {
-    logs.info(
-      `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
-    );
-    await network.disconnect({ Container: conflictingContainer.Name });
-  } else logs.info("Conflicting container not found.");
-}
-
-/**
- * Removes the CIDR suffix from an IP address. This function is useful for processing
- * the output of `docker.getNetwork().inspect().Containers` information, where the IP
- * address includes the CIDR suffix.
- *
- * @param ipWithCidr The IP address with CIDR suffix (e.g., '172.30.0.7/16').
- * @returns The IP address without the CIDR suffix (e.g., '172.30.0.7').
- */
-function removeCidrSuffix(ipWithCidr: string): string {
-  return ipWithCidr.split("/")[0];
 }

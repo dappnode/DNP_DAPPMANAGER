@@ -20,7 +20,7 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/common": "^0.1.0",
+    "@dappnode/types": "^0.1.0",
     "@dappnode/params": "^0.1.0",
     "ajv": "^6.10.2",
     "async-retry": "^1.3.1",

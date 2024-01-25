@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { HostInfoScript } from "@dappnode/common";
+import { HostInfoScript } from "@dappnode/types";
 import { runScript } from "../runScripts.js";
 
 /**
@@ -28,7 +28,7 @@ export const getHostInfoMemoized = memoize(
       os: info.os.toLowerCase().trim(),
       versionCodename: info.versionCodename.toLowerCase().trim(),
       architecture: info.architecture.toLowerCase().trim(),
-      kernel: info.kernel.toLowerCase().trim()
+      kernel: info.kernel.toLowerCase().trim(),
     };
   },
 

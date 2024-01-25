@@ -3,7 +3,7 @@ import {
   HostLogicalVolume,
   HostHardDisk,
   HostVolumeGroup
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { api } from "api";
 import Button from "components/Button";
 import Ok from "components/Ok";

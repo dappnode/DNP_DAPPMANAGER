@@ -9,7 +9,7 @@ import {
   PackageRelease,
   InstallPackageData,
   ContainersStatus,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   getBackupPath,
   getDockerComposePath,

@@ -5,7 +5,7 @@ import {
   ConsensusClient,
   Signer,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { lt } from "semver";
 
 export function ensureSetRequirements<T extends Network>({

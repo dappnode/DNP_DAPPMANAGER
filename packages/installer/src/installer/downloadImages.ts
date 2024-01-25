@@ -1,6 +1,6 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { InstallPackageData, DistributedFile } from "@dappnode/common";
+import { InstallPackageData, DistributedFile } from "@dappnode/types";
 import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath, getImageTag } from "@dappnode/utils";
 import { getDockerImageManifest } from "@dappnode/dockerapi";

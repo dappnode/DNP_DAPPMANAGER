@@ -1,5 +1,5 @@
 import { dbCache, dbMain } from "./dbFactory.js";
-import { PackageVersionData } from "@dappnode/common";
+import { PackageVersionData } from "@dappnode/types";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const SERVER_NAME = "server-name";

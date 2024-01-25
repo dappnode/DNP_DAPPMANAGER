@@ -7,7 +7,7 @@ import {
   ApmVersionState,
 } from "./types.js";
 import * as isIPFS from "is-ipfs";
-import { isEnsDomain } from "@dappnode/utils";
+import { isEnsDomain } from "../isEnsDomain.js";
 import { repositoryAbi } from "./params.js";
 
 /**
@@ -22,7 +22,9 @@ export class ApmRepository {
    */
   constructor(ethUrl: string) {
     if (!ethUrl) throw new Error("Ethereum URL is required");
-    this.ethProvider = new ethers.JsonRpcProvider(ethUrl, "mainnet");
+    this.ethProvider = new ethers.JsonRpcProvider(ethUrl, "mainnet", {
+      staticNetwork: true,
+    });
   }
 
   /**
@@ -31,7 +33,9 @@ export class ApmRepository {
    */
   public changeEthProvider(ethUrl: string): void {
     if (!ethUrl) throw new Error("Ethereum URL is required");
-    this.ethProvider = new ethers.JsonRpcProvider(ethUrl, "mainnet");
+    this.ethProvider = new ethers.JsonRpcProvider(ethUrl, "mainnet", {
+      staticNetwork: true,
+    });
   }
 
   /**

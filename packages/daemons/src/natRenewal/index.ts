@@ -9,7 +9,7 @@ import {
   runAtMostEveryIntervals,
   runOnlyOneSequentially,
 } from "@dappnode/utils";
-import { PackagePort } from "@dappnode/common";
+import { PackagePort } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { listPackageContainers } from "@dappnode/dockerapi";
 

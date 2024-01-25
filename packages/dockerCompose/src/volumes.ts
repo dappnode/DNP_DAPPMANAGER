@@ -1,5 +1,5 @@
 import path from "path";
-import { VolumeMapping } from "@dappnode/common";
+import { VolumeMapping } from "@dappnode/types";
 
 /**
  * Normalizes volume paths, removes trailing slash
@@ -30,7 +30,7 @@ export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
       return {
         host,
         container,
-        name: isNamed ? host : undefined
+        name: isNamed ? host : undefined,
       };
     })
     .filter(({ container }) => container);

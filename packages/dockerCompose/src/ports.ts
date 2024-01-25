@@ -1,4 +1,4 @@
-import { PortMapping, PortProtocol } from "@dappnode/common";
+import { PortMapping, PortProtocol } from "@dappnode/types";
 import { uniqBy, concat } from "lodash-es";
 
 /**

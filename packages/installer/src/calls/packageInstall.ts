@@ -13,7 +13,8 @@ import {
   afterInstall,
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
-import { Routes, PackageRequest } from "@dappnode/common";
+import { Routes } from "@dappnode/types";
+import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 /**

@@ -1,6 +1,6 @@
 import { getPortsToOpen } from "@dappnode/daemons";
 import { listPackageContainers } from "@dappnode/dockerapi";
-import { PackageContainer, PortToOpen } from "@dappnode/common";
+import { PackageContainer, PortToOpen } from "@dappnode/types";
 
 /**
  * Returns ports to be opened

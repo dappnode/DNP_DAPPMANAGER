@@ -1,4 +1,4 @@
-import { Routes, UserActionLog } from "@dappnode/common";
+import { Routes, UserActionLog } from "@dappnode/types";
 
 const userActionLogsState: UserActionLog[] = [];
 

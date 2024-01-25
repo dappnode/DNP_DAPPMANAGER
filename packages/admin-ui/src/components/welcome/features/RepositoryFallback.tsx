@@ -3,7 +3,7 @@ import {
   fallbackToBoolean,
   booleanToFallback
 } from "components/EthMultiClient";
-import { EthClientFallback } from "@dappnode/common";
+import { EthClientFallback } from "@dappnode/types";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
 import Alert from "react-bootstrap/Alert";

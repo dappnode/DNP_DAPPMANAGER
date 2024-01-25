@@ -1,4 +1,4 @@
-import { HostStatDisk } from "@dappnode/common";
+import { HostStatDisk } from "@dappnode/types";
 import { shell } from "@dappnode/utils";
 
 /**

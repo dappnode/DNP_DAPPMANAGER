@@ -4,10 +4,7 @@ import { cleanTestDir, testDir } from "../testUtils.js";
 import path from "path";
 import fs from "fs";
 import { createHash } from "crypto";
-import {
-  ReleaseSignatureStatusCode,
-  TrustedReleaseKey,
-} from "@dappnode/common";
+import { ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
 
 describe("Dappnode Repository", function () {
   const ipfsUrls = [

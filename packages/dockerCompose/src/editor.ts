@@ -13,13 +13,16 @@ import {
 } from "lodash-es";
 import { ContainerLabelsRaw } from "./types.js";
 import {
+  Manifest,
   Compose,
   ComposeService,
   ComposeNetwork,
-  ComposeServiceNetwork,
   PackageEnvs,
-  Manifest,
-} from "@dappnode/common";
+  ComposeServiceNetwork,
+  GlobalEnvsPrefixed,
+  PortMapping,
+  UserSettings,
+} from "@dappnode/types";
 import {
   stringifyPortMappings,
   parsePortMappings,
@@ -27,11 +30,6 @@ import {
 } from "./ports.js";
 import { parseServiceNetworks } from "./networks.js";
 import { verifyCompose } from "./verify.js";
-import {
-  GlobalEnvsPrefixed,
-  PortMapping,
-  UserSettings,
-} from "@dappnode/common";
 import { parseUserSettings, applyUserSettings } from "./userSettings.js";
 import {
   getDockerComposePath,
