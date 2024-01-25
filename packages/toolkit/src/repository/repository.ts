@@ -30,8 +30,8 @@ import {
   getReleaseSignatureStatus,
   serializeIpfsDirectory,
 } from "./releaseSignature.js";
-import { params } from "@dappnode/params";
 import { isEnsDomain } from "../isEnsDomain.js";
+import { dappnodeRegistry } from "./params.js";
 
 const source = "ipfs" as const;
 
@@ -222,8 +222,7 @@ export class DappnodeRepository extends ApmRepository {
       // consider adding to signedSafe !origin ||
       signedSafe,
       warnings: {
-        coreFromForeignRegistry:
-          isCore && !dnpName.endsWith(params.DAPPNODE_REGISTRY),
+        coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
         requestNameMismatch:
           isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName,
       },

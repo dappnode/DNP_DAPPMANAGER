@@ -7,7 +7,7 @@ import {
   ReleaseSignatureStatusCode,
   TrustedReleaseKey,
 } from "@dappnode/types";
-import { IPFSEntry } from "@dappnode/toolkit";
+import { IPFSEntry } from "../../src/repository/types.js";
 import {
   serializeIpfsDirectory,
   getReleaseSignatureStatus,

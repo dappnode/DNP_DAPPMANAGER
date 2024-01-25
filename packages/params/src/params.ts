@@ -82,8 +82,6 @@ export const params = {
   // Signature API
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
-  DAPPNODE_REGISTRY: ".dnp.dappnode.eth",
-
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
   IPFS_GATEWAY: "/ipfs/",
