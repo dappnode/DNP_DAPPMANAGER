@@ -1,4 +1,4 @@
-import { GlobalEnvsPrefixed, GlobalEnvs } from "@dappnode/common";
+import { GlobalEnvsPrefixed, GlobalEnvs } from "@dappnode/types";
 import { staticIp, domain, dyndnsIdentity, publicIp } from "./dyndns.js";
 import { internalIp, noNatLoopback } from "./network.js";
 import { opEnableHistoricalRpc, opExecutionClient } from "./optimismConfig.js";

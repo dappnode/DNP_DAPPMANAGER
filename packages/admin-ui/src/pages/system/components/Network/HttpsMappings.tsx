@@ -18,7 +18,7 @@ import { ReqStatus } from "types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 import Button from "components/Button";
-import { ExposableServiceInfo, HttpsPortalMapping } from "@dappnode/common";
+import { ExposableServiceInfo, HttpsPortalMapping } from "@dappnode/types";
 
 export function HttpsMappings() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/common";
+import { Dependencies } from "@dappnode/types";
 import { DappGetDnps, DappGetDnp } from "../types.js";
 import { sanitizeDependencies } from "./sanitizeDependencies.js";
 
@@ -38,9 +38,7 @@ export function setVersion(
   dnps[name].versions[version] = sanitizeDependencies(dependencies);
 }
 
-export function getVersionsFromDnp(
-  dnp: DappGetDnp
-): {
+export function getVersionsFromDnp(dnp: DappGetDnp): {
   [version: string]: {
     [dependencyName: string]: string;
   };

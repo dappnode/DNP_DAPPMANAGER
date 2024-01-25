@@ -9,21 +9,21 @@ import fs from "fs";
 import stream from "stream";
 import util from "util";
 import {
-  Architecture,
-  Manifest,
   ReleaseSignature,
   TrustedReleaseKey,
   defaultArch,
   ReleaseSignatureStatusCode,
   releaseFilesToDownload,
-  Compose,
   ReleaseSignatureStatus,
   DistributedFile,
   FileConfig,
   FileFormat,
   PackageRelease,
   releaseFiles,
-} from "@dappnode/common";
+  Manifest,
+  Compose,
+  Architecture,
+} from "@dappnode/types";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
 import {

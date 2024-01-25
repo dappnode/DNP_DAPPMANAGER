@@ -6,7 +6,7 @@ import {
   ReleaseSignature,
   ReleaseSignatureStatusCode,
   TrustedReleaseKey,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { IPFSEntry } from "@dappnode/toolkit";
 import {
   serializeIpfsDirectory,

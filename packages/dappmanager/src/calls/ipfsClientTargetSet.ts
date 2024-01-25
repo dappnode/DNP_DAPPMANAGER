@@ -1,4 +1,4 @@
-import { IpfsRepository, IpfsClientTarget } from "@dappnode/common";
+import { IpfsRepository, IpfsClientTarget } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { dappnodeInstaller } from "../index.js";

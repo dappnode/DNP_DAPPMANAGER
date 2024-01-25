@@ -4,7 +4,7 @@ import {
   InstalledPackageData,
   Network,
   UserSettingsAllDnps,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   DappnodeInstaller,
   packageInstall,

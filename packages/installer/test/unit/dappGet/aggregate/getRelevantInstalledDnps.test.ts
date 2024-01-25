@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { valid } from "semver";
 import { mockDnp, mockContainer } from "../../../testUtils.js";
 import getRelevantInstalledDnps from "../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * Purpose of the test. Make sure it is able to pick up relevant installed DNPs

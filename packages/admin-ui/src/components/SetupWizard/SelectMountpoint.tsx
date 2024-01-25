@@ -9,7 +9,7 @@ import { joinCssClass } from "utils/css";
 import newTabProps from "utils/newTabProps";
 import { troubleShootMountpointsGuideUrl } from "params";
 import "./selectMountpoint.scss";
-import { MountpointData } from "@dappnode/common";
+import { MountpointData } from "@dappnode/types";
 
 function renderMountpointDataSummary({
   mountpoint,

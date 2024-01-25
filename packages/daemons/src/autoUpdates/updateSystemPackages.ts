@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { getCoreUpdateData } from "./getCoreUpdateData.js";
-import { CoreUpdateDataAvailable } from "@dappnode/common";
+import { CoreUpdateDataAvailable } from "@dappnode/types";
 import { sendUpdateSystemNotificationMaybe } from "./sendUpdateNotification.js";
 import { flagErrorUpdate } from "./flagErrorUpdate.js";
 import { isUpdateDelayCompleted } from "./isUpdateDelayCompleted.js";

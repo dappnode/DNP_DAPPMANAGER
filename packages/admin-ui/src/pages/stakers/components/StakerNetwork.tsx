@@ -4,7 +4,7 @@ import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/common";
+import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -21,7 +21,7 @@ import "./columns.scss";
 import { AppContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
-import { Network } from "@dappnode/common";
+import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 

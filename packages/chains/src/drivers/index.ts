@@ -1,8 +1,8 @@
 import {
-  InstalledPackageData,
   ChainDriver,
   ChainDriverSpecs,
-} from "@dappnode/common";
+  InstalledPackageData,
+} from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 // Drivers
 import { bitcoin } from "./bitcoin.js";

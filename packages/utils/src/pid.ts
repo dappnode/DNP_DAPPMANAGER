@@ -1,8 +1,4 @@
-import {
-  InstallPackageData,
-  PackageContainer,
-  Compose,
-} from "@dappnode/common";
+import { Compose, InstallPackageData, PackageContainer } from "@dappnode/types";
 import { packageInstalledHasPid } from "./packageInstalledHasPid.js";
 
 export interface ComposeServicesSharingPid {

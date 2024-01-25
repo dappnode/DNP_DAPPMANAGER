@@ -1,10 +1,10 @@
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
 import {
-  PackageContainer,
   ComposeNetwork,
   ComposeServiceNetwork,
-} from "@dappnode/common";
+  PackageContainer,
+} from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import {

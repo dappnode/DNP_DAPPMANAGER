@@ -13,7 +13,7 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   ethereumClient,
   getLocalFallbackContentHash,

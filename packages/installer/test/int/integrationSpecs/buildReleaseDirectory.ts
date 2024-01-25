@@ -10,7 +10,7 @@ import {
   Compose,
   SetupWizard,
   ComposeService,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   testDir,
   manifestFileName,

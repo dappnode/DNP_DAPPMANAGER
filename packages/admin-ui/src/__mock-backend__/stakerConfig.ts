@@ -5,7 +5,7 @@ import {
   Routes,
   Signer,
   Network
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 export const stakerConfig: Pick<
   Routes,

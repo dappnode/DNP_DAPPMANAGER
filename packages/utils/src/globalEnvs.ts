@@ -1,4 +1,4 @@
-import { GlobalEnvs } from "@dappnode/common";
+import { GlobalEnvs, GLOBAL_ENVS } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import fs from "fs";
 import { mapKeys } from "lodash-es";
@@ -29,7 +29,7 @@ export function createGlobalEnvsEnvFile(): void {
 export function writeEnvFile(envPath: string, envs: GlobalEnvs): void {
   const envsWithPrefix = mapKeys(
     envs,
-    (_0, key) => params.GLOBAL_ENVS[key as keyof typeof envs]
+    (_0, key) => GLOBAL_ENVS[key as keyof typeof envs]
   );
   const envData = stringifyEnvironment(envsWithPrefix).join("\n");
   fs.writeFileSync(envPath, envData);

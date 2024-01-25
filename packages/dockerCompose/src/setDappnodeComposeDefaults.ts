@@ -11,13 +11,13 @@ import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
-  Manifest,
   Compose,
+  ComposeNetworks,
   ComposeService,
   ComposeServiceNetworks,
-  ComposeNetworks,
   dockerComposeSafeKeys,
-} from "@dappnode/common";
+  Manifest,
+} from "@dappnode/types";
 import { lt } from "semver";
 
 /**

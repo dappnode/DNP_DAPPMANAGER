@@ -1,7 +1,7 @@
 import fs from "fs";
 import { isEqual } from "lodash-es";
 import memoize from "memoizee";
-import { PackageVersionData } from "@dappnode/common";
+import { PackageVersionData } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 

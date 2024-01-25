@@ -8,7 +8,7 @@ import {
   PackageNotification,
   DirectoryItem,
   ExecutionClientMainnet,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 interface EventTypes {
   chainData: ChainData[];

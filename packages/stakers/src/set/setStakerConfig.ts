@@ -14,7 +14,7 @@ import {
   ConsensusClientHolesky,
   ExecutionClientHolesky,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "@dappnode/db";
 import { getStakerConfigByNetwork } from "../index.js";

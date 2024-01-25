@@ -1,5 +1,5 @@
 import { httpsPortal } from "../index.js";
-import { InstallPackageData } from "@dappnode/common";
+import { InstallPackageData } from "@dappnode/types";
 import { getExternalNetworkAlias } from "../domains.js";
 import { params } from "@dappnode/params";
 import {

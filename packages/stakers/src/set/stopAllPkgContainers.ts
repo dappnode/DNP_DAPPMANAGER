@@ -1,7 +1,7 @@
 import {
   InstalledPackageDataApiReturn,
-  InstalledPackageData
-} from "@dappnode/common";
+  InstalledPackageData,
+} from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { dockerContainerStop } from "@dappnode/dockerapi";
 
@@ -13,9 +13,9 @@ export async function stopAllPkgContainers(
 ): Promise<void> {
   await Promise.all(
     pkg.containers
-      .filter(c => c.running)
-      .map(async c =>
+      .filter((c) => c.running)
+      .map(async (c) =>
         dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
       )
-  ).catch(e => logs.error(e.message));
+  ).catch((e) => logs.error(e.message));
 }

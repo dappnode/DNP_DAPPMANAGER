@@ -1,5 +1,5 @@
 import fetch from "node-fetch";
-import { InstalledPackageData, ChainDriverSpecs } from "@dappnode/common";
+import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import {
   buildNetworkAlias,
   EthSyncing,

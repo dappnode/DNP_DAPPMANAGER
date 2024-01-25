@@ -1,5 +1,5 @@
 import { dbCache } from "./dbFactory.js";
-import { PackageVersionData } from "@dappnode/common";
+import { PackageVersionData } from "@dappnode/types";
 
 const VERSION_DATA_VPN = "version-data-vpn";
 

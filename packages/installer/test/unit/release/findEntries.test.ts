@@ -7,7 +7,7 @@ import {
   DirectoryFiles,
   FileConfig,
   releaseFiles,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 interface IpfsFileResult {
   name: string; // 'avatar.png',

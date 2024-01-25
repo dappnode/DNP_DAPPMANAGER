@@ -1,4 +1,5 @@
-import { PackageItemData, PackageRelease, Manifest } from "@dappnode/common";
+import { PackageItemData, PackageRelease } from "@dappnode/types";
+import { Manifest } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { pick } from "lodash-es";
 import { eventBus } from "@dappnode/eventbus";
@@ -24,7 +25,9 @@ export async function packageGetData(
   }
 }
 
-export function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
+export function packagePickItemData(
+  pkgRelease: PackageRelease
+): PackageItemData {
   return {
     manifest: packagePickManifestData(pkgRelease.manifest),
     ...pick(pkgRelease, [

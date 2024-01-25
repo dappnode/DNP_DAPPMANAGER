@@ -159,3 +159,38 @@ export interface ComposePaths {
   /** 'manifest-admin.json', [optional] name of the compose file */
   composeFileName?: string;
 }
+
+export const dockerComposeSafeKeys: (keyof ComposeService)[] = [
+  "cap_add",
+  "cap_drop",
+  "command",
+  "depends_on",
+  "devices",
+  "entrypoint",
+  "environment",
+  "expose",
+  "extra_hosts",
+  "healthcheck",
+  "labels",
+  "logging",
+  "network_mode",
+  "networks",
+  "ports",
+  "privileged",
+  "restart",
+  "stop_grace_period",
+  "stop_signal",
+  "user",
+  "volumes",
+  "working_dir",
+  "security_opt",
+  "image",
+  "build",
+  "volumes",
+  "environment",
+  "pid",
+  "container_name",
+  "dns",
+  "ulimits",
+  "deploy",
+];

@@ -1,4 +1,4 @@
-import { Routes, VpnDevice } from "@dappnode/common";
+import { Routes, VpnDevice } from "@dappnode/types";
 
 const url = "link-to-otp/?id=617824#hdfuisf";
 const password = "SAMPLETEMPPASSWORD";

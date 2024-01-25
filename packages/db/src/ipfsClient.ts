@@ -1,5 +1,5 @@
 import { dbMain } from "./dbFactory.js";
-import { IpfsClientTarget } from "@dappnode/common";
+import { IpfsClientTarget } from "@dappnode/types";
 import { params } from "@dappnode/params";
 
 // User chosen properties

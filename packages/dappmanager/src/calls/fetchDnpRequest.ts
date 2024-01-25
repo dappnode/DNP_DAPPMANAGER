@@ -22,10 +22,9 @@ import {
   PackageRelease,
   CompatibleDnps,
   InstalledPackageData,
-  ReleaseSignatureStatusCode,
-  Manifest,
-  SetupWizardField
-} from "@dappnode/common";
+  ReleaseSignatureStatusCode
+} from "@dappnode/types";
+import { Manifest, SetupWizardField } from "@dappnode/types";
 
 export async function fetchDnpRequest({
   id

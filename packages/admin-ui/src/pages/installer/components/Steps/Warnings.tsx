@@ -1,6 +1,7 @@
 import React from "react";
 import Card from "components/Card";
-import { RequestedDnp, Manifest } from "@dappnode/common";
+import { RequestedDnp } from "@dappnode/types";
+import { Manifest } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
 

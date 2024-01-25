@@ -1,4 +1,4 @@
-import { Dependencies, ChainDriver } from "@dappnode/common";
+import { Dependencies, ChainDriver } from "@dappnode/types";
 
 export interface ContainerLabelsRaw {
   [labelId: string]: string;

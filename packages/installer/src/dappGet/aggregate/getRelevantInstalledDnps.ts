@@ -1,5 +1,5 @@
 import { intersection } from "lodash-es";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * @param requestedDnps = [
@@ -21,7 +21,7 @@ import { InstalledPackageData } from "@dappnode/common";
 
 export default function getRelevantInstalledDnps({
   requestedDnps,
-  installedDnps
+  installedDnps,
 }: {
   requestedDnps: string[];
   installedDnps: InstalledPackageData[];
@@ -32,16 +32,16 @@ export default function getRelevantInstalledDnps({
   const state: { [dnpName: string]: InstalledPackageData } = {};
   const intersectedDnps = intersection(
     requestedDnps,
-    installedDnps.map(dnp => dnp.dnpName)
+    installedDnps.map((dnp) => dnp.dnpName)
   );
-  const installedDnpsWithDeps = installedDnps.filter(dnp => dnp.dependencies);
+  const installedDnpsWithDeps = installedDnps.filter((dnp) => dnp.dependencies);
   for (const dnpName of intersectedDnps) {
-    const dnp = installedDnps.find(dnp => dnp.dnpName === dnpName);
+    const dnp = installedDnps.find((dnp) => dnp.dnpName === dnpName);
     if (dnp) addDependants(dnp);
   }
   // Return only packages that are not already included in the requestedDnps array
   return Object.values(state).filter(
-    dnp => !requestedDnps.includes(dnp.dnpName)
+    (dnp) => !requestedDnps.includes(dnp.dnpName)
   );
 
   function addDependants(dnp: InstalledPackageData): void {
