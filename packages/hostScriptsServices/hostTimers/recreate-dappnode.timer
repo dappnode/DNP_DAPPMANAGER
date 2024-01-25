@@ -1,0 +1,11 @@
+[Unit]
+Description=Timer for recreating dappnode to latest if required
+After=network.target
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=6h
+Unit=check-docker-network.service
+
+[Install]
+WantedBy=timers.target
