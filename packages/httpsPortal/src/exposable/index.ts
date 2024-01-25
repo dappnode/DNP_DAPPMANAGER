@@ -1,5 +1,5 @@
 import memoizee from "memoizee";
-import { ExposableServiceInfo, InstalledPackageData } from "@dappnode/common";
+import { ExposableServiceInfo, InstalledPackageData } from "@dappnode/types";
 import { listPackages } from "@dappnode/dockerapi";
 import { readManifestIfExists } from "@dappnode/utils";
 import { exposablePredefined } from "./predefined.js";

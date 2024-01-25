@@ -21,7 +21,7 @@ import { postInstallClean } from "./postInstallClean.js";
 import { afterInstall } from "./afterInstall.js";
 import { flagPackagesAreInstalling } from "./packageIsInstalling.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
+import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/types";
 
 const restartId = params.restartDnpName;
 const dappmanagerName = params.dappmanagerDnpName;

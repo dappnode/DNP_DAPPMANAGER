@@ -49,7 +49,3 @@ export interface PackageRequest {
   ver: string;
   req?: string;
 }
-
-export interface DappGetState {
-  [dnpName: string]: string; // version
-}

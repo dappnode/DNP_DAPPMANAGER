@@ -18,7 +18,7 @@ import {
   Compose,
   Manifest,
   PackageEnvs,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   clearDbs,
   getTestMountpoint,

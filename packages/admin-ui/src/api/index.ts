@@ -9,10 +9,9 @@ import {
   SubscriptionsTypes,
   Routes,
   routesData,
-  ResolvedType,
-  parseRpcResponse,
-  subscriptionsFactory
-} from "@dappnode/common";
+  ResolvedType
+} from "@dappnode/types";
+import { parseRpcResponse, subscriptionsFactory } from "@dappnode/common";
 // Internal
 import { mapSubscriptionsToRedux } from "./subscriptions";
 import { initialCallsOnOpen } from "./initialCalls";

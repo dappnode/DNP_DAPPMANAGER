@@ -1,4 +1,4 @@
-import { InstalledPackageDetailData, PackageContainer } from "@dappnode/common";
+import { InstalledPackageDetailData, PackageContainer } from "@dappnode/types";
 import { sampleContainer, sampleDnp } from "./sample";
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";

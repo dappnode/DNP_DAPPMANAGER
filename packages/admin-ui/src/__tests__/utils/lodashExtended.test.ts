@@ -1,4 +1,4 @@
-import { UserSettingsAllDnps } from "@dappnode/common";
+import { UserSettingsAllDnps } from "@dappnode/types";
 import deepmerge from "deepmerge";
 import { difference, isDeepEmpty } from "utils/lodashExtended";
 

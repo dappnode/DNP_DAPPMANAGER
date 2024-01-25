@@ -1,4 +1,4 @@
-import { GlobalEnvs } from "@dappnode/common";
+import { GlobalEnvs } from "@dappnode/types";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { wrapHandler } from "../utils.js";
 

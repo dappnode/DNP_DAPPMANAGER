@@ -1,5 +1,5 @@
 import { dappmanagerDnpName, coreDnpName } from "params";
-import { Args } from "@dappnode/common";
+import { Args } from "@dappnode/types";
 
 /**
  * Restarting the DAPPMANAGER will cause this error

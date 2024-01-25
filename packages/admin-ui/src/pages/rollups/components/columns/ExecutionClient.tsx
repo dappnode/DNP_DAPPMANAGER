@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { OptimismItem, OptimismItemOk } from "@dappnode/common";
+import { OptimismItem, OptimismItemOk } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";

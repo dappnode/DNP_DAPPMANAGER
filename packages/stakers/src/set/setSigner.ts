@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";

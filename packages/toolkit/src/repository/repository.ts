@@ -9,34 +9,29 @@ import fs from "fs";
 import stream from "stream";
 import util from "util";
 import {
-  Architecture,
-  Manifest,
   ReleaseSignature,
   TrustedReleaseKey,
   defaultArch,
   ReleaseSignatureStatusCode,
   releaseFilesToDownload,
-  Compose,
   ReleaseSignatureStatus,
   DistributedFile,
   FileConfig,
   FileFormat,
   PackageRelease,
   releaseFiles,
-} from "@dappnode/common";
-import {
-  getImageName,
-  getIsCore,
-  getLegacyImageName,
-  isEnsDomain,
-} from "@dappnode/utils";
+  Manifest,
+  Compose,
+  Architecture,
+} from "@dappnode/types";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
 import {
   getReleaseSignatureStatus,
   serializeIpfsDirectory,
 } from "./releaseSignature.js";
-import { params } from "@dappnode/params";
+import { isEnsDomain } from "../isEnsDomain.js";
+import { dappnodeRegistry } from "./params.js";
 
 const source = "ipfs" as const;
 
@@ -167,7 +162,7 @@ export class DappnodeRepository extends ApmRepository {
     if (!manifest)
       throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
     const dnpName = manifest.name;
-    const isCore = getIsCore(manifest);
+    const isCore = manifest.type === "dncore";
 
     // get compose
     const compose = await this.getPkgAsset<Compose>(
@@ -227,8 +222,7 @@ export class DappnodeRepository extends ApmRepository {
       // consider adding to signedSafe !origin ||
       signedSafe,
       warnings: {
-        coreFromForeignRegistry:
-          isCore && !dnpName.endsWith(params.DAPPNODE_REGISTRY),
+        coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
         requestNameMismatch:
           isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName,
       },
@@ -526,11 +520,15 @@ export class DappnodeRepository extends ApmRepository {
 
     const { name, version } = manifest;
     const imageAsset =
-      files.find((file) => file.name === getImageName(name, version, arch)) ||
+      files.find(
+        (file) => file.name === this.getImageName(name, version, arch)
+      ) ||
       (arch === defaultArch
         ? // New DAppNodes should load old single arch packages,
           // and consider their single image as amd64
-          files.find((file) => file.name === getLegacyImageName(name, version))
+          files.find(
+            (file) => file.name === this.getLegacyImageName(name, version)
+          )
         : undefined);
 
     if (!imageAsset) {
@@ -596,4 +594,33 @@ export class DappnodeRepository extends ApmRepository {
     if (ipfsPath.includes("ipfs")) return ipfsPath.replace("/ipfs/", "");
     return ipfsPath;
   }
+
+  /**
+   * Returns the legacy image path for the given container name and version
+   * @param name Container name
+   * @param version Container version
+   * @returns Legacy image path in the format <name>_<version>.tar.xz
+   */
+  private getLegacyImageName = (name: string, version: string): string =>
+    `${name}_${version}.tar.xz`;
+
+  /**
+   * Returns the image path for the given container name, version and architecture
+   * @param name Container name
+   * @param version Container version
+   * @param arch Container architecture in the format <os>/<arch>
+   * @returns Image path in the format <name>_<version>_<os>-<arch>.txz
+   */
+  private getImageName = (
+    name: string,
+    version: string,
+    arch: Architecture
+  ): string => `${name}_${version}_${this.getArchTag(arch)}.txz`;
+
+  /**
+   * Returns the arch tag for the given architecture
+   * @param arch Architecture in the format <os>/<arch>
+   * @returns Arch tag in the format <os>-<arch>
+   */
+  private getArchTag = (arch: Architecture): string => arch.replace(/\//g, "-");
 }

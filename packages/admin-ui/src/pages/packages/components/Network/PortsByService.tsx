@@ -14,7 +14,7 @@ import {
   InstalledPackageData,
   PortMapping,
   PortProtocol
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 const maxPortNumber = 32768 - 1;
 const maxEphemeralPortNumber = 65535;

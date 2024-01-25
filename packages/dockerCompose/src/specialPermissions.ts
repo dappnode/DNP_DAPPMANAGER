@@ -1,4 +1,4 @@
-import { SpecialPermission, Compose } from "@dappnode/common";
+import { Compose, SpecialPermission } from "@dappnode/types";
 
 /**
  * Parses relevant settings in the compose that may be dangerous or grant

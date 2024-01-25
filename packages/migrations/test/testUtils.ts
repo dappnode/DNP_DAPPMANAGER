@@ -1,4 +1,4 @@
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import { shell } from "@dappnode/utils";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
@@ -32,7 +32,7 @@ export const mockContainer: PackageContainer = {
 };
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
-  return async function(arg: A): Promise<R | undefined> {
+  return async function (arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {

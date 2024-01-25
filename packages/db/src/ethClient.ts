@@ -8,7 +8,7 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 // User chosen properties
 const ETH_CLIENT_FALLBACK = "eth-client-fallback";

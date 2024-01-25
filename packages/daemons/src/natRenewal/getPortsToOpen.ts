@@ -1,4 +1,4 @@
-import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/common";
+import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 

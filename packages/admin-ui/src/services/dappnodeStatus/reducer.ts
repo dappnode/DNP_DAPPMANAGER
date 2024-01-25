@@ -1,5 +1,5 @@
 import { mapValues } from "lodash-es";
-import { RebootRequiredScript, SystemInfo, VolumeData } from "@dappnode/common";
+import { RebootRequiredScript, SystemInfo, VolumeData } from "@dappnode/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WifiCredentials } from "types";
 

@@ -5,7 +5,7 @@ import {
   Signer,
   StakerCompatibleVersionsByNetwork,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 /**
  * Get the current staker config (execution and consensus clients selected) as well as
@@ -158,7 +158,8 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             minVersion: "0.1.0",
           },
           {
-            dnpName: "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
+            dnpName:
+              "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0",
           },
           {
@@ -168,9 +169,8 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
         ],
         compatibleConsensus: [
           {
-            dnpName: "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<
-              T
-            >,
+            dnpName:
+              "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0",
           },
           {

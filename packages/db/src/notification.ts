@@ -1,6 +1,6 @@
 import { dbCache } from "./dbFactory.js";
 import { stripDots } from "./dbUtils.js";
-import { PackageNotificationDb, PackageNotification } from "@dappnode/common";
+import { PackageNotificationDb, PackageNotification } from "@dappnode/types";
 
 const NOTIFICATION = "notification";
 const NOTIFICATION_LAST_EMITTED_VERSION = "notification-last-emitted-version";
@@ -10,9 +10,9 @@ export const notification = dbCache.indexedByKey<PackageNotificationDb, string>(
     rootKey: NOTIFICATION,
     // The `update-available-${dnpName}-${newVersion}` included dots,
     // so for backwards compatibility they must be stripped
-    getKey: id => stripDots(id),
+    getKey: (id) => stripDots(id),
     validate: (id, notification) =>
-      typeof id === "string" && typeof notification === "object"
+      typeof id === "string" && typeof notification === "object",
   }
 );
 
@@ -27,8 +27,8 @@ export function notificationPush(id: string, n: PackageNotification): void {
 export const notificationLastEmitVersion = dbCache.indexedByKey<string, string>(
   {
     rootKey: NOTIFICATION_LAST_EMITTED_VERSION,
-    getKey: dnpName => stripDots(dnpName),
+    getKey: (dnpName) => stripDots(dnpName),
     validate: (dnpName, lastEmittedVersion) =>
-      typeof lastEmittedVersion === "string"
+      typeof lastEmittedVersion === "string",
   }
 );

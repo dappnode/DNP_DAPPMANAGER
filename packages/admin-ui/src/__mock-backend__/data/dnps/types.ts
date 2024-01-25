@@ -3,10 +3,9 @@ import {
   SpecialPermission,
   InstalledPackageDetailData,
   PackageContainer,
-  RequestedDnp,
-  Manifest,
-  SetupWizard
-} from "@dappnode/common";
+  RequestedDnp
+} from "@dappnode/types";
+import { Manifest, SetupWizard } from "@dappnode/types";
 
 export interface MockDnp {
   manifest: Manifest;

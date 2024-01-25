@@ -1,4 +1,4 @@
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import {

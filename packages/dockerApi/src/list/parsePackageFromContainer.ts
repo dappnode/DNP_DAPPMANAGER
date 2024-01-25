@@ -1,5 +1,5 @@
 import { pick } from "lodash-es";
-import { InstalledPackageData, PackageContainer } from "@dappnode/common";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 
 /**
  * Return containers grouped by parent package. Necessary for multi-service packages
@@ -23,9 +23,9 @@ export function groupPackagesFromContainers(
           "origin",
           "chain",
           "domainAlias",
-          "canBeFullnode"
+          "canBeFullnode",
         ]),
-        containers: []
+        containers: [],
       };
       dnpMap.set(container.dnpName, dnp);
     }

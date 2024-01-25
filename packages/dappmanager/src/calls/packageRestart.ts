@@ -5,7 +5,7 @@ import { dockerContainerRestart, listPackage } from "@dappnode/dockerapi";
 import { restartDappmanagerPatch } from "@dappnode/installer";
 import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import { getDockerComposePathSmart } from "@dappnode/utils";
 
 /**

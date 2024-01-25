@@ -1,6 +1,6 @@
 // @ts-ignore
 import { Daemon } from "monero-rpc";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { buildNetworkAlias } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
 
@@ -31,7 +31,7 @@ export async function monero(
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: true
+    isMainOrMonoservice: true,
   });
 
   // http://monero.dappnode:18081
@@ -54,13 +54,13 @@ export async function monero(
       syncing: true,
       error: false,
       message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
-      progress: currentBlock / highestBlock
+      progress: currentBlock / highestBlock,
     };
   } else {
     return {
       syncing: false,
       error: false,
-      message: `Synced #${currentBlock}`
+      message: `Synced #${currentBlock}`,
     };
   }
 }

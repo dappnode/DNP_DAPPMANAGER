@@ -1,4 +1,4 @@
-import { NotificationType, PackageNotification } from "@dappnode/common";
+import { NotificationType, PackageNotification } from "@dappnode/types";
 import { bold } from "./markdown.js";
 
 // TELEGRAM DAPPNODE NOTIFICATIONS MESSAGES
@@ -10,7 +10,7 @@ import { bold } from "./markdown.js";
 export function formatNotification(notification: PackageNotification): string {
   return [
     `${typeToEmoji(notification.type)} ${bold(notification.title)}`,
-    notification.body
+    notification.body,
   ].join("\n\n");
 }
 

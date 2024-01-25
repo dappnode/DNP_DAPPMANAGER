@@ -2,7 +2,7 @@ import {
   InstalledPackageData,
   PackageContainer,
   VolumeMapping,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 /**
  * Mock data

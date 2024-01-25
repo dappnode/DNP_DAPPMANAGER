@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * Returns true if the package is running or false if not

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { Manifest } from "@dappnode/common";
+import { Manifest } from "@dappnode/types";
 import { getManifestPath } from "./getManifestPath.js";
 import { isNotFoundError } from "./isNotFoundError.js";
 import { validatePath } from "./validatePath.js";

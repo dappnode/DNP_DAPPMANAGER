@@ -1,4 +1,4 @@
-import { params } from "@dappnode/params";
+import { ContainerState } from "./pkg.js";
 import { PackageEnvs } from "./compose.js";
 import {
   Manifest,
@@ -9,7 +9,6 @@ import {
 } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
 import { ExecutionClientMainnet, ConsensusClientMainnet } from "./stakers.js";
-import { ContainerState } from "./pkg.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -1109,24 +1108,6 @@ export interface IdentityInterface {
   privateKey: string;
   publicKey: string;
 }
-
-/**
- * ===========
- * GLOBAL ENVS
- * ===========
- */
-
-type GlobalEnvsKeys = keyof typeof params.GLOBAL_ENVS;
-type GlobalEnvsValues = (typeof params.GLOBAL_ENVS)[GlobalEnvsKeys];
-
-export type GlobalEnvs = {
-  [K in keyof typeof params.GLOBAL_ENVS]: string;
-};
-
-// Create type GlobalEnvsPrefixed where the key may be any value from GlobalEnvsValues
-export type GlobalEnvsPrefixed = {
-  [K in GlobalEnvsValues]: string;
-};
 
 /**
  * =====

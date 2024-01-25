@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { buildNetworkAlias, urlJoin } from "@dappnode/utils";
-import { InstalledPackageData, ChainDriverSpecs } from "@dappnode/common";
+import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 import { safeProgress } from "../utils.js";
 

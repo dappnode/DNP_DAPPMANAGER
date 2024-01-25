@@ -2,7 +2,7 @@ import {
   ExposableServiceInfo,
   HttpsPortalMapping,
   Routes
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 const mappings = new Map<string, HttpsPortalMapping>();
 

@@ -9,7 +9,7 @@ import {
 } from "../../../dappmanager/test/testUtils.js";
 import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";
-import { TrustedReleaseKey } from "@dappnode/common";
+import { TrustedReleaseKey } from "@dappnode/types";
 import {
   cleanInstallationArtifacts,
   uploadDirectoryRelease,

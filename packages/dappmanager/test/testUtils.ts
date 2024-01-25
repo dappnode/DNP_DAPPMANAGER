@@ -11,9 +11,9 @@ import {
   PackageRelease,
   ReleaseSignatureStatusCode,
   InstallPackageData,
-  Compose,
-  Manifest
-} from "@dappnode/common";
+  Compose
+} from "@dappnode/types";
+import { Manifest } from "@dappnode/types";
 import { DappnodeInstaller } from "@dappnode/installer";
 
 export const dappnodeInstaller = new DappnodeInstaller(

@@ -6,7 +6,7 @@ import {
   optimismL2Geth,
   executionClientsOptimism,
   ExecutionClientOptimism,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import {

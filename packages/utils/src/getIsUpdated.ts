@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { shouldUpdate } from "./shouldUpdate.js";
 
 /**

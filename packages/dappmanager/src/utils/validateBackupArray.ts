@@ -1,4 +1,4 @@
-import { PackageBackup } from "@dappnode/common";
+import { PackageBackup } from "@dappnode/types";
 import path from "path";
 
 /**

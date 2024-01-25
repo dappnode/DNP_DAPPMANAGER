@@ -3,7 +3,7 @@ import { PlainTextFileDb } from "@dappnode/utils";
 import { getRandomAlphanumericToken } from "./token.js";
 import { wrapHandler } from "../utils.js";
 import { SessionData, SessionsManager } from "../sessions/index.js";
-import { LoginStatusReturn } from "@dappnode/common";
+import { LoginStatusReturn } from "@dappnode/types";
 import {
   AlreadyRegisteredError,
   MissingCredentialsError,

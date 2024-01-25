@@ -8,7 +8,7 @@ import {
   HostHardDisk,
   HostVolumeGroup,
   HostLogicalVolume
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 export async function lvmhardDisksGet(): Promise<HostHardDisk[]> {
   return await getHostHardDisks();

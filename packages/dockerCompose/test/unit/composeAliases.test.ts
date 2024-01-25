@@ -8,7 +8,7 @@ import {
 import { params } from "@dappnode/params";
 import fs from "fs";
 import path from "path";
-import { GlobalEnvsPrefixed, ComposeServiceNetwork } from "@dappnode/common";
+import { GlobalEnvsPrefixed, ComposeServiceNetwork } from "@dappnode/types";
 
 describe("compose service editor", () => {
   const exampleCompose = `

@@ -1,4 +1,4 @@
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 export function removeNetworkAliasCompose(

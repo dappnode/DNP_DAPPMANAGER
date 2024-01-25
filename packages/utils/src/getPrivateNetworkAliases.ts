@@ -1,4 +1,4 @@
-import { ContainerNames } from "@dappnode/common";
+import { ContainerNames } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import { buildNetworkAlias } from "./buildNetworkAlias.js";
 

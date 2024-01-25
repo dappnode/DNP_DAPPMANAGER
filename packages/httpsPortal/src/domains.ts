@@ -1,4 +1,4 @@
-import { ContainerNames } from "@dappnode/common";
+import { ContainerNames } from "@dappnode/types";
 import { getShortUniqueDnp, getContainerDomain } from "@dappnode/utils";
 
 export function stripBadDomainChars(s: string): string {

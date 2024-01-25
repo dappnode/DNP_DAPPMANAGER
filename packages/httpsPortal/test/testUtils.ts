@@ -1,4 +1,4 @@
-import { InstalledPackageData, PackageContainer } from "@dappnode/common";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 export const mockDnpVersion = "0.0.0";

@@ -1,14 +1,14 @@
 import {
   AutoUpdateDataView,
+  VpnDevice,
   DirectoryItem,
   InstalledPackageData,
-  PackageNotification,
   ProgressLog,
+  PackageNotification,
   SystemInfo,
   UserActionLog,
   VolumeData,
-  VpnDevice,
-} from "./types/index.js";
+} from "./calls.js";
 
 export interface SubscriptionsTypes {
   /**
@@ -93,7 +93,7 @@ export type Subscriptions = {
   };
 };
 
-export const subscriptionsData: { [P in keyof Subscriptions]: {} } = {
+export const subscriptionsData: { [P in keyof Subscriptions]: object } = {
   autoUpdateData: {},
   devices: {},
   directory: {},

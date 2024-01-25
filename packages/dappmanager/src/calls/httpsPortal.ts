@@ -1,4 +1,4 @@
-import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/common";
+import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/types";
 import { httpsPortal, getExposableServices } from "@dappnode/httpsportal";
 
 /**

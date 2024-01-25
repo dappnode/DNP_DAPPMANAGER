@@ -1,7 +1,7 @@
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { PortMapping } from "@dappnode/common";
+import { PortMapping } from "@dappnode/types";
 import { mapValues } from "lodash-es";
 import {
   getContainersStatus,

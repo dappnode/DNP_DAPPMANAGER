@@ -8,7 +8,7 @@ import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 import { prettyVolumeName, prettyBytes, prettyDnpName } from "utils/format";
-import { InstalledPackageDetailData } from "@dappnode/common";
+import { InstalledPackageDetailData } from "@dappnode/types";
 import "./volumesList.scss";
 
 interface WarningItem {

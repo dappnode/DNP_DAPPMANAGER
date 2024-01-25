@@ -3,7 +3,7 @@ import { apiRoutes } from "api";
 import Input from "components/Input";
 import Button from "components/Button";
 import newTabProps from "utils/newTabProps";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 
 export function CopyFileFrom({
   container,

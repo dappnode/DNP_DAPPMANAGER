@@ -1,4 +1,4 @@
-import { CoreUpdateData } from "@dappnode/common";
+import { CoreUpdateData } from "@dappnode/types";
 import { getCoreUpdateData } from "@dappnode/daemons";
 import { dappnodeInstaller } from "../index.js";
 

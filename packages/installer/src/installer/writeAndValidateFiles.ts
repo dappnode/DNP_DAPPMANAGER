@@ -1,11 +1,10 @@
 import fs from "fs";
 import { Log } from "@dappnode/logger";
 import { validatePath } from "@dappnode/utils";
-import { InstallPackageData } from "@dappnode/common";
+import { InstallPackageData } from "@dappnode/types";
 import { dockerComposeConfig } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { writeManifest } from "@dappnode/utils";
-import { isNotFoundError } from "@dappnode/utils";
+import { isNotFoundError, writeManifest } from "@dappnode/utils";
 
 /**
  * Write the new compose and test it with config
