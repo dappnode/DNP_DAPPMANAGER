@@ -6,7 +6,6 @@ import {
   dockerComposeSafeKeys,
 } from "@dappnode/types";
 import { dockerParams } from "./params.js";
-import { params } from "../../params/dist/params.js";
 
 let aggregatedError: string[];
 
@@ -30,8 +29,7 @@ export function validateDappnodeCompose(
   // COMPOSE TOP LEVEL restrictions
 
   validateComposeVersion(compose);
-  // TODO: remove this bypass once bind is published
-  if (manifest.name !== params.bindDnpName) validateComposeNetworks(compose);
+  validateComposeNetworks(compose);
 
   // SERVICE LEVEL restrictions
 
@@ -137,9 +135,7 @@ function validateComposeService(
       `service ${serviceName} has network_mode: host but is not a core package`
     );
 
-  // TODO: remove this bypass once bind is published
-  if (dnpName !== params.bindDnpName)
-    validateComposeServiceNetworks(compose, isCore, serviceName);
+  validateComposeServiceNetworks(compose, isCore, serviceName);
 
   if (
     volumes &&
