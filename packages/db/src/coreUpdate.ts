@@ -1,6 +1,6 @@
 import { dbCache } from "./dbFactory.js";
 import { pick } from "lodash-es";
-import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/common";
+import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/types";
 
 const CORE_UPDATE_PACKAGES_DATA = "core-update-packages-data";
 
@@ -32,9 +32,9 @@ export const coreUpdatePackagesData = {
                 "imagePath",
                 "isUpdate",
                 "dockerTimeout",
-                "containersStatus"
+                "containersStatus",
               ])
           )
         : packagesData
-    )
+    ),
 };

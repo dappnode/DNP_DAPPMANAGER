@@ -11,10 +11,9 @@ import {
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { IdentityInterface } from "@dappnode/common";
+import { IdentityInterface, IpfsClientTarget } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
-import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
 import { pause, shell, getPublicIpFromUrls } from "@dappnode/utils";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
@@ -55,25 +54,6 @@ export async function initializeDb(): Promise<void> {
   } catch (e) {
     logs.error("Error getting ipfsClientTarget", e);
     db.ipfsClientTarget.set(IpfsClientTarget.local);
-  }
-
-  /**
-   * Eth client remote
-   */
-  try {
-    const ethClientRemote = db.ethClientRemote.get();
-    if (!ethClientRemote) {
-      logs.info(
-        "ethClientRemote not found, grabbing default value from db, key eth-client-target"
-      );
-      const ethClientTarget = db.ethClientTarget.get();
-      if (ethClientTarget && ethClientTarget === "remote")
-        db.ethClientRemote.set(EthClientRemote.on);
-      else db.ethClientRemote.set(EthClientRemote.off);
-    }
-  } catch (e) {
-    logs.error("Error setting default value for eth-client-remote", e);
-    db.ethClientRemote.set(EthClientRemote.off);
   }
 
   /**
@@ -169,7 +149,7 @@ export async function initializeDb(): Promise<void> {
   //   and the external IP from UPnP command succeeded
   const upnpAvailable =
     Boolean(publicIp && externalIp && internalIp !== publicIp) &&
-      (await isUpnpAvailable())
+    (await isUpnpAvailable())
       ? true
       : false;
 

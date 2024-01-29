@@ -1,16 +1,6 @@
 import { Compose } from "./compose.js";
-import { GrafanaDashboard, Manifest, PrometheusTarget } from "./manifest.js";
+import { Manifest, PrometheusTarget, GrafanaDashboard } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
-
-/**
- * IPFS
- */
-
-export interface IpfsDagGetDirectory {
-  Name: string;
-  Size: number;
-  Hash: string;
-}
 
 /**
  * =========
@@ -207,6 +197,4 @@ export interface PackageRequest {
   req?: string;
 }
 
-export interface DappGetState {
-  [dnpName: string]: string; // version
-}
+export const defaultArch = "linux/amd64" as const;

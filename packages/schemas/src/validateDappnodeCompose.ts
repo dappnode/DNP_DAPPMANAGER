@@ -1,12 +1,11 @@
 import semver from "semver";
 import {
   Compose,
-  Manifest,
   ComposeService,
+  Manifest,
   dockerComposeSafeKeys,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { dockerParams } from "./params.js";
-import { params } from "../../params/dist/params.js";
 
 let aggregatedError: string[];
 
@@ -30,8 +29,7 @@ export function validateDappnodeCompose(
   // COMPOSE TOP LEVEL restrictions
 
   validateComposeVersion(compose);
-  // TODO: remove this bypass once bind is published
-  if (manifest.name !== params.bindDnpName) validateComposeNetworks(compose);
+  validateComposeNetworks(compose);
 
   // SERVICE LEVEL restrictions
 
@@ -107,9 +105,8 @@ function validateComposeService(
       );
   }
 
-  const { dns, pid, privileged, network_mode, volumes } = compose.services[
-    serviceName
-  ];
+  const { dns, pid, privileged, network_mode, volumes } =
+    compose.services[serviceName];
 
   // Check that if defined, the DNS must be the one provided from the bind package
   if (!isCore && dns && !dockerParams.DNS_SERVICE.includes(dns))
@@ -138,9 +135,7 @@ function validateComposeService(
       `service ${serviceName} has network_mode: host but is not a core package`
     );
 
-  // TODO: remove this bypass once bind is published
-  if (dnpName !== params.bindDnpName)
-    validateComposeServiceNetworks(compose, isCore, serviceName);
+  validateComposeServiceNetworks(compose, isCore, serviceName);
 
   if (
     volumes &&
@@ -167,12 +162,10 @@ function validateComposeServiceNetworks(
   isCore: boolean,
   serviceName: string
 ): void {
-  const DOCKER_WHITELIST_NETWORKS_STR = dockerParams.DOCKER_WHITELIST_NETWORKS.join(
-    ","
-  );
-  const DOCKER_WHITELIST_ALIASES_STR = dockerParams.DOCKER_CORE_ALIASES.join(
-    ","
-  );
+  const DOCKER_WHITELIST_NETWORKS_STR =
+    dockerParams.DOCKER_WHITELIST_NETWORKS.join(",");
+  const DOCKER_WHITELIST_ALIASES_STR =
+    dockerParams.DOCKER_CORE_ALIASES.join(",");
   const service = compose.services[serviceName];
   const serviceNetworks = service.networks;
   if (!serviceNetworks) return;

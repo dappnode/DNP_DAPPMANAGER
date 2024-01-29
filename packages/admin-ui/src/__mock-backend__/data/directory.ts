@@ -1,6 +1,6 @@
 import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
-import { DirectoryItem, DirectoryItemOk } from "@dappnode/common";
+import { DirectoryItem, DirectoryItemOk } from "@dappnode/types";
 
 function getDirectoryDnp(dnp: MockDnp, index: number): DirectoryItemOk {
   return {

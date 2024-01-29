@@ -4,8 +4,8 @@ import { listPackages } from "@dappnode/dockerapi";
 import {
   InstalledPackageData,
   InstalledPackageDataApiReturn,
-  UpdateAvailable
-} from "@dappnode/common";
+  UpdateAvailable,
+} from "@dappnode/types";
 
 /**
  * Returns the list of current containers associated to packages
@@ -16,7 +16,7 @@ export async function packagesGet(): Promise<InstalledPackageDataApiReturn[]> {
   // Check if an update is available from stored last known version
   const latestKnownVersions = db.packageLatestKnownVersion.getAll();
 
-  return dnps.map(dnp => {
+  return dnps.map((dnp) => {
     const latestKnownVersion: UpdateAvailable | undefined =
       latestKnownVersions[dnp.dnpName];
     return {
@@ -25,7 +25,7 @@ export async function packagesGet(): Promise<InstalledPackageDataApiReturn[]> {
         latestKnownVersion &&
         shouldUpdate(dnp.version, latestKnownVersion.newVersion)
           ? latestKnownVersion
-          : null
+          : null,
     };
   });
 }

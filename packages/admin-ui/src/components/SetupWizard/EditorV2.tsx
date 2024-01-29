@@ -1,6 +1,6 @@
 import React from "react";
 // Components
-import { SetupWizardAllDnps } from "@dappnode/common";
+import { SetupWizardAllDnps } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 import RenderMarkdown from "components/RenderMarkdown";
 import InputField from "./InputField";

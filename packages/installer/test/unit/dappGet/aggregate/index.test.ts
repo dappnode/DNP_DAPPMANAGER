@@ -5,7 +5,7 @@ import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock } from "../testHelpers.js";
 // Import for types
 import aggregateType from "../../../../src/dappGet/aggregate/index.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { mockDnp } from "../../../testUtils.js";
 import { DappGetDnps } from "../../../../src/dappGet/types.js";
 
@@ -122,15 +122,17 @@ describe.skip("dappGet/aggregate", () => {
     const mock = await rewiremock.around(
       () => import("../../../../src/dappGet/aggregate/index.js"),
       (mock) => {
-        mock(() =>
-          import(
-            "../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js"
-          )
+        mock(
+          () =>
+            import(
+              "../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js"
+            )
         )
           .withDefault(getRelevantInstalledDnps)
           .toBeUsed();
-        mock(() =>
-          import("../../../../src/dappGet/aggregate/aggregateDependencies.js")
+        mock(
+          () =>
+            import("../../../../src/dappGet/aggregate/aggregateDependencies.js")
         )
           .withDefault(aggregateDependencies)
           .toBeUsed();
@@ -204,9 +206,8 @@ describe.skip("dappGet/aggregate", () => {
     );
 
     dnpAggregateDependenciesCalls.forEach((callArgs, i) => {
-      const { name, versionRange } = aggregateDependenciesSpy.getCall(
-        i
-      ).lastArg;
+      const { name, versionRange } =
+        aggregateDependenciesSpy.getCall(i).lastArg;
       expect({ name, versionRange }).to.deep.equal(
         callArgs,
         `Wrong arguments for call ${i} to aggregateDependencies`

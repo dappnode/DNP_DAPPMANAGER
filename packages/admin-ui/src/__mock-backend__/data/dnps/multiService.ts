@@ -1,4 +1,4 @@
-import { PortProtocol } from "@dappnode/common";
+import { PortProtocol } from "@dappnode/types";
 import { MockDnp } from "./types";
 
 const dnpName = "multi-service.dnp.dappnode.eth";

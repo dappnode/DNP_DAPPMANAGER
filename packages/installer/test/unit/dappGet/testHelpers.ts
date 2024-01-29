@@ -1,6 +1,6 @@
 import "mocha";
 import { safeSemver } from "../../../src/dappGet/utils/safeSemver.js";
-import { PackageRequest, Dependencies } from "@dappnode/common";
+import { PackageRequest, Dependencies } from "@dappnode/types";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 import { DappGetState, DappGetDnps } from "../../../src/dappGet/types.js";
 import { DappnodeInstaller } from "../../../src/dappnodeInstaller.js";

@@ -13,7 +13,7 @@ import {
   ErrorDappGetNotSatisfyRange,
   ErrorDappGetNoVersions,
 } from "../errors.js";
-import { InstalledPackageData, PackageRequest } from "@dappnode/common";
+import { InstalledPackageData, PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
 /**

@@ -1,5 +1,5 @@
 import { eventBus } from "@dappnode/eventbus";
-import { ProgressLog } from "@dappnode/common";
+import { ProgressLog } from "@dappnode/types";
 import { logs } from "./logs.js";
 
 export type Log = (dnpName: string, message: string) => void;
@@ -35,7 +35,7 @@ export function logUiClear({ id }: { id: string }): void {
  * Curried version of logUi to simplify code
  * @param id, overall log id (to bundle multiple logs)
  */
-export const getLogUi = (id: string): Log => (
-  dnpName: string,
-  message: string
-): void => logUi({ id, dnpName, message });
+export const getLogUi =
+  (id: string): Log =>
+  (dnpName: string, message: string): void =>
+    logUi({ id, dnpName, message });

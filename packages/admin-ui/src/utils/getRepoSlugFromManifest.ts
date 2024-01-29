@@ -1,5 +1,5 @@
 import { stringSplit, stringIncludes } from "./strings";
-import { Manifest } from "@dappnode/common";
+import { Manifest } from "@dappnode/types";
 
 const githubBaseUrl = "https://github.com/";
 

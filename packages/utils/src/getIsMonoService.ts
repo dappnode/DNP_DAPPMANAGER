@@ -1,4 +1,4 @@
-import { Compose } from "@dappnode/common";
+import { Compose } from "@dappnode/types";
 
 /**
  * Returns whether the given compose file is a mono-service compose file or not

@@ -30,7 +30,7 @@ import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
-import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/common";
+import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;

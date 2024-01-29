@@ -6,7 +6,7 @@ import { getDockerComposePath, validatePath } from "@dappnode/utils";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { mockDnp, cleanTestDir, mockContainer } from "../../testUtils.js";
 import { getMockEventBus } from "./eventBus.js";
 

@@ -1,7 +1,11 @@
 import Ajv, { ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
-import { Args, LoggerMiddleware } from "../../types/index.js";
-import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
+import {
+  Args,
+  LoggerMiddleware,
+  Subscriptions,
+  subscriptionsData,
+} from "@dappnode/types";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 

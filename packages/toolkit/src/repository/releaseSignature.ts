@@ -9,9 +9,9 @@ import {
   ReleaseSignatureProtocol,
   ReleaseSignature,
   ReleaseSignatureWithData,
-} from "@dappnode/common";
+  releaseFiles,
+} from "@dappnode/types";
 import { CID } from "kubo-rpc-client";
-import { releaseFiles } from "@dappnode/common";
 import { IPFSEntry } from "./types.js";
 
 export function getReleaseSignatureStatus(

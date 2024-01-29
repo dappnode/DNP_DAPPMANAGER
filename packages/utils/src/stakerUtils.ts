@@ -1,4 +1,4 @@
-import { UserSettingsAllDnps, Network } from "@dappnode/common";
+import { UserSettingsAllDnps, Network } from "@dappnode/types";
 
 /**
  * Get the validator service name.

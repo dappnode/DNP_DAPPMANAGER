@@ -6,7 +6,7 @@ import {
   listPackages,
 } from "@dappnode/dockerapi";
 import fs from "fs";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import {
   getDockerComposePath,
   isNotFoundError,

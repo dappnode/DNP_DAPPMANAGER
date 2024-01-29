@@ -1,4 +1,4 @@
-import { Dependencies } from "@dappnode/common";
+import { Dependencies } from "@dappnode/types";
 import { validRange, satisfies, valid } from "semver";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 

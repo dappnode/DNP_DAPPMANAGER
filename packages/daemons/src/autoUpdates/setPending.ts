@@ -1,4 +1,4 @@
-import { AutoUpdatePendingEntry } from "@dappnode/common";
+import { AutoUpdatePendingEntry } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 
@@ -18,8 +18,8 @@ export function setPending(
     ...pending,
     [dnpName]: {
       ...(pending[dnpName] || {}),
-      ...data
-    }
+      ...data,
+    },
   });
 
   eventBus.requestAutoUpdateData.emit();

@@ -1,9 +1,9 @@
 import io, { Socket } from "socket.io-client";
 import { Emitter } from "mitt";
-import { Args, RpcPayload, RpcResponse } from "@dappnode/common";
+import { Args, RpcPayload, RpcResponse } from "@dappnode/types";
 import { IApiRpc } from "./interface";
 import { socketIoUrl } from "params";
-import { subscriptionsData } from "@dappnode/common";
+import { subscriptionsData } from "@dappnode/types";
 
 let socketGlobal: Socket | null = null;
 let apiStarted = false;

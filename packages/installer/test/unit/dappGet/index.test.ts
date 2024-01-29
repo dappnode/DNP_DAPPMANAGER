@@ -4,7 +4,7 @@ import sinon from "sinon";
 import rewiremock from "rewiremock/webpack";
 // Import for types
 import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { dappnodeInstaller, mockDnp } from "../../testUtils.js";
 import { DappGetDnps } from "../../../src/dappGet/types.js";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";

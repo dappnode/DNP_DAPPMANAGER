@@ -4,7 +4,7 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { StakerItem, Network } from "@dappnode/common";
+import { StakerItem, Network } from "@dappnode/types";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";

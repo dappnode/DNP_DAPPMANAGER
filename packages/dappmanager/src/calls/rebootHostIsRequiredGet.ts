@@ -1,4 +1,4 @@
-import { RebootRequiredScript } from "@dappnode/common";
+import { RebootRequiredScript } from "@dappnode/types";
 import { getRebootRequiredMemoized } from "@dappnode/hostscriptsservices";
 
 /**

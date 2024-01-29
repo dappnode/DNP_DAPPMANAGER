@@ -1,4 +1,4 @@
-import { FileFormat } from "../types/pkg.js";
+import { FileFormat } from "./pkg.js";
 
 export const releaseFiles = Object.freeze({
   manifest: Object.freeze({
@@ -86,3 +86,14 @@ export const releaseFiles = Object.freeze({
     multiple: true as const,
   }),
 } as const);
+
+export const releaseFilesToDownload = {
+  manifest: releaseFiles.manifest,
+  compose: releaseFiles.compose,
+  signature: releaseFiles.signature,
+  setupWizard: releaseFiles.setupWizard,
+  disclaimer: releaseFiles.disclaimer,
+  gettingStarted: releaseFiles.gettingStarted,
+  prometheusTargets: releaseFiles.prometheusTargets,
+  grafanaDashboards: releaseFiles.grafanaDashboards,
+};

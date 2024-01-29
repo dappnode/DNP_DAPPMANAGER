@@ -8,12 +8,12 @@ import {
   dockerContainerRemove,
   dockerContainerStop,
   dockerComposeDown,
-  listPackage
+  listPackage,
 } from "@dappnode/dockerapi";
 import { isRunningHttps } from "@dappnode/httpsportal";
 import { httpsPortal } from "@dappnode/httpsportal";
 import * as db from "@dappnode/db";
-import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/common";
+import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
 
 /**
@@ -24,7 +24,7 @@ import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
  */
 export async function packageRemove({
   dnpName,
-  deleteVolumes = false
+  deleteVolumes = false,
 }: {
   dnpName: string;
   deleteVolumes?: boolean;
@@ -51,7 +51,7 @@ export async function packageRemove({
           await httpsPortal
             .removeMapping(mapping)
             // Bypass error to continue deleting mappings
-            .catch(e =>
+            .catch((e) =>
               logs.error(`Error removing https mapping of ${dnp.dnpName}`, e)
             );
       }
@@ -89,7 +89,7 @@ export async function packageRemove({
       await dockerComposeDown(composePath, {
         volumes: deleteVolumes,
         // Ignore timeout is user doesn't want to keep any data
-        timeout: deleteVolumes ? undefined : timeout
+        timeout: deleteVolumes ? undefined : timeout,
       });
       hasRemoved = true; // To mimic an early return
     } catch (e) {
@@ -98,11 +98,11 @@ export async function packageRemove({
   }
 
   if (!hasRemoved) {
-    const containerNames = dnp.containers.map(c => c.containerName);
+    const containerNames = dnp.containers.map((c) => c.containerName);
     await Promise.all(
-      containerNames.map(async containerName => {
+      containerNames.map(async (containerName) => {
         // Continue removing package even if container is already stopped
-        await dockerContainerStop(containerName, { timeout }).catch(e => {
+        await dockerContainerStop(containerName, { timeout }).catch((e) => {
           if (
             e.reason.includes("container already stopped") &&
             e.statusCode === 304
@@ -119,7 +119,7 @@ export async function packageRemove({
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
 
   // Remove client from maindb.json if it is a staker package
-  if (stakerPkgs.some(stakerPkg => stakerPkg === dnp.dnpName))
+  if (stakerPkgs.some((stakerPkg) => stakerPkg === dnp.dnpName))
     await removeStakerPkgFromDbIfSelected({ dnpName });
 
   // Emit packages update
@@ -132,7 +132,7 @@ export async function packageRemove({
  * @param dnpName DNP of the removed package
  */
 async function removeStakerPkgFromDbIfSelected({
-  dnpName
+  dnpName,
 }: {
   dnpName: string;
 }): Promise<void> {

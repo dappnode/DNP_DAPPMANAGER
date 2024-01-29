@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * Helper to check if a package is installed

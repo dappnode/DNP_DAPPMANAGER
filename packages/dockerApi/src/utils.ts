@@ -1,6 +1,6 @@
 import Dockerode from "dockerode";
 import stripAnsi from "strip-ansi";
-import { PortMapping, PortProtocol } from "@dappnode/common";
+import { PortMapping, PortProtocol } from "@dappnode/types";
 import { isPortMappingDeletable } from "./list/isPortMappingDeletable.js";
 
 /**
@@ -38,7 +38,7 @@ export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
   return stripAnsi(
     logs
       .split("\n")
-      .map(line => stripDockerApiLogHeader(line))
+      .map((line) => stripDockerApiLogHeader(line))
       .join("\n")
   );
 }
@@ -119,13 +119,13 @@ export function ensureUniquePortsFromDockerApi(
         ({
           ...(PublicPort ? { host: PublicPort } : {}),
           container: PrivatePort,
-          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP
+          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP,
         })
     )
     .map(
       (port): PortMapping => ({
         ...port,
-        deletable: isPortMappingDeletable(port, defaultPorts)
+        deletable: isPortMappingDeletable(port, defaultPorts),
       })
     );
 

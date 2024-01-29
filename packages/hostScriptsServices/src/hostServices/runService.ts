@@ -10,6 +10,7 @@ import { copyHostService } from "./copyHostService.js";
  */
 export type ServiceName =
   | "update-upgrade-host.service"
+  | "recreate-dappnode.service"
   | "check-docker-network.service";
 
 /**

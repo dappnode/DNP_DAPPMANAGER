@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getMultiClientStatus } from "./clientStatus.js";
-import { EthClientStatusError, EthProviderError } from "@dappnode/common";
+import { EthClientStatusError, EthProviderError } from "@dappnode/types";
 import { emitSyncedNotification } from "./syncedNotification.js";
 import { ethereumClient } from "./index.js";
 

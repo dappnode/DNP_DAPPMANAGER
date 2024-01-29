@@ -5,7 +5,7 @@ import {
   PackageRelease,
   Compose,
   ReleaseSignatureStatusCode,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { DappnodeInstaller } from "../src/dappnodeInstaller.js";
 import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";

@@ -1,4 +1,4 @@
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { listPackageContainers } from "./listContainers.js";
 import { groupPackagesFromContainers } from "./parsePackageFromContainer.js";
 

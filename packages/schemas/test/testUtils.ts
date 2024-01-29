@@ -1,7 +1,7 @@
-import { shell } from "@dappnode/utils";
+import fs from "fs";
 
 export const testDir = "test_files";
 
 export async function cleanTestDir(): Promise<void> {
-  await shell(`rm -rf ${testDir}`);
+  fs.rmdirSync(testDir, { recursive: true });
 }

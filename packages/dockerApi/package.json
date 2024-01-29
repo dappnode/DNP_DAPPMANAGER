@@ -20,7 +20,6 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/common": "^0.1.0",
     "@dappnode/hostscriptsservices": "^0.1.0",
     "@dappnode/params": "^0.1.0",
     "@dappnode/utils": "^0.1.0",

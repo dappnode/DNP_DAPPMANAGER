@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import path from "path";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { mockDnp } from "../../../../dappmanager/test/testUtils.js";
 import rewiremock from "rewiremock/webpack";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";

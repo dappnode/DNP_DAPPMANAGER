@@ -1,6 +1,6 @@
 import { listPackages } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { DirectoryItem } from "@dappnode/common";
+import { DirectoryItem } from "@dappnode/types";
 import {
   fileToGatewayUrl,
   getIsInstalled,

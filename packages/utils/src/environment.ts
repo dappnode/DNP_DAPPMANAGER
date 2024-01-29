@@ -1,4 +1,4 @@
-import { PackageEnvs } from "@dappnode/common";
+import { PackageEnvs } from "@dappnode/types";
 import { pickBy } from "lodash-es";
 
 /**
