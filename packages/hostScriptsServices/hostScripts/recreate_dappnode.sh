@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Implemented in core release 0.2.88
+
+# This script is a debian host service that ensures the minimum requirement for dappnode to be healthy: dappmanager docker container is running
+# - If dappmanager docker compose file does not exist, then recreate DAppNode to latest
+# - If dappmanager docker container does not exist, then run docker compose up to dappmanager file
+# - If dappmanager docker container is not running, then restart it
+# - If dappmanager docker container is restarting, then check 5 times with a 5 seconds delay the status is still the same. If 3 or more times the status is the same, then recreate dappnode
+# - If dappmanager docker container is created, exited, dead or paused, then restart it
+# - If dappmanager docker container is running, then do nothing
+
 DNCORE_DIR="/usr/src/dappnode/DNCORE"
 DAPPMANAGER_DNCORE_FILE="$DNCORE_DIR/docker-compose-dappmanager.yml"
 LOG_DIR="/usr/src/dappnode/logs"
