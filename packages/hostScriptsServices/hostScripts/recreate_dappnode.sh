@@ -19,7 +19,7 @@ if [ ! -f "$DAPPMANAGER_DNCORE_FILE" ]; then
 fi 
 
 # dappmanager docker container does not exist, then run docker compose up to dappmanager file
-if [ ! "$(docker ps -q -f name="$DAPPMANAGER_CONTAINER_NAME")" ]; then
+if [ ! "$(docker ps -q -f -a name="$DAPPMANAGER_CONTAINER_NAME")" ]; then
     echo "Container $DAPPMANAGER_CONTAINER_NAME does not exist. Running docker compose up to dappmanager file." | tee "$RECREATE_DAPPNODE_LOG_FILE"
     docker-compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
     # if the previous command fails, then recreate dappnode
@@ -54,14 +54,14 @@ if [ "$STATUS" == "restarting" ]; then
         echo "Container $DAPPMANAGER_CONTAINER_NAME is restarting after 25s. Status: $STATUS. Recreating dappnode to latest version." | tee "$RECREATE_DAPPNODE_LOG_FILE"
         wget -O - https://installer.dappnode.io | sudo UPDATE=true bash 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
     else
-        echo "Container $DAPPMANAGER_CONTAINER_NAME is not running. Status: $STATUS. Double checking before recreating dappnode to latest version." | tee "$RECREATE_DAPPNODE_LOG_FILE"
+        echo "Container $DAPPMANAGER_CONTAINER_NAME recovered from restarting state. Doing nothing." | tee "$RECREATE_DAPPNODE_LOG_FILE"
     fi
 elif [ "$STATUS" == "created" ] || [ "$STATUS" == "exited" ] || [ "$STATUS" == "dead" ] || [ "$STATUS" == "paused" ]; then
-    echo "Container $DAPPMANAGER_CONTAINER_NAME is not running. Status: $STATUS. Running docker compose up to dappmanager file." | tee "$RECREATE_DAPPNODE_LOG_FILE"
-    docker-compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
+    echo "Container $DAPPMANAGER_CONTAINER_NAME is not running. Status: $STATUS. Running docker restart to dappmanager." | tee "$RECREATE_DAPPNODE_LOG_FILE"
+    docker restart "$DAPPMANAGER_CONTAINER_NAME" 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
     # if the previous command fails, then recreate dappnode
     if [ $? -ne 0 ]; then
-        echo "Error while docker compose up $DAPPMANAGER_DNCORE_FILE. Recreating dappnode to latest version." | tee "$RECREATE_DAPPNODE_LOG_FILE"
+        echo "Error while docker restart to $DAPPMANAGER_CONTAINER_NAME. Recreating dappnode to latest version." | tee "$RECREATE_DAPPNODE_LOG_FILE"
         wget -O - https://installer.dappnode.io | sudo UPDATE=true bash 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
     fi
 else
