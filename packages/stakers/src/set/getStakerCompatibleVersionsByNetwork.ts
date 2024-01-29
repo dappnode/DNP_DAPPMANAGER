@@ -74,6 +74,10 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "1.0.18",
           },
+          {
+            dnpName: "erigon-gnosis.dnp.dappnode.eth" as ExecutionClient<T>,
+            minVersion: "0.1.0",
+          },
         ],
         compatibleConsensus: [
           {
