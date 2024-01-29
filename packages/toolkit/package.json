@@ -1,7 +1,7 @@
 {
   "name": "@dappnode/toolkit",
   "type": "module",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "The DappNode Toolkit is a collection of shared smart contracts, types, and utility functions that can be used across various DappNode projects. This toolkit aims to simplify development by providing reusable code and a consistent set of interfaces and types. The package includes modules for ACL, APM, Apps, EVMScript, Params, Registry, and Types, each with their own set of submodules and functionalities. The toolkit is designed to be extensible, allowing for the easy addition of new modules as needed. Additionally, the toolkit includes comprehensive testing functionality and documentation to ensure the quality and usability of the code.",
   "main": "dist/index.js",
   "scripts": {
@@ -42,7 +42,7 @@
     "typechain": "^8.3.2"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.0",
+    "@dappnode/types": "^0.1.34",
     "@ipld/car": "^5.1.1",
     "esm": "^3.2.25",
     "ethers": "^6.9.0",
