@@ -3,6 +3,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { initializeDb } from "./initializeDb.js";
 import {
   checkDockerNetwork,
+  recreateDappnode,
   copyHostScripts,
   copyHostServices,
   copyHostTimers
@@ -107,6 +108,10 @@ Promise.all([
   // start check-docker-network service with timer
   checkDockerNetwork().catch(e =>
     logs.error("Error starting service docker network checker", e)
+  );
+  // start recreate-dappnode service with timer
+  recreateDappnode().catch(e =>
+    logs.error("Error starting service recreate dappnode", e)
   );
 });
 
