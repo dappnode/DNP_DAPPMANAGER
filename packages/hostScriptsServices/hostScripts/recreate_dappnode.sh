@@ -24,9 +24,9 @@ mkdir -p "$LOG_DIR"
 # dappmanager docker compose file does not exist, then install DAppNode
 if [ ! -f "$DAPPMANAGER_DNCORE_FILE" ]; then
     echo "File $DAPPMANAGER_DNCORE_FILE does not exist. Installing DAppNode." | tee "$RECREATE_DAPPNODE_LOG_FILE"
-    wget -O - https://installer.dappnode.io | sudo UPDATE=true bash 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE" 
-    return
-fi 
+    wget -O - https://installer.dappnode.io | sudo UPDATE=true bash 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
+    exit 0
+fi
 
 # dappmanager docker container does not exist, then run docker compose up to dappmanager file
 if [ ! "$(docker ps -aq -f name="$DAPPMANAGER_CONTAINER_NAME")" ]; then
@@ -37,7 +37,7 @@ if [ ! "$(docker ps -aq -f name="$DAPPMANAGER_CONTAINER_NAME")" ]; then
         echo "Error while docker compose up $DAPPMANAGER_DNCORE_FILE. Recreating dappnode to latest version." | tee "$RECREATE_DAPPNODE_LOG_FILE"
         wget -O - https://installer.dappnode.io | sudo UPDATE=true bash 2>&1 | tee "$RECREATE_DAPPNODE_LOG_FILE"
     fi
-    return
+    exit 0
 fi
 
 # Check the status of the container
@@ -82,5 +82,5 @@ elif [ "$STATUS" == "created" ] || [ "$STATUS" == "exited" ] || [ "$STATUS" == "
     fi
 else
     # do nothing
-    return
+    exit 0
 fi
