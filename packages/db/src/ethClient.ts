@@ -1,5 +1,6 @@
 import { dbCache, dbMain } from "./dbFactory.js";
 import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
 import {
   EthClientRemote,
   EthClientFallback,
