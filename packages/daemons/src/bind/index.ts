@@ -26,6 +26,7 @@ export function startBindDaemon(signal: AbortSignal): void {
   runAtMostEvery(
     async () => ensureBindNetworkConfig(),
     params.BIND_DAEMON_INTERVAL,
-    signal
+    signal,
+    1000 * 10 // initial delay
   );
 }
