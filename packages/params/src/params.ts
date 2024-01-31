@@ -145,7 +145,7 @@ export const params = {
   CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
   NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
   ETHICAL_METRICS_DAEMON_INTERVAL: 50 * MINUTE,
-  BIND_DAEMON_INTERVAL: 30 * MINUTE,
+  BIND_DAEMON_INTERVAL: 10 * MINUTE, // TODO: after public ip range migration put a higher value
 
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
