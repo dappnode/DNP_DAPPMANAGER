@@ -129,15 +129,14 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  await addDappnodePeerToLocalIpfsNode().catch(
-    (e: { message: any; stack: any }) =>
-      migrationErrors.push({
-        migration: "add Dappnode peer to local IPFS node",
-        coreVersion: "0.2.88",
-        name: "MIGRATION_ERROR",
-        message: e.message,
-        stack: e.stack,
-      })
+  await addDappnodePeerToLocalIpfsNode().catch((e) =>
+    migrationErrors.push({
+      migration: "add Dappnode peer to local IPFS node",
+      coreVersion: "0.2.88",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
   );
 
   if (migrationErrors.length > 0) throw migrationErrors;

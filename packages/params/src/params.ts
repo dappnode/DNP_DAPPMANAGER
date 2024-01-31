@@ -118,12 +118,12 @@ export const params = {
   WIREGUARD_DEVICES_ENVNAME: "PEERS",
 
   // Docker network parameters
-  DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
+  DOCKER_NETWORK_SUBNET: "10.20.0.0/24",
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_LEGACY_DNS: "172.33.1.2",
-  BIND_IP: "172.33.1.2", // "10.20.0.2"
-  DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
+  BIND_IP: "10.20.0.2",
+  DAPPMANAGER_IP: "10.20.0.7",
 
   // Docker compose parameters
   // Use of new compose file feature: network name
@@ -145,7 +145,7 @@ export const params = {
   CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
   NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
   ETHICAL_METRICS_DAEMON_INTERVAL: 50 * MINUTE,
-  BIND_DAEMON_INTERVAL: 30 * MINUTE,
+  BIND_DAEMON_INTERVAL: 10 * MINUTE, // TODO: after public ip range migration put a higher value
 
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
@@ -335,6 +335,18 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
     },
   ],
 };

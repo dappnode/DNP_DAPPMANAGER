@@ -68,8 +68,10 @@ interface MemoizeDebouncedFunction<F extends AnyFunction>
 export async function runAtMostEvery(
   fn: () => Promise<void>,
   intervalMs: number,
-  signal: AbortSignal
+  signal: AbortSignal,
+  initialDelayMs?: number
 ): Promise<void> {
+  if (initialDelayMs) await sleep(initialDelayMs, signal);
   runAtMostEveryIntervals(fn, [intervalMs], signal);
 }
 
