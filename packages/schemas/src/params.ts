@@ -26,6 +26,5 @@ export const dockerParams = {
     "ipfs.dappnode",
     "bind.dappnode",
   ],
-  DNS_SERVICE: "172.33.1.2",
   MINIMUM_COMPOSE_FILE_VERSION: "3.4",
 };
