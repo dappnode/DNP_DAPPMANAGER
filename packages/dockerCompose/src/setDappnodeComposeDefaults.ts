@@ -1,16 +1,16 @@
 import { mapValues, toPairs, sortBy, fromPairs, pick } from "lodash-es";
 import {
-  getContainerName,
   getPrivateNetworkAliases,
   getIsCore,
   parseEnvironment,
-  getImageTag,
   getIsMonoService,
 } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { cleanCompose } from "./clean.js";
 import { parseServiceNetworks } from "./networks.js";
 import {
+  getContainerName,
+  getImageTag,
   Compose,
   ComposeNetworks,
   ComposeService,

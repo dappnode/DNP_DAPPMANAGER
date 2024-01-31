@@ -1,8 +1,6 @@
 export { applyRecursivelyToStringValues } from "./applyRecursivelyToStringValues.js";
 export { JsonFileDb } from "./jsonFileDb.js";
 export { PlainTextFileDb } from "./plainTextFileDb.js";
-export { getContainerName } from "./getContainerName.js";
-export { getContainerDomain } from "./getContainerDomain.js";
 export { validatePath } from "./validatePath.js";
 export { isNotFoundError } from "./isNotFoundError.js";
 export { yamlParse, yamlDump } from "./yaml.js";
@@ -28,7 +26,6 @@ export {
 } from "./environment.js";
 export { writeEnvFile, createGlobalEnvsEnvFile } from "./globalEnvs.js";
 export { getManifestPath } from "./getManifestPath.js";
-export { getImageTag } from "./getImageTag.js";
 export { getImagePath } from "./getImagePath.js";
 export { getIsMonoService } from "./getIsMonoService.js";
 export { getEnvFilePath } from "./getEnvFilePath.js";

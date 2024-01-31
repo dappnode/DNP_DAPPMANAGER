@@ -1,4 +1,3 @@
-import { params } from "@dappnode/params";
 import { getContainerDomain } from "./getContainerDomain.js";
 
 /**
@@ -19,6 +18,6 @@ export const getContainerName = ({
 }): string =>
   // Note: _PREFIX variables already end with the character "-"
   [
-    isCore ? params.CONTAINER_CORE_NAME_PREFIX : params.CONTAINER_NAME_PREFIX,
+    isCore ? "DAppNodeCore-" : "DAppNodePackage-",
     getContainerDomain({ dnpName, serviceName }),
   ].join("");

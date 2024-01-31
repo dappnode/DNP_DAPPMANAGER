@@ -18,7 +18,7 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.0",
+    "@dappnode/types": "^0.1.34",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
