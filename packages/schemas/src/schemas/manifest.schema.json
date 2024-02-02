@@ -136,6 +136,26 @@
         }
       }
     },
+    "optionalDependencies": {
+      "type": "object",
+      "description": "DAppNode Package optional dependencies, this means that if installed in dappnode, they will be updated to defined version. Must be an object where the keys are the DAppNode Package's ENS. The values must be a semantic range, i.e. `'0.2.0'`, `'^0.2.1'`, `'*'`, `'latest'`, `'/ipfs/QmWwMb3XhuCH6JnCF6m6EQzA4mW9pHHtg7rqAfhDr2ofi8'`.",
+      "examples": [
+        {
+          "bitcoin.dnp.dappnode.eth": "^0.1.2",
+          "swarm.dnp.dappnode.eth": "latest"
+        },
+        {
+          "only-for-dev-1.dappnode.eth": "/ipfs/QmYjtig7VJQ6XsnUjqqJvj7QaMcCAwtrgNdahSiFofrE7o",
+          "only-for-dev-2.dappnode.eth": "/ipfs/zdj7WWeQ43G6JJvLWQWZpyHuAMq6uYWRjkBXFad11vE2LHhQ7"
+        }
+      ],
+      "patternProperties": {
+        "^(.*)$": {
+          "type": "string",
+          "description": "Semantic version range or IPFS / BZZ hash."
+        }
+      }
+    },
     "requirements": {
       "type": "object",
       "description": "Specify requirements to be met before allowing users to install this DAppNode Package.",
