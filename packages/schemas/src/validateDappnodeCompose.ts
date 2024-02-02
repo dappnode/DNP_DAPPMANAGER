@@ -108,9 +108,11 @@ function validateComposeService(
   const { dns, pid, privileged, network_mode, volumes } =
     compose.services[serviceName];
 
-  // Check that dns is not defined, it must be used native docker networks
-  if (!isCore && dns)
-    err(`service ${serviceName} has DNS ${dns} but is not allowed`);
+  // Check that if defined, the DNS must be the one provided from the bind package
+  if (!isCore && dns && !dockerParams.DNS_SERVICE.includes(dns))
+    err(
+      `service ${serviceName} has DNS different than ${dockerParams.DNS_SERVICE}`
+    );
 
   // Check compose pid feature can only be used with the format service:*. The pid:host is dangerous
   if (pid && !pid.startsWith("service:"))
