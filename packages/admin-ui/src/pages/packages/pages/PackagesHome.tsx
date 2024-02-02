@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useParams } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import { title, subPaths } from "../data";
 // Components
@@ -55,8 +55,20 @@ export function PackagesHome() {
             path={route.subPath}
             element={
               <Routes>
-                <Route index element={<route.component />} />
-                <Route path=":id/*" element={<PackageById />} />
+                <Route
+                  index
+                  element={
+                    // Dynamically extract 'id' from the URL and pass it down
+                    <route.component />
+                  }
+                />
+                <Route
+                  path=":id/*"
+                  element={(props) => {
+                    const { id } = useParams();
+                    return <PackageById id={id || ''} {...props} />;
+                  }}
+                />
               </Routes>
             }
           />

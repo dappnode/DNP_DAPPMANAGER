@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Routes, Route, NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
@@ -18,14 +18,34 @@ import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
+import { responseInterface } from "swr";
+import { ResolvedType } from "@dappnode/types";
 
-export const PackageById: React.FC = () => {
+interface PackageByIdProps {
+  id: string;
+}
+export const PackageById: React.FC<PackageByIdProps> = ({ id }) => {
   const params = useParams();
-  const id = params.id || "";
+  // const id = params.id || "";
 
-  const dnpRequest = useApi.packageGet({ dnpName: id });
+  // const dnpRequest = useApi.packageGet({ dnpName: id });
+  const dnpRequest = useMemo(() => useApi.packageGet({ dnpName: id }), [id]);
+
+  // const [dnpRequest, setDnpRequest] = useState<responseInterface<ResolvedType<any>, Error> | null>(null);
+
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     const response = useApi.packageGet({ dnpName: id });
+  //     setDnpRequest(response); // Now correctly typed
+  //   };
+
+  //   fetchData();
+  // }, [id]);
+
   const dnp = dnpRequest.data;
-
+  useEffect(() => {
+    console.log("rerendering package by id");
+  }, []);
   if (!dnp) {
     return (
       <>

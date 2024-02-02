@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 // Components
 import Card from "components/Card";
@@ -18,7 +18,7 @@ export const FileManager = ({
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
-  const container = containers.find(c => c.serviceName === serviceName);
+  const container = useMemo(() => containers.find(c => c.serviceName === serviceName), [serviceName, containers]);
 
   return (
     <>
