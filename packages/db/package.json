@@ -19,7 +19,7 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.34",
+    "@dappnode/types": "^0.1.35",
     "@dappnode/dockerapi": "^0.1.0",
     "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/eventbus": "^0.1.0",

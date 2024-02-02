@@ -43,6 +43,7 @@ export interface Manifest {
   /** "15min" | 3600 */
   dockerTimeout?: string;
   dependencies?: Dependencies;
+  optionalDependencies?: Dependencies;
   requirements?: {
     minimumDappnodeVersion: string;
   };
