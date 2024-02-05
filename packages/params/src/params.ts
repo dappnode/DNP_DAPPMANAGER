@@ -348,6 +348,12 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
     },
+    {
+      name: "HOPR Team",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
+    },
   ],
 };
 
