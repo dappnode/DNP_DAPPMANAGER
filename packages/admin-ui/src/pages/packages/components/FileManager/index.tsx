@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useLocation } from "react-router-dom";
 // Components
 import Card from "components/Card";
@@ -7,6 +7,7 @@ import { CopyFileFrom } from "./From";
 import { PackageContainer } from "@dappnode/types";
 import { ServiceSelector } from "../ServiceSelector";
 import SubTitle from "components/SubTitle";
+import { use } from "chai";
 
 export const FileManager = ({
   containers
@@ -18,8 +19,13 @@ export const FileManager = ({
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
-  const container = containers.find(c => c.serviceName === serviceName);
+  const container = useMemo(() => containers.find(c => c.serviceName === serviceName), [serviceName, containers]);
 
+  useEffect(() => {
+    console.log("rerendering filemanager, maybe containers changed", containers)
+  }
+  , [container]);
+  
   return (
     <>
       {containers.length > 1 && (

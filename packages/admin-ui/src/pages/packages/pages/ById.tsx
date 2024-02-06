@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { Routes, Route, NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
@@ -22,9 +22,27 @@ import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAva
 export const PackageById: React.FC = () => {
   const params = useParams();
   const id = params.id || "";
+  // const [dnpRequest, setDnpRequest] = useState<responseInterface<InstalledPackageDetailData, any>>();
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
-  const dnp = dnpRequest.data;
+  // const dnp = dnpRequest.data;
+
+  // this memo doesnt work because dnpRequest seems to change every time this component is rendered.
+  // useApi.packageGet seems to be async
+  const dnp = useMemo(() => {
+    console.log("Memoizing dnp", dnpRequest.data);
+    return dnpRequest.data;
+  }, [id]);
+
+  useEffect(() => {
+    console.log("rerendering packagebyId", dnp)
+  }, [dnp]);
+
+  // const memoizedContainers = useMemo(() => {
+  //   console.log("dnp?.containers changed")
+  //   // Only derive containers from dnp if dnp is not null/undefined
+  //   return dnp ? dnp.containers : [];
+  // }, [dnp?.containers]);
 
   if (!dnp) {
     return (
@@ -54,6 +72,7 @@ export const PackageById: React.FC = () => {
     containers,
     updateAvailable
   } = dnp;
+
 
   /**
    * Construct all subroutes to iterate them both in:
