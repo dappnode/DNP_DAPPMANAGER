@@ -33,7 +33,7 @@ export class DappGetFetcher {
       }
     }
 
-    return manifest.dependencies || {};
+    return dependencies;
   }
 
   /**
