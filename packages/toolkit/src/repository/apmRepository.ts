@@ -1,6 +1,5 @@
 import { ethers } from "ethers";
 import { valid, parse, validRange } from "semver";
-import { Repo__factory, Repo } from "../typechain/index.js";
 import {
   ApmRepoVersionReturn,
   ApmVersionRawAndOrigin,
@@ -45,7 +44,7 @@ export class ApmRepository {
    * @param dnpName - The name of the DNP to resolve.
    * @returns - A promise that resolves to the Repo instance.
    */
-  public async getRepoContract(dnpName: string): Promise<Repo> {
+  public async getRepoContract(dnpName: string): Promise<ethers.Contract> {
     const contractAddress = await this.ethProvider.resolveName(
       this.ensureValidDnpName(dnpName)
     );
@@ -53,7 +52,11 @@ export class ApmRepository {
     // This error should include "NOREPO" in order to handle it properly in SDK publish code
     if (!contractAddress)
       throw new Error(`Could not resolve name ${dnpName}: NOREPO`);
-    return Repo__factory.connect(contractAddress, this.ethProvider);
+    return new ethers.Contract(
+      contractAddress,
+      repositoryAbi,
+      this.ethProvider
+    );
   }
 
   /**
@@ -89,7 +92,7 @@ export class ApmRepository {
           : await repoContract.getLatest();
 
       return this.parseApmVersionReturn({
-        semanticVersion: res[0].map((v) => parseInt(v.toString())),
+        semanticVersion: res[0].map((v: any) => parseInt(v.toString())),
         contractAddress: res[1],
         contentURI: res[2],
       });

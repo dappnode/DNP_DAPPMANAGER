@@ -27,7 +27,6 @@
   ],
   "license": "ISC",
   "devDependencies": {
-    "@typechain/ethers-v6": "^0.5.1",
     "@types/node": "^20.1.1",
     "@types/semver": "^7.3.13",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
@@ -38,14 +37,13 @@
     "rimraf": "^5.0.0",
     "truffle": "^5.9.0",
     "ts-loader": "^9.4.2",
-    "tsconfig-paths": "^4.2.0",
-    "typechain": "^8.3.2"
+    "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
     "@dappnode/types": "^0.1.35",
     "@ipld/car": "^5.1.1",
     "esm": "^3.2.25",
-    "ethers": "^6.9.0",
+    "ethers": "^6.10.0",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
     "ipfs-unixfs-exporter": "^13.1.5",

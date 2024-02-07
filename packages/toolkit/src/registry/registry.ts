@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { APMRegistry, APMRegistry__factory } from "../typechain/index.js";
 import { DNPRegistryEntry, PublicRegistryEntry, Registry } from "./types.js";
 import { request, gql } from "graphql-request";
 import {
@@ -7,6 +6,7 @@ import {
   dnpRegistryGraphEndpoint,
   registryPublicAddress,
   publicRegistryGraphEndpoint,
+  registryAbi,
 } from "./params.js";
 
 // TODO: Consider adding scanning functions for events
@@ -19,7 +19,7 @@ export class DappNodeRegistry {
   private registry: Registry;
   private graphEndpoint: string;
   private nameSuffix: string;
-  private registryContract: APMRegistry;
+  private registryContract: ethers.Contract;
 
   /**
    * Class constructor
@@ -36,8 +36,9 @@ export class DappNodeRegistry {
       this.graphEndpoint = publicRegistryGraphEndpoint;
     }
 
-    this.registryContract = APMRegistry__factory.connect(
+    this.registryContract = new ethers.Contract(
       this.contractAddress,
+      registryAbi,
       new ethers.JsonRpcProvider(ethUrl, "mainnet", { staticNetwork: true })
     );
 

@@ -1,25 +1,23 @@
 import { ethers } from "ethers";
-import {
-  DAppNodePackageDirectory,
-  DAppNodePackageDirectory__factory,
-} from "../typechain/index.js";
 import { DirectoryDnp, directoryDnpStatus } from "./types.js";
 import { directoryAddress } from "./params.js";
 import { isEnsDomain } from "../isEnsDomain.js";
+import { directoryAbi } from "./params.js";
 
 /**
  * DappNodeDirectory is a class to interact with the DAppNode Directory Contract.
  */
 export class DappNodeDirectory {
-  private directoryContract: DAppNodePackageDirectory;
+  private directoryContract: ethers.Contract;
 
   /**
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
   constructor(ethUrl: string) {
-    this.directoryContract = DAppNodePackageDirectory__factory.connect(
+    this.directoryContract = new ethers.Contract(
       directoryAddress,
+      directoryAbi,
       new ethers.JsonRpcProvider(ethUrl, "mainnet", { staticNetwork: true })
     );
   }
