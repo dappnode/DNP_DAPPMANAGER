@@ -84,6 +84,7 @@ export const consensusClientsGnosis = Object.freeze([
 export type ExecutionClientGnosis = (typeof executionClientsGnosis)[number];
 export const executionClientsGnosis = Object.freeze([
   "nethermind-xdai.dnp.dappnode.eth",
+  "erigon-gnosis.dnp.dappnode.eth",
 ] as const);
 export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
 export const signerGnosis: SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";

@@ -145,7 +145,7 @@ export const params = {
   CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
   NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
   ETHICAL_METRICS_DAEMON_INTERVAL: 50 * MINUTE,
-  BIND_DAEMON_INTERVAL: 30 * MINUTE,
+  BIND_DAEMON_INTERVAL: 10 * MINUTE, // TODO: after public ip range migration put a higher value
 
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
@@ -335,6 +335,24 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+    },
+    {
+      name: "HOPR Team",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
     },
   ],
 };

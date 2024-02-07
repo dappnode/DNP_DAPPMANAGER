@@ -62,7 +62,8 @@ export async function ensureBindContainerIpAndRunning(): Promise<void> {
             .NetworkSettings.Networks[params.DOCKER_PRIVATE_NETWORK_NAME]
             .IPAddress === params.BIND_IP;
         if (hasRightIp) {
-          logs.info(`${params.bindContainerName} container has right IP`);
+          // logs.info(`${params.bindContainerName} container has right IP`);
+          return;
         } else {
           logs.info(`${params.bindContainerName} container has wrong IP`);
           await disconnectConflictingContainerAndStartBind();

@@ -6,8 +6,6 @@ import {
   IpfsClientTarget,
   PackageRelease,
   ManifestWithImage,
-} from "@dappnode/types";
-import {
   Compose,
   Manifest,
   PackageRequest,
