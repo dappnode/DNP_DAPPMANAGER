@@ -1,5 +1,5 @@
 import React from "react";
-import { api, useApi } from "api";
+import { useApi } from "api";
 import { AppContext } from "App";
 import Card from "components/Card";
 import ErrorView from "components/ErrorView";
@@ -7,161 +7,76 @@ import Loading from "components/Loading";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import SubTitle from "components/SubTitle";
-import ExecutionClient from "./columns/ExecutionClient";
-import LegacyGeth from "./columns/LegacyGeth";
-import OptimismNode from "./columns/OptimismNode";
-import { useOptimismConfig } from "./useOptimismConfig";
+import { useZkEvmConfig } from "./useZkEvmConfig";
 import "./columns.scss";
-import { Alert, Button, Form } from "react-bootstrap";
-import Input from "components/Input";
-import { confirm } from "components/ConfirmDialog";
-import { disclaimer } from "../data";
-import { withToast } from "components/toast/Toast";
+import { Alert, Button } from "react-bootstrap";
 import ZkevmCommunity from "./ZKevmCommunity";
+import ZkEvm from "./columns/ZkEvm";
+import { responseInterface } from "swr";
+
+type ZkEvmItem = {
+  id: number;
+  name: string;
+};
+
+type ZkEvmConfigGetResponse = responseInterface<ZkEvmItem[], Error>;
+
+const zkEvmConfigGet = (): ZkEvmConfigGetResponse => {
+  // For now, return an empty response to resolve the TypeScript error
+  return {
+    data: [],
+    revalidate: async () => true,
+    mutate: async () => [],
+    isValidating: false
+  };
+};
 
 export default function Zkevm({ description }: { description: string }) {
   const { theme } = React.useContext(AppContext);
-
-  const currentOptimismConfigReq = useApi.optimismConfigGet();
+  const currentZkEvmConfigReq = zkEvmConfigGet();
 
   // hooks
-  const {
-    reqStatus,
-    setReqStatus,
-    ethRpcUrlError,
-    newExecClient,
-    setNewExecClient,
-    customMainnetRpcUrl,
-    setCustomMainnetRpcUrl,
-    newRollup,
-    setNewRollup,
-    newArchive,
-    setNewArchive,
-    changes
-  } = useOptimismConfig(currentOptimismConfigReq);
+  const { reqStatus, isZkEvmInstalled, setReqStatus } = useZkEvmConfig(
+    currentZkEvmConfigReq
+  );
 
   /**
-   * Set new Optimism config
+   * Set new zkEVM config
    */
-  async function setNewOptimismConfig() {
+  async function setNewZkEvmConfig() {
     try {
-      if (changes) {
-        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-          confirm({
-            title: `Optimism configuration`,
-            text:
-              "Are you sure you want to implement this Optimism configuration?",
-            buttons: [
-              {
-                label: "Continue",
-                onClick: () => resolve(true)
-              }
-            ]
-          });
-        });
-        await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
-          confirm({
-            title: `Disclaimer`,
-            text: disclaimer,
-            buttons: [
-              {
-                label: "Continue",
-                onClick: () => resolve(true)
-              }
-            ]
-          });
-        });
-
-        setReqStatus({ loading: true });
-        await withToast(
-          () =>
-            api.optimismConfigSet({
-              archive: newArchive,
-              rollup: newRollup
-                ? {
-                    ...newRollup,
-                    mainnetRpcUrl: customMainnetRpcUrl
-                      ? customMainnetRpcUrl
-                      : newRollup?.mainnetRpcUrl
-                  }
-                : undefined,
-              executionClient: newExecClient
-            }),
-          {
-            message: `Setting new Optimism configuration...`,
-            onSuccess: `Successfully set new Optimism configuration`,
-            onError: `Error setting new Optimism configuration`
-          }
-        );
-        setReqStatus({ result: true });
-      }
+      // logic for setting the zkEVM configuration here
     } catch (e) {
       setReqStatus({ error: e });
     } finally {
-      setReqStatus({ loading: true });
-      await withToast(() => currentOptimismConfigReq.revalidate(), {
-        message: `Getting new Optimism staker configuration`,
-        onSuccess: `Successfully loaded Optimism staker configuration`,
-        onError: `Error new loading Optimism staker configuration`
-      });
-      setReqStatus({ loading: false });
+      // logic for updating the zkEVM configuration here
     }
+  }
+
+  function setNewZkEvmItem(value: any): void {
+    throw new Error("Function not implemented.");
   }
 
   return (
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
+      {/* Render the ZkEvmCommunity component */}
       <ZkevmCommunity />
-      {currentOptimismConfigReq.data ? (
+      {currentZkEvmConfigReq.data ? (
         <Card>
-          <p>
-            The zkEVM is a zero-knowledge powered scalability solution. You can
-            use your dappnode to run self-sovereign tools to empower yourself.
-            Currently, you can deploy your own UI to Force Transactions in the
-            zkEVM without needing the sequencer, making you uncensorable. Most
-            of the times you won't need this, as it needs ETH in L1 to pay for
-            it, but if something were to happen to the zkEVM, you would be able
-            to withdraw your funds.
-            <br />
-            <br />
-            (1) <b>Choose</b> an <b>Execution Client</b> <br />
-            (2) <b>Select</b> the <b>zkEVM Node</b> <br />
-            (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you
-            are already running an Ethereum mainnet node on this Dappnode)
-            <br />
-            (4) [Optional] <b>Select Legacy Geth</b> to enable historical
-            transactions
-          </p>
-          <br />
-
+          {/* Render the description */}
           <p>{description}</p>
-
-          <>
-            <Input
-              value={customMainnetRpcUrl || ""}
-              onValueChange={(value: string) => setCustomMainnetRpcUrl(value)}
-              isInvalid={Boolean(ethRpcUrlError)}
-              prepend="Ethereum RPC URL"
-              placeholder="Ethereum mainnet RPC URL for zkEVM node"
-            />
-            {customMainnetRpcUrl && ethRpcUrlError && (
-              <Form.Text className="text-danger" as="span">
-                {ethRpcUrlError}
-              </Form.Text>
-            )}
-          </>
 
           <Row className="staker-network">
             <Col>
               <SubTitle>zkEVM Modules</SubTitle>
-              {currentOptimismConfigReq.data.executionClients.map(
-                (executionClient, i) => (
-                  <ExecutionClient
+              {/* Map over the zkEVM items */}
+              {currentZkEvmConfigReq.data.map(
+                (zkEvmItem: ZkEvmItem, i: number) => (
+                  <ZkEvm
                     key={i}
-                    executionClient={executionClient}
-                    setNewExecClient={setNewExecClient}
-                    isSelected={
-                      executionClient.dnpName === newExecClient?.dnpName
-                    }
+                    zkEvmItem={zkEvmItem}
+                    setNewZkEvmItem={setNewZkEvmItem}
+                    isSelected={false} // need to implement isSelected logic
                   />
                 )
               )}
@@ -176,33 +91,36 @@ export default function Zkevm({ description }: { description: string }) {
 
           <div>
             <div className="staker-buttons">
+              {/* Button to apply changes */}
               <Button
                 variant="dappnode"
-                disabled={!changes.isAllowed || reqStatus.loading}
-                onClick={() => setNewOptimismConfig()}
+                disabled={!isZkEvmInstalled || reqStatus.loading}
+                onClick={() => setNewZkEvmConfig()}
               >
                 Apply changes
               </Button>
             </div>
 
-            {!changes.isAllowed && changes.reason && (
+            {/* Render alert if changes are not allowed */}
+            {!isZkEvmInstalled && (
               <>
                 <br />
                 <br />
-                <Alert variant={changes.severity}>
-                  Cannot apply changes: <b>{changes.reason}</b>
+                <Alert variant="danger">
+                  Cannot apply changes: zkEVM is not installed
                 </Alert>
               </>
             )}
 
+            {/* Render error view if there's an error */}
             {reqStatus.error && (
               <ErrorView error={reqStatus.error} hideIcon red />
             )}
           </div>
         </Card>
-      ) : currentOptimismConfigReq.error ? (
-        <ErrorView error={currentOptimismConfigReq.error} hideIcon red />
-      ) : currentOptimismConfigReq.isValidating ? (
+      ) : currentZkEvmConfigReq.error ? (
+        <ErrorView error={currentZkEvmConfigReq.error} hideIcon red />
+      ) : currentZkEvmConfigReq.isValidating ? (
         <Loading steps={[`Loading zkEVM configuration`]} />
       ) : (
         <ErrorView error={"No data found"} hideIcon red />
