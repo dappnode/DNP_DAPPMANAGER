@@ -183,4 +183,4 @@ export const repositoryAbi: Abi = [
     name: "NewVersion",
     type: "event",
   },
-];
+] as const;
