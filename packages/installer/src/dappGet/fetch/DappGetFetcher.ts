@@ -1,10 +1,12 @@
 import { Dependencies } from "@dappnode/types";
 import { validRange, satisfies, valid } from "semver";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class DappGetFetcher {
   /**
    * Fetches the dependencies of a given DNP name and version
+   * Injects the optional dependencies if the package is installed
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
@@ -14,7 +16,24 @@ export class DappGetFetcher {
     version: string
   ): Promise<Dependencies> {
     const manifest = await dappnodeInstaller.getManifestFromDir(name, version);
-    return manifest.dependencies || {};
+    const dependencies = manifest.dependencies || {};
+
+    const optionalDependencies = manifest.optionalDependencies;
+    if (optionalDependencies) {
+      // Iterate over optional dependencies and inject them if installed
+      for (const [
+        optionalDependencyName,
+        optionalDependencyVersion,
+      ] of Object.entries(optionalDependencies)) {
+        const optionalDependency = await listPackageNoThrow({
+          dnpName: optionalDependencyName,
+        });
+        if (!optionalDependency) continue;
+        dependencies[optionalDependencyName] = optionalDependencyVersion;
+      }
+    }
+
+    return dependencies;
   }
 
   /**

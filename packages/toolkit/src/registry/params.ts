@@ -188,4 +188,4 @@ export const registryAbi: Abi = [
     name: "NewAppProxy",
     type: "event",
   },
-];
+] as const;
