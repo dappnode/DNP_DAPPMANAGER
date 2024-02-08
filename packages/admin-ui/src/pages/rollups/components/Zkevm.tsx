@@ -13,18 +13,14 @@ import { Alert, Button } from "react-bootstrap";
 import ZkevmCommunity from "./ZKevmCommunity";
 import ZkEvm from "./columns/ZkEvm";
 import { responseInterface } from "swr";
+import { ZKEVMItem } from "@dappnode/common";
 
-type ZkEvmItem = {
-  id: number;
-  name: string;
-};
-
-type ZkEvmConfigGetResponse = responseInterface<ZkEvmItem[], Error>;
+type ZkEvmConfigGetResponse = responseInterface<ZKEVMItem<"rollup">[], Error>;
 
 const zkEvmConfigGet = (): ZkEvmConfigGetResponse => {
   // For now, return an empty response to resolve the TypeScript error
   return {
-    data: [],
+    data: [], // Change the type here to match ZKEVMItem<"rollup">[]
     revalidate: async () => true,
     mutate: async () => [],
     isValidating: false
@@ -71,7 +67,7 @@ export default function Zkevm({ description }: { description: string }) {
               <SubTitle>zkEVM Modules</SubTitle>
               {/* Map over the zkEVM items */}
               {currentZkEvmConfigReq.data.map(
-                (zkEvmItem: ZkEvmItem, i: number) => (
+                (zkEvmItem: ZKEVMItem<"rollup">, i: number) => (
                   <ZkEvm
                     key={i}
                     zkEvmItem={zkEvmItem}

@@ -1,5 +1,5 @@
 import React from "react";
-import { ZkEvmItem } from "@dappnode/common";
+import { ZKEVMItem } from "@dappnode/common";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -10,13 +10,13 @@ import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 
 const ZkEvm = ({
-  zkEvmItem,
-  setNewZkEvmItem,
+  zkEvmItem, // Rename ZKEVMItem to zkEvmItem
+  setNewZkEvmItem, // Rename setNewZKEVMItem to setNewZkEvmItem
   isSelected,
   ...props
 }: {
-  zkEvmItem: ZkEvmItem;
-  setNewZkEvmItem: React.Dispatch<React.SetStateAction<ZkEvmItem | undefined>>;
+  zkEvmItem: ZKEVMItem<"rollup">; // Specify the type argument "rollup"
+  setNewZkEvmItem: React.Dispatch<React.SetStateAction<ZKEVMItem<"rollup"> | undefined>>; // Specify the type argument "rollup"
   isSelected: boolean;
 }) => {
   const navigate = useNavigate();
