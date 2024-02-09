@@ -26,15 +26,27 @@ const StatsCardContainer: React.FunctionComponent<{
   );
 };
 
-function StatsCardOk({ percent, text }: { percent: number; text?: string }) {
-  const value = Math.round(percent);
+function StatsCardOk({
+  percent,
+  label,
+  text,
+  max
+}: {
+  percent: number;
+  label: "%" | "ºC";
+  text?: string;
+  max?: number;
+}) {
+  let value: number;
+  if (label === "%") value = Math.round(percent);
+  else value = percent;
 
   return (
     <>
       <ProgressBar
         variant={parseVariant(value)}
         now={value}
-        label={value + "%"}
+        label={value + label}
       />
       {text ? <div className="text">{text}</div> : null}
     </>
@@ -53,6 +65,7 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
+  const swapStats = useApi.statsSwapGet();
   const hostUptime = useApi.getHostUptime();
 
   useEffect(() => {
@@ -77,9 +90,27 @@ export function HostStats() {
 
   return (
     <div className="dashboard-cards">
-      <StatsCardContainer title={"cpu"}>
+      <StatsCardContainer title={"cpu usage"}>
         {cpuStats.data ? (
-          <StatsCardOk percent={cpuStats.data.usedPercentage} />
+          <StatsCardOk
+            percent={cpuStats.data.usedPercentage}
+            label={"%"}
+            text={`Numbe of cores ${cpuStats.data.numberOfCores}`}
+          />
+        ) : cpuStats.error ? (
+          <StatsCardError error={cpuStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
+      <StatsCardContainer title={"cpu temperature"}>
+        {cpuStats.data?.temperatureAverage ? (
+          <StatsCardOk
+            percent={cpuStats.data.temperatureAverage}
+            text="Average temperature of the CPU cores"
+            label={"ºC"}
+          />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
         ) : (
@@ -91,6 +122,7 @@ export function HostStats() {
         {memoryStats.data ? (
           <StatsCardOk
             percent={memoryStats.data.usedPercentage}
+            label="%"
             text={
               humanFileSize(memoryStats.data.used) +
               " / " +
@@ -104,10 +136,29 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
+      <StatsCardContainer title={"swap"}>
+        {swapStats.data ? (
+          <StatsCardOk
+            percent={swapStats.data.usedPercentage}
+            label="%"
+            text={
+              humanFileSize(swapStats.data.used) +
+              " / " +
+              humanFileSize(swapStats.data.total)
+            }
+          />
+        ) : swapStats.error ? (
+          <StatsCardError error={swapStats.error} />
+        ) : (
+          <StatsCardLoading />
+        )}
+      </StatsCardContainer>
+
       <StatsCardContainer title={"disk"}>
         {diskStats.data ? (
           <StatsCardOk
             percent={diskStats.data.usedPercentage}
+            label="%"
             text={
               humanFileSize(diskStats.data.used) +
               " / " +
