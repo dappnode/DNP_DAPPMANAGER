@@ -80,6 +80,7 @@ export const consensusClientsGnosis = Object.freeze([
   "lighthouse-gnosis.dnp.dappnode.eth",
   "teku-gnosis.dnp.dappnode.eth",
   "lodestar-gnosis.dnp.dappnode.eth",
+  "nimbus-gnosis.dnp.dappnode.eth",
 ] as const);
 export type ExecutionClientGnosis = (typeof executionClientsGnosis)[number];
 export const executionClientsGnosis = Object.freeze([
