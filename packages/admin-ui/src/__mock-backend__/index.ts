@@ -229,7 +229,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         stack: "Some Error\nline 56 file.ts"
       }
     },
-    ethProvider: "http://geth.dappnode:8545",
+    ethRemoteRpc: "http://remoteNode.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
       //"repository",

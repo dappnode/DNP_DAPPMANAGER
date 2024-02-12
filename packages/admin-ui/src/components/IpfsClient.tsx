@@ -65,6 +65,7 @@ export function IpfsClient({
 
               {option === "remote" && (
                 <Input
+                  placeholder="https://gateway.ipfs.dappnode.io"
                   value={gatewayTarget || ""}
                   onValueChange={onGatewayTargetChange}
                 />

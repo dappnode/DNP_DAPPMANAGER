@@ -7,6 +7,7 @@ import { dappnodeInstaller } from "../index.js";
  */
 export async function ethClientTargetSet({
   target,
+  ethRemoteRpc,
   sync = false,
   useCheckpointSync = false,
   deletePrevExecClient = false,
@@ -15,6 +16,7 @@ export async function ethClientTargetSet({
   deletePrevConsClientVolumes = false
 }: {
   target: Eth2ClientTarget;
+  ethRemoteRpc: string;
   sync?: boolean;
   useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
@@ -24,14 +26,15 @@ export async function ethClientTargetSet({
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
 
-  await ethereumClient.changeEthClient(
+  await ethereumClient.changeEthClient({
     dappnodeInstaller,
-    target,
+    nextTarget: target,
     sync,
     useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
     deletePrevConsClient,
-    deletePrevConsClientVolumes
-  );
+    deletePrevConsClientVolumes,
+    ethRemoteRpc
+  });
 }

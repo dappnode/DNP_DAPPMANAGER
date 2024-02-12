@@ -20,6 +20,8 @@ export const getRebootIsRequired = (state: RootState) =>
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
 
 // Sub-sub local properties
+export const getEthRemoteRpc = (state: RootState) =>
+  (getSystemInfo(state) || {}).ethRemoteRpc;
 export const getEthClientTarget = (state: RootState) =>
   (getSystemInfo(state) || {}).eth2ClientTarget;
 export const getEthClientFallback = (state: RootState) =>
