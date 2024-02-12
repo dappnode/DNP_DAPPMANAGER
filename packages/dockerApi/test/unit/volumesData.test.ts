@@ -4,7 +4,7 @@ import {
   parseVolumeOwnershipData,
   normalizeProjectName,
 } from "../../src/index.js";
-import { PackageContainer, VolumeOwnershipData } from "@dappnode/common";
+import { PackageContainer, VolumeOwnershipData } from "@dappnode/types";
 
 describe("docker > volumes data", () => {
   describe("normalizeProjectName", () => {
@@ -39,8 +39,7 @@ describe("docker > volumes data", () => {
           ports: [],
           volumes: [
             {
-              host:
-                "/var/lib/docker/volumes/maindnpdappnodeeth_changeme-main/_data",
+              host: "/var/lib/docker/volumes/maindnpdappnodeeth_changeme-main/_data",
               container: "/temp",
               name: "maindnpdappnodeeth_changeme-main",
             },
@@ -50,8 +49,7 @@ describe("docker > volumes data", () => {
               name: "maindnpdappnodeeth_data",
             },
             {
-              host:
-                "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
+              host: "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
               container: "/usrdep",
               name: "dependencydnpdappnodeeth_data",
             },
@@ -81,13 +79,11 @@ describe("docker > volumes data", () => {
           ports: [],
           volumes: [
             {
-              host:
-                "/home/lion/Code/dappnode/DNP_DAPPMANAGER/packages/dappmanager/test_mountpoints/dnplifecycle-dep/testBind",
+              host: "/home/lion/Code/dappnode/DNP_DAPPMANAGER/packages/dappmanager/test_mountpoints/dnplifecycle-dep/testBind",
               container: "/temp",
             },
             {
-              host:
-                "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
+              host: "/var/lib/docker/volumes/dependencydnpdappnodeeth_data/_data",
               container: "/usr",
               name: "dependencydnpdappnodeeth_data",
             },

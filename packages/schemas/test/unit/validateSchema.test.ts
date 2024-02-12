@@ -7,7 +7,7 @@ import {
 import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
-import { Manifest, SetupWizard } from "@dappnode/common";
+import { Manifest, SetupWizard } from "@dappnode/types";
 
 describe("schemaValidation", () => {
   describe("manifest", () => {

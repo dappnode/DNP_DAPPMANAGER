@@ -3,7 +3,7 @@ import { urlJoin } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { packageSetEnvironment } from "./packageSetEnvironment.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { WireguardDeviceCredentials } from "@dappnode/common";
+import { WireguardDeviceCredentials } from "@dappnode/types";
 
 const {
   WIREGUARD_API_URL,

@@ -1,4 +1,4 @@
-import { PortMapping } from "@dappnode/common";
+import { PortMapping } from "@dappnode/types";
 
 /**
  * Utility to mark a port mapping as deletable in the admin UI
@@ -14,7 +14,7 @@ export function isPortMappingDeletable(
     // Assume if no defaultPorts they were empty, so all ports = deletable
     !Array.isArray(defaultPorts) ||
     !defaultPorts.find(
-      defaultPort =>
+      (defaultPort) =>
         defaultPort.container == port.container &&
         defaultPort.protocol == port.protocol
     )

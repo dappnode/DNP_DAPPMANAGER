@@ -3,7 +3,7 @@ import React from "react";
 import ConsensusClient from "../columns/ConsensusClient";
 import ExecutionClient from "../columns/ExecutionClient";
 import MevBoost from "../columns/MevBoost";
-import { StakerConfigGetOk, StakerItemOk, Network } from "@dappnode/common";
+import { StakerConfigGetOk, StakerItemOk, Network } from "@dappnode/types";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
 export const launchpadSteps = <T extends Network>({

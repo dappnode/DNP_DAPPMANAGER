@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { VolumeMapping } from "@dappnode/common";
+import { VolumeMapping } from "@dappnode/types";
 import {
   parseVolumeMappings,
   stringifyVolumeMappings,

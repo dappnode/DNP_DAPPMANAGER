@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { MountpointData } from "@dappnode/common";
+import { MountpointData } from "@dappnode/types";
 import { runScript } from "../runScripts.js";
 
 /**
@@ -49,7 +49,7 @@ export const detectMountpoints = memoize(
         total: parseInt(dataRaw.total),
         free: parseInt(dataRaw.free),
         vendor: dataRaw.vendor,
-        model: dataRaw.model
+        model: dataRaw.model,
       })
     );
 

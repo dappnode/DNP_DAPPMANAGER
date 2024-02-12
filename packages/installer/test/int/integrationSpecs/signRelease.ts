@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { sortBy } from "lodash-es";
 import { serializeIpfsDirectory } from "@dappnode/toolkit";
-import { ReleaseSignature } from "@dappnode/common";
+import { ReleaseSignature } from "@dappnode/types";
 import { dappnodeInstaller, ipfs } from "../../testUtils.js";
 import { CID } from "kubo-rpc-client";
 

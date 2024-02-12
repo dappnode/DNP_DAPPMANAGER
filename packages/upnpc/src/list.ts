@@ -1,5 +1,5 @@
 import upnpcCommand from "./upnpcCommand.js";
-import { PortProtocol, UpnpPortMapping } from "@dappnode/common";
+import { PortProtocol, UpnpPortMapping } from "@dappnode/types";
 import { parseUpnpErrors } from "./upnpError.js";
 
 /**
@@ -85,10 +85,10 @@ export function parseListOutput(terminalOutput: string): UpnpPortMapping[] {
       .split(/\r?\n/)
       // Filter by lines that have the table format above
       .filter(
-        line => line && typeof line === "string" && validLineRegex.test(line)
+        (line) => line && typeof line === "string" && validLineRegex.test(line)
       )
       // Parse the line to extract the protocol and port mapping
-      .map(line => {
+      .map((line) => {
         //  3 UDP 30303->192.168.1.42:30303 'DAppNode' '' 0
         const [, protocol, mapping] = line.trim().split(/\s+/);
         const exPort = mapping.split("->")[0];
@@ -97,7 +97,7 @@ export function parseListOutput(terminalOutput: string): UpnpPortMapping[] {
           protocol: protocol === "UDP" ? PortProtocol.UDP : PortProtocol.TCP,
           exPort,
           inPort,
-          ip
+          ip,
         };
       })
       // Make sure each result is correct, otherwise remove it

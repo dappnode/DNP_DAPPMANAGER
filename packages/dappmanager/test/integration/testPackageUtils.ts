@@ -1,6 +1,6 @@
 import "mocha";
 import * as calls from "../../src/calls/index.js";
-import { InstalledPackageData, ContainerState } from "@dappnode/common";
+import { InstalledPackageData, ContainerState } from "@dappnode/types";
 
 export async function getDnpFromListPackages(
   dnpName: string

@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { PackageContainer, PortProtocol } from "@dappnode/common";
+import { PackageContainer, PortProtocol } from "@dappnode/types";
 import {
   parseContainerInfo,
   parseDnpNameFromContainerName,

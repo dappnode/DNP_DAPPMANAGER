@@ -1,5 +1,6 @@
 import { dbCache, dbMain } from "./dbFactory.js";
 import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
 import {
   EthClientRemote,
   EthClientFallback,
@@ -8,8 +9,7 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-} from "@dappnode/common";
-import { params } from "@dappnode/params";
+} from "@dappnode/types";
 
 // User chosen properties
 const ETH_CLIENT_FALLBACK = "eth-client-fallback";

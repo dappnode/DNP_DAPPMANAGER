@@ -1,13 +1,12 @@
 import * as logUserAction from "./logUserAction.js";
 import { logs } from "./logs.js";
+import { routesData, Routes } from "@dappnode/types";
 import {
-  routesData,
-  Routes,
   LoggerMiddleware,
   Args,
   Result,
   EthProviderError,
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 export const routesLogger: LoggerMiddleware = {
   onCall: (route: string, args: Args = []): void => {

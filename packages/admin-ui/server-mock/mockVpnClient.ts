@@ -1,4 +1,4 @@
-import { VpnDevice, PackageVersionData } from "@dappnode/common";
+import { VpnDevice, PackageVersionData } from "@dappnode/types";
 import { VpnApiClient } from "@dappnode/dappmanager/src/api/vpnApiClient";
 
 const url = "link-to-otp/?id=617824#hdfuisf";

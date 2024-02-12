@@ -1,4 +1,4 @@
-import { OptimismConfigGet, OptimismConfigSet } from "@dappnode/common";
+import { OptimismConfigGet, OptimismConfigSet } from "@dappnode/types";
 import { getOptimismConfig, setOptimismConfig } from "@dappnode/optimism";
 import { dappnodeInstaller } from "../index.js";
 

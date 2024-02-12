@@ -4,14 +4,14 @@ import {
   ExposableServiceInfo,
   ExposableServiceManifestInfo,
   InstalledPackageData,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { mockDnp, mockContainer } from "../testUtils.js";
 
 describe("modules / https-portal / exposable", () => {
   it("Should parse manifest.exposable", () => {
     const manifestExposable: ExposableServiceManifestInfo[] = [
       { name: "name1", port: 1111 },
-      ({ broken: true } as unknown) as ExposableServiceManifestInfo,
+      { broken: true } as unknown as ExposableServiceManifestInfo,
       { name: "name3", description: "desc3", serviceName: "serv3", port: 3333 },
     ];
 

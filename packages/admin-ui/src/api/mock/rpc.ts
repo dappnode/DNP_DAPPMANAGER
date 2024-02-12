@@ -1,4 +1,4 @@
-import { RpcPayload, RpcResponse } from "@dappnode/common";
+import { RpcPayload, RpcResponse } from "@dappnode/types";
 import { calls } from "../../__mock-backend__";
 import { IApiRpc } from "../interface";
 

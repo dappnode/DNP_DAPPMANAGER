@@ -17,7 +17,7 @@ import DnpNameVerified from "components/DnpNameVerified";
 import Ok from "components/Ok";
 import defaultAvatar from "img/defaultAvatar.png";
 import { MdExpandMore, MdClose, MdExpandLess } from "react-icons/md";
-import { RequestedDnp } from "@dappnode/common";
+import { RequestedDnp } from "@dappnode/types";
 import { SignedStatus } from "./SignedStatus";
 // Styles
 import "./info.scss";

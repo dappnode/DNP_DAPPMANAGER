@@ -13,7 +13,7 @@ import {
   ContainersStatus,
   InstalledPackageData,
   PackageContainer,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { getDockerComposePathSmart } from "@dappnode/utils";
 
 interface ComposeUpArgs {

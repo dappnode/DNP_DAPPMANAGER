@@ -5,7 +5,7 @@ import {
   MevBoostMainnet,
   MevBoostPrater,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import {
   DappnodeInstaller,
   packageInstall,

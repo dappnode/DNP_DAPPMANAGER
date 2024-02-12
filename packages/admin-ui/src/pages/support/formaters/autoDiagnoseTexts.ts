@@ -4,7 +4,7 @@ import {
   InstalledPackageData,
   HostStatDisk,
   PublicIpResponse
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { mandatoryCoreDnps } from "params";
 import { responseInterface } from "swr";
 

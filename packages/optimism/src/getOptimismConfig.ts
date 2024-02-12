@@ -4,10 +4,10 @@ import {
   executionClientsOptimism,
   optimismL2Geth,
   optimismNode,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { listPackages } from "@dappnode/dockerapi";
-import {  DappnodeInstaller, packageGetData } from "@dappnode/installer";
+import { DappnodeInstaller, packageGetData } from "@dappnode/installer";
 import {
   getIsInstalled,
   getIsRunning,
@@ -60,7 +60,10 @@ export async function getOptimismConfig(
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismNode);
 
-            const pkgData = await packageGetData(dappnodeInstaller, optimismNode);
+            const pkgData = await packageGetData(
+              dappnodeInstaller,
+              optimismNode
+            );
             const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -91,7 +94,10 @@ export async function getOptimismConfig(
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismL2Geth);
 
-            const pkgData = await packageGetData(dappnodeInstaller, optimismL2Geth);
+            const pkgData = await packageGetData(
+              dappnodeInstaller,
+              optimismL2Geth
+            );
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",

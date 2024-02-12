@@ -12,7 +12,7 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { mockDnp, mockContainer, dappnodeInstaller } from "../testUtils.js";
 
 interface State {

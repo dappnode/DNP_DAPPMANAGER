@@ -1,6 +1,6 @@
 // @ts-ignore
 import Client from "bitcoin-core";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 import { dockerContainerInspect } from "@dappnode/dockerapi";
 import { buildNetworkAlias, parseEnvironment } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
@@ -40,7 +40,7 @@ export async function bitcoin(
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: true
+    isMainOrMonoservice: true,
   });
 
   const apiUrl = containerDomain; // 'bitcoin.dappnode'
@@ -59,7 +59,7 @@ export async function bitcoin(
     host: apiUrl,
     username,
     password,
-    port // If port is falsy, it will take the default value. From source code: `this.port = port || networks[network];`
+    port, // If port is falsy, it will take the default value. From source code: `this.port = port || networks[network];`
   });
   const blockIndex = await client.getBlockCount();
 
@@ -80,13 +80,13 @@ export async function bitcoin(
       syncing: true,
       error: false,
       message: `Blocks synced: ${blockIndex} / ${blockDiffAprox + blockIndex}`,
-      progress: blockIndex / (blockDiffAprox + blockIndex)
+      progress: blockIndex / (blockDiffAprox + blockIndex),
     };
   else
     return {
       syncing: false,
       error: false,
-      message: `Synced #${blockIndex}`
+      message: `Synced #${blockIndex}`,
     };
 }
 
@@ -113,9 +113,9 @@ export function parseCredentialsFromEnvs(envsArray: string[]): {
   const keys = Object.keys(envs);
 
   // Find keys for both bitcoin and zcash packages
-  const userKey = keys.find(key => key.includes("_RPCUSER"));
-  const passKey = keys.find(key => key.includes("_RPCPASSWORD"));
-  const portKey = keys.find(key => key.includes("_RPCPORT"));
+  const userKey = keys.find((key) => key.includes("_RPCUSER"));
+  const passKey = keys.find((key) => key.includes("_RPCPASSWORD"));
+  const portKey = keys.find((key) => key.includes("_RPCPORT"));
 
   if (!userKey) throw Error("RPCUSER not defined");
   if (!passKey) throw Error("RPCPASSWORD not defined");

@@ -9,7 +9,7 @@ import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
 import { updateDnpDirectory } from "services/dnpDirectory/actions";
 import { updateDnpRegistry } from "services/dnpRegistry/actions";
-import { Subscriptions } from "@dappnode/common";
+import { Subscriptions } from "@dappnode/types";
 
 export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
   subscriptions.directory.on(directoryDnps => {

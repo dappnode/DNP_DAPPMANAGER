@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { validateDappnodeCompose } from "../../src/index.js";
-import { Manifest, Compose } from "@dappnode/common";
+import { Manifest, Compose } from "@dappnode/types";
 
 describe("files / compose / validateDappnodeCompose", () => {
   const manifest: Manifest = {
@@ -44,8 +44,7 @@ describe("files / compose / validateDappnodeCompose", () => {
         "This is a major update of Prysm Prater, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update",
     },
     links: {
-      ui:
-        "http://ui.web3signer-prater.dappnode?signer_url=http://web3signer.web3signer-prater.dappnode:9000",
+      ui: "http://ui.web3signer-prater.dappnode?signer_url=http://web3signer.web3signer-prater.dappnode:9000",
       homepage: "https://prysmaticlabs.com/",
       readme: "https://github.com/dappnode/DAppNodePackage-prysm-prater",
       docs: "https://docs.prylabs.network/docs/getting-started",

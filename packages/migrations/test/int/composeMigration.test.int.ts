@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import fs from "fs";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import { migrateCoreNetworkAndAliasInCompose } from "../../src/addAliasToRunningContainers.js";
 import { removeDnsFromPackageComposeFile } from "../../src/removeDnsFromComposeFiles.js";
 import { params } from "@dappnode/params";

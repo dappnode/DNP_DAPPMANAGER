@@ -2,19 +2,18 @@ import { params } from "@dappnode/params";
 import { DappnodeRepository } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
-  Compose,
-  DappGetState,
   DistributedFile,
-  GrafanaDashboard,
   IpfsClientTarget,
+  PackageRelease,
+  ManifestWithImage,
+  Compose,
   Manifest,
   PackageRequest,
   SetupWizard,
+  GrafanaDashboard,
   PrometheusTarget,
-  PackageRelease,
-  ManifestWithImage,
-} from "@dappnode/common";
-import { DappgetOptions, dappGet } from "./dappGet/index.js";
+} from "@dappnode/types";
+import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import {
   validateDappnodeCompose,
   validateManifestSchema,

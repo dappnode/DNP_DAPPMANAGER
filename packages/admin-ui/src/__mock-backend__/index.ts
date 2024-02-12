@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -123,7 +123,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ],
   dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
   statsCpuGet: async () => ({
-    usedPercentage: 88
+    usedPercentage: 88,
+    numberOfCores: 4,
+    temperatureAverage: 40
   }),
   statsMemoryGet: async () => ({
     total: 8093155328,
@@ -137,7 +139,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-
+  statsSwapGet: async () => ({
+    total: 2147483648,
+    used: 0,
+    free: 2147483648,
+    usedPercentage: 0
+  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",

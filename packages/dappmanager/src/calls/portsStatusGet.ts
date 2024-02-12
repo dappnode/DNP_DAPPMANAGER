@@ -7,7 +7,7 @@ import {
   ApiTablePortStatus,
   UpnpPortMapping,
   PackagePort
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { params } from "@dappnode/params";
 import Ajv from "ajv";
 

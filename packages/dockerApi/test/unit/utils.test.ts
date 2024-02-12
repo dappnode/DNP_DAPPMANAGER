@@ -5,7 +5,7 @@ import {
   ensureUniquePortsFromDockerApi,
   stripDockerApiLogsHeaderAndAnsi,
 } from "../../src/index.js";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 import { mockContainer } from "../testUtils.js";
 import Dockerode from "dockerode";
 

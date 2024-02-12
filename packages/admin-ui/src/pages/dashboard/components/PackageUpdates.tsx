@@ -2,7 +2,7 @@ import React from "react";
 import Alert from "react-bootstrap/esm/Alert";
 import { useApi } from "api";
 import { getInstallerPath } from "pages/installer";
-import { UpdateAvailable } from "@dappnode/common";
+import { UpdateAvailable } from "@dappnode/types";
 import { useNavigate } from "react-router-dom";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";

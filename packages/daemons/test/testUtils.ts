@@ -1,4 +1,4 @@
-import { PackageContainer, InstalledPackageData } from "@dappnode/common";
+import { PackageContainer, InstalledPackageData } from "@dappnode/types";
 import { DappnodeInstaller } from "@dappnode/installer";
 
 export const dappnodeInstaller = new DappnodeInstaller(

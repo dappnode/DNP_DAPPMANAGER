@@ -82,8 +82,6 @@ export const params = {
   // Signature API
   SIGNATURE_PREFIX: "\x1dDappnode Signed Message:",
 
-  DAPPNODE_REGISTRY: ".dnp.dappnode.eth",
-
   // HTTP API parameters
   /** Use the internal ipfs gateway proxy so the UI works served from the HTTPs Portal */
   IPFS_GATEWAY: "/ipfs/",
@@ -147,7 +145,7 @@ export const params = {
   CHECK_DISK_USAGE_DAEMON_INTERVAL: 1 * MINUTE,
   NAT_RENEWAL_DAEMON_INTERVAL: 1 * HOUR,
   ETHICAL_METRICS_DAEMON_INTERVAL: 50 * MINUTE,
-  BIND_DAEMON_INTERVAL: 30 * MINUTE,
+  BIND_DAEMON_INTERVAL: 10 * MINUTE, // TODO: after public ip range migration put a higher value
 
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
@@ -263,30 +261,6 @@ export const params = {
   WIFI_KEY_SSID: "SSID",
   WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
 
-  // Global ENVs names
-  GLOBAL_ENVS: {
-    ACTIVE: "_DAPPNODE_GLOBAL_ENVS_ACTIVE",
-    DOMAIN: "_DAPPNODE_GLOBAL_DOMAIN", // "" || "6b3d49d4965584c2.dyndns.dappnode.io"
-    STATIC_IP: "_DAPPNODE_GLOBAL_STATIC_IP", // "" || "138.68.106.96"
-    HOSTNAME: "_DAPPNODE_GLOBAL_HOSTNAME", // "6b3d49d4965584c2.dyndns.dappnode.io" || "138.68.106.96"
-    INTERNAL_IP: "_DAPPNODE_GLOBAL_INTERNAL_IP", // "192.168.0.1"
-    UPNP_AVAILABLE: "_DAPPNODE_GLOBAL_UPNP_AVAILABLE", // "true" || "false"
-    NO_NAT_LOOPBACK: "_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", // "true" || "false"
-    PUBKEY: "_DAPPNODE_GLOBAL_PUBKEY", // "0x048e66b3e549818ea2cb354fb70749f6c8de8fa484f7530fc447d5fe80a1c424e4f5ae648d648c980ae7095d1efad87161d83886ca4b6c498ac22a93da5099014a",
-    ADDRESS: "_DAPPNODE_GLOBAL_ADDRESS", // "0x6B3D49d4965584C28Fbf14B82b1012664a73b9Ab"
-    PUBLIC_IP: "_DAPPNODE_GLOBAL_PUBLIC_IP", // "138.68.106.96"
-    SERVER_NAME: "_DAPPNODE_GLOBAL_SERVER_NAME", // "MyDAppNode"
-    CONSENSUS_CLIENT_MAINNET: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_MAINNET", // "prysm.dnp.dappnode.eth"
-    EXECUTION_CLIENT_MAINNET: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_MAINNET", // "geth.dnp.dappnode.eth"
-    CONSENSUS_CLIENT_GNOSIS: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_GNOSIS", // "teku-gnosis.dnp.dappnode.eth"
-    EXECUTION_CLIENT_GNOSIS: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_GNOSIS", // "nethermind-xdai.dnp.dappnode.eth"
-    CONSENSUS_CLIENT_PRATER: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_PRATER", // "prysm-prater.dnp.dappnode.eth"
-    EXECUTION_CLIENT_PRATER: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_PRATER", // "goerli-geth.dnp.dappnode.eth"
-    CONSENSUS_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_LUKSO", // "prysm-lukso.dnp.dappnode.eth"
-    EXECUTION_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_LUKSO", // "lukso-geth.dnp.dappnode.eth",
-    CONSENSUS_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOLESKY", // "prysm-holesky.dnp.dappnode.eth"
-    EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "geth.dnp.dappnode.eth"
-  },
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
 
@@ -361,6 +335,24 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+    },
+    {
+      name: "Mgarciate",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+    },
+    {
+      name: "HOPR Team",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
     },
   ],
 };

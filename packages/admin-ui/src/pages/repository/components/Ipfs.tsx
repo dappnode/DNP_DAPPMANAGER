@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useApi, api } from "api";
-import { IpfsClientTarget } from "@dappnode/common";
+import { IpfsClientTarget } from "@dappnode/types";
 import { withToast } from "components/toast/Toast";
 import SubTitle from "components/SubTitle";
 import { IpfsClient } from "components/IpfsClient";

@@ -10,7 +10,7 @@ import {
 } from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { Eth2ClientTarget } from "@dappnode/common";
+import { Eth2ClientTarget } from "@dappnode/types";
 import { isEqual } from "lodash-es";
 
 // Redux Thunk actions

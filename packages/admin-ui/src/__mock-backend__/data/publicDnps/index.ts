@@ -1,4 +1,4 @@
-import { DirectoryItem } from "@dappnode/common";
+import { DirectoryItem } from "@dappnode/types";
 
 // Packages from ENS public.dappnode.eth
 // From block 8905883 to ~ 13000000

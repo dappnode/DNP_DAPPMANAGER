@@ -1,4 +1,4 @@
-import { InstallPackageData } from "@dappnode/common";
+import { InstallPackageData } from "@dappnode/types";
 import { Log } from "@dappnode/logger";
 import { loadImage, getDockerImageManifest } from "@dappnode/dockerapi";
 

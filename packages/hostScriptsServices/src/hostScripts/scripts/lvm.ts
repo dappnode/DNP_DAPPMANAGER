@@ -6,8 +6,8 @@ import {
   HostVolumeGroup,
   HostVolumeGroupReport,
   HostLogicalVolume,
-  HostLogicalVolumeReport
-} from "@dappnode/common";
+  HostLogicalVolumeReport,
+} from "@dappnode/types";
 
 /**
  * Returns host hard disks detected

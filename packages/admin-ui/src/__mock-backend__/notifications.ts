@@ -1,4 +1,4 @@
-import { PackageNotificationDb, Routes } from "@dappnode/common";
+import { PackageNotificationDb, Routes } from "@dappnode/types";
 
 export const notifications: Pick<
   Routes,

@@ -4,7 +4,7 @@ import {
   EthClientRemote,
   ExecutionClient,
   InstalledPackageDetailData,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
@@ -25,7 +25,7 @@ import {
   ExecutionClientMainnet,
   ConsensusClientMainnet,
   Network,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export enum ComposeAliasEditorAction {

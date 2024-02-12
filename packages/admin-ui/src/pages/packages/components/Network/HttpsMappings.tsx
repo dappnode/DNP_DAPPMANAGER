@@ -20,7 +20,7 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
-import { HttpsPortalMapping } from "@dappnode/common";
+import { HttpsPortalMapping } from "@dappnode/types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
 import { urlJoin } from "utils/url";

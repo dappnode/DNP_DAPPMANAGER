@@ -3,7 +3,7 @@ import {
   StakerItemOk,
   Network,
   InstalledPackageData,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import {

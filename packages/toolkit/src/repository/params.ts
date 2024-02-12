@@ -2,6 +2,8 @@
 
 import { Abi } from "../types.js";
 
+export const dappnodeRegistry = ".dnp.dappnode.eth";
+
 // This SC creates repos for DAppNodePackages to control versioning
 
 export const repositoryContractName = "repository";
@@ -181,4 +183,4 @@ export const repositoryAbi: Abi = [
     name: "NewVersion",
     type: "event",
   },
-];
+] as const;

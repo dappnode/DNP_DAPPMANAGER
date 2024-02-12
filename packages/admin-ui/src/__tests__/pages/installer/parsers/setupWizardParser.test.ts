@@ -3,7 +3,7 @@ import {
   userSettingsToFormData
 } from "pages/installer/parsers/formDataParser";
 import { SetupWizardFormDataReturn } from "pages/installer/types";
-import { UserSettingsAllDnps } from "@dappnode/common";
+import { UserSettingsAllDnps } from "@dappnode/types";
 import deepmerge from "deepmerge";
 import { SetupTargetAllDnps } from "types";
 

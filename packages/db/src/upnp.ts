@@ -1,5 +1,5 @@
 import { dbCache } from "./dbFactory.js";
-import { PackagePort, UpnpPortMapping } from "@dappnode/common";
+import { PackagePort, UpnpPortMapping } from "@dappnode/types";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 
 const UPNP_AVAILABLE = "upnp-available";

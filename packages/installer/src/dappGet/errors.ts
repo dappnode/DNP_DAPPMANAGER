@@ -1,4 +1,4 @@
-import { PackageRequest } from "@dappnode/common";
+import { PackageRequest } from "@dappnode/types";
 
 export class DappGetError extends Error {}
 

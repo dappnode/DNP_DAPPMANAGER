@@ -1,2 +1,2 @@
-export * from "./timers/check-docker-network.js";
+export * from "./timers/index.js";
 export * from "./copyHostTimers.js";

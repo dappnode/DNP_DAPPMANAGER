@@ -6,7 +6,7 @@ import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";
-import { EthProviderError } from "@dappnode/common";
+import { EthProviderError } from "@dappnode/types";
 import { clearPendingUpdates } from "./clearPendingUpdates.js";
 import { clearCompletedCoreUpdatesIfAny } from "./clearCompletedCoreUpdatesIfAny.js";
 import { clearRegistry } from "./clearRegistry.js";

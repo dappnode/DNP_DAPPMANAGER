@@ -1,10 +1,7 @@
 import fetch from "node-fetch";
 import { mapValues } from "lodash-es";
-import {
-  PackageVersionData,
-  RpcResponse,
-  parseRpcResponse
-} from "@dappnode/common";
+import { parseRpcResponse } from "@dappnode/common";
+import { PackageVersionData, RpcResponse } from "@dappnode/types";
 
 export interface VpnApiClient {
   addDevice: (kwargs: { id: string }) => Promise<void>;

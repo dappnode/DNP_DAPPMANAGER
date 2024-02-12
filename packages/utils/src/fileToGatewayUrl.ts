@@ -1,4 +1,4 @@
-import { DistributedFile } from "@dappnode/common";
+import { DistributedFile } from "@dappnode/types";
 import { normalizeHash } from "./normalizeHash.js";
 import url from "url";
 import { params } from "@dappnode/params";

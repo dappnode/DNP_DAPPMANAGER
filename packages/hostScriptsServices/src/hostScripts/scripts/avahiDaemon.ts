@@ -1,5 +1,5 @@
 import memoize from "memoizee";
-import { AvahiDaemonStatus } from "@dappnode/common";
+import { AvahiDaemonStatus } from "@dappnode/types";
 import { runScript } from "../runScripts.js";
 
 /**
@@ -35,7 +35,7 @@ export const getAvahiDaemonStatus = memoize(
     return {
       isAvahiRunning: status.isAvahiRunning === "true",
       isAvahiEnabled: status.isAvahiEnabled === "true",
-      avahiResolves: status.avahiResolves === "true"
+      avahiResolves: status.avahiResolves === "true",
     };
   },
   // Prevent running this script more than once

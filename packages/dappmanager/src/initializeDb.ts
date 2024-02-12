@@ -11,10 +11,9 @@ import {
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { IdentityInterface } from "@dappnode/common";
+import { IdentityInterface, IpfsClientTarget } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
-import { IpfsClientTarget } from "@dappnode/common";
 import { pause, shell, getPublicIpFromUrls } from "@dappnode/utils";
 
 // Wrap async getter so they do NOT throw, but return null and log the error

@@ -4,7 +4,7 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
-import { CoreUpdateDataAvailable } from "@dappnode/common";
+import { CoreUpdateDataAvailable } from "@dappnode/types";
 import {
   formatPackageUpdateNotification,
   formatSystemUpdateNotification,

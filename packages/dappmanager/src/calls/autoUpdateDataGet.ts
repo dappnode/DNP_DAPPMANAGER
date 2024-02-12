@@ -9,7 +9,7 @@ import {
   AutoUpdateRegistry,
   AutoUpdatePending,
   AutoUpdateFeedback
-} from "@dappnode/common";
+} from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import {

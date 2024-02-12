@@ -7,7 +7,7 @@ import {
 import { listPackageContainers } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { getExternalNetworkAlias } from "./domains.js";
-import { PackageContainer, HttpsPortalMapping } from "@dappnode/common";
+import { PackageContainer, HttpsPortalMapping } from "@dappnode/types";
 import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { addNetworkAliasCompose } from "./utils/addNetworkAliasCompose.js";

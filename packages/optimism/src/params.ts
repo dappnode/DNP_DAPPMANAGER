@@ -1,4 +1,4 @@
-import { ExecutionClientOptimism } from "@dappnode/common";
+import { ExecutionClientOptimism } from "@dappnode/types";
 
 export const opNodeRpcUrlEnvName = "CUSTOM_L1_RPC";
 export const opNodeServiceName = "op-node";

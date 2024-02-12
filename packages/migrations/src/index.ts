@@ -7,6 +7,7 @@ import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
+import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
 
 export class MigrationError extends Error {
@@ -122,6 +123,16 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  await addDappnodePeerToLocalIpfsNode().catch((e) =>
+    migrationErrors.push({
+      migration: "add Dappnode peer to local IPFS node",
+      coreVersion: "0.2.88",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,

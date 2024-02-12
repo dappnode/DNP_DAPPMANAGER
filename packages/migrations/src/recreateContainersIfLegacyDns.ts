@@ -2,7 +2,7 @@ import { logs } from "@dappnode/logger";
 import { listPackages, docker, dockerComposeUp } from "@dappnode/dockerapi";
 import { getDockerComposePath } from "@dappnode/utils";
 import { params } from "@dappnode/params";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 
 /**
  * Recreate docker containers if legacy dns is still set in runtime.

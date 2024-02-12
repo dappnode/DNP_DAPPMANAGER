@@ -6,7 +6,7 @@ import {
   ConsensusClientMainnet,
   executionClientsMainnet,
   consensusClientsMainnet,
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";

@@ -1,5 +1,5 @@
 import { useApi } from "api";
-import { ChainData } from "@dappnode/common";
+import { ChainData } from "@dappnode/types";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { getRepositorySourceChainItem } from "services/dappnodeStatus/selectors";
