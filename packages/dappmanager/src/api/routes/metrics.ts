@@ -6,6 +6,7 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
 import { getHostInfoMemoized } from "@dappnode/hostscriptsservices";
+import si from "systeminformation";
 
 /**
  * Collect the metrics:
@@ -234,6 +235,31 @@ register.registerMetric(
       const views = db.counterViews.get();
       this.reset();
       this.inc({ views: "views" }, views);
+    }
+  })
+);
+
+// Add cpu temperature metric
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_cpu_temperature_celsius",
+    help: "CPU temperature metrics, including current and maximum safe operating temperatures in Celsius degrees",
+    labelNames: ["type"], // 'type' label to distinguish between 'current' and 'max'
+    async collect() {
+      const cpuTemperature = await si.cpuTemperature();
+      const { main, max } = cpuTemperature;
+
+      // Set the current CPU temperature
+      if (main !== undefined) {
+        this.labels("current").set(main);
+      }
+
+      // Optionally set the maximum safe operating temperature
+      // Note: This value is typically static and does not change over time,
+      // so it might be more efficient to document this elsewhere unless it's important for it to be queryable in Prometheus.
+      if (max !== undefined) {
+        this.labels("max").set(max);
+      }
     }
   })
 );
