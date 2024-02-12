@@ -10,13 +10,13 @@ import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 
 const ZkEvm = ({
-  zkEvmItem, // Rename ZKEVMItem to zkEvmItem
-  setNewZkEvmItem, // Rename setNewZKEVMItem to setNewZkEvmItem
+  zkEvmItem, 
+  setNewZkEvmItem, 
   isSelected,
   ...props
 }: {
-  zkEvmItem: ZKEVMItem<"rollup">; // Specify the type argument "rollup"
-  setNewZkEvmItem: React.Dispatch<React.SetStateAction<ZKEVMItem<"rollup"> | undefined>>; // Specify the type argument "rollup"
+  zkEvmItem: ZKEVMItem<"rollup">; 
+  setNewZkEvmItem: React.Dispatch<React.SetStateAction<ZKEVMItem<"rollup"> | undefined>>; 
   isSelected: boolean;
 }) => {
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const ZkEvm = ({
         </div>
       ) : null}
 
-      <div className="title">{prettyDnpName(zkEvmItem.dnpName)} </div>
+      <div className="title">{prettyDnpName(zkEvmItem.dnpName)}</div>
 
       {zkEvmItem.status === "ok" && isSelected && (
         <>

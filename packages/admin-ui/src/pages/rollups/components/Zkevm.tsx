@@ -18,9 +18,9 @@ import { ZKEVMItem } from "@dappnode/common";
 type ZkEvmConfigGetResponse = responseInterface<ZKEVMItem<"rollup">[], Error>;
 
 const zkEvmConfigGet = (): ZkEvmConfigGetResponse => {
-  // For now, return an empty response to resolve the TypeScript error
+ 
   return {
-    data: [], // Change the type here to match ZKEVMItem<"rollup">[]
+    data: [], 
     revalidate: async () => true,
     mutate: async () => [],
     isValidating: false
@@ -72,7 +72,7 @@ export default function Zkevm({ description }: { description: string }) {
                     key={i}
                     zkEvmItem={zkEvmItem}
                     setNewZkEvmItem={setNewZkEvmItem}
-                    isSelected={false} // need to implement isSelected logic
+                    isSelected={false} 
                   />
                 )
               )}
