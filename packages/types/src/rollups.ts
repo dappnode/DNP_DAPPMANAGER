@@ -70,3 +70,42 @@ export interface OptimismConfigSet {
 }
 
 // TODO: Polygon
+// ZK-EVM
+
+export type ZKEVMType = "rollup";
+export type ZKEVMItem<T extends ZKEVMType> = ZKEVMItemOk<T> | ZKEVMItemError<T>;
+
+interface ZKEVMTokenWithdrawals {
+  dnpName: "zkevm-tokens-withdrawal.dnp.dappnode.eth";
+}
+
+type ZKEVMItemBasic<T extends ZKEVMType> = T extends "rollup"
+  ? ZKEVMTokenWithdrawals
+  : never;
+
+export type ZKEVMItemError<T extends ZKEVMType> = {
+  status: "error";
+  error: string;
+} & ZKEVMItemBasic<T>;
+
+export type ZKEVMItemOk<T extends ZKEVMType> = {
+  status: "ok";
+  avatarUrl: string;
+  isInstalled: boolean; 
+  isUpdated: boolean;
+  isRunning: boolean;
+  data?: PackageItemData;
+  isSelected: boolean;
+} & ZKEVMItemBasic<T>;
+
+export interface ZkevmConfigGet {
+  rollup: ZKEVMItem<"rollup">;
+}
+
+export interface ZkevmConfigGetOk {
+  rollup: ZKEVMItemOk<"rollup">;
+}
+
+export interface ZkevmConfigSet {
+  rollup?: ZKEVMItemOk<"rollup">;
+}
