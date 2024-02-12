@@ -888,10 +888,22 @@ export interface HostStatDisk {
 }
 
 /**
+ *
+ */
+export interface HostStatSwap {
+  total: number;
+  used: number;
+  free: number;
+  usedPercentage: number;
+}
+
+/**
  * Host machine CPU used
  */
 export interface HostStatCpu {
   usedPercentage: number;
+  numberOfCores: number;
+  temperatureAverage: number;
 }
 
 export interface PublicIpResponse {
