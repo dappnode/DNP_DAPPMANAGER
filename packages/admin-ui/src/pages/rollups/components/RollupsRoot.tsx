@@ -22,7 +22,7 @@ const RollupsRoot: React.FC = () => {
     },
     {
       title: "zkEVM",
-      subPath: "polygon",
+      subPath: "zk",
       component: () =>
         Zkevm({
           description:

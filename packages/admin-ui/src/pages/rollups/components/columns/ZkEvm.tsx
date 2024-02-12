@@ -40,7 +40,7 @@ const ZkEvm = ({
   return (
     <Card
       {...props}
-      className={`zk-evm-node ${joinCssClass({ isSelected })}`}
+      className={`optimism-node ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
       onClick={handleClick}
     >
