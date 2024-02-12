@@ -118,8 +118,9 @@ export function HostStats() {
         )}
       </StatsCardContainer>
 
-      <StatsCardContainer title={"cpu temperature"}>
-        {cpuStats.data?.temperatureAverage ? (
+      {cpuStats.data?.temperatureAverage ? (
+        <StatsCardContainer title={"cpu temperature"}>
+          {" "}
           <StatsCardOk
             percent={cpuStats.data.temperatureAverage}
             text="Average temperature of the CPU cores"
@@ -128,10 +129,12 @@ export function HostStats() {
             danger={95}
             warning={85}
           />
-        ) : cpuStats.error ? (
-          <StatsCardError error={cpuStats.error} /> // Do not show loading card since temperature is not available in cloud
-        ) : null}
-      </StatsCardContainer>
+        </StatsCardContainer>
+      ) : cpuStats.error ? (
+        <StatsCardContainer title={"cpu temperature"}>
+          <StatsCardError error={cpuStats.error} />
+        </StatsCardContainer>
+      ) : null}
 
       <StatsCardContainer title={"memory"}>
         {memoryStats.data ? (
