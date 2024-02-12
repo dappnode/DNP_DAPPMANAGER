@@ -5,9 +5,17 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import humanFileSize from "utils/humanFileSize";
 import Ok from "../../../components/Ok";
 
-function parseVariant(value: number) {
-  if (value > 90) return "danger";
-  if (value > 75) return "warning";
+function parseVariant({
+  value,
+  danger = 90,
+  warning = 75
+}: {
+  value: number;
+  danger?: number;
+  warning?: number;
+}) {
+  if (value > danger) return "danger";
+  if (value > warning) return "warning";
   return "success";
 }
 
@@ -30,12 +38,16 @@ function StatsCardOk({
   percent,
   label,
   text,
-  max
+  max,
+  danger,
+  warning
 }: {
   percent: number;
   label: "%" | "ºC";
   text?: string;
   max?: number;
+  danger?: number;
+  warning?: number;
 }) {
   let value: number;
   if (label === "%") value = Math.round(percent);
@@ -44,7 +56,8 @@ function StatsCardOk({
   return (
     <>
       <ProgressBar
-        variant={parseVariant(value)}
+        variant={parseVariant({ value, danger, warning })}
+        max={max || 100}
         now={value}
         label={value + label}
       />
@@ -82,11 +95,12 @@ export function HostStats() {
   useEffect(() => {
     const interval = setInterval(() => {
       hostUptime.revalidate();
-    }, 60 * 1000);
+      swapStats.revalidate();
+    }, 60 * 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [hostUptime]);
+  }, [hostUptime, swapStats]);
 
   return (
     <div className="dashboard-cards">
@@ -95,7 +109,7 @@ export function HostStats() {
           <StatsCardOk
             percent={cpuStats.data.usedPercentage}
             label={"%"}
-            text={`Numbe of cores ${cpuStats.data.numberOfCores}`}
+            text={`Number of cores ${cpuStats.data.numberOfCores}`}
           />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
@@ -110,6 +124,9 @@ export function HostStats() {
             percent={cpuStats.data.temperatureAverage}
             text="Average temperature of the CPU cores"
             label={"ºC"}
+            max={115} // cpu temperature above 100/110 triggers automatic shutdowns in intel NUCs
+            danger={95}
+            warning={85}
           />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
