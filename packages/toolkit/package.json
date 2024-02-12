@@ -11,7 +11,6 @@
     "build": "tsc -p tsconfig.json",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
-    "typechain": "typechain --node16-modules --target ethers-v6 --out-dir ./src/typechain './truffle/contracts_build/contracts*/*.json' && node fixTypesImports.js",
     "test": "mocha --config .mocharc.yml test/**/*.test.ts",
     "truffle:compile:v0.4": "truffle compile --config ./truffle/truffle-config-v0.4.cjs",
     "truffle:compile:v0.5": "truffle compile --config ./truffle/truffle-config-v0.5.cjs",
