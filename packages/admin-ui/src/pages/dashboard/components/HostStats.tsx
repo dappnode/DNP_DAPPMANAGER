@@ -129,7 +129,7 @@ export function HostStats() {
             warning={85}
           />
         ) : cpuStats.error ? (
-          <StatsCardError error={cpuStats.error} />
+          <StatsCardError error={cpuStats.error} /> // Do not show loading card since temperature is not available in cloud
         ) : null}
       </StatsCardContainer>
 
@@ -146,7 +146,9 @@ export function HostStats() {
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
-        ) : null}
+        ) : (
+          <StatsCardLoading />
+        )}
       </StatsCardContainer>
 
       <StatsCardContainer title={"swap"}>
