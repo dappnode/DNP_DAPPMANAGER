@@ -130,9 +130,7 @@ export function HostStats() {
           />
         ) : cpuStats.error ? (
           <StatsCardError error={cpuStats.error} />
-        ) : (
-          <StatsCardLoading />
-        )}
+        ) : null}
       </StatsCardContainer>
 
       <StatsCardContainer title={"memory"}>
@@ -148,9 +146,7 @@ export function HostStats() {
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
-        ) : (
-          <StatsCardLoading />
-        )}
+        ) : null}
       </StatsCardContainer>
 
       <StatsCardContainer title={"swap"}>
