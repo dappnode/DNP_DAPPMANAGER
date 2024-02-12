@@ -92,6 +92,10 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             dnpName: "lodestar-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0",
           },
+          {
+            dnpName: "nimbus-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0",
+          },
         ],
         compatibleSigner: {
           dnpName: "web3signer-gnosis.dnp.dappnode.eth" as Signer<T>,
