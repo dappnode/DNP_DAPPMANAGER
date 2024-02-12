@@ -75,7 +75,7 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
             minVersion: "1.0.18",
           },
           {
-            dnpName: "erigon-gnosis.dnp.dappnode.eth" as ExecutionClient<T>,
+            dnpName: "gnosis-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
             minVersion: "0.1.0",
           },
         ],
@@ -90,6 +90,10 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           },
           {
             dnpName: "lodestar-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+            minVersion: "0.1.0",
+          },
+          {
+            dnpName: "nimbus-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
             minVersion: "0.1.0",
           },
         ],
