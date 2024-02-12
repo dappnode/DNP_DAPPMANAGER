@@ -25,7 +25,9 @@
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
-  "dependencies": {},
+  "dependencies": {
+    "@dappnode/types": "0.1.35"
+  },
   "devDependencies": {
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
