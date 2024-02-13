@@ -19,7 +19,7 @@ export const FileManager = ({
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
-  const container = useMemo(() => containers.find(c => c.serviceName === serviceName), [serviceName, containers]);
+  const container = useMemo(() => containers.find(c => c.serviceName === serviceName), [containers]);
 
   useEffect(() => {
     console.log("rerendering filemanager, maybe containers changed", containers)

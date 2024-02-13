@@ -22,8 +22,8 @@ import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAva
 export const PackageById: React.FC = () => {
   const params = useParams();
   const id = params.id || "";
-  // const [dnpRequest, setDnpRequest] = useState<responseInterface<InstalledPackageDetailData, any>>();
 
+  console.log("executing dnpRequest")
   const dnpRequest = useApi.packageGet({ dnpName: id });
   // const dnp = dnpRequest.data;
 
@@ -32,17 +32,12 @@ export const PackageById: React.FC = () => {
   const dnp = useMemo(() => {
     console.log("Memoizing dnp", dnpRequest.data);
     return dnpRequest.data;
-  }, [id]);
+  }, [dnpRequest]);
 
   useEffect(() => {
     console.log("rerendering packagebyId", dnp)
-  }, [dnp]);
+  }, []);
 
-  // const memoizedContainers = useMemo(() => {
-  //   console.log("dnp?.containers changed")
-  //   // Only derive containers from dnp if dnp is not null/undefined
-  //   return dnp ? dnp.containers : [];
-  // }, [dnp?.containers]);
 
   if (!dnp) {
     return (
