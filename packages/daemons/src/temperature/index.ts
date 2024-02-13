@@ -24,9 +24,9 @@ const thresholds: TemperatureThreshold[] = [
   {
     id: "cpuTemperature-danger",
     type: "danger",
-    celsius: 105,
+    celsius: 100,
     title: "CPU temperature is too high",
-    body: "The CPU temperature is at a dangerous level of 105ºC. An unexpected shutdown might occur.",
+    body: "The CPU temperature is at a dangerous level of 100ºC. An unexpected shutdown might occur.",
   },
 ];
 
@@ -66,8 +66,8 @@ async function monitorCpuTemperature(): Promise<void> {
           record.count += 1;
         }
 
-        // Check if warning condition is met (5 times within an hour)
-        if (record.count >= 5) {
+        // Check if warning condition is met (8 times within an hour with a daemon interval of 5 mins)
+        if (record.count >= 8) {
           emitNotification(threshold);
           // Reset record to avoid multiple notifications within the same period
           record.count = 0;
