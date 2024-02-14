@@ -52,24 +52,25 @@ async function monitorCpuTemperature(): Promise<void> {
 
     // Check if the CPU temperature exceeds the threshold
     if (cpuTemperature.main > threshold.celsius) {
-      if (threshold.type === "danger") {
-        // Emit danger notification immediately
+      if (threshold.type === "danger" && now - record.lastEmit > HOUR_IN_MS) {
+        // For danger notifications, emit at most once per hour
         emitNotification(threshold);
+        record.lastEmit = now;
       } else if (threshold.type === "warning") {
-        // Update count and lastEmit time for warning threshold
-        if (now - record.lastEmit > HOUR_IN_MS) {
-          // Reset if more than an hour has passed since last emit
+        // Increment count if within an hour for warning
+        if (now - record.lastEmit <= HOUR_IN_MS) {
+          record.count += 1;
+        } else {
+          // Reset count and lastEmit if more than an hour has passed
           record.count = 1;
           record.lastEmit = now;
-        } else {
-          // Increment count
-          record.count += 1;
+          continue;
         }
 
-        // Check if warning condition is met (8 times within an hour with a daemon interval of 5 mins)
-        if (record.count >= 8) {
+        // Emit warning notification at most once per hour when count reaches 8
+        if (record.count >= 8 && now - record.lastEmit > HOUR_IN_MS) {
           emitNotification(threshold);
-          // Reset record to avoid multiple notifications within the same period
+          // Reset count and update lastEmit to prevent multiple notifications within the same hour
           record.count = 0;
           record.lastEmit = now;
         }
