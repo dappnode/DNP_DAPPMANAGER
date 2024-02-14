@@ -8,6 +8,7 @@ import { startNatRenewalDaemon } from "./natRenewal/index.js";
 import { startStakerDaemon } from "./stakerConfig/index.js";
 import { startTelegramBotDaemon } from "./telegramBot/index.js";
 import { startBindDaemon } from "./bind/index.js";
+import { startTemperatureDaemon } from "./temperature/index.js";
 
 // DAEMONS EXPORT
 
@@ -24,6 +25,7 @@ export function startDaemons(
   startStakerDaemon(dappnodeInstaller);
   startTelegramBotDaemon();
   startBindDaemon(signal);
+  startTemperatureDaemon(signal);
 }
 
 export { startAvahiDaemon } from "./avahi/index.js";
