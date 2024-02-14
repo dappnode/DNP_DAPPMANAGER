@@ -19,7 +19,7 @@ const thresholds: TemperatureThreshold[] = [
     type: "warning",
     celsius: 95,
     title: "CPU temperature is too high",
-    body: "The CPU temperature has consistently been at a warning level of 95ºC. Dappnode performance might be affected.",
+    body: "The CPU temperature has consistently been at a warning level of 95ºC, you can ommit this waring if your dappnode is syncinga blockchain, its temperature should decrease once synced.",
   },
   {
     id: "cpuTemperature-danger",
