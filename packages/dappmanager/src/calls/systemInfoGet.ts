@@ -8,7 +8,8 @@ import { isCoreUpdateEnabled } from "@dappnode/daemons";
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const eth2ClientTarget = ethereumClient.computeEthereumTarget();
+  const { target: eth2ClientTarget, ethRemoteRpc } =
+    ethereumClient.computeEthereumTarget();
 
   return {
     // Git version data
@@ -33,7 +34,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
         ? db.ethExecClientStatus.get(eth2ClientTarget.execClient)
         : null,
     ethClientFallback: db.ethClientFallback.get(),
-    ethProvider: db.ethProviderUrl.get(),
+    ethRemoteRpc,
     // Domain map
     fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
     // UI stats

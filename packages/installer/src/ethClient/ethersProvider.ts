@@ -13,8 +13,6 @@ import { ethereumClient } from "./index.js";
  */
 export async function getEthersProvider(): Promise<ethers.JsonRpcProvider> {
   const url = await getEthUrl();
-  // Store (just for UI / info purposes) the latest used url
-  db.ethProviderUrl.set(url);
   return new ethers.JsonRpcProvider(url, "mainnet", { staticNetwork: true });
 }
 
@@ -27,14 +25,13 @@ export async function getEthUrl(): Promise<string> {
   if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
     return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 
-  const target = ethereumClient.computeEthereumTarget();
-  const fallback = db.ethClientFallback.get();
+  const { target, ethRemoteRpc } = ethereumClient.computeEthereumTarget();
 
   // Initial case where the user has not selected any client yet
   if (!target) throw new EthProviderError(`No ethereum client selected yet`);
 
   // Remote is selected, just return remote
-  if (target === "remote") return params.ETH_MAINNET_RPC_URL_REMOTE;
+  if (target === "remote") return ethRemoteRpc;
 
   // Full node is selected, ensure client is not empty
   if (!target.execClient) throw Error("No execution client selected yet");
@@ -51,6 +48,8 @@ export async function getEthUrl(): Promise<string> {
     // Package test succeeded return its url
     return status.url;
   } else {
+    const fallback = db.ethClientFallback.get();
+
     if (fallback === "on") {
       // Fallback on, ignore error and return remote
       return params.ETH_MAINNET_RPC_URL_REMOTE;
