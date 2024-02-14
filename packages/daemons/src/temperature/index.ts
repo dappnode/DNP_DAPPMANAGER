@@ -67,8 +67,8 @@ async function monitorCpuTemperature(): Promise<void> {
           continue;
         }
 
-        // Emit warning notification at most once per hour when count reaches 8
-        if (record.count >= 8 && now - record.lastEmit > HOUR_IN_MS) {
+        // Emit warning notification at most once per hour when count reaches 5
+        if (record.count >= 5 && now - record.lastEmit > HOUR_IN_MS) {
           emitNotification(threshold);
           // Reset count and update lastEmit to prevent multiple notifications within the same hour
           record.count = 0;
