@@ -2,20 +2,32 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     /* Modules */
-    "types": ["mocha", "node"],
-
+    "types": [
+      "mocha",
+      "node"
+    ],
     /* Emit */
     "outDir": "dist",
-
     /* Language and Environment */
     "target": "ES2019",
-    "lib": ["ES2020", "ESNext", "ESNext.Promise", "DOM"]
+    "lib": [
+      "ES2020",
+      "ESNext",
+      "ESNext.Promise",
+      "DOM"
+    ]
   },
   "ts-node": {
     "esm": true,
     "experimentalSpecifierResolution": "node",
     "experimentalResolver": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "test/**/*"]
+  "include": [
+    "src/**/*",
+    "zkevm"
+  ],
+  "exclude": [
+    "node_modules",
+    "test/**/*"
+  ]
 }

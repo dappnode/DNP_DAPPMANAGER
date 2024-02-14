@@ -45,7 +45,7 @@ import {
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
 import { TrustedReleaseKey } from "./pkg.js";
-import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
+import { OptimismConfigSet, OptimismConfigGet, ZkevmConfigGet, ZkevmConfigSet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 
 export interface Routes {
@@ -391,6 +391,16 @@ export interface Routes {
    */
   optimismConfigGet: () => Promise<OptimismConfigGet>;
 
+  /**
+     * Gets ZKEVM configuration
+     */
+  zkevmConfigGet: () => Promise<ZkevmConfigGet>;
+
+  /**
+    * Sets ZKEVM configuration
+    */
+  zkevmConfigSet: (config: ZkevmConfigSet) => Promise<void>;
+  
   /**
    * Installs a DAppNode Package.
    * Resolves dependencies, downloads release assets, loads the images to docker,
@@ -740,6 +750,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsTest: {},
   optimismConfigGet: {},
   optimismConfigSet: { log: true },
+  zkevmConfigGet: {},
+  zkevmConfigSet: { log: true },
   packageInstall: { log: true },
   packageGet: {},
   packagesGet: {},

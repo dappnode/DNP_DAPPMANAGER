@@ -91,7 +91,7 @@ export type ZKEVMItemError<T extends ZKEVMType> = {
 export type ZKEVMItemOk<T extends ZKEVMType> = {
   status: "ok";
   avatarUrl: string;
-  isInstalled: boolean; 
+  isInstalled: boolean;
   isUpdated: boolean;
   isRunning: boolean;
   data?: PackageItemData;

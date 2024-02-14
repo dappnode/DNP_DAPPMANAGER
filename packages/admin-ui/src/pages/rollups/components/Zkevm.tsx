@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ZKEVMItem } from "../../../../../types/src/rollups";
 import { useApi } from "api";
 import { AppContext } from "App";
@@ -14,6 +14,9 @@ import ZkevmCommunity from "./ZKevmCommunity";
 import ZkEvm from "./columns/ZkEvm";
 import { responseInterface } from "swr";
 import { useZkEvmConfig } from "./useZkEvmConfig";
+import {
+  listPackageNoThrow,
+} from "@dappnode/dockerapi";
 
 type ZkEvmConfigGetResponse = responseInterface<ZKEVMItem<"rollup">[], Error>;
 
@@ -53,10 +56,44 @@ export default function Zkevm({ description }: { description: string }) {
     throw new Error("Function not implemented.");
   }
 
+
+  const [isPackageInstalled, setIsPackageInstalled] = useState<boolean>(false);
+
+  // Function to check package installation
+  async function checkPackageInstallation() {
+    try {
+      const packageName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
+      const installedPackage = await listPackageNoThrow({ dnpName: packageName });
+
+      if (installedPackage) {
+        console.log(`${packageName} is installed.`);
+        setIsPackageInstalled(true);
+        // Package is installed
+      } else {
+        console.log(`${packageName} is not installed.`);
+        setIsPackageInstalled(false);
+        // Package is not installed
+      }
+    } catch (error) {
+      console.error("An error occurred while checking package installation:", error);
+      // Handle error
+    }
+  }
+
+  // Call the function when currentZkEvmConfigReq.data changes
+  useEffect(() => {
+    if (currentZkEvmConfigReq.data) {
+      checkPackageInstallation();
+    }
+  }, [currentZkEvmConfigReq.data]);
+
+
   return (
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
       {/* Render the ZkEvmCommunity component */}
       <ZkevmCommunity />
+      <p>{isPackageInstalled ? "Package is installed" : "Package is not installed"}</p>
+
       {currentZkEvmConfigReq.data ? (
         <Card>
           {/* Render the description */}
