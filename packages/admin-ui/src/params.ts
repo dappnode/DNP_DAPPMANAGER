@@ -44,6 +44,7 @@ export const adminUiLocalDomain = "http://dappnode.local";
 // DNP names
 export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
+export const zkevmDnpName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
