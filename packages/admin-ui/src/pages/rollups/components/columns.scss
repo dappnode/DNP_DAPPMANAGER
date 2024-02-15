@@ -120,3 +120,12 @@
 .not-found {
   text-align: center;
 }
+
+.install-link {
+  color: var(--dappnode-strong-main-color);
+  text-decoration: none;
+}
+
+.install-link:hover {
+  text-decoration: underline;
+}

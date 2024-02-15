@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Accordion, Card } from "react-bootstrap";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { BsDiscord } from "react-icons/bs";
-import { MdForum, MdHowToVote } from "react-icons/md";
+import { MdForum } from "react-icons/md";
 import "./opCommunity.css";
 
 export default function ZkevmCommunity() {

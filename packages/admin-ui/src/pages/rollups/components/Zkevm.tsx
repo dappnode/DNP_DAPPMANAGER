@@ -18,7 +18,7 @@ import { MdDownload } from "react-icons/md";
 
 export function Zkevm() {
   const navigate = useNavigate();
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+  const [reqStatus] = useState<ReqStatus>({});
   const dnpsRequest = useApi.packagesGet();
 
   // Declare zkevmDnp and zkevmRunning variables
@@ -74,7 +74,7 @@ export function Zkevm() {
                   <Alert variant="secondary">
                     You must install the Zkevm package{" "}
                     <a
-                      href="#"
+                      className="install-link"
                       onClick={() =>
                         navigate(`${getInstallerPath(zkevmDnpName)}/${zkevmDnpName}`)
                       }
