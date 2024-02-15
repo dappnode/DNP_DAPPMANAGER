@@ -14,7 +14,6 @@ import Button from "components/Button";
 import { zkevmDnpName } from "params";
 import ZkevmCommunity from "./ZKevmCommunity";
 import { prettyDnpName } from "utils/format";
-import { MdDownload } from "react-icons/md";
 
 export function Zkevm() {
   const navigate = useNavigate();
@@ -55,7 +54,7 @@ export function Zkevm() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <Button variant="dappnode">Go to UI</Button>
+                        <Button variant="dappnode" className="fullWidthButton">Go to UI</Button>
                       </a>
                     </Card>
                   ) : zkevmDnp && !zkevmRunning ? (
@@ -70,18 +69,17 @@ export function Zkevm() {
                   <div className="avatar">
                     <img src={zkevmDnp?.avatarUrl || defaultAvatar} alt="avatar" />
                   </div>
+                  <div className="title">{zkevmDnp && prettyDnpName(zkevmDnp.dnpName)}</div>
                   <br />
-                  <Alert variant="secondary">
-                    You must install the Zkevm package{" "}
-                    <a
-                      className="install-link"
-                      onClick={() =>
-                        navigate(`${getInstallerPath(zkevmDnpName)}/${zkevmDnpName}`)
-                      }
-                    >
-                      here <MdDownload />
-                    </a>
-                  </Alert>
+                  <p>
+                    You must install the Zkevm package
+                  </p>
+                  <Button
+                    variant="dappnode"
+                    className="fullWidthButton"
+                    onClick={() =>
+                      navigate(`${getInstallerPath(zkevmDnpName)}/${zkevmDnpName}`)
+                    }>GET</Button>
                 </Card>
               )
             ) : null}
