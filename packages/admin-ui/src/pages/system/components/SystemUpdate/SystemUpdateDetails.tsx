@@ -68,16 +68,5 @@ export function getCoreDeps(
   if (coreDeps.length) return coreDeps;
 
   const coreDnp = corePackages.find(dnp => (dnp.name || "").includes("core"));
-  if (coreDnp) {
-    // #### TODO: to prevent show the legacy OpenVPN 0.2.0 warning alert
-    // remove the warning on install for the core.dnp.dappnode.eth DNP
-    // Alerts can be added via the conditional update alerts
-    coreDnp.warningOnInstall = "";
-
-    // instead create a new object with warningOnInstall removed
-    // otherwise there will be raised the error: `TypeError: Cannot add property warningOnInstall, object is not extensible`
-    return [{ ...coreDnp, warningOnInstall: "" }];
-  }
-
-  return [];
+  return coreDnp ? [coreDnp] : [];
 }
