@@ -42,13 +42,12 @@ export function Zkevm() {
                       <div className="avatar">
                         <img src={zkevmDnp?.avatarUrl || defaultAvatar} alt="avatar" />
                       </div>
-                      <div className="title">{prettyDnpName(zkevmDnp.dnpName)} </div>
+                      <div className="title">{prettyDnpName(zkevmDnp.dnpName)}</div>
 
                       <br />
                       <Alert variant="success">
                         The Zkevm package is currently <span className="running-text">running</span>
                       </Alert>
-                      <br />
                       <a
                         href="http://ui.zkevm-tokens-withdrawal.dappnode/"
                         target="_blank"
@@ -58,9 +57,24 @@ export function Zkevm() {
                       </a>
                     </Card>
                   ) : zkevmDnp && !zkevmRunning ? (
-                    <Alert variant="warning">
-                      The Zkevm package is installed but not currently running.
-                    </Alert>
+                    <Card className="not-found">
+                      {/* zkevmDnp is not found */}
+                      <div className="avatar">
+                        <img src={zkevmDnp?.avatarUrl || defaultAvatar} alt="avatar" />
+                      </div>
+                      <div className="title">{zkevmDnp && prettyDnpName(zkevmDnp.dnpName)}</div>
+                      <br />
+                      <Alert variant="warning">
+                        The Zkevm package is installed but not currently running.
+                      </Alert>
+                      <Button
+                        variant="dappnode"
+                        className="fullWidthButton"
+                        onClick={() => navigate(`/packages/my/${zkevmDnpName}/info`)}
+                      >
+                        GO TO PACKAGES
+                      </Button>
+                    </Card>
                   ) : null}
                 </>
               ) : (

@@ -13,21 +13,21 @@ const RollupsRoot: React.FC = () => {
     title: string;
     component: () => React.JSX.Element;
   }[] = [
-    {
-      subPath: "optimism",
-      title: "Optimism",
-      component: () =>
-        Optimism({
-          description: "Optimism is a Layer 2 scaling solution for Ethereum."
-        })
-    },
-    {
-      title: "zkEVM",
-      subPath: "zk",
-      component: () =>
-        Zkevm()
-    }
-  ];
+      {
+        subPath: "optimism",
+        title: "Optimism",
+        component: () =>
+          Optimism({
+            description: "Optimism is a Layer 2 scaling solution for Ethereum."
+          })
+      },
+      {
+        title: "zkEVM",
+        subPath: "zkevm",
+        component: () =>
+          Zkevm()
+      }
+    ];
 
   return (
     <>
