@@ -16,6 +16,7 @@ type ScriptName =
   | "collect_host_info.sh"
   | "avahi_daemon.sh"
   | "reboot_required.sh"
+  | "docker_upgrade.sh"
   | "update_upgrade.sh";
 
 /**

@@ -9,6 +9,7 @@ export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
 export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
+export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";
 export { ethClientFallbackSet } from "./ethClientFallbackSet.js";
