@@ -9,6 +9,7 @@ import { withToast } from "components/toast/Toast";
 import { DockerUpgradeRequirements } from "@dappnode/types";
 //import { Alert } from "react-bootstrap";
 import { gte, lt } from "semver";
+import Card from "components/Card";
 
 function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
   return (
@@ -79,7 +80,7 @@ export function DockerUpgrade() {
     lt(checkReq.result.dockerHostVersion, checkReq.result.dockerLatestVersion);
 
   return (
-    <>
+    <Card spacing>
       <div className="subtle-header">UPDATE DOCKER ENGINE</div>
       <p>Update docker engine to a stable version with DAppNode</p>
 
@@ -114,6 +115,6 @@ export function DockerUpgrade() {
           ) : null}
         </>
       )}
-    </>
+    </Card>
   );
 }

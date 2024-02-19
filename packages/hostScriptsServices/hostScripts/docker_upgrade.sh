@@ -220,7 +220,7 @@ case $1 in
     getDockerLatestVersion
     getIsDockerInstalledThroughApt
     getIsDockerInUnattendedUpgrades
-    echo "{\"isDockerInstalledThroughApt\": ${isDockerInstalledThroughApt}, \"isDockerInUnattendedUpgrades\": ${isDockerInUnattendedUpgrades}, \"dockerHostVersion\": ${dockerHostVersion}, \"dockerLatestVersion\": \"${dockerLatestVersion}\"}"
+    echo -n "{\"isDockerInstalledThroughApt\": \"${isDockerInstalledThroughApt}\", \"isDockerInUnattendedUpgrades\": \"${isDockerInUnattendedUpgrades}\", \"dockerHostVersion\": \"${dockerHostVersion}\", \"dockerLatestVersion\": \"${dockerLatestVersion}\"}"
     ;;
 --upgrade)
     internetAndDnsActive
