@@ -378,7 +378,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   }),
   optimismConfigSet: async () => {},
-  updateUpgrade: async () => "Successfully updated"
+  updateUpgrade: async () => "Successfully updated",
+  dockerUpgrade: async () => {},
+  dockerUpgradeCheck: async () => ({
+    isDockerInUnattendedUpgrades: true,
+    isDockerInstalledThroughApt: true,
+    dockerHostVersion: "20.10.7",
+    dockerLatestVersion: "20.10.8"
+  })
 };
 
 export const calls: Routes = {

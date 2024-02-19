@@ -7,7 +7,7 @@ import Ok from "components/Ok";
 import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 import { DockerUpgradeRequirements } from "@dappnode/types";
-import { Alert } from "react-bootstrap";
+//import { Alert } from "react-bootstrap";
 import { gte, lt } from "semver";
 
 function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
