@@ -32,11 +32,7 @@ function getDockerHostVersion() {
 
 # Get the latest version of Docker
 function getDockerLatestVersion() {
-    # TODO: find a better way to get the latest version of Docker
-    # Get the latest version of Docker from the GitHub API. Using apt might not return anything
-    # Since docker might have been installed through pkg instead of apt
-    apt-get install -y jq >> ${LOG_FILE} 2>&1
-    dockerLatestVersion=$(curl -s https://api.github.com/repos/docker/cli/tags | jq -r '.[0].name | sub("^v"; "")')
+    dockerLatestVersion=$(apt-cache madison docker-ce | head -n 1 | awk '{print $3}' | sed -E 's/^[0-9]+:([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 }
 
 # Check if Docker is installed through apt
