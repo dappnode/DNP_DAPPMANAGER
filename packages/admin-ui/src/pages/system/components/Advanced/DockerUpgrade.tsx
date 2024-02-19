@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { ReqStatus } from "types";
 import { api } from "api";
 import { confirm } from "components/ConfirmDialog";
@@ -16,12 +16,12 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
     <div>
       <Ok
         title="Docker in unattended upgrades"
-        msg=""
+        msg="Docker is in the unattended upgrades list. This means that it will be automatically updated by the system"
         ok={items.isDockerInUnattendedUpgrades}
       />
       <Ok
         title="Docker installed through apt"
-        msg=""
+        msg="docker has been installed through the apt package manager. This is the recommended way to install docker in DAppNode so it can be automatically updated by unattended upgrades"
         ok={items.isDockerInstalledThroughApt}
       />
       <Ok
@@ -38,6 +38,20 @@ export function DockerUpgrade() {
   const [checkReq, setCheckReq] = useState<
     ReqStatus<DockerUpgradeRequirements>
   >({});
+  const [canUpdate, setCanUpdate] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (checkReq.result) {
+      setCanUpdate(
+        !checkReq.result.isDockerInUnattendedUpgrades &&
+          !checkReq.result.isDockerInstalledThroughApt &&
+          lt(
+            checkReq.result.dockerHostVersion,
+            checkReq.result.dockerLatestVersion
+          )
+      );
+    }
+  }, [checkReq.result]);
 
   async function dockerUpdateCheck() {
     try {
@@ -72,12 +86,6 @@ export function DockerUpgrade() {
       console.error("Error on dockerUpdate", e);
     }
   }
-
-  const canUpdate =
-    checkReq.result &&
-    !checkReq.result.isDockerInUnattendedUpgrades &&
-    !checkReq.result.isDockerInstalledThroughApt &&
-    lt(checkReq.result.dockerHostVersion, checkReq.result.dockerLatestVersion);
 
   return (
     <Card spacing>
