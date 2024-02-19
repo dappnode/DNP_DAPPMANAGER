@@ -18,7 +18,6 @@ LOG_FILE="/usr/src/dappnode/logs/docker_upgrade.log"
 # Initialize variables
 isDockerInstalledThroughApt=false
 isDockerInUnattendedUpgrades=false
-isDockerUpdated=false
 dockerHostVersion=""
 dockerLatestVersion=""
 
@@ -36,7 +35,7 @@ function getDockerLatestVersion() {
     # TODO: find a better way to get the latest version of Docker
     # Get the latest version of Docker from the GitHub API. Using apt might not return anything
     # Since docker might have been installed through pkg instead of apt
-    apt-get install -y jq 2>&1 | tee -a ${LOG_FILE}
+    apt-get install -y jq >> ${LOG_FILE} 2>&1
     dockerLatestVersion=$(curl -s https://api.github.com/repos/docker/cli/tags | jq -r '.[0].name | sub("^v"; "")')
 }
 

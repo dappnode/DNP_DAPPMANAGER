@@ -7,7 +7,7 @@ import Ok from "components/Ok";
 import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 import { DockerUpgradeRequirements } from "@dappnode/types";
-//import { Alert } from "react-bootstrap";
+import { Alert } from "react-bootstrap";
 import { gte, lt } from "semver";
 import Card from "components/Card";
 
@@ -84,10 +84,14 @@ export function DockerUpgrade() {
       <div className="subtle-header">UPDATE DOCKER ENGINE</div>
       <p>Update docker engine to a stable version with DAppNode</p>
 
-      {!canUpdate && (
+      {!canUpdate ? (
         <Button disabled={checkReq.loading} onClick={dockerUpdateCheck}>
           Check update requirements
         </Button>
+      ) : (
+        <Alert variant="success">
+          Docker is updated and in unattended upgrades and installed through apt
+        </Alert>
       )}
 
       {checkReq.error ? (
