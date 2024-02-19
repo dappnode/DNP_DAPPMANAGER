@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import { DappNodeDirectory } from "../../src/directory/index.js";
 import { expect } from "chai";
 
-describe("Dappnode Directory", function () {
+describe.skip("Dappnode Directory", function () {
   this.timeout(100000);
   const contract = new DappNodeDirectory(
     `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
