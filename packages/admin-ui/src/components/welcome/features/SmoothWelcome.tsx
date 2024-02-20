@@ -1,5 +1,4 @@
 import React from "react";
-import BottomButtons from "../BottomButtons";
 import { Link } from "react-router-dom";
 import { useApi } from "api";
 import Button from "components/Button";
@@ -68,7 +67,6 @@ export default function SmoothWelcome({
           </>
         )}
       </div>
-      <BottomButtons onBack={onBack} onNext={onNext} />
     </>
   );
 }

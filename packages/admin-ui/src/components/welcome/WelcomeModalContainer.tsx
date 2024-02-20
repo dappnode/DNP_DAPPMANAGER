@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { joinCssClass } from "utils/css";
 import "./welcome.scss";
+import { AiOutlineClose } from "react-icons/ai";
 
 // Matches the value in welcome.scss
 const transitionMs = 300;
@@ -18,7 +19,8 @@ type FadeStatus = "null" | "opacity-0" | "opacity-1";
 const WelcomeModalContainer: React.FC<{
   children?: React.ReactNode;
   show: boolean;
-}> = ({ show, children }) => {
+  onClose: () => void;
+}> = ({ show, children, onClose }) => {
   const [status, setStatus] = useState<FadeStatus>("null");
 
   useEffect(() => {
@@ -42,6 +44,9 @@ const WelcomeModalContainer: React.FC<{
   return (
     <div className={joinCssClass("welcome-container", status)}>
       <div className="welcome">
+        <button className="close-button" onClick={onClose}>
+          <AiOutlineClose className="close-icon" />
+        </button>
         {children}
       </div>
     </div>
