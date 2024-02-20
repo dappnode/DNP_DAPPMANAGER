@@ -278,6 +278,7 @@ export interface RequestedDnp {
   imageSize: number;
   isUpdated: boolean;
   isInstalled: boolean;
+  installedVersion?: string;
   // Decoupled metadata
   manifest: Manifest;
   specialPermissions: SpecialPermissionAllDnps;
