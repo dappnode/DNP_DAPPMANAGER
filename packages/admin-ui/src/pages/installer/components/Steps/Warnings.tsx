@@ -39,40 +39,40 @@ export default function Warnings({
               <RenderMarkdown source={warnings.onInstall} />
             </div>
           </div>
-        ) : updateType === "patch" && warnings.onPatchUpdate ? (
-          <div>
-            <div className="card-section-header">
-              <span>
-                <strong>Patch Update Warning</strong>
-              </span>
-            </div>
-            <div>
-              <RenderMarkdown source={warnings.onPatchUpdate} />
-            </div>
-          </div>
-        ) : updateType === "minor" && warnings.onMinorUpdate ? (
-          <div>
-            <div className="card-section-header">
-              <span>
-                <strong>Minor Update Warning</strong>
-              </span>
-            </div>
-            <div>
-              <RenderMarkdown source={warnings.onMinorUpdate} />
-            </div>
-          </div>
-        ) : updateType === "major" && warnings.onMajorUpdate ? (
-          <div>
-            <div className="card-section-header">
-              <span>
-                <strong>Major Update Warning</strong>
-              </span>
-            </div>
-            <div>
-              <RenderMarkdown source={warnings.onMajorUpdate} />
-            </div>
-          </div>
         ) : null
+      ) : updateType === "patch" && warnings.onPatchUpdate ? (
+        <div>
+          <div className="card-section-header">
+            <span>
+              <strong>Patch Update Warning</strong>
+            </span>
+          </div>
+          <div>
+            <RenderMarkdown source={warnings.onPatchUpdate} />
+          </div>
+        </div>
+      ) : updateType === "minor" && warnings.onMinorUpdate ? (
+        <div>
+          <div className="card-section-header">
+            <span>
+              <strong>Minor Update Warning</strong>
+            </span>
+          </div>
+          <div>
+            <RenderMarkdown source={warnings.onMinorUpdate} />
+          </div>
+        </div>
+      ) : updateType === "major" && warnings.onMajorUpdate ? (
+        <div>
+          <div className="card-section-header">
+            <span>
+              <strong>Major Update Warning</strong>
+            </span>
+          </div>
+          <div>
+            <RenderMarkdown source={warnings.onMajorUpdate} />
+          </div>
+        </div>
       ) : null}
 
       <div className="button-group">
