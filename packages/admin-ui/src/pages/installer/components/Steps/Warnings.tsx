@@ -4,6 +4,7 @@ import { RequestedDnp } from "@dappnode/types";
 import { Manifest } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
+import { ReleaseType } from "semver";
 
 export default function Warnings({
   goNext,
@@ -16,7 +17,7 @@ export default function Warnings({
   goBack: () => void;
   warnings: Manifest["warnings"];
   isInstalled: RequestedDnp["isInstalled"];
-  updateType?: "" | "downgrade" | "major" | "minor" | "patch" | null;
+  updateType?: ReleaseType | null | "";
 }) {
   if (!warnings)
     return (

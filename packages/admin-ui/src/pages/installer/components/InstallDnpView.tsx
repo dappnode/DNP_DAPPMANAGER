@@ -31,7 +31,7 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
 import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
-import computeSemverUpdateType from "utils/computeSemverUpdateType";
+import { diff } from "semver";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -70,8 +70,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     isInstalled,
     installedVersion
   } = dnp;
-  const updateType =
-    installedVersion && computeSemverUpdateType(installedVersion, semVersion);
+  const updateType = installedVersion && diff(installedVersion, semVersion);
   console.log("updateType", updateType);
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
