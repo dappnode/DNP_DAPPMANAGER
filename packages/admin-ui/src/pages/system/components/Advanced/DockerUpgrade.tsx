@@ -7,7 +7,6 @@ import Ok from "components/Ok";
 import ErrorView from "components/ErrorView";
 import { withToast } from "components/toast/Toast";
 import { DockerUpgradeRequirements } from "@dappnode/types";
-import { Alert } from "react-bootstrap";
 import { gte, lt } from "semver";
 import Card from "components/Card";
 
@@ -29,7 +28,7 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
         msg={
           items.isDockerInstalledThroughApt
             ? `Docker host version ${items.dockerHostVersion}, Docker latest version ${items.dockerLatestVersion}`
-            : `Could not be determined the latest docker version available because docker is not installed through apt`
+            : `Docker host version ${items.dockerHostVersion}. Could not be determined the latest docker version available because docker is not installed through apt`
         }
         ok={
           items.isDockerInstalledThroughApt && items.dockerLatestVersion
@@ -108,14 +107,10 @@ export function DockerUpgrade() {
         so you do not worry about updating docker anymore
       </p>
 
-      {!canUpdate ? (
+      {!canUpdate && (
         <Button disabled={checkReq.loading} onClick={dockerUpdateCheck}>
           Check update requirements
         </Button>
-      ) : (
-        <Alert variant="success">
-          Docker is updated and in unattended upgrades and installed through apt
-        </Alert>
       )}
 
       {checkReq.error ? (
