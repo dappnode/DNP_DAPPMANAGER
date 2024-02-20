@@ -9,12 +9,14 @@ export default function Warnings({
   goNext,
   goBack,
   warnings,
-  isInstalled
+  isInstalled,
+  updateType
 }: {
   goNext: () => void;
   goBack: () => void;
   warnings: Manifest["warnings"];
   isInstalled: RequestedDnp["isInstalled"];
+  updateType?: "" | "downgrade" | "major" | "minor" | "patch" | null;
 }) {
   if (!warnings)
     return (
@@ -25,54 +27,53 @@ export default function Warnings({
 
   return (
     <Card>
-      {warnings.onInstall && (
-        <div>
-          <div className="card-section-header">
-            <span>
-              <strong>Installation Warning</strong>
-            </span>
-          </div>
+      {isInstalled ? (
+        warnings.onInstall ? (
           <div>
-            <RenderMarkdown source={warnings.onInstall} />
+            <div className="card-section-header">
+              <span>
+                <strong>Installation Warning</strong>
+              </span>
+            </div>
+            <div>
+              <RenderMarkdown source={warnings.onInstall} />
+            </div>
           </div>
-        </div>
-      )}
-      {isInstalled && warnings.onPatchUpdate && (
-        <div>
-          <div className="card-section-header">
-            <span>
-              <strong>Patch Update Warning</strong>
-            </span>
-          </div>
+        ) : updateType === "patch" && warnings.onPatchUpdate ? (
           <div>
-            <RenderMarkdown source={warnings.onPatchUpdate} />
+            <div className="card-section-header">
+              <span>
+                <strong>Patch Update Warning</strong>
+              </span>
+            </div>
+            <div>
+              <RenderMarkdown source={warnings.onPatchUpdate} />
+            </div>
           </div>
-        </div>
-      )}
-      {isInstalled && warnings.onMinorUpdate && (
-        <div>
-          <div className="card-section-header">
-            <span>
-              <strong>Minor Update Warning</strong>
-            </span>
-          </div>
+        ) : updateType === "minor" && warnings.onMinorUpdate ? (
           <div>
-            <RenderMarkdown source={warnings.onMinorUpdate} />
+            <div className="card-section-header">
+              <span>
+                <strong>Minor Update Warning</strong>
+              </span>
+            </div>
+            <div>
+              <RenderMarkdown source={warnings.onMinorUpdate} />
+            </div>
           </div>
-        </div>
-      )}
-      {isInstalled && warnings.onMajorUpdate && (
-        <div>
-          <div className="card-section-header">
-            <span>
-              <strong>Major Update Warning</strong>
-            </span>
-          </div>
+        ) : updateType === "major" && warnings.onMajorUpdate ? (
           <div>
-            <RenderMarkdown source={warnings.onMajorUpdate} />
+            <div className="card-section-header">
+              <span>
+                <strong>Major Update Warning</strong>
+              </span>
+            </div>
+            <div>
+              <RenderMarkdown source={warnings.onMajorUpdate} />
+            </div>
           </div>
-        </div>
-      )}
+        ) : null
+      ) : null}
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>

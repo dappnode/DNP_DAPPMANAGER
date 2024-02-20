@@ -31,6 +31,7 @@ import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
 import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
+import computeSemverUpdateType from "utils/computeSemverUpdateType";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -65,12 +66,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     settings,
     manifest,
     setupWizard,
-    isInstalled
+    isInstalled,
+    installedVersion
   } = dnp;
-  const isWarningUpdate =
-    manifest.warnings?.onMajorUpdate ||
-    manifest.warnings?.onMinorUpdate ||
-    manifest.warnings?.onPatchUpdate;
+  const updateType =
+    installedVersion && computeSemverUpdateType(installedVersion, reqVersion);
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
@@ -239,10 +239,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           goBack={goBack}
           warnings={manifest.warnings || {}}
           isInstalled={isInstalled}
+          updateType={updateType}
         />
       ),
-      available:
-        manifest.warnings?.onInstall || (isInstalled && isWarningUpdate)
+      available: manifest.warnings?.onInstall || (isInstalled && updateType)
     },
     {
       name: "Disclaimer",

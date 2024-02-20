@@ -111,6 +111,7 @@ export async function fetchDnpRequest({
     imageSize: mainRelease.imageFile.size,
     isUpdated: getIsUpdated(mainRelease, dnpList),
     isInstalled: getIsInstalled(mainRelease, dnpList),
+    installedVersion: getInstalledVersion(mainRelease, dnpList),
     // Prevent sending duplicated data
     manifest: omit(mainRelease.manifest, ["setupWizard"]),
     specialPermissions, // Decoupled metadata
@@ -213,4 +214,11 @@ function getReleaseSignedSafeMessage(release: PackageRelease): string {
         return "Unsafe origin, bad signature";
       }
   }
+}
+
+function getInstalledVersion(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): string | undefined {
+  return dnpList.find(dnp => dnp.dnpName === dnpName)?.version;
 }
