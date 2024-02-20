@@ -27,19 +27,17 @@ export default function Warnings({
 
   return (
     <Card>
-      {isInstalled ? (
-        warnings.onInstall ? (
-          <div>
-            <div className="card-section-header">
-              <span>
-                <strong>Installation Warning</strong>
-              </span>
-            </div>
-            <div>
-              <RenderMarkdown source={warnings.onInstall} />
-            </div>
+      {isInstalled && warnings.onInstall ? (
+        <div>
+          <div className="card-section-header">
+            <span>
+              <strong>Installation Warning</strong>
+            </span>
           </div>
-        ) : null
+          <div>
+            <RenderMarkdown source={warnings.onInstall} />
+          </div>
+        </div>
       ) : updateType === "patch" && warnings.onPatchUpdate ? (
         <div>
           <div className="card-section-header">
