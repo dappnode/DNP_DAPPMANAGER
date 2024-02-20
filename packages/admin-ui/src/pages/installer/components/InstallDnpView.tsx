@@ -71,7 +71,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     installedVersion
   } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
-  console.log("updateType", updateType);
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
