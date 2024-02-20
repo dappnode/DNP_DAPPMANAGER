@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { EthMultiClientsAndFallback } from "components/EthMultiClient";
-import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
-import { getEthClientTarget } from "services/dappnodeStatus/selectors";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/types";
+import {
+  getEthClientTarget,
+  getEthRemoteRpc
+} from "services/dappnodeStatus/selectors";
 import BottomButtons from "../BottomButtons";
 import { api } from "api";
 
@@ -21,10 +24,17 @@ export default function Repository({
   onNext: () => void;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
+  const ethRemoteRpc = useSelector(getEthRemoteRpc);
   const [useCheckpointSync, setUseCheckpointSync] = useState(true);
   const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
+
+  const [newEthRemoteRpc, setNewEthRemoteRpc] = useState<string>("");
+
+  useEffect(() => {
+    if (ethRemoteRpc) setNewEthRemoteRpc(ethRemoteRpc);
+  }, [ethRemoteRpc]);
 
   useEffect(() => {
     if (ethClientTarget) setTarget(ethClientTarget);
@@ -35,6 +45,7 @@ export default function Repository({
       api
         .ethClientTargetSet({
           target,
+          ethRemoteRpc: newEthRemoteRpc,
           useCheckpointSync
         })
         .catch(e => {
@@ -67,6 +78,8 @@ export default function Repository({
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        newEthRemoteRpc={newEthRemoteRpc}
+        setNewEthRemoteRpc={setNewEthRemoteRpc}
         useCheckpointSync={useCheckpointSync}
         setUseCheckpointSync={setUseCheckpointSync}
         showStats

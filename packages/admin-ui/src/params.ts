@@ -60,12 +60,6 @@ export const mandatoryCoreDnps = [
 ];
 export const corePackages = [...mandatoryCoreDnps, coreDnpName];
 
-// NACL keys
-export const adminNaclSecretKey =
-  "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=";
-export const adminNaclPublicKey =
-  "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
-
 // URLs / Links
 export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
@@ -88,14 +82,11 @@ export const docsUrl = {
   connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
   connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
   connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
-  httpsExplanation:
-    `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
-  ipfsPeersExplanation:
-    `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
+  httpsExplanation: `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
+  ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
-  ethicalMetricsOverview:
-    `${docsBaseUrl}/docs/user/ethical-metrics/overview`
+  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`
 };
 
 export const forumUrl = {

@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { OptimismItem, OptimismItemOk } from "@dappnode/common";
+import { OptimismItem, OptimismItemOk } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -72,9 +72,7 @@ export default function ExecutionClient({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected &&
-            executionClient.data &&
-            executionClient.data.metadata.shortDescription}
+          {isSelected && executionClient.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

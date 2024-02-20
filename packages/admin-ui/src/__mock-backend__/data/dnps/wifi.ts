@@ -4,7 +4,7 @@ const dnpName = "wifi.dnp.dappnode.eth";
 const serviceName = dnpName;
 
 export const wifi: MockDnp = {
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.2.6",
     description: "DAppNode wifi",

@@ -1,8 +1,8 @@
 import isIp from "is-ip";
-import shell from "./shell.js";
-import getDappmanagerImage from "./getDappmanagerImage.js";
+import { shell } from "@dappnode/utils";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
 
-export default async function getInternalIp(): Promise<string> {
+export async function getInternalIp(): Promise<string> {
   try {
     const image = await getDappmanagerImage();
     const output = await shell(

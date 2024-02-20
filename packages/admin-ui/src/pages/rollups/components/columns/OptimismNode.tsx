@@ -1,5 +1,5 @@
 import React from "react";
-import { OptimismItem, OptimismItemOk } from "@dappnode/common";
+import { OptimismItem, OptimismItemOk } from "@dappnode/types";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -73,7 +73,7 @@ export default function OptimismNode({
 
       {rollup.status === "ok" && (
         <div className="description">
-          {isSelected && rollup.data && rollup.data.metadata.shortDescription}
+          {isSelected && rollup.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

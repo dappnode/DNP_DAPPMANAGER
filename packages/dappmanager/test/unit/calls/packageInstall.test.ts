@@ -1,16 +1,14 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import { PackageRelease } from "@dappnode/common";
+import { PackageRelease } from "@dappnode/types";
 import { getMockEventBus } from "./eventBus.js";
 import rewiremock from "rewiremock/webpack";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall.js";
-import { DappGetState } from "../../../src/modules/dappGet/types.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
-import { ReleaseFetcher } from "../../../src/modules/release/index.js";
-import { Manifest } from "@dappnode/types";
-import { PackageRequest } from "../../../src/types.js";
+import { DappGetState, DappnodeInstaller } from "@dappnode/installer";
+import { PackageRequest, Manifest } from "@dappnode/types";
 
 describe.skip("Call function: packageInstall", function () {
   // Pkg data
@@ -23,7 +21,7 @@ describe.skip("Call function: packageInstall", function () {
   };
   const pkgPkg: PackageRelease = {
     ...mockRelease,
-    metadata: pkgManifest,
+    manifest: pkgManifest,
     dnpName: pkgName,
     reqVersion: pkgVer
   };
@@ -38,7 +36,7 @@ describe.skip("Call function: packageInstall", function () {
   };
   const depPkg: PackageRelease = {
     ...mockRelease,
-    metadata: depManifest,
+    manifest: depManifest,
     dnpName: depName,
     reqVersion: depVer
   };
@@ -52,7 +50,7 @@ describe.skip("Call function: packageInstall", function () {
 
   const dappGetSpy = sinon.spy();
 
-  class ReleaseFetcherMock extends ReleaseFetcher {
+  class DappnodeInstallerMock extends DappnodeInstaller {
     async getReleasesResolved(req: PackageRequest): Promise<{
       releases: PackageRelease[];
       message: string;
@@ -79,8 +77,8 @@ describe.skip("Call function: packageInstall", function () {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/packageInstall"),
       mock => {
-        mock(() => import("../../../src/modules/release"))
-          .with({ ReleaseFetcher: ReleaseFetcherMock })
+        mock(() => import("@dappnode/installer"))
+          .with({ DappnodeInstaller: DappnodeInstallerMock })
           .toBeUsed();
         mock(() => import("@dappnode/eventbus"))
           .with({ eventBus })

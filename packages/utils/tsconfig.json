@@ -2,11 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     /* Modules */
-    "types": ["node"],
+    "types": ["node", "mocha"],
 
     /* Emit */
     "outDir": "dist",
-    "sourceMap": true,
 
     /* Language and Environment */
     "lib": ["ESNext"]

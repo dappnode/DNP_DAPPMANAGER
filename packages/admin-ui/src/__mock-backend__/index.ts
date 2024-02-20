@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -40,7 +40,7 @@ let dappnodeWebName = "Mock-DAppNode";
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   backupGet: async () =>
     "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
-  backupRestore: async () => { },
+  backupRestore: async () => {},
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",
@@ -60,19 +60,20 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       progress: 0.83027522935
     }
   ],
-  changeIpfsTimeout: async () => { },
-  cleanCache: async () => { },
-  cleanDb: async () => { },
-  copyFileTo: async () => { },
+  changeIpfsTimeout: async () => {},
+  cleanCache: async () => {},
+  cleanDb: async () => {},
+  copyFileToDockerContainer: async () => {},
   diagnose: async () => [],
-  ethClientFallbackSet: async () => { },
-  ethClientTargetSet: async () => { },
-  ipfsTest: async () => { },
+  ethClientFallbackSet: async () => {},
+  ethClientTargetSet: async () => {},
+  getHostUptime: async () => "1 week, 1 day, 5 hours, 10 minutes",
+  ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
   }),
 
-  packageSentDataDelete: async () => { },
+  packageSentDataDelete: async () => {},
 
   portsToOpenGet: async () => [
     {
@@ -120,9 +121,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-  dappnodeWebNameSet: async ({ dappnodeWebName }) => { },
+  dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
   statsCpuGet: async () => ({
-    usedPercentage: 88
+    usedPercentage: 88,
+    numberOfCores: 4,
+    temperatureAverage: 40
   }),
   statsMemoryGet: async () => ({
     total: 8093155328,
@@ -136,7 +139,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-
+  statsSwapGet: async () => ({
+    total: 2147483648,
+    used: 0,
+    free: 2147483648,
+    usedPercentage: 0
+  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",
@@ -176,12 +184,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   ],
 
-  newFeatureStatusSet: async () => { },
-  poweroffHost: async () => { },
-  rebootHost: async () => { },
-  rebootHostIsRequiredGet: async () => false,
-  seedPhraseSet: async () => { },
-  setStaticIp: async () => { },
+  newFeatureStatusSet: async () => {},
+  poweroffHost: async () => {},
+  rebootHost: async () => {},
+  rebootHostIsRequiredGet: async () => ({
+    rebootRequired: true,
+    pkgs: "docker"
+  }),
+  setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
     versionData: {
@@ -204,7 +214,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     alertToOpenPorts: false,
     internalIp: "192.168.0.1",
     publicIp: "85.84.83.82",
-    dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
     eth2ClientTarget: {
@@ -220,7 +229,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         stack: "Some Error\nline 56 file.ts"
       }
     },
-    ethProvider: "http://geth.dappnode:8545",
+    ethRemoteRpc: "http://remoteNode.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
       //"repository",
@@ -230,7 +239,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       //"change-host-password"
     ]
   }),
-  natRenewalEnable: async () => { },
+  natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [
     { name: "sda", size: "3.7T" },
@@ -242,17 +251,17 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     { lv_name: "swap_1", vg_name: "rootvg", lv_size: "976.00m" }
   ],
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space",
-  ipfsClientTargetSet: async () => { },
+  ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
   }),
-  enableEthicalMetrics: async ({ mail }) => { },
+  enableEthicalMetrics: async ({ mail }) => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
     isEnabled: true
   }),
-  disableEthicalMetrics: async () => { },
+  disableEthicalMetrics: async () => {},
   optimismConfigGet: async () => ({
     executionClients: [
       {
@@ -273,7 +282,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           },
           warnings: {},
           signedSafe: true,
-          metadata: {
+          manifest: {
             name: "geth.dnp.dappnode.eth",
             description: "Go implementation of ethereum. Execution client",
             shortDescription: "Go implementation of ethereum",
@@ -301,7 +310,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           },
           warnings: {},
           signedSafe: true,
-          metadata: {
+          manifest: {
             name: "geth.dnp.dappnode.eth",
             description: "Go implementation of ethereum. Execution client",
             shortDescription: "Go implementation of ethereum",
@@ -330,7 +339,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         warnings: {},
         signedSafe: true,
-        metadata: {
+        manifest: {
           name: "geth.dnp.dappnode.eth",
           description: "Go implementation of ethereum. Execution client",
           shortDescription: "Go implementation of ethereum",
@@ -358,7 +367,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         },
         warnings: {},
         signedSafe: true,
-        metadata: {
+        manifest: {
           name: "geth.dnp.dappnode.eth",
           description: "Go implementation of ethereum. Execution client",
           shortDescription: "Go implementation of ethereum",
@@ -368,7 +377,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isSelected: true
     }
   }),
-  optimismConfigSet: async () => { }
+  optimismConfigSet: async () => {},
+  updateUpgrade: async () => "Successfully updated"
 };
 
 export const calls: Routes = {

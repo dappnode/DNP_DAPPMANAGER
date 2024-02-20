@@ -14,7 +14,7 @@ import { api, useApi } from "api";
 import { continueIfCalleDisconnected } from "api/utils";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 // Types
-import { ContainerState, WifiReport } from "@dappnode/common";
+import { ContainerState, WifiReport } from "@dappnode/types";
 import { docsUrl, wifiDnpName } from "./../../../../params";
 
 import { StateBadgeContainer } from "pages/packages/components/StateBadge";

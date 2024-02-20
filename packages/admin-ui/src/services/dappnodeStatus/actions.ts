@@ -14,7 +14,8 @@ import {
 
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
-export const setRebootHostIsRequired = dappnodeStatus.actions.rebootIsRequired;
+export const setRebootHostIsRequired =
+  dappnodeStatus.actions.rebootRequiredScript;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 
@@ -23,7 +24,7 @@ const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 export const fetchRebootIsRequired = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
     dispatch(setRebootHostIsRequired(await api.rebootHostIsRequiredGet()));
-  }, "rebootIsRequired");
+  }, "rebootHostIsRequiredGet");
 
 export const fetchPasswordIsSecure = (): AppThunk => async dispatch =>
   withTryCatch(async () => {

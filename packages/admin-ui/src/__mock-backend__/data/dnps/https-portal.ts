@@ -5,7 +5,7 @@ const dnpName = "https.dnp.dappnode.eth";
 export const httpsPortal: MockDnp = {
   avatar: "",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.1.0",
     description: "HTTPs Portal",

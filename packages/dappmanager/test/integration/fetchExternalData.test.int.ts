@@ -2,13 +2,17 @@ import "mocha";
 import { expect } from "chai";
 import * as calls from "../../src/calls/index.js";
 import { clearDbs } from "../testUtils.js";
+import { params } from "@dappnode/params";
 
 describe("Fetch external data", () => {
   before("Clear DBs and set remote", async () => {
     clearDbs();
     // Activate remote and fallback to fetch test data without a local node
     await calls.ethClientFallbackSet({ fallback: "on" });
-    await calls.ethClientTargetSet({ target: "remote" });
+    await calls.ethClientTargetSet({
+      target: "remote",
+      ethRemoteRpc: params.ETH_MAINNET_RPC_URL_REMOTE
+    });
   });
 
   const bindId = "bind.dnp.dappnode.eth";

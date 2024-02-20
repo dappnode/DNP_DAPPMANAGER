@@ -1,5 +1,5 @@
-import * as db from "../db/index.js";
-import * as dyndns from "../modules/dyndns/index.js";
+import * as db from "@dappnode/db";
+import { updateDyndnsIp } from "@dappnode/dyndns";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 
@@ -22,7 +22,7 @@ export async function setStaticIp({
   if (!oldStaticIp && staticIp) {
     logs.info(`Enabled static IP: ${staticIp}`);
   } else if (oldStaticIp && !staticIp) {
-    await dyndns.updateIp();
+    await updateDyndnsIp();
     const domain = db.domain.get();
     logs.info(`Disabled static IP, and registered to dyndns: ${domain}`);
   } else {

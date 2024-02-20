@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -11,7 +11,6 @@ import { useNavigate } from "react-router-dom";
 import { Table } from "react-bootstrap";
 import { Form } from "react-bootstrap";
 import { AiFillInfoCircle } from "react-icons/ai";
-import { Network } from "@dappnode/types";
 
 interface RelayIface {
   operator: string;
@@ -95,9 +94,7 @@ export default function MevBoost<T extends Network>({
 
       {mevBoost.status === "ok" && (
         <div className="description">
-          {isSelected &&
-            mevBoost.data &&
-            mevBoost.data.metadata.shortDescription}
+          {isSelected && mevBoost.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>
@@ -244,25 +241,11 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
             "https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com"
         },
         {
-          operator: "bloXroute (Ethical)",
-          ofacCompliant: false,
-          docs: "https://bloxroute.com/",
-          url:
-            "https://0xad0a8bb54565c2211cee576363f3a347089d2f07cf72679d16911d740262694cadb62d7fd7483f27afd714ca0f1b9118@bloxroute.ethical.blxrbdn.com"
-        },
-        {
           operator: "bloXroute (Regulated)",
           ofacCompliant: true,
           docs: "https://bloxroute.com/",
           url:
             "https://0xb0b07cd0abef743db4260b0ed50619cf6ad4d82064cb4fbec9d3ec530f7c5e6793d9f286c4e082c0244ffb9f2658fe88@bloxroute.regulated.blxrbdn.com"
-        },
-        {
-          operator: "Blocknative",
-          ofacCompliant: true,
-          docs: "https://www.blocknative.com/",
-          url:
-            "https://0x9000009807ed12c1f08bf4e81c6da3ba8e3fc3d953898ce0102433094e5f22f21102ec057841fcb81978ed1ea0fa8246@builder-relay-mainnet.blocknative.com"
         },
         {
           operator: "Eden Network",

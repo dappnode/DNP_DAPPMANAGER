@@ -2,7 +2,7 @@ import { logSafeObjects } from "./logSafeObjects.js";
 import { logs } from "./logs.js";
 // dappnode
 import { JsonFileDb } from "@dappnode/utils";
-import { UserActionLog } from "@dappnode/common";
+import { UserActionLog } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 

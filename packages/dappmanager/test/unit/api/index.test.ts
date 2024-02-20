@@ -2,7 +2,7 @@ import { startHttpApi } from "../../../src/api/startHttpApi.js";
 import fetch, { Response } from "node-fetch";
 import http from "http";
 import { expect } from "chai";
-import { urlJoin } from "../../../src/utils/url.js";
+import { urlJoin } from "@dappnode/utils";
 import { io } from "socket.io-client";
 
 interface RequestRes {
@@ -20,7 +20,7 @@ describe.skip("Test server auth", function () {
   async function parseRes(res: Response): Promise<RequestRes> {
     return {
       code: res.status,
-      body: await res.json()
+      body: (await res.json()) as any
     };
   }
 

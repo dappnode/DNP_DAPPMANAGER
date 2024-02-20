@@ -22,7 +22,7 @@ export function prepareMessageFromPackage({
 }
 
 export function hashMessage(message: string): string {
-  return ethers.utils.solidityKeccak256(["string"], [message]);
+  return ethers.solidityPackedKeccak256(["string"], [message]);
 }
 
 export function signDataFromPackage({
@@ -37,10 +37,8 @@ export function signDataFromPackage({
   const message = prepareMessageFromPackage({ packageEnsName, data });
   const hash = hashMessage(message);
 
-  // Using ethers as a raw signer (without '\x19Ethereum Signed Message:\n' prefix)
-  // to mimic previous EthCrypto signature
-  const signingKey = new ethers.utils.SigningKey(privateKey);
-  return ethers.utils.joinSignature(signingKey.signDigest(hash));
+  const signingKey = new ethers.SigningKey(privateKey);
+  return ethers.Signature.from(signingKey.sign(hash)).serialized;
 }
 
 export function getAddressFromPrivateKey(privateKey: string): string {

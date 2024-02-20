@@ -1,11 +1,11 @@
 import Ajv from "ajv";
 import { routesArgumentsSchema } from "@dappnode/common";
 import {
-  Routes,
   LoggerMiddleware,
   RpcPayload,
+  Routes,
   RpcResponse
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 const ajv = new Ajv({ allErrors: true });
 

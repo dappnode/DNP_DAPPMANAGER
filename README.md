@@ -63,6 +63,7 @@ docker-compose logs -f
 ### Developing
 
 Before choosing any of the following options for development, remember to run:
+
 ```
 yarn
 yarn generate
@@ -116,6 +117,7 @@ https://github.com/dappnode/DNP_DAPPMANAGER
 Open the directory where you cloned the repo using VS Code SSH extension (optional, but recommended)
 
 Force remove Dappmanager container:
+
 ```
 docker rm -f DAppNodeCore-dappmanager.dnp.dappnode.eth
 ```
@@ -132,10 +134,9 @@ Start dev Dappmanager:
 docker-compose -f docker-compose-dev.yml up -d
 ```
 
-After this, you will be able to access the dappmanager through http://172.33.1.7:5000/
+After this, you will be able to access the dappmanager through http://my.dappnode:5000/
 
 _Note: To switch back to production Dappmanager, you will have to remove this container and run:_
-
 
 ```
 docker-compose -f /usr/src/dappnode/DNCORE/docker-compose-dappmanager.yml up -d

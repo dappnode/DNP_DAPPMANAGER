@@ -3,12 +3,12 @@ import {
   getHostVolumeGroups,
   getHostLogicalVolumes,
   extendHostDiskSpace
-} from "../modules/hostScripts/scripts/lvm.js";
+} from "@dappnode/hostscriptsservices";
 import {
   HostHardDisk,
   HostVolumeGroup,
   HostLogicalVolume
-} from "@dappnode/common";
+} from "@dappnode/types";
 
 export async function lvmhardDisksGet(): Promise<HostHardDisk[]> {
   return await getHostHardDisks();

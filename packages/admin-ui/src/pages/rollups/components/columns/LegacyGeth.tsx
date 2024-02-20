@@ -1,5 +1,5 @@
 import React from "react";
-import { OptimismItem, OptimismItemOk } from "@dappnode/common";
+import { OptimismItem, OptimismItemOk } from "@dappnode/types";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -70,7 +70,7 @@ export default function LegacyGeth({
 
       {archive.status === "ok" && (
         <div className="description">
-          {isSelected && archive.data && archive.data.metadata.shortDescription}
+          {isSelected && archive.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

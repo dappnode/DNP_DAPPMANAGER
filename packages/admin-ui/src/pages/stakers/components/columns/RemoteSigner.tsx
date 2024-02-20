@@ -4,12 +4,11 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { StakerItem } from "@dappnode/common";
+import { StakerItem, Network } from "@dappnode/types";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 import { FaKey } from "react-icons/fa";
-import { Network } from "@dappnode/types";
 
 export default function RemoteSigner<T extends Network>({
   signer,
@@ -66,7 +65,7 @@ export default function RemoteSigner<T extends Network>({
       {signer.status === "ok" &&
         isSelected &&
         signer.isInstalled &&
-        signer.data?.metadata.links?.ui && (
+        signer.data?.manifest?.links?.ui && (
           <div
             style={{
               alignItems: "center",
@@ -75,7 +74,7 @@ export default function RemoteSigner<T extends Network>({
             }}
           >
             <a
-              href={signer.data.metadata.links.ui}
+              href={signer.data.manifest.links.ui}
               target="_blank"
               rel="noreferrer noopener"
             >
@@ -86,7 +85,7 @@ export default function RemoteSigner<T extends Network>({
 
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected && signer.data && signer.data.metadata.shortDescription}
+          {isSelected && signer.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

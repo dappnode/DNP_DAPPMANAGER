@@ -1,4 +1,4 @@
-import { RpcResponse } from "../../types";
+import { RpcResponse } from "@dappnode/types";
 
 /**
  * Parse RPC response, to be used in the client

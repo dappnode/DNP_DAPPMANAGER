@@ -1,5 +1,5 @@
 import { mapValues } from "lodash-es";
-import { SystemInfo, VolumeData } from "@dappnode/common";
+import { RebootRequiredScript, SystemInfo, VolumeData } from "@dappnode/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WifiCredentials } from "types";
 
@@ -14,7 +14,7 @@ interface DappnodeStatusState {
    */
   passwordIsSecure: boolean | null;
   volumes: VolumeData[];
-  rebootIsRequired: boolean | null;
+  rebootRequiredScript: RebootRequiredScript | null;
 }
 
 const initialState: DappnodeStatusState = {
@@ -22,7 +22,7 @@ const initialState: DappnodeStatusState = {
   wifiCredentials: null,
   passwordIsSecure: null,
   volumes: [],
-  rebootIsRequired: null
+  rebootRequiredScript: null
 };
 
 export const dappnodeStatus = createSlice({

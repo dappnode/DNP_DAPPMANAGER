@@ -1,5 +1,4 @@
-import { ipfs } from "../../src/modules/ipfs/index.js";
-import { IpfsClientTarget } from "@dappnode/common";
+import { dappnodeInstaller } from "../testUtils.js";
 import { setUpIpfsNode, setDownIpfsNode, ipfsApiUrl } from "./testIpfsUtils.js";
 
 export const mochaHooks = {
@@ -7,7 +6,7 @@ export const mochaHooks = {
     async function (): Promise<void> {
       console.log("Setting up IPFS node...");
       await setUpIpfsNode();
-      ipfs.changeHost(ipfsApiUrl, IpfsClientTarget.local);
+      dappnodeInstaller.changeIpfsProvider(ipfsApiUrl);
     }
   ],
   afterAll: [

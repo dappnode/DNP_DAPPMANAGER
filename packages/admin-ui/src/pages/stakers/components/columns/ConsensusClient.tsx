@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -10,7 +10,6 @@ import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
-import { Network } from "@dappnode/types";
 
 export default function ConsensusClient<T extends Network>({
   consensusClient,
@@ -85,7 +84,7 @@ export default function ConsensusClient<T extends Network>({
           <>
             {consensusClient.data && (
               <div className="description">
-                {consensusClient.data.metadata.shortDescription}
+                {consensusClient.data?.manifest?.shortDescription}
                 <hr />
               </div>
             )}

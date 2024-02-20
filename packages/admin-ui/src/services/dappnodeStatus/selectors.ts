@@ -3,7 +3,7 @@ import {
   getEthClientPrettyStatusError,
   getEthClientType
 } from "components/EthMultiClient";
-import { ChainData } from "@dappnode/common";
+import { ChainData } from "@dappnode/types";
 import { activateFallbackPath } from "pages/system/data";
 import { getDnpInstalled } from "services/dnpInstalled/selectors";
 import { wifiDnpName } from "params";
@@ -16,12 +16,12 @@ export const getDappnodeParams = (state: RootState) => getSystemInfo(state);
 export const getPasswordIsSecure = (state: RootState) =>
   state.dappnodeStatus.passwordIsSecure;
 export const getRebootIsRequired = (state: RootState) =>
-  state.dappnodeStatus.rebootIsRequired;
-export const getIdentityAddress = (state: RootState) =>
-  (getSystemInfo(state) || {}).identityAddress;
+  state.dappnodeStatus.rebootRequiredScript;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
 
 // Sub-sub local properties
+export const getEthRemoteRpc = (state: RootState) =>
+  (getSystemInfo(state) || {}).ethRemoteRpc;
 export const getEthClientTarget = (state: RootState) =>
   (getSystemInfo(state) || {}).eth2ClientTarget;
 export const getEthClientFallback = (state: RootState) =>
@@ -30,8 +30,6 @@ export const getEthClientStatus = (state: RootState) =>
   (getSystemInfo(state) || {}).ethClientStatus;
 export const getNewFeatureIds = (state: RootState) =>
   (getSystemInfo(state) || {}).newFeatureIds;
-export const getDappmanagerNaclPublicKey = (state: RootState) =>
-  (getSystemInfo(state) || {}).dappmanagerNaclPublicKey;
 
 /**
  * Returns a pretty warning about the eth client only if the user has to see it

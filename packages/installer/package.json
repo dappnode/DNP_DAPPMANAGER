@@ -1,0 +1,52 @@
+{
+  "name": "@dappnode/installer",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "dependencies": {
+    "@dappnode/types": "^0.1.35",
+    "@dappnode/db": "^0.1.0",
+    "@dappnode/dockerapi": "^0.1.0",
+    "@dappnode/dockercompose": "^0.1.0",
+    "@dappnode/ethicalmetrics": "^0.1.0",
+    "@dappnode/eventbus": "^0.1.0",
+    "@dappnode/httpsportal": "^0.1.0",
+    "@dappnode/logger": "^0.1.0",
+    "@dappnode/params": "^0.1.0",
+    "@dappnode/schemas": "^0.1.13",
+    "@dappnode/toolkit": "^0.1.21",
+    "@dappnode/utils": "^0.1.0",
+    "deepmerge": "2.2.1",
+    "ethers": "^6.9.0",
+    "is-ipfs": "8.0.1",
+    "lodash-es": "4.17.21",
+    "node-fetch": "^3.3.2",
+    "semver": "7.3.8",
+    "timestring": "6.0.0"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.23",
+    "@types/lodash-es": "4.17.6",
+    "@types/node": "^20.6.2",
+    "@types/node-fetch": "^2.6.9",
+    "@types/sinon": "7.0.13",
+    "it-all": "^3.0.4",
+    "rewiremock": "3.13.7",
+    "sinon": "5.0.10"
+  }
+}

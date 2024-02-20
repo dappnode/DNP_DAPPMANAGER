@@ -5,6 +5,9 @@
   "private": true,
   "repository": "git@github.com:dappnode/DNP_DAPPMANAGER.git",
   "license": "GPL-3.0",
+  "engines": {
+    "node": "20.x"
+  },
   "workspaces": {
     "packages": [
       "packages/*"
@@ -24,13 +27,20 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.4",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
+    "chai": "^4.3.10",
+    "depcheck": "^1.4.7",
     "eslint": "^8.44.0",
     "eslint-config-react-app": "^7.0.1",
     "lerna": "^6.3.0",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.2",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.8.1",
-    "typescript": "^5.1.6"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

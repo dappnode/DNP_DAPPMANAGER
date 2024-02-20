@@ -4,7 +4,7 @@ export const prysm: MockDnp = {
   avatar:
     "https://github.com/dappnode/DAppNodePackage-prysm/blob/main/avatar-prysm.png",
 
-  metadata: {
+  manifest: {
     name: "prysm.dnp.dappnode.eth",
     version: "2.0.0",
     upstreamVersion: "v2.1.2",

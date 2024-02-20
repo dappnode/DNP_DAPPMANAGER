@@ -2,13 +2,13 @@ import fs from "fs";
 import crypto from "crypto";
 import path from "path";
 import { logs } from "@dappnode/logger";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 // Modules
-import { listPackage } from "../modules/docker/list/index.js";
+import { listPackage } from "@dappnode/dockerapi";
 // Utils
-import shell from "../utils/shell.js";
-import validateBackupArray from "../utils/validateBackupArray.js";
+import { shell } from "@dappnode/utils";
+import { validateBackupArray } from "../utils/index.js";
 import { PackageBackup } from "@dappnode/types";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;

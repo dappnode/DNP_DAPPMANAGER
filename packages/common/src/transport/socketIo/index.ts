@@ -1,9 +1,13 @@
-import Ajv from "ajv";
+import Ajv, { ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
-import { Args, LoggerMiddleware } from "../../types";
-import { Subscriptions, subscriptionsData } from "../../subscriptions.js";
+import {
+  Args,
+  LoggerMiddleware,
+  Subscriptions,
+  subscriptionsData,
+} from "@dappnode/types";
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, strict: false });
 
 interface SocketIsh {
   /**
@@ -81,7 +85,7 @@ export function subscriptionsFactory(
 }
 
 function formatErrors(
-  errors: Array<Ajv.ErrorObject> | null | undefined,
+  errors: Array<ErrorObject> | null | undefined,
   route: string
 ): string {
   const dataVar = `root_prop`;

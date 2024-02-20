@@ -3,8 +3,8 @@ import { packageSetEnvironment } from "../actions";
 // Components
 import { SetupWizard } from "components/SetupWizard";
 // Utils
-import { SetupWizard as SetupWizardType, PackageEnvs } from "@dappnode/types";
-import { UserSettingsAllDnps, UserSettings } from "@dappnode/common";
+import { UserSettingsAllDnps, UserSettings } from "@dappnode/types";
+import { PackageEnvs, SetupWizard as SetupWizardType } from "@dappnode/types";
 import { difference } from "utils/lodashExtended";
 
 export function Config({
@@ -16,8 +16,9 @@ export function Config({
   setupWizard?: SetupWizardType;
   userSettings?: UserSettings;
 }) {
-  const [localUserSettings, setLocalUserSettings] =
-    useState<UserSettingsAllDnps>({});
+  const [localUserSettings, setLocalUserSettings] = useState<
+    UserSettingsAllDnps
+  >({});
 
   useEffect(() => {
     if (userSettings) setLocalUserSettings({ [dnpName]: userSettings });

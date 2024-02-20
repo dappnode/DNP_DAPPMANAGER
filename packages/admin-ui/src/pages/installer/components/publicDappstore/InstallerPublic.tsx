@@ -26,7 +26,6 @@ import {
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
-import { useApi } from "api";
 
 export const InstallerPublic: React.FC = routeProps => {
   const navigate = useNavigate();
@@ -41,18 +40,6 @@ export const InstallerPublic: React.FC = routeProps => {
     {} as SelectedCategories
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
-  const registryProgress = useApi.fetchRegistryProgress({});
-
-  useEffect(() => {
-    const interval =
-      requestStatus.loading &&
-      setInterval(() => {
-        registryProgress.revalidate();
-      }, 5000);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [requestStatus.loading, registryProgress]);
 
   useEffect(() => {
     dispatch(fetchDnpRegistry({}));
@@ -172,12 +159,7 @@ export const InstallerPublic: React.FC = routeProps => {
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />
       ) : requestStatus.loading ? (
-        <Loading
-          steps={[
-            `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
-              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
-          ]}
-        />
+        <Loading steps={["Loading DAppNode Packages"]} />
       ) : requestStatus.success ? (
         <ErrorView error={"Directory loaded but found no packages"} />
       ) : null}

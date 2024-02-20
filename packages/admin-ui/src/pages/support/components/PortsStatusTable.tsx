@@ -14,7 +14,7 @@ import {
   ApiTablePortStatus,
   PortToOpen,
   UpnpTablePortStatus
-} from "@dappnode/common";
+} from "@dappnode/types";
 import Switch from "components/Switch";
 
 function RenderApiStatus({

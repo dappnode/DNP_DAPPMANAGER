@@ -4,7 +4,7 @@ import { getInstallerPath } from "pages/installer";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
 import { prettyDnpName } from "utils/format";
-import { UpdateAvailable } from "@dappnode/common";
+import { UpdateAvailable } from "@dappnode/types";
 
 export function AlertPackageUpdateAvailable({
   dnpName,

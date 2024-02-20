@@ -31,6 +31,16 @@ const StakersRoot: React.FC = () => {
         })
     },
     {
+      subPath: "holesky",
+      title: "Holesky",
+      component: () =>
+        StakerNetwork({
+          network: "holesky",
+          description:
+            "Holesky is a merged-from-genesis public Ethereum testnet which will replace Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol."
+        })
+    },
+    {
       subPath: "prater",
       title: "Prater",
       component: () =>

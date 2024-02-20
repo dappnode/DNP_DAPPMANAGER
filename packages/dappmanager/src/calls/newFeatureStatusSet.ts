@@ -1,6 +1,6 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
-import { NewFeatureId, NewFeatureStatus } from "@dappnode/common";
+import { NewFeatureId, NewFeatureStatus } from "@dappnode/types";
 
 /**
  * Flag the UI welcome flow as completed

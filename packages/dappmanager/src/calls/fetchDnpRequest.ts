@@ -1,15 +1,19 @@
 import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
-import { Manifest, SetupWizardField } from "@dappnode/types";
-import { listPackages } from "../modules/docker/list/index.js";
 import { params } from "@dappnode/params";
-import shouldUpdate from "../modules/dappGet/utils/shouldUpdate.js";
 import deepmerge from "deepmerge";
-import { fileToGatewayUrl } from "../utils/distributedFile.js";
-import { ReleaseFetcher } from "../modules/release/index.js";
-import { dockerInfoArchive } from "../modules/docker/api/index.js";
-import { ComposeEditor, ComposeFileEditor } from "../modules/compose/editor.js";
-import { parseSpecialPermissions } from "../modules/compose/specialPermissions.js";
+import {
+  fileToGatewayUrl,
+  getIsUpdated,
+  getIsInstalled
+} from "@dappnode/utils";
+import { dappnodeInstaller } from "../index.js";
+import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
+import {
+  ComposeEditor,
+  ComposeFileEditor,
+  parseSpecialPermissions
+} from "@dappnode/dockercompose";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
@@ -19,16 +23,15 @@ import {
   CompatibleDnps,
   InstalledPackageData,
   ReleaseSignatureStatusCode
-} from "@dappnode/common";
+} from "@dappnode/types";
+import { Manifest, SetupWizardField } from "@dappnode/types";
 
 export async function fetchDnpRequest({
   id
 }: {
   id: string;
 }): Promise<RequestedDnp> {
-  const releaseFetcher = new ReleaseFetcher();
-
-  const mainRelease = await releaseFetcher.getRelease(id);
+  const mainRelease = await dappnodeInstaller.getRelease(id);
 
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
@@ -38,7 +41,7 @@ export async function fetchDnpRequest({
   const dnpList = await listPackages();
 
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
-    const { dnpName, metadata, compose, isCore } = release;
+    const { dnpName, compose, isCore } = release;
 
     const dnp = dnpList.find(d => d.dnpName === dnpName);
 
@@ -51,14 +54,14 @@ export async function fetchDnpRequest({
 
     specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
-    if (metadata.setupWizard) {
+    if (release.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
-      for (const field of metadata.setupWizard.fields) {
+      for (const field of release.setupWizard.fields) {
         if (await shouldAddSetupWizardField(field, dnp))
           activeSetupWizardFields.push(field);
       }
       setupWizard[dnpName] = {
-        ...metadata.setupWizard,
+        ...release.setupWizard,
         fields: activeSetupWizardFields
       };
     }
@@ -78,7 +81,7 @@ export async function fetchDnpRequest({
   try {
     const { dnpName, reqVersion } = mainRelease;
     const { state, currentVersions, releases } =
-      await releaseFetcher.getReleasesResolved({
+      await dappnodeInstaller.getReleasesResolved({
         name: dnpName,
         ver: reqVersion
       });
@@ -108,8 +111,9 @@ export async function fetchDnpRequest({
     imageSize: mainRelease.imageFile.size,
     isUpdated: getIsUpdated(mainRelease, dnpList),
     isInstalled: getIsInstalled(mainRelease, dnpList),
+    installedVersion: getInstalledVersion(mainRelease, dnpList),
     // Prevent sending duplicated data
-    metadata: omit(mainRelease.metadata, ["setupWizard"]),
+    manifest: omit(mainRelease.manifest, ["setupWizard"]),
     specialPermissions, // Decoupled metadata
     // Settings must include the previous user settings
     settings,
@@ -131,61 +135,18 @@ export async function fetchDnpRequest({
   };
 }
 
-/**
- * Helper to check if a package is installed
- */
-export function getIsInstalled(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  return !!dnpList.find(dnp => dnp.dnpName === dnpName);
-}
-
-/**
- * Helper to check if a package is update to the latest version
- */
-export function getIsUpdated(
-  { dnpName, reqVersion }: { dnpName: string; reqVersion: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
-  if (!dnp) return false;
-  return !shouldUpdate(dnp.version, reqVersion);
-}
-
-/**
- * Returns true if the package is running or false if not
- * For web3signer, it does not take into account the container "flyway" which may not be running
- */
-export function getIsRunning(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const flywayServiceName = "flyway";
-  const isSigner = dnpName.includes("web3signer");
-  const dnp = dnpList.find(dnp => dnp.dnpName === dnpName);
-  if (dnp) {
-    if (isSigner)
-      return dnp.containers
-        .filter(c => c.serviceName !== flywayServiceName)
-        .every(c => c.running);
-    else return dnp.containers.every(c => c.running);
-  }
-  return false;
-}
-
 function getRequiresCoreUpdate(
-  { metadata }: { metadata: Manifest },
+  { manifest }: { manifest: Manifest },
   dnpList: InstalledPackageData[]
 ): boolean {
   const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;
   const coreVersion = coreDnp.version;
-  const minDnVersion = metadata.requirements
-    ? metadata.requirements.minimumDappnodeVersion
+  const minDnVersion = manifest.requirements
+    ? manifest.requirements.minimumDappnodeVersion
     : "";
   return Boolean(
-    metadata.requirements &&
+    manifest.requirements &&
       valid(minDnVersion) &&
       valid(coreVersion) &&
       gt(minDnVersion, coreVersion)
@@ -253,4 +214,11 @@ function getReleaseSignedSafeMessage(release: PackageRelease): string {
         return "Unsafe origin, bad signature";
       }
   }
+}
+
+function getInstalledVersion(
+  { dnpName }: { dnpName: string },
+  dnpList: InstalledPackageData[]
+): string | undefined {
+  return dnpList.find(dnp => dnp.dnpName === dnpName)?.version;
 }

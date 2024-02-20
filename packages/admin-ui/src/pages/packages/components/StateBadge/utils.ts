@@ -1,4 +1,4 @@
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 
 export type SimpleState =
   | "stopped"

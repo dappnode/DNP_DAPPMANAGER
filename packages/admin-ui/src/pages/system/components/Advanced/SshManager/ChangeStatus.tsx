@@ -8,7 +8,7 @@ import { confirm } from "components/ConfirmDialog";
 import { ReqStatus } from "types";
 import "./sshManager.scss";
 import { withToast } from "components/toast/Toast";
-import { ShhStatus } from "@dappnode/common";
+import { ShhStatus } from "@dappnode/types";
 
 export function SshManagerChangeStatus() {
   const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});

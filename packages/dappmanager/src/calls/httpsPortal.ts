@@ -1,16 +1,5 @@
-import { params } from "@dappnode/params";
-import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/common";
-import {
-  HttpsPortal,
-  HttpsPortalApiClient,
-  getExposableServices
-} from "../modules/https-portal/index.js";
-
-const httpsPortalApiClient = new HttpsPortalApiClient(
-  params.HTTPS_PORTAL_API_URL
-);
-
-export const httpsPortal = new HttpsPortal(httpsPortalApiClient);
+import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/types";
+import { httpsPortal, getExposableServices } from "@dappnode/httpsportal";
 
 /**
  * HTTPs Portal: map a subdomain

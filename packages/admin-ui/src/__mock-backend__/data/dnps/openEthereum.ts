@@ -1,11 +1,11 @@
-import { PortProtocol } from "@dappnode/common";
+import { PortProtocol } from "@dappnode/types";
 import { MockDnp } from "./types";
 
 const dnpName = "open-ethereum.dnp.dappnode.eth";
 const serviceName = dnpName;
 
 export const openEthereum: MockDnp = {
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.2.6",
     description:

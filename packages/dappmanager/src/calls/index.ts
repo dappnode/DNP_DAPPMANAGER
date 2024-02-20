@@ -7,7 +7,7 @@ export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";
 export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
-export { copyFileTo } from "./copyFileTo.js";
+export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";
@@ -21,8 +21,8 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
 export { fetchRegistry } from "./fetchRegistry.js";
-export { fetchRegistryProgress } from "./fetchRegistry.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
+export { getHostUptime } from "./getHostUptime.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
@@ -48,8 +48,7 @@ export { packageSetEnvironment } from "./packageSetEnvironment.js";
 export { packageSetPortMappings } from "./packageSetPortMappings.js";
 export { packageStartStop } from "./packageStartStop.js";
 export { packageGettingStartedToggle } from "./packageGettingStartedToggle.js";
-export { passwordChange } from "./passwordChange.js";
-export { passwordIsSecure } from "./passwordIsSecure.js";
+export { passwordChange, passwordIsSecure } from "./passwordManager.js";
 export { poweroffHost } from "./poweroffHost.js";
 export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
@@ -57,13 +56,20 @@ export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
 export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
-export { seedPhraseSet } from "./seedPhraseSet.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { statsCpuGet } from "./statsCpuGet.js";
+export {
+  sshPortGet,
+  sshPortSet,
+  sshStatusGet,
+  sshStatusSet
+} from "./sshManager.js";
 export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
+export { statsSwapGet } from "./statsSwapGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
 export * from "./telegram.js";
+export { updateUpgrade } from "./updateUpgrade.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";
 export { volumeRemove } from "./volumeRemove.js";
 export { volumesGet } from "./volumesGet.js";

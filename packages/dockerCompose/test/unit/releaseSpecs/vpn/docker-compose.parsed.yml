@@ -1,0 +1,31 @@
+version: "3.5"
+services:
+  vpn.dnp.dappnode.eth:
+    container_name: DAppNodeCore-vpn.dnp.dappnode.eth
+    image: "vpn.dnp.dappnode.eth:0.2.5"
+    logging:
+      driver: journald
+    networks:
+      dncore_network:
+        aliases:
+          - "vpn.dnp.dappnode.eth.vpn.dappnode"
+          - "vpn.dappnode"
+    ports:
+      - "1194:1194/udp"
+      - "8092:8092"
+    privileged: true
+    restart: unless-stopped
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/etc/hostname:/etc/vpnname:ro"
+      - "/usr/src/dappnode/config:/usr/src/app/config:ro"
+      - "/lib/modules:/lib/modules:ro"
+      - "vpndnpdappnodeeth_data:/usr/src/app/secrets"
+      - "vpndnpdappnodeeth_config:/etc/openvpn"
+volumes:
+  vpndnpdappnodeeth_data: {}
+  vpndnpdappnodeeth_config: {}
+networks:
+  dncore_network:
+    external: true
+    name: dncore_network

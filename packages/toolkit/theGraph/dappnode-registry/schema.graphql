@@ -1,0 +1,17 @@
+type NewRepo @entity(immutable: true) {
+  id: Bytes!
+  Registry_id: Bytes! # bytes32
+  name: String! # string
+  repo: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewAppProxy @entity(immutable: true) {
+  id: Bytes!
+  proxy: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}

@@ -1,0 +1,40 @@
+{
+  "name": "@dappnode/dockerapi",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
+    "test:int": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/int --timeout 10000",
+    "dev": "tsc -w",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "dependencies": {
+    "@dappnode/hostscriptsservices": "^0.1.0",
+    "@dappnode/params": "^0.1.0",
+    "@dappnode/utils": "^0.1.0",
+    "@types/lodash-es": "^4.17.9",
+    "dargs": "7.0.0",
+    "data-uri-to-buffer": "^2.0.0",
+    "dockerode": "^4.0.0",
+    "lodash-es": "^4.17.21",
+    "memoizee": "0.4.14",
+    "tar-stream": "2.1.4"
+  },
+  "devDependencies": {
+    "@types/dockerode": "^3.3.23",
+    "@types/memoizee": "0.4.4",
+    "@types/node": "^20.6.2",
+    "@types/tar-stream": "2.1.0"
+  }
+}

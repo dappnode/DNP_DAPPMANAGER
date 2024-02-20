@@ -2,8 +2,7 @@ import http from "http";
 import httpProxy from "http-proxy";
 import express from "express";
 import { params } from "@dappnode/params";
-import { ipfs } from "../../../modules/ipfs/index.js";
-import { urlJoin } from "../../../utils/url.js";
+import { urlJoin } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
 import {
@@ -13,7 +12,7 @@ import {
   NotFoundError,
   Content
 } from "./types.js";
-import { EthProviderError } from "@dappnode/common";
+import { EthProviderError } from "@dappnode/types";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",
@@ -64,9 +63,6 @@ export function getIpfsProxyHandler<T>(
           else reject(new ProxyError(e.message, target));
         });
       });
-
-      if (content.location === "ipfs" && params.ETHFORWARD_PIN_ON_VISIT)
-        ipfs.pinAddNoThrow(content.hash);
     } catch (e) {
       res.writeHead(200, { "Content-Type": "text/html" });
       res.write(errorToResponseHtml(e, req.url));

@@ -1,131 +1,44 @@
 ARG NODE_VERSION=20.3.0
 
-############
-# GIT-DATA #
-############
-FROM --platform=${BUILDPLATFORM:-amd64} node:${NODE_VERSION}-alpine as git-data
-
-WORKDIR /usr/src/app
-RUN apk add --no-cache git
-
-COPY .git .git
-COPY dappnode_package.json .
-COPY docker/getGitData.js .
-
-RUN node getGitData /usr/src/app/.git-data.json
-
-##################
-# BUILD-BINARIES #
-##################
-FROM --platform=${BUILDPLATFORM:-amd64} node:${NODE_VERSION}-alpine as build-binaries
-
-RUN apk add --no-cache bind-tools docker curl
-RUN curl -L https://github.com/docker/compose/releases/download/v2.5.0/docker-compose-linux-$(uname -m) > /usr/local/bin/docker-compose \
-  && chmod +x /usr/local/bin/docker-compose
-
 # Common base so it's cached
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
+ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 
-############################
-# BUILD-SRC AND PRODUCTION #
-############################
-FROM --platform=${BUILDPLATFORM:-amd64} node:${NODE_VERSION}-alpine as build-src
+# Initial stage to gather git data
+FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as git-data
+WORKDIR /usr/src/app
+RUN apk add --no-cache git
+COPY .git dappnode_package.json docker/getGitData.js ./
+RUN node getGitData /usr/src/app/.git-data.json
 
+
+# Build + Prod stage
+FROM node:${NODE_VERSION}-alpine
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
   UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
-  REACT_APP_API_URL=http://172.33.1.7:5000/
-
+  REACT_APP_API_URL=http://my.dappnode:5000/
 WORKDIR /app
-RUN apk add --no-cache python3 build-base bash git bind-tools docker \
-  curl bind-dev xz libltdl miniupnpc zip unzip dbus bind tmux avahi-tools
-
-# Build the src code:
-# Copy and install deps first to cache
-COPY package.json yarn.lock lerna.json tsconfig.json ./
-RUN yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
-COPY packages/admin-ui/package.json \ 
-  packages/admin-ui/
-COPY packages/dappmanager/package.json \ 
-  packages/dappmanager/
-COPY packages/common/package.json \ 
-  packages/common/
-COPY packages/params/package.json \ 
-  packages/params/
-COPY packages/utils/package.json \ 
-  packages/utils/
-COPY packages/eventBus/package.json \ 
-  packages/eventBus/
-COPY packages/logger/package.json \ 
-  packages/logger/
-RUN yarn --frozen-lockfile --non-interactive --ignore-optional
-
-# Build common
-WORKDIR /app/packages/common/
-COPY packages/common/ .
-RUN yarn build
-# Results in dist/*
-
-# Build params
-WORKDIR /app/packages/params/
-COPY packages/params/ .
-RUN yarn build
-# Results in dist/*
-
-# Build utils
-WORKDIR /app/packages/utils/
-COPY packages/utils/ .
-RUN yarn build
-# Results in dist/*
-
-# Build eventBus
-WORKDIR /app/packages/eventBus/
-COPY packages/eventBus/ .
-RUN yarn build
-# Results in dist/*
-
-# Build logger
-WORKDIR /app/packages/logger/
-COPY packages/logger/ .
-RUN yarn build
-# Results in dist/*
-
-# Build admin-ui
-WORKDIR /app/packages/admin-ui/
-COPY packages/admin-ui/ .
-ENV REACT_APP_API_URL /
-RUN yarn build
-# Results in build/*
-
-# Build dappmanager
-WORKDIR /app/packages/dappmanager/
-COPY packages/dappmanager/ .
-RUN yarn build
-# Results in dist/*
-
-# Copy docker
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
+RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
+  miniupnpc dbus tmux avahi-tools
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
-# Copy binaries
-COPY --from=build-binaries /usr/bin/nsupdate /usr/bin/nsupdate
-COPY --from=build-binaries /usr/bin/docker /usr/bin/docker
-COPY --from=build-binaries /usr/local/bin/docker-compose /usr/local/bin/docker-compose
-
-# Copy the src last as it's the layer most likely to change
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
-
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
-
-WORKDIR /app
 COPY docker/start_dev.sh /usr/src/app/start_dev.sh
+
+# Build the src code:
+# Copy and install deps first to cache
+COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY packages packages
+
+RUN yarn --frozen-lockfile --non-interactive --ignore-optional
+
+ENV REACT_APP_API_URL /
+RUN yarn build
+
 ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]

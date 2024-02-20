@@ -6,7 +6,7 @@ import {
   OptimismItemOk,
   OptimismType,
   OptimismItem
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { responseInterface } from "swr";
 
 export const useOptimismConfig = (
@@ -152,13 +152,21 @@ function getChanges({
   if (
     executionClient?.dnpName === newExecClient?.dnpName &&
     Boolean(rollup) === Boolean(newRollup) &&
-    Boolean(archive) === Boolean(newArchive) &&
+    Boolean(archive?.isSelected) === Boolean(newArchive) &&
     rollup?.mainnetRpcUrl === customMainnetRpcUrl
   )
     return {
       isAllowed: false,
       reason: "No changes detected",
       severity: "secondary"
+    };
+
+  // Not allowed if mainnet RPC is modified and there is no Rollup
+  if (rollup?.mainnetRpcUrl !== customMainnetRpcUrl && !newRollup)
+    return {
+      isAllowed: false,
+      reason: "Mainnet RPC modified without OP Node",
+      severity: "danger"
     };
 
   // Not allowed if only Rollup is selected

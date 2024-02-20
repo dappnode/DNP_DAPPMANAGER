@@ -4,10 +4,10 @@ import { expect } from "chai";
 import { mockPackageData, shellSafe } from "../testUtils.js";
 import {
   packageToInstallHasPid,
-  getServicesSharingPid
-} from "../../src/utils/pid.js";
-import { ComposeFileEditor } from "../../src/modules/compose/editor.js";
-import { ComposeServicesSharingPid } from "../../src/types.js";
+  getServicesSharingPid,
+  ComposeServicesSharingPid
+} from "@dappnode/utils";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 describe("Module > compose > pid", () => {
   // Example package

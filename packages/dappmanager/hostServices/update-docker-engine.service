@@ -1,9 +1,0 @@
-[Unit]
-Description=Update docker engine
-
-[Service]
-Type=oneshot
-ExecStart=/bin/bash /usr/src/dappnode/DNCORE/scripts/host/docker_engine_update.sh --install
-
-[Install]
-WantedBy=multi-user.target

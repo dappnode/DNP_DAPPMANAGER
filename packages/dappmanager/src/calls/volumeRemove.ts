@@ -1,4 +1,4 @@
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
+import { removeNamedVolume } from "@dappnode/dockerapi";
 import { eventBus } from "@dappnode/eventbus";
 
 /**

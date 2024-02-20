@@ -1,6 +1,6 @@
 import { createAction } from "@reduxjs/toolkit";
 import { api } from "api";
-import { DirectoryItem, RequestStatus } from "@dappnode/common";
+import { DirectoryItem, RequestStatus } from "@dappnode/types";
 import { AppThunk } from "store";
 
 // Service > dnpRegistry
@@ -24,9 +24,7 @@ export const fetchDnpRegistry = ({
 }): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
-    const registry = await api.fetchRegistry({
-      addressOrEnsName
-    });
+    const registry = await api.fetchRegistry();
     // Some items in registry may be undefined
     dispatch(setDnpRegistry(registry.filter(Boolean)));
     dispatch(updateStatus({ loading: false, success: true }));

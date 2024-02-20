@@ -1,5 +1,5 @@
-import * as db from "../db/index.js";
-import { PackageNotificationDb } from "@dappnode/common";
+import * as db from "@dappnode/db";
+import { PackageNotificationDb } from "@dappnode/types";
 
 /**
  * Returns not viewed notifications.

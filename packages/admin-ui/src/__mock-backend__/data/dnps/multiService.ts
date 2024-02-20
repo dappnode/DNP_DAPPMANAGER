@@ -1,4 +1,4 @@
-import { PortProtocol } from "@dappnode/common";
+import { PortProtocol } from "@dappnode/types";
 import { MockDnp } from "./types";
 
 const dnpName = "multi-service.dnp.dappnode.eth";
@@ -12,7 +12,7 @@ const serviceNames = {
 export const multiService: MockDnp = {
   avatar: "https://icon-library.com/images/multiple-icon/multiple-icon-15.jpg",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.2.0",
     description: "Sample package with two services.",

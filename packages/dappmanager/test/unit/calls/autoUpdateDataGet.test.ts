@@ -11,11 +11,11 @@ import {
   editCoreSetting,
   isUpdateDelayCompleted,
   flagCompletedUpdate
-} from "../../../src/utils/autoUpdateHelper.js";
+} from "@dappnode/daemons";
 import { params } from "@dappnode/params";
 import rewiremock from "rewiremock/webpack";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";
-import { InstalledPackageData } from "@dappnode/common";
+import { InstalledPackageData } from "@dappnode/types";
 
 describe.skip("Call function: autoUpdateDataGet", function () {
   this.timeout(5000);
@@ -62,7 +62,7 @@ describe.skip("Call function: autoUpdateDataGet", function () {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/autoUpdateDataGet"),
       mock => {
-        mock(() => import("../../../src/modules/docker/list"))
+        mock(() => import("@dappnode/dockerapi"))
           .with({ listPackages })
           .toBeUsed();
       }

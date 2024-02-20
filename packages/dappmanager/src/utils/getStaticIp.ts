@@ -1,9 +1,9 @@
 import fs from "fs";
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import isIp from "is-ip";
-import { isNotFoundError } from "./node.js";
+import { isNotFoundError } from "@dappnode/utils";
 
 const staticIpPath = params.STATIC_IP_PATH;
 
@@ -26,7 +26,7 @@ function getInstallationStaticIp(): string {
   }
 }
 
-export default async function getStaticIp(): Promise<string> {
+export async function getStaticIp(): Promise<string> {
   if (db.importedInstallationStaticIp.get()) return db.staticIp.get();
 
   const staticIp = await getInstallationStaticIp();

@@ -4,16 +4,15 @@ import assert from "assert";
 import fs from "fs";
 import retry from "async-retry";
 import path from "path";
-import shell from "../../../src/utils/shell.js";
+import { shell } from "@dappnode/utils";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../../testUtils.js";
 import {
   listContainer,
-  listContainers
-} from "../../../src/modules/docker/list/index.js";
-import { dockerContainerInspect } from "../../../src/modules/docker/api/index.js";
-import { ComposeEditor } from "../../../src/modules/compose/editor.js";
-
+  listPackageContainers,
+  dockerContainerInspect
+} from "@dappnode/dockerapi";
+import { ComposeEditor } from "@dappnode/dockercompose";
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,
  * a copy of it will still be around and may cause trouble
@@ -262,7 +261,7 @@ exit $UPEXIT
     // Query the next container that should be running
     // Because it had failed to be brought up, it will be the temp renamed container
     // cea8fecfa936_DAppNodeTest-main-service
-    const [next] = await listContainers();
+    const [next] = await listPackageContainers();
     console.log(
       `Next container ${next.containerName} ${next.state}, ID: ${next.containerId}`
     );

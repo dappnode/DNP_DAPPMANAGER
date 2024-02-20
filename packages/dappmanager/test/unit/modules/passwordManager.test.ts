@@ -8,13 +8,13 @@ function getPasswordManager(
   image: string
 ) {
   return rewiremock.around(
-    () => import("../../../src/modules/passwordManager"),
+    () => import("../../../src/calls/passwordManager"),
     mock => {
-      mock(() => import("../../../src/utils/shell"))
-        .withDefault(shellMock)
+      mock(() => import("@dappnode/utils"))
+        .with({ shell: shellMock })
         .toBeUsed();
-      mock(() => import("../../../src/utils/getDappmanagerImage"))
-        .withDefault(async () => image)
+      mock(() => import("@dappnode/dockerapi"))
+        .with({ getDappmanagerImage: async () => image })
         .toBeUsed();
     }
   );

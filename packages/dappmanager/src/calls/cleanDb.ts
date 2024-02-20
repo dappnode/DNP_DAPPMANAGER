@@ -1,4 +1,4 @@
-import { clearMainDb } from "../db/index.js";
+import { clearMainDb } from "@dappnode/db";
 
 /**
  * Cleans the database content
