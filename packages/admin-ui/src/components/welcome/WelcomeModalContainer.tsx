@@ -41,7 +41,9 @@ const WelcomeModalContainer: React.FC<{
   if (!children || status === "null") return null;
   return (
     <div className={joinCssClass("welcome-container", status)}>
-      <div className="welcome">{children}</div>
+      <div className="welcome">
+        {children}
+      </div>
     </div>
   );
 };

@@ -78,12 +78,24 @@ export default function Welcome() {
     if (render) routes.push({ featureId, render });
   }
 
+  // Check if SmoothWelcome route exists and add it if it does
+  const smoothWelcomeRoute = routes.find(route => route.featureId === "smooth-welcome");
+
   // Append first and last view to make the UX less abrupt
-  const routesWithStartFinish = [
-    { render: (props: RouteProps) => <Start {...props} /> },
-    ...routes,
-    { render: (props: RouteProps) => <Finished {...props} /> }
-  ];
+  let routesWithStartFinish = [];
+
+  // Check if SmoothWelcome route exists and add it if it does
+  if (!smoothWelcomeRoute) {
+    routesWithStartFinish.push({ render: (props: RouteProps) => <Start {...props} /> });
+  }
+
+  // Add other routes
+  routesWithStartFinish.push(...routes);
+
+  // Check if SmoothWelcome route exists and add it if it does
+  if (!smoothWelcomeRoute) {
+    routesWithStartFinish.push({ render: (props: RouteProps) => <Finished {...props} /> });
+  }
 
   // Only modify internal routes when the user is not completing the flow
   // When modifying internal routes, reset route counter and status
@@ -123,6 +135,7 @@ export default function Welcome() {
 
   const currentRoute = routesWithStartFinish[routeN];
   const featureId = "featureId" in currentRoute && currentRoute.featureId;
+
 
   return (
     <WelcomeModalContainer show={routes.length > 0 && status === "active"}>
