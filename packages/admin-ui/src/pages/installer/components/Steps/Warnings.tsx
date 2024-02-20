@@ -4,17 +4,20 @@ import { RequestedDnp } from "@dappnode/types";
 import { Manifest } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
+import { ReleaseType } from "semver";
 
 export default function Warnings({
   goNext,
   goBack,
   warnings,
-  isInstalled
+  isInstalled,
+  updateType
 }: {
   goNext: () => void;
   goBack: () => void;
   warnings: Manifest["warnings"];
   isInstalled: RequestedDnp["isInstalled"];
+  updateType?: ReleaseType | null | "";
 }) {
   if (!warnings)
     return (
@@ -25,7 +28,7 @@ export default function Warnings({
 
   return (
     <Card>
-      {warnings.onInstall && (
+      {isInstalled && warnings.onInstall ? (
         <div>
           <div className="card-section-header">
             <span>
@@ -36,8 +39,7 @@ export default function Warnings({
             <RenderMarkdown source={warnings.onInstall} />
           </div>
         </div>
-      )}
-      {isInstalled && warnings.onPatchUpdate && (
+      ) : updateType === "patch" && warnings.onPatchUpdate ? (
         <div>
           <div className="card-section-header">
             <span>
@@ -48,8 +50,7 @@ export default function Warnings({
             <RenderMarkdown source={warnings.onPatchUpdate} />
           </div>
         </div>
-      )}
-      {isInstalled && warnings.onMinorUpdate && (
+      ) : updateType === "minor" && warnings.onMinorUpdate ? (
         <div>
           <div className="card-section-header">
             <span>
@@ -60,8 +61,7 @@ export default function Warnings({
             <RenderMarkdown source={warnings.onMinorUpdate} />
           </div>
         </div>
-      )}
-      {isInstalled && warnings.onMajorUpdate && (
+      ) : updateType === "major" && warnings.onMajorUpdate ? (
         <div>
           <div className="card-section-header">
             <span>
@@ -72,7 +72,7 @@ export default function Warnings({
             <RenderMarkdown source={warnings.onMajorUpdate} />
           </div>
         </div>
-      )}
+      ) : null}
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>
