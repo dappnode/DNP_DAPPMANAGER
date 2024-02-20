@@ -796,7 +796,7 @@ export interface DockerUpgradeRequirements {
   isDockerInstalledThroughApt: boolean;
   isDockerInUnattendedUpgrades: boolean;
   dockerHostVersion: string;
-  dockerLatestVersion: string;
+  dockerLatestVersion?: string;
 }
 
 /**

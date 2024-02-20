@@ -5,5 +5,9 @@ export async function dockerUpgradeCheck(): Promise<DockerUpgradeRequirements> {
   const requirements = await runScript("docker_upgrade.sh", "-- --check");
   const requirementsParsed: DockerUpgradeRequirements =
     JSON.parse(requirements);
-  return requirementsParsed;
+  // check if dockerLatestVersion is empty string and set it to undefined if so
+  return {
+    ...requirementsParsed,
+    dockerLatestVersion: requirementsParsed.dockerLatestVersion || undefined,
+  };
 }

@@ -59,8 +59,9 @@ export function DockerUpgrade() {
       const canUpdate =
         !isDockerInUnattendedUpgrades ||
         !isDockerInstalledThroughApt ||
-        (Boolean(dockerLatestVersion) && // docker latest version might be empty if docker is not installed through apt
-          lt(dockerHostVersion, dockerLatestVersion));
+        Boolean(
+          dockerLatestVersion && lt(dockerHostVersion, dockerLatestVersion)
+        );
       setCanUpdate(canUpdate);
     }
   }, [checkReq.result]);
