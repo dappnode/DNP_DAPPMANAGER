@@ -32,6 +32,7 @@ function getDockerHostVersion() {
 
 # Get the latest version of Docker
 function getDockerLatestVersion() {
+    # docker latest version might be empty if docker is not installed through apt
     dockerLatestVersion=$(apt-cache madison docker-ce | head -n 1 | awk '{print $3}' | sed -E 's/^[0-9]+:([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
 }
 

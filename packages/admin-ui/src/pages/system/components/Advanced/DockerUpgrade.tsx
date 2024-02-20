@@ -50,15 +50,18 @@ export function DockerUpgrade() {
 
   useEffect(() => {
     if (checkReq.result) {
-      setCanUpdate(
-        !checkReq.result.isDockerInUnattendedUpgrades ||
-          !checkReq.result.isDockerInstalledThroughApt ||
-          (checkReq.result.isDockerInstalledThroughApt &&
-            lt(
-              checkReq.result.dockerHostVersion,
-              checkReq.result.dockerLatestVersion
-            ))
-      );
+      const {
+        isDockerInUnattendedUpgrades,
+        isDockerInstalledThroughApt,
+        dockerHostVersion,
+        dockerLatestVersion
+      } = checkReq.result;
+      const canUpdate =
+        !isDockerInUnattendedUpgrades ||
+        !isDockerInstalledThroughApt ||
+        (Boolean(dockerLatestVersion) && // docker latest version might be empty if docker is not installed through apt
+          lt(dockerHostVersion, dockerLatestVersion));
+      setCanUpdate(canUpdate);
     }
   }, [checkReq.result]);
 
@@ -69,7 +72,7 @@ export function DockerUpgrade() {
       setCheckReq({ result: requirements });
     } catch (e) {
       setCheckReq({ error: e });
-      console.error("Error on dockerEngineUpdateCheck", e);
+      console.error("Error on dockerUpdateCheck", e);
     }
   }
 
