@@ -26,8 +26,16 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
       />
       <Ok
         title="Docker is updated"
-        msg={`Docker host version ${items.dockerHostVersion}, Docker latest version ${items.dockerLatestVersion}`}
-        ok={gte(items.dockerHostVersion, items.dockerLatestVersion)}
+        msg={
+          items.isDockerInstalledThroughApt
+            ? `Docker host version ${items.dockerHostVersion}, Docker latest version ${items.dockerLatestVersion}`
+            : `Could not be determined the latest docker version available because docker is not installed through apt`
+        }
+        ok={
+          items.isDockerInstalledThroughApt && items.dockerLatestVersion
+            ? gte(items.dockerHostVersion, items.dockerLatestVersion)
+            : false
+        }
       />
     </div>
   );
@@ -43,12 +51,13 @@ export function DockerUpgrade() {
   useEffect(() => {
     if (checkReq.result) {
       setCanUpdate(
-        !checkReq.result.isDockerInUnattendedUpgrades &&
-          !checkReq.result.isDockerInstalledThroughApt &&
-          lt(
-            checkReq.result.dockerHostVersion,
-            checkReq.result.dockerLatestVersion
-          )
+        !checkReq.result.isDockerInUnattendedUpgrades ||
+          !checkReq.result.isDockerInstalledThroughApt ||
+          (checkReq.result.isDockerInstalledThroughApt &&
+            lt(
+              checkReq.result.dockerHostVersion,
+              checkReq.result.dockerLatestVersion
+            ))
       );
     }
   }, [checkReq.result]);
@@ -89,8 +98,11 @@ export function DockerUpgrade() {
 
   return (
     <Card spacing>
-      <div className="subtle-header">UPDATE DOCKER ENGINE</div>
-      <p>Update docker engine to a stable version with DAppNode</p>
+      <p>
+        Update docker to latest version, make sure its installed through the
+        standard apt package manager and enable unattended upgrades for docker
+        so you do not worry about updating docker anymore
+      </p>
 
       {!canUpdate ? (
         <Button disabled={checkReq.loading} onClick={dockerUpdateCheck}>
