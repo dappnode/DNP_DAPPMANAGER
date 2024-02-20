@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { NavLink, RouteComponentProps } from "react-router-dom";
+import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
@@ -17,9 +17,9 @@ import ErrorView from "components/ErrorView";
 import Title from "components/Title";
 // Icons
 import { MdOpenInNew } from "react-icons/md";
-import { GoClippy } from "react-icons/go";
+import { GoCopy } from "react-icons/go";
 import { urlJoin } from "utils/url";
-import { VpnDeviceCredentials } from "@dappnode/common";
+import { VpnDeviceCredentials } from "@dappnode/types";
 
 function OpenVpnDeviceDetailsLoaded({
   device
@@ -54,7 +54,7 @@ function OpenVpnDeviceDetailsLoaded({
           append={
             <>
               <Button className="copy-input-copy" data-clipboard-text={url}>
-                <GoClippy />
+                <GoCopy />
               </Button>
               <Button className="copy-input-open">
                 <a href={url} {...newTabProps} className="no-a-style">
@@ -91,7 +91,7 @@ function OpenVpnDeviceDetailsLoaded({
                       className="copy-input-copy"
                       data-clipboard-text={device.id}
                     >
-                      <GoClippy />
+                      <GoCopy />
                     </Button>
                   </>
                 }
@@ -110,7 +110,7 @@ function OpenVpnDeviceDetailsLoaded({
                       className="copy-input-copy"
                       data-clipboard-text={device.password}
                     >
-                      <GoClippy />
+                      <GoCopy />
                     </Button>
                   </>
                 }
@@ -130,10 +130,9 @@ function OpenVpnDeviceDetailsLoaded({
   );
 }
 
-export const OpenVpnDeviceDetails: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
-  const id = match.params.id;
+export const OpenVpnDeviceDetails: React.FC = () => {
+  const params = useParams();
+  const id = params.id || "";
   const deviceCredentials = useApi.deviceCredentialsGet({ id });
 
   return (

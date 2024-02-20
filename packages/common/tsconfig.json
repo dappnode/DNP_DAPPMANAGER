@@ -4,9 +4,12 @@
     /* Modules */
     "types": ["node"],
 
+    /* Required for JSON schemas */
+    "module": "ESNext",
+    "moduleResolution": "node",
+
     /* Emit */
     "outDir": "dist",
-    "sourceMap": true,
 
     /* Language and Environment */
     "lib": ["DOM", "ESNext"]

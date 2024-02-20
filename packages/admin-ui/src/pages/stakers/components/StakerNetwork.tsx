@@ -1,16 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import SubTitle from "components/SubTitle";
 import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import {
-  Network,
-  StakerConfigGet,
-  StakerConfigGetOk,
-  StakerConfigSet,
-  StakerItemOk
-} from "@dappnode/common";
+import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -21,19 +15,15 @@ import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
-import {
-  getChanges,
-  isOkSelectedInstalledAndRunning,
-  validateEthereumAddress
-} from "./utils";
 import { responseInterface } from "swr";
-import { Alert, Form } from "react-bootstrap";
-import { ReqStatus } from "types";
+import { Alert } from "react-bootstrap";
 import "./columns.scss";
-import { ThemeContext } from "App";
+import { AppContext } from "App";
 import LaunchpadValidators from "./launchpad/LaunchpadValidators";
 import { FaEthereum } from "react-icons/fa";
-import Input from "components/Input";
+import { Network } from "@dappnode/types";
+import { useStakerConfig } from "./useStakerConfig";
+import { AlertDismissible } from "components/AlertDismissible";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -43,125 +33,29 @@ export default function StakerNetwork<T extends Network>({
   description: string;
 }) {
   // Context
-  const { theme } = React.useContext(ThemeContext);
-  // Launchpad
-  const [showLaunchpadValidators, setShowLaunchpadValidators] = useState(false);
-  const [allStakerItemsOk, setAllStakerItemsOk] = useState<boolean>(false);
-  // Error
-  const [feeRecipientError, setFeeRecipientError] = useState<string | null>(
-    null
-  );
-  // Req
-  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  // New config
-  const [newFeeRecipient, setNewFeeRecipient] = useState<string>("");
-  const [newExecClient, setNewExecClient] = useState<
-    StakerItemOk<T, "execution">
-  >();
-  const [newConsClient, setNewConsClient] = useState<
-    StakerItemOk<T, "consensus">
-  >();
-  const [newMevBoost, setNewMevBoost] = useState<
-    StakerItemOk<T, "mev-boost">
-  >();
-  const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
-    false
-  );
-
-  // Apply button state
-  const [changes, setChanges] = useState<{
-    isAllowed: boolean;
-    reason?: string;
-    severity?: "warning" | "secondary" | "danger";
-  }>({ isAllowed: false });
-  const [currentStakerConfig, setCurrentStakerConfig] = useState<
-    StakerConfigSet<T>
-  >();
+  const { theme } = React.useContext(AppContext);
 
   const currentStakerConfigReq = useApi.stakerConfigGet(
     network
   ) as responseInterface<StakerConfigGet<T>, Error>;
 
-  useEffect(() => {
-    if (currentStakerConfigReq.data) {
-      const {
-        executionClients,
-        consensusClients,
-        mevBoost,
-        web3Signer,
-        feeRecipient
-      } = currentStakerConfigReq.data;
-
-      const executionClient = executionClients.find(ec =>
-        isOkSelectedInstalledAndRunning(ec)
-      );
-      const consensusClient = consensusClients.find(cc =>
-        isOkSelectedInstalledAndRunning(cc)
-      );
-      const enableWeb3signer = isOkSelectedInstalledAndRunning(web3Signer);
-
-      if (executionClient && executionClient.status === "ok")
-        setNewExecClient(executionClient);
-      if (consensusClient && consensusClient.status === "ok")
-        setNewConsClient(consensusClient);
-
-      if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
-        setNewMevBoost(mevBoost);
-      setNewEnableWeb3signer(enableWeb3signer);
-      if (feeRecipient) setNewFeeRecipient(feeRecipient);
-
-      // Set the current config to be displayed in advance view
-      setCurrentStakerConfig({
-        network,
-        executionClient:
-          executionClient?.status === "ok" ? executionClient : undefined,
-        consensusClient:
-          consensusClient?.status === "ok" ? consensusClient : undefined,
-        mevBoost:
-          mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
-            ? mevBoost
-            : undefined,
-        enableWeb3signer,
-        feeRecipient
-      });
-
-      // set allStakerItemsOk
-      setAllStakerItemsOk(
-        executionClients.every(ec => ec.status === "ok") &&
-          consensusClients.every(cc => cc.status === "ok") &&
-          mevBoost.status === "ok" &&
-          web3Signer.status === "ok"
-      );
-    }
-  }, [currentStakerConfigReq.data, network]);
-
-  useEffect(() => {
-    if (newFeeRecipient)
-      setFeeRecipientError(validateEthereumAddress(newFeeRecipient));
-  }, [newFeeRecipient]);
-
-  useEffect(() => {
-    if (currentStakerConfig)
-      setChanges(
-        getChanges({
-          currentStakerConfig,
-          feeRecipientError,
-          newConsClient,
-          newMevBoost,
-          newEnableWeb3signer,
-          newExecClient,
-          newFeeRecipient
-        })
-      );
-  }, [
-    currentStakerConfig,
-    feeRecipientError,
-    newConsClient,
-    newMevBoost,
-    newEnableWeb3signer,
+  // hooks
+  const {
+    showLaunchpadValidators,
+    setShowLaunchpadValidators,
+    allStakerItemsOk,
+    reqStatus,
+    setReqStatus,
     newExecClient,
-    newFeeRecipient
-  ]);
+    setNewExecClient,
+    newConsClient,
+    setNewConsClient,
+    newMevBoost,
+    setNewMevBoost,
+    newEnableWeb3signer,
+    setNewEnableWeb3signer,
+    changes
+  } = useStakerConfig(network, currentStakerConfigReq);
 
   /**
    * Set new staker config
@@ -210,7 +104,6 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                feeRecipient: newFeeRecipient,
                 executionClient:
                   newExecClient?.status === "ok"
                     ? { ...newExecClient, data: undefined }
@@ -248,166 +141,164 @@ export default function StakerNetwork<T extends Network>({
   }
 
   return (
-    <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
-      {currentStakerConfigReq.data ? (
-        <Card>
+    <>
+      {network === "prater" && (
+        <AlertDismissible variant="warning">
           <p>
-            Set up your Proof-of-Stake validator configuration for Ethereum and
-            Ethereum-based chains. You will need to: <br />
-            (1) Choose an Execution Layer client <br />
-            (2) Choose a Consensus Layer client (+ validator) <br />
-            (3) Install the web3signer, which will hold the validator keys and
-            sign <br />
-            {network !== "gnosis" && (
-              <>
-                (4) Optional; delegate block-building capacities through the MEV
-                Boost network and potentially profit from MEV
-              </>
-            )}
+            The prater network is about to be deprecated, please migrate to{" "}
+            <b>Holesky</b>.
           </p>
-          <br />
+        </AlertDismissible>
+      )}
 
-          <p>{description}</p>
-
-          <>
-            <Input
-              value={newFeeRecipient || ""}
-              onValueChange={setNewFeeRecipient}
-              isInvalid={Boolean(feeRecipientError)}
-              prepend="Default Fee Recipient"
-              placeholder="Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-            />
-            {newFeeRecipient && feeRecipientError && (
-              <Form.Text className="text-danger" as="span">
-                {feeRecipientError}
-              </Form.Text>
-            )}
-          </>
-
-          <Row className="staker-network">
-            <Col>
-              <SubTitle>Execution Clients</SubTitle>
-              {currentStakerConfigReq.data.executionClients.map(
-                (executionClient, i) => (
-                  <ExecutionClient<T>
-                    key={i}
-                    executionClient={executionClient}
-                    setNewExecClient={setNewExecClient}
-                    isSelected={
-                      executionClient.dnpName === newExecClient?.dnpName
-                    }
-                  />
-                )
+      <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
+        {currentStakerConfigReq.data ? (
+          <Card>
+            <p>
+              Set up your Proof-of-Stake validator configuration for Ethereum
+              and Ethereum-based chains. You will need to: <br />
+              (1) Choose an Execution Layer client <br />
+              (2) Choose a Consensus Layer client (+ validator) <br />
+              (3) Install the web3signer, which will hold the validator keys and
+              sign <br />
+              {network !== "gnosis" && network !== "lukso" && (
+                <>
+                  (4) Optional; delegate block-building capacities through the
+                  MEV Boost network and potentially profit from MEV
+                </>
               )}
-            </Col>
+            </p>
+            <br />
 
-            <Col>
-              <SubTitle>Consensus Clients</SubTitle>
-              {currentStakerConfigReq.data.consensusClients.map(
-                (consensusClient, i) => (
-                  <ConsensusClient<T>
-                    key={i}
-                    consensusClient={consensusClient}
-                    setNewConsClient={setNewConsClient}
-                    isSelected={
-                      consensusClient.dnpName === newConsClient?.dnpName
-                    }
-                  />
-                )
-              )}
-            </Col>
+            <p>{description}</p>
 
-            <Col>
-              <SubTitle>Remote signer</SubTitle>
-              <RemoteSigner
-                signer={currentStakerConfigReq.data.web3Signer}
-                setEnableWeb3signer={setNewEnableWeb3signer}
-                isSelected={newEnableWeb3signer}
-              />
-            </Col>
-            {(network === "prater" || network === "mainnet") && (
+            <Row className="staker-network">
               <Col>
-                <SubTitle>Mev Boost</SubTitle>
-                <MevBoost
-                  network={network}
-                  mevBoost={currentStakerConfigReq.data.mevBoost}
-                  newMevBoost={newMevBoost}
-                  setNewMevBoost={setNewMevBoost}
-                  isSelected={
-                    currentStakerConfigReq.data.mevBoost.dnpName ===
-                    newMevBoost?.dnpName
-                      ? true
-                      : false
-                  }
+                <SubTitle>Execution Clients</SubTitle>
+                {currentStakerConfigReq.data.executionClients.map(
+                  (executionClient, i) => (
+                    <ExecutionClient<T>
+                      key={i}
+                      executionClient={executionClient}
+                      setNewExecClient={setNewExecClient}
+                      isSelected={
+                        executionClient.dnpName === newExecClient?.dnpName
+                      }
+                    />
+                  )
+                )}
+              </Col>
+
+              <Col>
+                <SubTitle>Consensus Clients</SubTitle>
+                {currentStakerConfigReq.data.consensusClients.map(
+                  (consensusClient, i) => (
+                    <ConsensusClient<T>
+                      key={i}
+                      consensusClient={{
+                        ...consensusClient,
+                        useCheckpointSync: true
+                      }}
+                      setNewConsClient={setNewConsClient}
+                      isSelected={
+                        consensusClient.dnpName === newConsClient?.dnpName
+                      }
+                    />
+                  )
+                )}
+              </Col>
+
+              <Col>
+                <SubTitle>Remote signer</SubTitle>
+                <RemoteSigner
+                  signer={currentStakerConfigReq.data.web3Signer}
+                  setEnableWeb3signer={setNewEnableWeb3signer}
+                  isSelected={newEnableWeb3signer}
                 />
               </Col>
-            )}
-          </Row>
+              {(network === "prater" || network === "mainnet") && (
+                <Col>
+                  <SubTitle>Mev Boost</SubTitle>
+                  <MevBoost
+                    network={network}
+                    mevBoost={currentStakerConfigReq.data.mevBoost}
+                    newMevBoost={newMevBoost}
+                    setNewMevBoost={setNewMevBoost}
+                    isSelected={
+                      currentStakerConfigReq.data.mevBoost.dnpName ===
+                      newMevBoost?.dnpName
+                        ? true
+                        : false
+                    }
+                  />
+                </Col>
+              )}
+            </Row>
 
-          <hr />
+            <hr />
 
-          <div>
-            <div className="staker-buttons">
-              <Button
-                variant="dappnode"
-                disabled={!changes.isAllowed || reqStatus.loading}
-                onClick={() => setNewConfig(false)}
-              >
-                Apply changes
-              </Button>
-              {network === "prater" && (
+            <div>
+              <div className="staker-buttons">
                 <Button
-                  disabled={!allStakerItemsOk}
-                  onClick={() => setShowLaunchpadValidators(true)}
                   variant="dappnode"
+                  disabled={!changes.isAllowed || reqStatus.loading}
+                  onClick={() => setNewConfig(false)}
                 >
-                  <FaEthereum /> Step by step setup
+                  Apply changes
                 </Button>
+                {(network === "prater" || network === "holesky") && (
+                  <Button
+                    disabled={!allStakerItemsOk}
+                    onClick={() => setShowLaunchpadValidators(true)}
+                    variant="dappnode"
+                  >
+                    <FaEthereum /> Step by step setup
+                  </Button>
+                )}
+              </div>
+
+              {!changes.isAllowed && changes.reason && (
+                <>
+                  <br />
+                  <br />
+                  <Alert variant={changes.severity}>
+                    Cannot apply changes: <b>{changes.reason}</b>
+                  </Alert>
+                </>
+              )}
+
+              {reqStatus.error && (
+                <ErrorView error={reqStatus.error} hideIcon red />
               )}
             </div>
 
-            {!changes.isAllowed && changes.reason && (
-              <>
-                <br />
-                <br />
-                <Alert variant={changes.severity}>
-                  Cannot apply changes: <b>{changes.reason}</b>
-                </Alert>
-              </>
+            {showLaunchpadValidators && allStakerItemsOk && (
+              <LaunchpadValidators
+                network={network}
+                stakerConfig={
+                  (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<
+                    T
+                  >
+                }
+                setNewConfig={setNewConfig}
+                setShowLaunchpadValidators={setShowLaunchpadValidators}
+                setNewExecClient={setNewExecClient}
+                setNewConsClient={setNewConsClient}
+                setNewMevBoost={setNewMevBoost}
+                newExecClient={newExecClient}
+                newConsClient={newConsClient}
+                newMevBoost={newMevBoost}
+              />
             )}
-
-            {reqStatus.error && (
-              <ErrorView error={reqStatus.error} hideIcon red />
-            )}
-          </div>
-
-          {showLaunchpadValidators && allStakerItemsOk && (
-            <LaunchpadValidators
-              network={network}
-              stakerConfig={
-                (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<T>
-              }
-              setNewConfig={setNewConfig}
-              setShowLaunchpadValidators={setShowLaunchpadValidators}
-              setNewFeeRecipient={setNewFeeRecipient}
-              newFeeRecipient={newFeeRecipient}
-              setNewExecClient={setNewExecClient}
-              setNewConsClient={setNewConsClient}
-              setNewMevBoost={setNewMevBoost}
-              newExecClient={newExecClient}
-              newConsClient={newConsClient}
-              newMevBoost={newMevBoost}
-              feeRecipientError={feeRecipientError}
-            />
-          )}
-        </Card>
-      ) : currentStakerConfigReq.error ? (
-        <ErrorView error={currentStakerConfigReq.error} hideIcon red />
-      ) : currentStakerConfigReq.isValidating ? (
-        <Loading steps={[`Loading ${network} staker configuration`]} />
-      ) : (
-        <ErrorView error={"No data"} hideIcon red />
-      )}
-    </div>
+          </Card>
+        ) : currentStakerConfigReq.error ? (
+          <ErrorView error={currentStakerConfigReq.error} hideIcon red />
+        ) : currentStakerConfigReq.isValidating ? (
+          <Loading steps={[`Loading ${network} staker configuration`]} />
+        ) : (
+          <ErrorView error={"No data"} hideIcon red />
+        )}
+      </div>
+    </>
   );
 }

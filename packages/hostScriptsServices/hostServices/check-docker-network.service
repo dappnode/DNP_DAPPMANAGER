@@ -1,0 +1,9 @@
+[Unit]
+Description=Check Docker network status
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/src/dappnode/DNCORE/scripts/host/check_docker_network.sh
+
+[Install]
+WantedBy=multi-user.target

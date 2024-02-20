@@ -1,4 +1,4 @@
-import { Routes, TrustedReleaseKey } from "@dappnode/common";
+import { Routes, TrustedReleaseKey } from "@dappnode/types";
 
 const initialTrustedKey: TrustedReleaseKey = {
   name: "DAppNode Association",

@@ -2,8 +2,8 @@ import * as api from "../calls/index.js";
 import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
-import params from "../params.js";
-import { logs } from "../logs.js";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 
 export function startTestApi(): http.Server {
   const app = express();
@@ -40,8 +40,13 @@ export function startTestApi(): http.Server {
           callFn(req.body as never)
             .then(data => res.send(data))
             .catch(e => {
+              const errorResponse = {
+                name: e.name,
+                message: e.message,
+                stack: e.stack
+              };
               logs.error(`Error in ${callCasted}: ${e.stack}`);
-              res.status(500).send(e.message);
+              res.status(500).send(errorResponse);
             });
         });
       } else {
@@ -49,8 +54,13 @@ export function startTestApi(): http.Server {
           callFn(req.query as never)
             .then(data => res.send(data))
             .catch(e => {
+              const errorResponse = {
+                name: e.name,
+                message: e.message,
+                stack: e.stack
+              };
               logs.error(`Error in ${callCasted}: ${e.stack}`);
-              res.status(500).send(e.message);
+              res.status(500).send(errorResponse);
             });
         });
       }

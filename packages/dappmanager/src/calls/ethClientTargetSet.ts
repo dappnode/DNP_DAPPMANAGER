@@ -1,11 +1,13 @@
-import { Eth2ClientTarget } from "@dappnode/common";
-import { ethereumClient } from "../modules/ethClient/index.js";
+import { Eth2ClientTarget } from "@dappnode/types";
+import { ethereumClient } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Changes the ethereum client used to fetch package data
  */
 export async function ethClientTargetSet({
   target,
+  ethRemoteRpc,
   sync = false,
   useCheckpointSync = false,
   deletePrevExecClient = false,
@@ -14,6 +16,7 @@ export async function ethClientTargetSet({
   deletePrevConsClientVolumes = false
 }: {
   target: Eth2ClientTarget;
+  ethRemoteRpc: string;
   sync?: boolean;
   useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
@@ -23,13 +26,15 @@ export async function ethClientTargetSet({
 }): Promise<void> {
   if (!target) throw Error(`Argument target must be defined`);
 
-  await ethereumClient.changeEthClient(
-    target,
+  await ethereumClient.changeEthClient({
+    dappnodeInstaller,
+    nextTarget: target,
     sync,
     useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
     deletePrevConsClient,
-    deletePrevConsClientVolumes
-  );
+    deletePrevConsClientVolumes,
+    ethRemoteRpc
+  });
 }

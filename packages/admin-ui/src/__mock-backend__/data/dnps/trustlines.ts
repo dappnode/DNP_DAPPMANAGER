@@ -6,7 +6,7 @@ const serviceName = dnpName;
 export const trustlines: MockDnp = {
   avatar: "https://i.ibb.co/vLBbdGZ/avatar-min.png",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.0.1",
     upstreamVersion: "release4044",

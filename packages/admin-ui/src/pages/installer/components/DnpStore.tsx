@@ -10,7 +10,7 @@ import {
   DirectoryItem,
   DirectoryItemOk,
   DirectoryItemError
-} from "@dappnode/common";
+} from "@dappnode/types";
 import "./dnpStore.scss";
 
 function getTag({

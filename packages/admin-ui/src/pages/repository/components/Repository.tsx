@@ -1,17 +1,11 @@
 import React from "react";
 import Eth from "./Eth";
 import Ipfs from "./Ipfs";
-import {
-  NavLink,
-  Redirect,
-  Route,
-  RouteComponentProps,
-  Switch
-} from "react-router-dom";
+import { NavLink, Route, Routes } from "react-router-dom";
 import { subPaths, title } from "../data";
 import Title from "components/Title";
 
-export const Repository: React.FC<RouteComponentProps> = ({ match }) => {
+export const Repository: React.FC = () => {
   const availableRoutes: {
     name: string;
     subPath: string;
@@ -36,7 +30,7 @@ export const Repository: React.FC<RouteComponentProps> = ({ match }) => {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -47,18 +41,15 @@ export const Repository: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

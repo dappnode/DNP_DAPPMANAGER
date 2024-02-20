@@ -1,23 +1,20 @@
-import * as db from "./db/index.js";
-import { eventBus } from "./eventBus.js";
-import * as dyndns from "./modules/dyndns/index.js";
-import getDappmanagerImage from "./utils/getDappmanagerImage.js";
-import getServerName from "./utils/getServerName.js";
-import getInternalIp from "./utils/getInternalIp.js";
-import getStaticIp from "./utils/getStaticIp.js";
-import getExternalUpnpIp from "./modules/upnpc/getExternalIp.js";
-import { writeGlobalEnvsToEnvFile } from "./modules/globalEnvs.js";
-import getPublicIpFromUrls from "./utils/getPublicIpFromUrls.js";
-import params from "./params.js";
-import ping from "./utils/ping.js";
-import { pause } from "./utils/asyncFlows.js";
-import retry from "async-retry";
-import shell from "./utils/shell.js";
-import { IdentityInterface } from "./types.js";
-import { logs } from "./logs.js";
+import * as db from "@dappnode/db";
+import { eventBus } from "@dappnode/eventbus";
+import { generateKeysIfNotExistOrNotValid } from "@dappnode/dyndns";
+import { getDappmanagerImage } from "@dappnode/dockerapi";
+import {
+  getInternalIp,
+  getServerName,
+  getStaticIp,
+  ping
+} from "./utils/index.js";
+import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
+import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
+import { params } from "@dappnode/params";
+import { IdentityInterface, IpfsClientTarget } from "@dappnode/types";
+import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
-import { isUpnpAvailable } from "./modules/upnpc/isUpnpAvailable.js";
-import { EthClientRemote, IpfsClientTarget } from "@dappnode/common";
+import { pause, shell, getPublicIpFromUrls } from "@dappnode/utils";
 
 // Wrap async getter so they do NOT throw, but return null and log the error
 const getInternalIpSafe = returnNullIfError(getInternalIp);
@@ -44,7 +41,7 @@ function returnNullIfError(
  * - Get network status variables
  * - Trigger a dyndns loop
  */
-export default async function initializeDb(): Promise<void> {
+export async function initializeDb(): Promise<void> {
   /**
    * ipfsClientTarget
    */
@@ -57,25 +54,6 @@ export default async function initializeDb(): Promise<void> {
   } catch (e) {
     logs.error("Error getting ipfsClientTarget", e);
     db.ipfsClientTarget.set(IpfsClientTarget.local);
-  }
-
-  /**
-   * Eth client remote
-   */
-  try {
-    const ethClientRemote = db.ethClientRemote.get();
-    if (!ethClientRemote) {
-      logs.info(
-        "ethClientRemote not found, grabbing default value from db, key eth-client-target"
-      );
-      const ethClientTarget = db.ethClientTarget.get();
-      if (ethClientTarget && ethClientTarget === "remote")
-        db.ethClientRemote.set(EthClientRemote.on);
-      else db.ethClientRemote.set(EthClientRemote.off);
-    }
-  } catch (e) {
-    logs.error("Error setting default value for eth-client-remote", e);
-    db.ethClientRemote.set(EthClientRemote.off);
   }
 
   /**
@@ -209,34 +187,7 @@ export default async function initializeDb(): Promise<void> {
   // Create VPN's address + privateKey if it doesn't exist yet (with static ip or not)
   // - Verify if the privateKey is corrupted or lost. Then create a new identity and alert the user
   // - Updates the domain: db.domain.set(domain);
-  dyndns.generateKeys(); // Auto-checks if keys are already generated
-
-  /**
-   * Set the domain of this DAppNode to point to the internal IP for better UX
-   * on Wifi connections, only if the internal IP !== public IP
-   * MUST be run after key generation `dyndns.generateKeys()`
-   * NOTE: Runs as a forked process with retry and a try / catch block
-   * > update_local_dyndns abcd1234abcd1234.dyndns.dappnode.io 192.168.1.12
-   */
-  try {
-    await retry(async function updateLocalDyndnsCall(): Promise<void> {
-      const domain = db.domain.get();
-      const publicIp = db.publicIp.get();
-      const internalIp = db.internalIp.get();
-      if (internalIp !== publicIp && internalIp && domain) {
-        try {
-          await shell(`update_local_dyndns ${domain} ${internalIp}`);
-          logs.info(`Updated local dyndns: ${domain} ${internalIp}`);
-        } catch (e) {
-          // Log the error in each attempt for transparency / debugging
-          logs.warn(`Error on updateLocalDyndns attempt: ${e.message}`);
-          throw e;
-        }
-      }
-    });
-  } catch (e) {
-    logs.error("Error on update local dyndns", e);
-  }
+  generateKeysIfNotExistOrNotValid(); // Auto-checks if keys are already generated
 
   /**
    * After initializing all the internal params (hostname, internal_ip, etc)

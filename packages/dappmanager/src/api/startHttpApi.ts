@@ -18,15 +18,15 @@ import {
   ClientSideCookiesParams
 } from "./sessions/index.js";
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
-import { Logs } from "../logs.js";
-import { EventBus } from "../eventBus.js";
+import { Logs } from "@dappnode/logger";
+import { EventBus } from "@dappnode/eventbus";
+import { subscriptionsFactory } from "@dappnode/common";
 import {
-  Routes,
   RpcPayload,
   RpcResponse,
   LoggerMiddleware,
-  subscriptionsFactory
-} from "@dappnode/common";
+  Routes
+} from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
 
 export interface HttpApiParams
@@ -101,6 +101,7 @@ export function startHttpApi({
 
   app.use(helmetConf());
   // Intercept decentralized website requests first
+  // TODO: research how to use auth in the proxy
   app.use(ethForwardMiddleware);
   // default options. ALL CORS + limit fileSize and file count
   app.use(fileUpload({ limits: { fileSize: 500 * 1024 * 1024, files: 10 } }));

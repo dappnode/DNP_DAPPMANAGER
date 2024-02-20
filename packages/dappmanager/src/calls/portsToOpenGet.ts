@@ -1,11 +1,11 @@
-import getPortsToOpen from "../daemons/natRenewal/getPortsToOpen.js";
-import { listContainers } from "../modules/docker/list/listContainers.js";
-import { PackageContainer, PortToOpen } from "@dappnode/common";
+import { getPortsToOpen } from "@dappnode/daemons";
+import { listPackageContainers } from "@dappnode/dockerapi";
+import { PackageContainer, PortToOpen } from "@dappnode/types";
 
 /**
  * Returns ports to be opened
  */
 export async function portsToOpenGet(): Promise<PortToOpen[]> {
-  const containers: PackageContainer[] = await listContainers();
+  const containers: PackageContainer[] = await listPackageContainers();
   return getPortsToOpen(containers); // Ports to be opened
 }

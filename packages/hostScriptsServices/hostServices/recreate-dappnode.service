@@ -1,0 +1,9 @@
+[Unit]
+Description=Recreate dappnode to latest if required
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/src/dappnode/DNCORE/scripts/host/recreate_dappnode.sh
+
+[Install]
+WantedBy=multi-user.target

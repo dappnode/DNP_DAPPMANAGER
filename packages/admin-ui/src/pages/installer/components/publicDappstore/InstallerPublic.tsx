@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RouteComponentProps, NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
@@ -8,7 +8,6 @@ import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterDirectory from "../../helpers/filterDirectory";
-import { rootPath } from "../../data";
 import CategoryFilter from "../CategoryFilter";
 import NoPackageFound from "../NoPackageFound";
 import DnpStore from "../DnpStore";
@@ -27,10 +26,10 @@ import {
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
-import { PublicSwitch } from "../PublicSwitch";
-import { useApi } from "api";
 
-export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
+export const InstallerPublic: React.FC = routeProps => {
+  const navigate = useNavigate();
+
   const registry = useSelector(getDnpRegistry);
   const requestStatus = useSelector(getRegistryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -41,18 +40,6 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
     {} as SelectedCategories
   );
   const [showErrorDnps, setShowErrorDnps] = useState(false);
-  const registryProgress = useApi.fetchRegistryProgress({});
-
-  useEffect(() => {
-    const interval =
-      requestStatus.loading &&
-      setInterval(() => {
-        registryProgress.revalidate();
-      }, 5000);
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [requestStatus.loading, registryProgress]);
 
   useEffect(() => {
     dispatch(fetchDnpRegistry({}));
@@ -74,7 +61,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
+    navigate(encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -115,7 +102,6 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
 
   return (
     <>
-      <PublicSwitch {...routeProps} />
       <AlertDismissible variant="warning">
         The public repository is open and permissionless and can contain
         malicious packages that can compromise the security of your DAppNode.
@@ -173,12 +159,7 @@ export const InstallerPublic: React.FC<RouteComponentProps> = routeProps => {
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />
       ) : requestStatus.loading ? (
-        <Loading
-          steps={[
-            `Scanning DAppNode packages from Ethereum ${registryProgress.data &&
-              `:${registryProgress.data.lastFetchedBlock} / ${registryProgress.data.latestBlock}`}`
-          ]}
-        />
+        <Loading steps={["Loading DAppNode Packages"]} />
       ) : requestStatus.success ? (
         <ErrorView error={"Directory loaded but found no packages"} />
       ) : null}

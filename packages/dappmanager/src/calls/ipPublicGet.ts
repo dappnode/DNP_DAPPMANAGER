@@ -1,5 +1,5 @@
-import { PublicIpResponse } from "@dappnode/common";
-import getPublicIpFromUrls from "../utils/getPublicIpFromUrls.js";
+import { PublicIpResponse } from "@dappnode/types";
+import { getPublicIpFromUrls } from "@dappnode/utils";
 
 export async function ipPublicGet(): Promise<PublicIpResponse> {
   return {

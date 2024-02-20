@@ -1,7 +1,9 @@
 // This will be used later in our root reducer and selectors
-export const rootPath = "/packages";
+export const relativePath = "packages/my"; // default redirect to packages
+export const rootPath = "packages/*";
 export const title = "Packages";
 
-// SubPaths
-export const systemPackagesSubPath = "/system";
-export const systemPackagesPath = rootPath + systemPackagesSubPath;
+export const subPaths = {
+  my: "my/*",
+  system: "system/*"
+};

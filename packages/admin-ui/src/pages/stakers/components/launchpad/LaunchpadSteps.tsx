@@ -3,33 +3,25 @@ import React from "react";
 import ConsensusClient from "../columns/ConsensusClient";
 import ExecutionClient from "../columns/ExecutionClient";
 import MevBoost from "../columns/MevBoost";
-import { Network, StakerConfigGetOk, StakerItemOk } from "@dappnode/common";
+import { StakerConfigGetOk, StakerItemOk, Network } from "@dappnode/types";
 import { disclaimer } from "pages/stakers/data";
 import RenderMarkdown from "components/RenderMarkdown";
-import { InputForm } from "components/InputForm";
-import Input from "components/Input";
-
 export const launchpadSteps = <T extends Network>({
   network,
   stakerConfig,
   setNewConfig,
   setShowLaunchpadValidators,
-  setNewFeeRecipient,
-  newFeeRecipient,
   setNewExecClient,
   newExecClient,
   setNewConsClient,
   newConsClient,
   setNewMevBoost,
-  newMevBoost,
-  feeRecipientError
+  newMevBoost
 }: {
   network: T;
   stakerConfig: StakerConfigGetOk<T>;
   setNewConfig(isLaunchpad: boolean): Promise<void>;
   setShowLaunchpadValidators: React.Dispatch<React.SetStateAction<boolean>>;
-  setNewFeeRecipient: React.Dispatch<React.SetStateAction<string>>;
-  newFeeRecipient: string;
   setNewExecClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
   >;
@@ -42,7 +34,6 @@ export const launchpadSteps = <T extends Network>({
   setNewMevBoost: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
   >;
-  feeRecipientError: string | null;
 }) => [
   {
     title: "Create the validator keystores and do the deposit",
@@ -56,7 +47,13 @@ export const launchpadSteps = <T extends Network>({
               ? "https://launchpad.ethereum.org/"
               : network === "prater"
               ? "https://goerli.launchpad.ethereum.org/"
-              : "https://launchpad.gnosis.gateway.fm/"
+              : network === "holesky"
+              ? "https://launchpad.holesky.ethereum.org/"
+              : network === "gnosis"
+              ? "https://launchpad.gnosis.gateway.fm/"
+              : network === "lukso"
+              ? "https://deposit.mainnet.lukso.network/en/overview"
+              : ""
           );
         }}
       >
@@ -90,34 +87,12 @@ export const launchpadSteps = <T extends Network>({
         {stakerConfig.consensusClients.map((consensusClient, i) => (
           <ConsensusClient<T>
             key={i}
-            consensusClient={consensusClient}
+            consensusClient={{ ...consensusClient, useCheckpointSync: true }}
             setNewConsClient={setNewConsClient}
             isSelected={consensusClient.dnpName === newConsClient?.dnpName}
           />
         ))}
       </div>
-    )
-  },
-  {
-    title: "Set the default Fee Recipient",
-    description:
-      "Set the default fee recipient for the validator(s). The fee recipient is the address that will receive the validator's fees. You can change it at any time.",
-    component: (
-      <InputForm
-        fields={[
-          {
-            label: `Default Fee Recipient`,
-            labelId: "new-feeRecipient",
-            name: "new-fee-recipient",
-            autoComplete: "new-feeRecipient",
-            value: newFeeRecipient || "",
-            onValueChange: setNewFeeRecipient,
-            error: feeRecipientError,
-            placeholder:
-              "Default fee recipient to be used as a fallback in case you have not set a fee recipient for a validator"
-          }
-        ]}
-      />
     )
   },
   {
@@ -139,13 +114,6 @@ export const launchpadSteps = <T extends Network>({
     description: `This is a summary of the staker configuration you have selected. If you are happy with it, click on the "next" button.`,
     component: (
       <div className="launchpad-summary">
-        {newFeeRecipient && (
-          <Input
-            aria-disabled={true}
-            value={newFeeRecipient}
-            onValueChange={() => {}}
-          />
-        )}
         {newExecClient && (
           <ExecutionClient<T>
             executionClient={newExecClient}
@@ -182,7 +150,7 @@ export const launchpadSteps = <T extends Network>({
         </div>
         <Button
           variant="dappnode"
-          disabled={!newExecClient || !newConsClient || !newFeeRecipient}
+          disabled={!newExecClient || !newConsClient}
           onClick={() => {
             setNewConfig(true);
             setShowLaunchpadValidators(false);

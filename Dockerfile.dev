@@ -1,49 +1,44 @@
-ARG NODE_VERSION=19.2.0
+ARG NODE_VERSION=20.3.0
 
 # Common base so it's cached
 # --platform=$BUILDPLATFORM is used build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
-#####################################
-FROM --platform=${BUILDPLATFORM:-amd64} node:${NODE_VERSION}-alpine as build-monorepo
+ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 
-WORKDIR /app
-
-RUN apk add --no-cache python3 build-base bash
-
+# Initial stage to gather git data
+FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as git-data
 WORKDIR /usr/src/app
-
 RUN apk add --no-cache git
-COPY .git .git
-COPY dappnode_package.json .
-COPY docker/getGitData.js .
+COPY .git dappnode_package.json docker/getGitData.js ./
 RUN node getGitData /usr/src/app/.git-data.json
 
-RUN apk add --no-cache bind-tools docker
 
-ENV DOCKER_COMPOSE_VERSION v2.5.0
-
-ENV REACT_APP_API_URL /
-
-RUN apk add --no-cache curl bind-dev xz libltdl miniupnpc zip unzip dbus bind tmux \
-  # See https://github.com/dappnode/DNP_DAPPMANAGER/issues/669
-  avahi-tools
-
-RUN curl -L https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-linux-$(uname -m) > /usr/local/bin/docker-compose \
-  && chmod +x /usr/local/bin/docker-compose
-
+# Build + Prod stage
+FROM node:${NODE_VERSION}-alpine
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
   UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
-  TEST=true
+  TEST=true \
+  REACT_APP_API_URL=http://my.dappnode:5000/
+WORKDIR /app
+RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
+  miniupnpc dbus tmux avahi-tools
 
-# Copy the src last as it's the layer most likely to change
-COPY packages/dappmanager/hostScripts /usr/src/app/hostScripts
-COPY packages/dappmanager/hostServices /usr/src/app/hostServices
-
-COPY docker/rndc.conf /etc/bind/
-COPY docker/update_local_dyndns.sh /usr/local/bin/update_local_dyndns
+# Copy git data
+COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 
 COPY docker/start_dev.sh /usr/src/app/start_dev.sh
+
+# Build the src code:
+# Copy and install deps first to cache
+COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY packages packages
+
+RUN yarn --frozen-lockfile --non-interactive --ignore-optional
+
+ENV REACT_APP_API_URL /
+RUN yarn build
+
 ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]

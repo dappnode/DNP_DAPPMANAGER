@@ -1,19 +1,25 @@
 import fs from "fs";
-import { removeNamedVolume } from "../modules/docker/removeNamedVolume.js";
-import { eventBus } from "../eventBus.js";
-import params from "../params.js";
-import { logs } from "../logs.js";
-import * as getPath from "../utils/getPath.js";
+import { removeNamedVolume } from "@dappnode/dockerapi";
+import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
 import {
   dockerContainerRemove,
   dockerVolumesList,
   dockerComposeUpPackage,
   getContainersStatus,
-  getContainersAndVolumesToRemove
-} from "../modules/docker/index.js";
-import { listPackage } from "../modules/docker/list/index.js";
-import { packageInstalledHasPid } from "../utils/pid.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
+  getContainersAndVolumesToRemove,
+  dockerContainerStop,
+  listPackage
+} from "@dappnode/dockerapi";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
+import {
+  ethicalMetricsDnpName,
+  ethicalMetricsTorServiceVolume,
+  unregister
+} from "@dappnode/ethicalmetrics";
+import { getDockerComposePath, packageInstalledHasPid } from "@dappnode/utils";
+import { restartDappmanagerPatch } from "@dappnode/installer";
 
 /**
  * Removes a package volumes. The re-ups the package
@@ -40,7 +46,7 @@ export async function packageRestartVolumes({
   const { compose } = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
 
   // Make sure the compose exists before deleting it's containers
-  const composePath = getPath.dockerCompose(dnp.dnpName, dnp.isCore);
+  const composePath = getDockerComposePath(dnp.dnpName, dnp.isCore);
   if (!fs.existsSync(composePath))
     throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
 
@@ -53,11 +59,35 @@ export async function packageRestartVolumes({
     return;
   }
 
+  // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
+  if (
+    (dnp.dnpName === ethicalMetricsDnpName && !volumeName) ||
+    volumeName === ethicalMetricsTorServiceVolume
+  ) {
+    try {
+      await unregister();
+    } catch (e) {
+      logs.error(`Error unregistering Ethical Metrics instance`, e);
+    }
+  }
+
   const containersStatus = await getContainersStatus({ dnpName });
 
   let err: Error | null = null;
   try {
     for (const containerName of containersToRemove) {
+      // get the service name from the container name
+      const serviceName = containerName
+        .split(
+          containerName.includes(params.CONTAINER_NAME_PREFIX)
+            ? params.CONTAINER_NAME_PREFIX
+            : params.CONTAINER_CORE_NAME_PREFIX
+        )[1]
+        .split(".")[0];
+      // only stop containers that are running
+      if (containersStatus[serviceName]?.targetStatus === "running")
+        await dockerContainerStop(containerName, { timeout: 5 });
+
       await dockerContainerRemove(containerName);
     }
     for (const volName of volumesToRemove) {
@@ -68,11 +98,18 @@ export async function packageRestartVolumes({
   }
 
   // In case of error: FIRST up the dnp, THEN throw the error
-  await dockerComposeUpPackage(
-    { dnpName },
-    containersStatus,
-    (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
-  );
+  // DAPPMANAGER patch
+  if (dnpName === params.dappmanagerDnpName) {
+    // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
+    await restartDappmanagerPatch({ composePath });
+    return;
+  } else {
+    await dockerComposeUpPackage(
+      { dnpName },
+      containersStatus,
+      (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
+    );
+  }
 
   if (err) {
     throw err;

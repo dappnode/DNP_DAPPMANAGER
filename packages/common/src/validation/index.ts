@@ -1,13 +1,10 @@
 import Ajv from "ajv";
-// @ts-ignore
 import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" assert { type: "json" };
-// @ts-ignore
 import routesReturnSchema from "./schemas/RoutesReturn.schema.json" assert { type: "json" };
-// @ts-ignore
 import subscriptionsArgumentsSchema from "./schemas/SubscriptionsArguments.schema.json" assert { type: "json" };
 import { Args } from "typescript-json-schema";
 
-const ajv = new Ajv({ allErrors: true });
+const ajv = new Ajv({ allErrors: true, strict: false });
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function validateRoutesArgsFactory() {

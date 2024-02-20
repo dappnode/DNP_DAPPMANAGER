@@ -2,11 +2,11 @@ import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import React from "react";
 import { ChangeDappnodeWebName } from "./ChangeDappnodeWebName";
-import { DockerUpdate } from "./DockerUpdate";
 import { SshManager } from "./SshManager";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
+import UpdateUpgrade from "./UpdateUpgrade";
 
 export function Advanced() {
   return (
@@ -26,8 +26,8 @@ export function Advanced() {
       <SubTitle>Release trusted keys</SubTitle>
       <ReleaseTrustedKeysEditor />
 
-      <SubTitle>Docker update</SubTitle>
-      <DockerUpdate />
+      <SubTitle>Update and upgrade the host machine</SubTitle>
+      <UpdateUpgrade />
 
       <SubTitle>Clear cache db</SubTitle>
       <ClearCacheDb />

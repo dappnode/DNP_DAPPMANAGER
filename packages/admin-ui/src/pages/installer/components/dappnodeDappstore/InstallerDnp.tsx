@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { RouteComponentProps, NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { throttle, isEmpty } from "lodash-es";
 import { SelectedCategories } from "../../types";
 // This page
@@ -8,8 +8,6 @@ import isIpfsHash from "utils/isIpfsHash";
 import isDnpDomain from "utils/isDnpDomain";
 import { correctPackageName } from "../../utils";
 import filterDirectory from "../../helpers/filterDirectory";
-import { rootPath } from "../../data";
-import { rootPath as stakersPath } from "../../../stakers/data";
 import NoPackageFound from "../NoPackageFound";
 import CategoryFilter from "../CategoryFilter";
 import DnpStore from "../DnpStore";
@@ -27,9 +25,12 @@ import {
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
-import { PublicSwitch } from "../PublicSwitch";
+import { confirmPromise } from "components/ConfirmDialog";
+import { stakehouseLsdUrl } from "params";
 
-export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
+export const InstallerDnp: React.FC = routeProps => {
+  const navigate = useNavigate();
+
   const directory = useSelector(getDnpDirectory);
   const requestStatus = useSelector(getDirectoryRequestStatus);
   const ethClientWarning = useSelector(getEthClientWarning);
@@ -61,14 +62,33 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
   }, [query, fetchQueryThrottled]);
 
   function openDnp(id: string) {
-    // Middleware for Ethereum and Gnosis fake cards to redirect to stakers UI:
-    // - Mainnet: http://my.dappnode/#/stakers/mainnet
-    // - Gnosis: http://my.dappnode/#/stakers/gnosis
-    if (id === "ethereum.dnp.dappnode.eth")
-      routeProps.history.push(stakersPath + "/mainnet");
-    else if (id === "gnosis.dnp.dappnode.eth")
-      routeProps.history.push(stakersPath + "/gnosis");
-    else routeProps.history.push(rootPath + "/" + encodeURIComponent(id));
+    // Middleware for Ethereum, Gnosis and Stakehouse fake cards to redirect to stakers UI:
+    // - Mainnet: http://my.dappnode/stakers/mainnet
+    // - Gnosis: http://my.dappnode/stakers/gnosis
+    // - Stakehouse: http://my.dappnode/stakers/stakehouse
+    if (id === "ethereum.dnp.dappnode.eth") navigate("/stakers/ethereum");
+    else if (id === "gnosis.dnp.dappnode.eth") navigate("/stakers/gnosis");
+    else if (id === "stakehouse.dnp.dappnode.eth") {
+      // open a dialog that says it will open an external link, are you sure?
+      confirmPromise({
+        title: "Ready to Explore Stakehouse?",
+        text:
+          "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
+        buttons: [
+          {
+            label: "Cancel",
+            onClick: () => null
+          },
+          {
+            label: "Open",
+            variant: "dappnode",
+            onClick: () => {
+              window.open(stakehouseLsdUrl, "_blank");
+            }
+          }
+        ]
+      });
+    } else navigate(encodeURIComponent(id));
   }
 
   function onCategoryChange(category: string) {
@@ -109,7 +129,6 @@ export const InstallerDnp: React.FC<RouteComponentProps> = routeProps => {
 
   return (
     <>
-      <PublicSwitch {...routeProps} />
       <Input
         placeholder="DAppNode Package's name or IPFS hash"
         value={query}

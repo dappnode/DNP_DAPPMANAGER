@@ -1,7 +1,6 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/common";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
-import { dockerUpdate } from "./dockerUpdate";
 import { fetchPkgsData } from "./fetchPkgsData";
 import { httpsPortal } from "./httpsPortal";
 import { localProxying } from "./localProxying";
@@ -20,7 +19,6 @@ import { stakerConfig } from "./stakerConfig";
 const namedSpacedCalls = {
   ...autoUpdate,
   ...devices,
-  ...dockerUpdate,
   ...fetchPkgsData,
   ...httpsPortal,
   ...localProxying,
@@ -65,10 +63,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
   cleanDb: async () => {},
-  copyFileTo: async () => {},
+  copyFileToDockerContainer: async () => {},
   diagnose: async () => [],
   ethClientFallbackSet: async () => {},
   ethClientTargetSet: async () => {},
+  getHostUptime: async () => "1 week, 1 day, 5 hours, 10 minutes",
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
     publicIp: "85.84.83.82"
@@ -124,7 +123,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ],
   dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
   statsCpuGet: async () => ({
-    usedPercentage: 88
+    usedPercentage: 88,
+    numberOfCores: 4,
+    temperatureAverage: 40
   }),
   statsMemoryGet: async () => ({
     total: 8093155328,
@@ -138,7 +139,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-
+  statsSwapGet: async () => ({
+    total: 2147483648,
+    used: 0,
+    free: 2147483648,
+    usedPercentage: 0
+  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",
@@ -181,7 +187,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
-  seedPhraseSet: async () => {},
+  rebootHostIsRequiredGet: async () => ({
+    rebootRequired: true,
+    pkgs: "docker"
+  }),
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -205,7 +214,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     alertToOpenPorts: false,
     internalIp: "192.168.0.1",
     publicIp: "85.84.83.82",
-    dappmanagerNaclPublicKey: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
     eth2ClientTarget: {
@@ -216,19 +224,21 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ethClientStatus: {
       ok: false,
       code: "STATE_CALL_ERROR",
-      error: { message: "Some Error", stack: "Some Error\nline 56 file.ts" }
+      error: {
+        message: "Some Error",
+        stack: "Some Error\nline 56 file.ts"
+      }
     },
-    ethProvider: "http://geth.dappnode:8545",
+    ethRemoteRpc: "http://remoteNode.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [
-      // "repository",
-      // "repository-fallback",
-      // "system-auto-updates",
-      // "change-host-password"
+      //"repository",
+      //"repository-fallback",
+      //"system-auto-updates",
+      //"enable-ethical-metrics",
+      //"change-host-password"
     ]
   }),
-  runHostUpdates: async () =>
-    "Host updates have been executed successfully, no reboot needed",
   natRenewalEnable: async () => {},
   natRenewalIsEnabled: async () => true,
   lvmhardDisksGet: async () => [
@@ -245,7 +255,130 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
-  })
+  }),
+  enableEthicalMetrics: async ({ mail }) => {},
+  getEthicalMetricsConfig: async () => ({
+    mail: "@example.com",
+    isEnabled: true
+  }),
+  disableEthicalMetrics: async () => {},
+  optimismConfigGet: async () => ({
+    executionClients: [
+      {
+        status: "ok",
+        dnpName: "op-geth.dnp.dappnode.eth",
+        avatarUrl: "",
+        isInstalled: true,
+        isUpdated: true,
+        isRunning: true,
+        data: {
+          dnpName: "package",
+          reqVersion: "0.1.0",
+          semVersion: "0.1.0",
+          imageFile: {
+            hash: "QM..",
+            source: "ipfs",
+            size: 123
+          },
+          warnings: {},
+          signedSafe: true,
+          manifest: {
+            name: "geth.dnp.dappnode.eth",
+            description: "Go implementation of ethereum. Execution client",
+            shortDescription: "Go implementation of ethereum",
+            version: "0.1.0"
+          }
+        },
+        isSelected: true,
+        enableHistorical: true
+      },
+      {
+        status: "ok",
+        dnpName: "op-erigon.dnp.dappnode.eth",
+        avatarUrl: "",
+        isInstalled: true,
+        isUpdated: true,
+        isRunning: true,
+        data: {
+          dnpName: "package",
+          reqVersion: "0.1.0",
+          semVersion: "0.1.0",
+          imageFile: {
+            hash: "QM..",
+            source: "ipfs",
+            size: 123
+          },
+          warnings: {},
+          signedSafe: true,
+          manifest: {
+            name: "geth.dnp.dappnode.eth",
+            description: "Go implementation of ethereum. Execution client",
+            shortDescription: "Go implementation of ethereum",
+            version: "0.1.0"
+          }
+        },
+        isSelected: false,
+        enableHistorical: false
+      }
+    ],
+    rollup: {
+      status: "ok",
+      dnpName: "op-node.dnp.dappnode.eth",
+      avatarUrl: "",
+      isInstalled: false,
+      isUpdated: false,
+      isRunning: true,
+      data: {
+        dnpName: "package",
+        reqVersion: "0.1.0",
+        semVersion: "0.1.0",
+        imageFile: {
+          hash: "QM..",
+          source: "ipfs",
+          size: 123
+        },
+        warnings: {},
+        signedSafe: true,
+        manifest: {
+          name: "geth.dnp.dappnode.eth",
+          description: "Go implementation of ethereum. Execution client",
+          shortDescription: "Go implementation of ethereum",
+          version: "0.1.0"
+        }
+      },
+      isSelected: false,
+      mainnetRpcUrl: ""
+    },
+    archive: {
+      status: "ok",
+      dnpName: "op-l2geth.dnp.dappnode.eth",
+      avatarUrl: "",
+      isInstalled: false,
+      isUpdated: false,
+      isRunning: true,
+      data: {
+        dnpName: "package",
+        reqVersion: "0.1.0",
+        semVersion: "0.1.0",
+        imageFile: {
+          hash: "QM..",
+          source: "ipfs",
+          size: 123
+        },
+        warnings: {},
+        signedSafe: true,
+        manifest: {
+          name: "geth.dnp.dappnode.eth",
+          description: "Go implementation of ethereum. Execution client",
+          shortDescription: "Go implementation of ethereum",
+          version: "0.1.0"
+        }
+      },
+      isSelected: true
+    }
+  }),
+  optimismConfigSet: async () => {},
+  updateUpgrade: async () => "Successfully updated"
 };
 
 export const calls: Routes = {

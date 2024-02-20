@@ -1,11 +1,5 @@
 import React, { useMemo } from "react";
-import {
-  NavLink,
-  Switch,
-  Route,
-  Redirect,
-  RouteComponentProps
-} from "react-router-dom";
+import { NavLink, Routes, Route } from "react-router-dom";
 import { useApi } from "api";
 import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
@@ -14,8 +8,9 @@ import Title from "components/Title";
 import { docsUrl, vpnDnpName, wireguardDnpName } from "params";
 import LinkDocs from "components/LinkDocs";
 
-export function VpnHome({ match }: RouteComponentProps) {
+export function VpnHome() {
   const dnpsRequest = useApi.packagesGet();
+
   const availableRoutes = useMemo(() => {
     const dnpsSet = dnpsRequest.data
       ? new Set(dnpsRequest.data.map(dnp => dnp.dnpName))
@@ -24,18 +19,21 @@ export function VpnHome({ match }: RouteComponentProps) {
     const routes: {
       name: string;
       subPath: string;
+      subLink: string;
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
       {
-        name: "OpenVpn",
+        name: "OpenVPN",
         subPath: subPaths.openVpn,
+        subLink: "openvpn",
         component: OpenVpnDevicesRoot,
         installed: dnpsSet.has(vpnDnpName)
       },
       {
         name: "Wireguard",
         subPath: subPaths.wireguard,
+        subLink: "wireguard",
         component: WireguardDevicesRoot,
         installed: dnpsSet.has(wireguardDnpName)
       }
@@ -53,7 +51,7 @@ export function VpnHome({ match }: RouteComponentProps) {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subLink}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -65,25 +63,22 @@ export function VpnHome({ match }: RouteComponentProps) {
 
       <p>
         Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your DAppNode from an external network. Learn more about VPN at:{" "}
+        access your Dappnode from an external network. Learn more about VPN at:{" "}
         <LinkDocs href={docsUrl.connectVpn}>
-          How to connect to your DAppNode VPN
+          How to connect to your Dappnode VPN
         </LinkDocs>
       </p>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

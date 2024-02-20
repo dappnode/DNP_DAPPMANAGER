@@ -5,7 +5,7 @@ import computeSemverUpdateType from "utils/computeSemverUpdateType";
 import RenderMarkdown from "components/RenderMarkdown";
 import styled from "styled-components";
 import { prettyDnpName } from "utils/format";
-import { DependencyListItem } from "@dappnode/common";
+import { DependencyListItem } from "@dappnode/types";
 
 const InfoContainer = styled.div`
   display: grid;

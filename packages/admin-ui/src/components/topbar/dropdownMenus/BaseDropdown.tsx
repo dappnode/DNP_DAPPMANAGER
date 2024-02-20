@@ -3,6 +3,7 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import RenderMarkdown from "components/RenderMarkdown";
 import "./dropdown.scss";
 import { HelpTo } from "components/Help";
+import Switch from "components/Switch";
 
 // Bubble color does not support "info", nor "light". So "light" with display nothing
 type BubbleColor = "danger" | "warning" | "success" | "light";
@@ -44,6 +45,10 @@ type MessageType = "danger" | "warning" | "success" | "info";
 export interface BaseDropdownMessage {
   type?: MessageType;
   title?: string | JSX.Element | null;
+  toggle?: {
+    checked: boolean;
+    onToggle: () => void;
+  };
   body?: string;
   help?: string; // href link to attach to help icon
   progress?: number;
@@ -143,12 +148,20 @@ function BaseDropdown({
       <div className={`menu ${collapsed ? "" : "show"}`}>
         <div className="header">{name}</div>
         {messages.map(
-          ({ type, title, body, progress, showProgress, help }, i) => (
+          ({ type, title, toggle, body, progress, showProgress, help }, i) => (
             <div key={i}>
               {title && (
                 <div className="title">
                   <span className={`text text-${type}`}>{title}</span>
-                  {help && <HelpTo url={help} />}
+                  <div className="title-actions">
+                    {help && <HelpTo url={help} />}
+                    {toggle && (
+                      <Switch
+                        checked={toggle.checked}
+                        onToggle={toggle.onToggle}
+                      />
+                    )}
+                  </div>
                 </div>
               )}
 

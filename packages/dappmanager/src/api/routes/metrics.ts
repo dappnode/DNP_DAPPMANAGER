@@ -1,16 +1,18 @@
 import client from "prom-client";
 import { wrapHandler } from "../utils.js";
-import * as db from "../../db/index.js";
-import { stakerParamsByNetwork } from "../../modules/stakerConfig/stakerParamsByNetwork.js";
-import { Network } from "@dappnode/common";
-import { listPackageNoThrow } from "../../modules/docker/list/index.js";
+import * as db from "@dappnode/db";
+import { getStakerConfigByNetwork } from "@dappnode/stakers";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
+import { Network } from "@dappnode/types";
+import { getHostInfoMemoized } from "@dappnode/hostscriptsservices";
+import si from "systeminformation";
 
 /**
  * Collect the metrics:
  *   - IPFS node local or remote
  *   - Ethereum node local or remote
- *   - Which clients running on Ethereum, Gnosis, and prater
+ *   - Which clients running on Ethereum, Gnosis, Lukso, Prater, Holesky
  *   - Which is the favourite connectivity method: Wifi, VPN, Wireguard, local
  *   - Auto-updates enabled
  *   - Fallback enabled
@@ -95,47 +97,84 @@ register.registerMetric(
         if (client.includes("nimbus")) return 2;
         if (client.includes("prysm")) return 3;
         if (client.includes("teku")) return 4;
+        if (client.includes("lodestar")) return 5;
 
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis"] as Network[]) {
-        const stakerConfig = stakerParamsByNetwork(network);
+      for (const network of [
+        "mainnet",
+        "prater",
+        "gnosis",
+        "lukso",
+        "holesky"
+      ] as Network[]) {
+        const { executionClient, consensusClient, isMevBoostSelected } =
+          getStakerConfigByNetwork(network);
 
         // Execution client
         if (
-          stakerConfig.currentExecClient &&
+          executionClient &&
           (await listPackageNoThrow({
-            dnpName: stakerConfig.currentExecClient
+            dnpName: executionClient
           }))
         )
           this.set(
             { executionClient: network },
-            parseClientToNumber(stakerConfig.currentExecClient)
+            parseClientToNumber(executionClient)
           );
         else this.set({ executionClient: network }, 0);
 
         // Consensus client
         if (
-          stakerConfig.currentConsClient &&
+          consensusClient &&
           (await listPackageNoThrow({
-            dnpName: stakerConfig.currentConsClient
+            dnpName: consensusClient
           }))
         )
           this.set(
             { consensusClient: network },
-            parseClientToNumber(stakerConfig.currentConsClient)
+            parseClientToNumber(consensusClient)
           );
         else this.set({ consensusClient: network }, 0);
 
         // MEV boost
-        if (
-          stakerConfig.isMevBoostSelected &&
-          (await listPackageNoThrow({ dnpName: stakerConfig.mevBoost }))
-        )
-          this.set({ mevBoost: network }, 1);
+        if (isMevBoostSelected) this.set({ mevBoost: network }, 1);
         else this.set({ mevBoost: network }, 0);
       }
+    }
+  })
+);
+
+// Host info metrics
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_host_info",
+    help: "host info: docker, docker-cli and docker-compose versions, os, kernel, version codename and architecture",
+    labelNames: [
+      "dockerServerVersion",
+      "dockerCliVersion",
+      "dockerComposeVersion",
+      "os",
+      "kernel",
+      "versionCodename",
+      "architecture"
+    ],
+    async collect() {
+      const hostInfo = await getHostInfoMemoized();
+
+      this.set(
+        {
+          dockerServerVersion: hostInfo.dockerServerVersion,
+          dockerCliVersion: hostInfo.dockerCliVersion,
+          dockerComposeVersion: hostInfo.dockerComposeVersion,
+          os: hostInfo.os,
+          kernel: hostInfo.kernel,
+          versionCodename: hostInfo.versionCodename,
+          architecture: hostInfo.architecture
+        },
+        1
+      );
     }
   })
 );
@@ -196,6 +235,27 @@ register.registerMetric(
       const views = db.counterViews.get();
       this.reset();
       this.inc({ views: "views" }, views);
+    }
+  })
+);
+
+// Add cpu temperature metric
+register.registerMetric(
+  new client.Gauge({
+    name: "dappmanager_cpu_temperature_celsius",
+    help: "CPU temperature metrics, including current and maximum safe operating temperatures in Celsius degrees",
+    labelNames: ["type"], // 'type' label to distinguish between 'current' and 'max'
+    async collect() {
+      const cpuTemperature = await si.cpuTemperature();
+      const { main, max } = cpuTemperature;
+
+      // Set the current CPU temperature
+      if (main) this.labels("current").set(main);
+
+      // Optionally set the maximum safe operating temperature
+      // Note: This value is typically static and does not change over time,
+      // so it might be more efficient to document this elsewhere unless it's important for it to be queryable in Prometheus.
+      if (max) this.labels("max").set(max);
     }
   })
 );

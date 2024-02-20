@@ -1,5 +1,5 @@
-import * as db from "../db/index.js";
-import { EthClientFallback } from "@dappnode/common";
+import * as db from "@dappnode/db";
+import { EthClientFallback } from "@dappnode/types";
 
 /**
  * Sets if a fallback should be used

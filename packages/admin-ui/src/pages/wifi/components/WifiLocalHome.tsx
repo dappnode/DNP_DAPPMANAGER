@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Switch,
-  Route,
-  NavLink,
-  Redirect,
-  RouteComponentProps
-} from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 // Own module
 import { title, subPaths } from "../data";
 // Components
@@ -15,7 +9,7 @@ import { LocalProxying } from "./localProxying/LocalProxying";
 // CSS
 import "./wifiLocal.scss";
 
-export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
+export const WifiLocalHome: React.FC = () => {
   const availableRoutes: {
     name: string;
     subPath: string;
@@ -40,7 +34,7 @@ export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -51,18 +45,15 @@ export const WifiLocalHome: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
 
       <div className="section-spacing">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

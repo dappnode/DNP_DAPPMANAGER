@@ -42,6 +42,7 @@ export const wifiEnvSSID = "SSID";
 export const adminUiLocalDomain = "http://dappnode.local";
 
 // DNP names
+export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
@@ -59,13 +60,8 @@ export const mandatoryCoreDnps = [
 ];
 export const corePackages = [...mandatoryCoreDnps, coreDnpName];
 
-// NACL keys
-export const adminNaclSecretKey =
-  "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=";
-export const adminNaclPublicKey =
-  "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=";
-
 // URLs / Links
+export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
@@ -78,16 +74,19 @@ export const githubNewIssueDappnodeUrl =
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
+const docsBaseUrl = "https://docs.dappnode.io";
+
 export const docsUrl = {
-  main: "https://docs.dappnode.io",
-  recoverPasswordGuide: "https://docs.dappnode.io/user/faq/troubleshooting",
-  connectWifi: "https://docs.dappnode.io/user/guides/access/wifi",
-  connectLocalProxy: "https://docs.dappnode.io/user/guides/access/local",
-  connectVpn: "https://docs.dappnode.io/user/guides/access/vpn",
-  httpsExplanation:
-    "https://docs.dappnode.io/user/product-manual/system#networkk",
-  ipfsPeersExplanation:
-    "https://docs.dappnode.io/user/product-manual/system#peers"
+  main: docsBaseUrl,
+  recoverPasswordGuide: `${docsBaseUrl}/docs/user/getting-started/register#troubleshooting`,
+  connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
+  connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
+  connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
+  httpsExplanation: `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
+  ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
+  stakers: `${docsBaseUrl}/docs/user/staking/overview`,
+  rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
+  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`
 };
 
 export const forumUrl = {
@@ -102,7 +101,8 @@ export const forumUrl = {
 export const troubleShootMountpointsGuideUrl =
   "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
-export const explorerTreasuryUrl = "https://sourcecred.dappnode.io/#/explorer";
+export const explorerGitcoinUrl =
+  "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
 export const dappnodeGithub = "https://github.com/dappnode/DAppNode";
 export const dappnodeDiscourse = "https://forum.dappnode.io/";
 export const dappnodeDiscord = "https://discord.gg/dappnode";

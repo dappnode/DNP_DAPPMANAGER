@@ -1,5 +1,5 @@
-import { SetupTarget } from "@dappnode/dappnodesdk";
-import { PackageVersionData } from "@dappnode/common";
+import { PackageVersionData } from "@dappnode/types";
+import { SetupTarget } from "@dappnode/types";
 
 export interface WifiCredentials {
   ssid: string;
@@ -46,4 +46,21 @@ export interface DappnodeParams {
 
 export type Theme = "light" | "dark";
 
-export type UsageMode = "basic" | "advanced";
+export type UiModuleStatus = "enabled" | "disabled";
+
+export interface AppContextIface {
+  theme: Theme;
+  stakersModuleStatus: UiModuleStatus;
+  rollupsModuleStatus: UiModuleStatus;
+  toggleTheme: () => void;
+  toggleStakersModuleStatus: () => void;
+  toggleRollupsModuleStatus: () => void;
+}
+
+export type ModulesContext = Pick<
+  AppContextIface,
+  | "stakersModuleStatus"
+  | "rollupsModuleStatus"
+  | "toggleStakersModuleStatus"
+  | "toggleRollupsModuleStatus"
+>;

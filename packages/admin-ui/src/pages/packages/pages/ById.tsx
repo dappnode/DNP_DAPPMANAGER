@@ -1,6 +1,5 @@
 import React from "react";
-import { RouteComponentProps } from "react-router-dom";
-import { Switch, Route, NavLink, Redirect } from "react-router-dom";
+import { Routes, Route, NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import { isEmpty } from "lodash-es";
 // This module
@@ -19,16 +18,14 @@ import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
-import { UsageContext } from "App";
 
-export const PackageById: React.FC<RouteComponentProps<{
-  id: string;
-}>> = ({ match }) => {
-  const { usage } = React.useContext(UsageContext);
-  const id = decodeURIComponent(match.params.id || "");
+export const PackageById: React.FC = () => {
+  const params = useParams();
+  const id = params.id || "";
 
   const dnpRequest = useApi.packageGet({ dnpName: id });
   const dnp = dnpRequest.data;
+
   if (!dnp) {
     return (
       <>
@@ -64,7 +61,7 @@ export const PackageById: React.FC<RouteComponentProps<{
    * - Route (render, path)
    */
 
-  const basicRoutes: {
+  const availableRoutes: {
     name: string;
     subPath: string;
     render: () => JSX.Element;
@@ -76,13 +73,7 @@ export const PackageById: React.FC<RouteComponentProps<{
         <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />
       ),
       available: true
-    }
-  ].filter(route => route.available);
-  const advancedRoutes: {
-    name: string;
-    subPath: string;
-    render: () => JSX.Element;
-  }[] = [
+    },
     {
       name: "Config",
       subPath: "config",
@@ -117,9 +108,6 @@ export const PackageById: React.FC<RouteComponentProps<{
     }
   ].filter(route => route.available);
 
-  const availableRoutes =
-    usage === "advanced" ? [...basicRoutes, ...advancedRoutes] : basicRoutes;
-
   return (
     <>
       <Title title={title} subtitle={prettyDnpName(dnpName)} />
@@ -128,7 +116,7 @@ export const PackageById: React.FC<RouteComponentProps<{
         {availableRoutes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -146,18 +134,15 @@ export const PackageById: React.FC<RouteComponentProps<{
       )}
 
       <div className="packages-content">
-        <Switch>
+        <Routes>
           {availableRoutes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              render={route.render}
+              path={route.subPath}
+              element={<route.render />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Switch,
-  Route,
-  NavLink,
-  Redirect,
-  RouteComponentProps
-} from "react-router-dom";
+import { Routes, Route, NavLink } from "react-router-dom";
 import { title } from "../data";
 // Components
 import AutoDiagnose from "./AutoDiagnose";
@@ -16,7 +10,7 @@ import Title from "components/Title";
 import "./support.scss";
 import Ports from "./Ports";
 
-const SupportRoot: React.FC<RouteComponentProps> = ({ match }) => {
+const SupportRoot: React.FC = () => {
   const routes = [
     {
       name: "Auto Diagnose",
@@ -48,7 +42,7 @@ const SupportRoot: React.FC<RouteComponentProps> = ({ match }) => {
         {routes.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
-              to={`${match.url}/${route.subPath}`}
+              to={route.subPath}
               className="item no-a-style"
               style={{ whiteSpace: "nowrap" }}
             >
@@ -59,18 +53,15 @@ const SupportRoot: React.FC<RouteComponentProps> = ({ match }) => {
       </div>
 
       <div className="packages-content">
-        <Switch>
+        <Routes>
           {routes.map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              component={route.component}
+              path={route.subPath}
+              element={<route.component />}
             />
           ))}
-          {/* Redirect automatically to the first route. DO NOT hardcode 
-              to prevent typos and causing infinite loops */}
-          <Redirect to={`${match.path}/${routes[0].subPath}`} />
-        </Switch>
+        </Routes>
       </div>
     </>
   );

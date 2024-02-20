@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation, useHistory } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { BsLock } from "react-icons/bs";
 import { apiAuth } from "api";
 import Button from "components/Button";
@@ -24,7 +24,7 @@ export function Login({
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
   const location = useLocation();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   async function onLogin() {
     try {
@@ -53,12 +53,12 @@ export function Login({
   }
 
   function onForgotPassword() {
-    history.push(forgotPasswordPath);
+    navigate(forgotPasswordPath);
   }
 
   async function onSuccessfulReset() {
-    await refetchStatus()?.catch(() => {});
-    history.push(loginRootPath);
+    await refetchStatus()?.catch(() => { });
+    navigate(loginRootPath);
   }
 
   // Use minimal router since there only one possible path

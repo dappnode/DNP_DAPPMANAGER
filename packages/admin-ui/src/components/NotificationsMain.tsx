@@ -11,10 +11,11 @@ import {
 } from "services/coreUpdate/selectors";
 import {
   getWifiStatus,
-  getPasswordIsSecure
+  getPasswordIsSecure,
+  getRebootIsRequired
 } from "services/dappnodeStatus/selectors";
 import {
-  rootPath as systemRootPath,
+  pathName as systemPathName,
   subPaths as systemSubPaths
 } from "pages/system/data";
 import Button from "components/Button";
@@ -32,6 +33,7 @@ export default function NotificationsView() {
   const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
   const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
+  const rebootHostIsRequired = useSelector(getRebootIsRequired);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -43,15 +45,26 @@ export default function NotificationsView() {
 
   const notifications = [
     /**
+     * [HOST-REBOOT]
+     * Tell the user to reboot the host
+     */
+    {
+      id: "hostReboot",
+      linkText: "Reboot",
+      linkPath: systemPathName + "/" + systemSubPaths.power,
+      body: `**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes. The following packages will be updated: ${rebootHostIsRequired?.pkgs}`,
+      active: rebootHostIsRequired?.rebootRequired
+    },
+    /**
      * [SYSTEM-UPDATE]
      * Tell the user to update the core DNPs
      */
     {
       id: "systemUpdate",
       linkText: "Update",
-      linkPath: systemRootPath + "/" + systemSubPaths.update,
+      linkPath: systemPathName + "/" + systemSubPaths.update,
       body:
-        "**DAppNode system update available.** Click **Update** to review and approve it",
+        "**Dappnode system update available.** Click **Update** to review and approve it",
       active:
         coreUpdateAvailable &&
         !updatingCore &&
@@ -65,9 +78,9 @@ export default function NotificationsView() {
     {
       id: "wifiCredentials",
       linkText: "Change",
-      linkPath: systemRootPath + "/" + systemSubPaths.security,
+      linkPath: systemPathName + "/" + systemSubPaths.security,
       body:
-        "**Change the DAppNode WIFI credentials**, they are insecure default values.",
+        "**Change the Dappnode WiFi credentials**, they are insecure default values.",
       active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
     },
     /**
@@ -77,7 +90,7 @@ export default function NotificationsView() {
     {
       id: "hostPasswordInsecure",
       linkText: "Change",
-      linkPath: systemRootPath + "/" + systemSubPaths.security,
+      linkPath: systemPathName + "/" + systemSubPaths.security,
       body:
         "**Change the host 'dappnode' user password**, it's an insecure default.",
       active: passwordIsSecure === false

@@ -1,6 +1,7 @@
 // This will be used later in our root reducer and selectors
-
-export const rootPath = "/system";
+export const pathName = "system";
+export const relativePath = pathName + "/info"; // default redirect to info
+export const rootPath = pathName + "/*";
 export const title = "System";
 
 // Aditional data
@@ -11,7 +12,7 @@ export const subPaths = {
   identity: "identity",
   security: "security",
   autoUpdates: "auto-updates",
-  repository: "repository",
+  repository: "/repository",
   staticIp: "static-ip",
   network: "network",
   update: "update",
@@ -25,8 +26,8 @@ export const subPaths = {
 };
 
 // Computed paths
-export const activateFallbackPath = `${rootPath}/${subPaths.repository}`;
-export const systemProfilePath = `${rootPath}/${subPaths.profile}`;
+export const activateFallbackPath = `${subPaths.repository}/eth`;
+export const systemProfilePath = `${pathName}/${subPaths.profile}`;
 
 // DAppNode data
 export const ipfsApiUrl = "http://ipfs.dappnode:5001/api/v0";

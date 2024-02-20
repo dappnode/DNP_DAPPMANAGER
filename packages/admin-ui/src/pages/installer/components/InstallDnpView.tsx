@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from "react";
 import { api } from "api";
 import { useDispatch } from "react-redux";
 import {
-  Switch,
+  Routes,
   Route,
-  Redirect,
-  withRouter,
-  RouteComponentProps
+  useNavigate,
+  useLocation,
+  useParams
 } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
@@ -22,7 +22,7 @@ import HorizontalStepper from "./HorizontalStepper";
 import Card from "components/Card";
 import StatusIcon from "components/StatusIcon";
 // External
-import { rootPath as packagesRootPath } from "pages/packages/data";
+import { relativePath as packagesRelativePath } from "pages/packages/data";
 import { ProgressLogs } from "types";
 import { withToast } from "components/toast/Toast";
 import { isSetupWizardEmpty } from "../parsers/formDataParser";
@@ -30,7 +30,8 @@ import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
-import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/common";
+import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
+import { diff } from "semver";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -42,14 +43,14 @@ interface InstallDnpViewProps {
  * or do it with caution. The size of userSetFormData stringified is not found
  */
 
-const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
+const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   dnp,
-  progressLogs,
-  // Extra
-  history,
-  location,
-  match
+  progressLogs
 }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const params = useParams();
+
   const [userSettings, setUserSettings] = useState({} as UserSettingsAllDnps);
   const [bypassCoreOpt, setBypassCoreOpt] = useState<boolean>();
   const [bypassSignedOpt, setBypassSignedOpt] = useState<boolean>();
@@ -62,16 +63,15 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const {
     dnpName,
     reqVersion,
+    semVersion,
     settings,
-    metadata,
+    manifest,
     setupWizard,
-    isInstalled
+    isInstalled,
+    installedVersion
   } = dnp;
-  const isWarningUpdate =
-    metadata.warnings?.onMajorUpdate ||
-    metadata.warnings?.onMinorUpdate ||
-    metadata.warnings?.onPatchUpdate;
-  const isCore = metadata.type === "dncore";
+  const updateType = installedVersion && diff(installedVersion, semVersion);
+  const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
   const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
@@ -132,7 +132,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
-            history.push(packagesRootPath + "/" + dnpName);
+            navigate("/" + packagesRelativePath + "/" + dnpName + "/info");
           }
         }, 1000);
       }
@@ -158,10 +158,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
       message:
         "This package has been developed by a third party. DAppNode association is not maintaining this package and has not performed any audit on its content. Use it at your own risk. DAppNode will not be liable for any loss or damage produced by the use of this package"
     });
-  if (metadata.disclaimer)
+  if (manifest.disclaimer)
     disclaimers.push({
       name: prettyDnpName(dnpName),
-      message: metadata.disclaimer.message
+      message: manifest.disclaimer.message
     });
 
   /**
@@ -200,7 +200,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
   const availableRoutes: {
     name: string;
     subPath: string;
-    render?: ((props: RouteComponentProps<{}>) => React.ReactNode) | undefined;
+    render?: (() => React.ReactNode) | undefined;
   }[] = [
     {
       name: "Setup",
@@ -237,12 +237,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         <Warnings
           goNext={goNext}
           goBack={goBack}
-          warnings={metadata.warnings || {}}
+          warnings={manifest.warnings || {}}
           isInstalled={isInstalled}
+          updateType={updateType}
         />
       ),
-      available:
-        metadata.warnings?.onInstall || (isInstalled && isWarningUpdate)
+      available: manifest.warnings?.onInstall || (isInstalled && updateType)
     },
     {
       name: "Disclaimer",
@@ -266,7 +266,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
 
   // Compute the route index for the stepper display
   const currentSubRoute =
-    (location.pathname || "").split(match.url + "/")[1] || "";
+    location.pathname.split(`${encodeURIComponent(params.id || "")}/`)[1] || "";
   const currentIndex = availableRoutes.findIndex(
     ({ subPath }) => subPath && currentSubRoute.includes(subPath)
   );
@@ -277,7 +277,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
    * - When the DNP is updated (finish installation), redirect to /packages
    */
   useEffect(() => {
-    if (currentSubRoute) history.push(match.url);
+    if (currentSubRoute) navigate(".");
     /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
@@ -290,19 +290,20 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
     const nextIndex = currentIndex + 1;
     // When going to the last step "install", redirect to home and install
     if (nextIndex >= availableRoutes.length - 1) {
-      // Prevent re-renders and pushing the same route
-      if (location.pathname !== match.url) history.push(match.url);
+      // This navigates to the current route. Modify it according to your setup.
+      navigate(".");
       onInstallThrottle(newData);
     } else {
       const nextStep = availableRoutes[nextIndex];
-      if (nextStep) history.push(`${match.url}/${nextStep.subPath}`);
+      if (nextStep) navigate(nextStep.subPath);
     }
   }
 
   function goBack() {
     const prevStep = availableRoutes[currentIndex - 1];
-    if (prevStep) history.push(`${match.url}/${prevStep.subPath}`);
-    else history.push(match.url);
+    if (prevStep)
+      navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
+    else navigate("..");
   }
 
   return (
@@ -332,34 +333,30 @@ const InstallDnpView: React.FC<InstallDnpViewProps & RouteComponentProps> = ({
         />
       )}
 
-      <Switch>
+      <Routes>
         <Route
-          path={match.path}
-          exact
-          render={() => (
+          path={"/"}
+          element={
             <InstallerStepInfo
               dnp={dnp}
               onInstall={() => goNext()}
               disableInstallation={disableInstallation}
               optionsArray={optionsArray}
             />
-          )}
+          }
         />
         {availableRoutes
           .filter(route => route.render)
           .map(route => (
             <Route
               key={route.subPath}
-              path={`${match.path}/${route.subPath}`}
-              render={route.render}
+              path={route.subPath}
+              element={<>{route.render && route.render()}</>}
             />
           ))}
-        {/* Redirect automatically to the first route. DO NOT hardcode 
-                to prevent typos and causing infinite loops */}
-        <Redirect to={`${match.url}/${availableRoutes[0].subPath}`} />
-      </Switch>
+      </Routes>
     </>
   );
 };
 
-export default withRouter(InstallDnpView);
+export default InstallDnpView;

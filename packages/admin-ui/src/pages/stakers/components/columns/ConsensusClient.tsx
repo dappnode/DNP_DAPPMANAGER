@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
 
@@ -23,9 +23,9 @@ export default function ConsensusClient<T extends Network>({
   >;
   isSelected: boolean;
 }) {
-  const [useCheckpointSync, setUseCheckpointSync] = useState(
-    consensusClient.useCheckpointSync || false
-  );
+  const navigate = useNavigate();
+
+  const [checkpointSyncChecked, setCheckpointSyncChecked] = useState(true);
   return (
     <Card
       {...props}
@@ -65,9 +65,18 @@ export default function ConsensusClient<T extends Network>({
         <>
           {consensusClient.isInstalled && !consensusClient.isUpdated && (
             <>
-              <Link to={`${installedRootPath}/${consensusClient.dnpName}`}>
-                <Button variant="dappnode">UPDATE</Button>
-              </Link>
+              <Button
+                onClick={() =>
+                  navigate(
+                    `${getInstallerPath(consensusClient.dnpName)}/${
+                      consensusClient.dnpName
+                    }`
+                  )
+                }
+                variant="dappnode"
+              >
+                UPDATE
+              </Button>
               <br />
               <br />
             </>
@@ -75,19 +84,19 @@ export default function ConsensusClient<T extends Network>({
           <>
             {consensusClient.data && (
               <div className="description">
-                {consensusClient.data.metadata.shortDescription}
+                {consensusClient.data?.manifest?.shortDescription}
                 <hr />
               </div>
             )}
             {consensusClient.useCheckpointSync !== undefined && (
               <Switch
-                checked={useCheckpointSync}
+                checked={checkpointSyncChecked}
                 onToggle={() => {
                   setNewConsClient({
                     ...consensusClient,
-                    useCheckpointSync: !useCheckpointSync
+                    useCheckpointSync: !checkpointSyncChecked
                   });
-                  setUseCheckpointSync(!useCheckpointSync);
+                  setCheckpointSyncChecked(!checkpointSyncChecked);
                 }}
                 label={"Use checksync"}
               />
@@ -97,7 +106,8 @@ export default function ConsensusClient<T extends Network>({
       ) : null}
 
       {isSelected &&
-        consensusClient.dnpName ===
+        // cast to any as long as the gnosis prysm was deprecated
+        (consensusClient.dnpName as any) ===
           "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
           <Alert variant="warning">
             It is <b>not recommended</b> to use <b>Prysm</b> as a consensus

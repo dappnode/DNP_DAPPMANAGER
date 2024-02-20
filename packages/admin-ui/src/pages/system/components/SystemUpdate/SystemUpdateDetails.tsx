@@ -11,7 +11,7 @@ import Card from "components/Card";
 import Button from "components/Button";
 // Icons
 import { FaArrowRight } from "react-icons/fa";
-import { DependencyListItem } from "@dappnode/common";
+import { DependencyListItem } from "@dappnode/types";
 
 export default function SystemUpdateDetails() {
   const coreUpdateData = useSelector(getCoreUpdateData);
@@ -68,13 +68,5 @@ export function getCoreDeps(
   if (coreDeps.length) return coreDeps;
 
   const coreDnp = corePackages.find(dnp => (dnp.name || "").includes("core"));
-  if (coreDnp) {
-    // #### TODO: to prevent show the legacy OpenVPN 0.2.0 warning alert
-    // remove the warning on install for the core.dnp.dappnode.eth DNP
-    // Alerts can be added via the conditional update alerts
-    coreDnp.warningOnInstall = "";
-    return [coreDnp];
-  }
-
-  return [];
+  return coreDnp ? [coreDnp] : [];
 }

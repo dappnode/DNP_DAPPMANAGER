@@ -2,12 +2,12 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { Network, StakerItem, StakerItemOk } from "@dappnode/common";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 
 export default function ExecutionClient<T extends Network>({
   executionClient,
@@ -21,6 +21,7 @@ export default function ExecutionClient<T extends Network>({
   >;
   isSelected: boolean;
 }) {
+  const navigate = useNavigate();
   return (
     <Card
       {...props}
@@ -51,9 +52,18 @@ export default function ExecutionClient<T extends Network>({
         executionClient.isInstalled &&
         !executionClient.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${executionClient.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
+            <Button
+              onClick={() =>
+                navigate(
+                  `${getInstallerPath(executionClient.dnpName)}/${
+                    executionClient.dnpName
+                  }`
+                )
+              }
+              variant="dappnode"
+            >
+              UPDATE
+            </Button>
             <br />
             <br />
           </>
@@ -61,9 +71,7 @@ export default function ExecutionClient<T extends Network>({
 
       {executionClient.status === "ok" && (
         <div className="description">
-          {isSelected &&
-            executionClient.data &&
-            executionClient.data.metadata.shortDescription}
+          {isSelected && executionClient.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

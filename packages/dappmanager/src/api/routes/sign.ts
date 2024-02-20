@@ -1,10 +1,10 @@
-import { PackageContainer } from "@dappnode/common";
-import * as db from "../../db/index.js";
-import { listContainers } from "../../modules/docker/list/index.js";
+import { PackageContainer } from "@dappnode/types";
+import * as db from "@dappnode/db";
+import { listPackageContainers } from "@dappnode/dockerapi";
 import {
   signDataFromPackage,
   getAddressFromPrivateKey
-} from "../../utils/sign.js";
+} from "../../utils/index.js";
 import { HttpError, wrapHandler } from "../utils.js";
 
 type Params = Record<string, unknown>;
@@ -46,7 +46,7 @@ export const sign = wrapHandler<Params>(async (req, res) => {
  */
 export async function getDnpFromIp(ip: string): Promise<PackageContainer> {
   const ipv4 = ip.replace("::ffff:", "");
-  const dnps = await listContainers();
+  const dnps = await listPackageContainers();
   const dnp = dnps.find(_dnp => _dnp.ip === ipv4);
   if (!dnp)
     throw new HttpError({ statusCode: 405, name: `No DNP with ip ${ipv4}` });

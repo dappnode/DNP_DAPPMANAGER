@@ -8,7 +8,7 @@ import fileToDataUri from "utils/fileToDataUri";
 import humanFileSize from "utils/humanFileSize";
 import { prettyFullName } from "utils/format";
 import { withToast } from "components/toast/Toast";
-import { PackageContainer } from "@dappnode/common";
+import { PackageContainer } from "@dappnode/types";
 
 const fileSizeWarning = 1e6;
 
@@ -37,7 +37,7 @@ export function CopyFileTo({
 
         await withToast(
           () =>
-            api.copyFileTo({
+            api.copyFileToDockerContainer({
               containerName: container.containerName,
               dataUri,
               filename: name || "",

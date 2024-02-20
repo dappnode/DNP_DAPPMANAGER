@@ -1,0 +1,32 @@
+{
+  "name": "@dappnode/dyndns",
+  "type": "module",
+  "version": "0.1.0",
+  "license": "GPL-3.0",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsc -w",
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
+    "lint": "eslint . --ext .ts --fix src"
+  },
+  "dependencies": {
+    "@dappnode/db": "^0.1.0",
+    "@dappnode/logger": "^0.1.0",
+    "@dappnode/params": "^0.1.0",
+    "ethers": "^6.9.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.6.2",
+    "@types/node-fetch": "^2.6.9"
+  }
+}

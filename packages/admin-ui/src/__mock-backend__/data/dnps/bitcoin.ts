@@ -6,7 +6,7 @@ const serviceName = dnpName;
 export const bitcoin: MockDnp = {
   avatar: "https://en.bitcoin.it/w/images/en/2/29/BC_Logo_.png",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.1.3",
     description: `The Bitcoin Core daemon (0.18.0). Bitcoind is a program that implements the Bitcoin protocol for remote procedure call (RPC) use.

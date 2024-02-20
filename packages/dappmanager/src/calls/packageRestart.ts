@@ -1,13 +1,12 @@
 import fs from "fs";
-import params from "../params.js";
-import { eventBus } from "../eventBus.js";
-import * as getPath from "../utils/getPath.js";
-import { dockerContainerRestart } from "../modules/docker/index.js";
-import { listPackage } from "../modules/docker/list/index.js";
-import { restartDappmanagerPatch } from "../modules/installer/restartPatch.js";
-import { getServicesSharingPid } from "../utils/pid.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
-import { PackageContainer } from "@dappnode/common";
+import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
+import { dockerContainerRestart, listPackage } from "@dappnode/dockerapi";
+import { restartDappmanagerPatch } from "@dappnode/installer";
+import { getServicesSharingPid } from "@dappnode/utils";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
+import { PackageContainer } from "@dappnode/types";
+import { getDockerComposePathSmart } from "@dappnode/utils";
 
 /**
  * Recreates a package containers
@@ -26,7 +25,7 @@ export async function packageRestart({
 
   // DAPPMANAGER patch
   if (dnp.dnpName === params.dappmanagerDnpName) {
-    const composePath = getPath.dockerComposeSmart(dnpName);
+    const composePath = getDockerComposePathSmart(dnpName);
     if (!fs.existsSync(composePath))
       throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
     return await restartDappmanagerPatch({ composePath });

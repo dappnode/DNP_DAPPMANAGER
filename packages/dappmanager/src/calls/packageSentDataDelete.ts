@@ -1,5 +1,5 @@
-import * as db from "../db/index.js";
-import { eventBus } from "../eventBus.js";
+import * as db from "@dappnode/db";
+import { eventBus } from "@dappnode/eventbus";
 
 /**
  * Delete package sent data key

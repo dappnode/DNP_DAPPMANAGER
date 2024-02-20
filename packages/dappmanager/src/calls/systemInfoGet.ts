@@ -1,14 +1,15 @@
-import * as db from "../db/index.js";
+import * as db from "@dappnode/db";
 import { getVersionData } from "../utils/getVersionData.js";
-import * as autoUpdateHelper from "../utils/autoUpdateHelper.js";
-import { NewFeatureId, SystemInfo } from "@dappnode/common";
-import { ethereumClient } from "../modules/ethClient/index.js";
+import { NewFeatureId, SystemInfo } from "@dappnode/types";
+import { ethereumClient } from "@dappnode/installer";
+import { isCoreUpdateEnabled } from "@dappnode/daemons";
 
 /**
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const eth2ClientTarget = ethereumClient.computeEthereumTarget();
+  const { target: eth2ClientTarget, ethRemoteRpc } =
+    ethereumClient.computeEthereumTarget();
 
   return {
     // Git version data
@@ -26,11 +27,6 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     internalIp: db.internalIp.get(),
     // publicIp is used to check for internet connection after installation
     publicIp: db.publicIp.get(),
-    // Public key of nacl's asymmetric encryption, used by the ADMIN UI
-    // to send sensitive data in a slightly more protected way
-    dappmanagerNaclPublicKey: db.naclPublicKey.get(),
-    // From seedPhrase: If it's not stored yet, it's an empty string
-    identityAddress: db.identityAddress.get(),
     // Eth provider configured URL
     eth2ClientTarget,
     ethClientStatus:
@@ -38,7 +34,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
         ? db.ethExecClientStatus.get(eth2ClientTarget.execClient)
         : null,
     ethClientFallback: db.ethClientFallback.get(),
-    ethProvider: db.ethProviderUrl.get(),
+    ethRemoteRpc,
     // Domain map
     fullnodeDomainTarget: db.fullnodeDomainTarget.get(),
     // UI stats
@@ -69,8 +65,11 @@ function getNewFeatureIds(): NewFeatureId[] {
   }
 
   // auto-updates: Show only if all are disabled
-  if (!autoUpdateHelper.isCoreUpdateEnabled())
-    newFeatureIds.push("system-auto-updates");
+  if (!isCoreUpdateEnabled()) newFeatureIds.push("system-auto-updates");
+
+  // enable-ethical-metrics: Show only if not seen
+  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")
+    newFeatureIds.push("enable-ethical-metrics");
 
   // change-host-password: Show only if insecure
   if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");

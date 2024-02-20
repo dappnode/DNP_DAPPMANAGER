@@ -1,4 +1,4 @@
-import shell from "./shell.js";
+import { shell } from "@dappnode/utils";
 
 /**
  * Verify a compressed .xz file
@@ -10,7 +10,7 @@ import shell from "./shell.js";
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-export default function verifyXz(xzFilePath: string): Promise<{
+export function verifyXz(xzFilePath: string): Promise<{
   success: boolean;
   message: string;
 }> {

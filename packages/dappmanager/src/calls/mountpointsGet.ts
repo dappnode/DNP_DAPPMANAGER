@@ -1,5 +1,5 @@
-import { detectMountpoints } from "../modules/hostScripts/index.js";
-import { MountpointData } from "@dappnode/common";
+import { detectMountpoints } from "@dappnode/hostscriptsservices";
+import { MountpointData } from "@dappnode/types";
 
 /**
  * Returns the list of current mountpoints in the host,

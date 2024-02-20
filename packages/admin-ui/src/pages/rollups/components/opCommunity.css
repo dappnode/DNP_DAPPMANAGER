@@ -1,0 +1,13 @@
+.iconLink {
+  color: inherit; /* inherit color to make sure it looks like regular text */
+  text-decoration: none; /* to remove the underline */
+}
+
+.iconLink:hover {
+  color: var(--dappnode-links-color); /* change the color on hover */
+}
+
+.iconLink svg {
+  /* targeting the svg which is the icon */
+  vertical-align: middle; /* to align the icon with the text */
+}

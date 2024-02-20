@@ -1,8 +1,8 @@
 import {
-  listContainers,
-  listContainerNoThrow
-} from "../../modules/docker/list/index.js";
-import { PackageContainer } from "@dappnode/common";
+  listPackageContainers,
+  listPackageContainerNoThrow
+} from "@dappnode/dockerapi";
+import { PackageContainer } from "@dappnode/types";
 import { wrapHandler } from "../utils.js";
 
 interface Params {
@@ -16,14 +16,14 @@ export const publicPackagesData = wrapHandler<Params>(async (req, res) => {
   const { containerName } = req.params;
 
   if (containerName) {
-    const privateDnpData = await listContainerNoThrow({ containerName });
+    const privateDnpData = await listPackageContainerNoThrow({ containerName });
     if (privateDnpData) {
       res.status(200).send(getPublicPackageData(privateDnpData));
     } else {
       res.status(404).send();
     }
   } else {
-    const privateDnpData = await listContainers();
+    const privateDnpData = await listPackageContainers();
     res.status(200).send(privateDnpData.map(getPublicPackageData));
   }
 });

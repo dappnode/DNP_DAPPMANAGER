@@ -8,9 +8,10 @@ import { IconType } from "react-icons/lib";
 import DiscordActions from "./components/DiscordActions";
 import DiscourseActions from "./components/DiscourseActions";
 import GithubActions from "./components/GithubActions";
-import TreasuryActions from "./components/TreasuryActions";
+import GitcoinActions from "./components/GitcoinActions";
 
-export const rootPath = "/community";
+export const relativePath = "community";
+export const rootPath = "community";
 export const title = "Community";
 
 export const communityTypes: CommunityItem[] = [
@@ -23,12 +24,12 @@ export const communityTypes: CommunityItem[] = [
       "DAppNode has a vibrant community. You can get support, share your experience, and just hang out with other Node Runners in our Discord Server"
   },
   {
-    subPath: "treasury",
-    title: "Treasury",
+    subPath: "gitcoin",
+    title: "Gitcoin Grant",
     icon: FaCommentsDollar,
-    actions: [TreasuryActions],
+    actions: [GitcoinActions],
     text:
-      "The DAppNode Community Treasury is the way the community gets rewarded for contributing and helping each other out."
+      "Vote with your money! A small donation can be greatly matched to support Dappnode's Open Source efforts."
   },
   {
     subPath: "discourse",

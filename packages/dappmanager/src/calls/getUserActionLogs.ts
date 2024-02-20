@@ -1,5 +1,5 @@
-import * as logUserAction from "../logUserAction.js";
-import { UserActionLog } from "@dappnode/common";
+import { logUserAction } from "@dappnode/logger";
+import { UserActionLog } from "@dappnode/types";
 
 /**
  * Returns the user action logs. This logs are stored in a different

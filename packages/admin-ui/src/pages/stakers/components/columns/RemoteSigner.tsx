@@ -4,10 +4,10 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { Network, StakerItem } from "@dappnode/common";
+import { StakerItem, Network } from "@dappnode/types";
 import Button from "components/Button";
-import { rootPath as installedRootPath } from "pages/installer";
-import { Link } from "react-router-dom";
+import { getInstallerPath } from "pages/installer";
+import { useNavigate } from "react-router-dom";
 import { FaKey } from "react-icons/fa";
 
 export default function RemoteSigner<T extends Network>({
@@ -20,6 +20,8 @@ export default function RemoteSigner<T extends Network>({
   setEnableWeb3signer: (installWeb3signer: boolean) => void;
   isSelected: boolean;
 }) {
+  const navigate = useNavigate();
+
   return (
     <Card
       {...props}
@@ -45,9 +47,16 @@ export default function RemoteSigner<T extends Network>({
         signer.isInstalled &&
         !signer.isUpdated && (
           <>
-            <Link to={`${installedRootPath}/${signer.dnpName}`}>
-              <Button variant="dappnode">UPDATE</Button>
-            </Link>
+            <Button
+              onClick={() =>
+                navigate(
+                  `${getInstallerPath(signer.dnpName)}/${signer.dnpName}`
+                )
+              }
+              variant="dappnode"
+            >
+              UPDATE
+            </Button>
             <br />
             <br />
           </>
@@ -56,7 +65,7 @@ export default function RemoteSigner<T extends Network>({
       {signer.status === "ok" &&
         isSelected &&
         signer.isInstalled &&
-        signer.data?.metadata.links?.ui && (
+        signer.data?.manifest?.links?.ui && (
           <div
             style={{
               alignItems: "center",
@@ -65,7 +74,7 @@ export default function RemoteSigner<T extends Network>({
             }}
           >
             <a
-              href={signer.data.metadata.links.ui}
+              href={signer.data.manifest.links.ui}
               target="_blank"
               rel="noreferrer noopener"
             >
@@ -76,7 +85,7 @@ export default function RemoteSigner<T extends Network>({
 
       {signer.status === "ok" && (
         <div className="description">
-          {isSelected && signer.data && signer.data.metadata.shortDescription}
+          {isSelected && signer.data?.manifest?.shortDescription}
         </div>
       )}
     </Card>

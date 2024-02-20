@@ -28,6 +28,9 @@ packages/common/src/validation/schemas
 # Version data file
 .version.json
 
+# Git data .git-data.json
+packages/*/.git-data.json
+
 # Extra
 node_modules/\.yarn-integrity
 
@@ -49,3 +52,7 @@ packages/*/package-lock.json
 packages/dappmanager/dist
 packages/dappmanager/DNCORE
 packages/dappmanager/dnp_repo
+
+# Specific from toolkit
+#packages/toolkit/src/typechain/*
+packages/toolkit/truffle/contracts_build/*

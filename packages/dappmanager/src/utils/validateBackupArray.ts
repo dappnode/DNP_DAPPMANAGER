@@ -1,4 +1,4 @@
-import { PackageBackup } from "@dappnode/dappnodesdk";
+import { PackageBackup } from "@dappnode/types";
 import path from "path";
 
 /**
@@ -11,7 +11,7 @@ import path from "path";
  *   { name: "keystore", path: "/usr/.raiden/secret/keystore" }
  * ]
  */
-export default function validateBackupArray(backup: PackageBackup[]): void {
+export function validateBackupArray(backup: PackageBackup[]): void {
   const pathsObj: { [backupName: string]: boolean } = {};
   for (const { name, path: _path } of backup) {
     if (pathsObj[name])

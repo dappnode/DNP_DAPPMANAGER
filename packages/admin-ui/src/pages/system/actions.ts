@@ -4,22 +4,28 @@ import { prettyDnpName, prettyVolumeName } from "utils/format";
 // External actions
 import { fetchPasswordIsSecure } from "services/dappnodeStatus/actions";
 // Selectors
-import { getEthClientTarget } from "services/dappnodeStatus/selectors";
+import {
+  getEthClientTarget,
+  getEthRemoteRpc
+} from "services/dappnodeStatus/selectors";
 import { withToastNoThrow } from "components/toast/Toast";
 import { AppThunk } from "store";
-import { Eth2ClientTarget } from "@dappnode/common";
+import { Eth2ClientTarget } from "@dappnode/types";
 import { isEqual } from "lodash-es";
 
 // Redux Thunk actions
 
 export const changeEthClientTarget = (
   nextTarget: Eth2ClientTarget,
+  newEthRemoteRpc: string,
   useCheckpointSync?: boolean
 ): AppThunk => async (_, getState) => {
   const prevTarget = getEthClientTarget(getState());
+  const prevEthRemoteRpc = getEthRemoteRpc(getState());
 
   // Make sure the target has changed or the call will error
-  if (isEqual(nextTarget, prevTarget)) return;
+  if (isEqual(nextTarget, prevTarget) && prevEthRemoteRpc === newEthRemoteRpc)
+    return;
 
   // If the previous target is package, ask the user if deleteVolumes
   let deletePrevExecClient = false;
@@ -116,6 +122,7 @@ export const changeEthClientTarget = (
       api.ethClientTargetSet({
         target: nextTarget,
         sync: false,
+        ethRemoteRpc: newEthRemoteRpc,
         useCheckpointSync,
         deletePrevExecClient,
         deletePrevExecClientVolumes,

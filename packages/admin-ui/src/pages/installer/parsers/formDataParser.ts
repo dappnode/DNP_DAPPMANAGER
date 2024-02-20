@@ -5,9 +5,9 @@ import {
   UserSettingsAllDnps,
   UserSettings,
   SetupWizardAllDnps
-} from "@dappnode/common";
+} from "@dappnode/types";
 import { SetupWizardFormDataReturn } from "../types";
-import { SetupSchema } from "@dappnode/dappnodesdk";
+import { SetupSchema } from "@dappnode/types";
 import { SetupTargetAllDnps } from "types";
 
 const ajv = new Ajv({ allErrors: true });

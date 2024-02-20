@@ -6,7 +6,7 @@ const serviceName = dnpName;
 export const raidenTestnet: MockDnp = {
   avatar: "https://i.ibb.co/2ynnctD/raiden-testnet-300.png",
 
-  metadata: {
+  manifest: {
     name: dnpName,
     version: "0.0.2",
     description:

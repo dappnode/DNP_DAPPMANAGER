@@ -3,9 +3,10 @@ import { useSelector, useDispatch } from "react-redux";
 import {
   getEthClientTarget,
   getEthClientStatus,
-  getEthClientFallback
+  getEthClientFallback,
+  getEthRemoteRpc
 } from "services/dappnodeStatus/selectors";
-import { EthClientFallback, Eth2ClientTarget } from "@dappnode/common";
+import { EthClientFallback, Eth2ClientTarget } from "@dappnode/types";
 import { changeEthClientTarget } from "pages/system/actions";
 import { withToastNoThrow } from "components/toast/Toast";
 import { api } from "api";
@@ -21,6 +22,7 @@ import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash-es";
 
 export default function Eth() {
+  const ethRemoteRpc = useSelector(getEthRemoteRpc);
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethClientStatus = useSelector(getEthClientStatus);
   const ethClientFallback = useSelector(getEthClientFallback);
@@ -31,6 +33,11 @@ export default function Eth() {
   const [useCheckpointSync, setUseCheckpointSync] = useState<
     boolean | undefined
   >(undefined);
+  const [newEthRemoteRpc, setNewEthRemoteRpc] = useState<string>("");
+
+  useEffect(() => {
+    if (ethRemoteRpc) setNewEthRemoteRpc(ethRemoteRpc);
+  }, [ethRemoteRpc]);
 
   useEffect(() => {
     if (ethClientTarget) {
@@ -48,7 +55,10 @@ export default function Eth() {
   }, [target, ethClientTarget]);
 
   function changeClient() {
-    if (target) dispatch(changeEthClientTarget(target, useCheckpointSync));
+    if (target)
+      dispatch(
+        changeEthClientTarget(target, newEthRemoteRpc, useCheckpointSync)
+      );
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
@@ -69,7 +79,7 @@ export default function Eth() {
    *
    * 2. if (!dnp.running)
    *    Package can be stopped because the user stopped it or
-   *    because the DAppNode is too full and auto-stop kicked in
+   *    because the Dappnode is too full and auto-stop kicked in
    *  > Show an error or something in the UI as
    *    "Alert!" you target is OFF, go to remote or install it again
    */
@@ -97,7 +107,7 @@ export default function Eth() {
     <Card className="dappnode-identity">
       <SubTitle>Ethereum</SubTitle>
       <div>
-        DAppNode uses smart contracts to access a decentralized repository of
+        Dappnode uses smart contracts to access a decentralized repository of
         DApps. Choose to connect to a remote network or use your own local node
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (
@@ -118,17 +128,25 @@ export default function Eth() {
       <EthMultiClientsAndFallback
         target={target}
         onTargetChange={setTarget}
+        newEthRemoteRpc={newEthRemoteRpc}
+        setNewEthRemoteRpc={setNewEthRemoteRpc}
         fallback={ethClientFallback || "off"}
         onFallbackChange={changeFallback}
         useCheckpointSync={useCheckpointSync}
         setUseCheckpointSync={setUseCheckpointSync}
       />
 
+      <br />
+
       <div style={{ textAlign: "end" }}>
         <Button
           variant="dappnode"
           onClick={changeClient}
-          disabled={!target || isEqual(ethClientTarget, target)}
+          disabled={
+            !target ||
+            (isEqual(ethClientTarget, target) &&
+              ethRemoteRpc === newEthRemoteRpc)
+          }
         >
           Change
         </Button>

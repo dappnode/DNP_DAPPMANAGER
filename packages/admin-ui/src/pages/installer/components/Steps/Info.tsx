@@ -17,7 +17,7 @@ import DnpNameVerified from "components/DnpNameVerified";
 import Ok from "components/Ok";
 import defaultAvatar from "img/defaultAvatar.png";
 import { MdExpandMore, MdClose, MdExpandLess } from "react-icons/md";
-import { RequestedDnp } from "@dappnode/common";
+import { RequestedDnp } from "@dappnode/types";
 import { SignedStatus } from "./SignedStatus";
 // Styles
 import "./info.scss";
@@ -67,7 +67,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     compatible,
     signedSafe,
     signedSafeAll,
-    metadata,
+    manifest,
     isUpdated,
     isInstalled,
     avatarUrl,
@@ -82,12 +82,12 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     author = "Unknown",
     version,
     upstreamVersion
-  } = metadata;
+  } = manifest;
 
   const tagDisplay = isUpdated ? "UPDATED" : isInstalled ? "UPDATE" : "INSTALL";
 
   // If the repoSlug is invalid, it will be returned as null
-  const repoSlug = getRepoSlugFromManifest(metadata);
+  const repoSlug = getRepoSlugFromManifest(manifest);
 
   // Resolution status
   const isCompatible = compatible.isCompatible;

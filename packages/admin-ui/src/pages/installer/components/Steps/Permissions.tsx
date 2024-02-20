@@ -4,7 +4,7 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Card from "components/Card";
 import Button from "components/Button";
 import StatusIcon from "components/StatusIcon";
-import { SpecialPermissionAllDnps } from "@dappnode/common";
+import { SpecialPermissionAllDnps } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 import "./permissions.scss";
 

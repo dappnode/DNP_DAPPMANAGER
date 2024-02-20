@@ -5,6 +5,9 @@
   "private": true,
   "repository": "git@github.com:dappnode/DNP_DAPPMANAGER.git",
   "license": "GPL-3.0",
+  "engines": {
+    "node": "20.x"
+  },
   "workspaces": {
     "packages": [
       "packages/*"
@@ -17,24 +20,27 @@
     "test:int": "lerna run test:int --stream",
     "pre-commit": "lerna run pre-commit --stream",
     "mock-standalone:build": "lerna run mock-standalone:build --stream",
-    "postinstall": "patch-package",
     "generate": "lerna run generate --stream",
     "clean": "yarn run clean:build && yarn run clean:libraries",
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
-  "dependencies": {
-    "patch-package": "^6.5.1",
-    "postinstall-postinstall": "^2.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "eslint": "^8.38.0",
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.10.4",
+    "@typescript-eslint/eslint-plugin": "^5.61.0",
+    "@typescript-eslint/parser": "^5.61.0",
+    "chai": "^4.3.10",
+    "depcheck": "^1.4.7",
+    "eslint": "^8.44.0",
     "eslint-config-react-app": "^7.0.1",
     "lerna": "^6.3.0",
+    "mocha": "^10.2.0",
+    "nodemon": "^3.0.2",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.8.1",
-    "typescript": "^5.0.4"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }

@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { getEthProviderUrl } from "../../../modules/ethClient/index.js";
+import { getEthUrl } from "@dappnode/installer";
 import resolverAbi from "./abi/resolverAbi.json" assert { type: "json" };
 import ensAbi from "./abi/ens.json" assert { type: "json" };
 import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
@@ -37,7 +37,7 @@ interface InterfacesAvailable {
 async function getEthersProviderByNetwork(network: Network): Promise<string> {
   switch (network) {
     case "mainnet":
-      return await getEthProviderUrl();
+      return await getEthUrl();
     case "ropsten":
       return ropstenJsonRpc;
     default:
@@ -61,7 +61,7 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
   return async function (domain: string): Promise<Content> {
     const network = parseNetworkFromDomain(domain);
     const providerUrl = await _getEthersProviderByNetwork(network);
-    const provider = new ethers.providers.JsonRpcProvider(providerUrl);
+    const provider = new ethers.JsonRpcProvider(providerUrl, "mainnet", { staticNetwork: true });
     return _resolveDomain(domain, provider);
   };
 }
@@ -77,9 +77,9 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
  */
 export async function resolveDomain(
   domain: string,
-  provider: ethers.providers.Provider
+  provider: ethers.Provider
 ): Promise<Content> {
-  const node = ethers.utils.namehash(domain);
+  const node = ethers.namehash(domain);
   const ens = new ethers.Contract(ensAddress, ensAbi, provider);
   const resolverAddress = await ens.resolver(node);
   if (parseInt(resolverAddress) === 0)

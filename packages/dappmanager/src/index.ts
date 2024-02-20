@@ -1,41 +1,77 @@
-import * as db from "./db/index.js";
-import { eventBus } from "./eventBus.js";
-import initializeDb from "./initializeDb.js";
-import { createGlobalEnvsEnvFile } from "./modules/globalEnvs.js";
-import { generateKeyPair } from "./utils/publickeyEncryption.js";
-import { copyHostScripts } from "./modules/hostScripts/index.js";
-import { postRestartPatch } from "./modules/installer/restartPatch.js";
-import { startDaemons } from "./daemons/index.js";
-import { SshManager } from "./modules/sshManager.js";
-import * as calls from "./calls/index.js";
-import { routesLogger, subscriptionsLogger } from "./api/logger.js";
-import * as routes from "./api/routes/index.js";
-import { logs } from "./logs.js";
-import params from "./params.js";
-import { getVpnApiClient } from "./api/vpnApiClient.js";
+import * as db from "@dappnode/db";
+import { eventBus } from "@dappnode/eventbus";
+import { initializeDb } from "./initializeDb.js";
 import {
-  getVersionData,
-  isNewDappmanagerVersion
-} from "./utils/getVersionData.js";
-import { shellHost } from "./utils/shell.js";
-import { startDappmanager } from "./startDappmanager.js";
-import { copyHostServices } from "./modules/hostServices/copyHostServices.js";
-import { startAvahiDaemon } from "./daemons/avahi/index.js";
-import { executeMigrations } from "./modules/migrations/index.js";
+  checkDockerNetwork,
+  recreateDappnode,
+  copyHostScripts,
+  copyHostServices,
+  copyHostTimers
+} from "@dappnode/hostscriptsservices";
+import {
+  DappnodeInstaller,
+  getEthUrl,
+  getIpfsUrl,
+  postRestartPatch
+} from "@dappnode/installer";
+import * as calls from "./calls/index.js";
+import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
+import * as routes from "./api/routes/index.js";
+import { params } from "@dappnode/params";
+import { getVpnApiClient } from "./api/vpnApiClient.js";
+import { getVersionData, isNewDappmanagerVersion } from "./utils/index.js";
+import { createGlobalEnvsEnvFile } from "@dappnode/utils";
+import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
+import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
 import {
   getLimiter,
   getViewsCounterMiddleware,
   getEthForwardMiddleware
 } from "./api/middlewares/index.js";
+import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
+import { DeviceCalls } from "./calls/device/index.js";
+import { startHttpApi } from "./api/startHttpApi.js";
+import { DappNodeRegistry } from "@dappnode/toolkit";
 
 const controller = new AbortController();
 
+// Initialize DB must be the first step so the db has the required values
+initializeDb()
+  .then(() => logs.info("Initialized Database"))
+  .catch(e => logs.error("Error inititializing Database", e));
+
+const ethUrl = await getEthUrl().catch(e => {
+  logs.error(
+    `Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`,
+    e
+  );
+  return params.ETH_MAINNET_RPC_URL_REMOTE;
+});
+
+let ipfsUrl = params.IPFS_LOCAL;
+try {
+  ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
+} catch (e) {
+  logs.error(`Error getting ipfsUrl: ${e.message}. Using default: ${ipfsUrl}`);
+}
+
+// Required db to be initialized
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, ethUrl);
+
+export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
+
+// TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
-const sshManager = new SshManager({ shellHost });
+const adminPasswordDb = new AdminPasswordDb(params);
+const deviceCalls = new DeviceCalls({
+  eventBus,
+  adminPasswordDb,
+  vpnApiClient
+});
 
 // Start HTTP API
-const server = startDappmanager({
+const server = startHttpApi({
   params,
   logs,
   routes,
@@ -43,12 +79,11 @@ const server = startDappmanager({
   counterViewsMiddleware: getViewsCounterMiddleware(),
   ethForwardMiddleware: getEthForwardMiddleware(),
   routesLogger,
-  methods: calls,
+  methods: { ...calls, ...deviceCalls },
   subscriptionsLogger,
+  adminPasswordDb,
   eventBus,
-  isNewDappmanagerVersion,
-  vpnApiClient,
-  sshManager
+  isNewDappmanagerVersion
 });
 
 // Start Test API
@@ -57,32 +92,31 @@ if (params.TEST) startTestApi();
 // Execute migrations
 executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
 
-// Initialize DB
-initializeDb()
-  .then(() => logs.info("Initialized Database"))
-  .catch(e => logs.error("Error inititializing Database", e));
-
 // Start daemons
-startDaemons(controller.signal);
+startDaemons(dappnodeInstaller, controller.signal);
 
 Promise.all([
+  // Copy host scripts
+  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)),
   // Copy host services
   copyHostServices().catch(e => logs.error("Error copying host services", e)),
-  copyHostScripts().catch(e => logs.error("Error copying host scripts", e)) // Copy hostScripts
-]).then(() =>
+  // Copy host timers
+  copyHostTimers().catch(e => logs.error("Error copying host timers", e))
+]).then(() => {
   // avahiDaemon uses a host script that must be copied before been initialized
-  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e))
-);
+  startAvahiDaemon().catch(e => logs.error("Error starting avahi daemon", e));
+  // start check-docker-network service with timer
+  checkDockerNetwork().catch(e =>
+    logs.error("Error starting service docker network checker", e)
+  );
+  // start recreate-dappnode service with timer
+  recreateDappnode().catch(e =>
+    logs.error("Error starting service recreate dappnode", e)
+  );
+});
 
 // Create the global env file
 createGlobalEnvsEnvFile();
-
-// Create local keys for NACL public encryption
-if (!db.naclPublicKey.get() || !db.naclSecretKey.get()) {
-  const { publicKey, secretKey } = generateKeyPair();
-  db.naclPublicKey.set(publicKey);
-  db.naclSecretKey.set(secretKey);
-}
 
 // TODO: find a proper place for this
 // Store pushed notifications in DB
@@ -91,6 +125,7 @@ eventBus.notification.on(notification => {
 });
 
 // Initial calls to check this DAppNode's status
+// TODO: find a proper place for this. Consider having a initial calls health check
 calls
   .passwordIsSecure()
   .then(isSecure =>

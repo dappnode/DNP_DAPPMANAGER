@@ -4,9 +4,9 @@ import { prettyDnpName, prettyFullName } from "utils/format";
 import { api } from "api";
 // Selectors
 import { withToastNoThrow } from "components/toast/Toast";
-import { InstalledPackageData, PackageContainer } from "@dappnode/common";
+import { InstalledPackageData, PackageContainer } from "@dappnode/types";
+import { PackageEnvs } from "@dappnode/types";
 import { continueIfCalleDisconnected } from "api/utils";
-import { PackageEnvs } from "@dappnode/dappnodesdk";
 
 // Used in package interface / envs
 

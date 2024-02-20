@@ -17,18 +17,20 @@ import {
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
+import { GiRolledCloth } from "react-icons/gi";
 // URLs
-import { rootPath as dashboardRootPath } from "pages/dashboard";
-import { rootPath as devicesRootPath } from "pages/vpn";
-import { rootPath as installerRootPath } from "pages/installer";
-import { rootPath as packagesRootPath } from "pages/packages";
-import { rootPath as systemRootPath } from "pages/system";
-import { rootPath as sdkRootPath } from "pages/sdk";
-import { rootPath as supportRootPath } from "pages/support";
-import { rootPath as wifiRootPath } from "pages/wifi";
-import { rootPath as communityRootPath } from "pages/community";
-import { rootPath as stakersRootPath } from "pages/stakers";
-import { rootPath as repositoryRootPath } from "pages/repository";
+import { relativePath as dashboardRelativePath } from "pages/dashboard";
+import { relativePath as devicesRelativePath } from "pages/vpn";
+import { relativePath as installerRelativePath } from "pages/installer";
+import { relativePath as packagesRelativePath } from "pages/packages";
+import { relativePath as systemRelativePath } from "pages/system";
+import { relativePath as sdkRelativePath } from "pages/sdk";
+import { relativePath as supportRelativePath } from "pages/support";
+import { relativePath as wifiRelativePath } from "pages/wifi";
+import { relativePath as communityRelativePath } from "pages/community";
+import { relativePath as stakersRelativePath } from "pages/stakers";
+import { relativePath as rollupsRelativePath } from "pages/rollups";
+import { relativePath as repositoryRelativePath } from "pages/repository";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -45,7 +47,7 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
     logo: GivethLogo,
     text: "Giveth",
-    link: "https://beta.giveth.io/campaigns/5b44b198647f33526e67c262"
+    link: "https://giveth.io/project/dappnode"
   },
   {
     logo: EcfLogo,
@@ -54,71 +56,82 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
-export const advancedItems: {
+export const sidenavItems: {
   name: string;
   href: string;
   icon: (props: any) => JSX.Element;
-}[] = [
-  {
-    name: "Community",
-    href: communityRootPath,
-    icon: MdPeople
-  },
-  {
-    name: "Sdk",
-    href: sdkRootPath,
-    icon: MdBuild
-  },
-  {
-    name: "Support",
-    href: supportRootPath,
-    icon: MdHelp
-  }
-];
-
-export const basicItems: {
-  name: string;
-  href: string;
-  icon: (props: any) => JSX.Element;
+  show: boolean;
 }[] = [
   {
     name: "Dashboard",
-    href: dashboardRootPath,
-    icon: MdDashboard
+    href: dashboardRelativePath,
+    icon: MdDashboard,
+    show: true
   },
   {
     name: "Wi-Fi",
-    href: wifiRootPath,
-    icon: MdWifi
+    href: wifiRelativePath,
+    icon: MdWifi,
+    show: true
   },
   {
     name: "VPN",
-    href: devicesRootPath,
-    icon: MdDevices
+    href: devicesRelativePath,
+    icon: MdDevices,
+    show: true
   },
   {
     name: "DAppStore",
-    href: installerRootPath,
-    icon: MdCreateNewFolder
+    href: installerRelativePath,
+    icon: MdCreateNewFolder,
+    show: true
   },
   {
     name: "Packages",
-    href: packagesRootPath,
-    icon: MdFolder
+    href: packagesRelativePath,
+    icon: MdFolder,
+    show: true
   },
   {
     name: "Stakers",
-    href: stakersRootPath,
-    icon: SiEthereum
+    href: stakersRelativePath,
+    icon: SiEthereum,
+    show: true
+  },
+  {
+    name: "Rollups",
+    href: rollupsRelativePath,
+    icon: GiRolledCloth,
+    show: true
   },
   {
     name: "Repository",
-    href: repositoryRootPath,
-    icon: BiGitRepoForked
+    href: repositoryRelativePath,
+    icon: BiGitRepoForked,
+    show: true
   },
   {
     name: "System",
-    href: systemRootPath,
-    icon: MdSettings
+    href: systemRelativePath,
+    icon: MdSettings,
+    show: true
+  },
+  {
+    name: "Community",
+    href: communityRelativePath,
+    icon: MdPeople,
+    show: true
+  },
+  {
+    name: "Sdk",
+    href: sdkRelativePath,
+    icon: MdBuild,
+    show: true
+  },
+  {
+    name: "Support",
+    href: supportRelativePath,
+    icon: MdHelp,
+    show: true
   }
 ];

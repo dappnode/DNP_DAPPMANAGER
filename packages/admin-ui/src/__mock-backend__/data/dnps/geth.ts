@@ -4,7 +4,7 @@ export const geth: MockDnp = {
   avatar:
     "https://github.com/dappnode/DAppNodePackage-geth/blob/master/geth-avatar.png",
 
-  metadata: {
+  manifest: {
     name: "geth.dnp.dappnode.eth",
     version: "0.1.17",
     upstreamVersion: "v1.10.21",

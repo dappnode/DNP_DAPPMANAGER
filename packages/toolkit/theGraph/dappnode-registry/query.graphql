@@ -1,0 +1,8 @@
+query getAllNewRepos {
+  newRepos {
+    id
+    Registry_id
+    name
+    repo
+  }
+}

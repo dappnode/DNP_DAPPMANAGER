@@ -1,30 +1,6 @@
-import { getInstallerPackagesData } from "../modules/installer/getInstallerPackageData.js";
-import createVolumeDevicePaths from "../modules/installer/createVolumeDevicePaths.js";
-// Utils
-import { getLogUi, logUiClear } from "../utils/logUi.js";
-import {
-  sanitizeRequestName,
-  sanitizeRequestVersion
-} from "../utils/sanitize.js";
-import { ReleaseFetcher } from "../modules/release/index.js";
-import { PackageRequest } from "../types.js";
-import {
-  downloadImages,
-  loadImages,
-  flagPackagesAreInstalling,
-  packageIsInstalling,
-  runPackages,
-  rollbackPackages,
-  writeAndValidateFiles,
-  postInstallClean,
-  afterInstall
-} from "../modules/installer/index.js";
-import { logs } from "../logs.js";
-import {
-  ensureEth2MigrationRequirements,
-  isPrysmLegacy
-} from "../modules/installer/ensureEth2MigrationRequirements.js";
-import { Routes } from "@dappnode/common";
+import { Routes } from "@dappnode/types";
+import { packageInstall as pkgInstall } from "@dappnode/installer";
+import { dappnodeInstaller } from "../index.js";
 
 /**
  * Installs a DAppNode Package.
@@ -44,88 +20,10 @@ export async function packageInstall({
   userSettings = {},
   options = {}
 }: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
-  // 1. Parse the id into a request
-  const req: PackageRequest = {
-    name: sanitizeRequestName(reqName),
-    ver: sanitizeRequestVersion(reqVersion)
-  };
-  const id = req.name;
-  const log = getLogUi(id);
-
-  try {
-    log(id, "Resolving dependencies...");
-    const releaseFetcher = new ReleaseFetcher();
-    const { state, currentVersions, releases } =
-      await releaseFetcher.getReleasesResolved(req, options);
-    logs.info("Resolved request", req, state);
-
-    // Throw any errors found in the release
-    for (const release of releases) {
-      if (
-        release.warnings.coreFromForeignRegistry &&
-        !options.BYPASS_CORE_RESTRICTION
-      )
-        throw Error(
-          `Core package ${release.dnpName} is from a foreign registry`
-        );
-      if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
-        throw Error(
-          `Package ${release.dnpName} is from untrusted origin and is not signed`
-        );
-      }
-    }
-
-    // Gather all data necessary for the install
-    const packagesData = await getInstallerPackagesData({
-      releases,
-      userSettings,
-      currentVersions,
-      reqName
-    });
-    logs.debug("Packages data", packagesData);
-    logs.debug("User settings", userSettings);
-
-    // Make sure that no package is already being installed
-    const dnpNames = packagesData.map(({ dnpName }) => dnpName);
-    for (const dnpName of dnpNames)
-      if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
-
-    // Ensure Eth2 migration requirements
-    await ensureEth2MigrationRequirements(packagesData);
-
-    try {
-      flagPackagesAreInstalling(dnpNames);
-
-      await downloadImages(packagesData, log);
-      await loadImages(packagesData, log);
-
-      await createVolumeDevicePaths(packagesData);
-      await writeAndValidateFiles(packagesData, log);
-
-      try {
-        await runPackages(packagesData, log);
-      } catch (e) {
-        // Bypass rollback if is Prysm legacy
-        if (!isPrysmLegacy(req.name, req.ver)) {
-          await rollbackPackages(packagesData, log);
-          throw e;
-        } else {
-          logs.error(
-            "Bypassing rollback due to client legacy version. ",
-            e.message
-          );
-        }
-      }
-
-      await postInstallClean(packagesData, log);
-      afterInstall(dnpNames);
-      logUiClear({ id });
-    } catch (e) {
-      afterInstall(dnpNames);
-      throw e;
-    }
-  } catch (e) {
-    logUiClear({ id }); // Clear "resolving..." logs
-    throw e;
-  }
+  await pkgInstall(dappnodeInstaller, {
+    name: reqName,
+    version: reqVersion,
+    userSettings,
+    options
+  });
 }

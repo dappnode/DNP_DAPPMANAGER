@@ -1,14 +1,14 @@
-import { eventBus } from "../eventBus.js";
-import params from "../params.js";
-import { listPackage } from "../modules/docker/list/index.js";
-import { ComposeFileEditor } from "../modules/compose/editor.js";
-import { PortMapping } from "@dappnode/common";
+import { eventBus } from "@dappnode/eventbus";
+import { params } from "@dappnode/params";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
+import { PortMapping } from "@dappnode/types";
 import { mapValues } from "lodash-es";
 import {
   getContainersStatus,
-  dockerComposeUpPackage
-} from "../modules/docker/index.js";
-import { packageInstalledHasPid } from "../utils/pid.js";
+  dockerComposeUpPackage,
+  listPackage
+} from "@dappnode/dockerapi";
+import { packageInstalledHasPid } from "@dappnode/utils";
 
 /**
  * Updates the .env file of a package. If requested, also re-ups it

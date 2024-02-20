@@ -4,7 +4,7 @@ export const web3signer: MockDnp = {
   avatar:
     "https://github.com/dappnode/DAppNodePackage-web3signer/blob/master/node-avatar.png",
 
-  metadata: {
+  manifest: {
     name: "web3signer.dnp.dappnode.eth",
     version: "0.1.0",
     upstreamVersion: "22.8.0",

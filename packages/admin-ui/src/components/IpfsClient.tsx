@@ -1,6 +1,6 @@
 import React from "react";
 import "./multiClient.scss";
-import { IpfsClientTarget } from "@dappnode/common";
+import { IpfsClientTarget } from "@dappnode/types";
 import Card from "components/Card";
 import { joinCssClass } from "utils/css";
 import Input from "./Input";
@@ -65,6 +65,7 @@ export function IpfsClient({
 
               {option === "remote" && (
                 <Input
+                  placeholder="https://gateway.ipfs.dappnode.io"
                   value={gatewayTarget || ""}
                   onValueChange={onGatewayTargetChange}
                 />

@@ -5,21 +5,13 @@ ln -s /app/packages/admin-ui/build/ /app/packages/dappmanager/dist
 ln -s /usr/src/app/dnp_repo/ /app/packages/dappmanager
 ln -s /usr/src/app/DNCORE/ /app/packages/dappmanager
 
-# Install lerna first
-rm -rf node_modules
-yarn --frozen-lockfile --non-interactive --ignore-scripts --ignore-optional
-yarn
+# execute the scripts in background
+for dir in /app/packages/*; do
+    if [ -d "$dir" ]; then
+        cd $dir
+        yarn dev &
+    fi
+done
 
-# Build common
-cd /app/packages/common/ && rm -rf node_modules && yarn && yarn generate && yarn build
-
-# Build admin-ui
-cd /app/packages/admin-ui/ && rm -rf node_modules && yarn && yarn build
-
-# Build dappmanager
-cd /app/packages/dappmanager/ && rm -rf node_modules && yarn && yarn build
-
-# execute the scripts in background and wait
-cd /app/packages/dappmanager && yarn dev &
-cd /app/packages/admin-ui && yarn dev &
+# wait for all processes to finish
 wait

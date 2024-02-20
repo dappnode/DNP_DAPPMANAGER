@@ -2,7 +2,7 @@ import React from "react";
 import { orderBy, isEmpty } from "lodash-es";
 // Components
 import Input from "components/Input";
-import { UserSettingsAllDnps } from "@dappnode/common";
+import { UserSettingsAllDnps } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 import "./editorAdvanced.scss";
 
