@@ -2,6 +2,7 @@ import fetch from "node-fetch";
 import Ajv from "ajv";
 import querystring from "querystring";
 import { urlJoin } from "@dappnode/utils";
+import { logs } from "@dappnode/logger";
 
 const ajv = new Ajv({ allErrors: true });
 
@@ -59,7 +60,7 @@ export class HttpsPortalApiClient {
       from: fromSubdomain,
       to: toHost,
     });
-    await this.get(urlJoin(this.baseUrl, `/add?${search}`));
+    await this.get(urlJoin(this.baseUrl, `/add?${search}&external=false`));
   }
 
   /**

@@ -1,5 +1,9 @@
 import fetch from "node-fetch";
-import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
+import {
+  AddEthereumChainParameter,
+  ChainDriverSpecs,
+  InstalledPackageData,
+} from "@dappnode/types";
 import {
   buildNetworkAlias,
   EthSyncing,
@@ -69,15 +73,20 @@ export async function ethereum(
     return data.result;
   }
 
-  const [syncing, peersCount, blockNumber] = await Promise.all([
+  // Ethereum RPC spec https://ethereum.github.io/execution-apis/api-documentation/
+  const [syncing, peersCount, blockNumber, chainId] = await Promise.all([
     fetchJsonRpc("eth_syncing").then(parseEthersSyncing), // Make sure parseEthersSyncing is compatible with direct JSON-RPC responses
     fetchJsonRpc("net_peerCount")
       .then((result) => parseInt(result, 16))
       .catch(() => undefined),
     fetchJsonRpc("eth_blockNumber").then((result) => parseInt(result, 16)),
+    fetchJsonRpc("eth_chainId").then((result) => parseInt(result, 16)),
   ]);
 
-  return parseEthereumState(syncing, blockNumber, peersCount);
+  return {
+    ...parseEthereumState(syncing, blockNumber, peersCount),
+    wallet: getEthereumChainParameters(chainId, apiUrl),
+  };
 }
 
 /**
@@ -165,5 +174,79 @@ export function parseEthereumState(
         peers: peersCount,
       };
     }
+  }
+}
+
+function getEthereumChainParameters(
+  chainId: number,
+  rpcUrl: string
+): AddEthereumChainParameter {
+  switch (chainId) {
+    case 1:
+      return {
+        chainId: "0x1",
+        chainName: "Ethereum Mainnet",
+        nativeCurrency: {
+          name: "Ethereum",
+          symbol: "ETH",
+          decimals: 18,
+        },
+        rpcUrls: ["https://geth.dappnode.eth"], // [rpcUrl],
+        blockExplorerUrls: ["https://etherscan.io"],
+      };
+    case 5:
+      return {
+        chainId: "0x5",
+        chainName: "Goerli Testnet",
+        nativeCurrency: {
+          name: "Goerli Ether",
+          symbol: "GTH",
+          decimals: 18,
+        },
+        rpcUrls: [rpcUrl],
+        blockExplorerUrls: ["https://goerli.etherscan.io"],
+      };
+    case 42:
+      return {
+        chainId: "0x2a",
+        chainName: "Lukso Mainnet",
+        nativeCurrency: {
+          name: "Lukso token",
+          symbol: "LYX",
+          decimals: 18,
+        },
+        rpcUrls: [rpcUrl],
+        blockExplorerUrls: ["https://explorer.execution.mainnet.lukso.network"],
+      };
+    case 100:
+      return {
+        chainId: "0x64",
+        chainName: "Gnosis Chain",
+        nativeCurrency: {
+          name: "XDAI",
+          symbol: "XDAI",
+          decimals: 18,
+        },
+        rpcUrls: [rpcUrl],
+        blockExplorerUrls: ["https://gnosisscan.io/"],
+      };
+    case 17000:
+      return {
+        chainId: "0x4268",
+        chainName: "Holesky",
+        nativeCurrency: {
+          name: "ETH",
+          symbol: "ETH",
+          decimals: 18,
+        },
+        rpcUrls: [rpcUrl],
+        blockExplorerUrls: ["https://holesky.etherscan.io"],
+      };
+    default:
+      return {
+        chainId: `0x${chainId.toString(16)}`,
+        chainName: `Chain ID ${chainId}`,
+        rpcUrls: [rpcUrl],
+      };
   }
 }
