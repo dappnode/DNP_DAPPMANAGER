@@ -101,6 +101,8 @@ export function DockerUpgrade() {
         onSuccess: "Updated Docker"
       });
       setUpdateReq({ result: true });
+      // update the requirements after the update
+      await dockerUpdateCheck();
     } catch (e) {
       setUpdateReq({ error: e });
       console.error("Error on dockerUpdate", e);
