@@ -64,6 +64,7 @@ export class HttpsPortal {
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`,
+      external: mapping.external,
     });
 
     // Edit compose to persist the setting

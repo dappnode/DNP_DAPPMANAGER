@@ -26,6 +26,7 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  external?: boolean;
 }
 
 export interface ExposableServiceInfo extends HttpsPortalMapping {
