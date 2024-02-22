@@ -4,10 +4,19 @@ import ProgressBar from "react-bootstrap/ProgressBar";
 import Card from "components/Card";
 import RenderMarkdown from "components/RenderMarkdown";
 import { prettyDnpName } from "utils/format";
-import { ChainData } from "@dappnode/types";
+import { AddEthereumChainParameter, ChainData } from "@dappnode/types";
 import { HelpTo } from "components/Help";
 import { Link } from "react-router-dom";
 import { relativePath as packagesRelativePath } from "pages/packages";
+import Button from "components/Button";
+import { FaWallet } from "react-icons/fa";
+
+// set window.ethereum to any to avoid typescript error
+declare global {
+  interface Window {
+    ethereum: any;
+  }
+}
 
 export function ChainCards() {
   const chainData = useChainData();
@@ -30,8 +39,25 @@ function ChainCard(chain: ChainData) {
     progress,
     error,
     syncing,
-    peers
+    peers,
+    wallet
   } = chain;
+
+  async function connectWallet(wallet: AddEthereumChainParameter) {
+    await window.ethereum.request({
+      method: "wallet_addEthereumChain",
+      params: [
+        {
+          chainId: wallet.chainId,
+          chainName: wallet.chainName,
+          rpcUrls: wallet.rpcUrls,
+          nativeCurrency: wallet.nativeCurrency,
+          blockExplorerUrls: wallet.blockExplorerUrls
+        }
+      ]
+    });
+  }
+
   return (
     <Card className="chain-card">
       <div className="name">
@@ -53,7 +79,22 @@ function ChainCard(chain: ChainData) {
       ) : error ? (
         <ProgressBar now={100} variant="warning" />
       ) : (
-        <ProgressBar now={100} variant="success" />
+        <>
+          <ProgressBar now={100} variant="success" />
+          {/** Button with icon wallet to connect wallet */}
+          {wallet && (
+            <Button
+              variant="dappnode"
+              size="sm"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => connectWallet(wallet)}
+            >
+              <FaWallet />
+              Connect wallet
+            </Button>
+          )}
+        </>
       )}
 
       <div className="message">
