@@ -15,12 +15,20 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
     <div>
       <Ok
         title="Docker in unattended upgrades"
-        msg="Docker is in the unattended upgrades list. This means that it will be automatically updated by the system"
+        msg={
+          items.isDockerInUnattendedUpgrades
+            ? `Docker is in the unattended upgrades list. This means that it will be automatically updated by the system`
+            : `Docker is not in the unattended upgrades list. This means that it will not be automatically updated by the system`
+        }
         ok={items.isDockerInUnattendedUpgrades}
       />
       <Ok
         title="Docker installed through apt"
-        msg="docker has been installed through the apt package manager. This is the recommended way to install docker in DAppNode so it can be automatically updated by unattended upgrades"
+        msg={
+          items.isDockerInstalledThroughApt
+            ? `Docker has been installed through the apt package manager. This is the recommended way to install docker in DAppNode so it can be automatically updated by unattended upgrades`
+            : `Docker has not been installed through the apt package manager. This means that it will not be automatically updated by unattended upgrades`
+        }
         ok={items.isDockerInstalledThroughApt}
       />
       <Ok
