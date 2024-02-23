@@ -18,8 +18,14 @@ export const setRebootHostIsRequired =
   dappnodeStatus.actions.rebootRequiredScript;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
+const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
 
 // Fetch
+
+export const fetchShouldShowSmooth = (): AppThunk => async dispatch =>
+  withTryCatch(async () => {
+    dispatch(updateShouldShowSmooth(await api.getShouldShowSmooth()));
+  }, "getShouldShowSmooth");
 
 export const fetchRebootIsRequired = (): AppThunk => async dispatch =>
   withTryCatch(async () => {

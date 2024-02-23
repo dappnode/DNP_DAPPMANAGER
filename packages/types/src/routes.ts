@@ -577,6 +577,16 @@ export interface Routes {
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
   /**
+   * Returns weather or not should show the smooth animation
+   */
+  getShouldShowSmooth: () => Promise<boolean>;
+
+  /**
+   * Sets the status of the smooth animation
+   */
+  setShouldShownSmooth: (kwargs: { isShown: boolean }) => Promise<void>;
+
+  /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
@@ -770,6 +780,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
+  setShouldShownSmooth: {},
+  getShouldShowSmooth: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},

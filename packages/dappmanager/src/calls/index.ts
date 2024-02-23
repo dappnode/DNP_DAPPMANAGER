@@ -57,6 +57,7 @@ export { rebootHost } from "./rebootHost.js";
 export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
+export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";
 export { statsCpuGet } from "./statsCpuGet.js";
 export {
   sshPortGet,
