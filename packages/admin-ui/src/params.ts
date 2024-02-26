@@ -66,6 +66,9 @@ export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
+// smooth
+export const packageInfoPath = `/packages/my/${zkevmDnpName}/info`;
+export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
