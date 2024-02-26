@@ -23,6 +23,7 @@
     max-width: 40rem;
     margin: auto;
     justify-content: center;
+    margin-bottom: 0.5rem;
   }
   
   .full-width-button {
@@ -35,4 +36,12 @@
     text-decoration: underline; 
     font-weight: bold; 
     margin-left: 4px;
+  }
+
+  .custom-modal .modal-header {
+    border-bottom: none; 
+  }
+  
+  .custom-modal .modal-title {
+    margin-left: auto;
   }

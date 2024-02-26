@@ -74,6 +74,11 @@ export const githubNewIssueDappnodeUrl =
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
 
+// smooth
+export const mainSmooth = "https://smooth.dappnode.io/";
+export const docsSmooth = "https://docs.dappnode.io/docs/smooth/";
+export const brainSmooth = "http://brain.web3signer.dappnode/";
+
 const docsBaseUrl = "https://docs.dappnode.io";
 
 export const docsUrl = {
