@@ -6,6 +6,7 @@ import * as formatDiagnose from "../formaters/autoDiagnoseTexts";
 // Components
 import Card from "components/Card";
 import Ok from "components/Ok";
+import LinkDocs from "components/LinkDocs";
 
 export default function AutoDiagnose() {
   const publicIpRes = useApi.ipPublicGet();
@@ -25,7 +26,7 @@ export default function AutoDiagnose() {
 
   return (
     <Card>
-      {diagnosesArray.map(({ loading, ok, msg, solutions }, i) => (
+      {diagnosesArray.map(({ loading, ok, msg, solutions, link }, i) => (
         <div key={i}>
           <Ok {...{ msg, ok, loading }} />
           {!ok && !loading && solutions ? (
@@ -33,6 +34,7 @@ export default function AutoDiagnose() {
               {solutions.map((item, j) => (
                 <li key={j}>{item}</li>
               ))}
+              {link && <LinkDocs href={link.linkUrl}>{link.linkMsg}</LinkDocs>}
             </ul>
           ) : null}
         </div>

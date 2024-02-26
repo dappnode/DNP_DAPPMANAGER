@@ -83,6 +83,7 @@ const docsBaseUrl = "https://docs.dappnode.io";
 export const docsUrl = {
   main: docsBaseUrl,
   recoverPasswordGuide: `${docsBaseUrl}/docs/user/getting-started/register#troubleshooting`,
+  connectToRouter: `${docsBaseUrl}/docs/user/getting-started/connect-dappnode-to-the-router`,
   connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
   connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
   connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
