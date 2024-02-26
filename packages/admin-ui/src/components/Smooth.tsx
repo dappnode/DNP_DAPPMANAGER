@@ -1,16 +1,84 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { getShouldShowSmooth } from "services/dappnodeStatus/selectors";
 import { api } from "api";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
+import { Link } from "react-router-dom";
+import "./smooth.scss";
 
 export default function Smooth() {
+  /* const shouldShowSmooth = useSelector(getShouldShowSmooth);
+  console.log("should show smooth:", shouldShowSmooth)
+  if (!shouldShowSmooth) return null; */
+
+  console.log("Smooth component");
+
   const shouldShowSmooth = useSelector(getShouldShowSmooth);
+  console.log("should show smooth:", shouldShowSmooth);
+
+  const [modalShown, setModalShown] = useState(false);
+
+  useEffect(() => {
+    if (shouldShowSmooth) {
+      setModalShown(true);
+    }
+  }, [shouldShowSmooth]);
+
+  const closeModal = () => {
+    setModalShown(false);
+    api.setShouldShownSmooth({ isShown: true });
+  };
+
   if (!shouldShowSmooth) return null;
+
+
   // TODO return modal
 
   // TODO: implement setShouldShownSmooth when user closes the modal. Use api method api.setShouldShownSmooth
   // How to determine that the modal has been shown api.setShouldShownSmooth({ isShown: true })
   // - When user closes the modal
   // - When user clicks on see smooth
-  return <div>Smooth</div>;
+  return (
+    <Modal show={modalShown} onHide={closeModal} centered size="lg">
+      <Modal.Header closeButton>
+        <Modal.Title>
+          <div className="title">
+            Smooth by Dappnode is here!
+          </div>
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <div className="description">
+          <p>
+            Welcome to Smooth, a MEV Smoothing Pool designed to enhance your Ethereum solo staking journey. By aggregating MEV rewards, Smooth provides solo stakers with a distinct advantage, allowing them to:
+          </p>
+          <div className="centered">
+            <ul className="list">
+              <li>🚀 Consistently earn higher rewards</li>
+              <li>🍀 Minimize dependency on luck</li>
+              <li>💰 Maximize the potential of every staked ether</li>
+            </ul>
+          </div>
+          <p>
+            Elevate your solo staking experience with Smooth! Ready to learn more?{" "}
+            <Link to="https://docs.dappnode.io/docs/smooth/" target="_blank">Explore now</Link>
+          </p>
+        </div>
+        <div className="button-container">
+          <Link to="https://smooth.dappnode.io/" target="_blank">
+            <Button variant="dappnode" className="full-width-button">
+              Go to Smooth
+            </Button>
+          </Link>
+
+          <Link to="http://brain.web3signer.dappnode/" target="_blank">
+            <Button variant="dappnode" className="full-width-button">
+              Go to Brain
+            </Button>
+          </Link>
+        </div>
+      </Modal.Body>
+    </Modal>
+  );
 }

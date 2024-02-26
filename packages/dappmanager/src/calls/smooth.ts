@@ -2,6 +2,7 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export async function getShouldShowSmooth(): Promise<boolean> {
+  console.log("getShouldShowSmooth has been called")
   if (db.smoothShown.get() === true) return false;
 
   // If the the smooth has not been shown yet, check if it should be shown or not

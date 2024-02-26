@@ -1,0 +1,38 @@
+
+.title {
+    font-weight: bold;
+    font-size: 2rem; 
+    transition: color 0.15s;
+    color: #000;
+    margin-top: 20px;
+    text-align: center !important;
+  }
+
+.description {
+    font-size: 1rem; 
+    color: var(--light-text-color);
+    max-width: 40rem;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: left;
+  }
+
+  .button-container {
+    display: flex;
+    max-width: 40rem;
+    margin: auto;
+    justify-content: center;
+  }
+  
+  .full-width-button {
+    flex: 1;
+    margin-right: 10px;
+  }
+  
+  .learn-more-link {
+    color: #007bff; 
+    text-decoration: underline; 
+    font-weight: bold; 
+    margin-left: 4px;
+  }
