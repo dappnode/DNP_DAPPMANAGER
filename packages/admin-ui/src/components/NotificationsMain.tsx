@@ -52,9 +52,9 @@ export default function NotificationsView() {
      */
     {
       id: "connectedToInternet",
-      linkText: "Check",
+      linkText: "Navigate",
       linkPath: "support/auto-diagnose",
-      body: `**Dappnode host is not connected to internet.** Click **Check** to run the autodiagnose and learn more about it.`,
+      body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
       active: !isConnectedToInternet
     },
     /**
