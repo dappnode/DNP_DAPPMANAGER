@@ -25,7 +25,6 @@ import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
-import { MdWifi } from "react-icons/md";
 import { BsInfoCircleFill } from "react-icons/bs";
 
 export default function StakerNetwork<T extends Network>({
