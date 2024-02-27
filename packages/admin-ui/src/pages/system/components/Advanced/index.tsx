@@ -6,7 +6,8 @@ import { SshManager } from "./SshManager";
 import { ClearCacheDb } from "./ClearCacheDb";
 import { ClearMainDb } from "./ClearMainDb";
 import { ReleaseTrustedKeysEditor } from "./ReleaseTrustedKeysEditor";
-import UpdateUpgrade from "./UpdateUpgrade";
+import { UpdateUpgrade } from "./UpdateUpgrade";
+import { DockerUpgrade } from "./DockerUpgrade";
 
 export function Advanced() {
   return (
@@ -28,6 +29,9 @@ export function Advanced() {
 
       <SubTitle>Update and upgrade the host machine</SubTitle>
       <UpdateUpgrade />
+
+      <SubTitle>Docker update</SubTitle>
+      <DockerUpgrade />
 
       <SubTitle>Clear cache db</SubTitle>
       <ClearCacheDb />
