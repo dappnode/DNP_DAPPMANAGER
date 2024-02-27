@@ -24,17 +24,14 @@ const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
 
 // Fetch
 
-<<<<<<< HEAD
 export const fetchShouldShowSmooth = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
     dispatch(updateShouldShowSmooth(await api.getShouldShowSmooth()));
   }, "getShouldShowSmooth");
-=======
 export const fetchIsConnectedToInternet = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
     dispatch(setIsConnectedToInternet(await api.getIsConnectedToInternet()));
   }, "getIsConnectedToInternet");
->>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 
 export const fetchRebootIsRequired = (): AppThunk => async dispatch =>
   withTryCatch(async () => {

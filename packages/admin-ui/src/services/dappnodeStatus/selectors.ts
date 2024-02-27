@@ -18,13 +18,10 @@ export const getPasswordIsSecure = (state: RootState) =>
 export const getRebootIsRequired = (state: RootState) =>
   state.dappnodeStatus.rebootRequiredScript;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
-<<<<<<< HEAD
 export const getShouldShowSmooth = (state: RootState) =>
   state.dappnodeStatus.shouldShowSmooth;
-=======
 export const getIsConnectedToInternet = (state: RootState) =>
   state.dappnodeStatus.isConnectedToInternet;
->>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 
 // Sub-sub local properties
 export const getEthRemoteRpc = (state: RootState) =>
