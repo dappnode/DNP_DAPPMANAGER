@@ -385,7 +385,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     isDockerInstalledThroughApt: true,
     dockerHostVersion: "20.10.7",
     dockerLatestVersion: "20.10.8"
-  })
+  }),
+  getIsConnectedToInternet: async () => false
 };
 
 export const calls: Routes = {
