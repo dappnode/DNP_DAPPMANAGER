@@ -7,7 +7,11 @@ import {
   fetchPasswordIsSecure,
   fetchWifiCredentials,
   fetchRebootIsRequired,
+<<<<<<< HEAD
   fetchShouldShowSmooth,
+=======
+  fetchIsConnectedToInternet
+>>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 } from "services/dappnodeStatus/actions";
 
 export function initialCallsOnOpen() {
@@ -18,5 +22,9 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchPasswordIsSecure());
   store.dispatch<any>(fetchWifiCredentials());
   store.dispatch<any>(fetchRebootIsRequired());
+<<<<<<< HEAD
   store.dispatch<any>(fetchShouldShowSmooth());
+=======
+  store.dispatch<any>(fetchIsConnectedToInternet());
+>>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 }

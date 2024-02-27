@@ -15,7 +15,11 @@ interface DappnodeStatusState {
   passwordIsSecure: boolean | null;
   volumes: VolumeData[];
   rebootRequiredScript: RebootRequiredScript | null;
+<<<<<<< HEAD
   shouldShowSmooth: boolean | null;
+=======
+  isConnectedToInternet: boolean | null;
+>>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 }
 
 const initialState: DappnodeStatusState = {
@@ -24,7 +28,11 @@ const initialState: DappnodeStatusState = {
   passwordIsSecure: null,
   volumes: [],
   rebootRequiredScript: null,
+<<<<<<< HEAD
   shouldShowSmooth: null
+=======
+  isConnectedToInternet: null
+>>>>>>> 9c2a2b370a25d2bdf5356e3058fb4ee4ae13f82e
 };
 
 export const dappnodeStatus = createSlice({

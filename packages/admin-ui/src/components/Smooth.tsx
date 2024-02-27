@@ -9,6 +9,7 @@ import { mainSmooth, docsSmooth, brainSmooth } from "params";
 import "./smooth.scss";
 
 export default function Smooth() {
+  // Get the state indicating whether the Smooth modal should be shown
   const shouldShowSmooth = useSelector(getShouldShowSmooth);
   console.log("should show smooth:", shouldShowSmooth);
 
@@ -22,9 +23,11 @@ export default function Smooth() {
 
   const closeModal = () => {
     setModalShown(false);
+    // Set shouldShownSmooth to true using the API
     api.setShouldShownSmooth({ isShown: true });
   };
 
+  // If shouldShowSmooth is false, do not render the modal
   if (!shouldShowSmooth) return null;
 
 
