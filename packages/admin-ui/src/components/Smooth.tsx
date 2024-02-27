@@ -42,18 +42,18 @@ export default function Smooth() {
             dialogClassName="custom-modal"
         >
             <Modal.Header closeButton className="custom-header">
-                <Modal.Title className="text-center">
-                    <div className="title">Smooth by Dappnode is here!</div>
+                <Modal.Title>
+                    <div className="smooth-modal-title">Smooth by Dappnode is here!</div>
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div>
-                    <div className="description">
+                    <div className="smooth-modal-description">
                         <p>
                             Welcome to Smooth, a MEV Smoothing Pool designed to enhance your Ethereum solo staking journey. By aggregating MEV rewards, Smooth provides solo stakers with a distinct advantage, allowing them to:
                         </p>
-                        <div className="centered">
-                            <ul className="list">
+                        <div>
+                            <ul>
                                 <li>🚀 Consistently earn higher rewards</li>
                                 <li>🍀 Minimize dependency on luck</li>
                                 <li>💰 Maximize the potential of every staked ether</li>
@@ -64,15 +64,15 @@ export default function Smooth() {
                             <Link to={docsSmooth} target="_blank">Explore now</Link>
                         </p>
                     </div>
-                    <div className="button-container">
+                    <div className="smooth-modal-button-container">
                         <Link to={mainSmooth} target="_blank">
-                            <Button variant="dappnode" className="full-width-button">
+                            <Button variant="dappnode" className="smooth-full-width-button">
                                 Go to Smooth
                             </Button>
                         </Link>
 
                         <Link to={brainSmooth} target="_blank">
-                            <Button variant="dappnode" className="full-width-button">
+                            <Button variant="dappnode" className="smooth-full-width-button">
                                 Go to Brain
                             </Button>
                         </Link>
