@@ -80,7 +80,6 @@ export function DockerUpgrade() {
       setCheckReq({ result: requirements });
     } catch (e) {
       setCheckReq({ error: e });
-      console.error("Error on dockerUpdateCheck", e);
     }
   }
 
@@ -89,7 +88,7 @@ export function DockerUpgrade() {
       await new Promise<void>(resolve => {
         confirm({
           title: `Docker update`,
-          text: `Warning, you are about to update Docker . It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important packages.`,
+          text: `Warning, you are about to update Docker . It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important data.`,
           label: "Update",
           onClick: resolve
         });
@@ -105,7 +104,6 @@ export function DockerUpgrade() {
       await dockerUpdateCheck();
     } catch (e) {
       setUpdateReq({ error: e });
-      console.error("Error on dockerUpdate", e);
     }
   }
 
