@@ -5,7 +5,7 @@ import Button from "components/Button";
 import { confirm } from "components/ConfirmDialog";
 import { withToastNoThrow } from "components/toast/Toast";
 
-export default function UpdateUpgrade() {
+export function UpdateUpgrade() {
   async function updateUpgrade() {
     await new Promise<void>(resolve =>
       confirm({

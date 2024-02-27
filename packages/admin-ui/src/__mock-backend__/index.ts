@@ -381,6 +381,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   updateUpgrade: async () => "Successfully updated",
   setShouldShownSmooth: async () => {},
   getShouldShowSmooth: async () => true,
+  dockerUpgrade: async () => {},
+  dockerUpgradeCheck: async () => ({
+    isDockerInUnattendedUpgrades: true,
+    isDockerInstalledThroughApt: true,
+    dockerHostVersion: "20.10.7",
+    dockerLatestVersion: "20.10.8"
+  }),
   getIsConnectedToInternet: async () => false
 };
 

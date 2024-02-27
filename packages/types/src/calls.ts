@@ -788,6 +788,19 @@ export interface PackageVersionData {
 }
 
 /**
+ * =============
+ * HOST - DOCKER
+ * =============
+ */
+
+export interface DockerUpgradeRequirements {
+  isDockerInstalledThroughApt: boolean;
+  isDockerInUnattendedUpgrades: boolean;
+  dockerHostVersion: string;
+  dockerLatestVersion?: string;
+}
+
+/**
  * ===========
  * HOST - DATA
  * ===========
