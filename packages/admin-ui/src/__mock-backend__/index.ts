@@ -379,6 +379,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   optimismConfigSet: async () => {},
   updateUpgrade: async () => "Successfully updated",
+  setShouldShownSmooth: async () => {},
+  getShouldShowSmooth: async () => true,
   getIsConnectedToInternet: async () => false
 };
 
