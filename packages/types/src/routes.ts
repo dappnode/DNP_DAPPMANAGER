@@ -582,12 +582,12 @@ export interface Routes {
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
    /**
-   * Returns weather or not should show the smooth animation
+   * Returns weather or not should show the smooth modal
    */
    getShouldShowSmooth: () => Promise<boolean>;
 
    /**
-    * Sets the status of the smooth animation
+    * Sets the status of the smooth modal
     */
    setShouldShownSmooth: (kwargs: { isShown: boolean }) => Promise<void>;
  
