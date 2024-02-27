@@ -10,7 +10,6 @@ import "./smooth.scss";
 
 export default function Smooth() {
     const shouldShowSmooth = useSelector(getShouldShowSmooth);
-    console.log("should show smooth:", shouldShowSmooth);
     const [modalShown, setModalShown] = useState(false);
 
     useEffect(() => {

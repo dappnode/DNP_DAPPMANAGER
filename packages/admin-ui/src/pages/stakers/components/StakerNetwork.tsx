@@ -24,6 +24,9 @@ import { FaEthereum } from "react-icons/fa";
 import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
+import { docsSmooth } from "params";
+import { MdWifi } from "react-icons/md";
+import { BsInfoCircleFill } from "react-icons/bs";
 
 export default function StakerNetwork<T extends Network>({
   network,
@@ -151,6 +154,21 @@ export default function StakerNetwork<T extends Network>({
         </AlertDismissible>
       )}
 
+      {(network === "prater" || network === "mainnet") && (
+        <AlertDismissible variant="info">
+          <p>
+            <BsInfoCircleFill className="smooth-alert-icon" />
+            <b>Smooth is out!</b> Discover the new MEV Smoothing Pool designed for solo validators. It allows you to pool your MEV rewards, ensuring consistent higher rewards. Subscribing is as easy as changing your fee recipient!
+            {" "}
+            <b>
+              <a href={docsSmooth} target="_blank" rel="noopener noreferrer">
+                Learn more
+              </a>
+            </b>
+          </p>
+        </AlertDismissible>
+      )}
+
       <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
         {currentStakerConfigReq.data ? (
           <Card>
@@ -226,7 +244,7 @@ export default function StakerNetwork<T extends Network>({
                     setNewMevBoost={setNewMevBoost}
                     isSelected={
                       currentStakerConfigReq.data.mevBoost.dnpName ===
-                      newMevBoost?.dnpName
+                        newMevBoost?.dnpName
                         ? true
                         : false
                     }
