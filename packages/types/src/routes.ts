@@ -42,6 +42,7 @@ import {
   WifiReport,
   WireguardDeviceCredentials,
   HostStatSwap,
+  DockerUpgradeRequirements,
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -203,6 +204,16 @@ export interface Routes {
    * Collect host info for support
    */
   diagnose: () => Promise<HostDiagnoseItem[]>;
+
+  /**
+   * Updates docker engine
+   */
+  dockerUpgrade: () => Promise<void>;
+
+  /**
+   * Checks requirements to update docker
+   */
+  dockerUpgradeCheck: () => Promise<DockerUpgradeRequirements>;
 
   /**
    * Sets if a fallback should be used
@@ -720,6 +731,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
+  dockerUpgrade: { log: true },
+  dockerUpgradeCheck: { log: true },
   ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
