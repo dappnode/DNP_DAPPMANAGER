@@ -167,14 +167,13 @@ function installDocker() {
         exit 1
     fi
     log "Download and install docker gpg key"
-    curl -fL "${DOWNLOAD_GPG_URL}" |
-        gpg --yes --dearmor -o /etc/apt/keyrings/docker.gpg 2>&1 | tee -a ${LOG_FILE}
+    curl -fsSL "${DOWNLOAD_GPG_URL}" -o /etc/apt/keyrings/docker.asc 2>&1 | tee -a ${LOG_FILE}
     if [ $? -ne 0 ]; then
         log "Failed to download and install docker gpg key."
         exit 1
     fi
-    log "Change permissions for docker gpg key"
-    chmod a+r /etc/apt/keyrings/docker.gpg 2>&1 | tee -a ${LOG_FILE}
+    log "Change permissions for docker asc key"
+    chmod a+r /etc/apt/keyrings/docker.asc 2>&1 | tee -a ${LOG_FILE}
     if [ $? -ne 0 ]; then
         log "Failed to change permissions for docker gpg key."
         exit 1
@@ -182,8 +181,8 @@ function installDocker() {
     # 3. Use the following command to set up the repository
     log "Add docker repository"
     echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] ${DOWNLOAD_REPO_URL} \
-  $(source /etc/os-release && echo "$VERSION_CODENAME") stable" 2>&1 |
+        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] ${DOWNLOAD_REPO_URL} \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" |
         tee /etc/apt/sources.list.d/docker.list >/dev/null
     if [ $? -ne 0 ]; then
         log "Failed to add docker repository."
