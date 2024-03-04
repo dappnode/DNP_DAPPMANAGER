@@ -38,7 +38,6 @@ import {
   pathName as systemPathName,
   subPaths as systemSubPaths
 } from "pages/system/data";
-import { getDockerVersion } from "@dappnode/dockerapi";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
