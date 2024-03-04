@@ -3,6 +3,9 @@ import Optimism from "./Optimism";
 import Title from "components/Title";
 import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
+import { Zkevm } from "./Zkevm";
+
+
 
 const RollupsRoot: React.FC = () => {
   const rollupsItems: {
@@ -10,15 +13,21 @@ const RollupsRoot: React.FC = () => {
     title: string;
     component: () => React.JSX.Element;
   }[] = [
-    {
-      subPath: "optimism",
-      title: "Optimism",
-      component: () =>
-        Optimism({
-          description: "Optimism is a Layer 2 scaling solution for Ethereum."
-        })
-    }
-  ];
+      {
+        subPath: "optimism",
+        title: "Optimism",
+        component: () =>
+          Optimism({
+            description: "Optimism is a Layer 2 scaling solution for Ethereum."
+          })
+      },
+      {
+        title: "zkEVM",
+        subPath: "zkevm",
+        component: () =>
+          Zkevm()
+      }
+    ];
 
   return (
     <>

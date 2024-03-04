@@ -44,6 +44,7 @@ export const adminUiLocalDomain = "http://dappnode.local";
 // DNP names
 export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
+export const zkevmDnpName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
@@ -65,6 +66,9 @@ export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
+// zkEvm
+export const packageInfoPath = `/packages/my/${zkevmDnpName}/info`;
+export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
