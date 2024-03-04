@@ -1,6 +1,7 @@
 export * from "./container.js";
 export * from "./df.js";
 export * from "./getArchive.js";
+export * from "./getDockerVersion.js";
 export * from "./imageRemove.js";
 export * from "./infoArchive.js";
 export * from "./listContainers.js";

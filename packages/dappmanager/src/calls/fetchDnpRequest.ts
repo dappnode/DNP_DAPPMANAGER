@@ -8,7 +8,11 @@ import {
   getIsInstalled
 } from "@dappnode/utils";
 import { dappnodeInstaller } from "../index.js";
-import { dockerInfoArchive, listPackages } from "@dappnode/dockerapi";
+import {
+  dockerInfoArchive,
+  listPackages,
+  getDockerVersion
+} from "@dappnode/dockerapi";
 import {
   ComposeEditor,
   ComposeFileEditor,
@@ -120,6 +124,7 @@ export async function fetchDnpRequest({
     compatible: {
       // Compute version metadata
       requiresCoreUpdate: getRequiresCoreUpdate(mainRelease, dnpList),
+      requiresDockerUpdate: await getRequiresDockerUpdate(mainRelease),
       resolving: false,
       isCompatible: !compatibleError,
       error: compatibleError,
@@ -147,9 +152,26 @@ function getRequiresCoreUpdate(
     : "";
   return Boolean(
     manifest.requirements &&
+      minDnVersion &&
       valid(minDnVersion) &&
       valid(coreVersion) &&
       gt(minDnVersion, coreVersion)
+  );
+}
+async function getRequiresDockerUpdate({
+  manifest
+}: {
+  manifest: Manifest;
+}): Promise<boolean> {
+  const minDockerVersion = manifest.requirements?.minimumDockerVersion;
+  if (!minDockerVersion) return false;
+  const currentDockerVersion = await getDockerVersion();
+  return Boolean(
+    manifest.requirements &&
+      minDockerVersion &&
+      valid(minDockerVersion) &&
+      valid(currentDockerVersion) &&
+      gt(minDockerVersion, currentDockerVersion)
   );
 }
 
