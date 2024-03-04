@@ -16,14 +16,15 @@ import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
 import { AppContextIface, Theme, UiModuleStatus } from "types";
+import Smooth from "components/Smooth";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
   stakersModuleStatus: "enabled",
   rollupsModuleStatus: "disabled",
-  toggleTheme: () => {},
-  toggleStakersModuleStatus: () => {},
-  toggleRollupsModuleStatus: () => {}
+  toggleTheme: () => { },
+  toggleStakersModuleStatus: () => { },
+  toggleRollupsModuleStatus: () => { }
 });
 
 const useLocalStorage = <T extends string>(
@@ -119,6 +120,7 @@ function MainApp({ username }: { username: string }) {
 
         {/* Place here non-page components */}
         <Welcome />
+        <Smooth />
         <ToastContainer />
       </div>
     </AppContext.Provider>
