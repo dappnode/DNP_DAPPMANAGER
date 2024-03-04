@@ -94,23 +94,18 @@ function addDockerToUnattendedUpgrades() {
 # Get the download URLs for the Docker repository depending on the OS
 function getDowloadUrls() {
     # Check the OS
-    if [ -f /etc/os-release ]; then
+    if type lsb_release >/dev/null 2>&1; then
+        OS=$(lsb_release -si)
+    elif [ -f /etc/os-release ]; then
         source /etc/os-release
         OS=$NAME
-        VERSION=$VERSION_ID
-    elif type lsb_release >/dev/null 2>&1; then
-        OS=$(lsb_release -si)
-        VERSION=$(lsb_release -sr)
     elif [ -f /etc/lsb-release ]; then
         source /etc/lsb-release
         OS=$DISTRIB_ID
-        VERSION=$DISTRIB_RELEASE
     elif [ -f /etc/debian_version ]; then
         OS=Debian
-        VERSION=$(cat /etc/debian_version)
     else
         OS=$(uname -s)
-        VERSION=$(uname -r)
     fi
 
     if echo "$OS" | grep -Ei "(Debian)" >/dev/null 2>&1; then
