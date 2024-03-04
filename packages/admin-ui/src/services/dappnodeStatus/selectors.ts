@@ -18,6 +18,8 @@ export const getPasswordIsSecure = (state: RootState) =>
 export const getRebootIsRequired = (state: RootState) =>
   state.dappnodeStatus.rebootRequiredScript;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
+export const getShouldShowSmooth = (state: RootState) =>
+  state.dappnodeStatus.shouldShowSmooth;
 export const getIsConnectedToInternet = (state: RootState) =>
   state.dappnodeStatus.isConnectedToInternet;
 

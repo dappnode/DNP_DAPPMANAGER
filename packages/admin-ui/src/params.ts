@@ -44,6 +44,7 @@ export const adminUiLocalDomain = "http://dappnode.local";
 // DNP names
 export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
+export const zkevmDnpName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
@@ -65,6 +66,9 @@ export const stakehouseLsdUrl = "https://l.linklyhq.com/l/1mPRE";
 export const dappnodeForumUrl = "https://forum.dappnode.io";
 export const topicBaseUrl = `https://forum.dappnode.io/new-topic`;
 export const discordInviteUrl = "https://discord.gg/dappnode";
+// zkEvm
+export const packageInfoPath = `/packages/my/${zkevmDnpName}/info`;
+export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
@@ -73,6 +77,11 @@ export const githubNewIssueDappnodeUrl =
 
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
+
+// smooth
+export const mainSmooth = "https://smooth.dappnode.io/";
+export const docsSmooth = "https://docs.dappnode.io/docs/smooth/";
+export const brainSmooth = "http://brain.web3signer.dappnode/";
 
 const docsBaseUrl = "https://docs.dappnode.io";
 

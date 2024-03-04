@@ -15,6 +15,7 @@ interface DappnodeStatusState {
   passwordIsSecure: boolean | null;
   volumes: VolumeData[];
   rebootRequiredScript: RebootRequiredScript | null;
+  shouldShowSmooth: boolean | null;
   isConnectedToInternet: boolean | null;
 }
 
@@ -24,6 +25,7 @@ const initialState: DappnodeStatusState = {
   passwordIsSecure: null,
   volumes: [],
   rebootRequiredScript: null,
+  shouldShowSmooth: null,
   isConnectedToInternet: null
 };
 

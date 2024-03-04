@@ -296,8 +296,14 @@ export const params = {
 
   DEFAULT_RELEASE_TRUSTED_KEYS: [
     {
-      name: "DAppNode Association",
+      name: "DAppNode Association (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+    },
+    {
+      name: "DAppNode Association (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
     },
