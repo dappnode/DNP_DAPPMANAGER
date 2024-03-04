@@ -11,6 +11,10 @@ import { gte, lt } from "semver";
 import Card from "components/Card";
 
 function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
+  const isDockerUpdated =
+    items.isDockerInstalledThroughApt && items.dockerLatestVersion
+      ? gte(items.dockerHostVersion, items.dockerLatestVersion)
+      : false;
   return (
     <div>
       <Ok
@@ -32,17 +36,13 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
         ok={items.isDockerInstalledThroughApt}
       />
       <Ok
-        title="Docker is updated"
+        title={`Docker ${isDockerUpdated ? "is" : "is not"} updated`}
         msg={
           items.isDockerInstalledThroughApt
             ? `Docker host version ${items.dockerHostVersion}, Docker latest version ${items.dockerLatestVersion}`
             : `Docker host version ${items.dockerHostVersion}. Could not be determined the latest docker version available because docker is not installed through apt`
         }
-        ok={
-          items.isDockerInstalledThroughApt && items.dockerLatestVersion
-            ? gte(items.dockerHostVersion, items.dockerLatestVersion)
-            : false
-        }
+        ok={isDockerUpdated}
       />
     </div>
   );
