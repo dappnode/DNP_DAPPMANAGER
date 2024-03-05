@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { sidenavItems, fundedBy } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
@@ -6,6 +6,7 @@ import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
 import { AppContext } from "../../App";
 import "./sidebar.scss";
+import { api } from "api";
 
 if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
@@ -25,6 +26,14 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
     if (rollupsModuleStatus === "enabled") rollupsItem.show = true;
     else rollupsItem.show = false;
   }
+  const [coreVersion, setCoreVersion] = useState("");
+  useEffect(() => {
+    async function getCoreVersion(): Promise<void> {
+      setCoreVersion(await api.getCoreVersion());
+    }
+
+    getCoreVersion();
+  }, []);
 
   return (
     <div id="sidebar">
@@ -57,6 +66,12 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
 
       {/* spacer keeps the funded-by section at the bottom (if possible) */}
       <div className="spacer" />
+
+      {coreVersion && (
+        <div id="core-version" className={`${theme === "dark" && "dark"}`}>
+          core <span>v.{coreVersion}</span>
+        </div>
+      )}
 
       <div className="funded-by">
         <div
