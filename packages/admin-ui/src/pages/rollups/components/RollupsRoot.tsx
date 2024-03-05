@@ -3,8 +3,6 @@ import Optimism from "./Optimism";
 import Title from "components/Title";
 import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
-import { Zkevm } from "./Zkevm";
-
 
 
 const RollupsRoot: React.FC = () => {
