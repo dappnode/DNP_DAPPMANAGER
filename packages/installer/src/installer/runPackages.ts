@@ -10,10 +10,7 @@ import {
   copyFileToDockerContainer,
 } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
-import {
-  connectToPublicNetwork,
-  exposeByDefaultHttpsPorts,
-} from "@dappnode/httpsportal";
+import { httpsPortal } from "@dappnode/httpsportal";
 
 const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 
@@ -100,9 +97,8 @@ export async function runPackages(
 
     log(pkg.dnpName, "Package started");
 
-    // Expose default HTTPs ports if required
-
-    await connectToPublicNetwork(pkg, externalNetworkName);
-    await exposeByDefaultHttpsPorts(pkg, log);
+    // Expose default HTTPs ports if required and connected to public network
+    await httpsPortal.connectToPublicNetwork(pkg, externalNetworkName);
+    await httpsPortal.exposeByDefaultHttpsPorts(pkg, log);
   }
 }

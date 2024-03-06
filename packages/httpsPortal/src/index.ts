@@ -6,7 +6,4 @@ const httpsPortalApiClient = new HttpsPortalApiClient(
 );
 export const httpsPortal = new HttpsPortal(httpsPortalApiClient);
 
-export { connectToPublicNetwork } from "./utils/connectToPublicNetwork.js";
-export { exposeByDefaultHttpsPorts } from "./utils/exposeByDefaultHttpsPorts.js";
 export { getExposableServices } from "./exposable/index.js";
-export { isRunningHttps } from "./utils/isRunningHttps.js";
