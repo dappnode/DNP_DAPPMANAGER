@@ -151,8 +151,7 @@ function getRequiresCoreUpdate(
     ? manifest.requirements.minimumDappnodeVersion
     : "";
   return Boolean(
-    manifest.requirements &&
-      minDnVersion &&
+    minDnVersion &&
       valid(minDnVersion) &&
       valid(coreVersion) &&
       gt(minDnVersion, coreVersion)
@@ -167,8 +166,7 @@ async function getRequiresDockerUpdate({
   if (!minDockerVersion) return false;
   const currentDockerVersion = await getDockerVersion();
   return Boolean(
-    manifest.requirements &&
-      minDockerVersion &&
+    minDockerVersion &&
       valid(minDockerVersion) &&
       valid(currentDockerVersion) &&
       gt(minDockerVersion, currentDockerVersion)
