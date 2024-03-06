@@ -144,4 +144,8 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
+
+  #core-version span {
+    font-size: small;
+  }
 }

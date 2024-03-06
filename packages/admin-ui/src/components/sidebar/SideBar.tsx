@@ -69,7 +69,8 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
 
       {coreVersion && (
         <div id="core-version" className={`${theme === "dark" && "dark"}`}>
-          core <span>v.{coreVersion}</span>
+          {screenWidth > 640 && <>core </>}
+          <span>v.{coreVersion}</span>
         </div>
       )}
 
