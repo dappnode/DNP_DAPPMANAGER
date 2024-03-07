@@ -230,47 +230,34 @@ function EthMultiClients({
               options !== "remote" && (
                 <>
                   <Select
-                    value={
-                      selectedTarget
-                        ? prettyDnpName(selectedTarget.execClient)
-                        : undefined
-                    }
-                    options={options.execClients
-                      .filter(ec => ec)
-                      .map(ec => prettyDnpName(ec))}
+                    value={selectedTarget && prettyDnpName(selectedTarget.execClient)}
+                    options={options.execClients.filter(Boolean).map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newEc = executionClientsMainnet.find(
-                        ec => prettyDnpName(ec) === newOpt
-                      );
-                      if (newEc)
+                      const newEc = executionClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      if (newEc) {
                         onTargetChange({
-                          ...selectedTarget,
+                          ...(selectedTarget || {}),
                           execClient: newEc
                         });
+                      }
                     }}
                     prepend="Execution client"
-                  ></Select>
+                  />
+
                   <Select
-                    value={
-                      selectedTarget
-                        ? prettyDnpName(selectedTarget.consClient)
-                        : undefined
-                    }
-                    options={options.consClients
-                      .filter(ec => ec)
-                      .map(ec => prettyDnpName(ec))}
+                    value={selectedTarget && prettyDnpName(selectedTarget.consClient)}
+                    options={options.consClients.filter(Boolean).map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newCc = consensusClientsMainnet.find(
-                        ec => prettyDnpName(ec) === newOpt
-                      );
-                      if (newCc)
+                      const newCc = consensusClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      if (newCc) {
                         onTargetChange({
-                          ...selectedTarget,
+                          ...(selectedTarget || {}),
                           consClient: newCc
                         });
+                      }
                     }}
                     prepend="Consensus client"
-                  ></Select>
+                  />
                 </>
               )}
           </Card>
