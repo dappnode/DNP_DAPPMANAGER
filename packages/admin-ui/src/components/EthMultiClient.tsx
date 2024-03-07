@@ -19,6 +19,8 @@ import Switch from "./Switch";
 import Alert from "react-bootstrap/Alert";
 import { prettyDnpName } from "utils/format";
 import Input from "./Input";
+import { useSelector } from "react-redux";
+import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
@@ -90,11 +92,11 @@ interface EthClientData {
   title: string;
   description: string;
   options:
-    | "remote"
-    | {
-        execClients: ExecutionClientMainnet[];
-        consClients: ConsensusClientMainnet[];
-      };
+  | "remote"
+  | {
+    execClients: ExecutionClientMainnet[];
+    consClients: ConsensusClientMainnet[];
+  };
   stats: EthClientDataStats;
   highlights: (keyof EthClientDataStats)[];
 }
@@ -126,6 +128,8 @@ function EthMultiClients({
   showStats?: boolean;
   useCheckpointSync?: boolean;
 }) {
+  const ethClientTarget = useSelector(getEthClientTarget);
+
   const clients: EthClientData[] = [
     {
       title: "Remote",
@@ -157,22 +161,30 @@ function EthMultiClients({
   return (
     <div className="eth-multi-clients">
       {clients.map(({ title, description, options, stats, highlights }) => {
-        const defaultTarget: Eth2ClientTarget =
-          options === "remote"
-            ? options
-            : {
-                execClient: options.execClients[0],
-                consClient: options.consClients[0]
-              };
+        let defaultTarget: Eth2ClientTarget;
+        if (options === "remote") {
+          defaultTarget = options;
+        } else if (ethClientTarget && ethClientTarget !== "remote") {
+          defaultTarget = {
+            execClient: ethClientTarget.execClient,
+            consClient: ethClientTarget.consClient
+          };
+        } else {
+          defaultTarget = {
+            execClient: options.execClients[0],
+            consClient: options.consClients[0]
+          };
+        }
+
         let selected: boolean;
         if (options === "remote") {
           selected = selectedTarget === options ? true : false;
         } else {
           selected =
             selectedTarget &&
-            selectedTarget !== "remote" &&
-            options.execClients.includes(selectedTarget.execClient) &&
-            options.consClients.includes(selectedTarget.consClient)
+              selectedTarget !== "remote" &&
+              options.execClients.includes(selectedTarget.execClient) &&
+              options.consClients.includes(selectedTarget.consClient)
               ? true
               : false;
         }
