@@ -163,18 +163,21 @@ function EthMultiClients({
   return (
     <div className="eth-multi-clients">
       {clients.map(({ title, description, options, stats, highlights }) => {
-        const defaultTarget: Eth2ClientTarget =
-          options === "remote"
-            ? options
-            : ethClientTarget && ethClientTarget !== "remote"
-              ? {
-                execClient: ethClientTarget.execClient,
-                consClient: ethClientTarget.consClient
-              }
-              : {
-                execClient: options.execClients[0],
-                consClient: options.consClients[0]
-              };
+        let defaultTarget: Eth2ClientTarget;
+        if (options === "remote") {
+          defaultTarget = options;
+        } else if (ethClientTarget && ethClientTarget !== "remote") {
+          defaultTarget = {
+            execClient: ethClientTarget.execClient,
+            consClient: ethClientTarget.consClient
+          };
+        } else {
+          defaultTarget = {
+            execClient: options.execClients[0],
+            consClient: options.consClients[0]
+          };
+        }
+
         let selected: boolean;
         if (options === "remote") {
           selected = selectedTarget === options ? true : false;
