@@ -107,8 +107,12 @@ export default function Eth() {
     <Card className="dappnode-identity">
       <SubTitle>Ethereum</SubTitle>
       <div>
-        Dappnode uses smart contracts to access a decentralized repository of
-        DApps. Choose to connect to a remote network or use your own local node
+        <p>
+          Dappnode uses smart contracts to access a decentralized repository of DApps.
+        </p>
+        <p>
+          Choose to connect to a <strong>remote network</strong> or use your own <strong>local node.</strong>
+        </p>
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (
         <div className="description">
