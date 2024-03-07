@@ -22,6 +22,8 @@ export const getShouldShowSmooth = (state: RootState) =>
   state.dappnodeStatus.shouldShowSmooth;
 export const getIsConnectedToInternet = (state: RootState) =>
   state.dappnodeStatus.isConnectedToInternet;
+export const getIpfsResolves = (state: RootState) =>
+  state.dappnodeStatus.ipfsResolves;
 
 // Sub-sub local properties
 export const getEthRemoteRpc = (state: RootState) =>

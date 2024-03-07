@@ -336,6 +336,11 @@ export interface Routes {
   ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
+   * Returns bollean depening on ipfs resolving
+   */
+  ipfsResolves(): Promise<boolean>;
+
+  /**
    * Local proxying allows to access the admin UI through dappnode.local.
    * When disabling this feature:
    * - Remove NGINX logic in HTTPs Portal to route .local domains
@@ -769,6 +774,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  ipfsResolves: {},
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},

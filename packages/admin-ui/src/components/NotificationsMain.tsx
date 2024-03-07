@@ -13,12 +13,18 @@ import {
   getWifiStatus,
   getPasswordIsSecure,
   getRebootIsRequired,
-  getIsConnectedToInternet
+  getIsConnectedToInternet,
+  getIpfsResolves
 } from "services/dappnodeStatus/selectors";
 import {
   pathName as systemPathName,
   subPaths as systemSubPaths
 } from "pages/system/data";
+import { relativePath as autoDiagnosePath } from "pages/support/data";
+import {
+  pathName as repositoryPathName,
+  subPaths as repositorySubPaths
+} from "pages/repository/data";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
@@ -36,6 +42,7 @@ export default function NotificationsView() {
   const passwordIsSecure = useSelector(getPasswordIsSecure);
   const rebootHostIsRequired = useSelector(getRebootIsRequired);
   const isConnectedToInternet = useSelector(getIsConnectedToInternet);
+  const ipfsResolves = useSelector(getIpfsResolves);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -53,7 +60,7 @@ export default function NotificationsView() {
     {
       id: "connectedToInternet",
       linkText: "Navigate",
-      linkPath: "support/auto-diagnose",
+      linkPath: autoDiagnosePath,
       body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
       active: isConnectedToInternet === false
     },
@@ -107,6 +114,18 @@ export default function NotificationsView() {
       body:
         "**Change the host 'dappnode' user password**, it's an insecure default.",
       active: passwordIsSecure === false
+    },
+    /**
+     * [IPFS-RESOLVES]
+     * Tell the user if IPFS resolves
+     */
+    {
+      id: "ipfsResolution",
+      linkText: "Navigate",
+      linkPath: repositoryPathName + "/" + repositorySubPaths.ipfs,
+      body:
+        "**IPFS is not resolving**, Click **Navigate** to go to its repository section and toggle its configuration to Remote / Local.",
+      active: ipfsResolves === false
     }
   ];
 
