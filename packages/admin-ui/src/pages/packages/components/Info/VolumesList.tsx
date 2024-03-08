@@ -80,7 +80,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
   }
 
   const totalVolumeSize = volumes.reduce(
-    (total, vol) => total + (vol.size || 0),
+    (total, vol) => (vol.size != null ? total + vol.size : total),
     0
   );
 
