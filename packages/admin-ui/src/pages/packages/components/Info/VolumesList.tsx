@@ -79,8 +79,6 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     return null;
   }
 
-  const isTotalVolumeSizeIllDefined = volumes.some(v => !v.size);
-
   const totalVolumeSize = volumes.reduce(
     (total, vol) => total + (vol.size || 0),
     0
@@ -104,7 +102,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
           </span>
         </span>
         <span>
-          {isTotalVolumeSizeIllDefined ? "-" : prettyBytes(totalVolumeSize)}
+          {prettyBytes(totalVolumeSize)}
         </span>
 
         <BsTrash
