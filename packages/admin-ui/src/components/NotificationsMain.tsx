@@ -124,7 +124,7 @@ export default function NotificationsView() {
       linkText: "Navigate",
       linkPath: repositoryPathName + "/" + repositorySubPaths.ipfs,
       body:
-        "**IPFS is not resolving**, Click **Navigate** to go to its repository section and toggle its configuration to Remote / Local.",
+        "**IPFS is not resolving**, Click **Navigate** to go to Repository section and toggle its configuration to **Remote** / **Local**.",
       active: ipfsResolves === false
     }
   ];

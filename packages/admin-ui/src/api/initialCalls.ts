@@ -23,4 +23,9 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchShouldShowSmooth());
   store.dispatch<any>(fetchIsConnectedToInternet());
   store.dispatch<any>(fetchIpfsResolves());
+
+  //Checks every 5 min if Ipfs is resolving
+  setInterval(() => {
+    store.dispatch<any>(fetchIpfsResolves());
+  }, 300000);
 }
