@@ -8,7 +8,6 @@ import { getPublicIpFromUrls } from "@dappnode/utils";
  * @returns Whether or not if the dappnode is connected to internet
  */
 export async function getIsConnectedToInternet(): Promise<boolean> {
-  logs.error(`Checking internet connectivity`);
   try {
     await getPublicIpFromUrls({
       timeout: 3 * 1000,

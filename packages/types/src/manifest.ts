@@ -45,7 +45,8 @@ export interface Manifest {
   dependencies?: Dependencies;
   optionalDependencies?: Dependencies;
   requirements?: {
-    minimumDappnodeVersion: string;
+    minimumDappnodeVersion?: string;
+    minimumDockerVersion?: string;
   };
   globalEnvs?:
     | {

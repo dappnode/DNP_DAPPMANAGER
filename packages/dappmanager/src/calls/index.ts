@@ -22,6 +22,7 @@ export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
 export { fetchRegistry } from "./fetchRegistry.js";
+export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export { getIsConnectedToInternet } from "./getIsConnectedToInternet.js";

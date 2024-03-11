@@ -166,6 +166,13 @@
           "examples": ["0.2.0"],
           "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
           "errorMessage": "should be a semantic version in the format x.y.z"
+        },
+        "minimumDockerVersion": {
+          "type": "string",
+          "description": "Minimum Docker version that includes all the features necessary to run this DAppNode Package.",
+          "examples": ["23.0.3"],
+          "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
+          "errorMessage": "should be a semantic version in the format x.y.z"
         }
       }
     },

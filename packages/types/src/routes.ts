@@ -252,6 +252,11 @@ export interface Routes {
   disableEthicalMetrics: () => Promise<void>;
 
   /**
+   * Returns current core version in string if core was installed, else returns empty string
+   */
+  getCoreVersion: () => Promise<string>;
+
+  /**
    * Returns the current ethical metrics config
    */
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig>;
@@ -592,16 +597,16 @@ export interface Routes {
   /** Remove a release key from trusted keys db, by name */
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
-   /**
+  /**
    * Returns weather or not should show the smooth modal
    */
-   getShouldShowSmooth: () => Promise<boolean>;
+  getShouldShowSmooth: () => Promise<boolean>;
 
-   /**
-    * Sets the status of the smooth modal
-    */
-   setShouldShownSmooth: (kwargs: { isShown: boolean }) => Promise<void>;
- 
+  /**
+   * Sets the status of the smooth modal
+   */
+  setShouldShownSmooth: (kwargs: { isShown: boolean }) => Promise<void>;
+
   /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
@@ -746,6 +751,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
+  getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
   getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },

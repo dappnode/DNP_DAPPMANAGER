@@ -285,6 +285,7 @@ export interface RequestedDnp {
   // Request status and dependencies
   compatible: {
     requiresCoreUpdate: boolean;
+    requiresDockerUpdate: boolean;
     resolving: boolean;
     isCompatible: boolean; // false;
     error: string; // "LN requires incompatible dependency";
