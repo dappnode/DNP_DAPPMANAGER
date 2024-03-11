@@ -30,9 +30,11 @@ export default function EnableEthicalMetrics({
 
   function onSetEnanleEthicalMetrics() {
     if (ethicalMetricsOn)
-      api.enableEthicalMetrics({ mail, sync: false }).catch(e => {
-        console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
-      });
+      api
+        .enableEthicalMetrics({ mail, tgChannelId: null, sync: false })
+        .catch(e => {
+          console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
+        });
     onNext();
   }
 
