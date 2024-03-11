@@ -16,10 +16,11 @@ export async function checkEthicalMetricsStatus(
   const dmsDnpName = "dms.dnp.dappnode.eth";
 
   try {
-    const isEnabled = db.ethicalMetricsStatus.get();
-    if (isEnabled) {
-      const mail = db.ethicalMetricsMail.get();
-      if (!mail) throw Error("Email must exist for ethical metrics");
+    const ethicalMetricsConfig = db.ethicalMetrics.get();
+    if (!ethicalMetricsConfig) return;
+    const { mail, enabled, tgChannelId } = ethicalMetricsConfig;
+    if (enabled) {
+      if (!mail && !tgChannelId) throw Error("mail or tgChannelId is required");
 
       // First check for Ethical metrics, then for DMS and last for Exporter
       // Ethical Metrics package has DMS as dependency, so it will be installed automatically
@@ -29,34 +30,28 @@ export async function checkEthicalMetricsStatus(
       const ethicalMetricsPkg = await listPackageNoThrow({
         dnpName: ethicalMetricsDnpName,
       });
-      if (!ethicalMetricsPkg) {
+      if (!ethicalMetricsPkg)
         await packageInstall(dappnodeInstaller, {
           name: ethicalMetricsDnpName,
         });
-      } else {
-        ensureAllContainersRunning(ethicalMetricsPkg);
-      }
+      else ensureAllContainersRunning(ethicalMetricsPkg);
 
       // check dms package
       const dmsPkg = await listPackageNoThrow({ dnpName: dmsDnpName });
-      if (!dmsPkg) {
+      if (!dmsPkg)
         await packageInstall(dappnodeInstaller, { name: dmsDnpName });
-      } else {
-        ensureAllContainersRunning(dmsPkg);
-      }
+      else ensureAllContainersRunning(dmsPkg);
 
       // check exporter pkg
       const exporterPkg = await listPackageNoThrow({
         dnpName: exporterDnpName,
       });
-      if (!exporterPkg) {
+      if (!exporterPkg)
         await packageInstall(dappnodeInstaller, { name: exporterDnpName });
-      } else {
-        ensureAllContainersRunning(exporterPkg);
-      }
+      else ensureAllContainersRunning(exporterPkg);
 
       // Register instance
-      await register({ mail });
+      await register({ mail, tgChannelId });
     }
   } catch (e) {
     logs.error("Error on ethical metrics check", e);

@@ -239,10 +239,12 @@ export interface Routes {
   /**
    * Enables ethical metrics notifications
    * @param mail
+   * @param tgChannelId
    * @param sync
    */
   enableEthicalMetrics: (kwargs: {
-    mail: string;
+    mail: string | null;
+    tgChannelId: string | null;
     sync: boolean;
   }) => Promise<void>;
 
@@ -259,7 +261,7 @@ export interface Routes {
   /**
    * Returns the current ethical metrics config
    */
-  getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig>;
+  getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
    * Returns true if dappnode connected to internet

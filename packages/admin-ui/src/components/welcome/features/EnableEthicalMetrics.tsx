@@ -28,11 +28,13 @@ export default function EnableEthicalMetrics({
     }
   }, [mail]);
 
-  function onSetEnanleEthicalMetrics() {
+  function onSetEnabeEthicalMetrics() {
     if (ethicalMetricsOn)
-      api.enableEthicalMetrics({ mail, sync: false }).catch(e => {
-        console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
-      });
+      api
+        .enableEthicalMetrics({ mail, tgChannelId: null, sync: false })
+        .catch(e => {
+          console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
+        });
     onNext();
   }
 
@@ -67,7 +69,7 @@ export default function EnableEthicalMetrics({
         />
       </div>
 
-      <BottomButtons onBack={onBack} onNext={onSetEnanleEthicalMetrics} />
+      <BottomButtons onBack={onBack} onNext={onSetEnabeEthicalMetrics} />
     </>
   );
 }
