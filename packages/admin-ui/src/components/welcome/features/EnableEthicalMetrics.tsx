@@ -28,7 +28,7 @@ export default function EnableEthicalMetrics({
     }
   }, [mail]);
 
-  function onSetEnanleEthicalMetrics() {
+  function onSetEnabeEthicalMetrics() {
     if (ethicalMetricsOn)
       api
         .enableEthicalMetrics({ mail, tgChannelId: null, sync: false })
@@ -69,7 +69,7 @@ export default function EnableEthicalMetrics({
         />
       </div>
 
-      <BottomButtons onBack={onBack} onNext={onSetEnanleEthicalMetrics} />
+      <BottomButtons onBack={onBack} onNext={onSetEnabeEthicalMetrics} />
     </>
   );
 }
