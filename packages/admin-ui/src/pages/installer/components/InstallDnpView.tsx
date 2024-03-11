@@ -77,6 +77,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     installedVersion
   } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
+  const areUpdateWarnings =
+    manifest.warnings?.onPatchUpdate ||
+    manifest.warnings?.onMinorUpdate ||
+    manifest.warnings?.onMajorUpdate;
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
@@ -250,7 +254,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           updateType={updateType}
         />
       ),
-      available: manifest.warnings?.onInstall || (isInstalled && updateType)
+      available:
+        manifest.warnings?.onInstall ||
+        (areUpdateWarnings && isInstalled && updateType)
     },
     {
       name: "Disclaimer",
