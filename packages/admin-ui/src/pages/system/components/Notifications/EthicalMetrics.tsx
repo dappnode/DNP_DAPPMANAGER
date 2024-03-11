@@ -29,7 +29,7 @@ export default function EthicalMetrics() {
   }, [mail]);
 
   useEffect(() => {
-    if (ethicalMetricsConfig.data) {
+    if (ethicalMetricsConfig.data?.mail) {
       setMail(ethicalMetricsConfig.data.mail);
     }
   }, [ethicalMetricsConfig.data]);
@@ -37,10 +37,13 @@ export default function EthicalMetrics() {
   async function enableEthicalMetricsSync() {
     try {
       setReqStatusEnable({ loading: true });
-      await withToast(() => api.enableEthicalMetrics({ mail, sync: true }), {
-        message: `Enabling ethical metrics with email ${mail}...`,
-        onSuccess: `Enabled ethical metrics`
-      });
+      await withToast(
+        () => api.enableEthicalMetrics({ mail, tgChannelId: null, sync: true }),
+        {
+          message: `Enabling ethical metrics with email ${mail}...`,
+          onSuccess: `Enabled ethical metrics`
+        }
+      );
       setReqStatusEnable({ result: true });
       ethicalMetricsConfig.revalidate();
     } catch (e) {
@@ -120,10 +123,10 @@ export default function EthicalMetrics() {
 
           <Switch
             disabled={mailError}
-            checked={ethicalMetricsConfig.data.isEnabled}
-            label={ethicalMetricsConfig.data.isEnabled ? "On" : "Off"}
+            checked={ethicalMetricsConfig.data.enabled}
+            label={ethicalMetricsConfig.data.enabled ? "On" : "Off"}
             onToggle={
-              ethicalMetricsConfig.data.isEnabled
+              ethicalMetricsConfig.data.enabled
                 ? disableEthicalMetrics
                 : enableEthicalMetricsSync
             }

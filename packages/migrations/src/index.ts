@@ -9,6 +9,7 @@ import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.j
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
+import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -133,6 +134,16 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "add Dappnode peer to local IPFS node",
       coreVersion: "0.2.88",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  await changeEthicalMetricsDbFormat().catch((e) =>
+    migrationErrors.push({
+      migration: "change ethical metrics db format",
+      coreVersion: "0.2.92",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,

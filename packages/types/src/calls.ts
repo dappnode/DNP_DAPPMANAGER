@@ -53,9 +53,11 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
  * Ethical Metrics
  * ===============
  */
+
 export interface EthicalMetricsConfig {
-  isEnabled: boolean;
-  mail: string;
+  enabled: boolean;
+  mail: string | null;
+  tgChannelId: string | null;
 }
 
 /**
