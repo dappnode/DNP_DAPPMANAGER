@@ -2,7 +2,7 @@ import React from "react";
 import Switch from "react-switch";
 import "./switchBig.scss";
 
-const factor = 2;
+const factor = 1.5;
 const height = 28 * factor;
 const width = 64 * factor;
 const fontSize = 16 * factor;
@@ -31,9 +31,11 @@ export default function SwitchBig({
   onChange: (bool: boolean) => void;
   disabled?: boolean;
 }) {
+  const labelClass = checked ? 'blue-text' : '';
+
   return (
     <label htmlFor={id} className="switch-big">
-      <span>{label}</span>
+      <span className={labelClass}>{label}</span>
       <Switch
         disabled={disabled}
         checked={checked}
