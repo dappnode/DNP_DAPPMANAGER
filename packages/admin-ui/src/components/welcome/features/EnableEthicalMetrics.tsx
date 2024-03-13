@@ -16,20 +16,20 @@ export default function EnableEthicalMetrics({
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
 
-  const [telegramId, setTelegramId] = useState("");
-  const [telegramIdError, setTelegramIdError] = useState(false);
+  const [tgChannelId, setTgChannelId] = useState("");
+  const [tgChannelIdError, setTgChannelIdError] = useState(false);
 
   // regex for Telegram Channel ID validation
   useEffect(() => {
-    const regex = /^-100\d+$/; // Start with -100 followed by digits
-    if (regex.test(telegramId)) {
-      setTelegramIdError(false);
+    const regex = /^-100\d{10}$/; // Start with -100 followed by digits
+    if (regex.test(tgChannelId) || tgChannelId === "") {
+      setTgChannelIdError(false);
       setEthicalMetricsOn(true); // Enable system notifications if Telegram ID is valid
     } else {
-      setTelegramIdError(true); // Show error if Telegram ID is invalid
+      setTgChannelIdError(true); // Show error if Telegram ID is invalid
       setEthicalMetricsOn(false); // Disable system notifications if Telegram ID is invalid
     }
-  }, [telegramId]);
+  }, [tgChannelId]);
 
   // regex for email validation
   useEffect(() => {
@@ -66,18 +66,28 @@ export default function EnableEthicalMetrics({
 
       <p className="instructions">
         <p className="instructions">
-          <strong>Telegram notifications are available!</strong> Enter your <strong>Telegram Channel ID</strong> to receive reliable alerts promptly. If you don't have one, you can <a href="https://telegram.org/" target="_blank">create one now!</a> We highly recommend using the Telegram channel option (or both) rather than relying only on email notifications. Email notifications may be categorized as spam, potentially causing you to miss important notifications!
+          <strong>Telegram notifications are available!</strong> Enter your{" "}
+          <strong>Telegram Channel ID</strong> to receive reliable alerts
+          promptly. If you don't have one, you can{" "}
+          <a href="https://telegram.org/" target="_blank">
+            create one now!
+          </a>{" "}
+          We highly recommend using the Telegram channel option (or both) rather
+          than relying only on email notifications. Email notifications may be
+          categorized as spam, potentially causing you to miss important
+          notifications!
         </p>
         <p className="additional-info">
-          You can edit these settings later in <strong>System</strong> &rarr; <strong>Notifications</strong>.
+          You can edit these settings later in <strong>System</strong> &rarr;{" "}
+          <strong>Notifications</strong>.
         </p>
       </p>
 
       <Input
         prepend="Telegram"
-        value={telegramId}
-        onValueChange={setTelegramId}
-        isInvalid={telegramIdError}
+        value={tgChannelId}
+        onValueChange={setTgChannelId}
+        isInvalid={tgChannelIdError}
         required={true}
         placeholder="Your Telegram Channel ID"
       />
@@ -94,7 +104,7 @@ export default function EnableEthicalMetrics({
       {/* This top div prevents the card from stretching vertically */}
       <div>
         <SwitchBig
-          disabled={!telegramId && mailError && !ethicalMetricsOn}
+          disabled={!tgChannelId && mailError && !ethicalMetricsOn}
           checked={ethicalMetricsOn}
           onChange={setEthicalMetricsOn}
           label="Enable system notifications"

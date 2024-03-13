@@ -19,7 +19,7 @@ export default function EthicalMetrics() {
   const { theme } = React.useContext(AppContext);
 
   const ethicalMetricsConfig = useApi.getEthicalMetricsConfig();
-  const [ethicalEnabled, setEthicalEnabled] = useState(false);
+  const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
 
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
@@ -57,7 +57,7 @@ export default function EthicalMetrics() {
       ethicalMetricsData.mail && setMail(ethicalMetricsData.mail);
       ethicalMetricsData.tgChannelId &&
         setTgChannelId(ethicalMetricsData.tgChannelId);
-      setEthicalEnabled(ethicalMetricsData.enabled);
+      setEthicalMetricsOn(ethicalMetricsData.enabled);
     }
   }, [ethicalMetricsConfig.data]);
 
@@ -88,11 +88,11 @@ export default function EthicalMetrics() {
       );
       setReqStatusEnable({ result: true });
       ethicalMetricsConfig.revalidate();
-      setEthicalEnabled(true);
+      setEthicalMetricsOn(true);
     } catch (e) {
       setReqStatusEnable({ error: e });
       console.error("Error on enableEthicalMetrics", e);
-      setEthicalEnabled(false);
+      setEthicalMetricsOn(false);
     }
   }
 
@@ -105,7 +105,7 @@ export default function EthicalMetrics() {
       });
       setReqStatusDisable({ result: true });
       ethicalMetricsConfig.revalidate();
-      setEthicalEnabled(false);
+      setEthicalMetricsOn(false);
     } catch (e) {
       setReqStatusDisable({ error: e });
       console.error("Error on registerEthicalMetrics", e);
@@ -156,10 +156,10 @@ export default function EthicalMetrics() {
           <br />
           {/** TODO: show instance and register status */}
           <Switch
-            checked={ethicalEnabled}
-            label={ethicalEnabled ? "On" : "Off"}
+            checked={ethicalMetricsOn}
+            label={ethicalMetricsOn ? "On" : "Off"}
             onToggle={
-              ethicalEnabled ? disableEthicalMetrics : enableEthicalSwitch
+              ethicalMetricsOn ? disableEthicalMetrics : enableEthicalSwitch
             }
           ></Switch>
           <br />
@@ -232,7 +232,7 @@ export default function EthicalMetrics() {
             value={tgChannelId}
             onValueChange={setTgChannelId}
             append={
-              ethicalEnabled ? (
+              ethicalMetricsOn ? (
                 <Button
                   type="submit"
                   className="register-button"
@@ -266,7 +266,7 @@ export default function EthicalMetrics() {
             value={mail}
             onValueChange={setMail}
             append={
-              ethicalEnabled ? (
+              ethicalMetricsOn ? (
                 <Button
                   type="submit"
                   className="register-button"
