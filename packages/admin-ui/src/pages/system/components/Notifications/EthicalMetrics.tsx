@@ -165,11 +165,11 @@ export default function EthicalMetrics() {
           <br />
           <br />
           <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
-            <div>
+            <div className="accordion-notifications-wrapper">
               <Accordion.Toggle
                 eventKey="0"
                 onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-                className="accordion"
+                className="accordion-notifications"
               >
                 <div className="header">
                   <BsInfoCircleFill className="links-icon" />

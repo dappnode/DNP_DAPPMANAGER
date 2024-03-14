@@ -1,4 +1,4 @@
-.accordion {
+.accordion-notifications {
   border-style: none;
   background-color: transparent;
 
@@ -12,7 +12,9 @@
   .header:hover {
     text-decoration: underline;
   }
+}
 
+.accordion-notifications-wrapper {
   span {
     padding: 5px;
     border-radius: 5px;

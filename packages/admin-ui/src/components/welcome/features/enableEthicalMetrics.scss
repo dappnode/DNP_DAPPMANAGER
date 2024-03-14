@@ -3,10 +3,9 @@
   justify-content: center;
 }
 
-.accordionModal {
+.accordion-modal {
   border-style: none;
   background-color: transparent;
-  font-size: 13px;
 
   .header {
     cursor: pointer;
@@ -19,6 +18,15 @@
     text-decoration: underline;
   }
 
+  span {
+    padding: 3px;
+    border-radius: 5px;
+    background-color: lightgray;
+  }
+}
+
+.accordion-modal-wrapper {
+  font-size: 13px;
   span {
     padding: 3px;
     border-radius: 5px;

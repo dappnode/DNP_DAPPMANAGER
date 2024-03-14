@@ -29,10 +29,13 @@ export default function EnableEthicalMetrics({
 
   // useEffect to populate email field when data is available
   useEffect(() => {
-    if (ethicalMetricsConfig.data?.mail) {
-      setMail(ethicalMetricsConfig.data.mail);
-      setEthicalMetricsOn(ethicalMetricsConfig.data?.enabled);
-      setWasEthicalMetricsOn(ethicalMetricsConfig.data?.enabled);
+    const ethicalMetricsData = ethicalMetricsConfig.data;
+    if (ethicalMetricsData) {
+      ethicalMetricsData.mail && setMail(ethicalMetricsData.mail);
+      ethicalMetricsData.tgChannelId &&
+        setTgChannelId(ethicalMetricsData.tgChannelId);
+      setEthicalMetricsOn(ethicalMetricsData.enabled);
+      setWasEthicalMetricsOn(ethicalMetricsData.enabled);
     }
   }, [ethicalMetricsConfig.data]);
 
@@ -103,11 +106,11 @@ export default function EnableEthicalMetrics({
       </em>
 
       <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
-        <div>
+        <div className="accordion-modal-wrapper">
           <Accordion.Toggle
             eventKey="0"
             onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-            className="accordionModal"
+            className="accordion-modal"
           >
             <div className="header">
               <BsInfoCircleFill className="links-icon" />
@@ -152,7 +155,7 @@ export default function EnableEthicalMetrics({
         onValueChange={setTgChannelId}
         isInvalid={tgChannelIdError}
         required={true}
-        placeholder="Your Telegram Channel ID"
+        placeholder="-100XXXXXXXXXX"
       />
       {tgChannelIdError && (
         <span style={{ fontSize: "12px", color: "red" }}>
