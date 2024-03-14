@@ -2,16 +2,17 @@
   border-style: none;
   background-color: transparent;
 
-  &.header {
+  .header {
     cursor: pointer;
     display: flex;
     flex-direction: row;
     align-items: center;
     color: #3bb1f4;
   }
-  &.header:hover {
+  .header:hover {
     text-decoration: underline;
   }
+
   span {
     padding: 5px;
     border-radius: 5px;
