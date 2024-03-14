@@ -6,6 +6,7 @@
 .accordion {
     border-style: none;
     background-color: transparent;
+    font-size: 13px;
   
     .header {
       cursor: pointer;
@@ -19,10 +20,9 @@
     }
   
     span {
-      padding: 5px;
+      padding: 3px;
       border-radius: 5px;
       background-color: lightgray;
-      font-size: 9px;
     }
   }
   
