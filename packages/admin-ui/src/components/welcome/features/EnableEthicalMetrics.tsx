@@ -18,6 +18,7 @@ export default function EnableEthicalMetrics({
   onNext: () => void;
 }) {
   const ethicalMetricsConfig = useApi.getEthicalMetricsConfig();
+  const [wasEthicalMetricsOn, setWasEthicalMetricsOn] = useState(false);
   const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
@@ -30,7 +31,8 @@ export default function EnableEthicalMetrics({
   useEffect(() => {
     if (ethicalMetricsConfig.data?.mail) {
       setMail(ethicalMetricsConfig.data.mail);
-      setEthicalMetricsOn(ethicalMetricsConfig.data?.enabled)
+      setEthicalMetricsOn(ethicalMetricsConfig.data?.enabled);
+      setWasEthicalMetricsOn(ethicalMetricsConfig.data?.enabled);
     }
   }, [ethicalMetricsConfig.data]);
 
@@ -77,17 +79,6 @@ export default function EnableEthicalMetrics({
     }
   }
 
-  function onSetEnableEthicalMetrics() {
-    if (ethicalMetricsOn) {
-      const tgChannelIdValue = tgChannelId && !tgChannelIdError ? tgChannelId : null;
-      const mailValue = mail && !mailError ? mail : null;
-      enableEthicalMetricsSync({ mailValue, tgChannelIdValue });
-    }
-    onNext();
-  }
-
-  console.log("Ethical Metrics On:", ethicalMetricsOn);
-
   return (
     <div className="ethical-container">
       <div className="header">
@@ -101,16 +92,22 @@ export default function EnableEthicalMetrics({
 
       <p className="instructions">
         <strong>Telegram notifications are available!</strong> Enter your{" "}
-        <strong>Telegram Channel ID</strong> to receive reliable alerts promptly.
+        <strong>Telegram Channel ID</strong> to receive reliable alerts
+        promptly.
       </p>
-      <em>Advice: We highly recommend using the Telegram channel option (or both) rather than relying only on email notifications. Email notifications may be categorized as spam, potentially causing you to miss important notifications!</em>
+      <em>
+        Advice: We highly recommend using the Telegram channel option (or both)
+        rather than relying only on email notifications. Email notifications may
+        be categorized as spam, potentially causing you to miss important
+        notifications!
+      </em>
 
       <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
         <div>
           <Accordion.Toggle
             eventKey="0"
             onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-            className="accordion"
+            className="accordionModal"
           >
             <div className="header">
               <BsInfoCircleFill className="links-icon" />
@@ -123,11 +120,8 @@ export default function EnableEthicalMetrics({
               <ol>
                 <li>Create a private channel in your telegram.</li>
                 <li>
-                  Add dappnode bot{" "}
-                  <span>
-                    @ethicalMetricsAlerts_bot
-                  </span>{" "}
-                  to the channel as an administrator.
+                  Add dappnode bot <span>@ethicalMetricsAlerts_bot</span> to the
+                  channel as an administrator.
                 </li>
                 <li>
                   Open telegram in a web browser{" "}
@@ -135,28 +129,15 @@ export default function EnableEthicalMetrics({
                   open the channel.
                 </li>
                 <li>
-                  Copy the channel id from the url. The channel Id is the
-                  number of 13 digits that comes just after the{" "}
-                  <span>
-                    -
-                  </span>{" "}
-                  in the url. It always starts with{" "}
-                  <span>
-                    -100
-                  </span>
-                  . While coping it, make sure to include the{" "}
-                  <span>
-                    -
-                  </span>{" "}
-                  just before the number!
+                  Copy the channel id from the url. The channel Id is the number
+                  of 13 digits that comes just after the <span>-</span> in the
+                  url. It always starts with <span>-100</span>. While coping it,
+                  make sure to include the <span>-</span> just before the
+                  number!
                 </li>
                 <li>
                   Paste it in the Telegram Channel Id field and toggle the
-                  switch{" "}
-                  <span>
-                    ON
-                  </span>{" "}
-                  to start receiving notifications.
+                  switch <span>ON</span> to start receiving notifications.
                 </li>
               </ol>
             </div>
@@ -196,7 +177,7 @@ export default function EnableEthicalMetrics({
 
       {/* This top div prevents the card from stretching vertically */}
       <div>
-        {ethicalMetricsOn ? (
+        {wasEthicalMetricsOn ? (
           // Render the "Update" button if ethical metrics are enabled
           <div className="update-button">
             <Button
@@ -209,11 +190,13 @@ export default function EnableEthicalMetrics({
               }
               variant="dappnode"
               disabled={
-                tgChannelId === "" && mail === "" ||
-                tgChannelIdError && mailError ||
-                tgChannelIdError && mail === "" ||
-                tgChannelId === "" && mailError ||
-                mail === ethicalMetricsConfig.data?.mail && tgChannelId === ""
+                (tgChannelId === "" && mail === "") ||
+                (tgChannelIdError && mailError) ||
+                (tgChannelIdError && mail === "") ||
+                (tgChannelId === "" && mailError) ||
+                (mail === ethicalMetricsConfig.data?.mail &&
+                  tgChannelId === "") ||
+                (mail === ethicalMetricsConfig.data?.mail && tgChannelIdError)
               }
             >
               Update
@@ -221,16 +204,21 @@ export default function EnableEthicalMetrics({
           </div>
         ) : (
           <SwitchBig
-            disabled={mailError}
+            disabled={
+              (tgChannelId === "" && mail === "") ||
+              (tgChannelIdError && mailError) ||
+              (tgChannelIdError && mail === "") ||
+              (tgChannelId === "" && mailError)
+            }
             checked={ethicalMetricsOn}
-            onChange={() => setEthicalMetricsOn(true)}
+            onChange={() => setEthicalMetricsOn(!ethicalMetricsOn)}
             label="Enable system notifications"
             id="enable-ethical-metrics"
           />
         )}
       </div>
 
-      <BottomButtons onBack={onBack} onNext={onSetEnableEthicalMetrics} />
+      <BottomButtons onBack={onBack} onNext={() => onNext()} />
 
       {validationMessage && (
         <p className="validation-message">{validationMessage}</p>

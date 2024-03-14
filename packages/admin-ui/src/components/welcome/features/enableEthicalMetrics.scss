@@ -1,29 +1,27 @@
 .update-button {
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
-.accordion {
-    border-style: none;
-    background-color: transparent;
-    font-size: 13px;
-  
-    .header {
-      cursor: pointer;
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      color: #3bb1f4;
-    }
-    .header:hover {
-      text-decoration: underline;
-    }
-  
-    span {
-      padding: 3px;
-      border-radius: 5px;
-      background-color: lightgray;
-    }
+.accordionModal {
+  border-style: none;
+  background-color: transparent;
+  font-size: 13px;
+
+  .header {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: #3bb1f4;
   }
-  
-  
+  .header:hover {
+    text-decoration: underline;
+  }
+
+  span {
+    padding: 3px;
+    border-radius: 5px;
+    background-color: lightgray;
+  }
+}
