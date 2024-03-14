@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
 import SwitchBig from "components/SwitchBig";
-import { api } from "api";
+import { api, useApi } from "api";
 import Input from "components/Input";
 import { docsUrl } from "params";
+import Form from "react-bootstrap/esm/Form";
+import Button from "components/Button";
+import { Accordion } from "react-bootstrap";
+import { BsInfoCircleFill } from "react-icons/bs";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
+import "./enableEthicalMetrics.scss";
 
 export default function EnableEthicalMetrics({
   onBack,
@@ -12,46 +18,76 @@ export default function EnableEthicalMetrics({
   onBack?: () => void;
   onNext: () => void;
 }) {
+  const ethicalMetricsConfig = useApi.getEthicalMetricsConfig();
   const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
-
   const [tgChannelId, setTgChannelId] = useState("");
   const [tgChannelIdError, setTgChannelIdError] = useState(false);
+  const [validationMessage, setValidationMessage] = useState("");
+  const [tgAccordionOpen, setTgAccordionOpen] = useState(false);
 
-  // regex for Telegram Channel ID validation
+  // useEffect to populate email field when data is available
   useEffect(() => {
-    const regex = /^-100\d{10}$/; // Start with -100 followed by digits
-    if (regex.test(tgChannelId) || tgChannelId === "") {
-      setTgChannelIdError(false);
-      setEthicalMetricsOn(true); // Enable system notifications if Telegram ID is valid
-    } else {
-      setTgChannelIdError(true); // Show error if Telegram ID is invalid
-      setEthicalMetricsOn(false); // Disable system notifications if Telegram ID is invalid
+    if (ethicalMetricsConfig.data?.mail) {
+      setMail(ethicalMetricsConfig.data.mail);
+      setEthicalMetricsOn(ethicalMetricsConfig.data?.enabled)
     }
-  }, [tgChannelId]);
+  }, [ethicalMetricsConfig.data]);
 
-  // regex for email validation
+  // effect and regex for email validation
   useEffect(() => {
     const regex = /\S+@\S+\.\S+/;
-    if (regex.test(mail)) {
+    if (regex.test(mail) || mail === "") {
       setMailError(false);
-      setEthicalMetricsOn(true);
     } else {
       setMailError(true);
-      setEthicalMetricsOn(false);
     }
   }, [mail]);
 
-  function onSetEnabeEthicalMetrics() {
-    if (ethicalMetricsOn)
-      api
-        .enableEthicalMetrics({ mail, tgChannelId: null, sync: false })
-        .catch(e => {
-          console.error(`Error on autoUpdateSettingsEdit : ${e.stack}`);
-        });
+  // effect and regex for telegram channelId validation
+  useEffect(() => {
+    const regex = /^-100\d{10}$/;
+    if (regex.test(tgChannelId) || tgChannelId === "") {
+      setTgChannelIdError(false);
+    } else {
+      setTgChannelIdError(true);
+    }
+  }, [tgChannelId]);
+
+  async function enableEthicalMetricsSync({
+    mailValue,
+    tgChannelIdValue
+  }: {
+    mailValue?: string | null;
+    tgChannelIdValue?: string | null;
+  }) {
+    try {
+      setValidationMessage("Enabling ethical metrics...");
+      await api.enableEthicalMetrics({
+        mail: mailValue || mail,
+        tgChannelId: tgChannelIdValue || tgChannelId,
+        sync: true
+      });
+      setEthicalMetricsOn(true);
+      setValidationMessage("Ethical metrics enabled successfully.");
+      onNext();
+    } catch (error) {
+      setValidationMessage("Error enabling ethical metrics.");
+      console.error("Error enabling ethical metrics:", error);
+    }
+  }
+
+  function onSetEnableEthicalMetrics() {
+    if (ethicalMetricsOn) {
+      const tgChannelIdValue = tgChannelId && !tgChannelIdError ? tgChannelId : null;
+      const mailValue = mail && !mailError ? mail : null;
+      enableEthicalMetricsSync({ mailValue, tgChannelIdValue });
+    }
     onNext();
   }
+
+  console.log("Ethical Metrics On:", ethicalMetricsOn);
 
   return (
     <div className="ethical-container">
@@ -65,24 +101,71 @@ export default function EnableEthicalMetrics({
       </div>
 
       <p className="instructions">
-        <p className="instructions">
-          <strong>Telegram notifications are available!</strong> Enter your{" "}
-          <strong>Telegram Channel ID</strong> to receive reliable alerts
-          promptly. If you don't have one, you can{" "}
-          <a href="https://telegram.org/" target="_blank">
-            create one now!
-          </a>{" "}
-          We highly recommend using the Telegram channel option (or both) rather
-          than relying only on email notifications. Email notifications may be
-          categorized as spam, potentially causing you to miss important
-          notifications!
-        </p>
-        <p className="additional-info">
-          You can edit these settings later in <strong>System</strong> &rarr;{" "}
-          <strong>Notifications</strong>.
-        </p>
+        <strong>Telegram notifications are available!</strong> Enter your{" "}
+        <strong>Telegram Channel ID</strong> to receive reliable alerts promptly.
       </p>
+      <em>Advice: We highly recommend using the Telegram channel option (or both) rather than relying only on email notifications. Email notifications may be categorized as spam, potentially causing you to miss important notifications!</em>
 
+      <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
+        <div>
+          <Accordion.Toggle
+            eventKey="0"
+            onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
+            className="accordion"
+          >
+            <div className="header">
+              <BsInfoCircleFill className="links-icon" />
+              How can I get a Telegram channel Id?{" "}
+              {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+            </div>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey="0">
+            <div>
+              <ol>
+                <li>Create a private channel in your telegram.</li>
+                <li>
+                  Add dappnode bot{" "}
+                  <span>
+                    @ethicalMetricsAlerts_bot
+                  </span>{" "}
+                  to the channel as an administrator.
+                </li>
+                <li>
+                  Open telegram in a web browser{" "}
+                  <a href="https://web.telegram.org/">(Telegram web)</a> and
+                  open the channel.
+                </li>
+                <li>
+                  Copy the channel id from the url. The channel Id is the
+                  number of 13 digits that comes just after the{" "}
+                  <span>
+                    -
+                  </span>{" "}
+                  in the url. It always starts with{" "}
+                  <span>
+                    -100
+                  </span>
+                  . While coping it, make sure to include the{" "}
+                  <span>
+                    -
+                  </span>{" "}
+                  just before the number!
+                </li>
+                <li>
+                  Paste it in the Telegram Channel Id field and toggle the
+                  switch{" "}
+                  <span>
+                    ON
+                  </span>{" "}
+                  to start receiving notifications.
+                </li>
+              </ol>
+            </div>
+          </Accordion.Collapse>
+        </div>
+      </Accordion>
+
+      <span>Ethical metrics notifications by telegram channel</span>
       <Input
         prepend="Telegram"
         value={tgChannelId}
@@ -91,7 +174,13 @@ export default function EnableEthicalMetrics({
         required={true}
         placeholder="Your Telegram Channel ID"
       />
+      {tgChannelIdError && (
+        <span style={{ fontSize: "12px", color: "red" }}>
+          Telegram channel Id format is incorrect
+        </span>
+      )}
 
+      <span>Ethical metrics notifications by email</span>
       <Input
         prepend="Email"
         value={mail}
@@ -100,19 +189,53 @@ export default function EnableEthicalMetrics({
         required={true}
         placeholder="example@email.com"
       />
+      {mailError && (
+        <span style={{ fontSize: "12px", color: "red" }}>
+          Email format is incorrect
+        </span>
+      )}
 
       {/* This top div prevents the card from stretching vertically */}
       <div>
-        <SwitchBig
-          disabled={!tgChannelId && mailError && !ethicalMetricsOn}
-          checked={ethicalMetricsOn}
-          onChange={setEthicalMetricsOn}
-          label="Enable system notifications"
-          id="enable-ethical-metrics"
-        />
+        {ethicalMetricsOn ? (
+          // Render the "Update" button if ethical metrics are enabled
+          <div className="update-button">
+            <Button
+              type="submit"
+              onClick={() =>
+                enableEthicalMetricsSync({
+                  tgChannelIdValue: tgChannelId,
+                  mailValue: mail
+                })
+              }
+              variant="dappnode"
+              disabled={
+                tgChannelId === "" && mail === "" ||
+                tgChannelIdError && mailError ||
+                tgChannelIdError && mail === "" ||
+                tgChannelId === "" && mailError ||
+                mail === ethicalMetricsConfig.data?.mail && tgChannelId === ""
+              }
+            >
+              Update
+            </Button>
+          </div>
+        ) : (
+          <SwitchBig
+            disabled={mailError}
+            checked={ethicalMetricsOn}
+            onChange={() => setEthicalMetricsOn(true)}
+            label="Enable system notifications"
+            id="enable-ethical-metrics"
+          />
+        )}
       </div>
 
-      <BottomButtons onBack={onBack} onNext={onSetEnabeEthicalMetrics} />
+      <BottomButtons onBack={onBack} onNext={onSetEnableEthicalMetrics} />
+
+      {validationMessage && (
+        <p className="validation-message">{validationMessage}</p>
+      )}
     </div>
   );
 }
