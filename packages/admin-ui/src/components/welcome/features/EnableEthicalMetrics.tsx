@@ -4,7 +4,6 @@ import SwitchBig from "components/SwitchBig";
 import { api, useApi } from "api";
 import Input from "components/Input";
 import { docsUrl } from "params";
-import Form from "react-bootstrap/esm/Form";
 import Button from "components/Button";
 import { Accordion } from "react-bootstrap";
 import { BsInfoCircleFill } from "react-icons/bs";
