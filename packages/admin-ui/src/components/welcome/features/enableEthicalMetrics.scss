@@ -17,15 +17,13 @@
     .header:hover {
       text-decoration: underline;
     }
+  
     span {
       padding: 5px;
       border-radius: 5px;
-      &.light {
-        background-color: lightgray;
-      }
-      &.dark {
-        background-color: dimgray;
-      }
+      background-color: lightgray;
+      font-size: 9px;
     }
   }
+  
   
