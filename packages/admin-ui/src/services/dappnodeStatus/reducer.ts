@@ -17,6 +17,7 @@ interface DappnodeStatusState {
   rebootRequiredScript: RebootRequiredScript | null;
   shouldShowSmooth: boolean | null;
   isConnectedToInternet: boolean | null;
+  ipfsResolves: boolean | null;
 }
 
 const initialState: DappnodeStatusState = {
@@ -26,7 +27,8 @@ const initialState: DappnodeStatusState = {
   volumes: [],
   rebootRequiredScript: null,
   shouldShowSmooth: null,
-  isConnectedToInternet: null
+  isConnectedToInternet: null,
+  ipfsResolves: null
 };
 
 export const dappnodeStatus = createSlice({
