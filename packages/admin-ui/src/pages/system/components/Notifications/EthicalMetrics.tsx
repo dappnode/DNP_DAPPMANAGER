@@ -112,13 +112,6 @@ export default function EthicalMetrics() {
     }
   }
 
-  function enableEthicalSwitch() {
-    enableEthicalMetricsSync({
-      mailValue: mail && !mailError ? mail : null,
-      tgChannelIdValue: tgChannelId && !tgChannelIdError ? tgChannelId : null
-    });
-  }
-
   return (
     <Card spacing>
       <div>
@@ -159,7 +152,14 @@ export default function EthicalMetrics() {
             checked={ethicalMetricsOn}
             label={ethicalMetricsOn ? "On" : "Off"}
             onToggle={
-              ethicalMetricsOn ? disableEthicalMetrics : enableEthicalSwitch
+              ethicalMetricsOn
+                ? disableEthicalMetrics
+                : () =>
+                    enableEthicalMetricsSync({
+                      mailValue: mail && !mailError ? mail : null,
+                      tgChannelIdValue:
+                        tgChannelId && !tgChannelIdError ? tgChannelId : null
+                    })
             }
           ></Switch>
           <br />

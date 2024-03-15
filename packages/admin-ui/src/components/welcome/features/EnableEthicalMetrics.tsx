@@ -63,17 +63,26 @@ export default function EnableEthicalMetrics({
     try {
       setValidationMessage("Enabling ethical metrics...");
       await api.enableEthicalMetrics({
-        mail,
-        tgChannelId,
+        mail: mailValue ? mailValue : null,
+        tgChannelId: tgChannelIdValue ? tgChannelIdValue : null,
         sync: true
       });
       setEthicalMetricsOn(true);
       setValidationMessage("Ethical metrics enabled successfully.");
-      onNext();
     } catch (error) {
       setValidationMessage("Error enabling ethical metrics.");
       console.error("Error enabling ethical metrics:", error);
     }
+  }
+
+  function toggleEthicalSwitch() {
+    if (!ethicalMetricsOn) {
+      enableEthicalMetricsSync({
+        tgChannelIdValue: tgChannelId,
+        mailValue: mail
+      });
+    }
+    setEthicalMetricsOn(!ethicalMetricsOn);
   }
 
   return (
@@ -203,7 +212,7 @@ export default function EnableEthicalMetrics({
               (tgChannelId === "" && mailError)
             }
             checked={ethicalMetricsOn}
-            onChange={() => setEthicalMetricsOn(!ethicalMetricsOn)}
+            onChange={toggleEthicalSwitch}
             label="Enable system notifications"
             id="enable-ethical-metrics"
           />
