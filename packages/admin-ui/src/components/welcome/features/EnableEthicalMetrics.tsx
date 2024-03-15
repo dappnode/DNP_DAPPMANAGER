@@ -59,18 +59,12 @@ export default function EnableEthicalMetrics({
     }
   }, [tgChannelId]);
 
-  async function enableEthicalMetricsSync({
-    mailValue,
-    tgChannelIdValue
-  }: {
-    mailValue?: string | null;
-    tgChannelIdValue?: string | null;
-  }) {
+  async function enableEthicalMetricsSync() {
     try {
       setValidationMessage("Enabling ethical metrics...");
       await api.enableEthicalMetrics({
-        mail: mailValue || mail,
-        tgChannelId: tgChannelIdValue || tgChannelId,
+        mail,
+        tgChannelId,
         sync: true
       });
       setEthicalMetricsOn(true);
@@ -185,12 +179,7 @@ export default function EnableEthicalMetrics({
           <div className="update-button">
             <Button
               type="submit"
-              onClick={() =>
-                enableEthicalMetricsSync({
-                  tgChannelIdValue: tgChannelId,
-                  mailValue: mail
-                })
-              }
+              onClick={enableEthicalMetricsSync}
               variant="dappnode"
               disabled={
                 (tgChannelId === "" && mail === "") ||
