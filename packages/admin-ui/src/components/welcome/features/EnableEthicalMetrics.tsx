@@ -69,11 +69,22 @@ export default function EnableEthicalMetrics({
       });
       setEthicalMetricsOn(true);
       setValidationMessage("Ethical metrics enabled successfully.");
+      await ethicalMetricsConfig.revalidate()
     } catch (error) {
       setValidationMessage("Error enabling ethical metrics.");
       console.error("Error enabling ethical metrics:", error);
     }
   }
+
+  // clear the success message after 5 seconds
+  useEffect(() => {
+    if (validationMessage === "Ethical metrics enabled successfully.") {
+      const timer = setTimeout(() => {
+        setValidationMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [validationMessage]);
 
   function toggleEthicalSwitch() {
     if (!ethicalMetricsOn) {
@@ -186,16 +197,20 @@ export default function EnableEthicalMetrics({
           <div className="update-button">
             <Button
               type="submit"
-              onClick={enableEthicalMetricsSync}
+              onClick={async () => {
+                setValidationMessage("");
+                await enableEthicalMetricsSync();
+              }}
               variant="dappnode"
               disabled={
-                (tgChannelId === "" && mail === "") ||
-                (tgChannelIdError && mailError) ||
-                (tgChannelIdError && mail === "") ||
-                (tgChannelId === "" && mailError) ||
-                (mail === ethicalMetricsConfig.data?.mail &&
-                  tgChannelId === "") ||
-                (mail === ethicalMetricsConfig.data?.mail && tgChannelIdError)
+                (tgChannelId === "" && mail === "") || // No input provided
+                (tgChannelIdError && mailError) || // Both inputs have errors
+                (tgChannelIdError && mail === "") || // Only tgChannelId has error
+                (tgChannelId === "" && mailError) || // Only mail has error
+                (mail === ethicalMetricsConfig.data?.mail && tgChannelId === "") || // No changes
+                (mail === ethicalMetricsConfig.data?.mail && tgChannelId === ethicalMetricsConfig.data?.tgChannelId) || // No changes
+                (mail === ethicalMetricsConfig.data?.mail && tgChannelIdError) || // No changes with tgChannelId error
+                (validationMessage !== "") // Asynchronous operation in progress
               }
             >
               Update
