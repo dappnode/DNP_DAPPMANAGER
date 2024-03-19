@@ -124,10 +124,9 @@ export default function EthicalMetrics() {
   return (
     <Card spacing>
       <div>
-        You will receive a notification if your{" "}
-        <strong>dappnode is down</strong> for atleast 6 hours into your telegram
-        or email. Telemetry is tracked anonymously and no personal data is
-        collected.
+        Receive notifications if your <strong>dappnode remains offline</strong>{" "}
+        for at least 6 hours, sent to either your Telegram or email. Telemetry
+        is collected anonymously to ensure no personal data is retained.
       </div>
       <div>
         <span style={{ fontWeight: "bold" }}>Advice: </span>
