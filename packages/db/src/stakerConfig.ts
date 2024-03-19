@@ -114,6 +114,7 @@ export const mevBoostPrater = interceptGlobalEnvOnSet(
 
 const CONSENSUS_CLIENT_HOLESKY = "consensus-client-holesky";
 const EXECUTION_CLIENT_HOLESKY = "execution-client-holesky";
+const MEVBOOST_HOLESKY = "mevboost-holesky";
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
@@ -133,6 +134,11 @@ export const executionClientHolesky = interceptGlobalEnvOnSet(
     null
   ),
   Object.keys({ EXECUTION_CLIENT_HOLESKY })[0]
+);
+
+export const mevBoostHolesky = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_HOLESKY, false),
+  Object.keys({ MEVBOOST_HOLESKY })[0]
 );
 
 // LUKSO

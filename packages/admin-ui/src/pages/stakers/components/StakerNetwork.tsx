@@ -233,7 +233,7 @@ export default function StakerNetwork<T extends Network>({
                   isSelected={newEnableWeb3signer}
                 />
               </Col>
-              {(network === "prater" || network === "mainnet") && (
+              {(network === "prater" || network === "mainnet" || network === "holesky") && (
                 <Col>
                   <SubTitle>Mev Boost</SubTitle>
                   <MevBoost
