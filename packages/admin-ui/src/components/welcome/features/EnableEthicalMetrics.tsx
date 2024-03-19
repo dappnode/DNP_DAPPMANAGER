@@ -203,14 +203,18 @@ export default function EnableEthicalMetrics({
               }}
               variant="dappnode"
               disabled={
-                (tgChannelId === "" && mail === "") || // No input provided
-                (tgChannelIdError && mailError) || // Both inputs have errors
-                (tgChannelIdError && mail === "") || // Only tgChannelId has error
-                (tgChannelId === "" && mailError) || // Only mail has error
-                (mail === ethicalMetricsConfig.data?.mail && tgChannelId === "") || // No changes
-                (mail === ethicalMetricsConfig.data?.mail && tgChannelId === ethicalMetricsConfig.data?.tgChannelId) || // No changes
-                (mail === ethicalMetricsConfig.data?.mail && tgChannelIdError) || // No changes with tgChannelId error
-                (validationMessage !== "") // Asynchronous operation in progress
+                // No input provided or both inputs have errors
+                (tgChannelId === "" && mail === "") || (tgChannelIdError && mailError) ||
+                // Only tgChannelId has error or only mail has error
+                (tgChannelIdError && mail === "") || (tgChannelId === "" && mailError) ||
+                // No changes in mail or tgChannelId
+                (mail === ethicalMetricsConfig.data?.mail && (
+                  tgChannelId === "" ||
+                  tgChannelId === ethicalMetricsConfig.data?.tgChannelId ||
+                  tgChannelIdError
+                )) ||
+                // Asynchronous operation in progress
+                (validationMessage !== "")
               }
             >
               Update
