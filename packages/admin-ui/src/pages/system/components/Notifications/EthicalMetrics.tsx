@@ -55,9 +55,8 @@ export default function EthicalMetrics() {
   useEffect(() => {
     const ethicalMetricsData = ethicalMetricsConfig.data;
     if (ethicalMetricsData) {
-      ethicalMetricsData.mail && setMail(ethicalMetricsData.mail);
-      ethicalMetricsData.tgChannelId &&
-        setTgChannelId(ethicalMetricsData.tgChannelId);
+      setMail(ethicalMetricsData.mail || "");
+      setTgChannelId(ethicalMetricsData.tgChannelId || "");
       setEthicalMetricsOn(ethicalMetricsData.enabled);
     }
   }, [ethicalMetricsConfig.data]);
@@ -88,7 +87,7 @@ export default function EthicalMetrics() {
         }
       );
       setReqStatusEnable({ result: true });
-      ethicalMetricsConfig.revalidate();
+      await ethicalMetricsConfig.revalidate();
       setEthicalMetricsOn(true);
     } catch (e) {
       setReqStatusEnable({ error: e });
@@ -114,7 +113,7 @@ export default function EthicalMetrics() {
         onSuccess: `Disabled ethical metrics`
       });
       setReqStatusDisable({ result: true });
-      ethicalMetricsConfig.revalidate();
+      await ethicalMetricsConfig.revalidate();
       setEthicalMetricsOn(false);
     } catch (e) {
       setReqStatusDisable({ error: e });
