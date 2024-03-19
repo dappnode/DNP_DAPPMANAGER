@@ -75,7 +75,6 @@ export default function EnableEthicalMetrics({
     }
   }
 
-
   function toggleEthicalSwitch() {
     if (!ethicalMetricsOn) {
       enableEthicalMetricsSync();
@@ -88,9 +87,10 @@ export default function EnableEthicalMetrics({
       <div className="header">
         <div className="title">Enable System Notifications</div>
         <div className="description">
-          Enable ethical metrics and receive alerts whenever your dappnode is
-          down without losing your privacy.{" "}
-          <a href={docsUrl.ethicalMetricsOverview}>Learn more</a>
+          <p className="description-text">
+            <span className="highlight">Enable ethical metrics</span> and receive alerts whenever your dappnode is down without compromising your privacy.
+            <span className="note"> Note: Ethical Metrics requires the Dappnode Monitoring Service (DMS) as a dependency.</span> <a href={docsUrl.ethicalMetricsOverview} className="learn-more">Learn more</a>
+          </p>
         </div>
       </div>
 
@@ -99,8 +99,8 @@ export default function EnableEthicalMetrics({
         <strong>Telegram Channel ID</strong> to receive reliable alerts
         promptly.
       </p>
-      <em>
-        Advice: We highly recommend using the Telegram channel option (or both)
+      <em className="advice">
+        <strong>Advice: </strong> We highly recommend using the Telegram channel option (or both)
         rather than relying only on email notifications. Email notifications may
         be categorized as spam, potentially causing you to miss important
         notifications!
