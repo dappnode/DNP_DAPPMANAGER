@@ -4,7 +4,6 @@ import Card from "components/Card";
 import ErrorView from "components/ErrorView";
 import Input from "components/Input";
 import Ok from "components/Ok";
-import Switch from "components/Switch";
 import { withToast } from "components/toast/Toast";
 import React, { useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
@@ -14,6 +13,8 @@ import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { ReqStatus } from "types";
 import "./ethicalMetrics.scss";
 import { AppContext } from "App";
+import SwitchBig from "components/SwitchBig";
+import { confirm } from "components/ConfirmDialog";
 
 export default function EthicalMetrics() {
   const { theme } = React.useContext(AppContext);
@@ -96,6 +97,15 @@ export default function EthicalMetrics() {
     }
   }
 
+  function disableConfirmation() {
+    confirm({
+      title: `Disabling Ethical Metrics`,
+      text: `Are you sure you want to disable Ethical Metrics? That way yo won't receive any notifications when your dappnode goes down!`,
+      label: "Disable",
+      onClick: disableEthicalMetrics
+    });
+  }
+
   async function disableEthicalMetrics() {
     try {
       setReqStatusDisable({ loading: true });
@@ -115,26 +125,10 @@ export default function EthicalMetrics() {
   return (
     <Card spacing>
       <div>
-        Receive notifications about the status of your dappnode directly into
-        your telegram or email. Telemetry is tracked anonymously and no personal
-        data is collected.
-      </div>
-      <div>
-        The notifications you will receive are:
-        <ul>
-          <li>
-            <strong>Dappnode down</strong>: You will receive a notification if
-            your dappnode is down for more than 30 minutes.
-          </li>
-          <li>
-            <strong>CPU over 80%</strong>: You will receive a notification if
-            your CPU is over 80% for more than 30 minutes.
-          </li>
-          <li>
-            <strong>CPU over 90%</strong>: You will receive a notification if
-            your CPU is over 90% for more than 30 minutes.
-          </li>
-        </ul>
+        You will receive a notification if your{" "}
+        <strong>dappnode is down</strong> for atleast 6 hours into your telegram
+        or email. Telemetry is tracked anonymously and no personal data is
+        collected.
       </div>
       <div>
         <span style={{ fontWeight: "bold" }}>Advice: </span>
@@ -148,22 +142,77 @@ export default function EthicalMetrics() {
           <Form.Label>Ethical metrics status</Form.Label>
           <br />
           {/** TODO: show instance and register status */}
-          <Switch
-            checked={ethicalMetricsOn}
-            label={ethicalMetricsOn ? "On" : "Off"}
-            onToggle={
-              ethicalMetricsOn
-                ? disableEthicalMetrics
-                : () =>
-                    enableEthicalMetricsSync({
-                      mailValue: mail && !mailError ? mail : null,
-                      tgChannelIdValue:
-                        tgChannelId && !tgChannelIdError ? tgChannelId : null
-                    })
+          <div style={{ display: "inline-block" }}>
+            <SwitchBig
+              disabled={
+                (tgChannelId === "" && mail === "") ||
+                mailError ||
+                tgChannelIdError
+              }
+              checked={ethicalMetricsOn}
+              onChange={
+                ethicalMetricsOn
+                  ? disableConfirmation
+                  : () =>
+                      enableEthicalMetricsSync({
+                        mailValue: mail && !mailError ? mail : null,
+                        tgChannelIdValue:
+                          tgChannelId && !tgChannelIdError ? tgChannelId : null
+                      })
+              }
+              label={""}
+              id="enable-ethical-metrics"
+              factor={1}
+            />
+          </div>
+          {!ethicalMetricsOn && (
+            <>
+              <br />
+              <span
+                style={{
+                  fontStyle: "italic",
+                  fontSize: "14px",
+                  color: "var(--dappnode-strong-main-color)"
+                }}
+              >
+                You must provide a Telegram channel ID or an email to enable
+                ethical metrics notifications
+              </span>
+            </>
+          )}
+          <br />
+          <br />
+
+          <Form.Label>
+            Ethical metrics notifications by telegram channel
+          </Form.Label>
+          <Input
+            placeholder="Telegram Channel Id"
+            isInvalid={tgChannelIdError}
+            value={tgChannelId}
+            onValueChange={setTgChannelId}
+            append={
+              ethicalMetricsOn ? (
+                <Button
+                  type="submit"
+                  className="register-button"
+                  onClick={() =>
+                    enableEthicalMetricsSync({ tgChannelIdValue: tgChannelId })
+                  }
+                  variant="dappnode"
+                  disabled={
+                    tgChannelId === "" ||
+                    tgChannelId === ethicalMetricsConfig.data.tgChannelId ||
+                    tgChannelIdError
+                  }
+                >
+                  Update
+                </Button>
+              ) : (
+                <></>
+              )
             }
-          ></Switch>
-          <br />
-          <br />
+          />
           <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
             <div className="accordion-notifications-wrapper">
               <Accordion.Toggle
@@ -172,7 +221,10 @@ export default function EthicalMetrics() {
                 className="accordion-notifications"
               >
                 <div className="header">
-                  <BsInfoCircleFill className="links-icon" />
+                  <BsInfoCircleFill
+                    className="links-icon"
+                    style={{ fontSize: "14px" }}
+                  />
                   How can I get a Telegram channel Id?{" "}
                   {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
                 </div>
@@ -222,37 +274,6 @@ export default function EthicalMetrics() {
               </Accordion.Collapse>
             </div>
           </Accordion>
-          <br />
-          <Form.Label>
-            Ethical metrics notifications by telegram channel
-          </Form.Label>
-          <Input
-            placeholder="Telegram Channel Id"
-            isInvalid={tgChannelIdError}
-            value={tgChannelId}
-            onValueChange={setTgChannelId}
-            append={
-              ethicalMetricsOn ? (
-                <Button
-                  type="submit"
-                  className="register-button"
-                  onClick={() =>
-                    enableEthicalMetricsSync({ tgChannelIdValue: tgChannelId })
-                  }
-                  variant="dappnode"
-                  disabled={
-                    tgChannelId === "" ||
-                    tgChannelId === ethicalMetricsConfig.data.tgChannelId ||
-                    tgChannelIdError
-                  }
-                >
-                  Update
-                </Button>
-              ) : (
-                <></>
-              )
-            }
-          />
           {tgChannelIdError && (
             <span style={{ fontSize: "12px", color: "red" }}>
               Telegram channel Id format is incorrect
