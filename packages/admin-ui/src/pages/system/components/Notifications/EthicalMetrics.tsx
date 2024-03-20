@@ -76,13 +76,12 @@ export default function EthicalMetrics() {
             sync: true
           }),
         {
-          message: `Enabling ethical metrics via ${
-            mailValue && tgChannelIdValue
+          message: `Enabling ethical metrics via ${mailValue && tgChannelIdValue
               ? "telegram channel and email"
               : mailValue
-              ? "email"
-              : tgChannelId && "telegram channel"
-          }`,
+                ? "email"
+                : tgChannelId && "telegram channel"
+            }`,
           onSuccess: `Enabled ethical metrics`
         }
       );
@@ -152,11 +151,11 @@ export default function EthicalMetrics() {
                 ethicalMetricsOn
                   ? disableConfirmation
                   : () =>
-                      enableEthicalMetricsSync({
-                        mailValue: mail && !mailError ? mail : null,
-                        tgChannelIdValue:
-                          tgChannelId && !tgChannelIdError ? tgChannelId : null
-                      })
+                    enableEthicalMetricsSync({
+                      mailValue: mail && !mailError ? mail : null,
+                      tgChannelIdValue:
+                        tgChannelId && !tgChannelIdError ? tgChannelId : null
+                    })
               }
               label={""}
               id="enable-ethical-metrics"
@@ -240,7 +239,7 @@ export default function EthicalMetrics() {
                     </li>
                     <li>
                       Open telegram in a web browser{" "}
-                      <a href="https://web.telegram.org/">(Telegram web)</a> and
+                      <a href="https://web.telegram.org/" target="_blank">(Telegram web)</a> and
                       open the channel.
                     </li>
                     <li>

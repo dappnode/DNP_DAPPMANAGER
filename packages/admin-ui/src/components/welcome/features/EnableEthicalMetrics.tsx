@@ -31,9 +31,8 @@ export default function EnableEthicalMetrics({
   useEffect(() => {
     const ethicalMetricsData = ethicalMetricsConfig.data;
     if (ethicalMetricsData) {
-      ethicalMetricsData.mail && setMail(ethicalMetricsData.mail);
-      ethicalMetricsData.tgChannelId &&
-        setTgChannelId(ethicalMetricsData.tgChannelId);
+      setMail(ethicalMetricsData.mail || "");
+      setTgChannelId(ethicalMetricsData.tgChannelId || "");
       setEthicalMetricsOn(ethicalMetricsData.enabled);
       setWasEthicalMetricsOn(ethicalMetricsData.enabled);
     }
@@ -117,6 +116,15 @@ export default function EnableEthicalMetrics({
         notifications!
       </em>
 
+      <span>Ethical metrics notifications by telegram channel</span>
+      <Input
+        prepend="Telegram"
+        value={tgChannelId}
+        onValueChange={setTgChannelId}
+        isInvalid={tgChannelIdError}
+        required={true}
+        placeholder="-100XXXXXXXXXX"
+      />
       <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
         <div className="accordion-modal-wrapper">
           <Accordion.Toggle
@@ -125,7 +133,7 @@ export default function EnableEthicalMetrics({
             className="accordion-modal"
           >
             <div className="header">
-              <BsInfoCircleFill className="links-icon" />
+              <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
               How can I get a Telegram channel Id?{" "}
               {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
             </div>
@@ -140,7 +148,7 @@ export default function EnableEthicalMetrics({
                 </li>
                 <li>
                   Open telegram in a web browser{" "}
-                  <a href="https://web.telegram.org/">(Telegram web)</a> and
+                  <a href="https://web.telegram.org/" target="_blank">(Telegram web)</a> and
                   open the channel.
                 </li>
                 <li>
@@ -159,16 +167,6 @@ export default function EnableEthicalMetrics({
           </Accordion.Collapse>
         </div>
       </Accordion>
-
-      <span>Ethical metrics notifications by telegram channel</span>
-      <Input
-        prepend="Telegram"
-        value={tgChannelId}
-        onValueChange={setTgChannelId}
-        isInvalid={tgChannelIdError}
-        required={true}
-        placeholder="-100XXXXXXXXXX"
-      />
       {tgChannelIdError && (
         <span style={{ fontSize: "12px", color: "red" }}>
           Telegram channel Id format is incorrect
