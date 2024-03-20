@@ -68,7 +68,7 @@ export default function EnableEthicalMetrics({
       });
       setEthicalMetricsOn(true);
       setValidationMessage("Ethical metrics enabled successfully.");
-      await ethicalMetricsConfig.revalidate()
+      await ethicalMetricsConfig.revalidate();
     } catch (error) {
       setValidationMessage("Error enabling ethical metrics.");
       console.error("Error enabling ethical metrics:", error);
@@ -98,8 +98,17 @@ export default function EnableEthicalMetrics({
         <div className="title">Enable System Notifications</div>
         <div className="description">
           <p className="description-text">
-            <span className="highlight">Enable ethical metrics</span> and receive alerts whenever your dappnode is down without compromising your privacy.
-            <span className="note"> Note: Ethical Metrics requires the Dappnode Monitoring Service (DMS) as a dependency.</span> <a href={docsUrl.ethicalMetricsOverview} className="learn-more">Learn more</a>
+            <span className="highlight">Enable ethical metrics</span> and
+            receive alerts whenever your dappnode is down without compromising
+            your privacy.
+            <span className="note">
+              {" "}
+              Note: Ethical Metrics requires the Dappnode Monitoring Service
+              (DMS) as a dependency.
+            </span>{" "}
+            <a href={docsUrl.ethicalMetricsOverview} className="learn-more">
+              Learn more
+            </a>
           </p>
         </div>
       </div>
@@ -110,12 +119,23 @@ export default function EnableEthicalMetrics({
         promptly.
       </p>
       <em className="advice">
-        <strong>Advice: </strong> We highly recommend using the Telegram channel option (or both)
-        rather than relying only on email notifications. Email notifications may
-        be categorized as spam, potentially causing you to miss important
-        notifications!
+        <strong>Advice: </strong> We highly recommend using the Telegram channel
+        option (or both) rather than relying only on email notifications. Email
+        notifications may be categorized as spam, potentially causing you to
+        miss important notifications!
       </em>
-
+      {!ethicalMetricsOn && (
+        <span
+          style={{
+            fontStyle: "italic",
+            fontSize: "14px",
+            color: "var(--dappnode-strong-main-color)"
+          }}
+        >
+          You must provide a Telegram channel ID or an email to enable ethical
+          metrics notifications
+        </span>
+      )}
       <span>Ethical metrics notifications by telegram channel</span>
       <Input
         prepend="Telegram"
@@ -133,7 +153,10 @@ export default function EnableEthicalMetrics({
             className="accordion-modal"
           >
             <div className="header">
-              <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
+              <BsInfoCircleFill
+                className="links-icon"
+                style={{ fontSize: "14px" }}
+              />
               How can I get a Telegram channel Id?{" "}
               {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
             </div>
@@ -148,8 +171,10 @@ export default function EnableEthicalMetrics({
                 </li>
                 <li>
                   Open telegram in a web browser{" "}
-                  <a href="https://web.telegram.org/" target="_blank">(Telegram web)</a> and
-                  open the channel.
+                  <a href="https://web.telegram.org/" target="_blank">
+                    (Telegram web)
+                  </a>{" "}
+                  and open the channel.
                 </li>
                 <li>
                   Copy the channel id from the url. The channel Id is the number
@@ -202,17 +227,18 @@ export default function EnableEthicalMetrics({
               variant="dappnode"
               disabled={
                 // No input provided or both inputs have errors
-                (tgChannelId === "" && mail === "") || (tgChannelIdError && mailError) ||
+                (tgChannelId === "" && mail === "") ||
+                (tgChannelIdError && mailError) ||
                 // Only tgChannelId has error or only mail has error
-                (tgChannelIdError && mail === "") || (tgChannelId === "" && mailError) ||
+                (tgChannelIdError && mail === "") ||
+                (tgChannelId === "" && mailError) ||
                 // No changes in mail or tgChannelId
-                (mail === ethicalMetricsConfig.data?.mail && (
-                  tgChannelId === "" ||
-                  tgChannelId === ethicalMetricsConfig.data?.tgChannelId ||
-                  tgChannelIdError
-                )) ||
+                (mail === ethicalMetricsConfig.data?.mail &&
+                  (tgChannelId === "" ||
+                    tgChannelId === ethicalMetricsConfig.data?.tgChannelId ||
+                    tgChannelIdError)) ||
                 // Asynchronous operation in progress
-                (validationMessage !== "")
+                validationMessage !== ""
               }
             >
               Update
@@ -228,7 +254,7 @@ export default function EnableEthicalMetrics({
             }
             checked={ethicalMetricsOn}
             onChange={toggleEthicalSwitch}
-            label="Enable system notifications"
+            label=""
             id="enable-ethical-metrics"
           />
         )}
