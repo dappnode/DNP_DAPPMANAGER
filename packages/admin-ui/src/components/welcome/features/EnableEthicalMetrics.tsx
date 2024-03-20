@@ -69,12 +69,22 @@ export default function EnableEthicalMetrics({
       });
       setEthicalMetricsOn(true);
       setValidationMessage("Ethical metrics enabled successfully.");
+      await ethicalMetricsConfig.revalidate()
     } catch (error) {
       setValidationMessage("Error enabling ethical metrics.");
       console.error("Error enabling ethical metrics:", error);
     }
   }
 
+  // clear the success message after 5 seconds
+  useEffect(() => {
+    if (validationMessage === "Ethical metrics enabled successfully.") {
+      const timer = setTimeout(() => {
+        setValidationMessage("");
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [validationMessage]);
 
   function toggleEthicalSwitch() {
     if (!ethicalMetricsOn) {
@@ -88,9 +98,10 @@ export default function EnableEthicalMetrics({
       <div className="header">
         <div className="title">Enable System Notifications</div>
         <div className="description">
-          Enable ethical metrics and receive alerts whenever your dappnode is
-          down without losing your privacy.{" "}
-          <a href={docsUrl.ethicalMetricsOverview}>Learn more</a>
+          <p className="description-text">
+            <span className="highlight">Enable ethical metrics</span> and receive alerts whenever your dappnode is down without compromising your privacy.
+            <span className="note"> Note: Ethical Metrics requires the Dappnode Monitoring Service (DMS) as a dependency.</span> <a href={docsUrl.ethicalMetricsOverview} className="learn-more">Learn more</a>
+          </p>
         </div>
       </div>
 
@@ -99,8 +110,8 @@ export default function EnableEthicalMetrics({
         <strong>Telegram Channel ID</strong> to receive reliable alerts
         promptly.
       </p>
-      <em>
-        Advice: We highly recommend using the Telegram channel option (or both)
+      <em className="advice">
+        <strong>Advice: </strong> We highly recommend using the Telegram channel option (or both)
         rather than relying only on email notifications. Email notifications may
         be categorized as spam, potentially causing you to miss important
         notifications!
@@ -186,16 +197,24 @@ export default function EnableEthicalMetrics({
           <div className="update-button">
             <Button
               type="submit"
-              onClick={enableEthicalMetricsSync}
+              onClick={async () => {
+                setValidationMessage("");
+                await enableEthicalMetricsSync();
+              }}
               variant="dappnode"
               disabled={
-                (tgChannelId === "" && mail === "") ||
-                (tgChannelIdError && mailError) ||
-                (tgChannelIdError && mail === "") ||
-                (tgChannelId === "" && mailError) ||
-                (mail === ethicalMetricsConfig.data?.mail &&
-                  tgChannelId === "") ||
-                (mail === ethicalMetricsConfig.data?.mail && tgChannelIdError)
+                // No input provided or both inputs have errors
+                (tgChannelId === "" && mail === "") || (tgChannelIdError && mailError) ||
+                // Only tgChannelId has error or only mail has error
+                (tgChannelIdError && mail === "") || (tgChannelId === "" && mailError) ||
+                // No changes in mail or tgChannelId
+                (mail === ethicalMetricsConfig.data?.mail && (
+                  tgChannelId === "" ||
+                  tgChannelId === ethicalMetricsConfig.data?.tgChannelId ||
+                  tgChannelIdError
+                )) ||
+                // Asynchronous operation in progress
+                (validationMessage !== "")
               }
             >
               Update
