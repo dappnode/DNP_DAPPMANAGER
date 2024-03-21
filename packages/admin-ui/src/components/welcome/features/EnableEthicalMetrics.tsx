@@ -18,7 +18,6 @@ export default function EnableEthicalMetrics({
   onNext: () => void;
 }) {
   const ethicalMetricsConfig = useApi.getEthicalMetricsConfig();
-  const [wasEthicalMetricsOn, setWasEthicalMetricsOn] = useState(false);
   const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
@@ -34,7 +33,6 @@ export default function EnableEthicalMetrics({
       setMail(ethicalMetricsData.mail || "");
       setTgChannelId(ethicalMetricsData.tgChannelId || "");
       setEthicalMetricsOn(ethicalMetricsData.enabled);
-      setWasEthicalMetricsOn(ethicalMetricsData.enabled);
     }
   }, [ethicalMetricsConfig.data]);
 
@@ -215,7 +213,7 @@ export default function EnableEthicalMetrics({
 
       {/* This top div prevents the card from stretching vertically */}
       <div>
-        {wasEthicalMetricsOn ? (
+        {ethicalMetricsOn ? (
           // Render the "Update" button if ethical metrics are enabled
           <div className="update-button">
             <Button

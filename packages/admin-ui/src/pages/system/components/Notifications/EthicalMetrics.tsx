@@ -239,19 +239,28 @@ export default function EthicalMetrics() {
                       to the channel as an administrator.
                     </li>
                     <li>
-                      Open telegram in a web browser{" "}
-                      <a href="https://web.telegram.org/" target="_blank">
-                        (Telegram web)
-                      </a>{" "}
-                      and open the channel.
+                      Open Telegram Web using this link:{" "}
+                      <a href="https://web.telegram.org/a/" target="_blank">
+                        Telegram web
+                      </a>
+                      . If you haven't opened it using this link, ensure that in
+                      the URL, just after{" "}
+                      <span className={theme === "dark" ? "dark" : "light"}>
+                        https://web.telegram.org
+                      </span>{" "}
+                      is followed with{" "}
+                      <span className={theme === "dark" ? "dark" : "light"}>
+                        /a/
+                      </span>
+                      . Otherwise you wont be able to get the channel id.
                     </li>
                     <li>
-                      Copy the channel id from the url. The channel Id is the
-                      number of 13 digits that comes just after the{" "}
+                      Open the channel and copy its id from the URL. The channel
+                      Id is the number of 13 digits that comes just after the{" "}
                       <span className={theme === "dark" ? "dark" : "light"}>
                         -
                       </span>{" "}
-                      in the url. It always starts with{" "}
+                      in the URL. It always starts with{" "}
                       <span className={theme === "dark" ? "dark" : "light"}>
                         -100
                       </span>
