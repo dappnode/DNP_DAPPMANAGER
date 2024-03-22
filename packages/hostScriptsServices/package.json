@@ -19,6 +19,7 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
+    "@dappnode/params": "^0.1.0",
     "@dappnode/types": "^0.1.36",
     "@dappnode/logger": "^0.1.0",
     "@dappnode/utils": "^0.1.0",
