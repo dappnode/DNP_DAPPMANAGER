@@ -10,64 +10,70 @@ const StakersRoot: React.FC = () => {
     title: string;
     component: () => React.JSX.Element;
   }[] = [
-    {
-      subPath: "ethereum",
-      title: "Ethereum",
-      component: () =>
-        StakerNetwork({
-          network: "mainnet",
-          description:
-            "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
-        })
-    },
-    {
-      subPath: "gnosis",
-      title: "Gnosis Chain",
-      component: () =>
-        StakerNetwork({
-          network: "gnosis",
-          description:
-            "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
-        })
-    },
-    {
-      subPath: "holesky",
-      title: "Holesky",
-      component: () =>
-        StakerNetwork({
-          network: "holesky",
-          description:
-            "Holesky is a merged-from-genesis public Ethereum testnet which will replace Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol."
-        })
-    },
-    {
-      subPath: "prater",
-      title: "Prater",
-      component: () =>
-        StakerNetwork({
-          network: "prater",
-          description:
-            "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
-        })
-    },
-    {
-      subPath: "lukso",
-      title: "LUKSO",
-      component: () =>
-        StakerNetwork({
-          network: "lukso",
-          description:
-            "LUKSO blockchain provides creators and users with future-proof tools and standards to unleash their creative force in an open interoperable ecosystem."
-        })
-    }
-  ];
+      {
+        subPath: "ethereum",
+        title: "Ethereum",
+        component: () =>
+          StakerNetwork({
+            network: "mainnet",
+            description:
+              "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
+          })
+      },
+      {
+        subPath: "gnosis",
+        title: "Gnosis Chain",
+        component: () =>
+          StakerNetwork({
+            network: "gnosis",
+            description:
+              "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
+          })
+      },
+      {
+        subPath: "holesky",
+        title: "Holesky",
+        component: () =>
+          StakerNetwork({
+            network: "holesky",
+            description:
+              "Holesky is a merged-from-genesis public Ethereum testnet which will replace Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol."
+          })
+      },
+      {
+        subPath: "prater",
+        title: "Prater",
+        component: () =>
+          StakerNetwork({
+            network: "prater",
+            description:
+              "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
+          })
+      },
+      {
+        subPath: "lukso",
+        title: "LUKSO",
+        component: () =>
+          StakerNetwork({
+            network: "lukso",
+            description:
+              "LUKSO blockchain provides creators and users with future-proof tools and standards to unleash their creative force in an open interoperable ecosystem."
+          })
+      }
+    ];
+
+  // Remove the "Prater" tab from the stakersItems array
+  const filteredStakersItems = stakersItems.filter(
+    item => item.subPath !== "prater"
+  );
 
   return (
     <>
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {stakersItems.map(route => (
+        {/* Render the staker tabs except for "Prater" */}
+        {filteredStakersItems.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
               to={route.subPath}
