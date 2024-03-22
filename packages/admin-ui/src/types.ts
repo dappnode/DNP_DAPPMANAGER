@@ -39,11 +39,6 @@ export interface ProgressLogsByDnp {
   [dnpName: string]: ProgressLogs;
 }
 
-export interface DappnodeParams {
-  DNCORE_DIR: string;
-  REPO_DIR: string;
-}
-
 export type Theme = "light" | "dark";
 
 export type UiModuleStatus = "enabled" | "disabled";

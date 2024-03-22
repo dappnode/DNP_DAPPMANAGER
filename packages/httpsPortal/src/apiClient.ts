@@ -5,7 +5,7 @@ import { urlJoin } from "@dappnode/utils";
 
 const ajv = new Ajv({ allErrors: true });
 
-export interface HttpPortalEntry {
+interface HttpPortalEntry {
   /**
    * The public subdomain
    * `"validator-prysm"`, `"customsubdomain"`

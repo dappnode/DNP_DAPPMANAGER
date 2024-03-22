@@ -30,7 +30,7 @@ interface AdminStatusById {
   [id: string]: { isAdmin: boolean };
 }
 
-export interface AdminPasswordDbParams {
+interface AdminPasswordDbParams {
   ADMIN_PASSWORDS_JSON_FILE: string;
   ADMIN_STATUS_JSON_FILE: string;
 }

@@ -1,7 +1,7 @@
 /**
  * Content locations supported by the ETH FORWARD
  */
-export type Location = "ipfs" | "swarm";
+type Location = "ipfs" | "swarm";
 
 /**
  * Network names supported by the ETH FORWARD
@@ -24,7 +24,7 @@ export type Content =
 /**
  * Custom errors
  */
-export type EthForwardErrorCode =
+type EthForwardErrorCode =
   | "NOTFOUND"
   | "RESOLVERNOTFOUND"
   | "PROXYERROR"
