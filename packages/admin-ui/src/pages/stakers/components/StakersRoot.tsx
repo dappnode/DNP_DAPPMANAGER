@@ -72,7 +72,7 @@ const StakersRoot: React.FC = () => {
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {/* Render the staker tabs except for "Prater" */}
+        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
         {filteredStakersItems.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
