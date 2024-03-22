@@ -19,7 +19,7 @@ interface HttpPortalEntry {
   toHost: string;
 }
 
-export const httpsPortalResponseSchema = {
+const httpsPortalResponseSchema = {
   type: "array",
   items: {
     type: "object",

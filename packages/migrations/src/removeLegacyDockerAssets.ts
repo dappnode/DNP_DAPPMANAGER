@@ -92,7 +92,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
  * This function will read the contents of .env files and add them in the
  * compose itself in the `environment` field in array format
  */
-export async function migrateLegacyEnvFiles(
+async function migrateLegacyEnvFiles(
   dnpList: InstalledPackageData[]
 ): Promise<void> {
   try {
@@ -103,10 +103,7 @@ export async function migrateLegacyEnvFiles(
   }
 }
 
-export function migrateLegacyEnvFile(
-  dnpName: string,
-  isCore: boolean
-): boolean {
+function migrateLegacyEnvFile(dnpName: string, isCore: boolean): boolean {
   const envFilePath = getEnvFilePath(dnpName, isCore);
   try {
     const envFileData = fs.readFileSync(envFilePath, "utf8");

@@ -30,7 +30,7 @@ type EthForwardErrorCode =
   | "PROXYERROR"
   | "NODENOTAVAILABLE";
 
-export class EthForwardError extends Error {
+class EthForwardError extends Error {
   code: EthForwardErrorCode;
   constructor(message: string, code: EthForwardErrorCode) {
     super(message);

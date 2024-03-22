@@ -61,7 +61,9 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
   return async function (domain: string): Promise<Content> {
     const network = parseNetworkFromDomain(domain);
     const providerUrl = await _getEthersProviderByNetwork(network);
-    const provider = new ethers.JsonRpcProvider(providerUrl, "mainnet", { staticNetwork: true });
+    const provider = new ethers.JsonRpcProvider(providerUrl, "mainnet", {
+      staticNetwork: true
+    });
     return _resolveDomain(domain, provider);
   };
 }
@@ -75,7 +77,7 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
  * @param domain
  * @returns content object
  */
-export async function resolveDomain(
+async function resolveDomain(
   domain: string,
   provider: ethers.Provider
 ): Promise<Content> {
