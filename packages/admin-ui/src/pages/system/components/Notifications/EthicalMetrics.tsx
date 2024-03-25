@@ -15,6 +15,8 @@ import "./ethicalMetrics.scss";
 import { AppContext } from "App";
 import SwitchBig from "components/SwitchBig";
 import { confirm } from "components/ConfirmDialog";
+import LinkDocs from "components/LinkDocs";
+import { docsUrl } from "params";
 
 export default function EthicalMetrics() {
   const { theme } = React.useContext(AppContext);
@@ -134,7 +136,11 @@ export default function EthicalMetrics() {
         than relying only on email notifications. Email notifications may be
         categorized as spam, potentially causing you to miss important
         notifications!
+        <LinkDocs href={docsUrl.ethicalMetricsOverview}>
+          Learn more about Ethical metrics in our Documentation
+        </LinkDocs>
       </div>
+
       {ethicalMetricsConfig.data ? (
         <Form.Group>
           <Form.Label>Ethical metrics status</Form.Label>
@@ -185,7 +191,7 @@ export default function EthicalMetrics() {
             Ethical metrics notifications by telegram channel
           </Form.Label>
           <Input
-            placeholder="Telegram Channel Id"
+            placeholder="Telegram Channel ID"
             isInvalid={tgChannelIdError}
             value={tgChannelId}
             onValueChange={setTgChannelId}
@@ -223,60 +229,65 @@ export default function EthicalMetrics() {
                     className="links-icon"
                     style={{ fontSize: "14px" }}
                   />
-                  How can I get a Telegram channel Id?{" "}
+                  How can I get a Telegram channel ID?{" "}
                   {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
                 </div>
               </Accordion.Toggle>
               <Accordion.Collapse eventKey="0">
                 <div>
                   <ol>
-                    <li>Create a private channel in your telegram.</li>
                     <li>
-                      Add dappnode bot{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        @ethicalMetricsAlerts_bot
-                      </span>{" "}
-                      to the channel as an administrator.
-                    </li>
-                    <li>
-                      Open Telegram Web using this link:{" "}
+                      Open{" "}
                       <a href="https://web.telegram.org/a/" target="_blank">
                         Telegram web
                       </a>
-                      . If you haven't opened it using this link, ensure that in
-                      the URL, just after{" "}
+                      .
+                      <ul>
+                        <li>
+                          Ensure the URL ends with{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>
+                            /a/
+                          </span>
+                          . If not, manually add{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>
+                            /a/
+                          </span>{" "}
+                          after{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>
+                            https://web.telegram.org
+                          </span>
+                          .{" "}
+                        </li>
+                      </ul>
+                    </li>
+                    <li>Create a private channel.</li>
+                    <li>
+                      Add{" "}
                       <span className={theme === "dark" ? "dark" : "light"}>
-                        https://web.telegram.org
+                        @ethicalMetricsAlerts_bot
                       </span>{" "}
-                      is followed with{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        /a/
-                      </span>
-                      . Otherwise you wont be able to get the channel id.
+                      as an administrator in the channel.
                     </li>
                     <li>
-                      Open the channel and copy its id from the URL. The channel
-                      Id is the number of 13 digits that comes just after the{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        -
-                      </span>{" "}
-                      in the URL. It always starts with{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        -100
-                      </span>
-                      . While coping it, make sure to include the{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        -
-                      </span>{" "}
-                      just before the number!
+                      Go to your channel and copy the 13-digit ID from the URL.
+                      <ul>
+                        <li>
+                          The channel ID always starts with{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>
+                            -100
+                          </span>
+                          . Ensure to include the{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>
+                            -
+                          </span>{" "}
+                          while coping it.
+                        </li>
+                      </ul>
                     </li>
+
                     <li>
-                      Paste it in the Telegram Channel Id field and toggle the
-                      switch{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        ON
-                      </span>{" "}
-                      to start receiving notifications.
+                      Paste the ID into the Telegram Channel ID field and enable
+                      Ethical Metrics to receive notifications.
                     </li>
                   </ol>
                 </div>
@@ -285,7 +296,7 @@ export default function EthicalMetrics() {
           </Accordion>
           {tgChannelIdError && (
             <span style={{ fontSize: "12px", color: "red" }}>
-              Telegram channel Id format is incorrect
+              Telegram channel ID format is incorrect
             </span>
           )}
           <br />

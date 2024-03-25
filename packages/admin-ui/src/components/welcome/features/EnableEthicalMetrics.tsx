@@ -135,64 +135,76 @@ export default function EnableEthicalMetrics({
         </span>
       )}
       <span>Ethical metrics notifications by telegram channel</span>
-      <Input
-        prepend="Telegram"
-        value={tgChannelId}
-        onValueChange={setTgChannelId}
-        isInvalid={tgChannelIdError}
-        required={true}
-        placeholder="-100XXXXXXXXXX"
-      />
-      <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
-        <div className="accordion-modal-wrapper">
-          <Accordion.Toggle
-            eventKey="0"
-            onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-            className="accordion-modal"
-          >
-            <div className="header">
-              <BsInfoCircleFill
-                className="links-icon"
-                style={{ fontSize: "14px" }}
-              />
-              How can I get a Telegram channel Id?{" "}
-              {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
-            </div>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey="0">
-            <div>
-              <ol>
-                <li>Create a private channel in your telegram.</li>
-                <li>
-                  Add dappnode bot <span>@ethicalMetricsAlerts_bot</span> to the
-                  channel as an administrator.
-                </li>
-                <li>
-                  Open telegram in a web browser{" "}
-                  <a href="https://web.telegram.org/" target="_blank">
-                    (Telegram web)
-                  </a>{" "}
-                  and open the channel.
-                </li>
-                <li>
-                  Copy the channel id from the url. The channel Id is the number
-                  of 13 digits that comes just after the <span>-</span> in the
-                  url. It always starts with <span>-100</span>. While coping it,
-                  make sure to include the <span>-</span> just before the
-                  number!
-                </li>
-                <li>
-                  Paste it in the Telegram Channel Id field and toggle the
-                  switch <span>ON</span> to start receiving notifications.
-                </li>
-              </ol>
-            </div>
-          </Accordion.Collapse>
-        </div>
-      </Accordion>
+      <div>
+        <Input
+          prepend="Telegram"
+          value={tgChannelId}
+          onValueChange={setTgChannelId}
+          isInvalid={tgChannelIdError}
+          required={true}
+          placeholder="-100XXXXXXXXXX"
+        />
+        <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
+          <div className="accordion-modal-wrapper">
+            <Accordion.Toggle
+              eventKey="0"
+              onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
+              className="accordion-modal"
+            >
+              <div className="header">
+                <BsInfoCircleFill
+                  className="links-icon"
+                  style={{ fontSize: "14px" }}
+                />
+                How can I get a Telegram channel Id?{" "}
+                {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+              </div>
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="0">
+              <div>
+                <ol>
+                  <li>
+                    Open{" "}
+                    <a href="https://web.telegram.org/a/" target="_blank">
+                      Telegram web
+                    </a>
+                    .
+                    <ul>
+                      <li>
+                        Ensure the URL ends with <span>/a/</span>. If not,
+                        manually add <span>/a/</span> after{" "}
+                        <span>https://web.telegram.org</span>.{" "}
+                      </li>
+                    </ul>
+                  </li>
+                  <li>Create a private channel.</li>
+                  <li>
+                    Add <span>@ethicalMetricsAlerts_bot</span> as an
+                    administrator in the channel.
+                  </li>
+                  <li>
+                    Go to your channel and copy the 13-digit ID from the URL.
+                    <ul>
+                      <li>
+                        The channel ID always starts with <span>-100</span>.
+                        Ensure to include the <span>-</span> while coping it.
+                      </li>
+                    </ul>
+                  </li>
+
+                  <li>
+                    Paste the ID into the Telegram Channel ID field and enable
+                    Ethical Metrics to receive notifications.
+                  </li>
+                </ol>
+              </div>
+            </Accordion.Collapse>
+          </div>
+        </Accordion>
+      </div>
       {tgChannelIdError && (
         <span style={{ fontSize: "12px", color: "red" }}>
-          Telegram channel Id format is incorrect
+          Telegram channel ID format is incorrect
         </span>
       )}
 
