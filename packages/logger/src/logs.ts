@@ -67,7 +67,7 @@ export const logs: Logs = {
 /* eslint-enable @typescript-eslint/no-empty-function */
 /* eslint-enable no-console */
 
-export class ErrorNoStack extends Error {}
+class ErrorNoStack extends Error {}
 
 function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
   return function log(...items: LogArguments[]): void {
@@ -111,7 +111,7 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
  * Works well for transpiled, minified or regular code
  * REQUIRES import "source-map-support/register";
  */
-export function getLocation(error: Error, stackCount: number): string | null {
+function getLocation(error: Error, stackCount: number): string | null {
   const parsed = stackTrace.parse(error);
   const firstOutsideRow = parsed[stackCount];
   if (!firstOutsideRow) return null;

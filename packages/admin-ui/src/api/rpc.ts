@@ -2,7 +2,7 @@ import io, { Socket } from "socket.io-client";
 import { Emitter } from "mitt";
 import { Args, RpcPayload, RpcResponse } from "@dappnode/types";
 import { IApiRpc } from "./interface";
-import { socketIoUrl } from "params";
+import { apiUrl } from "params";
 import { subscriptionsData } from "@dappnode/types";
 
 let socketGlobal: Socket | null = null;
@@ -54,8 +54,8 @@ export const apiRpc: IApiRpc = {
 function setupSocket(): Socket {
   if (!socketGlobal) {
     /* eslint-disable-next-line no-console */
-    console.log("Connecting API with Socket.io to", socketIoUrl);
-    socketGlobal = io(socketIoUrl);
+    console.log("Connecting API with Socket.io to", apiUrl);
+    socketGlobal = io(apiUrl);
   }
   return socketGlobal;
 }

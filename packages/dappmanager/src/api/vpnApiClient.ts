@@ -23,7 +23,7 @@ const vpnApiRoutesData: { [P in keyof VpnApiClient]: true } = {
   getVersionData: true
 };
 
-export interface VpnApiClientParams {
+interface VpnApiClientParams {
   VPN_API_RPC_URL: string;
 }
 

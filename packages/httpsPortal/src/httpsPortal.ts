@@ -19,7 +19,6 @@ import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { prettyDnpName } from "@dappnode/utils";
 import { Log, logs } from "@dappnode/logger";
 export { HttpsPortalApiClient };
-export { getExposableServices } from "./exposable/index.js";
 
 const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 

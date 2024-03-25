@@ -4,7 +4,7 @@ import fs from "fs";
 import { mapKeys } from "lodash-es";
 import { stringifyEnvironment } from "./environment.js";
 
-export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
+const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
 
 /**
  * Create a global ENVs file with only a sanity check value: { ACTIVE: "true" }

@@ -48,8 +48,3 @@ export interface IApiRpc {
   ): void;
   call<R>(payload: RpcPayload): Promise<RpcResponse<R>>;
 }
-
-export interface IApi {
-  auth: IApiAuth;
-  rpc: IApiRpc;
-}

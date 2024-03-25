@@ -14,9 +14,7 @@ export const dbMain = dbFactory(params.DB_MAIN_PATH);
  */
 export const dbCache = dbFactory(params.DB_CACHE_PATH);
 
-export function dbFactory(
-  dbPath: string
-): {
+function dbFactory(dbPath: string): {
   staticKey: <T>(
     key: string,
     defaultValue: T

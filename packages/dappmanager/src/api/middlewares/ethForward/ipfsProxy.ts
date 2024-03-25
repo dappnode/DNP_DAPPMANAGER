@@ -4,7 +4,13 @@ import express from "express";
 import { params } from "@dappnode/params";
 import { urlJoin } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import * as views from "./views/index.js";
+import {
+  noEth,
+  noIpfs,
+  noSwarm,
+  notFound,
+  unknownError
+} from "./views/index.js";
 import {
   NodeNotAvailable,
   ProxyError,
@@ -115,18 +121,18 @@ function errorToResponseHtml(e: Error, domain?: string): string {
 
   // Not found views
   if (e instanceof EnsResolverError || e instanceof NotFoundError)
-    return views.notFound(e);
+    return notFound(e);
 
   // Node not available views
-  if (e instanceof EthProviderError) return views.noEth(e);
+  if (e instanceof EthProviderError) return noEth(e);
   if (e instanceof NodeNotAvailable)
-    if (e.location === "swarm") return views.noSwarm(e);
-    else if (e.location === "ipfs") return views.noIpfs(e);
+    if (e.location === "swarm") return noSwarm(e);
+    else if (e.location === "ipfs") return noIpfs(e);
 
   // Proxy errors
-  if (e instanceof ProxyError) return views.unknownError(e);
+  if (e instanceof ProxyError) return unknownError(e);
 
   // Unknown errors, log to error
   logs.error(`ETHFORWARD Unknown error resolving ${domain}`, e);
-  return views.unknownError(e);
+  return unknownError(e);
 }

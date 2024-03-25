@@ -173,7 +173,7 @@ export async function validateTarImage(path: string): Promise<void> {
  * - If the file is not a .xz, returns false
  * - If the file is corrupted, returns false
  */
-async function verifyXz(xzFilePath: string): Promise<{
+export async function verifyXz(xzFilePath: string): Promise<{
   success: boolean;
   message: string;
 }> {

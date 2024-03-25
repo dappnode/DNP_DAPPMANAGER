@@ -54,7 +54,7 @@ export async function copyOnHost({
  * [NOTE]: If the path is not existent, return empty string ""
  * @param filePath
  */
-export function sha256File(filePath: string): string {
+function sha256File(filePath: string): string {
   const hash = crypto.createHash("sha256");
   if (!fs.existsSync(filePath)) return "";
   const data = fs.readFileSync(filePath);

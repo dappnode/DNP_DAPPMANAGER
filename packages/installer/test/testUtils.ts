@@ -131,3 +131,11 @@ export const mockPackageData: InstallPackageData = {
 export async function cleanRepos(): Promise<void> {
   await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
 }
+
+export async function cleanTestDir(): Promise<void> {
+  await shell(`rm -rf ${testDir}`);
+}
+export async function createTestDir(): Promise<void> {
+  await cleanTestDir();
+  await shell(`mkdir -p ${testDir}`);
+}
