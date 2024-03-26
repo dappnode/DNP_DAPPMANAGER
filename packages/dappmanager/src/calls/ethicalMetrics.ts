@@ -19,7 +19,7 @@ import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
  */
 export async function disableEthicalMetrics(): Promise<void> {
   // disable ethical metrics in db for installer daemon
-  db.ethicalMetrics.set({
+  db.notifications.set({
     mail: null,
     tgChannelId: null,
     enabled: false
@@ -59,7 +59,7 @@ export async function enableEthicalMetrics({
   if (!mail && !tgChannelId)
     throw new Error("You must provide an email or a telegram channel id");
 
-  db.ethicalMetrics.set({
+  db.notifications.set({
     mail,
     tgChannelId,
     enabled: true
@@ -96,5 +96,5 @@ export async function enableEthicalMetrics({
  * - email: the email used to register the instance
  */
 export async function getEthicalMetricsConfig(): Promise<EthicalMetricsConfig | null> {
-  return db.ethicalMetrics.get();
+  return db.notifications.get();
 }

@@ -22,12 +22,5 @@ import * as db from "@dappnode/db";
  */
 export async function changeEthicalMetricsDbFormat(): Promise<void> {
   // Initial value is null, so if it has a value it means the migration was already done
-  if (db.ethicalMetrics.get()) return;
-  const mail = db.ethicalMetricsMail.get();
-  const status = db.ethicalMetricsStatus.get();
-  db.ethicalMetrics.set({
-    enabled: status,
-    mail,
-    tgChannelId: null, // Important: at the time of this migration the tgChannelId was not implemented
-  });
+  if (db.notifications.get()) return;
 }

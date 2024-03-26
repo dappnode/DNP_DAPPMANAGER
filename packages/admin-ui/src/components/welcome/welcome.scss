@@ -51,6 +51,7 @@
   .header {
     text-align: center;
     .title {
+      margin-top: 2rem;
       font-weight: bold;
       font-size: 2rem; // Titles must be big enough in 100% zoom
       transition: color 0.15s;
@@ -132,3 +133,11 @@
     margin-bottom: 3rem;
   }
 }
+
+// Ethical Metrics modal container
+
+.ethical-container {
+  display: grid;
+  gap: 1rem;
+}
+
