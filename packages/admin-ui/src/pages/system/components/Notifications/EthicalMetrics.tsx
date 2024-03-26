@@ -238,7 +238,11 @@ export default function EthicalMetrics() {
                   <ol>
                     <li>
                       Open{" "}
-                      <a href="https://web.telegram.org/a/" target="_blank">
+                      <a
+                        href="https://web.telegram.org/a/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
                         Telegram web
                       </a>
                       .
@@ -280,7 +284,7 @@ export default function EthicalMetrics() {
                           <span className={theme === "dark" ? "dark" : "light"}>
                             -
                           </span>{" "}
-                          while coping it.
+                          when coping it.
                         </li>
                       </ul>
                     </li>

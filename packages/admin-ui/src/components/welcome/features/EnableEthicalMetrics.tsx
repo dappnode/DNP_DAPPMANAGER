@@ -165,7 +165,11 @@ export default function EnableEthicalMetrics({
                 <ol>
                   <li>
                     Open{" "}
-                    <a href="https://web.telegram.org/a/" target="_blank">
+                    <a
+                      href="https://web.telegram.org/a/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       Telegram web
                     </a>
                     .
@@ -187,7 +191,7 @@ export default function EnableEthicalMetrics({
                     <ul>
                       <li>
                         The channel ID always starts with <span>-100</span>.
-                        Ensure to include the <span>-</span> while coping it.
+                        Ensure to include the <span>-</span> when coping it.
                       </li>
                     </ul>
                   </li>
