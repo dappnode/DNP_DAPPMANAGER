@@ -233,7 +233,7 @@ export default function StakerNetwork<T extends Network>({
                   isSelected={newEnableWeb3signer}
                 />
               </Col>
-              {(network === "prater" || network === "mainnet" || network === "holesky") && (
+              {["prater", "mainnet", "holesky"].includes(network) && (
                 <Col>
                   <SubTitle>Mev Boost</SubTitle>
                   <MevBoost
@@ -242,18 +242,13 @@ export default function StakerNetwork<T extends Network>({
                     newMevBoost={newMevBoost}
                     setNewMevBoost={setNewMevBoost}
                     isSelected={
-                      currentStakerConfigReq.data.mevBoost.dnpName ===
-                        newMevBoost?.dnpName
-                        ? true
-                        : false
+                      currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName
                     }
                   />
                 </Col>
               )}
             </Row>
-
             <hr />
-
             <div>
               <div className="staker-buttons">
                 <Button
