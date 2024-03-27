@@ -32,7 +32,7 @@ export function getStakerConfigByNetwork<T extends Network>(
       return {
         executionClient: db.executionClientHolesky.get() as ExecutionClient<T>,
         consensusClient: db.consensusClientHolesky.get() as ConsensusClient<T>,
-        isMevBoostSelected: false, // holesky doesn't support mevBoost
+        isMevBoostSelected: db.mevBoostHolesky.get(),
       };
     case "lukso":
       return {

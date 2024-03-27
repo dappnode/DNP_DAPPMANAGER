@@ -10,6 +10,7 @@ import {
   executionClientsLukso,
   mevBoostMainnet,
   mevBoostPrater,
+  mevBoostHolesky,
   signerGnosis,
   signerMainnet,
   signerPrater,
@@ -49,7 +50,7 @@ export function getStakerDnpNamesByNetwork(
         executionClients: executionClientsHolesky,
         consensusClients: consensusClientsHolesky,
         signer: signerHolesky,
-        mevBoost: "",
+        mevBoost: mevBoostHolesky,
       };
     case "gnosis":
       return {

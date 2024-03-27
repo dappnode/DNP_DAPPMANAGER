@@ -190,6 +190,8 @@ async function setStakerConfigOnDb<T extends Network>(
         await db.consensusClientHolesky.set(
           consensusClient as ConsensusClientHolesky
         );
+      if (db.mevBoostHolesky.get() !== Boolean(mevBoost))
+        await db.mevBoostHolesky.set(mevBoost ? true : false);
       break;
 
     case "lukso":
