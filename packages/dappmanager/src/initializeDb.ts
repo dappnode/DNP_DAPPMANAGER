@@ -64,6 +64,23 @@ export async function initializeDb(): Promise<void> {
     db.ipfsGateway.set(params.IPFS_REMOTE);
 
   /**
+   *
+   *
+   */
+
+  if (db.notifications.get() === null) {
+    const mail = db.ethicalMetricsMail.get();
+    const status = db.ethicalMetricsStatus.get();
+    db.notifications.set({
+      enabled: status,
+      mail,
+      tgChannelId: null
+    });
+
+    db.newFeatureStatus.set("enable-ethical-metrics", "pending");
+  }
+
+  /**
    * Migrate data from the VPN db
    * - dyndns identity (including the domain)
    * - staticIp (if set)
