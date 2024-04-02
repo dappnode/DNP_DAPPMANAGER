@@ -2,13 +2,13 @@ import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
 import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { setDefaultEthicalMetricsEmail } from "./setDefaultEthicalMetricsEmail.js";
 import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
+import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -53,17 +53,6 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
-      name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
-    })
-  );
-
-  await setDefaultEthicalMetricsEmail().catch((e) =>
-    migrationErrors.push({
-      migration:
-        "set default email for ethical metrics if the package is installed",
-      coreVersion: "0.2.77",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
@@ -133,6 +122,16 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "add Dappnode peer to local IPFS node",
       coreVersion: "0.2.88",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  await changeEthicalMetricsDbFormat().catch((e) =>
+    migrationErrors.push({
+      migration: "change ethical metrics db format",
+      coreVersion: "0.2.92",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,

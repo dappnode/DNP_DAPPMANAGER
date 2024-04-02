@@ -12,8 +12,6 @@ import {
 } from "@dappnode/ethicalmetrics";
 import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 
-// TODO: handle uninstall package to unsubscribe from ethical metrics
-
 /**
  * Disables ethical metrics if enabled:
  * - unregisters instance
@@ -21,7 +19,11 @@ import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
  */
 export async function disableEthicalMetrics(): Promise<void> {
   // disable ethical metrics in db for installer daemon
-  db.ethicalMetricsStatus.set(false);
+  db.notifications.set({
+    mail: null,
+    tgChannelId: null,
+    enabled: false
+  });
 
   // Unregister instance
   await unregister().catch(() => {
@@ -42,32 +44,34 @@ export async function disableEthicalMetrics(): Promise<void> {
  * - triggers installer if not installed
  * - restarts package if not running
  * @param email email used to register the instance
+ * @param tgChannelId telegram channel id to send notifications
  * @param sync whether to wait for the installer to finish or not
  */
 export async function enableEthicalMetrics({
   mail,
+  tgChannelId,
   sync
 }: {
-  mail: string;
+  mail: string | null;
+  tgChannelId: string | null;
   sync: boolean;
 }): Promise<void> {
-  if (!mail) throw Error("email must exist");
+  if (!mail && !tgChannelId)
+    throw new Error("You must provide an email or a telegram channel id");
 
-  // Set email global env
-  db.ethicalMetricsMail.set(mail);
-  // enable ethical metrics in db for daemon
-  db.ethicalMetricsStatus.set(true);
+  db.notifications.set({
+    mail,
+    tgChannelId,
+    enabled: true
+  });
 
   const ethicalMetricsPkg = await listPackageNoThrow({
     dnpName: ethicalMetricsDnpName
   });
 
   if (!ethicalMetricsPkg) {
-    if (sync) {
-      await packageInstall({ name: ethicalMetricsDnpName });
-    } else {
-      eventBus.runEthicalMetricsInstaller.emit();
-    }
+    if (sync) await packageInstall({ name: ethicalMetricsDnpName });
+    else eventBus.runEthicalMetricsInstaller.emit();
   } else {
     // Make sure pkg is running
     for (const container of ethicalMetricsPkg.containers)
@@ -79,7 +83,8 @@ export async function enableEthicalMetrics({
 
     // Make sure the instance is registered
     await register({
-      mail
+      mail,
+      tgChannelId
     });
   }
 }
@@ -90,9 +95,6 @@ export async function enableEthicalMetrics({
  * - isEnabled: weather the ethical metrics notifications are enabled or not
  * - email: the email used to register the instance
  */
-export async function getEthicalMetricsConfig(): Promise<EthicalMetricsConfig> {
-  return {
-    mail: db.ethicalMetricsMail.get() || "",
-    isEnabled: db.ethicalMetricsStatus.get()
-  };
+export async function getEthicalMetricsConfig(): Promise<EthicalMetricsConfig | null> {
+  return db.notifications.get();
 }

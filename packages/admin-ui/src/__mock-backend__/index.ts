@@ -259,7 +259,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   enableEthicalMetrics: async ({ mail }) => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
-    isEnabled: true
+    enabled: true,
+    tgChannelId: null
   }),
   disableEthicalMetrics: async () => {},
   optimismConfigGet: async () => ({
