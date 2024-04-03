@@ -78,9 +78,6 @@ export async function enableEthicalMetrics({
       if (!container.running)
         await dockerContainerStart(container.containerName);
 
-    if (ethicalMetricsPkg.containers.some(c => c.state !== "running"))
-      await packageRestart({ dnpName: ethicalMetricsPkg.dnpName });
-
     // Make sure the instance is registered
     await register({
       mail,
