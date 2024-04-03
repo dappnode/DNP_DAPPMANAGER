@@ -78,13 +78,12 @@ export default function EthicalMetrics() {
             sync: true
           }),
         {
-          message: `Enabling ethical metrics via ${
-            mailValue && tgChannelIdValue
-              ? "telegram channel and email"
-              : mailValue
+          message: `Enabling ethical metrics via ${mailValue && tgChannelIdValue
+            ? "telegram channel and email"
+            : mailValue
               ? "email"
               : tgChannelId && "telegram channel"
-          }`,
+            }`,
           onSuccess: `Enabled ethical metrics`
         }
       );
@@ -126,16 +125,20 @@ export default function EthicalMetrics() {
   return (
     <Card spacing>
       <div>
-        Receive notifications if your <strong>dappnode remains offline</strong>{" "}
-        for at least 6 hours, sent to either your Telegram or email. Telemetry
-        is collected anonymously to ensure no personal data is retained.
+        <p>
+          Receive notifications if your <strong>dappnode remains offline</strong>{" "}
+          for at least 6 hours, sent to either your Telegram or email. Telemetry
+          is collected anonymously to ensure no personal data is retained.
+        </p>
       </div>
       <div>
-        <span style={{ fontWeight: "bold" }}>Advice: </span>
-        We highly recommend using the Telegram channel option (or both) rather
-        than relying only on email notifications. Email notifications may be
-        categorized as spam, potentially causing you to miss important
-        notifications!
+        <p>
+          <span style={{ fontWeight: "bold" }}>Advice: </span>
+          We highly recommend using the Telegram channel option (or both) rather
+          than relying only on email notifications. Email notifications may be
+          categorized as spam, potentially causing you to miss important
+          notifications!
+        </p>
         <LinkDocs href={docsUrl.ethicalMetricsOverview}>
           Learn more about Ethical metrics in our Documentation
         </LinkDocs>
@@ -158,11 +161,11 @@ export default function EthicalMetrics() {
                 ethicalMetricsOn
                   ? disableConfirmation
                   : () =>
-                      enableEthicalMetricsSync({
-                        mailValue: mail && !mailError ? mail : null,
-                        tgChannelIdValue:
-                          tgChannelId && !tgChannelIdError ? tgChannelId : null
-                      })
+                    enableEthicalMetricsSync({
+                      mailValue: mail && !mailError ? mail : null,
+                      tgChannelIdValue:
+                        tgChannelId && !tgChannelIdError ? tgChannelId : null
+                    })
               }
               label={""}
               id="enable-ethical-metrics"
