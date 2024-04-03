@@ -34,25 +34,24 @@ export default function EthicalMetrics() {
   const [reqStatusEnable, setReqStatusEnable] = useState<ReqStatus>({});
   const [reqStatusDisable, setReqStatusDisable] = useState<ReqStatus>({});
 
-  // effect and regex for email validation
   useEffect(() => {
-    const regex = /\S+@\S+\.\S+/;
-    if (regex.test(mail) || mail === "") {
+    const emailRegex = /\S+@\S+\.\S+/;
+    const tgChannelIdRegex = /^-100\d{10}(?:_\d{1,3})?$/;
+
+    // Email validation
+    if (emailRegex.test(mail) || mail === "") {
       setMailError(false);
     } else {
       setMailError(true);
     }
-  }, [mail]);
 
-  // effect and regex for telegram channelId validation
-  useEffect(() => {
-    const regex = /^-100\d{10}$/;
-    if (regex.test(tgChannelId) || tgChannelId === "") {
+    // Telegram channel ID validation
+    if (tgChannelIdRegex.test(tgChannelId) || tgChannelId === "") {
       setTgChannelIdError(false);
     } else {
       setTgChannelIdError(true);
     }
-  }, [tgChannelId]);
+  }, [mail, tgChannelId]);
 
   useEffect(() => {
     const ethicalMetricsData = ethicalMetricsConfig.data;
@@ -78,13 +77,12 @@ export default function EthicalMetrics() {
             sync: true
           }),
         {
-          message: `Enabling ethical metrics via ${
-            mailValue && tgChannelIdValue
-              ? "telegram channel and email"
-              : mailValue
+          message: `Enabling ethical metrics via ${mailValue && tgChannelIdValue
+            ? "telegram channel and email"
+            : mailValue
               ? "email"
               : tgChannelId && "telegram channel"
-          }`,
+            }`,
           onSuccess: `Enabled ethical metrics`
         }
       );
@@ -126,16 +124,20 @@ export default function EthicalMetrics() {
   return (
     <Card spacing>
       <div>
-        Receive notifications if your <strong>dappnode remains offline</strong>{" "}
-        for at least 6 hours, sent to either your Telegram or email. Telemetry
-        is collected anonymously to ensure no personal data is retained.
+        <p>
+          Receive notifications if your <strong>dappnode remains offline</strong>{" "}
+          for at least 3 hours, sent to either your Telegram or email. Telemetry
+          is collected anonymously to ensure no personal data is retained.
+        </p>
       </div>
       <div>
-        <span style={{ fontWeight: "bold" }}>Advice: </span>
-        We highly recommend using the Telegram channel option (or both) rather
-        than relying only on email notifications. Email notifications may be
-        categorized as spam, potentially causing you to miss important
-        notifications!
+        <p>
+          <span style={{ fontWeight: "bold" }}>Advice: </span>
+          We highly recommend using the Telegram channel option (or both) rather
+          than relying only on email notifications. Email notifications may be
+          categorized as spam, potentially causing you to miss important
+          notifications!
+        </p>
         <LinkDocs href={docsUrl.ethicalMetricsOverview}>
           Learn more about Ethical metrics in our Documentation
         </LinkDocs>
@@ -158,11 +160,11 @@ export default function EthicalMetrics() {
                 ethicalMetricsOn
                   ? disableConfirmation
                   : () =>
-                      enableEthicalMetricsSync({
-                        mailValue: mail && !mailError ? mail : null,
-                        tgChannelIdValue:
-                          tgChannelId && !tgChannelIdError ? tgChannelId : null
-                      })
+                    enableEthicalMetricsSync({
+                      mailValue: mail && !mailError ? mail : null,
+                      tgChannelIdValue:
+                        tgChannelId && !tgChannelIdError ? tgChannelId : null
+                    })
               }
               label={""}
               id="enable-ethical-metrics"
@@ -355,3 +357,4 @@ export default function EthicalMetrics() {
     </Card>
   );
 }
+
