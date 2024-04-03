@@ -36,25 +36,24 @@ export default function EnableEthicalMetrics({
     }
   }, [ethicalMetricsConfig.data]);
 
-  // effect and regex for email validation
   useEffect(() => {
-    const regex = /\S+@\S+\.\S+/;
-    if (regex.test(mail) || mail === "") {
+    const emailRegex = /\S+@\S+\.\S+/;
+    const tgChannelIdRegex = /^-100\d{10}(?:_\d{1,3})?$/;
+
+    // Email validation
+    if (emailRegex.test(mail) || mail === "") {
       setMailError(false);
     } else {
       setMailError(true);
     }
-  }, [mail]);
 
-  // effect and regex for telegram channelId validation
-  useEffect(() => {
-    const regex = /^-100\d{10}$/;
-    if (regex.test(tgChannelId) || tgChannelId === "") {
+    // Telegram channel ID validation
+    if (tgChannelIdRegex.test(tgChannelId) || tgChannelId === "") {
       setTgChannelIdError(false);
     } else {
       setTgChannelIdError(true);
     }
-  }, [tgChannelId]);
+  }, [mail, tgChannelId]);
 
   async function enableEthicalMetricsSync() {
     try {
@@ -195,7 +194,6 @@ export default function EnableEthicalMetrics({
                       </li>
                     </ul>
                   </li>
-
                   <li>
                     Paste the ID into the Telegram Channel ID field and enable
                     Ethical Metrics to receive notifications.
@@ -282,3 +280,4 @@ export default function EnableEthicalMetrics({
     </div>
   );
 }
+
