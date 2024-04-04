@@ -25,6 +25,7 @@ export default function EnableEthicalMetrics({
   const [tgChannelIdError, setTgChannelIdError] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
   const [tgAccordionOpen, setTgAccordionOpen] = useState(false);
+  const [ethicalLoading, setEthicalLoading] = useState(false);
 
   // useEffect to populate email field when data is available
   useEffect(() => {
@@ -56,6 +57,7 @@ export default function EnableEthicalMetrics({
   }, [mail, tgChannelId]);
 
   async function enableEthicalMetricsSync() {
+    setEthicalLoading(true);
     try {
       setValidationMessage("Enabling ethical metrics...");
       await api.enableEthicalMetrics({
@@ -70,6 +72,7 @@ export default function EnableEthicalMetrics({
       setValidationMessage("Error enabling ethical metrics.");
       console.error("Error enabling ethical metrics:", error);
     }
+    setEthicalLoading(false);
   }
 
   // clear the success message after 5 seconds
@@ -262,7 +265,8 @@ export default function EnableEthicalMetrics({
               (tgChannelId === "" && mail === "") ||
               (tgChannelIdError && mailError) ||
               (tgChannelIdError && mail === "") ||
-              (tgChannelId === "" && mailError)
+              (tgChannelId === "" && mailError) ||
+              ethicalLoading
             }
             checked={ethicalMetricsOn}
             onChange={toggleEthicalSwitch}
@@ -280,4 +284,3 @@ export default function EnableEthicalMetrics({
     </div>
   );
 }
-
