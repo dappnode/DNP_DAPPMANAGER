@@ -45,14 +45,20 @@ function getIsDockerInstalledThroughApt() {
     fi
 }
 
-# Check if Docker is in unattended upgrades
+# Check if unnatended upgrades is installed and Docker is in unattended upgrades
 function getIsDockerInUnattendedUpgrades() {
-    # Check if Docker is in unattended upgrades
-    if ! grep -q "${DOCKER_DOWNLOAD_ORIGINS}" "${UNATTENDED_UPGRADES_FILE}"; then
+    # Check if unattended-upgrades is installed
+    if [ ! -f "${UNATTENDED_UPGRADES_FILE}" ]; then
         isDockerInUnattendedUpgrades=false
     else
-        isDockerInUnattendedUpgrades=true
+        # Check if Docker is in unattended upgrades
+        if ! grep -q "${DOCKER_DOWNLOAD_ORIGINS}" "${UNATTENDED_UPGRADES_FILE}"; then
+            isDockerInUnattendedUpgrades=false
+        else
+            isDockerInUnattendedUpgrades=true
+        fi
     fi
+
 }
 
 # check if docker-compose is installed and create an alias for docker compose if not
