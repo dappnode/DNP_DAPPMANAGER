@@ -8,8 +8,7 @@ import { logs } from "@dappnode/logger";
 import {
   ethicalMetricsDnpName,
   register,
-  unregister,
-  isApiUp
+  unregister
 } from "@dappnode/ethicalmetrics";
 import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 
@@ -78,14 +77,6 @@ export async function enableEthicalMetrics({
     for (const container of ethicalMetricsPkg.containers)
       if (!container.running)
         await dockerContainerStart(container.containerName);
-
-    //Checking if Ethical Metrics API is up before registering
-    let isEthicalUp = await isApiUp();
-    while (!isEthicalUp) {
-      setInterval(async () => {
-        isEthicalUp = await isApiUp();
-      }, 500);
-    }
 
     // Make sure the instance is registered
     await register({
