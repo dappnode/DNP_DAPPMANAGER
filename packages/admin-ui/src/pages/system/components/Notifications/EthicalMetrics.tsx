@@ -23,6 +23,7 @@ export default function EthicalMetrics() {
 
   const ethicalMetricsConfig = useApi.getEthicalMetricsConfig();
   const [ethicalMetricsOn, setEthicalMetricsOn] = useState(false);
+  const [ethicalLoading, setEthicalLoading] = useState(false);
 
   const [mail, setMail] = useState("");
   const [mailError, setMailError] = useState(false);
@@ -66,6 +67,7 @@ export default function EthicalMetrics() {
     mailValue = ethicalMetricsConfig.data?.mail,
     tgChannelIdValue = ethicalMetricsConfig.data?.tgChannelId
   }) {
+    setEthicalLoading(true);
     try {
       setReqStatusEnable({ loading: true });
 
@@ -77,12 +79,13 @@ export default function EthicalMetrics() {
             sync: true
           }),
         {
-          message: `Enabling ethical metrics via ${mailValue && tgChannelIdValue
-            ? "telegram channel and email"
-            : mailValue
+          message: `Enabling ethical metrics via ${
+            mailValue && tgChannelIdValue
+              ? "telegram channel and email"
+              : mailValue
               ? "email"
               : tgChannelId && "telegram channel"
-            }`,
+          }`,
           onSuccess: `Enabled ethical metrics`
         }
       );
@@ -94,6 +97,7 @@ export default function EthicalMetrics() {
       console.error("Error on enableEthicalMetrics", e);
       setEthicalMetricsOn(false);
     }
+    setEthicalLoading(false);
   }
 
   function disableConfirmation() {
@@ -106,6 +110,7 @@ export default function EthicalMetrics() {
   }
 
   async function disableEthicalMetrics() {
+    setEthicalLoading(true);
     try {
       setReqStatusDisable({ loading: true });
       await withToast(() => api.disableEthicalMetrics(), {
@@ -119,15 +124,17 @@ export default function EthicalMetrics() {
       setReqStatusDisable({ error: e });
       console.error("Error on registerEthicalMetrics", e);
     }
+    setEthicalLoading(false);
   }
 
   return (
     <Card spacing>
       <div>
         <p>
-          Receive notifications if your <strong>dappnode remains offline</strong>{" "}
-          for at least 3 hours, sent to either your Telegram or email. Telemetry
-          is collected anonymously to ensure no personal data is retained.
+          Receive notifications if your{" "}
+          <strong>dappnode remains offline</strong> for at least 3 hours, sent
+          to either your Telegram or email. Telemetry is collected anonymously
+          to ensure no personal data is retained.
         </p>
       </div>
       <div>
@@ -151,20 +158,21 @@ export default function EthicalMetrics() {
           <div style={{ display: "inline-block" }}>
             <SwitchBig
               disabled={
-                (tgChannelId === "" && mail === "") ||
+                (tgChannelId === "" && mail === "" && !ethicalMetricsOn) ||
                 mailError ||
-                tgChannelIdError
+                tgChannelIdError ||
+                ethicalLoading
               }
               checked={ethicalMetricsOn}
               onChange={
                 ethicalMetricsOn
                   ? disableConfirmation
                   : () =>
-                    enableEthicalMetricsSync({
-                      mailValue: mail && !mailError ? mail : null,
-                      tgChannelIdValue:
-                        tgChannelId && !tgChannelIdError ? tgChannelId : null
-                    })
+                      enableEthicalMetricsSync({
+                        mailValue: mail && !mailError ? mail : null,
+                        tgChannelIdValue:
+                          tgChannelId && !tgChannelIdError ? tgChannelId : null
+                      })
               }
               label={""}
               id="enable-ethical-metrics"
@@ -357,4 +365,3 @@ export default function EthicalMetrics() {
     </Card>
   );
 }
-
