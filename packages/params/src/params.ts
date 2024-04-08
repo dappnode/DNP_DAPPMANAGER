@@ -361,6 +361,12 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
     },
+    {
+      name: "Gnosis Team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1",
+    },
   ],
 };
 
