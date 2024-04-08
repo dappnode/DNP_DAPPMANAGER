@@ -179,23 +179,23 @@ export function getStakerCompatibleVersionsByNetwork<T extends Network>(
           {
             dnpName:
               "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
-            minVersion: "0.1.0",
+            minVersion: "0.1.2",
           },
           {
             dnpName: "prysm-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
-            minVersion: "0.1.0",
+            minVersion: "0.1.3",
           },
           {
             dnpName: "teku-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
-            minVersion: "0.1.0",
+            minVersion: "0.1.2",
           },
           {
             dnpName: "nimbus-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
-            minVersion: "0.1.0",
+            minVersion: "0.1.2",
           },
           {
             dnpName: "lodestar-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
-            minVersion: "0.1.0",
+            minVersion: "0.1.3",
           },
         ],
         compatibleSigner: {
