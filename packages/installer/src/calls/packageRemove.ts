@@ -12,7 +12,7 @@ import {
 } from "@dappnode/dockerapi";
 import { httpsPortal } from "@dappnode/httpsportal";
 import * as db from "@dappnode/db";
-import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
+import { mevBoostMainnet, mevBoostPrater, mevBoostHolesky, stakerPkgs } from "@dappnode/types";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
 
 /**
@@ -160,6 +160,9 @@ async function removeStakerPkgFromDbIfSelected({
       break;
     case mevBoostPrater:
       await db.mevBoostPrater.set(false);
+      break;
+    case mevBoostHolesky:
+      await db.mevBoostHolesky.set(false);
       break;
     default:
       return;

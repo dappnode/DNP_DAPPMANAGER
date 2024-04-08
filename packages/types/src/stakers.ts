@@ -72,6 +72,9 @@ export const executionClientsHolesky = Object.freeze([
 export type SignerHolesky = "web3signer-holesky.dnp.dappnode.eth";
 export const signerHolesky: SignerHolesky =
   "web3signer-holesky.dnp.dappnode.eth";
+  export type MevBoostHolesky = "mev-boost-holesky.dnp.dappnode.eth";
+  export const mevBoostHolesky: MevBoostHolesky =
+    "mev-boost-holesky.dnp.dappnode.eth";
 
 // GNOSIS
 export type ConsensusClientGnosis = (typeof consensusClientsGnosis)[number];
@@ -133,6 +136,7 @@ export const signers = Object.freeze([
 export const mevBoosts = Object.freeze([
   mevBoostMainnet,
   mevBoostPrater,
+  mevBoostHolesky,
   //mevBoostGnosis,
 ] as const);
 
@@ -265,6 +269,8 @@ export type MevBoost<T extends Network> = T extends "mainnet"
   ? MevBoostMainnet
   : T extends "prater"
   ? MevBoostPrater
+  : T extends "holesky"
+  ? MevBoostHolesky
   : never;
 
 export interface StakerConfigByNetwork<T extends Network> {
@@ -301,6 +307,7 @@ export const stakerPkgs = Object.freeze([
   ...executionClientsHolesky,
   ...consensusClientsHolesky,
   signerHolesky,
+  mevBoostHolesky,
   ...executionClientsGnosis,
   ...consensusClientsGnosis,
   signerGnosis,
