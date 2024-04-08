@@ -4,6 +4,7 @@ import {
   InstalledPackageData,
   MevBoostMainnet,
   MevBoostPrater,
+  MevBoostHolesky,
   Network,
 } from "@dappnode/types";
 import {
@@ -22,7 +23,7 @@ export async function setMevBoost<T extends Network>({
   currentMevBoostPkg,
 }: {
   dappnodeInstaller: DappnodeInstaller;
-  mevBoost: T extends "mainnet" ? MevBoostMainnet : MevBoostPrater;
+  mevBoost: T extends "mainnet" ? MevBoostMainnet : (T extends "prater" ? MevBoostPrater : MevBoostHolesky);
   targetMevBoost?: StakerItemOk<T, "mev-boost">;
   currentMevBoostPkg?: InstalledPackageData;
 }): Promise<void> {
