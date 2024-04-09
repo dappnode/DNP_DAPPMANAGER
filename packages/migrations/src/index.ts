@@ -6,7 +6,7 @@ import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
+import { addDappnodePeerToIpfsNodes } from "./addDappnodePeerToIpfsNodes.js";
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 
@@ -118,20 +118,20 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  await addDappnodePeerToLocalIpfsNode().catch((e) =>
+  await changeEthicalMetricsDbFormat().catch((e) =>
     migrationErrors.push({
-      migration: "add Dappnode peer to local IPFS node",
-      coreVersion: "0.2.88",
+      migration: "change ethical metrics db format",
+      coreVersion: "0.2.92",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
     })
   );
 
-  await changeEthicalMetricsDbFormat().catch((e) =>
+  await addDappnodePeerToIpfsNodes().catch((e) =>
     migrationErrors.push({
-      migration: "change ethical metrics db format",
-      coreVersion: "0.2.92",
+      migration: "add Dappnode peer to IPFS nodes",
+      coreVersion: "0.2.93",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
