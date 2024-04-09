@@ -4,11 +4,13 @@ import fs from "fs";
 import dataUriToBuffer from "data-uri-to-buffer";
 import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";
+import { dockerContainerInspect, dockerContainerStart, dockerContainerStop } from "./container.js";
+import { logs } from "@dappnode/logger";
 
 const tempTransferDir = params.TEMP_TRANSFER_DIR;
 
 /**
- * Copy file to a DNP:
+ * Copy file to a DNP container, starting it if necessary:
  *
  * @param containerName Name of a docker container
  * @param dataUri = "data:application/zip;base64,UEsDBBQAAAg..."
@@ -79,12 +81,24 @@ export async function copyFileToDockerContainer({
    */
   dataUriToFile(dataUri, fromPath);
 
+  // Container needs to be running to copy files
+  const containerInspect = await dockerContainerInspect(containerName);
+  const isInitiallyRunning = containerInspect.State.Running;
+
+  if (!isInitiallyRunning)
+    await dockerContainerStart(containerName);
+
   // Copy file from local file system to container
   await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
   if (fs.existsSync(fromPath))
     fs.rmSync(fromPath, { recursive: true, force: true });
+
+  if (!isInitiallyRunning)
+    dockerContainerStop(containerName).catch(
+      (err) => logs.error(`Error stopping container ${containerName} after copying a to it: ${err}`)
+    );
 }
 
 function dockerCopyFileTo(
