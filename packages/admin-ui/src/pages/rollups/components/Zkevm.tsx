@@ -67,7 +67,7 @@ export function Zkevm() {
   const navigate = useNavigate();
   const [reqStatus] = useState<ReqStatus>({});
   const dnpRequest = useApi.packageGet({ dnpName: zkevmDnpName });
-  const zkevmDnp: InstalledPackageData = dnpRequest.data;
+  const zkevmDnp = dnpRequest.data;
   const zkevmRunning = zkevmDnp?.containers.every(
     container => container.running
   );
