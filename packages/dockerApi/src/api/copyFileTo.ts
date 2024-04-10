@@ -97,7 +97,7 @@ export async function copyFileToDockerContainer({
 
   if (!isInitiallyRunning)
     dockerContainerStop(containerName).catch(
-      (err) => logs.error(`Error stopping container ${containerName} after copying a to it: ${err}`)
+      (err) => logs.error(`Error stopping container ${containerName} after copying a file to it: ${err}`)
     );
 }
 
