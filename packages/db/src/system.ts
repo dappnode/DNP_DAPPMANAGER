@@ -8,6 +8,7 @@ const PASSWORD_IS_SECURE = "password-is-secure";
 const VERSION_DATA = "version-data";
 const TELEGRAM_STATUS = "telegram-status";
 const TELEGRAM_TOKEN = "telegram-token";
+const TELEGRA_USER_ID = "telegram-user-id";
 const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
@@ -48,6 +49,10 @@ export const telegramChannelIds = dbMain.staticKey<string[]>(
   TELEGRAM_CHANNEL_ID,
   []
 );
+
+// Telegram user Id
+
+export const telegramUserId = dbMain.staticKey<string>(TELEGRA_USER_ID, "");
 
 // Cache version information to detect updates
 
