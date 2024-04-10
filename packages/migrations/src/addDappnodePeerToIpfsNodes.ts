@@ -24,7 +24,7 @@ export async function addDappnodePeerToIpfsNodes() {
 
   // Adding peer for each node
   for (const node of nodesIps) {
-    logs.info(`adding dappnode peer to ipfs node: ${node}`);
+    logs.info(`adding dappnode peer to ipfs node: ${node.peer}`);
     await fetch(
       `http://${ipfsAlias}:5001/api/v0/swarm/peering/add?arg=${dappnodeIpfsPeer(
         node
