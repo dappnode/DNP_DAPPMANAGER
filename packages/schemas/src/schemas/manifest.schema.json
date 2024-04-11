@@ -457,7 +457,10 @@
           "Economic incentive",
           "Monitoring",
           "Payment channels",
-          "Storage"
+          "Storage",
+          "Lido",
+          "DVT",
+          "LSD"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",
@@ -467,7 +470,10 @@
           "Economic incentive": "Packages that offer an economic incentive or reward to the admin that runs it, i.e. Lightning Network",
           "Monitoring": "Packages that track metrics",
           "Payment channels": "Packages whose main purpose is to manage or control payment channels, i.e. Raiden",
-          "Storage": "Decentralized storage solutions, i.e. Swarm"
+          "Storage": "Decentralized storage solutions, i.e. Swarm",
+          "Lido": "Packages for Lido operators",
+          "DVT": "Packages for operators of Distributed Validators",
+          "LSD": "Packages for Liquidity Staking operators"
         }
       }
     },
