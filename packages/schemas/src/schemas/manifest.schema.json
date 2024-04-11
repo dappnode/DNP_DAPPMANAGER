@@ -458,7 +458,9 @@
           "Monitoring",
           "Payment channels",
           "Storage",
-          "Lido"
+          "Lido",
+          "DVT",
+          "LSD"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",
@@ -469,7 +471,9 @@
           "Monitoring": "Packages that track metrics",
           "Payment channels": "Packages whose main purpose is to manage or control payment channels, i.e. Raiden",
           "Storage": "Decentralized storage solutions, i.e. Swarm",
-          "Lido": "Packages for Lido operators"
+          "Lido": "Packages for Lido operators",
+          "DVT": "Packages for operators of Distributed Validators",
+          "LSD": "Packages for Liquidity Staking operators"
         }
       }
     },
