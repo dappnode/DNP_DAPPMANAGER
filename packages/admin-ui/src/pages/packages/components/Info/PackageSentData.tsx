@@ -37,12 +37,13 @@ export function RenderPackageSentData({
     });
   }
 
-  // Sorts the entries alphabetically
+  // Sorts the entries alphanumerically
   function orderEntries(entries: [string, string][]): [string, string][] {
     return entries.sort((a, b) =>
+      // Undefined here to use the default browser locale
       a[0].localeCompare(b[0], undefined, {
         numeric: true,
-        sensitivity: "base"
+        sensitivity: "base" // Case insensitive (a, A and other variations are considered the same)
       })
     );
   }
