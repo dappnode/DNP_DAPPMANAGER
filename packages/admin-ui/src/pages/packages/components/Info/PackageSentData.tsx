@@ -37,12 +37,23 @@ export function RenderPackageSentData({
     });
   }
 
+  // Sorts the entries alphanumerically
+  function orderEntries(entries: [string, string][]): [string, string][] {
+    return entries.sort((a, b) =>
+      // Undefined here to use the default browser locale
+      a[0].localeCompare(b[0], undefined, {
+        numeric: true,
+        sensitivity: "base" // Case insensitive (a, A and other variations are considered the same)
+      })
+    );
+  }
+
   return (
     <div className="package-sent-data">
       <header className="list-grid-header">Key</header>
       <header className="list-grid-header">Package sent values</header>
 
-      {entries.map(([key, value]) => (
+      {orderEntries(entries).map(([key, value]) => (
         <React.Fragment key={key}>
           <div>{key}</div>
           <div>
