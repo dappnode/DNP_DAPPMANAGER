@@ -84,8 +84,14 @@ export class DappnodeTelegramBot {
               "Unauthorized user. Please contact the admin"
             );
           } else {
-            logs.info(`Fetching wireguard credentials for user: ${userId}`);
-            const credentials = await this.getWireguardCredentialsCmd();
+            // default device https://github.com/dappnode/DNP_WIREGUARD/blob/4a074010c98b5d3003d1c3306edcb75392b247f4/docker-compose.yml#L12
+            const deviceName = msg.text.split(" ")[1] || "dappnode_admin";
+            logs.info(
+              `Fetching wireguard credentials from device ${deviceName} for user: ${userId}`
+            );
+            const credentials = await this.getWireguardCredentialsCmd(
+              deviceName
+            );
             await this.sendMessage(msg.chat.id.toString(), credentials);
           }
         } else {
@@ -124,11 +130,11 @@ export class DappnodeTelegramBot {
   /**
    *  Fetch wireguard credentials with the default device
    */
-  private async getWireguardCredentialsCmd(): Promise<string> {
-    // default device https://github.com/dappnode/DNP_WIREGUARD/blob/4a074010c98b5d3003d1c3306edcb75392b247f4/docker-compose.yml#L12
-    const defaultDevice = "dappnode_admin";
-    // build url with params.WIREGUARD_API_URL and defaultDevice
-    const url = `${params.WIREGUARD_API_URL}/${defaultDevice}`;
+  private async getWireguardCredentialsCmd(
+    deviceName?: string
+  ): Promise<string> {
+    // build url with params.WIREGUARD_API_URL and deviceName
+    const url = `${params.WIREGUARD_API_URL}/${deviceName}`;
     const res = await fetch(url);
     const configRemote = await res.text();
     if (!res.ok) {
