@@ -35,10 +35,7 @@ export function TelegramNotifications() {
         onSuccess: `Updated telegram configuration`
       });
       setReqStatusConfig({ result: true });
-      if (telegramStatus.data === false) {
-        await updateTelegramStatus(true);
-      }
-      setToken("");
+      if (telegramStatus.data === false) await updateTelegramStatus(true);
     } catch (e) {
       setReqStatusConfig({ error: e });
       console.error("Error on telegramConfigSet", e);
@@ -107,6 +104,7 @@ export function TelegramNotifications() {
             checked={telegramStatus.data}
             label={telegramStatus.data === true ? "On" : "Off"}
             onToggle={updateTelegramStatus}
+            disabled={telegramStatus.isValidating || !token || !userId}
           ></Switch>
         </Form.Group>
       ) : telegramStatus.error ? (
