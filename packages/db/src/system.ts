@@ -52,7 +52,7 @@ export const telegramChannelIds = dbMain.staticKey<string[]>(
 
 // Telegram user Id
 
-export const telegramUserId = dbMain.staticKey<string>(TELEGRA_USER_ID, "");
+export const telegramUserId = dbMain.staticKey<string>(TELEGRAM_USER_ID, "");
 
 // Cache version information to detect updates
 
