@@ -1,0 +1,52 @@
+import { docker } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
+import { logs } from "@dappnode/logger";
+import { networks } from "@dappnode/types";
+import * as db from "@dappnode/db";
+
+/**
+ * Creates the staker network and connects the staker packages to it
+ */
+export async function createStakerNetworkAndConnectStakerPkgs(): Promise<void> {
+  await createDockerStakerNetwork();
+  await connectStakerPkgsToStakerNetwork();
+}
+
+/**
+ * Creates the docker staker network
+ */
+async function createDockerStakerNetwork(): Promise<void> {
+  const stakerNetwork = docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME);
+
+  try {
+    await stakerNetwork.inspect();
+    logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} exists`);
+  } catch (e) {
+    if (e.statusCode === 404) {
+      logs.info(`Creating docker network ${params.DOCKER_STAKER_NETWORK_NAME}`);
+      await docker.createNetwork({
+        Name: params.DOCKER_STAKER_NETWORK_NAME,
+        Driver: "bridge",
+        IPAM: {
+          Driver: "default",
+        },
+      });
+    } else {
+      logs.error(
+        `Failed to create docker network ${params.DOCKER_STAKER_NETWORK_NAME}`
+      );
+      throw e;
+    }
+  }
+}
+
+/**
+ * Connect only selected staker packages by the user to the staker network
+ * for the existing networks
+ */
+async function connectStakerPkgsToStakerNetwork(): Promise<void> {
+  const stakerNetwork = docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME);
+  for (const network of Object.values(networks)) {
+    db.executionClientHolesky;
+  }
+}
