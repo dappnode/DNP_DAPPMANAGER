@@ -72,7 +72,12 @@ export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
 export { statsSwapGet } from "./statsSwapGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
-export * from "./telegram.js";
+export {
+  telegramConfigGet,
+  telegramConfigSet,
+  telegramStatusGet,
+  telegramStatusSet
+} from "./telegram.js";
 export { updateUpgrade } from "./updateUpgrade.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";
 export { volumeRemove } from "./volumeRemove.js";

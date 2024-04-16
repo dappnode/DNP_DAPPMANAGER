@@ -12,6 +12,7 @@ const TELEGRAM_USER_ID = "telegram-user-id";
 const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
+const IS_DAPPNODE_CLOUD = "is-dappnode-cloud";
 
 export const serverName = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(SERVER_NAME, ""),
@@ -50,9 +51,16 @@ export const telegramChannelIds = dbMain.staticKey<string[]>(
   []
 );
 
-// Telegram user Id
+// Telegram user Id i.e 1461924175
 
 export const telegramUserId = dbMain.staticKey<string>(TELEGRAM_USER_ID, "");
+
+// Is dappnode cloud
+
+export const isDappnodeCloud = dbMain.staticKey<boolean | null>(
+  IS_DAPPNODE_CLOUD,
+  null
+);
 
 // Cache version information to detect updates
 

@@ -6,30 +6,40 @@ import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage.js";
 import { bold } from "./markdown.js";
 import { editDnpSetting } from "../autoUpdates/editDnpSetting.js";
 import { editCoreSetting } from "../autoUpdates/editCoreSetting.js";
+import { params } from "@dappnode/params";
 
 // Note: Telegram commands MUST NOT contain "-", only "_"
 export const enableAutoUpdatesCmd = "/enable_auto_updates";
 export const startCmd = "/start";
 export const unsubscribeCmd = "/unsubscribe";
 export const helpCmd = "/help";
+export const getWireguardCredentials = "/get_wireguard_credentials";
 
 const cmds = [
   {
     cmd: enableAutoUpdatesCmd,
-    help: "Enable auto-updates for all packages"
+    help: "Enable auto-updates for all packages",
   },
   {
     cmd: startCmd,
-    help: "Subscribe to future notifications"
+    help: "Subscribe to future notifications",
   },
   {
     cmd: unsubscribeCmd,
-    help: "Unsubcribe from future notifications"
+    help: "Unsubcribe from future notifications",
   },
   {
     cmd: helpCmd,
-    help: "Display all available commands"
-  }
+    help: "Display all available commands",
+  },
+  {
+    cmd: helpCmd,
+    help: "Display all available commands",
+  },
+  {
+    cmd: getWireguardCredentials,
+    help: "Fetch wireguard credentials",
+  },
 ];
 
 /**
@@ -48,12 +58,12 @@ export class DappnodeTelegramBot {
     // 3. ETELEGRAM if error was returned from Telegram servers
     // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
     // ETELEGRAM: 404 Not Found => wrong token or not found
-    this.bot.on("polling_error", error => {
+    this.bot.on("polling_error", (error) => {
       logs.error(`${error.name}: ${error.message}`);
     });
 
     // Listen for any messages. If channel ID does not exists, it saves the channel ID
-    this.bot.on("message", async msg => {
+    this.bot.on("message", async (msg) => {
       try {
         if (!msg.text) return;
 
@@ -63,6 +73,20 @@ export class DappnodeTelegramBot {
           await this.unsubscribeCmd(msg);
         } else if (msg.text.startsWith(helpCmd)) {
           await this.helpCmd(msg);
+        } else if (msg.text.startsWith(getWireguardCredentials)) {
+          // verify user ID is whitelisted
+          const userId = msg.from?.id;
+          if (!userId) return;
+          if (userId.toString() !== db.telegramUserId.get()) {
+            logs.error(`Unauthorized user: ${userId}`);
+            await this.sendMessage(
+              msg.chat.id.toString(),
+              "Unauthorized user. Please contact the admin"
+            );
+            return;
+          }
+          const credentials = await this.getWireguardCredentialsCmd();
+          await this.sendMessage(msg.chat.id.toString(), credentials);
         } else {
           // If channel is not subscribed yet, subscribe
           if (!this.channelIdExists(msg.chat.id.toString())) {
@@ -90,8 +114,30 @@ export class DappnodeTelegramBot {
 
   async sendMessage(chatId: string | number, text: string): Promise<void> {
     await this.bot.sendMessage(chatId, text, {
-      parse_mode: "Markdown"
+      parse_mode: "Markdown",
     });
+  }
+
+  // Utils
+
+  /**
+   *  Fetch wireguard credentials with the default device
+   */
+  private async getWireguardCredentialsCmd(): Promise<string> {
+    // default device https://github.com/dappnode/DNP_WIREGUARD/blob/4a074010c98b5d3003d1c3306edcb75392b247f4/docker-compose.yml#L12
+    const defaultDevice = "dappnode_admin";
+    // build url with params.WIREGUARD_API_URL and defaultDevice
+    const url = `${params.WIREGUARD_API_URL}/${defaultDevice}`;
+    const res = await fetch(url);
+    const configRemote = await res.text();
+    if (!res.ok) {
+      if (res.status === 404) throw Error(`Device not found: ${configRemote}`);
+      throw Error(
+        `Error fetching credentials: ${res.statusText} ${configRemote}`
+      );
+    }
+
+    return configRemote;
   }
 
   /**
@@ -103,7 +149,7 @@ export class DappnodeTelegramBot {
 
     const message = [
       "Successfully enabled auto-updates",
-      "You can manage or disable auto-update in the Admin UI"
+      "You can manage or disable auto-update in the Admin UI",
     ].join("\n\n");
     await this.sendMessage(msg.chat.id.toString(), message);
   }
@@ -147,7 +193,7 @@ export class DappnodeTelegramBot {
     const chatId = msg.chat.id.toString();
     const message = [
       bold("Commands"),
-      cmds.map(({ cmd, help }) => `${bold(cmd)} ${help}`).join("\n")
+      cmds.map(({ cmd, help }) => `${bold(cmd)} ${help}`).join("\n"),
     ].join("\n\n");
 
     await this.sendMessage(chatId, message);
@@ -167,7 +213,7 @@ export class DappnodeTelegramBot {
   private removeChannelId(channelId: string): void {
     const channelIds = db.telegramChannelIds.get();
     db.telegramChannelIds.set(
-      channelIds.filter(chatId => chatId !== channelId)
+      channelIds.filter((chatId) => chatId !== channelId)
     );
   }
 }

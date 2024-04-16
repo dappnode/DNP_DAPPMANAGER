@@ -10,35 +10,38 @@ import Ok from "components/Ok";
 import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
 import { forumUrl } from "params";
+import Input from "components/Input";
 
 export function TelegramNotifications() {
   const telegramStatus = useApi.telegramStatusGet();
-  const telegramToken = useApi.telegramTokenGet();
+  const telegramConfig = useApi.telegramConfigGet();
 
-  const [reqStatusToken, setReqStatusToken] = useState<ReqStatus>({});
+  const [reqStatusConfig, setReqStatusConfig] = useState<ReqStatus>({});
   const [reqStatusStatus, setReqStatusStatus] = useState<ReqStatus>({});
   const [token, setToken] = useState("");
+  const [userId, setUserId] = useState("");
 
-  // Update local `token` input with the token stored in the DAPPMANAGER DB `telegramToken`
+  // Update local `token` and user ID input with the token stored in the DAPPMANAGER DB `telegramToken`
   useEffect(() => {
-    if (telegramToken.data) setToken(telegramToken.data);
-  }, [telegramToken.data]);
+    if (telegramConfig.data?.token) setToken(telegramConfig.data.token);
+    if (telegramConfig.data?.userId) setUserId(telegramConfig.data.userId);
+  }, [telegramConfig.data]);
 
-  async function updateTelegramToken() {
+  async function updateTelegramConfig() {
     try {
-      setReqStatusToken({ loading: true });
-      await withToast(() => api.telegramTokenSet({ telegramToken: token }), {
-        message: `Setting telegram token...`,
-        onSuccess: `Updated telegram token`
+      setReqStatusConfig({ loading: true });
+      await withToast(() => api.telegramConfigSet({ token, userId }), {
+        message: `Setting telegram configuration...`,
+        onSuccess: `Updated telegram configuration`
       });
-      setReqStatusToken({ result: true });
+      setReqStatusConfig({ result: true });
       if (telegramStatus.data === false) {
         await updateTelegramStatus(true);
       }
       setToken("");
     } catch (e) {
-      setReqStatusToken({ error: e });
-      console.error("Error on telegramTokenSet", e);
+      setReqStatusConfig({ error: e });
+      console.error("Error on telegramConfigSet", e);
     }
   }
 
@@ -95,26 +98,6 @@ export function TelegramNotifications() {
         </ul>
       </div>
 
-      <Form.Group>
-        <Form.Label>Telegram token</Form.Label>
-        <InputSecret
-          placeholder="Telegram token"
-          value={token}
-          onValueChange={setToken}
-          onEnterPress={updateTelegramToken}
-          append={
-            <Button
-              type="submit"
-              className="register-button"
-              onClick={updateTelegramToken}
-              variant="dappnode"
-            >
-              Submit
-            </Button>
-          }
-        />
-      </Form.Group>
-
       {telegramStatus.data !== undefined ? (
         <Form.Group>
           <div>
@@ -135,8 +118,49 @@ export function TelegramNotifications() {
           style={{ margin: "auto" }}
         />
       )}
-      {reqStatusToken.error && (
-        <ErrorView error={reqStatusToken.error} hideIcon red />
+
+      <Form.Group>
+        <Form.Label>Telegram token</Form.Label>
+        <InputSecret
+          placeholder="Telegram token"
+          value={token}
+          onValueChange={setToken}
+          onEnterPress={updateTelegramConfig}
+          append={
+            <Button
+              type="submit"
+              className="register-button"
+              onClick={updateTelegramConfig}
+              variant="dappnode"
+              disabled={!token || !userId}
+            >
+              Submit
+            </Button>
+          }
+        />
+
+        <Form.Label>Telegram user ID</Form.Label>
+        <Input
+          placeholder="Telegram user ID"
+          value={userId}
+          onValueChange={setUserId}
+          onEnterPress={updateTelegramConfig}
+          append={
+            <Button
+              type="submit"
+              className="register-button"
+              onClick={updateTelegramConfig}
+              variant="dappnode"
+              disabled={!userId || !token}
+            >
+              Submit
+            </Button>
+          }
+        />
+      </Form.Group>
+
+      {reqStatusConfig.error && (
+        <ErrorView error={reqStatusConfig.error} hideIcon red />
       )}
       {reqStatusStatus.error && (
         <ErrorView error={reqStatusStatus.error} hideIcon red />

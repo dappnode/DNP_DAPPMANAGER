@@ -22,21 +22,29 @@ export async function telegramStatusSet({
 }
 
 /**
- * Returns the token of the telegram bot
+ * Get telegram configuration: token and user ID
  */
-export async function telegramTokenGet(): Promise<string | null> {
-  return db.telegramToken.get();
+export async function telegramConfigGet(): Promise<{
+  token: string | null;
+  userId: string;
+}> {
+  return {
+    token: db.telegramToken.get(),
+    userId: db.telegramUserId.get()
+  };
 }
 
 /**
- * Sets the telegram token
- * @param telegramToken New telegram token
+ * Set telegram configuration: token and user ID
  */
-export async function telegramTokenSet({
-  telegramToken
+export async function telegramConfigSet({
+  token,
+  userId
 }: {
-  telegramToken: string;
+  token: string;
+  userId: string;
 }): Promise<void> {
-  db.telegramToken.set(telegramToken);
+  db.telegramToken.set(token);
+  db.telegramUserId.set(userId);
   eventBus.telegramStatusChanged.emit();
 }
