@@ -20,10 +20,56 @@
       "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
       "errorMessage": "should be a semantic version in the format x.y.z"
     },
+    "upstreamRepo": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the upstream software repository can be specified here.",
+          "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
+        },
+        {
+          "type": "array",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), several upstream software repositories can be specified here.",
+          "items": {
+            "type": "string",
+            "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
+          }
+        }
+      ]
+    },
     "upstreamVersion": {
-      "type": "string",
-      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
-      "examples": ["2.6.0-beta", "any-text"]
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
+          "examples": ["2.6.0", "v1.2.1"]
+        },
+        {
+          "type": "array",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node) from several repositories, the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
+          "items": {
+            "type": "string",
+            "examples": ["2.6.0", "v1.2.1"]
+          }
+        }
+      ]
+    },
+    "upstreamArg": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the env var name to handle the upstream software version can be specified here.",
+          "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
+        },
+        {
+          "type": "array",
+          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node) from several repositories, the env var names to handle the upstream software versions can be specified here.",
+          "items": {
+            "type": "string",
+            "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
+          }
+        }
+      ]
     },
     "shortDescription": {
       "type": "string",
