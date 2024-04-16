@@ -19,13 +19,29 @@ export function TelegramNotifications() {
   const [reqStatusConfig, setReqStatusConfig] = useState<ReqStatus>({});
   const [reqStatusStatus, setReqStatusStatus] = useState<ReqStatus>({});
   const [token, setToken] = useState("");
+  const [tokenError, setTokenError] = useState(false);
   const [userId, setUserId] = useState("");
+  const [userIdError, setUserIdError] = useState(false);
 
   // Update local `token` and user ID input with the token stored in the DAPPMANAGER DB `telegramToken`
   useEffect(() => {
     if (telegramConfig.data?.token) setToken(telegramConfig.data.token);
     if (telegramConfig.data?.userId) setUserId(telegramConfig.data.userId);
   }, [telegramConfig.data]);
+
+  useEffect(() => {
+    const tokenRegex = /^\d+:[A-Za-z0-9_-]+$/;
+    // Telegram token validation
+    if (tokenRegex.test(token) || token === "") setTokenError(false);
+    else setTokenError(true);
+  }, [token]);
+
+  useEffect(() => {
+    const userIdRegex = /^\d{1,10}$/;
+    // Telegram user ID validation
+    if (userIdRegex.test(userId) || userId === "") setUserIdError(false);
+    else setUserIdError(true);
+  }, [userId]);
 
   async function updateTelegramConfig() {
     try {
@@ -130,13 +146,19 @@ export function TelegramNotifications() {
               className="register-button"
               onClick={updateTelegramConfig}
               variant="dappnode"
-              disabled={!token || !userId}
+              disabled={
+                !token || token === telegramConfig.data?.token || tokenError
+              }
             >
               Submit
             </Button>
           }
         />
-
+        {tokenError && (
+          <span style={{ fontSize: "12px", color: "red" }}>
+            Telegram token format is incorrect
+          </span>
+        )}
         <Form.Label>Telegram user ID</Form.Label>
         <Input
           placeholder="Telegram user ID"
@@ -149,12 +171,19 @@ export function TelegramNotifications() {
               className="register-button"
               onClick={updateTelegramConfig}
               variant="dappnode"
-              disabled={!userId || !token}
+              disabled={
+                !userId || userId === telegramConfig.data?.userId || userIdError
+              }
             >
               Submit
             </Button>
           }
         />
+        {userIdError && (
+          <span style={{ fontSize: "12px", color: "red" }}>
+            Telegram user ID format is incorrect
+          </span>
+        )}
       </Form.Group>
 
       {reqStatusConfig.error && (
