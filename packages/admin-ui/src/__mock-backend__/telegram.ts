@@ -1,21 +1,28 @@
 import { Routes } from "@dappnode/types";
 
 let isEnabled = false;
-let token: string | null = null;
+let telegramToken: string = "";
+let telegramUserId: string = "";
 
 export const telegram: Pick<
   Routes,
   | "telegramStatusGet"
   | "telegramStatusSet"
-  | "telegramTokenGet"
-  | "telegramTokenSet"
+  | "telegramConfigGet"
+  | "telegramConfigSet"
 > = {
   telegramStatusGet: async () => isEnabled,
   telegramStatusSet: async ({ telegramStatus }) => {
     isEnabled = telegramStatus;
   },
-  telegramTokenGet: async () => token,
-  telegramTokenSet: async ({ telegramToken }) => {
-    token = telegramToken;
+  telegramConfigGet: async () => {
+    return {
+      token: telegramToken,
+      userId: telegramUserId
+    };
+  },
+  telegramConfigSet: async ({ token, userId }) => {
+    token = token;
+    userId = userId;
   }
 };
