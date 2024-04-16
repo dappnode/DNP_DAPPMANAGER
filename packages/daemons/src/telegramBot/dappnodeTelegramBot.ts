@@ -2,11 +2,11 @@ import TelegramBot from "node-telegram-bot-api";
 import { uniq } from "lodash-es";
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
-import { formatTelegramCommandHeader } from "./buildTelegramCommandMessage.js";
 import { bold } from "./markdown.js";
 import { editDnpSetting } from "../autoUpdates/editDnpSetting.js";
 import { editCoreSetting } from "../autoUpdates/editCoreSetting.js";
 import { params } from "@dappnode/params";
+import { TelegramCommandMessageHeader } from "./types.js";
 
 // Note: Telegram commands MUST NOT contain "-", only "_"
 export const enableAutoUpdatesCmd = "/enable_auto_updates";
@@ -74,7 +74,7 @@ export class DappnodeTelegramBot {
         } else if (msg.text.startsWith(helpCmd)) {
           await this.helpCmd(msg);
         } else if (msg.text.startsWith(getWireguardCredentials)) {
-          // verify user ID is whitelisted
+          // IMPORTANT: verify user ID is whitelisted
           const userId = msg.from?.id;
           if (!userId) return;
           if (userId.toString() !== db.telegramUserId.get()) {
@@ -83,10 +83,11 @@ export class DappnodeTelegramBot {
               msg.chat.id.toString(),
               "Unauthorized user. Please contact the admin"
             );
-            return;
+          } else {
+            logs.info(`Fetching wireguard credentials for user: ${userId}`);
+            const credentials = await this.getWireguardCredentialsCmd();
+            await this.sendMessage(msg.chat.id.toString(), credentials);
           }
-          const credentials = await this.getWireguardCredentialsCmd();
-          await this.sendMessage(msg.chat.id.toString(), credentials);
         } else {
           // If channel is not subscribed yet, subscribe
           if (!this.channelIdExists(msg.chat.id.toString())) {
@@ -160,7 +161,8 @@ export class DappnodeTelegramBot {
   private async subscribeCmd(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     const message =
-      formatTelegramCommandHeader("Success") + "Successfully saved channel ID";
+      this.formatTelegramCommandHeader("Success") +
+      "Successfully saved channel ID";
 
     this.addChannelId(chatId);
 
@@ -177,10 +179,11 @@ export class DappnodeTelegramBot {
       this.removeChannelId(chatId);
 
       message =
-        formatTelegramCommandHeader("Success") +
+        this.formatTelegramCommandHeader("Success") +
         "Succesfully removed channel ID";
     } else {
-      message = formatTelegramCommandHeader("Fail") + "Channel ID not found";
+      message =
+        this.formatTelegramCommandHeader("Fail") + "Channel ID not found";
     }
 
     await this.sendMessage(chatId, message);
@@ -215,5 +218,25 @@ export class DappnodeTelegramBot {
     db.telegramChannelIds.set(
       channelIds.filter((chatId) => chatId !== channelId)
     );
+  }
+
+  /**
+   * Builds the telegram command message header
+   */
+  private formatTelegramCommandHeader(
+    header: TelegramCommandMessageHeader
+  ): string {
+    switch (header) {
+      case "Fail":
+        return `❌ `;
+      case "Success":
+        return `✅ `;
+      case "Stats":
+        return `📊 `;
+      case "Note":
+        return `📋 `;
+      case "Help":
+        return `ℹ️ `;
+    }
   }
 }

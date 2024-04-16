@@ -22,7 +22,7 @@ export const telegram: Pick<
     };
   },
   telegramConfigSet: async ({ token, userId }) => {
-    token = token;
-    userId = userId;
+    telegramToken = token;
+    telegramUserId = userId;
   }
 };
