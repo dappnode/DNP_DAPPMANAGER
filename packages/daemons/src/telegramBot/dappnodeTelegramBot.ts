@@ -76,7 +76,14 @@ export class DappnodeTelegramBot {
         } else if (msg.text.startsWith(getWireguardCredentials)) {
           // IMPORTANT: verify user ID is whitelisted
           const userId = msg.from?.id;
-          if (!userId) return;
+          if (!userId) {
+            logs.error("This command requires user ID authentication");
+            await this.sendMessage(
+              msg.chat.id.toString(),
+              "This command requires user ID authentication"
+            );
+            return;
+          }
           if (userId.toString() !== db.telegramUserId.get()) {
             logs.error(`Unauthorized user: ${userId}`);
             await this.sendMessage(
@@ -89,10 +96,21 @@ export class DappnodeTelegramBot {
             logs.info(
               `Fetching wireguard credentials from device ${deviceName} for user: ${userId}`
             );
-            const credentials = await this.getWireguardCredentialsCmd(
-              deviceName
-            );
-            await this.sendMessage(msg.chat.id.toString(), credentials);
+            try {
+              const credentials = await this.getWireguardCredentialsCmd(
+                deviceName
+              );
+              await this.sendMessage(msg.chat.id.toString(), credentials);
+            } catch (e) {
+              logs.error(`Error fetching wireguard credentials: ${e}`);
+              // beauty error message for device not found
+              if (e.statusCode === 404)
+                e.message = `Device not found: ${deviceName}`;
+              await this.sendMessage(
+                msg.chat.id.toString(),
+                `Error fetching wireguard credentials: ${e.message}`
+              );
+            }
           }
         } else {
           // If channel is not subscribed yet, subscribe
