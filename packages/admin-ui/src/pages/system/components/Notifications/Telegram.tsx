@@ -124,8 +124,7 @@ export function TelegramNotifications() {
             disabled={
               telegramStatus.isValidating ||
               reqStatusConfig.loading ||
-              userIdError ||
-              tokenError ||
+              (telegramStatus.data === false && (userIdError || tokenError)) ||
               (!userId && !token && telegramStatus.data === false)
             }
           ></Switch>
