@@ -30,7 +30,7 @@ export function TelegramNotifications() {
   }, [telegramConfig.data]);
 
   useEffect(() => {
-    const tokenRegex = /^\d+:[A-Za-z0-9_-]+$/;
+    const tokenRegex = /^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$/;
     // Telegram token validation
     if (tokenRegex.test(token) || token === "") setTokenError(false);
     else setTokenError(true);
