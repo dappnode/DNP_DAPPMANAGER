@@ -50,6 +50,7 @@ export function TelegramNotifications() {
         message: `Setting telegram configuration...`,
         onSuccess: `Updated telegram configuration`
       });
+      await telegramConfig.revalidate();
       setReqStatusConfig({ result: true });
       if (telegramStatus.data === false) await updateTelegramStatus(true);
     } catch (e) {
@@ -68,7 +69,7 @@ export function TelegramNotifications() {
           onSuccess: newStatus ? "Telegram ON" : "Telegram OFF"
         }
       );
-      telegramStatus.revalidate();
+      await telegramStatus.revalidate();
       setReqStatusStatus({ result: true });
     } catch (e) {
       setReqStatusStatus({ error: e });
@@ -120,7 +121,12 @@ export function TelegramNotifications() {
             checked={telegramStatus.data}
             label={telegramStatus.data === true ? "On" : "Off"}
             onToggle={updateTelegramStatus}
-            disabled={telegramStatus.isValidating || !token || !userId}
+            disabled={
+              telegramStatus.isValidating ||
+              reqStatusConfig.loading ||
+              userIdError ||
+              tokenError
+            }
           ></Switch>
         </Form.Group>
       ) : telegramStatus.error ? (
@@ -159,6 +165,7 @@ export function TelegramNotifications() {
             Telegram token format is incorrect
           </span>
         )}
+        <br />
         <Form.Label>Telegram user ID</Form.Label>
         <Input
           placeholder="Telegram user ID"
