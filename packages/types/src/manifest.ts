@@ -9,9 +9,14 @@ export interface Manifest {
   // Package metadata
   name: string;
   version: string;
-  upstreamVersion?: string;
-  upstreamRepo?: string;
-  upstreamArg?: string;
+  upstreamVersion?: string | string[];
+  upstreamRepo?: string | string[];
+  upstreamArg?: string | string[];
+  upstream?: {
+    repo: string;
+    version: string;
+    arg: string;
+  }[];
   shortDescription?: string;
   description?: string;
   author?: string;
@@ -49,13 +54,13 @@ export interface Manifest {
     minimumDockerVersion?: string;
   };
   globalEnvs?:
-    | {
-        all?: boolean;
-      }
-    | {
-        envs: string[];
-        services: string[];
-      }[];
+  | {
+    all?: boolean;
+  }
+  | {
+    envs: string[];
+    services: string[];
+  }[];
   architectures?: Architecture[];
 
   // Safety properties to solve problematic updates
