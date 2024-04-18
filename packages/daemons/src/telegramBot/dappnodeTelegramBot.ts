@@ -80,7 +80,7 @@ export class DappnodeTelegramBot {
             logs.error("This command requires user ID authentication");
             await this.sendMessage(
               msg.chat.id.toString(),
-              "This command requires user ID authentication"
+              "This command requires user ID authentication. Set the auth user ID in your dappnode at http://my.dappnode/system/notifications"
             );
             return;
           }
