@@ -24,7 +24,7 @@ import newTabProps from "utils/newTabProps";
 import { HttpsPortalMapping } from "@dappnode/types";
 import { httpsPortalDnpName } from "params";
 import "./https-mapping.scss";
-import { urlJoin } from "utils/url";
+//import { urlJoin } from "utils/url";
 import { ReqStatus } from "types";
 
 export function HttpsMappings({
