@@ -28,6 +28,7 @@ export const subPaths = {
 // Computed paths
 export const activateFallbackPath = `${subPaths.repository}/eth`;
 export const systemProfilePath = `${pathName}/${subPaths.profile}`;
+export const httpsPortalPath = `${pathName}/${subPaths.network}`;
 
 // DAppNode data
 export const ipfsApiUrl = "http://ipfs.dappnode:5001/api/v0";
