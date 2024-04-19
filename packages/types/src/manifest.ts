@@ -107,8 +107,8 @@ export interface Manifest {
 // Upstream
 export interface UpstreamSettings {
   repo: string;
-  version: string;
   arg: string;
+  version?: string;
 }
 
 // Metrics
