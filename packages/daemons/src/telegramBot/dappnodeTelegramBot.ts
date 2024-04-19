@@ -14,10 +14,10 @@ interface ICommand {
   action:
     | "handleEnableAutoUpdates"
     | "handleDisableAutoUpdates"
-    | "subscribeCmd"
-    | "unsubscribeCmd"
-    | "helpCmd"
-    | "handleWireguardCredentials";
+    | "handleSubscribe"
+    | "handleUnsubscribe"
+    | "handleGetHelp"
+    | "handleGetWireguardCredentials";
   requiresAuth?: boolean;
 }
 
@@ -34,19 +34,19 @@ const COMMANDS: Record<string, ICommand> = {
   },
   "/start": {
     description: "Subscribe to future notifications",
-    action: "subscribeCmd",
+    action: "handleSubscribe",
   },
   "/unsubscribe": {
     description: "Unsubscribe from future notifications",
-    action: "unsubscribeCmd",
+    action: "handleUnsubscribe",
   },
   "/help": {
     description: "Display all available commands",
-    action: "helpCmd",
+    action: "handleGetHelp",
   },
   "/get_wireguard_credentials": {
     description: "Fetch wireguard credentials",
-    action: "handleWireguardCredentials",
+    action: "handleGetWireguardCredentials",
     requiresAuth: true,
   },
 };
@@ -105,7 +105,7 @@ export class DappnodeTelegramBot {
   /**
    *  Fetch wireguard credentials with the default device
    */
-  private async handleWireguardCredentials(
+  private async handleGetWireguardCredentials(
     msg: TelegramBot.Message
   ): Promise<void> {
     // default device name is dappnode_admin, see https://github.com/dappnode/DNP_WIREGUARD/blob/4a074010c98b5d3003d1c3306edcb75392b247f4/docker-compose.yml#L12
@@ -161,24 +161,23 @@ export class DappnodeTelegramBot {
   /**
    * Print help
    */
-  private async helpCmd(msg: TelegramBot.Message): Promise<void> {
+  private async handleGetHelp(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
-    const message = [
-      bold("Commands"),
-      ...Object.entries(COMMANDS).map(
-        ([command, { description }]) => `${command} - ${description}`
-      ),
-    ].join("\n\n");
+    const commandsList = Object.entries(COMMANDS).map(
+      ([command, { description }]) =>
+        `${command.replace(/_/g, "\\_")} - ${description}` // escape underscore for markdown
+    );
 
-    await this.sendMessage(chatId, message);
+    await this.sendMessage(
+      chatId,
+      [bold("Commands"), ...commandsList].join("\n\n")
+    );
   }
-
-  // Channel ID subscription
 
   /**
    * Add channel ID
    */
-  private async subscribeCmd(msg: TelegramBot.Message): Promise<void> {
+  private async handleSubscribe(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     const message =
       this.formatTelegramCommandHeader("Success") +
@@ -192,7 +191,7 @@ export class DappnodeTelegramBot {
   /**
    * Remove channel ID
    */
-  private async unsubscribeCmd(msg: TelegramBot.Message): Promise<void> {
+  private async handleUnsubscribe(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     let message = "";
     if (this.channelIdExists(chatId)) {
@@ -226,7 +225,7 @@ export class DappnodeTelegramBot {
 
   private async checkSubscription(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
-    if (!this.channelIdExists(chatId)) await this.subscribeCmd(msg);
+    if (!this.channelIdExists(chatId)) await this.handleSubscribe(msg);
   }
 
   private channelIdExists(chatId: string): boolean {
