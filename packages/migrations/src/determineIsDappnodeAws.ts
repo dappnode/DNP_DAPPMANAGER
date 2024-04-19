@@ -17,8 +17,8 @@ export async function determineIsDappnodeAws(): Promise<void> {
   try {
     logs.info("Determining is Dappnode AWS");
     // see command https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-add-user-data.html#instancedata-user-data-retrieval
-    const command = `TOKEN=\`curl -m 10 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"\` \\
-&& curl -m 10 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/user-data`;
+    const command = `TOKEN=\`curl -m 3 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"\` \\
+&& curl -m 3 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/user-data`;
 
     const userData = await shellHost(command);
     const [userId, botToken] = userData.split(",");
