@@ -36,7 +36,7 @@
     "@types/node": "^20.6.2"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
+    "@dappnode/types": "^0.1.37",
     "ajv": "^8.12.0",
     "semver": "^7.5.0"
   }

@@ -546,7 +546,7 @@ export type InstalledPackageData = Pick<
 
 export interface UpdateAvailable {
   newVersion: string;
-  upstreamVersion?: string;
+  upstreamVersion?: string | string[];
 }
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
@@ -1034,9 +1034,9 @@ export type EthClientSyncedNotificationStatus = {
 
 export type Eth2ClientTarget =
   | {
-      execClient: ExecutionClientMainnet;
-      consClient: ConsensusClientMainnet;
-    }
+    execClient: ExecutionClientMainnet;
+    consClient: ConsensusClientMainnet;
+  }
   | "remote";
 
 /**
