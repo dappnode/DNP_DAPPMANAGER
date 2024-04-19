@@ -68,6 +68,18 @@ export class DappnodeTelegramBot {
     this.bot.on("message", (msg) => this.handleMessage(msg));
   }
 
+  async sendMessage(chatId: number | string, text: string): Promise<void> {
+    await this.bot.sendMessage(chatId, text, { parse_mode: "Markdown" });
+  }
+
+  async start(): Promise<void> {
+    await this.bot.startPolling();
+  }
+
+  async stop(): Promise<void> {
+    await this.bot.stopPolling();
+  }
+
   private async handleMessage(msg: TelegramBot.Message): Promise<void> {
     if (!msg.text) return;
 
@@ -198,13 +210,6 @@ export class DappnodeTelegramBot {
   }
 
   // HELPERS
-
-  private async sendMessage(
-    chatId: number | string,
-    text: string
-  ): Promise<void> {
-    await this.bot.sendMessage(chatId, text, { parse_mode: "Markdown" });
-  }
 
   private isUserAuthorized(userId: number | undefined): boolean {
     return !!userId && userId.toString() === db.telegramUserId.get();
