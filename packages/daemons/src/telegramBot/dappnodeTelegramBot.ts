@@ -27,7 +27,7 @@ const COMMANDS: Record<string, ICommand> = {
     action: "handleEnableAutoUpdates",
     requiresAuth: true,
   },
-  disable_auto_updates: {
+  "/disable_auto_updates": {
     description: "Disable auto-updates for all packages",
     action: "handleDisableAutoUpdates",
     requiresAuth: true,
@@ -55,7 +55,7 @@ export class DappnodeTelegramBot {
   private bot: TelegramBot;
 
   constructor(telegramToken: string) {
-    this.bot = new TelegramBot(telegramToken, { polling: true });
+    this.bot = new TelegramBot(telegramToken);
     // POLLING ERRORS
     // 1. EFATAL if error was fatal e.g. network error
     // 2. EPARSE if response body could not be parsed
