@@ -12,7 +12,7 @@ const TELEGRAM_USER_ID = "telegram-user-id";
 const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
-const IS_DAPPNODE_CLOUD = "is-dappnode-cloud";
+const IS_DAPPNODE_AWS = "is-dappnode-aws";
 
 export const serverName = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(SERVER_NAME, ""),
@@ -55,10 +55,10 @@ export const telegramChannelIds = dbMain.staticKey<string[]>(
 
 export const telegramUserId = dbMain.staticKey<string>(TELEGRAM_USER_ID, "");
 
-// Is dappnode cloud
+// Is dappnode AWS instance
 
-export const isDappnodeCloud = dbMain.staticKey<boolean | null>(
-  IS_DAPPNODE_CLOUD,
+export const isDappnodeAws = dbMain.staticKey<boolean | null>(
+  IS_DAPPNODE_AWS,
   null
 );
 

@@ -9,7 +9,7 @@ import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcod
 import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
-import { determineIsDappnodeCloud } from "./determineIsDappnodeCloud.js";
+import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -139,9 +139,9 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  await determineIsDappnodeCloud().catch((e) =>
+  await determineIsDappnodeAws().catch((e) =>
     migrationErrors.push({
-      migration: "determine if the node is running in Dappnode Cloud",
+      migration: "determine if the node is running in Dappnode AWS",
       coreVersion: "0.2.93",
       name: "MIGRATION_ERROR",
       message: e.message,
