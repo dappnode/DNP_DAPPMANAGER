@@ -1,5 +1,6 @@
 import * as db from "@dappnode/db";
 import { logs } from "@dappnode/logger";
+import { shellHost } from "@dappnode/utils";
 import { eventBus } from "@dappnode/eventbus";
 
 /**
@@ -14,29 +15,19 @@ export async function determineIsDappnodeAws(): Promise<void> {
   if (db.isDappnodeAws.get() !== null) return;
 
   try {
-    const token = await fetchWithTimeout(
-      "http://169.254.169.254/latest/api/token",
-      {
-        method: "PUT",
-        headers: {
-          "X-aws-ec2-metadata-token-ttl-seconds": "21600",
-        },
-      }
-    );
+    logs.info("Determining is Dappnode AWS");
+    // see command https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-add-user-data.html#instancedata-user-data-retrieval
+    const command = `TOKEN=\`curl -m 10 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"\` \\
+&& curl -m 10 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/user-data`;
 
-    const userData = await fetchWithTimeout(
-      "http://169.254.169.254/latest/user-data",
-      {
-        headers: {
-          "X-aws-ec2-metadata-token": token,
-        },
-      }
-    );
-
+    const userData = await shellHost(command);
     const [userId, botToken] = userData.split(",");
 
-    if (!isValidTelegramUserId(userId) || !isValidTelegramToken(botToken))
-      throw new Error("Invalid user data format or content");
+    if (!isValidTelegramUserId(userId) || !isValidTelegramToken(botToken)) {
+      logs.error("Invalid aws user data format or content, got: ", userData);
+      db.isDappnodeAws.set(false);
+      return;
+    }
 
     logs.info(`Dappnode AWS cloud detected for user ID: ${userId}`);
 
@@ -48,31 +39,8 @@ export async function determineIsDappnodeAws(): Promise<void> {
     // emit event to trigger telegram bot daemon
     eventBus.telegramStatusChanged.emit();
   } catch (error) {
-    logs.error("Error determining Dappnode status", error);
+    logs.info("Not a Dappnode AWS cloud");
     db.isDappnodeAws.set(false);
-  }
-}
-
-/**
- * Implements fetch with a timeout
- */
-async function fetchWithTimeout(
-  url: string,
-  options: RequestInit,
-  timeout = 10000
-) {
-  const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
-  try {
-    const response = await fetch(url, {
-      ...options,
-      signal: controller.signal,
-    });
-    clearTimeout(id);
-    return await response.text();
-  } catch (error) {
-    logs.error(`Fetch request failed: ${error.message}`);
-    throw error;
   }
 }
 
