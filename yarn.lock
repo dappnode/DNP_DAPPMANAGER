@@ -1544,6 +1544,11 @@
     tunnel-agent "^0.6.0"
     uuid "^8.3.2"
 
+"@dappnode/types@^0.1.37":
+  version "0.1.37"
+  resolved "https://registry.yarnpkg.com/@dappnode/types/-/types-0.1.37.tgz#c66424ca047006cb3b7e22e8d38556babc692bd6"
+  integrity sha512-+MBKIQsiMG78Yt8mAqQJXDih1D1IqiQVQdXHAdJfoBONnd+bl1shPuOggvS53iBQ54yq1Ccc5oI7usV4a04g0w==
+
 "@emotion/is-prop-valid@^0.8.1":
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-0.8.8.tgz#db28b1c4368a259b60a97311d6a952d4fd01ac1a"

@@ -14,7 +14,7 @@ export function formatPackageUpdateNotification({
   dnpName: string;
   currentVersion: string;
   newVersion: string;
-  upstreamVersion?: string;
+  upstreamVersion?: string | string[];
   autoUpdatesEnabled: boolean;
 }): string {
   const prettyName = prettyDnpName(dnpName);
@@ -24,7 +24,7 @@ export function formatPackageUpdateNotification({
     `New version ready to install for ${prettyName} (current version ${currentVersion})`,
     upstreamVersion
       ? ` - package version: ${newVersion}\n` +
-        ` - upstream version: ${upstreamVersion}`
+      ` - upstream version: ${upstreamVersion}`
       : ` - version: ${newVersion}`,
 
     `Connect to your DAppNode to install this new version [install / ${prettyName}](${installUrl}).`,
@@ -45,8 +45,7 @@ export function formatSystemUpdateNotification({
     "New system version ready to install",
     packages.map(
       (p) =>
-        ` - ${prettyDnpName(p.name)}: ${p.to} ${
-          p.from ? `(current: ${p.from})` : ""
+        ` - ${prettyDnpName(p.name)}: ${p.to} ${p.from ? `(current: ${p.from})` : ""
         }`
     ),
 
