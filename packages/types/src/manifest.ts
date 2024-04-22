@@ -9,9 +9,9 @@ export interface Manifest {
   // Package metadata
   name: string;
   version: string;
-  upstreamVersion?: string | string[];
-  upstreamRepo?: string | string[];
-  upstreamArg?: string | string[];
+  upstreamVersion?: string;
+  upstreamRepo?: string;
+  upstreamArg?: string;
   upstream?: {
     repo: string;
     version: string;
