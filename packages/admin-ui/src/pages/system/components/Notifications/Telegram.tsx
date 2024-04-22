@@ -11,6 +11,9 @@ import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
 import { forumUrl } from "params";
 import Input from "components/Input";
+import { Accordion } from "react-bootstrap";
+import { BsInfoCircleFill } from "react-icons/bs";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 export function TelegramNotifications() {
   const telegramStatus = useApi.telegramStatusGet();
@@ -22,6 +25,7 @@ export function TelegramNotifications() {
   const [tokenError, setTokenError] = useState(false);
   const [userId, setUserId] = useState("");
   const [userIdError, setUserIdError] = useState(false);
+  const [tgAccordionOpen, setTgAccordionOpen] = useState(false);
 
   // Update local `token` and user ID input with the token stored in the DAPPMANAGER DB `telegramToken`
   useEffect(() => {
@@ -186,6 +190,53 @@ export function TelegramNotifications() {
             </Button>
           }
         />
+        <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
+          <div className="accordion-notifications-wrapper">
+            <Accordion.Toggle
+              eventKey="0"
+              onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
+              className="accordion-notifications"
+            >
+              <div className="header">
+                <BsInfoCircleFill
+                  className="links-icon"
+                  style={{ fontSize: "14px" }}
+                />
+                How can I get my telegram user Id?{" "}
+                {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+              </div>
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="0">
+              <div>
+                <ol>
+                  <li>
+                    Open{" "}
+                    <a
+                      href="https://web.telegram.org/a/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Telegram web
+                    </a>
+                    .
+                  </li>
+                  <li>
+                    Search for the bot <span>@raw_data_bot</span>.
+                  </li>
+                  <li>
+                    Write the command <span>/start</span> and copy the user ID
+                    returned.
+                  </li>
+                  <li>
+                    Paste the user ID into the user ID field and enable Telegram
+                    to secure your dappnode telegram bot and ensure only you are
+                    allowed to write commands to it.
+                  </li>
+                </ol>
+              </div>
+            </Accordion.Collapse>
+          </div>
+        </Accordion>
         {userIdError && (
           <span style={{ fontSize: "12px", color: "red" }}>
             Telegram user ID format is incorrect
