@@ -7,7 +7,7 @@ import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { getInstallerPath } from "pages/installer";
 //import { pathName as systemPathName } from "pages/system";
 //import { subPaths as systemSubPaths } from "pages/system/data";
-import httpsPortalPath from "pages/system/data";
+import { httpsPortalPath } from "pages/system/data";
 import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
