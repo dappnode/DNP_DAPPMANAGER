@@ -632,15 +632,20 @@ export interface Routes {
   telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
-   * Gets bot telegram token
+   * Get telegram configuration: token and user ID
    */
-  telegramTokenGet: () => Promise<string | null>;
+  telegramConfigGet: () => Promise<{
+    token: string | null;
+    userId: string | null;
+  }>;
 
   /**
-   * Sets the telegram token
-   * @param telegramToken new bot token
+   * Set telegram configuration: token and user ID
    */
-  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
+  telegramConfigSet: (kwargs: {
+    token: string;
+    userId: string;
+  }) => Promise<void>;
 
   /**
    * Updates and upgrades the host machine
@@ -814,8 +819,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
-  telegramTokenGet: {},
-  telegramTokenSet: { log: true },
+  telegramConfigGet: {},
+  telegramConfigSet: { log: true },
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
