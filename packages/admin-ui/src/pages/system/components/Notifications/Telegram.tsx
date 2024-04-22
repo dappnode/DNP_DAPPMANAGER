@@ -230,7 +230,7 @@ export function TelegramNotifications() {
                   <li>
                     Paste the user ID into the user ID field and enable Telegram
                     to secure your dappnode telegram bot and ensure only you are
-                    allowed to write commands to it.
+                    the only one allowed to write authenticated commands to it.
                   </li>
                 </ol>
               </div>
