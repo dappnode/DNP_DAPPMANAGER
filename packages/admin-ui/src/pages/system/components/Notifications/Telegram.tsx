@@ -129,7 +129,7 @@ export function TelegramNotifications() {
               telegramStatus.isValidating ||
               reqStatusConfig.loading ||
               (telegramStatus.data === false && (userIdError || tokenError)) ||
-              (!userId && !token && telegramStatus.data === false)
+              ((!userId || !token) && telegramStatus.data === false)
             }
           ></Switch>
         </Form.Group>
