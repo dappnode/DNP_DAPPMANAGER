@@ -905,16 +905,6 @@ export interface HostStatDisk {
 }
 
 /**
- *
- */
-export interface HostStatSwap {
-  total: number;
-  used: number;
-  free: number;
-  usedPercentage: number;
-}
-
-/**
  * Host machine CPU used
  */
 export interface HostStatCpu {
@@ -1034,9 +1024,9 @@ export type EthClientSyncedNotificationStatus = {
 
 export type Eth2ClientTarget =
   | {
-    execClient: ExecutionClientMainnet;
-    consClient: ConsensusClientMainnet;
-  }
+      execClient: ExecutionClientMainnet;
+      consClient: ConsensusClientMainnet;
+    }
   | "remote";
 
 /**

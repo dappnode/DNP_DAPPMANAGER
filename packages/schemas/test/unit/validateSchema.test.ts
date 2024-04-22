@@ -365,7 +365,8 @@ volumes:
       expect(() => validateManifestSchema(manifest)).to.not.throw();
     });
 
-    it("should allow a manifest with the upstream settings defined as separate arrays", () => {
+    it("should not allow a manifest with the upstream settings defined as separate arrays", () => {
+      // This way of defining the upstream settings has been deprecated
       const manifest: Manifest = {
         name: "example.dnp.dappnode.eth",
         version: "1.0.0",
@@ -377,7 +378,7 @@ volumes:
         upstreamArg: ["GETH_VERSION", "NETHERMIND_VERSION"]
       };
 
-      expect(() => validateManifestSchema(manifest)).to.not.throw();
+      expect(() => validateManifestSchema(manifest)).to.throw();
     });
 
     it("should not allow a manifest with upstream settings defined in both possible ways", () => {
