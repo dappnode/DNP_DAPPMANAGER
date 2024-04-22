@@ -26,7 +26,7 @@ export async function telegramStatusSet({
  */
 export async function telegramConfigGet(): Promise<{
   token: string | null;
-  userId: string;
+  userId: string | null;
 }> {
   return {
     token: db.telegramToken.get(),

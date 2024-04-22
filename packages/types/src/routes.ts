@@ -637,7 +637,7 @@ export interface Routes {
    */
   telegramConfigGet: () => Promise<{
     token: string | null;
-    userId: string;
+    userId: string | null;
   }>;
 
   /**

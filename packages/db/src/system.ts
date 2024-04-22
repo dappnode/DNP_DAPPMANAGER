@@ -53,7 +53,10 @@ export const telegramChannelIds = dbMain.staticKey<string[]>(
 
 // Telegram user Id i.e 1461924175
 
-export const telegramUserId = dbMain.staticKey<string>(TELEGRAM_USER_ID, "");
+export const telegramUserId = dbMain.staticKey<string | null>(
+  TELEGRAM_USER_ID,
+  null
+);
 
 // Is dappnode AWS instance
 
