@@ -141,8 +141,8 @@ export async function executeMigrations(): Promise<void> {
 
   await determineIsDappnodeAws().catch((e) =>
     migrationErrors.push({
-      migration: "determine if the node is running in Dappnode AWS",
-      coreVersion: "0.2.93",
+      migration: "determine if the dappnode is running in Dappnode AWS",
+      coreVersion: "0.2.94",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,
