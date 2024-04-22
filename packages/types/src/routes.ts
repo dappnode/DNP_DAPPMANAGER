@@ -41,7 +41,6 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  HostStatSwap,
   DockerUpgradeRequirements,
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
@@ -671,11 +670,6 @@ export interface Routes {
   sshStatusGet: () => Promise<ShhStatus>;
 
   /**
-   * Get memory swap stats
-   */
-  statsSwapGet: () => Promise<HostStatSwap>;
-
-  /**
    * Returns the current DAppNode system info
    */
   systemInfoGet: () => Promise<SystemInfo>;
@@ -818,7 +812,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsCpuGet: {},
   statsDiskGet: {},
   statsMemoryGet: {},
-  statsSwapGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},

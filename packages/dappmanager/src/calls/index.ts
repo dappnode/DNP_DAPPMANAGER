@@ -70,7 +70,6 @@ export {
 } from "./sshManager.js";
 export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
-export { statsSwapGet } from "./statsSwapGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
 export {
   telegramConfigGet,
