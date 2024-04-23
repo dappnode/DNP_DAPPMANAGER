@@ -11,7 +11,6 @@ import Form from "react-bootstrap/esm/Form";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { ReqStatus } from "types";
-import "./ethicalMetrics.scss";
 import { AppContext } from "App";
 import SwitchBig from "components/SwitchBig";
 import { confirm } from "components/ConfirmDialog";

@@ -368,6 +368,12 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1",
     },
+    {
+      name: "Blockswap Labs",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a",
+    }
   ],
 };
 

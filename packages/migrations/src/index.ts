@@ -10,6 +10,7 @@ import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
+import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -137,8 +138,18 @@ export async function executeMigrations(): Promise<void> {
       message: e.message,
       stack: e.stack,
     })
-  );
+  );                                                    
 
+  await determineIsDappnodeAws().catch((e) =>
+    migrationErrors.push({
+      migration: "determine if the dappnode is running in Dappnode AWS",
+      coreVersion: "0.2.94",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+  
   await createStakerNetworkAndConnectStakerPkgs().catch((e) =>
     migrationErrors.push({
       migration: "create docker staker network",
@@ -147,7 +158,7 @@ export async function executeMigrations(): Promise<void> {
       message: e.message,
       stack: e.stack,
     })
-  );
+  );  
 
   if (migrationErrors.length > 0) throw migrationErrors;
 }
