@@ -17,7 +17,7 @@ import DnpNameVerified from "components/DnpNameVerified";
 import Ok from "components/Ok";
 import defaultAvatar from "img/defaultAvatar.png";
 import { MdExpandMore, MdClose, MdExpandLess } from "react-icons/md";
-import { RequestedDnp } from "@dappnode/types";
+import { RequestedDnp, upstreamVersionToString } from "@dappnode/types";
 import { SignedStatus } from "./SignedStatus";
 // Styles
 import "./info.scss";
@@ -81,8 +81,14 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
     description = "No description",
     author = "Unknown",
     version,
-    upstreamVersion
+    upstreamVersion,
+    upstream
   } = manifest;
+
+  const parsedUpstreamVersion = upstreamVersionToString({
+    upstreamVersion,
+    upstream
+  });
 
   const tagDisplay = isUpdated ? "UPDATED" : isInstalled ? "UPDATE" : "INSTALL";
 
@@ -257,7 +263,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
               ) : (
                 version
               )}{" "}
-              {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
+              {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`}{" "}
               {origin || ""}
             </div>
             <div className="subtle-header">CREATED BY</div>
