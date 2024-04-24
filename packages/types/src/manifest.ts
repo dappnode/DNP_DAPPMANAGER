@@ -12,11 +12,7 @@ export interface Manifest {
   upstreamVersion?: string;
   upstreamRepo?: string;
   upstreamArg?: string;
-  upstream?: {
-    repo: string;
-    version: string;
-    arg: string;
-  }[];
+  upstream?: UpstreamItem[];
   shortDescription?: string;
   description?: string;
   author?: string;
@@ -106,6 +102,12 @@ export interface Manifest {
 
   // setupWizard for compacted manifests in core packages
   setupWizard?: SetupWizard;
+}
+
+export interface UpstreamItem {
+  repo: string;
+  version: string;
+  arg: string;
 }
 
 // Metrics
