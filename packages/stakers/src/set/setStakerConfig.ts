@@ -25,6 +25,7 @@ import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
 import { DappnodeInstaller, EthereumClient } from "@dappnode/installer";
+import { ensureStakerPkgsNetworkConfig } from "./ensureStakerPkgsNetworkConfig.js";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -118,6 +119,9 @@ export async function setStakerConfig<T extends Network>(
     consensusClient?.dnpName,
     mevBoost?.dnpName
   );
+
+  // staker network config
+  await ensureStakerPkgsNetworkConfig();
 
   await new EthereumClient().updateFullnodeAlias({
     network,

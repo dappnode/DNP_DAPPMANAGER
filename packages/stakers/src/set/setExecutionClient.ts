@@ -23,12 +23,8 @@ export async function setExecutionClient<T extends Network>({
   targetExecutionClient?: StakerItemOk<T, "execution">;
   currentExecClientPkg?: InstalledPackageData;
 }): Promise<void> {
-  if (!targetExecutionClient?.dnpName && !currentExecutionClient) {
+  if (!targetExecutionClient?.dnpName) {
     // Stop the current execution client if no option and not currentu execution client
-    logs.info(`Not execution client selected`);
-    if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
-  } else if (!targetExecutionClient?.dnpName && currentExecutionClient) {
-    // Stop the current execution client if no target provided
     logs.info(`Not execution client selected`);
     if (currentExecClientPkg) await stopAllPkgContainers(currentExecClientPkg);
   } else if (targetExecutionClient?.dnpName && !currentExecutionClient) {

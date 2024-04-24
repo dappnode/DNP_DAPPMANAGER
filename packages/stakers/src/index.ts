@@ -1,3 +1,3 @@
-export { getStakerConfig, getStakerDnpNamesByNetwork } from "./get/index.js";
-export { setStakerConfig } from "./set/index.js";
+export { getStakerConfig } from "./get/index.js";
+export { setStakerConfig, ensureStakerPkgsNetworkConfig } from "./set/index.js";
 export { getStakerConfigByNetwork } from "./getStakerConfigByNetwork.js";
