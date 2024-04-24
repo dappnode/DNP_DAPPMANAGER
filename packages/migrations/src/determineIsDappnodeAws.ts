@@ -17,13 +17,15 @@ export async function determineIsDappnodeAws(): Promise<void> {
   try {
     logs.info("Determining is Dappnode AWS");
     // see command https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-add-user-data.html#instancedata-user-data-retrieval
-    const command = `TOKEN=\`curl -m 3 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"\` \\
-&& curl -m 3 -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/user-data`;
-
     // The default "hop size" in the AWS instance is 2 so the dappmanager container itselve is not able to reach the metadata service
     // We need to use the host network to reach the metadata service and thats why we use the shellHost function
     // Otherwise user would have to set hop size 1 in the AWS instance creation process which is not user friendly
-    const userData = await shellHost(command);
+    const token = await shellHost(
+      `curl -- -m 3 -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 21600"`
+    );
+    const userData = await shellHost(
+      `curl -- -m 3 -H "X-aws-ec2-metadata-token: ${token}" http://169.254.169.254/latest/user-data`
+    );
     const [userId, botToken] = userData.split(",");
 
     if (!isValidTelegramUserId(userId) || !isValidTelegramToken(botToken)) {
