@@ -1,16 +1,14 @@
-import { docker, listPackageNoThrow } from "@dappnode/dockerapi";
+import {
+  docker,
+  listPackageNoThrow,
+  dockerNetworkConnectNotThrow,
+} from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import {
-  getStakerConfigByNetwork,
-  getStakerDnpNamesByNetwork,
-} from "@dappnode/stakers";
-import { networks } from "@dappnode/types";
-import Dockerode, { Network } from "dockerode";
-import {
-  ComposeFileEditor,
-  ComposeServiceEditor,
-} from "@dappnode/dockercompose";
+import { getStakerConfigByNetwork } from "@dappnode/stakers";
+import { networks, PackageContainer } from "@dappnode/types";
+import Dockerode from "dockerode";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 /**
  * Creates the staker network and connects the staker packages to it
@@ -51,12 +49,10 @@ async function createDockerStakerNetwork(
 
 /**
  * Ensure the following staker configuration:
- * - Add the staker network and its fullndoe alias to the docker-compose file
- * - Connect the staker pkg to the staker network
+ * - Add the staker network and its fullndoe alias to the docker-compose file to the execution client
+ * - Connect the execution and consensus pkgs to the staker network
  *
  * For the following staker pkgs from every network:
- * - web3signer
- * - mev boost
  * - **selected** execution client
  * - **selected** consensus client
  */
@@ -66,29 +62,46 @@ async function ensureStakerPkgsNetworkConfig(
   for (const network of networks) {
     const stakerConfig = getStakerConfigByNetwork(network);
 
-    for (const dnpName of [
-      stakerConfig.executionClient,
-      stakerConfig.consensusClient,
-    ]) {
-      if (dnpName && (await listPackageNoThrow({ dnpName }))) {
-        await addStakerNetworkToCompose(dnpName, network);
-        await connectPkgToStakerNetwork(stakerNetwork, dnpName);
+    if (stakerConfig.executionClient) {
+      // Get execution fullnode alias for the staker network
+      const alias = getStakerFullnodeAlias(
+        stakerConfig.executionClient,
+        network
+      );
+      const executionPkg = await listPackageNoThrow({
+        dnpName: stakerConfig.executionClient,
+      });
+      if (executionPkg) {
+        // Add staker network and fullnode alias to execution compose file
+        await connectPkgToStakerNetwork(
+          stakerNetwork,
+          executionPkg.containers,
+          alias
+        );
+        // Connect execution pkg to staker network
+        await addStakerNetworkToCompose(stakerConfig.executionClient, alias);
       }
+    }
+
+    // Connect consensus to staker network
+    if (stakerConfig.consensusClient) {
+      const consensusPkg = await listPackageNoThrow({
+        dnpName: stakerConfig.consensusClient,
+      });
+      if (consensusPkg)
+        await connectPkgToStakerNetwork(stakerNetwork, consensusPkg.containers);
     }
   }
 }
-
-function getFullnodeAlias(network: Network): string {}
 
 /**
  * Adds the staker network and its fullnode alias to the docker-compose file
  */
 async function addStakerNetworkToCompose(
   dnpName: string,
-  network: Network,
-  aliases?: string[]
+  alias: string
 ): Promise<void> {
-  // compose network
+  // add to compose network
   const compose = new ComposeFileEditor(dnpName, false);
   const stakerNetwork =
     compose.compose.networks?.[params.DOCKER_STAKER_NETWORK_NAME];
@@ -101,25 +114,32 @@ async function addStakerNetworkToCompose(
     };
     compose.write();
   }
-  // compose service network
-  // iterate over compose services
+  // add to compose service network
   for (const [serviceName, service] of Object.entries(
     compose.compose.services
   )) {
     const composeService = new ComposeFileEditor(dnpName, false);
-    if (Array.isArray(service.networks)) continue;
-
+    // network declared in array format is not supported
+    if (Array.isArray(service.networks)) {
+      logs.warn(
+        `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
+      );
+      continue;
+    }
     const stakerServiceNetwork =
       service.networks?.[params.DOCKER_STAKER_NETWORK_NAME];
+
     if (!stakerServiceNetwork) {
-      service.networks = {
-        ...service.networks,
-        [params.DOCKER_STAKER_NETWORK_NAME]: {
-          external: true,
-          aliases: getFullnodeAlias(network),
+      composeService.services()[serviceName].addNetwork(
+        params.DOCKER_STAKER_NETWORK_NAME,
+        {
+          aliases: [alias],
         },
-      };
-      compose.write();
+        {
+          external: true,
+        }
+      );
+      composeService.write();
     }
   }
 }
@@ -129,5 +149,23 @@ async function addStakerNetworkToCompose(
  */
 async function connectPkgToStakerNetwork(
   stakerNetwork: Dockerode.Network,
-  dnpName: string
-): Promise<void> {}
+  pkgContainers: PackageContainer[],
+  alias?: string
+): Promise<void> {
+  for (const container of pkgContainers)
+    await dockerNetworkConnectNotThrow(stakerNetwork, container.containerName, {
+      Aliases: alias ? [alias] : [],
+    });
+}
+
+/**
+ * Returns the execution fullnode alias for the staker network
+ * i.e for a dnpName="geth.dnp.dappnode.eth" and network "mainnet" it should return "geth.staker.dappnode"
+ * @param dnpName "geth.dnp.dappnode.eth"
+ * @param network "mainnet"
+ */
+function getStakerFullnodeAlias(dnpName: string, network: string): string {
+  // remove from dnpName the "dnp" | "public" and the "eth"
+  dnpName = dnpName.replace(/\.dnp|\.public|\.eth/g, "");
+  return `${dnpName}.staker.${network}`;
+}
