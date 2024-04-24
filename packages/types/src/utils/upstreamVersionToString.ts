@@ -7,5 +7,5 @@ export const upstreamVersionToString = ({
     upstreamVersion?: string;
     upstream?: UpstreamItem[];
 }): string | undefined => {
-    return upstreamVersion ? upstreamVersion : upstream && upstream.map(item => item.version).join(", ");
+    return upstreamVersion ? upstreamVersion : upstream && upstream.map(item => `${item.repo}@${item.version}`).join(", ");
 }
