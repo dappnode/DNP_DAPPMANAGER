@@ -1,5 +1,5 @@
 import {
-  dockerNetworkConnectNotThrow,
+  dockerNetworkConnect,
   dockerNetworkDisconnect,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
@@ -109,11 +109,13 @@ async function disconnectConnectedPkgFromStakerNetwork(
   networkName: string,
   pkgContainers: PackageContainer[]
 ): Promise<void> {
-  const connectedContainers = pkgContainers.filter((container) =>
-    container.networks.some((network) => network.name === networkName)
-  );
+  const connectedContainers = pkgContainers
+    .filter((container) =>
+      container.networks.some((network) => network.name === networkName)
+    )
+    .map((container) => container.containerName);
   for (const container of connectedContainers)
-    await dockerNetworkDisconnect(networkName, container.containerName);
+    await dockerNetworkDisconnect(networkName, container);
 }
 
 /**
@@ -171,8 +173,14 @@ async function connectPkgToStakerNetwork(
   pkgContainers: PackageContainer[],
   alias?: string | null
 ): Promise<void> {
-  for (const container of pkgContainers)
-    await dockerNetworkConnectNotThrow(networkName, container.containerName, {
+  const disconnectedContainers = pkgContainers
+    .filter(
+      (container) =>
+        !container.networks.some((network) => network.name === networkName)
+    )
+    .map((container) => container.containerName);
+  for (const container of disconnectedContainers)
+    await dockerNetworkConnect(networkName, container, {
       Aliases: alias ? [alias] : [],
     });
 }

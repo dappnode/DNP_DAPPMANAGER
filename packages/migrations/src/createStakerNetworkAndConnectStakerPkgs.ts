@@ -21,7 +21,7 @@ async function createDockerStakerNetwork(): Promise<void> {
     logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} exists`);
   } catch (e) {
     if (e.statusCode === 404) {
-      logs.info(`Creating docker network ${params.DOCKER_STAKER_NETWORK_NAME}`);
+      logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} not found, creating it`);
       await docker.createNetwork({
         Name: params.DOCKER_STAKER_NETWORK_NAME,
         Driver: "bridge",
