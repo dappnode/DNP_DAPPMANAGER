@@ -14,7 +14,6 @@ import {
   ConsensusClientHolesky,
   ExecutionClientHolesky,
   Network,
-  DockerStakerNetworkAction,
 } from "@dappnode/types";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "@dappnode/db";
@@ -25,7 +24,7 @@ import { setSigner } from "./setSigner.js";
 import { setMevBoost } from "./setMevBoost.js";
 import { ensureSetRequirements } from "./ensureSetRequirements.js";
 import { listPackages } from "@dappnode/dockerapi";
-import { DappnodeInstaller, EthereumClient } from "@dappnode/installer";
+import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import { ensureStakerPkgsNetworkConfig } from "./ensureStakerPkgsNetworkConfig.js";
 
 /**
@@ -113,9 +112,6 @@ export async function setStakerConfig<T extends Network>(
     }),
   ]);
 
-  // staker network config
-  await ensureStakerPkgsNetworkConfig(DockerStakerNetworkAction.REMOVE);
-
   // Set staker config on db
   await setStakerConfigOnDb(
     network,
@@ -124,10 +120,10 @@ export async function setStakerConfig<T extends Network>(
     mevBoost?.dnpName
   );
 
-  // staker network config
-  await ensureStakerPkgsNetworkConfig(DockerStakerNetworkAction.ADD);
+  // ensure staker network config. MUST GO AFTER WRITING ON DB
+  await ensureStakerPkgsNetworkConfig();
 
-  await new EthereumClient().updateFullnodeAlias({
+  await ethereumClient.updateFullnodeAlias({
     network,
     newExecClientDnpName: executionClient?.dnpName,
     prevExecClientDnpName: currentExecutionClient || undefined,

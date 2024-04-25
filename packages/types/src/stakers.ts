@@ -1,10 +1,5 @@
 import { PackageRelease } from "./pkg.js";
 
-export enum DockerStakerNetworkAction {
-  ADD,
-  REMOVE,
-}
-
 // NETWORKS
 export const networks = Object.freeze([
   "mainnet",

@@ -2,14 +2,13 @@ import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import { ensureStakerPkgsNetworkConfig } from "@dappnode/stakers";
-import { DockerStakerNetworkAction } from "@dappnode/types";
 
 /**
  * Creates the staker network and connects the staker packages to it
  */
 export async function createStakerNetworkAndConnectStakerPkgs(): Promise<void> {
   await createDockerStakerNetwork();
-  await ensureStakerPkgsNetworkConfig(DockerStakerNetworkAction.ADD);
+  await ensureStakerPkgsNetworkConfig();
 }
 
 /**

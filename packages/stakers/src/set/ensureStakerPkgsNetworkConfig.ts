@@ -1,19 +1,14 @@
 import {
-  docker,
   dockerNetworkConnectNotThrow,
   dockerNetworkDisconnect,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import Dockerode from "dockerode";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  networks,
-  PackageContainer,
-  DockerStakerNetworkAction,
-} from "@dappnode/types";
+import { networks, PackageContainer } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
+import { getStakerDnpNamesByNetwork } from "../get/getStakerDnpNamesByNetwork.js";
 
 /**
  * Ensure the following staker configuration:
@@ -24,18 +19,23 @@ import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
  * - **selected** execution client
  * - **selected** consensus client
  */
-export async function ensureStakerPkgsNetworkConfig(
-  stakerAction: DockerStakerNetworkAction
-): Promise<void> {
+export async function ensureStakerPkgsNetworkConfig(): Promise<void> {
   for (const network of networks) {
     const stakerConfig = getStakerConfigByNetwork(network);
+    const { executionClients, consensusClients } =
+      getStakerDnpNamesByNetwork(network);
 
-    for (const { dnpName, alias } of [
+    for (const { dnpName, clientsToCheck, alias } of [
       {
         dnpName: stakerConfig.executionClient,
+        clientsToCheck: executionClients,
         alias: getStakerFullnodeAlias(network, stakerConfig.executionClient),
       },
-      { dnpName: stakerConfig.consensusClient, alias: null },
+      {
+        dnpName: stakerConfig.consensusClient,
+        clientsToCheck: consensusClients,
+        alias: null,
+      },
     ]) {
       // skip if no client selected
       if (!dnpName) continue;
@@ -46,24 +46,37 @@ export async function ensureStakerPkgsNetworkConfig(
       // skip if pkg not installed
       if (!pkg) continue;
 
+      // Disconnect and remove staker network from other clients
+      await disconnectAndRemoveStakerNetworkFromCompose(clientsToCheck);
+
       // Add staker network and fullnode alias if available to client compose file
-      if (stakerAction === DockerStakerNetworkAction.ADD) {
-        await connectPkgToStakerNetwork(
-          params.DOCKER_STAKER_NETWORK_NAME,
-          pkg.containers,
-          alias
-        );
-        // Connect client to staker network
-        addStakerNetworkToCompose(dnpName, alias);
-      } else {
-        // Disconnect client from staker network
-        disconnectPkgFromStakerNetwork(
-          docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME),
-          pkg.containers
-        );
-        removeStakerNetworkFromCompose(dnpName);
-      }
+      await connectPkgToStakerNetwork(
+        params.DOCKER_STAKER_NETWORK_NAME,
+        pkg.containers,
+        alias
+      );
+      // Connect client to staker network
+      addStakerNetworkToCompose(dnpName, alias);
     }
+  }
+}
+
+async function disconnectAndRemoveStakerNetworkFromCompose(
+  clientsToCheck: readonly string[]
+): Promise<void> {
+  for (const client of clientsToCheck) {
+    const clientPkg = await listPackageNoThrow({
+      dnpName: client,
+    });
+    // skip if client not installed
+    if (!clientPkg) continue;
+
+    // Disconnect client from staker network
+    await disconnectConnectedPkgFromStakerNetwork(
+      params.DOCKER_STAKER_NETWORK_NAME,
+      clientPkg.containers
+    );
+    removeStakerNetworkFromCompose(client);
   }
 }
 
@@ -92,15 +105,15 @@ function removeStakerNetworkFromCompose(dnpName: string): void {
   }
 }
 
-function disconnectPkgFromStakerNetwork(
-  stakerNetwork: Dockerode.Network,
+async function disconnectConnectedPkgFromStakerNetwork(
+  networkName: string,
   pkgContainers: PackageContainer[]
-): void {
-  for (const container of pkgContainers)
-    dockerNetworkDisconnect(
-      params.DOCKER_STAKER_NETWORK_NAME,
-      container.containerName
-    );
+): Promise<void> {
+  const connectedContainers = pkgContainers.filter((container) =>
+    container.networks.some((network) => network.name === networkName)
+  );
+  for (const container of connectedContainers)
+    await dockerNetworkDisconnect(networkName, container.containerName);
 }
 
 /**
