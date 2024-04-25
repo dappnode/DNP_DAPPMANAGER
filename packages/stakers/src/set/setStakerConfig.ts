@@ -121,7 +121,7 @@ export async function setStakerConfig<T extends Network>(
   );
 
   // ensure staker network config. MUST GO AFTER WRITING ON DB
-  await ensureStakerPkgsNetworkConfig();
+  await ensureStakerPkgsNetworkConfig(network);
 
   await ethereumClient.updateFullnodeAlias({
     network,

@@ -2,13 +2,14 @@ import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import { ensureStakerPkgsNetworkConfig } from "@dappnode/stakers";
+import { networks } from "@dappnode/types";
 
 /**
  * Creates the staker network and connects the staker packages to it
  */
 export async function createStakerNetworkAndConnectStakerPkgs(): Promise<void> {
   await createDockerStakerNetwork();
-  await ensureStakerPkgsNetworkConfig();
+  for (const network of networks) await ensureStakerPkgsNetworkConfig(network);
 }
 
 /**
@@ -21,7 +22,9 @@ async function createDockerStakerNetwork(): Promise<void> {
     logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} exists`);
   } catch (e) {
     if (e.statusCode === 404) {
-      logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} not found, creating it`);
+      logs.info(
+        `docker network ${params.DOCKER_STAKER_NETWORK_NAME} not found, creating it`
+      );
       await docker.createNetwork({
         Name: params.DOCKER_STAKER_NETWORK_NAME,
         Driver: "bridge",
