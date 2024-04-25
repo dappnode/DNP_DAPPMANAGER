@@ -1,5 +1,10 @@
 import { PackageRelease } from "./pkg.js";
 
+export enum DockerStakerNetworkAction {
+  ADD,
+  REMOVE,
+}
+
 // NETWORKS
 export const networks = Object.freeze([
   "mainnet",
@@ -72,9 +77,9 @@ export const executionClientsHolesky = Object.freeze([
 export type SignerHolesky = "web3signer-holesky.dnp.dappnode.eth";
 export const signerHolesky: SignerHolesky =
   "web3signer-holesky.dnp.dappnode.eth";
-  export type MevBoostHolesky = "mev-boost-holesky.dnp.dappnode.eth";
-  export const mevBoostHolesky: MevBoostHolesky =
-    "mev-boost-holesky.dnp.dappnode.eth";
+export type MevBoostHolesky = "mev-boost-holesky.dnp.dappnode.eth";
+export const mevBoostHolesky: MevBoostHolesky =
+  "mev-boost-holesky.dnp.dappnode.eth";
 
 // GNOSIS
 export type ConsensusClientGnosis = (typeof consensusClientsGnosis)[number];

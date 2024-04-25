@@ -1,13 +1,18 @@
 import {
   docker,
   dockerNetworkConnectNotThrow,
+  dockerNetworkDisconnect,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { networks, PackageContainer } from "@dappnode/types";
+import {
+  networks,
+  PackageContainer,
+  DockerStakerNetworkAction,
+} from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
 
 /**
@@ -19,8 +24,9 @@ import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
  * - **selected** execution client
  * - **selected** consensus client
  */
-export async function ensureStakerPkgsNetworkConfig(): Promise<void> {
-  const stakerNetwork = docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME);
+export async function ensureStakerPkgsNetworkConfig(
+  stakerAction: DockerStakerNetworkAction
+): Promise<void> {
   for (const network of networks) {
     const stakerConfig = getStakerConfigByNetwork(network);
 
@@ -37,14 +43,64 @@ export async function ensureStakerPkgsNetworkConfig(): Promise<void> {
       const pkg = await listPackageNoThrow({
         dnpName: dnpName,
       });
-      if (pkg) {
-        // Add staker network and fullnode alias if available to client compose file
-        await connectPkgToStakerNetwork(stakerNetwork, pkg.containers, alias);
+      // skip if pkg not installed
+      if (!pkg) continue;
+
+      // Add staker network and fullnode alias if available to client compose file
+      if (stakerAction === DockerStakerNetworkAction.ADD) {
+        await connectPkgToStakerNetwork(
+          params.DOCKER_STAKER_NETWORK_NAME,
+          pkg.containers,
+          alias
+        );
         // Connect client to staker network
         addStakerNetworkToCompose(dnpName, alias);
+      } else {
+        // Disconnect client from staker network
+        disconnectPkgFromStakerNetwork(
+          docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME),
+          pkg.containers
+        );
+        removeStakerNetworkFromCompose(dnpName);
       }
     }
   }
+}
+
+function removeStakerNetworkFromCompose(dnpName: string): void {
+  // remove from compose network
+  const compose = new ComposeFileEditor(dnpName, false);
+  delete compose.compose.networks?.[params.DOCKER_STAKER_NETWORK_NAME];
+  compose.write();
+  // remove from compose service network
+  for (const [serviceName, service] of Object.entries(
+    compose.compose.services
+  )) {
+    const composeService = new ComposeFileEditor(dnpName, false);
+    // network declared in array format is not supported
+    if (Array.isArray(service.networks)) {
+      logs.warn(
+        `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
+      );
+      continue;
+    }
+    composeService
+      .services()
+      // eslint-disable-next-line no-unexpected-multiline
+      [serviceName].removeNetwork(params.DOCKER_STAKER_NETWORK_NAME);
+    composeService.write();
+  }
+}
+
+function disconnectPkgFromStakerNetwork(
+  stakerNetwork: Dockerode.Network,
+  pkgContainers: PackageContainer[]
+): void {
+  for (const container of pkgContainers)
+    dockerNetworkDisconnect(
+      params.DOCKER_STAKER_NETWORK_NAME,
+      container.containerName
+    );
 }
 
 /**
@@ -83,15 +139,12 @@ function addStakerNetworkToCompose(
       service.networks?.[params.DOCKER_STAKER_NETWORK_NAME];
 
     if (!stakerServiceNetwork) {
-      composeService.services()[serviceName].addNetwork(
-        params.DOCKER_STAKER_NETWORK_NAME,
-        {
+      composeService
+        .services()
+        // eslint-disable-next-line no-unexpected-multiline
+        [serviceName].addNetwork(params.DOCKER_STAKER_NETWORK_NAME, {
           aliases: alias ? [alias] : [],
-        },
-        {
-          external: true,
-        }
-      );
+        });
       composeService.write();
     }
   }
@@ -101,12 +154,12 @@ function addStakerNetworkToCompose(
  * Connects the staker pkg to the staker network with the fullnode alias
  */
 async function connectPkgToStakerNetwork(
-  stakerNetwork: Dockerode.Network,
+  networkName: string,
   pkgContainers: PackageContainer[],
   alias?: string | null
 ): Promise<void> {
   for (const container of pkgContainers)
-    await dockerNetworkConnectNotThrow(stakerNetwork, container.containerName, {
+    await dockerNetworkConnectNotThrow(networkName, container.containerName, {
       Aliases: alias ? [alias] : [],
     });
 }
@@ -124,5 +177,5 @@ function getStakerFullnodeAlias(
   if (!dnpName) return null;
   // remove from dnpName the "dnp" | "public" and the "eth"
   dnpName = dnpName.replace(/\.dnp|\.dappnode|\.public|\.eth/g, "");
-  return `${dnpName}.${network}.staker.dappnode`;
+  return `execution.${network}.staker.dappnode`;
 }

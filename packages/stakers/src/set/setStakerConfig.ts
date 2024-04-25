@@ -14,6 +14,7 @@ import {
   ConsensusClientHolesky,
   ExecutionClientHolesky,
   Network,
+  DockerStakerNetworkAction,
 } from "@dappnode/types";
 import { getStakerCompatibleVersionsByNetwork } from "./getStakerCompatibleVersionsByNetwork.js";
 import * as db from "@dappnode/db";
@@ -112,6 +113,9 @@ export async function setStakerConfig<T extends Network>(
     }),
   ]);
 
+  // staker network config
+  await ensureStakerPkgsNetworkConfig(DockerStakerNetworkAction.REMOVE);
+
   // Set staker config on db
   await setStakerConfigOnDb(
     network,
@@ -121,7 +125,7 @@ export async function setStakerConfig<T extends Network>(
   );
 
   // staker network config
-  await ensureStakerPkgsNetworkConfig();
+  await ensureStakerPkgsNetworkConfig(DockerStakerNetworkAction.ADD);
 
   await new EthereumClient().updateFullnodeAlias({
     network,
