@@ -10,35 +10,56 @@ import Ok from "components/Ok";
 import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
 import { forumUrl } from "params";
+import Input from "components/Input";
+import { Accordion } from "react-bootstrap";
+import { BsInfoCircleFill } from "react-icons/bs";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
 export function TelegramNotifications() {
   const telegramStatus = useApi.telegramStatusGet();
-  const telegramToken = useApi.telegramTokenGet();
+  const telegramConfig = useApi.telegramConfigGet();
 
-  const [reqStatusToken, setReqStatusToken] = useState<ReqStatus>({});
+  const [reqStatusConfig, setReqStatusConfig] = useState<ReqStatus>({});
   const [reqStatusStatus, setReqStatusStatus] = useState<ReqStatus>({});
   const [token, setToken] = useState("");
+  const [tokenError, setTokenError] = useState(false);
+  const [userId, setUserId] = useState("");
+  const [userIdError, setUserIdError] = useState(false);
+  const [tgAccordionOpen, setTgAccordionOpen] = useState(false);
 
-  // Update local `token` input with the token stored in the DAPPMANAGER DB `telegramToken`
+  // Update local `token` and user ID input with the token stored in the DAPPMANAGER DB `telegramToken`
   useEffect(() => {
-    if (telegramToken.data) setToken(telegramToken.data);
-  }, [telegramToken.data]);
+    if (telegramConfig.data?.token) setToken(telegramConfig.data.token);
+    if (telegramConfig.data?.userId) setUserId(telegramConfig.data.userId);
+  }, [telegramConfig.data]);
 
-  async function updateTelegramToken() {
+  useEffect(() => {
+    const tokenRegex = /^[0-9]{8,10}:[a-zA-Z0-9_-]{35}$/;
+    // Telegram token validation
+    if (tokenRegex.test(token) || token === "") setTokenError(false);
+    else setTokenError(true);
+  }, [token]);
+
+  useEffect(() => {
+    const userIdRegex = /^\d{1,10}$/;
+    // Telegram user ID validation
+    if (userIdRegex.test(userId) || userId === "") setUserIdError(false);
+    else setUserIdError(true);
+  }, [userId]);
+
+  async function updateTelegramConfig() {
     try {
-      setReqStatusToken({ loading: true });
-      await withToast(() => api.telegramTokenSet({ telegramToken: token }), {
-        message: `Setting telegram token...`,
-        onSuccess: `Updated telegram token`
+      setReqStatusConfig({ loading: true });
+      await withToast(() => api.telegramConfigSet({ token, userId }), {
+        message: `Setting telegram configuration...`,
+        onSuccess: `Updated telegram configuration`
       });
-      setReqStatusToken({ result: true });
-      if (telegramStatus.data === false) {
-        await updateTelegramStatus(true);
-      }
-      setToken("");
+      await telegramConfig.revalidate();
+      setReqStatusConfig({ result: true });
+      if (telegramStatus.data === false) await updateTelegramStatus(true);
     } catch (e) {
-      setReqStatusToken({ error: e });
-      console.error("Error on telegramTokenSet", e);
+      setReqStatusConfig({ error: e });
+      console.error("Error on telegramConfigSet", e);
     }
   }
 
@@ -52,7 +73,7 @@ export function TelegramNotifications() {
           onSuccess: newStatus ? "Telegram ON" : "Telegram OFF"
         }
       );
-      telegramStatus.revalidate();
+      await telegramStatus.revalidate();
       setReqStatusStatus({ result: true });
     } catch (e) {
       setReqStatusStatus({ error: e });
@@ -95,26 +116,6 @@ export function TelegramNotifications() {
         </ul>
       </div>
 
-      <Form.Group>
-        <Form.Label>Telegram token</Form.Label>
-        <InputSecret
-          placeholder="Telegram token"
-          value={token}
-          onValueChange={setToken}
-          onEnterPress={updateTelegramToken}
-          append={
-            <Button
-              type="submit"
-              className="register-button"
-              onClick={updateTelegramToken}
-              variant="dappnode"
-            >
-              Submit
-            </Button>
-          }
-        />
-      </Form.Group>
-
       {telegramStatus.data !== undefined ? (
         <Form.Group>
           <div>
@@ -124,6 +125,12 @@ export function TelegramNotifications() {
             checked={telegramStatus.data}
             label={telegramStatus.data === true ? "On" : "Off"}
             onToggle={updateTelegramStatus}
+            disabled={
+              telegramStatus.isValidating ||
+              reqStatusConfig.loading ||
+              (telegramStatus.data === false && (userIdError || tokenError)) ||
+              ((!userId || !token) && telegramStatus.data === false)
+            }
           ></Switch>
         </Form.Group>
       ) : telegramStatus.error ? (
@@ -135,8 +142,110 @@ export function TelegramNotifications() {
           style={{ margin: "auto" }}
         />
       )}
-      {reqStatusToken.error && (
-        <ErrorView error={reqStatusToken.error} hideIcon red />
+
+      <Form.Group>
+        <Form.Label>Telegram token</Form.Label>
+        <InputSecret
+          placeholder="Telegram token"
+          value={token}
+          onValueChange={setToken}
+          onEnterPress={updateTelegramConfig}
+          append={
+            <Button
+              type="submit"
+              className="register-button"
+              onClick={updateTelegramConfig}
+              variant="dappnode"
+              disabled={
+                !token || token === telegramConfig.data?.token || tokenError
+              }
+            >
+              Submit
+            </Button>
+          }
+        />
+        {tokenError && (
+          <span style={{ fontSize: "12px", color: "red" }}>
+            Telegram token format is incorrect
+          </span>
+        )}
+        <br />
+        <Form.Label>Telegram user ID</Form.Label>
+        <Input
+          placeholder="Telegram user ID"
+          value={userId}
+          onValueChange={setUserId}
+          onEnterPress={updateTelegramConfig}
+          append={
+            <Button
+              type="submit"
+              className="register-button"
+              onClick={updateTelegramConfig}
+              variant="dappnode"
+              disabled={
+                !userId || userId === telegramConfig.data?.userId || userIdError
+              }
+            >
+              Submit
+            </Button>
+          }
+        />
+        <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
+          <div className="accordion-notifications-wrapper">
+            <Accordion.Toggle
+              eventKey="0"
+              onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
+              className="accordion-notifications"
+            >
+              <div className="header">
+                <BsInfoCircleFill
+                  className="links-icon"
+                  style={{ fontSize: "14px" }}
+                />
+                How can I get my telegram user Id?{" "}
+                {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+              </div>
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="0">
+              <div>
+                <ol>
+                  <li>
+                    Open{" "}
+                    <a
+                      href="https://web.telegram.org/a/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Telegram web
+                    </a>
+                    .
+                  </li>
+                  <li>
+                    Search for the bot <span>@raw_data_bot</span>.
+                  </li>
+                  <li>
+                    Write the command <span>/start</span> and copy the user ID
+                    returned.
+                  </li>
+                  <li>
+                    Paste the user ID into the user ID field and enable Telegram
+                    to secure your dappnode telegram bot and ensure only you are
+                    the only one allowed to write authenticated commands to it.
+                  </li>
+                </ol>
+              </div>
+            </Accordion.Collapse>
+          </div>
+        </Accordion>
+        {userIdError && (
+          <span style={{ fontSize: "12px", color: "red" }}>
+            Telegram user ID format is incorrect
+          </span>
+        )}
+      </Form.Group>
+
+      {reqStatusConfig.error && (
+        <ErrorView error={reqStatusConfig.error} hideIcon red />
       )}
       {reqStatusStatus.error && (
         <ErrorView error={reqStatusStatus.error} hideIcon red />
