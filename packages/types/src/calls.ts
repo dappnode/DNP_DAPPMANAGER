@@ -546,7 +546,7 @@ export type InstalledPackageData = Pick<
 
 export interface UpdateAvailable {
   newVersion: string;
-  upstreamVersion?: string;
+  upstreamVersion?: string | string[];
 }
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
@@ -898,16 +898,6 @@ export interface HostStatMemory {
  * Host machine Disk stats: filesystem, used, available, etc
  */
 export interface HostStatDisk {
-  total: number;
-  used: number;
-  free: number;
-  usedPercentage: number;
-}
-
-/**
- *
- */
-export interface HostStatSwap {
   total: number;
   used: number;
   free: number;

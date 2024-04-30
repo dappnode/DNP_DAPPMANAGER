@@ -7,6 +7,28 @@
   "title": "DAppNode Package (DNP) manifest",
   "required": ["name", "version", "description", "type", "license"],
   "description": "The DAppNode Package manifest defines all the necessary information for a DAppNode to understand this package:\n - IPFS of BZZ hashes to download its docker image \n - Docker related data to configure and run its container \n - Metadata to control how the package is shown in the admin UI.",
+  "dependencies": {
+    "upstream": {
+      "not": {
+        "required": ["upstreamRepo", "upstreamVersion", "upstreamArg"]
+      }
+    },
+    "upstreamRepo": {
+      "not": {
+        "required": ["upstream"]
+      }
+    },
+    "upstreamVersion": {
+      "not": {
+        "required": ["upstream"]
+      }
+    },
+    "upstreamArg": {
+      "not": {
+        "required": ["upstream"]
+      }
+    }
+  },
   "properties": {
     "name": {
       "type": "string",
@@ -21,55 +43,43 @@
       "errorMessage": "should be a semantic version in the format x.y.z"
     },
     "upstreamRepo": {
-      "oneOf": [
-        {
-          "type": "string",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the upstream software repository can be specified here.",
-          "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
-        },
-        {
-          "type": "array",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), several upstream software repositories can be specified here.",
-          "items": {
-            "type": "string",
-            "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
-          }
-        }
-      ]
+      "type": "string",
+      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the upstream software repository can be specified here.",
+      "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
     },
     "upstreamVersion": {
-      "oneOf": [
-        {
-          "type": "string",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
-          "examples": ["2.6.0", "v1.2.1"]
-        },
-        {
-          "type": "array",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node) from several repositories, the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
-          "items": {
-            "type": "string",
-            "examples": ["2.6.0", "v1.2.1"]
-          }
-        }
-      ]
+      "type": "string",
+      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
+      "examples": ["2.6.0", "v1.2.1"]
     },
     "upstreamArg": {
-      "oneOf": [
-        {
-          "type": "string",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the env var name to handle the upstream software version can be specified here.",
-          "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
-        },
-        {
-          "type": "array",
-          "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node) from several repositories, the env var names to handle the upstream software versions can be specified here.",
-          "items": {
+      "type": "string",
+      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the env var name to handle the upstream software version can be specified here.",
+      "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
+    },
+    "upstream": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repo", "version", "arg"],
+        "properties": {
+          "repo": {
             "type": "string",
-            "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
+            "description": "Repository of the upstream software.",
+            "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the upstream software.",
+            "examples": ["2.6.0", "v1.2.1"]
+          },
+          "arg": {
+            "type": "string",
+            "description": "Environment variable name for specifying the version.",
+            "examples": ["GETH_VERSION", "NETHERMIND_VERSION"]
           }
         }
-      ]
+      }
     },
     "shortDescription": {
       "type": "string",

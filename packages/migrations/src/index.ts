@@ -9,6 +9,7 @@ import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcod
 import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
+import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -132,6 +133,16 @@ export async function executeMigrations(): Promise<void> {
     migrationErrors.push({
       migration: "change ethical metrics db format",
       coreVersion: "0.2.92",
+      name: "MIGRATION_ERROR",
+      message: e.message,
+      stack: e.stack,
+    })
+  );
+
+  await determineIsDappnodeAws().catch((e) =>
+    migrationErrors.push({
+      migration: "determine if the dappnode is running in Dappnode AWS",
+      coreVersion: "0.2.94",
       name: "MIGRATION_ERROR",
       message: e.message,
       stack: e.stack,

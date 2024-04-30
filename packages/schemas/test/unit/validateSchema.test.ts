@@ -330,5 +330,90 @@ volumes:
 
       expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
     });
+
+    it("should allow a manifest with upstream settings defined as an array of objects", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstream: [
+          {
+            repo: "ethereum/go-ethereum",
+            version: "1.9.24",
+            arg: "GETH_VERSION"
+          }
+        ]
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
+    it("should allow a manifest with the upstream settings defined as separate strings", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstreamRepo: "ethereum/go-ethereum",
+        upstreamVersion: "1.9.24",
+        upstreamArg: "GETH_VERSION"
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
+    it("should not allow a manifest with the upstream settings defined as separate arrays", () => {
+      // This way of defining the upstream settings has been deprecated
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstreamRepo: ["ethereum/go-ethereum", "NethermindEth/nethermind"],
+        upstreamVersion: ["1.9.24", "1.10.0"],
+        upstreamArg: ["GETH_VERSION", "NETHERMIND_VERSION"]
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.throw();
+    });
+
+    it("should not allow a manifest with upstream settings defined in both possible ways", () => {
+      const manifest: Manifest = {  // Using 'any' to bypass TypeScript checks for invalid schema
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT",
+        upstream: [
+          {
+            repo: "ethereum/go-ethereum",
+            version: "1.9.24",
+            arg: "GETH_VERSION"
+          }
+        ],
+        upstreamRepo: "ethereum/go-ethereum",
+        upstreamVersion: "1.9.24",
+        upstreamArg: "GETH_VERSION"
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.throw();
+    });
+
+    it("should allow a manifest without any upstream definitions", () => {
+      const manifest: Manifest = {
+        name: "example.dnp.dappnode.eth",
+        version: "1.0.0",
+        description: "A sample DAppNode package",
+        type: "service",
+        license: "MIT"
+      };
+
+      expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+
   });
 });

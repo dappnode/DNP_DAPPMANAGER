@@ -139,12 +139,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-  statsSwapGet: async () => ({
-    total: 2147483648,
-    used: 0,
-    free: 2147483648,
-    usedPercentage: 0
-  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",
