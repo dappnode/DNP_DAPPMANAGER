@@ -7,3 +7,4 @@ export const subPaths = {
   my: "my/*",
   system: "system/*"
 };
+

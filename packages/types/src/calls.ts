@@ -53,9 +53,11 @@ export interface ExposableServiceMapping extends ExposableServiceInfo {
  * Ethical Metrics
  * ===============
  */
+
 export interface EthicalMetricsConfig {
-  isEnabled: boolean;
-  mail: string;
+  enabled: boolean;
+  mail: string | null;
+  tgChannelId: string | null;
 }
 
 /**
@@ -285,6 +287,7 @@ export interface RequestedDnp {
   // Request status and dependencies
   compatible: {
     requiresCoreUpdate: boolean;
+    requiresDockerUpdate: boolean;
     resolving: boolean;
     isCompatible: boolean; // false;
     error: string; // "LN requires incompatible dependency";
@@ -543,7 +546,7 @@ export type InstalledPackageData = Pick<
 
 export interface UpdateAvailable {
   newVersion: string;
-  upstreamVersion?: string;
+  upstreamVersion?: string | string[];
 }
 
 export interface InstalledPackageDetailData extends InstalledPackageData {
@@ -802,6 +805,19 @@ export interface PackageVersionData {
 }
 
 /**
+ * =============
+ * HOST - DOCKER
+ * =============
+ */
+
+export interface DockerUpgradeRequirements {
+  isDockerInstalledThroughApt: boolean;
+  isDockerInUnattendedUpgrades: boolean;
+  dockerHostVersion: string;
+  dockerLatestVersion?: string;
+}
+
+/**
  * ===========
  * HOST - DATA
  * ===========
@@ -896,16 +912,6 @@ export interface HostStatMemory {
  * Host machine Disk stats: filesystem, used, available, etc
  */
 export interface HostStatDisk {
-  total: number;
-  used: number;
-  free: number;
-  usedPercentage: number;
-}
-
-/**
- *
- */
-export interface HostStatSwap {
   total: number;
   used: number;
   free: number;

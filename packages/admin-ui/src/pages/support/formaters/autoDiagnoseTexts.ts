@@ -5,7 +5,7 @@ import {
   HostStatDisk,
   PublicIpResponse
 } from "@dappnode/types";
-import { mandatoryCoreDnps } from "params";
+import { docsUrl, mandatoryCoreDnps } from "params";
 import { responseInterface } from "swr";
 
 type DiagnoseResultOrNull = DiagnoseResult | null;
@@ -20,6 +20,7 @@ type DiagnoseResultOrNull = DiagnoseResult | null;
  *   ok: {Boolean},
  *   msg: {string} (short description),
  *   solutions: {array}
+ *   link: {string (link message), string (link url)}
  * }
  *
  * can also return null, and that diagnose will be ignored
@@ -73,7 +74,11 @@ export function internetConnection(
       msg: msgs.join(". "),
       solutions: [
         "Make sure your DAppNode is connected to the internet. Make sure to plug its ethernet cable to the router."
-      ]
+      ],
+      link: {
+        linkMsg: "Learn more about it in our Documentation!",
+        linkUrl: docsUrl.connectToRouter
+      }
     };
   }
 }

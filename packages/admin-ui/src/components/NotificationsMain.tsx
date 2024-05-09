@@ -12,7 +12,8 @@ import {
 import {
   getWifiStatus,
   getPasswordIsSecure,
-  getRebootIsRequired
+  getRebootIsRequired,
+  getIsConnectedToInternet
 } from "services/dappnodeStatus/selectors";
 import {
   pathName as systemPathName,
@@ -34,6 +35,7 @@ export default function NotificationsView() {
   const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
   const rebootHostIsRequired = useSelector(getRebootIsRequired);
+  const isConnectedToInternet = useSelector(getIsConnectedToInternet);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -44,6 +46,17 @@ export default function NotificationsView() {
   ).enabled;
 
   const notifications = [
+    /**
+     * [HOST-CONNECTED-TO-INTERNET]
+     * Tell the user if is connected to internet
+     */
+    {
+      id: "connectedToInternet",
+      linkText: "Navigate",
+      linkPath: "support/auto-diagnose",
+      body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
+      active: isConnectedToInternet === false
+    },
     /**
      * [HOST-REBOOT]
      * Tell the user to reboot the host

@@ -1,2 +1,2 @@
-export * from "./services/updateUpgradeHost.js";
+export * from "./services/index.js";
 export * from "./copyHostServices.js";

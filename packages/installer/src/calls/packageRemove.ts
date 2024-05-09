@@ -10,10 +10,9 @@ import {
   dockerComposeDown,
   listPackage,
 } from "@dappnode/dockerapi";
-import { isRunningHttps } from "@dappnode/httpsportal";
 import { httpsPortal } from "@dappnode/httpsportal";
 import * as db from "@dappnode/db";
-import { mevBoostMainnet, mevBoostPrater, stakerPkgs } from "@dappnode/types";
+import { mevBoostMainnet, mevBoostPrater, mevBoostHolesky, stakerPkgs } from "@dappnode/types";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
 
 /**
@@ -44,18 +43,7 @@ export async function packageRemove({
   // Remove portal https portal mappings if any.
   // MUST removed before deleting containers
   try {
-    if ((await isRunningHttps()) === true) {
-      const mappings = await httpsPortal.getMappings(dnp.containers);
-      for (const mapping of mappings) {
-        if (mapping.dnpName === dnpName)
-          await httpsPortal
-            .removeMapping(mapping)
-            // Bypass error to continue deleting mappings
-            .catch((e) =>
-              logs.error(`Error removing https mapping of ${dnp.dnpName}`, e)
-            );
-      }
-    }
+    httpsPortal.removeMappings(dnp);
   } catch (e) {
     // Bypass error to continue deleting the package
     logs.error(
@@ -172,6 +160,9 @@ async function removeStakerPkgFromDbIfSelected({
       break;
     case mevBoostPrater:
       await db.mevBoostPrater.set(false);
+      break;
+    case mevBoostHolesky:
+      await db.mevBoostHolesky.set(false);
       break;
     default:
       return;

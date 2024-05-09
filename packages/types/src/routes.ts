@@ -41,7 +41,7 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  HostStatSwap,
+  DockerUpgradeRequirements,
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -205,6 +205,16 @@ export interface Routes {
   diagnose: () => Promise<HostDiagnoseItem[]>;
 
   /**
+   * Updates docker engine
+   */
+  dockerUpgrade: () => Promise<void>;
+
+  /**
+   * Checks requirements to update docker
+   */
+  dockerUpgradeCheck: () => Promise<DockerUpgradeRequirements>;
+
+  /**
    * Sets if a fallback should be used
    */
   ethClientFallbackSet: (kwargs: {
@@ -228,10 +238,12 @@ export interface Routes {
   /**
    * Enables ethical metrics notifications
    * @param mail
+   * @param tgChannelId
    * @param sync
    */
   enableEthicalMetrics: (kwargs: {
-    mail: string;
+    mail: string | null;
+    tgChannelId: string | null;
     sync: boolean;
   }) => Promise<void>;
 
@@ -241,9 +253,19 @@ export interface Routes {
   disableEthicalMetrics: () => Promise<void>;
 
   /**
+   * Returns current core version in string if core was installed, else returns empty string
+   */
+  getCoreVersion: () => Promise<string>;
+
+  /**
    * Returns the current ethical metrics config
    */
-  getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig>;
+  getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
+
+  /**
+   * Returns true if dappnode connected to internet
+   */
+  getIsConnectedToInternet: () => Promise<boolean>;
 
   /**
    * Return formated core update data
@@ -577,6 +599,16 @@ export interface Routes {
   releaseTrustedKeyRemove(keyName: string): Promise<void>;
 
   /**
+   * Returns weather or not should show the smooth modal
+   */
+  getShouldShowSmooth: () => Promise<boolean>;
+
+  /**
+   * Sets the status of the smooth modal
+   */
+  setShouldShownSmooth: (kwargs: { isShown: boolean }) => Promise<void>;
+
+  /**
    * Sets the static IP
    * @param staticIp New static IP. To enable: "85.84.83.82", disable: ""
    */
@@ -600,15 +632,20 @@ export interface Routes {
   telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
-   * Gets bot telegram token
+   * Get telegram configuration: token and user ID
    */
-  telegramTokenGet: () => Promise<string | null>;
+  telegramConfigGet: () => Promise<{
+    token: string | null;
+    userId: string | null;
+  }>;
 
   /**
-   * Sets the telegram token
-   * @param telegramToken new bot token
+   * Set telegram configuration: token and user ID
    */
-  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
+  telegramConfigSet: (kwargs: {
+    token: string;
+    userId: string;
+  }) => Promise<void>;
 
   /**
    * Updates and upgrades the host machine
@@ -631,11 +668,6 @@ export interface Routes {
    * Check if SSH is enabled of disabled in the DAppNode host
    */
   sshStatusGet: () => Promise<ShhStatus>;
-
-  /**
-   * Get memory swap stats
-   */
-  statsSwapGet: () => Promise<HostStatSwap>;
 
   /**
    * Returns the current DAppNode system info
@@ -715,10 +747,14 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   devicePasswordHas: {},
   devicesList: {},
   diagnose: {},
+  dockerUpgrade: { log: true },
+  dockerUpgradeCheck: { log: true },
   ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
+  getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
+  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
@@ -770,11 +806,12 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
+  setShouldShownSmooth: {},
+  getShouldShowSmooth: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},
   statsMemoryGet: {},
-  statsSwapGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},
@@ -782,8 +819,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
-  telegramTokenGet: {},
-  telegramTokenSet: { log: true },
+  telegramConfigGet: {},
+  telegramConfigSet: { log: true },
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},

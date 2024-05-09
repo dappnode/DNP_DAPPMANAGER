@@ -3,7 +3,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { runOnlyOneSequentially } from "@dappnode/utils";
 import { formatNotification } from "./formatNotification.js";
-import { DappnodeTelegramBot } from "./commands.js";
+import { DappnodeTelegramBot } from "./dappnodeTelegramBot.js";
 
 // Telegram setup When reboot it lost
 let currentTelegramToken: string | null;
@@ -65,7 +65,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
   });
 
   // NOTIFICATION SUBSCRIPTION => checks if the packages has been stopped
-  eventBus.notification.on(async notification => {
+  eventBus.notification.on(async (notification) => {
     try {
       const telegramChannelIds = db.telegramChannelIds.get();
 
@@ -76,7 +76,7 @@ export async function startTelegramBotDaemon(): Promise<void> {
       const message = formatNotification(notification);
 
       await Promise.all(
-        telegramChannelIds.map(async channelId => {
+        telegramChannelIds.map(async (channelId) => {
           if (bot) await bot.sendMessage(channelId, message);
         })
       );

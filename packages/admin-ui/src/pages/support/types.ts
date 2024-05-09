@@ -3,4 +3,5 @@ export type DiagnoseResult = {
   ok?: boolean;
   msg: string;
   solutions?: string[];
+  link?: { linkMsg: string; linkUrl: string };
 };

@@ -68,6 +68,23 @@
   }
 }
 
+/*
+ * Core Version
+ */
+
+#core-version {
+  text-align: center;
+
+  &.dark {
+    color: #ddd;
+  }
+
+  span {
+    font-weight: bold;
+    color: var(--dappnode-strong-main-color);
+  }
+}
+
 /* 
  * Funded-by
  */
@@ -126,5 +143,9 @@
   #sidebar .sidebar-media-footer {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  #core-version span {
+    font-size: small;
   }
 }

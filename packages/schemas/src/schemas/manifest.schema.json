@@ -7,6 +7,28 @@
   "title": "DAppNode Package (DNP) manifest",
   "required": ["name", "version", "description", "type", "license"],
   "description": "The DAppNode Package manifest defines all the necessary information for a DAppNode to understand this package:\n - IPFS of BZZ hashes to download its docker image \n - Docker related data to configure and run its container \n - Metadata to control how the package is shown in the admin UI.",
+  "dependencies": {
+    "upstream": {
+      "not": {
+        "required": ["upstreamRepo", "upstreamVersion", "upstreamArg"]
+      }
+    },
+    "upstreamRepo": {
+      "not": {
+        "required": ["upstream"]
+      }
+    },
+    "upstreamVersion": {
+      "not": {
+        "required": ["upstream"]
+      }
+    },
+    "upstreamArg": {
+      "not": {
+        "required": ["upstream"]
+      }
+    }
+  },
   "properties": {
     "name": {
       "type": "string",
@@ -20,10 +42,44 @@
       "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
       "errorMessage": "should be a semantic version in the format x.y.z"
     },
+    "upstreamRepo": {
+      "type": "string",
+      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the upstream software repository can be specified here.",
+      "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
+    },
     "upstreamVersion": {
       "type": "string",
       "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the underlying software version can be specified here. It will be shown in the admin UI alongside the field `version`.",
-      "examples": ["2.6.0-beta", "any-text"]
+      "examples": ["2.6.0", "v1.2.1"]
+    },
+    "upstreamArg": {
+      "type": "string",
+      "description": "For DAppNode Packages that only wrap existing software (i.e. Bitcoin node, Ethereum node), the env var name to handle the upstream software version can be specified here.",
+      "examples": ["UPSTREAM_VERSION", "UPSTREAM_ARG"]
+    },
+    "upstream": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["repo", "version", "arg"],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "Repository of the upstream software.",
+            "examples": ["ethereum/go-ethereum", "NethermindEth/nethermind"]
+          },
+          "version": {
+            "type": "string",
+            "description": "Version of the upstream software.",
+            "examples": ["2.6.0", "v1.2.1"]
+          },
+          "arg": {
+            "type": "string",
+            "description": "Environment variable name for specifying the version.",
+            "examples": ["GETH_VERSION", "NETHERMIND_VERSION"]
+          }
+        }
+      }
     },
     "shortDescription": {
       "type": "string",
@@ -164,6 +220,13 @@
           "type": "string",
           "description": "Minimum DAppNode version that includes all the features necessary to run this DAppNode Package.",
           "examples": ["0.2.0"],
+          "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
+          "errorMessage": "should be a semantic version in the format x.y.z"
+        },
+        "minimumDockerVersion": {
+          "type": "string",
+          "description": "Minimum Docker version that includes all the features necessary to run this DAppNode Package.",
+          "examples": ["23.0.3"],
           "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
           "errorMessage": "should be a semantic version in the format x.y.z"
         }
@@ -450,7 +513,10 @@
           "Economic incentive",
           "Monitoring",
           "Payment channels",
-          "Storage"
+          "Storage",
+          "Lido",
+          "DVT",
+          "LSD"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",
@@ -460,7 +526,10 @@
           "Economic incentive": "Packages that offer an economic incentive or reward to the admin that runs it, i.e. Lightning Network",
           "Monitoring": "Packages that track metrics",
           "Payment channels": "Packages whose main purpose is to manage or control payment channels, i.e. Raiden",
-          "Storage": "Decentralized storage solutions, i.e. Swarm"
+          "Storage": "Decentralized storage solutions, i.e. Swarm",
+          "Lido": "Packages for Lido operators",
+          "DVT": "Packages for operators of Distributed Validators",
+          "LSD": "Packages for Liquidity Staking operators"
         }
       }
     },

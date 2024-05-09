@@ -21,6 +21,7 @@ export const sampleRequestState: RequestedDnp = {
 
   compatible: {
     requiresCoreUpdate: false,
+    requiresDockerUpdate: false,
     resolving: false,
     isCompatible: true,
     error: "",

@@ -177,8 +177,8 @@ function Relay<T extends Network>({
         {relay.ofacCompliant === undefined
           ? "-"
           : relay.ofacCompliant
-          ? "Yes"
-          : "No"}
+            ? "Yes"
+            : "No"}
       </td>
       <td>
         <Form.Check
@@ -286,6 +286,27 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
           docs: "https://securerpc.com/",
           url:
             "https://0x8a72a5ec3e2909fff931c8b42c9e0e6c6e660ac48a98016777fc63a73316b3ffb5c622495106277f8dbcc17a06e92ca3@goerli-relay.securerpc.com/"
+        }
+      ];
+    case "holesky":
+      return [
+        {
+          operator: "Flashbots",
+          docs: "https://www.flashbots.net/",
+          url:
+            "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"
+        },
+        {
+          operator: "Aestus",
+          docs: "https://flashbots.notion.site/Relay-API-Documentation-5fb0819366954962bc02e81cb33840f5#417abe417dde45caaff3dc15aaae65dd",
+          url:
+            "https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live"
+        },
+        {
+          operator: "Ultrasound",
+          docs: "https://github.com/ultrasoundmoney/frontend",
+          url:
+            "https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money"
         }
       ];
     default:

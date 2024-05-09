@@ -6,7 +6,8 @@ import {
   Route,
   useNavigate,
   useLocation,
-  useParams
+  useParams,
+  NavLink
 } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
@@ -32,6 +33,11 @@ import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/
 import Warnings from "./Steps/Warnings";
 import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
+import Button from "components/Button";
+import {
+  pathName as systemPathName,
+  subPaths as systemSubPaths
+} from "pages/system/data";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -71,10 +77,15 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     installedVersion
   } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
+  const areUpdateWarnings =
+    manifest.warnings?.onPatchUpdate ||
+    manifest.warnings?.onMinorUpdate ||
+    manifest.warnings?.onMajorUpdate;
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
   const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
+  const requiresDockerUpdate = dnp.compatible.requiresDockerUpdate;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
 
@@ -189,7 +200,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     }
   ].filter(option => option.available);
 
-  const disableInstallation = !isEmpty(progressLogs) || requiresCoreUpdate;
+  const disableInstallation =
+    !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate;
 
   const setupSubPath = "setup";
   const permissionsSubPath = "permissions";
@@ -242,7 +254,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           updateType={updateType}
         />
       ),
-      available: manifest.warnings?.onInstall || (isInstalled && updateType)
+      available:
+        manifest.warnings?.onInstall ||
+        (areUpdateWarnings && isInstalled && updateType)
     },
     {
       name: "Disclaimer",
@@ -270,6 +284,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   const currentIndex = availableRoutes.findIndex(
     ({ subPath }) => subPath && currentSubRoute.includes(subPath)
   );
+
+  const requiredDockerVersion = manifest.requirements?.minimumDockerVersion;
 
   /**
    * Logic to control which route requires a redirect and when
@@ -323,6 +339,28 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           <strong>{prettyDnpName(dnpName)}</strong> requires a more recent
           version of DAppNode. <strong>Update your DAppNode</strong> before
           continuing the installation.
+        </div>
+      )}
+
+      {requiresDockerUpdate && (
+        <div
+          className="alert alert-danger"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center"
+          }}
+        >
+          <div>
+            <strong>{prettyDnpName(dnpName)}</strong> requires at least the
+            <strong>{requiredDockerVersion}</strong> version of Docker.{" "}
+            <strong>Update your DAppNode</strong> before continuing the
+            installation. You can do it with our update Docker button in{" "}
+            <strong> System / Advanced</strong> tab.
+          </div>
+          <NavLink to={"/" + systemPathName + "/" + systemSubPaths.advanced}>
+            <Button variant="danger">{"Navigate there"}</Button>
+          </NavLink>
         </div>
       )}
 

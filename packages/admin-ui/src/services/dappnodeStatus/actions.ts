@@ -12,14 +12,27 @@ import {
 
 // Update
 
+export const setIsConnectedToInternet =
+  dappnodeStatus.actions.isConnectedToInternet;
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
 export const setRebootHostIsRequired =
   dappnodeStatus.actions.rebootRequiredScript;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
+const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
 
 // Fetch
+
+export const fetchShouldShowSmooth = (): AppThunk => async dispatch =>
+  withTryCatch(async () => {
+    dispatch(updateShouldShowSmooth(await api.getShouldShowSmooth()));
+  }, "getShouldShowSmooth");
+
+export const fetchIsConnectedToInternet = (): AppThunk => async dispatch =>
+  withTryCatch(async () => {
+    dispatch(setIsConnectedToInternet(await api.getIsConnectedToInternet()));
+  }, "getIsConnectedToInternet");
 
 export const fetchRebootIsRequired = (): AppThunk => async dispatch =>
   withTryCatch(async () => {

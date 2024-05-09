@@ -8,12 +8,15 @@ import Ok from "../../../components/Ok";
 function parseVariant({
   value,
   danger = 90,
-  warning = 75
+  warning = 75,
+  infoCard
 }: {
   value: number;
   danger?: number;
   warning?: number;
+  infoCard: boolean;
 }) {
+  if (infoCard) return "info";
   if (value > danger) return "danger";
   if (value > warning) return "warning";
   return "success";
@@ -40,7 +43,8 @@ function StatsCardOk({
   text,
   max,
   danger,
-  warning
+  warning,
+  infoCard = false
 }: {
   percent: number;
   label: "%" | "ºC";
@@ -48,6 +52,7 @@ function StatsCardOk({
   max?: number;
   danger?: number;
   warning?: number;
+  infoCard?: boolean;
 }) {
   let value: number;
   if (label === "%") value = Math.round(percent);
@@ -56,7 +61,7 @@ function StatsCardOk({
   return (
     <>
       <ProgressBar
-        variant={parseVariant({ value, danger, warning })}
+        variant={parseVariant({ value, danger, warning, infoCard })}
         max={max || 100}
         now={value}
         label={value + label}
@@ -78,7 +83,6 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
-  const swapStats = useApi.statsSwapGet();
   const hostUptime = useApi.getHostUptime();
 
   useEffect(() => {
@@ -95,12 +99,11 @@ export function HostStats() {
   useEffect(() => {
     const interval = setInterval(() => {
       hostUptime.revalidate();
-      swapStats.revalidate();
     }, 60 * 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [hostUptime, swapStats]);
+  }, [hostUptime]);
 
   return (
     <div className="dashboard-cards">
@@ -149,24 +152,6 @@ export function HostStats() {
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
-        ) : (
-          <StatsCardLoading />
-        )}
-      </StatsCardContainer>
-
-      <StatsCardContainer title={"swap"}>
-        {swapStats.data ? (
-          <StatsCardOk
-            percent={swapStats.data.usedPercentage}
-            label="%"
-            text={
-              humanFileSize(swapStats.data.used) +
-              " / " +
-              humanFileSize(swapStats.data.total)
-            }
-          />
-        ) : swapStats.error ? (
-          <StatsCardError error={swapStats.error} />
         ) : (
           <StatsCardLoading />
         )}

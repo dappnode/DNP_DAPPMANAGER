@@ -7,3 +7,4 @@ export * from "./migrateVolume.js";
 export * from "./mountpoints.js";
 export * from "./rebootRequired.js";
 export * from "./updateUpgrade.js";
+export * from "./dockerUpgradeCheck.js";

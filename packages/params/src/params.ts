@@ -296,8 +296,14 @@ export const params = {
 
   DEFAULT_RELEASE_TRUSTED_KEYS: [
     {
-      name: "DAppNode Association",
+      name: "DAppNode Association (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+    },
+    {
+      name: "DAppNode Association (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
     },
@@ -355,6 +361,18 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
     },
+    {
+      name: "Gnosis Team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1",
+    },
+    {
+      name: "Blockswap Labs",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a",
+    }
   ],
 };
 

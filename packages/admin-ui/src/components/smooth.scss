@@ -1,0 +1,40 @@
+.smooth-modal-title {
+    font-weight: bold;
+    font-size: 2rem; 
+    transition: color 0.15s;
+    color: #000;
+    margin-top: 20px;
+    text-align: center !important;
+  }
+
+.smooth-modal-description {
+    color: var(--light-text-color);
+    font-size: 1rem;
+    max-width: 40rem;
+    text-align: left;
+    margin-bottom: 2rem;
+    margin-inline: 4rem;
+    margin-left: auto;
+  }
+
+  .smooth-modal-button-container {
+    display: flex;
+    max-width: 40rem;
+    margin: auto;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+  
+  .smooth-full-width-button {
+    flex: 1;
+    margin-right: 10px;
+  }
+
+  /* Using a generic name here due to inheriting class names from the Bootstrap version */
+  .custom-modal .modal-header {
+    border-bottom: none; 
+  }
+  
+  .custom-modal .modal-title {
+    margin-left: auto;
+  }

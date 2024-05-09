@@ -139,12 +139,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-  statsSwapGet: async () => ({
-    total: 2147483648,
-    used: 0,
-    free: 2147483648,
-    usedPercentage: 0
-  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",
@@ -259,7 +253,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   enableEthicalMetrics: async ({ mail }) => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
-    isEnabled: true
+    enabled: true,
+    tgChannelId: null
   }),
   disableEthicalMetrics: async () => {},
   optimismConfigGet: async () => ({
@@ -378,7 +373,18 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     }
   }),
   optimismConfigSet: async () => {},
-  updateUpgrade: async () => "Successfully updated"
+  updateUpgrade: async () => "Successfully updated",
+  setShouldShownSmooth: async () => {},
+  getShouldShowSmooth: async () => true,
+  dockerUpgrade: async () => {},
+  dockerUpgradeCheck: async () => ({
+    isDockerInUnattendedUpgrades: true,
+    isDockerInstalledThroughApt: true,
+    dockerHostVersion: "20.10.7",
+    dockerLatestVersion: "20.10.8"
+  }),
+  getIsConnectedToInternet: async () => false,
+  getCoreVersion: async () => "0.2.92"
 };
 
 export const calls: Routes = {
