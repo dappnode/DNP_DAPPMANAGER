@@ -307,6 +307,16 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
           docs: "https://github.com/ultrasoundmoney/frontend",
           url:
             "https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money"
+        },
+        {
+          operator: "Titan",
+          docs: "https://docs.titanrelay.xyz/",
+          url: "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz"
+        },
+        {
+          operator: "bloXroute",
+          docs: "https://bloxroute.holesky.blxrbdn.com/",
+          url: "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"
         }
       ];
     default:
