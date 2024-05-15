@@ -86,6 +86,14 @@ function SentDataRow({
   isSecret?: boolean;
 }) {
   const [show, setShow] = useState(false);
+  const [showCopyTooltip, setShowCopyTooltip] = useState(false);
+
+  const handleShowCopyTooltip = () => {
+    setShowCopyTooltip(true);
+    setTimeout(() => {
+      setShowCopyTooltip(false);
+    }, 1500);
+  };
 
   useEffect(() => {
     // Activate the copy functionality
@@ -121,7 +129,9 @@ function SentDataRow({
           <Button
             className="input-append-button copy-input-copy"
             data-clipboard-text={value}
+            onClick={handleShowCopyTooltip}
           >
+            {showCopyTooltip && <div className="copy-tooltip">copied!</div>}
             <GoCopy />
           </Button>
         </InputGroup.Append>
