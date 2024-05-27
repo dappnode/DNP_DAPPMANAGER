@@ -135,9 +135,7 @@ export interface Routes {
   ) => Promise<StakerConfigGet<T>>;
 
   /** Sets the staker configuration for a given network */
-  stakerConfigSet: <T extends Network>(kwargs: {
-    stakerConfig: StakerConfigSet<T>;
-  }) => Promise<void>;
+  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;

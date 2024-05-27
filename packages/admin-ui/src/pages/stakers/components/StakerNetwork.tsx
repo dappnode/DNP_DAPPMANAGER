@@ -4,7 +4,7 @@ import { withToast } from "components/toast/Toast";
 import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { StakerConfigGet, StakerConfigGetOk } from "@dappnode/types";
+import { StakerConfigGet } from "@dappnode/types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -19,8 +19,6 @@ import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import "./columns.scss";
 import { AppContext } from "App";
-import LaunchpadValidators from "./launchpad/LaunchpadValidators";
-import { FaEthereum } from "react-icons/fa";
 import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
@@ -43,19 +41,20 @@ export default function StakerNetwork<T extends Network>({
 
   // hooks
   const {
-    showLaunchpadValidators,
-    setShowLaunchpadValidators,
-    allStakerItemsOk,
     reqStatus,
     setReqStatus,
     newExecClient,
     setNewExecClient,
     newConsClient,
     setNewConsClient,
+    newUseCheckpointSync,
+    setNewUseCheckpointSync,
     newMevBoost,
     setNewMevBoost,
-    newEnableWeb3signer,
-    setNewEnableWeb3signer,
+    newRelays,
+    setNewRelays,
+    newWeb3signer,
+    setNewWeb3signer,
     changes
   } = useStakerConfig(network, currentStakerConfigReq);
 
@@ -106,19 +105,12 @@ export default function StakerNetwork<T extends Network>({
             api.stakerConfigSet({
               stakerConfig: {
                 network,
-                executionClient:
-                  newExecClient?.status === "ok"
-                    ? { ...newExecClient, data: undefined }
-                    : newExecClient,
-                consensusClient:
-                  newConsClient?.status === "ok"
-                    ? { ...newConsClient, data: undefined }
-                    : newConsClient,
-                mevBoost:
-                  newMevBoost?.status === "ok"
-                    ? { ...newMevBoost, data: undefined }
-                    : newMevBoost,
-                enableWeb3signer: isLaunchpad ? true : newEnableWeb3signer
+                executionDnpName: newExecClient?.dnpName || null,
+                consensusDnpName: newConsClient?.dnpName || null,
+                mevBoostDnpName: newMevBoost?.dnpName || null,
+                web3signerDnpName: newWeb3signer?.dnpName || null,
+                useCheckpointSync: newUseCheckpointSync,
+                relays: newRelays
               }
             }),
           {
@@ -157,8 +149,10 @@ export default function StakerNetwork<T extends Network>({
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
-            <b>Smooth is out!</b> Discover the new MEV Smoothing Pool designed for solo validators. It allows you to pool your MEV rewards, ensuring consistent higher rewards. Subscribing is as easy as changing your fee recipient!
-            {" "}
+            <b>Smooth is out!</b> Discover the new MEV Smoothing Pool designed
+            for solo validators. It allows you to pool your MEV rewards,
+            ensuring consistent higher rewards. Subscribing is as easy as
+            changing your fee recipient!{" "}
             <b>
               <a href={docsSmooth} target="_blank" rel="noopener noreferrer">
                 Learn more
@@ -217,6 +211,8 @@ export default function StakerNetwork<T extends Network>({
                         useCheckpointSync: true
                       }}
                       setNewConsClient={setNewConsClient}
+                      newUseCheckpointSync={newUseCheckpointSync}
+                      setNewUseCheckpointSync={setNewUseCheckpointSync}
                       isSelected={
                         consensusClient.dnpName === newConsClient?.dnpName
                       }
@@ -229,8 +225,8 @@ export default function StakerNetwork<T extends Network>({
                 <SubTitle>Remote signer</SubTitle>
                 <RemoteSigner
                   signer={currentStakerConfigReq.data.web3Signer}
-                  setEnableWeb3signer={setNewEnableWeb3signer}
-                  isSelected={newEnableWeb3signer}
+                  setNewWeb3signer={setNewWeb3signer}
+                  isSelected={Boolean(newWeb3signer)}
                 />
               </Col>
               {["prater", "mainnet", "holesky"].includes(network) && (
@@ -241,8 +237,11 @@ export default function StakerNetwork<T extends Network>({
                     mevBoost={currentStakerConfigReq.data.mevBoost}
                     newMevBoost={newMevBoost}
                     setNewMevBoost={setNewMevBoost}
+                    newRelays={newRelays}
+                    setNewRelays={setNewRelays}
                     isSelected={
-                      currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName
+                      currentStakerConfigReq.data.mevBoost.dnpName ===
+                      newMevBoost?.dnpName
                     }
                   />
                 </Col>
@@ -258,15 +257,6 @@ export default function StakerNetwork<T extends Network>({
                 >
                   Apply changes
                 </Button>
-                {(network === "prater" || network === "holesky") && (
-                  <Button
-                    disabled={!allStakerItemsOk}
-                    onClick={() => setShowLaunchpadValidators(true)}
-                    variant="dappnode"
-                  >
-                    <FaEthereum /> Step by step setup
-                  </Button>
-                )}
               </div>
 
               {!changes.isAllowed && changes.reason && (
@@ -283,25 +273,6 @@ export default function StakerNetwork<T extends Network>({
                 <ErrorView error={reqStatus.error} hideIcon red />
               )}
             </div>
-
-            {showLaunchpadValidators && allStakerItemsOk && (
-              <LaunchpadValidators
-                network={network}
-                stakerConfig={
-                  (currentStakerConfigReq.data as unknown) as StakerConfigGetOk<
-                    T
-                  >
-                }
-                setNewConfig={setNewConfig}
-                setShowLaunchpadValidators={setShowLaunchpadValidators}
-                setNewExecClient={setNewExecClient}
-                setNewConsClient={setNewConsClient}
-                setNewMevBoost={setNewMevBoost}
-                newExecClient={newExecClient}
-                newConsClient={newConsClient}
-                newMevBoost={newMevBoost}
-              />
-            )}
           </Card>
         ) : currentStakerConfigReq.error ? (
           <ErrorView error={currentStakerConfigReq.error} hideIcon red />

@@ -4,7 +4,7 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { StakerItem, Network } from "@dappnode/types";
+import { StakerItem, Network, StakerItemOk } from "@dappnode/types";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +12,14 @@ import { FaKey } from "react-icons/fa";
 
 export default function RemoteSigner<T extends Network>({
   signer,
-  setEnableWeb3signer,
+  setNewWeb3signer,
   isSelected,
   ...props
 }: {
   signer: StakerItem<T, "signer">;
-  setEnableWeb3signer: (installWeb3signer: boolean) => void;
+  setNewWeb3signer: React.Dispatch<
+    React.SetStateAction<StakerItemOk<T, "signer"> | undefined>
+  >;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -28,7 +30,15 @@ export default function RemoteSigner<T extends Network>({
       className={`remote-signer ${joinCssClass({ isSelected })}`}
       shadow={isSelected}
     >
-      <div onClick={() => setEnableWeb3signer(!isSelected)}>
+      <div
+        onClick={
+          signer.status === "ok"
+            ? isSelected
+              ? () => setNewWeb3signer(undefined)
+              : () => setNewWeb3signer(signer)
+            : undefined
+        }
+      >
         {signer.status === "ok" ? (
           <div className="avatar">
             <img src={signer.avatarUrl || defaultAvatar} alt="avatar" />

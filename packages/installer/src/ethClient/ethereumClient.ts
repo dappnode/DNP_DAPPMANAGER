@@ -2,7 +2,6 @@ import { isEqual, uniq } from "lodash-es";
 import {
   Eth2ClientTarget,
   EthClientRemote,
-  ExecutionClient,
   InstalledPackageDetailData,
 } from "@dappnode/types";
 import * as db from "@dappnode/db";
@@ -163,14 +162,14 @@ export class EthereumClient {
    * @param newExecClientDnpName - New execution client to set.
    * @param network - Network to define the proper alias.
    */
-  async updateFullnodeAlias<T extends Network>({
+  async updateFullnodeAlias({
     prevExecClientDnpName,
     newExecClientDnpName,
-    network = "mainnet" as T,
+    network = "mainnet",
   }: {
-    prevExecClientDnpName?: ExecutionClient<T>;
-    newExecClientDnpName?: ExecutionClient<T>;
-    network?: T;
+    prevExecClientDnpName?: string;
+    newExecClientDnpName?: string | null;
+    network?: Network;
   }): Promise<void> {
     const fullnodeAlias =
       network === "mainnet"
@@ -205,11 +204,11 @@ export class EthereumClient {
     }
   }
 
-  private async removeAliasFromPreviousExecClient<T extends Network>({
+  private async removeAliasFromPreviousExecClient({
     execClientDnpName,
     fullnodeAlias,
   }: {
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     fullnodeAlias: string;
   }): Promise<void> {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
@@ -233,11 +232,11 @@ export class EthereumClient {
     });
   }
 
-  private async addAliasToNewExecClient<T extends Network>({
+  private async addAliasToNewExecClient({
     execClientDnpName,
     fullnodeAlias,
   }: {
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     fullnodeAlias: string;
   }): Promise<void> {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
@@ -439,7 +438,7 @@ export class EthereumClient {
     alias = params.FULLNODE_ALIAS,
   }: {
     action: ComposeAliasEditorAction;
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     execClientServiceName: string;
     alias: string;
   }): void {

@@ -175,6 +175,8 @@ type StakerItemBasic<
   ? StakerSigner<T>
   : P extends "mev-boost"
   ? StakerMevBoost<T>
+  : P extends "signer"
+  ? StakerSigner<T>
   : never;
 
 export type StakerItemError<T extends Network, P extends StakerType> = {
@@ -221,12 +223,14 @@ export interface StakerConfigGetOk<T extends Network> {
   web3signer: StakerItemOk<T, "signer">;
   mevBoost: StakerItemOk<T, "mev-boost">;
 }
-export interface StakerConfigSet<T extends Network> {
-  network: T;
-  executionClient?: StakerItemOk<T, "execution">;
-  consensusClient?: StakerItemOk<T, "consensus">;
-  mevBoost?: StakerItemOk<T, "mev-boost">;
-  enableWeb3signer?: boolean;
+export interface StakerConfigSet {
+  network: Network;
+  executionDnpName: string | null;
+  consensusDnpName: string | null;
+  useCheckpointSync: boolean;
+  mevBoostDnpName: string | null;
+  relays: string[];
+  web3signerDnpName: string | null;
 }
 
 export type ExecutionClient<T extends Network> = T extends "mainnet"

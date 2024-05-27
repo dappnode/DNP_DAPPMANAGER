@@ -6,12 +6,12 @@ import { dappnodeInstaller } from "../index.js";
  * Sets the staker configuration: execution and consensus clients, remote signer,
  * mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigSet<T extends Network>({
+export async function stakerConfigSet({
   stakerConfig
 }: {
-  stakerConfig: StakerConfigSet<T>;
+  stakerConfig: StakerConfigSet;
 }): Promise<void> {
-  await setStakerConfig<T>(dappnodeInstaller, { ...stakerConfig });
+  await setStakerConfig(dappnodeInstaller, { ...stakerConfig });
 }
 
 /**

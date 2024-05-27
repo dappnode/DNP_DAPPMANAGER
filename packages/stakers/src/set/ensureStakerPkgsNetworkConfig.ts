@@ -6,7 +6,7 @@ import {
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { Network, networks, PackageContainer } from "@dappnode/types";
+import { Network, PackageContainer } from "@dappnode/types";
 import { getStakerConfigByNetwork } from "../getStakerConfigByNetwork.js";
 import { getStakerDnpNamesByNetwork } from "../get/getStakerDnpNamesByNetwork.js";
 
@@ -187,7 +187,7 @@ async function connectPkgToStakerNetwork(
 
 /**
  * Returns the execution fullnode alias for the staker network
- * i.e for a dnpName="geth.dnp.dappnode.eth" and network "mainnet" it should return "geth.staker.dappnode"
+ * i.e for a dnpName="geth.dnp.dappnode.eth" and network "mainnet" it should return "geth.mainnet.staker.dappnode"
  * @param dnpName "geth.dnp.dappnode.eth"
  * @param network "mainnet"
  */

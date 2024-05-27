@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
@@ -14,6 +14,8 @@ import Switch from "components/Switch";
 export default function ConsensusClient<T extends Network>({
   consensusClient,
   setNewConsClient,
+  newUseCheckpointSync,
+  setNewUseCheckpointSync,
   isSelected,
   ...props
 }: {
@@ -21,11 +23,12 @@ export default function ConsensusClient<T extends Network>({
   setNewConsClient: React.Dispatch<
     React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
   >;
+  newUseCheckpointSync: boolean;
+  setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
 
-  const [checkpointSyncChecked, setCheckpointSyncChecked] = useState(true);
   return (
     <Card
       {...props}
@@ -90,14 +93,8 @@ export default function ConsensusClient<T extends Network>({
             )}
             {consensusClient.useCheckpointSync !== undefined && (
               <Switch
-                checked={checkpointSyncChecked}
-                onToggle={() => {
-                  setNewConsClient({
-                    ...consensusClient,
-                    useCheckpointSync: !checkpointSyncChecked
-                  });
-                  setCheckpointSyncChecked(!checkpointSyncChecked);
-                }}
+                checked={newUseCheckpointSync}
+                onToggle={() => setNewUseCheckpointSync(!newUseCheckpointSync)}
                 label={"Use checksync"}
               />
             )}
