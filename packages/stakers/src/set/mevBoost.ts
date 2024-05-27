@@ -1,8 +1,4 @@
-import {
-  InstalledPackageData,
-  Network,
-  UserSettingsAllDnps,
-} from "@dappnode/types";
+import { Network, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
@@ -16,12 +12,12 @@ export class MevBoost extends StakerComponent {
   } | null;
 
   constructor(
-    pkg: InstalledPackageData | null,
+    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network,
     relays: string[]
   ) {
-    super(pkg, dappnodeInstaller);
+    super(dnpName, dappnodeInstaller);
     this.network = network;
     this.compatibleMevBoost = this.getCompatibleMevBoost();
     this.relays = relays;
@@ -44,9 +40,9 @@ export class MevBoost extends StakerComponent {
   }
 
   private getMevBoostUserSettings(): UserSettingsAllDnps {
-    return this.pkg?.dnpName
+    return this.dnpName
       ? {
-          [this.pkg.dnpName]: {
+          [this.dnpName]: {
             environment: {
               "mev-boost": {
                 ["RELAYS"]:

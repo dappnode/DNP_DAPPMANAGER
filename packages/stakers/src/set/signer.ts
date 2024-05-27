@@ -1,4 +1,4 @@
-import { InstalledPackageData, Network } from "@dappnode/types";
+import { Network } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
@@ -11,18 +11,18 @@ export class Signer extends StakerComponent {
   protected belongsToStakerNetwork = false;
 
   constructor(
-    pkg: InstalledPackageData | null,
+    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network
   ) {
-    super(pkg, dappnodeInstaller);
+    super(dnpName, dappnodeInstaller);
     this.network = network;
     this.compatibleSigner = this.getCompatibleSigner();
   }
 
-  async setNewSigner(newExecutionDnpName: string | null) {
+  async setNewSigner(newWeb3signerDnpName: string | null) {
     await super.setNew({
-      newStakerDnpName: newExecutionDnpName,
+      newStakerDnpName: newWeb3signerDnpName,
       compatibleClients: [this.compatibleSigner],
       belongsToStakerNetwork: this.belongsToStakerNetwork,
     });

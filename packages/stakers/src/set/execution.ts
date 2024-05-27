@@ -1,4 +1,4 @@
-import { InstalledPackageData, Network } from "@dappnode/types";
+import { Network } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 
@@ -12,11 +12,11 @@ export class Execution extends StakerComponent {
   }[];
 
   constructor(
-    pkg: InstalledPackageData | null,
+    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network
   ) {
-    super(pkg, dappnodeInstaller);
+    super(dnpName, dappnodeInstaller);
     this.network = network;
     this.executionFullnodeAlias = `execution.${this.network}.staker.dappnode`;
     this.compatibleExecutions = this.getCompatibleExecutions();
@@ -32,7 +32,7 @@ export class Execution extends StakerComponent {
     await ethereumClient.updateFullnodeAlias({
       network: this.network,
       newExecClientDnpName: newExecutionDnpName,
-      prevExecClientDnpName: this.pkg?.dnpName,
+      prevExecClientDnpName: this.dnpName || "",
     });
   }
 

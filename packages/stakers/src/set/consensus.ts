@@ -1,8 +1,4 @@
-import {
-  InstalledPackageData,
-  Network,
-  UserSettingsAllDnps,
-} from "@dappnode/types";
+import { Network, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
@@ -19,12 +15,12 @@ export class Consensus extends StakerComponent {
   }[];
 
   constructor(
-    pkg: InstalledPackageData | null,
+    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network,
     useCheckpointSync: boolean
   ) {
-    super(pkg, dappnodeInstaller);
+    super(dnpName, dappnodeInstaller);
     this.network = network;
     this.compatibleConsensus = this.getCompatibleConsensus();
     this.defaultCheckpointSync = this.getDefaultCheckpointSync();
@@ -54,9 +50,9 @@ export class Consensus extends StakerComponent {
     const beaconServiceName = this.getBeaconServiceName();
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-    return this.pkg?.dnpName
+    return this.dnpName
       ? {
-          [this.pkg.dnpName]: {
+          [this.dnpName]: {
             environment:
               beaconServiceName === validatorServiceName
                 ? {
@@ -99,8 +95,8 @@ export class Consensus extends StakerComponent {
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
   private getValidatorServiceName(): string {
-    return this.pkg?.dnpName
-      ? this.pkg.dnpName.includes("nimbus")
+    return this.dnpName
+      ? this.dnpName.includes("nimbus")
         ? "beacon-validator"
         : "validator"
       : "";
@@ -112,8 +108,8 @@ export class Consensus extends StakerComponent {
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
   private getBeaconServiceName(): string {
-    return this.pkg?.dnpName
-      ? this.pkg.dnpName.includes("nimbus")
+    return this.dnpName
+      ? this.dnpName.includes("nimbus")
         ? "beacon-validator"
         : "beacon-chain"
       : "";

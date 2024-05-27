@@ -18,19 +18,15 @@ import {
 import { lt } from "semver";
 
 export class StakerComponent {
-  protected pkg: InstalledPackageData | null;
+  protected dnpName: string | null;
   protected dappnodeInstaller: DappnodeInstaller;
   protected stakerNetwork = params.DOCKER_STAKER_NETWORK_NAME;
 
-  constructor(
-    pkg: InstalledPackageData | null,
-    dappnodeInstaller: DappnodeInstaller
-  ) {
-    this.pkg = pkg;
+  constructor(dnName: string | null, dappnodeInstaller: DappnodeInstaller) {
+    this.dnpName = dnName;
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
-  // TODO: add set User settings
   protected async setNew({
     newStakerDnpName,
     compatibleClients,
@@ -49,23 +45,29 @@ export class StakerComponent {
     executionFullnodeAlias?: string;
     userSettings?: UserSettingsAllDnps;
   }): Promise<void> {
-    if (compatibleClients) this.ensureSetRequirements(compatibleClients);
-    if (!this.pkg && !newStakerDnpName) return;
-    if (this.pkg?.dnpName === newStakerDnpName) return; // TODO: test if this return can cause issues due to not ensuring: pkg installed, running anbd connected to the network
+    if (!this.dnpName && !newStakerDnpName) return;
+    if (this.dnpName === newStakerDnpName) return; // TODO: test if this return can cause issues due to not ensuring: pkg installed, running anbd connected to the network
+
+    const pkg = await listPackageNoThrow({
+      dnpName: this.dnpName || "",
+    });
+
+    if (pkg && compatibleClients)
+      this.ensureSetRequirements(compatibleClients, pkg?.version || "0.0.0");
 
     if (newStakerDnpName) {
-      if (this.pkg) {
+      if (pkg) {
         // ensure old pkg is not running
-        await this.stopAllPkgContainers(this.pkg);
+        await this.stopAllPkgContainers(pkg);
         if (belongsToStakerNetwork) {
           // disconnect old pkg from staker network
           // important: disconnecting the container is necessary to avoid relying on docker-compose calls instead of docker calls
           await this.disconnectConnectedPkgFromStakerNetwork(
             this.stakerNetwork,
-            this.pkg.containers
+            pkg.containers
           );
           // remove staker network from the compose file
-          this.removeStakerNetworkFromCompose(this.pkg.dnpName);
+          this.removeStakerNetworkFromCompose(pkg.dnpName);
         }
       }
       // ensure pkg installed and running
@@ -97,13 +99,10 @@ export class StakerComponent {
           executionFullnodeAlias
         );
       }
-
-      this.pkg = newPkg;
     } else {
-      if (!this.pkg) return;
+      if (!pkg) return;
       // Stop the current staker
-      await this.stopAllPkgContainers(this.pkg);
-      this.pkg = null;
+      await this.stopAllPkgContainers(pkg);
     }
   }
 
@@ -215,12 +214,13 @@ export class StakerComponent {
     compatibleClients: {
       dnpName: string;
       minVersion: string;
-    }[]
+    }[],
+    pkgVersion: string
   ): void {
-    if (!this.pkg) return;
+    if (!this.dnpName) return;
 
     const compatibleClient = compatibleClients.find(
-      (c) => c.dnpName === this.pkg?.dnpName
+      (c) => c.dnpName === this.dnpName
     );
 
     // ensure valid dnpName
@@ -232,7 +232,7 @@ export class StakerComponent {
     // ensure valid version
     if (
       compatibleClient?.minVersion &&
-      lt(this.pkg.version, compatibleClient.minVersion)
+      lt(pkgVersion, compatibleClient.minVersion)
     ) {
       throw Error(
         `The selected staker version is not compatible with the current network. Required version: ${compatibleClient.minVersion}`

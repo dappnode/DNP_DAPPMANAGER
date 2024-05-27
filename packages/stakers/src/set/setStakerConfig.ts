@@ -6,7 +6,6 @@ import { Execution } from "./execution.js";
 import { Consensus } from "./consensus.js";
 import { MevBoost } from "./mevBoost.js";
 import { Signer } from "./signer.js";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
  *  Sets a new staker configuration based on user selection:
@@ -31,33 +30,23 @@ export async function setStakerConfig(
 ): Promise<void> {
   // create instances
   const executionPkg = new Execution(
-    await listPackageNoThrow({ dnpName: executionDnpName || "" }),
+    executionDnpName,
     dappnodeInstaller,
     network
   );
   const consensusPkg = new Consensus(
-    await listPackageNoThrow({
-      dnpName: consensusDnpName || "",
-    }),
+    consensusDnpName,
     dappnodeInstaller,
     network,
     useCheckpointSync
   );
   const mevBoostPkg = new MevBoost(
-    await listPackageNoThrow({
-      dnpName: mevBoostDnpName || "",
-    }),
+    mevBoostDnpName,
     dappnodeInstaller,
     network,
     relays
   );
-  const signerPkg = new Signer(
-    await listPackageNoThrow({
-      dnpName: web3signerDnpName || "",
-    }),
-    dappnodeInstaller,
-    network
-  );
+  const signerPkg = new Signer(web3signerDnpName, dappnodeInstaller, network);
 
   await Promise.all([
     executionPkg.setNewExecution(executionDnpName),
