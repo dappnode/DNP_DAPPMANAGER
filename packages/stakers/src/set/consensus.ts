@@ -1,6 +1,7 @@
 import { Network, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
+import * as db from "@dappnode/db";
 
 export class Consensus extends StakerComponent {
   protected defaultCheckpointSync: string;
@@ -28,7 +29,7 @@ export class Consensus extends StakerComponent {
   }
 
   async setNewConsensus(
-    newExecutionDnpName: string | null,
+    newConsensusDnpName: string | null,
     newUseCheckpointSync?: boolean
   ) {
     // update checksync
@@ -36,11 +37,34 @@ export class Consensus extends StakerComponent {
       this.useCheckpointSync = newUseCheckpointSync;
 
     await super.setNew({
-      newStakerDnpName: newExecutionDnpName,
+      newStakerDnpName: newConsensusDnpName,
       compatibleClients: this.compatibleConsensus,
       belongsToStakerNetwork: this.belongsToStakerNetwork,
       userSettings: this.getConsensusUserSettings(),
     });
+    // persist on db
+    const dbHandler = this.getDbHandler();
+    if (newConsensusDnpName !== dbHandler.get())
+      await dbHandler.set(newConsensusDnpName);
+  }
+  private getDbHandler(): {
+    get: () => string | null | undefined;
+    set: (globEnvValue: string | null | undefined) => Promise<void>;
+  } {
+    switch (this.network) {
+      case Network.Mainnet:
+        return db.consensusClientMainnet;
+      case Network.Gnosis:
+        return db.consensusClientGnosis;
+      case Network.Prater:
+        return db.consensusClientPrater;
+      case Network.Holesky:
+        return db.consensusClientHolesky;
+      case Network.Lukso:
+        return db.consensusClientLukso;
+      default:
+        throw Error(`Unsupported network: ${this.network}`);
+    }
   }
 
   private getConsensusUserSettings(): UserSettingsAllDnps {

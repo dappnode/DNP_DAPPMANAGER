@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
+import { StakerItem, StakerItemOk, Network, StakerType } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -29,10 +29,10 @@ export default function MevBoost<T extends Network>({
   ...props
 }: {
   network: T;
-  mevBoost: StakerItem<T, "mev-boost">;
-  newMevBoost: StakerItemOk<T, "mev-boost"> | undefined;
+  mevBoost: StakerItem<T, StakerType.Mevboost>;
+  newMevBoost: StakerItemOk<T, StakerType.Mevboost> | undefined;
   setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
+    React.SetStateAction<StakerItemOk<T, StakerType.Mevboost> | undefined>
   >;
   newRelays: string[];
   setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;

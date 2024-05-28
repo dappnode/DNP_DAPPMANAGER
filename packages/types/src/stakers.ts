@@ -103,7 +103,12 @@ export enum SignerLukso {
   Web3signer = "web3signer-lukso.dnp.dappnode.eth",
 }
 
-export type StakerType = "execution" | "consensus" | "signer" | "mev-boost";
+export enum StakerType {
+  Execution = "execution",
+  Consensus = "consensus",
+  Signer = "signer",
+  Mevboost = "mev-boost",
+}
 
 export type StakerItem<T extends Network, P extends StakerType> =
   | StakerItemOk<T, P>
@@ -174,17 +179,17 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
 } & StakerItemBasic<T, P>;
 
 export interface StakerConfigGet<T extends Network> {
-  executionClients: StakerItem<T, "execution">[];
-  consensusClients: StakerItem<T, "consensus">[];
-  web3Signer: StakerItem<T, "signer">;
-  mevBoost: StakerItem<T, "mev-boost">;
+  executionClients: StakerItem<T, StakerType.Execution>[];
+  consensusClients: StakerItem<T, StakerType.Consensus>[];
+  web3Signer: StakerItem<T, StakerType.Signer>;
+  mevBoost: StakerItem<T, StakerType.Mevboost>;
 }
 
 export interface StakerConfigGetOk<T extends Network> {
-  executionClients: StakerItemOk<T, "execution">[];
-  consensusClients: StakerItemOk<T, "consensus">[];
-  web3signer: StakerItemOk<T, "signer">;
-  mevBoost: StakerItemOk<T, "mev-boost">;
+  executionClients: StakerItemOk<T, StakerType.Execution>[];
+  consensusClients: StakerItemOk<T, StakerType.Consensus>[];
+  web3signer: StakerItemOk<T, StakerType.Signer>;
+  mevBoost: StakerItemOk<T, StakerType.Mevboost>;
 }
 export interface StakerConfigSet {
   network: Network;

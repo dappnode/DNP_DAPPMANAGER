@@ -1,6 +1,7 @@
 import { Network } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
+import * as db from "@dappnode/db";
 
 export class Execution extends StakerComponent {
   protected executionFullnodeAlias: string;
@@ -27,11 +28,37 @@ export class Execution extends StakerComponent {
       belongsToStakerNetwork: this.belongsToStakerNetwork,
       executionFullnodeAlias: this.executionFullnodeAlias,
     });
+    // persist on db
+    const dbHandler = this.getDbHandler();
+    if (newExecutionDnpName !== dbHandler.get())
+      await dbHandler.set(newExecutionDnpName);
+
+    // update fullnode alias
     await ethereumClient.updateFullnodeAlias({
       network: this.network,
       newExecClientDnpName: newExecutionDnpName,
       prevExecClientDnpName: this.dnpName || "",
     });
+  }
+
+  private getDbHandler(): {
+    get: () => string | null | undefined;
+    set: (globEnvValue: string | null | undefined) => Promise<void>;
+  } {
+    switch (this.network) {
+      case Network.Mainnet:
+        return db.executionClientMainnet;
+      case Network.Gnosis:
+        return db.executionClientGnosis;
+      case Network.Prater:
+        return db.executionClientPrater;
+      case Network.Holesky:
+        return db.executionClientHolesky;
+      case Network.Lukso:
+        return db.executionClientLukso;
+      default:
+        throw Error(`Unsupported network: ${this.network}`);
+    }
   }
 
   private getCompatibleExecutions(): {

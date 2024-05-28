@@ -7,7 +7,6 @@ import {
   EthClientStatus,
   EthClientSyncedNotificationStatus,
   EthClientInstallStatus,
-  ExecutionClientMainnet,
   ConsensusClientMainnet,
 } from "@dappnode/types";
 
@@ -46,7 +45,7 @@ export const ethClientFallback = interceptOnSet(
  * Cache the status of the eth exec client install loop
  */
 export const ethExecClientInstallStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientInstallStatus, ExecutionClientMainnet>({
+  dbCache.indexedByKey<EthClientInstallStatus, string>({
     rootKey: ETH_EXEC_CLIENT_INSTALL_STATUS,
     getKey: (target) => target,
     validate: (id, installStatus) =>
@@ -58,7 +57,7 @@ export const ethExecClientInstallStatus = interceptOnSet(
  * Cache the status of the eth cons client install loop
  */
 export const ethConsClientInstallStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientInstallStatus, ConsensusClientMainnet>({
+  dbCache.indexedByKey<EthClientInstallStatus, string>({
     rootKey: ETH_CONS_CLIENT_INSTALL_STATUS,
     getKey: (target) => target,
     validate: (id, installStatus) =>
@@ -70,7 +69,7 @@ export const ethConsClientInstallStatus = interceptOnSet(
  * Cache the general status of the eth client, if it's available or not
  */
 export const ethExecClientStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientStatus, ExecutionClientMainnet>({
+  dbCache.indexedByKey<EthClientStatus, string>({
     rootKey: ETH_EXEC_CLIENT_STATUS,
     getKey: (target) => target,
     validate: (id, status) =>

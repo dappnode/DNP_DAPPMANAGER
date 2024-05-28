@@ -20,11 +20,7 @@ import {
   listPackageNoThrow,
   getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  Network,
-} from "@dappnode/types";
+import { Network } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export enum ComposeAliasEditorAction {
@@ -337,9 +333,9 @@ export class EthereumClient {
     useCheckpointSync,
   }: {
     dappnodeInstaller: DappnodeInstaller;
-    prevExecClient?: ExecutionClientMainnet;
-    execClient: ExecutionClientMainnet;
-    consClient: ConsensusClientMainnet;
+    prevExecClient?: string;
+    execClient: string;
+    consClient: string;
     useCheckpointSync?: boolean;
   }): Promise<void> {
     try {
@@ -411,9 +407,9 @@ export class EthereumClient {
     consClient,
     useCheckpointSync,
   }: {
-    prevExecClient?: ExecutionClientMainnet;
-    execClient: ExecutionClientMainnet;
-    consClient: ConsensusClientMainnet;
+    prevExecClient?: string;
+    execClient: string;
+    consClient: string;
     useCheckpointSync?: boolean;
   }): Promise<void> {
     db.ethExecClientInstallStatus.set(execClient, {

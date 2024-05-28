@@ -41,7 +41,7 @@ import {
  */
 export async function runEthClientInstaller(
   dappnodeInstaller: DappnodeInstaller,
-  target: ExecutionClientMainnet | ConsensusClientMainnet | "remote",
+  target: string | "remote",
   status?: EthClientInstallStatus,
   useCheckpointSync?: boolean
 ): Promise<EthClientInstallStatus | null> {
@@ -169,7 +169,7 @@ export function startEthMultiClientDaemon(
       multiClientArgs:
         | {
             useCheckpointSync?: boolean;
-            prevExecClientDnpName?: ExecutionClientMainnet;
+            prevExecClientDnpName?: string;
           }
         | undefined
     ) => {

@@ -92,8 +92,8 @@ interface EthClientData {
   options:
     | "remote"
     | {
-        execClients: ExecutionClientMainnet[];
-        consClients: ConsensusClientMainnet[];
+        execClients: string[];
+        consClients: string[];
       };
   stats: EthClientDataStats;
   highlights: (keyof EthClientDataStats)[];

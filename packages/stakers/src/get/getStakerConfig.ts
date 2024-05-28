@@ -13,6 +13,7 @@ import {
   StakerConfigGet,
   StakerItem,
   Network,
+  StakerType,
 } from "@dappnode/types";
 import { listPackages } from "@dappnode/dockerapi";
 import {
@@ -117,69 +118,73 @@ export async function getStakerConfig<T extends Network>(
           }
         })
       ),
-      web3Signer: await new Promise<StakerItem<T, "signer">>((resolve) => {
-        (async () => {
-          try {
-            // make sure repo exists
-            await dappnodeInstaller.getRepoContract(signer);
-            const pkgData = await packageGetData(dappnodeInstaller, signer);
-            const signerIsRunning = getIsRunning(pkgData, dnpList);
-            resolve({
-              status: "ok",
-              dnpName: signer as Signer<T>,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-              isInstalled: getIsInstalled(pkgData, dnpList),
-              isUpdated: getIsUpdated(pkgData, dnpList),
-              isRunning: signerIsRunning,
-              data: pkgData,
-              isSelected: signerIsRunning,
-            });
-          } catch (error) {
-            resolve({
-              status: "error",
-              dnpName: signer as Signer<T>,
-              error,
-            });
-          }
-        })();
-      }),
-      mevBoost: await new Promise<StakerItem<T, "mev-boost">>((resolve) => {
-        (async () => {
-          try {
-            // make sure repo exists
-            await dappnodeInstaller.getRepoContract(mevBoost);
-            const pkgData = await packageGetData(dappnodeInstaller, mevBoost);
-            const isInstalled = getIsInstalled(pkgData, dnpList);
-            const relays: string[] = [];
-            if (isInstalled) {
-              const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
-                .userSettings?.environment;
-              if (pkgEnv) {
-                pkgEnv["mev-boost"]["RELAYS"]
-                  .split(",")
-                  .forEach((relay) => relays.push(relay));
-              }
+      web3Signer: await new Promise<StakerItem<T, StakerType.Signer>>(
+        (resolve) => {
+          (async () => {
+            try {
+              // make sure repo exists
+              await dappnodeInstaller.getRepoContract(signer);
+              const pkgData = await packageGetData(dappnodeInstaller, signer);
+              const signerIsRunning = getIsRunning(pkgData, dnpList);
+              resolve({
+                status: "ok",
+                dnpName: signer as Signer<T>,
+                avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+                isInstalled: getIsInstalled(pkgData, dnpList),
+                isUpdated: getIsUpdated(pkgData, dnpList),
+                isRunning: signerIsRunning,
+                data: pkgData,
+                isSelected: signerIsRunning,
+              });
+            } catch (error) {
+              resolve({
+                status: "error",
+                dnpName: signer as Signer<T>,
+                error,
+              });
             }
-            resolve({
-              status: "ok",
-              dnpName: mevBoost as MevBoost<T>,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-              isInstalled,
-              isUpdated: getIsUpdated(pkgData, dnpList),
-              isRunning: getIsRunning(pkgData, dnpList),
-              data: pkgData,
-              isSelected: Boolean(isMevBoostSelected),
-              relays,
-            });
-          } catch (error) {
-            resolve({
-              status: "error",
-              dnpName: mevBoost as MevBoost<T>,
-              error,
-            });
-          }
-        })();
-      }),
+          })();
+        }
+      ),
+      mevBoost: await new Promise<StakerItem<T, StakerType.Mevboost>>(
+        (resolve) => {
+          (async () => {
+            try {
+              // make sure repo exists
+              await dappnodeInstaller.getRepoContract(mevBoost);
+              const pkgData = await packageGetData(dappnodeInstaller, mevBoost);
+              const isInstalled = getIsInstalled(pkgData, dnpList);
+              const relays: string[] = [];
+              if (isInstalled) {
+                const pkgEnv = (await packageGet({ dnpName: pkgData.dnpName }))
+                  .userSettings?.environment;
+                if (pkgEnv) {
+                  pkgEnv["mev-boost"]["RELAYS"]
+                    .split(",")
+                    .forEach((relay) => relays.push(relay));
+                }
+              }
+              resolve({
+                status: "ok",
+                dnpName: mevBoost as MevBoost<T>,
+                avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+                isInstalled,
+                isUpdated: getIsUpdated(pkgData, dnpList),
+                isRunning: getIsRunning(pkgData, dnpList),
+                data: pkgData,
+                isSelected: Boolean(isMevBoostSelected),
+                relays,
+              });
+            } catch (error) {
+              resolve({
+                status: "error",
+                dnpName: mevBoost as MevBoost<T>,
+                error,
+              });
+            }
+          })();
+        }
+      ),
     };
   } catch (e) {
     throw Error(`Error getting staker config: ${e}`);

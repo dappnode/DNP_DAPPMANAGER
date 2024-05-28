@@ -15,10 +15,8 @@ import {
   UserSettingsAllDnps,
   PackageContainer,
   Network,
-  ExecutionClient,
 } from "@dappnode/types";
 import { lt } from "semver";
-import * as db from "@dappnode/db";
 
 export class StakerComponent {
   protected dnpName: string | null;
@@ -113,57 +111,6 @@ export class StakerComponent {
       // Stop the current staker
       await this.stopAllPkgContainers(pkg);
     }
-  }
-
-  private getDbSetter<T extends Network>(): (
-    dnpName: ExecutionClient<T> | null | undefined
-  ) => Promise<void> {
-    switch (this.network) {
-      case Network.Mainnet:
-        return db.executionClientMainnet.set;
-      case Network.Gnosis:
-        return db.executionClientGnosis.set;
-      case Network.Prater:
-        return db.executionClientPrater.set;
-      case Network.Holesky:
-        return db.executionClientHolesky.set;
-      case Network.Lukso:
-        return db.executionClientLukso.set;
-      default:
-        throw Error(`Unsupported network: ${this.network}`);
-    }
-  }
-
-  private getDbGetter(): () => ExecutionClient<Network> | null | undefined {
-    switch (this.network) {
-      case Network.Mainnet:
-        return db.executionClientMainnet.get;
-      case Network.Gnosis:
-        return db.executionClientGnosis.get;
-      case Network.Prater:
-        return db.executionClientPrater.get;
-      case Network.Holesky:
-        return db.executionClientHolesky.get;
-      case Network.Lukso:
-        return db.executionClientLukso.get;
-      default:
-        throw Error(`Unsupported network: ${this.network}`);
-    }
-  }
-
-  /**
-   * Persist configuration on db.
-   */
-  private async writeOnDb({
-    dbSetter,
-    dbGetter,
-    newDnpName,
-  }: {
-    dbSetter: (dnpName: string | null) => Promise<void>;
-    dbGetter: () => string;
-    newDnpName: string | null;
-  }): Promise<void> {
-    if (dbGetter() !== newDnpName) await dbSetter(newDnpName);
   }
 
   /**

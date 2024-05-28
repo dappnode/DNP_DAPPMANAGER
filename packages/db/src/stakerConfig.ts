@@ -1,17 +1,5 @@
 import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  ConsensusClientGnosis,
-  ExecutionClientGnosis,
-  ConsensusClientPrater,
-  ExecutionClientPrater,
-  ConsensusClientHolesky,
-  ExecutionClientHolesky,
-  ConsensusClientLukso,
-  ExecutionClientLukso,
-} from "@dappnode/types";
 
 // Mainnet
 
@@ -27,20 +15,14 @@ const MEVBOOST_MAINNET = "mevboost-mainnet";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientMainnet | undefined | null>(
-    CONSENSUS_CLIENT_MAINNET,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_MAINNET, null),
   Object.keys({ CONSENSUS_CLIENT_MAINNET })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientMainnet | undefined | null>(
-    EXECUTION_CLIENT_MAINNET,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_MAINNET, null),
   Object.keys({ EXECUTION_CLIENT_MAINNET })[0]
 );
 
@@ -57,20 +39,14 @@ const MEVBOOST_GNOSIS = "mevboost-gnosis";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientGnosis | undefined | null>(
-    CONSENSUS_CLIENT_GNOSIS,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_GNOSIS, null),
   Object.keys({ CONSENSUS_CLIENT_GNOSIS })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientGnosis | undefined | null>(
-    EXECUTION_CLIENT_GNOSIS,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_GNOSIS, null),
   Object.keys({ EXECUTION_CLIENT_GNOSIS })[0]
 );
 
@@ -88,20 +64,14 @@ const MEVBOOST_PRATER = "mevboost-prater";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientPrater | undefined | null>(
-    CONSENSUS_CLIENT_PRATER,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_PRATER, null),
   Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientPrater | undefined | null>(
-    EXECUTION_CLIENT_PRATER,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_PRATER, null),
   Object.keys({ EXECUTION_CLIENT_PRATER })[0]
 );
 
@@ -119,20 +89,14 @@ const MEVBOOST_HOLESKY = "mevboost-holesky";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientHolesky | undefined | null>(
-    CONSENSUS_CLIENT_HOLESKY,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOLESKY, null),
   Object.keys({ CONSENSUS_CLIENT_HOLESKY })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientHolesky | undefined | null>(
-    EXECUTION_CLIENT_HOLESKY,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOLESKY, null),
   Object.keys({ EXECUTION_CLIENT_HOLESKY })[0]
 );
 
@@ -150,20 +114,14 @@ const MEVBOOST_LUKSO = "mevboost-lukso";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientLukso | undefined | null>(
-    CONSENSUS_CLIENT_LUKSO,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_LUKSO, null),
   Object.keys({ CONSENSUS_CLIENT_LUKSO })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientLukso | undefined | null>(
-    EXECUTION_CLIENT_LUKSO,
-    null
-  ),
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_LUKSO, null),
   Object.keys({ EXECUTION_CLIENT_LUKSO })[0]
 );
 

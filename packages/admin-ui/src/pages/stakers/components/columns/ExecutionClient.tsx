@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
+import { StakerItem, StakerItemOk, Network, StakerType } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -15,9 +15,9 @@ export default function ExecutionClient<T extends Network>({
   isSelected,
   ...props
 }: {
-  executionClient: StakerItem<T, "execution">;
+  executionClient: StakerItem<T, StakerType.Execution>;
   setNewExecClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "execution"> | undefined>
+    React.SetStateAction<StakerItemOk<T, StakerType.Execution> | undefined>
   >;
   isSelected: boolean;
 }) {

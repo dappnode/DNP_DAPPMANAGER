@@ -1,7 +1,6 @@
 import { StakerConfigSet } from "@dappnode/types";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { ensureStakerPkgsNetworkConfig } from "./ensureStakerPkgsNetworkConfig.js";
-import { setStakerConfigOnDb } from "./setStakerConfigOnDb.js";
 import { Execution } from "./execution.js";
 import { Consensus } from "./consensus.js";
 import { MevBoost } from "./mevBoost.js";
@@ -53,15 +52,6 @@ export async function setStakerConfig(
     consensusPkg.setNewConsensus(consensusDnpName, useCheckpointSync),
     mevBoostPkg.setNewMevBoost(mevBoostDnpName, relays),
   ]);
-
-  // Set staker config on db
-  // TODO: move this to staker component
-  await setStakerConfigOnDb({
-    network,
-    executionDnpName,
-    consensusDnpName,
-    mevBoostDnpName,
-  });
 
   // ensure staker network config. MUST GO AFTER WRITING ON DB
   await ensureStakerPkgsNetworkConfig(network);

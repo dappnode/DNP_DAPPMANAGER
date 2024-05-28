@@ -1,6 +1,7 @@
 import { Network, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
+import * as db from "@dappnode/db";
 
 export class MevBoost extends StakerComponent {
   protected relays: string[];
@@ -35,6 +36,30 @@ export class MevBoost extends StakerComponent {
       belongsToStakerNetwork: this.belongsToStakerNetwork,
       userSettings: this.getMevBoostUserSettings(),
     });
+    // persist on db
+    const dbHandler = this.getDbHandler();
+    if (Boolean(newMevBoostDnpName) !== dbHandler.get())
+      await dbHandler.set(newMevBoostDnpName ? true : false);
+  }
+
+  private getDbHandler(): {
+    get: () => boolean;
+    set: (globEnvValue: boolean) => Promise<void>;
+  } {
+    switch (this.network) {
+      case Network.Mainnet:
+        return db.mevBoostMainnet;
+      case Network.Gnosis:
+        return db.mevBoostGnosis;
+      case Network.Prater:
+        return db.mevBoostPrater;
+      case Network.Holesky:
+        return db.mevBoostHolesky;
+      case Network.Lukso:
+        return db.mevBoostLukso;
+      default:
+        throw Error(`Unsupported network: ${this.network}`);
+    }
   }
 
   private getMevBoostUserSettings(): UserSettingsAllDnps {

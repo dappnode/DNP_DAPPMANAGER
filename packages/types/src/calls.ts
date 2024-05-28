@@ -8,7 +8,7 @@ import {
   ManifestUpdateAlert,
 } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
-import { ExecutionClientMainnet, ConsensusClientMainnet } from "./stakers.js";
+import { ExecutionClientMainnet } from "./stakers.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -1018,14 +1018,14 @@ export type EthClientInstallStatus =
   | { status: "UNINSTALLED" };
 
 export type EthClientSyncedNotificationStatus = {
-  execClientTarget: ExecutionClientMainnet;
+  execClientTarget: string;
   status: "AwaitingSynced" | "Synced";
 } | null;
 
 export type Eth2ClientTarget =
   | {
-      execClient: ExecutionClientMainnet;
-      consClient: ConsensusClientMainnet;
+      execClient: string;
+      consClient: string;
     }
   | "remote";
 

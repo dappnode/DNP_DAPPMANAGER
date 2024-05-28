@@ -17,20 +17,20 @@ export const useStakerConfig = <T extends Network>(
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
   const [newExecClient, setNewExecClient] = useState<
-    StakerItemOk<T, "execution">
+    StakerItemOk<T, StakerType.Execution>
   >();
   const [newConsClient, setNewConsClient] = useState<
-    StakerItemOk<T, "consensus">
+    StakerItemOk<T, StakerType.Consensus>
   >();
   const [newMevBoost, setNewMevBoost] = useState<
-    StakerItemOk<T, "mev-boost">
+    StakerItemOk<T, StakerType.Mevboost>
   >();
   const [newRelays, setNewRelays] = useState<string[]>([]);
   const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
     true
   );
   const [newWeb3signer, setNewWeb3signer] = useState<
-    StakerItemOk<T, "signer">
+    StakerItemOk<T, StakerType.Signer>
   >();
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
