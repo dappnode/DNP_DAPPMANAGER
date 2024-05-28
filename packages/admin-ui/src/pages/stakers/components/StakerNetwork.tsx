@@ -25,11 +25,11 @@ import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 
-export default function StakerNetwork<T extends Network>({
+export default function StakerNetwork({
   network,
   description
 }: {
-  network: T;
+  network: Network;
   description: string;
 }) {
   // Context
@@ -37,7 +37,7 @@ export default function StakerNetwork<T extends Network>({
 
   const currentStakerConfigReq = useApi.stakerConfigGet(
     network
-  ) as responseInterface<StakerConfigGet<T>, Error>;
+  ) as responseInterface<StakerConfigGet, Error>;
 
   // hooks
   const {
@@ -188,7 +188,7 @@ export default function StakerNetwork<T extends Network>({
                 <SubTitle>Execution Clients</SubTitle>
                 {currentStakerConfigReq.data.executionClients.map(
                   (executionClient, i) => (
-                    <ExecutionClient<T>
+                    <ExecutionClient
                       key={i}
                       executionClient={executionClient}
                       setNewExecClient={setNewExecClient}
@@ -204,7 +204,7 @@ export default function StakerNetwork<T extends Network>({
                 <SubTitle>Consensus Clients</SubTitle>
                 {currentStakerConfigReq.data.consensusClients.map(
                   (consensusClient, i) => (
-                    <ConsensusClient<T>
+                    <ConsensusClient
                       key={i}
                       consensusClient={{
                         ...consensusClient,

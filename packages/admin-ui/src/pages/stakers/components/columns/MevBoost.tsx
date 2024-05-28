@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network, StakerType } from "@dappnode/types";
+import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -18,7 +18,7 @@ interface RelayIface {
   docs?: string;
   ofacCompliant?: boolean;
 }
-export default function MevBoost<T extends Network>({
+export default function MevBoost({
   network,
   mevBoost,
   newMevBoost,
@@ -28,11 +28,11 @@ export default function MevBoost<T extends Network>({
   isSelected,
   ...props
 }: {
-  network: T;
-  mevBoost: StakerItem<T, StakerType.Mevboost>;
-  newMevBoost: StakerItemOk<T, StakerType.Mevboost> | undefined;
+  network: Network;
+  mevBoost: StakerItem;
+  newMevBoost: StakerItemOk | undefined;
   setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, StakerType.Mevboost> | undefined>
+    React.SetStateAction<StakerItemOk | undefined>
   >;
   newRelays: string[];
   setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;

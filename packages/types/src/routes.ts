@@ -130,9 +130,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: <T extends Network>(
-    network: T
-  ) => Promise<StakerConfigGet<T>>;
+  stakerConfigGet: <T extends Network>(network: T) => Promise<StakerConfigGet>;
 
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;

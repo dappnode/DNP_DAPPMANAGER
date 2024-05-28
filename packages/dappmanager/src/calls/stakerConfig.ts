@@ -18,8 +18,8 @@ export async function stakerConfigSet({
  * Returns the current staker configuration: execution and consensus clients,
  * remote signer, mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigGet<T extends Network>(
+export async function stakerConfigGet(
   network: Network
-): Promise<StakerConfigGet<T>> {
-  return await getStakerConfig<T>(dappnodeInstaller, network);
+): Promise<StakerConfigGet> {
+  return await getStakerConfig(dappnodeInstaller, network);
 }

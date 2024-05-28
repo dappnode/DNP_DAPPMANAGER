@@ -2,22 +2,22 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network, StakerType } from "@dappnode/types";
+import { StakerItem, StakerItemOk } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 
-export default function ExecutionClient<T extends Network>({
+export default function ExecutionClient({
   executionClient,
   setNewExecClient,
   isSelected,
   ...props
 }: {
-  executionClient: StakerItem<T, StakerType.Execution>;
+  executionClient: StakerItem;
   setNewExecClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, StakerType.Execution> | undefined>
+    React.SetStateAction<StakerItemOk | undefined>
   >;
   isSelected: boolean;
 }) {

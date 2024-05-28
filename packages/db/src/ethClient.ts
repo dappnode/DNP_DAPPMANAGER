@@ -7,7 +7,6 @@ import {
   EthClientStatus,
   EthClientSyncedNotificationStatus,
   EthClientInstallStatus,
-  ConsensusClientMainnet,
 } from "@dappnode/types";
 
 // User chosen properties
@@ -81,7 +80,7 @@ export const ethExecClientStatus = interceptOnSet(
  * Cache the general status of the eth client, if it's available or not
  */
 export const ethConsClientStatus = interceptOnSet(
-  dbCache.indexedByKey<EthClientStatus, ConsensusClientMainnet>({
+  dbCache.indexedByKey<EthClientStatus, string>({
     rootKey: ETH_CONS_CLIENT_STATUS,
     getKey: (target) => target,
     validate: (id, status) =>

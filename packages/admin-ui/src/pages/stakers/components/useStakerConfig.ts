@@ -4,7 +4,6 @@ import {
   StakerConfigGet,
   StakerConfigSet,
   StakerItemOk,
-  StakerType,
   StakerItem,
   Network
 } from "@dappnode/types";
@@ -12,26 +11,18 @@ import { responseInterface } from "swr";
 
 export const useStakerConfig = <T extends Network>(
   network: T,
-  currentStakerConfigReq: responseInterface<StakerConfigGet<T>, Error>
+  currentStakerConfigReq: responseInterface<StakerConfigGet, Error>
 ) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  const [newExecClient, setNewExecClient] = useState<
-    StakerItemOk<T, StakerType.Execution>
-  >();
-  const [newConsClient, setNewConsClient] = useState<
-    StakerItemOk<T, StakerType.Consensus>
-  >();
-  const [newMevBoost, setNewMevBoost] = useState<
-    StakerItemOk<T, StakerType.Mevboost>
-  >();
+  const [newExecClient, setNewExecClient] = useState<StakerItemOk>();
+  const [newConsClient, setNewConsClient] = useState<StakerItemOk>();
+  const [newMevBoost, setNewMevBoost] = useState<StakerItemOk>();
   const [newRelays, setNewRelays] = useState<string[]>([]);
   const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
     true
   );
-  const [newWeb3signer, setNewWeb3signer] = useState<
-    StakerItemOk<T, StakerType.Signer>
-  >();
+  const [newWeb3signer, setNewWeb3signer] = useState<StakerItemOk>();
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
   >();
@@ -227,10 +218,7 @@ function getChanges({
   return { isAllowed: true };
 }
 
-function isOkSelectedInstalledAndRunning<
-  T extends Network,
-  P extends StakerType
->(StakerItem: StakerItem<T, P>): boolean {
+function isOkSelectedInstalledAndRunning(StakerItem: StakerItem): boolean {
   return (
     StakerItem.status === "ok" &&
     StakerItem.isSelected &&

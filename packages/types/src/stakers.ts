@@ -103,54 +103,18 @@ export enum SignerLukso {
   Web3signer = "web3signer-lukso.dnp.dappnode.eth",
 }
 
-export enum StakerType {
-  Execution = "execution",
-  Consensus = "consensus",
-  Signer = "signer",
-  Mevboost = "mev-boost",
-}
+export type StakerItem = StakerItemOk | StakerItemError;
 
-export type StakerItem<T extends Network, P extends StakerType> =
-  | StakerItemOk<T, P>
-  | StakerItemError<T, P>;
-
-interface StakerExecution<T extends Network> {
-  dnpName: ExecutionClient<T>;
-}
-
-interface StakerConsensus<T extends Network> {
-  dnpName: ConsensusClient<T>;
+interface StakerItemBasic {
+  dnpName: string;
+  relays?: string[];
   useCheckpointSync?: boolean;
 }
 
-interface StakerSigner<T extends Network> {
-  dnpName: Signer<T>;
-}
-
-interface StakerMevBoost<T extends Network> {
-  dnpName: MevBoost<T>;
-  relays?: string[];
-}
-
-type StakerItemBasic<
-  T extends Network,
-  P extends StakerType
-> = P extends "execution"
-  ? StakerExecution<T>
-  : P extends "consensus"
-  ? StakerConsensus<T>
-  : P extends "signer"
-  ? StakerSigner<T>
-  : P extends "mev-boost"
-  ? StakerMevBoost<T>
-  : P extends "signer"
-  ? StakerSigner<T>
-  : never;
-
-export type StakerItemError<T extends Network, P extends StakerType> = {
+export type StakerItemError = {
   status: "error";
   error: string;
-} & StakerItemBasic<T, P>;
+} & StakerItemBasic;
 
 /**
  * Metadata of a staker item to be cached
@@ -168,7 +132,7 @@ export type PackageItemData = Pick<
   | "signedSafe"
 >;
 
-export type StakerItemOk<T extends Network, P extends StakerType> = {
+export type StakerItemOk = {
   status: "ok";
   avatarUrl: string;
   isInstalled: boolean;
@@ -176,20 +140,20 @@ export type StakerItemOk<T extends Network, P extends StakerType> = {
   isRunning: boolean;
   data?: PackageItemData;
   isSelected: boolean;
-} & StakerItemBasic<T, P>;
+} & StakerItemBasic;
 
-export interface StakerConfigGet<T extends Network> {
-  executionClients: StakerItem<T, StakerType.Execution>[];
-  consensusClients: StakerItem<T, StakerType.Consensus>[];
-  web3Signer: StakerItem<T, StakerType.Signer>;
-  mevBoost: StakerItem<T, StakerType.Mevboost>;
+export interface StakerConfigGet {
+  executionClients: StakerItem[];
+  consensusClients: StakerItem[];
+  web3Signer: StakerItem;
+  mevBoost: StakerItem;
 }
 
-export interface StakerConfigGetOk<T extends Network> {
-  executionClients: StakerItemOk<T, StakerType.Execution>[];
-  consensusClients: StakerItemOk<T, StakerType.Consensus>[];
-  web3signer: StakerItemOk<T, StakerType.Signer>;
-  mevBoost: StakerItemOk<T, StakerType.Mevboost>;
+export interface StakerConfigGetOk {
+  executionClients: StakerItemOk[];
+  consensusClients: StakerItemOk[];
+  web3signer: StakerItemOk;
+  mevBoost: StakerItemOk;
 }
 export interface StakerConfigSet {
   network: Network;
@@ -201,82 +165,8 @@ export interface StakerConfigSet {
   web3signerDnpName: string | null;
 }
 
-// export type ExecutionClient<T extends Network> =
-//   T extends keyof ExecutionClientMap ? ExecutionClientMap[T] : never;
-
-export type ExecutionClient<T extends Network> = T extends infer R
-  ? R extends Network.Mainnet
-    ? ExecutionClientMainnet
-    : R extends Network.Prater
-    ? ExecutionClientPrater
-    : R extends Network.Gnosis
-    ? ExecutionClientGnosis
-    : R extends Network.Lukso
-    ? ExecutionClientLukso
-    : R extends Network.Holesky
-    ? ExecutionClientHolesky
-    : never
-  : never;
-
-export type ConsensusClient<T extends Network> = T extends infer R
-  ? R extends Network.Mainnet
-    ? ConsensusClientMainnet
-    : R extends Network.Prater
-    ? ConsensusClientPrater
-    : R extends Network.Gnosis
-    ? ConsensusClientGnosis
-    : R extends Network.Lukso
-    ? ConsensusClientLukso
-    : R extends Network.Holesky
-    ? ConsensusClientHolesky
-    : never
-  : never;
-
-export type Signer<T extends Network> = T extends infer R
-  ? R extends Network.Mainnet
-    ? SignerMainnet
-    : R extends Network.Prater
-    ? SignerPrater
-    : R extends Network.Gnosis
-    ? SignerGnosis
-    : R extends Network.Lukso
-    ? SignerLukso
-    : R extends Network.Holesky
-    ? SignerHolesky
-    : never
-  : never;
-
-export type MevBoost<T extends Network> = T extends infer R
-  ? R extends Network.Mainnet
-    ? MevBoostMainnet
-    : R extends Network.Prater
-    ? MevBoostPrater
-    : R extends Network.Gnosis
-    ? never
-    : R extends Network.Lukso
-    ? never
-    : R extends Network.Holesky
-    ? MevBoostHolesky
-    : never
-  : never;
-
-export interface StakerConfigByNetwork<T extends Network> {
-  executionClient: ExecutionClient<T> | undefined | null;
-  consensusClient: ConsensusClient<T> | undefined | null;
+export interface StakerConfigByNetwork {
+  executionClient: string | undefined | null;
+  consensusClient: string | undefined | null;
   isMevBoostSelected: boolean;
-}
-export interface StakerCompatibleVersionsByNetwork<T extends Network> {
-  compatibleExecution: {
-    dnpName: ExecutionClient<T>;
-    minVersion: string;
-  }[];
-  compatibleConsensus: {
-    dnpName: ConsensusClient<T>;
-    minVersion: string;
-  }[];
-  compatibleSigner: {
-    dnpName: Signer<T>;
-    minVersion: string;
-  };
-  compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
 }

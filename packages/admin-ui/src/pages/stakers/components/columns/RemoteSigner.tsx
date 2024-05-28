@@ -4,21 +4,21 @@ import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
-import { StakerItem, Network, StakerItemOk, StakerType } from "@dappnode/types";
+import { StakerItem, StakerItemOk } from "@dappnode/types";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 import { FaKey } from "react-icons/fa";
 
-export default function RemoteSigner<T extends Network>({
+export default function RemoteSigner({
   signer,
   setNewWeb3signer,
   isSelected,
   ...props
 }: {
-  signer: StakerItem<T, StakerType.Signer>;
+  signer: StakerItem;
   setNewWeb3signer: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, StakerType.Signer> | undefined>
+    React.SetStateAction<StakerItemOk | undefined>
   >;
   isSelected: boolean;
 }) {

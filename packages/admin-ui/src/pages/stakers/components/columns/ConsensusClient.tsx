@@ -2,7 +2,7 @@ import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network, StakerType } from "@dappnode/types";
+import { StakerItem, StakerItemOk } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
 import Switch from "components/Switch";
 
-export default function ConsensusClient<T extends Network>({
+export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   newUseCheckpointSync,
@@ -19,9 +19,9 @@ export default function ConsensusClient<T extends Network>({
   isSelected,
   ...props
 }: {
-  consensusClient: StakerItem<T, StakerType.Consensus>;
+  consensusClient: StakerItem;
   setNewConsClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, StakerType.Consensus> | undefined>
+    React.SetStateAction<StakerItemOk | undefined>
   >;
   newUseCheckpointSync: boolean;
   setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
