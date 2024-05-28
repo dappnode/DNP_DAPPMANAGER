@@ -4,8 +4,6 @@ import {
   EthClientStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet,
 } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";
@@ -60,11 +58,11 @@ export async function getMultiClientStatus(
   consClientDnpName: ConsensusClientMainnet
 ): Promise<EthClientStatus> {
   try {
-    if (!executionClientsMainnet.includes(execClientDnpName))
+    if (!Object.values(ExecutionClientMainnet).includes(execClientDnpName))
       throw Error(
         `Unsupported execution client in mainnet '${execClientDnpName}'`
       );
-    if (!consensusClientsMainnet.includes(consClientDnpName))
+    if (!Object.values(ConsensusClientMainnet).includes(consClientDnpName))
       throw Error(
         `Unsupported consensus client in mainnet '${consClientDnpName}'`
       );

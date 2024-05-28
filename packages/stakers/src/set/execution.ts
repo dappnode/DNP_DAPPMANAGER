@@ -3,7 +3,6 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 
 export class Execution extends StakerComponent {
-  protected network: Network;
   protected executionFullnodeAlias: string;
   protected belongsToStakerNetwork = true;
   protected compatibleExecutions: {
@@ -16,8 +15,7 @@ export class Execution extends StakerComponent {
     dappnodeInstaller: DappnodeInstaller,
     network: Network
   ) {
-    super(dnpName, dappnodeInstaller);
-    this.network = network;
+    super(dnpName, network, dappnodeInstaller);
     this.executionFullnodeAlias = `execution.${this.network}.staker.dappnode`;
     this.compatibleExecutions = this.getCompatibleExecutions();
   }

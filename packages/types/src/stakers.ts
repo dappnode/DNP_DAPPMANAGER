@@ -1,144 +1,107 @@
 import { PackageRelease } from "./pkg.js";
 
 // NETWORKS
-export const networks = Object.freeze([
-  "mainnet",
-  "prater",
-  "gnosis",
-  "lukso",
-  "holesky",
-] as const);
-export type Network = (typeof networks)[number];
+
+export enum Network {
+  Mainnet = "mainnet",
+  Prater = "prater",
+  Gnosis = "gnosis",
+  Lukso = "lukso",
+  Holesky = "holesky",
+}
 
 // MAINNET
-export type ConsensusClientMainnet = (typeof consensusClientsMainnet)[number];
-export const consensusClientsMainnet = Object.freeze([
-  "lodestar.dnp.dappnode.eth",
-  "prysm.dnp.dappnode.eth",
-  "lighthouse.dnp.dappnode.eth",
-  "teku.dnp.dappnode.eth",
-  "nimbus.dnp.dappnode.eth",
-] as const);
-export type ExecutionClientMainnet = (typeof executionClientsMainnet)[number];
-export const executionClientsMainnet = Object.freeze([
-  "geth.dnp.dappnode.eth",
-  "besu.public.dappnode.eth",
-  "erigon.dnp.dappnode.eth",
-  "nethermind.public.dappnode.eth",
-] as const);
-export type SignerMainnet = "web3signer.dnp.dappnode.eth";
-export const signerMainnet: SignerMainnet = "web3signer.dnp.dappnode.eth";
-export type MevBoostMainnet = "mev-boost.dnp.dappnode.eth";
-export const mevBoostMainnet: MevBoostMainnet = "mev-boost.dnp.dappnode.eth";
+export enum ConsensusClientMainnet {
+  Lodestar = "lodestar.dnp.dappnode.eth",
+  Prysm = "prysm.dnp.dappnode.eth",
+  Lighthouse = "lighthouse.dnp.dappnode.eth",
+  Teku = "teku.dnp.dappnode.eth",
+  Nimbus = "nimbus.dnp.dappnode.eth",
+}
+export enum ExecutionClientMainnet {
+  Geth = "geth.dnp.dappnode.eth",
+  Besu = "besu.public.dappnode.eth",
+  Erigon = "erigon.dnp.dappnode.eth",
+  Nethermind = "nethermind.public.dappnode.eth",
+}
+export enum SignerMainnet {
+  Web3signer = "web3signer.dnp.dappnode.eth",
+}
+export enum MevBoostMainnet {
+  Mevboost = "mev-boost.dnp.dappnode.eth",
+}
 
 // PRATER
-export type ConsensusClientPrater = (typeof consensusClientsPrater)[number];
-export const consensusClientsPrater = Object.freeze([
-  "prysm-prater.dnp.dappnode.eth",
-  "lighthouse-prater.dnp.dappnode.eth",
-  "teku-prater.dnp.dappnode.eth",
-  "nimbus-prater.dnp.dappnode.eth",
-  "lodestar-prater.dnp.dappnode.eth",
-] as const);
-export type ExecutionClientPrater = (typeof executionClientsPrater)[number];
-export const executionClientsPrater = Object.freeze([
-  "goerli-geth.dnp.dappnode.eth",
-  "goerli-erigon.dnp.dappnode.eth",
-  "goerli-nethermind.dnp.dappnode.eth",
-  "goerli-besu.dnp.dappnode.eth",
-] as const);
-export type SignerPrater = "web3signer-prater.dnp.dappnode.eth";
-export const signerPrater: SignerPrater = "web3signer-prater.dnp.dappnode.eth";
-export type MevBoostPrater = "mev-boost-goerli.dnp.dappnode.eth";
-export const mevBoostPrater: MevBoostPrater =
-  "mev-boost-goerli.dnp.dappnode.eth";
+export enum ConsensusClientPrater {
+  Prysm = "prysm-prater.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-prater.dnp.dappnode.eth",
+  Teku = "teku-prater.dnp.dappnode.eth",
+  Nimbus = "nimbus-prater.dnp.dappnode.eth",
+  Lodestar = "lodestar-prater.dnp.dappnode.eth",
+}
+export enum ExecutionClientPrater {
+  Geth = "goerli-geth.dnp.dappnode.eth",
+  Erigon = "goerli-erigon.dnp.dappnode.eth",
+  Nethermind = "goerli-nethermind.dnp.dappnode.eth",
+  Besu = "goerli-besu.dnp.dappnode.eth",
+}
+export enum SignerPrater {
+  Web3signer = "web3signer-prater.dnp.dappnode.eth",
+}
+export enum MevBoostPrater {
+  Mevboost = "mev-boost-goerli.dnp.dappnode.eth",
+}
 
 // HOLESKY
-export type ConsensusClientHolesky = (typeof consensusClientsHolesky)[number];
-export const consensusClientsHolesky = Object.freeze([
-  "prysm-holesky.dnp.dappnode.eth",
-  "lighthouse-holesky.dnp.dappnode.eth",
-  "teku-holesky.dnp.dappnode.eth",
-  "nimbus-holesky.dnp.dappnode.eth",
-  "lodestar-holesky.dnp.dappnode.eth",
-] as const);
-export type ExecutionClientHolesky = (typeof executionClientsHolesky)[number];
-export const executionClientsHolesky = Object.freeze([
-  "holesky-geth.dnp.dappnode.eth",
-  "holesky-erigon.dnp.dappnode.eth",
-  "holesky-nethermind.dnp.dappnode.eth",
-  "holesky-besu.dnp.dappnode.eth",
-] as const);
-export type SignerHolesky = "web3signer-holesky.dnp.dappnode.eth";
-export const signerHolesky: SignerHolesky =
-  "web3signer-holesky.dnp.dappnode.eth";
-export type MevBoostHolesky = "mev-boost-holesky.dnp.dappnode.eth";
-export const mevBoostHolesky: MevBoostHolesky =
-  "mev-boost-holesky.dnp.dappnode.eth";
+export enum ConsensusClientHolesky {
+  Prysm = "prysm-holesky.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-holesky.dnp.dappnode.eth",
+  Teku = "teku-holesky.dnp.dappnode.eth",
+  Nimbus = "nimbus-holesky.dnp.dappnode.eth",
+  Lodestar = "lodestar-holesky.dnp.dappnode.eth",
+}
+export enum ExecutionClientHolesky {
+  Geth = "holesky-geth.dnp.dappnode.eth",
+  Erigon = "holesky-erigon.dnp.dappnode.eth",
+  Nethermind = "holesky-nethermind.dnp.dappnode.eth",
+  Besu = "holesky-besu.dnp.dappnode.eth",
+}
+export enum SignerHolesky {
+  Web3signer = "web3signer-holesky.dnp.dappnode.eth",
+}
+export enum MevBoostHolesky {
+  Mevboost = "mev-boost-holesky.dnp.dappnode.eth",
+}
 
 // GNOSIS
-export type ConsensusClientGnosis = (typeof consensusClientsGnosis)[number];
-export const consensusClientsGnosis = Object.freeze([
-  //"gnosis-beacon-chain-prysm.dnp.dappnode.eth", DEPRECATED
-  "lighthouse-gnosis.dnp.dappnode.eth",
-  "teku-gnosis.dnp.dappnode.eth",
-  "lodestar-gnosis.dnp.dappnode.eth",
-  "nimbus-gnosis.dnp.dappnode.eth",
-] as const);
-export type ExecutionClientGnosis = (typeof executionClientsGnosis)[number];
-export const executionClientsGnosis = Object.freeze([
-  "nethermind-xdai.dnp.dappnode.eth",
-  "gnosis-erigon.dnp.dappnode.eth",
-] as const);
-export type SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
-export const signerGnosis: SignerGnosis = "web3signer-gnosis.dnp.dappnode.eth";
+export enum ConsensusClientGnosis {
+  Lighthouse = "lighthouse-gnosis.dnp.dappnode.eth",
+  Teku = "teku-gnosis.dnp.dappnode.eth",
+  Lodestar = "lodestar-gnosis.dnp.dappnode.eth",
+  Nimbus = "nimbus-gnosis.dnp.dappnode.eth",
+}
+export enum ExecutionClientGnosis {
+  Nethermind = "nethermind-xdai.dnp.dappnode.eth",
+  Erigon = "gnosis-erigon.dnp.dappnode.eth",
+}
+export enum SignerGnosis {
+  Web3signer = "web3signer-gnosis.dnp.dappnode.eth",
+}
 
 // LUKSO
-export type ConsensusClientLukso = (typeof consensusClientsLukso)[number];
-export const consensusClientsLukso = Object.freeze([
+export enum ConsensusClientLukso {
   /*"lighthouse-lukso.dnp.dappnode.eth",*/
-  "prysm-lukso.dnp.dappnode.eth",
-  "teku-lukso.dnp.dappnode.eth",
-] as const);
-export type ExecutionClientLukso = (typeof executionClientsLukso)[number];
-export const executionClientsLukso = Object.freeze([
-  "lukso-geth.dnp.dappnode.eth",
+  Prysm = "prysm-lukso.dnp.dappnode.eth",
+  Teku = "teku-lukso.dnp.dappnode.eth",
+}
+
+export enum ExecutionClientLukso {
+  Geth = "lukso-geth.dnp.dappnode.eth",
   /*"lukso-erigon.dnp.dappnode.eth",*/
-] as const);
-export type SignerLukso = "web3signer-lukso.dnp.dappnode.eth";
-export const signerLukso: SignerLukso = "web3signer-lukso.dnp.dappnode.eth";
-
-// COMMON
-export const consensusClients = Object.freeze([
-  ...consensusClientsMainnet,
-  ...consensusClientsPrater,
-  ...consensusClientsHolesky,
-  ...consensusClientsGnosis,
-  ...consensusClientsLukso,
-] as const);
-
-export const executionClients = Object.freeze([
-  ...executionClientsMainnet,
-  ...executionClientsPrater,
-  ...executionClientsHolesky,
-  ...executionClientsGnosis,
-  ...executionClientsLukso,
-] as const);
-
-export const signers = Object.freeze([
-  signerMainnet,
-  signerPrater,
-  signerHolesky,
-  signerGnosis,
-  signerLukso,
-] as const);
-
-export const mevBoosts = Object.freeze([
-  mevBoostMainnet,
-  mevBoostPrater,
-  mevBoostHolesky,
-  //mevBoostGnosis,
-] as const);
+}
+export enum SignerLukso {
+  Web3signer = "web3signer-lukso.dnp.dappnode.eth",
+}
 
 export type StakerType = "execution" | "consensus" | "signer" | "mev-boost";
 
@@ -233,48 +196,63 @@ export interface StakerConfigSet {
   web3signerDnpName: string | null;
 }
 
-export type ExecutionClient<T extends Network> = T extends "mainnet"
-  ? ExecutionClientMainnet
-  : T extends "gnosis"
-  ? ExecutionClientGnosis
-  : T extends "prater"
-  ? ExecutionClientPrater
-  : T extends "holesky"
-  ? ExecutionClientHolesky
-  : T extends "lukso"
-  ? ExecutionClientLukso
+// export type ExecutionClient<T extends Network> =
+//   T extends keyof ExecutionClientMap ? ExecutionClientMap[T] : never;
+
+export type ExecutionClient<T extends Network> = T extends infer R
+  ? R extends Network.Mainnet
+    ? ExecutionClientMainnet
+    : R extends Network.Prater
+    ? ExecutionClientPrater
+    : R extends Network.Gnosis
+    ? ExecutionClientGnosis
+    : R extends Network.Lukso
+    ? ExecutionClientLukso
+    : R extends Network.Holesky
+    ? ExecutionClientHolesky
+    : never
   : never;
 
-export type ConsensusClient<T extends Network> = T extends "mainnet"
-  ? ConsensusClientMainnet
-  : T extends "gnosis"
-  ? ConsensusClientGnosis
-  : T extends "prater"
-  ? ConsensusClientPrater
-  : T extends "holesky"
-  ? ConsensusClientHolesky
-  : T extends "lukso"
-  ? ConsensusClientLukso
+export type ConsensusClient<T extends Network> = T extends infer R
+  ? R extends Network.Mainnet
+    ? ConsensusClientMainnet
+    : R extends Network.Prater
+    ? ConsensusClientPrater
+    : R extends Network.Gnosis
+    ? ConsensusClientGnosis
+    : R extends Network.Lukso
+    ? ConsensusClientLukso
+    : R extends Network.Holesky
+    ? ConsensusClientHolesky
+    : never
   : never;
 
-export type Signer<T extends Network> = T extends "mainnet"
-  ? SignerMainnet
-  : T extends "gnosis"
-  ? SignerGnosis
-  : T extends "prater"
-  ? SignerPrater
-  : T extends "holesky"
-  ? SignerHolesky
-  : T extends "lukso"
-  ? SignerLukso
+export type Signer<T extends Network> = T extends infer R
+  ? R extends Network.Mainnet
+    ? SignerMainnet
+    : R extends Network.Prater
+    ? SignerPrater
+    : R extends Network.Gnosis
+    ? SignerGnosis
+    : R extends Network.Lukso
+    ? SignerLukso
+    : R extends Network.Holesky
+    ? SignerHolesky
+    : never
   : never;
 
-export type MevBoost<T extends Network> = T extends "mainnet"
-  ? MevBoostMainnet
-  : T extends "prater"
-  ? MevBoostPrater
-  : T extends "holesky"
-  ? MevBoostHolesky
+export type MevBoost<T extends Network> = T extends infer R
+  ? R extends Network.Mainnet
+    ? MevBoostMainnet
+    : R extends Network.Prater
+    ? MevBoostPrater
+    : R extends Network.Gnosis
+    ? never
+    : R extends Network.Lukso
+    ? never
+    : R extends Network.Holesky
+    ? MevBoostHolesky
+    : never
   : never;
 
 export interface StakerConfigByNetwork<T extends Network> {
@@ -297,25 +275,3 @@ export interface StakerCompatibleVersionsByNetwork<T extends Network> {
   };
   compatibleMevBoost: { dnpName: MevBoost<T>; minVersion: string };
 }
-
-// STAKERS
-export const stakerPkgs = Object.freeze([
-  ...executionClientsMainnet,
-  ...consensusClientsMainnet,
-  signerMainnet,
-  mevBoostMainnet,
-  ...executionClientsPrater,
-  ...consensusClientsPrater,
-  signerPrater,
-  mevBoostPrater,
-  ...executionClientsHolesky,
-  ...consensusClientsHolesky,
-  signerHolesky,
-  mevBoostHolesky,
-  ...executionClientsGnosis,
-  ...consensusClientsGnosis,
-  signerGnosis,
-  ...executionClientsLukso,
-  ...consensusClientsLukso,
-  signerLukso,
-] as const);

@@ -13,12 +13,11 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
+  Network,
 } from "@dappnode/types";
 import {
   ethereumClient,
   getLocalFallbackContentHash,
-  isExecClient,
-  isConsClient,
   serializeError,
   packageInstall,
   DappnodeInstaller,
@@ -70,24 +69,26 @@ export async function runEthClientInstaller(
       case "INSTALLING_ERROR":
         // OK: Expected state, run / retry installation
         try {
-          if (isExecClient(target))
+          // check target belongs to enum ExecutionClientMainnet
+
+          if (isExecutionClientMainnet(target))
             db.ethExecClientInstallStatus.set(
               target as ExecutionClientMainnet,
               { status: "INSTALLING" }
             );
-          else if (isConsClient(target))
+          else if (isConsensusClientMainnet(target))
             db.ethConsClientInstallStatus.set(
               target as ConsensusClientMainnet,
               { status: "INSTALLING" }
             );
 
           try {
-            if (isConsClient(target))
+            if (isConsensusClientMainnet(target))
               await packageInstall(dappnodeInstaller, {
                 name: target,
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
-                  network: "mainnet",
+                  network: Network.Mainnet,
                   useCheckpointSync,
                 }),
               });
@@ -186,7 +187,7 @@ export function startEthMultiClientDaemon(
         for (const client of [execClient, consClient]) {
           if (!client) continue;
 
-          const prev = isExecClient(client)
+          const prev = isExecutionClientMainnet(client)
             ? db.ethExecClientInstallStatus.get(client)
             : db.ethConsClientInstallStatus.get(client);
           const next = await runEthClientInstaller(
@@ -197,7 +198,7 @@ export function startEthMultiClientDaemon(
           );
 
           if (!next) continue; // Package is uninstalled
-          isExecClient(client)
+          isExecutionClientMainnet(client)
             ? db.ethExecClientInstallStatus.set(execClient, next)
             : db.ethConsClientInstallStatus.set(consClient, next);
 
@@ -205,7 +206,10 @@ export function startEthMultiClientDaemon(
             // Next run MUST be defered to next event loop for prevStatus to refresh
             setTimeout(eventBus.runEthClientInstaller.emit, 1000);
 
-            if (isExecClient(client) && next.status === "INSTALLED") {
+            if (
+              isExecutionClientMainnet(client) &&
+              next.status === "INSTALLED"
+            ) {
               // If status switched to "INSTALLED", map to fullnode.dappnode
               // Must be done here in case the package is already installed
               // 1. Domain for BIND package
@@ -214,7 +218,7 @@ export function startEthMultiClientDaemon(
               ethereumClient.updateFullnodeAlias({
                 prevExecClientDnpName: multiClientArgs?.prevExecClientDnpName,
                 newExecClientDnpName: client,
-                network: "mainnet",
+                network: Network.Mainnet,
               });
             }
           }
@@ -235,5 +239,21 @@ export function startEthMultiClientDaemon(
     async () => runEthMultiClientTaskMemo(),
     params.AUTO_UPDATE_DAEMON_INTERVAL,
     signal
+  );
+}
+
+function isExecutionClientMainnet(
+  value: string
+): value is ExecutionClientMainnet {
+  return Object.values(ExecutionClientMainnet).includes(
+    value as ExecutionClientMainnet
+  );
+}
+
+function isConsensusClientMainnet(
+  value: string
+): value is ConsensusClientMainnet {
+  return Object.values(ConsensusClientMainnet).includes(
+    value as ConsensusClientMainnet
   );
 }

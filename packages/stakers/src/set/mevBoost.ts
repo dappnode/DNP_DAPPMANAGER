@@ -3,7 +3,6 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
 export class MevBoost extends StakerComponent {
-  protected network: Network;
   protected relays: string[];
   protected belongsToStakerNetwork = false;
   protected compatibleMevBoost: {
@@ -17,8 +16,7 @@ export class MevBoost extends StakerComponent {
     network: Network,
     relays: string[]
   ) {
-    super(dnpName, dappnodeInstaller);
-    this.network = network;
+    super(dnpName, network, dappnodeInstaller);
     this.compatibleMevBoost = this.getCompatibleMevBoost();
     this.relays = relays;
   }

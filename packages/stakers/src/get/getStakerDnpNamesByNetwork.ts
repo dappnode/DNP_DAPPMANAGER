@@ -1,23 +1,23 @@
 import {
+  ConsensusClientGnosis,
+  ConsensusClientHolesky,
+  ConsensusClientLukso,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  ExecutionClientGnosis,
+  ExecutionClientHolesky,
+  ExecutionClientLukso,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
+  SignerMainnet,
+  SignerGnosis,
+  SignerPrater,
+  SignerHolesky,
+  SignerLukso,
+  MevBoostMainnet,
+  MevBoostPrater,
+  MevBoostHolesky,
   Network,
-  consensusClientsGnosis,
-  consensusClientsMainnet,
-  consensusClientsPrater,
-  consensusClientsLukso,
-  executionClientsGnosis,
-  executionClientsMainnet,
-  executionClientsPrater,
-  executionClientsLukso,
-  mevBoostMainnet,
-  mevBoostPrater,
-  mevBoostHolesky,
-  signerGnosis,
-  signerMainnet,
-  signerPrater,
-  signerLukso,
-  signerHolesky,
-  consensusClientsHolesky,
-  executionClientsHolesky,
 } from "@dappnode/types";
 
 interface StakerDnpNamesByNetwork {
@@ -33,37 +33,37 @@ export function getStakerDnpNamesByNetwork(
   switch (network) {
     case "mainnet":
       return {
-        executionClients: executionClientsMainnet,
-        consensusClients: consensusClientsMainnet,
-        signer: signerMainnet,
-        mevBoost: mevBoostMainnet,
+        executionClients: Object.values(ExecutionClientMainnet),
+        consensusClients: Object.values(ConsensusClientMainnet),
+        signer: Object.values(SignerMainnet)[0],
+        mevBoost: Object.values(MevBoostMainnet)[0],
       };
     case "prater":
       return {
-        executionClients: executionClientsPrater,
-        consensusClients: consensusClientsPrater,
-        signer: signerPrater,
-        mevBoost: mevBoostPrater,
+        executionClients: Object.values(ExecutionClientPrater),
+        consensusClients: Object.values(ConsensusClientPrater),
+        signer: Object.values(SignerPrater)[0],
+        mevBoost: Object.values(MevBoostPrater)[0],
       };
     case "holesky":
       return {
-        executionClients: executionClientsHolesky,
-        consensusClients: consensusClientsHolesky,
-        signer: signerHolesky,
-        mevBoost: mevBoostHolesky,
+        executionClients: Object.values(ExecutionClientHolesky),
+        consensusClients: Object.values(ConsensusClientHolesky),
+        signer: Object.values(SignerHolesky)[0],
+        mevBoost: Object.values(MevBoostHolesky)[0],
       };
     case "gnosis":
       return {
-        executionClients: executionClientsGnosis,
-        consensusClients: consensusClientsGnosis,
-        signer: signerGnosis,
+        executionClients: Object.values(ExecutionClientGnosis),
+        consensusClients: Object.values(ConsensusClientGnosis),
+        signer: Object.values(SignerGnosis)[0],
         mevBoost: "", // As no mevBoost for gnosis is specified
       };
     case "lukso":
       return {
-        executionClients: executionClientsLukso,
-        consensusClients: consensusClientsLukso,
-        signer: signerLukso,
+        executionClients: Object.values(ExecutionClientLukso),
+        consensusClients: Object.values(ConsensusClientLukso),
+        signer: Object.values(SignerLukso)[0],
         mevBoost: "", // As no mevBoost for lukso is specified
       };
     default:

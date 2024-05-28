@@ -55,6 +55,7 @@ export async function setStakerConfig(
   ]);
 
   // Set staker config on db
+  // TODO: move this to staker component
   await setStakerConfigOnDb({
     network,
     executionDnpName,

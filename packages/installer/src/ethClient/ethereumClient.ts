@@ -121,7 +121,7 @@ export class EthereumClient {
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
       if (!deletePrevExecClient && currentTarget !== "remote")
         await this.updateFullnodeAlias({
-          network: "mainnet",
+          network: Network.Mainnet,
           prevExecClientDnpName: currentTarget.execClient,
         }).catch((e) =>
           logs.error(
@@ -165,7 +165,7 @@ export class EthereumClient {
   async updateFullnodeAlias({
     prevExecClientDnpName,
     newExecClientDnpName,
-    network = "mainnet",
+    network = Network.Mainnet,
   }: {
     prevExecClientDnpName?: string;
     newExecClientDnpName?: string | null;
@@ -353,7 +353,7 @@ export class EthereumClient {
         await packageInstall(dappnodeInstaller, { name: execClient }).then(
           async () =>
             await this.updateFullnodeAlias({
-              network: "mainnet",
+              network: Network.Mainnet,
               newExecClientDnpName: execClient,
               prevExecClientDnpName: prevExecClient,
             })
@@ -370,7 +370,7 @@ export class EthereumClient {
           ).then(
             async () =>
               await this.updateFullnodeAlias({
-                network: "mainnet",
+                network: Network.Mainnet,
                 newExecClientDnpName: execClient,
                 prevExecClientDnpName: prevExecClient,
               })
@@ -385,7 +385,7 @@ export class EthereumClient {
         // Get default cons client user settings and install cons client
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
-          network: "mainnet",
+          network: Network.Mainnet,
           useCheckpointSync,
         });
         await packageInstall(dappnodeInstaller, {
@@ -431,7 +431,7 @@ export class EthereumClient {
   // Utils
 
   // TODO: Should be private
-  public editFullnodeAliasInCompose<T extends Network>({
+  public editFullnodeAliasInCompose({
     action,
     execClientDnpName,
     execClientServiceName,

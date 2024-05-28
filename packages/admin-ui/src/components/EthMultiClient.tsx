@@ -9,9 +9,7 @@ import {
   EthClientStatusError,
   Eth2ClientTarget,
   ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet
+  ConsensusClientMainnet
 } from "@dappnode/types";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
@@ -92,11 +90,11 @@ interface EthClientData {
   title: string;
   description: string;
   options:
-  | "remote"
-  | {
-    execClients: ExecutionClientMainnet[];
-    consClients: ConsensusClientMainnet[];
-  };
+    | "remote"
+    | {
+        execClients: ExecutionClientMainnet[];
+        consClients: ConsensusClientMainnet[];
+      };
   stats: EthClientDataStats;
   highlights: (keyof EthClientDataStats)[];
 }
@@ -146,8 +144,8 @@ function EthMultiClients({
       title: "Full node",
       description: "Your own Ethereum node w/out 3rd parties",
       options: {
-        execClients: [...executionClientsMainnet],
-        consClients: [...consensusClientsMainnet]
+        execClients: [...Object.values(ExecutionClientMainnet)],
+        consClients: [...Object.values(ConsensusClientMainnet)]
       },
       stats: {
         syncTime: useCheckpointSync ? "Fast sync" : "Slow sync",
@@ -182,9 +180,9 @@ function EthMultiClients({
         } else {
           selected =
             selectedTarget &&
-              selectedTarget !== "remote" &&
-              options.execClients.includes(selectedTarget.execClient) &&
-              options.consClients.includes(selectedTarget.consClient)
+            selectedTarget !== "remote" &&
+            options.execClients.includes(selectedTarget.execClient) &&
+            options.consClients.includes(selectedTarget.consClient)
               ? true
               : false;
         }
@@ -231,10 +229,16 @@ function EthMultiClients({
               options !== "remote" && (
                 <>
                   <Select
-                    value={selectedTarget && prettyDnpName(selectedTarget.execClient)}
-                    options={options.execClients.filter(Boolean).map(prettyDnpName)}
+                    value={
+                      selectedTarget && prettyDnpName(selectedTarget.execClient)
+                    }
+                    options={options.execClients
+                      .filter(Boolean)
+                      .map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newEc = executionClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      const newEc = Object.values(ExecutionClientMainnet).find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
                       if (newEc) {
                         onTargetChange({
                           ...(selectedTarget || {}),
@@ -246,10 +250,16 @@ function EthMultiClients({
                   />
 
                   <Select
-                    value={selectedTarget && prettyDnpName(selectedTarget.consClient)}
-                    options={options.consClients.filter(Boolean).map(prettyDnpName)}
+                    value={
+                      selectedTarget && prettyDnpName(selectedTarget.consClient)
+                    }
+                    options={options.consClients
+                      .filter(Boolean)
+                      .map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newCc = consensusClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      const newCc = Object.values(ConsensusClientMainnet).find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
                       if (newCc) {
                         onTargetChange({
                           ...(selectedTarget || {}),

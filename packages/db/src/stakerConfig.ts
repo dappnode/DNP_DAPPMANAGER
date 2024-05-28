@@ -1,16 +1,16 @@
 import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
 import {
-  ConsensusClientMainnet,
   ExecutionClientMainnet,
+  ConsensusClientMainnet,
   ConsensusClientGnosis,
   ExecutionClientGnosis,
   ConsensusClientPrater,
   ExecutionClientPrater,
-  ConsensusClientLukso,
-  ExecutionClientLukso,
   ConsensusClientHolesky,
   ExecutionClientHolesky,
+  ConsensusClientLukso,
+  ExecutionClientLukso,
 } from "@dappnode/types";
 
 // Mainnet

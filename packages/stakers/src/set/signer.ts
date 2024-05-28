@@ -3,7 +3,6 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
 export class Signer extends StakerComponent {
-  protected network: Network;
   protected compatibleSigner: {
     dnpName: string;
     minVersion: string;
@@ -15,8 +14,7 @@ export class Signer extends StakerComponent {
     dappnodeInstaller: DappnodeInstaller,
     network: Network
   ) {
-    super(dnpName, dappnodeInstaller);
-    this.network = network;
+    super(dnpName, network, dappnodeInstaller);
     this.compatibleSigner = this.getCompatibleSigner();
   }
 

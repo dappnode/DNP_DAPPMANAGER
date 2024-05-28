@@ -3,7 +3,6 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 
 export class Consensus extends StakerComponent {
-  protected network: Network;
   protected defaultCheckpointSync: string;
   protected beaconServiceName: string;
   protected validatorServiceName: string;
@@ -20,8 +19,7 @@ export class Consensus extends StakerComponent {
     network: Network,
     useCheckpointSync: boolean
   ) {
-    super(dnpName, dappnodeInstaller);
-    this.network = network;
+    super(dnpName, network, dappnodeInstaller);
     this.compatibleConsensus = this.getCompatibleConsensus();
     this.defaultCheckpointSync = this.getDefaultCheckpointSync();
     this.beaconServiceName = this.getBeaconServiceName();
