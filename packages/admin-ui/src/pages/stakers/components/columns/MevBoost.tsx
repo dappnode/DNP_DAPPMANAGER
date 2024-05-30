@@ -30,10 +30,8 @@ export default function MevBoost({
 }: {
   network: Network;
   mevBoost: StakerItem;
-  newMevBoost: StakerItemOk | undefined;
-  setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk | undefined>
-  >;
+  newMevBoost: StakerItemOk | null;
+  setNewMevBoost: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   newRelays: string[];
   setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
   isSelected: boolean;
@@ -50,7 +48,7 @@ export default function MevBoost({
         onClick={
           mevBoost.status === "ok"
             ? isSelected
-              ? () => setNewMevBoost(undefined)
+              ? () => setNewMevBoost(null)
               : () => setNewMevBoost(mevBoost)
             : undefined
         }

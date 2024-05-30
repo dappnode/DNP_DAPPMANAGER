@@ -20,9 +20,7 @@ export default function ConsensusClient({
   ...props
 }: {
   consensusClient: StakerItem;
-  setNewConsClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk | undefined>
-  >;
+  setNewConsClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   newUseCheckpointSync: boolean;
   setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
   isSelected: boolean;
@@ -40,7 +38,7 @@ export default function ConsensusClient({
           consensusClient.status === "ok"
             ? isSelected
               ? () => {
-                  setNewConsClient(undefined);
+                  setNewConsClient(null);
                 }
               : () => {
                   setNewConsClient(consensusClient);

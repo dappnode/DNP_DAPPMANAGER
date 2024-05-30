@@ -15,14 +15,14 @@ export const useStakerConfig = <T extends Network>(
 ) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  const [newExecClient, setNewExecClient] = useState<StakerItemOk>();
-  const [newConsClient, setNewConsClient] = useState<StakerItemOk>();
-  const [newMevBoost, setNewMevBoost] = useState<StakerItemOk>();
+  const [newExecClient, setNewExecClient] = useState<StakerItemOk | null>(null);
+  const [newConsClient, setNewConsClient] = useState<StakerItemOk | null>(null);
+  const [newMevBoost, setNewMevBoost] = useState<StakerItemOk | null>(null);
   const [newRelays, setNewRelays] = useState<string[]>([]);
   const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
     true
   );
-  const [newWeb3signer, setNewWeb3signer] = useState<StakerItemOk>();
+  const [newWeb3signer, setNewWeb3signer] = useState<StakerItemOk | null>(null);
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
   >();
@@ -57,29 +57,28 @@ export const useStakerConfig = <T extends Network>(
           setNewUseCheckpointSync(consensusClient.useCheckpointSync);
       }
 
-      if (
-        isOkSelectedInstalledAndRunning(mevBoost) &&
-        mevBoost.status === "ok"
-      ) {
+      const currentMevBoost = isOkSelectedInstalledAndRunning(mevBoost)
+        ? mevBoost
+        : null;
+      if (currentMevBoost && mevBoost.status === "ok") {
         setNewMevBoost(mevBoost);
         mevBoost.relays && setNewRelays(mevBoost.relays);
       }
 
-      if (
-        isOkSelectedInstalledAndRunning(web3Signer) &&
-        web3Signer.status === "ok"
-      )
+      const currentWeb3signer = isOkSelectedInstalledAndRunning(web3Signer)
+        ? web3Signer
+        : null;
+      if (currentWeb3signer && web3Signer.status === "ok")
         setNewWeb3signer(web3Signer);
 
-      // Set the current config to be displayed in advance view
       setCurrentStakerConfig({
         network,
         executionDnpName: executionClient?.dnpName || null,
         consensusDnpName: consensusClient?.dnpName || null,
         useCheckpointSync: consensusClient?.useCheckpointSync || false,
-        mevBoostDnpName: mevBoost.dnpName || null,
-        relays: mevBoost.relays || [],
-        web3signerDnpName: web3Signer.dnpName
+        mevBoostDnpName: currentMevBoost?.dnpName || null,
+        relays: currentMevBoost?.relays || [],
+        web3signerDnpName: currentWeb3signer?.dnpName || null
       });
     }
   }, [currentStakerConfigReq.data, network]);
@@ -189,8 +188,22 @@ function getChanges({
       severity: "secondary"
     };
 
+  // Not allowed if execution and !consensus or !execution and consensus
+  if (
+    (newStakerConfig.executionDnpName && !newStakerConfig.consensusDnpName) ||
+    (!newStakerConfig.executionDnpName && newStakerConfig.consensusDnpName)
+  )
+    return {
+      isAllowed: false,
+      reason: "Execution and consensus clients must be selected together",
+      severity: "warning"
+    };
+
   // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
-  if (isExecAndConsDeSelected && (web3signerDnpName || mevBoostDnpName))
+  if (
+    isExecAndConsDeSelected &&
+    (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName)
+  )
     return {
       isAllowed: false,
       reason:
@@ -199,7 +212,10 @@ function getChanges({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (signer or mev boost)
-  if (!isExecAndConsSelected && (web3signerDnpName || mevBoostDnpName))
+  if (
+    !isExecAndConsSelected &&
+    (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName)
+  )
     return {
       isAllowed: false,
       reason:
@@ -208,7 +224,7 @@ function getChanges({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
-  if (relays.length === 0)
+  if (newStakerConfig.mevBoostDnpName && newStakerConfig.relays.length === 0)
     return {
       isAllowed: false,
       reason: "You must select at least one relay in the MEV boost",

@@ -16,9 +16,7 @@ export default function ExecutionClient({
   ...props
 }: {
   executionClient: StakerItem;
-  setNewExecClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk | undefined>
-  >;
+  setNewExecClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -29,7 +27,7 @@ export default function ExecutionClient({
       onClick={
         executionClient.status === "ok"
           ? isSelected
-            ? () => setNewExecClient(undefined)
+            ? () => setNewExecClient(null)
             : () => setNewExecClient(executionClient)
           : undefined
       }

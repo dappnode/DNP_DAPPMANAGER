@@ -17,9 +17,7 @@ export default function RemoteSigner({
   ...props
 }: {
   signer: StakerItem;
-  setNewWeb3signer: React.Dispatch<
-    React.SetStateAction<StakerItemOk | undefined>
-  >;
+  setNewWeb3signer: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -34,7 +32,7 @@ export default function RemoteSigner({
         onClick={
           signer.status === "ok"
             ? isSelected
-              ? () => setNewWeb3signer(undefined)
+              ? () => setNewWeb3signer(null)
               : () => setNewWeb3signer(signer)
             : undefined
         }
