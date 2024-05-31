@@ -35,10 +35,10 @@ export class Signer extends StakerComponent {
   }
 
   async getAllSigners(network: Network): Promise<StakerItem[]> {
-    return await super.getAll(
-      [Signer.CompatibleSigners[network].dnpName],
-      Signer.CompatibleSigners[network].dnpName
-    );
+    return await super.getAll({
+      dnpNames: [Signer.CompatibleSigners[network].dnpName],
+      currentClient: Signer.CompatibleSigners[network].dnpName,
+    });
   }
 
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {

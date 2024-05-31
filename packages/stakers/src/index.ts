@@ -1,4 +1,3 @@
-export { getStakerConfig } from "./get/index.js";
 export { getStakerConfigByNetwork } from "./getStakerConfigByNetwork.js";
 
 export { Consensus } from "./consensus.js";

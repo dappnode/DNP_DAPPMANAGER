@@ -1,6 +1,6 @@
 import { Network, StakerItem, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
-import { DappnodeInstaller } from "@dappnode/installer";
+import { DappnodeInstaller, packageGet } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 
 export class MevBoost extends StakerComponent {
@@ -41,11 +41,25 @@ export class MevBoost extends StakerComponent {
   }
 
   async getAllMevBoost(network: Network): Promise<StakerItem[]> {
-    const mevBoost = MevBoost.CompatibleMevBoost[network]?.dnpName;
-    return await super.getAll(
-      mevBoost ? [mevBoost] : [],
-      MevBoost.DbHandlers[network].get()
-    );
+    const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
+    return await super.getAll({
+      dnpNames: mevBoostDnpName ? [mevBoostDnpName] : [],
+      currentClient: MevBoost.DbHandlers[network].get(),
+      relays: await this.getMevBoostCurrentRelays(mevBoostDnpName),
+    });
+  }
+
+  async getMevBoostCurrentRelays(mevBoostDnpName?: string): Promise<string[]> {
+    const relays: string[] = [];
+    if (!mevBoostDnpName) return relays;
+    const pkgEnv = (await packageGet({ dnpName: mevBoostDnpName })).userSettings
+      ?.environment;
+    if (pkgEnv) {
+      pkgEnv["mev-boost"]["RELAYS"]
+        .split(",")
+        .forEach((relay) => relays.push(relay));
+    }
+    return relays;
   }
 
   async setNewMevBoost(
@@ -58,14 +72,17 @@ export class MevBoost extends StakerComponent {
       newStakerDnpName: newMevBoostDnpName,
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       belongsToStakerNetwork: this.belongsToStakerNetwork,
-      userSettings: this.getMevBoostUserSettings(newMevBoostDnpName, newRelays),
+      userSettings: this.getMevBoostNewUserSettings(
+        newMevBoostDnpName,
+        newRelays
+      ),
     });
     // persist on db
     if (Boolean(newMevBoostDnpName) !== MevBoost.DbHandlers[network].get())
       await MevBoost.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
-  private getMevBoostUserSettings(
+  private getMevBoostNewUserSettings(
     newMevBoostDnpName: string | null,
     newRelays: string[]
   ): UserSettingsAllDnps {

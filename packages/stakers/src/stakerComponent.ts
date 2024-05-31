@@ -37,10 +37,15 @@ export class StakerComponent {
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
-  protected async getAll(
-    dnpNames: string[],
-    currentClient?: boolean | string | null
-  ): Promise<StakerItem[]> {
+  protected async getAll({
+    dnpNames,
+    currentClient,
+    relays,
+  }: {
+    dnpNames: string[];
+    currentClient?: boolean | string | null;
+    relays?: string[];
+  }): Promise<StakerItem[]> {
     const dnpList = await listPackages();
 
     return await Promise.all(
@@ -56,6 +61,7 @@ export class StakerComponent {
             isUpdated: getIsUpdated(pkgData, dnpList),
             isRunning: getIsRunning(pkgData, dnpList),
             data: pkgData,
+            relays, // only for mevBoost
             isSelected:
               typeof dnpName === "string"
                 ? dnpName === currentClient // for execution consensus and signer

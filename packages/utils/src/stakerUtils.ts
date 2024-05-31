@@ -1,5 +1,7 @@
 import { UserSettingsAllDnps, Network } from "@dappnode/types";
 
+// TODO: remove these utils
+
 /**
  * Get the validator service name.
  * - Nimbus package is monoservice (beacon-validator)

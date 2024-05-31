@@ -67,10 +67,12 @@ export class Consensus extends StakerComponent {
   }
 
   async getAllConsensus(network: Network): Promise<StakerItem[]> {
-    return await super.getAll(
-      Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
-      Consensus.DbHandlers[network].get()
-    );
+    return await super.getAll({
+      dnpNames: Consensus.CompatibleConsensus[network].map(
+        (client) => client.dnpName
+      ),
+      currentClient: Consensus.DbHandlers[network].get(),
+    });
   }
 
   async setNewConsensus(

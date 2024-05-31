@@ -60,10 +60,12 @@ export class Execution extends StakerComponent {
   }
 
   async getAllExecutions(network: Network): Promise<StakerItem[]> {
-    return await super.getAll(
-      Execution.CompatibleExecutions[network].map((client) => client.dnpName),
-      Execution.DbHandlers[network].get()
-    );
+    return await super.getAll({
+      dnpNames: Execution.CompatibleExecutions[network].map(
+        (client) => client.dnpName
+      ),
+      currentClient: Execution.DbHandlers[network].get(),
+    });
   }
 
   async setNewExecution(network: Network, newExecutionDnpName: string | null) {
