@@ -12,12 +12,11 @@ export class MevBoost extends StakerComponent {
   } | null;
 
   constructor(
-    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network,
     relays: string[]
   ) {
-    super(dnpName, network, dappnodeInstaller);
+    super(network, dappnodeInstaller);
     this.compatibleMevBoost = this.getCompatibleMevBoost();
     this.relays = relays;
   }
@@ -34,7 +33,7 @@ export class MevBoost extends StakerComponent {
         ? [this.compatibleMevBoost]
         : null,
       belongsToStakerNetwork: this.belongsToStakerNetwork,
-      userSettings: this.getMevBoostUserSettings(),
+      userSettings: this.getMevBoostUserSettings(newMevBoostDnpName),
     });
     // persist on db
     const dbHandler = this.getDbHandler();
@@ -62,10 +61,12 @@ export class MevBoost extends StakerComponent {
     }
   }
 
-  private getMevBoostUserSettings(): UserSettingsAllDnps {
-    return this.dnpName
+  private getMevBoostUserSettings(
+    newMevBoostDnpName: string | null
+  ): UserSettingsAllDnps {
+    return newMevBoostDnpName
       ? {
-          [this.dnpName]: {
+          [newMevBoostDnpName]: {
             environment: {
               "mev-boost": {
                 ["RELAYS"]:

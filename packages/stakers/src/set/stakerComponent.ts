@@ -1,8 +1,8 @@
 import {
   dockerComposeUpPackage,
   dockerContainerStop,
-  dockerNetworkConnect,
   dockerNetworkDisconnect,
+  listPackage,
   listPackageNoThrow,
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
@@ -19,17 +19,11 @@ import {
 import { lt } from "semver";
 
 export class StakerComponent {
-  protected dnpName: string | null;
   protected network: Network;
   protected dappnodeInstaller: DappnodeInstaller;
   protected stakerNetwork = params.DOCKER_STAKER_NETWORK_NAME;
 
-  constructor(
-    dnName: string | null,
-    network: Network,
-    dappnodeInstaller: DappnodeInstaller
-  ) {
-    this.dnpName = dnName;
+  constructor(network: Network, dappnodeInstaller: DappnodeInstaller) {
     this.network = network;
     this.dappnodeInstaller = dappnodeInstaller;
   }
@@ -40,6 +34,7 @@ export class StakerComponent {
     belongsToStakerNetwork,
     executionFullnodeAlias,
     userSettings,
+    prevClient,
   }: {
     newStakerDnpName: string | null | undefined;
     compatibleClients:
@@ -51,87 +46,71 @@ export class StakerComponent {
     belongsToStakerNetwork: boolean;
     executionFullnodeAlias?: string;
     userSettings?: UserSettingsAllDnps;
+    prevClient?: string | null;
   }): Promise<void> {
-    if (!this.dnpName && !newStakerDnpName) return;
-    if (this.dnpName === newStakerDnpName) return; // TODO: test if this return can cause issues due to not ensuring: pkg installed, running anbd connected to the network
-
-    const pkg = await listPackageNoThrow({
-      dnpName: this.dnpName || "",
-    });
-
-    if (pkg && compatibleClients)
-      this.ensureSetRequirements(compatibleClients, pkg?.version || "0.0.0");
-
-    if (newStakerDnpName) {
-      if (pkg) {
-        // ensure old pkg is not running
-        await this.stopAllPkgContainers(pkg);
-        if (belongsToStakerNetwork) {
-          // disconnect old pkg from staker network
-          // important: disconnecting the container is necessary to avoid relying on docker-compose calls instead of docker calls
-          await this.disconnectConnectedPkgFromStakerNetwork(
-            this.stakerNetwork,
-            pkg.containers
-          );
-          // remove staker network from the compose file
-          this.removeStakerNetworkFromCompose(pkg.dnpName);
-        }
-      }
-      // ensure pkg installed and running
-      const newPkg = await listPackageNoThrow({
-        dnpName: newStakerDnpName,
-      });
-      if (!newPkg)
-        await packageInstall(this.dappnodeInstaller, {
-          name: newStakerDnpName,
-          userSettings,
-        });
-      else
-        await dockerComposeUpPackage(
-          { dnpName: newStakerDnpName },
-          {},
-          {},
-          true
-        );
-
-      if (belongsToStakerNetwork) {
-        // ensure new pkg is connected to the staker network
-        await this.connectPkgToStakerNetwork(
-          newPkg?.containers || [],
-          executionFullnodeAlias
-        );
-        // add staker network to the compose file
-        this.addStakerNetworkToCompose(
-          newStakerDnpName,
-          executionFullnodeAlias
-        );
-      }
-    } else {
-      if (!pkg) return;
-      // Stop the current staker
-      await this.stopAllPkgContainers(pkg);
+    if (!prevClient && !newStakerDnpName) {
+      logs.info("no client selected, skipping");
+      return;
     }
+
+    const currentPkg = await listPackageNoThrow({
+      dnpName: prevClient || "",
+    });
+    if (currentPkg) {
+      if (newStakerDnpName && compatibleClients)
+        this.ensureSetRequirements(
+          newStakerDnpName,
+          compatibleClients,
+          currentPkg.version
+        );
+      await this.unsetStakerPkgConfig(currentPkg, belongsToStakerNetwork);
+    }
+
+    if (!newStakerDnpName) return;
+    // set staker config
+    await this.setStakerPkgConfig(
+      newStakerDnpName,
+      belongsToStakerNetwork,
+      userSettings,
+      executionFullnodeAlias
+    );
   }
 
   /**
-   * Connects the staker pkg to the staker network with the fullnode alias
+   * Set the staker pkg:
+   * - ensures the staker pkg is installed
+   * - connects the staker pkg to the staker network
+   * - adds the staker network to the docker-compose file
+   * - starts the staker pkg
    */
-  private async connectPkgToStakerNetwork(
-    pkgContainers: PackageContainer[],
-    alias?: string | null
+  private async setStakerPkgConfig(
+    dnpName: string,
+    belongsToStakerNetwork: boolean,
+    userSettings?: UserSettingsAllDnps,
+    executionFullnodeAlias?: string | null
   ): Promise<void> {
-    const disconnectedContainers = pkgContainers
-      .filter(
-        (container) =>
-          !container.networks.some(
-            (network) => network.name === this.stakerNetwork
-          )
-      )
-      .map((container) => container.containerName);
-    for (const container of disconnectedContainers)
-      await dockerNetworkConnect(this.stakerNetwork, container, {
-        Aliases: alias ? [alias] : [],
+    // ensure pkg installed
+    if (
+      !(await listPackageNoThrow({
+        dnpName,
+      }))
+    )
+      await packageInstall(this.dappnodeInstaller, {
+        name: dnpName,
+        userSettings,
       });
+
+    const pkg = await listPackage({
+      dnpName,
+    });
+
+    // add staker network to the compose file
+    if (belongsToStakerNetwork)
+      this.addStakerNetworkToCompose(pkg.dnpName, executionFullnodeAlias);
+
+    // start all containers
+    // docker will automatically recreate those with changes in the compose file
+    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, {}, {}, true);
   }
 
   /**
@@ -179,6 +158,30 @@ export class StakerComponent {
     }
   }
 
+  /**
+   * Unset staker pkg:
+   * - disconnects the staker pkg from the staker network
+   * - stops the staker pkg
+   * - removes the staker network from the docker-compose file
+   */
+  private async unsetStakerPkgConfig(
+    pkg: InstalledPackageData,
+    belongsToStakerNetwork: boolean
+  ): Promise<void> {
+    // disconnect pkg from staker network
+    if (belongsToStakerNetwork)
+      await this.disconnectConnectedPkgFromStakerNetwork(
+        this.stakerNetwork,
+        pkg.containers
+      );
+
+    // stop all containers
+    await this.stopAllPkgContainers(pkg);
+    // remove staker network from the compose file
+    if (belongsToStakerNetwork)
+      this.removeStakerNetworkFromCompose(pkg.dnpName);
+  }
+
   private async disconnectConnectedPkgFromStakerNetwork(
     networkName: string,
     pkgContainers: PackageContainer[]
@@ -218,16 +221,17 @@ export class StakerComponent {
   }
 
   private ensureSetRequirements(
+    dnpName: string,
     compatibleClients: {
       dnpName: string;
       minVersion: string;
     }[],
     pkgVersion: string
   ): void {
-    if (!this.dnpName) return;
+    if (!dnpName) return;
 
     const compatibleClient = compatibleClients.find(
-      (c) => c.dnpName === this.dnpName
+      (c) => c.dnpName === dnpName
     );
 
     // ensure valid dnpName

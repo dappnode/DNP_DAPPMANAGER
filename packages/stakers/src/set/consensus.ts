@@ -5,8 +5,6 @@ import * as db from "@dappnode/db";
 
 export class Consensus extends StakerComponent {
   protected defaultCheckpointSync: string;
-  protected beaconServiceName: string;
-  protected validatorServiceName: string;
   protected useCheckpointSync: boolean;
   protected belongsToStakerNetwork = true;
   protected compatibleConsensus: {
@@ -15,16 +13,13 @@ export class Consensus extends StakerComponent {
   }[];
 
   constructor(
-    dnpName: string | null,
     dappnodeInstaller: DappnodeInstaller,
     network: Network,
     useCheckpointSync: boolean
   ) {
-    super(dnpName, network, dappnodeInstaller);
+    super(network, dappnodeInstaller);
     this.compatibleConsensus = this.getCompatibleConsensus();
     this.defaultCheckpointSync = this.getDefaultCheckpointSync();
-    this.beaconServiceName = this.getBeaconServiceName();
-    this.validatorServiceName = this.getValidatorServiceName();
     this.useCheckpointSync = useCheckpointSync;
   }
 
@@ -32,6 +27,8 @@ export class Consensus extends StakerComponent {
     newConsensusDnpName: string | null,
     newUseCheckpointSync?: boolean
   ) {
+    const dbHandler = this.getDbHandler();
+    const prevConsClientDnpName = dbHandler.get();
     // update checksync
     if (newUseCheckpointSync !== undefined)
       this.useCheckpointSync = newUseCheckpointSync;
@@ -40,11 +37,11 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       compatibleClients: this.compatibleConsensus,
       belongsToStakerNetwork: this.belongsToStakerNetwork,
-      userSettings: this.getConsensusUserSettings(),
+      userSettings: this.getConsensusUserSettings(newConsensusDnpName),
+      prevClient: prevConsClientDnpName,
     });
     // persist on db
-    const dbHandler = this.getDbHandler();
-    if (newConsensusDnpName !== dbHandler.get())
+    if (newConsensusDnpName !== prevConsClientDnpName)
       await dbHandler.set(newConsensusDnpName);
   }
   private getDbHandler(): {
@@ -67,14 +64,17 @@ export class Consensus extends StakerComponent {
     }
   }
 
-  private getConsensusUserSettings(): UserSettingsAllDnps {
-    const validatorServiceName = this.getValidatorServiceName();
-    const beaconServiceName = this.getBeaconServiceName();
+  private getConsensusUserSettings(
+    newConsensusDnpName: string | null
+  ): UserSettingsAllDnps {
+    const validatorServiceName =
+      this.getValidatorServiceName(newConsensusDnpName);
+    const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-    return this.dnpName
+    return newConsensusDnpName
       ? {
-          [this.dnpName]: {
+          [newConsensusDnpName]: {
             environment:
               beaconServiceName === validatorServiceName
                 ? {
@@ -116,9 +116,9 @@ export class Consensus extends StakerComponent {
    * - Nimbus package is monoservice (beacon-validator)
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
-  private getValidatorServiceName(): string {
-    return this.dnpName
-      ? this.dnpName.includes("nimbus")
+  private getValidatorServiceName(newConsensusDnpName: string | null): string {
+    return newConsensusDnpName
+      ? newConsensusDnpName.includes("nimbus")
         ? "beacon-validator"
         : "validator"
       : "";
@@ -129,9 +129,9 @@ export class Consensus extends StakerComponent {
    * - Nimbus package is monoservice (beacon-validator)
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
-  private getBeaconServiceName(): string {
-    return this.dnpName
-      ? this.dnpName.includes("nimbus")
+  private getBeaconServiceName(newConsensusDnpName: string | null): string {
+    return newConsensusDnpName
+      ? newConsensusDnpName.includes("nimbus")
         ? "beacon-validator"
         : "beacon-chain"
       : "";

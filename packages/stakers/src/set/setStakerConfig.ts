@@ -28,29 +28,19 @@ export async function setStakerConfig(
   }: StakerConfigSet
 ): Promise<void> {
   // create instances
-  const executionPkg = new Execution(
-    executionDnpName,
-    dappnodeInstaller,
-    network
-  );
+  const executionPkg = new Execution(dappnodeInstaller, network);
   const consensusPkg = new Consensus(
-    consensusDnpName,
     dappnodeInstaller,
     network,
     useCheckpointSync
   );
-  const mevBoostPkg = new MevBoost(
-    mevBoostDnpName,
-    dappnodeInstaller,
-    network,
-    relays
-  );
-  const signerPkg = new Signer(web3signerDnpName, dappnodeInstaller, network);
+  const mevBoostPkg = new MevBoost(dappnodeInstaller, network, relays);
+  const signerPkg = new Signer(dappnodeInstaller, network);
 
   await Promise.all([
-    executionPkg.setNewExecution(executionDnpName),
-    consensusPkg.setNewConsensus(consensusDnpName, useCheckpointSync),
-    mevBoostPkg.setNewMevBoost(mevBoostDnpName, relays),
+    await executionPkg.setNewExecution(executionDnpName),
+    await consensusPkg.setNewConsensus(consensusDnpName, useCheckpointSync),
+    await mevBoostPkg.setNewMevBoost(mevBoostDnpName, relays),
   ]);
 
   // ensure staker network config. MUST GO AFTER WRITING ON DB

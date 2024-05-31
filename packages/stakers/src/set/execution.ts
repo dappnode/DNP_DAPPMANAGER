@@ -2,6 +2,7 @@ import { Network } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
+import { logs } from "@dappnode/logger";
 
 export class Execution extends StakerComponent {
   protected executionFullnodeAlias: string;
@@ -11,34 +12,37 @@ export class Execution extends StakerComponent {
     minVersion: string;
   }[];
 
-  constructor(
-    dnpName: string | null,
-    dappnodeInstaller: DappnodeInstaller,
-    network: Network
-  ) {
-    super(dnpName, network, dappnodeInstaller);
+  constructor(dappnodeInstaller: DappnodeInstaller, network: Network) {
+    super(network, dappnodeInstaller);
     this.executionFullnodeAlias = `execution.${this.network}.staker.dappnode`;
     this.compatibleExecutions = this.getCompatibleExecutions();
   }
 
   async setNewExecution(newExecutionDnpName: string | null) {
+    const dbHandler = this.getDbHandler();
+    const prevExecClientDnpName = dbHandler.get();
+    logs.info(
+      `Setting new execution client: ${newExecutionDnpName} (prev: ${prevExecClientDnpName})`
+    );
+
     await super.setNew({
       newStakerDnpName: newExecutionDnpName,
       compatibleClients: this.compatibleExecutions,
       belongsToStakerNetwork: this.belongsToStakerNetwork,
       executionFullnodeAlias: this.executionFullnodeAlias,
+      prevClient: prevExecClientDnpName,
     });
-    // persist on db
-    const dbHandler = this.getDbHandler();
-    if (newExecutionDnpName !== dbHandler.get())
-      await dbHandler.set(newExecutionDnpName);
 
-    // update fullnode alias
-    await ethereumClient.updateFullnodeAlias({
-      network: this.network,
-      newExecClientDnpName: newExecutionDnpName,
-      prevExecClientDnpName: this.dnpName || "",
-    });
+    if (newExecutionDnpName !== prevExecClientDnpName) {
+      // persist on db
+      await dbHandler.set(newExecutionDnpName);
+      // update fullnode alias
+      await ethereumClient.updateFullnodeAlias({
+        network: this.network,
+        newExecClientDnpName: newExecutionDnpName,
+        prevExecClientDnpName: prevExecClientDnpName || "",
+      });
+    }
   }
 
   private getDbHandler(): {

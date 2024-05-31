@@ -138,7 +138,7 @@ export async function executeMigrations(): Promise<void> {
       message: e.message,
       stack: e.stack,
     })
-  );                                                    
+  );
 
   await determineIsDappnodeAws().catch((e) =>
     migrationErrors.push({
@@ -149,16 +149,16 @@ export async function executeMigrations(): Promise<void> {
       stack: e.stack,
     })
   );
-  
-  await createStakerNetworkAndConnectStakerPkgs().catch((e) =>
-    migrationErrors.push({
-      migration: "create docker staker network",
-      coreVersion: "0.2.95",
-      name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
-    })
-  );  
+
+  // await createStakerNetworkAndConnectStakerPkgs().catch((e) =>
+  //   migrationErrors.push({
+  //     migration: "create docker staker network",
+  //     coreVersion: "0.2.95",
+  //     name: "MIGRATION_ERROR",
+  //     message: e.message,
+  //     stack: e.stack,
+  //   })
+  // );
 
   if (migrationErrors.length > 0) throw migrationErrors;
 }

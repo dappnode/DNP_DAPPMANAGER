@@ -9,12 +9,8 @@ export class Signer extends StakerComponent {
   };
   protected belongsToStakerNetwork = false;
 
-  constructor(
-    dnpName: string | null,
-    dappnodeInstaller: DappnodeInstaller,
-    network: Network
-  ) {
-    super(dnpName, network, dappnodeInstaller);
+  constructor(dappnodeInstaller: DappnodeInstaller, network: Network) {
+    super(network, dappnodeInstaller);
     this.compatibleSigner = this.getCompatibleSigner();
   }
 
