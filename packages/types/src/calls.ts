@@ -8,7 +8,6 @@ import {
   ManifestUpdateAlert,
 } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
-import { ExecutionClientMainnet } from "./stakers.js";
 
 /**
  * Take into account the following tags to document the new types inside this file

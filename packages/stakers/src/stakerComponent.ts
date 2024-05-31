@@ -4,9 +4,14 @@ import {
   dockerNetworkDisconnect,
   listPackage,
   listPackageNoThrow,
+  listPackages,
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
+import {
+  DappnodeInstaller,
+  packageGetData,
+  packageInstall,
+} from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import {
@@ -14,18 +19,57 @@ import {
   InstalledPackageData,
   UserSettingsAllDnps,
   PackageContainer,
-  Network,
+  StakerItem,
 } from "@dappnode/types";
+import {
+  getIsInstalled,
+  getIsUpdated,
+  getIsRunning,
+  fileToGatewayUrl,
+} from "@dappnode/utils";
 import { lt } from "semver";
 
 export class StakerComponent {
-  protected network: Network;
   protected dappnodeInstaller: DappnodeInstaller;
   protected stakerNetwork = params.DOCKER_STAKER_NETWORK_NAME;
 
-  constructor(network: Network, dappnodeInstaller: DappnodeInstaller) {
-    this.network = network;
+  constructor(dappnodeInstaller: DappnodeInstaller) {
     this.dappnodeInstaller = dappnodeInstaller;
+  }
+
+  protected async getAll(
+    dnpNames: string[],
+    currentClient?: boolean | string | null
+  ): Promise<StakerItem[]> {
+    const dnpList = await listPackages();
+
+    return await Promise.all(
+      dnpNames.map(async (dnpName) => {
+        try {
+          await this.dappnodeInstaller.getRepoContract(dnpName);
+          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+          return {
+            status: "ok",
+            dnpName,
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+            isInstalled: getIsInstalled(pkgData, dnpList),
+            isUpdated: getIsUpdated(pkgData, dnpList),
+            isRunning: getIsRunning(pkgData, dnpList),
+            data: pkgData,
+            isSelected:
+              typeof dnpName === "string"
+                ? dnpName === currentClient // for execution consensus and signer
+                : Boolean(currentClient), // for mevBoost
+          };
+        } catch (error) {
+          return {
+            status: "error",
+            dnpName,
+            error,
+          };
+        }
+      })
+    );
   }
 
   protected async setNew({
@@ -109,8 +153,12 @@ export class StakerComponent {
       this.addStakerNetworkToCompose(pkg.dnpName, executionFullnodeAlias);
 
     // start all containers
-    // docker will automatically recreate those with changes in the compose file
-    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, {}, {}, true);
+    await dockerComposeUpPackage(
+      { dnpName: pkg.dnpName },
+      {},
+      { forceRecreate: true }, // force recreate to apply changes in the compose file
+      true
+    );
   }
 
   /**

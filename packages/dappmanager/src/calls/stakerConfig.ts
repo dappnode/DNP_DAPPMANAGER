@@ -1,6 +1,5 @@
-import { getStakerConfig, setStakerConfig } from "@dappnode/stakers";
 import { StakerConfigGet, StakerConfigSet, Network } from "@dappnode/types";
-import { dappnodeInstaller } from "../index.js";
+import { execution, consensus, mevBoost, signer } from "../index.js";
 
 /**
  * Sets the staker configuration: execution and consensus clients, remote signer,
@@ -11,7 +10,29 @@ export async function stakerConfigSet({
 }: {
   stakerConfig: StakerConfigSet;
 }): Promise<void> {
-  await setStakerConfig(dappnodeInstaller, { ...stakerConfig });
+  const {
+    network,
+    executionDnpName,
+    consensusDnpName,
+    useCheckpointSync,
+    mevBoostDnpName,
+    relays,
+    web3signerDnpName
+  } = stakerConfig;
+  await Promise.all([
+    await execution.setNewExecution(network, executionDnpName),
+    await consensus.setNewConsensus(
+      network,
+      consensusDnpName,
+      useCheckpointSync
+    ),
+    await mevBoost.setNewMevBoost(network, mevBoostDnpName, relays)
+  ]);
+
+  // WEB3SIGNER
+  // The web3signer deppends on the global envs EXECUTION_CLIENT and CONSENSUS_CLIENT
+  // so it is convenient to set it at the end once the db is updated
+  await signer.setNewSigner(network, web3signerDnpName);
 }
 
 /**
@@ -21,5 +42,17 @@ export async function stakerConfigSet({
 export async function stakerConfigGet(
   network: Network
 ): Promise<StakerConfigGet> {
-  return await getStakerConfig(dappnodeInstaller, network);
+  return await Promise.all([
+    await execution.getAllExecutions(network),
+    await consensus.getAllConsensus(network),
+    await mevBoost.getAllMevBoost(network),
+    await signer.getAllSigners(network)
+  ]).then(([executionClients, consensusClients, mevBoost, web3signer]) => {
+    return {
+      executionClients,
+      consensusClients,
+      mevBoost: mevBoost[0],
+      web3Signer: web3signer[0]
+    };
+  });
 }
