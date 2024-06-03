@@ -54,7 +54,7 @@ export class MevBoost extends StakerComponent {
     const relays: string[] = [];
     if (
       !mevBoostDnpName ||
-      (await listPackageNoThrow({ dnpName: mevBoostDnpName }))
+      !(await listPackageNoThrow({ dnpName: mevBoostDnpName }))
     )
       return relays;
     const pkgEnv = (await packageGet({ dnpName: mevBoostDnpName })).userSettings
