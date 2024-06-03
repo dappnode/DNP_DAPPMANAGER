@@ -224,7 +224,6 @@ export interface Routes {
     target: Eth2ClientTarget;
     ethRemoteRpc: string;
     sync?: boolean;
-    useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
     deletePrevExecClientVolumes?: boolean;
     deletePrevConsClient?: boolean;

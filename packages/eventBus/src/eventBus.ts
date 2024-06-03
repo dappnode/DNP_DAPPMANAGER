@@ -27,7 +27,6 @@ interface EventTypes {
   requestPackages: void;
   requestSystemInfo: void;
   runEthClientInstaller: {
-    useCheckpointSync?: boolean;
     prevExecClientDnpName?: string;
   };
   runEthicalMetricsInstaller: void;

@@ -66,7 +66,6 @@ export class EthereumClient {
     dappnodeInstaller,
     nextTarget,
     sync,
-    useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
     deletePrevConsClient,
@@ -76,7 +75,6 @@ export class EthereumClient {
     dappnodeInstaller: DappnodeInstaller;
     nextTarget: Eth2ClientTarget;
     sync: boolean;
-    useCheckpointSync: boolean;
     deletePrevExecClient: boolean;
     deletePrevExecClientVolumes: boolean;
     deletePrevConsClient: boolean;
@@ -137,7 +135,6 @@ export class EthereumClient {
             currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
-          useCheckpointSync,
         });
       else
         await this.changeEthClientNotAsync({
@@ -145,7 +142,6 @@ export class EthereumClient {
             currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
-          useCheckpointSync,
         });
     }
   }
@@ -330,13 +326,11 @@ export class EthereumClient {
     prevExecClient,
     execClient,
     consClient,
-    useCheckpointSync,
   }: {
     dappnodeInstaller: DappnodeInstaller;
     prevExecClient?: string;
     execClient: string;
     consClient: string;
-    useCheckpointSync?: boolean;
   }): Promise<void> {
     try {
       // Install execution client and set default fullnode alias
@@ -382,7 +376,6 @@ export class EthereumClient {
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
           network: Network.Mainnet,
-          useCheckpointSync,
         });
         await packageInstall(dappnodeInstaller, {
           name: consClient,
@@ -405,12 +398,10 @@ export class EthereumClient {
     prevExecClient,
     execClient,
     consClient,
-    useCheckpointSync,
   }: {
     prevExecClient?: string;
     execClient: string;
     consClient: string;
-    useCheckpointSync?: boolean;
   }): Promise<void> {
     db.ethExecClientInstallStatus.set(execClient, {
       status: "TO_INSTALL",
@@ -419,7 +410,6 @@ export class EthereumClient {
       status: "TO_INSTALL",
     });
     eventBus.runEthClientInstaller.emit({
-      useCheckpointSync,
       prevExecClientDnpName: prevExecClient,
     });
   }

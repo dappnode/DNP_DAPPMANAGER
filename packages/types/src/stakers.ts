@@ -108,7 +108,6 @@ export type StakerItem = StakerItemOk | StakerItemError;
 interface StakerItemBasic {
   dnpName: string;
   relays?: string[];
-  useCheckpointSync?: boolean;
 }
 
 export type StakerItemError = {

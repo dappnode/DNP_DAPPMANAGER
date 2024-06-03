@@ -9,20 +9,15 @@ import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
-import Switch from "components/Switch";
 
 export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
-  newUseCheckpointSync,
-  setNewUseCheckpointSync,
   isSelected,
   ...props
 }: {
   consensusClient: StakerItem;
   setNewConsClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
-  newUseCheckpointSync: boolean;
-  setNewUseCheckpointSync: React.Dispatch<React.SetStateAction<boolean>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -88,13 +83,6 @@ export default function ConsensusClient({
                 {consensusClient.data?.manifest?.shortDescription}
                 <hr />
               </div>
-            )}
-            {consensusClient.useCheckpointSync !== undefined && (
-              <Switch
-                checked={newUseCheckpointSync}
-                onToggle={() => setNewUseCheckpointSync(!newUseCheckpointSync)}
-                label={"Use checksync"}
-              />
             )}
           </>
         </>

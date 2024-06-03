@@ -28,11 +28,9 @@ export function getBeaconServiceName(dnpName: string): string {
 export function getConsensusUserSettings({
   dnpName,
   network,
-  useCheckpointSync,
 }: {
   dnpName: string;
   network: Network;
-  useCheckpointSync?: boolean;
 }): UserSettingsAllDnps {
   const validatorServiceName = getValidatorServiceName(dnpName);
   const beaconServiceName = getBeaconServiceName(dnpName);
@@ -49,9 +47,7 @@ export function getConsensusUserSettings({
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : "",
+                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network),
               },
             }
           : {
@@ -66,9 +62,7 @@ export function getConsensusUserSettings({
                 // Fee recipient is set as global env, keep this for backwards compatibility
                 ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: useCheckpointSync
-                  ? getDefaultCheckpointSync(network)
-                  : "",
+                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network),
               },
             },
     },

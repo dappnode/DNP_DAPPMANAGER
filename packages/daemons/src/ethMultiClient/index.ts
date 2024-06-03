@@ -42,8 +42,7 @@ import {
 export async function runEthClientInstaller(
   dappnodeInstaller: DappnodeInstaller,
   target: string | "remote",
-  status?: EthClientInstallStatus,
-  useCheckpointSync?: boolean
+  status?: EthClientInstallStatus
 ): Promise<EthClientInstallStatus | null> {
   // Re-check just in case, on run the installer for local target clients
   if (target === "remote") return null;
@@ -89,7 +88,6 @@ export async function runEthClientInstaller(
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
                   network: Network.Mainnet,
-                  useCheckpointSync,
                 }),
               });
             else await packageInstall(dappnodeInstaller, { name: target });
@@ -168,7 +166,6 @@ export function startEthMultiClientDaemon(
     async (
       multiClientArgs:
         | {
-            useCheckpointSync?: boolean;
             prevExecClientDnpName?: string;
           }
         | undefined
@@ -193,8 +190,7 @@ export function startEthMultiClientDaemon(
           const next = await runEthClientInstaller(
             dappnodeInstaller,
             client,
-            prev,
-            multiClientArgs?.useCheckpointSync
+            prev
           );
 
           if (!next) continue; // Package is uninstalled
@@ -230,9 +226,8 @@ export function startEthMultiClientDaemon(
   );
 
   // Subscribe with a throttle to run only one time at once
-  eventBus.runEthClientInstaller.on(
-    ({ useCheckpointSync, prevExecClientDnpName }) =>
-      runEthMultiClientTaskMemo({ useCheckpointSync, prevExecClientDnpName })
+  eventBus.runEthClientInstaller.on(({ prevExecClientDnpName }) =>
+    runEthMultiClientTaskMemo({ prevExecClientDnpName })
   );
 
   runAtMostEvery(

@@ -30,9 +30,6 @@ export default function Eth() {
   const [target, setTarget] = useState<Eth2ClientTarget | null>(
     ethClientTarget || null
   );
-  const [useCheckpointSync, setUseCheckpointSync] = useState<
-    boolean | undefined
-  >(undefined);
   const [newEthRemoteRpc, setNewEthRemoteRpc] = useState<string>("");
 
   useEffect(() => {
@@ -45,20 +42,8 @@ export default function Eth() {
     }
   }, [ethClientTarget]);
 
-  /**
-   * Only shows the checkpointsync switch if ethclient target is
-   * the fullnode and the user is changing the client.
-   */
-  useEffect(() => {
-    if (target !== "remote" && !isEqual(ethClientTarget, target))
-      setUseCheckpointSync(true);
-  }, [target, ethClientTarget]);
-
   function changeClient() {
-    if (target)
-      dispatch(
-        changeEthClientTarget(target, newEthRemoteRpc, useCheckpointSync)
-      );
+    if (target) dispatch(changeEthClientTarget(target, newEthRemoteRpc));
   }
 
   async function changeFallback(newFallback: EthClientFallback) {
@@ -108,10 +93,12 @@ export default function Eth() {
       <SubTitle>Ethereum</SubTitle>
       <div>
         <p>
-          Dappnode uses smart contracts to access a decentralized repository of DApps.
+          Dappnode uses smart contracts to access a decentralized repository of
+          DApps.
         </p>
         <p>
-          Choose to connect to a <strong>remote network</strong> or use your own <strong>local node.</strong>
+          Choose to connect to a <strong>remote network</strong> or use your own{" "}
+          <strong>local node.</strong>
         </p>
       </div>
       {ethClientTarget && ethClientTarget !== "remote" && (
@@ -136,8 +123,6 @@ export default function Eth() {
         setNewEthRemoteRpc={setNewEthRemoteRpc}
         fallback={ethClientFallback || "off"}
         onFallbackChange={changeFallback}
-        useCheckpointSync={useCheckpointSync}
-        setUseCheckpointSync={setUseCheckpointSync}
       />
 
       <br />

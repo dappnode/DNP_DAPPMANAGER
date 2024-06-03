@@ -47,8 +47,6 @@ export default function StakerNetwork({
     setNewExecClient,
     newConsClient,
     setNewConsClient,
-    newUseCheckpointSync,
-    setNewUseCheckpointSync,
     newMevBoost,
     setNewMevBoost,
     newRelays,
@@ -109,7 +107,6 @@ export default function StakerNetwork({
                 consensusDnpName: newConsClient?.dnpName || null,
                 mevBoostDnpName: newMevBoost?.dnpName || null,
                 web3signerDnpName: newWeb3signer?.dnpName || null,
-                useCheckpointSync: newUseCheckpointSync,
                 relays: newRelays
               }
             }),
@@ -206,13 +203,8 @@ export default function StakerNetwork({
                   (consensusClient, i) => (
                     <ConsensusClient
                       key={i}
-                      consensusClient={{
-                        ...consensusClient,
-                        useCheckpointSync: true
-                      }}
+                      consensusClient={consensusClient}
                       setNewConsClient={setNewConsClient}
-                      newUseCheckpointSync={newUseCheckpointSync}
-                      setNewUseCheckpointSync={setNewUseCheckpointSync}
                       isSelected={
                         consensusClient.dnpName === newConsClient?.dnpName
                       }

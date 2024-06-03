@@ -150,8 +150,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -179,8 +178,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -208,8 +206,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -236,8 +233,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -264,8 +260,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Lodestar consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
@@ -471,8 +466,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -500,8 +494,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -529,8 +522,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -557,8 +549,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
@@ -767,8 +758,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -796,8 +786,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -825,8 +814,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -853,8 +841,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
@@ -980,8 +967,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -1008,8 +994,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -1037,8 +1022,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -1066,8 +1050,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
@@ -1218,8 +1201,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
@@ -1247,8 +1229,7 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
             /*{
               status: "ok",
@@ -1277,7 +1258,6 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              useCheckpointSync: true
             }*/
           ],
           web3Signer: {

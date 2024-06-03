@@ -19,9 +19,6 @@ export const useStakerConfig = <T extends Network>(
   const [newConsClient, setNewConsClient] = useState<StakerItemOk | null>(null);
   const [newMevBoost, setNewMevBoost] = useState<StakerItemOk | null>(null);
   const [newRelays, setNewRelays] = useState<string[]>([]);
-  const [newUseCheckpointSync, setNewUseCheckpointSync] = useState<boolean>(
-    true
-  );
   const [newWeb3signer, setNewWeb3signer] = useState<StakerItemOk | null>(null);
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
     StakerConfigSet
@@ -51,11 +48,8 @@ export const useStakerConfig = <T extends Network>(
 
       if (executionClient && executionClient.status === "ok")
         setNewExecClient(executionClient);
-      if (consensusClient && consensusClient.status === "ok") {
+      if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
-        consensusClient.useCheckpointSync &&
-          setNewUseCheckpointSync(consensusClient.useCheckpointSync);
-      }
 
       const currentMevBoost = isOkSelectedInstalledAndRunning(mevBoost)
         ? mevBoost
@@ -75,7 +69,6 @@ export const useStakerConfig = <T extends Network>(
         network,
         executionDnpName: executionClient?.dnpName || null,
         consensusDnpName: consensusClient?.dnpName || null,
-        useCheckpointSync: consensusClient?.useCheckpointSync || false,
         mevBoostDnpName: currentMevBoost?.dnpName || null,
         relays: currentMevBoost?.relays || [],
         web3signerDnpName: currentWeb3signer?.dnpName || null
@@ -92,7 +85,6 @@ export const useStakerConfig = <T extends Network>(
             network,
             executionDnpName: newExecClient?.dnpName || null,
             consensusDnpName: newConsClient?.dnpName || null,
-            useCheckpointSync: newUseCheckpointSync,
             mevBoostDnpName: newMevBoost?.dnpName || null,
             relays: newRelays,
             web3signerDnpName: newWeb3signer?.dnpName || null
@@ -103,7 +95,6 @@ export const useStakerConfig = <T extends Network>(
     network,
     currentStakerConfig,
     newConsClient,
-    newUseCheckpointSync,
     newMevBoost,
     newRelays,
     newWeb3signer,
@@ -117,8 +108,6 @@ export const useStakerConfig = <T extends Network>(
     setNewExecClient,
     newConsClient,
     setNewConsClient,
-    newUseCheckpointSync,
-    setNewUseCheckpointSync,
     newMevBoost,
     setNewMevBoost,
     newRelays,
@@ -157,7 +146,6 @@ function getChanges({
   const {
     executionDnpName,
     consensusDnpName,
-    useCheckpointSync,
     mevBoostDnpName,
     relays,
     web3signerDnpName
@@ -179,7 +167,6 @@ function getChanges({
     consensusDnpName === newStakerConfig.consensusDnpName &&
     mevBoostDnpName === newStakerConfig.mevBoostDnpName &&
     !mevBoostRelaysChanged &&
-    useCheckpointSync === newStakerConfig.useCheckpointSync &&
     web3signerDnpName === newStakerConfig.web3signerDnpName
   )
     return {
