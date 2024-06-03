@@ -2,6 +2,7 @@ import { Network, StakerItem, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, packageGet } from "@dappnode/installer";
 import * as db from "@dappnode/db";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class MevBoost extends StakerComponent {
   protected belongsToStakerNetwork = false;
@@ -51,7 +52,11 @@ export class MevBoost extends StakerComponent {
 
   async getMevBoostCurrentRelays(mevBoostDnpName?: string): Promise<string[]> {
     const relays: string[] = [];
-    if (!mevBoostDnpName) return relays;
+    if (
+      !mevBoostDnpName ||
+      (await listPackageNoThrow({ dnpName: mevBoostDnpName }))
+    )
+      return relays;
     const pkgEnv = (await packageGet({ dnpName: mevBoostDnpName })).userSettings
       ?.environment;
     if (pkgEnv) {
