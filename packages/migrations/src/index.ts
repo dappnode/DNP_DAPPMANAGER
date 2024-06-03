@@ -11,6 +11,7 @@ import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
+import { Consensus, Execution } from "@dappnode/stakers";
 
 export class MigrationError extends Error {
   migration: string;
@@ -28,7 +29,10 @@ export class MigrationError extends Error {
 /**
  * Executes migrations required for the current DAppNode core version.
  */
-export async function executeMigrations(): Promise<void> {
+export async function executeMigrations(
+  execution: Execution,
+  consensus: Consensus
+): Promise<void> {
   const migrationErrors: MigrationError[] = [];
 
   await removeLegacyDockerAssets().catch((e) =>
@@ -150,15 +154,16 @@ export async function executeMigrations(): Promise<void> {
     })
   );
 
-  // await createStakerNetworkAndConnectStakerPkgs().catch((e) =>
-  //   migrationErrors.push({
-  //     migration: "create docker staker network",
-  //     coreVersion: "0.2.95",
-  //     name: "MIGRATION_ERROR",
-  //     message: e.message,
-  //     stack: e.stack,
-  //   })
-  // );
+  await createStakerNetworkAndConnectStakerPkgs(execution, consensus).catch(
+    (e) =>
+      migrationErrors.push({
+        migration: "create docker staker network",
+        coreVersion: "0.2.95",
+        name: "MIGRATION_ERROR",
+        message: e.message,
+        stack: e.stack,
+      })
+  );
 
   if (migrationErrors.length > 0) throw migrationErrors;
 }

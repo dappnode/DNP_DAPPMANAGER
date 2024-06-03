@@ -14,18 +14,13 @@ export async function stakerConfigSet({
     network,
     executionDnpName,
     consensusDnpName,
-    useCheckpointSync,
     mevBoostDnpName,
     relays,
     web3signerDnpName
   } = stakerConfig;
   await Promise.all([
     await execution.setNewExecution(network, executionDnpName),
-    await consensus.setNewConsensus(
-      network,
-      consensusDnpName,
-      useCheckpointSync
-    ),
+    await consensus.setNewConsensus(network, consensusDnpName),
     await mevBoost.setNewMevBoost(network, mevBoostDnpName, relays)
   ]);
 

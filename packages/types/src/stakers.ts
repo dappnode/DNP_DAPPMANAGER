@@ -159,7 +159,6 @@ export interface StakerConfigSet {
   network: Network;
   executionDnpName: string | null;
   consensusDnpName: string | null;
-  useCheckpointSync: boolean;
   mevBoostDnpName: string | null;
   relays: string[];
   web3signerDnpName: string | null;

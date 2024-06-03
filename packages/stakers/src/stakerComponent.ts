@@ -78,6 +78,20 @@ export class StakerComponent {
     );
   }
 
+  protected async persistSelectedIfInstalled(
+    dnpName: string,
+    belongsToStakerNetwork: boolean,
+    userSettings: UserSettingsAllDnps,
+    executionFullnodeAlias?: string
+  ): Promise<void> {
+    await this.setStakerPkgConfig(
+      dnpName,
+      belongsToStakerNetwork,
+      userSettings,
+      executionFullnodeAlias
+    );
+  }
+
   protected async setNew({
     newStakerDnpName,
     compatibleClients,
@@ -106,6 +120,7 @@ export class StakerComponent {
     const currentPkg = await listPackageNoThrow({
       dnpName: prevClient || "",
     });
+
     if (currentPkg) {
       if (newStakerDnpName && compatibleClients)
         this.ensureSetRequirements(

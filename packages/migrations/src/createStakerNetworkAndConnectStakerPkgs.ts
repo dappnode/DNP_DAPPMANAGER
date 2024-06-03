@@ -1,16 +1,23 @@
 import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { ensureStakerPkgsNetworkConfig } from "@dappnode/stakers";
+import { Execution, Consensus } from "@dappnode/stakers";
 import { Network } from "@dappnode/types";
 
 /**
  * Creates the staker network and connects the staker packages to it
  */
-export async function createStakerNetworkAndConnectStakerPkgs(): Promise<void> {
+export async function createStakerNetworkAndConnectStakerPkgs(
+  execution: Execution,
+  consensus: Consensus
+): Promise<void> {
   await createDockerStakerNetwork();
-  for (const network of Object.values(Network))
-    await ensureStakerPkgsNetworkConfig(network);
+  for (const network of Object.values(Network)) {
+    await Promise.all([
+      await execution.persistSelectedExecutionIfInstalled(network),
+      await consensus.persistSelectedConsensusIfInstalled(network),
+    ]);
+  }
 }
 
 /**

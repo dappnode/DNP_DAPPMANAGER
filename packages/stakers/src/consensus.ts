@@ -2,6 +2,7 @@ import { Network, StakerItem, UserSettingsAllDnps } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Consensus extends StakerComponent {
   protected belongsToStakerNetwork = true;
@@ -75,22 +76,29 @@ export class Consensus extends StakerComponent {
     });
   }
 
-  async setNewConsensus(
-    network: Network,
-    newConsensusDnpName: string | null,
-    newUseCheckpointSync?: boolean
-  ) {
+  async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
+    const currentConsensusDnpName = Consensus.DbHandlers[network].get();
+    if (
+      currentConsensusDnpName &&
+      (await listPackageNoThrow({ dnpName: currentConsensusDnpName }))
+    ) {
+      await this.persistSelectedIfInstalled(
+        currentConsensusDnpName,
+        this.belongsToStakerNetwork,
+        this.getConsensusUserSettings(currentConsensusDnpName, network),
+        currentConsensusDnpName
+      );
+    }
+  }
+
+  async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = Consensus.DbHandlers[network].get();
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       compatibleClients: Consensus.CompatibleConsensus[network],
       belongsToStakerNetwork: this.belongsToStakerNetwork,
-      userSettings: this.getConsensusUserSettings(
-        newConsensusDnpName,
-        network,
-        newUseCheckpointSync
-      ),
+      userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });
     // persist on db
@@ -100,8 +108,7 @@ export class Consensus extends StakerComponent {
 
   private getConsensusUserSettings(
     newConsensusDnpName: string | null,
-    network: Network,
-    newUseCheckpointSync?: boolean
+    network: Network
   ): UserSettingsAllDnps {
     const validatorServiceName =
       this.getValidatorServiceName(newConsensusDnpName);
@@ -120,9 +127,8 @@ export class Consensus extends StakerComponent {
                       // Graffiti is a mandatory value
                       ["GRAFFITI"]: defaultDappnodeGraffiti,
                       // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]: newUseCheckpointSync
-                        ? Consensus.DefaultCheckpointSync[network]
-                        : "",
+                      ["CHECKPOINT_SYNC_URL"]:
+                        Consensus.DefaultCheckpointSync[network],
                     },
                   }
                 : {
@@ -137,9 +143,8 @@ export class Consensus extends StakerComponent {
                       // Fee recipient is set as global env, keep this for backwards compatibility
                       ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                       // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]: newUseCheckpointSync
-                        ? Consensus.DefaultCheckpointSync[network]
-                        : "",
+                      ["CHECKPOINT_SYNC_URL"]:
+                        Consensus.DefaultCheckpointSync[network],
                     },
                   },
           },
