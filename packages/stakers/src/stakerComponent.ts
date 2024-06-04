@@ -62,10 +62,7 @@ export class StakerComponent {
             isRunning: getIsRunning(pkgData, dnpList),
             data: pkgData,
             relays, // only for mevBoost
-            isSelected:
-              typeof dnpName === "string"
-                ? dnpName === currentClient // for execution consensus and signer
-                : Boolean(currentClient), // for mevBoost
+            isSelected: dnpName === currentClient || currentClient === true,
           };
         } catch (error) {
           return {
