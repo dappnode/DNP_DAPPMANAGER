@@ -119,9 +119,9 @@ export class StakerComponent {
     });
 
     if (currentPkg) {
-      if (newStakerDnpName && compatibleClients)
+      if (prevClient && compatibleClients)
         this.ensureSetRequirements(
-          newStakerDnpName,
+          prevClient,
           compatibleClients,
           currentPkg.version
         );
@@ -313,7 +313,7 @@ export class StakerComponent {
       lt(pkgVersion, compatibleClient.minVersion)
     ) {
       throw Error(
-        `The selected staker version is not compatible with the current network. Required version: ${compatibleClient.minVersion}`
+        `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
   }
