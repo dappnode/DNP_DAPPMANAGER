@@ -90,14 +90,13 @@ export class Consensus extends StakerComponent {
     if (
       currentConsensusDnpName &&
       (await listPackageNoThrow({ dnpName: currentConsensusDnpName }))
-    ) {
+    )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
         this.belongsToStakerNetwork,
         this.getConsensusUserSettings(currentConsensusDnpName, network),
         currentConsensusDnpName
       );
-    }
   }
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {

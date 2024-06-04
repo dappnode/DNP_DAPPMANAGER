@@ -10,7 +10,6 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
-import { logs } from "@dappnode/logger";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Execution extends StakerComponent {
@@ -78,21 +77,17 @@ export class Execution extends StakerComponent {
     if (
       currentExecutionDnpName &&
       (await listPackageNoThrow({ dnpName: currentExecutionDnpName }))
-    ) {
+    )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
         this.belongsToStakerNetwork,
         {},
         currentExecutionDnpName
       );
-    }
   }
 
   async setNewExecution(network: Network, newExecutionDnpName: string | null) {
     const prevExecClientDnpName = this.DbHandlers[network].get();
-    logs.info(
-      `Setting new execution client: ${newExecutionDnpName} (prev: ${prevExecClientDnpName})`
-    );
 
     await super.setNew({
       newStakerDnpName: newExecutionDnpName,

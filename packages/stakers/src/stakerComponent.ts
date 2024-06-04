@@ -170,13 +170,14 @@ export class StakerComponent {
     if (belongsToStakerNetwork)
       this.addStakerNetworkToCompose(pkg.dnpName, executionFullnodeAlias);
 
-    // start all containers
-    await dockerComposeUpPackage(
-      { dnpName: pkg.dnpName },
-      {},
-      { forceRecreate: true }, // force recreate to apply changes in the compose file
-      true
-    );
+    // start all containers if not running
+    if (!pkg.containers.every((c) => c.running))
+      await dockerComposeUpPackage(
+        { dnpName: pkg.dnpName },
+        {},
+        { forceRecreate: true }, // force recreate to apply changes in the compose file
+        true
+      );
   }
 
   /**
