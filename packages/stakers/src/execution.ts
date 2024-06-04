@@ -1,4 +1,12 @@
-import { Network, StakerItem } from "@dappnode/types";
+import {
+  ExecutionClientGnosis,
+  ExecutionClientHolesky,
+  ExecutionClientLukso,
+  ExecutionClientMainnet,
+  ExecutionClientPrater,
+  Network,
+  StakerItem,
+} from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -7,7 +15,7 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Execution extends StakerComponent {
   protected belongsToStakerNetwork = true;
-  protected static readonly DbHandlers: Record<
+  readonly DbHandlers: Record<
     Network,
     {
       get: () => string | null | undefined;
@@ -26,33 +34,29 @@ export class Execution extends StakerComponent {
     { dnpName: string; minVersion: string }[]
   > = {
     [Network.Mainnet]: [
-      { dnpName: "geth.dnp.dappnode.eth", minVersion: "0.1.37" },
-      { dnpName: "nethermind.public.dappnode.eth", minVersion: "1.0.27" },
-      { dnpName: "erigon.dnp.dappnode.eth", minVersion: "0.1.34" },
-      { dnpName: "besu.public.dappnode.eth", minVersion: "1.2.6" },
+      { dnpName: ExecutionClientMainnet.Geth, minVersion: "0.1.37" },
+      { dnpName: ExecutionClientMainnet.Nethermind, minVersion: "1.0.27" },
+      { dnpName: ExecutionClientMainnet.Erigon, minVersion: "0.1.34" },
+      { dnpName: ExecutionClientMainnet.Besu, minVersion: "1.2.6" },
     ],
     [Network.Gnosis]: [
-      { dnpName: "nethermind-xdai.dnp.dappnode.eth", minVersion: "1.0.18" },
-      { dnpName: "gnosis-erigon.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Nethermind, minVersion: "1.0.18" },
+      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" },
     ],
     [Network.Prater]: [
-      { dnpName: "goerli-geth.dnp.dappnode.eth", minVersion: "0.4.26" },
-      { dnpName: "goerli-erigon.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "goerli-nethermind.dnp.dappnode.eth", minVersion: "1.0.1" },
-      { dnpName: "goerli-besu.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ExecutionClientPrater.Geth, minVersion: "0.4.26" },
+      { dnpName: ExecutionClientPrater.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientPrater.Nethermind, minVersion: "1.0.1" },
+      { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" },
     ],
     [Network.Holesky]: [
-      { dnpName: "holesky-geth.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "holesky-erigon.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "holesky-nethermind.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "holesky-besu.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHolesky.Geth, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" },
     ],
     [Network.Lukso]: [
-      { dnpName: "lukso-geth.dnp.dappnode.eth", minVersion: "0.1.0" },
-      /*{
-        dnpName: "lukso-erigon.dnp.dappnode.eth",
-        minVersion: "0.1.0"
-      }*/
+      { dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" },
     ],
   };
 
@@ -65,12 +69,12 @@ export class Execution extends StakerComponent {
       dnpNames: Execution.CompatibleExecutions[network].map(
         (client) => client.dnpName
       ),
-      currentClient: Execution.DbHandlers[network].get(),
+      currentClient: this.DbHandlers[network].get(),
     });
   }
 
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
-    const currentExecutionDnpName = Execution.DbHandlers[network].get();
+    const currentExecutionDnpName = this.DbHandlers[network].get();
     if (
       currentExecutionDnpName &&
       (await listPackageNoThrow({ dnpName: currentExecutionDnpName }))
@@ -85,7 +89,7 @@ export class Execution extends StakerComponent {
   }
 
   async setNewExecution(network: Network, newExecutionDnpName: string | null) {
-    const prevExecClientDnpName = Execution.DbHandlers[network].get();
+    const prevExecClientDnpName = this.DbHandlers[network].get();
     logs.info(
       `Setting new execution client: ${newExecutionDnpName} (prev: ${prevExecClientDnpName})`
     );
@@ -100,7 +104,7 @@ export class Execution extends StakerComponent {
 
     if (newExecutionDnpName !== prevExecClientDnpName) {
       // persist on db
-      await Execution.DbHandlers[network].set(newExecutionDnpName);
+      await this.DbHandlers[network].set(newExecutionDnpName);
       // update fullnode alias
       await ethereumClient.updateFullnodeAlias({
         network,

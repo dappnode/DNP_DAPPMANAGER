@@ -1,4 +1,13 @@
-import { Network, StakerItem, UserSettingsAllDnps } from "@dappnode/types";
+import {
+  ConsensusClientGnosis,
+  ConsensusClientHolesky,
+  ConsensusClientLukso,
+  ConsensusClientMainnet,
+  ConsensusClientPrater,
+  Network,
+  StakerItem,
+  UserSettingsAllDnps,
+} from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -6,7 +15,7 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Consensus extends StakerComponent {
   protected belongsToStakerNetwork = true;
-  protected static readonly DbHandlers: Record<
+  readonly DbHandlers: Record<
     Network,
     {
       get: () => string | null | undefined;
@@ -31,35 +40,35 @@ export class Consensus extends StakerComponent {
     { dnpName: string; minVersion: string }[]
   > = {
     [Network.Mainnet]: [
-      { dnpName: "prysm.dnp.dappnode.eth", minVersion: "3.0.4" },
-      { dnpName: "lighthouse.dnp.dappnode.eth", minVersion: "1.0.3" },
-      { dnpName: "teku.dnp.dappnode.eth", minVersion: "2.0.4" },
-      { dnpName: "nimbus.dnp.dappnode.eth", minVersion: "1.0.5" },
-      { dnpName: "lodestar.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
+      { dnpName: ConsensusClientMainnet.Lighthouse, minVersion: "1.0.3" },
+      { dnpName: ConsensusClientMainnet.Teku, minVersion: "2.0.4" },
+      { dnpName: ConsensusClientMainnet.Nimbus, minVersion: "1.0.5" },
+      { dnpName: ConsensusClientMainnet.Lodestar, minVersion: "0.1.0" },
     ],
     [Network.Gnosis]: [
-      { dnpName: "lighthouse-gnosis.dnp.dappnode.eth", minVersion: "0.1.5" },
-      { dnpName: "teku-gnosis.dnp.dappnode.eth", minVersion: "0.1.5" },
-      { dnpName: "lodestar-gnosis.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "nimbus-gnosis.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ConsensusClientGnosis.Lighthouse, minVersion: "0.1.5" },
+      { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
+      { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" },
     ],
     [Network.Prater]: [
-      { dnpName: "prysm-prater.dnp.dappnode.eth", minVersion: "1.0.15" },
-      { dnpName: "lighthouse-prater.dnp.dappnode.eth", minVersion: "0.1.9" },
-      { dnpName: "teku-prater.dnp.dappnode.eth", minVersion: "0.1.10" },
-      { dnpName: "nimbus-prater.dnp.dappnode.eth", minVersion: "0.1.7" },
-      { dnpName: "lodestar-prater.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
+      { dnpName: ConsensusClientPrater.Lighthouse, minVersion: "0.1.9" },
+      { dnpName: ConsensusClientPrater.Teku, minVersion: "0.1.10" },
+      { dnpName: ConsensusClientPrater.Nimbus, minVersion: "0.1.7" },
+      { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" },
     ],
     [Network.Holesky]: [
-      { dnpName: "lighthouse-holesky.dnp.dappnode.eth", minVersion: "0.1.2" },
-      { dnpName: "prysm-holesky.dnp.dappnode.eth", minVersion: "0.1.3" },
-      { dnpName: "teku-holesky.dnp.dappnode.eth", minVersion: "0.1.2" },
-      { dnpName: "nimbus-holesky.dnp.dappnode.eth", minVersion: "0.1.2" },
-      { dnpName: "lodestar-holesky.dnp.dappnode.eth", minVersion: "0.1.3" },
+      { dnpName: ConsensusClientHolesky.Lighthouse, minVersion: "0.1.2" },
+      { dnpName: ConsensusClientHolesky.Prysm, minVersion: "0.1.3" },
+      { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
+      { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
+      { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" },
     ],
     [Network.Lukso]: [
-      { dnpName: "prysm-lukso.dnp.dappnode.eth", minVersion: "0.1.0" },
-      { dnpName: "teku-lukso.dnp.dappnode.eth", minVersion: "0.1.0" },
+      { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" },
     ],
   };
 
@@ -72,12 +81,12 @@ export class Consensus extends StakerComponent {
       dnpNames: Consensus.CompatibleConsensus[network].map(
         (client) => client.dnpName
       ),
-      currentClient: Consensus.DbHandlers[network].get(),
+      currentClient: this.DbHandlers[network].get(),
     });
   }
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
-    const currentConsensusDnpName = Consensus.DbHandlers[network].get();
+    const currentConsensusDnpName = this.DbHandlers[network].get();
     if (
       currentConsensusDnpName &&
       (await listPackageNoThrow({ dnpName: currentConsensusDnpName }))
@@ -92,7 +101,7 @@ export class Consensus extends StakerComponent {
   }
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
-    const prevConsClientDnpName = Consensus.DbHandlers[network].get();
+    const prevConsClientDnpName = this.DbHandlers[network].get();
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
@@ -103,7 +112,7 @@ export class Consensus extends StakerComponent {
     });
     // persist on db
     if (newConsensusDnpName !== prevConsClientDnpName)
-      await Consensus.DbHandlers[network].set(newConsensusDnpName);
+      await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
   private getConsensusUserSettings(

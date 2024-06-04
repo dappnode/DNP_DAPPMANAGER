@@ -1,4 +1,11 @@
-import { Network, StakerItem, UserSettingsAllDnps } from "@dappnode/types";
+import {
+  MevBoostHolesky,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network,
+  StakerItem,
+  UserSettingsAllDnps,
+} from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, packageGet } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -6,7 +13,7 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class MevBoost extends StakerComponent {
   protected belongsToStakerNetwork = false;
-  protected static readonly DbHandlers: Record<
+  readonly DbHandlers: Record<
     Network,
     { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }
   > = {
@@ -22,16 +29,16 @@ export class MevBoost extends StakerComponent {
     { dnpName: string; minVersion: string } | null
   > = {
     [Network.Mainnet]: {
-      dnpName: "mev-boost.dnp.dappnode.eth",
+      dnpName: MevBoostMainnet.Mevboost,
       minVersion: "0.1.0",
     },
     [Network.Gnosis]: null,
     [Network.Prater]: {
-      dnpName: "mev-boost-goerli.dnp.dappnode.eth",
+      dnpName: MevBoostPrater.Mevboost,
       minVersion: "0.1.0",
     },
     [Network.Holesky]: {
-      dnpName: "mev-boost-holesky.dnp.dappnode.eth",
+      dnpName: MevBoostHolesky.Mevboost,
       minVersion: "0.1.0",
     },
     [Network.Lukso]: null,
@@ -45,7 +52,7 @@ export class MevBoost extends StakerComponent {
     const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
     return await super.getAll({
       dnpNames: mevBoostDnpName ? [mevBoostDnpName] : [],
-      currentClient: MevBoost.DbHandlers[network].get(),
+      currentClient: this.DbHandlers[network].get(),
       relays: await this.getMevBoostCurrentRelays(mevBoostDnpName),
     });
   }
@@ -83,8 +90,8 @@ export class MevBoost extends StakerComponent {
       ),
     });
     // persist on db
-    if (Boolean(newMevBoostDnpName) !== MevBoost.DbHandlers[network].get())
-      await MevBoost.DbHandlers[network].set(newMevBoostDnpName ? true : false);
+    if (Boolean(newMevBoostDnpName) !== this.DbHandlers[network].get())
+      await this.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
   private getMevBoostNewUserSettings(

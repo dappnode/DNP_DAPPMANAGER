@@ -71,10 +71,7 @@ export async function runEthClientInstaller(
           // check target belongs to enum ExecutionClientMainnet
 
           if (isExecutionClientMainnet(target))
-            db.ethExecClientInstallStatus.set(
-              target as ExecutionClientMainnet,
-              { status: "INSTALLING" }
-            );
+            db.ethExecClientInstallStatus.set(target, { status: "INSTALLING" });
           else if (isConsensusClientMainnet(target))
             db.ethConsClientInstallStatus.set(
               target as ConsensusClientMainnet,
