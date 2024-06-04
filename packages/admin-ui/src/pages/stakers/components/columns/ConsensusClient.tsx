@@ -81,7 +81,6 @@ export default function ConsensusClient({
             {consensusClient.data && (
               <div className="description">
                 {consensusClient.data?.manifest?.shortDescription}
-                <hr />
               </div>
             )}
           </>
