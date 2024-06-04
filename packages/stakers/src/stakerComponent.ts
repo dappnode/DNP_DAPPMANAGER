@@ -125,7 +125,8 @@ export class StakerComponent {
           compatibleClients,
           currentPkg.version
         );
-      await this.unsetStakerPkgConfig(currentPkg, belongsToStakerNetwork);
+      if (prevClient !== newStakerDnpName)
+        await this.unsetStakerPkgConfig(currentPkg, belongsToStakerNetwork);
     }
 
     if (!newStakerDnpName) return;
