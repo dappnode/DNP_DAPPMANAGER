@@ -174,12 +174,7 @@ export class StakerComponent {
 
     // start all containers if not running
     if (!pkg.containers.every((c) => c.running))
-      await dockerComposeUpPackage(
-        { dnpName: pkg.dnpName },
-        {},
-        { forceRecreate: true }, // force recreate to apply changes in the compose file
-        true
-      );
+      await dockerComposeUpPackage({ dnpName: pkg.dnpName }, {}, {}, true);
   }
 
   /**
