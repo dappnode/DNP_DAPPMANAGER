@@ -148,12 +148,6 @@ export interface StakerConfigGet {
   mevBoost: StakerItem;
 }
 
-export interface StakerConfigGetOk {
-  executionClients: StakerItemOk[];
-  consensusClients: StakerItemOk[];
-  web3signer: StakerItemOk;
-  mevBoost: StakerItemOk;
-}
 export interface StakerConfigSet {
   network: Network;
   executionDnpName: string | null;
@@ -161,10 +155,4 @@ export interface StakerConfigSet {
   mevBoostDnpName: string | null;
   relays: string[];
   web3signerDnpName: string | null;
-}
-
-export interface StakerConfigByNetwork {
-  executionClient: string | undefined | null;
-  consensusClient: string | undefined | null;
-  isMevBoostSelected: boolean;
 }
