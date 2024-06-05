@@ -352,12 +352,7 @@ export class EthereumClient {
         logs.info(`Starting execution client ${execClient}`);
         // Start pkg if not running
         if (execClientPackage.containers.some((c) => c.state !== "running"))
-          await dockerComposeUpPackage(
-            { dnpName: execClient },
-            {},
-            {},
-            true
-          ).then(
+          await dockerComposeUpPackage({ dnpName: execClient }, true).then(
             async () =>
               await this.updateFullnodeAlias({
                 network: Network.Mainnet,
@@ -384,7 +379,7 @@ export class EthereumClient {
       } else {
         // Start pkg if not running
         if (consClientPkg.containers.some((c) => c.state !== "running"))
-          await dockerComposeUpPackage({ dnpName: consClient }, {}, {}, true);
+          await dockerComposeUpPackage({ dnpName: consClient }, true);
       }
     } catch (e) {
       throw Error(`Error changing eth client: ${e}`);

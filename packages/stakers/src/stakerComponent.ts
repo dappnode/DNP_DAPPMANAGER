@@ -174,7 +174,7 @@ export class StakerComponent {
 
     // start all containers if not running
     if (!pkg.containers.every((c) => c.running))
-      await dockerComposeUpPackage({ dnpName: pkg.dnpName }, {}, {}, true);
+      await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
   }
 
   /**
