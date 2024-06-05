@@ -81,6 +81,7 @@ export class StakerComponent {
     userSettings: UserSettingsAllDnps,
     executionFullnodeAlias?: string
   ): Promise<void> {
+    logs.info(`Persisting selected staker ${dnpName}`);
     await this.setStakerPkgConfig(
       dnpName,
       belongsToStakerNetwork,

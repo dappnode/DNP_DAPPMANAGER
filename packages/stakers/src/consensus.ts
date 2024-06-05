@@ -14,7 +14,7 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Consensus extends StakerComponent {
-  protected belongsToStakerNetwork = true;
+  protected static readonly BelongsToStakerNetwork = true;
   readonly DbHandlers: Record<
     Network,
     {
@@ -93,7 +93,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.belongsToStakerNetwork,
+        Consensus.BelongsToStakerNetwork,
         this.getConsensusUserSettings(currentConsensusDnpName, network),
         currentConsensusDnpName
       );
@@ -105,7 +105,7 @@ export class Consensus extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       compatibleClients: Consensus.CompatibleConsensus[network],
-      belongsToStakerNetwork: this.belongsToStakerNetwork,
+      belongsToStakerNetwork: Consensus.BelongsToStakerNetwork,
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });

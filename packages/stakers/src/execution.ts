@@ -13,7 +13,7 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Execution extends StakerComponent {
-  protected belongsToStakerNetwork = true;
+  protected static readonly BelongsToStakerNetwork = true;
   readonly DbHandlers: Record<
     Network,
     {
@@ -80,7 +80,7 @@ export class Execution extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
-        this.belongsToStakerNetwork,
+        Execution.BelongsToStakerNetwork,
         {},
         currentExecutionDnpName
       );
@@ -92,7 +92,7 @@ export class Execution extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newExecutionDnpName,
       compatibleClients: Execution.CompatibleExecutions[network],
-      belongsToStakerNetwork: this.belongsToStakerNetwork,
+      belongsToStakerNetwork: Execution.BelongsToStakerNetwork,
       executionFullnodeAlias: `execution.${network}.staker.dappnode`,
       prevClient: prevExecClientDnpName,
     });

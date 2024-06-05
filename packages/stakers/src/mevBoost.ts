@@ -12,7 +12,7 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class MevBoost extends StakerComponent {
-  protected belongsToStakerNetwork = false;
+  protected static readonly BelongsToStakerNetwork = false;
   readonly DbHandlers: Record<
     Network,
     { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }
@@ -83,7 +83,7 @@ export class MevBoost extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newMevBoostDnpName,
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
-      belongsToStakerNetwork: this.belongsToStakerNetwork,
+      belongsToStakerNetwork: MevBoost.BelongsToStakerNetwork,
       userSettings: this.getMevBoostNewUserSettings(
         newMevBoostDnpName,
         newRelays
