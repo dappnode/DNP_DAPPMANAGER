@@ -80,7 +80,6 @@ export class StakerComponent {
     userSettings: UserSettingsAllDnps,
     executionFullnodeAlias?: string
   ): Promise<void> {
-    logs.info(`Persisting selected staker ${dnpName}`);
     await this.setStakerPkgConfig(
       dnpName,
       belongsToStakerNetwork,
@@ -184,9 +183,10 @@ export class StakerComponent {
         executionFullnodeAlias
       );
 
-    // start all containers if not running
-    if (!pkg.containers.every((c) => c.running))
-      await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
+    // start all containers
+    // docker will automatically recreate those containers with changes in the compose file
+    // this applies to the staker network addition
+    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
   }
 
   /**

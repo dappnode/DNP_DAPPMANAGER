@@ -40,8 +40,7 @@ export async function executeMigrations(
       migration: "bundle legacy ops to prevent spamming the docker API",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -50,8 +49,7 @@ export async function executeMigrations(
       migration: "migrate winston .log JSON file to a lowdb",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -60,8 +58,7 @@ export async function executeMigrations(
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -70,8 +67,7 @@ export async function executeMigrations(
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -81,8 +77,7 @@ export async function executeMigrations(
         "ensure core composes files has correct hardcoded IPs in range",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -91,8 +86,7 @@ export async function executeMigrations(
       migration: "remove legacy dns from running containers",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -109,8 +103,7 @@ export async function executeMigrations(
       migration: "ensure docker network configuration",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -119,8 +112,7 @@ export async function executeMigrations(
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -129,8 +121,7 @@ export async function executeMigrations(
       migration: "add Dappnode peer to local IPFS node",
       coreVersion: "0.2.88",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -139,8 +130,7 @@ export async function executeMigrations(
       migration: "change ethical metrics db format",
       coreVersion: "0.2.92",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -149,19 +139,18 @@ export async function executeMigrations(
       migration: "determine if the dappnode is running in Dappnode AWS",
       coreVersion: "0.2.94",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
   await createStakerNetworkAndConnectStakerPkgs(execution, consensus).catch(
     (e) =>
       migrationErrors.push({
-        migration: "create docker staker network",
+        migration:
+          "create docker staker network and persist selected staker pkgs per network",
         coreVersion: "0.2.95",
         name: "MIGRATION_ERROR",
-        message: e.message,
-        stack: e.stack,
+        message: e,
       })
   );
 
