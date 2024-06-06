@@ -1,4 +1,5 @@
 import path from "path";
+import { Network } from "@dappnode/types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 const MINUTE = 60 * 1000; // miliseconds
@@ -121,7 +122,13 @@ export const params = {
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
-  DOCKER_STAKER_NETWORK_NAME: "staker_network",
+  DOCKER_STAKER_NETWORKS: {
+    [Network.Mainnet]: "mainnet_network",
+    [Network.Holesky]: "holesky_network",
+    [Network.Prater]: "prater_network",
+    [Network.Gnosis]: "gnosis_network",
+    [Network.Lukso]: "lukso_network",
+  },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2", // "10.20.0.2"
   DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
@@ -373,7 +380,7 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a",
-    }
+    },
   ],
 };
 

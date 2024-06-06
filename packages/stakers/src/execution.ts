@@ -11,6 +11,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
 
 export class Execution extends StakerComponent {
   protected static readonly BelongsToStakerNetwork = true;
@@ -80,6 +81,7 @@ export class Execution extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
+        params.DOCKER_STAKER_NETWORKS[network],
         Execution.BelongsToStakerNetwork,
         {},
         currentExecutionDnpName
@@ -91,6 +93,7 @@ export class Execution extends StakerComponent {
 
     await super.setNew({
       newStakerDnpName: newExecutionDnpName,
+      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
       belongsToStakerNetwork: Execution.BelongsToStakerNetwork,
       executionFullnodeAlias: `execution.${network}.staker.dappnode`,

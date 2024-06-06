@@ -53,7 +53,7 @@ export async function runEthClientInstaller(
   if (dnp) {
     // OK: Client is already installed, ensure it's running
     if (dnp.containers.some((c) => !c.running))
-      await dockerComposeUpPackage({ dnpName: target }, {}, {}, true);
+      await dockerComposeUpPackage({ dnpName: target }, true);
     return { status: "INSTALLED" };
   } else {
     // Client is not installed

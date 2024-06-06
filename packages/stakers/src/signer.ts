@@ -9,6 +9,7 @@ import {
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
+import { params } from "@dappnode/params";
 
 export class Signer extends StakerComponent {
   protected static readonly BelongsToStakerNetwork = false;
@@ -52,6 +53,7 @@ export class Signer extends StakerComponent {
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
     await super.setNew({
       newStakerDnpName: newWeb3signerDnpName,
+      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: [Signer.CompatibleSigners[network]],
       belongsToStakerNetwork: Signer.BelongsToStakerNetwork,
     });

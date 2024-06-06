@@ -12,6 +12,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
 
 export class Consensus extends StakerComponent {
   protected static readonly BelongsToStakerNetwork = true;
@@ -93,6 +94,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
+        params.DOCKER_STAKER_NETWORKS[network],
         Consensus.BelongsToStakerNetwork,
         this.getConsensusUserSettings(currentConsensusDnpName, network),
         currentConsensusDnpName
@@ -104,6 +106,7 @@ export class Consensus extends StakerComponent {
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
+      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
       belongsToStakerNetwork: Consensus.BelongsToStakerNetwork,
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),

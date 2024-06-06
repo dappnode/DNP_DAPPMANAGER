@@ -11,8 +11,8 @@ export async function createStakerNetworkAndConnectStakerPkgs(
   execution: Execution,
   consensus: Consensus
 ): Promise<void> {
-  await createDockerStakerNetwork();
   for (const network of Object.values(Network)) {
+    await createDockerStakerNetwork(params.DOCKER_STAKER_NETWORKS[network]);
     await Promise.all([
       await execution.persistSelectedExecutionIfInstalled(network),
       await consensus.persistSelectedConsensusIfInstalled(network),
@@ -23,27 +23,23 @@ export async function createStakerNetworkAndConnectStakerPkgs(
 /**
  * Creates the docker staker network
  */
-async function createDockerStakerNetwork(): Promise<void> {
+async function createDockerStakerNetwork(network: string): Promise<void> {
   try {
-    const stakerNetwork = docker.getNetwork(params.DOCKER_STAKER_NETWORK_NAME);
+    const stakerNetwork = docker.getNetwork(network);
     await stakerNetwork.inspect();
-    logs.info(`docker network ${params.DOCKER_STAKER_NETWORK_NAME} exists`);
+    logs.info(`docker network ${network} exists`);
   } catch (e) {
     if (e.statusCode === 404) {
-      logs.info(
-        `docker network ${params.DOCKER_STAKER_NETWORK_NAME} not found, creating it`
-      );
+      logs.info(`docker network ${network} not found, creating it`);
       await docker.createNetwork({
-        Name: params.DOCKER_STAKER_NETWORK_NAME,
+        Name: network,
         Driver: "bridge",
         IPAM: {
           Driver: "default",
         },
       });
     } else {
-      logs.error(
-        `Failed to create docker network ${params.DOCKER_STAKER_NETWORK_NAME}`
-      );
+      logs.error(`Failed to create docker network ${network}`);
       throw e;
     }
   }

@@ -10,6 +10,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, packageGet } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
 
 export class MevBoost extends StakerComponent {
   protected static readonly BelongsToStakerNetwork = false;
@@ -82,6 +83,7 @@ export class MevBoost extends StakerComponent {
     const compatibleMevBoost = MevBoost.CompatibleMevBoost[network];
     await super.setNew({
       newStakerDnpName: newMevBoostDnpName,
+      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       belongsToStakerNetwork: MevBoost.BelongsToStakerNetwork,
       userSettings: this.getMevBoostNewUserSettings(
