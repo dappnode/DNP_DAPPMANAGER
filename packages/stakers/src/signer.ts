@@ -56,6 +56,7 @@ export class Signer extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: [Signer.CompatibleSigners[network]],
       belongsToStakerNetwork: Signer.BelongsToStakerNetwork,
+      prevClient: Signer.CompatibleSigners[network].dnpName,
     });
   }
 }

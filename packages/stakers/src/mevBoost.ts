@@ -90,6 +90,7 @@ export class MevBoost extends StakerComponent {
         newMevBoostDnpName,
         newRelays
       ),
+      prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null,
     });
     // persist on db
     if (Boolean(newMevBoostDnpName) !== this.DbHandlers[network].get())
