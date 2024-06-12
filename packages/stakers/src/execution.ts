@@ -13,6 +13,8 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
+// TODO: move ethereumClient logic here
+
 export class Execution extends StakerComponent {
   readonly DbHandlers: Record<
     Network,
@@ -80,8 +82,7 @@ export class Execution extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
-        params.DOCKER_STAKER_NETWORKS[network],
-        this.getServiceRegexAliasesMap(network)
+        this.getDockerNetSvcAliasesMap(network)
       );
   }
 
@@ -92,7 +93,7 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
+      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
       prevClient: prevExecClientDnpName,
     });
 
@@ -108,14 +109,23 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private getServiceRegexAliasesMap(
+  private getDockerNetSvcAliasesMap(
     network: Network
-  ): { regex: RegExp; alias: string }[] {
-    return [
-      {
-        regex: /(geth|nethermind|erigon|besu|reth|execution)/,
-        alias: `execution.${network}.staker.dappnode`,
-      },
-    ];
+  ): Record<string, { regex: RegExp; alias: string }[]> {
+    const regex = /(geth|nethermind|erigon|besu|reth|execution)/;
+    return {
+      [params.DOCKER_STAKER_NETWORKS[network]]: [
+        {
+          regex,
+          alias: `execution.${network}.staker.dappnode`,
+        },
+      ],
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
+        {
+          regex,
+          alias: `execution.${network}.dncore.dappnode`,
+        },
+      ],
+    };
   }
 }

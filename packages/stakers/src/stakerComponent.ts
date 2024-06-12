@@ -75,18 +75,13 @@ export class StakerComponent {
 
   protected async persistSelectedIfInstalled(
     dnpName: string,
-    dockerNetworkName: string,
-    serviceRegexAliases: {
-      regex: RegExp;
-      alias: string;
-    }[],
+    dockerNetSvcAliasesMap: Record<string, { regex: RegExp; alias: string }[]>,
     userSettings?: UserSettingsAllDnps
   ): Promise<void> {
     console.log("persisting: ", dnpName);
     await this.setStakerPkgConfig(
       dnpName,
-      dockerNetworkName,
-      serviceRegexAliases,
+      dockerNetSvcAliasesMap,
       userSettings
     );
   }
@@ -95,7 +90,7 @@ export class StakerComponent {
     newStakerDnpName,
     dockerNetworkName,
     compatibleClients,
-    serviceRegexAliases,
+    dockerNetSvcAliasesMap,
     userSettings,
     prevClient,
   }: {
@@ -107,10 +102,7 @@ export class StakerComponent {
           minVersion: string;
         }[]
       | null;
-    serviceRegexAliases: {
-      regex: RegExp;
-      alias: string;
-    }[];
+    dockerNetSvcAliasesMap: Record<string, { regex: RegExp; alias: string }[]>;
     userSettings?: UserSettingsAllDnps;
     prevClient?: string | null;
   }): Promise<void> {
@@ -138,8 +130,7 @@ export class StakerComponent {
     // set staker config
     await this.setStakerPkgConfig(
       newStakerDnpName,
-      dockerNetworkName,
-      serviceRegexAliases,
+      dockerNetSvcAliasesMap,
       userSettings
     );
   }
@@ -153,11 +144,7 @@ export class StakerComponent {
    */
   private async setStakerPkgConfig(
     dnpName: string,
-    dockerNetworkName: string,
-    serviceRegexAliases: {
-      regex: RegExp;
-      alias: string;
-    }[],
+    dockerNetSvcAliasesMap: Record<string, { regex: RegExp; alias: string }[]>,
     userSettings?: UserSettingsAllDnps
   ): Promise<void> {
     // ensure pkg installed
@@ -176,11 +163,7 @@ export class StakerComponent {
     });
 
     // add staker network to the compose file
-    this.addStakerNetworkToCompose(
-      pkg.dnpName,
-      dockerNetworkName,
-      serviceRegexAliases
-    );
+    this.addStakerNetworkToCompose(pkg.dnpName, dockerNetSvcAliasesMap);
 
     // start all containers
     //if (!pkg.containers.some((c) => c.running))
@@ -192,69 +175,71 @@ export class StakerComponent {
    */
   private addStakerNetworkToCompose(
     dnpName: string,
-    dockerNetworkName: string,
-    serviceRegexAliases: {
-      regex: RegExp;
-      alias: string;
-    }[]
+    dockerNetSvcAliasesMap: Record<string, { regex: RegExp; alias: string }[]>
   ): void {
-    // add to compose network
     const compose = new ComposeFileEditor(dnpName, false);
-    const stakerNetwork = compose.compose.networks?.[dockerNetworkName];
-    if (!stakerNetwork) {
-      compose.compose.networks = {
-        ...compose.compose.networks,
-        [dockerNetworkName]: {
-          external: true,
-        },
-      };
-      compose.write();
-    }
 
-    // add to compose service network
-    for (const [serviceName, service] of Object.entries(
-      compose.compose.services
+    for (const [dockerNetworkName, serviceRegexAliases] of Object.entries(
+      dockerNetSvcAliasesMap
     )) {
-      const composeService = new ComposeFileEditor(dnpName, false);
-
-      // network declared in array format is not supported
-      if (Array.isArray(service.networks)) {
-        logs.warn(
-          `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
-        );
-        continue;
+      // add to compose network
+      const stakerNetwork = compose.compose.networks?.[dockerNetworkName];
+      if (!stakerNetwork) {
+        compose.compose.networks = {
+          ...compose.compose.networks,
+          [dockerNetworkName]: {
+            external: true,
+          },
+        };
+        compose.write();
       }
 
-      const stakerServiceNetwork = service.networks?.[dockerNetworkName];
-      const aliases = serviceRegexAliases
-        .filter(({ regex }) => regex.test(serviceName))
-        .map(({ alias }) => alias);
+      // add to compose service network
+      for (const [serviceName, service] of Object.entries(
+        compose.compose.services
+      )) {
+        const composeService = new ComposeFileEditor(dnpName, false);
 
-      if (aliases.length === 0)
-        aliases.push(`${serviceName}.${dockerNetworkName}.dappnode`);
+        // network declared in array format is not supported
+        if (Array.isArray(service.networks)) {
+          logs.warn(
+            `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
+          );
+          continue;
+        }
 
-      if (!stakerServiceNetwork) {
-        composeService
-          .services()
-          // eslint-disable-next-line no-unexpected-multiline
-          [serviceName].addNetwork(dockerNetworkName, {
-            aliases: aliases,
-          });
-        composeService.write();
-      } else {
-        // check the aliases are included in the existing service network aliases if not add them
-        const existingAliases = stakerServiceNetwork.aliases || [];
-        const newAliases = aliases.filter(
-          (alias) => !existingAliases.includes(alias)
-        );
-        if (newAliases.length > 0) {
+        const stakerServiceNetwork = service.networks?.[dockerNetworkName];
+        const aliases = serviceRegexAliases
+          .filter(({ regex }) => regex.test(serviceName))
+          .map(({ alias }) => alias);
+
+        if (aliases.length === 0) {
+          aliases.push(`${serviceName}.${dockerNetworkName}.dappnode`);
+        }
+
+        if (!stakerServiceNetwork) {
           composeService
             .services()
             // eslint-disable-next-line no-unexpected-multiline
             [serviceName].addNetwork(dockerNetworkName, {
-              aliases: existingAliases.concat(newAliases),
+              aliases: aliases,
             });
           composeService.write();
+        } else {
+          // check the aliases are included in the existing service network aliases if not add them
+          const existingAliases = stakerServiceNetwork.aliases || [];
+          const newAliases = aliases.filter(
+            (alias) => !existingAliases.includes(alias)
+          );
+          if (newAliases.length > 0) {
+            composeService
+              .services()
+              // eslint-disable-next-line no-unexpected-multiline
+              [serviceName].addNetwork(dockerNetworkName, {
+                aliases: existingAliases.concat(newAliases),
+              });
+            composeService.write();
+          }
         }
       }
     }

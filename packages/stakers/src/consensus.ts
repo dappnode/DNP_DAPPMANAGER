@@ -14,6 +14,8 @@ import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
+// TODO: move ethereumClient logic here
+
 export class Consensus extends StakerComponent {
   readonly DbHandlers: Record<
     Network,
@@ -93,8 +95,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        params.DOCKER_STAKER_NETWORKS[network],
-        this.getServiceRegexAliasesMap(network),
+        this.getDockerNetSvcAliasesMap(network),
         this.getConsensusUserSettings(currentConsensusDnpName, network)
       );
   }
@@ -106,7 +107,7 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
+      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });
@@ -187,18 +188,32 @@ export class Consensus extends StakerComponent {
       : "";
   }
 
-  private getServiceRegexAliasesMap(
+  private getDockerNetSvcAliasesMap(
     network: Network
-  ): { regex: RegExp; alias: string }[] {
-    return [
-      {
-        regex: /(beacon|beacon-chain)/,
-        alias: `beacon-chain.${network}.staker.dappnode`,
-      },
-      {
-        regex: /(validator)/,
-        alias: `validator.${network}.staker.dappnode`,
-      },
-    ];
+  ): Record<string, { regex: RegExp; alias: string }[]> {
+    const beaconRegex = /(beacon)/;
+    const validatorRegex = /(validator)/;
+    return {
+      [params.DOCKER_STAKER_NETWORKS[network]]: [
+        {
+          regex: beaconRegex,
+          alias: `beacon-chain.${network}.staker.dappnode`,
+        },
+        {
+          regex: validatorRegex,
+          alias: `validator.${network}.staker.dappnode`,
+        },
+      ],
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
+        {
+          regex: beaconRegex,
+          alias: `beacon-chain.${network}.dncore.dappnode`,
+        },
+        {
+          regex: validatorRegex,
+          alias: `validator.${network}.dncore.dappnode`,
+        },
+      ],
+    };
   }
 }
