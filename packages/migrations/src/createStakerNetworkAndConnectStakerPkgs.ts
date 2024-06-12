@@ -1,7 +1,7 @@
 import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { Execution, Consensus } from "@dappnode/stakers";
+import { Execution, Consensus, Signer, MevBoost } from "@dappnode/stakers";
 import { Network } from "@dappnode/types";
 
 /**
@@ -9,13 +9,17 @@ import { Network } from "@dappnode/types";
  */
 export async function createStakerNetworkAndConnectStakerPkgs(
   execution: Execution,
-  consensus: Consensus
+  consensus: Consensus,
+  signer: Signer,
+  mevBoost: MevBoost
 ): Promise<void> {
   for (const network of Object.values(Network)) {
     await createDockerStakerNetwork(params.DOCKER_STAKER_NETWORKS[network]);
     await Promise.all([
       await execution.persistSelectedExecutionIfInstalled(network),
       await consensus.persistSelectedConsensusIfInstalled(network),
+      await signer.persistSignerIfInstalledAndRunning(network),
+      await mevBoost.persistMevBoostIfInstalledAndRunning(network),
     ]);
   }
 }

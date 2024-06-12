@@ -11,7 +11,7 @@ import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
-import { Consensus, Execution } from "@dappnode/stakers";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 export class MigrationError extends Error {
   migration: string;
@@ -31,7 +31,9 @@ export class MigrationError extends Error {
  */
 export async function executeMigrations(
   execution: Execution,
-  consensus: Consensus
+  consensus: Consensus,
+  signer: Signer,
+  mevBoost: MevBoost
 ): Promise<void> {
   const migrationErrors: MigrationError[] = [];
 
@@ -143,15 +145,19 @@ export async function executeMigrations(
     })
   );
 
-  await createStakerNetworkAndConnectStakerPkgs(execution, consensus).catch(
-    (e) =>
-      migrationErrors.push({
-        migration:
-          "create docker staker network and persist selected staker pkgs per network",
-        coreVersion: "0.2.95",
-        name: "MIGRATION_ERROR",
-        message: e,
-      })
+  await createStakerNetworkAndConnectStakerPkgs(
+    execution,
+    consensus,
+    signer,
+    mevBoost
+  ).catch((e) =>
+    migrationErrors.push({
+      migration:
+        "create docker staker network and persist selected staker pkgs per network",
+      coreVersion: "0.2.95",
+      name: "MIGRATION_ERROR",
+      message: e,
+    })
   );
 
   if (migrationErrors.length > 0) throw migrationErrors;

@@ -15,7 +15,6 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
 export class Consensus extends StakerComponent {
-  protected static readonly BelongsToStakerNetwork = true;
   readonly DbHandlers: Record<
     Network,
     {
@@ -95,9 +94,8 @@ export class Consensus extends StakerComponent {
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
         params.DOCKER_STAKER_NETWORKS[network],
-        Consensus.BelongsToStakerNetwork,
-        this.getConsensusUserSettings(currentConsensusDnpName, network),
-        currentConsensusDnpName
+        this.getServiceRegexAliasesMap(network),
+        this.getConsensusUserSettings(currentConsensusDnpName, network)
       );
   }
 
@@ -108,7 +106,7 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      belongsToStakerNetwork: Consensus.BelongsToStakerNetwork,
+      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });
@@ -187,5 +185,20 @@ export class Consensus extends StakerComponent {
         ? "beacon-validator"
         : "beacon-chain"
       : "";
+  }
+
+  private getServiceRegexAliasesMap(
+    network: Network
+  ): { regex: RegExp; alias: string }[] {
+    return [
+      {
+        regex: /(beacon|beacon-chain)/,
+        alias: `beacon-chain.${network}.staker.dappnode`,
+      },
+      {
+        regex: /(validator)/,
+        alias: `validator.${network}.staker.dappnode`,
+      },
+    ];
   }
 }

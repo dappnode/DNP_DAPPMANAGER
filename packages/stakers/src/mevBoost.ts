@@ -13,7 +13,6 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
 export class MevBoost extends StakerComponent {
-  protected static readonly BelongsToStakerNetwork = false;
   readonly DbHandlers: Record<
     Network,
     { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }
@@ -75,6 +74,24 @@ export class MevBoost extends StakerComponent {
     return relays;
   }
 
+  async persistMevBoostIfInstalledAndRunning(network: Network): Promise<void> {
+    const currentMevBoostDnpName =
+      MevBoost.CompatibleMevBoost[network]?.dnpName;
+    if (
+      currentMevBoostDnpName &&
+      (
+        await listPackageNoThrow({
+          dnpName: currentMevBoostDnpName,
+        })
+      )?.containers.some((container) => container.running)
+    )
+      await this.persistSelectedIfInstalled(
+        currentMevBoostDnpName,
+        params.DOCKER_STAKER_NETWORKS[network],
+        this.getServiceRegexAliasesMap(network)
+      );
+  }
+
   async setNewMevBoost(
     network: Network,
     newMevBoostDnpName: string | null,
@@ -85,7 +102,7 @@ export class MevBoost extends StakerComponent {
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
-      belongsToStakerNetwork: MevBoost.BelongsToStakerNetwork,
+      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
       userSettings: this.getMevBoostNewUserSettings(
         newMevBoostDnpName,
         newRelays
@@ -116,5 +133,16 @@ export class MevBoost extends StakerComponent {
           },
         }
       : {};
+  }
+
+  private getServiceRegexAliasesMap(
+    network: Network
+  ): { regex: RegExp; alias: string }[] {
+    return [
+      {
+        regex: /(mev|mev-boost|mevboost)/,
+        alias: `mev-boost.${network}.staker.dappnode`,
+      },
+    ];
   }
 }

@@ -76,16 +76,18 @@ export class StakerComponent {
   protected async persistSelectedIfInstalled(
     dnpName: string,
     dockerNetworkName: string,
-    belongsToStakerNetwork: boolean,
-    userSettings: UserSettingsAllDnps,
-    executionFullnodeAlias?: string
+    serviceRegexAliases: {
+      regex: RegExp;
+      alias: string;
+    }[],
+    userSettings?: UserSettingsAllDnps
   ): Promise<void> {
+    console.log("persisting: ", dnpName);
     await this.setStakerPkgConfig(
       dnpName,
-      belongsToStakerNetwork,
       dockerNetworkName,
-      userSettings,
-      executionFullnodeAlias
+      serviceRegexAliases,
+      userSettings
     );
   }
 
@@ -93,8 +95,7 @@ export class StakerComponent {
     newStakerDnpName,
     dockerNetworkName,
     compatibleClients,
-    belongsToStakerNetwork,
-    executionFullnodeAlias,
+    serviceRegexAliases,
     userSettings,
     prevClient,
   }: {
@@ -106,8 +107,10 @@ export class StakerComponent {
           minVersion: string;
         }[]
       | null;
-    belongsToStakerNetwork: boolean;
-    executionFullnodeAlias?: string;
+    serviceRegexAliases: {
+      regex: RegExp;
+      alias: string;
+    }[];
     userSettings?: UserSettingsAllDnps;
     prevClient?: string | null;
   }): Promise<void> {
@@ -128,21 +131,16 @@ export class StakerComponent {
           currentPkg.version
         );
       if (prevClient !== newStakerDnpName)
-        await this.unsetStakerPkgConfig(
-          currentPkg,
-          dockerNetworkName,
-          belongsToStakerNetwork
-        );
+        await this.unsetStakerPkgConfig(currentPkg, dockerNetworkName);
     }
 
     if (!newStakerDnpName) return;
     // set staker config
     await this.setStakerPkgConfig(
       newStakerDnpName,
-      belongsToStakerNetwork,
       dockerNetworkName,
-      userSettings,
-      executionFullnodeAlias
+      serviceRegexAliases,
+      userSettings
     );
   }
 
@@ -155,10 +153,12 @@ export class StakerComponent {
    */
   private async setStakerPkgConfig(
     dnpName: string,
-    belongsToStakerNetwork: boolean,
     dockerNetworkName: string,
-    userSettings?: UserSettingsAllDnps,
-    executionFullnodeAlias?: string | null
+    serviceRegexAliases: {
+      regex: RegExp;
+      alias: string;
+    }[],
+    userSettings?: UserSettingsAllDnps
   ): Promise<void> {
     // ensure pkg installed
     if (
@@ -176,16 +176,14 @@ export class StakerComponent {
     });
 
     // add staker network to the compose file
-    if (belongsToStakerNetwork)
-      this.addStakerNetworkToCompose(
-        pkg.dnpName,
-        dockerNetworkName,
-        executionFullnodeAlias
-      );
+    this.addStakerNetworkToCompose(
+      pkg.dnpName,
+      dockerNetworkName,
+      serviceRegexAliases
+    );
 
     // start all containers
-    // docker will automatically recreate those containers with changes in the compose file
-    // this applies to the staker network addition
+    //if (!pkg.containers.some((c) => c.running))
     await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
   }
 
@@ -195,7 +193,10 @@ export class StakerComponent {
   private addStakerNetworkToCompose(
     dnpName: string,
     dockerNetworkName: string,
-    alias?: string | null
+    serviceRegexAliases: {
+      regex: RegExp;
+      alias: string;
+    }[]
   ): void {
     // add to compose network
     const compose = new ComposeFileEditor(dnpName, false);
@@ -209,11 +210,13 @@ export class StakerComponent {
       };
       compose.write();
     }
+
     // add to compose service network
     for (const [serviceName, service] of Object.entries(
       compose.compose.services
     )) {
       const composeService = new ComposeFileEditor(dnpName, false);
+
       // network declared in array format is not supported
       if (Array.isArray(service.networks)) {
         logs.warn(
@@ -221,16 +224,38 @@ export class StakerComponent {
         );
         continue;
       }
+
       const stakerServiceNetwork = service.networks?.[dockerNetworkName];
+      const aliases = serviceRegexAliases
+        .filter(({ regex }) => regex.test(serviceName))
+        .map(({ alias }) => alias);
+
+      if (aliases.length === 0)
+        aliases.push(`${serviceName}.${dockerNetworkName}.dappnode`);
 
       if (!stakerServiceNetwork) {
         composeService
           .services()
           // eslint-disable-next-line no-unexpected-multiline
           [serviceName].addNetwork(dockerNetworkName, {
-            aliases: alias ? [alias] : [],
+            aliases: aliases,
           });
         composeService.write();
+      } else {
+        // check the aliases are included in the existing service network aliases if not add them
+        const existingAliases = stakerServiceNetwork.aliases || [];
+        const newAliases = aliases.filter(
+          (alias) => !existingAliases.includes(alias)
+        );
+        if (newAliases.length > 0) {
+          composeService
+            .services()
+            // eslint-disable-next-line no-unexpected-multiline
+            [serviceName].addNetwork(dockerNetworkName, {
+              aliases: existingAliases.concat(newAliases),
+            });
+          composeService.write();
+        }
       }
     }
   }
@@ -243,21 +268,18 @@ export class StakerComponent {
    */
   private async unsetStakerPkgConfig(
     pkg: InstalledPackageData,
-    dockerNetworkName: string,
-    belongsToStakerNetwork: boolean
+    dockerNetworkName: string
   ): Promise<void> {
     // disconnect pkg from staker network
-    if (belongsToStakerNetwork)
-      await this.disconnectConnectedPkgFromStakerNetwork(
-        dockerNetworkName,
-        pkg.containers
-      );
+    await this.disconnectConnectedPkgFromStakerNetwork(
+      dockerNetworkName,
+      pkg.containers
+    );
 
     // stop all containers
     await this.stopAllPkgContainers(pkg);
     // remove staker network from the compose file
-    if (belongsToStakerNetwork)
-      this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
+    this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
   }
 
   private async disconnectConnectedPkgFromStakerNetwork(

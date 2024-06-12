@@ -10,9 +10,11 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { params } from "@dappnode/params";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 export class Signer extends StakerComponent {
-  protected static readonly BelongsToStakerNetwork = false;
+  protected static readonly ServiceAliasesMap: Record<string, string[]> = {};
+
   protected static readonly CompatibleSigners: Record<
     Network,
     { dnpName: string; minVersion: string }
@@ -50,13 +52,39 @@ export class Signer extends StakerComponent {
     });
   }
 
+  async persistSignerIfInstalledAndRunning(network: Network): Promise<void> {
+    if (
+      (
+        await listPackageNoThrow({
+          dnpName: Signer.CompatibleSigners[network].dnpName,
+        })
+      )?.containers.some((container) => container.running)
+    )
+      await this.persistSelectedIfInstalled(
+        Signer.CompatibleSigners[network].dnpName,
+        params.DOCKER_STAKER_NETWORKS[network],
+        this.getServiceRegexAliasesMap(network)
+      );
+  }
+
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
     await super.setNew({
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: [Signer.CompatibleSigners[network]],
-      belongsToStakerNetwork: Signer.BelongsToStakerNetwork,
+      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
       prevClient: Signer.CompatibleSigners[network].dnpName,
     });
+  }
+
+  private getServiceRegexAliasesMap(
+    network: Network
+  ): { regex: RegExp; alias: string }[] {
+    return [
+      {
+        regex: /(signer|web3signer)/,
+        alias: `signer.${network}.staker.dappnode`,
+      },
+    ];
   }
 }

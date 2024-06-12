@@ -14,7 +14,6 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
 export class Execution extends StakerComponent {
-  protected static readonly BelongsToStakerNetwork = true;
   readonly DbHandlers: Record<
     Network,
     {
@@ -82,9 +81,7 @@ export class Execution extends StakerComponent {
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
         params.DOCKER_STAKER_NETWORKS[network],
-        Execution.BelongsToStakerNetwork,
-        {},
-        currentExecutionDnpName
+        this.getServiceRegexAliasesMap(network)
       );
   }
 
@@ -95,8 +92,7 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      belongsToStakerNetwork: Execution.BelongsToStakerNetwork,
-      executionFullnodeAlias: `execution.${network}.staker.dappnode`,
+      serviceRegexAliases: this.getServiceRegexAliasesMap(network),
       prevClient: prevExecClientDnpName,
     });
 
@@ -110,5 +106,16 @@ export class Execution extends StakerComponent {
         prevExecClientDnpName: prevExecClientDnpName || "",
       });
     }
+  }
+
+  private getServiceRegexAliasesMap(
+    network: Network
+  ): { regex: RegExp; alias: string }[] {
+    return [
+      {
+        regex: /(geth|nethermind|erigon|besu|reth|execution)/,
+        alias: `execution.${network}.staker.dappnode`,
+      },
+    ];
   }
 }
