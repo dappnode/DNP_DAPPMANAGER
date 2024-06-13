@@ -26,10 +26,6 @@ describe("ethForward > resolveDomain", () => {
       "mycrypto.dappnode.eth": {
         location: "ipfs",
         hash: "Qmdojo8KAsZu7XTkETYwSiZMCjdUa58YNZCUKmsZ21i8gV"
-      },
-      "testing.dnp.dappnode.eth": {
-        location: "ipfs",
-        hash: "QmNkxf4oPYjg1Urd3xmjbbHanTiXS3ebkKq3hpjcYpALHx"
       }
     };
 
