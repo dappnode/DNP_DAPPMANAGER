@@ -1,4 +1,5 @@
 import {
+  ComposeServiceNetworksObj,
   ConsensusClientGnosis,
   ConsensusClientHolesky,
   ConsensusClientLukso,
@@ -95,7 +96,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getDockerNetSvcAliasesMap(network),
+        this.getNetworkConfigsToAdd(network),
         this.getConsensusUserSettings(currentConsensusDnpName, network)
       );
   }
@@ -107,7 +108,7 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
+      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });
@@ -188,32 +189,26 @@ export class Consensus extends StakerComponent {
       : "";
   }
 
-  private getDockerNetSvcAliasesMap(
-    network: Network
-  ): Record<string, { regex: RegExp; alias: string }[]> {
-    const beaconRegex = /(beacon)/;
-    const validatorRegex = /(validator)/;
+  private getNetworkConfigsToAdd(network: Network): {
+    [serviceName: string]: ComposeServiceNetworksObj;
+  } {
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: [
-        {
-          regex: beaconRegex,
-          alias: `beacon-chain.${network}.staker.dappnode`,
+      ["beacon-chain"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`beacon-chain.${network}.staker.dappnode`],
         },
-        {
-          regex: validatorRegex,
-          alias: `validator.${network}.staker.dappnode`,
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`beacon-chain.${network}.dncore.dappnode`],
         },
-      ],
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
-        {
-          regex: beaconRegex,
-          alias: `beacon-chain.${network}.dncore.dappnode`,
+      },
+      ["validator"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`validator.${network}.staker.dappnode`],
         },
-        {
-          regex: validatorRegex,
-          alias: `validator.${network}.dncore.dappnode`,
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`validator.${network}.dncore.dappnode`],
         },
-      ],
+      },
     };
   }
 }

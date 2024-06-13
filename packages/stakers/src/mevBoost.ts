@@ -1,4 +1,5 @@
 import {
+  ComposeServiceNetworksObj,
   MevBoostHolesky,
   MevBoostMainnet,
   MevBoostPrater,
@@ -87,7 +88,7 @@ export class MevBoost extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
-        this.getDockerNetSvcAliasesMap(network)
+        this.getNetworkConfigsToAdd(network)
       );
   }
 
@@ -101,7 +102,7 @@ export class MevBoost extends StakerComponent {
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
-      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
+      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
       userSettings: this.getMevBoostNewUserSettings(
         newMevBoostDnpName,
         newRelays
@@ -134,23 +135,18 @@ export class MevBoost extends StakerComponent {
       : {};
   }
 
-  private getDockerNetSvcAliasesMap(
-    network: Network
-  ): Record<string, { regex: RegExp; alias: string }[]> {
-    const regex = /(mev|mev-boost|mevboost)/;
+  private getNetworkConfigsToAdd(network: Network): {
+    [serviceName: string]: ComposeServiceNetworksObj;
+  } {
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: [
-        {
-          regex: regex,
-          alias: `mev-boost.${network}.staker.dappnode`,
+      ["mev-boost"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`mev-boost.${network}.staker.dappnode`],
         },
-      ],
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
-        {
-          regex: regex,
-          alias: `mev-boost.${network}.dncore.dappnode`,
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`mev-boost.${network}.dncore.dappnode`],
         },
-      ],
+      },
     };
   }
 }
