@@ -284,28 +284,27 @@ export class StakerComponent {
     dnpName: string,
     dockerNetworkName: string
   ): void {
-    // remove from compose network
-    const compose = new ComposeFileEditor(dnpName, false);
-    delete compose.compose.networks?.[dockerNetworkName];
-    compose.write();
-    // remove from compose service network
-    for (const [serviceName, service] of Object.entries(
-      compose.compose.services
-    )) {
-      const composeService = new ComposeFileEditor(dnpName, false);
-      // network declared in array format is not supported
-      if (Array.isArray(service.networks)) {
-        logs.warn(
-          `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
+    const composeEditor = new ComposeFileEditor(dnpName, false);
+    const services = composeEditor.compose.services;
+
+    // Remove network from root level
+    delete composeEditor.compose.networks?.[dockerNetworkName];
+
+    for (const [, service] of Object.entries(services)) {
+      const serviceNetworks = service.networks;
+
+      if (!serviceNetworks) continue;
+
+      // Array case
+      if (Array.isArray(serviceNetworks))
+        service.networks = serviceNetworks.filter(
+          (network) => network !== dockerNetworkName
         );
-        continue;
-      }
-      composeService
-        .services()
-        // eslint-disable-next-line no-unexpected-multiline
-        [serviceName].removeNetwork(dockerNetworkName);
-      composeService.write();
+      // ComposeServiceNetworksObj case
+      else delete serviceNetworks[dockerNetworkName];
     }
+
+    composeEditor.write();
   }
 
   private ensureSetRequirements(
