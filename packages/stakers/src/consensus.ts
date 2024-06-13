@@ -1,4 +1,5 @@
 import {
+  ComposeServiceNetworksObj,
   ConsensusClientGnosis,
   ConsensusClientHolesky,
   ConsensusClientLukso,
@@ -24,12 +25,12 @@ export class Consensus extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.consensusClientMainnet,
-    [Network.Gnosis]: db.consensusClientGnosis,
-    [Network.Prater]: db.consensusClientPrater,
-    [Network.Holesky]: db.consensusClientHolesky,
-    [Network.Lukso]: db.consensusClientLukso,
-  };
+      [Network.Mainnet]: db.consensusClientMainnet,
+      [Network.Gnosis]: db.consensusClientGnosis,
+      [Network.Prater]: db.consensusClientPrater,
+      [Network.Holesky]: db.consensusClientHolesky,
+      [Network.Lukso]: db.consensusClientLukso,
+    };
   protected static readonly DefaultCheckpointSync: Record<Network, string> = {
     [Network.Mainnet]: "https://checkpoint-sync.dappnode.io",
     [Network.Prater]: "https://checkpoint-sync-prater.dappnode.io",
@@ -41,38 +42,38 @@ export class Consensus extends StakerComponent {
     Network,
     { dnpName: string; minVersion: string }[]
   > = {
-    [Network.Mainnet]: [
-      { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
-      { dnpName: ConsensusClientMainnet.Lighthouse, minVersion: "1.0.3" },
-      { dnpName: ConsensusClientMainnet.Teku, minVersion: "2.0.4" },
-      { dnpName: ConsensusClientMainnet.Nimbus, minVersion: "1.0.5" },
-      { dnpName: ConsensusClientMainnet.Lodestar, minVersion: "0.1.0" },
-    ],
-    [Network.Gnosis]: [
-      { dnpName: ConsensusClientGnosis.Lighthouse, minVersion: "0.1.5" },
-      { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
-      { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
-      { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" },
-    ],
-    [Network.Prater]: [
-      { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
-      { dnpName: ConsensusClientPrater.Lighthouse, minVersion: "0.1.9" },
-      { dnpName: ConsensusClientPrater.Teku, minVersion: "0.1.10" },
-      { dnpName: ConsensusClientPrater.Nimbus, minVersion: "0.1.7" },
-      { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" },
-    ],
-    [Network.Holesky]: [
-      { dnpName: ConsensusClientHolesky.Lighthouse, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Prysm, minVersion: "0.1.3" },
-      { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" },
-    ],
-    [Network.Lukso]: [
-      { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
-      { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" },
-    ],
-  };
+      [Network.Mainnet]: [
+        { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
+        { dnpName: ConsensusClientMainnet.Lighthouse, minVersion: "1.0.3" },
+        { dnpName: ConsensusClientMainnet.Teku, minVersion: "2.0.4" },
+        { dnpName: ConsensusClientMainnet.Nimbus, minVersion: "1.0.5" },
+        { dnpName: ConsensusClientMainnet.Lodestar, minVersion: "0.1.0" },
+      ],
+      [Network.Gnosis]: [
+        { dnpName: ConsensusClientGnosis.Lighthouse, minVersion: "0.1.5" },
+        { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
+        { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
+        { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" },
+      ],
+      [Network.Prater]: [
+        { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
+        { dnpName: ConsensusClientPrater.Lighthouse, minVersion: "0.1.9" },
+        { dnpName: ConsensusClientPrater.Teku, minVersion: "0.1.10" },
+        { dnpName: ConsensusClientPrater.Nimbus, minVersion: "0.1.7" },
+        { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" },
+      ],
+      [Network.Holesky]: [
+        { dnpName: ConsensusClientHolesky.Lighthouse, minVersion: "0.1.2" },
+        { dnpName: ConsensusClientHolesky.Prysm, minVersion: "0.1.3" },
+        { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
+        { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
+        { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" },
+      ],
+      [Network.Lukso]: [
+        { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
+        { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" },
+      ],
+    };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
     super(dappnodeInstaller);
@@ -95,7 +96,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getDockerNetSvcAliasesMap(network),
+        this.getNetworkConfigToAdd(network),
         this.getConsensusUserSettings(currentConsensusDnpName, network)
       );
   }
@@ -107,7 +108,7 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
+      netConfigsToAdd: this.getNetworkConfigToAdd(network),
       userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
       prevClient: prevConsClientDnpName,
     });
@@ -127,38 +128,38 @@ export class Consensus extends StakerComponent {
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
     return newConsensusDnpName
       ? {
-          [newConsensusDnpName]: {
-            environment:
-              beaconServiceName === validatorServiceName
-                ? {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
-                  }
-                : {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                    },
+        [newConsensusDnpName]: {
+          environment:
+            beaconServiceName === validatorServiceName
+              ? {
+                [validatorServiceName]: {
+                  // Fee recipient is set as global env, keep this for backwards compatibility
+                  ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
+                  // Graffiti is a mandatory value
+                  ["GRAFFITI"]: defaultDappnodeGraffiti,
+                  // Checkpoint sync is an optional value
+                  ["CHECKPOINT_SYNC_URL"]:
+                    Consensus.DefaultCheckpointSync[network],
+                },
+              }
+              : {
+                [validatorServiceName]: {
+                  // Fee recipient is set as global env, keep this for backwards compatibility
+                  ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                  // Graffiti is a mandatory value
+                  ["GRAFFITI"]: defaultDappnodeGraffiti,
+                },
 
-                    [beaconServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
-                  },
-          },
-        }
+                [beaconServiceName]: {
+                  // Fee recipient is set as global env, keep this for backwards compatibility
+                  ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                  // Checkpoint sync is an optional value
+                  ["CHECKPOINT_SYNC_URL"]:
+                    Consensus.DefaultCheckpointSync[network],
+                },
+              },
+        },
+      }
       : {};
   }
 
@@ -188,32 +189,27 @@ export class Consensus extends StakerComponent {
       : "";
   }
 
-  private getDockerNetSvcAliasesMap(
+  private getNetworkConfigToAdd(
     network: Network
-  ): Record<string, { regex: RegExp; alias: string }[]> {
-    const beaconRegex = /(beacon)/;
-    const validatorRegex = /(validator)/;
+  ): { [serviceName: string]: ComposeServiceNetworksObj } {
+
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: [
-        {
-          regex: beaconRegex,
-          alias: `beacon-chain.${network}.staker.dappnode`,
+      ["beacon"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`beacon-chain.${network}.staker.dappnode`],
         },
-        {
-          regex: validatorRegex,
-          alias: `validator.${network}.staker.dappnode`,
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`beacon-chain.${network}.dncore.dappnode`],
+        }
+      },
+      ["validator"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`validator.${network}.staker.dappnode`],
         },
-      ],
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
-        {
-          regex: beaconRegex,
-          alias: `beacon-chain.${network}.dncore.dappnode`,
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`validator.${network}.dncore.dappnode`],
         },
-        {
-          regex: validatorRegex,
-          alias: `validator.${network}.dncore.dappnode`,
-        },
-      ],
-    };
+      }
+    }
   }
 }
