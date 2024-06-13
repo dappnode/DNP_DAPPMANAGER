@@ -27,9 +27,9 @@ describe("ethForward > resolveDomain", () => {
         location: "ipfs",
         hash: "Qmdojo8KAsZu7XTkETYwSiZMCjdUa58YNZCUKmsZ21i8gV"
       },
-      "eth2dai.eduadiez.eth": {
+      "testing.dnp.dappnode.eth": {
         location: "ipfs",
-        hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
+        hash: "QmNkxf4oPYjg1Urd3xmjbbHanTiXS3ebkKq3hpjcYpALHx"
       }
     };
 
