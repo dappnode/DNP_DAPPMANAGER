@@ -1,4 +1,5 @@
 import {
+  ComposeServiceNetworksObj,
   ExecutionClientGnosis,
   ExecutionClientHolesky,
   ExecutionClientLukso,
@@ -82,7 +83,7 @@ export class Execution extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
-        this.getDockerNetSvcAliasesMap(network)
+        this.getNetworkConfigToAdd(network)
       );
   }
 
@@ -93,7 +94,7 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
+      netConfigsToAdd: this.getNetworkConfigToAdd(network),
       prevClient: prevExecClientDnpName,
     });
 
@@ -109,23 +110,20 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private getDockerNetSvcAliasesMap(
+  private getNetworkConfigToAdd(
     network: Network
-  ): Record<string, { regex: RegExp; alias: string }[]> {
-    const regex = /(geth|nethermind|erigon|besu|reth|execution)/;
+  ): { [serviceName: string]: ComposeServiceNetworksObj } {
+
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: [
-        {
-          regex,
-          alias: `execution.${network}.staker.dappnode`,
+      // Execution clients are monoservice
+      [""]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`execution.${network}.staker.dappnode`],
         },
-      ],
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
-        {
-          regex,
-          alias: `execution.${network}.dncore.dappnode`,
-        },
-      ],
-    };
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`execution.${network}.dncore.dappnode`],
+        }
+      }
+    }
   }
 }

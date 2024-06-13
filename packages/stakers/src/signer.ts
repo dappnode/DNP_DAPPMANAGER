@@ -1,4 +1,5 @@
 import {
+  ComposeServiceNetworksObj,
   Network,
   SignerGnosis,
   SignerHolesky,
@@ -62,7 +63,7 @@ export class Signer extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         Signer.CompatibleSigners[network].dnpName,
-        this.getDockerNetSvcAliasesMap(network)
+        this.getNetworkConfigToAdd(network)
       );
   }
 
@@ -71,28 +72,24 @@ export class Signer extends StakerComponent {
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: [Signer.CompatibleSigners[network]],
-      dockerNetSvcAliasesMap: this.getDockerNetSvcAliasesMap(network),
+      netConfigsToAdd: this.getNetworkConfigToAdd(network),
       prevClient: Signer.CompatibleSigners[network].dnpName,
     });
   }
 
-  private getDockerNetSvcAliasesMap(
+  private getNetworkConfigToAdd(
     network: Network
-  ): Record<string, { regex: RegExp; alias: string }[]> {
-    const regex = /(signer|web3signer)/;
+  ): { [serviceName: string]: ComposeServiceNetworksObj } {
+
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: [
-        {
-          regex: regex,
-          alias: `signer.${network}.staker.dappnode`,
+      ["web3signer"]: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`signer.${network}.staker.dappnode`],
         },
-      ],
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: [
-        {
-          regex: regex,
-          alias: `signer.${network}.dncore.dappnode`,
-        },
-      ],
-    };
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`signer.${network}.dncore.dappnode`],
+        }
+      },
+    }
   }
 }

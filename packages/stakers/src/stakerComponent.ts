@@ -28,7 +28,7 @@ import {
   fileToGatewayUrl,
 } from "@dappnode/utils";
 import { lt } from "semver";
-import { merge } from "lodash";
+import _ from "lodash";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -201,12 +201,12 @@ export class StakerComponent {
 
       // Merge networkConfig into service.networks without removing existing aliases
       service.networks = service.networks || {};
-      merge(service.networks, networkConfig);
+      _.merge(service.networks, networkConfig);
 
       // Ensure all networks are added to the root level
       const serviceNetworkNames = Object.keys(networkConfig);
 
-      for (const [networkName] of serviceNetworkNames) {
+      for (const networkName of serviceNetworkNames) {
         if (!rootNetworks[networkName]) {
           rootNetworks[networkName] = {
             external: true
