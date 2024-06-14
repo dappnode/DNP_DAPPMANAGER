@@ -217,13 +217,11 @@ export class StakerComponent {
       // Ensure all networks are added to the root level
       const serviceNetworkNames = Object.keys(networkConfig);
 
-      for (const [networkName] of serviceNetworkNames) {
-        if (!rootNetworks[networkName]) {
+      for (const networkName of serviceNetworkNames)
+        if (!rootNetworks[networkName])
           rootNetworks[networkName] = {
             external: true,
           };
-        }
-      }
     }
 
     composeEditor.compose.networks = rootNetworks;
