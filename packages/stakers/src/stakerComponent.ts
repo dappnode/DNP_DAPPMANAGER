@@ -212,6 +212,7 @@ export class StakerComponent {
 
       // Merge networkConfig into service.networks without removing existing aliases
       service.networks = service.networks || {};
+      // TODO: consider using unique from lodash to merge array aliases
       merge(service.networks, networkConfig);
 
       // Ensure all networks are added to the root level
