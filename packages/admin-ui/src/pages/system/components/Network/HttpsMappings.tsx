@@ -175,7 +175,9 @@ export function HttpsMappings() {
               <Switch
                 checked={mapping.exposed}
                 onToggle={() =>
-                  mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
+                  mapping.exposed
+                    ? removeMapping(mapping)
+                    : addMapping({ ...mapping, external: false })
                 }
               />
             </React.Fragment>

@@ -17,6 +17,12 @@ export interface HttpPortalEntry {
    * `"validator-prysm"`, `"internal-docker-dns-based-host"`
    */
   toHost: string;
+  /**
+   *  Whether the mapping is external or not
+   * external=true makes the mapping accessible from everywhere
+   * external=false makes the mapping accessible only from the local network
+   */
+  external?: boolean;
 }
 
 export const httpsPortalResponseSchema = {
@@ -54,12 +60,18 @@ export class HttpsPortalApiClient {
    * GET /add?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async add({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
+  async add({
+    fromSubdomain,
+    toHost,
+    external = true,
+  }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
       to: toHost,
     });
-    await this.get(urlJoin(this.baseUrl, `/add?${search}`));
+    await this.get(
+      urlJoin(this.baseUrl, `/add?${search}&external=${external}`)
+    );
   }
 
   /**
@@ -84,9 +96,9 @@ export class HttpsPortalApiClient {
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
-    const entries = await this.get<{ from: string; to: string }[]>(
-      urlJoin(this.baseUrl, `/?format=json`)
-    );
+    const entries = await this.get<
+      { from: string; to: string; external: boolean }[]
+    >(urlJoin(this.baseUrl, `/?format=json`));
 
     if (!ajv.validate(httpsPortalResponseSchema, entries)) {
       throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
@@ -95,6 +107,7 @@ export class HttpsPortalApiClient {
     return entries.map((entry) => ({
       fromSubdomain: entry.from,
       toHost: entry.to,
+      external: entry.external,
     }));
   }
 
