@@ -604,6 +604,20 @@ export interface ChainData {
   help?: string; // External link to show as help if needed: "http://geth.help"
   progress?: number; // 0.83027522935
   peers?: number; // 10
+  wallet?: AddEthereumChainParameter; // https://eips.ethereum.org/EIPS/eip-3085
+}
+
+export interface AddEthereumChainParameter {
+  chainId: string;
+  blockExplorerUrls?: string[];
+  chainName?: string;
+  iconUrls?: string[];
+  nativeCurrency?: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
+  rpcUrls: string[];
 }
 
 /**
