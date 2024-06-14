@@ -7,5 +7,5 @@
  * @returns "http://ipfs.io/ipfs/Qm"
  */
 export function urlJoin(...args: string[]): string {
-  return args.join("/").replace(/(?<!\:)\/{2,}|\*/g, "$1");
+  return args.join("/").replace(/(?<!:)\/{2,}|\*/g, "$1");
 }
