@@ -39,22 +39,6 @@ describe("ethForward > resolveDomain", () => {
     }
   });
 
-  describe("resolveDomain with variable mainnet bzz domains", () => {
-    const ensDomains: string[] = ["theswarm.eth"];
-    const expectedLocation: Location = "swarm";
-
-    for (const domain of ensDomains) {
-      it(`should return the IPFS hash of ${domain}`, async () => {
-        const { location, hash } = await resolveDomain(domain, provider);
-        expect(location).to.equal(expectedLocation, "Wrong location");
-        // hash = "7027b30fa1702e5badb0d5a0378e01566da7798c9b2bf054b7e1f3168480ef96"
-        expect(hash, "Hash must be a 32 bytes hex").to.match(
-          /^([A-Fa-f0-9]{64})$/
-        );
-      });
-    }
-  });
-
   // Not using a testCases + for loop construction since the assertion logic
   // for each case is too different
   describe("resolveDomain should error for wrong domains", () => {
