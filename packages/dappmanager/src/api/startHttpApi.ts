@@ -29,7 +29,7 @@ import {
 } from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
 
-export interface HttpApiParams
+interface HttpApiParams
   extends ClientSideCookiesParams,
     AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
@@ -38,7 +38,7 @@ export interface HttpApiParams
   HTTP_CORS_WHITELIST: string[];
 }
 
-export interface HttpRoutes {
+interface HttpRoutes {
   containerLogs: RequestHandler<{ containerName: string }>;
   dataSend: RequestHandler;
   download: RequestHandler<{ fileId: string }>;

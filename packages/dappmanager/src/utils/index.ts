@@ -10,4 +10,3 @@ export {
   getAddressFromPrivateKey
 } from "./sign.js";
 export { validateBackupArray } from "./validateBackupArray.js";
-export { verifyXz } from "./verifyXz.js";

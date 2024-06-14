@@ -6,7 +6,7 @@ import ButtonBootstap, {
 import { joinCssClass } from "utils/css";
 import "./button.scss";
 
-export type ButtonType = "button" | "submit" | "reset" | undefined;
+type ButtonType = "button" | "submit" | "reset" | undefined;
 export type ButtonVariant =
   | "secondary"
   | "dappnode"

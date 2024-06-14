@@ -5,7 +5,6 @@ import { params } from "@dappnode/params";
 const adminUiUrl = `http://my.dappnode/`;
 const adminUiInstallUrl = `${adminUiUrl}/installer`;
 const adminUiPackagesUrl = `${adminUiUrl}/packages`;
-const ropstenName = "ropsten.dnp.dappnode.eth";
 const swarmName = "swarm.dnp.dappnode.eth";
 
 const a = (url: string, text?: string): string =>
@@ -30,15 +29,6 @@ export function noEth(e: Error): string {
   );
 }
 
-export function noRopsten(): string {
-  return base(
-    "Ropsten not installed",
-    `Please install the Ropsten DNP (DAppNode package) to resolve .test domains
-    <br />
-    ${a(`${adminUiInstallUrl}/${ropstenName}`, "Install Ropsten")}`
-  );
-}
-
 export function noSwarm(e: Error): string {
   return base(
     "Swarm not installed",
@@ -55,15 +45,6 @@ export function noIpfs(e: Error): string {
     `Make sure your IPFS node is available 
     ${a(`${adminUiPackagesUrl}/${params.ipfsDnpName}`, "IPFS status")}`,
     e
-  );
-}
-
-export function ethSyncing(): string {
-  return base(
-    "Page Not Available",
-    `Please wait until the chain is synced to browse decentralized webs
-    <br />
-    Go to the ${a(adminUiUrl, "Admin UI")} to check the sync status`
   );
 }
 

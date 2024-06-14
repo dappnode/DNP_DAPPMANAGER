@@ -24,7 +24,7 @@ import { upnpAvailable } from "./upnp.js";
 import { params } from "@dappnode/params";
 import { writeEnvFile } from "@dappnode/utils";
 
-export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
+const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
 
 /**
  * Compute global ENVs from DB values

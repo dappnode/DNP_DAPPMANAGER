@@ -43,8 +43,6 @@
     "@types/node": "^20.6.2",
     "@types/node-telegram-bot-api": "^0.64.6",
     "@types/semver": "^7.3.13",
-    "@types/systeminformation": "^3.54.1",
-    "rewiremock": "^3.13.7",
-    "sinon": "^5.0.10"
+    "@types/systeminformation": "^3.54.1"
   }
 }
