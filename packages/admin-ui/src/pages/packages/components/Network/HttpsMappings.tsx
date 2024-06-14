@@ -5,8 +5,6 @@ import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { getInstallerPath } from "pages/installer";
-//import { pathName as systemPathName } from "pages/system";
-//import { subPaths as systemSubPaths } from "pages/system/data";
 import { httpsPortalPath } from "pages/system/data";
 import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
@@ -169,10 +167,10 @@ export function HttpsMappings({
         <p>
           It recommended to only expose the pre-approved safe services listed in{" "}
           <NavLink to={httpsPortalPath}>
-            System - Network
+            System / Network
           </NavLink>
-          . Please, only add custom mappings manually if you understand the
-          security risks
+          . Please, only add custom mappings manually if you Fully understand the
+          security risks involved.
         </p>
 
         <div className="list-grid">
