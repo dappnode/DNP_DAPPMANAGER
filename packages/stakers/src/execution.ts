@@ -113,21 +113,17 @@ export class Execution extends StakerComponent {
   private getNetworkConfigsToAdd(network: Network): {
     [serviceName: string]: ComposeServiceNetworksObj;
   } {
-    const networkAliases = {
-      [params.DOCKER_STAKER_NETWORKS[network]]: {
-        aliases: [`execution.${network}.staker.dappnode`],
-      },
-      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-        aliases: [`execution.${network}.dncore.dappnode`],
-      },
-    };
     return {
-      execution: networkAliases,
-      geth: networkAliases,
-      besu: networkAliases,
-      erigon: networkAliases,
-      nethermind: networkAliases,
-      reth: networkAliases,
+      // TODO: be consistent with execution clients service names and do sanity check
+      // use empty string since the addConfigNetworkToCompose will use includes to check for the existance service AND the executions are MONOSERVICE
+      "": {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          aliases: [`execution.${network}.staker.dappnode`],
+        },
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          aliases: [`execution.${network}.dncore.dappnode`],
+        },
+      },
     };
   }
 }

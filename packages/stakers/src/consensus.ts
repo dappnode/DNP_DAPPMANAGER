@@ -193,7 +193,9 @@ export class Consensus extends StakerComponent {
     [serviceName: string]: ComposeServiceNetworksObj;
   } {
     return {
-      ["beacon-chain"]: {
+      // TODO: be consistent with consensus clients validator and beacon service names and do sanity check
+      // required until nimbus is splitted into 2 services
+      ["beacon"]: {
         [params.DOCKER_STAKER_NETWORKS[network]]: {
           aliases: [`beacon-chain.${network}.staker.dappnode`],
         },
