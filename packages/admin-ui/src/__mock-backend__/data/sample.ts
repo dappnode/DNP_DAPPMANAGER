@@ -22,6 +22,7 @@ export const sampleRequestState: RequestedDnp = {
   compatible: {
     requiresCoreUpdate: false,
     requiresDockerUpdate: false,
+    packagesToBeUninstalled: ["package-uncompatible.dnp.dappnode.eth"],
     resolving: false,
     isCompatible: true,
     error: "",
