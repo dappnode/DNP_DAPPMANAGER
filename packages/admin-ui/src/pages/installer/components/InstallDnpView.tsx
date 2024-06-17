@@ -86,6 +86,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   const hasPermissions = Object.values(permissions).some(p => p.length > 0);
   const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
   const requiresDockerUpdate = dnp.compatible.requiresDockerUpdate;
+  const packagesToBeUninstalled = dnp.compatible.packagesToBeUninstalled;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
 
@@ -201,7 +202,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   ].filter(option => option.available);
 
   const disableInstallation =
-    !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate;
+    !isEmpty(progressLogs) ||
+    requiresCoreUpdate ||
+    requiresDockerUpdate ||
+    packagesToBeUninstalled.length > 0;
 
   const setupSubPath = "setup";
   const permissionsSubPath = "permissions";
@@ -361,6 +365,20 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           <NavLink to={"/" + systemPathName + "/" + systemSubPaths.advanced}>
             <Button variant="danger">{"Navigate there"}</Button>
           </NavLink>
+        </div>
+      )}
+
+      {packagesToBeUninstalled.length > 0 && (
+        <div className="alert alert-danger">
+          <strong>{prettyDnpName(dnpName)}</strong> requires the following
+          packages to be uninstalled:{" "}
+          {packagesToBeUninstalled.map((pkg, i) => (
+            <span key={pkg}>
+              <strong>{pkg}</strong>
+              {i < packagesToBeUninstalled.length - 1 ? ", " : ""}
+            </span>
+          ))}{" "}
+          <strong>Uninstall them</strong> before continuing the installation.
         </div>
       )}
 
