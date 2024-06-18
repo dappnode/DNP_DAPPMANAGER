@@ -139,7 +139,7 @@ export class HttpsPortalApiClient {
    * @see https://nginx.org/en/docs/http/ngx_http_auth_basic_module.html
    * @param {string} params.username - The username.
    * @param {string} params.password - The password.
-   * @returns {Promise<string>} The htpasswd entry in the format `username:{SSHA}base64hash`.
+   * @returns {Promise<string>}`exampleUser:{SSHA}5ZCbZYs5Pn5T6Z9wXV5YWZRp+mgc0e3cLQFklHQbU3W5bg==`.
    */
   private async getHtpasswdEntry({
     username,
