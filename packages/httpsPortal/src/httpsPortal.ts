@@ -71,6 +71,7 @@ export class HttpsPortal {
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`,
+      auth: mapping.auth,
     });
 
     // Edit compose to persist the setting
@@ -144,7 +145,7 @@ export class HttpsPortal {
     }
 
     const mappings: HttpsPortalMapping[] = [];
-    for (const { fromSubdomain, toHost } of entries) {
+    for (const { fromSubdomain, toHost, auth } of entries) {
       const [alias, port] = toHost.split(":");
       const container = aliases.get(alias);
       if (container) {
@@ -153,6 +154,7 @@ export class HttpsPortal {
           dnpName: container.dnpName,
           serviceName: container.serviceName,
           port: parseInt(port) || 80,
+          auth,
         });
       }
     }
