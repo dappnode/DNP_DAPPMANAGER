@@ -103,11 +103,11 @@ export class StakerComponent {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
     compatibleClients:
-    | {
-      dnpName: string;
-      minVersion: string;
-    }[]
-    | null;
+      | {
+          dnpName: string;
+          minVersion: string;
+        }[]
+      | null;
     dockerNetworkConfigsToAdd: {
       [serviceName: string]: ComposeServiceNetworksObj;
     };
@@ -167,6 +167,9 @@ export class StakerComponent {
         name: dnpName,
         userSettings,
       });
+    // TODO: fix persist mev boost relays if installed
+    //else
+    // write userSettings if are different!
 
     const pkg = await listPackage({
       dnpName,
@@ -208,11 +211,14 @@ export class StakerComponent {
         continue;
       }
 
-      service.networks = this.mergeServiceNetworks({ currentNetworks: service.networks, networksToAdd: networkConfig });
+      service.networks = this.mergeServiceNetworks({
+        currentNetworks: service.networks,
+        networksToAdd: networkConfig,
+      });
 
       composeEditor.compose.networks = this.updateComposeRootNetworks({
         currentRootNetworks: rootNetworks,
-        serviceNetworkConfig: netConfigsToAdd
+        serviceNetworkConfig: netConfigsToAdd,
       });
     }
 
@@ -221,44 +227,42 @@ export class StakerComponent {
 
   /**
    * Looks for the service that matches the serviceName
-   * 
+   *
    * If the service is not found, it will look for a service that includes the serviceName in its name
    */
   private findMatchingService({
     services,
-    serviceName
+    serviceName,
   }: {
     services: {
-      [dnpName: string]: ComposeService
-    },
-    serviceName: string
+      [dnpName: string]: ComposeService;
+    };
+    serviceName: string;
   }): ComposeService {
-    return services[serviceName] ||
-      Object.entries(services).find(([name]) =>
-        name.includes(serviceName)
-      )?.[1];
+    return (
+      services[serviceName] ||
+      Object.entries(services).find(([name]) => name.includes(serviceName))?.[1]
+    );
   }
 
   /**
    * Merges the current networks with the networks to add in a docker compose service
-   * 
+   *
    * It also ensures that the aliases are unique
    */
   private mergeServiceNetworks({
     currentNetworks,
-    networksToAdd
+    networksToAdd,
   }: {
-    currentNetworks?: ComposeServiceNetworksObj,
-    networksToAdd: ComposeServiceNetworksObj
+    currentNetworks?: ComposeServiceNetworksObj;
+    networksToAdd: ComposeServiceNetworksObj;
   }): ComposeServiceNetworksObj {
-
     const mergedNetworks: ComposeServiceNetworksObj = { ...currentNetworks };
 
     merge(mergedNetworks, networksToAdd);
 
     for (const network of Object.values(mergedNetworks)) {
-      if (network.aliases)
-        network.aliases = uniq(network.aliases);
+      if (network.aliases) network.aliases = uniq(network.aliases);
     }
     return mergedNetworks;
   }
@@ -268,12 +272,11 @@ export class StakerComponent {
    */
   private updateComposeRootNetworks({
     currentRootNetworks,
-    serviceNetworkConfig
+    serviceNetworkConfig,
   }: {
-    currentRootNetworks: ComposeNetworks,
-    serviceNetworkConfig: ComposeServiceNetworksObj
+    currentRootNetworks: ComposeNetworks;
+    serviceNetworkConfig: ComposeServiceNetworksObj;
   }): ComposeNetworks {
-
     const updatedRootNetworks = { ...currentRootNetworks };
 
     // Ensure all networks are added to the root level

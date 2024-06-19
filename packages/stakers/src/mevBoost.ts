@@ -65,6 +65,7 @@ export class MevBoost extends StakerComponent {
       !(await listPackageNoThrow({ dnpName: mevBoostDnpName }))
     )
       return relays;
+    // TODO: do not use packageGet, instead use module dockerCompose to retrieve envs
     const pkgEnv = (await packageGet({ dnpName: mevBoostDnpName })).userSettings
       ?.environment;
     if (pkgEnv) {
