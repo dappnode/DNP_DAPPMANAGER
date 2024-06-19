@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -58,7 +58,8 @@ export function HttpsMappings({
       fromSubdomain: from,
       dnpName,
       serviceName,
-      port: parseInt(port)
+      port: parseInt(port),
+      auth: user && password ? { username: user, password } : undefined
     };
 
     try {
@@ -143,9 +144,12 @@ export function HttpsMappings({
     // New mapping validation
     const fromError = validateFromSubdomain(from, mappings.data);
     const portError = validatePort(port);
-    const userError = validateUser(user);
-    const passwordError = validatePassword(password);
-    const isValid = !fromError && !portError;
+    const userError = user ? validateUser(user) : null;
+    const passwordError = user ? validatePassword(password) : null;
+    // - domain and port are valid and user and password are not set
+    // - domain and port are valid and user and password are set and user and password are valid
+    const isValid =
+      !fromError && !portError && (!user || (!userError && !passwordError));
 
     return (
       <div className="network-mappings">
