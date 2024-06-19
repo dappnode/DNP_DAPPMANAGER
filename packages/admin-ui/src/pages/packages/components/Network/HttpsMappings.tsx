@@ -39,6 +39,8 @@ export function HttpsMappings({
   const [editing, setEditing] = useState(false);
   const [from, setFrom] = useState("");
   const [port, setPort] = useState("80");
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
 
   const mappings = useApi.httpsPortalMappingsGet();
   const dnpsRequest = useApi.packagesGet();
@@ -141,6 +143,8 @@ export function HttpsMappings({
     // New mapping validation
     const fromError = validateFromSubdomain(from, mappings.data);
     const portError = validatePort(port);
+    const userError = validateUser(user);
+    const passwordError = validatePassword(password);
     const isValid = !fromError && !portError;
 
     return (
@@ -160,6 +164,7 @@ export function HttpsMappings({
           <header className="name">CONTAINER</header>
           <header className="name" />
           <header className="name">SUBDOMAIN</header>
+          <header className="name">AUTH</header>
           <header className="header">REMOVE</header>
 
           <hr />
@@ -187,6 +192,10 @@ export function HttpsMappings({
                 </a>
               </span>
 
+              <span className="name">
+                {mapping.auth ? `${mapping.auth.username}` : "-"}
+              </span>
+
               <MdClose onClick={() => removeMapping(mapping)} />
             </React.Fragment>
           ))}
@@ -209,6 +218,23 @@ export function HttpsMappings({
                 value: port,
                 onValueChange: setPort,
                 error: portError
+              },
+              {
+                label: "User",
+                labelId: "user",
+                required: false,
+                value: user,
+                onValueChange: setUser,
+                error: userError
+              },
+              {
+                label: "Password",
+                labelId: "password",
+                required: false,
+                secret: true,
+                value: password,
+                onValueChange: setPassword,
+                error: passwordError
               }
             ]}
           >
@@ -279,5 +305,21 @@ function validatePort(port: string): string | null {
   const portNum = parseInt(port);
   if (!portNum) return "Invalid port number";
   if (portNum > 65535) return "Port number too high";
+  return null;
+}
+
+function validatePassword(password: string): string | null {
+  if (!password) return "Invalid empty password";
+  const regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
+  if (!regex.test(password))
+    return "Password must contain at least 8 characters, one uppercase, one lowercase, one number";
+  return null;
+}
+
+function validateUser(user: string): string | null {
+  if (!user) return "Invalid empty user";
+  // regex for user. it must not contain special characters
+  const regex = new RegExp("^[a-zA-Z0-9]*$");
+  if (!regex.test(user)) return "User must contain only letters and numbers";
   return null;
 }
