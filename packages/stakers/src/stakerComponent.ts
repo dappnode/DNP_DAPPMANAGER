@@ -20,6 +20,8 @@ import {
   PackageContainer,
   StakerItem,
   ComposeServiceNetworksObj,
+  ComposeService,
+  ComposeNetworks,
 } from "@dappnode/types";
 import {
   getIsInstalled,
@@ -28,7 +30,7 @@ import {
   fileToGatewayUrl,
 } from "@dappnode/utils";
 import { lt } from "semver";
-import { merge } from "lodash-es";
+import { merge, uniq } from "lodash-es";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -82,7 +84,7 @@ export class StakerComponent {
     },
     userSettings?: UserSettingsAllDnps
   ): Promise<void> {
-    console.log("persisting: ", dnpName);
+    logs.info(`Persisting ${dnpName}`);
     await this.setStakerPkgConfig(
       dnpName,
       dockerNetworkConfigsToAdd,
@@ -101,11 +103,11 @@ export class StakerComponent {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
     compatibleClients:
-      | {
-          dnpName: string;
-          minVersion: string;
-        }[]
-      | null;
+    | {
+      dnpName: string;
+      minVersion: string;
+    }[]
+    | null;
     dockerNetworkConfigsToAdd: {
       [serviceName: string]: ComposeServiceNetworksObj;
     };
@@ -123,7 +125,7 @@ export class StakerComponent {
 
     if (currentPkg) {
       if (prevClient && compatibleClients)
-        this.ensureSetRequirements(
+        this.ensureCompatibilityRequirements(
           prevClient,
           compatibleClients,
           currentPkg.version
@@ -174,9 +176,9 @@ export class StakerComponent {
     this.addStakerNetworkToCompose(pkg.dnpName, dockerNetworkConfigsoAdd);
 
     // start all containers
-    //if (!pkg.containers.some((c) => c.running))
     await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
   }
+
   /**
    * Adds the staker network and its fullnode alias to the docker-compose file
    */
@@ -192,15 +194,11 @@ export class StakerComponent {
       netConfigsToAdd
     )) {
       // Find the service that includes serviceName in its name
-      const service =
-        services[serviceName] ||
-        Object.entries(services).find(([name]) =>
-          name.includes(serviceName)
-        )?.[1];
+      const service = this.findMatchingService({ services, serviceName });
 
       if (!service) {
-        logs.info(`Service ${serviceName} not found in ${dnpName}, skipping`);
-        continue;
+        logs.warn(`Service ${serviceName} not found in ${dnpName}, skipping`);
+        continue; // TODO: Throw error here?
       }
 
       if (Array.isArray(service.networks)) {
@@ -210,24 +208,82 @@ export class StakerComponent {
         continue;
       }
 
-      // Merge networkConfig into service.networks without removing existing aliases
-      service.networks = service.networks || {};
-      // TODO: consider using unique from lodash to merge array aliases
-      merge(service.networks, networkConfig);
+      service.networks = this.mergeServiceNetworks({ currentNetworks: service.networks, networksToAdd: networkConfig });
 
-      // Ensure all networks are added to the root level
-      const serviceNetworkNames = Object.keys(networkConfig);
-
-      for (const networkName of serviceNetworkNames)
-        if (!rootNetworks[networkName])
-          rootNetworks[networkName] = {
-            external: true,
-          };
+      composeEditor.compose.networks = this.updateComposeRootNetworks({
+        currentRootNetworks: rootNetworks,
+        serviceNetworkConfig: netConfigsToAdd
+      });
     }
 
-    composeEditor.compose.networks = rootNetworks;
-
     composeEditor.write();
+  }
+
+  /**
+   * Looks for the service that matches the serviceName
+   * 
+   * If the service is not found, it will look for a service that includes the serviceName in its name
+   */
+  private findMatchingService({
+    services,
+    serviceName
+  }: {
+    services: {
+      [dnpName: string]: ComposeService
+    },
+    serviceName: string
+  }): ComposeService {
+    return services[serviceName] ||
+      Object.entries(services).find(([name]) =>
+        name.includes(serviceName)
+      )?.[1];
+  }
+
+  /**
+   * Merges the current networks with the networks to add in a docker compose service
+   * 
+   * It also ensures that the aliases are unique
+   */
+  private mergeServiceNetworks({
+    currentNetworks,
+    networksToAdd
+  }: {
+    currentNetworks?: ComposeServiceNetworksObj,
+    networksToAdd: ComposeServiceNetworksObj
+  }): ComposeServiceNetworksObj {
+
+    const mergedNetworks: ComposeServiceNetworksObj = { ...currentNetworks };
+
+    merge(mergedNetworks, networksToAdd);
+
+    for (const network of Object.values(mergedNetworks)) {
+      if (network.aliases)
+        network.aliases = uniq(network.aliases);
+    }
+    return mergedNetworks;
+  }
+
+  /**
+   * Updates the root level networks in the docker compose file
+   */
+  private updateComposeRootNetworks({
+    currentRootNetworks,
+    serviceNetworkConfig
+  }: {
+    currentRootNetworks: ComposeNetworks,
+    serviceNetworkConfig: ComposeServiceNetworksObj
+  }): ComposeNetworks {
+
+    const updatedRootNetworks = { ...currentRootNetworks };
+
+    // Ensure all networks are added to the root level
+    const serviceNetworkNames = Object.keys(serviceNetworkConfig);
+
+    for (const networkName of serviceNetworkNames)
+      if (!updatedRootNetworks[networkName])
+        updatedRootNetworks[networkName] = { external: true };
+
+    return updatedRootNetworks;
   }
 
   /**
@@ -241,7 +297,7 @@ export class StakerComponent {
     dockerNetworkName: string
   ): Promise<void> {
     // disconnect pkg from staker network
-    await this.disconnectConnectedPkgFromStakerNetwork(
+    await this.disconnectPkgFromStakerNetwork(
       dockerNetworkName,
       pkg.containers
     );
@@ -252,7 +308,7 @@ export class StakerComponent {
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
   }
 
-  private async disconnectConnectedPkgFromStakerNetwork(
+  private async disconnectPkgFromStakerNetwork(
     networkName: string,
     pkgContainers: PackageContainer[]
   ): Promise<void> {
@@ -292,7 +348,7 @@ export class StakerComponent {
     composeEditor.write();
   }
 
-  private ensureSetRequirements(
+  private ensureCompatibilityRequirements(
     dnpName: string,
     compatibleClients: {
       dnpName: string;
@@ -326,6 +382,7 @@ export class StakerComponent {
   /**
    * Stop all the containers from a given package dnpName
    */
+  // TODO: Move this to where packages and containers are started/stopped
   private async stopAllPkgContainers(
     pkg: InstalledPackageDataApiReturn | InstalledPackageData
   ): Promise<void> {
