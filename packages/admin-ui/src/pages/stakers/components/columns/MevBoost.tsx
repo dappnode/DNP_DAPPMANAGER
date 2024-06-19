@@ -198,6 +198,8 @@ function Relay({
 
 // Utils
 
+// bloxroute (maxprofit) is OFAC compliant as of Dec 2023: https://x.com/bloXrouteLabs/status/1736819783520092357
+// Info on all relays specs: https://github.com/eth-educators/ethstaker-guides/blob/main/MEV-relay-list.md
 const getDefaultRelays = (network: Network): RelayIface[] => {
   switch (network) {
     case "mainnet":
@@ -225,7 +227,7 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
         },
         {
           operator: "bloXroute (Max profit)",
-          ofacCompliant: false,
+          ofacCompliant: true,
           docs: "https://bloxroute.com/",
           url:
             "https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com"
@@ -243,6 +245,20 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
           docs: "https://docs.edennetwork.io/",
           url:
             "https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io"
+        },
+        {
+          operator: "Aestus",
+          ofacCompliant: false,
+          docs: "https://aestus.live/",
+          url:
+            "https://0xa15b52576bcbf1072f4a011c0f99f9fb6c66f3e1ff321f11f461d15e31b1cb359caa092c71bbded0bae5b5ea401aab7e@aestus.live"
+        },
+        {
+          operator: "Manifold",
+          ofacCompliant: false,
+          docs: "https://kb.manifoldfinance.com/",
+          url:
+            "https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com"
         }
       ];
     case "prater":
