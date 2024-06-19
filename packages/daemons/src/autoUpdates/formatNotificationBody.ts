@@ -1,8 +1,8 @@
 import { CoreUpdateDataAvailable } from "@dappnode/types";
 import { urlJoin, prettyDnpName } from "@dappnode/utils";
+import { getInstallerPath } from "pages/system/data"
 
 const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
-const adminUiInstallPackageUrl = "http://my.dappnode/installer";
 
 export function formatPackageUpdateNotification({
   dnpName,
@@ -18,7 +18,7 @@ export function formatPackageUpdateNotification({
   autoUpdatesEnabled: boolean;
 }): string {
   const prettyName = prettyDnpName(dnpName);
-  const installUrl = urlJoin(adminUiInstallPackageUrl, dnpName);
+  const installUrl = urlJoin(getInstallerPath(dnpName), dnpName);
 
   return [
     `New version ready to install for ${prettyName} (current version ${currentVersion})`,
