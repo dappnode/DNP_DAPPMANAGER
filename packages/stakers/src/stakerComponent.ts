@@ -103,11 +103,11 @@ export class StakerComponent {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
     compatibleClients:
-      | {
-          dnpName: string;
-          minVersion: string;
-        }[]
-      | null;
+    | {
+      dnpName: string;
+      minVersion: string;
+    }[]
+    | null;
     dockerNetworkConfigsToAdd: {
       [serviceName: string]: ComposeServiceNetworksObj;
     };
@@ -158,11 +158,9 @@ export class StakerComponent {
     userSettings?: UserSettingsAllDnps
   ): Promise<void> {
     // ensure pkg installed
-    if (
-      !(await listPackageNoThrow({
-        dnpName,
-      }))
-    )
+    if (!(await listPackageNoThrow({
+      dnpName,
+    })))
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings,
@@ -227,7 +225,7 @@ export class StakerComponent {
 
       composeEditor.compose.networks = this.updateComposeRootNetworks({
         currentRootNetworks: rootNetworks,
-        serviceNetworkConfig: netConfigsToAdd,
+        serviceNetworkConfig: networkConfig
       });
     }
 
