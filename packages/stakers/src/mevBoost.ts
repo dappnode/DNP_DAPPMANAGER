@@ -8,10 +8,11 @@ import {
   UserSettingsAllDnps,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
-import { DappnodeInstaller, packageGet } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 export class MevBoost extends StakerComponent {
   readonly DbHandlers: Record<
@@ -66,8 +67,10 @@ export class MevBoost extends StakerComponent {
     )
       return relays;
     // TODO: do not use packageGet, instead use module dockerCompose to retrieve envs
-    const pkgEnv = (await packageGet({ dnpName: mevBoostDnpName })).userSettings
-      ?.environment;
+    const pkgEnv = new ComposeFileEditor(
+      mevBoostDnpName,
+      false
+    ).getUserSettings().environment;
     if (pkgEnv) {
       pkgEnv["mev-boost"]["RELAYS"]
         .split(",")
