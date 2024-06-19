@@ -168,7 +168,7 @@ export class StakerComponent {
         userSettings,
       });
     else if (userSettings) {
-      // write userSettings if are different
+      // write userSettings if are different. Currently only applies to mev boost
       const userSettingsPrev = new ComposeFileEditor(
         dnpName,
         false
