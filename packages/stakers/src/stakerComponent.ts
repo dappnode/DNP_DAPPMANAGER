@@ -30,7 +30,7 @@ import {
   fileToGatewayUrl,
 } from "@dappnode/utils";
 import { lt } from "semver";
-import { merge, uniq } from "lodash-es";
+import { merge, uniq, isEqual } from "lodash-es";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -167,9 +167,18 @@ export class StakerComponent {
         name: dnpName,
         userSettings,
       });
-    // TODO: fix persist mev boost relays if installed
-    //else
-    // write userSettings if are different!
+    else if (userSettings) {
+      // write userSettings if are different
+      const userSettingsPrev = new ComposeFileEditor(
+        dnpName,
+        false
+      ).getUserSettings();
+      if (!isEqual(userSettingsPrev, userSettings)) {
+        const composeEditor = new ComposeFileEditor(dnpName, false);
+        composeEditor.applyUserSettings(userSettings, { dnpName });
+        composeEditor.write();
+      }
+    }
 
     const pkg = await listPackage({
       dnpName,
