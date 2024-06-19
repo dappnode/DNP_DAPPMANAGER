@@ -41,10 +41,32 @@ export function HttpsMappings({
   const [port, setPort] = useState("80");
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
+  const [fromError, setFromError] = useState<string | null>(null);
+  const [portError, setPortError] = useState<string | null>(null);
+  const [userAndPasswordError, setUserAndPasswordError] = useState<
+    string | null
+  >(null);
+  const [isValid, setIsValid] = useState(false);
 
   const mappings = useApi.httpsPortalMappingsGet();
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
+
+  useEffect(() => {
+    if (mappings.data) {
+      const fromErr = validateFromSubdomain(from, mappings.data);
+      const portErr = validatePort(port);
+      const userAndPasswordErr = validateUserAndPassword(user, password);
+
+      setFromError(fromErr);
+      setPortError(portErr);
+      setUserAndPasswordError(userAndPasswordErr);
+
+      const isFormValid = !fromErr && !portErr && !userAndPasswordErr;
+
+      setIsValid(isFormValid);
+    }
+  }, [from, port, user, password, mappings.data]);
 
   // DO NOT - Prefill the `from` input with the recommended subdomain on every select change
   // Why? To des-incentivize users from randomly creating mappings for services that may
@@ -141,16 +163,6 @@ export function HttpsMappings({
         (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
     );
 
-    // New mapping validation
-    const fromError = validateFromSubdomain(from, mappings.data);
-    const portError = validatePort(port);
-    const userError = user ? validateUser(user) : null;
-    const passwordError = user ? validatePassword(password) : null;
-    // - domain and port are valid and user and password are not set
-    // - domain and port are valid and user and password are set and user and password are valid
-    const isValid =
-      !fromError && !portError && (!user || (!userError && !passwordError));
-
     return (
       <div className="network-mappings">
         <p>
@@ -229,7 +241,7 @@ export function HttpsMappings({
                 required: false,
                 value: user,
                 onValueChange: setUser,
-                error: userError
+                error: userAndPasswordError
               },
               {
                 label: "Password",
@@ -238,7 +250,7 @@ export function HttpsMappings({
                 secret: true,
                 value: password,
                 onValueChange: setPassword,
-                error: passwordError
+                error: userAndPasswordError
               }
             ]}
           >
@@ -312,18 +324,23 @@ function validatePort(port: string): string | null {
   return null;
 }
 
-function validatePassword(password: string): string | null {
+function validateUserAndPassword(
+  user: string,
+  password: string
+): string | null {
+  if (!user && !password) return null;
   if (!password) return "Invalid empty password";
-  const regex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
-  if (!regex.test(password))
-    return "Password must contain at least 8 characters, one uppercase, one lowercase, one number";
-  return null;
-}
-
-function validateUser(user: string): string | null {
   if (!user) return "Invalid empty user";
   // regex for user. it must not contain special characters
-  const regex = new RegExp("^[a-zA-Z0-9]*$");
-  if (!regex.test(user)) return "User must contain only letters and numbers";
+  const userRegex = new RegExp("^[a-zA-Z0-9]*$");
+  if (!userRegex.test(user))
+    return "User must contain only letters and numbers";
+
+  const passwordRegex = new RegExp(
+    "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})"
+  );
+  if (!passwordRegex.test(password))
+    return "Password must contain at least 8 characters, one uppercase, one lowercase, one number";
+
   return null;
 }
