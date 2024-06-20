@@ -60,7 +60,7 @@ const polkadotCurrentCompose = {
   },
 };
 
-describe("parseUserSet", () => {
+describe("parseUserSettings", () => {
   it("Should parse a normal case", () => {
     const compose: Compose = {
       ...mockCompose,
@@ -77,6 +77,11 @@ describe("parseUserSet", () => {
             "moredata:/usr/data1",
             `${bitcoinVolumeNameNew}:/usr/data2`,
           ],
+          networks: {
+            holesky_network: {
+              aliases: ["mock-dnp"],
+            }
+          }
         },
       },
       volumes: {
@@ -90,6 +95,11 @@ describe("parseUserSet", () => {
           },
         },
       },
+      networks: {
+        holesky_network: {
+          external: true,
+        }
+      }
     };
 
     const userSettings = parseUserSettings(compose);
@@ -112,6 +122,20 @@ describe("parseUserSet", () => {
         [bitcoinVolumeNameNew]: "/dev0/data",
         moredata: "",
       },
+      networks: {
+        rootNetworks: {
+          holesky_network: {
+            external: true,
+          }
+        },
+        serviceNetworks: {
+          [mockDnpName]: {
+            holesky_network: {
+              aliases: ["mock-dnp"],
+            }
+          }
+        }
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
