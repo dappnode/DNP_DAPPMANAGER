@@ -10,6 +10,7 @@ import {
 import { parseEnvironment } from "@dappnode/utils";
 import {
   Compose,
+  ComposeServiceNetworks,
   PortMapping,
   UserSettings,
   VolumeMapping,
@@ -35,6 +36,24 @@ export const parseUserSettingsFns: {
     mapValues(compose.services, (service) =>
       parseEnvironment(service.environment || [])
     ),
+
+  networks: (compose) => {
+    const serviceNetworks = Object.entries(compose.services)
+      // Filter out services without networks
+      .filter(([, service]) => service.networks)
+      // Return map of service names to networks
+      .reduce((acc, [serviceName, service]) => {
+        acc[serviceName] = service.networks as ComposeServiceNetworks;
+        return acc;
+      }, {} as { [serviceName: string]: ComposeServiceNetworks });
+
+    const rootNetworks = compose.networks || {};
+
+    return {
+      serviceNetworks,
+      rootNetworks,
+    };
+  },
 
   portMappings: (compose) =>
     mapValues(compose.services, (service) => {
@@ -130,6 +149,8 @@ export function applyUserSettings(
       (userSettings.portMappings || {})[serviceName] || {};
     const userSetLegacyBindVolumes =
       (userSettings.legacyBindVolumes || {})[serviceName] || {};
+    const userSetNetworks =
+      (userSettings.networks?.serviceNetworks || {})[serviceName] || {};
 
     // New values
     const nextEnvironment = mapValues(
@@ -147,6 +168,8 @@ export function applyUserSettings(
           : portMapping;
       })
     );
+
+    const nextNetworks = userSetNetworks;
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
@@ -172,6 +195,7 @@ export function applyUserSettings(
       ports: nextPorts,
       volumes: nextServiceVolumes,
       labels: nextLabels,
+      networks: nextNetworks,
     };
   });
 
@@ -183,19 +207,22 @@ export function applyUserSettings(
       userSettings.allNamedVolumeMountpoint;
     return mountpoint
       ? {
-          driver_opts: {
-            type: "none",
-            device: getDevicePath({ mountpoint, dnpName, volumeName }),
-            o: "bind",
-          },
-        }
+        driver_opts: {
+          type: "none",
+          device: getDevicePath({ mountpoint, dnpName, volumeName }),
+          o: "bind",
+        },
+      }
       : vol;
   });
+
+  const nextNetworks = userSettings.networks?.rootNetworks;
 
   return cleanCompose({
     ...compose,
     services: nextServices,
     volumes: nextVolumes,
+    networks: nextNetworks,
   });
 }
 

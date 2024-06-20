@@ -1,5 +1,5 @@
 import { ContainerState } from "./pkg.js";
-import { PackageEnvs } from "./compose.js";
+import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.js";
 import {
   Manifest,
   Dependencies,
@@ -242,6 +242,12 @@ export interface UserSettings {
       [containerPath: string]: string; // dataURL
     };
   };
+
+  networks?: {
+    rootNetworks: ComposeNetworks;
+    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks; }
+  }
+
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
   legacyBindVolumes?: {
@@ -1023,9 +1029,9 @@ export type EthClientSyncedNotificationStatus = {
 
 export type Eth2ClientTarget =
   | {
-      execClient: string;
-      consClient: string;
-    }
+    execClient: string;
+    consClient: string;
+  }
   | "remote";
 
 /**
