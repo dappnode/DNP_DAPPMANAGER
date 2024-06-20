@@ -6,6 +6,7 @@ import {
   parseVolumeMappings,
   parseDevicePathMountpoint,
   getDevicePath,
+  ComposeFileEditor,
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
 import {
@@ -39,11 +40,13 @@ export const parseUserSettingsFns: {
 
   networks: (compose) => {
     const serviceNetworks = Object.entries(compose.services)
-      // Filter out services without networks
-      .filter(([, service]) => service.networks)
-      // Return map of service names to networks
       .reduce((acc, [serviceName, service]) => {
-        acc[serviceName] = service.networks as ComposeServiceNetworks;
+        if (Array.isArray(service.networks)) {
+          // Convert array to object
+          acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
+        } else {
+          acc[serviceName] = service.networks || {};
+        }
         return acc;
       }, {} as { [serviceName: string]: ComposeServiceNetworks });
 
@@ -216,6 +219,7 @@ export function applyUserSettings(
       : vol;
   });
 
+  // TODO: Handle networks in array format?
   const nextNetworks = userSettings.networks?.rootNetworks;
 
   return cleanCompose({

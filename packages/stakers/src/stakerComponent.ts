@@ -212,10 +212,7 @@ export class StakerComponent {
       }
 
       if (Array.isArray(service.networks)) {
-        logs.warn(
-          `Service ${serviceName} in ${dnpName} has a network declared in array format, skipping`
-        );
-        continue;
+        service.networks = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
       }
 
       service.networks = this.mergeServiceNetworks({
