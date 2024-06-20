@@ -1,6 +1,6 @@
 import { CoreUpdateDataAvailable } from "@dappnode/types";
 import { urlJoin, prettyDnpName } from "@dappnode/utils";
-import { getInstallerPath } from "./../../../admin-ui/src/pages/installer/data.ts";
+import { getInstallerPath } from "./../../../admin-ui/src/pages/installer/data";
 
 const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
 
