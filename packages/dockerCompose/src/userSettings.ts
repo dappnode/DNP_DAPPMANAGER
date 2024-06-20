@@ -45,12 +45,12 @@ export const parseUserSettingsFns: {
           // Convert array to object
           acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
         } else {
-          acc[serviceName] = service.networks || {};
+          acc[serviceName] = service.networks;
         }
         return acc;
-      }, {} as { [serviceName: string]: ComposeServiceNetworks });
+      }, {} as { [serviceName: string]: ComposeServiceNetworks | undefined });
 
-    const rootNetworks = compose.networks || {};
+    const rootNetworks = compose.networks;
 
     return {
       serviceNetworks,
