@@ -125,6 +125,7 @@ export async function fetchDnpRequest({
       // Compute version metadata
       requiresCoreUpdate: getRequiresCoreUpdate(mainRelease, dnpList),
       requiresDockerUpdate: await getRequiresDockerUpdate(mainRelease),
+      packagesToBeUninstalled: await getRequiresUninstallPackages(mainRelease),
       resolving: false,
       isCompatible: !compatibleError,
       error: compatibleError,
@@ -138,6 +139,19 @@ export async function fetchDnpRequest({
     signedSafe,
     signedSafeAll: Object.values(signedSafe).every(r => r.safe === true)
   };
+}
+
+async function getRequiresUninstallPackages({
+  manifest
+}: {
+  manifest: Manifest;
+}): Promise<string[]> {
+  const { notInstalledPackages } = manifest.requirements || {};
+  if (!notInstalledPackages || notInstalledPackages.length === 0) return [];
+  const installedPackages = await listPackages();
+  return notInstalledPackages.filter(dnpName =>
+    installedPackages.find(dnp => dnp.dnpName === dnpName)
+  );
 }
 
 function getRequiresCoreUpdate(

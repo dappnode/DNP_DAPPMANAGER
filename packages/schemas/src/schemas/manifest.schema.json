@@ -251,6 +251,15 @@
           "examples": ["23.0.3"],
           "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
           "errorMessage": "should be a semantic version in the format x.y.z"
+        },
+        "notInstalledPackages": {
+          "type": "array",
+          "description": "List of packages that must not be installed for this DAppNode Package to be installed.",
+          "items": {
+            "type": "string",
+            "description": "Package name that should not be installed.",
+            "examples": ["conflicting-package.dnp.dappnode.eth"]
+          }
         }
       }
     },
