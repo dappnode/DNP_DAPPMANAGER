@@ -169,6 +169,12 @@ describe("parseUserSettings", () => {
           [bitcoinVolumeName]: "/dev1/custom-path",
         },
       },
+      networks: {
+        rootNetworks: {},
+        serviceNetworks: {
+          [bitcoinName]: {},
+        },
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
@@ -194,6 +200,18 @@ describe("parseUserSettings", () => {
       namedVolumeMountpoints: {
         polkadot: "",
       },
+      networks: {
+        rootNetworks: {
+          dncore_network: {
+            external: true,
+          },
+        },
+        serviceNetworks: {
+          [polkadotServiceName]: {
+            dncore_network: {},
+          },
+        }
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
@@ -261,6 +279,21 @@ describe("parseUserSettings", () => {
         ethchaindnpdappnodeeth_geth: "",
         ethchaindnpdappnodeeth_identity: "",
         ethchaindnpdappnodeeth_ipc: "",
+      },
+      networks: {
+        rootNetworks: {
+          network: {
+            driver: "bridge",
+            ipam: { config: [{ subnet: "172.33.0.0/16" }] },
+          },
+        },
+        serviceNetworks: {
+          [serviceName]: {
+            network: {
+              ipv4_address: "172.33.1.6",
+            },
+          }
+        }
       },
     };
 

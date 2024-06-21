@@ -245,8 +245,8 @@ export interface UserSettings {
 
   // For keeping staker network in case client is selected
   networks?: {
-    rootNetworks?: ComposeNetworks;
-    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks | undefined; }
+    rootNetworks: ComposeNetworks;
+    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks; }
   }
 
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
