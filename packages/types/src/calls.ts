@@ -26,6 +26,10 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  auth?: {
+    username: string;
+    password: string;
+  };
 }
 
 export interface ExposableServiceInfo extends HttpsPortalMapping {

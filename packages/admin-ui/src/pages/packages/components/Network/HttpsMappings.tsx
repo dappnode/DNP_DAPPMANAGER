@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -39,10 +39,34 @@ export function HttpsMappings({
   const [editing, setEditing] = useState(false);
   const [from, setFrom] = useState("");
   const [port, setPort] = useState("80");
+  const [user, setUser] = useState("");
+  const [password, setPassword] = useState("");
+  const [fromError, setFromError] = useState<string | null>(null);
+  const [portError, setPortError] = useState<string | null>(null);
+  const [userAndPasswordError, setUserAndPasswordError] = useState<
+    string | null
+  >(null);
+  const [isValid, setIsValid] = useState(false);
 
   const mappings = useApi.httpsPortalMappingsGet();
   const dnpsRequest = useApi.packagesGet();
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
+
+  useEffect(() => {
+    if (mappings.data) {
+      const fromErr = validateFromSubdomain(from, mappings.data);
+      const portErr = validatePort(port);
+      const userAndPasswordErr = validateUserAndPassword(user, password);
+
+      setFromError(fromErr);
+      setPortError(portErr);
+      setUserAndPasswordError(userAndPasswordErr);
+
+      const isFormValid = !fromErr && !portErr && !userAndPasswordErr;
+
+      setIsValid(isFormValid);
+    }
+  }, [from, port, user, password, mappings.data]);
 
   // DO NOT - Prefill the `from` input with the recommended subdomain on every select change
   // Why? To des-incentivize users from randomly creating mappings for services that may
@@ -56,7 +80,8 @@ export function HttpsMappings({
       fromSubdomain: from,
       dnpName,
       serviceName,
-      port: parseInt(port)
+      port: parseInt(port),
+      auth: user && password ? { username: user, password } : undefined
     };
 
     try {
@@ -138,11 +163,6 @@ export function HttpsMappings({
         (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
     );
 
-    // New mapping validation
-    const fromError = validateFromSubdomain(from, mappings.data);
-    const portError = validatePort(port);
-    const isValid = !fromError && !portError;
-
     return (
       <div className="network-mappings">
         <p>
@@ -160,6 +180,7 @@ export function HttpsMappings({
           <header className="name">CONTAINER</header>
           <header className="name" />
           <header className="name">SUBDOMAIN</header>
+          <header className="name">AUTH</header>
           <header className="header">REMOVE</header>
 
           <hr />
@@ -187,6 +208,10 @@ export function HttpsMappings({
                 </a>
               </span>
 
+              <span className="name">
+                {mapping.auth ? `${mapping.auth.username}` : "-"}
+              </span>
+
               <MdClose onClick={() => removeMapping(mapping)} />
             </React.Fragment>
           ))}
@@ -209,6 +234,23 @@ export function HttpsMappings({
                 value: port,
                 onValueChange: setPort,
                 error: portError
+              },
+              {
+                label: "User",
+                labelId: "user",
+                required: false,
+                value: user,
+                onValueChange: setUser,
+                error: userAndPasswordError
+              },
+              {
+                label: "Password",
+                labelId: "password",
+                required: false,
+                secret: true,
+                value: password,
+                onValueChange: setPassword,
+                error: userAndPasswordError
               }
             ]}
           >
@@ -279,5 +321,26 @@ function validatePort(port: string): string | null {
   const portNum = parseInt(port);
   if (!portNum) return "Invalid port number";
   if (portNum > 65535) return "Port number too high";
+  return null;
+}
+
+function validateUserAndPassword(
+  user: string,
+  password: string
+): string | null {
+  if (!user && !password) return null;
+  if (!password) return "Invalid empty password";
+  if (!user) return "Invalid empty user";
+  // regex for user. it must not contain special characters
+  const userRegex = new RegExp("^[a-zA-Z0-9]*$");
+  if (!userRegex.test(user))
+    return "User must contain only letters and numbers";
+
+  const passwordRegex = new RegExp(
+    "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})"
+  );
+  if (!passwordRegex.test(password))
+    return "Password must contain at least 8 characters, one uppercase, one lowercase, one number";
+
   return null;
 }
