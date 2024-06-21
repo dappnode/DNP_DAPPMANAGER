@@ -38,7 +38,9 @@ const polkadotNewCompose = {
       },
       restart: "unless-stopped",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
-      networks: ["dncore_network"],
+      networks: {
+        dncore_network: {},
+      },
     },
   },
   volumes: {
@@ -167,12 +169,6 @@ describe("parseUserSettings", () => {
       legacyBindVolumes: {
         [bitcoinName]: {
           [bitcoinVolumeName]: "/dev1/custom-path",
-        },
-      },
-      networks: {
-        rootNetworks: {},
-        serviceNetworks: {
-          [bitcoinName]: {},
         },
       }
     };

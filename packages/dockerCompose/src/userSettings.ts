@@ -39,6 +39,9 @@ export const parseUserSettingsFns: {
     ),
 
   networks: (compose) => {
+    // There can't be service networks without root networks
+    if (!compose.networks) return undefined;
+
     const serviceNetworks = Object.entries(compose.services)
       .reduce((acc, [serviceName, service]) => {
         if (Array.isArray(service.networks)) {
@@ -50,7 +53,7 @@ export const parseUserSettingsFns: {
         return acc;
       }, {} as { [serviceName: string]: ComposeServiceNetworks });
 
-    const rootNetworks = compose.networks || {};
+    const rootNetworks = compose.networks;
 
     return {
       serviceNetworks,
