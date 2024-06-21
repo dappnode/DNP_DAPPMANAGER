@@ -26,6 +26,10 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  auth?: {
+    username: string;
+    password: string;
+  };
 }
 
 export interface ExposableServiceInfo extends HttpsPortalMapping {
@@ -288,6 +292,7 @@ export interface RequestedDnp {
   compatible: {
     requiresCoreUpdate: boolean;
     requiresDockerUpdate: boolean;
+    packagesToBeUninstalled: string[];
     resolving: boolean;
     isCompatible: boolean; // false;
     error: string; // "LN requires incompatible dependency";
