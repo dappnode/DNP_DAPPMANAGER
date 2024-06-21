@@ -1,12 +1,12 @@
 import client from "prom-client";
 import { wrapHandler } from "../utils.js";
 import * as db from "@dappnode/db";
-import { getStakerConfigByNetwork } from "@dappnode/stakers";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
 import { Network } from "@dappnode/types";
 import { getHostInfoMemoized } from "@dappnode/hostscriptsservices";
 import si from "systeminformation";
+import { mevBoost, execution, consensus } from "../../index.js";
 
 /**
  * Collect the metrics:
@@ -109,8 +109,9 @@ register.registerMetric(
         "lukso",
         "holesky"
       ] as Network[]) {
-        const { executionClient, consensusClient, isMevBoostSelected } =
-          getStakerConfigByNetwork(network);
+        const isMevBoostSelected = mevBoost.DbHandlers[network].get();
+        const executionClient = execution.DbHandlers[network].get();
+        const consensusClient = consensus.DbHandlers[network].get();
 
         // Execution client
         if (

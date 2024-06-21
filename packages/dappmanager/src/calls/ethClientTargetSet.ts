@@ -9,7 +9,6 @@ export async function ethClientTargetSet({
   target,
   ethRemoteRpc,
   sync = false,
-  useCheckpointSync = false,
   deletePrevExecClient = false,
   deletePrevExecClientVolumes = false,
   deletePrevConsClient = false,
@@ -18,7 +17,6 @@ export async function ethClientTargetSet({
   target: Eth2ClientTarget;
   ethRemoteRpc: string;
   sync?: boolean;
-  useCheckpointSync?: boolean;
   deletePrevExecClient?: boolean;
   deletePrevExecClientVolumes?: boolean;
   deletePrevConsClient?: boolean;
@@ -30,7 +28,6 @@ export async function ethClientTargetSet({
     dappnodeInstaller,
     nextTarget: target,
     sync,
-    useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
     deletePrevConsClient,

@@ -32,7 +32,7 @@ export async function reconnectDisconnectedContainers(
           Aliases: aliasesIpsMap.get(c)?.aliases ?? [],
         };
 
-        await dockerNetworkConnectNotThrow(network, c, networkConfig);
+        await dockerNetworkConnectNotThrow(network.id, c, networkConfig);
       })
     );
   }

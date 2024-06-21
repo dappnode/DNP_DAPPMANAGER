@@ -17,8 +17,7 @@ import { isEqual } from "lodash-es";
 
 export const changeEthClientTarget = (
   nextTarget: Eth2ClientTarget,
-  newEthRemoteRpc: string,
-  useCheckpointSync?: boolean
+  newEthRemoteRpc: string
 ): AppThunk => async (_, getState) => {
   const prevTarget = getEthClientTarget(getState());
   const prevEthRemoteRpc = getEthRemoteRpc(getState());
@@ -123,7 +122,6 @@ export const changeEthClientTarget = (
         target: nextTarget,
         sync: false,
         ethRemoteRpc: newEthRemoteRpc,
-        useCheckpointSync,
         deletePrevExecClient,
         deletePrevExecClientVolumes,
         deletePrevConsClient,

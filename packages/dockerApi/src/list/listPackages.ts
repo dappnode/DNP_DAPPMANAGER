@@ -15,7 +15,7 @@ export async function listPackageNoThrow({
 }: {
   dnpName: string;
 }): Promise<InstalledPackageData | null> {
-  if (!dnpName) throw Error(`Falsy dnpName: ${dnpName}`);
+  if (!dnpName) return null;
 
   // Optimize call are request only containers mapping to this package
   // Assumes containerName includes dnpName

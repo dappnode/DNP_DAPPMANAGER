@@ -48,7 +48,7 @@ export async function packageSetEnvironment({
     });
     return;
   } else {
-    await dockerComposeUpPackage({ dnpName }, containersStatus, {
+    await dockerComposeUpPackage({ dnpName }, false, containersStatus, {
       forceRecreate: packageInstalledHasPid(compose.compose),
     });
   }

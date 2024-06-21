@@ -9,9 +9,7 @@ import {
   EthClientStatusError,
   Eth2ClientTarget,
   ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet
+  ConsensusClientMainnet
 } from "@dappnode/types";
 import { AiFillSafetyCertificate, AiFillClockCircle } from "react-icons/ai";
 import { FaDatabase } from "react-icons/fa";
@@ -92,11 +90,11 @@ interface EthClientData {
   title: string;
   description: string;
   options:
-  | "remote"
-  | {
-    execClients: ExecutionClientMainnet[];
-    consClients: ConsensusClientMainnet[];
-  };
+    | "remote"
+    | {
+        execClients: string[];
+        consClients: string[];
+      };
   stats: EthClientDataStats;
   highlights: (keyof EthClientDataStats)[];
 }
@@ -118,15 +116,13 @@ function EthMultiClients({
   onTargetChange,
   newEthRemoteRpc,
   setNewEthRemoteRpc,
-  showStats,
-  useCheckpointSync
+  showStats
 }: {
   target: Eth2ClientTarget | null;
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
   newEthRemoteRpc: string;
   setNewEthRemoteRpc: (newEthRemoteRpc: string) => void;
   showStats?: boolean;
-  useCheckpointSync?: boolean;
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
 
@@ -146,15 +142,15 @@ function EthMultiClients({
       title: "Full node",
       description: "Your own Ethereum node w/out 3rd parties",
       options: {
-        execClients: [...executionClientsMainnet],
-        consClients: [...consensusClientsMainnet]
+        execClients: [...Object.values(ExecutionClientMainnet)],
+        consClients: [...Object.values(ConsensusClientMainnet)]
       },
       stats: {
-        syncTime: useCheckpointSync ? "Fast sync" : "Slow sync",
+        syncTime: "Fast sync",
         requirements: "High requirements",
         trust: "Fully decentralized"
       },
-      highlights: useCheckpointSync ? ["trust", "syncTime"] : ["trust"]
+      highlights: ["trust", "syncTime"]
     }
   ];
 
@@ -182,9 +178,9 @@ function EthMultiClients({
         } else {
           selected =
             selectedTarget &&
-              selectedTarget !== "remote" &&
-              options.execClients.includes(selectedTarget.execClient) &&
-              options.consClients.includes(selectedTarget.consClient)
+            selectedTarget !== "remote" &&
+            options.execClients.includes(selectedTarget.execClient) &&
+            options.consClients.includes(selectedTarget.consClient)
               ? true
               : false;
         }
@@ -231,10 +227,16 @@ function EthMultiClients({
               options !== "remote" && (
                 <>
                   <Select
-                    value={selectedTarget && prettyDnpName(selectedTarget.execClient)}
-                    options={options.execClients.filter(Boolean).map(prettyDnpName)}
+                    value={
+                      selectedTarget && prettyDnpName(selectedTarget.execClient)
+                    }
+                    options={options.execClients
+                      .filter(Boolean)
+                      .map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newEc = executionClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      const newEc = Object.values(ExecutionClientMainnet).find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
                       if (newEc) {
                         onTargetChange({
                           ...(selectedTarget || {}),
@@ -246,10 +248,16 @@ function EthMultiClients({
                   />
 
                   <Select
-                    value={selectedTarget && prettyDnpName(selectedTarget.consClient)}
-                    options={options.consClients.filter(Boolean).map(prettyDnpName)}
+                    value={
+                      selectedTarget && prettyDnpName(selectedTarget.consClient)
+                    }
+                    options={options.consClients
+                      .filter(Boolean)
+                      .map(prettyDnpName)}
                     onValueChange={(newOpt: string) => {
-                      const newCc = consensusClientsMainnet.find(ec => prettyDnpName(ec) === newOpt);
+                      const newCc = Object.values(ConsensusClientMainnet).find(
+                        ec => prettyDnpName(ec) === newOpt
+                      );
                       if (newCc) {
                         onTargetChange({
                           ...(selectedTarget || {}),
@@ -265,33 +273,6 @@ function EthMultiClients({
         );
       })}
     </div>
-  );
-}
-
-/**
- * View and toggle using the checkpointsync
- * This component should be used with EthMultiClients
- */
-function EthMultiClientCheckpointSync({
-  target,
-  useCheckpointSync,
-  setUseCheckpointSync
-}: {
-  target: Eth2ClientTarget | null;
-  useCheckpointSync: boolean;
-  setUseCheckpointSync: (newUseCheckpointSync: boolean) => void;
-}) {
-  // Do not render for remote
-  if (!target || target === "remote") return null;
-
-  return (
-    <Switch
-      className="eth-multi-clients-fallback"
-      checked={useCheckpointSync}
-      onToggle={bool => setUseCheckpointSync(bool)}
-      label={`Use dappnode checkpoint sync (https://checkpoint-sync.dappnode.io) for consensus client fast sync`}
-      id="eth-multi-clients-checkpointsync-switch"
-    />
   );
 }
 
@@ -334,8 +315,6 @@ export function EthMultiClientsAndFallback({
   onTargetChange,
   newEthRemoteRpc,
   setNewEthRemoteRpc,
-  useCheckpointSync,
-  setUseCheckpointSync,
   showStats,
   fallback,
   onFallbackChange
@@ -344,8 +323,6 @@ export function EthMultiClientsAndFallback({
   onTargetChange: (newTarget: Eth2ClientTarget) => void;
   newEthRemoteRpc: string;
   setNewEthRemoteRpc: (newEthRemoteRpc: string) => void;
-  useCheckpointSync?: boolean;
-  setUseCheckpointSync?: (newUseCheckpointSync: boolean) => void;
   showStats?: boolean;
   fallback: EthClientFallback;
   onFallbackChange: (newFallback: EthClientFallback) => void;
@@ -358,7 +335,6 @@ export function EthMultiClientsAndFallback({
         newEthRemoteRpc={newEthRemoteRpc}
         setNewEthRemoteRpc={setNewEthRemoteRpc}
         showStats={showStats}
-        useCheckpointSync={useCheckpointSync}
       />
 
       <EthMultiClientFallback
@@ -372,24 +348,6 @@ export function EthMultiClientsAndFallback({
           If your node is not available, you won't be able to update packages or
           access the DAppStore.
         </Alert>
-      )}
-
-      {useCheckpointSync !== undefined && setUseCheckpointSync !== undefined && (
-        <>
-          <br />
-          <br />
-          <EthMultiClientCheckpointSync
-            target={target}
-            useCheckpointSync={useCheckpointSync}
-            setUseCheckpointSync={setUseCheckpointSync}
-          />
-
-          {target && target !== "remote" && !useCheckpointSync && (
-            <Alert variant="warning">
-              It may take a while for the consensus client to sync from genesis.
-            </Alert>
-          )}
-        </>
       )}
     </div>
   );

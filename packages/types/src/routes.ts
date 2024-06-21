@@ -130,14 +130,10 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: <T extends Network>(
-    network: T
-  ) => Promise<StakerConfigGet<T>>;
+  stakerConfigGet: <T extends Network>(network: T) => Promise<StakerConfigGet>;
 
   /** Sets the staker configuration for a given network */
-  stakerConfigSet: <T extends Network>(kwargs: {
-    stakerConfig: StakerConfigSet<T>;
-  }) => Promise<void>;
+  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
@@ -228,7 +224,6 @@ export interface Routes {
     target: Eth2ClientTarget;
     ethRemoteRpc: string;
     sync?: boolean;
-    useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
     deletePrevExecClientVolumes?: boolean;
     deletePrevConsClient?: boolean;

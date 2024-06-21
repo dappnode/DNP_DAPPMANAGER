@@ -2,7 +2,6 @@ import { isEqual, uniq } from "lodash-es";
 import {
   Eth2ClientTarget,
   EthClientRemote,
-  ExecutionClient,
   InstalledPackageDetailData,
 } from "@dappnode/types";
 import * as db from "@dappnode/db";
@@ -21,11 +20,7 @@ import {
   listPackageNoThrow,
   getNetworkContainerConfig,
 } from "@dappnode/dockerapi";
-import {
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  Network,
-} from "@dappnode/types";
+import { Network } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export enum ComposeAliasEditorAction {
@@ -71,7 +66,6 @@ export class EthereumClient {
     dappnodeInstaller,
     nextTarget,
     sync,
-    useCheckpointSync,
     deletePrevExecClient,
     deletePrevExecClientVolumes,
     deletePrevConsClient,
@@ -81,7 +75,6 @@ export class EthereumClient {
     dappnodeInstaller: DappnodeInstaller;
     nextTarget: Eth2ClientTarget;
     sync: boolean;
-    useCheckpointSync: boolean;
     deletePrevExecClient: boolean;
     deletePrevExecClientVolumes: boolean;
     deletePrevConsClient: boolean;
@@ -122,7 +115,7 @@ export class EthereumClient {
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
       if (!deletePrevExecClient && currentTarget !== "remote")
         await this.updateFullnodeAlias({
-          network: "mainnet",
+          network: Network.Mainnet,
           prevExecClientDnpName: currentTarget.execClient,
         }).catch((e) =>
           logs.error(
@@ -142,7 +135,6 @@ export class EthereumClient {
             currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
-          useCheckpointSync,
         });
       else
         await this.changeEthClientNotAsync({
@@ -150,7 +142,6 @@ export class EthereumClient {
             currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
           consClient,
-          useCheckpointSync,
         });
     }
   }
@@ -163,14 +154,14 @@ export class EthereumClient {
    * @param newExecClientDnpName - New execution client to set.
    * @param network - Network to define the proper alias.
    */
-  async updateFullnodeAlias<T extends Network>({
+  async updateFullnodeAlias({
     prevExecClientDnpName,
     newExecClientDnpName,
-    network = "mainnet" as T,
+    network = Network.Mainnet,
   }: {
-    prevExecClientDnpName?: ExecutionClient<T>;
-    newExecClientDnpName?: ExecutionClient<T>;
-    network?: T;
+    prevExecClientDnpName?: string;
+    newExecClientDnpName?: string | null;
+    network?: Network;
   }): Promise<void> {
     const fullnodeAlias =
       network === "mainnet"
@@ -205,11 +196,11 @@ export class EthereumClient {
     }
   }
 
-  private async removeAliasFromPreviousExecClient<T extends Network>({
+  private async removeAliasFromPreviousExecClient({
     execClientDnpName,
     fullnodeAlias,
   }: {
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     fullnodeAlias: string;
   }): Promise<void> {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
@@ -233,11 +224,11 @@ export class EthereumClient {
     });
   }
 
-  private async addAliasToNewExecClient<T extends Network>({
+  private async addAliasToNewExecClient({
     execClientDnpName,
     fullnodeAlias,
   }: {
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     fullnodeAlias: string;
   }): Promise<void> {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
@@ -335,13 +326,11 @@ export class EthereumClient {
     prevExecClient,
     execClient,
     consClient,
-    useCheckpointSync,
   }: {
     dappnodeInstaller: DappnodeInstaller;
-    prevExecClient?: ExecutionClientMainnet;
-    execClient: ExecutionClientMainnet;
-    consClient: ConsensusClientMainnet;
-    useCheckpointSync?: boolean;
+    prevExecClient?: string;
+    execClient: string;
+    consClient: string;
   }): Promise<void> {
     try {
       // Install execution client and set default fullnode alias
@@ -354,7 +343,7 @@ export class EthereumClient {
         await packageInstall(dappnodeInstaller, { name: execClient }).then(
           async () =>
             await this.updateFullnodeAlias({
-              network: "mainnet",
+              network: Network.Mainnet,
               newExecClientDnpName: execClient,
               prevExecClientDnpName: prevExecClient,
             })
@@ -363,15 +352,10 @@ export class EthereumClient {
         logs.info(`Starting execution client ${execClient}`);
         // Start pkg if not running
         if (execClientPackage.containers.some((c) => c.state !== "running"))
-          await dockerComposeUpPackage(
-            { dnpName: execClient },
-            {},
-            {},
-            true
-          ).then(
+          await dockerComposeUpPackage({ dnpName: execClient }, true).then(
             async () =>
               await this.updateFullnodeAlias({
-                network: "mainnet",
+                network: Network.Mainnet,
                 newExecClientDnpName: execClient,
                 prevExecClientDnpName: prevExecClient,
               })
@@ -386,8 +370,7 @@ export class EthereumClient {
         // Get default cons client user settings and install cons client
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
-          network: "mainnet",
-          useCheckpointSync,
+          network: Network.Mainnet,
         });
         await packageInstall(dappnodeInstaller, {
           name: consClient,
@@ -396,7 +379,7 @@ export class EthereumClient {
       } else {
         // Start pkg if not running
         if (consClientPkg.containers.some((c) => c.state !== "running"))
-          await dockerComposeUpPackage({ dnpName: consClient }, {}, {}, true);
+          await dockerComposeUpPackage({ dnpName: consClient }, true);
       }
     } catch (e) {
       throw Error(`Error changing eth client: ${e}`);
@@ -410,12 +393,10 @@ export class EthereumClient {
     prevExecClient,
     execClient,
     consClient,
-    useCheckpointSync,
   }: {
-    prevExecClient?: ExecutionClientMainnet;
-    execClient: ExecutionClientMainnet;
-    consClient: ConsensusClientMainnet;
-    useCheckpointSync?: boolean;
+    prevExecClient?: string;
+    execClient: string;
+    consClient: string;
   }): Promise<void> {
     db.ethExecClientInstallStatus.set(execClient, {
       status: "TO_INSTALL",
@@ -424,7 +405,6 @@ export class EthereumClient {
       status: "TO_INSTALL",
     });
     eventBus.runEthClientInstaller.emit({
-      useCheckpointSync,
       prevExecClientDnpName: prevExecClient,
     });
   }
@@ -432,14 +412,14 @@ export class EthereumClient {
   // Utils
 
   // TODO: Should be private
-  public editFullnodeAliasInCompose<T extends Network>({
+  public editFullnodeAliasInCompose({
     action,
     execClientDnpName,
     execClientServiceName,
     alias = params.FULLNODE_ALIAS,
   }: {
     action: ComposeAliasEditorAction;
-    execClientDnpName: ExecutionClient<T>;
+    execClientDnpName: string;
     execClientServiceName: string;
     alias: string;
   }): void {

@@ -38,7 +38,9 @@ const polkadotNewCompose = {
       },
       restart: "unless-stopped",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
-      networks: ["dncore_network"],
+      networks: {
+        dncore_network: {},
+      },
     },
   },
   volumes: {
@@ -60,7 +62,7 @@ const polkadotCurrentCompose = {
   },
 };
 
-describe("parseUserSet", () => {
+describe("parseUserSettings", () => {
   it("Should parse a normal case", () => {
     const compose: Compose = {
       ...mockCompose,
@@ -77,6 +79,11 @@ describe("parseUserSet", () => {
             "moredata:/usr/data1",
             `${bitcoinVolumeNameNew}:/usr/data2`,
           ],
+          networks: {
+            holesky_network: {
+              aliases: ["mock-dnp"],
+            }
+          }
         },
       },
       volumes: {
@@ -90,6 +97,11 @@ describe("parseUserSet", () => {
           },
         },
       },
+      networks: {
+        holesky_network: {
+          external: true,
+        }
+      }
     };
 
     const userSettings = parseUserSettings(compose);
@@ -112,6 +124,20 @@ describe("parseUserSet", () => {
         [bitcoinVolumeNameNew]: "/dev0/data",
         moredata: "",
       },
+      networks: {
+        rootNetworks: {
+          holesky_network: {
+            external: true,
+          }
+        },
+        serviceNetworks: {
+          [mockDnpName]: {
+            holesky_network: {
+              aliases: ["mock-dnp"],
+            }
+          }
+        }
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
@@ -144,7 +170,7 @@ describe("parseUserSet", () => {
         [bitcoinName]: {
           [bitcoinVolumeName]: "/dev1/custom-path",
         },
-      },
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
@@ -170,6 +196,18 @@ describe("parseUserSet", () => {
       namedVolumeMountpoints: {
         polkadot: "",
       },
+      networks: {
+        rootNetworks: {
+          dncore_network: {
+            external: true,
+          },
+        },
+        serviceNetworks: {
+          [polkadotServiceName]: {
+            dncore_network: {},
+          },
+        }
+      }
     };
 
     expect(userSettings).to.deep.equal(expectedUserSet);
@@ -237,6 +275,21 @@ describe("parseUserSet", () => {
         ethchaindnpdappnodeeth_geth: "",
         ethchaindnpdappnodeeth_identity: "",
         ethchaindnpdappnodeeth_ipc: "",
+      },
+      networks: {
+        rootNetworks: {
+          network: {
+            driver: "bridge",
+            ipam: { config: [{ subnet: "172.33.0.0/16" }] },
+          },
+        },
+        serviceNetworks: {
+          [serviceName]: {
+            network: {
+              ipv4_address: "172.33.1.6",
+            },
+          }
+        }
       },
     };
 
