@@ -9,6 +9,9 @@ import { bitcoin } from "./bitcoin.js";
 import { ethereum } from "./ethereum.js";
 import { ethereum2 } from "./ethereum2.js";
 import { monero } from "./monero.js";
+import { avalanche } from "./avalanche.js";
+import { substrate } from "./substrate.js";
+import { tendermint } from "./tendermint.js";
 
 /**
  * Returns chain data given a driver and api URL
@@ -40,6 +43,12 @@ export async function runWithChainDriver(
       return ethereum2(dnp, chainDriverSpecs);
     case "monero":
       return monero(dnp);
+    case "avalanche":
+      return avalanche(dnp, chainDriverSpecs);
+    case "tendermint":
+      return tendermint(dnp, chainDriverSpecs);
+    case "substrate":
+      return substrate(dnp, chainDriverSpecs);
     default:
       throw Error(`Unsupported chain: ${chainDriverSpecs.driver}`);
   }

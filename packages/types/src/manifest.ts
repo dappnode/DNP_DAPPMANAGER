@@ -157,6 +157,9 @@ export const chainDriversTypes = [
   "ethereum-beacon-chain",
   "ethereum2-beacon-chain-prysm",
   "monero",
+  "substrate",
+  "tendermint",
+  "avalanche",
 ] as const;
 
 // HTTPS ports
