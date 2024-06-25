@@ -30,7 +30,7 @@ import {
   fileToGatewayUrl,
 } from "@dappnode/utils";
 import { lt } from "semver";
-import { merge, uniq, isEqual } from "lodash-es";
+import { merge, uniq, isMatch } from "lodash-es";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -103,11 +103,11 @@ export class StakerComponent {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
     compatibleClients:
-    | {
-      dnpName: string;
-      minVersion: string;
-    }[]
-    | null;
+      | {
+          dnpName: string;
+          minVersion: string;
+        }[]
+      | null;
     dockerNetworkConfigsToAdd: {
       [serviceName: string]: ComposeServiceNetworksObj;
     };
@@ -158,22 +158,17 @@ export class StakerComponent {
     userSettings?: UserSettingsAllDnps
   ): Promise<void> {
     // ensure pkg installed
-    if (!(await listPackageNoThrow({
-      dnpName,
-    })))
+    if (!(await listPackageNoThrow({ dnpName })))
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings,
       });
     else if (userSettings) {
-      // write userSettings if are different. Currently only applies to mev boost
-      const userSettingsPrev = new ComposeFileEditor(
-        dnpName,
-        false
-      ).getUserSettings();
-      if (!isEqual(userSettingsPrev, userSettings)) {
-        const composeEditor = new ComposeFileEditor(dnpName, false);
-        composeEditor.applyUserSettings(userSettings, { dnpName });
+      const composeEditor = new ComposeFileEditor(dnpName, false);
+      const userSettingsPrev: UserSettingsAllDnps = {};
+      userSettingsPrev[dnpName] = composeEditor.getUserSettings();
+      if (!isMatch(userSettingsPrev, userSettings)) {
+        composeEditor.applyUserSettings(userSettings[dnpName], { dnpName });
         composeEditor.write();
       }
     }
@@ -212,7 +207,9 @@ export class StakerComponent {
       }
 
       if (Array.isArray(service.networks)) {
-        service.networks = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
+        service.networks = ComposeFileEditor.convertNetworkArrayToObject(
+          service.networks
+        );
       }
 
       service.networks = this.mergeServiceNetworks({
@@ -222,7 +219,7 @@ export class StakerComponent {
 
       composeEditor.compose.networks = this.updateComposeRootNetworks({
         currentRootNetworks: rootNetworks,
-        serviceNetworkConfig: networkConfig
+        serviceNetworkConfig: networkConfig,
       });
     }
 

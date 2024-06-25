@@ -103,13 +103,20 @@ export class Consensus extends StakerComponent {
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
+    // get default userSettings for the new consensus to be installed
+    // use undefined to avoid overwriting existing userSettings
+    const userSettings =
+      newConsensusDnpName &&
+      !(await listPackageNoThrow({ dnpName: newConsensusDnpName }))
+        ? this.getConsensusUserSettings(newConsensusDnpName, network)
+        : undefined;
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
       dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
-      userSettings: this.getConsensusUserSettings(newConsensusDnpName, network),
+      userSettings,
       prevClient: prevConsClientDnpName,
     });
     // persist on db
