@@ -1,3 +1,4 @@
+//import { Network } from "pages/system/components/Network";
 import { urlJoin } from "utils/url";
 
 // JSON RPC API
@@ -40,6 +41,9 @@ export const wifiEnvSSID = "SSID";
 
 // Local proxying
 export const adminUiLocalDomain = "http://dappnode.local";
+
+// HTTPS Portal UI Link (http://my.dappnode/system/network)
+export const httpsPortalUIPath = urlJoin(apiUrl, "system", "network");
 
 // DNP names
 export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
