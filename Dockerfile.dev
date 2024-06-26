@@ -33,7 +33,7 @@ COPY docker/start_dev.sh /usr/src/app/start_dev.sh
 
 # Build the src code:
 # Copy and install deps first to cache
-COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY package.json yarn.lock tsconfig.json ./
 COPY packages packages
 
 RUN yarn --frozen-lockfile --non-interactive

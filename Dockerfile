@@ -17,7 +17,7 @@ FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS build-src
 # python3 and build-base are needed for react app build
 RUN apk add --no-cache python3 py3-pip build-base
 WORKDIR /app
-COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY package.json yarn.lock tsconfig.json ./
 COPY packages packages
 # For the admin-ui
 ENV VITE_APP_API_URL /
