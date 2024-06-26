@@ -36,7 +36,7 @@ COPY docker/start_dev.sh /usr/src/app/start_dev.sh
 COPY package.json yarn.lock tsconfig.json ./
 COPY packages packages
 
-RUN yarn --frozen-lockfile --non-interactive
+RUN yarn --immutable --non-interactive --ignore-optional
 
 ENV VITE_APP_API_URL /
 RUN yarn build

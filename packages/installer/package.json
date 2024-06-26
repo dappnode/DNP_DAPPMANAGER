@@ -19,7 +19,6 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
     "@dappnode/db": "^0.1.0",
     "@dappnode/dockerapi": "^0.1.0",
     "@dappnode/dockercompose": "^0.1.0",
@@ -30,6 +29,7 @@
     "@dappnode/params": "^0.1.0",
     "@dappnode/schemas": "^0.1.14",
     "@dappnode/toolkit": "^0.1.21",
+    "@dappnode/types": "^0.1.36",
     "@dappnode/utils": "^0.1.0",
     "deepmerge": "2.2.1",
     "ethers": "^6.9.0",

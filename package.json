@@ -9,44 +9,20 @@
     "node": "20.x"
   },
   "workspaces": [
-    "packages/types",
-    "packages/ethicalMetrics",
-    "packages/params",
-    "packages/eventBus",
-    "packages/toolkit",
-    "packages/common",
-    "packages/schemas",
-    "packages/utils",
-    "packages/logger",
-    "packages/dockerCompose",
-    "packages/hostScriptsServices",
-    "packages/dockerApi",
-    "packages/db",
-    "packages/httpsPortal",
-    "packages/upnpc",
-    "packages/chains",
-    "packages/installer",
-    "packages/dyndns",
-    "packages/stakers",
-    "packages/daemons",
-    "packages/optimism",
-    "packages/migrations",
-    "packages/dappmanager",
-    "packages/admin-ui"
+    "packages/*"
   ],
   "scripts": {
-    "build": "yarn workspaces run build",
-    "test": "yarn workspaces run --include-workspace-root false test",
-    "lint": "yarn workspaces run --include-workspace-root false lint",
-    "test:int": "yarn workspaces run --include-workspace-root false test:int",
-    "pre-commit": "yarn workspaces run --include-workspace-root false pre-commit",
-    "mock-standalone:build": "yarn workspaces run --include-workspace-root false mock-standalone:build",
-    "generate": "yarn workspaces run --include-workspace-root false generate",
+    "build": "yarn workspaces foreach -p -A run build",
+    "test": "yarn workspaces foreach -p -A run test",
+    "lint": "yarn workspaces foreach -p -A run lint",
+    "test:int": "yarn workspaces foreach -p -A run test:int",
+    "pre-commit": "yarn workspaces foreach -p -A run pre-commit",
+    "mock-standalone:build": "yarn workspaces foreach workspaces foreach -p -A run mock-standalone:build",
+    "generate": "yarn workspaces foreach workspaces foreach -p -A run generate",
     "clean": "yarn run clean:build && yarn run clean:libraries",
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
@@ -62,5 +38,6 @@
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"
-  }
+  },
+  "packageManager": "yarn@4.3.1"
 }
