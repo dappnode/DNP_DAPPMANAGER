@@ -1,9 +1,13 @@
 import { CoreUpdateDataAvailable } from "@dappnode/types";
 import { urlJoin, prettyDnpName } from "@dappnode/utils";
-import { getInstallerPath } from "../../../admin-ui/src/pages/installer/data.js";
+//import { getInstallerPath } from "../../../admin-ui/src/pages/installer/data.js";
 
 const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
-const adminUiInstallPackageUrl = "http://my.dappnode";
+//const adminUiInstallPackageUrl = "http://my.dappnode";
+const getInstallerPath = (dnpName: string) => {
+  if (dnpName.includes("public")) return "http://my.dappnode/installer/public";
+  return "http://my.dappnode/installer/dnp";
+};
 
 export function formatPackageUpdateNotification({
   dnpName,
@@ -19,7 +23,7 @@ export function formatPackageUpdateNotification({
   autoUpdatesEnabled: boolean;
 }): string {
   const prettyName = prettyDnpName(dnpName);
-  const installUrl = urlJoin(adminUiInstallPackageUrl, getInstallerPath(dnpName), dnpName);
+  const installUrl = urlJoin(getInstallerPath(dnpName), dnpName);
 
   return [
     `New version ready to install for ${prettyName} (current version ${currentVersion})`,
