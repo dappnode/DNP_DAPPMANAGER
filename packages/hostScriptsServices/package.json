@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@dappnode/logger": "^0.1.0",
+    "@dappnode/params": "^0.1.0",
     "@dappnode/types": "^0.1.36",
     "@dappnode/utils": "^0.1.0",
     "memoizee": "0.4.14"

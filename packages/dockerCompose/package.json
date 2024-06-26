@@ -19,12 +19,15 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
+    "@dappnode/params": "^0.1.0",
     "@dappnode/types": "^0.1.36",
     "@dappnode/utils": "^0.1.0",
-    "lodash-es": "^4.17.21"
+    "lodash-es": "^4.17.21",
+    "semver": "^7.3.8"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.9",
-    "@types/node": "^20.6.2"
+    "@types/node": "^20.6.2",
+    "@types/semver": "^7.5.8"
   }
 }

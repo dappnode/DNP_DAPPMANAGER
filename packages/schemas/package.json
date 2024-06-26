@@ -33,7 +33,8 @@
     "src/schemas"
   ],
   "devDependencies": {
-    "@types/node": "^20.6.2"
+    "@types/node": "^20.6.2",
+    "@types/semver": "^7.5.8"
   },
   "dependencies": {
     "@dappnode/types": "^0.1.38",
