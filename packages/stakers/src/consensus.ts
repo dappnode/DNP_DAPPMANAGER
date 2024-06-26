@@ -97,7 +97,7 @@ export class Consensus extends StakerComponent {
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
         this.getNetworkConfigsToAdd(network),
-        this.getConsensusUserSettings(currentConsensusDnpName, network)
+        this.getDefaultConsensusUserSettings(currentConsensusDnpName, network)
       );
   }
 
@@ -108,7 +108,7 @@ export class Consensus extends StakerComponent {
     const userSettings =
       newConsensusDnpName &&
       !(await listPackageNoThrow({ dnpName: newConsensusDnpName }))
-        ? this.getConsensusUserSettings(newConsensusDnpName, network)
+        ? this.getDefaultConsensusUserSettings(newConsensusDnpName, network)
         : undefined;
 
     await super.setNew({
@@ -124,7 +124,7 @@ export class Consensus extends StakerComponent {
       await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getConsensusUserSettings(
+  private getDefaultConsensusUserSettings(
     newConsensusDnpName: string | null,
     network: Network
   ): UserSettingsAllDnps {

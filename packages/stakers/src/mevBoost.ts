@@ -107,7 +107,7 @@ export class MevBoost extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
-      userSettings: this.getMevBoostNewUserSettings(
+      userSettings: this.getNewMevBoostNewUserSettings(
         newMevBoostDnpName,
         newRelays
       ),
@@ -118,7 +118,7 @@ export class MevBoost extends StakerComponent {
       await this.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
-  private getMevBoostNewUserSettings(
+  private getNewMevBoostNewUserSettings(
     newMevBoostDnpName: string | null,
     newRelays: string[]
   ): UserSettingsAllDnps {
