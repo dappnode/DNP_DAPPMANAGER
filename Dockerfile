@@ -19,10 +19,10 @@ COPY package.json yarn.lock tsconfig.json ./
 COPY packages packages
 # For the admin-ui
 ENV REACT_APP_API_URL /
-RUN yarn --frozen-lockfile --non-interactive --ignore-optional && \
+RUN yarn --immutable --non-interactive --ignore-optional && \
   yarn build && \
   yarn clean:libraries && \
-  yarn install --non-interactive --frozen-lockfile --production --force --ignore-optional
+  yarn install workspaces focus --all --production --non-interactive --immutable --force --ignore-optional
 RUN rm -rf yarn.lock packages/*/node_modules packages/*/src packages/*/tsconfig.json packages/*/.eslint*
 
 # Production stage
