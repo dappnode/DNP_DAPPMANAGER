@@ -36,12 +36,12 @@
   ],
   "scripts": {
     "build": "yarn workspaces run build",
-    "test": "yarn workspaces run test",
-    "lint": "yarn workspaces run lint",
-    "test:int": "yarn workspaces run test:int",
-    "pre-commit": "yarn workspaces run pre-commit",
-    "mock-standalone:build": "yarn workspaces run mock-standalone:build",
-    "generate": "yarn workspaces run generate",
+    "test": "yarn workspaces run --include-workspace-root false test",
+    "lint": "yarn workspaces run --include-workspace-root false lint",
+    "test:int": "yarn workspaces run --include-workspace-root false test:int",
+    "pre-commit": "yarn workspaces run --include-workspace-root false pre-commit",
+    "mock-standalone:build": "yarn workspaces run --include-workspace-root false mock-standalone:build",
+    "generate": "yarn workspaces run --include-workspace-root false generate",
     "clean": "yarn run clean:build && yarn run clean:libraries",
     "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
     "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
