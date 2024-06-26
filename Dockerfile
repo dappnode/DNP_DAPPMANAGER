@@ -15,7 +15,7 @@ RUN node getGitData /usr/src/app/.git-data.json
 # Build source files
 FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as build-src
 WORKDIR /app
-COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY package.json yarn.lock tsconfig.json ./
 COPY packages packages
 # For the admin-ui
 ENV REACT_APP_API_URL /
