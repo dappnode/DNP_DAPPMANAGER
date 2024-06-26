@@ -32,6 +32,7 @@
     "@dappnode/types": "^0.1.36",
     "@dappnode/upnpc": "^0.1.0",
     "@dappnode/utils": "^0.1.0",
+    "dockerode": "^4.0.0",
     "is-ip": "^3.0.0",
     "lodash-es": "^4.17.21",
     "node-telegram-bot-api": "^0.65.1",
@@ -39,6 +40,7 @@
     "systeminformation": "^5.21.24"
   },
   "devDependencies": {
+    "@types/dockerode": "^3.3.23",
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^20.6.2",
     "@types/node-telegram-bot-api": "^0.64.6",

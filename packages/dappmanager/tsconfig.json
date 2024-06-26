@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     /* Modules */
-    "types": ["mocha", "node"],
+    "types": [ "node"],
 
     /* Emit */
     "outDir": "dist",
