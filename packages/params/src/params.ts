@@ -319,13 +319,13 @@ export const params = {
       name: "Nethermind Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
     },
     {
       name: "Nethermind Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
     },
     {
       name: "Lodestar Ethereum consensus client team",
