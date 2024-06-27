@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "yarn run generate && tsc -p tsconfig.json",
-    "generate": "NODE_OPTIONS=--loader=ts-node/esm ts-node -P tsconfig.json ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
+    "generate": "NODE_PATH=$MODULE_DIR NODE_OPTIONS=ts-node/esm ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
@@ -26,7 +26,6 @@
     "@types/lodash-es": "^4.17.6",
     "@types/node": "^18.11.18",
     "ajv": "^8.12.0",
-    "ts-node": "^10.9.2",
     "typescript": "^5.3.3",
     "typescript-json-schema": "^0.62.0"
   }
