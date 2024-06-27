@@ -158,6 +158,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-config-react-app", "virtual:84da825047ceadb9de084386f090d9c85eb8449c510433e854ee809aa0fab882d841d7c1eab0f8d1462f5a93457428a0f1b5343acc49480199ac6e3d59f2006b#npm:7.0.1"],\
           ["mocha", "npm:10.2.0"],\
           ["nodemon", "npm:3.0.2"],\
+          ["prettier", "npm:3.3.2"],\
           ["rimraf", "npm:3.0.2"],\
           ["ts-node", "virtual:84da825047ceadb9de084386f090d9c85eb8449c510433e854ee809aa0fab882d841d7c1eab0f8d1462f5a93457428a0f1b5343acc49480199ac6e3d59f2006b#npm:10.9.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"]\
@@ -4188,6 +4189,7 @@ const RAW_RUNTIME_STATE =
           ["@reduxjs/toolkit", "virtual:71fe3b2a9886d1f023087fe2e1f0523919648221d50e1ab375ecccf5dd6990c1e4628dedf5fcb2429fe1c4764fddefabb1caef19cd3ec29b59d178a1c93a9101#npm:1.9.5"],\
           ["@types/clipboard", "npm:2.0.7"],\
           ["@types/jest", "npm:24.9.1"],\
+          ["@types/lodash-es", "npm:4.17.8"],\
           ["@types/node", "npm:18.17.1"],\
           ["@types/qrcode.react", "npm:1.0.2"],\
           ["@types/react", "npm:18.2.18"],\
@@ -4206,7 +4208,6 @@ const RAW_RUNTIME_STATE =
           ["is-ipfs", "npm:8.0.1"],\
           ["lodash-es", "npm:4.17.21"],\
           ["mitt", "npm:2.1.0"],\
-          ["prettier", "npm:1.19.1"],\
           ["pretty-bytes", "npm:5.6.0"],\
           ["qrcode.react", "virtual:71fe3b2a9886d1f023087fe2e1f0523919648221d50e1ab375ecccf5dd6990c1e4628dedf5fcb2429fe1c4764fddefabb1caef19cd3ec29b59d178a1c93a9101#npm:0.8.0"],\
           ["react", "npm:18.2.0"],\
@@ -4368,7 +4369,6 @@ const RAW_RUNTIME_STATE =
           ["multicodec", "npm:3.2.1"],\
           ["multiformats", "npm:11.0.2"],\
           ["node-fetch", "npm:3.3.2"],\
-          ["prettier", "npm:2.8.8"],\
           ["prom-client", "npm:14.2.0"],\
           ["rewiremock", "npm:3.14.5"],\
           ["semver", "npm:7.5.4"],\
@@ -4396,6 +4396,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-config-react-app", "virtual:84da825047ceadb9de084386f090d9c85eb8449c510433e854ee809aa0fab882d841d7c1eab0f8d1462f5a93457428a0f1b5343acc49480199ac6e3d59f2006b#npm:7.0.1"],\
           ["mocha", "npm:10.2.0"],\
           ["nodemon", "npm:3.0.2"],\
+          ["prettier", "npm:3.3.2"],\
           ["rimraf", "npm:3.0.2"],\
           ["ts-node", "virtual:84da825047ceadb9de084386f090d9c85eb8449c510433e854ee809aa0fab882d841d7c1eab0f8d1462f5a93457428a0f1b5343acc49480199ac6e3d59f2006b#npm:10.9.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"]\
@@ -4708,7 +4709,6 @@ const RAW_RUNTIME_STATE =
           ["is-ipfs", "npm:8.0.1"],\
           ["kubo-rpc-client", "npm:3.0.1"],\
           ["multiformats", "npm:11.0.2"],\
-          ["prettier", "npm:2.8.8"],\
           ["rimraf", "npm:5.0.5"],\
           ["semver", "npm:7.5.4"],\
           ["truffle", "npm:5.11.5"],\
@@ -25908,17 +25908,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["prettier", [\
-      ["npm:1.19.1", {\
-        "packageLocation": "../../../../../.yarn/berry/cache/prettier-npm-1.19.1-e56d246fd2-10c0.zip/node_modules/prettier/",\
+      ["npm:3.3.2", {\
+        "packageLocation": "./.yarn/unplugged/prettier-npm-3.3.2-efeafcaa4b/node_modules/prettier/",\
         "packageDependencies": [\
-          ["prettier", "npm:1.19.1"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:2.8.8", {\
-        "packageLocation": "../../../../../.yarn/berry/cache/prettier-npm-2.8.8-430828a36c-10c0.zip/node_modules/prettier/",\
-        "packageDependencies": [\
-          ["prettier", "npm:2.8.8"]\
+          ["prettier", "npm:3.3.2"]\
         ],\
         "linkType": "HARD"\
       }]\

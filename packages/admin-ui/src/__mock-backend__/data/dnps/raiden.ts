@@ -27,8 +27,7 @@ export const raiden: MockDnp = {
     author:
       "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: ["Abel Boldú (@vdo)"],
-    //@ts-ignore
-    homepage: {
+    links: {
       homepage: "https://github.com/dappnode/DAppNodePackage-raiden#readme"
     },
     repository: {
