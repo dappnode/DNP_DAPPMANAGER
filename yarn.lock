@@ -19279,7 +19279,6 @@ __metadata:
     "@types/node": "npm:^18.11.18"
     ajv: "npm:^8.12.0"
     lodash-es: "npm:^4.17.21"
-    ts-node: "npm:^10.9.2"
     typescript: "npm:^5.3.3"
     typescript-json-schema: "npm:^0.62.0"
   languageName: unknown
@@ -19412,6 +19411,9 @@ __metadata:
     rimraf: "npm:^3.0.2"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.3.3"
+  dependenciesMeta:
+    ts-node@10.9.2:
+      unplugged: true
   languageName: unknown
   linkType: soft
 
