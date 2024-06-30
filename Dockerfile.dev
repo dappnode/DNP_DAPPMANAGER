@@ -6,9 +6,9 @@ ARG NODE_VERSION=20.3.0
 ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 
 # Initial stage to gather git data
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as git-data
+FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
-RUN apk add --no-cache git
+RUN apk add --no-cache python3 py3-pip build-base
 COPY .git dappnode_package.json docker/getGitData.js ./
 RUN node getGitData /usr/src/app/.git-data.json
 
