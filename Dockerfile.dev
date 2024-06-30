@@ -21,7 +21,7 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
-  REACT_APP_API_URL=http://my.dappnode:5000/
+  VITE_APP_API_URL=http://my.dappnode:5000/
 WORKDIR /app
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
@@ -38,7 +38,7 @@ COPY packages packages
 
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional
 
-ENV REACT_APP_API_URL /
+ENV VITE_APP_API_URL /
 RUN yarn build
 
 ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]

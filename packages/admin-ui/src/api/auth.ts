@@ -55,6 +55,7 @@ export const apiAuth: IApiAuth = {
 ////////
 
 async function fetchAuthPost<T, R>(url: string, data?: T): Promise<R> {
+  console.log("apiTestMode", apiTestMode);
   const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -18,7 +18,7 @@ WORKDIR /app
 COPY package.json yarn.lock lerna.json tsconfig.json ./
 COPY packages packages
 # For the admin-ui
-ENV REACT_APP_API_URL /
+ENV VITE_APP_API_URL /
 RUN yarn --frozen-lockfile --non-interactive --ignore-optional && \
   yarn build && \
   yarn clean:libraries && \
