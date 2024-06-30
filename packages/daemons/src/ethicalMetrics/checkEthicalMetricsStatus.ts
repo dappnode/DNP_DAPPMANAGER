@@ -16,7 +16,7 @@ export async function checkEthicalMetricsStatus(
   const dmsDnpName = "dms.dnp.dappnode.eth";
 
   try {
-    const ethicalMetricsConfig = db.ethicalMetrics.get();
+    const ethicalMetricsConfig = db.notifications.get();
     if (!ethicalMetricsConfig) return;
     const { mail, enabled, tgChannelId } = ethicalMetricsConfig;
     if (enabled) {

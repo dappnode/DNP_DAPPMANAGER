@@ -1,0 +1,28 @@
+.accordion-notifications {
+  border-style: none;
+  background-color: transparent;
+
+  .header {
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    color: var(--dappnode-strong-main-color);
+  }
+  .header:hover {
+    text-decoration: underline;
+  }
+}
+
+.accordion-notifications-wrapper {
+  span {
+    padding: 5px;
+    border-radius: 5px;
+    &.light {
+      background-color: lightgray;
+    }
+    &.dark {
+      background-color: dimgray;
+    }
+  }
+}

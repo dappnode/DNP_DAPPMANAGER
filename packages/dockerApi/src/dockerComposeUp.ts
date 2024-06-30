@@ -28,9 +28,9 @@ interface ComposeUpArgs {
  */
 export async function dockerComposeUpPackage(
   { dnpName, composePath }: ComposeUpArgs,
-  containersStatus: ContainersStatus,
-  dockerComposeUpOptions: DockerComposeUpOptions = {},
-  upAll = false
+  upAll: boolean,
+  containersStatus?: ContainersStatus,
+  dockerComposeUpOptions?: DockerComposeUpOptions
 ): Promise<void> {
   if (!composePath) composePath = getDockerComposePathSmart(dnpName);
   if (!fs.existsSync(composePath)) {
@@ -41,14 +41,18 @@ export async function dockerComposeUpPackage(
   // because it adds a lot of complexity to create a new module for it.
 
   // Add timeout option if not previously specified
-  const timeout = getDockerTimeoutMax(Object.values(containersStatus));
-  if (timeout && !dockerComposeUpOptions.timeout)
+  const timeout = containersStatus
+    ? getDockerTimeoutMax(Object.values(containersStatus))
+    : undefined;
+  if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout)
     dockerComposeUpOptions.timeout = timeout;
 
   // Check the current status of package's container if any
   const serviceNames: string[] = readComposeServiceNames(composePath);
   const servicesToStart = serviceNames.filter(
-    (serviceName) => containersStatus[serviceName]?.targetStatus !== "stopped"
+    (serviceName) =>
+      containersStatus &&
+      containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
   try {

@@ -1,4 +1,5 @@
 import path from "path";
+import { Network } from "@dappnode/types";
 
 const devMode = process.env.LOG_LEVEL === "DEV_MODE";
 const MINUTE = 60 * 1000; // miliseconds
@@ -121,6 +122,13 @@ export const params = {
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
+  DOCKER_STAKER_NETWORKS: {
+    [Network.Mainnet]: "mainnet_network",
+    [Network.Holesky]: "holesky_network",
+    [Network.Prater]: "prater_network",
+    [Network.Gnosis]: "gnosis_network",
+    [Network.Lukso]: "lukso_network",
+  },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2", // "10.20.0.2"
   DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
@@ -311,13 +319,13 @@ export const params = {
       name: "Nethermind Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
     },
     {
       name: "Nethermind Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xbD404c6f101833b45fF45b80bEfBd17816376246",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
     },
     {
       name: "Lodestar Ethereum consensus client team",
@@ -360,6 +368,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
+    },
+    {
+      name: "Gnosis Team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1",
+    },
+    {
+      name: "Blockswap Labs",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a",
     },
   ],
 };

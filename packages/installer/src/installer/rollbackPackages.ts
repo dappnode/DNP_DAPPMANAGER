@@ -60,6 +60,7 @@ export async function rollbackPackages(
         } else {
           await dockerComposeUpPackage(
             { dnpName: pkg.dnpName, composePath: pkg.composePath },
+            false,
             pkg.containersStatus,
             { timeout: pkg.dockerTimeout }
           );

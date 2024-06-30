@@ -3,6 +3,7 @@ import React from "react";
 import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
 import StakerNetwork from "./StakerNetwork";
+import { Network } from "@dappnode/types";
 
 const StakersRoot: React.FC = () => {
   const stakersItems: {
@@ -15,9 +16,9 @@ const StakersRoot: React.FC = () => {
       title: "Ethereum",
       component: () =>
         StakerNetwork({
-          network: "mainnet",
+          network: Network.Mainnet,
           description:
-            "Ethereum is an open source, distributed software platform that is based on blockchain technology. It has its own native cryptocurrency called Ether and a programming language called Solidity."
+            "Ethereum is a decentralized, permissionless blockchain platform that employs a proof-of-stake (PoS) consensus mechanism, where validators stake Ether (ETH, native token of Ethereum) to secure the network and validate transactions in exchange for ETH rewards. This approach enhances network security and energy efficiency while also supporting the development and execution of smart contracts enabling robust decentralized applications (dApps) creating endless opportunities in its open-source ecosystem."
         })
     },
     {
@@ -25,9 +26,9 @@ const StakersRoot: React.FC = () => {
       title: "Gnosis Chain",
       component: () =>
         StakerNetwork({
-          network: "gnosis",
+          network: Network.Gnosis,
           description:
-            "Gnosis Chain is a reliable payments EVM blockchain built for rapid and cheap transactions. xDai is a stable token. GNO will provide Proof of Stake protection using the consensus-layer Gnosis Beacon Chain"
+            "The Gnosis Chain Network is a highly efficient, Ethereum-compatible blockchain that emphasizes security, low transaction costs, and fast execution speeds, catering primarily to decentralized finance (DeFi) applications and prediction markets. Leveraging a unique proof-of-stake consensus mechanism, it enables developers to build scalable dApps, fostering innovation and accessibility within the broader blockchain ecosystem."
         })
     },
     {
@@ -35,9 +36,9 @@ const StakersRoot: React.FC = () => {
       title: "Holesky",
       component: () =>
         StakerNetwork({
-          network: "holesky",
+          network: Network.Holesky,
           description:
-            "Holesky is a merged-from-genesis public Ethereum testnet which will replace Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol."
+            "Holesky is the latest public Ethereum testnet which will/has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
         })
     },
     {
@@ -45,9 +46,9 @@ const StakersRoot: React.FC = () => {
       title: "Prater",
       component: () =>
         StakerNetwork({
-          network: "prater",
+          network: Network.Prater,
           description:
-            "The resulting testnet from the Prater and Göerli merge is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack"
+            "Göerli, the proper name for the resulting testnet created from the Prater and Göerli merge, is the long-standing Ethereum testnet. Node operators can use it to test their node setups and app developers to test their stack before deploying to the Mainnet.  It has since been replaced by the Holesky Testnet that was launched in a merged state and did not need to merge EL and CL layers as was done in Göerli"
         })
     },
     {
@@ -55,19 +56,25 @@ const StakersRoot: React.FC = () => {
       title: "LUKSO",
       component: () =>
         StakerNetwork({
-          network: "lukso",
+          network: Network.Lukso,
           description:
-            "LUKSO blockchain provides creators and users with future-proof tools and standards to unleash their creative force in an open interoperable ecosystem."
+            "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
         })
     }
   ];
+
+  // Remove the "Prater" tab from the stakersItems array
+  const filteredStakersItems = stakersItems.filter(
+    item => item.subPath !== "prater"
+  );
 
   return (
     <>
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {stakersItems.map(route => (
+        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
+        {filteredStakersItems.map(route => (
           <button key={route.subPath} className="item-container">
             <NavLink
               to={route.subPath}

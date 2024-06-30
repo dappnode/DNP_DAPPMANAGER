@@ -6,6 +6,8 @@ import { params } from "@dappnode/params";
  * is greater than 4 MB
  */
 export async function pruneUserActionLogs(): Promise<void> {
+  // return if no file exists
+  if (!fs.existsSync(params.USER_ACTION_LOGS_DB_PATH)) return;
   const maxFileSizeBytes = 4194304; // Bytes = 4MB
   const currentFileSizeBytes = fs.statSync(
     params.USER_ACTION_LOGS_DB_PATH

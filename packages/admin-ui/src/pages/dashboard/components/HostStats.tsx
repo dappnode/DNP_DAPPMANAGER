@@ -83,7 +83,6 @@ export function HostStats() {
   const cpuStats = useApi.statsCpuGet();
   const memoryStats = useApi.statsMemoryGet();
   const diskStats = useApi.statsDiskGet();
-  const swapStats = useApi.statsSwapGet();
   const hostUptime = useApi.getHostUptime();
 
   useEffect(() => {
@@ -100,12 +99,11 @@ export function HostStats() {
   useEffect(() => {
     const interval = setInterval(() => {
       hostUptime.revalidate();
-      swapStats.revalidate();
     }, 60 * 5 * 1000);
     return () => {
       clearInterval(interval);
     };
-  }, [hostUptime, swapStats]);
+  }, [hostUptime]);
 
   return (
     <div className="dashboard-cards">
@@ -154,25 +152,6 @@ export function HostStats() {
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
-        ) : (
-          <StatsCardLoading />
-        )}
-      </StatsCardContainer>
-
-      <StatsCardContainer title={"swap"}>
-        {swapStats.data ? (
-          <StatsCardOk
-            infoCard
-            percent={swapStats.data.usedPercentage}
-            label="%"
-            text={
-              humanFileSize(swapStats.data.used) +
-              " / " +
-              humanFileSize(swapStats.data.total)
-            }
-          />
-        ) : swapStats.error ? (
-          <StatsCardError error={swapStats.error} />
         ) : (
           <StatsCardLoading />
         )}

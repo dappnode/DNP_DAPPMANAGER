@@ -133,6 +133,7 @@ describe("Fetch releases", () => {
         },
         compatible: {
           requiresCoreUpdate: false,
+          packagesToBeUninstalled: ["package-uncompatible.dnp.dappnode.eth"],
           resolving: false,
           isCompatible: true,
           error: "",

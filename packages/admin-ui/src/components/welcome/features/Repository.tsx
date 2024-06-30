@@ -25,7 +25,6 @@ export default function Repository({
 }) {
   const ethClientTarget = useSelector(getEthClientTarget);
   const ethRemoteRpc = useSelector(getEthRemoteRpc);
-  const [useCheckpointSync, setUseCheckpointSync] = useState(true);
   const [target, setTarget] = useState<Eth2ClientTarget>("remote");
   // Use fallback by default
   const [fallback, setFallback] = useState<EthClientFallback>("on");
@@ -45,8 +44,7 @@ export default function Repository({
       api
         .ethClientTargetSet({
           target,
-          ethRemoteRpc: newEthRemoteRpc,
-          useCheckpointSync
+          ethRemoteRpc: newEthRemoteRpc
         })
         .catch(e => {
           console.error(`Error on ethClientTargetSet: ${e.stack}`);
@@ -80,8 +78,6 @@ export default function Repository({
         onTargetChange={setTarget}
         newEthRemoteRpc={newEthRemoteRpc}
         setNewEthRemoteRpc={setNewEthRemoteRpc}
-        useCheckpointSync={useCheckpointSync}
-        setUseCheckpointSync={setUseCheckpointSync}
         showStats
         fallback={fallback}
         onFallbackChange={setFallback}

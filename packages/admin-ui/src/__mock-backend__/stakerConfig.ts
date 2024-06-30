@@ -1,11 +1,4 @@
-import {
-  ConsensusClient,
-  ExecutionClient,
-  MevBoost,
-  Routes,
-  Signer,
-  Network
-} from "@dappnode/types";
+import { Routes, Network } from "@dappnode/types";
 
 export const stakerConfig: Pick<
   Routes,
@@ -19,7 +12,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "geth.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -47,7 +40,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "nethermind.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -75,7 +68,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "besu.public.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "besu.public.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -103,7 +96,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -133,7 +126,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -157,12 +150,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "lighthouse.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -186,12 +178,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "teku.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -215,12 +206,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "nimbus.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -243,12 +233,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "lodestar.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "lodestar.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -271,13 +260,12 @@ export const stakerConfig: Pick<
                   shortDescription: "Lodestar consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer.dnp.dappnode.eth" as Signer<T>,
+            dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -304,7 +292,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost.dnp.dappnode.eth" as MevBoost<T>,
+            dnpName: "mev-boost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -342,7 +330,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "goerli-geth.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "goerli-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -369,9 +357,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-nethermind.dnp.dappnode.eth" as ExecutionClient<
-                T
-              >,
+              dnpName: "goerli-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -399,7 +385,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-besu.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "goerli-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -426,7 +412,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "goerli-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "goerli-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -456,7 +442,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm-prater.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "prysm-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -480,14 +466,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "lighthouse-prater.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "lighthouse-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -511,12 +494,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "teku-prater.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "teku-prater.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: false,
               isUpdated: true,
@@ -540,12 +522,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "nimbus-prater.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "nimbus-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -568,13 +549,12 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-prater.dnp.dappnode.eth" as Signer<T>,
+            dnpName: "web3signer-prater.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -604,7 +584,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-goerli.dnp.dappnode.eth" as MevBoost<T>,
+            dnpName: "mev-boost-goerli.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -642,7 +622,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "holesky-geth.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "holesky-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -669,9 +649,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "holesky-nethermind.dnp.dappnode.eth" as ExecutionClient<
-                T
-              >,
+              dnpName: "holesky-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -699,7 +677,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "holesky-besu.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "holesky-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -726,7 +704,7 @@ export const stakerConfig: Pick<
             },
             {
               status: "ok",
-              dnpName: "holesky-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "holesky-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -756,7 +734,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "prysm-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -780,14 +758,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "lighthouse-holesky.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "lighthouse-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -811,12 +786,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "teku-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "teku-holesky.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: false,
               isUpdated: true,
@@ -840,12 +814,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "nimbus-holesky.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "nimbus-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -868,13 +841,12 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-holesky.dnp.dappnode.eth" as Signer<T>,
+            dnpName: "web3signer-holesky.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -904,7 +876,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-holesky.dnp.dappnode.eth" as MevBoost<T>,
+            dnpName: "mev-boost-holesky.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -941,7 +913,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "nethermind-xdai.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "nethermind-xdai.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -971,9 +943,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -997,14 +967,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "lighthouse-gnosis.dnp.dappnode.eth" as ConsensusClient<
-                T
-              >,
+              dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1027,12 +994,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Lighthouse consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "teku-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "teku-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1056,12 +1022,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "nimbus-gnosis.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1085,13 +1050,12 @@ export const stakerConfig: Pick<
                   shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-gnosis.dnp.dappnode.eth" as Signer<T>,
+            dnpName: "web3signer-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -1118,7 +1082,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-gnosis.dnp.dappnode.eth" as MevBoost<T>,
+            dnpName: "mev-boost-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -1155,7 +1119,7 @@ export const stakerConfig: Pick<
           executionClients: [
             {
               status: "ok",
-              dnpName: "lukso-geth.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "lukso-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1183,7 +1147,7 @@ export const stakerConfig: Pick<
             }
             /*{
               status: "ok",
-              dnpName: "lukso-erigon.dnp.dappnode.eth" as ExecutionClient<T>,
+              dnpName: "lukso-erigon.dnp.dappnode.eth" ,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1213,7 +1177,7 @@ export const stakerConfig: Pick<
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "prysm-lukso.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1237,12 +1201,11 @@ export const stakerConfig: Pick<
                   shortDescription: "Prysm consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             },
             {
               status: "ok",
-              dnpName: "teku-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+              dnpName: "teku-lukso.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: true,
               isUpdated: true,
@@ -1266,13 +1229,12 @@ export const stakerConfig: Pick<
                   shortDescription: "Teku consensus client",
                   version: "0.1.0"
                 }
-              },
-              useCheckpointSync: true
+              }
             }
             /*{
               status: "ok",
               dnpName:
-                "lighthouse-lukso.dnp.dappnode.eth" as ConsensusClient<T>,
+                "lighthouse-lukso.dnp.dappnode.eth" ,
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1296,12 +1258,11 @@ export const stakerConfig: Pick<
                   version: "0.1.0"
                 }
               },
-              useCheckpointSync: true
             }*/
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-lukso.dnp.dappnode.eth" as Signer<T>,
+            dnpName: "web3signer-lukso.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -1328,7 +1289,7 @@ export const stakerConfig: Pick<
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-lukso.dnp.dappnode.eth" as MevBoost<T>,
+            dnpName: "mev-boost-lukso.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,

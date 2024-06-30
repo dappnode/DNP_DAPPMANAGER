@@ -15,6 +15,7 @@ import {
   mevBoostLukso,
   mevBoostMainnet,
   mevBoostPrater,
+  mevBoostHolesky,
   consensusClientHolesky,
   executionClientHolesky,
 } from "./stakerConfig.js";
@@ -55,6 +56,7 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}MEVBOOST_PRATER`]: mevBoostPrater.get(),
     [`${prefix}CONSENSUS_CLIENT_HOLESKY`]: consensusClientHolesky.get(),
     [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),
+    [`${prefix}MEVBOOST_HOLESKY`]: mevBoostHolesky.get(),
     [`${prefix}CONSENSUS_CLIENT_LUKSO`]: consensusClientLukso.get(),
     [`${prefix}EXECUTION_CLIENT_LUKSO`]: executionClientLukso.get(),
     [`${prefix}MEVBOOST_LUKSO`]: mevBoostLukso.get(),

@@ -4,7 +4,6 @@ import {
   StakerConfigGet,
   StakerConfigSet,
   StakerItemOk,
-  StakerType,
   StakerItem,
   Network
 } from "@dappnode/types";
@@ -12,27 +11,17 @@ import { responseInterface } from "swr";
 
 export const useStakerConfig = <T extends Network>(
   network: T,
-  currentStakerConfigReq: responseInterface<StakerConfigGet<T>, Error>
+  currentStakerConfigReq: responseInterface<StakerConfigGet, Error>
 ) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-  // Launchpad
-  const [showLaunchpadValidators, setShowLaunchpadValidators] = useState(false);
-  const [allStakerItemsOk, setAllStakerItemsOk] = useState<boolean>(false);
-  const [newExecClient, setNewExecClient] = useState<
-    StakerItemOk<T, "execution">
-  >();
-  const [newConsClient, setNewConsClient] = useState<
-    StakerItemOk<T, "consensus">
-  >();
-  const [newMevBoost, setNewMevBoost] = useState<
-    StakerItemOk<T, "mev-boost">
-  >();
-  const [newEnableWeb3signer, setNewEnableWeb3signer] = useState<boolean>(
-    false
-  );
+  const [newExecClient, setNewExecClient] = useState<StakerItemOk | null>(null);
+  const [newConsClient, setNewConsClient] = useState<StakerItemOk | null>(null);
+  const [newMevBoost, setNewMevBoost] = useState<StakerItemOk | null>(null);
+  const [newRelays, setNewRelays] = useState<string[]>([]);
+  const [newWeb3signer, setNewWeb3signer] = useState<StakerItemOk | null>(null);
   const [currentStakerConfig, setCurrentStakerConfig] = useState<
-    StakerConfigSet<T>
+    StakerConfigSet
   >();
   // Changes
   const [changes, setChanges] = useState<{
@@ -56,38 +45,34 @@ export const useStakerConfig = <T extends Network>(
       const consensusClient = consensusClients.find(cc =>
         isOkSelectedInstalledAndRunning(cc)
       );
-      const enableWeb3signer = isOkSelectedInstalledAndRunning(web3Signer);
 
       if (executionClient && executionClient.status === "ok")
         setNewExecClient(executionClient);
       if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
 
-      if (isOkSelectedInstalledAndRunning(mevBoost) && mevBoost.status === "ok")
+      const currentMevBoost = isOkSelectedInstalledAndRunning(mevBoost)
+        ? mevBoost
+        : null;
+      if (currentMevBoost && mevBoost.status === "ok") {
         setNewMevBoost(mevBoost);
-      setNewEnableWeb3signer(enableWeb3signer);
+        mevBoost.relays && setNewRelays(mevBoost.relays);
+      }
 
-      // Set the current config to be displayed in advance view
+      const currentWeb3signer = isOkSelectedInstalledAndRunning(web3Signer)
+        ? web3Signer
+        : null;
+      if (currentWeb3signer && web3Signer.status === "ok")
+        setNewWeb3signer(web3Signer);
+
       setCurrentStakerConfig({
         network,
-        executionClient:
-          executionClient?.status === "ok" ? executionClient : undefined,
-        consensusClient:
-          consensusClient?.status === "ok" ? consensusClient : undefined,
-        mevBoost:
-          mevBoost?.status === "ok" && isOkSelectedInstalledAndRunning(mevBoost)
-            ? mevBoost
-            : undefined,
-        enableWeb3signer
+        executionDnpName: executionClient?.dnpName || null,
+        consensusDnpName: consensusClient?.dnpName || null,
+        mevBoostDnpName: currentMevBoost?.dnpName || null,
+        relays: currentMevBoost?.relays || [],
+        web3signerDnpName: currentWeb3signer?.dnpName || null
       });
-
-      // set allStakerItemsOk
-      setAllStakerItemsOk(
-        executionClients.every(ec => ec.status === "ok") &&
-          consensusClients.every(cc => cc.status === "ok") &&
-          mevBoost.status === "ok" &&
-          web3Signer.status === "ok"
-      );
     }
   }, [currentStakerConfigReq.data, network]);
 
@@ -96,24 +81,27 @@ export const useStakerConfig = <T extends Network>(
       setChanges(
         getChanges({
           currentStakerConfig,
-          newConsClient,
-          newMevBoost,
-          newEnableWeb3signer,
-          newExecClient
+          newStakerConfig: {
+            network,
+            executionDnpName: newExecClient?.dnpName || null,
+            consensusDnpName: newConsClient?.dnpName || null,
+            mevBoostDnpName: newMevBoost?.dnpName || null,
+            relays: newRelays,
+            web3signerDnpName: newWeb3signer?.dnpName || null
+          }
         })
       );
   }, [
+    network,
     currentStakerConfig,
     newConsClient,
     newMevBoost,
-    newEnableWeb3signer,
+    newRelays,
+    newWeb3signer,
     newExecClient
   ]);
 
   return {
-    showLaunchpadValidators,
-    setShowLaunchpadValidators,
-    allStakerItemsOk,
     reqStatus,
     setReqStatus,
     newExecClient,
@@ -122,8 +110,10 @@ export const useStakerConfig = <T extends Network>(
     setNewConsClient,
     newMevBoost,
     setNewMevBoost,
-    newEnableWeb3signer,
-    setNewEnableWeb3signer,
+    newRelays,
+    setNewRelays,
+    newWeb3signer,
+    setNewWeb3signer,
     changes
   };
 };
@@ -142,46 +132,42 @@ export const useStakerConfig = <T extends Network>(
  *   - MEV boost
  *   - MEV boost relays
  */
-function getChanges<T extends Network>({
+function getChanges({
   currentStakerConfig,
-  newConsClient,
-  newMevBoost,
-  newEnableWeb3signer,
-  newExecClient
+  newStakerConfig
 }: {
-  currentStakerConfig: StakerConfigSet<T>;
-  newExecClient: StakerItemOk<T, "execution"> | undefined;
-  newConsClient?: StakerItemOk<T, "consensus">;
-  newMevBoost?: StakerItemOk<T, "mev-boost">;
-  newEnableWeb3signer: boolean;
+  currentStakerConfig: StakerConfigSet;
+  newStakerConfig: StakerConfigSet;
 }): {
   isAllowed: boolean;
   reason?: string;
   severity?: "warning" | "secondary" | "danger";
 } {
   const {
-    executionClient,
-    consensusClient,
-    mevBoost,
-    enableWeb3signer
+    executionDnpName,
+    consensusDnpName,
+    mevBoostDnpName,
+    relays,
+    web3signerDnpName
   } = currentStakerConfig;
-  const isExecAndConsSelected = Boolean(newExecClient && newConsClient);
-  const isExecAndConsDeSelected = Boolean(!newExecClient && !newConsClient);
+  const isExecAndConsSelected = Boolean(
+    newStakerConfig.executionDnpName && newStakerConfig.consensusDnpName
+  );
+  const isExecAndConsDeSelected = Boolean(
+    !newStakerConfig.executionDnpName && !newStakerConfig.consensusDnpName
+  );
 
   // Order and compare relays, returns true if changes were made
   const mevBoostRelaysChanged =
-    (newMevBoost?.relays || []).sort().join(",") !==
-    (mevBoost?.relays || []).sort().join(",");
+    relays.sort().join(",") !== newStakerConfig.relays.sort().join(",");
 
   // Not allowed if no changes
   if (
-    executionClient?.dnpName === newExecClient?.dnpName &&
-    consensusClient?.dnpName === newConsClient?.dnpName &&
-    mevBoost?.dnpName === newMevBoost?.dnpName &&
+    executionDnpName === newStakerConfig.executionDnpName &&
+    consensusDnpName === newStakerConfig.consensusDnpName &&
+    mevBoostDnpName === newStakerConfig.mevBoostDnpName &&
     !mevBoostRelaysChanged &&
-    currentStakerConfig.consensusClient?.useCheckpointSync ===
-      newConsClient?.useCheckpointSync &&
-    enableWeb3signer === newEnableWeb3signer
+    web3signerDnpName === newStakerConfig.web3signerDnpName
   )
     return {
       isAllowed: false,
@@ -189,8 +175,22 @@ function getChanges<T extends Network>({
       severity: "secondary"
     };
 
+  // Not allowed if execution and !consensus or !execution and consensus
+  if (
+    (newStakerConfig.executionDnpName && !newStakerConfig.consensusDnpName) ||
+    (!newStakerConfig.executionDnpName && newStakerConfig.consensusDnpName)
+  )
+    return {
+      isAllowed: false,
+      reason: "Execution and consensus clients must be selected together",
+      severity: "warning"
+    };
+
   // Not allowed if changes AND (EC AND CC are deselected) AND (changes in signer or MEV boost)
-  if (isExecAndConsDeSelected && (newEnableWeb3signer || newMevBoost))
+  if (
+    isExecAndConsDeSelected &&
+    (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName)
+  )
     return {
       isAllowed: false,
       reason:
@@ -199,7 +199,10 @@ function getChanges<T extends Network>({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (signer or mev boost)
-  if (!isExecAndConsSelected && (newEnableWeb3signer || newMevBoost))
+  if (
+    !isExecAndConsSelected &&
+    (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName)
+  )
     return {
       isAllowed: false,
       reason:
@@ -208,7 +211,7 @@ function getChanges<T extends Network>({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (no signer or no mev boost)
-  if (newMevBoost && newMevBoost.relays?.length === 0)
+  if (newStakerConfig.mevBoostDnpName && newStakerConfig.relays.length === 0)
     return {
       isAllowed: false,
       reason: "You must select at least one relay in the MEV boost",
@@ -218,10 +221,7 @@ function getChanges<T extends Network>({
   return { isAllowed: true };
 }
 
-function isOkSelectedInstalledAndRunning<
-  T extends Network,
-  P extends StakerType
->(StakerItem: StakerItem<T, P>): boolean {
+function isOkSelectedInstalledAndRunning(StakerItem: StakerItem): boolean {
   return (
     StakerItem.status === "ok" &&
     StakerItem.isSelected &&

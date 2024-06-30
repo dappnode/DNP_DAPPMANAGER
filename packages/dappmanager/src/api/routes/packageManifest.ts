@@ -23,6 +23,7 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
   const filteredManifest = pick(manifest, [
     "name",
     "version",
+    "upstream",
     "upstreamVersion",
     "shortDescription",
     "description",
