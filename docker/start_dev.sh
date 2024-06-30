@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # link important directories
-ln -s /app/packages/admin-ui/build/ /app/packages/dappmanager/dist
+ln -s /app/packages/admin-ui/dist/ /app/packages/dappmanager/dist
 ln -s /usr/src/app/dnp_repo/ /app/packages/dappmanager
 ln -s /usr/src/app/DNCORE/ /app/packages/dappmanager
 
