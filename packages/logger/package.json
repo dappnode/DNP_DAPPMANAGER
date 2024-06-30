@@ -19,14 +19,14 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/eventbus": "^0.1.0",
-    "@dappnode/params": "^0.1.0",
-    "@dappnode/types": "^0.1.36",
-    "@dappnode/utils": "^0.1.0",
+    "@dappnode/eventbus": "workspace:^0.1.0",
+    "@dappnode/params": "workspace:^0.1.0",
+    "@dappnode/types": "workspace:^0.1.36",
+    "@dappnode/utils": "workspace:^0.1.0",
     "stack-trace": "0.0.10"
   },
   "devDependencies": {
-    "@types/node": "^20.6.2",
+    "@types/node": "^20.14.9",
     "@types/stack-trace": "0.0.29"
   }
 }

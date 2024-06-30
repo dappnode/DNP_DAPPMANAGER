@@ -14,19 +14,20 @@
   },
   "scripts": {
     "build": "yarn run generate && tsc -p tsconfig.json",
-    "generate": "NODE_PATH=$MODULE_DIR NODE_OPTIONS=ts-node/esm ts-node ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
+    "generate": "yarn node --import tsx/esm ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
+    "@dappnode/types": "workspace:^0.1.36",
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
-    "@types/node": "^18.11.18",
+    "@types/node": "^20.14.9",
     "ajv": "^8.12.0",
-    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.16.0",
     "typescript-json-schema": "^0.62.0"
   }
 }
