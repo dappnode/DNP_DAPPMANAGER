@@ -7,7 +7,6 @@ import {
   UserActionLog,
   PackageNotification,
   DirectoryItem,
-  ExecutionClientMainnet,
 } from "@dappnode/types";
 
 interface EventTypes {
@@ -28,8 +27,7 @@ interface EventTypes {
   requestPackages: void;
   requestSystemInfo: void;
   runEthClientInstaller: {
-    useCheckpointSync?: boolean;
-    prevExecClientDnpName?: ExecutionClientMainnet;
+    prevExecClientDnpName?: string;
   };
   runEthicalMetricsInstaller: void;
   runNatRenewal: void;

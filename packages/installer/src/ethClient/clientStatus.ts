@@ -1,12 +1,6 @@
 import { ethers } from "ethers";
 import * as db from "@dappnode/db";
-import {
-  EthClientStatus,
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
-  executionClientsMainnet,
-  consensusClientsMainnet,
-} from "@dappnode/types";
+import { EthClientStatus } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
@@ -56,18 +50,10 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
  *       enforces that all possible states are covered
  */
 export async function getMultiClientStatus(
-  execClientDnpName: ExecutionClientMainnet,
-  consClientDnpName: ConsensusClientMainnet
+  execClientDnpName: string,
+  consClientDnpName: string
 ): Promise<EthClientStatus> {
   try {
-    if (!executionClientsMainnet.includes(execClientDnpName))
-      throw Error(
-        `Unsupported execution client in mainnet '${execClientDnpName}'`
-      );
-    if (!consensusClientsMainnet.includes(consClientDnpName))
-      throw Error(
-        `Unsupported consensus client in mainnet '${consClientDnpName}'`
-      );
     const execUrl = getEthExecClientApiUrl(execClientDnpName);
     const consUrl = await getEthConsClientApiUrl(consClientDnpName);
     try {

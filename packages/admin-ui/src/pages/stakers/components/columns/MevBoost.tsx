@@ -18,20 +18,22 @@ interface RelayIface {
   docs?: string;
   ofacCompliant?: boolean;
 }
-export default function MevBoost<T extends Network>({
+export default function MevBoost({
   network,
   mevBoost,
   newMevBoost,
   setNewMevBoost,
+  newRelays,
+  setNewRelays,
   isSelected,
   ...props
 }: {
-  network: T;
-  mevBoost: StakerItem<T, "mev-boost">;
-  newMevBoost: StakerItemOk<T, "mev-boost"> | undefined;
-  setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
-  >;
+  network: Network;
+  mevBoost: StakerItem;
+  newMevBoost: StakerItemOk | null;
+  setNewMevBoost: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
+  newRelays: string[];
+  setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -46,7 +48,7 @@ export default function MevBoost<T extends Network>({
         onClick={
           mevBoost.status === "ok"
             ? isSelected
-              ? () => setNewMevBoost(undefined)
+              ? () => setNewMevBoost(null)
               : () => setNewMevBoost(mevBoost)
             : undefined
         }
@@ -87,8 +89,8 @@ export default function MevBoost<T extends Network>({
       {newMevBoost?.status === "ok" && isSelected && (
         <RelaysList
           network={network}
-          newMevBoost={newMevBoost}
-          setNewMevBoost={setNewMevBoost}
+          newRelays={newRelays}
+          setNewRelays={setNewRelays}
         />
       )}
 
@@ -101,16 +103,14 @@ export default function MevBoost<T extends Network>({
   );
 }
 
-function RelaysList<T extends Network>({
+function RelaysList({
   network,
-  newMevBoost,
-  setNewMevBoost
+  newRelays,
+  setNewRelays
 }: {
-  network: T;
-  newMevBoost: StakerItemOk<T, "mev-boost">;
-  setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
-  >;
+  network: Network;
+  newRelays: string[];
+  setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const defaultRelays = getDefaultRelays(network);
   if (defaultRelays.length > 0)
@@ -137,8 +137,8 @@ function RelaysList<T extends Network>({
             <Relay
               key={index}
               relay={relay}
-              newMevBoost={newMevBoost}
-              setNewMevBoost={setNewMevBoost}
+              newRelays={newRelays}
+              setNewRelays={setNewRelays}
             />
           ))}
         </tbody>
@@ -147,19 +147,17 @@ function RelaysList<T extends Network>({
   return null;
 }
 
-function Relay<T extends Network>({
+function Relay({
   relay,
-  newMevBoost,
-  setNewMevBoost
+  newRelays,
+  setNewRelays
 }: {
   relay: RelayIface;
-  newMevBoost: StakerItemOk<T, "mev-boost">;
-  setNewMevBoost: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "mev-boost"> | undefined>
-  >;
+  newRelays: string[];
+  setNewRelays: React.Dispatch<React.SetStateAction<string[]>>;
 }) {
   const [isAdded, setIsAdded] = useState(
-    newMevBoost?.relays?.includes(relay.url) ? true : false
+    newRelays.includes(relay.url) ? true : false
   );
 
   return (
@@ -184,18 +182,10 @@ function Relay<T extends Network>({
         <Form.Check
           onChange={() => {
             if (!isAdded) {
-              setNewMevBoost({
-                ...newMevBoost,
-                relays: [...(newMevBoost?.relays || []), relay.url]
-              });
+              setNewRelays([...newRelays, relay.url]);
               setIsAdded(true);
             } else {
-              setNewMevBoost({
-                ...newMevBoost,
-                relays: [
-                  ...(newMevBoost?.relays?.filter(r => r !== relay.url) || [])
-                ]
-              });
+              setNewRelays(newRelays.filter(r => r !== relay.url));
               setIsAdded(false);
             }
           }}
@@ -208,7 +198,9 @@ function Relay<T extends Network>({
 
 // Utils
 
-const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
+// bloxroute (maxprofit) is OFAC compliant as of Dec 2023: https://x.com/bloXrouteLabs/status/1736819783520092357
+// Info on all relays specs: https://github.com/eth-educators/ethstaker-guides/blob/main/MEV-relay-list.md
+const getDefaultRelays = (network: Network): RelayIface[] => {
   switch (network) {
     case "mainnet":
       return [
@@ -235,7 +227,7 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
         },
         {
           operator: "bloXroute (Max profit)",
-          ofacCompliant: false,
+          ofacCompliant: true,
           docs: "https://bloxroute.com/",
           url:
             "https://0x8b5d2e73e2a3a55c6c87b8b6eb92e0149a125c852751db1422fa951e42a09b82c142c3ea98d0d9930b056a3bc9896b8f@bloxroute.max-profit.blxrbdn.com"
@@ -253,6 +245,20 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
           docs: "https://docs.edennetwork.io/",
           url:
             "https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io"
+        },
+        {
+          operator: "Aestus",
+          ofacCompliant: false,
+          docs: "https://aestus.live/",
+          url:
+            "https://0xa15b52576bcbf1072f4a011c0f99f9fb6c66f3e1ff321f11f461d15e31b1cb359caa092c71bbded0bae5b5ea401aab7e@aestus.live"
+        },
+        {
+          operator: "Manifold",
+          ofacCompliant: false,
+          docs: "https://kb.manifoldfinance.com/",
+          url:
+            "https://0x98650451ba02064f7b000f5768cf0cf4d4e492317d82871bdc87ef841a0743f69f0f1eea11168503240ac35d101c9135@mainnet-relay.securerpc.com"
         }
       ];
     case "prater":
@@ -286,6 +292,40 @@ const getDefaultRelays = <T extends Network>(network: T): RelayIface[] => {
           docs: "https://securerpc.com/",
           url:
             "https://0x8a72a5ec3e2909fff931c8b42c9e0e6c6e660ac48a98016777fc63a73316b3ffb5c622495106277f8dbcc17a06e92ca3@goerli-relay.securerpc.com/"
+        }
+      ];
+    case "holesky":
+      return [
+        {
+          operator: "Flashbots",
+          docs: "https://www.flashbots.net/",
+          url:
+            "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@boost-relay-holesky.flashbots.net"
+        },
+        {
+          operator: "Aestus",
+          docs:
+            "https://flashbots.notion.site/Relay-API-Documentation-5fb0819366954962bc02e81cb33840f5#417abe417dde45caaff3dc15aaae65dd",
+          url:
+            "https://0xab78bf8c781c58078c3beb5710c57940874dd96aef2835e7742c866b4c7c0406754376c2c8285a36c630346aa5c5f833@holesky.aestus.live"
+        },
+        {
+          operator: "Ultrasound",
+          docs: "https://github.com/ultrasoundmoney/frontend",
+          url:
+            "https://0xb1559beef7b5ba3127485bbbb090362d9f497ba64e177ee2c8e7db74746306efad687f2cf8574e38d70067d40ef136dc@relay-stag.ultrasound.money"
+        },
+        {
+          operator: "Titan",
+          docs: "https://docs.titanrelay.xyz/",
+          url:
+            "https://0xaa58208899c6105603b74396734a6263cc7d947f444f396a90f7b7d3e65d102aec7e5e5291b27e08d02c50a050825c2f@holesky.titanrelay.xyz"
+        },
+        {
+          operator: "bloXroute",
+          docs: "https://bloxroute.holesky.blxrbdn.com/",
+          url:
+            "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"
         }
       ];
     default:

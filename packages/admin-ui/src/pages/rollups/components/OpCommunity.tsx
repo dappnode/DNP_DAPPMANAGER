@@ -52,7 +52,7 @@ export default function OpCommunity() {
               </div>
               <div>
                 <a
-                  href="https://snapshot.org/#/opcollective.eth"
+                  href="https://vote.optimism.io"
                   className="iconLink"
                 >
                   <MdHowToVote style={iconStyle} />

@@ -22,6 +22,7 @@ import {
   GlobalEnvsPrefixed,
   PortMapping,
   UserSettings,
+  ComposeServiceNetworksObj,
 } from "@dappnode/types";
 import {
   stringifyPortMappings,
@@ -292,6 +293,19 @@ export class ComposeEditor {
 
   static getComposePath(dnpName: string, isCore: boolean): string {
     return getDockerComposePath(dnpName, isCore);
+  }
+
+  /**
+ * Converts an array of network names to an object with empty values
+ */
+  static convertNetworkArrayToObject(networks: string[]): ComposeServiceNetworksObj {
+    return networks.reduce(
+      (acc, networkName) => ({
+        ...acc,
+        [networkName]: {},
+      }),
+      {}
+    );
   }
 
   firstService(): ComposeServiceEditor {

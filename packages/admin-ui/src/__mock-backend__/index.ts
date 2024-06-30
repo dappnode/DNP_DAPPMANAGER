@@ -1,4 +1,10 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
+import {
+  ConsensusClientMainnet,
+  ExecutionClientMainnet,
+  IpfsClientTarget,
+  PortProtocol,
+  Routes
+} from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -139,12 +145,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     free: 39646527488,
     usedPercentage: 83
   }),
-  statsSwapGet: async () => ({
-    total: 2147483648,
-    used: 0,
-    free: 2147483648,
-    usedPercentage: 0
-  }),
   mountpointsGet: async () => [
     {
       mountpoint: "",
@@ -217,8 +217,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
     ethClientTarget: "nethermind",
     eth2ClientTarget: {
-      execClient: "besu.public.dappnode.eth",
-      consClient: "lighthouse.dnp.dappnode.eth"
+      execClient: ExecutionClientMainnet.Geth,
+      consClient: ConsensusClientMainnet.Prysm
     },
     ethClientFallback: "off",
     ethClientStatus: {

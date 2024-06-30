@@ -9,7 +9,7 @@ import { MdClose } from "react-icons/md";
 import { Links } from "./Links";
 import newTabProps from "utils/newTabProps";
 import { InstalledPackageDetailData } from "@dappnode/types";
-import { Manifest } from "@dappnode/types";
+import { Manifest, upstreamVersionToString } from "@dappnode/types";
 import { ipfsGatewayUrl } from "pages/system/data";
 import { RemovePackage } from "./RemovePackage";
 import { VolumesList } from "./VolumesList";
@@ -34,7 +34,12 @@ export function Info({
   // Show the version from `docker ps`, which the one affecting logic
   const { dnpName, version, origin } = dnp;
   // Show the upstream version from the manifest which is used for metadata only
-  const { upstreamVersion, links, bugs } = manifest || {};
+  const { upstreamVersion, upstream, links, bugs } = manifest || {};
+
+  const parsedUpstreamVersion = upstreamVersionToString({
+    upstreamVersion,
+    upstream
+  });
 
   useEffect(() => {
     setGettingStartedIsShown(Boolean(gettingStartedShow));
@@ -87,7 +92,8 @@ export function Info({
 
           <div className="version-info">
             <strong>Version: </strong>
-            {version} {upstreamVersion && `(${upstreamVersion} upstream)`}{" "}
+            {version}{" "}
+            {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`}{" "}
             {origin ? (
               <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
                 {origin}

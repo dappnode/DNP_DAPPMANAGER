@@ -75,7 +75,7 @@ class SshManager {
     try {
       // shellHost("systemctl is-active sshd") returns
       // 'active'
-      await this.shellHost("systemctl is-active sshd");
+      await this.shellHost("systemctl is-active ssh");
       return "enabled";
     } catch (e) {
       // Error: Command failed: docker run --rm --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i systemctl is-active sshd

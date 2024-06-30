@@ -56,6 +56,7 @@ export async function packageSetPortMappings({
   try {
     await dockerComposeUpPackage(
       { dnpName },
+      false,
       containersStatus,
       dockerComposeUpOptions
     );
@@ -71,6 +72,7 @@ export async function packageSetPortMappings({
 
       await dockerComposeUpPackage(
         { dnpName },
+        false,
         containersStatus,
         dockerComposeUpOptions
       );

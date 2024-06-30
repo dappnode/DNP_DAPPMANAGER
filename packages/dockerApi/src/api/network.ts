@@ -98,17 +98,18 @@ export async function dockerNetworkConnect(
  * @param aliases `["network-alias"]`
  */
 export async function dockerNetworkConnectNotThrow(
-  network: Dockerode.Network,
+  networkName: string,
   containerName: string,
   endpointConfig?: Partial<Dockerode.NetworkInfo>
 ): Promise<void> {
   try {
+    const network = docker.getNetwork(networkName);
     await network.connect({
       Container: containerName,
       EndpointConfig: endpointConfig,
     });
   } catch (e) {
-    logs.error(e);
+    logs.debug(e);
   }
 }
 

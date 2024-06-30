@@ -7,6 +7,13 @@ label.switch-big {
     order: 2;
     font-size: 0.85rem;
     margin-top: 0.15rem;
+  }
+
+  > .react-switch {
     cursor: pointer;
   }
+}
+
+.blue-text {
+  color: #00b1f4;
 }

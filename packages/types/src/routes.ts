@@ -41,7 +41,6 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  HostStatSwap,
   DockerUpgradeRequirements,
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
@@ -131,14 +130,10 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: <T extends Network>(
-    network: T
-  ) => Promise<StakerConfigGet<T>>;
+  stakerConfigGet: <T extends Network>(network: T) => Promise<StakerConfigGet>;
 
   /** Sets the staker configuration for a given network */
-  stakerConfigSet: <T extends Network>(kwargs: {
-    stakerConfig: StakerConfigSet<T>;
-  }) => Promise<void>;
+  stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
@@ -229,7 +224,6 @@ export interface Routes {
     target: Eth2ClientTarget;
     ethRemoteRpc: string;
     sync?: boolean;
-    useCheckpointSync?: boolean;
     deletePrevExecClient?: boolean;
     deletePrevExecClientVolumes?: boolean;
     deletePrevConsClient?: boolean;
@@ -633,15 +627,20 @@ export interface Routes {
   telegramStatusSet: (kwarg: { telegramStatus: boolean }) => Promise<void>;
 
   /**
-   * Gets bot telegram token
+   * Get telegram configuration: token and user ID
    */
-  telegramTokenGet: () => Promise<string | null>;
+  telegramConfigGet: () => Promise<{
+    token: string | null;
+    userId: string | null;
+  }>;
 
   /**
-   * Sets the telegram token
-   * @param telegramToken new bot token
+   * Set telegram configuration: token and user ID
    */
-  telegramTokenSet: (kwarg: { telegramToken: string }) => Promise<void>;
+  telegramConfigSet: (kwargs: {
+    token: string;
+    userId: string;
+  }) => Promise<void>;
 
   /**
    * Updates and upgrades the host machine
@@ -664,11 +663,6 @@ export interface Routes {
    * Check if SSH is enabled of disabled in the DAppNode host
    */
   sshStatusGet: () => Promise<ShhStatus>;
-
-  /**
-   * Get memory swap stats
-   */
-  statsSwapGet: () => Promise<HostStatSwap>;
 
   /**
    * Returns the current DAppNode system info
@@ -813,7 +807,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   statsCpuGet: {},
   statsDiskGet: {},
   statsMemoryGet: {},
-  statsSwapGet: {},
   sshPortGet: {},
   sshPortSet: { log: true },
   sshStatusGet: {},
@@ -821,8 +814,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   systemInfoGet: {},
   telegramStatusGet: {},
   telegramStatusSet: { log: true },
-  telegramTokenGet: {},
-  telegramTokenSet: { log: true },
+  telegramConfigGet: {},
+  telegramConfigSet: { log: true },
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},

@@ -33,6 +33,7 @@ import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
 import { DappNodeRegistry } from "@dappnode/toolkit";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 const controller = new AbortController();
 
@@ -89,8 +90,16 @@ const server = startHttpApi({
 // Start Test API
 if (params.TEST) startTestApi();
 
+// Create staker instances
+export const execution = new Execution(dappnodeInstaller);
+export const consensus = new Consensus(dappnodeInstaller);
+export const mevBoost = new MevBoost(dappnodeInstaller);
+export const signer = new Signer(dappnodeInstaller);
+
 // Execute migrations
-executeMigrations().catch(e => logs.error("Error on executeMigrations", e));
+executeMigrations(execution, consensus, signer, mevBoost).catch(e =>
+  logs.error("Error on executeMigrations", e)
+);
 
 // Start daemons
 startDaemons(dappnodeInstaller, controller.signal);

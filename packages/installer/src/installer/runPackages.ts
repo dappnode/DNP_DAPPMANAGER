@@ -91,6 +91,7 @@ export async function runPackages(
     } else {
       await dockerComposeUpPackage(
         { dnpName: pkg.dnpName, composePath: pkg.composePath },
+        false,
         pkg.containersStatus
       );
     }

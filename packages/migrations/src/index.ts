@@ -9,6 +9,9 @@ import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcod
 import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
+import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
+import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 export class MigrationError extends Error {
   migration: string;
@@ -26,7 +29,12 @@ export class MigrationError extends Error {
 /**
  * Executes migrations required for the current DAppNode core version.
  */
-export async function executeMigrations(): Promise<void> {
+export async function executeMigrations(
+  execution: Execution,
+  consensus: Consensus,
+  signer: Signer,
+  mevBoost: MevBoost
+): Promise<void> {
   const migrationErrors: MigrationError[] = [];
 
   await removeLegacyDockerAssets().catch((e) =>
@@ -34,8 +42,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "bundle legacy ops to prevent spamming the docker API",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -44,8 +51,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "migrate winston .log JSON file to a lowdb",
       coreVersion: "0.2.30",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -54,8 +60,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "prune user action logs if the size is greater than 4 MB",
       coreVersion: "0.2.59",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -64,8 +69,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "remove bind DNS from docker compose files",
       coreVersion: "0.2.82",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -75,8 +79,7 @@ export async function executeMigrations(): Promise<void> {
         "ensure core composes files has correct hardcoded IPs in range",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -85,8 +88,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "remove legacy dns from running containers",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -103,8 +105,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "ensure docker network configuration",
       coreVersion: "0.2.85",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -113,8 +114,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -123,8 +123,7 @@ export async function executeMigrations(): Promise<void> {
       migration: "add Dappnode peer to local IPFS node",
       coreVersion: "0.2.88",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
     })
   );
 
@@ -133,8 +132,31 @@ export async function executeMigrations(): Promise<void> {
       migration: "change ethical metrics db format",
       coreVersion: "0.2.92",
       name: "MIGRATION_ERROR",
-      message: e.message,
-      stack: e.stack,
+      message: e,
+    })
+  );
+
+  await determineIsDappnodeAws().catch((e) =>
+    migrationErrors.push({
+      migration: "determine if the dappnode is running in Dappnode AWS",
+      coreVersion: "0.2.94",
+      name: "MIGRATION_ERROR",
+      message: e,
+    })
+  );
+
+  await createStakerNetworkAndConnectStakerPkgs(
+    execution,
+    consensus,
+    signer,
+    mevBoost
+  ).catch((e) =>
+    migrationErrors.push({
+      migration:
+        "create docker staker network and persist selected staker pkgs per network",
+      coreVersion: "0.2.95",
+      name: "MIGRATION_ERROR",
+      message: e,
     })
   );
 

@@ -1,31 +1,27 @@
-import React, { useState } from "react";
+import React from "react";
 import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { joinCssClass } from "utils/css";
-import { StakerItem, StakerItemOk, Network } from "@dappnode/types";
+import { StakerItem, StakerItemOk } from "@dappnode/types";
 import defaultAvatar from "img/defaultAvatar.png";
 import errorAvatar from "img/errorAvatarTrim.png";
 import Button from "components/Button";
 import { getInstallerPath } from "pages/installer";
 import { useNavigate } from "react-router-dom";
 import { Alert } from "react-bootstrap";
-import Switch from "components/Switch";
 
-export default function ConsensusClient<T extends Network>({
+export default function ConsensusClient({
   consensusClient,
   setNewConsClient,
   isSelected,
   ...props
 }: {
-  consensusClient: StakerItem<T, "consensus">;
-  setNewConsClient: React.Dispatch<
-    React.SetStateAction<StakerItemOk<T, "consensus"> | undefined>
-  >;
+  consensusClient: StakerItem;
+  setNewConsClient: React.Dispatch<React.SetStateAction<StakerItemOk | null>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
 
-  const [checkpointSyncChecked, setCheckpointSyncChecked] = useState(true);
   return (
     <Card
       {...props}
@@ -37,7 +33,7 @@ export default function ConsensusClient<T extends Network>({
           consensusClient.status === "ok"
             ? isSelected
               ? () => {
-                  setNewConsClient(undefined);
+                  setNewConsClient(null);
                 }
               : () => {
                   setNewConsClient(consensusClient);
@@ -85,21 +81,7 @@ export default function ConsensusClient<T extends Network>({
             {consensusClient.data && (
               <div className="description">
                 {consensusClient.data?.manifest?.shortDescription}
-                <hr />
               </div>
-            )}
-            {consensusClient.useCheckpointSync !== undefined && (
-              <Switch
-                checked={checkpointSyncChecked}
-                onToggle={() => {
-                  setNewConsClient({
-                    ...consensusClient,
-                    useCheckpointSync: !checkpointSyncChecked
-                  });
-                  setCheckpointSyncChecked(!checkpointSyncChecked);
-                }}
-                label={"Use checksync"}
-              />
             )}
           </>
         </>

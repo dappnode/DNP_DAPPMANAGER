@@ -232,7 +232,36 @@ p.no-p-style:last-child {
 .copy-input-copy {
   padding: 4px 9px 0px 11px;
   font-size: 1.3rem;
+  position: relative;
+  display: inline-block;
 }
+
+.copy-tooltip {
+  position: absolute;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  font-size: 15px;
+  padding: 5px;
+  border-radius: 6px;
+  z-index: 1;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+// The triangle just below the 'copied' dialog
+.copy-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
 .copy-input-open {
   padding: 0px 9px 0px 10px;
   font-size: 1.3rem;

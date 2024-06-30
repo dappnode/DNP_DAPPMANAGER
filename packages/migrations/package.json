@@ -22,6 +22,7 @@
   "dependencies": {
     "@dappnode/types": "^0.1.36",
     "@dappnode/db": "^0.1.0",
+    "@dappnode/stakers": "^0.1.0",
     "@dappnode/dockerapi": "^0.1.0",
     "@dappnode/dockercompose": "^0.1.0",
     "@dappnode/ethicalmetrics": "^0.1.0",
