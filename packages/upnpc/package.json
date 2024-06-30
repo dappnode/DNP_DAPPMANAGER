@@ -19,9 +19,9 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/dockerapi": "^0.1.0",
-    "@dappnode/types": "^0.1.36",
-    "@dappnode/utils": "^0.1.0",
+    "@dappnode/dockerapi": "workspace:^0.1.0",
+    "@dappnode/types": "workspace:^0.1.36",
+    "@dappnode/utils": "workspace:^0.1.0",
     "is-ip": "3.0.0"
   },
   "devDependencies": {

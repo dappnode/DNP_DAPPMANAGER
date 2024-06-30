@@ -10,8 +10,15 @@ build_*
 build/
 uploader
 
-# Dependencies
-node_modules/
+# Dependencies node_modules from yarn pnp
+node_modules
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Test artifacts
 test_build/
