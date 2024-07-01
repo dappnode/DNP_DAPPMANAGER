@@ -26,10 +26,6 @@ describe("ethForward > resolveDomain", () => {
       "mycrypto.dappnode.eth": {
         location: "ipfs",
         hash: "Qmdojo8KAsZu7XTkETYwSiZMCjdUa58YNZCUKmsZ21i8gV"
-      },
-      "eth2dai.eduadiez.eth": {
-        location: "ipfs",
-        hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
       }
     };
 
