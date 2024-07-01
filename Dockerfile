@@ -21,10 +21,10 @@ COPY package.json yarn.lock lerna.json tsconfig.json ./
 COPY packages packages
 # For the admin-ui
 ENV VITE_APP_API_URL /
-RUN yarn --frozen-lockfile --non-interactive --ignore-optional && \
+RUN yarn --frozen-lockfile --non-interactive && \
   yarn build && \
   yarn clean:libraries && \
-  yarn install --non-interactive --frozen-lockfile --production --force --ignore-optional
+  yarn install --non-interactive --frozen-lockfile --production --force
 RUN rm -rf yarn.lock packages/*/node_modules packages/*/src packages/*/tsconfig.json packages/*/.eslint*
 
 # Production stage
