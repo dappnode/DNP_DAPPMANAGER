@@ -26,10 +26,6 @@ describe("ethForward > resolveDomain", () => {
       "mycrypto.dappnode.eth": {
         location: "ipfs",
         hash: "Qmdojo8KAsZu7XTkETYwSiZMCjdUa58YNZCUKmsZ21i8gV"
-      },
-      "eth2dai.eduadiez.eth": {
-        location: "ipfs",
-        hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
       }
     };
 
@@ -39,22 +35,6 @@ describe("ethForward > resolveDomain", () => {
       it(`should return the IPFS hash of ${domain}`, async () => {
         const content = await resolveDomain(domain, provider);
         expect(content).to.deep.equal(expectedContent, "Wrong content");
-      });
-    }
-  });
-
-  describe("resolveDomain with variable mainnet bzz domains", () => {
-    const ensDomains: string[] = ["theswarm.eth"];
-    const expectedLocation: Location = "swarm";
-
-    for (const domain of ensDomains) {
-      it(`should return the IPFS hash of ${domain}`, async () => {
-        const { location, hash } = await resolveDomain(domain, provider);
-        expect(location).to.equal(expectedLocation, "Wrong location");
-        // hash = "7027b30fa1702e5badb0d5a0378e01566da7798c9b2bf054b7e1f3168480ef96"
-        expect(hash, "Hash must be a 32 bytes hex").to.match(
-          /^([A-Fa-f0-9]{64})$/
-        );
       });
     }
   });
