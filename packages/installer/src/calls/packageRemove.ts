@@ -11,8 +11,6 @@ import {
   listPackage,
 } from "@dappnode/dockerapi";
 import { httpsPortal } from "@dappnode/httpsportal";
-import * as db from "@dappnode/db";
-import { mevBoostMainnet, mevBoostPrater, mevBoostHolesky, stakerPkgs } from "@dappnode/types";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
 
 /**
@@ -106,67 +104,7 @@ export async function packageRemove({
   // Remove DNP folder and files
   if (fs.existsSync(packageRepoDir)) await shell(`rm -r ${packageRepoDir}`);
 
-  // Remove client from maindb.json if it is a staker package
-  if (stakerPkgs.some((stakerPkg) => stakerPkg === dnp.dnpName))
-    await removeStakerPkgFromDbIfSelected({ dnpName });
-
   // Emit packages update
   eventBus.requestPackages.emit();
   eventBus.packagesModified.emit({ dnpNames: [dnp.dnpName], removed: true });
-}
-/**
- * Removes the package from the main DB if it is a staker package and it is selected as current client
- *
- * @param dnpName DNP of the removed package
- */
-async function removeStakerPkgFromDbIfSelected({
-  dnpName,
-}: {
-  dnpName: string;
-}): Promise<void> {
-  switch (dnpName) {
-    case db.executionClientMainnet.get():
-      await db.executionClientMainnet.set(undefined);
-      break;
-    case db.executionClientGnosis.get():
-      await db.executionClientGnosis.set(undefined);
-      break;
-    case db.executionClientPrater.get():
-      await db.executionClientPrater.set(undefined);
-      break;
-    case db.executionClientLukso.get():
-      await db.executionClientLukso.set(undefined);
-      break;
-    case db.executionClientHolesky.get():
-      await db.executionClientHolesky.set(undefined);
-      break;
-    case db.consensusClientMainnet.get():
-      await db.consensusClientMainnet.set(undefined);
-      break;
-    case db.consensusClientGnosis.get():
-      await db.consensusClientGnosis.set(undefined);
-      break;
-    case db.consensusClientPrater.get():
-      await db.consensusClientPrater.set(undefined);
-      break;
-    case db.consensusClientLukso.get():
-      await db.consensusClientLukso.set(undefined);
-      break;
-    case db.consensusClientHolesky.get():
-      await db.consensusClientHolesky.set(undefined);
-      break;
-    case mevBoostMainnet:
-      await db.mevBoostMainnet.set(false);
-      break;
-    case mevBoostPrater:
-      await db.mevBoostPrater.set(false);
-      break;
-    case mevBoostHolesky:
-      await db.mevBoostHolesky.set(false);
-      break;
-    default:
-      return;
-  }
-
-  logs.info(`Removed client ${dnpName} from main DB after package is removed`);
 }

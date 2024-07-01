@@ -106,6 +106,7 @@ export async function packageRestartVolumes({
   } else {
     await dockerComposeUpPackage(
       { dnpName },
+      false,
       containersStatus,
       (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
     );

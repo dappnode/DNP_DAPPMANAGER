@@ -139,7 +139,7 @@ export const PackageById: React.FC = () => {
             <Route
               key={route.subPath}
               path={route.subPath}
-              element={<route.render />}
+              element={route.render()}
             />
           ))}
         </Routes>

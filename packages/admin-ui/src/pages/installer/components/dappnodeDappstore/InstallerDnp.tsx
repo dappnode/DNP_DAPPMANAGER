@@ -130,7 +130,7 @@ export const InstallerDnp: React.FC = routeProps => {
   return (
     <>
       <Input
-        placeholder="DAppNode Package's name or IPFS hash"
+        placeholder="Dappnode Package's name or IPFS hash"
         value={query}
         onValueChange={(value: string) => setQuery(correctPackageName(value))}
         onEnterPress={runQuery}
@@ -180,7 +180,7 @@ export const InstallerDnp: React.FC = routeProps => {
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />
       ) : requestStatus.loading ? (
-        <Loading steps={["Loading DAppNode Packages"]} />
+        <Loading steps={["Loading Dappnode Packages"]} />
       ) : requestStatus.success ? (
         <ErrorView error={"Directory loaded but found no packages"} />
       ) : null}

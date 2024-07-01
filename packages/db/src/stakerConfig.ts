@@ -1,17 +1,5 @@
 import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
-import {
-  ConsensusClientMainnet,
-  ExecutionClientMainnet,
-  ConsensusClientGnosis,
-  ExecutionClientGnosis,
-  ConsensusClientPrater,
-  ExecutionClientPrater,
-  ConsensusClientLukso,
-  ExecutionClientLukso,
-  ConsensusClientHolesky,
-  ExecutionClientHolesky,
-} from "@dappnode/types";
 
 // Mainnet
 
@@ -27,26 +15,20 @@ const MEVBOOST_MAINNET = "mevboost-mainnet";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientMainnet | undefined | null>(
-    CONSENSUS_CLIENT_MAINNET,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_MAINNET })[0]
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_MAINNET, null),
+  CONSENSUS_CLIENT_MAINNET
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientMainnet | undefined | null>(
-    EXECUTION_CLIENT_MAINNET,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_MAINNET })[0]
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_MAINNET, null),
+  EXECUTION_CLIENT_MAINNET
 );
 
 export const mevBoostMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_MAINNET, false),
-  Object.keys({ MEVBOOST_MAINNET })[0]
+  MEVBOOST_MAINNET
 );
 // Gnosis
 
@@ -57,26 +39,20 @@ const MEVBOOST_GNOSIS = "mevboost-gnosis";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientGnosis | undefined | null>(
-    CONSENSUS_CLIENT_GNOSIS,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_GNOSIS })[0]
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_GNOSIS, null),
+  CONSENSUS_CLIENT_GNOSIS
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientGnosis = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientGnosis | undefined | null>(
-    EXECUTION_CLIENT_GNOSIS,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_GNOSIS })[0]
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_GNOSIS, null),
+  EXECUTION_CLIENT_GNOSIS
 );
 
 export const mevBoostGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_GNOSIS, false),
-  Object.keys({ MEVBOOST_GNOSIS })[0]
+  MEVBOOST_GNOSIS
 );
 
 // Prater
@@ -88,26 +64,20 @@ const MEVBOOST_PRATER = "mevboost-prater";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientPrater | undefined | null>(
-    CONSENSUS_CLIENT_PRATER,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_PRATER })[0]
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_PRATER, null),
+  CONSENSUS_CLIENT_PRATER
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientPrater = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientPrater | undefined | null>(
-    EXECUTION_CLIENT_PRATER,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_PRATER })[0]
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_PRATER, null),
+  EXECUTION_CLIENT_PRATER
 );
 
 export const mevBoostPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_PRATER, false),
-  Object.keys({ MEVBOOST_PRATER })[0]
+  MEVBOOST_PRATER
 );
 
 // Holesky
@@ -119,26 +89,20 @@ const MEVBOOST_HOLESKY = "mevboost-holesky";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientHolesky | undefined | null>(
-    CONSENSUS_CLIENT_HOLESKY,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_HOLESKY })[0]
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOLESKY, null),
+  CONSENSUS_CLIENT_HOLESKY
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientHolesky = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientHolesky | undefined | null>(
-    EXECUTION_CLIENT_HOLESKY,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_HOLESKY })[0]
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOLESKY, null),
+  EXECUTION_CLIENT_HOLESKY
 );
 
 export const mevBoostHolesky = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_HOLESKY, false),
-  Object.keys({ MEVBOOST_HOLESKY })[0]
+  MEVBOOST_HOLESKY
 );
 
 // LUKSO
@@ -150,24 +114,18 @@ const MEVBOOST_LUKSO = "mevboost-lukso";
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const consensusClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ConsensusClientLukso | undefined | null>(
-    CONSENSUS_CLIENT_LUKSO,
-    null
-  ),
-  Object.keys({ CONSENSUS_CLIENT_LUKSO })[0]
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_LUKSO, null),
+  CONSENSUS_CLIENT_LUKSO
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientLukso = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientLukso | undefined | null>(
-    EXECUTION_CLIENT_LUKSO,
-    null
-  ),
-  Object.keys({ EXECUTION_CLIENT_LUKSO })[0]
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_LUKSO, null),
+  EXECUTION_CLIENT_LUKSO
 );
 
 export const mevBoostLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
-  Object.keys({ MEVBOOST_LUKSO })[0]
+  MEVBOOST_LUKSO
 );

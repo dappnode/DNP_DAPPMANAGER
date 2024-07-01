@@ -126,7 +126,7 @@ volumes:
       const validComposePath = path.join(testDir, "valid-docker-compose.yml");
       fs.writeFileSync(validComposePath, validCompose);
       expect(
-        async () => await validateComposeSchema(validComposePath)
+        async () => await validateComposeSchema([validComposePath])
       ).to.not.throw();
     });
 
@@ -179,14 +179,68 @@ volumes:
       );
       fs.writeFileSync(invalidComposePath, invalidCompose);
 
-      const error = await validateComposeSchema(invalidComposePath).catch(
+      const error = await validateComposeSchema([invalidComposePath]).catch(
         (e) => e
       );
       console.log(error);
       const expectedErrorMessage = `Invalid compose`;
       expect(error.message).to.include(expectedErrorMessage);
     });
+
+    it("should validate a merged compose file", async () => {
+      const validCompose1 = `version: "3.4"
+  services:
+  beacon-chain:
+    image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
+    volumes:
+      - "beacon-chain-data:/data"
+    ports:
+      - "13000"
+      - 12000/udp
+    restart: unless-stopped
+    environment:
+      HTTP_WEB3PROVIDER: "http://goerli-geth.dappnode:8545"
+      CHECKPOINT_SYNC_URL: ""
+      CORSDOMAIN: "http://prysm-prater.dappnode"
+      WEB3_BACKUP: ""
+      EXTRA_OPTS: ""
+  validator:
+    image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0"
+    volumes:
+      - "validator-data:/root/"
+    restart: unless-stopped
+    environment:
+      LOG_TYPE: INFO
+      BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000"
+      BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500"
+      GRAFFITI: validating_from_DAppNode
+      EXTRA_OPTS: ""
+      FEE_RECIPIENT_ADDRESS: ""
+  volumes:
+  beacon-chain-data: {}
+  validator-data: {}`;
+
+      const validCompose2 = `version: "3.4"
+  services:
+  beacon-chain:
+    environment:
+      ANOTHER_BEACON_ENV: "another-beacon-env-value"
+  validator:
+    environment:
+    ANOTHER_VALIDATOR_ENV: "another-validator-env-value"`;
+
+      const validComposePath1 = path.join(testDir, "valid-docker-compose-1.yml");
+      const validComposePath2 = path.join(testDir, "valid-docker-compose-2.yml");
+
+      fs.writeFileSync(validComposePath1, validCompose1);
+      fs.writeFileSync(validComposePath2, validCompose2);
+
+      expect(
+        async () => await validateComposeSchema([validComposePath1, validComposePath2])
+      ).to.not.throw();
+    });
   });
+
   describe("setupWizard", () => {
     before(() => {
       cleanTestDir();
@@ -363,22 +417,6 @@ volumes:
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
-    });
-
-    it("should not allow a manifest with the upstream settings defined as separate arrays", () => {
-      // This way of defining the upstream settings has been deprecated
-      const manifest: Manifest = {
-        name: "example.dnp.dappnode.eth",
-        version: "1.0.0",
-        description: "A sample DAppNode package",
-        type: "service",
-        license: "MIT",
-        upstreamRepo: ["ethereum/go-ethereum", "NethermindEth/nethermind"],
-        upstreamVersion: ["1.9.24", "1.10.0"],
-        upstreamArg: ["GETH_VERSION", "NETHERMIND_VERSION"]
-      };
-
-      expect(() => validateManifestSchema(manifest)).to.throw();
     });
 
     it("should not allow a manifest with upstream settings defined in both possible ways", () => {

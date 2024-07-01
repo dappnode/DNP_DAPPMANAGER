@@ -1,5 +1,5 @@
 import { ContainerState } from "./pkg.js";
-import { PackageEnvs } from "./compose.js";
+import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.js";
 import {
   Manifest,
   Dependencies,
@@ -8,7 +8,6 @@ import {
   ManifestUpdateAlert,
 } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
-import { ExecutionClientMainnet, ConsensusClientMainnet } from "./stakers.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -26,6 +25,10 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  auth?: {
+    username: string;
+    password: string;
+  };
 }
 
 export interface ExposableServiceInfo extends HttpsPortalMapping {
@@ -243,6 +246,13 @@ export interface UserSettings {
       [containerPath: string]: string; // dataURL
     };
   };
+
+  // For keeping staker network in case client is selected
+  networks?: {
+    rootNetworks: ComposeNetworks;
+    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks; }
+  }
+
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
   legacyBindVolumes?: {
@@ -288,6 +298,7 @@ export interface RequestedDnp {
   compatible: {
     requiresCoreUpdate: boolean;
     requiresDockerUpdate: boolean;
+    packagesToBeUninstalled: string[];
     resolving: boolean;
     isCompatible: boolean; // false;
     error: string; // "LN requires incompatible dependency";
@@ -1018,15 +1029,15 @@ export type EthClientInstallStatus =
   | { status: "UNINSTALLED" };
 
 export type EthClientSyncedNotificationStatus = {
-  execClientTarget: ExecutionClientMainnet;
+  execClientTarget: string;
   status: "AwaitingSynced" | "Synced";
 } | null;
 
 export type Eth2ClientTarget =
   | {
-      execClient: ExecutionClientMainnet;
-      consClient: ConsensusClientMainnet;
-    }
+    execClient: string;
+    consClient: string;
+  }
   | "remote";
 
 /**

@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import Ajv from "ajv";
+import crypto from "crypto";
 import querystring from "querystring";
 import { urlJoin } from "@dappnode/utils";
 
@@ -17,6 +18,13 @@ export interface HttpPortalEntry {
    * `"validator-prysm"`, `"internal-docker-dns-based-host"`
    */
   toHost: string;
+  /**
+   * Optional auth credentials for mapping with basic auth
+   */
+  auth?: {
+    username: string;
+    password: string;
+  };
 }
 
 export const httpsPortalResponseSchema = {
@@ -54,10 +62,11 @@ export class HttpsPortalApiClient {
    * GET /add?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async add({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
+  async add({ fromSubdomain, toHost, auth }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
       to: toHost,
+      auth: auth && (await this.getHtpasswdEntry(auth)),
     });
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
@@ -84,9 +93,9 @@ export class HttpsPortalApiClient {
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
-    const entries = await this.get<{ from: string; to: string }[]>(
-      urlJoin(this.baseUrl, `/?format=json`)
-    );
+    const entries = await this.get<
+      { from: string; to: string; auth?: string }[]
+    >(urlJoin(this.baseUrl, `/?format=json`));
 
     if (!ajv.validate(httpsPortalResponseSchema, entries)) {
       throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
@@ -95,6 +104,12 @@ export class HttpsPortalApiClient {
     return entries.map((entry) => ({
       fromSubdomain: entry.from,
       toHost: entry.to,
+      auth: entry.auth
+        ? {
+            username: entry.auth.split(":")[0],
+            password: entry.auth.split(":")[1],
+          }
+        : undefined,
     }));
   }
 
@@ -111,5 +126,43 @@ export class HttpsPortalApiClient {
     } catch (e) {
       throw Error(`Error parsing JSON ${e.message}\n${body}`);
     }
+  }
+
+  /**
+   * Generates an htpasswd entry for a given username and password using the {SSHA} scheme.
+   * This entry can be used for HTTP Basic Authentication in NGINX.
+   *
+   * The {SSHA} scheme uses the SHA-1 hashing algorithm combined with a salt for added security.
+   * The salt helps to protect against dictionary and rainbow table attacks by ensuring that even
+   * identical passwords will have different hashes if different salts are used.
+   *
+   * @see https://nginx.org/en/docs/http/ngx_http_auth_basic_module.html
+   * @param {string} params.username - The username.
+   * @param {string} params.password - The password.
+   * @returns {Promise<string>}`exampleUser:{SSHA}5ZCbZYs5Pn5T6Z9wXV5YWZRp+mgc0e3cLQFklHQbU3W5bg==`.
+   */
+  private async getHtpasswdEntry({
+    username,
+    password,
+  }: {
+    username: string;
+    password: string;
+  }): Promise<string> {
+    const saltLength = 16; // Length of the salt in bytes
+
+    // Generate a random salt
+    const salt = crypto.randomBytes(saltLength);
+
+    // Hash the password using SHA-1 with the salt
+    const sha1Hasher = crypto.createHash("sha1");
+    sha1Hasher.update(password);
+    sha1Hasher.update(salt);
+    const hash = sha1Hasher.digest();
+
+    // Combine the hash and salt, then encode in Base64
+    const combined = Buffer.concat([hash, salt]).toString("base64");
+
+    // Format the htpasswd entry with the {SSHA} scheme
+    return `${username}:{SSHA}${combined}`;
   }
 }

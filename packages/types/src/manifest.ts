@@ -48,15 +48,16 @@ export interface Manifest {
   requirements?: {
     minimumDappnodeVersion?: string;
     minimumDockerVersion?: string;
+    notInstalledPackages?: string[];
   };
   globalEnvs?:
-  | {
-    all?: boolean;
-  }
-  | {
-    envs: string[];
-    services: string[];
-  }[];
+    | {
+        all?: boolean;
+      }
+    | {
+        envs: string[];
+        services: string[];
+      }[];
   architectures?: Architecture[];
 
   // Safety properties to solve problematic updates

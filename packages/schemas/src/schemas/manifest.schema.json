@@ -162,6 +162,28 @@
         "monero": "Must have a Monero API exposed internally at port 18081. Uses the NPM package `monero-rpc`"
       }
     },
+    "runOrder": {
+      "type": "array",
+      "description": "Specifies the order in which the services should be started.",
+      "items": {
+        "type": "string",
+        "examples": [
+          "vpn.dnp.dappnode.eth",
+          "core.dnp.dappnode.eth",
+          "dappmanager.dnp.dappnode.eth"
+        ]
+      }
+    },
+    "restartCommand": {
+      "type": "string",
+      "description": "Command to execute for restarting the service.",
+      "examples": ["service restart"]
+    },
+    "restartLaunchCommand": {
+      "type": "string",
+      "description": "Command to execute for launching the service on restart.",
+      "examples": ["service launch"]
+    },
     "mainService": {
       "type": "string",
       "description": "For multi-service packages, indicate which service is the main one. The root ENS domain of this package will be mapped to this service IP.",
@@ -229,6 +251,15 @@
           "examples": ["23.0.3"],
           "pattern": "^((([0-9]+).([0-9]+).([0-9]+)))$",
           "errorMessage": "should be a semantic version in the format x.y.z"
+        },
+        "notInstalledPackages": {
+          "type": "array",
+          "description": "List of packages that must not be installed for this DAppNode Package to be installed.",
+          "items": {
+            "type": "string",
+            "description": "Package name that should not be installed.",
+            "examples": ["conflicting-package.dnp.dappnode.eth"]
+          }
         }
       }
     },
