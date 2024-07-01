@@ -5,6 +5,8 @@
     "strict": true,
     "useUnknownInCatchVariables": false,
 
+    "types": ["node"],
+
     /* Modules */
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

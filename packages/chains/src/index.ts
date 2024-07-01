@@ -26,7 +26,8 @@ export async function getChainsData(): Promise<ChainData[]> {
 
         // Ignore packages where all containers are not running
         // Ethereum 2.0 multiservice should be handled in the driver
-        if (dnp.containers.every((container) => !container.running)) return;
+        if (dnp.containers.every((container: any) => !container.running))
+          return;
 
         const chainData = await runWithChainDriver(dnp, chainDriverName);
         loggedErrors.delete(dnp.dnpName); // Reset last seen error
