@@ -6,5 +6,12 @@
  * @returns "http://ipfs.io/ipfs/Qm"
  */
 export function urlJoin(...args: string[]): string {
-  return args.join("/").replace(/([^:]\/)\/+/g, "$1");
+  return (
+    args
+      .join("/")
+      // Remove duplicated // expect for the protocol
+      .replace(/([^:]\/)\/+/g, "$1")
+      // Remove duplicated // at the start of the string, "//route" => "/route"
+      .replace(/^\/+/, "/")
+  );
 }
