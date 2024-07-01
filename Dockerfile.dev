@@ -8,7 +8,7 @@ ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 # Initial stage to gather git data
 FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
-RUN apk add --no-cache python3 py3-pip build-base
+RUN apk add --no-cache git python3 py3-pip build-base
 COPY .git dappnode_package.json docker/getGitData.js ./
 RUN node getGitData /usr/src/app/.git-data.json
 
@@ -18,7 +18,7 @@ FROM node:${NODE_VERSION}-alpine
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
-  UI_FILES_PATH=/app/packages/admin-ui/dist \
+  UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
   VITE_APP_API_URL=http://my.dappnode:5000/

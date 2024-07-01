@@ -32,7 +32,7 @@ FROM node:${NODE_VERSION}-alpine
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
-  UI_FILES_PATH=/usr/src/app/packages/admin-ui/dist \
+  UI_FILES_PATH=/usr/src/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json 
 WORKDIR /usr/src/app
 # TODO: Remove bind modules when we don't use Bind package?
