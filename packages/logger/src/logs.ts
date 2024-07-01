@@ -107,7 +107,6 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
 /**
  * Grab the Nth path of the call stack
  * Works well for transpiled, minified or regular code
- * REQUIRES import "source-map-support/register";
  */
 export function getLocation(error: Error, stackCount: number): string | null {
   const parsed = stackTrace.parse(error);
