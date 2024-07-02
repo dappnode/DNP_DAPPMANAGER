@@ -1,5 +1,6 @@
 import React from "react";
-import { render } from "react-dom";
+import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -24,12 +25,12 @@ window.versionData = cleanObj({
   branch: import.meta.env.VITE_APP_BRANCH,
   commit: import.meta.env.VITE_APP_COMMIT
 });
+const root = createRoot(document.getElementById("root") as HTMLElement);
 
-render(
+root.render(
   <Provider store={store}>
     <Router>
       <App />
     </Router>
-  </Provider>,
-  document.getElementById("root")
+  </Provider>
 );

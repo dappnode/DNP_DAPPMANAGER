@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "VITE_APP_API_TEST=true vite",
-    "build": "tsc && vite build",
+    "build": "tsc -b && vite build",
     "analyze": "npx source-map-explorer build/static/js/main.*",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src",
     "prettier": "prettier --write 'src/**/*.*'",
@@ -15,7 +15,7 @@
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json",
     "mock-standalone": "VITE_APP_MOCK=true yarn start",
     "mock-standalone:build": "VITE_APP_MOCK=true yarn build",
-    "dev": "nodemon --ignore \"*.json\" -e ts,tsx --watch src/ --exec \"yarn build\""
+    "dev": "VITE_APP_API_TEST=true nodemon --ignore \"*.json\" -e ts,tsx --watch src/ --exec \"yarn build\""
   },
   "dependencies": {
     "@dappnode/common": "^0.1.0",
@@ -27,7 +27,6 @@
     "@types/node": "^18.11.18",
     "@types/qrcode.react": "^1.0.2",
     "@types/react": "^18.2.14",
-    "@types/react-dom": "^18.2.6",
     "@types/react-redux": "^7.1.25",
     "@types/react-router-dom": "^5.3.3",
     "@types/semver": "^7.3.13",
@@ -46,7 +45,7 @@
     "qrcode.react": "^0.8.0",
     "react": "^18.2.0",
     "react-bootstrap": "^1.0.0-beta.5",
-    "react-dom": "^18.2.0",
+    "react-dom": "^18.3.1",
     "react-icons": "^4.3.1",
     "react-markdown": "^8.0.0",
     "react-redux": "^7.2.0",
@@ -66,6 +65,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/jest": "^24.9.1",
+    "@types/react-dom": "^18.3.0",
     "prettier": "^1.16.4"
   },
   "optionalDependencies": {
