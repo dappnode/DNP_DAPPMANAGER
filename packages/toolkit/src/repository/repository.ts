@@ -566,20 +566,24 @@ export class DappnodeRepository extends ApmRepository {
   private parseAsset<T>(data: string | string[], format: FileFormat): T {
     const parseSingle = (content: string): any => {
       switch (format) {
-        case FileFormat.YAML:
-          const parsedYaml = YAML.parse(content);
-          if (!parsedYaml || typeof parsedYaml === "string")
-            throw new Error("Invalid YAML object");
-          return parsedYaml;
-        case FileFormat.JSON:
-          return JSON.parse(content);
-        case FileFormat.TEXT:
+        case FileFormat.YAML: {
+            const parsedYaml = YAML.parse(content);
+            if (!parsedYaml || typeof parsedYaml === "string")
+              throw new Error("Invalid YAML object");
+            return parsedYaml;
+        }
+        case FileFormat.JSON: {
+            return JSON.parse(content);
+        }
+        case FileFormat.TEXT: {
           return content; // TEXT format assumes direct usage of the string.
-        default:
+        }
+        default: {
           throw new Error(`Unsupported format: ${format}`);
+        }
       }
     };
-
+  
     try {
       if (Array.isArray(data)) {
         // Map over array data if it's an array, using parseSingle for each item
@@ -593,6 +597,7 @@ export class DappnodeRepository extends ApmRepository {
       throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
     }
   }
+  
 
 
   /**
