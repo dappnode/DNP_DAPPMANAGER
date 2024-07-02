@@ -1,7 +1,7 @@
 import { urlJoin } from "utils/url";
 
 // JSON RPC API
-export const apiUrl = process.env.REACT_APP_API_URL || "http://my.dappnode/";
+export const apiUrl = import.meta.env.VITE_APP_API_URL || "http://my.dappnode/";
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
 
@@ -25,7 +25,7 @@ export const apiUrls = {
 export const socketIoUrl = apiUrl;
 
 // Allow cross-domain cookies
-export const apiTestMode = process.env.REACT_APP_API_TEST;
+export const apiTestMode = import.meta.env.VITE_APP_API_TEST;
 
 // API Auth errors. Must be in sync with the DAPPMANAGER
 export const ERROR_NOT_REGISTERED = "NOT_REGISTERED";

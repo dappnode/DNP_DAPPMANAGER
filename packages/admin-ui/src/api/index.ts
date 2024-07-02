@@ -27,7 +27,7 @@ export { apiRoutes };
 
 // Inject mock API code to have a workable UI offline
 // Usefull for developing and testing UI elements without any server
-if (process.env.REACT_APP_MOCK) {
+if (import.meta.env.VITE_APP_MOCK) {
   import("./mock").then(mock => {
     Object.assign(apiAuth, mock.apiAuth);
     Object.assign(apiRoutes, mock.apiRoutes);

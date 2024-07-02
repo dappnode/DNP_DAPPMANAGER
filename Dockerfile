@@ -6,23 +6,25 @@ ARG NODE_VERSION=20.3.0
 ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.18
 
 # Initial stage to gather git data
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as git-data
+FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
 RUN apk add --no-cache git
 COPY .git dappnode_package.json docker/getGitData.js ./
 RUN node getGitData /usr/src/app/.git-data.json
 
 # Build source files
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} as build-src
+FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS build-src
+# python3 and build-base are needed for react app build
+RUN apk add --no-cache python3 py3-pip build-base
 WORKDIR /app
 COPY package.json yarn.lock lerna.json tsconfig.json ./
 COPY packages packages
 # For the admin-ui
-ENV REACT_APP_API_URL /
-RUN yarn --frozen-lockfile --non-interactive --ignore-optional && \
+ENV VITE_APP_API_URL /
+RUN yarn --frozen-lockfile --non-interactive && \
   yarn build && \
   yarn clean:libraries && \
-  yarn install --non-interactive --frozen-lockfile --production --force --ignore-optional
+  yarn install --non-interactive --frozen-lockfile --production --force
 RUN rm -rf yarn.lock packages/*/node_modules packages/*/src packages/*/tsconfig.json packages/*/.eslint*
 
 # Production stage

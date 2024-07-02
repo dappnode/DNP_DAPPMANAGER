@@ -56,3 +56,6 @@ packages/dappmanager/dnp_repo
 # Specific from toolkit
 #packages/toolkit/src/typechain/*
 packages/toolkit/truffle/contracts_build/*
+
+# docker tmp
+docker-compose-tmp.yml

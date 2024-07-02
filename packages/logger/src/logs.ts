@@ -1,8 +1,6 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import stackTrace from "stack-trace";
-// "source-map-support" MUST be imported for stack traces to work properly after Typescript transpile
-import "source-map-support/register.js";
 import { logSafeObjects } from "./logSafeObjects.js";
 import { inspect } from "util";
 
@@ -109,7 +107,6 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
 /**
  * Grab the Nth path of the call stack
  * Works well for transpiled, minified or regular code
- * REQUIRES import "source-map-support/register";
  */
 export function getLocation(error: Error, stackCount: number): string | null {
   const parsed = stackTrace.parse(error);
