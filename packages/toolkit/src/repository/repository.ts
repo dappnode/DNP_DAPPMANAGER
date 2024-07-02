@@ -246,33 +246,45 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Get a given release asset for a request. It lookfs for an IPFS entry for
-   * a given release file given a release file config.
-   *
-   * @param ipfsEntries - An array of IPFS entries.
-   * @param fileConfig - A file configuration.
-   * @throws - If the file is required and not found.
-   * @returns - The release package for the request or undefined if not found.
-   */
-  public async getPkgAsset<T>(
-    fileConfig: FileConfig,
-    ipfsEntries: IPFSEntry[]
-  ): Promise<T | undefined> {
-    const { regex, required } = fileConfig;
-    const entry: IPFSEntry | undefined = ipfsEntries.find((file) =>
-      regex.test(file.name)
-    );
-    if (!entry && required) throw new Error(`Missing required file ${regex}`);
-    if (!entry) return undefined;
+ * Get a given release asset for a request. It looks for an IPFS entry for
+ * a given release file given a release file config.
+ *
+ * @param ipfsEntries - An array of IPFS entries.
+ * @param fileConfig - A file configuration.
+ * @throws - If the file is required and not found.
+ * @returns - The release package for the request or undefined if not found.
+ */
+public async getPkgAsset<T>(
+  fileConfig: FileConfig,
+  ipfsEntries: IPFSEntry[]
+): Promise<T | undefined> {
+  const { regex, required, multiple } = fileConfig;
 
-    const { maxSize: maxLength, format } = fileConfig;
-    const content = await this.writeFileToMemory(
-      entry.cid.toString(),
-      maxLength
-    );
-    // TODO: validate content with JSON schema
+  // We filter the entries (files) so that we only consider the ones that match the regex.
+  // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
+  const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
+
+  // Handle no matches. If the file is required, throw an error, otherwise return undefined.
+  if (matchingEntries.length === 0) {
+    if (required) throw new Error(`Missing required file ${regex}`);
+    return undefined;
+  }
+
+  // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
+  const { maxSize: maxLength, format } = fileConfig;
+  if (multiple && matchingEntries.length > 1) {
+    const contents = await Promise.all(matchingEntries.map(entry =>
+      this.writeFileToMemory(entry.cid.toString(), maxLength)
+    ));
+    return this.parseAssets<T>(contents, format);
+  } else {
+    // Single file scenario, either because only one file matched or multiple files are not allowed.
+    // We take the first matching entry and parse it. Since we already checked that there is at least one matching entry, we can safely access the first element.
+    const entry = matchingEntries[0];
+    const content = await this.writeFileToMemory(entry.cid.toString(), maxLength);
     return this.parseAsset<T>(content, format);
   }
+}
 
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
@@ -583,6 +595,43 @@ export class DappnodeRepository extends ApmRepository {
         throw Error(`Attempting to parse unknown format ${format}`);
     }
   }
+
+ /**
+   * Parses asset data into the specified format (YAML, JSON, or TEXT).
+   * Throws an error if an unknown format is specified.
+   *
+   * @param data - The asset data to parse.
+   * @param format - The format to parse the data into.
+   * @returns The parsed data.
+   */
+private parseAssets<T>(contents: string[], format: FileFormat): T {
+  const parsedContents = contents.map(content => {
+    try {
+      switch (format) {
+        case FileFormat.YAML:
+          const parsedYaml = YAML.parse(content);
+          if (!parsedYaml || typeof parsedYaml === "string")
+            throw new Error(`YAML content returned invalid object`);
+          return parsedYaml;
+        case FileFormat.JSON:
+          return JSON.parse(content);
+        case FileFormat.TEXT:
+          return content; // Assuming TEXT just passes through data
+        default:
+          throw new Error(`Attempting to parse unknown format ${format}`);
+      }
+    } catch (e) {
+      if (e instanceof Error) {
+        e.message = `Error parsing content with format ${format}: ${e.message}`;
+        throw e;
+      }
+      throw new Error('Unknown error occurred during parsing');
+    }
+  });
+  // Cast to unknown to avoid type errors, then cast to T
+  return parsedContents as unknown as T;
+}
+
 
   /**
    * Sanitizes an IPFS path by removing "/ipfs/" if it is present.
