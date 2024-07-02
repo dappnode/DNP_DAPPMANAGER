@@ -275,9 +275,9 @@ export class DappnodeRepository extends ApmRepository {
       this.writeFileToMemory(entry.cid.toString(), maxLength)
     ));
   
-    // If multiple files are allowed and multiple files were found, we return an array of parsed assets.
+    // If multiple files are allowed, we return an array of parsed assets.
     // Otherwise, we return a single parsed asset.
-    return this.parseAsset<T>(multiple && matchingEntries.length > 1 ? contents : contents[0], format);
+    return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
   
 
