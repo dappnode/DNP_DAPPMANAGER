@@ -254,37 +254,32 @@ export class DappnodeRepository extends ApmRepository {
  * @throws - If the file is required and not found.
  * @returns - The release package for the request or undefined if not found.
  */
-public async getPkgAsset<T>(
-  fileConfig: FileConfig,
-  ipfsEntries: IPFSEntry[]
-): Promise<T | undefined> {
-  const { regex, required, multiple } = fileConfig;
-
-  // We filter the entries (files) so that we only consider the ones that match the regex.
-  // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
-  const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
-
-  // Handle no matches. If the file is required, throw an error, otherwise return undefined.
-  if (matchingEntries.length === 0) {
-    if (required) throw new Error(`Missing required file ${regex}`);
-    return undefined;
-  }
-
-  // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
-  const { maxSize: maxLength, format } = fileConfig;
-  if (multiple && matchingEntries.length > 1) {
+  public async getPkgAsset<T>(
+    fileConfig: FileConfig,
+    ipfsEntries: IPFSEntry[]
+  ): Promise<T | undefined> {
+    const { regex, required, multiple } = fileConfig;
+    // We filter the entries (files) so that we only consider the ones that match the regex.
+    // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
+    const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
+  
+    // Handle no matches. If the file is required, throw an error, otherwise return undefined.
+    if (matchingEntries.length === 0) {
+      if (required) throw new Error(`Missing required file: ${regex}`);
+      return undefined;
+    }
+  
+    // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
+    const { maxSize: maxLength, format } = fileConfig;
     const contents = await Promise.all(matchingEntries.map(entry =>
       this.writeFileToMemory(entry.cid.toString(), maxLength)
     ));
-    return this.parseAssets<T>(contents, format);
-  } else {
-    // Single file scenario, either because only one file matched or multiple files are not allowed.
-    // We take the first matching entry and parse it. Since we already checked that there is at least one matching entry, we can safely access the first element.
-    const entry = matchingEntries[0];
-    const content = await this.writeFileToMemory(entry.cid.toString(), maxLength);
-    return this.parseAsset<T>(content, format);
+  
+    // If multiple files are allowed and multiple files were found, we return an array of parsed assets.
+    // Otherwise, we return a single parsed asset.
+    return this.parseAsset<T>(multiple && matchingEntries.length > 1 ? contents : contents[0], format);
   }
-}
+  
 
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
@@ -568,69 +563,36 @@ public async getPkgAsset<T>(
    * @param format - The format to parse the data into.
    * @returns The parsed data.
    */
-  private parseAsset<T>(data: string, format: FileFormat): T {
-    switch (format) {
-      case FileFormat.YAML:
-        try {
-          const parsedData = YAML.parse(data);
-          if (!parsedData || typeof parsedData === "string")
-            throw Error(`returned invalid object`);
-          return parsedData as T;
-        } catch (e) {
-          if (e instanceof Error)
-            e.message = `Error parsing YAML: ${e.message}`;
-          throw e;
-        }
-      case FileFormat.JSON:
-        try {
-          return JSON.parse(data);
-        } catch (e) {
-          if (e instanceof Error)
-            e.message = `Error parsing JSON: ${e.message}`;
-          throw e;
-        }
-      case FileFormat.TEXT:
-        return data as T;
-      default:
-        throw Error(`Attempting to parse unknown format ${format}`);
-    }
-  }
-
- /**
-   * Parses asset data into the specified format (YAML, JSON, or TEXT).
-   * Throws an error if an unknown format is specified.
-   *
-   * @param data - The asset data to parse.
-   * @param format - The format to parse the data into.
-   * @returns The parsed data.
-   */
-private parseAssets<T>(contents: string[], format: FileFormat): T {
-  const parsedContents = contents.map(content => {
-    try {
+  private parseAsset<T>(data: string | string[], format: FileFormat): T {
+    const parseSingle = (content: string): any => {
       switch (format) {
         case FileFormat.YAML:
           const parsedYaml = YAML.parse(content);
           if (!parsedYaml || typeof parsedYaml === "string")
-            throw new Error(`YAML content returned invalid object`);
+            throw new Error("Invalid YAML object");
           return parsedYaml;
         case FileFormat.JSON:
           return JSON.parse(content);
         case FileFormat.TEXT:
-          return content; // Assuming TEXT just passes through data
+          return content; // TEXT format assumes direct usage of the string.
         default:
-          throw new Error(`Attempting to parse unknown format ${format}`);
+          throw new Error(`Unsupported format: ${format}`);
+      }
+    };
+
+    try {
+      if (Array.isArray(data)) {
+        // Map over array data if it's an array, using parseSingle for each item
+        return data.map(parseSingle) as unknown as T;
+      } else {
+        // Directly parse data if it's a single string
+        return parseSingle(data) as T;
       }
     } catch (e) {
-      if (e instanceof Error) {
-        e.message = `Error parsing content with format ${format}: ${e.message}`;
-        throw e;
-      }
-      throw new Error('Unknown error occurred during parsing');
+      // Handle and throw the error from single or multiple parsing
+      throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
     }
-  });
-  // Cast to unknown to avoid type errors, then cast to T
-  return parsedContents as unknown as T;
-}
+  }
 
 
   /**
