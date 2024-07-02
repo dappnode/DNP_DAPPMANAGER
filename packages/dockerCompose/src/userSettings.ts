@@ -7,6 +7,7 @@ import {
   parseDevicePathMountpoint,
   getDevicePath,
   ComposeFileEditor,
+  parseServiceNetworks,
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
 import {
@@ -42,16 +43,20 @@ export const parseUserSettingsFns: {
     // There can't be service networks without root networks
     if (!compose.networks) return undefined;
 
-    const serviceNetworks = Object.entries(compose.services)
-      .reduce((acc, [serviceName, service]) => {
+    const serviceNetworks = Object.entries(compose.services).reduce(
+      (acc, [serviceName, service]) => {
         if (Array.isArray(service.networks)) {
           // Convert array to object
-          acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
+          acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(
+            service.networks
+          );
         } else {
           acc[serviceName] = service.networks || {};
         }
         return acc;
-      }, {} as { [serviceName: string]: ComposeServiceNetworks });
+      },
+      {} as { [serviceName: string]: ComposeServiceNetworks }
+    );
 
     const rootNetworks = compose.networks;
 
@@ -147,6 +152,7 @@ export function applyUserSettings(
     const environment = parseEnvironment(service.environment || {});
     const portMappings = parsePortMappings(service.ports || []);
     const volumeMappings = parseVolumeMappings(service.volumes || []);
+    const networks = parseServiceNetworks(service.networks || {});
 
     // User set
     const userSetEnvironment =
@@ -175,7 +181,10 @@ export function applyUserSettings(
       })
     );
 
-    const nextNetworks = userSetNetworks;
+    const nextNetworks = {
+      ...networks,
+      ...userSetNetworks,
+    };
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
@@ -213,17 +222,20 @@ export function applyUserSettings(
       userSettings.allNamedVolumeMountpoint;
     return mountpoint
       ? {
-        driver_opts: {
-          type: "none",
-          device: getDevicePath({ mountpoint, dnpName, volumeName }),
-          o: "bind",
-        },
-      }
+          driver_opts: {
+            type: "none",
+            device: getDevicePath({ mountpoint, dnpName, volumeName }),
+            o: "bind",
+          },
+        }
       : vol;
   });
 
   // TODO: Handle networks in array format?
-  const nextNetworks = userSettings.networks?.rootNetworks;
+  const nextNetworks = {
+    ...compose.networks,
+    ...userSettings.networks?.rootNetworks,
+  };
 
   return cleanCompose({
     ...compose,
