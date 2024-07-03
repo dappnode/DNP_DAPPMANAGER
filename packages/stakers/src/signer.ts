@@ -7,6 +7,7 @@ import {
   SignerMainnet,
   SignerPrater,
   StakerItem,
+  UserSettings,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -63,7 +64,7 @@ export class Signer extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         Signer.CompatibleSigners[network].dnpName,
-        this.getNetworkConfigsToAdd(network)
+        this.getUserSettings(network)
       );
   }
 
@@ -72,21 +73,31 @@ export class Signer extends StakerComponent {
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: [Signer.CompatibleSigners[network]],
-      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
+      userSettings: this.getUserSettings(network),
       prevClient: Signer.CompatibleSigners[network].dnpName,
     });
   }
 
-  private getNetworkConfigsToAdd(network: Network): {
-    [serviceName: string]: ComposeServiceNetworksObj;
-  } {
+  private getUserSettings(network: Network): UserSettings {
     return {
-      web3signer: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`signer.${network}.staker.dappnode`],
+      networks: {
+        rootNetworks: {
+          [params.DOCKER_STAKER_NETWORKS[network]]: {
+            external: true,
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+            external: true,
+          },
         },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`signer.${network}.dncore.dappnode`],
+        serviceNetworks: {
+          web3signer: {
+            [params.DOCKER_STAKER_NETWORKS[network]]: {
+              aliases: [`signer.${network}.staker.dappnode`],
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+              aliases: [`signer.${network}.dncore.dappnode`],
+            },
+          },
         },
       },
     };
