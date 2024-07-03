@@ -77,14 +77,21 @@ export class Execution extends StakerComponent {
 
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
     const currentExecutionDnpName = this.DbHandlers[network].get();
-    if (
-      currentExecutionDnpName &&
-      (await listPackageNoThrow({ dnpName: currentExecutionDnpName }))
-    )
+    if (currentExecutionDnpName) {
+      const isInstalled = await listPackageNoThrow({
+        dnpName: currentExecutionDnpName,
+      });
+
+      if (!isInstalled) {
+        // update status in db
+        this.DbHandlers[network].set(undefined);
+        return;
+      }
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
         this.getUserSettings(network, currentExecutionDnpName)
       );
+    }
   }
 
   async setNewExecution(network: Network, newExecutionDnpName: string | null) {

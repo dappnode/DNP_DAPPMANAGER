@@ -91,17 +91,21 @@ export class Consensus extends StakerComponent {
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
-    if (currentConsensusDnpName)
+    if (currentConsensusDnpName) {
+      const isInstalled = Boolean(
+        await listPackageNoThrow({ dnpName: currentConsensusDnpName })
+      );
+
+      if (!isInstalled) {
+        // update status in db
+        this.DbHandlers[network].set(undefined);
+        return;
+      }
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getUserSettings(
-          currentConsensusDnpName,
-          Boolean(
-            await listPackageNoThrow({ dnpName: currentConsensusDnpName })
-          ),
-          network
-        )
+        this.getUserSettings(currentConsensusDnpName, isInstalled, network)
       );
+    }
   }
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {

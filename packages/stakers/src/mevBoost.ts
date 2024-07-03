@@ -67,7 +67,6 @@ export class MevBoost extends StakerComponent {
       !(await listPackageNoThrow({ dnpName: mevBoostDnpName }))
     )
       return relays;
-    // TODO: do not use packageGet, instead use module dockerCompose to retrieve envs
     const pkgEnv = new ComposeFileEditor(
       mevBoostDnpName,
       false
@@ -83,18 +82,22 @@ export class MevBoost extends StakerComponent {
   async persistMevBoostIfInstalledAndRunning(network: Network): Promise<void> {
     const currentMevBoostDnpName =
       MevBoost.CompatibleMevBoost[network]?.dnpName;
-    if (
-      currentMevBoostDnpName &&
-      (
+    if (currentMevBoostDnpName) {
+      const isInstalledAndRunning = (
         await listPackageNoThrow({
           dnpName: currentMevBoostDnpName,
         })
-      )?.containers.some((container) => container.running)
-    )
+      )?.containers.some((container) => container.running);
+
+      if (!isInstalledAndRunning) {
+        this.DbHandlers[network].set(false);
+        return;
+      }
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
         this.getUserSettings(currentMevBoostDnpName, [], network) // TODO: persist existing relays
       );
+    }
   }
 
   async setNewMevBoost(
