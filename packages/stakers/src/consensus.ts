@@ -7,6 +7,7 @@ import {
   ConsensusClientPrater,
   Network,
   StakerItem,
+  UserSettings,
   UserSettingsAllDnps,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
@@ -90,33 +91,37 @@ export class Consensus extends StakerComponent {
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
-    if (
-      currentConsensusDnpName &&
-      (await listPackageNoThrow({ dnpName: currentConsensusDnpName }))
-    )
+    if (currentConsensusDnpName) {
+      const isInstalled = Boolean(
+        await listPackageNoThrow({ dnpName: currentConsensusDnpName })
+      );
+
+      if (!isInstalled) {
+        // update status in db
+        this.DbHandlers[network].set(undefined);
+        return;
+      }
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getNetworkConfigsToAdd(network),
-        this.getDefaultConsensusUserSettings(currentConsensusDnpName, network)
+        this.getUserSettings(currentConsensusDnpName, isInstalled, network)
       );
+    }
   }
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
-    // get default userSettings for the new consensus to be installed
-    // use undefined to avoid overwriting existing userSettings
-    const userSettings =
-      newConsensusDnpName &&
-      !(await listPackageNoThrow({ dnpName: newConsensusDnpName }))
-        ? this.getDefaultConsensusUserSettings(newConsensusDnpName, network)
-        : undefined;
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
-      userSettings,
+      userSettings: newConsensusDnpName
+        ? this.getUserSettings(
+            newConsensusDnpName,
+            Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
+            network
+          )
+        : {},
       prevClient: prevConsClientDnpName,
     });
     // persist on db
@@ -124,50 +129,104 @@ export class Consensus extends StakerComponent {
       await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getDefaultConsensusUserSettings(
-    newConsensusDnpName: string | null,
+  private getUserSettings(
+    newConsensusDnpName: string,
+    shouldSetEnvironment: boolean,
     network: Network
-  ): UserSettingsAllDnps {
+  ): UserSettings {
     const validatorServiceName =
       this.getValidatorServiceName(newConsensusDnpName);
     const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-    return newConsensusDnpName
-      ? {
-          [newConsensusDnpName]: {
-            environment:
-              beaconServiceName === validatorServiceName
-                ? {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
-                  }
-                : {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                    },
+    return {
+      environment: shouldSetEnvironment
+        ? beaconServiceName === validatorServiceName
+          ? {
+              [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]: defaultDappnodeGraffiti,
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  Consensus.DefaultCheckpointSync[network],
+              },
+            }
+          : {
+              [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]: defaultDappnodeGraffiti,
+              },
 
-                    [beaconServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
+              [beaconServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  Consensus.DefaultCheckpointSync[network],
+              },
+            }
+        : {},
+      networks:
+        beaconServiceName === validatorServiceName
+          ? {
+              rootNetworks: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  external: true,
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  external: true,
+                },
+              },
+              serviceNetworks: {
+                ["beacon-validator"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [
+                      `beacon-chain.${network}.staker.dappnode`,
+                      `validator.${network}.staker.dappnode`,
+                    ],
                   },
-          },
-        }
-      : {};
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [
+                      `beacon-chain.${network}.dncore.dappnode`,
+                      `validator.${network}.dncore.dappnode`,
+                    ],
+                  },
+                },
+              },
+            }
+          : {
+              rootNetworks: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  external: true,
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  external: true,
+                },
+              },
+              serviceNetworks: {
+                ["beacon-chain"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [`beacon-chain.${network}.staker.dappnode`],
+                  },
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [`beacon-chain.${network}.dncore.dappnode`],
+                  },
+                },
+                ["validator"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [`validator.${network}.staker.dappnode`],
+                  },
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [`validator.${network}.dncore.dappnode`],
+                  },
+                },
+              },
+            },
+    };
   }
 
   /**
@@ -194,30 +253,5 @@ export class Consensus extends StakerComponent {
         ? "beacon-validator"
         : "beacon-chain"
       : "";
-  }
-
-  private getNetworkConfigsToAdd(network: Network): {
-    [serviceName: string]: ComposeServiceNetworksObj;
-  } {
-    return {
-      // TODO: be consistent with consensus clients validator and beacon service names and do sanity check
-      // required until nimbus is splitted into 2 services
-      ["beacon"]: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`beacon-chain.${network}.staker.dappnode`],
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`beacon-chain.${network}.dncore.dappnode`],
-        },
-      },
-      ["validator"]: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`validator.${network}.staker.dappnode`],
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`validator.${network}.dncore.dappnode`],
-        },
-      },
-    };
   }
 }
