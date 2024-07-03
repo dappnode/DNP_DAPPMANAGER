@@ -2,7 +2,6 @@ import {
   dockerComposeUpPackage,
   dockerContainerStop,
   dockerNetworkDisconnect,
-  listPackage,
   listPackageNoThrow,
   listPackages,
 } from "@dappnode/dockerapi";
@@ -19,9 +18,7 @@ import {
   UserSettingsAllDnps,
   PackageContainer,
   StakerItem,
-  ComposeServiceNetworksObj,
-  ComposeService,
-  ComposeNetworks,
+  UserSettings,
 } from "@dappnode/types";
 import {
   getIsInstalled,
@@ -30,7 +27,7 @@ import {
   fileToGatewayUrl,
 } from "@dappnode/utils";
 import { lt } from "semver";
-import { merge, uniq, isMatch } from "lodash-es";
+import { isMatch } from "lodash-es";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -79,24 +76,16 @@ export class StakerComponent {
 
   protected async persistSelectedIfInstalled(
     dnpName: string,
-    dockerNetworkConfigsToAdd: {
-      [serviceName: string]: ComposeServiceNetworksObj;
-    },
-    userSettings?: UserSettingsAllDnps
+    userSettings: UserSettings
   ): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig(
-      dnpName,
-      dockerNetworkConfigsToAdd,
-      userSettings
-    );
+    await this.setStakerPkgConfig(dnpName, userSettings);
   }
 
   protected async setNew({
     newStakerDnpName,
     dockerNetworkName,
     compatibleClients,
-    dockerNetworkConfigsToAdd,
     userSettings,
     prevClient,
   }: {
@@ -108,10 +97,7 @@ export class StakerComponent {
           minVersion: string;
         }[]
       | null;
-    dockerNetworkConfigsToAdd: {
-      [serviceName: string]: ComposeServiceNetworksObj;
-    };
-    userSettings?: UserSettingsAllDnps;
+    userSettings: UserSettings;
     prevClient?: string | null;
   }): Promise<void> {
     if (!prevClient && !newStakerDnpName) {
@@ -136,11 +122,7 @@ export class StakerComponent {
 
     if (!newStakerDnpName) return;
     // set staker config
-    await this.setStakerPkgConfig(
-      newStakerDnpName,
-      dockerNetworkConfigsToAdd,
-      userSettings
-    );
+    await this.setStakerPkgConfig(newStakerDnpName, userSettings);
   }
 
   /**
@@ -152,142 +134,26 @@ export class StakerComponent {
    */
   private async setStakerPkgConfig(
     dnpName: string,
-    dockerNetworkConfigsoAdd: {
-      [serviceName: string]: ComposeServiceNetworksObj;
-    },
-    userSettings?: UserSettingsAllDnps
+    userSettings: UserSettings
   ): Promise<void> {
     // ensure pkg installed
     if (!(await listPackageNoThrow({ dnpName })))
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
-        userSettings,
+        userSettings: userSettings ? { [dnpName]: userSettings } : {},
       });
     else if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
       const userSettingsPrev: UserSettingsAllDnps = {};
       userSettingsPrev[dnpName] = composeEditor.getUserSettings();
       if (!isMatch(userSettingsPrev, userSettings)) {
-        composeEditor.applyUserSettings(userSettings[dnpName], { dnpName });
+        composeEditor.applyUserSettings(userSettings, { dnpName });
         composeEditor.write();
       }
     }
 
-    const pkg = await listPackage({
-      dnpName,
-    });
-
-    // add staker network to the compose file
-    this.addStakerNetworkToCompose(pkg.dnpName, dockerNetworkConfigsoAdd);
-
     // start all containers
-    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, true);
-  }
-
-  /**
-   * Adds the staker network and its fullnode alias to the docker-compose file
-   */
-  private addStakerNetworkToCompose(
-    dnpName: string,
-    netConfigsToAdd: { [serviceName: string]: ComposeServiceNetworksObj }
-  ): void {
-    const composeEditor = new ComposeFileEditor(dnpName, false);
-    const services = composeEditor.compose.services;
-    const rootNetworks = composeEditor.compose.networks || {};
-
-    for (const [serviceName, networkConfig] of Object.entries(
-      netConfigsToAdd
-    )) {
-      // Find the service that includes serviceName in its name
-      const service = this.findMatchingService({ services, serviceName });
-
-      if (!service) {
-        logs.warn(`Service ${serviceName} not found in ${dnpName}, skipping`);
-        continue; // TODO: Throw error here?
-      }
-
-      if (Array.isArray(service.networks)) {
-        service.networks = ComposeFileEditor.convertNetworkArrayToObject(
-          service.networks
-        );
-      }
-
-      service.networks = this.mergeServiceNetworks({
-        currentNetworks: service.networks,
-        networksToAdd: networkConfig,
-      });
-
-      composeEditor.compose.networks = this.updateComposeRootNetworks({
-        currentRootNetworks: rootNetworks,
-        serviceNetworkConfig: networkConfig,
-      });
-    }
-
-    composeEditor.write();
-  }
-
-  /**
-   * Looks for the service that matches the serviceName
-   *
-   * If the service is not found, it will look for a service that includes the serviceName in its name
-   */
-  private findMatchingService({
-    services,
-    serviceName,
-  }: {
-    services: {
-      [dnpName: string]: ComposeService;
-    };
-    serviceName: string;
-  }): ComposeService {
-    return (
-      services[serviceName] ||
-      Object.entries(services).find(([name]) => name.includes(serviceName))?.[1]
-    );
-  }
-
-  /**
-   * Merges the current networks with the networks to add in a docker compose service
-   *
-   * It also ensures that the aliases are unique
-   */
-  private mergeServiceNetworks({
-    currentNetworks,
-    networksToAdd,
-  }: {
-    currentNetworks?: ComposeServiceNetworksObj;
-    networksToAdd: ComposeServiceNetworksObj;
-  }): ComposeServiceNetworksObj {
-    const mergedNetworks: ComposeServiceNetworksObj = { ...currentNetworks };
-
-    merge(mergedNetworks, networksToAdd);
-
-    for (const network of Object.values(mergedNetworks)) {
-      if (network.aliases) network.aliases = uniq(network.aliases);
-    }
-    return mergedNetworks;
-  }
-
-  /**
-   * Updates the root level networks in the docker compose file
-   */
-  private updateComposeRootNetworks({
-    currentRootNetworks,
-    serviceNetworkConfig,
-  }: {
-    currentRootNetworks: ComposeNetworks;
-    serviceNetworkConfig: ComposeServiceNetworksObj;
-  }): ComposeNetworks {
-    const updatedRootNetworks = { ...currentRootNetworks };
-
-    // Ensure all networks are added to the root level
-    const serviceNetworkNames = Object.keys(serviceNetworkConfig);
-
-    for (const networkName of serviceNetworkNames)
-      if (!updatedRootNetworks[networkName])
-        updatedRootNetworks[networkName] = { external: true };
-
-    return updatedRootNetworks;
+    await dockerComposeUpPackage({ dnpName }, true);
   }
 
   /**
