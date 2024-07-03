@@ -97,25 +97,22 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getUserSettings(currentConsensusDnpName, network)
+        this.getUserSettings(currentConsensusDnpName, true, network)
       );
   }
 
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
-    // get default userSettings for the new consensus to be installed
-    // use undefined to avoid overwriting existing userSettings
-    const userSettings =
-      newConsensusDnpName &&
-      !(await listPackageNoThrow({ dnpName: newConsensusDnpName }))
-        ? this.getUserSettings(newConsensusDnpName, network)
-        : undefined;
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      userSettings,
+      userSettings: this.getUserSettings(
+        newConsensusDnpName,
+        prevConsClientDnpName === newConsensusDnpName,
+        network
+      ),
       prevClient: prevConsClientDnpName,
     });
     // persist on db
@@ -125,6 +122,7 @@ export class Consensus extends StakerComponent {
 
   private getUserSettings(
     newConsensusDnpName: string | null,
+    prevAndNewAreSame: boolean, // used to avoid overwriting consensus envs
     network: Network
   ): UserSettings {
     const validatorServiceName =
@@ -135,8 +133,8 @@ export class Consensus extends StakerComponent {
     return newConsensusDnpName
       ? {
           [newConsensusDnpName]: {
-            environment:
-              beaconServiceName === validatorServiceName
+            environment: prevAndNewAreSame
+              ? beaconServiceName === validatorServiceName
                 ? {
                     [validatorServiceName]: {
                       // Fee recipient is set as global env, keep this for backwards compatibility
@@ -163,7 +161,8 @@ export class Consensus extends StakerComponent {
                       ["CHECKPOINT_SYNC_URL"]:
                         Consensus.DefaultCheckpointSync[network],
                     },
-                  },
+                  }
+              : {},
             networks:
               beaconServiceName === validatorServiceName
                 ? {

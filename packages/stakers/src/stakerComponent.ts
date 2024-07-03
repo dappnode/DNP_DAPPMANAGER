@@ -76,7 +76,7 @@ export class StakerComponent {
 
   protected async persistSelectedIfInstalled(
     dnpName: string,
-    userSettings?: UserSettings
+    userSettings: UserSettings
   ): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
     await this.setStakerPkgConfig(dnpName, userSettings);
@@ -97,7 +97,7 @@ export class StakerComponent {
           minVersion: string;
         }[]
       | null;
-    userSettings?: UserSettings;
+    userSettings: UserSettings;
     prevClient?: string | null;
   }): Promise<void> {
     if (!prevClient && !newStakerDnpName) {
@@ -134,7 +134,7 @@ export class StakerComponent {
    */
   private async setStakerPkgConfig(
     dnpName: string,
-    userSettings?: UserSettings
+    userSettings: UserSettings
   ): Promise<void> {
     // ensure pkg installed
     if (!(await listPackageNoThrow({ dnpName })))
