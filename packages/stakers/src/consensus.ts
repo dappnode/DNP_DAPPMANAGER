@@ -91,13 +91,16 @@ export class Consensus extends StakerComponent {
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
-    if (
-      currentConsensusDnpName &&
-      (await listPackageNoThrow({ dnpName: currentConsensusDnpName }))
-    )
+    if (currentConsensusDnpName)
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getUserSettings(currentConsensusDnpName, true, network)
+        this.getUserSettings(
+          currentConsensusDnpName,
+          Boolean(
+            await listPackageNoThrow({ dnpName: currentConsensusDnpName })
+          ),
+          network
+        )
       );
   }
 
@@ -111,7 +114,7 @@ export class Consensus extends StakerComponent {
       userSettings: newConsensusDnpName
         ? this.getUserSettings(
             newConsensusDnpName,
-            prevConsClientDnpName === newConsensusDnpName,
+            Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
             network
           )
         : {},
@@ -124,7 +127,7 @@ export class Consensus extends StakerComponent {
 
   private getUserSettings(
     newConsensusDnpName: string,
-    prevAndNewAreSame: boolean, // used to avoid overwriting consensus envs
+    shouldSetEnvironment: boolean,
     network: Network
   ): UserSettings {
     const validatorServiceName =
@@ -133,7 +136,7 @@ export class Consensus extends StakerComponent {
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
     return {
-      environment: prevAndNewAreSame
+      environment: shouldSetEnvironment
         ? beaconServiceName === validatorServiceName
           ? {
               [validatorServiceName]: {
