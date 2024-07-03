@@ -1,5 +1,4 @@
 import {
-  ComposeServiceNetworksObj,
   ExecutionClientGnosis,
   ExecutionClientHolesky,
   ExecutionClientLukso,
@@ -7,6 +6,7 @@ import {
   ExecutionClientPrater,
   Network,
   StakerItem,
+  UserSettings,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
@@ -83,7 +83,7 @@ export class Execution extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentExecutionDnpName,
-        this.getNetworkConfigsToAdd(network)
+        this.getUserSettings(network, currentExecutionDnpName)
       );
   }
 
@@ -94,7 +94,9 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
+      userSettings: newExecutionDnpName
+        ? this.getUserSettings(network, newExecutionDnpName)
+        : {},
       prevClient: prevExecClientDnpName,
     });
 
@@ -110,20 +112,46 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private getNetworkConfigsToAdd(network: Network): {
-    [serviceName: string]: ComposeServiceNetworksObj;
-  } {
+  private getUserSettings(network: Network, dnpName: string): UserSettings {
     return {
-      // TODO: be consistent with execution clients service names and do sanity check
-      // use empty string since the addConfigNetworkToCompose will use includes to check for the existance service AND the executions are MONOSERVICE
-      "": {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`execution.${network}.staker.dappnode`],
+      networks: {
+        rootNetworks: {
+          [params.DOCKER_STAKER_NETWORKS[network]]: {
+            external: true,
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+            external: true,
+          },
         },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`execution.${network}.dncore.dappnode`],
+        serviceNetworks: {
+          [this.getExecutionServiceName(dnpName)]: {
+            [params.DOCKER_STAKER_NETWORKS[network]]: {
+              aliases: [`execution.${network}.staker.dappnode`],
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+              aliases: [`execution.${network}.dncore.dappnode`],
+            },
+          },
         },
       },
     };
+  }
+
+  /**
+   * Returns the service name of the execution client
+   *
+   * TODO: find a better way to get the service name of the execution client or force execution clients to have same service name "execution", similar as consensus clients with beacon-chain and validator services
+   */
+  private getExecutionServiceName(dnpName: string): string {
+    // TODO: geth mainnet is the only execution with service name === dnpName. See https://github.com/dappnode/DAppNodePackage-geth/blob/7e8e5aa860a8861986f675170bfa92215760d32e/docker-compose.yml#L3
+    if (dnpName === ExecutionClientMainnet.Geth)
+      return ExecutionClientMainnet.Geth;
+    if (dnpName.includes("geth")) return "geth";
+    if (dnpName.includes("nethermind")) return "nethermind";
+    if (dnpName.includes("erigon")) return "erigon";
+    if (dnpName.includes("besu")) return "besu";
+    if (dnpName.includes("reth")) return "reth";
+
+    return dnpName;
   }
 }

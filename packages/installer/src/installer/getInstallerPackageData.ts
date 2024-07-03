@@ -81,6 +81,10 @@ function getInstallerPackageData(
   const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
   const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
+  console.log(`userSettings: JSON.stringify(userSettings)`);
+  console.log(`prevUserSet: ${JSON.stringify(prevUserSet)}`);
+  console.log(`nextUserSet: ${JSON.stringify(nextUserSet)}`);
+
   // Append to compose
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });

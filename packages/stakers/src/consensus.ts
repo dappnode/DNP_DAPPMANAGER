@@ -7,6 +7,7 @@ import {
   ConsensusClientPrater,
   Network,
   StakerItem,
+  UserSettings,
   UserSettingsAllDnps,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
@@ -96,8 +97,7 @@ export class Consensus extends StakerComponent {
     )
       await this.persistSelectedIfInstalled(
         currentConsensusDnpName,
-        this.getNetworkConfigsToAdd(network),
-        this.getDefaultConsensusUserSettings(currentConsensusDnpName, network)
+        this.getUserSettings(currentConsensusDnpName, network)
       );
   }
 
@@ -108,14 +108,13 @@ export class Consensus extends StakerComponent {
     const userSettings =
       newConsensusDnpName &&
       !(await listPackageNoThrow({ dnpName: newConsensusDnpName }))
-        ? this.getDefaultConsensusUserSettings(newConsensusDnpName, network)
+        ? this.getUserSettings(newConsensusDnpName, network)
         : undefined;
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      dockerNetworkConfigsToAdd: this.getNetworkConfigsToAdd(network),
       userSettings,
       prevClient: prevConsClientDnpName,
     });
@@ -124,10 +123,10 @@ export class Consensus extends StakerComponent {
       await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getDefaultConsensusUserSettings(
+  private getUserSettings(
     newConsensusDnpName: string | null,
     network: Network
-  ): UserSettingsAllDnps {
+  ): UserSettings {
     const validatorServiceName =
       this.getValidatorServiceName(newConsensusDnpName);
     const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
@@ -165,6 +164,62 @@ export class Consensus extends StakerComponent {
                         Consensus.DefaultCheckpointSync[network],
                     },
                   },
+            networks:
+              beaconServiceName === validatorServiceName
+                ? {
+                    rootNetworks: {
+                      [params.DOCKER_STAKER_NETWORKS[network]]: {
+                        external: true,
+                      },
+                      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                        external: true,
+                      },
+                    },
+                    serviceNetworks: {
+                      ["beacon-validator"]: {
+                        [params.DOCKER_STAKER_NETWORKS[network]]: {
+                          aliases: [
+                            `beacon-chain.${network}.staker.dappnode`,
+                            `validator.${network}.staker.dappnode`,
+                          ],
+                        },
+                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                          aliases: [
+                            `beacon-chain.${network}.dncore.dappnode`,
+                            `validator.${network}.dncore.dappnode`,
+                          ],
+                        },
+                      },
+                    },
+                  }
+                : {
+                    rootNetworks: {
+                      [params.DOCKER_STAKER_NETWORKS[network]]: {
+                        external: true,
+                      },
+                      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                        external: true,
+                      },
+                    },
+                    serviceNetworks: {
+                      ["beacon-chain"]: {
+                        [params.DOCKER_STAKER_NETWORKS[network]]: {
+                          aliases: [`beacon-chain.${network}.staker.dappnode`],
+                        },
+                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                          aliases: [`beacon-chain.${network}.dncore.dappnode`],
+                        },
+                      },
+                      ["validator"]: {
+                        [params.DOCKER_STAKER_NETWORKS[network]]: {
+                          aliases: [`validator.${network}.staker.dappnode`],
+                        },
+                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                          aliases: [`validator.${network}.dncore.dappnode`],
+                        },
+                      },
+                    },
+                  },
           },
         }
       : {};
@@ -194,30 +249,5 @@ export class Consensus extends StakerComponent {
         ? "beacon-validator"
         : "beacon-chain"
       : "";
-  }
-
-  private getNetworkConfigsToAdd(network: Network): {
-    [serviceName: string]: ComposeServiceNetworksObj;
-  } {
-    return {
-      // TODO: be consistent with consensus clients validator and beacon service names and do sanity check
-      // required until nimbus is splitted into 2 services
-      ["beacon"]: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`beacon-chain.${network}.staker.dappnode`],
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`beacon-chain.${network}.dncore.dappnode`],
-        },
-      },
-      ["validator"]: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          aliases: [`validator.${network}.staker.dappnode`],
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          aliases: [`validator.${network}.dncore.dappnode`],
-        },
-      },
-    };
   }
 }
