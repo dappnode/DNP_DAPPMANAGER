@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     outDir: "build"
   },
-  base: "",
+  base: "/",
   plugins: [react(), viteTsconfigPaths()],
   server: {
     // this ensures that the browser opens upon server start
