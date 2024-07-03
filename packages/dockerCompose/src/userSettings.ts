@@ -1,5 +1,5 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject } from "lodash-es";
+import { mapValues, pick, omitBy, isObject, merge } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
@@ -181,10 +181,8 @@ export function applyUserSettings(
       })
     );
 
-    const nextNetworks = {
-      ...networks,
-      ...userSetNetworks,
-    };
+    // use lodash to merge networks and userSetNetworks with merge
+    const nextNetworks = merge(networks, userSetNetworks);
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
