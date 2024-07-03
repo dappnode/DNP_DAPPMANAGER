@@ -108,11 +108,13 @@ export class Consensus extends StakerComponent {
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      userSettings: this.getUserSettings(
-        newConsensusDnpName,
-        prevConsClientDnpName === newConsensusDnpName,
-        network
-      ),
+      userSettings: newConsensusDnpName
+        ? this.getUserSettings(
+            newConsensusDnpName,
+            prevConsClientDnpName === newConsensusDnpName,
+            network
+          )
+        : {},
       prevClient: prevConsClientDnpName,
     });
     // persist on db
@@ -121,7 +123,7 @@ export class Consensus extends StakerComponent {
   }
 
   private getUserSettings(
-    newConsensusDnpName: string | null,
+    newConsensusDnpName: string,
     prevAndNewAreSame: boolean, // used to avoid overwriting consensus envs
     network: Network
   ): UserSettings {
@@ -130,98 +132,94 @@ export class Consensus extends StakerComponent {
     const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-    return newConsensusDnpName
-      ? {
-          [newConsensusDnpName]: {
-            environment: prevAndNewAreSame
-              ? beaconServiceName === validatorServiceName
-                ? {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
-                  }
-                : {
-                    [validatorServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Graffiti is a mandatory value
-                      ["GRAFFITI"]: defaultDappnodeGraffiti,
-                    },
+    return {
+      environment: prevAndNewAreSame
+        ? beaconServiceName === validatorServiceName
+          ? {
+              [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]: defaultDappnodeGraffiti,
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  Consensus.DefaultCheckpointSync[network],
+              },
+            }
+          : {
+              [validatorServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                // Graffiti is a mandatory value
+                ["GRAFFITI"]: defaultDappnodeGraffiti,
+              },
 
-                    [beaconServiceName]: {
-                      // Fee recipient is set as global env, keep this for backwards compatibility
-                      ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                      // Checkpoint sync is an optional value
-                      ["CHECKPOINT_SYNC_URL"]:
-                        Consensus.DefaultCheckpointSync[network],
-                    },
-                  }
-              : {},
-            networks:
-              beaconServiceName === validatorServiceName
-                ? {
-                    rootNetworks: {
-                      [params.DOCKER_STAKER_NETWORKS[network]]: {
-                        external: true,
-                      },
-                      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                        external: true,
-                      },
-                    },
-                    serviceNetworks: {
-                      ["beacon-validator"]: {
-                        [params.DOCKER_STAKER_NETWORKS[network]]: {
-                          aliases: [
-                            `beacon-chain.${network}.staker.dappnode`,
-                            `validator.${network}.staker.dappnode`,
-                          ],
-                        },
-                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                          aliases: [
-                            `beacon-chain.${network}.dncore.dappnode`,
-                            `validator.${network}.dncore.dappnode`,
-                          ],
-                        },
-                      },
-                    },
-                  }
-                : {
-                    rootNetworks: {
-                      [params.DOCKER_STAKER_NETWORKS[network]]: {
-                        external: true,
-                      },
-                      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                        external: true,
-                      },
-                    },
-                    serviceNetworks: {
-                      ["beacon-chain"]: {
-                        [params.DOCKER_STAKER_NETWORKS[network]]: {
-                          aliases: [`beacon-chain.${network}.staker.dappnode`],
-                        },
-                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                          aliases: [`beacon-chain.${network}.dncore.dappnode`],
-                        },
-                      },
-                      ["validator"]: {
-                        [params.DOCKER_STAKER_NETWORKS[network]]: {
-                          aliases: [`validator.${network}.staker.dappnode`],
-                        },
-                        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                          aliases: [`validator.${network}.dncore.dappnode`],
-                        },
-                      },
-                    },
+              [beaconServiceName]: {
+                // Fee recipient is set as global env, keep this for backwards compatibility
+                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+                // Checkpoint sync is an optional value
+                ["CHECKPOINT_SYNC_URL"]:
+                  Consensus.DefaultCheckpointSync[network],
+              },
+            }
+        : {},
+      networks:
+        beaconServiceName === validatorServiceName
+          ? {
+              rootNetworks: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  external: true,
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  external: true,
+                },
+              },
+              serviceNetworks: {
+                ["beacon-validator"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [
+                      `beacon-chain.${network}.staker.dappnode`,
+                      `validator.${network}.staker.dappnode`,
+                    ],
                   },
-          },
-        }
-      : {};
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [
+                      `beacon-chain.${network}.dncore.dappnode`,
+                      `validator.${network}.dncore.dappnode`,
+                    ],
+                  },
+                },
+              },
+            }
+          : {
+              rootNetworks: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  external: true,
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  external: true,
+                },
+              },
+              serviceNetworks: {
+                ["beacon-chain"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [`beacon-chain.${network}.staker.dappnode`],
+                  },
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [`beacon-chain.${network}.dncore.dappnode`],
+                  },
+                },
+                ["validator"]: {
+                  [params.DOCKER_STAKER_NETWORKS[network]]: {
+                    aliases: [`validator.${network}.staker.dappnode`],
+                  },
+                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                    aliases: [`validator.${network}.dncore.dappnode`],
+                  },
+                },
+              },
+            },
+    };
   }
 
   /**
