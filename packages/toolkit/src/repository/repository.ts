@@ -280,7 +280,7 @@ export class DappnodeRepository extends ApmRepository {
     return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
   
-
+  
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
@@ -489,7 +489,7 @@ export class DappnodeRepository extends ApmRepository {
 
     for await (const entry of entries) {
       if (entry.type === "file") iterable.push(entry.content());
-      else throw Error(`Expexted type: file, got: ${entry.type}`);
+      else throw Error(`Expected type: file, got: ${entry.type}`);
     }
     if (iterable.length > 1)
       throw Error(`Unexpected number of files. There must be only one`);
@@ -564,40 +564,43 @@ export class DappnodeRepository extends ApmRepository {
    * @returns The parsed data.
    */
   private parseAsset<T>(data: string | string[], format: FileFormat): T {
-    const parseSingle = (content: string): any => {
+    const parseSingle = (content: string): T => {
       switch (format) {
         case FileFormat.YAML: {
-            const parsedYaml = YAML.parse(content);
-            if (!parsedYaml || typeof parsedYaml === "string")
-              throw new Error("Invalid YAML object");
-            return parsedYaml;
+          const parsedYaml = YAML.parse(content);
+          if (!parsedYaml || typeof parsedYaml === "string") {
+            throw new Error("Invalid YAML object");
+          }
+          return parsedYaml as T;
         }
         case FileFormat.JSON: {
-            return JSON.parse(content);
+          return JSON.parse(content) as T;
         }
         case FileFormat.TEXT: {
-          return content; // TEXT format assumes direct usage of the string.
+          return content as T; // TEXT format assumes direct usage of the string.
         }
         default: {
           throw new Error(`Unsupported format: ${format}`);
         }
       }
     };
+
+    const parseContent = (input: string | string[]): T | T[] => {
+      if (Array.isArray(input)) {
+        return input.map(parseSingle) as T[];
+      } else {
+        return parseSingle(input);
+      }
+    };
   
     try {
-      if (Array.isArray(data)) {
-        // Map over array data if it's an array, using parseSingle for each item
-        return data.map(parseSingle) as unknown as T;
-      } else {
-        // Directly parse data if it's a single string
-        return parseSingle(data) as T;
-      }
+      const parsedData = parseContent(data);
+      return parsedData as T;
     } catch (e) {
-      // Handle and throw the error from single or multiple parsing
       throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
     }
   }
-  
+
 
 
   /**
