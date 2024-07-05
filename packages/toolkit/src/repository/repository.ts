@@ -246,34 +246,41 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Get a given release asset for a request. It lookfs for an IPFS entry for
-   * a given release file given a release file config.
-   *
-   * @param ipfsEntries - An array of IPFS entries.
-   * @param fileConfig - A file configuration.
-   * @throws - If the file is required and not found.
-   * @returns - The release package for the request or undefined if not found.
-   */
+ * Get a given release asset for a request. It looks for an IPFS entry for
+ * a given release file given a release file config.
+ *
+ * @param ipfsEntries - An array of IPFS entries.
+ * @param fileConfig - A file configuration.
+ * @throws - If the file is required and not found.
+ * @returns - The release package for the request or undefined if not found.
+ */
   public async getPkgAsset<T>(
     fileConfig: FileConfig,
     ipfsEntries: IPFSEntry[]
   ): Promise<T | undefined> {
-    const { regex, required } = fileConfig;
-    const entry: IPFSEntry | undefined = ipfsEntries.find((file) =>
-      regex.test(file.name)
-    );
-    if (!entry && required) throw new Error(`Missing required file ${regex}`);
-    if (!entry) return undefined;
-
+    const { regex, required, multiple } = fileConfig;
+    // We filter the entries (files) so that we only consider the ones that match the regex.
+    // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
+    const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
+  
+    // Handle no matches. If the file is required, throw an error, otherwise return undefined.
+    if (matchingEntries.length === 0) {
+      if (required) throw new Error(`Missing required file: ${regex}`);
+      return undefined;
+    }
+  
+    // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
-    const content = await this.writeFileToMemory(
-      entry.cid.toString(),
-      maxLength
-    );
-    // TODO: validate content with JSON schema
-    return this.parseAsset<T>(content, format);
+    const contents = await Promise.all(matchingEntries.map(entry =>
+      this.writeFileToMemory(entry.cid.toString(), maxLength)
+    ));
+  
+    // If multiple files are allowed, we return an array of parsed assets.
+    // Otherwise, we return a single parsed asset.
+    return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
-
+  
+  
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
@@ -482,7 +489,7 @@ export class DappnodeRepository extends ApmRepository {
 
     for await (const entry of entries) {
       if (entry.type === "file") iterable.push(entry.content());
-      else throw Error(`Expexted type: file, got: ${entry.type}`);
+      else throw Error(`Expected type: file, got: ${entry.type}`);
     }
     if (iterable.length > 1)
       throw Error(`Unexpected number of files. There must be only one`);
@@ -556,33 +563,45 @@ export class DappnodeRepository extends ApmRepository {
    * @param format - The format to parse the data into.
    * @returns The parsed data.
    */
-  private parseAsset<T>(data: string, format: FileFormat): T {
-    switch (format) {
-      case FileFormat.YAML:
-        try {
-          const parsedData = YAML.parse(data);
-          if (!parsedData || typeof parsedData === "string")
-            throw Error(`returned invalid object`);
-          return parsedData as T;
-        } catch (e) {
-          if (e instanceof Error)
-            e.message = `Error parsing YAML: ${e.message}`;
-          throw e;
+  private parseAsset<T>(data: string | string[], format: FileFormat): T {
+    const parseSingle = (content: string): T => {
+      switch (format) {
+        case FileFormat.YAML: {
+          const parsedYaml = YAML.parse(content);
+          if (!parsedYaml || typeof parsedYaml === "string") {
+            throw new Error("Invalid YAML object");
+          }
+          return parsedYaml as T;
         }
-      case FileFormat.JSON:
-        try {
-          return JSON.parse(data);
-        } catch (e) {
-          if (e instanceof Error)
-            e.message = `Error parsing JSON: ${e.message}`;
-          throw e;
+        case FileFormat.JSON: {
+          return JSON.parse(content) as T;
         }
-      case FileFormat.TEXT:
-        return data as T;
-      default:
-        throw Error(`Attempting to parse unknown format ${format}`);
+        case FileFormat.TEXT: {
+          return content as T; // TEXT format assumes direct usage of the string.
+        }
+        default: {
+          throw new Error(`Unsupported format: ${format}`);
+        }
+      }
+    };
+
+    const parseContent = (input: string | string[]): T | T[] => {
+      if (Array.isArray(input)) {
+        return input.map(parseSingle) as T[];
+      } else {
+        return parseSingle(input);
+      }
+    };
+  
+    try {
+      const parsedData = parseContent(data);
+      return parsedData as T;
+    } catch (e) {
+      throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
     }
   }
+
+
 
   /**
    * Sanitizes an IPFS path by removing "/ipfs/" if it is present.
