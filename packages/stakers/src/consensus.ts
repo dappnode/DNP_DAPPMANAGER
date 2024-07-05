@@ -118,7 +118,9 @@ export class Consensus extends StakerComponent {
       userSettings: newConsensusDnpName
         ? this.getUserSettings(
             newConsensusDnpName,
-            Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
+            !Boolean(
+              await listPackageNoThrow({ dnpName: newConsensusDnpName })
+            ),
             network
           )
         : {},
