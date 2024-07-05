@@ -23,6 +23,7 @@ export const sign = wrapHandler<Params>(async (req, res) => {
     throw new HttpError({ statusCode: 400, name: `Arg data ${e.message}` });
   }
 
+  if (!req.ip) throw new HttpError({ statusCode: 400, name: "Missing IP" });
   const dnp = await getDnpFromIp(req.ip);
 
   const privateKey = db.dyndnsIdentity.get()?.privateKey;

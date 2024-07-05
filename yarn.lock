@@ -19573,7 +19573,7 @@ __metadata:
     "@dappnode/params": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.36"
     "@dappnode/utils": "workspace:^0.1.0"
-    "@types/dockerode": "npm:^3.3.23"
+    "@types/dockerode": "npm:^3.3.29"
     "@types/lodash-es": "npm:^4.17.9"
     "@types/memoizee": "npm:0.4.4"
     "@types/node": "npm:^20.14.9"
@@ -19581,7 +19581,7 @@ __metadata:
     "@types/tar-stream": "npm:2.1.0"
     dargs: "npm:7.0.0"
     data-uri-to-buffer: "npm:^2.0.0"
-    dockerode: "npm:^4.0.0"
+    dockerode: "npm:^4.0.2"
     lodash-es: "npm:^4.17.21"
     memoizee: "npm:0.4.14"
     strip-ansi: "npm:^7.1.0"
@@ -22132,7 +22132,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/dockerode@npm:^3.3.23":
+"@types/dockerode@npm:^3.3.23, @types/dockerode@npm:^3.3.29":
   version: 3.3.29
   resolution: "@types/dockerode@npm:3.3.29"
   dependencies:
@@ -25852,7 +25852,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dockerode@npm:^4.0.0":
+"dockerode@npm:^4.0.0, dockerode@npm:^4.0.2":
   version: 4.0.2
   resolution: "dockerode@npm:4.0.2"
   dependencies:
@@ -32454,7 +32454,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-flexbugs-fixes@npm:*, postcss-flexbugs-fixes@npm:^5.0.2":
+"postcss-flexbugs-fixes@npm:^5.0.2":
   version: 5.0.2
   resolution: "postcss-flexbugs-fixes@npm:5.0.2"
   peerDependencies:

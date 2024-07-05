@@ -35,6 +35,7 @@ export const notificationSend = wrapHandler(async (req, res) => {
     throw new HttpError({ statusCode: 400, name: `Arg body ${e.message}` });
   }
 
+  if (!req.ip) throw new HttpError({ statusCode: 400, name: "Missing IP" });
   const { dnpName } = await getDnpFromIp(req.ip);
 
   eventBus.notification.emit({

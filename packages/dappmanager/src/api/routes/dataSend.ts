@@ -30,6 +30,7 @@ export const dataSend = wrapHandler(async (req, res) => {
     throw new HttpError({ statusCode: 400, name: `Arg data ${e.message}` });
   }
 
+  if (!req.ip) throw new HttpError({ statusCode: 400, name: "Missing IP" });
   const { dnpName } = await getDnpFromIp(req.ip);
 
   const packageData = db.packageSentData.get(dnpName) ?? {};

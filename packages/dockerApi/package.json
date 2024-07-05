@@ -29,14 +29,14 @@
     "@types/lodash-es": "^4.17.9",
     "dargs": "7.0.0",
     "data-uri-to-buffer": "^2.0.0",
-    "dockerode": "^4.0.0",
+    "dockerode": "^4.0.2",
     "lodash-es": "^4.17.21",
     "memoizee": "0.4.14",
     "strip-ansi": "^7.1.0",
     "tar-stream": "2.1.4"
   },
   "devDependencies": {
-    "@types/dockerode": "^3.3.23",
+    "@types/dockerode": "^3.3.29",
     "@types/memoizee": "0.4.4",
     "@types/node": "^20.14.9",
     "@types/semver": "^7.5.8",
