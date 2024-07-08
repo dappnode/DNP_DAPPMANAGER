@@ -95,7 +95,7 @@ export class MevBoost extends StakerComponent {
       }
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
-        this.getUserSettings(currentMevBoostDnpName, [], network) // TODO: persist existing relays
+        this.getUserSettings([], !isInstalledAndRunning, network)
       );
       this.DbHandlers[network].set(true);
     }
@@ -111,11 +111,13 @@ export class MevBoost extends StakerComponent {
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
-      userSettings: this.getUserSettings(
-        newMevBoostDnpName,
-        newRelays,
-        network
-      ),
+      userSettings: newMevBoostDnpName
+        ? this.getUserSettings(
+            newRelays,
+            Boolean(await listPackageNoThrow({ dnpName: newMevBoostDnpName })),
+            network
+          )
+        : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null,
     });
     // persist on db
@@ -124,44 +126,42 @@ export class MevBoost extends StakerComponent {
   }
 
   private getUserSettings(
-    newMevBoostDnpName: string | null,
     newRelays: string[],
+    shouldSetEnvironment: boolean,
     network: Network
   ): UserSettings {
-    return newMevBoostDnpName
-      ? {
-          [newMevBoostDnpName]: {
-            environment: {
-              "mev-boost": {
-                ["RELAYS"]:
-                  newRelays
-                    .join(",")
-                    .trim()
-                    .replace(/(^,)|(,$)/g, "") || "",
-              },
+    return {
+      environment: shouldSetEnvironment
+        ? {
+            "mev-boost": {
+              ["RELAYS"]:
+                newRelays
+                  .join(",")
+                  .trim()
+                  .replace(/(^,)|(,$)/g, "") || "",
             },
-            networks: {
-              rootNetworks: {
-                [params.DOCKER_STAKER_NETWORKS[network]]: {
-                  external: true,
-                },
-                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                  external: true,
-                },
-              },
-              serviceNetworks: {
-                ["mev-boost"]: {
-                  [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`mev-boost.${network}.staker.dappnode`],
-                  },
-                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`mev-boost.${network}.dncore.dappnode`],
-                  },
-                },
-              },
+          }
+        : {},
+      networks: {
+        rootNetworks: {
+          [params.DOCKER_STAKER_NETWORKS[network]]: {
+            external: true,
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+            external: true,
+          },
+        },
+        serviceNetworks: {
+          ["mev-boost"]: {
+            [params.DOCKER_STAKER_NETWORKS[network]]: {
+              aliases: [`mev-boost.${network}.staker.dappnode`],
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+              aliases: [`mev-boost.${network}.dncore.dappnode`],
             },
           },
-        }
-      : {};
+        },
+      },
+    };
   }
 }
