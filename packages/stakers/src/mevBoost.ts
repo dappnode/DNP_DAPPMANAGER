@@ -95,7 +95,7 @@ export class MevBoost extends StakerComponent {
       }
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
-        this.getUserSettings([], network) // TODO: persist existing relays
+        this.getUserSettings([], isInstalledAndRunning, network)
       );
       this.DbHandlers[network].set(true);
     }
@@ -112,7 +112,11 @@ export class MevBoost extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       userSettings: newMevBoostDnpName
-        ? this.getUserSettings(newRelays, network)
+        ? this.getUserSettings(
+            newRelays,
+            !Boolean(await listPackageNoThrow({ dnpName: newMevBoostDnpName })),
+            network
+          )
         : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null,
     });
@@ -121,17 +125,23 @@ export class MevBoost extends StakerComponent {
       await this.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
-  private getUserSettings(newRelays: string[], network: Network): UserSettings {
+  private getUserSettings(
+    newRelays: string[],
+    shouldSetEnvironment: boolean,
+    network: Network
+  ): UserSettings {
     return {
-      environment: {
-        "mev-boost": {
-          ["RELAYS"]:
-            newRelays
-              .join(",")
-              .trim()
-              .replace(/(^,)|(,$)/g, "") || "",
-        },
-      },
+      environment: shouldSetEnvironment
+        ? {
+            "mev-boost": {
+              ["RELAYS"]:
+                newRelays
+                  .join(",")
+                  .trim()
+                  .replace(/(^,)|(,$)/g, "") || "",
+            },
+          }
+        : {},
       networks: {
         rootNetworks: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
