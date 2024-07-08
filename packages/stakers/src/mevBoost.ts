@@ -97,6 +97,7 @@ export class MevBoost extends StakerComponent {
         currentMevBoostDnpName,
         this.getUserSettings(currentMevBoostDnpName, [], network) // TODO: persist existing relays
       );
+      this.DbHandlers[network].set(true);
     }
   }
 

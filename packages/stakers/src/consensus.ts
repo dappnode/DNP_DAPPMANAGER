@@ -105,6 +105,7 @@ export class Consensus extends StakerComponent {
         currentConsensusDnpName,
         this.getUserSettings(currentConsensusDnpName, isInstalled, network)
       );
+      await this.DbHandlers[network].set(currentConsensusDnpName);
     }
   }
 

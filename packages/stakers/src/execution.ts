@@ -91,6 +91,7 @@ export class Execution extends StakerComponent {
         currentExecutionDnpName,
         this.getUserSettings(network, currentExecutionDnpName)
       );
+      await this.DbHandlers[network].set(currentExecutionDnpName);
     }
   }
 
