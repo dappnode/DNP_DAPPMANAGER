@@ -16,19 +16,19 @@ const MEVBOOST_MAINNET = "mevboost-mainnet";
 // Undefined means its set but the user has not selected any value
 export const consensusClientMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_MAINNET, null),
-  CONSENSUS_CLIENT_MAINNET
+  Object.keys(CONSENSUS_CLIENT_MAINNET)[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_MAINNET, null),
-  EXECUTION_CLIENT_MAINNET
+  Object.keys(EXECUTION_CLIENT_MAINNET)[0]
 );
 
 export const mevBoostMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_MAINNET, false),
-  MEVBOOST_MAINNET
+  Object.keys(MEVBOOST_MAINNET)[0]
 );
 // Gnosis
 
@@ -40,19 +40,19 @@ const MEVBOOST_GNOSIS = "mevboost-gnosis";
 // Undefined means its set but the user has not selected any value
 export const consensusClientGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_GNOSIS, null),
-  CONSENSUS_CLIENT_GNOSIS
+  Object.keys(CONSENSUS_CLIENT_GNOSIS)[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_GNOSIS, null),
-  EXECUTION_CLIENT_GNOSIS
+  Object.keys(EXECUTION_CLIENT_GNOSIS)[0]
 );
 
 export const mevBoostGnosis = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_GNOSIS, false),
-  MEVBOOST_GNOSIS
+  Object.keys(MEVBOOST_GNOSIS)[0]
 );
 
 // Prater
@@ -65,19 +65,19 @@ const MEVBOOST_PRATER = "mevboost-prater";
 // Undefined means its set but the user has not selected any value
 export const consensusClientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_PRATER, null),
-  CONSENSUS_CLIENT_PRATER
+  Object.keys(CONSENSUS_CLIENT_PRATER)[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_PRATER, null),
-  EXECUTION_CLIENT_PRATER
+  Object.keys(EXECUTION_CLIENT_PRATER)[0]
 );
 
 export const mevBoostPrater = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_PRATER, false),
-  MEVBOOST_PRATER
+  Object.keys(MEVBOOST_PRATER)[0]
 );
 
 // Holesky
@@ -90,19 +90,19 @@ const MEVBOOST_HOLESKY = "mevboost-holesky";
 // Undefined means its set but the user has not selected any value
 export const consensusClientHolesky = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOLESKY, null),
-  CONSENSUS_CLIENT_HOLESKY
+  Object.keys(CONSENSUS_CLIENT_HOLESKY)[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientHolesky = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOLESKY, null),
-  EXECUTION_CLIENT_HOLESKY
+  Object.keys(EXECUTION_CLIENT_HOLESKY)[0]
 );
 
 export const mevBoostHolesky = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_HOLESKY, false),
-  MEVBOOST_HOLESKY
+  Object.keys(MEVBOOST_HOLESKY)[0]
 );
 
 // LUKSO
@@ -115,17 +115,17 @@ const MEVBOOST_LUKSO = "mevboost-lukso";
 // Undefined means its set but the user has not selected any value
 export const consensusClientLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_LUKSO, null),
-  CONSENSUS_CLIENT_LUKSO
+  Object.keys(CONSENSUS_CLIENT_LUKSO)[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
 export const executionClientLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_LUKSO, null),
-  EXECUTION_CLIENT_LUKSO
+  Object.keys(EXECUTION_CLIENT_LUKSO)[0]
 );
 
 export const mevBoostLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
-  MEVBOOST_LUKSO
+  Object.keys(MEVBOOST_LUKSO)[0]
 );
