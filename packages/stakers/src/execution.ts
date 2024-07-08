@@ -52,6 +52,7 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" },
     ],
     [Network.Holesky]: [
+      { dnpName: ExecutionClientHolesky.Reth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Geth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },

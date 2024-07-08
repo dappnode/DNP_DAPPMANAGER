@@ -65,6 +65,7 @@ export enum ExecutionClientHolesky {
   Erigon = "holesky-erigon.dnp.dappnode.eth",
   Nethermind = "holesky-nethermind.dnp.dappnode.eth",
   Besu = "holesky-besu.dnp.dappnode.eth",
+  Reth = "holesky-reth.dnp.dappnode.eth",
 }
 export enum SignerHolesky {
   Web3signer = "web3signer-holesky.dnp.dappnode.eth",
