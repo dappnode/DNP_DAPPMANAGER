@@ -95,7 +95,7 @@ export class MevBoost extends StakerComponent {
       }
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
-        this.getUserSettings([], isInstalledAndRunning, network)
+        this.getUserSettings([], !isInstalledAndRunning, network)
       );
       this.DbHandlers[network].set(true);
     }
@@ -114,7 +114,7 @@ export class MevBoost extends StakerComponent {
       userSettings: newMevBoostDnpName
         ? this.getUserSettings(
             newRelays,
-            !Boolean(await listPackageNoThrow({ dnpName: newMevBoostDnpName })),
+            Boolean(await listPackageNoThrow({ dnpName: newMevBoostDnpName })),
             network
           )
         : {},
