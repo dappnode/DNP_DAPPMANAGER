@@ -95,7 +95,7 @@ export class MevBoost extends StakerComponent {
       }
       await this.persistSelectedIfInstalled(
         currentMevBoostDnpName,
-        this.getUserSettings([], !isInstalledAndRunning, network)
+        this.getUserSettings([], false, network)
       );
       this.DbHandlers[network].set(true);
     }
@@ -112,11 +112,7 @@ export class MevBoost extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       userSettings: newMevBoostDnpName
-        ? this.getUserSettings(
-            newRelays,
-            Boolean(await listPackageNoThrow({ dnpName: newMevBoostDnpName })),
-            network
-          )
+        ? this.getUserSettings(newRelays, true, network)
         : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null,
     });
