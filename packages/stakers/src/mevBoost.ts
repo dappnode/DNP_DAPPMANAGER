@@ -1,12 +1,10 @@
 import {
-  ComposeServiceNetworksObj,
   MevBoostHolesky,
   MevBoostMainnet,
   MevBoostPrater,
   Network,
   StakerItem,
   UserSettings,
-  UserSettingsAllDnps,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
