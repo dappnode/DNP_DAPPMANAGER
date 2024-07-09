@@ -173,19 +173,19 @@ export class Consensus extends StakerComponent {
               },
             }
         : {},
-      networks:
-        beaconServiceName === validatorServiceName
-          ? {
-              rootNetworks: {
-                [params.DOCKER_STAKER_NETWORKS[network]]: {
-                  external: true,
-                },
-                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                  external: true,
-                },
-              },
-              serviceNetworks: {
-                ["beacon-validator"]: {
+      networks: {
+        rootNetworks: {
+          [params.DOCKER_STAKER_NETWORKS[network]]: {
+            external: true,
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+            external: true,
+          },
+        },
+        serviceNetworks:
+          beaconServiceName === validatorServiceName
+            ? {
+                "beacon-validator": {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
                     aliases: [
                       `beacon-chain.${network}.staker.dappnode`,
@@ -199,19 +199,9 @@ export class Consensus extends StakerComponent {
                     ],
                   },
                 },
-              },
-            }
-          : {
-              rootNetworks: {
-                [params.DOCKER_STAKER_NETWORKS[network]]: {
-                  external: true,
-                },
-                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                  external: true,
-                },
-              },
-              serviceNetworks: {
-                ["beacon-chain"]: {
+              }
+            : {
+                "beacon-chain": {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
                     aliases: [`beacon-chain.${network}.staker.dappnode`],
                   },
@@ -219,7 +209,7 @@ export class Consensus extends StakerComponent {
                     aliases: [`beacon-chain.${network}.dncore.dappnode`],
                   },
                 },
-                ["validator"]: {
+                validator: {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
                     aliases: [`validator.${network}.staker.dappnode`],
                   },
@@ -228,7 +218,7 @@ export class Consensus extends StakerComponent {
                   },
                 },
               },
-            },
+      },
     };
   }
 

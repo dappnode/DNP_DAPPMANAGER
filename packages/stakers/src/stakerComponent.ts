@@ -79,7 +79,7 @@ export class StakerComponent {
     userSettings: UserSettings
   ): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig(dnpName, userSettings);
+    await this.setStakerPkgConfig(dnpName, true, userSettings);
   }
 
   protected async setNew({
@@ -122,7 +122,11 @@ export class StakerComponent {
 
     if (!newStakerDnpName) return;
     // set staker config
-    await this.setStakerPkgConfig(newStakerDnpName, userSettings);
+    await this.setStakerPkgConfig(
+      newStakerDnpName,
+      Boolean(currentPkg),
+      userSettings
+    );
   }
 
   /**
@@ -134,10 +138,11 @@ export class StakerComponent {
    */
   private async setStakerPkgConfig(
     dnpName: string,
+    isInstalled: boolean,
     userSettings: UserSettings
   ): Promise<void> {
     // ensure pkg installed
-    if (!(await listPackageNoThrow({ dnpName })))
+    if (!isInstalled)
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings: userSettings ? { [dnpName]: userSettings } : {},
