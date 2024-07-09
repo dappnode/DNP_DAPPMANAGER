@@ -221,23 +221,24 @@ export default function StakerNetwork({
                   isSelected={Boolean(newWeb3signer)}
                 />
               </Col>
-              {["prater", "mainnet", "holesky"].includes(network) && (
-                <Col>
-                  <SubTitle>Mev Boost</SubTitle>
-                  <MevBoost
-                    network={network}
-                    mevBoost={currentStakerConfigReq.data.mevBoost}
-                    newMevBoost={newMevBoost}
-                    setNewMevBoost={setNewMevBoost}
-                    newRelays={newRelays}
-                    setNewRelays={setNewRelays}
-                    isSelected={
-                      currentStakerConfigReq.data.mevBoost.dnpName ===
-                      newMevBoost?.dnpName
-                    }
-                  />
-                </Col>
-              )}
+              {["prater", "mainnet", "holesky"].includes(network) &&
+                currentStakerConfigReq.data.mevBoost && (
+                  <Col>
+                    <SubTitle>Mev Boost</SubTitle>
+                    <MevBoost
+                      network={network}
+                      mevBoost={currentStakerConfigReq.data.mevBoost}
+                      newMevBoost={newMevBoost}
+                      setNewMevBoost={setNewMevBoost}
+                      newRelays={newRelays}
+                      setNewRelays={setNewRelays}
+                      isSelected={
+                        currentStakerConfigReq.data.mevBoost.dnpName ===
+                        newMevBoost?.dnpName
+                      }
+                    />
+                  </Col>
+                )}
             </Row>
             <hr />
             <div>
