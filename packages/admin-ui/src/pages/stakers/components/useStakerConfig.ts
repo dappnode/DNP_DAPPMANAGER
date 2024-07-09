@@ -51,10 +51,9 @@ export const useStakerConfig = <T extends Network>(
       if (consensusClient && consensusClient.status === "ok")
         setNewConsClient(consensusClient);
 
-      const currentMevBoost = isOkSelectedInstalledAndRunning(mevBoost)
-        ? mevBoost
-        : null;
-      if (currentMevBoost && mevBoost.status === "ok") {
+      const currentMevBoost =
+        mevBoost && isOkSelectedInstalledAndRunning(mevBoost) ? mevBoost : null;
+      if (currentMevBoost && mevBoost?.status === "ok") {
         setNewMevBoost(mevBoost);
         mevBoost.relays && setNewRelays(mevBoost.relays);
       }

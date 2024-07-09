@@ -146,7 +146,7 @@ export interface StakerConfigGet {
   executionClients: StakerItem[];
   consensusClients: StakerItem[];
   web3Signer: StakerItem;
-  mevBoost: StakerItem;
+  mevBoost?: StakerItem;
 }
 
 export interface StakerConfigSet {
