@@ -18,7 +18,6 @@ async function updateMevBoostOnDb({
 }): Promise<void> {
   try {
     if (!removed) return;
-    logs.info("Updating mev boost on db", dnpNames);
     if (dnpNames.includes(MevBoostMainnet.Mevboost))
       await db.mevBoostMainnet.set(false);
     if (dnpNames.includes(MevBoostPrater.Mevboost))
