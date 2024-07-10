@@ -101,10 +101,14 @@ export class Consensus extends StakerComponent {
         this.DbHandlers[network].set(undefined);
         return;
       }
-      await this.persistSelectedIfInstalled(
-        currentConsensusDnpName,
-        this.getUserSettings(currentConsensusDnpName, isInstalled, network)
-      );
+      await this.persistSelectedIfInstalled({
+        dnpName: currentConsensusDnpName,
+        userSettings: this.getUserSettings(
+          currentConsensusDnpName,
+          isInstalled,
+          network
+        ),
+      });
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
   }
