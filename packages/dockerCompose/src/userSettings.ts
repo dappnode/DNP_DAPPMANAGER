@@ -194,26 +194,12 @@ export function applyUserSettings(
     // TODO: use docker compose merge to automatically merge these dappnode docker compose properties
     // see https://github.com/dappnode/DNP_DAPPMANAGER/issues/1983
     const nextNetworks = mergeWith(
-      {},
       networks,
       userSetNetworks,
-      (objValue, srcValue) => {
-        if (isArray(objValue) && isArray(srcValue)) {
-          return union(objValue, srcValue);
-        } else if (isObject(objValue) && isObject(srcValue)) {
-          return mergeWith(
-            {},
-            objValue,
-            srcValue,
-            (innerObjValue, innerSrcValue) => {
-              if (isArray(innerObjValue) && isArray(innerSrcValue)) {
-                return union(innerObjValue, innerSrcValue);
-              }
-              return undefined; // Use default merging behavior for other types
-            }
-          );
-        }
-        return undefined; // Use default merging behavior for other types
+      (value1, value2) => {
+        return mergeWith(value1, value2, (subvalue1, subvalue2) => {
+          return union(subvalue1, subvalue2);
+        });
       }
     );
 
