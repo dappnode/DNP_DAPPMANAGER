@@ -91,10 +91,10 @@ export class MevBoost extends StakerComponent {
         this.DbHandlers[network].set(false);
         return;
       }
-      await this.persistSelectedIfInstalled(
-        currentMevBoostDnpName,
-        this.getUserSettings([], false, network)
-      );
+      await this.persistSelectedIfInstalled({
+        dnpName: currentMevBoostDnpName,
+        userSettings: this.getUserSettings([], false, network),
+      });
       this.DbHandlers[network].set(true);
     }
   }

@@ -62,10 +62,10 @@ export class Signer extends StakerComponent {
         })
       )?.containers.some((container) => container.running)
     )
-      await this.persistSelectedIfInstalled(
-        Signer.CompatibleSigners[network].dnpName,
-        this.getUserSettings(network)
-      );
+      await this.persistSelectedIfInstalled({
+        dnpName: Signer.CompatibleSigners[network].dnpName,
+        userSettings: this.getUserSettings(network),
+      });
   }
 
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
