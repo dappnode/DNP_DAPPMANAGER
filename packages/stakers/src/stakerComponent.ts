@@ -74,12 +74,15 @@ export class StakerComponent {
     );
   }
 
-  protected async persistSelectedIfInstalled(
-    dnpName: string,
-    userSettings: UserSettings
-  ): Promise<void> {
+  protected async persistSelectedIfInstalled({
+    dnpName,
+    userSettings,
+  }: {
+    dnpName: string;
+    userSettings: UserSettings;
+  }): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig(dnpName, userSettings);
+    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
   }
 
   protected async setNew({
@@ -122,7 +125,13 @@ export class StakerComponent {
 
     if (!newStakerDnpName) return;
     // set staker config
-    await this.setStakerPkgConfig(newStakerDnpName, userSettings);
+    await this.setStakerPkgConfig({
+      dnpName: newStakerDnpName,
+      isInstalled: Boolean(
+        await listPackageNoThrow({ dnpName: newStakerDnpName })
+      ),
+      userSettings,
+    });
   }
 
   /**
@@ -132,12 +141,17 @@ export class StakerComponent {
    * - adds the staker network to the docker-compose file
    * - starts the staker pkg
    */
-  private async setStakerPkgConfig(
-    dnpName: string,
-    userSettings: UserSettings
-  ): Promise<void> {
+  private async setStakerPkgConfig({
+    dnpName,
+    isInstalled,
+    userSettings,
+  }: {
+    dnpName: string;
+    isInstalled: boolean;
+    userSettings: UserSettings;
+  }): Promise<void> {
     // ensure pkg installed
-    if (!(await listPackageNoThrow({ dnpName })))
+    if (!isInstalled)
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings: userSettings ? { [dnpName]: userSettings } : {},

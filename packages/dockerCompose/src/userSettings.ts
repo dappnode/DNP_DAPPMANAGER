@@ -1,5 +1,14 @@
 import path from "path";
-import { mapValues, pick, omitBy, isObject, merge } from "lodash-es";
+import {
+  mapValues,
+  pick,
+  omitBy,
+  isObject,
+  merge,
+  mergeWith,
+  isArray,
+  union,
+} from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
@@ -181,8 +190,18 @@ export function applyUserSettings(
       })
     );
 
-    // use lodash to merge networks and userSetNetworks with merge
-    const nextNetworks = merge(networks, userSetNetworks);
+    // docker aliases must be uinique
+    // TODO: use docker compose merge to automatically merge these dappnode docker compose properties
+    // see https://github.com/dappnode/DNP_DAPPMANAGER/issues/1983
+    const nextNetworks = mergeWith(
+      networks,
+      userSetNetworks,
+      (value1, value2) => {
+        return mergeWith(value1, value2, (subvalue1, subvalue2) => {
+          return union(subvalue1, subvalue2);
+        });
+      }
+    );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
