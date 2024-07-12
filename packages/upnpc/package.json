@@ -25,6 +25,6 @@
     "is-ip": "3.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.6.2"
+    "@types/node": "^20.14.10"
   }
 }

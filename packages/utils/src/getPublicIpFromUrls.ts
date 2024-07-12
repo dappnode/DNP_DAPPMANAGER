@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import isIp from "is-ip";
 import retry from "async-retry";
 

@@ -1,5 +1,4 @@
 import Dockerode from "dockerode";
-import stripAnsi from "strip-ansi";
 import { PortMapping, PortProtocol } from "@dappnode/types";
 import { isPortMappingDeletable } from "./list/isPortMappingDeletable.js";
 
@@ -34,13 +33,18 @@ import { isPortMappingDeletable } from "./list/isPortMappingDeletable.js";
  * is the header
  */
 export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
+  const pattern = [
+    "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
+    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))",
+  ].join("|");
+
+  const regex = new RegExp(pattern, "g");
   // Running strip-ansi for each line is 20-25 times slower than all at once.
-  return stripAnsi(
-    logs
-      .split("\n")
-      .map((line) => stripDockerApiLogHeader(line))
-      .join("\n")
-  );
+  return logs
+    .split("\n")
+    .map((line) => stripDockerApiLogHeader(line))
+    .join("\n")
+    .replace(regex, "");
 }
 
 function stripDockerApiLogHeader(line: string): string {

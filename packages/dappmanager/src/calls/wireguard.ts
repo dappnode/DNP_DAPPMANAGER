@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { urlJoin } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { packageSetEnvironment } from "./packageSetEnvironment.js";

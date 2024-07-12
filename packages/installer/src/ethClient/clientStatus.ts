@@ -6,7 +6,6 @@ import { serializeError } from "./types.js";
 import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
 import { parseEthersBlock, parseEthersSyncing } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
-import fetch from "node-fetch";
 import { params } from "@dappnode/params";
 
 /**

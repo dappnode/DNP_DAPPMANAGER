@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { buildNetworkAlias, urlJoin } from "@dappnode/utils";
 import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
