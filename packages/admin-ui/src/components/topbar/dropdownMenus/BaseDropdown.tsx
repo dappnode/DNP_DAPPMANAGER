@@ -65,6 +65,8 @@ interface BaseDropdownProps {
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   offset?: number;
   moreVisible?: boolean;
+  unCollapsed?: boolean;
+  children?: React.JSX.Element;
 }
 
 function BaseDropdown({
@@ -74,9 +76,11 @@ function BaseDropdown({
   onClick,
   className,
   placeholder,
-  moreVisible
+  moreVisible,
+  unCollapsed,
+  children
 }: BaseDropdownProps) {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(unCollapsed ? false : true);
   const dropdownEl = useRef<HTMLDivElement>(null);
 
   function onToggle(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
@@ -177,7 +181,8 @@ function BaseDropdown({
             </div>
           )
         )}
-        {!messages.length && placeholder && (
+        {children && children}
+        {!messages.length && placeholder && !children && (
           <div className="placeholder">{placeholder}</div>
         )}
       </div>

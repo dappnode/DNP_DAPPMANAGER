@@ -27,8 +27,11 @@ export default function SystemUpdate() {
     <>
       <SubTitle>Update</SubTitle>
       {/* This component will automatically hide if logs are empty */}
-      <ProgressLogsView progressLogs={coreProgressLogs} />
-
+      {coreProgressLogs && (
+        <Card>
+          <ProgressLogsView progressLogs={coreProgressLogs} />
+        </Card>
+      )}
       {coreUpdateAvailable ? (
         <SystemUpdateDetails />
       ) : loading ? (
