@@ -3,7 +3,6 @@ import { isEmpty } from "lodash-es";
 import { prettyDnpName } from "utils/format";
 // Components
 import ProgressBar from "react-bootstrap/ProgressBar";
-import Card from "components/Card";
 import { stringIncludes } from "utils/strings";
 import { ProgressLogs } from "types";
 
@@ -30,7 +29,7 @@ export function ProgressLogsView({
   if (!progressLogs || isEmpty(progressLogs)) return null;
 
   return (
-    <Card>
+    <>
       {Object.entries(progressLogs)
         // Don't show "core.dnp.dappnode.eth" actual progress log information
         .filter(([dnpName]) => dnpName !== "core.dnp.dappnode.eth")
@@ -39,10 +38,10 @@ export function ProgressLogsView({
           const progressing = Boolean(percent) || stringIncludes(log, "...");
           return (
             <div key={dnpName} className="row">
-              <div className="col-6 text-truncate">
+              <div className="col-4 text-truncate">
                 <span>{prettyDnpName(dnpName)}</span>
               </div>
-              <div className="col-6 text-truncate center">
+              <div className="col-8 text-truncate center">
                 <ProgressBar
                   now={percent ? parseInt(percent) : 100}
                   animated={progressing}
@@ -53,6 +52,6 @@ export function ProgressLogsView({
             </div>
           );
         })}
-    </Card>
+    </>
   );
 }
