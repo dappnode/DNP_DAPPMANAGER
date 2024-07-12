@@ -17,8 +17,8 @@ services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -34,7 +34,7 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - goerli:/goerli
     labels:
       dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
@@ -86,8 +86,8 @@ services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -102,7 +102,7 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - goerli:/goerli
     labels:
       dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
@@ -139,8 +139,8 @@ services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -157,7 +157,7 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - goerli:/goerli
     labels:
       dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
@@ -192,8 +192,8 @@ services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -209,7 +209,7 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - goerli:/goerli
     labels:
       dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
@@ -259,10 +259,10 @@ services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
       - _DAPPNODE_GLOBAL_ACTIVE=true
       - _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK=false
-    image: 'goerli-geth.dnp.dappnode.eth:0.4.12'
+    image: goerli-geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -278,7 +278,7 @@ services:
       - 30304/udp
     restart: always
     volumes:
-      - 'goerli:/goerli'
+      - goerli:/goerli
     labels:
       dappnode.dnp.dnpName: goerli-geth.dnp.dappnode.eth
       dappnode.dnp.version: 0.4.12
