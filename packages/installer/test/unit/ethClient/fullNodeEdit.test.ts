@@ -23,8 +23,8 @@ services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
@@ -58,8 +58,8 @@ services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth
     environment:
-      - 'EXTRA_OPTIONS=--http.api eth,net,web3,txpool'
-    image: 'geth.dnp.dappnode.eth:0.4.12'
+      - EXTRA_OPTIONS=--http.api eth,net,web3,txpool
+    image: geth.dnp.dappnode.eth:0.4.12
     logging:
       driver: json-file
       options:
