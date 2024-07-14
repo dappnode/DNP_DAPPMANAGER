@@ -12,7 +12,7 @@ import { params } from "@dappnode/params";
 /**
  * 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022
  * src: https://ycharts.com/indicators/ethereum_blocks_per_day#:~:text=Ethereum%20Blocks%20Per%20Day%20is,12.10%25%20from%20one%20year%20ago.
- * TODO: find a way to get the average blocks per day dynamicallly
+ * TODO: find a way to get the average blocks per day dynamically
  */
 const ETHEREUM_BLOCKS_PER_DAY = 7200;
 
@@ -28,7 +28,7 @@ const MIN_ETH_BLOCK_DIFF_SYNC = 60;
 /**
  * Goal:
  *  - Fastest possible success path, minimize number of call
- *  - Capture current state with a much details as possible
+ *  - Capture current state with as much details as possible
  *
  * All possible status
  * - Provider API works
@@ -73,7 +73,7 @@ export async function getMultiClientStatus(
           }
         );
         if (_isApmStateCorrect) {
-          // State contract is okey!!
+          // State contract is okay!!
           // Check is synced with consensus and remote execution
           if (
             (await isSyncedWithConsensus(execUrl, consUrl).catch((e) => {
