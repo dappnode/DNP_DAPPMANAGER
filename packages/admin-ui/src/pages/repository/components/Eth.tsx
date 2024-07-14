@@ -60,13 +60,13 @@ export default function Eth() {
    *    NOT-OK Client should be installed
    *    Something or someone removed the client, re-install?
    *  > Show an error or something in the UI as
-   *    "Alert!" you target is OFF, go to remote or install it again
+   *    "Alert!" your target is OFF, go to remote or install it again
    *
    * 2. if (!dnp.running)
    *    Package can be stopped because the user stopped it or
    *    because the Dappnode is too full and auto-stop kicked in
    *  > Show an error or something in the UI as
-   *    "Alert!" you target is OFF, go to remote or install it again
+   *    "Alert!" your target is OFF, go to remote or install it again
    */
   function renderEthMultiClientWarning() {
     if (ethClientStatus && !ethClientStatus.ok)
