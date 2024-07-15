@@ -14,7 +14,7 @@ export const viewedNotifications = (): AppThunk => async (
   dispatch,
   getState
 ) => {
-  // Mark notifications as viewed immmediatelly
+  // Mark notifications as viewed immediately
   dispatch(notificationsSlice.actions.viewedNotifications());
 
   // Load notifications
