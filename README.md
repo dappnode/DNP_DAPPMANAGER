@@ -106,7 +106,7 @@ yarn start
 
 _Note: This mode is not working a the moment since cross-domain cookies are not enabled._
 
-4. Docker real-time development (Recomended).
+4. Docker real-time development (recommended).
 
 SSH into your Dappnode and clone this repo:
 
