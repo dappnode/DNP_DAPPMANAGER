@@ -105,7 +105,7 @@ export const api: Routes = mapValues(
 
 /**
  * React hook to perform RPC calls on component mount
- * Usefull to keep track of changing data that may need to be revalidated
+ * Useful to keep track of changing data that may need to be revalidated
  */
 export const useApi: {
   [K in keyof Routes]: (
