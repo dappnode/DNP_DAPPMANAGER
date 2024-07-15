@@ -14,5 +14,5 @@
 
 ## Test instructions
 
-<!-- MANDATORY: please, do not skip this step, it is very importand for DAppNode team to have simple and well defined instructions on how to test this PR.
+<!-- MANDATORY: please, do not skip this step, it is very important for DAppNode team to have simple and well defined instructions on how to test this PR.
 -->
