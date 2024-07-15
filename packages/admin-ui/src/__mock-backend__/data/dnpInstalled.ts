@@ -4,7 +4,7 @@ import { MockDnp } from "./dnps/types";
 import { mockDnps } from "./dnps";
 
 // The functions: getContainerName, getContainerDomain and getImageTag are utility functions from the module @dappnode/utils
-// they are used in the server mock, and to avoid compiling issues due to not able to use node modules in the browser
+// they are used in the server mock, and to avoid compiling issues due to not being able to use node modules in the browser
 // they are copied here
 
 // TODO: either export them from uitls in a subpath separately or find a way to use them in the browser without duplicating them
