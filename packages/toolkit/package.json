@@ -32,14 +32,13 @@
     "@typescript-eslint/parser": "^5.59.5",
     "eslint": "^8.38.0",
     "eslint-plugin-import": "^2.27.5",
-    "prettier": "^2.8.7",
     "rimraf": "^5.0.0",
     "truffle": "^5.9.0",
     "ts-loader": "^9.4.2",
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
+    "@dappnode/types": "workspace:^0.1.36",
     "@ipld/car": "^5.1.1",
     "esm": "^3.2.25",
     "ethers": "^6.10.0",

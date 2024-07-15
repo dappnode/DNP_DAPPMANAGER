@@ -29,8 +29,7 @@ export const bitcoin: MockDnp = {
       onRemove: "Make sure you have change the endpoint in your bitcoin miner"
     },
     keywords: ["bitcoin", "btc"],
-    // @ts-ignore
-    homepage: {
+    links: {
       homepage: "https://github.com/dappnode/DAppNodePackage-bitcoin#readme"
     },
     repository: {

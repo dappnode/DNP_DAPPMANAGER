@@ -246,14 +246,14 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
- * Get a given release asset for a request. It looks for an IPFS entry for
- * a given release file given a release file config.
- *
- * @param ipfsEntries - An array of IPFS entries.
- * @param fileConfig - A file configuration.
- * @throws - If the file is required and not found.
- * @returns - The release package for the request or undefined if not found.
- */
+   * Get a given release asset for a request. It looks for an IPFS entry for
+   * a given release file given a release file config.
+   *
+   * @param ipfsEntries - An array of IPFS entries.
+   * @param fileConfig - A file configuration.
+   * @throws - If the file is required and not found.
+   * @returns - The release package for the request or undefined if not found.
+   */
   public async getPkgAsset<T>(
     fileConfig: FileConfig,
     ipfsEntries: IPFSEntry[]
@@ -261,26 +261,27 @@ export class DappnodeRepository extends ApmRepository {
     const { regex, required, multiple } = fileConfig;
     // We filter the entries (files) so that we only consider the ones that match the regex.
     // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
-    const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
-  
+    const matchingEntries = ipfsEntries.filter((file) => regex.test(file.name));
+
     // Handle no matches. If the file is required, throw an error, otherwise return undefined.
     if (matchingEntries.length === 0) {
       if (required) throw new Error(`Missing required file: ${regex}`);
       return undefined;
     }
-  
+
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
-    const contents = await Promise.all(matchingEntries.map(entry =>
-      this.writeFileToMemory(entry.cid.toString(), maxLength)
-    ));
-  
+    const contents = await Promise.all(
+      matchingEntries.map((entry) =>
+        this.writeFileToMemory(entry.cid.toString(), maxLength)
+      )
+    );
+
     // If multiple files are allowed, we return an array of parsed assets.
     // Otherwise, we return a single parsed asset.
     return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
-  
-  
+
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
@@ -479,7 +480,7 @@ export class DappnodeRepository extends ApmRepository {
   ): Promise<AsyncIterable<Uint8Array>> {
     const iterable: AsyncIterable<Uint8Array>[] = [];
 
-    const entries = exporter(root, {
+    const entries = exporter(root.toString(), {
       async get(cid) {
         const block = await carReader.get(cid);
         if (!block) throw Error(`Could not get block ${cid}`);
@@ -592,16 +593,18 @@ export class DappnodeRepository extends ApmRepository {
         return parseSingle(input);
       }
     };
-  
+
     try {
       const parsedData = parseContent(data);
       return parsedData as T;
     } catch (e) {
-      throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
+      throw new Error(
+        `Error processing content: ${
+          e instanceof Error ? e.message : "Unknown error"
+        }`
+      );
     }
   }
-
-
 
   /**
    * Sanitizes an IPFS path by removing "/ipfs/" if it is present.

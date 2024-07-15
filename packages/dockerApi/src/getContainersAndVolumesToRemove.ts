@@ -1,7 +1,7 @@
 import { uniq } from "lodash-es";
 import { InstalledPackageData } from "@dappnode/types";
 import { isVolumeOwner } from "./volumesData.js";
-import { DockerVolumeListItem } from "./api/index.js";
+import { VolumeInspectInfo } from "dockerode";
 
 /**
  * Util: Remove all package volumes => compute list of packages and volumes to remove
@@ -9,7 +9,7 @@ import { DockerVolumeListItem } from "./api/index.js";
 export function getContainersAndVolumesToRemove(
   dnp: InstalledPackageData,
   volumeName: string | undefined,
-  volumes: DockerVolumeListItem[]
+  volumes: VolumeInspectInfo[]
 ): {
   containersToRemove: string[];
   volumesToRemove: string[];

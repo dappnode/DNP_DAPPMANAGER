@@ -3,7 +3,7 @@ import * as db from "@dappnode/db";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import {
   signDataFromPackage,
-  getAddressFromPrivateKey
+  getAddressFromPrivateKey,
 } from "../../utils/index.js";
 import { HttpError, wrapHandler } from "../utils.js";
 
@@ -23,6 +23,7 @@ export const sign = wrapHandler<Params>(async (req, res) => {
     throw new HttpError({ statusCode: 400, name: `Arg data ${e.message}` });
   }
 
+  if (!req.ip) throw new HttpError({ statusCode: 400, name: "Missing IP" });
   const dnp = await getDnpFromIp(req.ip);
 
   const privateKey = db.dyndnsIdentity.get()?.privateKey;
@@ -32,12 +33,12 @@ export const sign = wrapHandler<Params>(async (req, res) => {
   const signature = signDataFromPackage({
     privateKey,
     packageEnsName: dnp.dnpName,
-    data
+    data,
   });
 
   return res.status(200).send({
     signature,
-    address
+    address,
   });
 });
 
@@ -47,7 +48,7 @@ export const sign = wrapHandler<Params>(async (req, res) => {
 export async function getDnpFromIp(ip: string): Promise<PackageContainer> {
   const ipv4 = ip.replace("::ffff:", "");
   const dnps = await listPackageContainers();
-  const dnp = dnps.find(_dnp => _dnp.ip === ipv4);
+  const dnp = dnps.find((_dnp) => _dnp.ip === ipv4);
   if (!dnp)
     throw new HttpError({ statusCode: 405, name: `No DNP with ip ${ipv4}` });
 
