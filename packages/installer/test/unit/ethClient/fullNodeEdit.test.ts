@@ -74,7 +74,7 @@ services:
       - 30303/udp
       - 30304/udp
     restart: always
-    volumes: 
+    volumes:
       - data:/data
     labels:
       dappnode.dnp.dnpName: geth.dnp.dappnode.eth
