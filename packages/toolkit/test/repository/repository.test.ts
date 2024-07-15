@@ -9,7 +9,7 @@ import { ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
     "https://api.ipfs.dappnode.io",
-    "https://gateway.ipfs.dappnode.io",
+    //"https://gateway.ipfs.dappnode.io",
   ];
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";
