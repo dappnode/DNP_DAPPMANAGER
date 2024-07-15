@@ -48,7 +48,7 @@ export default function Ipfs() {
     <Card className="dappnode-identity">
       <SubTitle>IPFS</SubTitle>
       <div>
-        DAppNode uses IPFS to distribute DAppNode packages in a decentrallized
+        DAppNode uses IPFS to distribute DAppNode packages in a decentralized
         way. Choose to connect to a remote IPFS gateway or use your own local
         IPFS node. More information at:{" "}
         <LinkDocs href={forumUrl.ipfsRemoteHowTo}>

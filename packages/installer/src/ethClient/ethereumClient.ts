@@ -387,7 +387,7 @@ export class EthereumClient {
   }
 
   /**
-   * Changes the ethereum client asynchronosly by triggering an event
+   * Changes the ethereum client asynchronously by triggering an event
    */
   private async changeEthClientNotAsync({
     prevExecClient,
