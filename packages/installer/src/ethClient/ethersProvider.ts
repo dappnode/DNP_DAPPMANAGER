@@ -18,7 +18,7 @@ export async function getEthersProvider(url?: string, network?: string): Promise
   const rpcNetwork = network ?? "mainnet";
   const fetchRequest = new FetchRequest(rpcUrl);
   const versionData = getVersionData()
-  fetchRequest.setHeader("x-dappmanager-verison", `${versionData.data.version}-${versionData.data.commit?.slice(0,8)}` );
+  fetchRequest.setHeader("x-dappmanager-version", `${versionData.data.version}-${versionData.data.commit?.slice(0,8)}` );
   return new ethers.JsonRpcProvider(fetchRequest, rpcNetwork, { staticNetwork: true });
 }
 
