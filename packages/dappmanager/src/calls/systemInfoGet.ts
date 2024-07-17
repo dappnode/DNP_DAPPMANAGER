@@ -1,5 +1,5 @@
 import * as db from "@dappnode/db";
-import { getVersionData } from "@dappnode/utils";
+import { getVersionData } from "../utils/getVersionData.js";
 import { NewFeatureId, SystemInfo } from "@dappnode/types";
 import { ethereumClient } from "@dappnode/installer";
 import { isCoreUpdateEnabled } from "@dappnode/daemons";

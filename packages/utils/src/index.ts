@@ -50,4 +50,3 @@ export * from "./coreVersionId.js";
 export { writeManifest } from "./writeManifest.js";
 export { readManifestIfExists } from "./readManifestIfExists.js";
 export { removeCidrSuffix } from "./removeCidrSuffix.js";
-export { getVersionData, isNewDappmanagerVersion} from "./getVersionData.js";

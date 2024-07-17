@@ -22,7 +22,6 @@
   "dependencies": {
     "@dappnode/types": "^0.1.36",
     "@dappnode/params": "^0.1.0",
-    "@dappnode/db": "^0.1.0",
     "ajv": "^6.10.2",
     "async-retry": "^1.3.1",
     "is-ip": "^3.0.0",
