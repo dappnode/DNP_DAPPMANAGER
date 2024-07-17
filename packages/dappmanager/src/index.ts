@@ -19,8 +19,7 @@ import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
 import { params } from "@dappnode/params";
 import { getVpnApiClient } from "./api/vpnApiClient.js";
-import { getVersionData, isNewDappmanagerVersion } from "./utils/index.js";
-import { createGlobalEnvsEnvFile } from "@dappnode/utils";
+import { createGlobalEnvsEnvFile, getVersionData, isNewDappmanagerVersion } from "@dappnode/utils"
 import { startAvahiDaemon, startDaemons } from "@dappnode/daemons";
 import { executeMigrations } from "@dappnode/migrations";
 import { startTestApi } from "./api/startTestApi.js";
