@@ -27,8 +27,9 @@ import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
-import { getEthUrl } from "./ethClient/index.js";
+import { getEthersProvider, getEthUrl } from "./ethClient/index.js";
 import { omit } from "lodash-es";
+import { ethers } from "ethers";
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
@@ -46,14 +47,13 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethUrl: string, timeout?: number) {
-    super(ipfsUrl, ethUrl, timeout);
+  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider, timeout?: number) {
+    super(ipfsUrl, ethersProvider, timeout);
   }
 
   private async updateProviders(): Promise<void> {
-    const newEthUrl = await getEthUrl();
     const newIpfsUrl = getIpfsUrl();
-    super.changeEthProvider(newEthUrl);
+    super.changeEthProvider(await getEthersProvider());
     super.changeIpfsProvider(newIpfsUrl);
   }
 

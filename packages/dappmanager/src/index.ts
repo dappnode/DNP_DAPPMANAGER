@@ -10,6 +10,7 @@ import {
 } from "@dappnode/hostscriptsservices";
 import {
   DappnodeInstaller,
+  getEthersProvider,
   getEthUrl,
   getIpfsUrl,
   postRestartPatch
@@ -58,9 +59,9 @@ try {
 }
 
 // Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, ethUrl);
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersProvider());
 
-export const publicRegistry = new DappNodeRegistry(ethUrl, "public");
+export const publicRegistry = new DappNodeRegistry(await getEthersProvider(), "public");
 
 // TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);

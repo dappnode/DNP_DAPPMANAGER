@@ -32,7 +32,7 @@
     "@dappnode/toolkit": "^0.1.21",
     "@dappnode/utils": "^0.1.0",
     "deepmerge": "2.2.1",
-    "ethers": "^6.9.0",
+    "ethers": "^6.10.0",
     "is-ipfs": "8.0.1",
     "lodash-es": "4.17.21",
     "node-fetch": "^3.3.2",

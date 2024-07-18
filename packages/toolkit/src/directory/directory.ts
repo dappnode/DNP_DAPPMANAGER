@@ -14,11 +14,11 @@ export class DappNodeDirectory {
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ethUrl: string) {
+  constructor(ethersProvider: ethers.JsonRpcProvider) {
     this.directoryContract = new ethers.Contract(
       directoryAddress,
       directoryAbi,
-      new ethers.JsonRpcProvider(ethUrl, "mainnet", { staticNetwork: true })
+      ethersProvider
     );
   }
 
