@@ -38,7 +38,7 @@
     "@dappnode/optimism": "^0.1.0",
     "@dappnode/params": "^0.1.0",
     "@dappnode/stakers": "^0.1.0",
-    "@dappnode/toolkit": "^0.1.21",
+    "@dappnode/toolkit": "^0.1.22",
     "@dappnode/types": "^0.1.36",
     "@dappnode/upnpc": "^0.1.0",
     "@dappnode/utils": "^0.1.0",

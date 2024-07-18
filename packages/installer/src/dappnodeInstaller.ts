@@ -27,7 +27,7 @@ import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
-import { getEthersProvider, getEthUrl } from "./ethClient/index.js";
+import { getEthersProvider } from "./ethClient/index.js";
 import { omit } from "lodash-es";
 import { ethers } from "ethers";
 
