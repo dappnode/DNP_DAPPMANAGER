@@ -13,13 +13,13 @@ import { repositoryAbi } from "./params.js";
  * ApmRepository is a class to interact with the DAppNode APM Repository Contract.
  */
 export class ApmRepository {
-  private ethProvider: ethers.JsonRpcProvider;
+  private ethProvider: ethers.AbstractProvider;
 
   /**
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ethersProvider: ethers.JsonRpcProvider) {
+  constructor(ethersProvider: ethers.AbstractProvider) {
     this.ethProvider = ethersProvider;
   }
 
@@ -27,7 +27,7 @@ export class ApmRepository {
    * Changes the Ethereum node to connect to.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  public changeEthProvider(ethersProvider: ethers.JsonRpcProvider): void {
+  public changeEthProvider(ethersProvider: ethers.AbstractProvider): void {
     this.ethProvider = ethersProvider;
   }
 

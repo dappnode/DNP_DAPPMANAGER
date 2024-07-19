@@ -51,7 +51,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider, timeout?: number) {
+  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
     super(ethersProvider);
     this.timeout = timeout || 30 * 1000;
     this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });

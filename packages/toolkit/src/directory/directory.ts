@@ -14,7 +14,7 @@ export class DappNodeDirectory {
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ethersProvider: ethers.JsonRpcProvider) {
+  constructor(ethersProvider: ethers.AbstractProvider) {
     this.directoryContract = new ethers.Contract(
       directoryAddress,
       directoryAbi,

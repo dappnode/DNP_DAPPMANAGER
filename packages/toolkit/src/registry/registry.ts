@@ -26,7 +26,7 @@ export class DappNodeRegistry {
    * @param ethUrl - The URL of the Ethereum node to connect to.
    * @param registry - The type of the registry (DNP or Public).
    */
-  constructor(ethersProvider: ethers.JsonRpcProvider, registry: Registry) {
+  constructor(ethersProvider: ethers.AbstractProvider, registry: Registry) {
     this.registry = registry;
     if (registry === "dnp") {
       this.contractAddress = registryDnpAddress;
