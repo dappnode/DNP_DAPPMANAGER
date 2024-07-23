@@ -7,12 +7,11 @@ import { InstalledPackageData } from "@dappnode/types";
 
 /**
  * Make sure that on Ethical metrics enabled and existing email,
- * the packages exporter, DMS and Ethical metrics are installed and running
+ * the packages DMS and Ethical metrics are installed and running
  */
 export async function checkEthicalMetricsStatus(
   dappnodeInstaller: DappnodeInstaller
 ): Promise<void> {
-  const exporterDnpName = "dappnode-exporter.dnp.dappnode.eth";
   const dmsDnpName = "dms.dnp.dappnode.eth";
 
   try {
@@ -22,9 +21,8 @@ export async function checkEthicalMetricsStatus(
     if (enabled) {
       if (!mail && !tgChannelId) throw Error("mail or tgChannelId is required");
 
-      // First check for Ethical metrics, then for DMS and last for Exporter
+      // First check for Ethical metrics, then for DMS
       // Ethical Metrics package has DMS as dependency, so it will be installed automatically
-      // DMS package has Exporter as dependency, so it will be installed automatically
 
       // Check ethical metrics pkg
       const ethicalMetricsPkg = await listPackageNoThrow({
@@ -41,14 +39,6 @@ export async function checkEthicalMetricsStatus(
       if (!dmsPkg)
         await packageInstall(dappnodeInstaller, { name: dmsDnpName });
       else ensureAllContainersRunning(dmsPkg);
-
-      // check exporter pkg
-      const exporterPkg = await listPackageNoThrow({
-        dnpName: exporterDnpName,
-      });
-      if (!exporterPkg)
-        await packageInstall(dappnodeInstaller, { name: exporterDnpName });
-      else ensureAllContainersRunning(exporterPkg);
 
       // Register instance
       await register({ mail, tgChannelId });
