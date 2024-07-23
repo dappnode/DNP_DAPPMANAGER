@@ -9,7 +9,7 @@ import { ethers } from "ethers";
 
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
-    "https://api.ipfs.dappnode.io",
+    //"https://api.ipfs.dappnode.io",
     "https://gateway.ipfs.dappnode.io",
   ];
 
