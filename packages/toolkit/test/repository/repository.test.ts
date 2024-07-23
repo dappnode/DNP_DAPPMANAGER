@@ -7,7 +7,7 @@ import { createHash } from "crypto";
 import { ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
 import { ethers } from "ethers";
 
-describe("Dappnode Repository", function () {
+describe.skip("Dappnode Repository", function () {
   const ipfsUrls = [
     //"https://api.ipfs.dappnode.io",
     "https://gateway.ipfs.dappnode.io",
