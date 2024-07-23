@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { createHash } from "crypto";
 import { ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
+import { ethers } from "ethers";
 
 describe("Dappnode Repository", function () {
   const ipfsUrls = [
@@ -29,7 +30,7 @@ describe("Dappnode Repository", function () {
     this.timeout(100000);
     const contract = new DappnodeRepository(
       ipfsUrl,
-      `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+      new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY)
     );
 
     it(`[${ipfsUrl}] Should get and validate package version for Prysm:${prysmVersion}`, async () => {
