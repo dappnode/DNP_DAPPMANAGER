@@ -716,7 +716,7 @@ describe("Dappnode Registry", function () {
       },
     ];
     const contract = new DappNodeRegistry(
-      `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`,
+      new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY),
       "dnp"
     );
     const result = await contract.queryGraphNewRepos<"dnp">();
@@ -1254,7 +1254,7 @@ describe("Dappnode Registry", function () {
     ];
 
     const contract = new DappNodeRegistry(
-      `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`,
+      new ethers.InfuraProvider("mainnet", process.env.INFURA_MAINNET_KEY),
       "public"
     );
 
