@@ -7,6 +7,7 @@ import { getEthExecClientApiUrl, getEthConsClientApiUrl } from "./apiUrl.js";
 import { parseEthersBlock, parseEthersSyncing } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
+import { getEthersProvider } from "./ethersProvider.js";
 
 /**
  * 7200 is the average blocks per day in Ethereum as Mon Nov 28 2022
@@ -173,23 +174,11 @@ export async function getMultiClientStatus(
 async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
   if (db.ethClientFallback.get() === "off") return true;
   // Check is synced with remote execution
-  const latestLocalBlock = await new ethers.JsonRpcProvider(
-    localUrl,
-    "mainnet",
-    {
-      staticNetwork: true,
-    }
-  )
+  const latestLocalBlock = await (await getEthersProvider(localUrl))
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
-  const latestRemoteBlock = await new ethers.JsonRpcProvider(
-    params.ETH_MAINNET_RPC_URL_REMOTE,
-    "mainnet",
-    {
-      staticNetwork: true,
-    }
-  )
+  const latestRemoteBlock = await (await getEthersProvider(params.ETH_MAINNET_RPC_URL_REMOTE))
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
@@ -203,9 +192,7 @@ async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
  * @param url "http://geth.dappnode:8545"
  */
 async function isSyncing(url: string): Promise<boolean> {
-  const provider = new ethers.JsonRpcProvider(url, "mainnet", {
-    staticNetwork: true,
-  });
+  const provider = await getEthersProvider(url);
   const syncing = await provider
     .send("eth_syncing", [])
     .then(parseEthersSyncing);
@@ -237,9 +224,7 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";
 
-  const provider = new ethers.JsonRpcProvider(url, "mainnet", {
-    staticNetwork: true,
-  });
+  const provider = await getEthersProvider(url);
 
   const res = await provider.send("eth_call", [testTxData, "latest"]);
   return res === result;
@@ -256,9 +241,7 @@ async function isSyncedWithConsensus(
   execUrl: string,
   consUrl: string
 ): Promise<boolean> {
-  const provider = new ethers.JsonRpcProvider(execUrl, "mainnet", {
-    staticNetwork: true,
-  });
+  const provider = await getEthersProvider(execUrl);
   const execBlockNumber = await provider.getBlockNumber();
   const execBlockHeadersResponse = await fetch(
     consUrl + "/eth/v2/beacon/blocks/head"

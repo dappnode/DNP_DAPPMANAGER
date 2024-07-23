@@ -32,6 +32,7 @@ import {
 } from "./releaseSignature.js";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
+import { ethers } from "ethers";
 
 const source = "ipfs" as const;
 
@@ -50,8 +51,8 @@ export class DappnodeRepository extends ApmRepository {
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, ethUrl: string, timeout?: number) {
-    super(ethUrl);
+  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
+    super(ethersProvider);
     this.timeout = timeout || 30 * 1000;
     this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });
   }

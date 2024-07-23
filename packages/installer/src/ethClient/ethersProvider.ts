@@ -5,15 +5,28 @@ import { getMultiClientStatus } from "./clientStatus.js";
 import { EthClientStatusError, EthProviderError } from "@dappnode/types";
 import { emitSyncedNotification } from "./syncedNotification.js";
 import { ethereumClient } from "./index.js";
+import { FetchRequest } from "ethers";
 
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(): Promise<ethers.JsonRpcProvider> {
-  const url = await getEthUrl();
-  return new ethers.JsonRpcProvider(url, "mainnet", { staticNetwork: true });
+export async function getEthersProvider(
+  url?: string,
+  network?: string
+): Promise<ethers.JsonRpcProvider> {
+  const rpcUrl = url ?? (await getEthUrl());
+  const rpcNetwork = network ?? "mainnet";
+  const fetchRequest = new FetchRequest(rpcUrl);
+  const versionData = db.versionData.get();
+  fetchRequest.setHeader(
+    "x-dappmanager-version",
+    `${versionData.version}-${db.versionData.get().commit?.slice(0, 8)}`
+  );
+  return new ethers.JsonRpcProvider(fetchRequest, rpcNetwork, {
+    staticNetwork: true,
+  });
 }
 
 /**
