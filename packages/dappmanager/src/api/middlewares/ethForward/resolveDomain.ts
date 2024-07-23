@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import { getEthUrl } from "@dappnode/installer";
+import { getEthersProvider, getEthUrl } from "@dappnode/installer";
 import resolverAbi from "./abi/resolverAbi.json" assert { type: "json" };
 import ensAbi from "./abi/ens.json" assert { type: "json" };
 import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
@@ -61,7 +61,7 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
   return async function (domain: string): Promise<Content> {
     const network = parseNetworkFromDomain(domain);
     const providerUrl = await _getEthersProviderByNetwork(network);
-    const provider = new ethers.JsonRpcProvider(providerUrl, "mainnet", { staticNetwork: true });
+    const provider = await getEthersProvider(providerUrl);
     return _resolveDomain(domain, provider);
   };
 }
