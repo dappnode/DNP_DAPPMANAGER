@@ -6,33 +6,27 @@ import { EthClientStatusError, EthProviderError } from "@dappnode/types";
 import { emitSyncedNotification } from "./syncedNotification.js";
 import { ethereumClient } from "./index.js";
 import { FetchRequest } from "ethers";
-import { PackageVersionData } from "@dappnode/types";
-import memoize from "memoizee";
-import fs from "fs";
-
-const getVersionData = memoize(function (): PackageVersionData {
-  try {
-    const data: PackageVersionData = JSON.parse(
-      fs.readFileSync(params.GIT_DATA_PATH, "utf8")
-    );
-    return data;
-  } catch (e) {
-    return {  };
-  }
-});
 
 /**
  * Returns the url of the JSON RPC an Eth multi-client status and target
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(url?: string, network?: string): Promise<ethers.JsonRpcProvider> {
-  const rpcUrl = url ?? await getEthUrl();
+export async function getEthersProvider(
+  url?: string,
+  network?: string
+): Promise<ethers.JsonRpcProvider> {
+  const rpcUrl = url ?? (await getEthUrl());
   const rpcNetwork = network ?? "mainnet";
   const fetchRequest = new FetchRequest(rpcUrl);
-  const versionData = getVersionData()
-  fetchRequest.setHeader("x-dappmanager-version", `${versionData.version}-${versionData.commit?.slice(0,8)}` );
-  return new ethers.JsonRpcProvider(fetchRequest, rpcNetwork, { staticNetwork: true });
+  const versionData = db.versionData.get();
+  fetchRequest.setHeader(
+    "x-dappmanager-version",
+    `${versionData.version}-${db.versionData.get().commit?.slice(0, 8)}`
+  );
+  return new ethers.JsonRpcProvider(fetchRequest, rpcNetwork, {
+    staticNetwork: true,
+  });
 }
 
 /**
