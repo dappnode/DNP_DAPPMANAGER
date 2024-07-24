@@ -2,7 +2,6 @@ import { expect } from "chai";
 import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
-import fetch from "node-fetch";
 import {
   docker,
   dockerGetArchiveSingleFile,

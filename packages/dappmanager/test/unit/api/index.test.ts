@@ -1,5 +1,4 @@
 import { startHttpApi } from "../../../src/api/startHttpApi.js";
-import fetch, { Response } from "node-fetch";
 import http from "http";
 import { expect } from "chai";
 import { urlJoin } from "@dappnode/utils";

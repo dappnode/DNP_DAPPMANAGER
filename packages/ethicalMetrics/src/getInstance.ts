@@ -1,6 +1,5 @@
 import { ethicalMetricsEndpoint } from "./params.js";
 import url from "url";
-import fetch from "node-fetch";
 
 export async function getInstance(): Promise<string> {
   return (

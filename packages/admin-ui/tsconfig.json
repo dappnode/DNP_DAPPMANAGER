@@ -1,11 +1,16 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "target": "ESNext",
     /* Modules */
     "module": "ESNext",
     "moduleResolution": "node",
 
     "baseUrl": "src",
+
+    "types": ["vite/client"],
+
+    "useDefineForClassFields": true,
 
     /* Emit */
     "noEmit": true,

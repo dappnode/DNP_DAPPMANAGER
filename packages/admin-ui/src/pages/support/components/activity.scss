@@ -59,22 +59,9 @@
      Using user-logs > x, to win the bootstrap css in specificity
   */
 
-  > .user-log {
-    border-left-width: 0;
-    border-right-width: 0;
-    padding: 0;
+   /* Polish bootstrap style */
 
-    > &:first-child {
-      border-top-width: 0;
-    }
-    > &:last-child {
-      border-bottom-width: 0;
-    }
-
-    /* Polish bootstrap style */
-
-    .badge {
-      margin-right: 0.5rem;
+  .badge {
+    margin-right: 0.5rem;
     }
   }
-}

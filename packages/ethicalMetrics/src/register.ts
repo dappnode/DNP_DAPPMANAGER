@@ -1,6 +1,5 @@
 import url from "url";
 import { ethicalMetricsEndpoint } from "./params.js";
-import fetch from "node-fetch";
 
 /**
  * Register the instance in the Ethical Metrics server with the given email

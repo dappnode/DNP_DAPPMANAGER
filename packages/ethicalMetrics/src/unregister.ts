@@ -1,6 +1,5 @@
 import { ethicalMetricsEndpoint } from "./params.js";
 import url from "url";
-import fetch from "node-fetch";
 
 /**
  * Unregister the instance in the Ethical Metrics server

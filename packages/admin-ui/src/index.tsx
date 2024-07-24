@@ -1,5 +1,6 @@
 import React from "react";
-import { render } from "react-dom";
+import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
 
@@ -18,18 +19,18 @@ import "./light_dark.scss";
 import "./layout.scss";
 
 // This process.env. vars will be substituted at build time
-// The REACT_APP_ prefix is mandatory for the substitution to work
+// The VITE_APP_ prefix is mandatory for the substitution to work
 window.versionData = cleanObj({
-  version: process.env.REACT_APP_VERSION,
-  branch: process.env.REACT_APP_BRANCH,
-  commit: process.env.REACT_APP_COMMIT
+  version: import.meta.env.VITE_APP_VERSION,
+  branch: import.meta.env.VITE_APP_BRANCH,
+  commit: import.meta.env.VITE_APP_COMMIT
 });
+const root = createRoot(document.getElementById("root") as HTMLElement);
 
-render(
+root.render(
   <Provider store={store}>
     <Router>
       <App />
     </Router>
-  </Provider>,
-  document.getElementById("root")
+  </Provider>
 );

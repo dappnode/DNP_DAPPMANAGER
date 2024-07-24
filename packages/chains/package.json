@@ -24,11 +24,9 @@
     "@dappnode/logger": "^0.1.0",
     "@dappnode/utils": "^0.1.0",
     "bitcoin-core": "2.0.0",
-    "monero-rpc": "0.5.0",
-    "node-fetch": "^3.3.2"
+    "monero-rpc": "0.5.0"
   },
   "devDependencies": {
-    "@types/node": "^20.6.2",
-    "@types/node-fetch": "^2.6.9"
+    "@types/node": "^20.14.10"
   }
 }

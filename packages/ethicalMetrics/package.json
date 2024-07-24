@@ -17,11 +17,8 @@
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
+  "dependencies": {},
   "devDependencies": {
-    "@types/node": "^20.6.2",
-    "@types/node-fetch": "^2.6.9"
+    "@types/node": "^20.14.10"
   }
 }

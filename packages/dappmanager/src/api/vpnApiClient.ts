@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { mapValues } from "lodash-es";
 import { parseRpcResponse } from "@dappnode/common";
 import { PackageVersionData, RpcResponse } from "@dappnode/types";

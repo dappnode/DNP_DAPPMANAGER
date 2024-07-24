@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import {
   buildNetworkAlias,

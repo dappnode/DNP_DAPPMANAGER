@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import Ajv from "ajv";
 import crypto from "crypto";
 import querystring from "querystring";
