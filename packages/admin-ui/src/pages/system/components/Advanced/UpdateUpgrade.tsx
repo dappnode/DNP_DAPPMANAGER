@@ -24,7 +24,7 @@ export function UpdateUpgrade() {
   return (
     <Card spacing>
       <p>
-        Update and upgrade the host machine. This action update and upgrade the
+        Update and upgrade the host machine. This action updates and upgrades the
         list of packages of the host machine. This action might require a reboot
         of the host machine, you will receive a notification if so.
       </p>
