@@ -347,7 +347,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       {requiresCoreUpdate && (
         <div className="alert alert-danger">
           <strong>{prettyDnpName(dnpName)}</strong> requires a more recent
-          version of DAppNode. <strong>Update your DAppNode</strong> before
+          version of Dappnode. <strong>Update your Dappnode</strong> before
           continuing the installation.
         </div>
       )}
