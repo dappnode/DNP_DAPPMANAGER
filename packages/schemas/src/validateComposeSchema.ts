@@ -18,7 +18,7 @@ export async function validateComposeSchema(composePaths: string[]): Promise<voi
 
   return new Promise((resolve, reject) => {
     exec(
-      `docker-compose -f ${composePaths.join(" -f")} config`,
+      `docker compose -f ${composePaths.join(" -f ")} config`,
       (error, _stdout, stderr) => {
         if (error) {
           console.error(`Error: ${error.message}`);
