@@ -4,6 +4,14 @@
     "allowUnreachableCode": false,
     "strict": true,
     "useUnknownInCatchVariables": false,
+    "forceConsistentCasingInFileNames": true, // Disallow inconsistently-cased references to the same file
+    "noUnusedLocals": true, // Report errors on unused locals
+    "noUnusedParameters": true, // Report errors on unused parameters
+    "noImplicitReturns": true, // Report errors on fallthrough cases in switch statements
+    "noFallthroughCasesInSwitch": true, // Report errors on fallthrough cases in switch statements
+    "strictNullChecks": true, // Enable strict null checks
+    "strictFunctionTypes": true, // Enable strict checking of function types
+    "strictPropertyInitialization": true, // Ensure non-undefined class properties are initialized in the constructor
 
     /* Modules */
     "module": "NodeNext",
@@ -23,6 +31,8 @@
 
     /* Language and Environment */
     "target": "ESNext" /* TODO: Review if we can use a defined target like ES2020 */,
+    "lib": ["ESNext"], // Include the latest ECMAScript library
+    "types": ["node"], // Include type definitions for Node.js
 
     /* Completeness */
     "skipLibCheck": true /* TODO: Should be removed when code is fixed */,
@@ -30,9 +40,7 @@
     // We want to speed up the CI run for all tests, which require us to use the
     // `transpileOnly` mode for the `ts-node`. This change requires to treat types for each module
     // independently, which is done by setting the `isolatedModules` flag to `true`.
-    "isolatedModules": true
-  },
-  "ts-node": {
-    "transpileOnly": true
+    "isolatedModules": true,
+    "incremental": true // Enable incremental compilation
   }
 }

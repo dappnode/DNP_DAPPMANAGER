@@ -4,7 +4,7 @@ import { wrapHandlerHtml } from "../utils.js";
 /**
  * Endpoint to download user action logs.
  */
-export const downloadUserActionLogs = wrapHandlerHtml(async (req, res) => {
+export const downloadUserActionLogs = wrapHandlerHtml(async (_, res) => {
   const logs = logUserAction.get();
 
   const filename = `dappnode-user-action-logs_${new Date().toISOString()}.json`;

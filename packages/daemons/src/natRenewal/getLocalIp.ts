@@ -17,5 +17,6 @@ export async function getLocalIp(options?: {
     return isIp(internalIp) ? internalIp : undefined;
   } catch (e) {
     if (!silent) logs.error(`Error getting internal IP: ${e.message}`);
+    return undefined;
   }
 }
