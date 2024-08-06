@@ -1,6 +1,6 @@
 # Arguments
-ARG NODE_VERSION=22.5
-ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.18
+ARG NODE_VERSION=22.5.1
+ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.19
 ARG BUILDPLATFORM
 
 # Initial stage to gather git data
