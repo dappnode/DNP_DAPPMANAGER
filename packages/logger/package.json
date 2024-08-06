@@ -19,9 +19,9 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
     "@dappnode/eventbus": "^0.1.0",
     "@dappnode/params": "^0.1.0",
+    "@dappnode/types": "^0.1.36",
     "@dappnode/utils": "^0.1.0",
     "stack-trace": "0.0.10"
   },

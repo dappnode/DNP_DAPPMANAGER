@@ -9,7 +9,6 @@
     "analyze": "npx source-map-explorer build/static/js/main.*",
     "lint": "eslint --ext ts,tsx,js,jsx --fix src",
     "prettier": "prettier --write 'src/**/*.*'",
-    "pre-commit": "yarn lint && CI=true yarn test",
     "mock": "VITE_APP_API_URL=http://localhost:5000 yarn start",
     "server-mock": "PORT=5000 nodemon server-mock/index.ts",
     "server-mock:check-types": "tsc --noEmit --project tsconfig.server-mock.json",

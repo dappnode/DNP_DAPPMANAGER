@@ -19,9 +19,9 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
     "@dappnode/dockerapi": "^0.1.0",
     "@dappnode/logger": "^0.1.0",
+    "@dappnode/types": "^0.1.36",
     "@dappnode/utils": "^0.1.0",
     "bitcoin-core": "2.0.0",
     "monero-rpc": "0.5.0"

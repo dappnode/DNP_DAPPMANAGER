@@ -16,7 +16,6 @@
     "test:all": "npm run test && npm run test:int",
     "lint": "eslint . --ext .ts --fix",
     "prettier": "prettier --write 'src/**/*.*' 'test/**/*.*'",
-    "pre-commit": "npm run build && npm run test",
     "clean": "rm -rf DNCORE/ dnp_repo/ .temp-transfer/ cache/ dist/"
   },
   "license": "GPL-3.0",
