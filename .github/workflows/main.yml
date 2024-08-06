@@ -22,14 +22,12 @@ jobs:
     name: Unit tests
     steps:
       - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: enable corepack and set yarn berry
-        run: |
-          yarn set version berry
-          yarn plugin import corepack
       - run: yarn
       - run: yarn build
       - run: yarn test
@@ -44,14 +42,13 @@ jobs:
     name: In app integration tests
     steps:
       - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: enable corepack and set yarn berry
-        run: |
-          yarn set version berry
-          yarn plugin import corepack
+          cache: "yarn"
       - run: yarn # Caching only saves 30s
       - run: yarn build
       - run: yarn test:int
@@ -67,14 +64,13 @@ jobs:
           [[ "$BUMP_TYPE" == "patch" ]] || [[ "$BUMP_TYPE" == "minor" ]] || \
           [[ "$BUMP_TYPE" == "major" ]] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
       - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: enable corepack and set yarn berry
-        run: |
-          yarn set version berry
-          yarn plugin import corepack
+          cache: "yarn"
       - name: Publish
         run: npx @dappnode/dappnodesdk publish ${BUMP_TYPE} --dappnode_team_preset
         env:
