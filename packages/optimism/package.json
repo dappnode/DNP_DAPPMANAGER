@@ -18,12 +18,12 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/db": "^0.1.0",
-    "@dappnode/dockerapi": "^0.1.0",
-    "@dappnode/dockercompose": "^0.1.0",
-    "@dappnode/installer": "^0.1.0",
-    "@dappnode/types": "^0.1.36",
-    "@dappnode/utils": "^0.1.0"
+    "@dappnode/db": "workspace:^0.1.0",
+    "@dappnode/dockerapi": "workspace:^0.1.0",
+    "@dappnode/dockercompose": "workspace:^0.1.0",
+    "@dappnode/installer": "workspace:^0.1.0",
+    "@dappnode/types": "workspace:^0.1.0",
+    "@dappnode/utils": "workspace:^0.1.0"
   },
   "devDependencies": {
     "@types/node": "^20.14.10"
