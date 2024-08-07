@@ -5,7 +5,7 @@ export const apiAuth: IApiAuth = {
     return { status: "logged-in", username: "admin" };
   },
 
-  async login(data) {
+  async login() {
     return { ok: true };
   },
 
@@ -13,15 +13,15 @@ export const apiAuth: IApiAuth = {
     window.location.reload();
   },
 
-  async register(data) {
+  async register() {
     return { recoveryToken: "TEST_TOKEN" };
   },
 
-  async changePass(data) {
+  async changePass() {
     return { ok: true };
   },
 
-  async recoverPass(data) {
+  async recoverPass() {
     return { ok: true };
   }
 };

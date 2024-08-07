@@ -8,18 +8,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      # Setup node version 14 for node-sass 4.14 https://stackoverflow.com/questions/60394291/error-node-modules-node-sass-command-failed
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
+      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
-      # Install dependencies
+          node-version: "22"
+          cache: "yarn"
       - run: yarn install
-      # Generate schemas
       - run: yarn build
-      # Build
       - run: yarn mock-standalone:build
-      # Deploy
       - name: Deploy to Netlify
         uses: nwtgck/actions-netlify@v1.1
         with:

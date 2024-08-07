@@ -32,6 +32,7 @@ export function loadContentHashes(filepath: string): ContentHashes | undefined {
     return parseContentHashFile(packagesContentHashData);
   } catch (e) {
     if (!isNotFoundError(e)) throw e;
+    return undefined;
   }
 }
 

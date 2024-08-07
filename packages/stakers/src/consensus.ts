@@ -1,5 +1,4 @@
 import {
-  ComposeServiceNetworksObj,
   ConsensusClientGnosis,
   ConsensusClientHolesky,
   ConsensusClientLukso,
@@ -8,7 +7,6 @@ import {
   Network,
   StakerItem,
   UserSettings,
-  UserSettingsAllDnps,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -123,9 +121,7 @@ export class Consensus extends StakerComponent {
       userSettings: newConsensusDnpName
         ? this.getUserSettings(
             newConsensusDnpName,
-            !Boolean(
-              await listPackageNoThrow({ dnpName: newConsensusDnpName })
-            ),
+            !(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
             network
           )
         : {},

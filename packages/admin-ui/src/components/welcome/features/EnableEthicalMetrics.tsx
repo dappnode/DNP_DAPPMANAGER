@@ -77,12 +77,12 @@ export default function EnableEthicalMetrics({
 
   // clear the success message after 5 seconds
   useEffect(() => {
-    if (validationMessage === "Ethical metrics enabled successfully.") {
-      const timer = setTimeout(() => {
-        setValidationMessage("");
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
+    if (validationMessage !== "Ethical metrics enabled successfully.") return;
+
+    const timer = setTimeout(() => {
+      setValidationMessage("");
+    }, 5000);
+    return () => clearTimeout(timer);
   }, [validationMessage]);
 
   function toggleEthicalSwitch() {

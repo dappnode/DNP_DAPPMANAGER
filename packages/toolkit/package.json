@@ -39,7 +39,7 @@
     "tsconfig-paths": "^4.2.0"
   },
   "dependencies": {
-    "@dappnode/types": "^0.1.36",
+    "@dappnode/types": "workspace:^0.1.0",
     "@ipld/car": "^5.1.1",
     "esm": "^3.2.25",
     "ethers": "^6.10.0",

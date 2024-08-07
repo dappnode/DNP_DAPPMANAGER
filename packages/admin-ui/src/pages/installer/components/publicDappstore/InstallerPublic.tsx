@@ -27,7 +27,7 @@ import { activateFallbackPath } from "pages/system/data";
 import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { fetchDnpRegistry } from "services/dnpRegistry/actions";
 
-export const InstallerPublic: React.FC = routeProps => {
+export const InstallerPublic: React.FC = () => {
   const navigate = useNavigate();
 
   const registry = useSelector(getDnpRegistry);
@@ -42,13 +42,13 @@ export const InstallerPublic: React.FC = routeProps => {
   const [showErrorDnps, setShowErrorDnps] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchDnpRegistry({}));
+    dispatch(fetchDnpRegistry());
   }, [dispatch]);
 
   // Limit the number of requests [TESTED]
   const fetchQueryThrottled = useMemo(
     () =>
-      throttle((query: string) => {
+      throttle((_query: string) => {
         // #### TODO: provide feedback to the user if the query is found
       }, 500),
     []

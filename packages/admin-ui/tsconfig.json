@@ -25,5 +25,5 @@
     "isolatedModules": true
   },
   "include": ["src/**/*"],
-  "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*"]
+  "exclude": ["test/**/*", "src/__tests__/*", "src/__mock-backend__/*", "build"]
 }

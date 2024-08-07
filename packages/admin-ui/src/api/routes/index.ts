@@ -44,7 +44,7 @@ export const apiRoutes: IApiRoutes = {
       });
 
       // Define what happens in case of error
-      xhr.addEventListener("error", e => reject(Error("Error loading file")));
+      xhr.addEventListener("error", _e => reject(Error("Error loading file")));
 
       if (xhr.upload)
         xhr.upload.addEventListener("progress", onProgress, false);

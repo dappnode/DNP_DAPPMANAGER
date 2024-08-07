@@ -4,7 +4,7 @@ import * as db from "@dappnode/db";
 let counter = 0;
 
 export function getViewsCounterMiddleware(): express.RequestHandler {
-  return (req, res, next): void => {
+  return (req, _, next): void => {
     try {
       // Only count views for the main page and login status
       // Other requests are not from the UI but for other API calls

@@ -17,11 +17,7 @@ export const updateStatus = createAction<RequestStatus>(
 
 // Redux-thunk actions
 
-export const fetchDnpRegistry = ({
-  addressOrEnsName
-}: {
-  addressOrEnsName?: string;
-}): AppThunk => async dispatch => {
+export const fetchDnpRegistry = (): AppThunk => async dispatch => {
   try {
     dispatch(updateStatus({ loading: true }));
     const registry = await api.fetchRegistry();

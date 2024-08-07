@@ -195,7 +195,7 @@ export function startHttpApi({
 
   // Serve UI. React-router, index.html at all routes
   // prettier-ignore
-  app.get("*", (req, res) => res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html")));
+  app.get("*", (_, res) => res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html")));
 
   server.listen(params.HTTP_API_PORT, () =>
     logs.info(`HTTP API ${params.HTTP_API_PORT}`)

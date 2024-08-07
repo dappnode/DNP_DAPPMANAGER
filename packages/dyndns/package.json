@@ -19,9 +19,9 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "dependencies": {
-    "@dappnode/db": "^0.1.0",
-    "@dappnode/logger": "^0.1.0",
-    "@dappnode/params": "^0.1.0",
+    "@dappnode/db": "workspace:^0.1.0",
+    "@dappnode/logger": "workspace:^0.1.0",
+    "@dappnode/params": "workspace:^0.1.0",
     "ethers": "^6.10.0",
     "node-fetch": "^3.3.2"
   },

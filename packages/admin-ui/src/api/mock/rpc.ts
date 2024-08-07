@@ -14,7 +14,7 @@ export const apiRpc: IApiRpc = {
     return { result };
   },
 
-  start(apiEventBridge, onConnect) {
+  start(_, onConnect) {
     onConnect();
   }
 };

@@ -1,12 +1,8 @@
-import { ethers } from "ethers";
 import { DNPRegistryEntry, PublicRegistryEntry, Registry } from "./types.js";
 import { request, gql } from "graphql-request";
 import {
-  registryDnpAddress,
   dnpRegistryGraphEndpoint,
-  registryPublicAddress,
   publicRegistryGraphEndpoint,
-  registryAbi,
 } from "./params.js";
 
 // TODO: Consider adding scanning functions for events
@@ -15,31 +11,19 @@ import {
  * DappNodeRegistry is a class to interact with the DAppNode Registry Contract.
  */
 export class DappNodeRegistry {
-  private contractAddress: string;
   private registry: Registry;
   private graphEndpoint: string;
   private nameSuffix: string;
-  private registryContract: ethers.Contract;
 
   /**
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    * @param registry - The type of the registry (DNP or Public).
    */
-  constructor(ethersProvider: ethers.AbstractProvider, registry: Registry) {
+  constructor(registry: Registry) {
     this.registry = registry;
-    if (registry === "dnp") {
-      this.contractAddress = registryDnpAddress;
-      this.graphEndpoint = dnpRegistryGraphEndpoint;
-    } else {
-      this.contractAddress = registryPublicAddress;
-      this.graphEndpoint = publicRegistryGraphEndpoint;
-    }
-    this.registryContract = new ethers.Contract(
-      this.contractAddress,
-      registryAbi,
-      ethersProvider
-    );
+    if (registry === "dnp") this.graphEndpoint = dnpRegistryGraphEndpoint;
+    else this.graphEndpoint = publicRegistryGraphEndpoint;
 
     this.nameSuffix =
       this.registry === "dnp" ? ".dnp.dappnode.eth" : ".public.dappnode.eth";

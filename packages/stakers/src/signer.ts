@@ -1,5 +1,4 @@
 import {
-  ComposeServiceNetworksObj,
   Network,
   SignerGnosis,
   SignerHolesky,

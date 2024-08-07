@@ -29,6 +29,6 @@ export const notificationLastEmitVersion = dbCache.indexedByKey<string, string>(
     rootKey: NOTIFICATION_LAST_EMITTED_VERSION,
     getKey: (dnpName) => stripDots(dnpName),
     validate: (dnpName, lastEmittedVersion) =>
-      typeof lastEmittedVersion === "string",
+      Boolean(dnpName) && typeof lastEmittedVersion === "string",
   }
 );

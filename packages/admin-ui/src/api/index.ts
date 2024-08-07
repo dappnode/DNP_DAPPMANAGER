@@ -100,7 +100,7 @@ async function callRoute<R>(method: string, params: any[]): Promise<R> {
  */
 export const api: Routes = mapValues(
   routesData,
-  (data, route) => (...args: any[]) => callRoute<any>(route, args)
+  (_data, route) => (...args: any[]) => callRoute<any>(route, args)
 );
 
 /**
@@ -111,7 +111,7 @@ export const useApi: {
   [K in keyof Routes]: (
     ...args: Parameters<Routes[K]>
   ) => responseInterface<ResolvedType<Routes[K]>, Error>;
-} = mapValues(routesData, (data, route) => {
+} = mapValues(routesData, (_data, route) => {
   return function(...args: any[]) {
     const argsKey = args.length > 0 ? JSON.stringify(args) : "";
     const fetcher = (...args: any[]) => callRoute<any>(route, args);
@@ -166,7 +166,7 @@ export const useSubscription: {
   [K in keyof Subscriptions]: (
     callback: (...args: Parameters<SubscriptionsTypes[K]>) => void
   ) => void;
-} = mapValues(subscriptionsData, (data, route) => {
+} = mapValues(subscriptionsData, (_data, route) => {
   return function(callback: (...args: any) => void) {
     useSubscribe(route as keyof Subscriptions, callback);
   };

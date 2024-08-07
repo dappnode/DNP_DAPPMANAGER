@@ -28,7 +28,7 @@ import { getEthClientWarning } from "services/dappnodeStatus/selectors";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
 
-export const InstallerDnp: React.FC = routeProps => {
+export const InstallerDnp: React.FC = () => {
   const navigate = useNavigate();
 
   const directory = useSelector(getDnpDirectory);
@@ -49,7 +49,7 @@ export const InstallerDnp: React.FC = routeProps => {
   // Limit the number of requests [TESTED]
   const fetchQueryThrottled = useMemo(
     () =>
-      throttle((query: string) => {
+      throttle((_query: string) => {
         // #### TODO: provide feedback to the user if the query is found
       }, 500),
     []

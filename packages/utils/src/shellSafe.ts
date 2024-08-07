@@ -1,11 +1,13 @@
 import { shell } from "./shell.js";
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
-  return async function(arg: A): Promise<R | undefined> {
+  return async function (arg: A): Promise<R | undefined> {
     try {
       return await fn(arg);
     } catch (e) {
-      // Ignore
+      // Print and ignore
+      console.error(e);
+      return undefined;
     }
   };
 }

@@ -1,4 +1,3 @@
-import { ethers } from "ethers";
 import * as db from "@dappnode/db";
 import { EthClientStatus } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
@@ -178,7 +177,9 @@ async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
-  const latestRemoteBlock = await (await getEthersProvider(params.ETH_MAINNET_RPC_URL_REMOTE))
+  const latestRemoteBlock = await (
+    await getEthersProvider(params.ETH_MAINNET_RPC_URL_REMOTE)
+  )
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
@@ -248,6 +249,7 @@ async function isSyncedWithConsensus(
   );
   // TODO: do better type checking
   const consBlockHeadersResponseParsed =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (await execBlockHeadersResponse.json()) as any;
   const consBlockNumber =
     consBlockHeadersResponseParsed.data.message.body.execution_payload

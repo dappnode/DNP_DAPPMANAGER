@@ -38,5 +38,7 @@ export const upload = wrapHandler(async (req, res) => {
         if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
       });
     }, 15 * 60 * 1000);
+    return;
   });
+  return;
 });
