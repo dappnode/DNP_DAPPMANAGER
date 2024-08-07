@@ -19,8 +19,8 @@
     "test:int": "yarn workspaces foreach --all -pt run test:int",
     "dev": "yarn workspaces foreach --all -pi run dev",
     "lint": "yarn workspaces foreach --all -pt run lint",
-    "mock-standalone:build": "yarn workspace admin-ui run mock-standalone:build",
-    "generate": "yarn workspace common run generate"
+    "mock-standalone:build": "yarn workspace @dappnode/admin-ui run mock-standalone:build",
+    "generate": "yarn workspace @dappnode/common run generate"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",
