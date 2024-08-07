@@ -19,11 +19,8 @@
     "test:int": "yarn workspaces foreach --all -pt run test:int",
     "dev": "yarn workspaces foreach --all -pi run dev",
     "lint": "yarn workspaces foreach --all -pt run lint",
-    "mock-standalone:build": "yarn workspaces focus admin-ui run mock-standalone:build",
-    "generate": "yarn workspaces focus common run generate",
-    "clean": "yarn workspaces foreach --all -pt run clean",
-    "clean:libraries": "yarn workspaces foreach --all -pt run clean:libraries",
-    "clean:build": "yarn workspaces foreach --all -pt run clean:build"
+    "mock-standalone:build": "yarn workspace admin-ui run mock-standalone:build",
+    "generate": "yarn workspace common run generate"
   },
   "devDependencies": {
     "@types/chai": "^4.3.11",

@@ -1,34 +1,36 @@
 # Arguments
-ARG NODE_VERSION=22.5.1
-ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.19
+ARG BASE_IMAGE=node:22.5.1-alpine3.19
 ARG BUILDPLATFORM
 
 # Initial stage to gather git data
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS git-data
+FROM ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
-RUN apk add --no-cache git
 COPY .git dappnode_package.json docker/getGitData.js ./
+RUN apk add --no-cache git
 RUN node getGitData /usr/src/app/.git-data.json
 
 # Build stage
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS build-src
+FROM ${BASE_IMAGE} AS build-src
+ENV VITE_APP_API_URL /
 WORKDIR /app
+
+# Copy and build packages
+COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
+COPY packages packages
 
 # Install necessary packages required by vite
 RUN apk add --no-cache python3 py3-pip build-base
-
-# Copy and build packages
-COPY package.json yarn.lock lerna.json tsconfig.json ./
-COPY packages packages
-ENV VITE_APP_API_URL /
-RUN yarn install --non-interactive --frozen-lockfile && \
-  yarn build && \
-  yarn clean:libraries && \
-  yarn install --non-interactive --frozen-lockfile --production --force --ignore-optional
+# Install corepack to be able to use modern yarn berry
+RUN corepack enable
+RUN yarn install --immutable
+# Build and install production dependencies
+RUN yarn build && \
+  yarn workspaces focus --all --production
+# Remove unnecessary files
 RUN rm -rf yarn.lock packages/*/src packages/*/tsconfig.json packages/*/.eslint*
 
 # Production stage
-FROM node:${NODE_VERSION}-alpine
+FROM ${BASE_IMAGE}
 WORKDIR /usr/src/app
 
 # Environment variables
