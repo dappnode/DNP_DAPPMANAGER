@@ -10,7 +10,7 @@ import BottomButtons from "../BottomButtons";
 import { api } from "api";
 
 /**
- * View to chose or change the Eth multi-client
+ * View to choose or change the Eth multi-client
  * There are three main options:
  * - Remote
  * - Full node
