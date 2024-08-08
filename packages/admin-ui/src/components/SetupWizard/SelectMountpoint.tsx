@@ -194,7 +194,7 @@ export default function SelectMountpoint({
 
       {showHelp && (
         <div className="change-mountpoint-help">
-          Existing volumes can't be changed. To do so, unistall this package and
+          Existing volumes can't be changed. To do so, uninstall this package and
           remove its data
         </div>
       )}

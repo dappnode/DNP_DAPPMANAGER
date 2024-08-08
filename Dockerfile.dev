@@ -1,7 +1,7 @@
 ARG NODE_VERSION=20.3.0
 
 # Common base so it's cached
-# --platform=$BUILDPLATFORM is used build javascript source with host arch
+# --platform=$BUILDPLATFORM is used to build javascript source with host arch
 # Otherwise webpack builds on emulated archs can be extremely slow (+1h)
 ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
 
