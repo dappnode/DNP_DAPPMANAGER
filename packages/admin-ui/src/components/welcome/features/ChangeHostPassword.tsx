@@ -10,7 +10,7 @@ import {
 import { InputForm } from "components/InputForm";
 
 /**
- * View to chose or change the Eth multi-client
+ * View to choose or change the Eth multi-client
  * There are three main options:
  * - Remote
  * - Full node
