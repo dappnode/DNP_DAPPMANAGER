@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { docker } from "../../src/index.js";
 import { getNetworkAliasesIpsMapNotThrow } from "../../src/api/network.js";
+import type { Network } from "dockerode";
 
 describe("Ensure docker network config migration => getDockerNetworkNameFromSubnet", () => {
   const testNetworkName = "docker_network_test";
@@ -12,7 +13,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
     "test_container_2",
     "test_container_3",
   ];
-  let testNetwork;
+  let testNetwork: Network;
 
   before(async () => {
     await removeAll();
