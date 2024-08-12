@@ -1,7 +1,7 @@
 import Ajv from "ajv";
-import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" assert { type: "json" };
-import routesReturnSchema from "./schemas/RoutesReturn.schema.json" assert { type: "json" };
-import subscriptionsArgumentsSchema from "./schemas/SubscriptionsArguments.schema.json" assert { type: "json" };
+import routesArgumentsSchema from "./schemas/RoutesArguments.schema.json" with { type: "json" };
+import routesReturnSchema from "./schemas/RoutesReturn.schema.json" with { type: "json" };
+import subscriptionsArgumentsSchema from "./schemas/SubscriptionsArguments.schema.json" with { type: "json" };
 import { Args } from "typescript-json-schema";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
