@@ -110,23 +110,29 @@ export class DappGetFetcher {
         );
         // Remove the dependency if the installed version satisfies the required version
         delete dependencies[depName];
-      } else {
-
-        // Use "*" (latest) if the dependency is not installed and version is >... or >=... 
-        if (!installedPackage && /^>=?\d+\.\d+\.\d+$/.test(depVersion)) {
-          dependencies[depName] = '*';
-
-          // Use x.x.x if the dependency is not installed and version is ^x.x.x or ~x.x.x
-        } else if (!installedPackage && /^[\^~]\d+\.\d+\.\d+$/.test(depVersion)) {
-
-          // Remove the operator prefix and use the defined version
-          dependencies[depName] = depVersion.slice(1);
-
-        } else {
-
-          throw new Error(`Unsupported version range for dependency ${depName}: ${depVersion}. Only simle ranges with operators ^, ~, > and >= are supported`);
-        }
+        continue;
       }
+
+      dependencies[depName] = this.parseSemverRangeToApmVersion(depVersion);
+
     }
+  }
+
+  private parseSemverRangeToApmVersion(semverRange: string): string {
+    // Exact version, just keep it
+    if (/\d+\.\d+\.\d+$/.test(semverRange))
+      return semverRange;
+
+    // Use "*" (latest) if version is >... or >=...
+    if (/^>=?\d+\.\d+\.\d+$/.test(semverRange)) {
+      return '*';
+    }
+
+    // Use x.x.x if version is ^x.x.x or ~x.x.x
+    if (/^[\^~]\d+\.\d+\.\d+$/.test(semverRange)) {
+      return semverRange.slice(1);
+    }
+
+    throw new Error(`Unsupported version range (${semverRange}). Only simple ranges with operators ^, ~, > and >= are supported`);
   }
 }
