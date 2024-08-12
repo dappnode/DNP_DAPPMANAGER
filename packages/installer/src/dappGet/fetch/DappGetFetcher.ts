@@ -5,8 +5,8 @@ import { listPackages } from "@dappnode/dockerapi";
 
 export class DappGetFetcher {
   /**
-   * Fetches the dependencies of a given DNP name and version
-   * Injects the optional dependencies if the package is installed
+   * Fetches the dependencies of a given DNP name and version.
+   * Injects the optional dependencies if the package is installed.
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
@@ -21,17 +21,17 @@ export class DappGetFetcher {
     const installedPackages = await listPackages();
 
     this.mergeOptionalDependencies(dependencies, optionalDependencies, installedPackages);
-    this.filterSatisfiedDependencies(dependencies, installedPackages);
+    this.processDependencies(dependencies, installedPackages);
 
     return dependencies;
   }
 
   /**
    * Fetches the available versions given a request.
-   * Will fetch the versions from different places according the type of version range:
+   * Will fetch the versions from different places according to the type of version range:
    * - valid semver range: Fetch the valid versions from APM
    * - valid semver version (not range): Return that version
-   * - unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
+   * - invalid semver version ("/ipfs/Qmre4..."): Assume it's the only version
    *
    * @param kwargs: {
    *   name: Name of package i.e. "kovan.dnp.dappnode.eth"
@@ -68,10 +68,18 @@ export class DappGetFetcher {
           .filter((version) => satisfies(version, versionRange));
       }
     }
-    // Case 3. unvalid semver version ("/ipfs/Qmre4..."): Asume it's the only version
+    // Case 3. invalid semver version ("/ipfs/Qmre4..."): Assume it's the only version
     return [versionRange];
   }
 
+  /**
+   * Merges optional dependencies into the main dependencies object if the corresponding 
+   * packages are installed.
+   *
+   * @param dependencies The main dependencies object to be merged into.
+   * @param optionalDependencies The optional dependencies to be checked and merged.
+   * @param installedPackages The list of currently installed packages.
+   */
   private mergeOptionalDependencies(
     dependencies: Dependencies,
     optionalDependencies: Dependencies,
@@ -88,7 +96,14 @@ export class DappGetFetcher {
     }
   }
 
-  private filterSatisfiedDependencies(
+  /**
+   * Processes the dependencies by first filtering out those that are already satisfied by installed packages
+   * and then converting any remaining semver ranges to appropriate APM versions.
+   *
+   * @param dependencies The main dependencies object to be processed.
+   * @param installedPackages The list of currently installed packages.
+   */
+  private processDependencies(
     dependencies: Dependencies,
     installedPackages: InstalledPackageData[]
   ): void {
@@ -104,20 +119,27 @@ export class DappGetFetcher {
         throw new Error(`Unsupported version range for dependency ${depName}: ${depVersion}. Only simple ranges are supported`);
       }
 
+      // Remove dependency if it is already satisfied by an installed package
       if (installedPackage && satisfies(installedPackage.version, depVersion)) {
         console.log(
           `Dependency ${depName} is already installed with version ${installedPackage.version}`
         );
-        // Remove the dependency if the installed version satisfies the required version
         delete dependencies[depName];
         continue;
       }
 
       dependencies[depName] = this.parseSemverRangeToApmVersion(depVersion);
-
     }
   }
 
+  /**
+   * Parses a semver range and converts it to a version suitable for APM.
+   * Handles specific semver operators like ^, ~, >, >= and converts them to
+   * appropriate APM-compatible versions.
+   *
+   * @param semverRange The semver range to be parsed.
+   * @returns The parsed version as a string.
+   */
   private parseSemverRangeToApmVersion(semverRange: string): string {
     // Exact version, just keep it
     if (/\d+\.\d+\.\d+$/.test(semverRange))
