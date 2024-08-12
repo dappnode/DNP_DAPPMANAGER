@@ -36,7 +36,9 @@
   "devDependencies": {
     "@types/dockerode": "^3.3.23",
     "@types/lodash-es": "^4.17.6",
+    "@types/mocha": "^10",
     "@types/node": "^20.14.10",
-    "@types/semver": "^7.3.13"
+    "@types/semver": "^7.3.13",
+    "mocha": "^10.7.0"
   }
 }

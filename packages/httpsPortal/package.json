@@ -30,6 +30,8 @@
   },
   "devDependencies": {
     "@types/memoizee": "0.4.4",
-    "@types/node": "^20.14.10"
+    "@types/mocha": "^10",
+    "@types/node": "^20.14.10",
+    "mocha": "^10.7.0"
   }
 }

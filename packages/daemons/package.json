@@ -40,10 +40,12 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
+    "@types/mocha": "^10",
     "@types/node": "^20.14.10",
     "@types/node-telegram-bot-api": "^0.64.6",
     "@types/semver": "^7.3.13",
     "@types/systeminformation": "^3.54.1",
+    "mocha": "^10.7.0",
     "rewiremock": "^3.13.7",
     "sinon": "^5.0.10"
   }

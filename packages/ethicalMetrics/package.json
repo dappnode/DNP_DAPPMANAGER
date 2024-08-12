@@ -18,6 +18,8 @@
     "lint": "eslint . --ext .ts --fix src"
   },
   "devDependencies": {
-    "@types/node": "^20.14.10"
+    "@types/mocha": "^10",
+    "@types/node": "^20.14.10",
+    "mocha": "^10.7.0"
   }
 }
