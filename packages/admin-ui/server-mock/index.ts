@@ -32,7 +32,7 @@ const subscriptionsLogger: LoggerMiddleware = {
   onError: (route, error) => console.log("Subscription error", route, error)
 };
 
-const adminPasswordDb = startHttpApi({
+startHttpApi({
   params,
   logs: {
     debug: console.log,
