@@ -6,4 +6,4 @@ require:
   - ./test/integration/hook.ts
 node-option:
   - experimental-specifier-resolution=node
-  - loader=ts-node/esm
+  - import=tsx/esm

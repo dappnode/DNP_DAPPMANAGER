@@ -37,9 +37,6 @@
     /* Completeness */
     "skipLibCheck": true /* TODO: Should be removed when code is fixed */,
 
-    // We want to speed up the CI run for all tests, which require us to use the
-    // `transpileOnly` mode for the `ts-node`. This change requires to treat types for each module
-    // independently, which is done by setting the `isolatedModules` flag to `true`.
     "isolatedModules": true,
     "incremental": true // Enable incremental compilation
   }
