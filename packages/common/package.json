@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "yarn run generate && tsc -p tsconfig.json",
-    "generate": "NODE_OPTIONS=--loader=ts-node/esm ts-node -P tsconfig.json ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
+    "generate": "node --import=tsx/esm ./src/validation/generateSchemas.ts tsconfig.json ./src/validation/schemas",
     "dev": "tsc -w",
     "lint": "eslint . --ext .ts --fix src"
   },
@@ -28,6 +28,6 @@
     "@types/node": "20.13.0",
     "ajv": "^8.12.0",
     "mocha": "^10.7.0",
-    "typescript-json-schema": "^0.62.0"
+    "typescript-json-schema": "^0.64.0"
   }
 }

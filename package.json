@@ -8,11 +8,9 @@
   "engines": {
     "node": "22.x"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "build": "yarn workspaces foreach --all -pt run build",
     "test": "yarn workspaces foreach --all -pt run test",
@@ -25,7 +23,7 @@
   "devDependencies": {
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.2.0",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "chai": "^4.3.10",
@@ -36,6 +34,7 @@
     "nodemon": "^3.0.2",
     "rimraf": "^3.0.2",
     "ts-node": "^10.9.2",
+    "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   },
   "packageManager": "yarn@4.4.0"

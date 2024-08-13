@@ -63,3 +63,4 @@ docker-compose-tmp.yml
 
 # yarn berry
 .yarn/install-state.gz
+.yarn/releases
