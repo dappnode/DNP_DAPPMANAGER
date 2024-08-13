@@ -12,9 +12,14 @@ import {
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { getContainerName, validatePath } from "@dappnode/utils";
-import { RequestedDnp, Manifest, SetupWizard } from "@dappnode/types";
-import { getImageTag } from "@dappnode/utils";
+import { validatePath } from "@dappnode/utils";
+import {
+  RequestedDnp,
+  Manifest,
+  SetupWizard,
+  getContainerName,
+  getImageTag,
+} from "@dappnode/types";
 
 describe("Fetch releases", () => {
   const dnpNameMain = "main.dnp.dappnode.eth";
@@ -30,7 +35,7 @@ describe("Fetch releases", () => {
     clearDbs();
     // Activate remote and fallback to fetch test data without a local node
     await calls.ethClientFallbackSet({ fallback: "on" });
-    await calls.ethClientTargetSet({ target: "remote" });
+    await calls.ethClientTargetSet({ target: "remote", ethRemoteRpc: "" });
   });
 
   before("Create releases dir", async () => {
@@ -132,6 +137,7 @@ describe("Fetch releases", () => {
           [dnpNameMain]: {},
         },
         compatible: {
+          requiresDockerUpdate: false,
           requiresCoreUpdate: false,
           packagesToBeUninstalled: ["package-uncompatible.dnp.dappnode.eth"],
           resolving: false,
@@ -158,7 +164,7 @@ describe("Fetch releases", () => {
       );
 
       after(async () => {
-        await shellSafe(`docker-compose -f ${composePathMain} down -v`);
+        await shellSafe(`docker compose -f ${composePathMain} down -v`);
       });
     });
   });

@@ -87,7 +87,7 @@ services:
 
     // Startup container
     await shellSafe(
-      `docker-compose -f ${testPackagePath}/docker-compose.yml -p DNCORE up -d`
+      `docker compose -f ${testPackagePath}/docker-compose.yml -p DNCORE up -d`
     );
     const containerExists = await shellSafe(
       `docker container ls --filter name=${containerName}`
