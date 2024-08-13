@@ -59,7 +59,7 @@ export default async function aggregateDependencies({
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
       const dependencies = await dappGetFetcher
-        .dependencies(dappnodeInstaller, name, version)
+        .dependenciesToInstall(dappnodeInstaller, name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
           e.message += `Error fetching ${name}@${version}`;

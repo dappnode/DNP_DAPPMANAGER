@@ -19,7 +19,7 @@ export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
   const dappGetFetcher = new DappGetFetcher();
-  const dependencies = await dappGetFetcher.dependencies(
+  const dependencies = await dappGetFetcher.dependenciesToInstall(
     dappnodeInstaller,
     req.name,
     req.ver

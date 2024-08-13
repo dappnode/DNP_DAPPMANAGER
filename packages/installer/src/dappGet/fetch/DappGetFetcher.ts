@@ -2,6 +2,7 @@ import { Dependencies, InstalledPackageData } from "@dappnode/types";
 import { validRange, satisfies, valid, maxSatisfying } from "semver";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 import { listPackages } from "@dappnode/dockerapi";
+import { isIpfsHash } from "../../utils.js";
 
 export class DappGetFetcher {
   /**
@@ -10,7 +11,7 @@ export class DappGetFetcher {
    * @returns dependencies:
    *   { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
    */
-  async dependencies(
+  async dependenciesToInstall(
     dappnodeInstaller: DappnodeInstaller,
     name: string,
     version: string
@@ -128,6 +129,17 @@ export class DappGetFetcher {
     }
   }
 
+  /**
+ * Resolves and updates the given dependencies to their exact version by determining the maximum satisfying version.
+ * 
+ * This method takes a set of dependencies where the version is specified as a semver range and resolves it to the exact
+ * version that should be installed. It does so by fetching all published versions of each dependency from the APM and 
+ * determining the highest version that satisfies the given semver range.
+ *
+ * @param dependencies - An object representing the dependencies where the key is the dependency name and the value is the semver range or version.
+ * @param dappnodeInstaller - An instance of `DappnodeInstaller` used to fetch published versions from the APM.
+ * @throws If a semver range is invalid or if no satisfying version can be found for a dependency.
+ */
   private async defineExactVersions(
     dependencies: Dependencies,
     dappnodeInstaller: DappnodeInstaller
@@ -135,21 +147,23 @@ export class DappGetFetcher {
 
     for (const [depName, depVersion] of Object.entries(dependencies)) {
 
-      if (validRange(depVersion)) {
+      if (isIpfsHash(depVersion)) continue;
 
-        const pkgPublishments = await dappnodeInstaller.fetchApmVersionsState(depName);
+      if (!validRange(depVersion))
+        throw new Error(`Invalid semver notation for dependency ${depName}: ${depVersion}`);
 
-        const pkgVersions = Object.values(pkgPublishments)
-          .map(({ version }) => version);
+      const pkgPublishments = await dappnodeInstaller.fetchApmVersionsState(depName);
 
-        const maxSatisfyingVersion = maxSatisfying(pkgVersions, depVersion);
+      const pkgVersions = Object.values(pkgPublishments)
+        .map(({ version }) => version);
 
-        if (!maxSatisfyingVersion) {
-          throw new Error(`Could not find any satisfying versions for ${depName}`);
-        }
+      const maxSatisfyingVersion = maxSatisfying(pkgVersions, depVersion);
 
-        dependencies[depName] = maxSatisfyingVersion;
-      }
+      if (!maxSatisfyingVersion)
+        throw new Error(`Could not find any satisfying versions for ${depName}`);
+
+      dependencies[depName] = maxSatisfyingVersion;
+
     }
   }
 }
