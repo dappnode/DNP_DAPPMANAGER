@@ -2485,6 +2485,7 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     memoizee: "npm:0.4.14"
     mocha: "npm:^10.7.0"
+    rewiremock: "npm:^3.13.7"
     tar-stream: "npm:2.1.4"
   languageName: unknown
   linkType: soft
