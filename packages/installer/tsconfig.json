@@ -10,7 +10,7 @@
     /* Language and Environment */
     "lib": ["ESNext", "DOM"]
   },
-  "ts-node": { "esm": true, "experimentalSpecifierResolution": "node" },
+
   "include": ["src/**/*", "src/**/*.json"],
   "exclude": ["node_modules", "test/**/*", "dist"]
 }
