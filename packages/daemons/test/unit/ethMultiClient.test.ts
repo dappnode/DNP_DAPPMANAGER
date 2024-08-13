@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 // imports for typings
 import {
   UserSettings,

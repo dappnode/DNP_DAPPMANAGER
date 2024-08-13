@@ -11,9 +11,9 @@ import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";
 import { create } from "kubo-rpc-client";
 import all from "it-all";
-import { AddResult } from "ipfs-core-types/src/root";
 import fs from "fs";
 import path from "path";
+import { ethers } from "ethers";
 
 // TODO setup a local ipfs node for these tests
 
@@ -27,7 +27,7 @@ export const ipfs = create({
  * @param path
  * @returns
  */
-export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
+export async function ipfsAddAll(dirPath: string): Promise<unknown[]> {
   if (!fs.existsSync(dirPath))
     throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
   const files = fs.readdirSync(dirPath).map((file) => {
@@ -41,7 +41,9 @@ export async function ipfsAddAll(dirPath: string): Promise<AddResult[]> {
 
 export const dappnodeInstaller = new DappnodeInstaller(
   "https://api.ipfs.dappnode.io",
-  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+  new ethers.JsonRpcProvider(
+    `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+  )
 );
 
 export const testDir = "./test_files/";
