@@ -65,6 +65,7 @@ export async function dappGet(
    * It will not use the fetch or resolver module and only
    * fetch the first level dependencies of the request
    */
+  // TODO: Add catch here?
   if (options && options.BYPASS_RESOLVER)
     return await dappGetBasic(dappnodeInstaller, req);
 

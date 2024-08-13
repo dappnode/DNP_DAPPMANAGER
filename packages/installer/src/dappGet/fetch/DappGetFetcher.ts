@@ -1,5 +1,5 @@
 import { Dependencies, InstalledPackageData } from "@dappnode/types";
-import { validRange, satisfies, valid, Range } from "semver";
+import { validRange, satisfies, valid, maxSatisfying } from "semver";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 import { listPackages } from "@dappnode/dockerapi";
 
@@ -21,7 +21,10 @@ export class DappGetFetcher {
     const installedPackages = await listPackages();
 
     this.mergeOptionalDependencies(dependencies, optionalDependencies, installedPackages);
-    this.processDependencies(dependencies, installedPackages);
+    this.filterSatisfiedDependencies(dependencies, installedPackages);
+    await this.defineExactVersions(dependencies, dappnodeInstaller);
+
+    console.log(`Resolved dependencies to install for ${name}@${version}: ${JSON.stringify(dependencies)}`);
 
     return dependencies;
   }
@@ -103,7 +106,7 @@ export class DappGetFetcher {
    * @param dependencies The main dependencies object to be processed.
    * @param installedPackages The list of currently installed packages.
    */
-  private processDependencies(
+  private filterSatisfiedDependencies(
     dependencies: Dependencies,
     installedPackages: InstalledPackageData[]
   ): void {
@@ -115,46 +118,38 @@ export class DappGetFetcher {
       if (!validRange(depVersion))
         throw new Error(`Invalid semver notation for dependency ${depName}: ${depVersion}`);
 
-      if (depVersion.includes('||') || depVersion.includes(' ')) {
-        throw new Error(`Unsupported version range for dependency ${depName}: ${depVersion}. Only simple ranges are supported`);
-      }
-
       // Remove dependency if it is already satisfied by an installed package
       if (installedPackage && satisfies(installedPackage.version, depVersion)) {
         console.log(
           `Dependency ${depName} is already installed with version ${installedPackage.version}`
         );
         delete dependencies[depName];
-        continue;
       }
-
-      dependencies[depName] = this.parseSemverRangeToApmVersion(depVersion);
     }
   }
 
-  /**
-   * Parses a semver range and converts it to a version suitable for APM.
-   * Handles specific semver operators like ^, ~, >, >= and converts them to
-   * appropriate APM-compatible versions.
-   *
-   * @param semverRange The semver range to be parsed.
-   * @returns The parsed version as a string.
-   */
-  private parseSemverRangeToApmVersion(semverRange: string): string {
-    // Exact version, just keep it
-    if (/\d+\.\d+\.\d+$/.test(semverRange))
-      return semverRange;
+  private async defineExactVersions(
+    dependencies: Dependencies,
+    dappnodeInstaller: DappnodeInstaller
+  ): Promise<void> {
 
-    // Use "*" (latest) if version is >... or >=...
-    if (/^>=?\d+\.\d+\.\d+$/.test(semverRange)) {
-      return '*';
+    for (const [depName, depVersion] of Object.entries(dependencies)) {
+
+      if (validRange(depVersion)) {
+
+        const pkgPublishments = await dappnodeInstaller.fetchApmVersionsState(depName);
+
+        const pkgVersions = Object.values(pkgPublishments)
+          .map(({ version }) => version);
+
+        const maxSatisfyingVersion = maxSatisfying(pkgVersions, depVersion);
+
+        if (!maxSatisfyingVersion) {
+          throw new Error(`Could not find any satisfying versions for ${depName}`);
+        }
+
+        dependencies[depName] = maxSatisfyingVersion;
+      }
     }
-
-    // Use x.x.x if version is ^x.x.x or ~x.x.x
-    if (/^[\^~]\d+\.\d+\.\d+$/.test(semverRange)) {
-      return semverRange.slice(1);
-    }
-
-    throw new Error(`Unsupported version range (${semverRange}). Only simple ranges with operators ^, ~, > and >= are supported`);
   }
 }
