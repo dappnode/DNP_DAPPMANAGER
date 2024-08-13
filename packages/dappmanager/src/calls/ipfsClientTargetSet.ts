@@ -2,6 +2,8 @@ import { IpfsRepository, IpfsClientTarget } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { dappnodeInstaller } from "../index.js";
+import { dockerContainerStart, dockerContainerStop, listPackageNoThrow } from "@dappnode/dockerapi";
+import { packageInstall } from "./packageInstall.js";
 
 /**
  * Changes the IPFS client
@@ -37,9 +39,21 @@ async function changeIpfsClient(
     const currentGateway = db.ipfsGateway.get();
     if (currentTarget === nextTarget && currentGateway === nextGateway) return;
 
+    const ipfsPackage = await listPackageNoThrow({
+      dnpName: "ipfs.dnp.dappnode.eth"
+    });
+
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
       dappnodeInstaller.changeIpfsProvider(params.IPFS_LOCAL);
+      if(!ipfsPackage) { // Should never run as IPFS is core
+        packageInstall({name: "ipfs.dnp.dappnode.eth"}) 
+      }
+      else {
+        for (const container of ipfsPackage.containers)
+          if (!container.running)
+            await dockerContainerStart(container.containerName);
+      }
     } else {
       // Set new values in db
       db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
@@ -47,6 +61,12 @@ async function changeIpfsClient(
 
       // Change IPFS host
       dappnodeInstaller.changeIpfsProvider(db.ipfsGateway.get());
+
+      if(ipfsPackage) {
+        for (const container of ipfsPackage.containers)
+          if (container.running)
+            await dockerContainerStop(container.containerName);
+      }
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);
