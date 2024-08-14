@@ -13,13 +13,19 @@ import ErrorView from "components/ErrorView";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
 const InstallDnpContainer: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id, version } = useParams<{ id: string, version: string }>();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
+
+  // Print the full URL
+  console.log("Full URL: ", window.location.href);
+  console.log("ID: ", id);
+  console.log("Version: ", version);
+
 
   // TODO: return a beautiful error page
   if (!id) return <div>No ID provided in route parameters.</div>;
 
-  const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id });
+  const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id, version });
 
   // Get progressLogs
   const dnpName = dnp?.dnpName;
