@@ -82,7 +82,17 @@ export const InstallerDnp: React.FC = () => {
           }
         ]
       });
-    } else navigate(encodeURIComponent(id));
+    } else {
+      // Check if version has been defined like dnpName:version
+      const [dnpName, version] = id.split(":");
+
+      const encodedDnpName = encodeURIComponent(dnpName);
+      const encodedVersion = version ? encodeURIComponent(version) : null;
+      
+      const pkgPath = encodedVersion ? `${encodedDnpName}/${encodedVersion}` : encodedDnpName;
+      
+      navigate(pkgPath); 
+    }
   }
 
   function onCategoryChange(category: string) {
