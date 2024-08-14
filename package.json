@@ -6,7 +6,7 @@
   "repository": "git@github.com:dappnode/DNP_DAPPMANAGER.git",
   "license": "GPL-3.0",
   "engines": {
-    "node": "22.x"
+    "node": "20.x"
   },
   "workspaces": [
     "packages/*"
