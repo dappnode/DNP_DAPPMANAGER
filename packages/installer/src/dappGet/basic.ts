@@ -19,10 +19,12 @@ export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
   const dappGetFetcher = new DappGetFetcher();
-  const dependencies = await dappGetFetcher.dependenciesToInstall(
+  const installedPackages = await listPackages();
+  const dependencies = await dappGetFetcher.dependencies(
     dappnodeInstaller,
     req.name,
-    req.ver
+    req.ver,
+    installedPackages
   );
 
   // Append dependencies in the list of DNPs to install
