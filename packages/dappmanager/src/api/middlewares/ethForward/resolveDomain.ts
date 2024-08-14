@@ -1,7 +1,7 @@
 import { ethers } from "ethers";
 import { getEthersProvider, getEthUrl } from "@dappnode/installer";
-import resolverAbi from "./abi/resolverAbi.json";
-import ensAbi from "./abi/ens.json";
+import resolverAbi from "./abi/resolverAbi.json" assert { type: "json" };
+import ensAbi from "./abi/ens.json" assert { type: "json" };
 import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
 import {
   decodeContentHash,
