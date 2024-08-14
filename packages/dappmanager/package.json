@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "nodemon -w src $(find .. -path '*/node_modules/*' -prune -o -name dist -type d -print | sed 's/^/-w /') -e js,ts,json --require dotenv/config -x 'node --loader ts-node/esm' src/index.ts",
+    "dev": "tsc -w && tsx --watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "watch-ts": "tsc -w",
     "file": "node",

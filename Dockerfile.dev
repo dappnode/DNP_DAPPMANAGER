@@ -17,17 +17,23 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
   VITE_APP_API_URL=http://my.dappnode:5000/
+
 WORKDIR /app
-# Copy git data
-COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
-COPY docker/start_dev.sh /usr/src/app/start_dev.sh
-COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
-COPY packages packages
 
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
+
+# Copy git data
+COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
+COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
+COPY packages packages
+
 # Install corepack to be able to use modern yarn berry
 RUN corepack enable
 RUN yarn --immutable && yarn build
 
-ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]
+# link instructions must be executed in runtime due to the way the volumes are mounted
+ENTRYPOINT ["/bin/bash", "-c", "ln -s /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
+  ln -s /usr/src/app/dnp_repo/ /app/packages/dappmanager && \
+  ln -s /usr/src/app/DNCORE/ /app/packages/dappmanager && \
+  yarn run dev"]
