@@ -105,7 +105,7 @@ const InstallerRoot: React.FC = () => {
             element={
               <Routes>
                 <Route index element={<route.component />} />
-                <Route path=":id/*" element={<InstallDnpContainer />} />
+                <Route path=":id/:version?/*" element={<InstallDnpContainer />} />
               </Routes>
             }
           />
