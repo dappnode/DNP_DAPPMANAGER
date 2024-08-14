@@ -55,13 +55,13 @@ startHttpApi({
     sign: () => {},
     upload: () => {}
   },
-  limiterMiddleware: (req, res, next) => {
+  limiterMiddleware: (_req, _res, next) => {
     next();
   },
-  counterViewsMiddleware: (req, res, next) => {
+  counterViewsMiddleware: (_req, _res, next) => {
     next();
   },
-  ethForwardMiddleware: (req, res, next) => {
+  ethForwardMiddleware: (_req, _res, next) => {
     next();
   },
   methods: calls,
