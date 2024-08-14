@@ -40,14 +40,14 @@ async function changeIpfsClient(
     if (currentTarget === nextTarget && currentGateway === nextGateway) return;
 
     const ipfsPackage = await listPackageNoThrow({
-      dnpName: "ipfs.dnp.dappnode.eth"
+      dnpName: params.ipfsDnpName
     });
 
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
       dappnodeInstaller.changeIpfsProvider(params.IPFS_LOCAL);
       if(!ipfsPackage) { // Should never run as IPFS is core
-        packageInstall({name: "ipfs.dnp.dappnode.eth"}) 
+        packageInstall({name: params.ipfsDnpName}) 
       }
       else {
         for (const container of ipfsPackage.containers)
