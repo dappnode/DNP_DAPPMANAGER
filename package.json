@@ -15,7 +15,7 @@
     "build": "yarn workspaces foreach --all -pt run build",
     "test": "yarn workspaces foreach --all -pt run test",
     "test:int": "yarn workspaces foreach --all -pt run test:int",
-    "dev": "yarn workspaces foreach --all -pi run dev",
+    "dev": "yarn workspaces foreach --all -pi -j unlimited run dev",
     "lint": "yarn workspaces foreach --all -pt run lint",
     "mock-standalone:build": "yarn workspace @dappnode/admin-ui run mock-standalone:build",
     "generate": "yarn workspace @dappnode/common run generate"

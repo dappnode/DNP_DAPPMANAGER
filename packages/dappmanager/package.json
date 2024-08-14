@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "scripts": {
     "start": "node dist/index.js",
-    "dev": "tsc -w && tsx --watch src/index.ts",
+    "dev": "tsx --watch src/index.ts",
     "build": "tsc -p tsconfig.json",
     "watch-ts": "tsc -w",
     "file": "node",

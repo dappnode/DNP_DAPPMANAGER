@@ -22,18 +22,15 @@ WORKDIR /app
 
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
+RUN corepack enable
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
 COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY packages packages
 
-# Install corepack to be able to use modern yarn berry
-RUN corepack enable
-RUN yarn --immutable && yarn build
-
 # link instructions must be executed in runtime due to the way the volumes are mounted
-ENTRYPOINT ["/bin/bash", "-c", "ln -s /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
-  ln -s /usr/src/app/dnp_repo/ /app/packages/dappmanager && \
-  ln -s /usr/src/app/DNCORE/ /app/packages/dappmanager && \
-  yarn run dev"]
+ENTRYPOINT ["/bin/sh", "-c", "ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
+  ln -sf /usr/src/app/dnp_repo/ /app/packages/dappmanager && \
+  ln -sf /usr/src/app/DNCORE/ /app/packages/dappmanager && \
+  yarn && yarn build && run dev"]
