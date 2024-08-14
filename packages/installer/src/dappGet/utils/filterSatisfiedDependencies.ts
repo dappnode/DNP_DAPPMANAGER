@@ -1,3 +1,4 @@
+import { listPackages } from "@dappnode/dockerapi";
 import { Dependencies, InstalledPackageData } from "@dappnode/types";
 import { satisfies, validRange } from "semver";
 
@@ -8,12 +9,14 @@ import { satisfies, validRange } from "semver";
  * @param dependencies The main dependencies object to be processed.
  * @param installedPackages The list of currently installed packages.
  */
-export function filterSatisfiedDependencies(
-    dependencies: Dependencies,
-    installedPackages: InstalledPackageData[]
-): Dependencies {
+export async function filterSatisfiedDependencies(
+    dependencies: Dependencies
+): Promise<{ satisfiedDeps: Dependencies, nonSatisfiedDeps: Dependencies }> {
 
-    const filteredDependencies: Dependencies = {};
+    const installedPackages = await listPackages();
+
+    const satisfiedDeps: Dependencies = {};
+    const nonSatisfiedDeps: Dependencies = {};
 
     for (const [depName, depVersion] of Object.entries(dependencies)) {
         const installedPackage = installedPackages.find(
@@ -23,15 +26,16 @@ export function filterSatisfiedDependencies(
         if (!validRange(depVersion))
             throw new Error(`Invalid semver notation for dependency ${depName}: ${depVersion}`);
 
-        // Remove dependency if it is already satisfied by an installed package
         if (installedPackage && satisfies(installedPackage.version, depVersion)) {
             console.log(
                 `Dependency ${depName} is already installed with version ${installedPackage.version}`
             );
 
-            filteredDependencies[depName] = installedPackage.version;
+            satisfiedDeps[depName] = installedPackage.version;
+        } else {
+            nonSatisfiedDeps[depName] = depVersion;
         }
     }
 
-    return filteredDependencies;
+    return { satisfiedDeps, nonSatisfiedDeps };
 }

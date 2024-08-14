@@ -6,6 +6,9 @@ import { logs } from "@dappnode/logger";
 import { DappGetResult, DappGetState } from "./types.js";
 import { DappGetFetcher } from "./fetch/index.js";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
+import { filterSatisfiedDependencies } from "./utils/filterSatisfiedDependencies.js";
+import { parseSemverRangeToVersion } from "./utils/parseSemverRangeToVersion.js";
+import { get } from "http";
 
 /**
  * Simple version of `dappGet`, since its resolver may cause errors.
@@ -19,48 +22,42 @@ export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
   const dappGetFetcher = new DappGetFetcher();
-  const installedPackages = await listPackages();
+
   const dependencies = await dappGetFetcher.dependencies(
     dappnodeInstaller,
     req.name,
     req.ver,
-    installedPackages
   );
+
+  const { satisfiedDeps, nonSatisfiedDeps } = await filterSatisfiedDependencies(dependencies);
+
+  const versionsToInstall = await parseSemverRangeToVersion(nonSatisfiedDeps, dappnodeInstaller);
+
+  console.log("dappGet basic resolved first level dependencies", JSON.stringify(dependencies));
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install
   const state = {
-    ...dependencies,
+    ...versionsToInstall,
     [req.name]: req.ver,
   };
-  const alreadyUpdated: DappGetState = {};
-  const currentVersions: DappGetState = {};
-
-  // The function below does not directly affect funcionality.
-  // However it would prevent already installed DNPs from installing
-  try {
-    const installedDnps = await listPackages();
-    for (const dnp of installedDnps) {
-      const prevVersion = dnp.version;
-      const nextVersion = state[dnp.dnpName];
-      if (nextVersion && !shouldUpdate(prevVersion, nextVersion)) {
-        // DNP is already updated.
-        // Remove from the success object and add it to the alreadyUpdatedd
-        alreadyUpdated[dnp.dnpName] = state[dnp.dnpName];
-        delete state[dnp.dnpName];
-      }
-      if (nextVersion) {
-        currentVersions[dnp.dnpName] = prevVersion;
-      }
-    }
-  } catch (e) {
-    logs.error("Error listing current containers", e);
-  }
 
   return {
     message: "dappGet basic resolved first level dependencies",
     state,
-    alreadyUpdated: {},
-    currentVersions,
+    alreadyUpdated: satisfiedDeps,
+    currentVersions: await getCurrentVersions(),
   };
+}
+
+async function getCurrentVersions() {
+  const dnpList = await listPackages();
+
+  const currentVersions: DappGetState = {};
+
+  dnpList.forEach((dnp) => {
+    currentVersions[dnp.dnpName] = dnp.version;
+  });
+
+  return currentVersions;
 }

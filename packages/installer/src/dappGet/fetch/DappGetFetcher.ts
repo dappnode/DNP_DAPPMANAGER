@@ -1,6 +1,7 @@
 import { Dependencies, InstalledPackageData } from "@dappnode/types";
 import { validRange, satisfies, valid } from "semver";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { listPackages } from "@dappnode/dockerapi";
 
 export class DappGetFetcher {
   /**
@@ -13,11 +14,11 @@ export class DappGetFetcher {
     dappnodeInstaller: DappnodeInstaller,
     name: string,
     version: string,
-    installedPackages: InstalledPackageData[]
   ): Promise<Dependencies> {
     const manifest = await dappnodeInstaller.getManifestFromDir(name, version);
     const dependencies = manifest.dependencies || {};
     const optionalDependencies = manifest.optionalDependencies || {};
+    const installedPackages = await listPackages();
 
     this.mergeOptionalDependencies(dependencies, optionalDependencies, installedPackages);
 

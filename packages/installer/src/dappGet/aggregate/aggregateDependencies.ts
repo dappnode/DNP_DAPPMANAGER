@@ -4,6 +4,8 @@ import { sanitizeDependencies } from "../utils/sanitizeDependencies.js";
 import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { filterSatisfiedDependencies } from "../utils/filterSatisfiedDependencies.js";
+import { parseSemverRangeToVersion } from "../utils/parseSemverRangeToVersion.js";
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -51,30 +53,40 @@ export default async function aggregateDependencies({
     .versions(dappnodeInstaller, name, versionRange)
     .then(sanitizeVersions);
 
+  console.log(`Versions matching the request for ${name}: ${versions}`);
+
   await Promise.all(
     versions.map(async (version) => {
+
+      // Here we know the exact versions of the requested package
+
       // Already checked, skip. Otherwise lock request to prevent duplicate fetches
       if (hasVersion(dnps, name, version)) return;
       else setVersion(dnps, name, version, {});
+
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
       const dependencies = await dappGetFetcher
-        .dependenciesToInstall(dappnodeInstaller, name, version)
+        .dependencies(dappnodeInstaller, name, version)
         .then(sanitizeDependencies)
         .catch((e: Error) => {
           e.message += `Error fetching ${name}@${version}`;
           throw e;
         });
 
-      // 3. Store dependencies
-      setVersion(dnps, name, version, dependencies);
+      const { nonSatisfiedDeps } = await filterSatisfiedDependencies(dependencies);
+      const nonSatisfiedDepsVersions = await parseSemverRangeToVersion(nonSatisfiedDeps, dappnodeInstaller);
+
+      // 3. Store the dependencies to satisfy in the dnps object
+      setVersion(dnps, name, version, nonSatisfiedDepsVersions);
+
       // 4. Fetch sub-dependencies recursively
       await Promise.all(
-        Object.keys(dependencies).map(async (dependencyName) => {
+        Object.keys(nonSatisfiedDepsVersions).map(async (dependencyName) => {
           await aggregateDependencies({
             dappnodeInstaller,
             name: dependencyName,
-            versionRange: dependencies[dependencyName],
+            versionRange: nonSatisfiedDepsVersions[dependencyName],
             dnps,
             recursiveCount,
             dappGetFetcher,

@@ -37,7 +37,9 @@ import { maxSatisfying, validRange } from "semver";
 export async function parseSemverRangeToVersion(
     dependencies: Dependencies,
     dappnodeInstaller: DappnodeInstaller
-): Promise<void> {
+): Promise<Dependencies> {
+
+    const parsedDeps: Dependencies = {};
 
     for (const [depName, depVersion] of Object.entries(dependencies)) {
 
@@ -56,7 +58,9 @@ export async function parseSemverRangeToVersion(
         if (!maxSatisfyingVersion)
             throw new Error(`Could not find any satisfying versions for ${depName}`);
 
-        dependencies[depName] = maxSatisfyingVersion;
+        parsedDeps[depName] = maxSatisfyingVersion;
 
     }
+
+    return parsedDeps;
 }
