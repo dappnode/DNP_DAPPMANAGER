@@ -259,7 +259,7 @@ export interface Routes {
   /**
    * Fetch extended info about a new DNP
    */
-  fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
+  fetchDnpRequest: (kwargs: { id: string, version?: string }) => Promise<RequestedDnp>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
