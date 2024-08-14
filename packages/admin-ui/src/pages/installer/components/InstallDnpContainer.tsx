@@ -16,12 +16,6 @@ const InstallDnpContainer: React.FC = () => {
   const { id, version } = useParams<{ id: string, version: string }>();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
-  // Print the full URL
-  console.log("Full URL: ", window.location.href);
-  console.log("ID: ", id);
-  console.log("Version: ", version);
-
-
   // TODO: return a beautiful error page
   if (!id) return <div>No ID provided in route parameters.</div>;
 
