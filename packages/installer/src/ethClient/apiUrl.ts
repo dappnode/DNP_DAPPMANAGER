@@ -1,4 +1,4 @@
-import { buildNetworkAlias, getBeaconServiceName } from "@dappnode/utils";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
@@ -38,14 +38,9 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
       isMainOrMonoservice: false
     });
   } else {
-    // Lighthouse, Teku and Prysm use 3500
-    // Nimbus uses 4500 because it is a monoservice and the validator API is using that port
-    if (dnpName.includes("nimbus")) {
-      port = 4500;
-    }
     domain = buildNetworkAlias({
       dnpName: dnpName,
-      serviceName: getBeaconServiceName(dnpName),
+      serviceName: "beacon-chain",
       isMainOrMonoservice: false
     });
   }

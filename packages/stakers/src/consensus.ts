@@ -110,7 +110,7 @@ export class Consensus extends StakerComponent {
       userSettings: newConsensusDnpName
         ? this.getUserSettings(
             newConsensusDnpName,
-            !(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
+            !Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
             network
           )
         : {},
@@ -120,39 +120,28 @@ export class Consensus extends StakerComponent {
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getUserSettings(newConsensusDnpName: string, shouldSetEnvironment: boolean, network: Network): UserSettings {
-    const validatorServiceName = this.getValidatorServiceName(newConsensusDnpName);
-    const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
+  private getUserSettings(shouldSetEnvironment: boolean, network: Network): UserSettings {
+    const validatorServiceName = "validator";
+    const beaconServiceName = "beacon-chain";
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
     return {
       environment: shouldSetEnvironment
-        ? beaconServiceName === validatorServiceName
-          ? {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
-              }
-            }
-          : {
-              [validatorServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti
-              },
+        ? {
+            [validatorServiceName]: {
+              // Fee recipient is set as global env, keep this for backwards compatibility
+              ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+              // Graffiti is a mandatory value
+              ["GRAFFITI"]: defaultDappnodeGraffiti
+            },
 
-              [beaconServiceName]: {
-                // Fee recipient is set as global env, keep this for backwards compatibility
-                ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-                // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
-              }
+            [beaconServiceName]: {
+              // Fee recipient is set as global env, keep this for backwards compatibility
+              ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+              // Checkpoint sync is an optional value
+              ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
             }
+          }
         : {},
       networks: {
         rootNetworks: {
@@ -163,55 +152,25 @@ export class Consensus extends StakerComponent {
             external: true
           }
         },
-        serviceNetworks:
-          beaconServiceName === validatorServiceName
-            ? {
-                "beacon-validator": {
-                  [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`beacon-chain.${network}.staker.dappnode`, `validator.${network}.staker.dappnode`]
-                  },
-                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`beacon-chain.${network}.dncore.dappnode`, `validator.${network}.dncore.dappnode`]
-                  }
-                }
-              }
-            : {
-                "beacon-chain": {
-                  [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`beacon-chain.${network}.staker.dappnode`]
-                  },
-                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`beacon-chain.${network}.dncore.dappnode`]
-                  }
-                },
-                validator: {
-                  [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`validator.${network}.staker.dappnode`]
-                  },
-                  [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`validator.${network}.dncore.dappnode`]
-                  }
-                }
-              }
+        serviceNetworks: {
+          "beacon-chain": {
+            [params.DOCKER_STAKER_NETWORKS[network]]: {
+              aliases: [`beacon-chain.${network}.staker.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+              aliases: [`beacon-chain.${network}.dncore.dappnode`]
+            }
+          },
+          validator: {
+            [params.DOCKER_STAKER_NETWORKS[network]]: {
+              aliases: [`validator.${network}.staker.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+              aliases: [`validator.${network}.dncore.dappnode`]
+            }
+          }
+        }
       }
     };
-  }
-
-  /**
-   * Get the validator service name.
-   * - Nimbus package is monoservice (beacon-validator)
-   * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
-   */
-  private getValidatorServiceName(newConsensusDnpName: string | null): string {
-    return newConsensusDnpName ? (newConsensusDnpName.includes("nimbus") ? "beacon-validator" : "validator") : "";
-  }
-
-  /**
-   * Get the beacon service name
-   * - Nimbus package is monoservice (beacon-validator)
-   * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
-   */
-  private getBeaconServiceName(newConsensusDnpName: string | null): string {
-    return newConsensusDnpName ? (newConsensusDnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain") : "";
   }
 }
