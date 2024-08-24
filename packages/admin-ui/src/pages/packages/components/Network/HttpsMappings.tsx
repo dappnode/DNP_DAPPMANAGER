@@ -5,8 +5,8 @@ import { useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { getInstallerPath } from "pages/installer";
-import { pathName as systemPathName } from "pages/system";
-import { subPaths as systemSubPaths } from "pages/system/data";
+//import { httpsPortalPath } from "pages/system/data";
+//import { subPaths as systemSubPaths } from "pages/system/data"
 import Alert from "react-bootstrap/esm/Alert";
 import { MdAdd } from "react-icons/md";
 import { MdClose } from "react-icons/md";
@@ -21,10 +21,11 @@ import Ok from "components/Ok";
 import { prettyFullName } from "utils/format";
 import newTabProps from "utils/newTabProps";
 import { HttpsPortalMapping } from "@dappnode/types";
-import { httpsPortalDnpName } from "params";
+import { httpsPortalDnpName, httpsPortalUIPath } from "params";
 import "./https-mapping.scss";
-import { urlJoin } from "utils/url";
+//import { urlJoin } from "utils/url";
 import { ReqStatus } from "types";
+//import { rootPath as systemRootPath } from "pages/system/data";
 
 export function HttpsMappings({
   dnpName,
@@ -167,11 +168,11 @@ export function HttpsMappings({
       <div className="network-mappings">
         <p>
           It recommended to only expose the pre-approved safe services listed in{" "}
-          <NavLink to={urlJoin(systemPathName, systemSubPaths.network)}>
+          <NavLink to={httpsPortalUIPath}>
             System / Network
           </NavLink>
-          . Please, only add custom mappings manually if you understand the
-          security risks
+          . Please, only add custom mappings manually if you Fully understand the
+          security risks involved.
         </p>
 
         <div className="list-grid">
