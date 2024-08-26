@@ -1,6 +1,6 @@
 import * as isIPFS from "is-ipfs";
 import { IPFSEntry } from "./types.js";
-import { CID, IPFSHTTPClient, create } from "kubo-rpc-client";
+import { CID, KuboRPCClient, create } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
@@ -43,7 +43,7 @@ const source = "ipfs" as const;
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected ipfs: IPFSHTTPClient;
+  protected ipfs: KuboRPCClient;
   protected timeout: number;
 
   /**
@@ -482,7 +482,8 @@ export class DappnodeRepository extends ApmRepository {
 
     const entries = exporter(root, {
       async get(cid) {
-        const block = await carReader.get(cid);
+        // TODO: remove below type casting
+        const block = await carReader.get(cid as CID);
         if (!block) throw Error(`Could not get block ${cid}`);
         return block.bytes;
       },
