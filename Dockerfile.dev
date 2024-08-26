@@ -16,7 +16,7 @@ ENV COMPOSE_HTTP_TIMEOUT=300 \
   UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
-  VITE_APP_API_URL=http://my.dappnode:5000/
+  VITE_APP_API_URL=http://my.dappnode/
 
 WORKDIR /app
 
