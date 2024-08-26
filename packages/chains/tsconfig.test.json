@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./test", // Root directory of input files
+    "resolveJsonModule": true
+  },
+  "include": ["test"],
+  "exclude": ["node_modules", "dist"]
+}

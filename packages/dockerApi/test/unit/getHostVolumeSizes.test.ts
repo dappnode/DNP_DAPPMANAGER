@@ -1,12 +1,12 @@
 import "mocha";
 import { expect } from "chai";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 
 describe.skip("getHostVolumeSizes", () => {
   /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
   async function getMock(shellHost: (cmd: string) => Promise<string>) {
     const mock = await rewiremock.around(
-      () => import("../../src/getHostVolumeSizes"),
+      () => import("../../src/getHostVolumeSizes.js"),
       (mock) => {
         mock(() => import("@dappnode/utils"))
           .with({ shellHost })

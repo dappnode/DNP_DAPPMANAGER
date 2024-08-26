@@ -31,7 +31,7 @@ fi
 # dappmanager docker container does not exist, then run docker compose up to dappmanager file
 if [ ! "$(docker ps -aq -f name="$DAPPMANAGER_CONTAINER_NAME")" ]; then
     echo "Container $DAPPMANAGER_CONTAINER_NAME does not exist. Running docker compose up to dappmanager file." | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
-    docker-compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
+    docker compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
     # if the previous command fails, then recreate dappnode
     if [ $? -ne 0 ]; then
         echo "Error while docker compose up $DAPPMANAGER_DNCORE_FILE. Recreating dappnode to latest version." | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
@@ -73,7 +73,7 @@ elif [ "$STATUS" == "created" ] || [ "$STATUS" == "exited" ] || [ "$STATUS" == "
     if [ $? -ne 0 ]; then
         # do docker compose up
         echo "Error while docker restart to $DAPPMANAGER_CONTAINER_NAME. Running docker compose up to dappmanager file." | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
-        docker-compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
+        docker compose -f "$DAPPMANAGER_DNCORE_FILE" up -d 2>&1 | tee -a "$RECREATE_DAPPNODE_LOG_FILE"
         # if the previous command fails, then recreate dappnode
         if [ $? -ne 0 ]; then
             echo "Error while docker compose up $DAPPMANAGER_DNCORE_FILE. Recreating dappnode to latest version." | tee -a "$RECREATE_DAPPNODE_LOG_FILE"

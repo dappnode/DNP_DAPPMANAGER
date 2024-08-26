@@ -158,7 +158,7 @@
       ],
       "enumDescriptions": {
         "ethereum": "Must have an Ethereum JSON RPC exposed internally at port 8545",
-        "bitcoin": "Must have a standard Bitcoin JSON API exposed at the default port (8332). Uses the NPM package `bitcoin-core`",
+        "bitcoin": "Must have a standard Bitcoin JSON API exposed at the default port (8332).",
         "monero": "Must have a Monero API exposed internally at port 18081. Uses the NPM package `monero-rpc`"
       }
     },

@@ -1,9 +1,10 @@
-// @ts-ignore
-import Client from "bitcoin-core";
 import { InstalledPackageData } from "@dappnode/types";
 import { dockerContainerInspect } from "@dappnode/dockerapi";
 import { buildNetworkAlias, parseEnvironment } from "@dappnode/utils";
 import { ChainDataResult } from "../types.js";
+import { request } from "http";
+import { URL } from "url";
+import { Buffer } from "buffer";
 
 function getMinBlockDiffSync(dnpName: string): number {
   return dnpName.includes("bitcoin")
@@ -13,96 +14,190 @@ function getMinBlockDiffSync(dnpName: string): number {
       30 / 2.5;
 }
 
-// Cache the blockIndex to prevent unnecessary calls
-const blockCache = new Map<string, { block: number; blockIndex: number }>();
+// Cache the block data to prevent unnecessary calls
+const blockCache = new Map<string, { block: any; blockIndex: number }>();
+
+/**
+ * Makes a JSON-RPC call to the specified URL with the given method and parameters.
+ * @param rpcUrl The full URL of the JSON-RPC endpoint.
+ * @param username The username for basic auth.
+ * @param password The password for basic auth.
+ * @param method The JSON-RPC method to call.
+ * @param params The parameters for the method.
+ * @returns The result of the JSON-RPC call.
+ */
+async function rpcCall(
+  rpcUrl: string,
+  username: string,
+  password: string,
+  method: string,
+  params: any[] = []
+): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const url = new URL(rpcUrl);
+
+    const postData = JSON.stringify({
+      jsonrpc: "1.0",
+      id: "dappnode_monitoring",
+      method,
+      params,
+    });
+
+    const auth = Buffer.from(`${username}:${password}`).toString("base64");
+
+    const options = {
+      hostname: url.hostname,
+      port: url.port,
+      path: url.pathname,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Content-Length": Buffer.byteLength(postData),
+        Authorization: `Basic ${auth}`,
+      },
+    };
+
+    const req = request(options, (res) => {
+      let data = "";
+
+      res.setEncoding("utf8");
+      res.on("data", (chunk) => {
+        data += chunk;
+      });
+
+      res.on("end", () => {
+        try {
+          const parsed = JSON.parse(data);
+          if (parsed.error) {
+            reject(new Error(parsed.error.message));
+          } else {
+            resolve(parsed.result);
+          }
+        } catch (e) {
+          reject(e);
+        }
+      });
+    });
+
+    req.on("error", (e) => {
+      reject(e);
+    });
+
+    req.write(postData);
+    req.end();
+  });
+}
 
 /**
  * Returns a chain data object for a [bitcoin] API
  * @returns
- * - On success: {
- *   syncing: true, {bool}
- *   message: "Blocks synced: 543000 / 654000", {string}
- *   progress: 0.83027522935,
- * }
- * - On error: {
- *   message: "Could not connect to RPC", {string}
- *   error: true {bool},
- * }
+ * - On success:
+ *   - syncing: boolean
+ *   - message: string
+ *   - progress: number (if syncing)
+ * - On error:
+ *   - message: string
+ *   - error: boolean
  */
 export async function bitcoin(
   dnp: InstalledPackageData
 ): Promise<ChainDataResult> {
-  const container = dnp.containers[0];
-  if (!container) throw Error("no container");
+  try {
+    const container = dnp.containers[0];
+    if (!container) throw new Error("No container found");
 
-  const { dnpName, serviceName } = container;
+    const { dnpName, serviceName } = container;
 
-  const containerDomain = buildNetworkAlias({
-    dnpName,
-    serviceName,
-    isMainOrMonoservice: true,
-  });
+    const containerDomain = buildNetworkAlias({
+      dnpName,
+      serviceName,
+      isMainOrMonoservice: true,
+    });
 
-  const apiUrl = containerDomain; // 'bitcoin.dappnode'
+    // Retrieve RPC credentials from container environment variables
+    const containerName = container.containerName;
+    const containerData = await dockerContainerInspect(containerName);
+    const { username, password, port } = parseCredentialsFromEnvs(
+      containerData.Config.Env
+    );
 
-  // To initialize the bitcoin client, the RPC user and password are necessary
-  // They are stored in the package envs
-  const containerName = dnp.containers[0].containerName;
-  const containerData = await dockerContainerInspect(containerName);
-  const { username, password, port } = parseCredentialsFromEnvs(
-    containerData.Config.Env
-  );
+    if (!port) {
+      throw new Error("RPC port not defined");
+    }
 
-  // After revising 'bitcoin-core' source code,
-  // there is no problem in creating a new instance of Client on each request
-  const client = new Client({
-    host: apiUrl,
-    username,
-    password,
-    port, // If port is falsy, it will take the default value. From source code: `this.port = port || networks[network];`
-  });
-  const blockIndex = await client.getBlockCount();
+    const apiUrl = `http://${containerDomain}:${port}/`;
 
-  // If the cached blockIndex is the same, return cached block
-  const cachedBlock = blockCache.get(apiUrl);
-  const block =
-    cachedBlock && cachedBlock.blockIndex === blockIndex
-      ? cachedBlock.block
-      : await client.getBlockHash(blockIndex).then(client.getBlock);
+    // Fetch block count
+    const blockIndex = await rpcCall(
+      apiUrl,
+      username,
+      password,
+      "getblockcount"
+    );
 
-  // Update cached values
-  blockCache.set(apiUrl, { blockIndex, block });
-  const secondsDiff = Math.floor(Date.now() / 1000) - block.time;
-  const blockDiffAprox = Math.floor(secondsDiff / (60 * 10));
+    // Check and utilize cached block data if available
+    const cachedBlockData = blockCache.get(apiUrl);
+    let block: any;
 
-  if (blockDiffAprox > getMinBlockDiffSync(dnp.dnpName))
-    return {
-      syncing: true,
-      error: false,
-      message: `Blocks synced: ${blockIndex} / ${blockDiffAprox + blockIndex}`,
-      progress: blockIndex / (blockDiffAprox + blockIndex),
-    };
-  else
+    if (cachedBlockData && cachedBlockData.blockIndex === blockIndex) {
+      block = cachedBlockData.block;
+    } else {
+      // Fetch block hash
+      const blockHash = await rpcCall(
+        apiUrl,
+        username,
+        password,
+        "getblockhash",
+        [blockIndex]
+      );
+
+      // Fetch block data
+      block = await rpcCall(apiUrl, username, password, "getblock", [
+        blockHash,
+      ]);
+
+      // Update cache
+      blockCache.set(apiUrl, { blockIndex, block });
+    }
+
+    const blockTime = block.time; // Unix timestamp
+    const currentTime = Math.floor(Date.now() / 1000); // Current Unix timestamp
+    const secondsDiff = currentTime - blockTime;
+    const blockTimeInMinutes = 10; // For Bitcoin
+    const blockDiffApprox = Math.floor(secondsDiff / (60 * blockTimeInMinutes));
+
+    if (blockDiffApprox > getMinBlockDiffSync(dnp.dnpName)) {
+      const estimatedTotalBlocks = blockIndex + blockDiffApprox;
+      const progress = blockIndex / estimatedTotalBlocks;
+
+      return {
+        syncing: true,
+        error: false,
+        message: `Blocks synced: ${blockIndex} / ${estimatedTotalBlocks}`,
+        progress,
+      };
+    } else {
+      return {
+        syncing: false,
+        error: false,
+        message: `Synced #${blockIndex}`,
+      };
+    }
+  } catch (error: any) {
     return {
       syncing: false,
-      error: false,
-      message: `Synced #${blockIndex}`,
+      error: true,
+      message: `Error: ${error.message}`,
     };
+  }
 }
 
-// Util
+// Utility function
 
 /**
- * Parses the username and password from the ENVs in a one line format
- * @param envLines
- * "Env": [
- *   "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
- *   "OPENVPN=/etc/openvpn",
- *   "DEFAULT_ADMIN_USER=dappnode_admin",
- *   "EASYRSA=/usr/share/easy-rsa",
- * ]
- * "[BTC_RPCUSER=dappnode BTC_RPCPASSWORD=dappnode BTC_TXINDEX=1 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
- * "[ZCASH_RPCUSER=dappnode ZCASH_RPCPASSWORD=dappnode ZCASH_RPCPORT=8342 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin]"
+ * Parses the username, password, and port from the environment variables.
+ * @param envsArray Array of environment variable strings.
+ * @returns An object containing username, password, and port.
  */
 export function parseCredentialsFromEnvs(envsArray: string[]): {
   username: string;
@@ -112,17 +207,18 @@ export function parseCredentialsFromEnvs(envsArray: string[]): {
   const envs = parseEnvironment(envsArray);
   const keys = Object.keys(envs);
 
-  // Find keys for both bitcoin and zcash packages
+  // Identify keys related to RPC credentials
   const userKey = keys.find((key) => key.includes("_RPCUSER"));
   const passKey = keys.find((key) => key.includes("_RPCPASSWORD"));
   const portKey = keys.find((key) => key.includes("_RPCPORT"));
 
-  if (!userKey) throw Error("RPCUSER not defined");
-  if (!passKey) throw Error("RPCPASSWORD not defined");
+  if (!userKey) throw new Error("RPCUSER not defined in environment variables");
+  if (!passKey)
+    throw new Error("RPCPASSWORD not defined in environment variables");
 
   const username = envs[userKey];
   const password = envs[passKey];
-  const port = portKey ? parseInt(envs[portKey]) || null : null;
+  const port = portKey ? parseInt(envs[portKey], 10) || null : null;
 
   return { username, password, port };
 }

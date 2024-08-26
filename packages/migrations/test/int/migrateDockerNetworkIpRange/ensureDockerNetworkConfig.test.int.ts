@@ -1,7 +1,11 @@
 import "mocha";
 import { expect } from "chai";
 import { ensureDockerNetworkConfig } from "../../../src/migrateDockerNetworkIpRange/ensureDockerNetworkConfig/index.js";
-import { docker, dockerNetworkConnect } from "@dappnode/dockerapi";
+import {
+  docker,
+  dockerNetworkConnect,
+  getNetworkAliasesIpsMapNotThrow,
+} from "@dappnode/dockerapi";
 import Dockerode from "dockerode";
 
 describe("Ensure docker network config migration => ensureDockerNetworkConfig", () => {
@@ -56,6 +60,7 @@ describe("Ensure docker network config migration => ensureDockerNetworkConfig", 
     await ensureDockerNetworkConfig({
       networkName: dockerNetworkName,
       networkSubnet: newDockerNetworkSubnet,
+      aliasesIpsMap: await getNetworkAliasesIpsMapNotThrow(dockerNetworkName),
     });
     const recreatedNetwork: Dockerode.NetworkInspectInfo = await docker
       .getNetwork(dockerNetworkName)

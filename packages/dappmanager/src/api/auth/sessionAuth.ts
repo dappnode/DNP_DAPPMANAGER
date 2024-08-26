@@ -194,7 +194,7 @@ export class AuthPasswordSession {
   /**
    * Middleware to protect routes only for admin sessions
    */
-  onlyAdmin = wrapHandler((req, res, next) => {
+  onlyAdmin = wrapHandler((req, _, next) => {
     this.assertOnlyAdmin(req);
     next();
   });

@@ -1,5 +1,3 @@
-import { Abi } from "../types.js";
-
 export const fromBlock = 5254499;
 export const directoryContractName = "directory";
 export const directoryAddress = "0xf19F629642C6697Af77d8316BeF8DE0de3A27a70";

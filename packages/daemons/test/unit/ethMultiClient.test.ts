@@ -1,17 +1,14 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 // imports for typings
 import {
-  EthClientTarget,
   UserSettings,
   InstalledPackageData,
   Eth2ClientTarget,
   EthClientRemote,
   EthClientInstallStatus,
-  ExecutionClientMainnet,
-  ConsensusClientMainnet,
 } from "@dappnode/types";
 import { mockDnp, mockContainer, dappnodeInstaller } from "../testUtils.js";
 
@@ -22,10 +19,9 @@ interface State {
 
 describe.skip("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    let currentExecClient: ExecutionClientMainnet | undefined | null =
+    let currentExecClient: string | null | undefined =
       "besu.public.dappnode.eth";
-    let currentConsClient: ConsensusClientMainnet | undefined | null =
-      "prysm.dnp.dappnode.eth";
+    let currentConsClient: string | null | undefined = "prysm.dnp.dappnode.eth";
     let currentRemote: EthClientRemote | null = EthClientRemote.on;
     const newTarget: Eth2ClientTarget = {
       execClient: "geth.dnp.dappnode.eth",
@@ -49,14 +45,14 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
     // Also, it will be enforced by rewiremock in case of error
     const db = {
       executionClientMainnet: {
-        get: (): ExecutionClientMainnet | undefined | null => currentExecClient,
-        set: async (execClient: ExecutionClientMainnet | undefined | null) => {
+        get: (): string | null | undefined => currentExecClient,
+        set: async (execClient: string | null | undefined) => {
           currentExecClient = execClient;
         },
       },
       consensusClientMainnet: {
-        get: (): ConsensusClientMainnet | undefined | null => currentConsClient,
-        set: async (consClient: ConsensusClientMainnet | undefined | null) => {
+        get: (): string | null | undefined => currentConsClient,
+        set: async (consClient: string | null | undefined) => {
           currentConsClient = consClient;
         },
       },
@@ -68,27 +64,21 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
       },
       ethExecClientInstallStatus: {
         getAll: () => ({}),
-        get: (keyArg: ExecutionClientMainnet) => state.status[keyArg],
-        set: (
-          keyArg: ExecutionClientMainnet,
-          status: EthClientInstallStatus
-        ) => {
+        get: (keyArg: string) => state.status[keyArg],
+        set: (keyArg: string, status: EthClientInstallStatus) => {
           state.status[keyArg] = status;
         },
-        remove: (keyArg: ExecutionClientMainnet) => {
+        remove: (keyArg: string) => {
           keyArg;
         },
       },
       ethConsClientInstallStatus: {
         getAll: () => ({}),
-        get: (keyArg: ConsensusClientMainnet) => state.status[keyArg],
-        set: (
-          keyArg: ConsensusClientMainnet,
-          status: EthClientInstallStatus
-        ) => {
+        get: (keyArg: string) => state.status[keyArg],
+        set: (keyArg: string, status: EthClientInstallStatus) => {
           state.status[keyArg] = status;
         },
-        remove: (keyArg: ConsensusClientMainnet) => {
+        remove: (keyArg: string) => {
           keyArg;
         },
       },
@@ -100,15 +90,15 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
       },
       ethClientUserSettings: {
         getAll: () => ({}),
-        get: (keyArg: EthClientTarget): UserSettings => {
+        get: (keyArg: Eth2ClientTarget): UserSettings => {
           keyArg;
           return {};
         },
-        set: (keyArg: EthClientTarget, userSettings: UserSettings) => {
+        set: (keyArg: Eth2ClientTarget, userSettings: UserSettings) => {
           keyArg;
           userSettings;
         },
-        remove: (keyArg: EthClientTarget) => {
+        remove: (keyArg: Eth2ClientTarget) => {
           keyArg;
         },
       },

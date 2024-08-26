@@ -4,7 +4,7 @@ import fs from "fs";
 import path from "path";
 import { InstalledPackageData } from "@dappnode/types";
 import { mockDnp } from "../../../../dappmanager/test/testUtils.js";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 import { DappGetFetcherMock, DappgetTestCase } from "./testHelpers.js";
 import { mapValues, isEmpty } from "lodash-es";
 import { logs } from "@dappnode/logger";

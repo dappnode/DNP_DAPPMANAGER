@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 
 /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 function getPasswordManager(
@@ -8,7 +8,7 @@ function getPasswordManager(
   image: string
 ) {
   return rewiremock.around(
-    () => import("../../../src/calls/passwordManager"),
+    () => import("../../../src/calls/passwordManager.js"),
     mock => {
       mock(() => import("@dappnode/utils"))
         .with({ shell: shellMock })

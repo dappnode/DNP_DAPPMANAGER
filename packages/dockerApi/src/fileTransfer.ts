@@ -37,7 +37,6 @@ export async function dockerGetFileOrDirBasedOnExtension(
 type FileType = "file" | "directory";
 
 export async function dockerGetPathType(
-  containerNameOrId: string,
   filePathAbsolute: string
 ): Promise<FileType> {
   if (path.parse(filePathAbsolute).ext) {

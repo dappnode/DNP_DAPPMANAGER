@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import { PackageRelease } from "@dappnode/types";
 import { getMockEventBus } from "./eventBus.js";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 // Imports for typings
 import { packageInstall as packageInstallType } from "../../../src/calls/packageInstall.js";
 import { mockManifest, mockRelease } from "../../testUtils.js";
@@ -75,7 +75,7 @@ describe.skip("Call function: packageInstall", function () {
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../../src/calls/packageInstall"),
+      () => import("../../../src/calls/packageInstall.js"),
       mock => {
         mock(() => import("@dappnode/installer"))
           .with({ DappnodeInstaller: DappnodeInstallerMock })

@@ -1,14 +1,5 @@
 import path from "path";
-import {
-  mapValues,
-  pick,
-  omitBy,
-  isObject,
-  merge,
-  mergeWith,
-  isArray,
-  union,
-} from "lodash-es";
+import { mapValues, pick, omitBy, isObject, mergeWith, union } from "lodash-es";
 import {
   parsePortMappings,
   stringifyPortMappings,
