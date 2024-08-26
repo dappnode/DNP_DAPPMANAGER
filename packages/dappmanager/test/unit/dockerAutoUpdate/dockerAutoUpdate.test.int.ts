@@ -87,7 +87,7 @@ describe.skip("Test a container restarting itself", function () {
     fs.writeFileSync(
       inHost(restartEntrypoint),
       `
-docker-compose -f ${inContainer(nextComposeName)} up -d -t 0
+docker compose -f ${inContainer(nextComposeName)} up -d -t 0
 UPEXIT=$?
 if [ $UPEXIT -ne 0 ]
 then
@@ -95,10 +95,10 @@ then
     if [ "$(docker ps -aq -f status=running -f name=${mainContainerName})" ]
     then
         echo "${mainContainerName} is still running"
-        docker-compose -f ${inContainer(prevComposeName)} up -d -t 0
+        docker compose -f ${inContainer(prevComposeName)} up -d -t 0
     else
         echo "${mainContainerName} is not running, using --force-recreate"
-        docker-compose -f ${inContainer(
+        docker compose -f ${inContainer(
           prevComposeName
         )} up -d -t 0 --force-recreate
     fi
@@ -117,13 +117,13 @@ exit $UPEXIT
 
   beforeEach("Start main container", async () => {
     await runUntilExited(
-      `docker-compose -f ${inHost(prevComposeName)} up -d`,
+      `docker compose -f ${inHost(prevComposeName)} up -d`,
       "main"
     );
   });
 
   function callRestart() {
-    const doRestartCmd = `docker-compose -f ${inContainer(
+    const doRestartCmd = `docker compose -f ${inContainer(
       restartComposeName
     )} up --exit-code-from ${restartContainerName}`;
     return runUntilExited(

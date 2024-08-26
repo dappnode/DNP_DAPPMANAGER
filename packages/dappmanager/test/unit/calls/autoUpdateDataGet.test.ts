@@ -13,7 +13,7 @@ import {
   flagCompletedUpdate
 } from "@dappnode/daemons";
 import { params } from "@dappnode/params";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";
 import { InstalledPackageData } from "@dappnode/types";
 
@@ -60,7 +60,7 @@ describe.skip("Call function: autoUpdateDataGet", function () {
 
   beforeEach("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../../src/calls/autoUpdateDataGet"),
+      () => import("../../../src/calls/autoUpdateDataGet.js"),
       mock => {
         mock(() => import("@dappnode/dockerapi"))
           .with({ listPackages })

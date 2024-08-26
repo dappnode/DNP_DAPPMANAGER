@@ -8,39 +8,33 @@
   "engines": {
     "node": "20.x"
   },
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
-  },
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build": "lerna run build --include-dependencies --stream",
-    "test": "lerna run test --stream",
-    "lint": "lerna run lint --stream",
-    "test:int": "lerna run test:int --stream",
-    "pre-commit": "lerna run pre-commit --stream",
-    "mock-standalone:build": "lerna run mock-standalone:build --stream",
-    "generate": "lerna run generate --stream",
-    "clean": "yarn run clean:build && yarn run clean:libraries",
-    "clean:libraries": "rimraf packages/**/node_modules && rimraf node_modules",
-    "clean:build": "rimraf packages/**/dist && rimraf packages/**/build"
+    "build": "yarn workspaces foreach --all -pt run build",
+    "test": "yarn workspaces foreach --all -pt run test",
+    "test:int": "yarn workspaces foreach --all -pt run test:int",
+    "dev": "yarn workspaces foreach --all -pi -j unlimited run dev",
+    "lint": "yarn workspaces foreach --all -pt run lint",
+    "mock-standalone:build": "yarn workspace @dappnode/admin-ui run mock-standalone:build",
+    "generate": "yarn workspace @dappnode/common run generate"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.14.10",
+    "@types/node": "^22.2.0",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "chai": "^4.3.10",
     "depcheck": "^1.4.7",
     "eslint": "^8.44.0",
     "eslint-config-react-app": "^7.0.1",
-    "lerna": "^6.3.0",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.2",
     "rimraf": "^3.0.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
-  }
+    "tsx": "^4.17.0",
+    "typescript": "^5.5.4"
+  },
+  "packageManager": "yarn@4.4.0"
 }

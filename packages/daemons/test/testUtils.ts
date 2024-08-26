@@ -1,9 +1,12 @@
 import { PackageContainer, InstalledPackageData } from "@dappnode/types";
 import { DappnodeInstaller } from "@dappnode/installer";
+import { ethers } from "ethers";
 
 export const dappnodeInstaller = new DappnodeInstaller(
   "https://api.ipfs.dappnode.io",
-  `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+  new ethers.JsonRpcProvider(
+    `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+  )
 );
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";

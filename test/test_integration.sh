@@ -1,6 +1,6 @@
 #!/bin/bash
 
-docker-compose -f docker-compose.yml -f test/docker-compose.yml up -d
+docker compose -f docker-compose.yml -f test/docker-compose.yml up -d
 
 sleep 3
 
@@ -16,10 +16,10 @@ docker-compose down --timeout 0 --volumes
 # mkdir -p $DAPPNODE_DIR/.git && cp -r .git/* $DAPPNODE_DIR/.git
 # cp dappnode_package.json $DAPPNODE_DIR
 
-# docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml build
+# docker compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml build
 # # Run test
 # ##########
-# docker-compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml up -d
+# docker compose -f ${DAPPNODE_DIR}/docker-compose-dappmanager.yml up -d
 
 # # Print state for debugging
 # docker ps -a

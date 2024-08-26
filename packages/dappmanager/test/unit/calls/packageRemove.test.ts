@@ -3,7 +3,7 @@ import { expect } from "chai";
 import sinon from "sinon";
 import fs from "fs";
 import { getDockerComposePath, validatePath } from "@dappnode/utils";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 // Imports for typings
 import { packageRemove as packageRemoveType } from "../../../src/calls/packageRemove.js";
 import { InstalledPackageData } from "@dappnode/types";
@@ -43,7 +43,7 @@ describe.skip("Call function: packageRemove", function () {
 
   before("Mock", async () => {
     const mock = await rewiremock.around(
-      () => import("../../../src/calls/packageRemove"),
+      () => import("../../../src/calls/packageRemove.js"),
       mock => {
         mock(() => import("@dappnode/dockerapi"))
           .with({ dockerComposeDown })

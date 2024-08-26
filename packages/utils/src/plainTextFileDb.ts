@@ -13,6 +13,7 @@ export class PlainTextFileDb {
       return fs.readFileSync(this.filepath, "utf8").trim();
     } catch (e) {
       if (e.code !== "ENOENT") throw e;
+      return undefined;
     }
   }
 

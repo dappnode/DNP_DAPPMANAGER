@@ -33,7 +33,9 @@
     "src/schemas"
   ],
   "devDependencies": {
-    "@types/node": "^20.14.10"
+    "@types/mocha": "^10",
+    "@types/node": "^20.14.10",
+    "mocha": "^10.7.0"
   },
   "dependencies": {
     "@dappnode/types": "^0.1.38",

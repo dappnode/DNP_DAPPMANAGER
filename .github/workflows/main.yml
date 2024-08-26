@@ -1,10 +1,6 @@
 name: "Main"
 on:
   workflow_dispatch:
-    branches:
-      - "master"
-    paths-ignore:
-      - "README.md"
     inputs:
       bump:
         description: "Bump type, it must be: patch | minor | major"
@@ -25,9 +21,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Unit tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
       - run: yarn
@@ -43,11 +41,14 @@ jobs:
     runs-on: ubuntu-latest
     name: In app integration tests
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "yarn"
       - run: yarn # Caching only saves 30s
       - run: yarn build
       - run: yarn test:int
@@ -62,11 +63,14 @@ jobs:
         run: |
           [[ "$BUMP_TYPE" == "patch" ]] || [[ "$BUMP_TYPE" == "minor" ]] || \
           [[ "$BUMP_TYPE" == "major" ]] || { echo "Wrong input, it must be: patch | minor | major"; exit 1;}
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Enable Corepack
+        run: corepack enable
       - name: Setup node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: "20"
+          cache: "yarn"
       - name: Publish
         run: npx @dappnode/dappnodesdk publish ${BUMP_TYPE} --dappnode_team_preset
         env:

@@ -1,13 +1,15 @@
 import "mocha";
 import { expect } from "chai";
 import sinon from "sinon";
-import rewiremock from "rewiremock/webpack";
+import rewiremock from "rewiremock/node.js";
 import { DappGetFetcherMock } from "../testHelpers.js";
 // Import for types
 import aggregateType from "../../../../src/dappGet/aggregate/index.js";
 import { InstalledPackageData } from "@dappnode/types";
 import { mockDnp } from "../../../testUtils.js";
 import { DappGetDnps } from "../../../../src/dappGet/types.js";
+import { ethers } from "ethers";
+import { DappnodeInstaller } from "../../../../src/dappnodeInstaller.js";
 
 /**
  * Purpose of the test. Make sure aggregate fetches all necessary DNPs and info
@@ -146,10 +148,19 @@ describe.skip("dappGet/aggregate", () => {
       name: nginxId,
       ver: "^0.1.0",
     };
+
+    const dappnodeInstaller = new DappnodeInstaller(
+      "https://api.ipfs.dappnode.io",
+      new ethers.JsonRpcProvider(
+        `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
+      )
+    );
+
     const dnps = await aggregate({
       req,
       dnpList,
       dappGetFetcher: dappGetFetcherEmpty,
+      dappnodeInstaller,
     });
 
     expect(dnps).to.deep.equal(

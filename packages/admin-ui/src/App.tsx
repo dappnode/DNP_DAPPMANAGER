@@ -22,9 +22,9 @@ export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
   stakersModuleStatus: "enabled",
   rollupsModuleStatus: "disabled",
-  toggleTheme: () => { },
-  toggleStakersModuleStatus: () => { },
-  toggleRollupsModuleStatus: () => { }
+  toggleTheme: () => {},
+  toggleStakersModuleStatus: () => {},
+  toggleRollupsModuleStatus: () => {}
 });
 
 const useLocalStorage = <T extends string>(
@@ -169,16 +169,16 @@ export default function App() {
 
   // Keep retrying if there is a loggin error, probably due a network error
   useEffect(() => {
-    if (isError) {
-      let timeToNext = 500;
-      let timeout: unknown;
-      const recursiveTimeout = () => {
-        onFetchLoginStatus();
-        timeout = setTimeout(recursiveTimeout, (timeToNext *= 2));
-      };
-      recursiveTimeout();
-      return () => clearTimeout(timeout as number);
-    }
+    if (!isError) return;
+
+    let timeToNext = 500;
+    let timeout: unknown;
+    const recursiveTimeout = () => {
+      onFetchLoginStatus();
+      timeout = setTimeout(recursiveTimeout, (timeToNext *= 2));
+    };
+    recursiveTimeout();
+    return () => clearTimeout(timeout as number);
   }, [isError, onFetchLoginStatus]);
 
   if (!loginStatus) {

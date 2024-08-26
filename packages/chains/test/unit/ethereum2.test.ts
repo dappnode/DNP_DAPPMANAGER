@@ -1,6 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import { ChainDataResult } from "../../src/types.js";
+import type { ChainDataResult } from "../../src/types.js";
 import { parseNodeSyncingResponse } from "../../src/drivers/ethereum2.js";
 
 describe("Watchers > chains > ethereum2Prysm", () => {

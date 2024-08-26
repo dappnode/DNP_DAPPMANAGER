@@ -19,7 +19,7 @@ import { mevBoost, execution, consensus } from "../../index.js";
  *   - Dappnode graffiti or other
  *   - User sessions
  */
-export const metrics = wrapHandler(async (req, res) => {
+export const metrics = wrapHandler(async (_, res) => {
   // Return all metrics the Prometheus exposition format
   res.setHeader("Content-Type", register.contentType);
   res.end(await register.metrics());
