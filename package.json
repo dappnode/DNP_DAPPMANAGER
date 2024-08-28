@@ -1,5 +1,5 @@
 {
-  "name": "@dappnode/dappnode",
+  "name": "root",
   "type": "module",
   "version": "1.0.0",
   "private": true,
@@ -24,6 +24,7 @@
     "generate": "yarn workspace @dappnode/common run generate"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.1.0",
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
     "@types/node": "^22.2.0",
