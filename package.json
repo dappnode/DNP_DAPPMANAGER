@@ -16,7 +16,9 @@
     "test": "yarn workspaces foreach --all -pt run test",
     "test:int": "yarn workspaces foreach --all -pt run test:int",
     "dev": "yarn workspaces foreach --all -pi -j unlimited run dev",
-    "lint": "yarn workspaces foreach --all -pt run lint",
+    "lint": "eslint 'packages/**/src/**/*.{js,ts,tsx}'",
+    "lint:fix": "eslint 'packages/**/src/**/*.{js,ts,tsx}' --fix",
+    "format": "prettier --write 'packages/**/src/**/*.{js,ts,tsx,json,md}'",
     "mock-standalone:build": "yarn workspace @dappnode/admin-ui run mock-standalone:build",
     "mock-standalone": "yarn workspace @dappnode/admin-ui run mock-standalone",
     "generate": "yarn workspace @dappnode/common run generate"
@@ -25,17 +27,23 @@
     "@types/chai": "^4.3.11",
     "@types/mocha": "^10.0.6",
     "@types/node": "^22.2.0",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
     "chai": "^4.3.10",
     "depcheck": "^1.4.7",
-    "eslint": "^8.44.0",
+    "eslint": "^9.9.1",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "eslint-plugin-promise": "^7.1.0",
     "mocha": "^10.2.0",
     "nodemon": "^3.0.2",
+    "prettier": "^3.3.3",
     "rimraf": "^3.0.2",
     "tsx": "^4.17.0",
     "typescript": "^5.5.4"
   },
-  "packageManager": "yarn@4.4.0"
+  "packageManager": "yarn@4.4.1"
 }

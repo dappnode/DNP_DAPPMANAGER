@@ -1,0 +1,7 @@
+# Ignore dist builds
+packages/*/dist
+packages/*/build
+
+# Ignore node_modules
+node_modules
+packages/*/node_modules

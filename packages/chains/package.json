@@ -15,8 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit",
-    "dev": "tsc -w",
-    "lint": "eslint . --ext .ts --fix src"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "@dappnode/dockerapi": "workspace:^0.1.0",

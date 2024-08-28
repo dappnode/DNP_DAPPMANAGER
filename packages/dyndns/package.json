@@ -15,8 +15,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w",
-    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit",
-    "lint": "eslint . --ext .ts --fix src"
+    "test": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/unit"
   },
   "dependencies": {
     "@dappnode/db": "workspace:^0.1.0",
