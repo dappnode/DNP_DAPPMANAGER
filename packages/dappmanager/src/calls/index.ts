@@ -30,6 +30,7 @@ export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
 export { ipfsClientTargetGet } from "./ipfsClientTargetGet.js";
+export { ipfsResolves } from "./ipfsResolves.js";
 export { ipPublicGet } from "./ipPublicGet.js";
 export * from "./localProxy.js";
 export * from "./manageLvm.js";

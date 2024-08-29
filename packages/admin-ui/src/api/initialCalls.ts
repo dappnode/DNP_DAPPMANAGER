@@ -8,7 +8,8 @@ import {
   fetchWifiCredentials,
   fetchRebootIsRequired,
   fetchShouldShowSmooth,
-  fetchIsConnectedToInternet
+  fetchIsConnectedToInternet,
+  fetchIpfsResolves
 } from "services/dappnodeStatus/actions";
 
 export function initialCallsOnOpen() {
@@ -21,4 +22,10 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchRebootIsRequired());
   store.dispatch<any>(fetchShouldShowSmooth());
   store.dispatch<any>(fetchIsConnectedToInternet());
+  store.dispatch<any>(fetchIpfsResolves());
+
+  //Checks every 5 min if Ipfs is resolving
+  setInterval(() => {
+    store.dispatch<any>(fetchIpfsResolves());
+  }, 300000);
 }

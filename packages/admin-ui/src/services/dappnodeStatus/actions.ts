@@ -18,6 +18,7 @@ export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
 export const setRebootHostIsRequired =
   dappnodeStatus.actions.rebootRequiredScript;
+export const setIpfsResolves = dappnodeStatus.actions.ipfsResolves;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
@@ -53,6 +54,11 @@ export const fetchSystemInfo = (): AppThunk => async dispatch =>
   withTryCatch(async () => {
     dispatch(setSystemInfo(await api.systemInfoGet()));
   }, "systemInfoGet");
+
+export const fetchIpfsResolves = (): AppThunk => async dispatch =>
+  withTryCatch(async () => {
+    dispatch(setIpfsResolves(await api.ipfsResolves()));
+  }, "getIsConnectedToInternet");
 
 /**
  * Check if the wifi DNP has the same credentials as the default ones
