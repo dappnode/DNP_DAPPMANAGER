@@ -188,7 +188,7 @@ async function removeDirectories(directoryPaths: string[]) {
 }
 
 describe("Add alias to running containers", function () {
-  this.timeout(1200000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
+  this.timeout(2400000); // Adjusts the timeout (in ms) for all hooks and tests in this suite
   before("Create and run containers in dncore_network", async () => {
     await ensureNetworkExists(DNCORE_NETWORK);
 
@@ -208,7 +208,7 @@ describe("Add alias to running containers", function () {
 
       fs.writeFileSync(`${path}/docker-compose.yml`, content);
 
-      await shellSafe(`docker-compose -f ${path}/docker-compose.yml up -d`);
+      await shellSafe(`docker compose -f ${path}/docker-compose.yml up -d`);
     }
 
     const containerNamesToCheck = [

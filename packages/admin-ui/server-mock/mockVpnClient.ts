@@ -42,7 +42,7 @@ export class MockVpnApiClient implements VpnApiClient {
     this.devices.delete(id);
   }
 
-  async resetDevice({ id }: { id: string }): Promise<void> {
+  async resetDevice(): Promise<void> {
     //
   }
 
@@ -50,9 +50,11 @@ export class MockVpnApiClient implements VpnApiClient {
     return Array.from(this.devices.values());
   }
 
-  async getDeviceCredentials(kwargs: {
-    id: string;
-  }): Promise<{ filename: string; key: string; url: string }> {
+  async getDeviceCredentials(): Promise<{
+    filename: string;
+    key: string;
+    url: string;
+  }> {
     return { filename: "00000", key: "0000000", url };
   }
 

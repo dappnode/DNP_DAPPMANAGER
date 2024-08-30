@@ -34,40 +34,45 @@ Go to the [installation overview](https://docs.dappnode.io/docs/user/install/ove
 
 ### Installing
 
-To get started, clone the project locally.
+1. To get started, clone the project locally.
 
-```
-$ git clone https://github.com/dappnode/DNP_DAPPMANAGER.git
-```
+   ```bash
+   $ git clone https://github.com/dappnode/DNP_DAPPMANAGER.git
+   ```
 
-To develop locally, cd into the src folder and start the nodejs application
+2. Use node 20 or higher to run the project.
 
-```
-cd build/src
-npm i
-npm start
-```
+   ```bash
+   $ nvm use 20
+   ```
 
-The DNP_DAPPMANAGER expects to be in a Dappnode network to connect to its WAMP module, Ethereum node and IPFS node. If you wish to use a different providers for such services you can edit their urls in the [`build/src/src/params.js` file](build/src/src/params.js).
+3. Install `yarn` globally.
 
-### Building
+   ```bash
+   $ npm install -g yarn
+   ```
 
-After making sure that the nodejs app runs successfully on its own and passes the tests `npm test`, you can dockerize the package.
+4. Enable corepack and set yarn version berry
 
-```
-docker-compose build
-docker-compose up -d
-docker-compose logs -f
-```
+   ```bash
+   $ corepack enable && yarn set version berry
+   ```
+
+5. Install the dependencies
+
+   ```bash
+   $ yarn
+   ```
+
+6. Build the project
+
+   ```bash
+   $ yarn build
+   ```
+
+The DNP_DAPPMANAGER expects to be in a Dappnode network to connect to its WAMP module, Ethereum node and IPFS node. If you wish to use a different providers for such services you can edit their urls in the [`packages/params/src/params.ts` file](packages/params/src/params.ts).
 
 ### Developing
-
-Before choosing any of the following options for development, remember to run:
-
-```
-yarn
-yarn generate
-```
 
 There are 4 different developing modes:
 
@@ -110,31 +115,25 @@ _Note: This mode is not working a the moment since cross-domain cookies are not 
 
 SSH into your Dappnode and clone this repo:
 
-```
-https://github.com/dappnode/DNP_DAPPMANAGER
+```bash
+git clone https://github.com/dappnode/DNP_DAPPMANAGER
 ```
 
 Open the directory where you cloned the repo using VS Code SSH extension (optional, but recommended)
 
 Force remove Dappmanager container:
 
-```
+```bash
 docker rm -f DAppNodeCore-dappmanager.dnp.dappnode.eth
 ```
 
-Build dev Dappmanager:
+Build and start dev Dappmanager:
 
-```
-docker-compose -f docker-compose-dev.yml build
-```
-
-Start dev Dappmanager:
-
-```
-docker-compose -f docker-compose-dev.yml up -d
+```bash
+docker-compose -f docker-compose-dev.yml up -d --build
 ```
 
-After this, you will be able to access the dappmanager through http://my.dappnode:5000/
+After this, you will be able to access the dappmanager through http://my.dappnode/
 
 _Note: To switch back to production Dappmanager, you will have to remove this container and run:_
 
@@ -164,6 +163,7 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 ## Authors
 
 - **Eduardo Antuña Díez** - _Initial work_ - [eduadiez](https://github.com/eduadiez)
+- **Pablo Mendez** - [pablomendez](https://github.com/pablomendezroyo)
 - **DAppLion** - [dapplion](https://github.com/dapplion)
 
 See also the list of [contributors](https://github.com/dappnode/DNP_DAPPMANAGER/contributors) who participated in this project.

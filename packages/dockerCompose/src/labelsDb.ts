@@ -22,12 +22,13 @@ const parseNumber = (value: string | undefined): number | undefined =>
 const parseBool = (value: string | undefined): boolean | undefined =>
   typeof value === "string" ? (value === "true" ? true : false) : undefined;
 const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
-  if (value)
-    try {
-      return JSON.parse(value);
-    } catch {
-      return;
-    }
+  if (!value) return undefined;
+
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return undefined;
+  }
 };
 
 const writeString = (data: string | undefined): string | undefined => data;

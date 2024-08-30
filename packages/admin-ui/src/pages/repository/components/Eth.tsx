@@ -69,24 +69,28 @@ export default function Eth() {
    *    "Alert!" your target is OFF, go to remote or install it again
    */
   function renderEthMultiClientWarning() {
-    if (ethClientStatus && !ethClientStatus.ok)
-      switch (ethClientStatus.code) {
-        case "NOT_RUNNING":
-          return (
-            <Alert variant="warning">
-              Selected client is not running. Please, restart the client or
-              select remote
-            </Alert>
-          );
-        case "NOT_INSTALLED":
-        case "UNINSTALLED":
-          return (
-            <Alert variant="warning">
-              Selected client is not installed. Please, re-install the client or
-              select remote
-            </Alert>
-          );
-      }
+    if (!ethClientStatus) return null;
+    if (ethClientStatus.ok) return null;
+
+    switch (ethClientStatus.code) {
+      case "NOT_RUNNING":
+        return (
+          <Alert variant="warning">
+            Selected client is not running. Please, restart the client or select
+            remote
+          </Alert>
+        );
+      case "NOT_INSTALLED":
+      case "UNINSTALLED":
+        return (
+          <Alert variant="warning">
+            Selected client is not installed. Please, re-install the client or
+            select remote
+          </Alert>
+        );
+      default:
+        return null;
+    }
   }
   return (
     <Card className="dappnode-identity">

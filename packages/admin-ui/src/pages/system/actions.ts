@@ -164,7 +164,7 @@ export const passwordChange = (
   dispatch(fetchPasswordIsSecure());
 };
 
-export const volumeRemove = (name: string): AppThunk => async dispatch => {
+export const volumeRemove = (name: string): AppThunk => async () => {
   // Display a dialog to confirm the password change
   await new Promise<void>(resolve =>
     confirm({

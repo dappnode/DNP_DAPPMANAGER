@@ -127,7 +127,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       dnpName: "dnp.prysm.eth"
     }
   ],
-  dappnodeWebNameSet: async ({ dappnodeWebName }) => {},
+  dappnodeWebNameSet: async () => {},
   statsCpuGet: async () => ({
     usedPercentage: 88,
     numberOfCores: 4,
@@ -256,7 +256,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     ipfsClientTarget: IpfsClientTarget.remote,
     ipfsGateway: "https://gateway.ipfs.dappnode.io"
   }),
-  enableEthicalMetrics: async ({ mail }) => {},
+  enableEthicalMetrics: async () => {},
   getEthicalMetricsConfig: async () => ({
     mail: "@example.com",
     enabled: true,

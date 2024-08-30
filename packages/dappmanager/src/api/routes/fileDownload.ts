@@ -28,7 +28,7 @@ export const fileDownload = wrapHandlerHtml<Params>(async (req, res) => {
     throw e;
   }
 
-  const filetype = await dockerGetPathType(containerNameOrId, filepath);
+  const filetype = await dockerGetPathType(filepath);
   const isSingleFile = filetype === "file";
 
   // Download single file as same mimetype, directory as .tar

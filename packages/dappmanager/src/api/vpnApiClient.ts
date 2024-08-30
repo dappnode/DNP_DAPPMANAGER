@@ -33,7 +33,7 @@ export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return mapValues(
     vpnApiRoutesData,
-    (data, route) =>
+    (_, route) =>
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (...args: Args): any =>
         vpnRpcCall(params, route, ...args)

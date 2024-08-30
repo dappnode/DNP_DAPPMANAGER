@@ -43,7 +43,7 @@ initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch(e => logs.error("Error inititializing Database", e));
 
-const ethUrl = await getEthUrl().catch(e => {
+await getEthUrl().catch(e => {
   logs.error(
     `Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`,
     e
@@ -59,9 +59,12 @@ try {
 }
 
 // Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersProvider());
+export const dappnodeInstaller = new DappnodeInstaller(
+  ipfsUrl,
+  await getEthersProvider()
+);
 
-export const publicRegistry = new DappNodeRegistry(await getEthersProvider(), "public");
+export const publicRegistry = new DappNodeRegistry("public");
 
 // TODO: find a way to move the velow constants to the api itself
 const vpnApiClient = getVpnApiClient(params);

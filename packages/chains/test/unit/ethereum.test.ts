@@ -1,7 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { parseEthereumState } from "../../src/drivers/ethereum.js";
-import { ChainDataResult } from "../../src/types.js";
+import type { ChainDataResult } from "../../src/types.js";
 import { parseEthersSyncing } from "@dappnode/utils";
 
 describe("Watchers > chains > ethereum", () => {

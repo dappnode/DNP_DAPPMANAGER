@@ -1,44 +1,36 @@
-ARG NODE_VERSION=20.3.0
-
-# Common base so it's cached
-# --platform=$BUILDPLATFORM is used build javascript source with host arch
-# Otherwise webpack builds on emulated archs can be extremely slow (+1h)
-ARG BASE_IMAGE=node:${NODE_VERSION}-alpine
+ARG NODE_VERSION=20.16.0
+ARG BASE_IMAGE=node:${NODE_VERSION}-alpine3.19
 
 # Initial stage to gather git data
-FROM --platform=${BUILDPLATFORM:-amd64} ${BASE_IMAGE} AS git-data
+FROM ${BASE_IMAGE} AS git-data
 WORKDIR /usr/src/app
-RUN apk add --no-cache git python3 py3-pip build-base
 COPY .git dappnode_package.json docker/getGitData.js ./
+RUN apk add --no-cache git python3 py3-pip build-base
 RUN node getGitData /usr/src/app/.git-data.json
 
-
 # Build + Prod stage
-FROM node:${NODE_VERSION}-alpine
+FROM ${BASE_IMAGE}
 ENV COMPOSE_HTTP_TIMEOUT=300 \
   DOCKER_CLIENT_TIMEOUT=300 \
   DOCKER_HOST=unix:///var/run/docker.sock \
   UI_FILES_PATH=/app/packages/admin-ui/build \
   GIT_DATA_PATH=.git-data.json \
   TEST=true \
-  VITE_APP_API_URL=http://my.dappnode:5000/
+  VITE_APP_API_URL=http://my.dappnode/
+
 WORKDIR /app
+
 RUN apk update && apk add --no-cache docker curl docker-cli-compose xz zip unzip libltdl bash git bind bind-tools bind-dev \ 
   miniupnpc dbus tmux avahi-tools
+RUN corepack enable
 
 # Copy git data
 COPY --from=git-data /usr/src/app/.git-data.json $GIT_DATA_PATH
-
-COPY docker/start_dev.sh /usr/src/app/start_dev.sh
-
-# Build the src code:
-# Copy and install deps first to cache
-COPY package.json yarn.lock lerna.json tsconfig.json ./
+COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY packages packages
 
-RUN yarn --frozen-lockfile --non-interactive
-
-ENV VITE_APP_API_URL /
-RUN yarn build
-
-ENTRYPOINT [ "/usr/src/app/start_dev.sh" ]
+# link instructions must be executed in runtime due to the way the volumes are mounted
+ENTRYPOINT ["/bin/sh", "-c", "ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
+  ln -sf /usr/src/app/dnp_repo/ /app/packages/dappmanager && \
+  ln -sf /usr/src/app/DNCORE/ /app/packages/dappmanager && \
+  yarn && yarn build && yarn run dev"]

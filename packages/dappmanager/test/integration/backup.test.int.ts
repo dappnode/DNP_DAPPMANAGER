@@ -53,7 +53,7 @@ describe("Integration test for backup to and from:", function () {
   beforeEach("Up a test docker container", async function () {
     await createTestDir();
     // Create container
-    await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
+    await shellSafe(`docker compose -f ${dockerComposePath} down -v -t 0`);
 
     await shell(`mkdir -p ${path.parse(dockerComposePath).dir}`);
     fs.writeFileSync(
@@ -69,7 +69,7 @@ volumes:
   test-demo: {}
 `
     );
-    await shell(`docker-compose -f ${dockerComposePath} up -d`);
+    await shell(`docker compose -f ${dockerComposePath} up -d`);
   });
 
   it("Should restore and download a backup for nginx", async () => {
@@ -145,6 +145,6 @@ volumes:
   after("Clean test docker container", async function () {
     await cleanTestDir();
     await shell(`docker rm -f -v ${containerName}`);
-    await shellSafe(`docker-compose -f ${dockerComposePath} down -v -t 0`);
+    await shellSafe(`docker compose -f ${dockerComposePath} down -v -t 0`);
   });
 });

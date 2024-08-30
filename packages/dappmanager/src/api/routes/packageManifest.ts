@@ -58,4 +58,5 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
   ]);
 
   res.status(200).send(filteredManifest);
+  return;
 });
