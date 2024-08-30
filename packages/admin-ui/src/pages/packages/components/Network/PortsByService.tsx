@@ -16,8 +16,8 @@ import {
   PortProtocol
 } from "@dappnode/types";
 
-const maxPortNumber = 32768 - 1;
-const maxEphemeralPortNumber = 65535;
+const maxRegisteredPortNumber = 32768 - 1;
+const maxPortNumber = 65535;
 
 export function PortsByService({
   dnpName,
@@ -120,14 +120,25 @@ export function PortsByService({
     return conflictingPorts;
   }
 
-  // Check if any port is over the max port number, except for the WireGuard port
+// Function to get any ports in the ephemeral range, excluding port 51820, which is the WireGuard port
+function getPortsInEphemeralRange(): PortMapping[] {
+  return ports.filter(
+    ({ host, container, deletable }) =>
+      deletable && (
+        (container > maxRegisteredPortNumber && container <= maxPortNumber && container !== 51820) ||
+        (host !== undefined && host > maxRegisteredPortNumber && host <= maxPortNumber && host !== 51820)
+      )
+  );
+}
+
+  // Function get any ports over the max allowed port number defined at "maxPortNumber"
   function getPortsOverTheMax(): PortMapping[] {
     return ports.filter(
       ({ host, container, deletable }) =>
-        (deletable &&
-          ((container > maxPortNumber || (host && host > maxPortNumber)) &&
-          host !== 51820)) || 
-        (host && host > maxEphemeralPortNumber && host !== 51820) 
+        deletable && (
+          container > maxPortNumber ||
+          (host !== undefined && host > maxPortNumber)
+        )
     );
   }
 
@@ -138,43 +149,68 @@ export function PortsByService({
   const duplicatedContainerPorts = getDuplicatedContainerPorts();
   const duplicatedHostPorts = getDuplicatedHostPorts();
   const conflictingPorts = getConflictingPorts();
+  const portsEphimeralRange = getPortsInEphemeralRange();
   const portsOverTheMax = getPortsOverTheMax();
   const arePortsTheSame = portsToId(portsFromDnp) === portsToId(ports);
 
-  // Aggregate error messages as an array of strings
+  // Aggregate error & warning messages as an array of strings
   const errors: string[] = [];
+  const warnings: string[] = [];
   for (const duplicatedHostPort of duplicatedHostPorts)
     errors.push(
-      `Duplicated mapping for host port ${duplicatedHostPort.host}/${duplicatedHostPort.protocol}. Each host port can only be mapped once.`
+      `❌ Duplicated mapping for host port ${duplicatedHostPort.host}/${duplicatedHostPort.protocol}. Each host port can only be mapped once.`
     );
 
   for (const duplicatedContainerPort of duplicatedContainerPorts)
     errors.push(
-      `Duplicated mapping for package port ${duplicatedContainerPort.container}/${duplicatedContainerPort.protocol}. Each package port can only be mapped once.`
+      `❌ Duplicated mapping for package port ${duplicatedContainerPort.container}/${duplicatedContainerPort.protocol}. Each package port can only be mapped once.`
     );
 
   for (const conflictingPort of conflictingPorts) {
     const portName = `${conflictingPort.host}/${conflictingPort.protocol}`;
     const ownerName = prettyDnpName(conflictingPort.owner);
     errors.push(
-      `Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
+      `❌ Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
     );
   }
 
-  for (const portOverTheMax of portsOverTheMax)
-    errors.push(
-      `Host port mapping ${portOverTheMax.host}/${portOverTheMax.protocol} is in the ephemeral port range (32768-65535). It must be avoided.`
-    );
+  // Push error if there are any ports (host or container) over the max allowed port number
+  for (const portOverEphimeralMax of portsOverTheMax) {
+    if (portOverEphimeralMax.host !== undefined) {
+      errors.push(
+        `❌ Port mapping ${portOverEphimeralMax.host}/${portOverEphimeralMax.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
+      );
+    }
+    if (portOverEphimeralMax.container !== undefined) {
+      errors.push(
+        `❌ Port mapping ${portOverEphimeralMax.container}/${portOverEphimeralMax.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
+      );
+    }
+  }
+
+  // Push error if there are any ports (host or container) over the max allowed but lower than the max ephemeral port number
+  for (const portEphimeralRange of portsEphimeralRange) {
+    if (portEphimeralRange.host !== undefined && portEphimeralRange.host !== 51820) {
+      warnings.push(
+        `⚠️ Host Port mapping ${portEphimeralRange.host}/${portEphimeralRange.protocol} is in the ephemeral port range (${maxRegisteredPortNumber}-${maxPortNumber}).`
+      );
+    }
+    if (portEphimeralRange.container !== undefined && portEphimeralRange.container !== 51820) {
+      warnings.push(
+        `⚠️ Package Port mapping ${portEphimeralRange.container}/${portEphimeralRange.protocol} is in the ephemeral port range (${maxRegisteredPortNumber}-${maxPortNumber}).`
+      );
+    }
+  }
 
   // Aggregate conditions to disable the update
   const disableUpdate = Boolean(
     areNewMappingsInvalid ||
-      duplicatedContainerPorts.length > 0 ||
-      duplicatedHostPorts.length > 0 ||
-      conflictingPorts.length > 0 ||
-      portsOverTheMax.length > 0 ||
-      arePortsTheSame ||
-      updating
+    duplicatedContainerPorts.length > 0 ||
+    duplicatedHostPorts.length > 0 ||
+    conflictingPorts.length > 0 ||
+    arePortsTheSame ||
+    updating ||
+    portsOverTheMax.length > 0
   );
 
   return (
@@ -212,7 +248,7 @@ export function PortsByService({
                   <Input
                     lock={true}
                     value={container}
-                    onValueChange={() => {}}
+                    onValueChange={() => { }}
                   />
                 )}
               </td>
@@ -232,7 +268,7 @@ export function PortsByService({
                   <Input
                     lock={true}
                     value={protocol}
-                    onValueChange={() => {}}
+                    onValueChange={() => { }}
                   />
                 )}
               </td>
@@ -255,6 +291,12 @@ export function PortsByService({
       {errors.map(error => (
         <div className="error" key={error}>
           {error}
+        </div>
+      ))}
+
+      {warnings.map(warning => (
+        <div key={warning}>
+          {warning}
         </div>
       ))}
 
