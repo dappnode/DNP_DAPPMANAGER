@@ -120,27 +120,39 @@ export function PortsByService({
     return conflictingPorts;
   }
 
-// Function to get any ports in the ephemeral range, excluding port 51820, which is the WireGuard port
-function getPortsInEphemeralRange(): PortMapping[] {
-  return ports.filter(
-    ({ host, container, deletable }) =>
-      deletable && (
-        (container > maxRegisteredPortNumber && container <= maxPortNumber && container !== 51820) ||
-        (host !== undefined && host > maxRegisteredPortNumber && host <= maxPortNumber && host !== 51820)
-      )
-  );
-}
-
-  // Function get any ports over the max allowed port number defined at "maxPortNumber"
-  function getPortsOverTheMax(): PortMapping[] {
+  // Function to get any container ports in the ephemeral range, excluding port 51820
+  function getContainerPortsInEphemeralRange(): PortMapping[] {
     return ports.filter(
-      ({ host, container, deletable }) =>
-        deletable && (
-          container > maxPortNumber ||
-          (host !== undefined && host > maxPortNumber)
-        )
+      ({ container, deletable }) =>
+        deletable && container > maxRegisteredPortNumber && container <= maxPortNumber && container !== 51820
     );
   }
+
+  // Function to get any host ports in the ephemeral range, excluding port 51820
+  function getHostPortsInEphemeralRange(): PortMapping[] {
+    return ports.filter(
+      ({ host, deletable }) =>
+        deletable && host !== undefined && host > maxRegisteredPortNumber && host <= maxPortNumber && host !== 51820
+    );
+  }
+
+
+  // Function to get any container ports over the max allowed port number
+  function getContainerPortsOverTheMax(): PortMapping[] {
+    return ports.filter(
+      ({ container, deletable }) =>
+        deletable && container > maxPortNumber
+    );
+  }
+
+  // Function to get any host ports over the max allowed port number
+  function getHostPortsOverTheMax(): PortMapping[] {
+    return ports.filter(
+      ({ host, deletable }) =>
+        deletable && host !== undefined && host > maxPortNumber
+    );
+  }
+
 
   const areNewMappingsInvalid = ports.some(
     ({ container, protocol, deletable }) =>
@@ -149,8 +161,10 @@ function getPortsInEphemeralRange(): PortMapping[] {
   const duplicatedContainerPorts = getDuplicatedContainerPorts();
   const duplicatedHostPorts = getDuplicatedHostPorts();
   const conflictingPorts = getConflictingPorts();
-  const portsEphimeralRange = getPortsInEphemeralRange();
-  const portsOverTheMax = getPortsOverTheMax();
+  const containerPortsEphimeralRange = getContainerPortsInEphemeralRange();
+  const hostPortsEphimeralRange = getHostPortsInEphemeralRange();
+  const containerPortsOverTheMax = getContainerPortsOverTheMax();
+  const hostPortsOverTheMax = getHostPortsOverTheMax();
   const arePortsTheSame = portsToId(portsFromDnp) === portsToId(ports);
 
   // Aggregate error & warning messages as an array of strings
@@ -174,33 +188,22 @@ function getPortsInEphemeralRange(): PortMapping[] {
     );
   }
 
-  // Push error if there are any ports (host or container) over the max allowed port number
-  for (const portOverEphimeralMax of portsOverTheMax) {
-    if (portOverEphimeralMax.host !== undefined) {
-      errors.push(
-        `❌ Port mapping ${portOverEphimeralMax.host}/${portOverEphimeralMax.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
-      );
-    }
-    if (portOverEphimeralMax.container !== undefined) {
-      errors.push(
-        `❌ Port mapping ${portOverEphimeralMax.container}/${portOverEphimeralMax.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
-      );
-    }
-  }
+  // Adjusting the loops for error and warning outputs accordingly
+  containerPortsOverTheMax.forEach(port => {
+    errors.push(`❌ Container port mapping ${port.container}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`);
+  });
 
-  // Push error if there are any ports (host or container) over the max allowed but lower than the max ephemeral port number
-  for (const portEphimeralRange of portsEphimeralRange) {
-    if (portEphimeralRange.host !== undefined && portEphimeralRange.host !== 51820) {
-      warnings.push(
-        `⚠️ Host Port mapping ${portEphimeralRange.host}/${portEphimeralRange.protocol} is in the ephemeral port range (${maxRegisteredPortNumber}-${maxPortNumber}).`
-      );
-    }
-    if (portEphimeralRange.container !== undefined && portEphimeralRange.container !== 51820) {
-      warnings.push(
-        `⚠️ Package Port mapping ${portEphimeralRange.container}/${portEphimeralRange.protocol} is in the ephemeral port range (${maxRegisteredPortNumber}-${maxPortNumber}).`
-      );
-    }
-  }
+  hostPortsOverTheMax.forEach(port => {
+    errors.push(`❌ Host port mapping ${port.host}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`);
+  });
+
+  containerPortsEphimeralRange.forEach(port => {
+    warnings.push(`⚠️ Package Port mapping ${port.container}/${port.protocol} is in the ephemeral port range (${maxRegisteredPortNumber + 1}-${maxPortNumber}).`);
+  });
+
+  hostPortsEphimeralRange.forEach(port => {
+    warnings.push(`⚠️ Host Port mapping ${port.host}/${port.protocol} is in the ephemeral port range (${maxRegisteredPortNumber + 1}-${maxPortNumber}).`);
+  });
 
   // Aggregate conditions to disable the update
   const disableUpdate = Boolean(
@@ -210,7 +213,8 @@ function getPortsInEphemeralRange(): PortMapping[] {
     conflictingPorts.length > 0 ||
     arePortsTheSame ||
     updating ||
-    portsOverTheMax.length > 0
+    containerPortsOverTheMax.length > 0 ||
+    hostPortsOverTheMax.length > 0
   );
 
   return (
