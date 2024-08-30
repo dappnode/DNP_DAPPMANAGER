@@ -120,12 +120,14 @@ export function PortsByService({
     return conflictingPorts;
   }
 
+  // Check if any port is over the max port number, except for the WireGuard port
   function getPortsOverTheMax(): PortMapping[] {
     return ports.filter(
       ({ host, container, deletable }) =>
         (deletable &&
-          (container > maxPortNumber || (host && host > maxPortNumber))) ||
-        (host && host > maxEphemeralPortNumber)
+          ((container > maxPortNumber || (host && host > maxPortNumber)) &&
+          host !== 51820)) || 
+        (host && host > maxEphemeralPortNumber && host !== 51820) 
     );
   }
 
