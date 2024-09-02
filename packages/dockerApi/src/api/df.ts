@@ -12,9 +12,7 @@ const dockerDfMemo = memoize(() => docker.df(), {
  * NOTE: Result is cached for 15s + it only ran once at a time,
  * resolving multiple calls with the value (like runOnlyOneReturnToAll)
  */
-export async function dockerDf(options?: {
-  noCache: boolean;
-}): Promise<DockerApiSystemDfReturn> {
+export async function dockerDf(options?: { noCache: boolean }): Promise<DockerApiSystemDfReturn> {
   if (options && options.noCache) return await docker.df();
   else return await dockerDfMemo();
 }

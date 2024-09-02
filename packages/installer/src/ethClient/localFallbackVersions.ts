@@ -15,9 +15,7 @@ interface ContentHashes {
  * Local fallback versions, to be able to install and eth client without connecting to remote
  * @param dnpName "geth.dnp.dappnode.eth"
  */
-export function getLocalFallbackContentHash(
-  dnpName: string
-): string | undefined {
+export function getLocalFallbackContentHash(dnpName: string): string | undefined {
   const contentHashes = loadContentHashes(params.FALLBACK_VERSIONS_PATH);
   return (contentHashes || {})[dnpName];
 }

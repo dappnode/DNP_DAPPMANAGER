@@ -22,20 +22,14 @@ export async function migrateUserActionLogs(): Promise<void> {
         userActionLogs.push({
           ...winstonLog,
           args: winstonLog.args || [winstonLog.kwargs],
-          timestamp: new Date(winstonLog.timestamp).getTime(),
+          timestamp: new Date(winstonLog.timestamp).getTime()
         });
       } catch (e) {
         logs.debug(`Error parsing user action log row: ${e.message}\n${row}`);
       }
     }
 
-    logUserAction.set(
-      orderBy(
-        [...logUserAction.get(), ...userActionLogs],
-        (log) => log.timestamp,
-        "desc"
-      )
-    );
+    logUserAction.set(orderBy([...logUserAction.get(), ...userActionLogs], (log) => log.timestamp, "desc"));
     fs.unlinkSync(userActionLogLegacyFile);
 
     logs.info(`Migrated ${userActionLogs.length} userActionLogs`);

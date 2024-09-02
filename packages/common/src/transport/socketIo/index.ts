@@ -1,11 +1,6 @@
 import Ajv, { ErrorObject } from "ajv";
 import { mapValues } from "lodash-es";
-import {
-  Args,
-  LoggerMiddleware,
-  Subscriptions,
-  subscriptionsData,
-} from "@dappnode/types";
+import { Args, LoggerMiddleware, Subscriptions, subscriptionsData } from "@dappnode/types";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 
@@ -27,7 +22,7 @@ interface SocketIsh {
    * for the callback depend on the event
    * @returns The default '/' Namespace
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-function-type
   on(event: string, listener: Function): any;
 }
 
@@ -79,20 +74,14 @@ export function subscriptionsFactory(
             if (onError) onError(`on - ${route}`, e, args);
           }
         });
-      },
+      }
     };
   });
 }
 
-function formatErrors(
-  errors: Array<ErrorObject> | null | undefined,
-  route: string
-): string {
+function formatErrors(errors: Array<ErrorObject> | null | undefined, route: string): string {
   const dataVar = `root_prop`;
   const toReplace = `${dataVar}.${route}`;
   const errorsText = ajv.errorsText(errors, { separator: "\n", dataVar });
-  return (
-    "Validation error:\n" +
-    errorsText.replace(new RegExp(toReplace, "g"), "params")
-  );
+  return "Validation error:\n" + errorsText.replace(new RegExp(toReplace, "g"), "params");
 }

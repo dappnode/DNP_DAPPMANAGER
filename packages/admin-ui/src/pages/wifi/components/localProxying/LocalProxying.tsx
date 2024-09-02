@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 // React
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
@@ -36,7 +35,7 @@ export function LocalProxying() {
 
       const isLocalProxyingRunning = localProxyingStatus.data === "running";
       if (isLocalProxyingRunning)
-        await new Promise<void>(resolve => {
+        await new Promise<void>((resolve) => {
           confirm({
             title: `Stopping Local Network Proxy`,
             text: `Warning, if you are connected to your DAppNode through Local Network Proxy you may lose access to your DAppNode. Make sure to have an alternative way to connect to it, like WiFi or a VPN connection.`,
@@ -46,17 +45,10 @@ export function LocalProxying() {
         });
 
       setReqStatus({ loading: true });
-      await withToast(
-        () => api.localProxyingEnableDisable(!isLocalProxyingRunning),
-        {
-          message: isLocalProxyingRunning
-            ? "Stopping Local Network Proxy..."
-            : "Starting Local Network Proxy",
-          onSuccess: isLocalProxyingRunning
-            ? "Stopped Local Network Proxy..."
-            : "Started Local Network Proxy"
-        }
-      );
+      await withToast(() => api.localProxyingEnableDisable(!isLocalProxyingRunning), {
+        message: isLocalProxyingRunning ? "Stopping Local Network Proxy..." : "Starting Local Network Proxy",
+        onSuccess: isLocalProxyingRunning ? "Stopped Local Network Proxy..." : "Started Local Network Proxy"
+      });
       setReqStatus({ result: true });
 
       localProxyingStatus.revalidate();
@@ -70,20 +62,10 @@ export function LocalProxying() {
     return (
       <Alert variant="secondary">
         You must{" "}
-        <a
-          href="#"
-          onClick={() =>
-            navigate(
-              `${getInstallerPath(httpsPortalDnpName)}/${httpsPortalDnpName}`
-            )
-          }
-        >
+        <a href="#" onClick={() => navigate(`${getInstallerPath(httpsPortalDnpName)}/${httpsPortalDnpName}`)}>
           install the HTTPs Portal
         </a>{" "}
-        to use this feature.{" "}
-        <LinkDocs href={docsUrl.connectLocalProxy}>
-          Learn more about Local Network
-        </LinkDocs>
+        to use this feature. <LinkDocs href={docsUrl.connectLocalProxy}>Learn more about Local Network</LinkDocs>
       </Alert>
     );
   }
@@ -93,31 +75,23 @@ export function LocalProxying() {
       {localProxyingStatus.data ? (
         <Card spacing>
           <p>
-            If you are connected to the same router as your DAppNode you can use
-            this page at <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>.
-            Learn more about the Local Network Proxy at:{" "}
-            <LinkDocs href={docsUrl.connectLocalProxy}>
-              How to connect to DAppNode Local Network Proxy
-            </LinkDocs>
+            If you are connected to the same router as your DAppNode you can use this page at{" "}
+            <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>. Learn more about the Local Network Proxy at:{" "}
+            <LinkDocs href={docsUrl.connectLocalProxy}>How to connect to DAppNode Local Network Proxy</LinkDocs>
           </p>
           {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
             <p>
-              Local and public IPs are equal. This may be due to dappnode is
-              running on a remote machine and does not require Local Network
-              Proxy.
+              Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not
+              require Local Network Proxy.
             </p>
           )}
           <hr />
 
           <div className="wifi-local-status-actions-row">
             <div className="wifi-local-status-container">
-              <StateBadge
-                {...parseAvahiPublishCmdState(localProxyingStatus.data)}
-              />
+              <StateBadge {...parseAvahiPublishCmdState(localProxyingStatus.data)} />
               <MdWifi className="wifi-local-status-icon" />
-              <span className="wifi-local-status-name">
-                Local Network Proxy
-              </span>
+              <span className="wifi-local-status-name">Local Network Proxy</span>
             </div>
 
             <div className="wifi-local-actions">

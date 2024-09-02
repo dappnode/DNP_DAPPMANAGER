@@ -16,8 +16,7 @@ export function CopyFileFrom({
   const containerName = container.containerName;
 
   const getDownloadUrl = useCallback(
-    (fromPath: string) =>
-      apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
+    (fromPath: string) => apiRoutes.fileDownloadUrl({ containerName, path: fromPath }),
     [containerName]
   );
 
@@ -42,11 +41,7 @@ export function CopyFileFrom({
         onValueChange={setFromPathInput}
         onEnterPress={() => downloadFile(fromPathInput)}
         append={
-          <a
-            href={getDownloadUrl(fromPathInput)}
-            {...newTabProps}
-            className="no-a-style"
-          >
+          <a href={getDownloadUrl(fromPathInput)} {...newTabProps} className="no-a-style">
             <Button variant="dappnode">Download</Button>
           </a>
         }

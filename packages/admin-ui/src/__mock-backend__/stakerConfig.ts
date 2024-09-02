@@ -1,9 +1,6 @@
 import { Routes, Network } from "@dappnode/types";
 
-export const stakerConfig: Pick<
-  Routes,
-  "stakerConfigGet" | "stakerConfigSet"
-> = {
+export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> = {
   stakerConfigSet: async () => {},
   stakerConfigGet: async <T extends Network>(network: T) => {
     switch (network) {
@@ -31,8 +28,7 @@ export const stakerConfig: Pick<
                 signedSafe: true,
                 manifest: {
                   name: "geth.dnp.dappnode.eth",
-                  description:
-                    "Go implementation of ethereum. Execution client",
+                  description: "Go implementation of ethereum. Execution client",
                   shortDescription: "Go implementation of ethereum",
                   version: "0.1.0"
                 }

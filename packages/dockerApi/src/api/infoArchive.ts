@@ -15,19 +15,12 @@ import { docker } from "./docker.js";
  *   linkTarget: '/bin/busybox'
  * }
  */
-export async function dockerInfoArchive(
-  id: string,
-  path: string
-): Promise<DockerInfoArchive> {
+export async function dockerInfoArchive(id: string, path: string): Promise<DockerInfoArchive> {
   const container = docker.getContainer(id);
   const res = await container.infoArchive({ path });
   const headers = res.headers;
-  const pathStatBase64 =
-    headers["x-docker-container-path-stat"] ||
-    headers["X-DOCKER-CONTAINER-PATH-STAT"];
-  const pathStatString = Buffer.from(pathStatBase64, "base64").toString(
-    "ascii"
-  );
+  const pathStatBase64 = headers["x-docker-container-path-stat"] || headers["X-DOCKER-CONTAINER-PATH-STAT"];
+  const pathStatString = Buffer.from(pathStatBase64, "base64").toString("ascii");
   return JSON.parse(pathStatString);
 }
 

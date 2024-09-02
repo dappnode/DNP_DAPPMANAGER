@@ -15,34 +15,29 @@ export const lightningNetwork: MockDnp = {
     version: "0.0.3",
     upstreamVersion: "0.6.1-beta",
     shortDescription: "Scalable, instant Bitcoin/Blockchain transactions",
-    description: "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.".repeat(
-      10
-    ),
+    description:
+      "The Lightning Network DAppNodePackage (lnd + RTL). The Lightning Network is a decentralized system for instant, high-volume micropayments that removes the risk of delegating custody of funds to trusted third parties.".repeat(
+        10
+      ),
     type: "service",
     backup: [{ name: "data", path: "/root/.lnd/data" }],
     style: {
       featuredBackground: "linear-gradient(67deg, #090909, #2f1354)",
       featuredColor: "#eee"
     },
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-    contributors: [
-      "Abel Boldú (@vdo)",
-      "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"
-    ],
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    contributors: ["Abel Boldú (@vdo)", "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"],
     categories: ["Payment channels", "Economic incentive"],
     keywords: ["bitcoin", "btc", "lightning network", "lnd"],
     links: {
-      homepage:
-        "https://github.com/dappnode/DAppNodePackage-LightningNetwork#readme",
+      homepage: "https://github.com/dappnode/DAppNodePackage-LightningNetwork#readme",
       ui: "http://lightning-network.dappnode",
       api: "http://lightning-network.dappnode:8080",
       another: "http://lightning-network.dappnode"
     },
     repository: {
       type: "git",
-      url:
-        "git+https://github.com/dappnode/DAppNodePackage-LightningNetwork.git"
+      url: "git+https://github.com/dappnode/DAppNodePackage-LightningNetwork.git"
     },
     bugs: {
       url: "https://github.com/dappnode/DAppNodePackage-LightningNetwork/issues"
@@ -90,8 +85,7 @@ export const lightningNetwork: MockDnp = {
           name: "ONLY_TESTNET"
         },
         title: "Only testnet",
-        description:
-          "Mock variable that should only be visible if `network = testnet`",
+        description: "Mock variable that should only be visible if `network = testnet`",
         required: true,
         if: {
           network: { enum: ["testnet"] }
@@ -170,8 +164,7 @@ Content in the first column | Content in the second column
     packageSentData: {
       apiKey: "AAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXXAAXX",
       secretKey: "ZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXXZZXX",
-      link:
-        "http://lightningNetwork.dappnode.eth/initialize?token=geagehTEGEgeg36eb.NIGE43"
+      link: "http://lightningNetwork.dappnode.eth/initialize?token=geagehTEGEgeg36eb.NIGE43"
     }
   },
   installedContainers: {

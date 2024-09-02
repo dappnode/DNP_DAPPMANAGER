@@ -2,10 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import fs from "fs";
 import { createTestDir, cleanTestDir } from "../../testUtils.js";
-import {
-  computeGlobalEnvsFromDb,
-  writeGlobalEnvsToEnvFile
-} from "@dappnode/db";
+import { computeGlobalEnvsFromDb, writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { createGlobalEnvsEnvFile } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 

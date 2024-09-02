@@ -7,18 +7,11 @@ import { ReqStatus } from "types";
 import Button from "components/Button";
 import ErrorView from "components/ErrorView";
 import { InputForm } from "components/InputForm";
-import {
-  validatePasswordsMatch,
-  validateStrongPassword
-} from "utils/validation";
+import { validatePasswordsMatch, validateStrongPassword } from "utils/validation";
 import "./register.scss";
 import Ok from "components/Ok";
 
-export function Register({
-  refetchStatus
-}: {
-  refetchStatus: () => Promise<void>;
-}) {
+export function Register({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
   const [username, setUsername] = useState("admin");
   const [password, setPassword] = useState("");
   const [password2, setPassword2] = useState("");
@@ -59,8 +52,8 @@ export function Register({
   return (
     <StandaloneContainer TopIcon={BsShieldLock} title="Register">
       <div className="text">
-        Welcome! To protect your Dappnode register an admin password. It is
-        recommended to use a password manager to set a strong password
+        Welcome! To protect your Dappnode register an admin password. It is recommended to use a password manager to set
+        a strong password
       </div>
 
       <InputForm
@@ -123,22 +116,17 @@ function CopyRecoveryToken({
   return (
     <StandaloneContainer TopIcon={BsShieldLock} title="Recovery token">
       <div className="text">
-        Store the recovery token in a safe place. If you lose your password it
-        will allow you to reset the admin account and register again
+        Store the recovery token in a safe place. If you lose your password it will allow you to reset the admin account
+        and register again
       </div>
 
       <div className="recovery-token-box">{recoveryToken}</div>
 
       <Alert variant="warning">
-        Warning! If you also lose your recovery token you will have to directly
-        access your machine
+        Warning! If you also lose your recovery token you will have to directly access your machine
       </Alert>
 
-      <Button
-        className="register-button"
-        onClick={onCopiedRecoveryToken}
-        variant="dappnode"
-      >
+      <Button className="register-button" onClick={onCopiedRecoveryToken} variant="dappnode">
         I've copied the recovery token
       </Button>
     </StandaloneContainer>

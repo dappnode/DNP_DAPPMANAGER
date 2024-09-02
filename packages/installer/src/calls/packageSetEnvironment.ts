@@ -1,10 +1,6 @@
 import { eventBus } from "@dappnode/eventbus";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  getContainersStatus,
-  dockerComposeUpPackage,
-  listPackage,
-} from "@dappnode/dockerapi";
+import { getContainersStatus, dockerComposeUpPackage, listPackage } from "@dappnode/dockerapi";
 import { packageInstalledHasPid, getDockerComposePath } from "@dappnode/utils";
 import { PackageEnvs } from "@dappnode/types";
 import { params } from "@dappnode/params";
@@ -15,7 +11,7 @@ import { restartDappmanagerPatch } from "../installer/index.js";
  */
 export async function packageSetEnvironment({
   dnpName,
-  environmentByService,
+  environmentByService
 }: {
   dnpName: string;
   environmentByService: { [serviceName: string]: PackageEnvs };
@@ -27,9 +23,7 @@ export async function packageSetEnvironment({
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   const services = compose.services();
 
-  for (const [serviceName, environment] of Object.entries(
-    environmentByService
-  )) {
+  for (const [serviceName, environment] of Object.entries(environmentByService)) {
     const service = services[serviceName];
     if (!service) throw Error(`No service ${serviceName} in dnp ${dnpName}`);
     service.mergeEnvs(environment);
@@ -44,12 +38,12 @@ export async function packageSetEnvironment({
   if (dnpName === params.dappmanagerDnpName) {
     // Note: About restartPatch, combining rm && up doesn't prevent the installer from crashing
     await restartDappmanagerPatch({
-      composePath: getDockerComposePath(params.dappmanagerDnpName, true),
+      composePath: getDockerComposePath(params.dappmanagerDnpName, true)
     });
     return;
   } else {
     await dockerComposeUpPackage({ dnpName }, false, containersStatus, {
-      forceRecreate: packageInstalledHasPid(compose.compose),
+      forceRecreate: packageInstalledHasPid(compose.compose)
     });
   }
 

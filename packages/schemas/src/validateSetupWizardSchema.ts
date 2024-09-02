@@ -15,8 +15,6 @@ export function validateSetupWizardSchema(setupWizard: SetupWizard): void {
     const errors = validateSetupWizard.errors
       ? validateSetupWizard.errors.map((e) => processError(e, "setupWizard"))
       : [];
-    throw new CliError(
-      `Invalid setupWizard: \n${errors.map((msg) => `  - ${msg}`).join("\n")}`
-    );
+    throw new CliError(`Invalid setupWizard: \n${errors.map((msg) => `  - ${msg}`).join("\n")}`);
   }
 }

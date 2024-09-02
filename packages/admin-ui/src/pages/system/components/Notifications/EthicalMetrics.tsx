@@ -82,8 +82,8 @@ export default function EthicalMetrics() {
             mailValue && tgChannelIdValue
               ? "telegram channel and email"
               : mailValue
-              ? "email"
-              : tgChannelId && "telegram channel"
+                ? "email"
+                : tgChannelId && "telegram channel"
           }`,
           onSuccess: `Enabled ethical metrics`
         }
@@ -130,23 +130,18 @@ export default function EthicalMetrics() {
     <Card spacing>
       <div>
         <p>
-          Receive notifications if your{" "}
-          <strong>dappnode remains offline</strong> for at least 3 hours, sent
-          to either your Telegram or email. Telemetry is collected anonymously
-          to ensure no personal data is retained.
+          Receive notifications if your <strong>dappnode remains offline</strong> for at least 3 hours, sent to either
+          your Telegram or email. Telemetry is collected anonymously to ensure no personal data is retained.
         </p>
       </div>
       <div>
         <p>
           <span style={{ fontWeight: "bold" }}>Advice: </span>
-          We highly recommend using the Telegram channel option (or both) rather
-          than relying only on email notifications. Email notifications may be
-          categorized as spam, potentially causing you to miss important
+          We highly recommend using the Telegram channel option (or both) rather than relying only on email
+          notifications. Email notifications may be categorized as spam, potentially causing you to miss important
           notifications!
         </p>
-        <LinkDocs href={docsUrl.ethicalMetricsOverview}>
-          Learn more about Ethical metrics in our Documentation
-        </LinkDocs>
+        <LinkDocs href={docsUrl.ethicalMetricsOverview}>Learn more about Ethical metrics in our Documentation</LinkDocs>
       </div>
 
       {ethicalMetricsConfig.data ? (
@@ -169,8 +164,7 @@ export default function EthicalMetrics() {
                   : () =>
                       enableEthicalMetricsSync({
                         mailValue: mail && !mailError ? mail : null,
-                        tgChannelIdValue:
-                          tgChannelId && !tgChannelIdError ? tgChannelId : null
+                        tgChannelIdValue: tgChannelId && !tgChannelIdError ? tgChannelId : null
                       })
               }
               label={""}
@@ -188,17 +182,14 @@ export default function EthicalMetrics() {
                   color: "var(--dappnode-strong-main-color)"
                 }}
               >
-                You must provide a Telegram channel ID or an email to enable
-                ethical metrics notifications
+                You must provide a Telegram channel ID or an email to enable ethical metrics notifications
               </span>
             </>
           )}
           <br />
           <br />
 
-          <Form.Label>
-            Ethical metrics notifications by telegram channel
-          </Form.Label>
+          <Form.Label>Ethical metrics notifications by telegram channel</Form.Label>
           <Input
             placeholder="Telegram Channel ID"
             isInvalid={tgChannelIdError}
@@ -209,14 +200,10 @@ export default function EthicalMetrics() {
                 <Button
                   type="submit"
                   className="register-button"
-                  onClick={() =>
-                    enableEthicalMetricsSync({ tgChannelIdValue: tgChannelId })
-                  }
+                  onClick={() => enableEthicalMetricsSync({ tgChannelIdValue: tgChannelId })}
                   variant="dappnode"
                   disabled={
-                    tgChannelId === "" ||
-                    tgChannelId === ethicalMetricsConfig.data.tgChannelId ||
-                    tgChannelIdError
+                    tgChannelId === "" || tgChannelId === ethicalMetricsConfig.data.tgChannelId || tgChannelIdError
                   }
                 >
                   Update
@@ -234,12 +221,8 @@ export default function EthicalMetrics() {
                 className="accordion-notifications"
               >
                 <div className="header">
-                  <BsInfoCircleFill
-                    className="links-icon"
-                    style={{ fontSize: "14px" }}
-                  />
-                  How can I get a Telegram channel ID?{" "}
-                  {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+                  <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
+                  How can I get a Telegram channel ID? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
                 </div>
               </Accordion.Toggle>
               <Accordion.Collapse eventKey="0">
@@ -247,60 +230,37 @@ export default function EthicalMetrics() {
                   <ol>
                     <li>
                       Open{" "}
-                      <a
-                        href="https://web.telegram.org/a/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
+                      <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
                         Telegram web
                       </a>
                       .
                       <ul>
                         <li>
-                          Ensure the URL ends with{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>
-                            /a/
-                          </span>
-                          . If not, manually add{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>
-                            /a/
-                          </span>{" "}
-                          after{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>
-                            https://web.telegram.org
-                          </span>
-                          .{" "}
+                          Ensure the URL ends with <span className={theme === "dark" ? "dark" : "light"}>/a/</span>. If
+                          not, manually add <span className={theme === "dark" ? "dark" : "light"}>/a/</span> after{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>https://web.telegram.org</span>.{" "}
                         </li>
                       </ul>
                     </li>
                     <li>Create a private channel.</li>
                     <li>
-                      Add{" "}
-                      <span className={theme === "dark" ? "dark" : "light"}>
-                        @ethicalMetricsAlerts_bot
-                      </span>{" "}
-                      as an administrator in the channel.
+                      Add <span className={theme === "dark" ? "dark" : "light"}>@ethicalMetricsAlerts_bot</span> as an
+                      administrator in the channel.
                     </li>
                     <li>
                       Go to your channel and copy the 13-digit ID from the URL.
                       <ul>
                         <li>
                           The channel ID always starts with{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>
-                            -100
-                          </span>
-                          . Ensure to include the{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>
-                            -
-                          </span>{" "}
-                          when coping it.
+                          <span className={theme === "dark" ? "dark" : "light"}>-100</span>. Ensure to include the{" "}
+                          <span className={theme === "dark" ? "dark" : "light"}>-</span> when coping it.
                         </li>
                       </ul>
                     </li>
 
                     <li>
-                      Paste the ID into the Telegram Channel ID field and enable
-                      Ethical Metrics to receive notifications.
+                      Paste the ID into the Telegram Channel ID field and enable Ethical Metrics to receive
+                      notifications.
                     </li>
                   </ol>
                 </div>
@@ -308,9 +268,7 @@ export default function EthicalMetrics() {
             </div>
           </Accordion>
           {tgChannelIdError && (
-            <span style={{ fontSize: "12px", color: "red" }}>
-              Telegram channel ID format is incorrect
-            </span>
+            <span style={{ fontSize: "12px", color: "red" }}>Telegram channel ID format is incorrect</span>
           )}
           <br />
           <Form.Label>Ethical metrics notifications by email</Form.Label>
@@ -326,11 +284,7 @@ export default function EthicalMetrics() {
                   className="register-button"
                   onClick={() => enableEthicalMetricsSync({ mailValue: mail })}
                   variant="dappnode"
-                  disabled={
-                    mail === "" ||
-                    mail === ethicalMetricsConfig.data.mail ||
-                    mailError
-                  }
+                  disabled={mail === "" || mail === ethicalMetricsConfig.data.mail || mailError}
                 >
                   Update
                 </Button>
@@ -339,28 +293,16 @@ export default function EthicalMetrics() {
               )
             }
           />
-          {mailError && (
-            <span style={{ fontSize: "12px", color: "red" }}>
-              Email format is incorrect
-            </span>
-          )}
+          {mailError && <span style={{ fontSize: "12px", color: "red" }}>Email format is incorrect</span>}
         </Form.Group>
       ) : ethicalMetricsConfig.error ? (
         <Ok msg={"Error getting status"} style={{ margin: "auto" }} />
       ) : (
-        <Ok
-          msg={"Loading status..."}
-          loading={true}
-          style={{ margin: "auto" }}
-        />
+        <Ok msg={"Loading status..."} loading={true} style={{ margin: "auto" }} />
       )}
 
-      {reqStatusDisable.error && (
-        <ErrorView error={reqStatusDisable.error} hideIcon red />
-      )}
-      {reqStatusEnable.error && (
-        <ErrorView error={reqStatusEnable.error} hideIcon red />
-      )}
+      {reqStatusDisable.error && <ErrorView error={reqStatusDisable.error} hideIcon red />}
+      {reqStatusEnable.error && <ErrorView error={reqStatusEnable.error} hideIcon red />}
     </Card>
   );
 }

@@ -6,10 +6,5 @@ export default function isDnpDomain(id: string): boolean {
   if (!id || typeof id !== "string") return false;
   if (!id.includes(".")) return false;
   const [, dnpTag, , extension] = id.split(".");
-  return Boolean(
-    dnpTag &&
-      (dnpTag === "dnp" || dnpTag === "public") &&
-      extension &&
-      extension === "eth"
-  );
+  return Boolean(dnpTag && (dnpTag === "dnp" || dnpTag === "public") && extension && extension === "eth");
 }

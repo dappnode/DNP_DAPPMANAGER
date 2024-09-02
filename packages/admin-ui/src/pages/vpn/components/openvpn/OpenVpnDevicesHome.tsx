@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -52,9 +51,7 @@ export default function OpenVpnDevicesHome() {
   function resetDevice(id: string) {
     const isMainAdmin = id === MAIN_ADMIN_NAME;
     confirm({
-      title: isMainAdmin
-        ? `WARNING! Reseting main admin`
-        : `Reseting ${id} device`,
+      title: isMainAdmin ? `WARNING! Reseting main admin` : `Reseting ${id} device`,
       text: isMainAdmin
         ? "You should only reset the credentials of the main admin if you suspect an unwanted party gained access to this credentials. If that is the case, reset the credentials, BUT download and install the new credentials IMMEDIATELY. Otherwise, you will lose access to your DAppNode when this connection stops"
         : "All profiles and links pointing to this device will no longer be valid",
@@ -76,12 +73,11 @@ export default function OpenVpnDevicesHome() {
 
   // Input errors
   const errors: string[] = [];
-  if (input.length > maxIdLength)
-    errors.push(`Device name must be shorter than {maxIdLength} characters`);
+  if (input.length > maxIdLength) errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
   // If the OpenVPN package (known as vpn) is not installed, invite the user to install it
   if (dnpsRequest.data) {
-    const vpnDnp = dnpsRequest.data.find(dnp => dnp.dnpName === vpnDnpName);
+    const vpnDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === vpnDnpName);
     if (!vpnDnp) {
       const url = `${getInstallerPath(vpnDnpName)}/${vpnDnpName}`;
       return (
@@ -102,27 +98,23 @@ export default function OpenVpnDevicesHome() {
         placeholder="Device's unique name"
         value={input}
         // Ensure id contains only alphanumeric characters
-        onValueChange={value => setInput(coerceDeviceName(value))}
+        onValueChange={(value) => setInput(coerceDeviceName(value))}
         onEnterPress={() => {
           addDevice(input);
           setInput("");
         }}
         append={
-          <Button
-            variant="dappnode"
-            onClick={() => addDevice(input)}
-            disabled={errors.length > 0}
-          >
+          <Button variant="dappnode" onClick={() => addDevice(input)} disabled={errors.length > 0}>
             Add device
           </Button>
         }
       />
 
-      {errors.map(error => (
+      {errors.map((error) => (
         <div className="color-danger">{error}</div>
       ))}
 
-      {renderResponse(devicesReq, ["Loading devices"], data => (
+      {renderResponse(devicesReq, ["Loading devices"], (data) => (
         <Card className="list-grid devices">
           <header>Name</header>
           <header className="center">Credentials</header>
@@ -131,7 +123,7 @@ export default function OpenVpnDevicesHome() {
           <header>Remove</header>
           {[...data]
             // Sort main admin device as first
-            .sort(d1 => (d1.id === MAIN_ADMIN_NAME ? -1 : 0))
+            .sort((d1) => (d1.id === MAIN_ADMIN_NAME ? -1 : 0))
             .map(({ id, admin }) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
@@ -139,18 +131,9 @@ export default function OpenVpnDevicesHome() {
                   <Button className="get-link">Get</Button>
                 </NavLink>
 
-                <Switch
-                  checked={admin}
-                  onToggle={() => toggleAdmin(id, !admin)}
-                />
-                <MdRefresh
-                  style={{ fontSize: "1.05rem" }}
-                  onClick={() => resetDevice(id)}
-                />
-                <MdDelete
-                  className={admin ? "disabled" : ""}
-                  onClick={() => (admin ? null : removeDevice(id))}
-                />
+                <Switch checked={admin} onToggle={() => toggleAdmin(id, !admin)} />
+                <MdRefresh style={{ fontSize: "1.05rem" }} onClick={() => resetDevice(id)} />
+                <MdDelete className={admin ? "disabled" : ""} onClick={() => (admin ? null : removeDevice(id))} />
                 <hr />
               </React.Fragment>
             ))}

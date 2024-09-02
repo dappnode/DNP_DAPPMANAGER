@@ -10,17 +10,14 @@ function fileToDataURL(files: FileList): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new window.FileReader();
     reader.onerror = reject;
-    reader.onload = event => {
-      if (event.target && event.target.result)
-        resolve(addNameToDataURL(event.target.result.toString(), file.name));
+    reader.onload = (event) => {
+      if (event.target && event.target.result) resolve(addNameToDataURL(event.target.result.toString(), file.name));
     };
     reader.readAsDataURL(file);
   });
 }
 
-function dataURLtoFile(
-  dataURL: string
-): {
+function dataURLtoFile(dataURL: string): {
   name: string;
   size: number;
   type: string;
@@ -32,7 +29,7 @@ function dataURLtoFile(
   // Get mime-type from params
   const type = params[0].replace("data:", "");
   // Filter the name property from params
-  const properties = params.filter(param => {
+  const properties = params.filter((param) => {
     return param.split("=")[0] === "name";
   });
   // Look for the name and use unknown if no name property.
@@ -91,7 +88,7 @@ export default function InputFieldFile({
         type="file"
         className="custom-file-input"
         accept={accept}
-        onChange={e => {
+        onChange={(e) => {
           if (e.target.files) onSelectFile(e.target.files);
         }}
         disabled={processing}
@@ -100,8 +97,8 @@ export default function InputFieldFile({
         {processing
           ? "Loading file..."
           : file
-          ? `${decodeURIComponent(file.name)} - ${humanFS(file.size)}`
-          : "Choose file"}
+            ? `${decodeURIComponent(file.name)} - ${humanFS(file.size)}`
+            : "Choose file"}
       </label>
     </div>
   );

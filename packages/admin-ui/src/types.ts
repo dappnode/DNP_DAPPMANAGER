@@ -23,6 +23,7 @@ declare global {
     /**
      * Autobahn session.call
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     call: (event: string, args?: any[], kwargs?: any) => any;
   }
 }
@@ -59,8 +60,5 @@ export interface AppContextIface {
 
 export type ModulesContext = Pick<
   AppContextIface,
-  | "stakersModuleStatus"
-  | "rollupsModuleStatus"
-  | "toggleStakersModuleStatus"
-  | "toggleRollupsModuleStatus"
+  "stakersModuleStatus" | "rollupsModuleStatus" | "toggleStakersModuleStatus" | "toggleRollupsModuleStatus"
 >;

@@ -3,17 +3,12 @@ import {
   dockerListNetworks,
   dockerNetworkConnect,
   dockerNetworkDisconnect,
-  listPackageNoThrow,
+  listPackageNoThrow
 } from "@dappnode/dockerapi";
 import { listPackageContainers } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { getExternalNetworkAlias } from "./domains.js";
-import {
-  PackageContainer,
-  HttpsPortalMapping,
-  InstallPackageData,
-  InstalledPackageData,
-} from "@dappnode/types";
+import { PackageContainer, HttpsPortalMapping, InstallPackageData, InstalledPackageData } from "@dappnode/types";
 import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { prettyDnpName } from "@dappnode/utils";
@@ -48,22 +43,17 @@ export class HttpsPortal {
     }
 
     // Ensure the HTTPs portal container is connected to `externalNetworkName`
-    const httpsPortalContainer = containers.find(
-      (c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME
-    );
+    const httpsPortalContainer = containers.find((c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME);
     if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
     if (!this.isConnected(httpsPortalContainer)) {
-      await dockerNetworkConnect(
-        externalNetworkName,
-        httpsPortalContainer.containerName
-      );
+      await dockerNetworkConnect(externalNetworkName, httpsPortalContainer.containerName);
     }
 
     // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
     if (!this.isConnected(container)) {
       await dockerNetworkConnect(externalNetworkName, container.containerName, {
-        Aliases: aliases,
+        Aliases: aliases
       });
     }
 
@@ -71,24 +61,19 @@ export class HttpsPortal {
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`,
-      auth: mapping.auth,
+      auth: mapping.auth
     });
 
     // Edit compose to persist the setting
     this.addNetworkAliasCompose(container, externalNetworkName, aliases);
 
     // Check whether DNP_HTTPS compose has external network persisted
-    const httpsComposePath = ComposeEditor.getComposePath(
-      params.HTTPS_PORTAL_DNPNAME,
-      true
-    );
+    const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true);
     const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath));
 
     if (editor.getComposeNetwork(externalNetworkName) === null) {
       const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
-      this.addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [
-        httpsExternalAlias,
-      ]);
+      this.addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias]);
     }
   }
 
@@ -105,34 +90,27 @@ export class HttpsPortal {
     // Call Http Portal API to remove the mapping
     await this.httpsPortalApiClient.remove({
       fromSubdomain: mapping.fromSubdomain,
-      toHost: externalNetworkAlias,
+      toHost: externalNetworkAlias
     });
 
     // If container still has mappings, don't disconnect from network
     const mappings = await this.getMappings(containers);
     const containerHasMappings = mappings.some(
-      (mapping) =>
-        mapping.dnpName === container.dnpName &&
-        mapping.serviceName === container.serviceName
+      (mapping) => mapping.dnpName === container.dnpName && mapping.serviceName === container.serviceName
     );
     if (containerHasMappings) return;
 
     // Container leaves external network
     // Check first is it's connected, or dockerNetworkDisconnect throws
     if (this.isConnected(container)) {
-      await dockerNetworkDisconnect(
-        externalNetworkName,
-        container.containerName
-      );
+      await dockerNetworkDisconnect(externalNetworkName, container.containerName);
     }
 
     // Edit compose to persist the setting
     this.removeNetworkAliasCompose(container, externalNetworkName);
   }
 
-  async getMappings(
-    containers?: PackageContainer[]
-  ): Promise<HttpsPortalMapping[]> {
+  async getMappings(containers?: PackageContainer[]): Promise<HttpsPortalMapping[]> {
     if (!(await this.isRunningHttps())) return [];
     if (!containers) containers = await listPackageContainers();
 
@@ -154,7 +132,7 @@ export class HttpsPortal {
           dnpName: container.dnpName,
           serviceName: container.serviceName,
           port: parseInt(port) || 80,
-          auth,
+          auth
         });
       }
     }
@@ -181,10 +159,7 @@ export class HttpsPortal {
    * - is HTTPS package
    * - any package with https portal mappings
    */
-  async connectToPublicNetwork(
-    pkg: InstallPackageData,
-    externalNetworkName: string
-  ): Promise<void> {
+  async connectToPublicNetwork(pkg: InstallPackageData, externalNetworkName: string): Promise<void> {
     // if there is no https, checks aren't needed
     if (!(await this.isRunningHttps())) return;
 
@@ -196,28 +171,21 @@ export class HttpsPortal {
     const containers =
       (
         await listPackageNoThrow({
-          dnpName: pkg.dnpName,
+          dnpName: pkg.dnpName
         })
       )?.containers || [];
 
     if (containers.length === 0) return;
 
     for (const container of containers) {
-      if (
-        pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
-        (await this.hasMapping(pkg.dnpName, container.serviceName))
-      ) {
+      if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME || (await this.hasMapping(pkg.dnpName, container.serviceName))) {
         const alias = getExternalNetworkAlias({
           serviceName: container.serviceName,
-          dnpName: pkg.dnpName,
+          dnpName: pkg.dnpName
         });
 
         if (!container.networks.find((n) => n.name === externalNetworkName)) {
-          await dockerNetworkConnect(
-            externalNetworkName,
-            container.containerName,
-            { Aliases: [alias] }
-          );
+          await dockerNetworkConnect(externalNetworkName, container.containerName, { Aliases: [alias] });
         }
       }
     }
@@ -226,10 +194,7 @@ export class HttpsPortal {
   /**
    * Expose default HTTPS ports on installation defined in the manifest - exposable
    */
-  async exposeByDefaultHttpsPorts(
-    pkg: InstallPackageData,
-    log: Log
-  ): Promise<void> {
+  async exposeByDefaultHttpsPorts(pkg: InstallPackageData, log: Log): Promise<void> {
     const exposables = pkg.manifest.exposable;
 
     // Return if no exposable or not exposeByDefault
@@ -237,9 +202,7 @@ export class HttpsPortal {
 
     // Requires that https package exists and it is running
     if (!(await this.isRunningHttps()))
-      throw Error(
-        `HTTPS package not running but required to expose HTTPS ports by default.`
-      );
+      throw Error(`HTTPS package not running but required to expose HTTPS ports by default.`);
 
     const currentMappings = await this.getMappings();
     const portMappinRollback: HttpsPortalMapping[] = [];
@@ -249,54 +212,29 @@ export class HttpsPortal {
         const portalMapping: HttpsPortalMapping = {
           fromSubdomain: exposable.fromSubdomain || prettyDnpName(pkg.dnpName), // get dnpName by default
           dnpName: pkg.dnpName,
-          serviceName:
-            exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
-          port: exposable.port,
+          serviceName: exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
+          port: exposable.port
         };
 
-        if (
-          currentMappings.length > 0 &&
-          currentMappings.includes(portalMapping)
-        )
-          continue;
+        if (currentMappings.length > 0 && currentMappings.includes(portalMapping)) continue;
 
         try {
           // Expose default HTTPS ports
-          log(
-            pkg.dnpName,
-            `Exposing ${prettyDnpName(pkg.dnpName)}:${
-              exposable.port
-            } to the external internet`
-          );
+          log(pkg.dnpName, `Exposing ${prettyDnpName(pkg.dnpName)}:${exposable.port} to the external internet`);
           await this.addMapping(portalMapping);
           portMappinRollback.push(portalMapping);
 
-          log(
-            pkg.dnpName,
-            `Exposed ${prettyDnpName(pkg.dnpName)}:${
-              exposable.port
-            } to the external internet`
-          );
+          log(pkg.dnpName, `Exposed ${prettyDnpName(pkg.dnpName)}:${exposable.port} to the external internet`);
         } catch (e) {
           if (e.message.includes("External endpoint already exists")) {
             // Bypass error if already exposed: 400 Bad Request {"error":"External endpoint already exists"}
-            log(
-              pkg.dnpName,
-              `External endpoint already exists for ${prettyDnpName(
-                pkg.dnpName
-              )}:${exposable.port}`
-            );
+            log(pkg.dnpName, `External endpoint already exists for ${prettyDnpName(pkg.dnpName)}:${exposable.port}`);
           } else {
             // Remove all mappings and throw error to trigger package install rollback
             e.message = `${e.message} Error exposing default HTTPS ports, removing mappings`;
             for (const mappingRollback of portMappinRollback) {
               await this.removeMapping(mappingRollback).catch((e) => {
-                log(
-                  pkg.dnpName,
-                  `Error removing mapping ${JSON.stringify(mappingRollback)}, ${
-                    e.message
-                  }`
-                );
+                log(pkg.dnpName, `Error removing mapping ${JSON.stringify(mappingRollback)}, ${e.message}`);
               });
             }
             throw e;
@@ -313,9 +251,7 @@ export class HttpsPortal {
       if (mapping.dnpName === pkg.dnpName)
         await this.removeMapping(mapping)
           // Bypass error to continue deleting mappings
-          .catch((e) =>
-            logs.error(`Error removing https mapping of ${pkg.dnpName}`, e)
-          );
+          .catch((e) => logs.error(`Error removing https mapping of ${pkg.dnpName}`, e));
     }
   }
 
@@ -325,14 +261,8 @@ export class HttpsPortal {
   ): Promise<PackageContainer> {
     if (!containers) containers = await listPackageContainers();
 
-    const container = containers.find(
-      (c) =>
-        c.dnpName === mapping.dnpName && c.serviceName === mapping.serviceName
-    );
-    if (!container)
-      throw Error(
-        `No container found for ${mapping.dnpName} ${mapping.serviceName}`
-      );
+    const container = containers.find((c) => c.dnpName === mapping.dnpName && c.serviceName === mapping.serviceName);
+    if (!container) throw Error(`No container found for ${mapping.dnpName} ${mapping.serviceName}`);
 
     return container;
   }
@@ -346,7 +276,7 @@ export class HttpsPortal {
    */
   private async isRunningHttps(): Promise<boolean> {
     const httpsPackage = await listPackageNoThrow({
-      dnpName: params.HTTPS_PORTAL_DNPNAME,
+      dnpName: params.HTTPS_PORTAL_DNPNAME
     });
 
     if (!httpsPackage) return false;
@@ -355,21 +285,14 @@ export class HttpsPortal {
     return httpsPackage.containers.every((container) => container.running);
   }
 
-  private removeNetworkAliasCompose(
-    container: PackageContainer,
-    networkName: string
-  ): void {
+  private removeNetworkAliasCompose(container: PackageContainer, networkName: string): void {
     const compose = new ComposeFileEditor(container.dnpName, container.isCore);
     const composeService = compose.services()[container.serviceName];
     composeService.removeNetwork(networkName);
     compose.write();
   }
 
-  private addNetworkAliasCompose(
-    container: PackageContainer,
-    networkName: string,
-    aliases: string[]
-  ): void {
+  private addNetworkAliasCompose(container: PackageContainer, networkName: string, aliases: string[]): void {
     const compose = new ComposeFileEditor(container.dnpName, container.isCore);
     const composeService = compose.services()[container.serviceName];
     composeService.addNetwork(networkName, { aliases });

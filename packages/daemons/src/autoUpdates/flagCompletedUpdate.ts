@@ -11,14 +11,10 @@ import { omit } from "lodash-es";
  * @param version "0.2.5"
  * @param timestamp Use ONLY to make tests deterministic
  */
-export function flagCompletedUpdate(
-  dnpName: string,
-  version: string,
-  timestamp?: number
-): void {
+export function flagCompletedUpdate(dnpName: string, version: string, timestamp?: number): void {
   setRegistry(dnpName, version, {
     updated: timestamp || Date.now(),
-    successful: true,
+    successful: true
   });
 
   clearPendingUpdatesOfDnp(dnpName);
@@ -32,11 +28,7 @@ export function flagCompletedUpdate(
  * @param version "0.2.5"
  * @param data { param: "value" }
  */
-function setRegistry(
-  dnpName: string,
-  version: string,
-  data: AutoUpdateRegistryEntry
-): void {
+function setRegistry(dnpName: string, version: string, data: AutoUpdateRegistryEntry): void {
   const registry = db.autoUpdateRegistry.get();
 
   db.autoUpdateRegistry.set({
@@ -45,9 +37,9 @@ function setRegistry(
       ...(registry[dnpName] || {}),
       [version]: {
         ...((registry[dnpName] || {})[version] || {}),
-        ...data,
-      },
-    },
+        ...data
+      }
+    }
   });
 
   eventBus.requestAutoUpdateData.emit();

@@ -7,9 +7,7 @@ import { runTimer } from "../runTimer.js";
 export async function recreateDappnode(): Promise<void> {
   const response = await runTimer({
     name: "recreate-dappnode.timer",
-    dependantService: "recreate-dappnode.service",
+    dependantService: "recreate-dappnode.service"
   });
-  logs.info(
-    `Successfully started recreate dappnode to latest service ${response}`
-  );
+  logs.info(`Successfully started recreate dappnode to latest service ${response}`);
 }

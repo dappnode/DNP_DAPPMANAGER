@@ -1,10 +1,5 @@
 import { logs } from "@dappnode/logger";
-import {
-  dockerVolumesList,
-  dockerVolumeRemove,
-  dockerContainerRemove,
-  listPackages,
-} from "@dappnode/dockerapi";
+import { dockerVolumesList, dockerVolumeRemove, dockerContainerRemove, listPackages } from "@dappnode/dockerapi";
 import fs from "fs";
 import { InstalledPackageData } from "@dappnode/types";
 import {
@@ -13,7 +8,7 @@ import {
   parseEnvironment,
   shell,
   getManifestPath,
-  getEnvFilePath,
+  getEnvFilePath
 } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
@@ -25,7 +20,7 @@ const volumesToRemove = [
   // must be removed for the bind state to be reset
   "dncore_binddnpdappnodeeth_bind",
   // Volume shared between ADMIN and VPN to share credentials
-  "vpndnpdappnodeeth_shared",
+  "vpndnpdappnodeeth_shared"
 ];
 
 const dnpsToRemove = [
@@ -35,7 +30,7 @@ const dnpsToRemove = [
   "admin.dnp.dappnode.eth",
   // DNP_ETHFORWARD functionality has been moved to the DAPPMANAGER
   // The migration is just deleting the container and clearing it's assets
-  "ethforward.dnp.dappnode.eth",
+  "ethforward.dnp.dappnode.eth"
 ];
 
 /**
@@ -45,9 +40,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
   const dnpList = await listPackages();
   const volumes = await dockerVolumesList();
 
-  migrateLegacyEnvFiles(dnpList).catch((e) =>
-    logs.error("Error migrate env_files", e)
-  );
+  migrateLegacyEnvFiles(dnpList).catch((e) => logs.error("Error migrate env_files", e));
 
   // Remove legacy volumes
   for (const volName of volumesToRemove)
@@ -68,19 +61,15 @@ export async function removeLegacyDockerAssets(): Promise<void> {
     if (dnp)
       try {
         // Remove / uninstall DNP
-        for (const container of dnp.containers)
-          await dockerContainerRemove(container.containerName);
+        for (const container of dnp.containers) await dockerContainerRemove(container.containerName);
 
         // Clean manifest and docker-compose
-        for (const filepath of [
-          getDockerComposePath(dnpName, true),
-          getManifestPath(dnpName, true),
-        ])
+        for (const filepath of [getDockerComposePath(dnpName, true), getManifestPath(dnpName, true)])
           if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 
         logs.info(`Removed legacy DNP ${dnpName}`);
       } catch (e) {
-        logs.error(`Error removing legacy DNP ${dnpName}`);
+        logs.error(`Error removing legacy DNP ${dnpName}: ${e}`);
       }
   }
 }
@@ -92,9 +81,7 @@ export async function removeLegacyDockerAssets(): Promise<void> {
  * This function will read the contents of .env files and add them in the
  * compose itself in the `environment` field in array format
  */
-export async function migrateLegacyEnvFiles(
-  dnpList: InstalledPackageData[]
-): Promise<void> {
+export async function migrateLegacyEnvFiles(dnpList: InstalledPackageData[]): Promise<void> {
   try {
     for (const dnp of dnpList) migrateLegacyEnvFile(dnp.dnpName, dnp.isCore);
     logs.info("Finished migrating legacy DNP .env files if any");
@@ -103,10 +90,7 @@ export async function migrateLegacyEnvFiles(
   }
 }
 
-export function migrateLegacyEnvFile(
-  dnpName: string,
-  isCore: boolean
-): boolean {
+export function migrateLegacyEnvFile(dnpName: string, isCore: boolean): boolean {
   const envFilePath = getEnvFilePath(dnpName, isCore);
   try {
     const envFileData = fs.readFileSync(envFilePath, "utf8");
@@ -123,13 +107,10 @@ export function migrateLegacyEnvFile(
       logs.info(`Converted ${dnpName} .env file to compose environment`);
       return true;
     } else {
-      throw Error(
-        `Can not migrate ENVs for multi-service packages: ${dnpName}`
-      );
+      throw Error(`Can not migrate ENVs for multi-service packages: ${dnpName}`);
     }
   } catch (e) {
-    if (!isNotFoundError(e))
-      logs.error(`Error migrating ${dnpName} .env file`, e);
+    if (!isNotFoundError(e)) logs.error(`Error migrating ${dnpName} .env file`, e);
     return false;
   }
 }

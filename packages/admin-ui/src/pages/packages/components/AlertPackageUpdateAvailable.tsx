@@ -16,22 +16,12 @@ export function AlertPackageUpdateAvailable({
   const [show, setShow] = useState(true);
   const navigate = useNavigate();
   return show ? (
-    <Alert
-      variant="info"
-      onClose={() => setShow(false)}
-      dismissible
-      className="main-notification"
-    >
+    <Alert variant="info" onClose={() => setShow(false)} dismissible className="main-notification">
       <div>
-        {prettyDnpName(dnpName)} update available to version{" "}
-        {updateAvailable.newVersion}{" "}
-        {updateAvailable.upstreamVersion &&
-          `(${updateAvailable.upstreamVersion} upstream)`}
+        {prettyDnpName(dnpName)} update available to version {updateAvailable.newVersion}{" "}
+        {updateAvailable.upstreamVersion && `(${updateAvailable.upstreamVersion} upstream)`}
       </div>
-      <Button
-        onClick={() => navigate(`${getInstallerPath(dnpName)}/${dnpName}`)}
-        variant="dappnode"
-      >
+      <Button onClick={() => navigate(`${getInstallerPath(dnpName)}/${dnpName}`)} variant="dappnode">
         Update
       </Button>
     </Alert>

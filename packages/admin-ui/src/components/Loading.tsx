@@ -5,7 +5,7 @@ import "./loading.scss";
 export default function Loading({ steps }: { steps: string[] }) {
   const [index, setIndex] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => setIndex(i => i + 1), 3000);
+    const interval = setInterval(() => setIndex((i) => i + 1), 3000);
     return () => clearInterval(interval);
   }, []);
 

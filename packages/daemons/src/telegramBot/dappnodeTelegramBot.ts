@@ -25,30 +25,30 @@ const COMMANDS: Record<string, ICommand> = {
   "/enable_auto_updates": {
     description: "Enable auto-updates for all packages",
     action: "handleEnableAutoUpdates",
-    requiresAuth: true,
+    requiresAuth: true
   },
   "/disable_auto_updates": {
     description: "Disable auto-updates for all packages",
     action: "handleDisableAutoUpdates",
-    requiresAuth: true,
+    requiresAuth: true
   },
   "/start": {
     description: "Subscribe to future notifications",
-    action: "handleSubscribe",
+    action: "handleSubscribe"
   },
   "/unsubscribe": {
     description: "Unsubscribe from future notifications",
-    action: "handleUnsubscribe",
+    action: "handleUnsubscribe"
   },
   "/help": {
     description: "Display all available commands",
-    action: "handleGetHelp",
+    action: "handleGetHelp"
   },
   "/get_wireguard_credentials": {
     description: "Fetch wireguard credentials",
     action: "handleGetWireguardCredentials",
-    requiresAuth: true,
-  },
+    requiresAuth: true
+  }
 };
 
 export class DappnodeTelegramBot {
@@ -62,9 +62,7 @@ export class DappnodeTelegramBot {
     // 3. ETELEGRAM if error was returned from Telegram servers
     // ETELEGRAM: 409 Conflict  =>  More than one bot instance polling
     // ETELEGRAM: 404 Not Found => wrong token or not found
-    this.bot.on("polling_error", (error) =>
-      logs.error(`${error.name}: ${error.message}`)
-    );
+    this.bot.on("polling_error", (error) => logs.error(`${error.name}: ${error.message}`));
     this.bot.on("message", (msg) => this.handleMessage(msg));
   }
 
@@ -83,9 +81,7 @@ export class DappnodeTelegramBot {
   private async handleMessage(msg: TelegramBot.Message): Promise<void> {
     if (!msg.text) return;
 
-    const command = Object.keys(COMMANDS).find((cmd) =>
-      msg.text?.startsWith(cmd)
-    );
+    const command = Object.keys(COMMANDS).find((cmd) => msg.text?.startsWith(cmd));
     if (!command) {
       await this.checkSubscription(msg);
       return;
@@ -105,9 +101,7 @@ export class DappnodeTelegramBot {
   /**
    *  Fetch wireguard credentials with the default device
    */
-  private async handleGetWireguardCredentials(
-    msg: TelegramBot.Message
-  ): Promise<void> {
+  private async handleGetWireguardCredentials(msg: TelegramBot.Message): Promise<void> {
     // default device name is dappnode_admin, see https://github.com/dappnode/DNP_WIREGUARD/blob/4a074010c98b5d3003d1c3306edcb75392b247f4/docker-compose.yml#L12
     const deviceName = msg.text?.split(" ")[1] || "dappnode_admin";
     // build url with params.WIREGUARD_API_URL and deviceName
@@ -120,11 +114,7 @@ export class DappnodeTelegramBot {
           msg.chat.id,
           `Device ${deviceName} not found. Please provide a valid device name or if you have setup dappnode cloud wait for the credentials to be generated.`
         );
-      else
-        return await this.sendMessage(
-          msg.chat.id,
-          `Error fetching wireguard credentials. Please try again later.`
-        );
+      else return await this.sendMessage(msg.chat.id, `Error fetching wireguard credentials. Please try again later.`);
     }
 
     await this.sendMessage(msg.chat.id, configRemote);
@@ -133,9 +123,7 @@ export class DappnodeTelegramBot {
   /**
    * Enable auto-updates for system and regular packages
    */
-  private async handleEnableAutoUpdates(
-    msg: TelegramBot.Message
-  ): Promise<void> {
+  private async handleEnableAutoUpdates(msg: TelegramBot.Message): Promise<void> {
     editDnpSetting(true);
     editCoreSetting(true);
     await this.sendMessage(
@@ -147,9 +135,7 @@ export class DappnodeTelegramBot {
   /**
    * Disable auto-updates for system and regular packages
    */
-  private async handleDisableAutoUpdates(
-    msg: TelegramBot.Message
-  ): Promise<void> {
+  private async handleDisableAutoUpdates(msg: TelegramBot.Message): Promise<void> {
     editDnpSetting(false);
     editCoreSetting(false);
     await this.sendMessage(
@@ -164,14 +150,10 @@ export class DappnodeTelegramBot {
   private async handleGetHelp(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
     const commandsList = Object.entries(COMMANDS).map(
-      ([command, { description }]) =>
-        `${command.replace(/_/g, "\\_")} - ${description}` // escape underscore for markdown
+      ([command, { description }]) => `${command.replace(/_/g, "\\_")} - ${description}` // escape underscore for markdown
     );
 
-    await this.sendMessage(
-      chatId,
-      [bold("Commands"), ...commandsList].join("\n\n")
-    );
+    await this.sendMessage(chatId, [bold("Commands"), ...commandsList].join("\n\n"));
   }
 
   /**
@@ -179,9 +161,7 @@ export class DappnodeTelegramBot {
    */
   private async handleSubscribe(msg: TelegramBot.Message): Promise<void> {
     const chatId = msg.chat.id.toString();
-    const message =
-      this.formatTelegramCommandHeader("Success") +
-      "Successfully saved channel ID";
+    const message = this.formatTelegramCommandHeader("Success") + "Successfully saved channel ID";
 
     this.addChannelId(chatId);
 
@@ -197,12 +177,9 @@ export class DappnodeTelegramBot {
     if (this.channelIdExists(chatId)) {
       this.removeChannelId(chatId);
 
-      message =
-        this.formatTelegramCommandHeader("Success") +
-        "Succesfully removed channel ID";
+      message = this.formatTelegramCommandHeader("Success") + "Succesfully removed channel ID";
     } else {
-      message =
-        this.formatTelegramCommandHeader("Fail") + "Channel ID not found";
+      message = this.formatTelegramCommandHeader("Fail") + "Channel ID not found";
     }
 
     await this.sendMessage(chatId, message);
@@ -214,13 +191,8 @@ export class DappnodeTelegramBot {
     return !!userId && userId.toString() === db.telegramUserId.get();
   }
 
-  private async sendUnauthorizedMessage(
-    chatId: number | string
-  ): Promise<void> {
-    await this.sendMessage(
-      chatId,
-      "Unauthorized user. Please contact the admin"
-    );
+  private async sendUnauthorizedMessage(chatId: number | string): Promise<void> {
+    await this.sendMessage(chatId, "Unauthorized user. Please contact the admin");
   }
 
   private async checkSubscription(msg: TelegramBot.Message): Promise<void> {
@@ -241,17 +213,13 @@ export class DappnodeTelegramBot {
 
   private removeChannelId(channelId: string): void {
     const channelIds = db.telegramChannelIds.get();
-    db.telegramChannelIds.set(
-      channelIds.filter((chatId) => chatId !== channelId)
-    );
+    db.telegramChannelIds.set(channelIds.filter((chatId) => chatId !== channelId));
   }
 
   /**
    * Builds the telegram command message header
    */
-  private formatTelegramCommandHeader(
-    header: TelegramCommandMessageHeader
-  ): string {
+  private formatTelegramCommandHeader(header: TelegramCommandMessageHeader): string {
     switch (header) {
       case "Fail":
         return `❌ `;

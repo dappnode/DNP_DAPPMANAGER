@@ -14,6 +14,6 @@ const hostScriptsDirSource = params.HOST_SCRIPTS_SOURCE_DIR;
 export async function copyHostScripts(): Promise<void> {
   await copyOnHost({
     hostDir: hostScriptsDir,
-    hostDirSource: hostScriptsDirSource,
+    hostDirSource: hostScriptsDirSource
   });
 }

@@ -4,9 +4,7 @@ import { InstallPackageData, InstallPackageDataPaths } from "@dappnode/types";
 
 const CORE_UPDATE_PACKAGES_DATA = "core-update-packages-data";
 
-const _coreUpdatePackagesData = dbCache.staticKey<
-  InstallPackageDataPaths[] | null
->(CORE_UPDATE_PACKAGES_DATA, null);
+const _coreUpdatePackagesData = dbCache.staticKey<InstallPackageDataPaths[] | null>(CORE_UPDATE_PACKAGES_DATA, null);
 
 /**
  * Store packages install data to finalize a core update after the DAPPMANAGER
@@ -15,9 +13,7 @@ const _coreUpdatePackagesData = dbCache.staticKey<
  */
 export const coreUpdatePackagesData = {
   get: _coreUpdatePackagesData.get,
-  set: (
-    packagesData: (InstallPackageData | InstallPackageDataPaths)[] | null
-  ): void =>
+  set: (packagesData: (InstallPackageData | InstallPackageDataPaths)[] | null): void =>
     _coreUpdatePackagesData.set(
       packagesData
         ? packagesData.map(
@@ -32,9 +28,9 @@ export const coreUpdatePackagesData = {
                 "imagePath",
                 "isUpdate",
                 "dockerTimeout",
-                "containersStatus",
+                "containersStatus"
               ])
           )
         : packagesData
-    ),
+    )
 };

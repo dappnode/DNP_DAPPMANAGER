@@ -10,19 +10,13 @@ import { confirm } from "components/ConfirmDialog";
 import "./packageSentData.scss";
 import { isLink } from "utils/isLink";
 
-export function RenderPackageSentData({
-  dnpName,
-  data
-}: {
-  dnpName: string;
-  data: Record<string, string>;
-}) {
+export function RenderPackageSentData({ dnpName, data }: { dnpName: string; data: Record<string, string> }) {
   const entries = Object.entries(data);
 
   if (entries.length === 0) return null;
 
   async function onDelete() {
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: "Removing sent data",
         text: "Are you sure you want to delete?",
@@ -57,12 +51,7 @@ export function RenderPackageSentData({
         <React.Fragment key={key}>
           <div>{key}</div>
           <div>
-            <SentDataRow
-              key={key}
-              value={value}
-              isLink={isLink(value)}
-              isSecret={isSecret(key)}
-            />
+            <SentDataRow key={key} value={value} isLink={isLink(value)} isSecret={isSecret(key)} />
           </div>
         </React.Fragment>
       ))}
@@ -76,15 +65,7 @@ export function RenderPackageSentData({
   );
 }
 
-function SentDataRow({
-  value,
-  isLink,
-  isSecret
-}: {
-  value: string;
-  isLink?: boolean;
-  isSecret?: boolean;
-}) {
+function SentDataRow({ value, isLink, isSecret }: { value: string; isLink?: boolean; isSecret?: boolean }) {
   const [show, setShow] = useState(false);
   const [showCopyTooltip, setShowCopyTooltip] = useState(false);
 
@@ -118,10 +99,7 @@ function SentDataRow({
       {!isLink && (
         <InputGroup.Append>
           {isSecret && (
-            <Button
-              onClick={() => setShow(x => !x)}
-              className="input-append-button"
-            >
+            <Button onClick={() => setShow((x) => !x)} className="input-append-button">
               {show ? <GoEyeClosed /> : <GoEye />}
             </Button>
           )}

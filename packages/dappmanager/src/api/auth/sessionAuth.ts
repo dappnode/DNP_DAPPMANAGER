@@ -39,11 +39,7 @@ export class AuthPasswordSession {
   adminPasswordDb: AdminPasswordDb;
   recoveryDb: PlainTextFileDb;
 
-  constructor(
-    sessions: SessionsManager,
-    adminPasswordDb: AdminPasswordDb,
-    params: AuthPasswordSessionParams
-  ) {
+  constructor(sessions: SessionsManager, adminPasswordDb: AdminPasswordDb, params: AuthPasswordSessionParams) {
     this.sessions = sessions;
     this.adminPasswordDb = adminPasswordDb;
     this.recoveryDb = new PlainTextFileDb(params.ADMIN_RECOVERY_FILE);
@@ -98,8 +94,7 @@ export class AuthPasswordSession {
     const password = req.body.password;
 
     if (!username || !password) throw new MissingCredentialsError();
-    if (this.adminPasswordDb.hasSomePassword())
-      throw new AlreadyRegisteredError();
+    if (this.adminPasswordDb.hasSomePassword()) throw new AlreadyRegisteredError();
 
     this.adminPasswordDb.setPassword(username, password);
 

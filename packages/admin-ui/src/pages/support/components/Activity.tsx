@@ -35,23 +35,18 @@ export default function Activity() {
   }, [userActionLogs.data]);
 
   function loadMore() {
-    setCount(n => n + 50);
+    setCount((n) => n + 50);
   }
 
   return (
     <>
       <p>
-        If a developer asks for more information regarding an error; please find
-        the error in the list below, tap on it and copy everything in the
-        expanded grey text area.
+        If a developer asks for more information regarding an error; please find the error in the list below, tap on it
+        and copy everything in the expanded grey text area.
       </p>
 
       <div>
-        <a
-          href={apiRoutes.userActionLogsUrl()}
-          {...newTabProps}
-          className="no-a-style"
-        >
+        <a href={apiRoutes.userActionLogsUrl()} {...newTabProps} className="no-a-style">
           <Button variant="dappnode"> Download all logs</Button>
         </a>
       </div>
@@ -66,14 +61,10 @@ export default function Activity() {
       ) : userActionLogs.error ? (
         <ErrorView error={userActionLogs.error} />
       ) : userActionLogs.isValidating ? (
-        <Loading
-          steps={["Loading user action logs", "Parsing user action logs"]}
-        />
+        <Loading steps={["Loading user action logs", "Parsing user action logs"]} />
       ) : null}
 
-      {userActionLogs.data && userActionLogs.data.length === count && (
-        <Button onClick={loadMore}>Load more</Button>
-      )}
+      {userActionLogs.data && userActionLogs.data.length === count && <Button onClick={loadMore}>Load more</Button>}
     </>
   );
 }
@@ -88,7 +79,7 @@ function ActivityItem({ log }: { log: UserActionLog }) {
   // Force a re-render every 15 seconds for the timeFrom to show up correctly
   const [, setClock] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => setClock(n => n + 1), 15 * 1000);
+    const interval = setInterval(() => setClock((n) => n + 1), 15 * 1000);
     return () => {
       clearInterval(interval);
     };
@@ -97,33 +88,23 @@ function ActivityItem({ log }: { log: UserActionLog }) {
   // memo JSON.stringify to prevent re-running it every time the clock is refreshed
   const argsString = useMemo(
     () =>
-      Array.isArray(log.args) && log.args.length === 1
-        ? stringifyObjSafe(log.args[0])
-        : stringifyObjSafe(log.args),
+      Array.isArray(log.args) && log.args.length === 1 ? stringifyObjSafe(log.args[0]) : stringifyObjSafe(log.args),
     [log.args]
   );
 
   return (
     <div className="user-log">
-      <div
-        className="list-group-item-action log-container"
-        onClick={() => setCollapsed(!collapsed)}
-      >
+      <div className="list-group-item-action log-container" onClick={() => setCollapsed(!collapsed)}>
         <div className="d-flex justify-content-between">
           {/* Top row - left */}
           <div className="log-header">
             {/* Error badge */}
-            {log.level === "error" ? (
-              <span className={badgeClass + type}>{log.level}</span>
-            ) : null}
+            {log.level === "error" ? <span className={badgeClass + type}>{log.level}</span> : null}
             {/* Count badge */}
-            {log.count ? (
-              <span className={badgeClass + "light"}>{log.count}</span>
-            ) : null}
+            {log.count ? <span className={badgeClass + "light"}>{log.count}</span> : null}
             {/* Call name */}
             <span className={"text-" + type}>
-              <span className="call-to">Call to</span>{" "}
-              <strong>{eventShort}</strong>
+              <span className="call-to">Call to</span> <strong>{eventShort}</strong>
             </span>
           </div>
           {/* Top row - right */}

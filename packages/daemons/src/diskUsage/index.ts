@@ -35,12 +35,10 @@ const thresholds = [
 async function monitorDiskUsage(): Promise<void> {
   try {
     const diskAvailable = await shell(`df -k / | awk 'NR>1 { print $4}'`);
-    if (!diskAvailable || typeof diskAvailable !== "string")
-      throw Error("diskAvailable return must be a string");
+    if (!diskAvailable || typeof diskAvailable !== "string") throw Error("diskAvailable return must be a string");
 
     const diskAvailableKBytes = parseInt(diskAvailable.trim());
-    if (isNaN(diskAvailableKBytes))
-      throw Error("diskAvailableKBytes must be a number");
+    if (isNaN(diskAvailableKBytes)) throw Error("diskAvailableKBytes must be a number");
 
     for (const threshold of thresholds) {
       const thresholdIsActive = db.diskUsageThreshold.get(threshold.id);
@@ -85,9 +83,8 @@ async function monitorDiskUsage(): Promise<void> {
         }
 
         // Format the names output to display the exact list of stopped containers
-        const stoppedContainerNames =
-          names && typeof names === "string" ? names.split(/\r?\n/g) : [];
-        const stoppedDnpNames = stoppedContainerNames.map(name =>
+        const stoppedContainerNames = names && typeof names === "string" ? names.split(/\r?\n/g) : [];
+        const stoppedDnpNames = stoppedContainerNames.map((name) =>
           name.replace(/(DAppNodePackage-)|(DAppNodeCore-)/g, "")
         );
         const stoppedDnpNameList = stoppedDnpNames.join(", ");
@@ -103,9 +100,7 @@ async function monitorDiskUsage(): Promise<void> {
           body: [
             `Available disk space is less than a ${threshold.id}.`,
             `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
-            stoppedDnpNames
-              .map(dnpName => ` - ${prettyDnpName(dnpName)}`)
-              .join("\n"),
+            stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
             `Please, free up enough disk space and start them again.`
           ].join("\n\n")
         });
@@ -128,9 +123,5 @@ async function monitorDiskUsage(): Promise<void> {
  * Prevents disk usage from getting full by stopping non-essential packages
  */
 export function startDiskUsageDaemon(signal: AbortSignal): void {
-  runAtMostEvery(
-    monitorDiskUsage,
-    params.CHECK_DISK_USAGE_DAEMON_INTERVAL,
-    signal
-  );
+  runAtMostEvery(monitorDiskUsage, params.CHECK_DISK_USAGE_DAEMON_INTERVAL, signal);
 }

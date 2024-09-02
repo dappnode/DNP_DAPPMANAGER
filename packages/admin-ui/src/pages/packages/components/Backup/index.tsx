@@ -6,13 +6,7 @@ import { BackupRestore } from "./Restore";
 import "./backup.scss";
 import { PackageBackup } from "@dappnode/types";
 
-export function Backup({
-  dnpName,
-  backup
-}: {
-  dnpName: string;
-  backup: PackageBackup[];
-}) {
+export function Backup({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }) {
   // Only render the component if a backup mechanism is provided
   if (!Array.isArray(backup)) return null;
 

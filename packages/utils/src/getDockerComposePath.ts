@@ -3,10 +3,7 @@ import fs from "fs";
 import { getRepoDirPath } from "./getRepoDirPath.js";
 
 export function getDockerComposePath(dnpName: string, isCore: boolean): string {
-  return path.join(
-    getRepoDirPath(dnpName, isCore),
-    getDockerComposeName(dnpName, isCore)
-  );
+  return path.join(getRepoDirPath(dnpName, isCore), getDockerComposeName(dnpName, isCore));
 }
 
 export function getDockerComposePathSmart(dnpName: string): string {
@@ -29,9 +26,5 @@ function getShortName(dnpName: string): string {
 
 function verifyDnpName(dnpName: string): void {
   if (typeof dnpName !== "string")
-    throw Error(
-      `dnpName must be a string, but it's ${typeof dnpName}: ${JSON.stringify(
-        dnpName
-      )}`
-    );
+    throw Error(`dnpName must be a string, but it's ${typeof dnpName}: ${JSON.stringify(dnpName)}`);
 }

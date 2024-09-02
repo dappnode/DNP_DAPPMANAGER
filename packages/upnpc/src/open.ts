@@ -16,10 +16,7 @@ import { PackagePort } from "@dappnode/types";
 // Timeout in seconds. Should be greater than the natRenewalInterval
 const natRenewalTimeout = 7200;
 
-export async function open(
-  port: PackagePort,
-  localIp: string
-): Promise<boolean> {
+export async function open(port: PackagePort, localIp: string): Promise<boolean> {
   const { portNumber, protocol } = port;
 
   try {

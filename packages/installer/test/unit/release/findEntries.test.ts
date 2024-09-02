@@ -2,12 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
 import { IPFSEntry } from "@dappnode/toolkit";
-import {
-  releaseFilesToDownload,
-  DirectoryFiles,
-  FileConfig,
-  releaseFiles,
-} from "@dappnode/types";
+import { releaseFilesToDownload, DirectoryFiles, FileConfig, releaseFiles } from "@dappnode/types";
 
 interface IpfsFileResult {
   name: string; // 'avatar.png',
@@ -21,18 +16,11 @@ type IPFSEntryName = Pick<IPFSEntry, "name">;
 type ReleaseFiles = typeof releaseFiles;
 
 // Overload to strictly type the return according to the fildId
-export function findEntries<
-  T extends IPFSEntryName,
-  K extends keyof ReleaseFiles
->(
+export function findEntries<T extends IPFSEntryName, K extends keyof ReleaseFiles>(
   files: T[],
   config: Omit<FileConfig, "format">,
   fileId: K
-): ReleaseFiles[K] extends { multiple: true }
-  ? T[]
-  : ReleaseFiles[K] extends { required: true }
-  ? T
-  : T | undefined;
+): ReleaseFiles[K] extends { multiple: true } ? T[] : ReleaseFiles[K] extends { required: true } ? T : T | undefined;
 
 export function findEntries<T extends IPFSEntryName>(
   files: T[],
@@ -41,14 +29,12 @@ export function findEntries<T extends IPFSEntryName>(
 ): T[] | T | undefined {
   const matches = files.filter((file) => config.regex.test(file.name));
 
-  if (matches.length === 0 && config.required)
-    throw Error(`No ${fileId} found`);
+  if (matches.length === 0 && config.required) throw Error(`No ${fileId} found`);
 
   if (config.multiple) {
     return matches;
   } else {
-    if (matches.length > 1)
-      throw Error(`Multiple possible entries found for ${fileId}`);
+    if (matches.length > 1) throw Error(`Multiple possible entries found for ${fileId}`);
     return matches[0];
   }
 }
@@ -68,12 +54,12 @@ describe("validateTarImage", () => {
       "host-grafana-dashboard.json",
       "prometheus-targets.json",
       "setup-wizard.json",
-      "signature.json",
+      "signature.json"
     ].map((name) => ({
       name,
       path: `Qm-root/${name}`,
       size: name.length,
-      hash: `Qm-${name}`,
+      hash: `Qm-${name}`
     }));
 
     const expectedResultWithNameOnly = {
@@ -84,10 +70,7 @@ describe("validateTarImage", () => {
       disclaimer: "disclaimer.md",
       gettingStarted: "getting-started.md",
       prometheusTargets: "prometheus-targets.json",
-      grafanaDashboards: [
-        "docker-grafana-dashboard.json",
-        "host-grafana-dashboard.json",
-      ],
+      grafanaDashboards: ["docker-grafana-dashboard.json", "host-grafana-dashboard.json"]
     };
 
     const result = mapValues(releaseFilesToDownload, (fileConfig, _fileId) => {

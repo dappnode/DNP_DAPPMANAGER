@@ -3,10 +3,7 @@ import { docker } from "./docker.js";
 /**
  * Load .tar.xz image sending it to the docker daemon
  */
-export async function loadImage(
-  imagePath: string,
-  onProgress?: (event: DockerLoadProgress) => void
-): Promise<void> {
+export async function loadImage(imagePath: string, onProgress?: (event: DockerLoadProgress) => void): Promise<void> {
   return new Promise((resolve, reject) => {
     // Must disable quiet flag to receive progress updates
     docker.loadImage(imagePath, { quiet: "0" }, (err, stream) => {
@@ -18,7 +15,7 @@ export async function loadImage(
             if (err) reject(err);
             else resolve();
           },
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
+
           onProgress || ((): void => {})
         );
     });

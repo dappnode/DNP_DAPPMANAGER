@@ -17,9 +17,7 @@ import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
  * - Send notification once per package and version
  * - Auto-update the package if allowed
  */
-export async function checkNewPackagesVersion(
-  dappnodeInstaller: DappnodeInstaller
-): Promise<void> {
+export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstaller): Promise<void> {
   const dnps = await listPackages();
 
   for (const { dnpName, version: currentVersion } of dnps) {
@@ -27,11 +25,7 @@ export async function checkNewPackagesVersion(
       // Ignore:
       // - core DNPs that must be updatable only from the "core.dnp.dappnode.eth" package
       // - non-valid versions (semver.lte will throw)
-      if (
-        !dnpName ||
-        !valid(currentVersion) ||
-        params.corePackagesNotAutoupdatable.includes(dnpName)
-      ) {
+      if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) {
         continue;
       }
 
@@ -44,10 +38,9 @@ export async function checkNewPackagesVersion(
         continue;
       }
 
-      const { version: newVersion } =
-        await dappnodeInstaller.getVersionAndIpfsHash({
-          dnpNameOrHash: dnpName,
-        });
+      const { version: newVersion } = await dappnodeInstaller.getVersionAndIpfsHash({
+        dnpNameOrHash: dnpName
+      });
 
       // This version is not an update
       if (lte(newVersion, currentVersion)) {
@@ -59,7 +52,7 @@ export async function checkNewPackagesVersion(
       // Will try to resolve the IPFS release content, so await it to ensure it resolves
       await sendUpdatePackageNotificationMaybe({
         dappnodeInstaller,
-        ...updateData,
+        ...updateData
       });
 
       await autoUpdatePackageMaybe({ dappnodeInstaller, ...updateData });
@@ -79,7 +72,7 @@ async function autoUpdatePackageMaybe({
   dappnodeInstaller,
   dnpName,
   currentVersion,
-  newVersion,
+  newVersion
 }: {
   dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
@@ -103,7 +96,7 @@ async function autoUpdatePackageMaybe({
   try {
     await packageInstall(dappnodeInstaller, {
       name: dnpName,
-      version: newVersion,
+      version: newVersion
     });
 
     flagCompletedUpdate(dnpName, newVersion);

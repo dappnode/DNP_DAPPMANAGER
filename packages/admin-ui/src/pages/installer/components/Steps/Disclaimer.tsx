@@ -13,11 +13,7 @@ interface DisclaimerProps {
   goBack: () => void;
 }
 
-const Disclaimer: React.FC<DisclaimerProps> = ({
-  disclaimers,
-  onAccept,
-  goBack
-}) => {
+const Disclaimer: React.FC<DisclaimerProps> = ({ disclaimers, onAccept, goBack }) => {
   /**
    * @param disclaimers = [{
    *   name: "Package disclaimer"
@@ -26,20 +22,16 @@ const Disclaimer: React.FC<DisclaimerProps> = ({
 
   return (
     <Card spacing divider>
-      {disclaimers.map(disclaimer => (
+      {disclaimers.map((disclaimer) => (
         <div key={disclaimer.name}>
-          <div className="card-section-header">
-            {prettyDnpName(disclaimer.name)} disclaimer
-          </div>
+          <div className="card-section-header">{prettyDnpName(disclaimer.name)} disclaimer</div>
           <div>
             <RenderMarkdown source={disclaimer.message} />
           </div>
         </div>
       ))}
 
-      {disclaimers.length === 0 && (
-        <StatusIcon success message={"Requires no special permissions"} />
-      )}
+      {disclaimers.length === 0 && <StatusIcon success message={"Requires no special permissions"} />}
 
       <div className="button-group">
         <Button onClick={goBack}>Back</Button>

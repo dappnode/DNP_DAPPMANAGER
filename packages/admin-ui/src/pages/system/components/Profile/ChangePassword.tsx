@@ -4,10 +4,7 @@ import ErrorView from "components/ErrorView";
 import { apiAuth } from "api";
 import { ReqStatus } from "types";
 import Ok from "components/Ok";
-import {
-  validatePasswordsMatch,
-  validateStrongPassword
-} from "utils/validation";
+import { validatePasswordsMatch, validateStrongPassword } from "utils/validation";
 import { InputForm } from "components/InputForm";
 
 export function ChangePassword() {
@@ -18,12 +15,7 @@ export function ChangePassword() {
 
   const passwordError = validateStrongPassword(newPassword);
   const password2Error = validatePasswordsMatch(newPassword, newPassword2);
-  const isValid =
-    oldPassword &&
-    newPassword &&
-    newPassword2 &&
-    !passwordError &&
-    !password2Error;
+  const isValid = oldPassword && newPassword && newPassword2 && !passwordError && !password2Error;
 
   async function onChangePassword() {
     if (isValid)
@@ -77,12 +69,7 @@ export function ChangePassword() {
           }
         ]}
       >
-        <Button
-          type="submit"
-          onClick={onChangePassword}
-          variant="dappnode"
-          disabled={reqStatus.loading}
-        >
+        <Button type="submit" onClick={onChangePassword} variant="dappnode" disabled={reqStatus.loading}>
           Change UI password
         </Button>
       </InputForm>

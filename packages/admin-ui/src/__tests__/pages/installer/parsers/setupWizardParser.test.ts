@@ -1,7 +1,4 @@
-import {
-  formDataToUserSettings,
-  userSettingsToFormData
-} from "pages/installer/parsers/formDataParser";
+import { formDataToUserSettings, userSettingsToFormData } from "pages/installer/parsers/formDataParser";
 import { SetupWizardFormDataReturn } from "pages/installer/types";
 import { UserSettingsAllDnps } from "@dappnode/types";
 import deepmerge from "deepmerge";
@@ -63,8 +60,7 @@ const testCases: {
         },
         fileUploads: {
           [dnpName]: {
-            "/usr/src/app/config.json":
-              "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+            "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
           }
         }
       },
@@ -177,15 +173,11 @@ describe("setupWizardParsers", () => {
   for (const { testName, setupTarget, userSettings, formData } of testCases) {
     describe(testName, () => {
       it("formDataToUserSettings", () => {
-        expect(formDataToUserSettings(formData, setupTarget)).toEqual(
-          userSettings
-        );
+        expect(formDataToUserSettings(formData, setupTarget)).toEqual(userSettings);
       });
 
       it("userSettingsToFormData", () => {
-        expect(userSettingsToFormData(userSettings, setupTarget)).toEqual(
-          formData
-        );
+        expect(userSettingsToFormData(userSettings, setupTarget)).toEqual(formData);
       });
     });
   }
@@ -201,14 +193,9 @@ describe("setupWizardParsers", () => {
         }
       };
 
-      const formDataWithUnknownProps: SetupWizardFormDataReturn = deepmerge(
-        formData,
-        formDataUnknownProps
-      );
+      const formDataWithUnknownProps: SetupWizardFormDataReturn = deepmerge(formData, formDataUnknownProps);
 
-      expect(
-        formDataToUserSettings(formDataWithUnknownProps, setupTarget)
-      ).toEqual(userSettings);
+      expect(formDataToUserSettings(formDataWithUnknownProps, setupTarget)).toEqual(userSettings);
     });
 
     it("userSettingsToFormData", () => {
@@ -230,15 +217,9 @@ describe("setupWizardParsers", () => {
         }
       };
 
-      const userSettingsWithUnknownProps: UserSettingsAllDnps = deepmerge(
-        userSettings,
-        userSettingsUnknownProps
-      );
+      const userSettingsWithUnknownProps: UserSettingsAllDnps = deepmerge(userSettings, userSettingsUnknownProps);
 
-      const formDataResult = userSettingsToFormData(
-        userSettingsWithUnknownProps,
-        setupTarget
-      );
+      const formDataResult = userSettingsToFormData(userSettingsWithUnknownProps, setupTarget);
 
       expect(formDataResult).toEqual(formData);
     });

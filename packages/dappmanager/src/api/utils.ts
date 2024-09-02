@@ -15,13 +15,11 @@ export class HttpError extends Error {
  * Wrap express routes to be able to safely throw errors and return JSON
  * @param handler
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
 export function wrapHandler<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReqParams extends { [key: string]: any } = Record<string, any>
->(
-  handler: express.RequestHandler<ReqParams>
-): express.RequestHandler<ReqParams> {
+>(handler: express.RequestHandler<ReqParams>): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
     try {
       await handler(req, res, next);
@@ -55,9 +53,7 @@ export function wrapHandler<
 export function wrapHandlerHtml<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ReqParams extends { [key: string]: any } = Record<string, any>
->(
-  handler: express.RequestHandler<ReqParams>
-): express.RequestHandler<ReqParams> {
+>(handler: express.RequestHandler<ReqParams>): express.RequestHandler<ReqParams> {
   return async (req, res, next): Promise<void> => {
     try {
       await handler(req, res, next);
@@ -67,9 +63,7 @@ export function wrapHandlerHtml<
   };
 }
 
-export function toSocketIoHandler(
-  expressHandler: express.Handler
-): Parameters<Server["use"]>[0] {
+export function toSocketIoHandler(expressHandler: express.Handler): Parameters<Server["use"]>[0] {
   return function (socket, next): void {
     expressHandler(
       socket.handshake as unknown as express.Request,

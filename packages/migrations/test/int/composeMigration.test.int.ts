@@ -21,8 +21,8 @@ describe("Migration", () => {
     serviceName,
     networks: [
       { name: "random", ip: "10.0.1.1" },
-      { name: "dncore_network", ip: "172.33.1.7" },
-    ],
+      { name: "dncore_network", ip: "172.33.1.7" }
+    ]
   };
 
   const composeNoDns = `
@@ -80,53 +80,35 @@ services:
     // Create compose
     await shellSafe(`mkdir -p ${testPackagePath}`);
     // Compose to be migrated
-    fs.writeFileSync(
-      `${testPackagePath}/docker-compose.yml`,
-      composeToBeMigratedBefore
-    );
+    fs.writeFileSync(`${testPackagePath}/docker-compose.yml`, composeToBeMigratedBefore);
 
     // Startup container
-    await shellSafe(
-      `docker compose -f ${testPackagePath}/docker-compose.yml -p DNCORE up -d`
-    );
-    const containerExists = await shellSafe(
-      `docker container ls --filter name=${containerName}`
-    );
+    await shellSafe(`docker compose -f ${testPackagePath}/docker-compose.yml -p DNCORE up -d`);
+    const containerExists = await shellSafe(`docker container ls --filter name=${containerName}`);
 
-    const networkExists = await shellSafe(
-      `docker network ls --filter name=${dncoreNetwork}`
-    );
+    const networkExists = await shellSafe(`docker network ls --filter name=${dncoreNetwork}`);
 
-    if (!containerExists || !networkExists)
-      throw Error("Error creating container or/and dncore_network");
+    if (!containerExists || !networkExists) throw Error("Error creating container or/and dncore_network");
   });
 
   it("Should do alias migration in compose", async () => {
     const aliases = ["test.test-migration.dappnode", "test.dappnode"];
     migrateCoreNetworkAndAliasInCompose(container, aliases);
 
-    const composeAfter = fs.readFileSync(
-      `${testPackagePath}/docker-compose.yml`,
-      { encoding: "utf8" }
-    );
+    const composeAfter = fs.readFileSync(`${testPackagePath}/docker-compose.yml`, { encoding: "utf8" });
     expect(composeAfter.trim()).to.equal(composeAlreadyMigrated.trim());
   });
 
   it("Should remove DNS from compose file", async () => {
     removeDnsFromPackageComposeFile(container.dnpName, false);
 
-    const composeAfter = fs.readFileSync(
-      `${testPackagePath}/docker-compose.yml`,
-      { encoding: "utf8" }
-    );
+    const composeAfter = fs.readFileSync(`${testPackagePath}/docker-compose.yml`, { encoding: "utf8" });
     expect(composeAfter.trim()).to.equal(composeNoDns.trim());
   });
 
   after("Remove test setup", async () => {
     // Disconnect from network
-    await shellSafe(
-      `docker network disconnect ${dncoreNetwork} ${containerName} --force`
-    );
+    await shellSafe(`docker network disconnect ${dncoreNetwork} ${containerName} --force`);
     // Remove network
     await shellSafe(`docker network rm dncore_network`);
     // Remove container

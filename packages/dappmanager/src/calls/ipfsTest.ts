@@ -1,5 +1,5 @@
 import retry from "async-retry";
-import { dappnodeInstaller } from "../index.js"
+import { dappnodeInstaller } from "../index.js";
 
 /** Well-known hash that should always be available */
 const hash = "QmPZ9gcCEpqKTo6aq61g2nXGUhM4iCL3ewB6LDXZCtioEB";
@@ -13,8 +13,7 @@ export async function ipfsTest(): Promise<void> {
     async () => {
       try {
         const file = await dappnodeInstaller.writeFileToMemory(hash);
-        if (!file.includes(expectedString))
-          throw Error("Resolved file does not include expected string");
+        if (!file.includes(expectedString)) throw Error("Resolved file does not include expected string");
       } catch (e) {
         e.message = `Error verifying IPFS: ${e.message}`;
         throw e;

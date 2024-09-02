@@ -14,16 +14,13 @@ interface TestCases {
 describe("ethForward > util > decode", () => {
   describe("decodeContentHash", () => {
     const contentHashes: TestCases = {
-      "0xe30101701220aa4396c7e54ce85638b1f5a66f83b0b698a80e6ca3511ccc7e8551c6ae89ab40":
-        {
-          location: "ipfs",
-          hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
-        }
+      "0xe30101701220aa4396c7e54ce85638b1f5a66f83b0b698a80e6ca3511ccc7e8551c6ae89ab40": {
+        location: "ipfs",
+        hash: "QmZoHo1wi4G9VHX6xLmMBRdFpdHMkHnsqVXqV6Vsng9m8j"
+      }
     };
 
-    for (const [contentHashEncoded, expectedContent] of Object.entries(
-      contentHashes
-    )) {
+    for (const [contentHashEncoded, expectedContent] of Object.entries(contentHashes)) {
       it(`should decode ${contentHashEncoded}`, async () => {
         const content = decodeContentHash(contentHashEncoded);
         expect(content).to.deep.equal(expectedContent, "Wrong content");

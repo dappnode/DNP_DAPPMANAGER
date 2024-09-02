@@ -24,7 +24,7 @@ const monoContainer: PackageContainer = {
   dnpName: `${DNP_NAME_MONO}`,
   serviceName: `${DNP_NAME_MONO}`,
   isCore: false,
-  isMain: true,
+  isMain: true
 };
 
 const monoContainerPublic: PackageContainer = {
@@ -33,7 +33,7 @@ const monoContainerPublic: PackageContainer = {
   dnpName: `${DNP_NAME_MONO_PUBLIC}`,
   serviceName: `service`,
   isCore: false,
-  isMain: true,
+  isMain: true
 };
 
 const containerMain: PackageContainer = {
@@ -42,7 +42,7 @@ const containerMain: PackageContainer = {
   dnpName: `${DNP_NAME}`,
   serviceName: "mainService",
   isMain: true,
-  isCore: false,
+  isCore: false
 };
 
 const containerNotMain: PackageContainer = {
@@ -51,7 +51,7 @@ const containerNotMain: PackageContainer = {
   dnpName: `${DNP_NAME}`,
   serviceName: "notmainService",
   isMain: false,
-  isCore: false,
+  isCore: false
 };
 
 const containerMainPublic: PackageContainer = {
@@ -60,7 +60,7 @@ const containerMainPublic: PackageContainer = {
   dnpName: `${DNP_NAME_PUBLIC}`,
   serviceName: "mainService",
   isMain: true,
-  isCore: false,
+  isCore: false
 };
 
 const containerNotMainPublic: PackageContainer = {
@@ -69,7 +69,7 @@ const containerNotMainPublic: PackageContainer = {
   dnpName: `${DNP_NAME_PUBLIC}`,
   serviceName: "notmainService",
   isMain: false,
-  isCore: false,
+  isCore: false
 };
 
 //We check 6 possible containers:
@@ -85,7 +85,7 @@ const containers = [
   monoContainer,
   containerMainPublic,
   containerNotMainPublic,
-  monoContainerPublic,
+  monoContainerPublic
 ];
 
 const CONTAINER_COMPOSE = `
@@ -155,20 +155,13 @@ async function ensureNetworkExists(networkName: string) {
 }
 
 // Inspect each container and fetch the aliases on the dncore network
-async function getContainerAliasesOnNetwork(
-  containerName: string,
-  networkName: string
-) {
-  const inspectData = await shellSafe(
-    `docker container inspect ${containerName}`
-  );
-  if (!inspectData)
-    throw new Error(`Error inspecting container ${containerName}`);
+async function getContainerAliasesOnNetwork(containerName: string, networkName: string) {
+  const inspectData = await shellSafe(`docker container inspect ${containerName}`);
+  if (!inspectData) throw new Error(`Error inspecting container ${containerName}`);
   const parsedData = JSON.parse(inspectData);
 
   // Extract the aliases from the specified network
-  const aliases =
-    parsedData[0]?.NetworkSettings?.Networks?.[networkName]?.Aliases || [];
+  const aliases = parsedData[0]?.NetworkSettings?.Networks?.[networkName]?.Aliases || [];
   return aliases;
 }
 
@@ -196,7 +189,7 @@ describe("Add alias to running containers", function () {
       { path: TEST_ALIAS_PATH, content: CONTAINER_COMPOSE },
       { path: TEST_ALIAS_PATH_PUBLIC, content: CONTAINER_COMPOSE_PUBLIC },
       { path: TEST_ALIAS_PATH_MONO, content: MONO_COMPOSE },
-      { path: TEST_ALIAS_PATH_MONO_PUBLIC, content: MONO_COMPOSE_PUBLIC },
+      { path: TEST_ALIAS_PATH_MONO_PUBLIC, content: MONO_COMPOSE_PUBLIC }
     ];
 
     for (const config of composeConfigs) {
@@ -217,7 +210,7 @@ describe("Add alias to running containers", function () {
       containerMainPublic.containerName,
       containerNotMainPublic.containerName,
       monoContainer.containerName,
-      monoContainerPublic.containerName,
+      monoContainerPublic.containerName
     ];
 
     // Check if all containers exist
@@ -239,63 +232,41 @@ describe("Add alias to running containers", function () {
     const containersToTest = [
       {
         container: containerMain,
-        expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"],
+        expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"]
       },
       {
         container: containerNotMain,
-        expectedAliases: ["notmainService.logger.dappnode"],
+        expectedAliases: ["notmainService.logger.dappnode"]
       },
       {
         container: monoContainer,
-        expectedAliases: [
-          "logger-mono.dnp.dappnode.eth.logger-mono.dappnode",
-          "logger-mono.dappnode",
-        ],
+        expectedAliases: ["logger-mono.dnp.dappnode.eth.logger-mono.dappnode", "logger-mono.dappnode"]
       },
       {
         container: monoContainerPublic,
-        expectedAliases: [
-          "service.logger-mono.public.dappnode",
-          "logger-mono.public.dappnode",
-        ],
+        expectedAliases: ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"]
       },
       {
         container: containerMainPublic,
-        expectedAliases: [
-          "mainService.logger.public.dappnode",
-          "logger.public.dappnode",
-        ],
+        expectedAliases: ["mainService.logger.public.dappnode", "logger.public.dappnode"]
       },
       {
         container: containerNotMainPublic,
-        expectedAliases: ["notmainService.logger.public.dappnode"],
-      },
+        expectedAliases: ["notmainService.logger.public.dappnode"]
+      }
     ];
 
     for (const { container, expectedAliases } of containersToTest) {
-      const actualAliases = await getContainerAliasesOnNetwork(
-        container.containerName,
-        DNCORE_NETWORK
-      );
+      const actualAliases = await getContainerAliasesOnNetwork(container.containerName, DNCORE_NETWORK);
       expect(actualAliases).to.include.members(expectedAliases);
     }
   });
 
   after("Cleanup", async () => {
-    const containerNames = containers.map(
-      (container) => container.containerName
-    );
-    const directoryPaths = [
-      TEST_ALIAS_PATH,
-      TEST_ALIAS_PATH_MONO,
-      TEST_ALIAS_PATH_PUBLIC,
-      TEST_ALIAS_PATH_MONO_PUBLIC,
-    ];
+    const containerNames = containers.map((container) => container.containerName);
+    const directoryPaths = [TEST_ALIAS_PATH, TEST_ALIAS_PATH_MONO, TEST_ALIAS_PATH_PUBLIC, TEST_ALIAS_PATH_MONO_PUBLIC];
 
-    await Promise.all([
-      stopAndRemoveContainers(containerNames),
-      removeDirectories(directoryPaths),
-    ]);
+    await Promise.all([stopAndRemoveContainers(containerNames), removeDirectories(directoryPaths)]);
 
     // Remove the DNCORE_NETWORK if it exists
     await shellSafe(`docker network rm ${DNCORE_NETWORK}`);

@@ -32,7 +32,7 @@ export default function verifyState(
     range: string;
   };
 } {
-  for (const stateDnp of Object.keys(state).filter(pkg => state[pkg])) {
+  for (const stateDnp of Object.keys(state).filter((pkg) => state[pkg])) {
     const stateVer = state[stateDnp] || "";
     if (!dnps[stateDnp]) {
       throw Error(`DNP ${stateDnp} not in dnps`);

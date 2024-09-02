@@ -15,11 +15,7 @@ import { dappnodeInstaller } from "../index.js";
  * @param enableHistorical this enables the historical transactions on the Optimism network
  * @param targetOpExecutionClient this is the client that will be used to connect to the Optimism network
  */
-export async function optimismConfigSet({
-  archive,
-  executionClient,
-  rollup
-}: OptimismConfigSet): Promise<void> {
+export async function optimismConfigSet({ archive, executionClient, rollup }: OptimismConfigSet): Promise<void> {
   await setOptimismConfig(dappnodeInstaller, {
     archive,
     executionClient,

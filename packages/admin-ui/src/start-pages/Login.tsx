@@ -14,11 +14,7 @@ import "./login.scss";
 const loginRootPath = "/";
 const forgotPasswordPath = "/forgot-password";
 
-export function Login({
-  refetchStatus
-}: {
-  refetchStatus: () => Promise<void>;
-}) {
+export function Login({ refetchStatus }: { refetchStatus: () => Promise<void> }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
@@ -57,7 +53,7 @@ export function Login({
   }
 
   async function onSuccessfulReset() {
-    await refetchStatus()?.catch(() => { });
+    await refetchStatus()?.catch(() => {});
     navigate(loginRootPath);
   }
 

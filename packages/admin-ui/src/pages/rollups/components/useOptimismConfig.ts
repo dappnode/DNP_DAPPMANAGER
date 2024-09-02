@@ -1,34 +1,20 @@
 import { useState, useEffect } from "react";
 import { ReqStatus } from "types";
-import {
-  OptimismConfigGet,
-  OptimismConfigSet,
-  OptimismItemOk,
-  OptimismType,
-  OptimismItem
-} from "@dappnode/types";
+import { OptimismConfigGet, OptimismConfigSet, OptimismItemOk, OptimismType, OptimismItem } from "@dappnode/types";
 import { responseInterface } from "swr";
 
-export const useOptimismConfig = (
-  currentOptimismConfigReq: responseInterface<OptimismConfigGet, Error>
-) => {
+export const useOptimismConfig = (currentOptimismConfigReq: responseInterface<OptimismConfigGet, Error>) => {
   // Request status
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
   // Error
   const [ethRpcUrlError, setEthRpcUrlError] = useState<string | null>(null);
   // New config
-  const [newExecClient, setNewExecClient] = useState<
-    OptimismItemOk<"execution">
-  >();
-  const [customMainnetRpcUrl, setCustomMainnetRpcUrl] = useState<string | null>(
-    null
-  );
+  const [newExecClient, setNewExecClient] = useState<OptimismItemOk<"execution">>();
+  const [customMainnetRpcUrl, setCustomMainnetRpcUrl] = useState<string | null>(null);
   const [newRollup, setNewRollup] = useState<OptimismItemOk<"rollup">>();
   const [newArchive, setNewArchive] = useState<OptimismItemOk<"archive">>();
-  const [currentOptimismConfig, setCurrentOptimismConfig] = useState<
-    OptimismConfigSet
-  >();
+  const [currentOptimismConfig, setCurrentOptimismConfig] = useState<OptimismConfigSet>();
   // Changes
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
@@ -38,31 +24,21 @@ export const useOptimismConfig = (
 
   useEffect(() => {
     if (currentOptimismConfigReq.data) {
-      const {
-        executionClients,
-        rollup,
-        archive
-      } = currentOptimismConfigReq.data;
+      const { executionClients, rollup, archive } = currentOptimismConfigReq.data;
 
-      const executionClient = executionClients.find(ec =>
-        isOkSelectedInstalledAndRunning(ec)
-      );
+      const executionClient = executionClients.find((ec) => isOkSelectedInstalledAndRunning(ec));
 
-      if (executionClient && executionClient.status === "ok")
-        setNewExecClient(executionClient);
+      if (executionClient && executionClient.status === "ok") setNewExecClient(executionClient);
 
-      if (isOkSelectedInstalledAndRunning(rollup) && rollup.status === "ok")
-        setNewRollup(rollup);
+      if (isOkSelectedInstalledAndRunning(rollup) && rollup.status === "ok") setNewRollup(rollup);
 
-      if (isOkSelectedInstalledAndRunning(archive) && archive.status === "ok")
-        setNewArchive(archive);
+      if (isOkSelectedInstalledAndRunning(archive) && archive.status === "ok") setNewArchive(archive);
 
       if (rollup.mainnetRpcUrl) setCustomMainnetRpcUrl(rollup.mainnetRpcUrl);
 
       // Set the current config to be displayed in advance view
       setCurrentOptimismConfig({
-        executionClient:
-          executionClient?.status === "ok" ? executionClient : undefined,
+        executionClient: executionClient?.status === "ok" ? executionClient : undefined,
         rollup: rollup?.status === "ok" ? rollup : undefined,
         archive: archive?.status === "ok" ? archive : undefined
       });
@@ -81,14 +57,7 @@ export const useOptimismConfig = (
           customMainnetRpcUrl
         })
       );
-  }, [
-    currentOptimismConfig,
-    newExecClient,
-    newRollup,
-    newArchive,
-    ethRpcUrlError,
-    customMainnetRpcUrl
-  ]);
+  }, [currentOptimismConfig, newExecClient, newRollup, newArchive, ethRpcUrlError, customMainnetRpcUrl]);
 
   useEffect(() => {
     // If the URL is null, then OP Node will use the corresponding RPC to _DAPPNODE_GLOBAL_EXECUTION_CLIENT_MAINNET
@@ -200,18 +169,12 @@ function validateUrl(str: string): string | null {
   try {
     new URL(str);
     return null;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_) {
     return "Invalid URL";
   }
 }
 
-function isOkSelectedInstalledAndRunning<T extends OptimismType>(
-  item: OptimismItem<T>
-): boolean {
-  return (
-    item.status === "ok" &&
-    item.isSelected &&
-    item.isInstalled &&
-    item.isRunning
-  );
+function isOkSelectedInstalledAndRunning<T extends OptimismType>(item: OptimismItem<T>): boolean {
+  return item.status === "ok" && item.isSelected && item.isInstalled && item.isRunning;
 }

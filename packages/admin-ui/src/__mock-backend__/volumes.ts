@@ -2,9 +2,7 @@ import { pause } from "./utils/pause";
 import { dnpInstalled } from "./data";
 import { VolumeData, Routes } from "@dappnode/types";
 
-const volumesState = new Map<string, VolumeData>(
-  getInitialVolumes().map(vol => [vol.name, vol])
-);
+const volumesState = new Map<string, VolumeData>(getInitialVolumes().map((vol) => [vol.name, vol]));
 
 export const volumes: Pick<Routes, "volumeRemove" | "volumesGet"> = {
   volumeRemove: async ({ name }) => {

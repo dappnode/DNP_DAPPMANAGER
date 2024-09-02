@@ -8,7 +8,7 @@ export const fetchPkgsData: Pick<
   fetchCoreUpdateData: async () => sampleCoreUpdateData,
   fetchDirectory: async () => directory,
   fetchRegistry: async () => {
-    return await new Promise(resolve => {
+    return await new Promise((resolve) => {
       setTimeout(() => {
         resolve(registry);
       }, 10000);

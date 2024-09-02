@@ -16,9 +16,7 @@ export default function LegacyGeth({
   ...props
 }: {
   archive: OptimismItem<"archive">;
-  setNewArchive: React.Dispatch<
-    React.SetStateAction<OptimismItemOk<"archive"> | undefined>
-  >;
+  setNewArchive: React.Dispatch<React.SetStateAction<OptimismItemOk<"archive"> | undefined>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
@@ -48,30 +46,21 @@ export default function LegacyGeth({
 
       <div className="title">{prettyDnpName(archive.dnpName)} </div>
 
-      {archive.status === "ok" &&
-        isSelected &&
-        archive.isInstalled &&
-        !archive.isUpdated && (
-          <>
-            <Button
-              onClick={() =>
-                navigate(
-                  `${getInstallerPath(archive.dnpName)}/${archive.dnpName}`
-                )
-              }
-              variant="dappnode"
-            >
-              UPDATE
-            </Button>
-            <br />
-            <br />
-          </>
-        )}
+      {archive.status === "ok" && isSelected && archive.isInstalled && !archive.isUpdated && (
+        <>
+          <Button
+            onClick={() => navigate(`${getInstallerPath(archive.dnpName)}/${archive.dnpName}`)}
+            variant="dappnode"
+          >
+            UPDATE
+          </Button>
+          <br />
+          <br />
+        </>
+      )}
 
       {archive.status === "ok" && (
-        <div className="description">
-          {isSelected && archive.data?.manifest?.shortDescription}
-        </div>
+        <div className="description">{isSelected && archive.data?.manifest?.shortDescription}</div>
       )}
     </Card>
   );

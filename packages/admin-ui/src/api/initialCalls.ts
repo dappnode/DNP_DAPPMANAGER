@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { store } from "../store";
 import { fetchDnpInstalled } from "services/dnpInstalled/actions";
 import { fetchCoreUpdateData } from "services/coreUpdate/actions";

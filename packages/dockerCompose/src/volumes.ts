@@ -23,23 +23,17 @@ export function normalizeVolumePath(volumePath: string): string {
 export function parseVolumeMappings(volumesArray: string[]): VolumeMapping[] {
   return volumesArray
     .map((volString): VolumeMapping => {
-      const [host, container] = volString
-        .split(/:(.*)/)
-        .map(normalizeVolumePath);
+      const [host, container] = volString.split(/:(.*)/).map(normalizeVolumePath);
       const isNamed = !host.startsWith("/") && !host.startsWith("~");
       return {
         host,
         container,
-        name: isNamed ? host : undefined,
+        name: isNamed ? host : undefined
       };
     })
     .filter(({ container }) => container);
 }
 
-export function stringifyVolumeMappings(
-  volumeMappings: VolumeMapping[]
-): string[] {
-  return volumeMappings.map(({ name, host, container }) =>
-    [name || host, container].join(":")
-  );
+export function stringifyVolumeMappings(volumeMappings: VolumeMapping[]): string[] {
+  return volumeMappings.map(({ name, host, container }) => [name || host, container].join(":"));
 }

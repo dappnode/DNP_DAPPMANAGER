@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { api, useApi } from "api";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -50,26 +49,16 @@ export function WireguardDevicesHome() {
 
   // Input errors
   const errors: string[] = [];
-  if (input.length > maxIdLength)
-    errors.push(`Device name must be shorter than {maxIdLength} characters`);
+  if (input.length > maxIdLength) errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
   // If the wireguard package is not installed, invite the user to install it
   if (dnpsRequest.data) {
-    const wireguardDnp = dnpsRequest.data.find(
-      dnp => dnp.dnpName === wireguardDnpName
-    );
+    const wireguardDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === wireguardDnpName);
     if (!wireguardDnp) {
       return (
         <Alert variant="secondary">
           You must{" "}
-          <a
-            href="#"
-            onClick={() =>
-              navigate(
-                `${getInstallerPath(wireguardDnpName)}/${wireguardDnpName}`
-              )
-            }
-          >
+          <a href="#" onClick={() => navigate(`${getInstallerPath(wireguardDnpName)}/${wireguardDnpName}`)}>
             install the Wireguard package
           </a>{" "}
           to use this feature
@@ -84,35 +73,31 @@ export function WireguardDevicesHome() {
         placeholder="Device's unique name"
         value={input}
         // Ensure id contains only alphanumeric characters
-        onValueChange={value => setInput(coerceDeviceName(value))}
+        onValueChange={(value) => setInput(coerceDeviceName(value))}
         onEnterPress={() => {
           addDevice(input);
           setInput("");
         }}
         append={
-          <Button
-            variant="dappnode"
-            onClick={() => addDevice(input)}
-            disabled={errors.length > 0}
-          >
+          <Button variant="dappnode" onClick={() => addDevice(input)} disabled={errors.length > 0}>
             Add device
           </Button>
         }
       />
 
-      {errors.map(error => (
+      {errors.map((error) => (
         <div className="color-danger">{error}</div>
       ))}
 
-      {renderResponse(devicesReq, ["Loading devices"], data => (
+      {renderResponse(devicesReq, ["Loading devices"], (data) => (
         <Card className="list-grid wireguard">
           <header>Name</header>
           <header className="center">Credentials</header>
           <header>Remove</header>
           {[...data]
             // Sort main admin device as first
-            .sort(d1 => (d1 === MAIN_ADMIN_NAME ? -1 : 0))
-            .map(id => (
+            .sort((d1) => (d1 === MAIN_ADMIN_NAME ? -1 : 0))
+            .map((id) => (
               <React.Fragment key={id}>
                 <div className="name">{id}</div>
                 <NavLink to={id} className="no-a-style">

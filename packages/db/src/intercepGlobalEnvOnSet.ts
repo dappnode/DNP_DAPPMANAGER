@@ -24,10 +24,9 @@ export function interceptGlobalEnvOnSet<T, U>(
   return {
     ...dbSetter,
 
-    set: async function(globEnvValue: U): Promise<void> {
+    set: async function (globEnvValue: U): Promise<void> {
       // Must be with prefix _DAPPNODE_GLOBAL_
-      if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX))
-        globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
+      if (!globEnvKey.includes(params.GLOBAL_ENVS_PREFIX)) globEnvKey = `${params.GLOBAL_ENVS_PREFIX}${globEnvKey}`;
 
       dbSetter.set(globEnvValue);
       // Update the global env file
@@ -36,12 +35,10 @@ export function interceptGlobalEnvOnSet<T, U>(
       try {
         // Only attempt to update packages if the global env is not nullish
         if (globEnvValue !== null && globEnvValue !== undefined)
-          await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as any);
+          await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as string);
       } catch (err) {
-        logs.error(
-          `Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`
-        );
+        logs.error(`Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`);
       }
-    },
+    }
   };
 }

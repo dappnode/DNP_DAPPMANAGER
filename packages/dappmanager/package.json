@@ -14,8 +14,6 @@
     "test:int": "npm run test:int:file \"./{,!(node_modules)/**}/*.test.int.ts\" ",
     "test:int:file": "HTTP_API_PORT=5000 TEST=true mocha --config ./test/integration/.mocharc.yaml --timeout 180000",
     "test:all": "npm run test && npm run test:int",
-    "lint": "eslint . --ext .ts --fix",
-    "prettier": "prettier --write 'src/**/*.*' 'test/**/*.*'",
     "clean": "rm -rf DNCORE/ dnp_repo/ .temp-transfer/ cache/ dist/"
   },
   "license": "GPL-3.0",

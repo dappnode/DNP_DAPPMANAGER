@@ -3,10 +3,7 @@ import { useDispatch } from "react-redux";
 import { passwordChangeInBackground } from "pages/system/actions";
 // Components
 import BottomButtons from "../BottomButtons";
-import {
-  validatePasswordsMatch,
-  validateStrongPasswordAsDockerEnv
-} from "utils/validation";
+import { validatePasswordsMatch, validateStrongPasswordAsDockerEnv } from "utils/validation";
 import { InputForm } from "components/InputForm";
 
 /**
@@ -16,13 +13,7 @@ import { InputForm } from "components/InputForm";
  * - Full node
  * There may be multiple available light-clients and fullnodes
  */
-export default function ChangeHostPassword({
-  onBack,
-  onNext
-}: {
-  onBack?: () => void;
-  onNext: () => void;
-}) {
+export default function ChangeHostPassword({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   const dispatch = useDispatch();
 
   const [password, setPassword] = useState("");
@@ -48,11 +39,9 @@ export default function ChangeHostPassword({
       <div className="header">
         <div className="title">Change host user password</div>
         <div className="description">
-          Please, change the host user password to a strong one that will
-          protect your DAppNode from external attackers. This implies changing
-          the credentials for accessing your DAppNode via terminal (keyboard and
-          screen directly connected to your box) or SSH with the user
-          'dappnode', so choose a strong password. Remember to store this
+          Please, change the host user password to a strong one that will protect your DAppNode from external attackers.
+          This implies changing the credentials for accessing your DAppNode via terminal (keyboard and screen directly
+          connected to your box) or SSH with the user 'dappnode', so choose a strong password. Remember to store this
           password in a safe place.
         </div>
       </div>

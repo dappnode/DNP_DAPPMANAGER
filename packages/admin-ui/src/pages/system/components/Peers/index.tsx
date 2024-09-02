@@ -17,8 +17,7 @@ const Peers: React.FC = () => {
   return (
     <>
       <p>
-        Learn more about IPFS peers at:{" "}
-        <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
+        Learn more about IPFS peers at: <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
       </p>
       <SubTitle>Share IPFS peer</SubTitle>
       <ShareIpfsPeer matchUrl={"system/" + subPaths.peers} />

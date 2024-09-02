@@ -16,7 +16,7 @@ describe("db", () => {
     const staticValue = staticKey(STATIC_VALUE_KEY, 1);
     const indexedValue = indexedByKey<number, string>({
       rootKey: INDEXED_VALUE_KEY,
-      getKey: (arg) => arg,
+      getKey: (arg) => arg
     });
 
     // staticValue
@@ -27,31 +27,19 @@ describe("db", () => {
 
     // indexedValue
 
-    expect(indexedValue.getAll()).to.deep.equal(
-      {},
-      "indexedValue - wrong def getAll"
-    );
-    expect(indexedValue.get("a")).to.deep.equal(
-      undefined,
-      "indexedValue - wrong def get('a')"
-    );
+    expect(indexedValue.getAll()).to.deep.equal({}, "indexedValue - wrong def getAll");
+    expect(indexedValue.get("a")).to.deep.equal(undefined, "indexedValue - wrong def get('a')");
     indexedValue.set("a", 5);
-    expect(indexedValue.getAll()).to.deep.equal(
-      { a: 5 },
-      "indexedValue - wrong getAll"
-    );
-    expect(indexedValue.get("a")).to.deep.equal(
-      5,
-      "indexedValue - wrong get('a')"
-    );
+    expect(indexedValue.getAll()).to.deep.equal({ a: 5 }, "indexedValue - wrong getAll");
+    expect(indexedValue.get("a")).to.deep.equal(5, "indexedValue - wrong get('a')");
 
     expect(fs.readFileSync(dbPath, "utf8").trim()).to.equal(
       JSON.stringify(
         {
           [STATIC_VALUE_KEY]: 5,
           [INDEXED_VALUE_KEY]: {
-            a: 5,
-          },
+            a: 5
+          }
         },
         null,
         2

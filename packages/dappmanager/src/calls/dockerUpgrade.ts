@@ -1,7 +1,4 @@
-import {
-  dockerUpgradeService,
-  dockerUpgradeCheck as _dockerUpgradeCheck
-} from "@dappnode/hostscriptsservices";
+import { dockerUpgradeService, dockerUpgradeCheck as _dockerUpgradeCheck } from "@dappnode/hostscriptsservices";
 import { DockerUpgradeRequirements } from "@dappnode/types";
 
 /**

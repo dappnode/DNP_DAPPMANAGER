@@ -24,7 +24,7 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
       ...mockDnp,
       version: "0.1.0",
       dnpName: "dnp-b.eth",
-      dependencies: { "dnp-c.eth": "0.1.0" },
+      dependencies: { "dnp-c.eth": "0.1.0" }
     };
     const dnpList: InstalledPackageData[] = [
       relevantPkg,
@@ -35,15 +35,15 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
         containers: [
           {
             ...mockContainer,
-            containerId: "17628371823",
-          },
-        ],
-      },
+            containerId: "17628371823"
+          }
+        ]
+      }
     ];
 
     const relevantInstalledDnps = getRelevantInstalledDnps({
       requestedDnps: ["dnp-a.eth", "dnp-c.eth"],
-      installedDnps: dnpList,
+      installedDnps: dnpList
     });
 
     expect(relevantInstalledDnps).to.deep.equal([relevantPkg]);
@@ -55,38 +55,38 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
         ...mockDnp,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
-          "letsencrypt-nginx.dnp.dappnode.eth": "latest",
+          "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
         dnpName: "web.dnp.dappnode.eth",
-        version: "0.0.0",
+        version: "0.0.0"
       },
       {
         ...mockDnp,
         dnpName: "vpn.dnp.dappnode.eth",
-        version: "0.1.16",
+        version: "0.1.16"
       },
       {
         ...mockDnp,
         dnpName: "bind.dnp.dappnode.eth",
-        version: "0.1.5",
+        version: "0.1.5"
       },
       {
         ...mockDnp,
         dnpName: "core.dnp.dappnode.eth",
-        version: "0.1.7",
+        version: "0.1.7"
       },
       {
         ...mockDnp,
         dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
         dnpName: "nginx-proxy.dnp.dappnode.eth",
-        version: "0.0.3",
+        version: "0.0.3"
       },
       {
         ...mockDnp,
         dependencies: { "web.dnp.dappnode.eth": "latest" },
         dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
-        version: "0.0.4",
-      },
+        version: "0.0.4"
+      }
     ];
 
     const expectedRelevantInstalledDnps: InstalledPackageData[] = [
@@ -94,24 +94,24 @@ describe("dappGet/aggregate/getRelevantInstalledDnps", () => {
         ...mockDnp,
         dependencies: {
           "nginx-proxy.dnp.dappnode.eth": "latest",
-          "letsencrypt-nginx.dnp.dappnode.eth": "latest",
+          "letsencrypt-nginx.dnp.dappnode.eth": "latest"
         },
         dnpName: "web.dnp.dappnode.eth",
-        version: "0.0.0",
+        version: "0.0.0"
       },
       {
         ...mockDnp,
         dependencies: {
-          "web.dnp.dappnode.eth": "latest",
+          "web.dnp.dappnode.eth": "latest"
         },
         dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
-        version: "0.0.4",
-      },
+        version: "0.0.4"
+      }
     ];
 
     const relevantInstalledDnps = getRelevantInstalledDnps({
       requestedDnps: ["nginx-proxy.dnp.dappnode.eth"],
-      installedDnps: dnpList.filter((pkg) => valid(pkg.version)),
+      installedDnps: dnpList.filter((pkg) => valid(pkg.version))
     });
 
     expect(relevantInstalledDnps).to.deep.equal(expectedRelevantInstalledDnps);

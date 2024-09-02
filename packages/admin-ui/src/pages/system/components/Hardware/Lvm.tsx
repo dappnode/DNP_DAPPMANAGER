@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  HostLogicalVolume,
-  HostHardDisk,
-  HostVolumeGroup
-} from "@dappnode/types";
+import { HostLogicalVolume, HostHardDisk, HostVolumeGroup } from "@dappnode/types";
 import { api } from "api";
 import Button from "components/Button";
 import Ok from "components/Ok";
@@ -20,12 +16,8 @@ export default function Lvm() {
   const [automatic, setAutomatic] = useState(false);
   // Requests
   const [diskReq, setDiskReq] = useState<ReqStatus<HostHardDisk[]>>({});
-  const [volumeGroupReq, setVolumeGroupReq] = useState<
-    ReqStatus<HostVolumeGroup[]>
-  >({});
-  const [logicalVolumeReq, setLogicalVolumeReq] = useState<
-    ReqStatus<HostLogicalVolume[]>
-  >({});
+  const [volumeGroupReq, setVolumeGroupReq] = useState<ReqStatus<HostVolumeGroup[]>>({});
+  const [logicalVolumeReq, setLogicalVolumeReq] = useState<ReqStatus<HostLogicalVolume[]>>({});
   const [expandDiskReq, setExpandDiskReq] = useState<ReqStatus<string>>({});
 
   // Select options
@@ -69,11 +61,7 @@ export default function Lvm() {
     }
   }
 
-  async function expandDisk(
-    disk: string,
-    volumeGroup: string,
-    logicalVolume: string
-  ) {
+  async function expandDisk(disk: string, volumeGroup: string, logicalVolume: string) {
     try {
       setExpandDiskReq({ loading: true });
       const logicalVolumes = await api.lvmDiskSpaceExtend({
@@ -91,24 +79,14 @@ export default function Lvm() {
   async function getDappnodeDefaults() {
     try {
       const volumeGroups = await api.lvmVolumeGroupsGet();
-      const defaultVg = volumeGroups.find(
-        vg => vg.vg_name === dappnodeVolumeGroup
-      )?.vg_name;
+      const defaultVg = volumeGroups.find((vg) => vg.vg_name === dappnodeVolumeGroup)?.vg_name;
       if (defaultVg) setVolumeGroup(defaultVg);
-      else
-        throw Error(
-          `Dappnode default volume group ${dappnodeVolumeGroup} not found`
-        );
+      else throw Error(`Dappnode default volume group ${dappnodeVolumeGroup} not found`);
 
       const logicalVolumes = await api.lvmLogicalVolumesGet();
-      const defaultLv = logicalVolumes.find(
-        lv => lv.lv_name === dappnodeLogicalVolume
-      )?.lv_name;
+      const defaultLv = logicalVolumes.find((lv) => lv.lv_name === dappnodeLogicalVolume)?.lv_name;
       if (defaultLv) setLogicalVolume(defaultLv);
-      else
-        throw Error(
-          `Dappnode default logical volume ${dappnodeLogicalVolume} not found`
-        );
+      else throw Error(`Dappnode default logical volume ${dappnodeLogicalVolume} not found`);
     } catch (e) {
       setExpandDiskReq({ error: e });
       console.error("Not possible to expand the disk space", e);
@@ -126,7 +104,7 @@ export default function Lvm() {
   }
 
   async function disclaimer(automatic: boolean) {
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: `Are you sure you want to extend the host filesystem with another storage device?`,
         text: `Extending the filesystem is a dangerous operation that cannot be undone. You must very well know what you are doing.
@@ -163,11 +141,8 @@ You must read the DAppNode documentation about extending the filesystem with LVM
     <Card spacing>
       <div>
         <p>
-          Expand your DAppNode filesystem with another storage device. More
-          information at:{" "}
-          <LinkDocs href={forumUrl.expandFileSystemHowTo}>
-            How to expand your DAppNode filesystem
-          </LinkDocs>
+          Expand your DAppNode filesystem with another storage device. More information at:{" "}
+          <LinkDocs href={forumUrl.expandFileSystemHowTo}>How to expand your DAppNode filesystem</LinkDocs>
         </p>
         <div style={{ display: "flex", justifyContent: "space-around" }}>
           <Button onClick={() => disclaimer(true)} variant="dappnode">
@@ -189,9 +164,7 @@ You must read the DAppNode documentation about extending the filesystem with LVM
           {diskReq.result ? (
             <Select
               value={undefined}
-              options={diskReq.result.map(
-                disk => `${disk.name} (${disk.size})`
-              )}
+              options={diskReq.result.map((disk) => `${disk.name} (${disk.size})`)}
               onValueChange={(value: string) => setDisk(value.split(/\s+/)[0])}
             />
           ) : diskReq.loading ? (
@@ -226,12 +199,8 @@ You must read the DAppNode documentation about extending the filesystem with LVM
           {volumeGroupReq.result ? (
             <Select
               value={undefined}
-              options={volumeGroupReq.result.map(
-                vg => `${vg.vg_name} (${vg.vg_size})`
-              )}
-              onValueChange={(value: string) =>
-                setVolumeGroup(value.split(/\s+/)[0])
-              }
+              options={volumeGroupReq.result.map((vg) => `${vg.vg_name} (${vg.vg_size})`)}
+              onValueChange={(value: string) => setVolumeGroup(value.split(/\s+/)[0])}
             />
           ) : volumeGroupReq.loading ? (
             <Ok msg="Getting volumes groups" loading={true} />
@@ -253,12 +222,8 @@ You must read the DAppNode documentation about extending the filesystem with LVM
           {logicalVolumeReq.result ? (
             <Select
               value={undefined}
-              options={logicalVolumeReq.result.map(
-                lv => `${lv.lv_name} (${lv.lv_size}) (${lv.vg_name})`
-              )}
-              onValueChange={(value: string) =>
-                setLogicalVolume(value.split(/\s+/)[0])
-              }
+              options={logicalVolumeReq.result.map((lv) => `${lv.lv_name} (${lv.lv_size}) (${lv.vg_name})`)}
+              onValueChange={(value: string) => setLogicalVolume(value.split(/\s+/)[0])}
             />
           ) : logicalVolumeReq.loading ? (
             <Ok msg="Getting logical volumes" loading={true} />
@@ -284,11 +249,7 @@ You must read the DAppNode documentation about extending the filesystem with LVM
                   <li key={volumeGroup}>Logical Volume: {logicalVolume}</li>
                 </ul>
               </p>
-              <Button
-                onClick={() => expandDisk(disk, volumeGroup, logicalVolume)}
-              >
-                Expand host filesystem
-              </Button>
+              <Button onClick={() => expandDisk(disk, volumeGroup, logicalVolume)}>Expand host filesystem</Button>
             </>
           ) : null}
         </>

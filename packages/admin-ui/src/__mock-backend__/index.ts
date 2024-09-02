@@ -41,21 +41,17 @@ const namedSpacedCalls = {
   ...wifi
 };
 
-let dappnodeWebName = "Mock-DAppNode";
+const dappnodeWebName = "Mock-DAppNode";
 
 export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
-  backupGet: async () =>
-    "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
+  backupGet: async () => "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc",
   backupRestore: async () => {},
   chainDataGet: async () => [
     {
       dnpName: "geth.dnp.dappnode.eth",
       syncing: true,
       error: false,
-      message: [
-        "Blocks synced: 543000 / 654000",
-        "States pulled: 25314123 / 154762142"
-      ].join("\n\n"),
+      message: ["Blocks synced: 543000 / 654000", "States pulled: 25314123 / 154762142"].join("\n\n"),
       help: "http://geth.io"
     },
     {

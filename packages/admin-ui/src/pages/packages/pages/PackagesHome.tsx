@@ -14,6 +14,7 @@ export function PackagesHome() {
     name: string;
     subPath: string;
     subLink: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
   }[] = [
     {
@@ -35,13 +36,9 @@ export function PackagesHome() {
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {routes.map(option => (
+        {routes.map((option) => (
           <button key={option.subPath} className="item-container">
-            <NavLink
-              to={option.subLink}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={option.subLink} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {option.name}
             </NavLink>
           </button>
@@ -49,7 +46,7 @@ export function PackagesHome() {
       </div>
 
       <Routes>
-        {routes.map(route => (
+        {routes.map((route) => (
           <Route
             key={route.subPath}
             path={route.subPath}

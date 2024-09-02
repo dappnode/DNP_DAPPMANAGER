@@ -76,17 +76,13 @@ export async function list(): Promise<UpnpPortMapping[]> {
  */
 export function parseListOutput(terminalOutput: string): UpnpPortMapping[] {
   // 1. Cut to the start of the table
-  const validLineRegex = RegExp(
-    /\d+\s+(UDP|TCP)\s+\d+->(\d+\.){3}\d+:\d+\s+.DAppNode/
-  );
+  const validLineRegex = RegExp(/\d+\s+(UDP|TCP)\s+\d+->(\d+\.){3}\d+:\d+\s+.DAppNode/);
   return (
     terminalOutput
       .trim()
       .split(/\r?\n/)
       // Filter by lines that have the table format above
-      .filter(
-        (line) => line && typeof line === "string" && validLineRegex.test(line)
-      )
+      .filter((line) => line && typeof line === "string" && validLineRegex.test(line))
       // Parse the line to extract the protocol and port mapping
       .map((line) => {
         //  3 UDP 30303->192.168.1.42:30303 'DAppNode' '' 0
@@ -97,12 +93,10 @@ export function parseListOutput(terminalOutput: string): UpnpPortMapping[] {
           protocol: protocol === "UDP" ? PortProtocol.UDP : PortProtocol.TCP,
           exPort,
           inPort,
-          ip,
+          ip
         };
       })
       // Make sure each result is correct, otherwise remove it
-      .filter(
-        ({ exPort, inPort }) => !isNaN(Number(exPort)) && !isNaN(Number(inPort))
-      )
+      .filter(({ exPort, inPort }) => !isNaN(Number(exPort)) && !isNaN(Number(inPort)))
   );
 }

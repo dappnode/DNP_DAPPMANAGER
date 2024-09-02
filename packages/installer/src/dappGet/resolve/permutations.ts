@@ -1,10 +1,6 @@
 import prioritizeVersions from "./prioritizeVersions.js";
 import prioritizeDnps from "./prioritizeDnps.js";
-import {
-  DappGetDnps,
-  PermutationsTableInterface,
-  PermutationInterface
-} from "../types.js";
+import { DappGetDnps, PermutationsTableInterface, PermutationInterface } from "../types.js";
 
 /**
  * Computes key parameters to construct all version permutations
@@ -32,9 +28,7 @@ import {
  *   { name: 'D', versions: [ '1.1.0', '1.0.0' ], n: 2, m: 6 }
  * ]
  */
-export function getPermutationsTable(
-  dnps: DappGetDnps
-): PermutationsTableInterface {
+export function getPermutationsTable(dnps: DappGetDnps): PermutationsTableInterface {
   let m = 1;
   // This sort is extremely important. It prioritizes the first successful version
   // The sort orders the priority criterias as follows
@@ -54,7 +48,7 @@ export function getPermutationsTable(
   //
   // It is more important for A to have a specific version than B,
   // then order 2 should be followed
-  return prioritizeDnps(dnps).map(dnp => {
+  return prioritizeDnps(dnps).map((dnp) => {
     const versions = prioritizeVersions(dnp);
     const n = versions.length;
     const _m = m;
@@ -73,13 +67,8 @@ export function getPermutationsTable(
  * ]
  * @returns total number of possible permutations
  */
-export function getTotalPermutations(
-  permutationsTable: PermutationsTableInterface
-): number {
-  return Object.values(permutationsTable).reduce(
-    (num, dnp) => num * dnp.versions.length,
-    1
-  );
+export function getTotalPermutations(permutationsTable: PermutationsTableInterface): number {
+  return Object.values(permutationsTable).reduce((num, dnp) => num * dnp.versions.length, 1);
 }
 
 /**
@@ -98,10 +87,7 @@ export function getTotalPermutations(
  * @returns A state with a specific set of versions
  * { A: '2.2.0', C: '2.0.0', D: '1.1.0' }
  */
-export function getPermutation(
-  permutationsTable: PermutationsTableInterface,
-  i: number
-): PermutationInterface {
+export function getPermutation(permutationsTable: PermutationsTableInterface, i: number): PermutationInterface {
   const permutation: PermutationInterface = {};
   for (const dnp of permutationsTable) {
     permutation[dnp.name] = dnp.versions[Math.floor(i / dnp.m) % dnp.n];

@@ -4,10 +4,7 @@ import { Compose, SpecialPermission } from "@dappnode/types";
  * Parses relevant settings in the compose that may be dangerous or grant
  * special permissions to this release's DNP
  */
-export function parseSpecialPermissions(
-  compose: Compose,
-  isCore: boolean
-): SpecialPermission[] {
+export function parseSpecialPermissions(compose: Compose, isCore: boolean): SpecialPermission[] {
   const specialPermissions: SpecialPermission[] = [];
 
   for (const [serviceName, service] of Object.entries(compose.services)) {
@@ -18,7 +15,7 @@ export function parseSpecialPermissions(
         name: "Privileged access to the system host",
         details:
           "Allows to manipulate and read any installed package and install additional packages. Allows to fully interact with the host system",
-        serviceName,
+        serviceName
       });
 
     if (isCore && service.networks && !Array.isArray(service.networks)) {
@@ -27,7 +24,7 @@ export function parseSpecialPermissions(
         specialPermissions.push({
           name: "Admin privileges in DAppNode's API",
           details: "Allows package can execute all admin action",
-          serviceName,
+          serviceName
         });
     }
 
@@ -36,7 +33,7 @@ export function parseSpecialPermissions(
         specialPermissions.push({
           name: `Privileged system capability ${cap}`,
           details: `See docker docs for more information https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities`,
-          serviceName,
+          serviceName
         });
 
     if (network_mode === "host")
@@ -44,7 +41,7 @@ export function parseSpecialPermissions(
         name: "Access to the host network",
         details:
           "Allows to connect directly to the host's network. It can bind its open ports directly to the host's IP address",
-        serviceName,
+        serviceName
       });
   }
 

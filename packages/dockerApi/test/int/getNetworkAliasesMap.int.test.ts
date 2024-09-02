@@ -8,11 +8,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
   const testNetworkName = "docker_network_test";
   const testNetworkSubnet = "172.40.0.0/16";
   const testImage = "alpine:latest";
-  const testContainerNames = [
-    "test_container_1",
-    "test_container_2",
-    "test_container_3",
-  ];
+  const testContainerNames = ["test_container_1", "test_container_2", "test_container_3"];
   let testNetwork: Network;
 
   before(async () => {
@@ -24,8 +20,8 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       Driver: "bridge",
       IPAM: {
         Driver: "default",
-        Config: [{ Subnet: testNetworkSubnet }],
-      },
+        Config: [{ Subnet: testNetworkSubnet }]
+      }
     });
 
     // Pull image and wait for completion
@@ -49,7 +45,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       const container = await docker.createContainer({
         Image: testImage, // Ensure the image is correctly referenced
         Cmd: ["sleep", "infinity"], // Use a command that is available in alpine
-        name: cn,
+        name: cn
       });
       await container.start();
       return container;
@@ -65,8 +61,8 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
         await testNetwork.connect({
           Container: container.id,
           EndpointConfig: {
-            Aliases: [`alias_${containerName}`],
-          },
+            Aliases: [`alias_${containerName}`]
+          }
         });
       })
     );
@@ -82,9 +78,7 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       expect(testContainerNames).to.include(key);
 
       // Check if the aliases array contains an alias starting with 'alias_test'
-      const hasTestAlias = value.aliases.some((alias) =>
-        alias.startsWith("alias_test")
-      );
+      const hasTestAlias = value.aliases.some((alias) => alias.startsWith("alias_test"));
       expect(hasTestAlias).to.be.true;
     });
   });
@@ -99,7 +93,6 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
       testContainerNames.map(async (cn) => {
         const container = docker.getContainer(cn);
         if (container) {
-          // eslint-disable-next-line @typescript-eslint/no-empty-function
           await container.remove({ force: true }).catch(() => {});
         }
       })
@@ -107,7 +100,6 @@ describe("Ensure docker network config migration => getDockerNetworkNameFromSubn
 
     // Remove docker network
     if (testNetwork) {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
       await testNetwork.remove().catch(() => {});
     }
   }

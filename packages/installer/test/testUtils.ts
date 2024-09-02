@@ -4,7 +4,7 @@ import {
   InstallPackageData,
   PackageRelease,
   Compose,
-  ReleaseSignatureStatusCode,
+  ReleaseSignatureStatusCode
 } from "@dappnode/types";
 import { DappnodeInstaller } from "../src/dappnodeInstaller.js";
 import { params } from "@dappnode/params";
@@ -18,7 +18,7 @@ import { ethers } from "ethers";
 // TODO setup a local ipfs node for these tests
 
 export const ipfs = create({
-  url: "https://api.ipfs.dappnode.io",
+  url: "https://api.ipfs.dappnode.io"
 });
 
 /**
@@ -28,12 +28,11 @@ export const ipfs = create({
  * @returns
  */
 export async function ipfsAddAll(dirPath: string): Promise<unknown[]> {
-  if (!fs.existsSync(dirPath))
-    throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
+  if (!fs.existsSync(dirPath)) throw Error(`ipfsAddAll error: no file found at: ${dirPath}`);
   const files = fs.readdirSync(dirPath).map((file) => {
     return {
       path: path.join(dirPath, file),
-      content: fs.readFileSync(path.join(dirPath, file)),
+      content: fs.readFileSync(path.join(dirPath, file))
     };
   });
   return all(ipfs.addAll(files));
@@ -41,9 +40,7 @@ export async function ipfsAddAll(dirPath: string): Promise<unknown[]> {
 
 export const dappnodeInstaller = new DappnodeInstaller(
   "https://api.ipfs.dappnode.io",
-  new ethers.JsonRpcProvider(
-    `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
-  )
+  new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`)
 );
 
 export const testDir = "./test_files/";
@@ -79,7 +76,7 @@ export const mockContainer: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  avatarUrl: "",
+  avatarUrl: ""
 };
 
 export const mockDnp: InstalledPackageData = {
@@ -91,7 +88,7 @@ export const mockDnp: InstalledPackageData = {
   dependencies: {},
   origin: "",
   avatarUrl: "",
-  containers: [mockContainer],
+  containers: [mockContainer]
 };
 
 export const mockCompose: Compose = {
@@ -99,9 +96,9 @@ export const mockCompose: Compose = {
   services: {
     [mockDnpName]: {
       image: `${mockDnpName}:${mockDnpVersion}`,
-      container_name: `DAppNodePackage-${mockDnpName}`,
-    },
-  },
+      container_name: `DAppNodePackage-${mockDnpName}`
+    }
+  }
 };
 
 export const mockRelease: PackageRelease = {
@@ -115,7 +112,7 @@ export const mockRelease: PackageRelease = {
   warnings: {},
   isCore: false,
   signedSafe: true,
-  signatureStatus: { status: ReleaseSignatureStatusCode.notSigned },
+  signatureStatus: { status: ReleaseSignatureStatusCode.notSigned }
 };
 
 export const mockPackageData: InstallPackageData = {
@@ -127,7 +124,7 @@ export const mockPackageData: InstallPackageData = {
   manifestPath: "mock/path/manifest.json",
   manifestBackupPath: "mock/path/manifest.backup.json",
   dockerTimeout: undefined,
-  containersStatus: {},
+  containersStatus: {}
 };
 
 export async function cleanRepos(): Promise<void> {

@@ -16,26 +16,16 @@ export default function OptimismNode({
   ...props
 }: {
   rollup: OptimismItem<"rollup">;
-  setNewRollup: React.Dispatch<
-    React.SetStateAction<OptimismItemOk<"rollup"> | undefined>
-  >;
+  setNewRollup: React.Dispatch<React.SetStateAction<OptimismItemOk<"rollup"> | undefined>>;
   isSelected: boolean;
 }) {
   const navigate = useNavigate();
 
   return (
-    <Card
-      {...props}
-      className={`optimism-node ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
-    >
+    <Card {...props} className={`optimism-node ${joinCssClass({ isSelected })}`} shadow={isSelected}>
       <div
         onClick={
-          rollup.status === "ok"
-            ? isSelected
-              ? () => setNewRollup(undefined)
-              : () => setNewRollup(rollup)
-            : undefined
+          rollup.status === "ok" ? (isSelected ? () => setNewRollup(undefined) : () => setNewRollup(rollup)) : undefined
         }
       >
         {rollup.status === "ok" ? (
@@ -51,30 +41,18 @@ export default function OptimismNode({
         <div className="title">{prettyDnpName(rollup.dnpName)} </div>
       </div>
 
-      {rollup.status === "ok" &&
-        isSelected &&
-        rollup.isInstalled &&
-        !rollup.isUpdated && (
-          <>
-            <Button
-              onClick={() =>
-                navigate(
-                  `${getInstallerPath(rollup.dnpName)}/${rollup.dnpName}`
-                )
-              }
-              variant="dappnode"
-            >
-              UPDATE
-            </Button>
-            <br />
-            <br />
-          </>
-        )}
+      {rollup.status === "ok" && isSelected && rollup.isInstalled && !rollup.isUpdated && (
+        <>
+          <Button onClick={() => navigate(`${getInstallerPath(rollup.dnpName)}/${rollup.dnpName}`)} variant="dappnode">
+            UPDATE
+          </Button>
+          <br />
+          <br />
+        </>
+      )}
 
       {rollup.status === "ok" && (
-        <div className="description">
-          {isSelected && rollup.data?.manifest?.shortDescription}
-        </div>
+        <div className="description">{isSelected && rollup.data?.manifest?.shortDescription}</div>
       )}
     </Card>
   );

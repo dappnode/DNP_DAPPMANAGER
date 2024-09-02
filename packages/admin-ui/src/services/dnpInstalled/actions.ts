@@ -8,7 +8,7 @@ export const setDnpInstalled = dnpInstalledSlice.actions.setDnpInstalled;
 
 // Redux-thunk actions
 
-export const fetchDnpInstalled = (): AppThunk => async dispatch => {
+export const fetchDnpInstalled = (): AppThunk => async (dispatch) => {
   try {
     dispatch(setDnpInstalled(await api.packagesGet()));
   } catch (e) {

@@ -18,9 +18,7 @@ export default function Report() {
   const hostStatsReq = useApi.statsDiskGet();
   const { versionData, versionDataVpn } = systemInfoReq.data || {};
   const diskUsedPercentage =
-    hostStatsReq.data?.usedPercentage != null
-      ? `${hostStatsReq.data?.usedPercentage}%`
-      : "...";
+    hostStatsReq.data?.usedPercentage != null ? `${hostStatsReq.data?.usedPercentage}%` : "...";
 
   const versionDatas: { [name: string]: PackageVersionData | undefined } = {
     "dappmanager.dnp.dappnode.eth": versionData,
@@ -29,8 +27,8 @@ export default function Report() {
   };
 
   const coreDnpVersions = (dnpsReq.data || [])
-    .filter(dnp => dnp.isCore)
-    .map(dnp => ({
+    .filter((dnp) => dnp.isCore)
+    .map((dnp) => ({
       name: dnp.dnpName,
       version: versionDatas[dnp.dnpName] || dnp.version
     }));
@@ -44,21 +42,20 @@ export default function Report() {
   const topicUrlWithData = formatTopicUrl(topicBody);
   const topicUrlNoData = topicBaseUrl;
   const reqs = [dnpsReq, systemInfoReq, diagnoseReq, hostStatsReq];
-  const isLoading = reqs.some(req => req.isValidating);
-  const isLoaded = reqs.every(req => req.data);
+  const isLoading = reqs.some((req) => req.isValidating);
+  const isLoaded = reqs.every((req) => req.data);
 
   return (
     <Card>
       <p>
-        To help the support team, the <strong>Report</strong> button will
-        prefill a new forum topic with the information shown below. If you don't
-        want to share any information, use the{" "}
+        To help the support team, the <strong>Report</strong> button will prefill a new forum topic with the information
+        shown below. If you don't want to share any information, use the{" "}
         <strong>Report without providing information</strong> button.
       </p>
 
       <p>
-        Before report, please, make sure that the topic does not already exits
-        in our <a href={dappnodeForumUrl}>forum</a>
+        Before report, please, make sure that the topic does not already exits in our{" "}
+        <a href={dappnodeForumUrl}>forum</a>
       </p>
 
       <div className="discourse-topic-header">

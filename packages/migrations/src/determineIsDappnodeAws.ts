@@ -44,7 +44,7 @@ export async function determineIsDappnodeAws(): Promise<void> {
     // emit event to trigger telegram bot daemon
     eventBus.telegramStatusChanged.emit();
   } catch (error) {
-    logs.info("Not a Dappnode AWS cloud");
+    logs.info(`Not a Dappnode AWS cloud: ${error.message}`);
     db.isDappnodeAws.set(false);
   }
 }

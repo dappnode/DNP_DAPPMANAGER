@@ -12,12 +12,7 @@ import {
 } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import {
-  isCoreUpdateEnabled,
-  SYSTEM_PACKAGES,
-  MY_PACKAGES,
-  isDnpUpdateEnabled
-} from "@dappnode/daemons";
+import { isCoreUpdateEnabled, SYSTEM_PACKAGES, MY_PACKAGES, isDnpUpdateEnabled } from "@dappnode/daemons";
 
 const coreDnpName = params.coreDnpName;
 
@@ -53,9 +48,7 @@ export async function autoUpdateDataGet(): Promise<AutoUpdateDataView> {
   if (isDnpUpdateEnabled()) {
     const singleDnpsToShow: InstalledPackageData[] = [];
     for (const dnp of dnpList) {
-      const storedDnp = singleDnpsToShow.find(
-        _dnp => _dnp.dnpName === dnp.dnpName
-      );
+      const storedDnp = singleDnpsToShow.find((_dnp) => _dnp.dnpName === dnp.dnpName);
       const storedVersion = storedDnp ? storedDnp.version : "";
       if (
         dnp.dnpName &&
@@ -121,17 +114,11 @@ export function getCoreFeedbackMessage(
    * Let's figure out the version of the core
    */
 
-  const {
-    version: pendingVersion,
-    scheduledUpdate,
-    errorMessage
-  } = pending[coreDnpName] || {};
+  const { version: pendingVersion, scheduledUpdate, errorMessage } = pending[coreDnpName] || {};
   const lastUpdatedVersion = getLastRegistryEntry(registry[coreDnpName] || {});
   const lastUpdatedVersionsAreInstalled =
-    lastUpdatedVersion.version &&
-    isVersionIdUpdated(lastUpdatedVersion.version, currentCorePackages);
-  const pendingVersionsAreInstalled =
-    pendingVersion && isVersionIdUpdated(pendingVersion, currentCorePackages);
+    lastUpdatedVersion.version && isVersionIdUpdated(lastUpdatedVersion.version, currentCorePackages);
+  const pendingVersionsAreInstalled = pendingVersion && isVersionIdUpdated(pendingVersion, currentCorePackages);
 
   if (scheduledUpdate) {
     // If the pending version is the current BUT it is NOT in the registry,
@@ -139,13 +126,11 @@ export function getCoreFeedbackMessage(
     if (pendingVersionsAreInstalled) return { manuallyUpdated: true };
 
     // Here, an update can be pending
-    if (Date.now() > scheduledUpdate)
-      return { inQueue: true, ...(errorMessage ? { errorMessage } : {}) };
+    if (Date.now() > scheduledUpdate) return { inQueue: true, ...(errorMessage ? { errorMessage } : {}) };
     else return { scheduled: scheduledUpdate };
   } else {
     // If current version is auto-installed, it will show up in the registry
-    if (lastUpdatedVersionsAreInstalled)
-      return { updated: lastUpdatedVersion.updated };
+    if (lastUpdatedVersionsAreInstalled) return { updated: lastUpdatedVersion.updated };
   }
 
   return {};
@@ -177,23 +162,15 @@ export function getDnpFeedbackMessage({
   if (!registry) registry = db.autoUpdateRegistry.get();
   if (!pending) pending = db.autoUpdatePending.get();
 
-  const currentVersionRegistry =
-    (registry[dnpName] || {})[currentVersion] || {};
-  const {
-    version: pendingVersion,
-    scheduledUpdate,
-    errorMessage
-  } = pending[dnpName] || {};
+  const currentVersionRegistry = (registry[dnpName] || {})[currentVersion] || {};
+  const { version: pendingVersion, scheduledUpdate, errorMessage } = pending[dnpName] || {};
 
   const lastUpdatedVersion = getLastRegistryEntry(registry[dnpName] || {});
-  const lastUpdatedVersionsAreInstalled =
-    lastUpdatedVersion.version && lastUpdatedVersion.version === currentVersion;
-  const pendingVersionsAreInstalled =
-    pendingVersion && pendingVersion === currentVersion;
+  const lastUpdatedVersionsAreInstalled = lastUpdatedVersion.version && lastUpdatedVersion.version === currentVersion;
+  const pendingVersionsAreInstalled = pendingVersion && pendingVersion === currentVersion;
 
   // If current version is auto-installed, it will show up in the registry
-  if (lastUpdatedVersionsAreInstalled)
-    return { updated: currentVersionRegistry.updated };
+  if (lastUpdatedVersionsAreInstalled) return { updated: currentVersionRegistry.updated };
 
   // If the pending version is the current BUT it is NOT in the registry,
   // it must have been updated by the user

@@ -12,13 +12,7 @@ import newTabProps from "utils/newTabProps";
 import { PackageBackup } from "@dappnode/types";
 import { ReqStatus } from "types";
 
-export function BackupDownload({
-  dnpName,
-  backup
-}: {
-  dnpName: string;
-  backup: PackageBackup[];
-}) {
+export function BackupDownload({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }) {
   const [reqStatus, setReqStatus] = useState<ReqStatus<string>>({});
 
   /**
@@ -45,10 +39,7 @@ export function BackupDownload({
 
   return (
     <>
-      <p>
-        Download a backup of the critical files of this package in your local
-        machine.
-      </p>
+      <p>Download a backup of the critical files of this package in your local machine.</p>
 
       {reqStatus.result ? (
         <>
@@ -65,16 +56,11 @@ export function BackupDownload({
             </div>
           </a>
           <Alert variant="warning" className="alert-download-sensitive">
-            This backup may contain sensitive data such as private keys. Make
-            sure to store it safely
+            This backup may contain sensitive data such as private keys. Make sure to store it safely
           </Alert>
         </>
       ) : (
-        <Button
-          onClick={prepareBackupForDownload}
-          disabled={reqStatus.loading}
-          variant="dappnode"
-        >
+        <Button onClick={prepareBackupForDownload} disabled={reqStatus.loading} variant="dappnode">
           Backup now
         </Button>
       )}

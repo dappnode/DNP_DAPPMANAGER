@@ -8,13 +8,9 @@ export const notificationsSlice = createSlice({
     [notificationId: string]: PackageNotificationDb;
   },
   reducers: {
-    viewedNotifications: state =>
-      mapValues(state, n => ({ ...n, viewed: true })),
+    viewedNotifications: (state) => mapValues(state, (n) => ({ ...n, viewed: true })),
 
-    pushNotification: (
-      state,
-      action: PayloadAction<PackageNotificationDb | PackageNotification>
-    ) => ({
+    pushNotification: (state, action: PayloadAction<PackageNotificationDb | PackageNotification>) => ({
       ...state,
       [action.payload.id]: {
         timestamp: Date.now(),

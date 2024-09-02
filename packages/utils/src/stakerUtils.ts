@@ -27,7 +27,7 @@ export function getBeaconServiceName(dnpName: string): string {
  */
 export function getConsensusUserSettings({
   dnpName,
-  network,
+  network
 }: {
   dnpName: string;
   network: Network;
@@ -47,25 +47,25 @@ export function getConsensusUserSettings({
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network),
-              },
+                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network)
+              }
             }
           : {
               [validatorServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
                 ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti,
+                ["GRAFFITI"]: defaultDappnodeGraffiti
               },
 
               [beaconServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
                 ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network),
-              },
-            },
-    },
+                ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network)
+              }
+            }
+    }
   };
 }
 
@@ -73,11 +73,11 @@ const getDefaultCheckpointSync = (network: Network): string =>
   network === "mainnet"
     ? "https://checkpoint-sync.dappnode.io"
     : network === "prater"
-    ? "https://checkpoint-sync-prater.dappnode.io"
-    : network === "gnosis"
-    ? "https://checkpoint-sync-gnosis.dappnode.io"
-    : network === "holesky"
-    ? "https://checkpoint-sync-holesky.dappnode.io"
-    : network === "lukso"
-    ? "https://checkpoints.mainnet.lukso.network"
-    : "";
+      ? "https://checkpoint-sync-prater.dappnode.io"
+      : network === "gnosis"
+        ? "https://checkpoint-sync-gnosis.dappnode.io"
+        : network === "holesky"
+          ? "https://checkpoint-sync-holesky.dappnode.io"
+          : network === "lukso"
+            ? "https://checkpoints.mainnet.lukso.network"
+            : "";

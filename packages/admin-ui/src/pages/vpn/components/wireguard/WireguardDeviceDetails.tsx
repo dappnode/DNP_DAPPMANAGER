@@ -21,13 +21,7 @@ import { WireguardDeviceCredentials } from "@dappnode/types";
 // Utils
 import { urlJoin } from "utils/url";
 
-function WireguardDeviceDetailsLoaded({
-  id,
-  device
-}: {
-  id: string;
-  device: WireguardDeviceCredentials;
-}) {
+function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: WireguardDeviceCredentials }) {
   const [showQr, setShowQr] = useState(false);
   const [showLocalCreds, setShowLocalCreds] = useState(false);
   const config = showLocalCreds ? device.configLocal : device.configRemote;
@@ -51,15 +45,9 @@ function WireguardDeviceDetailsLoaded({
       <div className="help-text">
         Add the following VPN configuration in your Wireguard client.
         <br /> <br />
-        In case you experience issues connecting from the same network as your
-        dappnode, use the local credentials.{" "}
-        <span
-          className="show-local-credentials"
-          onClick={() => setShowLocalCreds(x => !x)}
-        >
-          {showLocalCreds
-            ? "Go back to showing remote credentials"
-            : "Show local credentials"}
+        In case you experience issues connecting from the same network as your dappnode, use the local credentials.{" "}
+        <span className="show-local-credentials" onClick={() => setShowLocalCreds((x) => !x)}>
+          {showLocalCreds ? "Go back to showing remote credentials" : "Show local credentials"}
         </span>
       </div>
 
@@ -103,8 +91,7 @@ function WireguardDeviceDetailsLoaded({
       {showQr && config && <QrCode url={config} width={"400px"} />}
 
       <div className="alert alert-secondary" role="alert">
-        Beware of shoulder surfing attacks (unsolicited observers), This data
-        grants access to your DAppNode
+        Beware of shoulder surfing attacks (unsolicited observers), This data grants access to your DAppNode
       </div>
     </Card>
   );

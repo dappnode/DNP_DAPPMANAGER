@@ -38,8 +38,8 @@ export function startTestApi(): http.Server {
       if (callFn.length > 0) {
         app.post(`/${callCasted}`, (req, res) => {
           callFn(req.body as never)
-            .then(data => res.send(data))
-            .catch(e => {
+            .then((data) => res.send(data))
+            .catch((e) => {
               const errorResponse = {
                 name: e.name,
                 message: e.message,
@@ -52,8 +52,8 @@ export function startTestApi(): http.Server {
       } else {
         app.get(`/${callCasted}`, (req, res) => {
           callFn(req.query as never)
-            .then(data => res.send(data))
-            .catch(e => {
+            .then((data) => res.send(data))
+            .catch((e) => {
               const errorResponse = {
                 name: e.name,
                 message: e.message,

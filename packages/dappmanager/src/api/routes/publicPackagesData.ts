@@ -1,7 +1,4 @@
-import {
-  listPackageContainers,
-  listPackageContainerNoThrow
-} from "@dappnode/dockerapi";
+import { listPackageContainers, listPackageContainerNoThrow } from "@dappnode/dockerapi";
 import { PackageContainer } from "@dappnode/types";
 import { wrapHandler } from "../utils.js";
 

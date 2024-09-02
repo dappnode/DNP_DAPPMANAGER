@@ -1,13 +1,6 @@
-import {
-  AdminPasswordDb,
-  AdminPasswordDbError
-} from "../../api/auth/adminPasswordDb.js";
+import { AdminPasswordDb, AdminPasswordDbError } from "../../api/auth/adminPasswordDb.js";
 import { VpnApiClient } from "../../api/vpnApiClient.js";
-import {
-  VpnDeviceCredentials,
-  VpnDevice,
-  VpnDeviceAdminPassword
-} from "@dappnode/types";
+import { VpnDeviceCredentials, VpnDevice, VpnDeviceAdminPassword } from "@dappnode/types";
 
 // Temporal solution until eventBus is properly typed
 interface EventBusDevices {
@@ -47,13 +40,7 @@ export class DeviceCalls {
    * Gives/removes admin rights to the provided device id.
    * @param id Device id name
    */
-  deviceAdminToggle = async ({
-    id,
-    isAdmin
-  }: {
-    id: string;
-    isAdmin: boolean;
-  }): Promise<void> => {
+  deviceAdminToggle = async ({ id, isAdmin }: { id: string; isAdmin: boolean }): Promise<void> => {
     // Set admin status in local DB
     this.adminPasswordDb.setIsAdmin(id, isAdmin);
 
@@ -66,11 +53,7 @@ export class DeviceCalls {
    * concatenated with the device id.
    * @param id Device id name
    */
-  deviceCredentialsGet = async ({
-    id
-  }: {
-    id: string;
-  }): Promise<VpnDeviceCredentials> => {
+  deviceCredentialsGet = async ({ id }: { id: string }): Promise<VpnDeviceCredentials> => {
     const data = await this.vpnApiClient.getDeviceCredentials({ id });
     const device = await this.devicelist(id);
 
@@ -130,7 +113,7 @@ export class DeviceCalls {
 
   private devicelist = async (id: string): Promise<VpnDevice> => {
     const vpnDevices = await this.vpnApiClient.listDevices();
-    const device = vpnDevices.find(d => d.id === id);
+    const device = vpnDevices.find((d) => d.id === id);
     if (!device) throw Error(`Device ${id} not found`);
     return this.readDevice(device.id);
   };

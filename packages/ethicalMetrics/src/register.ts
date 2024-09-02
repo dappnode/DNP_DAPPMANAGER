@@ -6,7 +6,7 @@ import { ethicalMetricsEndpoint } from "./params.js";
  */
 export async function register({
   mail,
-  tgChannelId,
+  tgChannelId
 }: {
   mail: string | null;
   tgChannelId: string | null;
@@ -17,16 +17,13 @@ export async function register({
   if (mail) body["mail"] = mail;
   if (tgChannelId) body["tgChannelId"] = tgChannelId;
 
-  const response = await fetch(
-    url.resolve(ethicalMetricsEndpoint, "/targets"),
-    {
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-      },
+  const response = await fetch(url.resolve(ethicalMetricsEndpoint, "/targets"), {
+    method: "POST",
+    body: JSON.stringify(body),
+    headers: {
+      "Content-Type": "application/json"
     }
-  );
+  });
 
   if (response.status === 200) return;
 

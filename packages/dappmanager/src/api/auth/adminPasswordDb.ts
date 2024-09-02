@@ -83,8 +83,7 @@ export class AdminPasswordDb {
     const hash = passwordMap[id];
     if (hash) {
       const loginToken = parseLoginToken(hash);
-      if (loginToken == null)
-        throw Error(AdminPasswordDbError.PASSWORD_CHANGED);
+      if (loginToken == null) throw Error(AdminPasswordDbError.PASSWORD_CHANGED);
       return loginToken;
     }
 

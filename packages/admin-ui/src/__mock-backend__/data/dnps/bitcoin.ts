@@ -18,8 +18,7 @@ export const bitcoin: MockDnp = {
       featuredBackground: "linear-gradient(to right, #4b3317, #cb6e00)",
       featuredColor: "white"
     },
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: [
       "Abel Boldú (@vdo)",
       "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",
@@ -29,8 +28,7 @@ export const bitcoin: MockDnp = {
       onRemove: "Make sure you have change the endpoint in your bitcoin miner"
     },
     keywords: ["bitcoin", "btc"],
-    // @ts-ignore
-    homepage: {
+    links: {
       homepage: "https://github.com/dappnode/DAppNodePackage-bitcoin#readme"
     },
     repository: {

@@ -12,18 +12,13 @@ export function ServiceSelector({
   containers: PackageContainer[];
 }) {
   // services should already be sorted from the DAPPMANAGER, `calls/packagesGet.ts`
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map((c) => c.serviceName);
 
   if (serviceNames.length <= 1) return null;
 
   return (
     <div>
-      <Select
-        value={serviceName}
-        onValueChange={setServiceName}
-        options={serviceNames}
-        prepend="Service"
-      />
+      <Select value={serviceName} onValueChange={setServiceName} options={serviceNames} prepend="Service" />
     </div>
   );
 }

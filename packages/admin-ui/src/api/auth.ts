@@ -11,9 +11,7 @@ import { IApiAuth } from "./interface";
 export const apiAuth: IApiAuth = {
   async fetchLoginStatus() {
     try {
-      const res = await fetchAuthPost<{}, LoginStatusReturn>(
-        apiUrls.loginStatus
-      );
+      const res = await fetchAuthPost<object, LoginStatusReturn>(apiUrls.loginStatus);
       return { status: "logged-in", username: res.username };
     } catch (e) {
       switch (e.message) {
@@ -82,6 +80,7 @@ async function parseBodyErrorMessage(res: Response): Promise<string> {
       return bodyText;
     }
   } catch (e) {
+    console.error(`Error parsing body: ${e.message}\n${bodyText}`);
     return bodyText;
   }
 }

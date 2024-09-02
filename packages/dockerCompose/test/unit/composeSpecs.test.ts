@@ -4,11 +4,7 @@ import fs from "fs";
 import path from "path";
 import { Manifest, Compose } from "@dappnode/types";
 import { yamlParse, yamlDump, isNotFoundError } from "@dappnode/utils";
-import {
-  setDappnodeComposeDefaults,
-  validateCompose,
-  verifyCompose,
-} from "../../src/index.js";
+import { setDappnodeComposeDefaults, validateCompose, verifyCompose } from "../../src/index.js";
 import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -18,7 +14,7 @@ const specsDir = path.join(__dirname, "./releaseSpecs");
 const paths = {
   manifest: "dappnode_package.json",
   compose: "docker-compose.yml",
-  composeParsed: "docker-compose.parsed.yml",
+  composeParsed: "docker-compose.parsed.yml"
 };
 
 describe("Compose specs, against real DNPs", () => {
@@ -49,10 +45,7 @@ describe("Compose specs, against real DNPs", () => {
         const safeCompose = setDappnodeComposeDefaults(unsafeCompose, manifest);
         if (!composeParsed) {
           console.log(JSON.stringify(safeCompose, null, 2));
-          fs.writeFileSync(
-            path.join(specsDir, dirName, paths.composeParsed),
-            yamlDump(safeCompose)
-          );
+          fs.writeFileSync(path.join(specsDir, dirName, paths.composeParsed), yamlDump(safeCompose));
         } else {
           expect(safeCompose).to.deep.equal(composeParsed);
         }

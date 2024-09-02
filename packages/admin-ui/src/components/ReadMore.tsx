@@ -38,10 +38,7 @@ const ReadMore: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         {children}
       </div>
       {showReadMore && (
-        <span
-          className="read-more-toggle"
-          onClick={() => setReadMore(!readMore)}
-        >
+        <span className="read-more-toggle" onClick={() => setReadMore(!readMore)}>
           {readMore ? (
             <>
               <MdUnfoldLess /> Read less

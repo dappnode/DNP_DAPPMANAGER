@@ -5,10 +5,7 @@ import { parseStaticDate, parseDiffDates } from "utils/dates";
 import { autoUpdateIds } from "params";
 import { MdChevronRight } from "react-icons/md";
 import { getInstallerPath } from "pages/installer";
-import {
-  pathName as systemPathName,
-  subPaths as systemSubPaths
-} from "pages/system/data";
+import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 
 const { MY_PACKAGES, SYSTEM_PACKAGES } = autoUpdateIds;
 
@@ -28,6 +25,7 @@ export function AutoUpdateRowItem({
   id: string;
   displayName: string;
   enabled: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   feedback: any;
   isInstalling: boolean;
   isSinglePackage: boolean;
@@ -37,7 +35,7 @@ export function AutoUpdateRowItem({
   // Force a re-render every 15 seconds for the timeFrom to show up correctly
   const [, setClock] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => setClock(n => n + 1), 15 * 1000);
+    const interval = setInterval(() => setClock((n) => n + 1), 15 * 1000);
     return () => {
       clearInterval(interval);
     };
@@ -50,33 +48,28 @@ export function AutoUpdateRowItem({
     id === MY_PACKAGES
       ? null
       : id === SYSTEM_PACKAGES
-      ? `${systemPathName}/${systemSubPaths.update}`
-      : `${getInstallerPath(id)}/${id}`;
+        ? `${systemPathName}/${systemSubPaths.update}`
+        : `${getInstallerPath(id)}/${id}`;
 
   const feedbackText = !enabled
     ? "-"
     : isInstalling
-    ? "Updating..."
-    : manuallyUpdated
-    ? "Manually updated"
-    : inQueue
-    ? "In queue..."
-    : scheduled
-    ? `Scheduled, in ${parseDiffDates(scheduled)}`
-    : updated
-    ? parseStaticDate(updated)
-    : "-";
+      ? "Updating..."
+      : manuallyUpdated
+        ? "Manually updated"
+        : inQueue
+          ? "In queue..."
+          : scheduled
+            ? `Scheduled, in ${parseDiffDates(scheduled)}`
+            : updated
+              ? parseStaticDate(updated)
+              : "-";
 
   const showUpdateLink = isInstalling || inQueue || scheduled;
 
   return (
     <React.Fragment key={id}>
-      <span
-        className={`state-badge center badge-${
-          enabled ? "success" : "secondary"
-        }`}
-        style={{ opacity: 0.85 }}
-      >
+      <span className={`state-badge center badge-${enabled ? "success" : "secondary"}`} style={{ opacity: 0.85 }}>
         <span className="content">{enabled ? "on" : "off"}</span>
       </span>
 
@@ -100,11 +93,7 @@ export function AutoUpdateRowItem({
         ) : null}
       </span>
 
-      <Switch
-        checked={enabled ? true : false}
-        onToggle={() => setUpdateSettings(id, !Boolean(enabled))}
-        label=""
-      />
+      <Switch checked={enabled ? true : false} onToggle={() => setUpdateSettings(id, !enabled)} label="" />
 
       {!collapsed && <div className="extra-info">{errorMessage}</div>}
 

@@ -14,15 +14,10 @@ import { dappGet as dappGetType } from "../../../src/dappGet/index.js";
 import aggregateType from "../../../src/dappGet/aggregate/index.js";
 import { dappnodeInstaller } from "../../testUtils.js";
 
-/* eslint-disable no-console */
-
 const log = false;
 function logBig(...args: string[]): void {
   const b = "=".repeat(20);
-  if (log)
-    logs.info(
-      `\n${b}\n${args.map((s: string) => String(s)).join(`\n${b}\n`)}\n${b}'\n`
-    );
+  if (log) logs.info(`\n${b}\n${args.map((s: string) => String(s)).join(`\n${b}\n`)}\n${b}'\n`);
 }
 
 /**
@@ -39,9 +34,7 @@ describe.skip("dappGet integration test", async () => {
   const casesFolder = path.join(__dirname, "cases");
   for (const casePath of fs.readdirSync(casesFolder)) {
     // Load the case data with ES6 import
-    const caseData: DappgetTestCase = await import(
-      path.join(casesFolder, casePath)
-    ).then((m) => m.default);
+    const caseData: DappgetTestCase = await import(path.join(casesFolder, casePath)).then((m) => m.default);
 
     describe.skip(`Case: ${caseData.name}`, () => {
       // Prepare dependencies
@@ -51,17 +44,14 @@ describe.skip("dappGet integration test", async () => {
         .map((dnpName) => {
           const installedVersion = caseData.dnps[dnpName].installed || "";
           const dnp = caseData.dnps[dnpName].versions[installedVersion];
-          if (!dnp)
-            throw Error(
-              `The installed version must be defined: ${dnpName} @ ${installedVersion}`
-            );
+          if (!dnp) throw Error(`The installed version must be defined: ${dnpName} @ ${installedVersion}`);
 
           return {
             ...mockDnp,
             dnpName: dnpName,
             version: installedVersion,
             origin: undefined,
-            dependencies: dnp || {},
+            dependencies: dnp || {}
           };
         });
 
@@ -70,9 +60,7 @@ describe.skip("dappGet integration test", async () => {
         return dnpList;
       }
 
-      const dappGetFetcher = new DappGetFetcherMock(
-        mapValues(caseData.dnps, (dnp) => dnp.versions)
-      );
+      const dappGetFetcher = new DappGetFetcherMock(mapValues(caseData.dnps, (dnp) => dnp.versions));
 
       let dappGet: typeof dappGetType;
       let aggregate: typeof aggregateType;
@@ -86,9 +74,7 @@ describe.skip("dappGet integration test", async () => {
               .toBeUsed();
           }
         );
-        const aggregateImport = await rewiremock.around(
-          () => import("../../../src/dappGet/aggregate/index.js")
-        );
+        const aggregateImport = await rewiremock.around(() => import("../../../src/dappGet/aggregate/index.js"));
         dappGet = dappGetImport.dappGet;
         aggregate = aggregateImport.default;
       });
@@ -98,26 +84,20 @@ describe.skip("dappGet integration test", async () => {
           dappnodeInstaller,
           req: caseData.req,
           dnpList,
-          dappGetFetcher,
+          dappGetFetcher
         });
         logBig("  Aggregated DNPs", JSON.stringify(dnps, null, 2));
         expectNotEmpty(dnps);
-        expect(
-          dnps,
-          "Make sure the aggregation object includes the requested package"
-        ).to.have.property(caseData.req.name);
+        expect(dnps, "Make sure the aggregation object includes the requested package").to.have.property(
+          caseData.req.name
+        );
         if (caseData.expectedAggregate) {
           expect(dnps).to.deep.equal(caseData.expectedAggregate);
         }
       });
 
       it("Should return the expect result", async () => {
-        const result = await dappGet(
-          dappnodeInstaller,
-          caseData.req,
-          {},
-          dappGetFetcher
-        );
+        const result = await dappGet(dappnodeInstaller, caseData.req, {}, dappGetFetcher);
         const { state, alreadyUpdated } = result;
         logBig("  DNPs result", JSON.stringify(result, null, 2));
 
@@ -132,6 +112,5 @@ describe.skip("dappGet integration test", async () => {
 });
 
 function expectNotEmpty(obj: unknown): void {
-  expect(isEmpty(obj), "Obj must not be empty: " + JSON.stringify(obj, null, 2))
-    .to.be.false;
+  expect(isEmpty(obj), "Obj must not be empty: " + JSON.stringify(obj, null, 2)).to.be.false;
 }

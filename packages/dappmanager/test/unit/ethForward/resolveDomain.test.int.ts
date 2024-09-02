@@ -1,12 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-import {
-  Content,
-  EthForwardError,
-  EthForwardErrorCode,
-  Location
-} from "../../../src/api/middlewares/ethForward/types.js";
+import { Content, EthForwardError, EthForwardErrorCode } from "../../../src/api/middlewares/ethForward/types.js";
 import { resolveDomain } from "../../../src/api/middlewares/ethForward/resolveDomain.js";
 
 /**
@@ -19,8 +14,6 @@ import { resolveDomain } from "../../../src/api/middlewares/ethForward/resolveDo
  */
 
 describe("ethForward > resolveDomain", () => {
-  const provider = new ethers.InfuraProvider();
-
   describe("resolveDomain with stable mainnet domains", () => {
     const ensDomains: { [hash: string]: Content } = {
       "mycrypto.dappnode.eth": {

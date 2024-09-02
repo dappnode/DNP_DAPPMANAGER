@@ -44,7 +44,7 @@ describe.skip("Call function: packageRemove", function () {
   before("Mock", async () => {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/packageRemove.js"),
-      mock => {
+      (mock) => {
         mock(() => import("@dappnode/dockerapi"))
           .with({ dockerComposeDown })
           .toBeUsed();

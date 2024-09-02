@@ -109,26 +109,14 @@
       "oneOf": [
         {
           "type": "string",
-          "enum": [
-            "ethereum",
-            "ethereum-beacon-chain",
-            "ethereum2-beacon-chain-prysm",
-            "bitcoin",
-            "monero"
-          ]
+          "enum": ["ethereum", "ethereum-beacon-chain", "ethereum2-beacon-chain-prysm", "bitcoin", "monero"]
         },
         {
           "type": "object",
           "properties": {
             "driver": {
               "type": "string",
-              "enum": [
-                "bitcoin",
-                "ethereum",
-                "ethereum-beacon-chain",
-                "ethereum2-beacon-chain-prysm",
-                "monero"
-              ],
+              "enum": ["bitcoin", "ethereum", "ethereum-beacon-chain", "ethereum2-beacon-chain-prysm", "monero"],
               "description": "The blockchain driver used by this DAppNode Package",
               "examples": ["ethereum", "bitcoin"]
             },
@@ -167,11 +155,7 @@
       "description": "Specifies the order in which the services should be started.",
       "items": {
         "type": "string",
-        "examples": [
-          "vpn.dnp.dappnode.eth",
-          "core.dnp.dappnode.eth",
-          "dappmanager.dnp.dappnode.eth"
-        ]
+        "examples": ["vpn.dnp.dappnode.eth", "core.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"]
       }
     },
     "restartCommand": {
@@ -274,10 +258,7 @@
             "description": "The list of envs to inject to the defined services",
             "items": {
               "type": "string",
-              "examples": [
-                "_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK",
-                "_DAPPNODE_GLOBAL_PUBLIC_IP"
-              ]
+              "examples": ["_DAPPNODE_GLOBAL_NO_NAT_LOOPBACK", "_DAPPNODE_GLOBAL_PUBLIC_IP"]
             },
             "services": {
               "type": "array",
@@ -322,10 +303,7 @@
           "path": {
             "type": "string",
             "description": "Path to the file or directory to backup. It **MUST** be an absolute path (do not use the `~` character) for the backup tool to work correctly.",
-            "examples": [
-              "/root/.raiden/secret/keystore",
-              "/usr/src/app/config.json"
-            ],
+            "examples": ["/root/.raiden/secret/keystore", "/usr/src/app/config.json"],
             "minLength": 1,
             "errorMessage": "should be an non-empty string"
           },
@@ -342,9 +320,7 @@
     "changelog": {
       "type": "string",
       "description": "Description of relevant changes of this specific version. Supports markdown and links.",
-      "examples": [
-        "Brief summary of the most relevant changes that the user must known before installing"
-      ]
+      "examples": ["Brief summary of the most relevant changes that the user must known before installing"]
     },
     "warnings": {
       "type": "object",
@@ -374,9 +350,7 @@
         "onMajorUpdate": {
           "type": "string",
           "description": "Will be shown before performing a major update in the DAppNode Package, not in the first installation.",
-          "examples": [
-            "This is a major update of Prysm, it will start validating using the web3signer."
-          ]
+          "examples": ["This is a major update of Prysm, it will start validating using the web3signer."]
         },
         "onReset": {
           "type": "string",
@@ -437,9 +411,7 @@
         "message": {
           "type": "string",
           "description": "The message shown in the pop-up. Markdown and links are allowed.",
-          "examples": [
-            "This software is experimental, presented “as is” and inherently carries risks."
-          ]
+          "examples": ["This software is experimental, presented “as is” and inherently carries risks."]
         }
       }
     },
@@ -507,9 +479,7 @@
     "author": {
       "type": "string",
       "description": "Main author of this DAppNode Package. Must follow the structure `${name} <${email}> (${githubUserLink})`.",
-      "examples": [
-        "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)"
-      ],
+      "examples": ["DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)"],
       "minLength": 1,
       "errorMessage": "should be an non-empty string"
     },

@@ -10,7 +10,7 @@ import { withToast } from "components/toast/Toast";
 function PowerManagment() {
   async function reboot() {
     try {
-      await new Promise<void>(resolve =>
+      await new Promise<void>((resolve) =>
         confirm({
           title: `Rebooting host`,
           text: `Are you sure you want to reboot the host machine? Only do this if it’s strictly necessary.`,
@@ -32,7 +32,7 @@ function PowerManagment() {
   async function powerOff() {
     try {
       // Since there are two consecutive modals, the async form must be used
-      await new Promise<void>(resolve =>
+      await new Promise<void>((resolve) =>
         confirm({
           title: `Powering off host`,
           text: `WARNING! Your machine will power off and you will not be able to turn it back on without physical access or a remote way to switch on the power.`,
@@ -42,7 +42,7 @@ function PowerManagment() {
         })
       );
 
-      await new Promise<void>(resolve =>
+      await new Promise<void>((resolve) =>
         confirm({
           title: `Are you sure?`,
           text: `Please make sure you have a way of turning the host machine’s power back on.`,
@@ -68,8 +68,7 @@ function PowerManagment() {
         <div>
           <div className="subtle-header">REBOOT HOST</div>
           <p>
-            Only use this functionality as last resort and when all other
-            troubleshooting options have been exhausted.
+            Only use this functionality as last resort and when all other troubleshooting options have been exhausted.
           </p>
           <Button
             onClick={reboot}
@@ -83,10 +82,7 @@ function PowerManagment() {
         {/* Restore backup */}
         <div>
           <div className="subtle-header">POWER OFF HOST</div>
-          <p>
-            Your machine will power off and you will not be able to access the
-            Admin UI until you turn it back on.
-          </p>
+          <p>Your machine will power off and you will not be able to access the Admin UI until you turn it back on.</p>
           <Button
             onClick={powerOff}
             // disabled={isOnProgress}

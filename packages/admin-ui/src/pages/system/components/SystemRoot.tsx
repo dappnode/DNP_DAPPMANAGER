@@ -20,6 +20,7 @@ const SystemRoot: React.FC = () => {
     name: string;
     subLink: string;
     subPath: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
     hideFromMenu?: boolean;
   }[] = [
@@ -98,14 +99,10 @@ const SystemRoot: React.FC = () => {
 
       <div className="horizontal-navbar">
         {availableRoutes
-          .filter(route => !route.hideFromMenu)
-          .map(route => (
+          .filter((route) => !route.hideFromMenu)
+          .map((route) => (
             <button key={route.subPath} className="item-container">
-              <NavLink
-                to={route.subLink}
-                className="item no-a-style"
-                style={{ whiteSpace: "nowrap" }}
-              >
+              <NavLink to={route.subLink} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
                 {route.name}
               </NavLink>
             </button>
@@ -114,12 +111,8 @@ const SystemRoot: React.FC = () => {
 
       <div className="section-spacing">
         <Routes>
-          {availableRoutes.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<route.component />}
-            />
+          {availableRoutes.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
           ))}
         </Routes>
       </div>

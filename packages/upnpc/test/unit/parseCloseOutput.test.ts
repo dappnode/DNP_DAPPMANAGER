@@ -17,7 +17,7 @@ UPNP_DeletePortMapping() returned : 0
 `;
 
   it("On success, it should return ok", async () => {
-    const ok = parseCloseOutput(terminalOutputSuccess);
-    expect(ok).to.be.ok;
+    const result = parseCloseOutput(terminalOutputSuccess);
+    expect(result).to.be.ok;
   });
 });

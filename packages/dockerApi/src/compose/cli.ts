@@ -24,7 +24,7 @@ async function execDockerCompose(
     // service names MUST go after the options
     ...(serviceNames || []),
     // Adding <&- to prevent interactive mode
-    "<&-",
+    "<&-"
   ]);
 }
 
@@ -37,10 +37,7 @@ export interface DockerComposeUpOptions {
   removeOrphans?: boolean;
 }
 
-export function dockerComposeUp(
-  dcPath: string,
-  options: DockerComposeUpOptions = {}
-): Promise<string> {
+export function dockerComposeUp(dcPath: string, options: DockerComposeUpOptions = {}): Promise<string> {
   // --detach is invalid with --no-start
   if (options.noStart) options.detach = false;
   return execDockerCompose(
@@ -51,7 +48,7 @@ export function dockerComposeUp(
       detach: options.detach ?? true,
       forceRecreate: options.forceRecreate,
       timeout: options.timeout,
-      removeOrphans: options.removeOrphans,
+      removeOrphans: options.removeOrphans
     },
     options.serviceNames
   );
@@ -85,10 +82,7 @@ export function dockerComposeStart(dcPath: string): Promise<string> {
 /**
  * --timeout TIMEOUT   Specify a shutdown timeout in seconds.
  */
-export function dockerComposeStop(
-  dcPath: string,
-  options: { timeout?: number } = {}
-): Promise<string> {
+export function dockerComposeStop(dcPath: string, options: { timeout?: number } = {}): Promise<string> {
   return execDockerCompose(dcPath, "stop", options);
 }
 

@@ -1,29 +1,17 @@
 import Dockerode from "dockerode";
 import { uniq } from "lodash-es";
-import {
-  ComposeNetwork,
-  ComposeServiceNetwork,
-  PackageContainer,
-} from "@dappnode/types";
+import { ComposeNetwork, ComposeServiceNetwork, PackageContainer } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import {
-  ComposeFileEditor,
-  parseServiceNetworks,
-} from "@dappnode/dockercompose";
+import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getNetworkContainerConfig,
+  getNetworkContainerConfig
 } from "@dappnode/dockerapi";
 import { gte, lt, clean } from "semver";
-import {
-  getDockerComposePath,
-  getIsMonoService,
-  getPrivateNetworkAliases,
-  shell,
-} from "@dappnode/utils";
+import { getDockerComposePath, getIsMonoService, getPrivateNetworkAliases, shell } from "@dappnode/utils";
 
 /** Alias for code succinctness */
 const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
@@ -43,18 +31,15 @@ export async function addAliasToRunningContainers(): Promise<void> {
   await addAliasToGivenContainers(containers);
 }
 
-export async function addAliasToGivenContainers(
-  containers: PackageContainer[]
-): Promise<void> {
+export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {
   for (const container of containers) {
     try {
       const service = {
         serviceName: container.serviceName,
         dnpName: container.dnpName,
         isMainOrMonoservice:
-          getIsMonoService(
-            new ComposeFileEditor(container.dnpName, container.isCore).compose
-          ) || Boolean(container.isMain),
+          getIsMonoService(new ComposeFileEditor(container.dnpName, container.isCore).compose) ||
+          Boolean(container.isMain)
       };
 
       const aliases = getPrivateNetworkAliases(service);
@@ -68,15 +53,8 @@ export async function addAliasToGivenContainers(
         params.DOCKER_PRIVATE_NETWORK_NAME
       );
       if (!hasAliases(currentEndpointConfig, aliases)) {
-        const updatedConfig = updateEndpointConfig(
-          currentEndpointConfig,
-          aliases
-        );
-        await updateContainerNetwork(
-          dncoreNetworkName,
-          container,
-          updatedConfig
-        );
+        const updatedConfig = updateEndpointConfig(currentEndpointConfig, aliases);
+        await updateContainerNetwork(dncoreNetworkName, container, updatedConfig);
         logs.info(`aliases ${aliases} added to ${container.containerName}`);
       }
     } catch (e) {
@@ -92,16 +70,10 @@ export async function addAliasToGivenContainers(
  * @param aliases string[]
  * @returns void
  */
-export function migrateCoreNetworkAndAliasInCompose(
-  container: PackageContainer,
-  aliases: string[]
-): void {
+export function migrateCoreNetworkAndAliasInCompose(container: PackageContainer, aliases: string[]): void {
   const compose = new ComposeFileEditor(container.dnpName, container.isCore);
 
-  const rawServiceNetworks = compose.services()[
-    // eslint-disable-next-line no-unexpected-multiline
-    container.serviceName
-  ].get().networks;
+  const rawServiceNetworks = compose.services()[container.serviceName].get().networks;
 
   if (!rawServiceNetworks) {
     throw Error(`No networks found in ${container.serviceName} service`);
@@ -109,13 +81,10 @@ export function migrateCoreNetworkAndAliasInCompose(
 
   const serviceNetworks = parseServiceNetworks(rawServiceNetworks);
 
-  const dncoreServiceNetwork =
-    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME];
+  const dncoreServiceNetwork = serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME];
 
   if (!dncoreServiceNetwork) {
-    throw Error(
-      `No "dncore_network" found in ${container.serviceName} service`
-    );
+    throw Error(`No "dncore_network" found in ${container.serviceName} service`);
   }
 
   const currentDncoreNetworkAliases = dncoreServiceNetwork.aliases || [];
@@ -124,36 +93,24 @@ export function migrateCoreNetworkAndAliasInCompose(
   const newAliases = uniq([...currentDncoreNetworkAliases, ...aliases]);
 
   // Gets the network "dncore_network" from the general compose file
-  const dncoreComposeNetwork = compose.getComposeNetwork(
-    params.DOCKER_PRIVATE_NETWORK_NAME
-  );
+  const dncoreComposeNetwork = compose.getComposeNetwork(params.DOCKER_PRIVATE_NETWORK_NAME);
 
   // Return if migration was done, compose is already updated
-  if (
-    isComposeNetworkAndAliasMigrated(
-      dncoreComposeNetwork,
-      dncoreServiceNetwork,
-      compose.compose.version,
-      newAliases
-    )
-  )
+  if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, compose.compose.version, newAliases))
     return;
 
   // Ensure/update compose file version 3.5
   // check if its lower than 3.5. Docker aliases was introduced in docker compose version 3.5
-  if (
-    lt(parseComposeSemver(compose.compose.version), parseComposeSemver("3.5"))
-  )
+  if (lt(parseComposeSemver(compose.compose.version), parseComposeSemver("3.5")))
     compose.compose = {
       ...compose.compose,
-      version: params.MINIMUM_COMPOSE_VERSION,
+      version: params.MINIMUM_COMPOSE_VERSION
     };
 
   // Add aliases to service
-  compose.services()[
-    // eslint-disable-next-line no-unexpected-multiline
-    container.serviceName
-  ].addNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, newAliases, dncoreServiceNetwork);
+  compose
+    .services()
+    [container.serviceName].addNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, newAliases, dncoreServiceNetwork);
   compose.write();
 }
 
@@ -164,15 +121,12 @@ export function migrateCoreNetworkAndAliasInCompose(
 //   return false;
 // }
 
-function updateEndpointConfig(
-  currentEndpointConfig: Dockerode.NetworkInfo | null,
-  aliases: string[]
-) {
+function updateEndpointConfig(currentEndpointConfig: Dockerode.NetworkInfo | null, aliases: string[]) {
   const currentAliases = currentEndpointConfig?.Aliases || [];
   const newAliases = uniq([...currentAliases, ...aliases]);
   return {
     ...currentEndpointConfig,
-    Aliases: newAliases,
+    Aliases: newAliases
   };
 }
 
@@ -184,14 +138,9 @@ async function updateContainerNetwork(
   const containerName = container.containerName;
 
   // Wifi and VPN containers need a refresh connect due to their own network configuration
-  if (
-    containerName === params.vpnContainerName ||
-    containerName === params.wifiContainerName
-  ) {
+  if (containerName === params.vpnContainerName || containerName === params.wifiContainerName) {
     await shell(`docker rm ${containerName} --force`);
-    await dockerComposeUp(
-      getDockerComposePath(container.dnpName, container.isCore)
-    );
+    await dockerComposeUp(getDockerComposePath(container.dnpName, container.isCore));
   } else {
     await dockerNetworkReconnect(networkName, containerName, endpointConfig);
     logs.info(`Added new alias to ${containerName} in ${networkName} network`);
@@ -202,10 +151,7 @@ async function updateContainerNetwork(
  * @param aliases
  * @returns boolean
  */
-function hasAliases(
-  endpointConfig: Dockerode.NetworkInfo | null,
-  aliases: string[]
-): boolean {
+function hasAliases(endpointConfig: Dockerode.NetworkInfo | null, aliases: string[]): boolean {
   return Boolean(
     endpointConfig &&
       endpointConfig.Aliases &&
@@ -235,10 +181,7 @@ function isComposeNetworkAndAliasMigrated(
   if (
     dncoreComposeNetwork?.name === params.DOCKER_PRIVATE_NETWORK_NAME && // Check expected name
     dncoreComposeNetwork?.external && // Check is external network
-    gte(
-      parseComposeSemver(composeVersion),
-      parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)
-    ) && // Check version is at least 3.5
+    gte(parseComposeSemver(composeVersion), parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)) && // Check version is at least 3.5
     aliases.every((alias) => dncoreServiceNetwork.aliases?.includes(alias)) // Check every alias is already present
   )
     return true;
@@ -254,10 +197,9 @@ function isComposeNetworkAndAliasMigrated(
  */
 function sanitizeVersion(version: string): string {
   const sanitizedVersion = clean(version, {
-    loose: true,
+    loose: true
   });
-  if (!sanitizedVersion)
-    throw Error(`Error: ${version} cannot be used by semver`);
+  if (!sanitizedVersion) throw Error(`Error: ${version} cannot be used by semver`);
   return sanitizedVersion;
 }
 

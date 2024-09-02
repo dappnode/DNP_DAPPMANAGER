@@ -10,5 +10,5 @@ export const ajv = new Ajv({
   logger: false,
   allErrors: true,
   coerceTypes: true,
-  verbose: true,
+  verbose: true
 });

@@ -4,7 +4,7 @@ import {
   docker,
   dockerCreateNetwork,
   dockerNetworkConnect,
-  getNetworkAliasesIpsMapNotThrow,
+  getNetworkAliasesIpsMapNotThrow
 } from "../../src/index.js";
 import Dockerode from "dockerode";
 
@@ -14,38 +14,31 @@ describe("dockerApi => network", function () {
 
   const dockerNetworkName = "dncore_test";
   const dockerImageTest = "alpine:latest";
-  const containerNames = [
-    "test_container_1",
-    "test_container_2",
-    "test_container_3",
-  ]; // Define container names
+  const containerNames = ["test_container_1", "test_container_2", "test_container_3"]; // Define container names
 
   before(async () => {
     // Pull image and wait for completion
     await new Promise<void>((resolve, reject) => {
-      docker.pull(
-        dockerImageTest,
-        (err: Error, stream: NodeJS.ReadableStream) => {
-          if (err) {
-            reject(err);
-          } else {
-            docker.modem.followProgress(stream, (err) => {
-              if (err) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            });
-          }
+      docker.pull(dockerImageTest, (err: Error, stream: NodeJS.ReadableStream) => {
+        if (err) {
+          reject(err);
+        } else {
+          docker.modem.followProgress(stream, (err) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve();
+            }
+          });
         }
-      );
+      });
     });
     await Promise.all(
       containerNames.map(async (cn) => {
         const container = await docker.createContainer({
           Image: dockerImageTest,
           Cmd: ["tail", "-f", "/dev/null"], // Keep the container running
-          name: cn,
+          name: cn
         });
         await container.start();
       })
@@ -56,8 +49,7 @@ describe("dockerApi => network", function () {
     await dockerCreateNetwork(dockerNetworkName);
 
     const network = docker.getNetwork(dockerNetworkName);
-    const networkInspect =
-      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+    const networkInspect = (await network.inspect()) as Dockerode.NetworkInspectInfo;
     expect(networkInspect.Name).to.deep.equal(dockerNetworkName);
   });
 
@@ -66,19 +58,16 @@ describe("dockerApi => network", function () {
       containerNames.map(
         async (cn) =>
           await dockerNetworkConnect(dockerNetworkName, cn, {
-            Aliases: [cn],
+            Aliases: [cn]
           })
       )
     );
 
     const network = docker.getNetwork(dockerNetworkName);
-    const networkInspect =
-      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+    const networkInspect = (await network.inspect()) as Dockerode.NetworkInspectInfo;
     const containersInNetwork = networkInspect.Containers;
     if (!containersInNetwork) throw Error(`Expected containers in network`);
-    const containersNames = Object.values(containersInNetwork).map(
-      (c) => c.Name
-    );
+    const containersNames = Object.values(containersInNetwork).map((c) => c.Name);
     expect(containersNames).to.have.deep.members(containerNames);
   });
 
@@ -101,15 +90,12 @@ describe("dockerApi => network", function () {
   });
 
   it("should disconnect all docker containers from a docker network", async () => {
-    await disconnectAllContainersFromNetwork(
-      docker.getNetwork(dockerNetworkName)
-    );
+    await disconnectAllContainersFromNetwork(docker.getNetwork(dockerNetworkName));
   });
 
   after(async () => {
     // remove containers
-    for (const cn of containerNames)
-      await docker.getContainer(cn).remove({ force: true });
+    for (const cn of containerNames) await docker.getContainer(cn).remove({ force: true });
 
     // remove docker network
     await docker.getNetwork(dockerNetworkName).remove();

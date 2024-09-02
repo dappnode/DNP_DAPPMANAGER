@@ -7,13 +7,7 @@ function QrCode({ width, url }: { width: string; url: string }) {
   return (
     <div>
       <div style={{ maxWidth: width, margin: "auto" }}>
-        {url && (
-          <QRCode
-            value={url}
-            renderAs="svg"
-            style={{ width: "100%", height: "100%" }}
-          />
-        )}
+        {url && <QRCode value={url} renderAs="svg" style={{ width: "100%", height: "100%" }} />}
       </div>
     </div>
   );

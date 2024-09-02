@@ -20,7 +20,7 @@ export async function connectContainersToNetworkWithPrio({
   bindContainer,
   aliasesIpsMap,
   containersToRestart,
-  containersToRecreate,
+  containersToRecreate
 }: {
   network: Dockerode.Network;
   dappmanagerContainer: {
@@ -48,11 +48,9 @@ export async function connectContainersToNetworkWithPrio({
     network,
     containerName: dappmanagerContainer.name,
     containerIp: dappmanagerContainer.ip,
-    aliasesIpsMap,
+    aliasesIpsMap
   }).catch((e) =>
-    logs.error(
-      `Failed to connect container ${dappmanagerContainer.name} to network ${network.id}: ${e}`
-    )
+    logs.error(`Failed to connect container ${dappmanagerContainer.name} to network ${network.id}: ${e}`)
   );
 
   // 2. Connect bind container
@@ -60,19 +58,13 @@ export async function connectContainersToNetworkWithPrio({
     network,
     containerName: bindContainer.name,
     containerIp: bindContainer.ip,
-    aliasesIpsMap,
-  }).catch((e) =>
-    logs.error(
-      `Failed to connect container ${bindContainer.name} to network ${network.id}: ${e}`
-    )
-  );
+    aliasesIpsMap
+  }).catch((e) => logs.error(`Failed to connect container ${bindContainer.name} to network ${network.id}: ${e}`));
 
   await restoreContainersToNetworkNotThrow({
     containersToRestart,
     network,
     aliasesIpsMap,
-    containersToRecreate,
-  }).catch((e) =>
-    logs.error(`Failed to restore containers to network ${network.id}: ${e}`)
-  );
+    containersToRecreate
+  }).catch((e) => logs.error(`Failed to restore containers to network ${network.id}: ${e}`));
 }

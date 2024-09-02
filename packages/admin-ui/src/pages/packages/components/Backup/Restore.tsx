@@ -15,13 +15,7 @@ import { PackageBackup } from "@dappnode/types";
 type ProgressType = { label: string; percent?: number };
 type UploadReqStatus = ReqStatus<true, ProgressType>;
 
-export function BackupRestore({
-  dnpName,
-  backup
-}: {
-  dnpName: string;
-  backup: PackageBackup[];
-}) {
+export function BackupRestore({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }) {
   const [reqStatus, setReqStatus] = useState<UploadReqStatus>({});
   const isOnProgress = Boolean(reqStatus.loading !== undefined);
 
@@ -32,24 +26,19 @@ export function BackupRestore({
     try {
       setReqStatus({ loading: { label: "Uploading file" } });
 
-      const { fileId } = await apiRoutes.uploadFile(file, progressData => {
+      const { fileId } = await apiRoutes.uploadFile(file, (progressData) => {
         const { loaded, total } = progressData;
-        const percent = parseFloat(
-          ((100 * (loaded || 0)) / (total || 1)).toFixed(2)
-        );
+        const percent = parseFloat(((100 * (loaded || 0)) / (total || 1)).toFixed(2));
         const label = `${percent}% ${humanFS(loaded)} / ${humanFS(total)}`;
         setReqStatus({ loading: { percent, label } });
       });
 
       setReqStatus({ loading: { label: "Restoring backup..." } });
 
-      await withToastNoThrow(
-        () => api.backupRestore({ dnpName, backup, fileId }),
-        {
-          message: `Restoring backup for ${prettyDnpName(dnpName)}...`,
-          onSuccess: `Restored backup for ${prettyDnpName(dnpName)}`
-        }
-      );
+      await withToastNoThrow(() => api.backupRestore({ dnpName, backup, fileId }), {
+        message: `Restoring backup for ${prettyDnpName(dnpName)}...`,
+        onSuccess: `Restored backup for ${prettyDnpName(dnpName)}`
+      });
 
       setReqStatus({ result: true });
     } catch (e) {
@@ -61,9 +50,7 @@ export function BackupRestore({
     confirm({
       title: `Restoring backup`,
       text: `This action cannot be undone. The backup data will overwrite any previously existing data.`,
-      list: [
-        { title: "Selected file", body: `${file.name} (${humanFS(file.size)})` }
-      ],
+      list: [{ title: "Selected file", body: `${file.name} (${humanFS(file.size)})` }],
       label: "Restore",
       onClick: () => restoreBackup(file),
       variant: "dappnode"
@@ -75,10 +62,7 @@ export function BackupRestore({
 
   return (
     <>
-      <p>
-        Restore an existing backup. Note that this action will overwrite
-        existing data.
-      </p>
+      <p>Restore an existing backup. Note that this action will overwrite existing data.</p>
 
       <Button className="button-file-input" disabled={isOnProgress}>
         <span>Restore</span>
@@ -87,7 +71,7 @@ export function BackupRestore({
           id="backup_upload"
           name="file"
           accept=".tar, .xz, .tar.xz, .zip"
-          onChange={e => {
+          onChange={(e) => {
             if (e.target.files) handleClickRestore(e.target.files[0]);
           }}
           disabled={isOnProgress}
@@ -96,11 +80,7 @@ export function BackupRestore({
 
       {reqStatus.loading && (
         <div>
-          <ProgressBar
-            now={reqStatus.loading.percent || 100}
-            animated={true}
-            label={reqStatus.loading.label || ""}
-          />
+          <ProgressBar now={reqStatus.loading.percent || 100} animated={true} label={reqStatus.loading.label || ""} />
         </div>
       )}
 

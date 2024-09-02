@@ -19,13 +19,9 @@ interface InputFormProps {
   childrenBefore?: React.ReactNode;
 }
 
-export const InputForm: React.FC<InputFormProps> = ({
-  fields,
-  children,
-  childrenBefore
-}) => {
+export const InputForm: React.FC<InputFormProps> = ({ fields, children, childrenBefore }) => {
   return (
-    <Form className="input-form" onSubmit={e => e.preventDefault()}>
+    <Form className="input-form" onSubmit={(e) => e.preventDefault()}>
       {childrenBefore}
 
       {fields.map(({ labelId, label, secret, error, ...props }) => {
@@ -34,11 +30,7 @@ export const InputForm: React.FC<InputFormProps> = ({
           <Form.Group key={labelId} controlId={labelId}>
             <Form.Label>{label}</Form.Label>
             {props.options ? (
-              <Select
-                {...props}
-                value={props.value as string}
-                options={props.options as string[]}
-              />
+              <Select {...props} value={props.value as string} options={props.options as string[]} />
             ) : secret ? (
               <InputSecret isInvalid={isInvalid} required {...props} />
             ) : (

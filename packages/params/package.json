@@ -14,8 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "dev": "tsc -w",
-    "lint": "eslint . --ext .ts --fix src"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "@dappnode/types": "workspace:^0.1.0"

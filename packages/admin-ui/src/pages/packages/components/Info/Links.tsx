@@ -4,32 +4,22 @@ import { MdHome, MdSettingsRemote, MdSettings, MdInfo } from "react-icons/md";
 import { AiFillBug } from "react-icons/ai";
 import { Manifest } from "@dappnode/types";
 
-export function Links({
-  links,
-  bugs
-}: {
-  links: Manifest["links"];
-  bugs: Manifest["bugs"];
-}) {
+export function Links({ links, bugs }: { links: Manifest["links"]; bugs: Manifest["bugs"] }) {
   const linksArray =
     typeof links === "object"
       ? Object.entries(links || {})
           .map(([name, url]) => ({ name, url }))
           .filter(({ url }) => url)
           // Place homepage first
-          .sort(l1 => (l1.name === "homepage" ? -1 : 0))
+          .sort((l1) => (l1.name === "homepage" ? -1 : 0))
       : typeof links === "string"
-      ? [{ name: "homepage", url: links }]
-      : [];
+        ? [{ name: "homepage", url: links }]
+        : [];
 
   if (linksArray && bugs) linksArray.push({ name: "report", url: bugs.url });
 
   const items = linksArray.map(({ name, url }) =>
-    name === "homepage" ||
-    name === "ui" ||
-    name === "webui" ||
-    name === "gateway" ||
-    name === "report" ? (
+    name === "homepage" || name === "ui" || name === "webui" || name === "gateway" || name === "report" ? (
       <a className="links-url" href={url} {...newTabProps}>
         <span className="links-icon">
           {name === "homepage" ? (

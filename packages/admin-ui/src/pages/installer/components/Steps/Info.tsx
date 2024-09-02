@@ -28,16 +28,9 @@ interface OkBadgeProps {
   msg: string;
 }
 
-const OkBadge: React.FC<OkBadgeProps &
-  React.HTMLAttributes<HTMLDivElement>> = ({ ok, loading, msg, ...props }) => {
+const OkBadge: React.FC<OkBadgeProps & React.HTMLAttributes<HTMLDivElement>> = ({ ok, loading, msg, ...props }) => {
   const status = ok ? "ok" : loading ? "" : "not-ok";
-  return (
-    <Ok
-      className={`status-badge ${status}`}
-      {...{ ok, loading, msg }}
-      {...props}
-    />
-  );
+  return <Ok className={`status-badge ${status}`} {...{ ok, loading, msg }} {...props} />;
 };
 
 interface InstallerStepInfoProps {
@@ -118,13 +111,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
       Component: () => (
         <div>
           {optionsArray.map(({ name, checked, toggle }) => (
-            <Switch
-              key={name}
-              checked={checked}
-              onToggle={toggle}
-              label={name}
-              id={"switch-" + name}
-            />
+            <Switch key={name} checked={checked} onToggle={toggle} label={name} id={"switch-" + name} />
           ))}
         </div>
       )
@@ -140,12 +127,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
       show: showResolveStatus,
       close: () => setShowResolveStatus(false),
       Component: () => (
-        <Dependencies
-          noCard
-          resolving={resolvingCompatibility}
-          error={compatibilityError}
-          dnps={compatible.dnps}
-        />
+        <Dependencies noCard resolving={resolvingCompatibility} error={compatibilityError} dnps={compatible.dnps} />
       )
     },
     {
@@ -154,7 +136,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
       close: () => setShowAvailableStatus(false),
       Component: () => <Ok ok={true} msg={"All package resources available"} />
     }
-  ].filter(panel => panel.show);
+  ].filter((panel) => panel.show);
 
   return (
     <>
@@ -167,14 +149,12 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
             <div className="right-top">
               <div className="info">
                 <DnpNameVerified name={dnpName} origin={origin} />
-                <div className="subtle-header capitalize">
-                  {shortAuthor(author)}
-                </div>
+                <div className="subtle-header capitalize">{shortAuthor(author)}</div>
                 <div className="right-bottom">
                   <OkBadge
                     ok={signedSafeAll}
                     msg={signedSafeAll ? "Signed" : "Not signed"}
-                    onClick={() => setShowSignedStatus(x => !x)}
+                    onClick={() => setShowSignedStatus((x) => !x)}
                   />
                   <OkBadge
                     loading={resolvingCompatibility}
@@ -183,18 +163,14 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
                       isCompatible
                         ? "Compatible"
                         : resolvingCompatibility
-                        ? "Resolving"
-                        : compatibilityError
-                        ? "Not compatible"
-                        : "Error"
+                          ? "Resolving"
+                          : compatibilityError
+                            ? "Not compatible"
+                            : "Error"
                     }
-                    onClick={() => setShowResolveStatus(x => !x)}
+                    onClick={() => setShowResolveStatus((x) => !x)}
                   />
-                  <OkBadge
-                    ok={true}
-                    msg={"Available"}
-                    onClick={() => setShowAvailableStatus(x => !x)}
-                  />
+                  <OkBadge ok={true} msg={"Available"} onClick={() => setShowAvailableStatus((x) => !x)} />
                 </div>
               </div>
               <div className="actions">
@@ -213,10 +189,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
 
         {optionsArray.length > 0 && (
           <div>
-            <div
-              className="subtle-header capitalize more-options"
-              onClick={() => setShowOptions(x => !x)}
-            >
+            <div className="subtle-header capitalize more-options" onClick={() => setShowOptions((x) => !x)}>
               {showOptions ? <MdExpandLess /> : <MdExpandMore />}
               <span>Advanced options</span>
             </div>
@@ -224,7 +197,7 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
         )}
 
         <div className="expandable-info">
-          {expandablePanels.map(panel => (
+          {expandablePanels.map((panel) => (
             <div key={panel.name}>
               <div className="subtle-header">
                 <span>{panel.name}</span>
@@ -254,17 +227,13 @@ export const InstallerStepInfo: React.FC<InstallerStepInfoProps> = ({
             <div className="subtle-header">VERSION</div>
             <div>
               {repoSlug && version ? (
-                <a
-                  href={`https://github.com/${repoSlug}/releases/v${version}`}
-                  {...newTabProps}
-                >
+                <a href={`https://github.com/${repoSlug}/releases/v${version}`} {...newTabProps}>
                   {version}
                 </a>
               ) : (
                 version
               )}{" "}
-              {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`}{" "}
-              {origin || ""}
+              {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`} {origin || ""}
             </div>
             <div className="subtle-header">CREATED BY</div>
             <RenderMarkdown source={author} />

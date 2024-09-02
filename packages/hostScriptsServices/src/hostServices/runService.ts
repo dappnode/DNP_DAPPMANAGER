@@ -19,19 +19,11 @@ export type ServiceName =
  * @param serviceName "update-docker-engine.service"
  * sytemd service info: https://www.freedesktop.org/software/systemd/man/systemd.service.html
  */
-export async function runService(
-  serviceName: ServiceName,
-  reload: boolean,
-  args = ""
-): Promise<string> {
-  const servicePath = path.resolve(
-    params.HOST_SERVICES_SOURCE_DIR,
-    serviceName
-  );
+export async function runService(serviceName: ServiceName, reload: boolean, args = ""): Promise<string> {
+  const servicePath = path.resolve(params.HOST_SERVICES_SOURCE_DIR, serviceName);
   try {
     // Check if service exists
-    if (!fs.existsSync(servicePath))
-      throw Error(`Host service ${serviceName} not found`);
+    if (!fs.existsSync(servicePath)) throw Error(`Host service ${serviceName} not found`);
 
     // Copy service into shared volume
     await copyHostService(serviceName);

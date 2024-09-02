@@ -1,20 +1,14 @@
 import { PackageContainer } from "@dappnode/types";
 
-export type SimpleState =
-  | "stopped"
-  | "crashed"
-  | "running"
-  | "restarting"
-  | "removing";
+export type SimpleState = "stopped" | "crashed" | "running" | "restarting" | "removing";
 export type BadgeVariant = "danger" | "success" | "secondary" | "warning";
-export type PackageContainerStatus = Pick<
-  PackageContainer,
-  "state" | "exitCode"
->;
+export type PackageContainerStatus = Pick<PackageContainer, "state" | "exitCode">;
 
-export function parseContainerState(
-  container: PackageContainerStatus
-): { variant: BadgeVariant; state: SimpleState; title: string } {
+export function parseContainerState(container: PackageContainerStatus): {
+  variant: BadgeVariant;
+  state: SimpleState;
+  title: string;
+} {
   const { state, exitCode } = container;
 
   switch (state) {
@@ -51,15 +45,11 @@ export function parseContainerState(
   }
 }
 
-export function allContainersHaveSameVariant(
-  containers: PackageContainer[]
-): boolean {
+export function allContainersHaveSameVariant(containers: PackageContainer[]): boolean {
   return (
     containers.length <= 1 ||
     containers.every(
-      container =>
-        parseContainerState(container).variant ===
-        parseContainerState(containers[0]).variant
+      (container) => parseContainerState(container).variant === parseContainerState(containers[0]).variant
     )
   );
 }

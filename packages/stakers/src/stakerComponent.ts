@@ -3,14 +3,10 @@ import {
   dockerContainerStop,
   dockerNetworkDisconnect,
   listPackageNoThrow,
-  listPackages,
+  listPackages
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  DappnodeInstaller,
-  packageGetData,
-  packageInstall,
-} from "@dappnode/installer";
+import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import {
   InstalledPackageDataApiReturn,
@@ -18,14 +14,9 @@ import {
   UserSettingsAllDnps,
   PackageContainer,
   StakerItem,
-  UserSettings,
+  UserSettings
 } from "@dappnode/types";
-import {
-  getIsInstalled,
-  getIsUpdated,
-  getIsRunning,
-  fileToGatewayUrl,
-} from "@dappnode/utils";
+import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { isMatch } from "lodash-es";
 
@@ -39,7 +30,7 @@ export class StakerComponent {
   protected async getAll({
     dnpNames,
     currentClient,
-    relays,
+    relays
   }: {
     dnpNames: string[];
     currentClient?: boolean | string | null;
@@ -61,13 +52,13 @@ export class StakerComponent {
             isRunning: getIsRunning(pkgData, dnpList),
             data: pkgData,
             relays, // only for mevBoost
-            isSelected: dnpName === currentClient || currentClient === true,
+            isSelected: dnpName === currentClient || currentClient === true
           };
         } catch (error) {
           return {
             status: "error",
             dnpName,
-            error,
+            error
           };
         }
       })
@@ -76,7 +67,7 @@ export class StakerComponent {
 
   protected async persistSelectedIfInstalled({
     dnpName,
-    userSettings,
+    userSettings
   }: {
     dnpName: string;
     userSettings: UserSettings;
@@ -90,7 +81,7 @@ export class StakerComponent {
     dockerNetworkName,
     compatibleClients,
     userSettings,
-    prevClient,
+    prevClient
   }: {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
@@ -109,28 +100,21 @@ export class StakerComponent {
     }
 
     const currentPkg = await listPackageNoThrow({
-      dnpName: prevClient || "",
+      dnpName: prevClient || ""
     });
 
     if (currentPkg) {
       if (prevClient && compatibleClients)
-        this.ensureCompatibilityRequirements(
-          prevClient,
-          compatibleClients,
-          currentPkg.version
-        );
-      if (prevClient !== newStakerDnpName)
-        await this.unsetStakerPkgConfig(currentPkg, dockerNetworkName);
+        this.ensureCompatibilityRequirements(prevClient, compatibleClients, currentPkg.version);
+      if (prevClient !== newStakerDnpName) await this.unsetStakerPkgConfig(currentPkg, dockerNetworkName);
     }
 
     if (!newStakerDnpName) return;
     // set staker config
     await this.setStakerPkgConfig({
       dnpName: newStakerDnpName,
-      isInstalled: Boolean(
-        await listPackageNoThrow({ dnpName: newStakerDnpName })
-      ),
-      userSettings,
+      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
+      userSettings
     });
   }
 
@@ -144,7 +128,7 @@ export class StakerComponent {
   private async setStakerPkgConfig({
     dnpName,
     isInstalled,
-    userSettings,
+    userSettings
   }: {
     dnpName: string;
     isInstalled: boolean;
@@ -154,7 +138,7 @@ export class StakerComponent {
     if (!isInstalled)
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
-        userSettings: userSettings ? { [dnpName]: userSettings } : {},
+        userSettings: userSettings ? { [dnpName]: userSettings } : {}
       });
     else if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
@@ -176,15 +160,9 @@ export class StakerComponent {
    * - stops the staker pkg
    * - removes the staker network from the docker-compose file
    */
-  private async unsetStakerPkgConfig(
-    pkg: InstalledPackageData,
-    dockerNetworkName: string
-  ): Promise<void> {
+  private async unsetStakerPkgConfig(pkg: InstalledPackageData, dockerNetworkName: string): Promise<void> {
     // disconnect pkg from staker network
-    await this.disconnectPkgFromStakerNetwork(
-      dockerNetworkName,
-      pkg.containers
-    );
+    await this.disconnectPkgFromStakerNetwork(dockerNetworkName, pkg.containers);
 
     // stop all containers
     await this.stopAllPkgContainers(pkg);
@@ -192,23 +170,14 @@ export class StakerComponent {
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
   }
 
-  private async disconnectPkgFromStakerNetwork(
-    networkName: string,
-    pkgContainers: PackageContainer[]
-  ): Promise<void> {
+  private async disconnectPkgFromStakerNetwork(networkName: string, pkgContainers: PackageContainer[]): Promise<void> {
     const connectedContainers = pkgContainers
-      .filter((container) =>
-        container.networks.some((network) => network.name === networkName)
-      )
+      .filter((container) => container.networks.some((network) => network.name === networkName))
       .map((container) => container.containerName);
-    for (const container of connectedContainers)
-      await dockerNetworkDisconnect(networkName, container);
+    for (const container of connectedContainers) await dockerNetworkDisconnect(networkName, container);
   }
 
-  private removeStakerNetworkFromCompose(
-    dnpName: string,
-    dockerNetworkName: string
-  ): void {
+  private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
     const composeEditor = new ComposeFileEditor(dnpName, false);
     const services = composeEditor.compose.services;
 
@@ -222,9 +191,7 @@ export class StakerComponent {
 
       // Array case
       if (Array.isArray(serviceNetworks))
-        service.networks = serviceNetworks.filter(
-          (network) => network !== dockerNetworkName
-        );
+        service.networks = serviceNetworks.filter((network) => network !== dockerNetworkName);
       // ComposeServiceNetworksObj case
       else delete serviceNetworks[dockerNetworkName];
     }
@@ -242,21 +209,13 @@ export class StakerComponent {
   ): void {
     if (!dnpName) return;
 
-    const compatibleClient = compatibleClients.find(
-      (c) => c.dnpName === dnpName
-    );
+    const compatibleClient = compatibleClients.find((c) => c.dnpName === dnpName);
 
     // ensure valid dnpName
-    if (!compatibleClient)
-      throw Error(
-        "The selected staker is not compatible with the current network"
-      );
+    if (!compatibleClient) throw Error("The selected staker is not compatible with the current network");
 
     // ensure valid version
-    if (
-      compatibleClient?.minVersion &&
-      lt(pkgVersion, compatibleClient.minVersion)
-    ) {
+    if (compatibleClient?.minVersion && lt(pkgVersion, compatibleClient.minVersion)) {
       throw Error(
         `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
@@ -267,15 +226,11 @@ export class StakerComponent {
    * Stop all the containers from a given package dnpName
    */
   // TODO: Move this to where packages and containers are started/stopped
-  private async stopAllPkgContainers(
-    pkg: InstalledPackageDataApiReturn | InstalledPackageData
-  ): Promise<void> {
+  private async stopAllPkgContainers(pkg: InstalledPackageDataApiReturn | InstalledPackageData): Promise<void> {
     await Promise.all(
       pkg.containers
         .filter((c) => c.running)
-        .map(async (c) =>
-          dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-        )
+        .map(async (c) => dockerContainerStop(c.containerName, { timeout: c.dockerTimeout }))
     ).catch((e) => logs.error(e.message));
   }
 }

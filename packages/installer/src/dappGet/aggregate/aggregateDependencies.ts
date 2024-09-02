@@ -28,7 +28,7 @@ export default async function aggregateDependencies({
   versionRange,
   dnps,
   recursiveCount,
-  dappGetFetcher,
+  dappGetFetcher
 }: {
   dappnodeInstaller: DappnodeInstaller;
   name: string;
@@ -42,14 +42,11 @@ export default async function aggregateDependencies({
   else if (recursiveCount++ > 1000) return;
 
   // Check injected dependency
-  if (!dappGetFetcher)
-    throw Error('injected dependency "fetch" is not defined');
+  if (!dappGetFetcher) throw Error('injected dependency "fetch" is not defined');
 
   // 1. Fetch versions of "name" that match this request
   //    versions = [ "0.1.0", "/ipfs/QmFe3..."]
-  const versions = await dappGetFetcher
-    .versions(dappnodeInstaller, name, versionRange)
-    .then(sanitizeVersions);
+  const versions = await dappGetFetcher.versions(dappnodeInstaller, name, versionRange).then(sanitizeVersions);
 
   await Promise.all(
     versions.map(async (version) => {
@@ -77,7 +74,7 @@ export default async function aggregateDependencies({
             versionRange: dependencies[dependencyName],
             dnps,
             recursiveCount,
-            dappGetFetcher,
+            dappGetFetcher
           });
         })
       );

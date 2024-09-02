@@ -20,8 +20,7 @@ function getRequestDnp(dnp: MockDnp): RequestedDnp {
     const dnpName = dep.manifest.name;
     if (dep.userSettings) settings[dnpName] = dep.userSettings;
     if (dep.setupWizard) setupWizard[dnpName] = dep.setupWizard;
-    if (dep.specialPermissions)
-      specialPermissions[dnpName] = dep.specialPermissions;
+    if (dep.specialPermissions) specialPermissions[dnpName] = dep.specialPermissions;
     compatibleDnps[dnpName] = {
       from: dep.installedData?.version,
       to: dep.manifest.version

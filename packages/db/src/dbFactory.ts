@@ -14,17 +14,12 @@ export const dbMain = dbFactory(params.DB_MAIN_PATH);
  */
 export const dbCache = dbFactory(params.DB_CACHE_PATH);
 
-export function dbFactory(
-  dbPath: string
-): {
-  staticKey: <T>(
-    key: string,
-    defaultValue: T
-  ) => { get: () => T; set: (value: T) => void };
+export function dbFactory(dbPath: string): {
+  staticKey: <T>(key: string, defaultValue: T) => { get: () => T; set: (value: T) => void };
   indexedByKey: <V, K>({
     rootKey,
     getKey,
-    validate,
+    validate
   }: {
     rootKey: string;
     getKey: (keyArg: K) => string;
@@ -54,17 +49,14 @@ export function dbFactory(
    * Factory methods
    */
 
-  function staticKey<T>(
-    key: string,
-    defaultValue: T
-  ): { get: () => T; set: (value: T) => void } {
+  function staticKey<T>(key: string, defaultValue: T): { get: () => T; set: (value: T) => void } {
     return {
       get: (): T => jsonFileDb.read()[key] ?? defaultValue,
       set: (newValue: T): void => {
         const all = jsonFileDb.read();
         all[key] = newValue;
         jsonFileDb.write(all);
-      },
+      }
     };
   }
 
@@ -76,7 +68,7 @@ export function dbFactory(
   function indexedByKey<V, K>({
     rootKey,
     getKey,
-    validate,
+    validate
   }: {
     rootKey: string;
     getKey: (keyArg: K) => string;
@@ -89,8 +81,7 @@ export function dbFactory(
     set: (keyArg: K, value: V) => void;
     remove: (keyArg: K) => void;
   } {
-    const getRoot = (): { [key: string]: V } =>
-      jsonFileDb.read()[rootKey] || {};
+    const getRoot = (): { [key: string]: V } => jsonFileDb.read()[rootKey] || {};
 
     return {
       getAll: getRoot,
@@ -115,12 +106,12 @@ export function dbFactory(
         delete root[getKey(keyArg)];
         all[rootKey] = root;
         jsonFileDb.write(all);
-      },
+      }
     };
   }
 
   // DB returns are of unkown type. External methods below are typed
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+
   // function getEntireDb(): any {
   //   return Object.freeze(JSON.parse(JSON.stringify(db.getState())));
   // }
@@ -128,6 +119,6 @@ export function dbFactory(
   return {
     staticKey,
     indexedByKey,
-    clearDb,
+    clearDb
   };
 }

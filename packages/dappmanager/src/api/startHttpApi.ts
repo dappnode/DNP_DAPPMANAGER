@@ -8,30 +8,17 @@ import cors from "cors";
 import { Server } from "socket.io";
 import path from "path";
 import { toSocketIoHandler, wrapHandler } from "./utils.js";
-import {
-  AuthPasswordSession,
-  AuthPasswordSessionParams
-} from "./auth/index.js";
+import { AuthPasswordSession, AuthPasswordSessionParams } from "./auth/index.js";
 import { AdminPasswordDb } from "./auth/adminPasswordDb.js";
-import {
-  ClientSideCookies,
-  ClientSideCookiesParams
-} from "./sessions/index.js";
+import { ClientSideCookies, ClientSideCookiesParams } from "./sessions/index.js";
 import { mapSubscriptionsToEventBus } from "./subscriptions.js";
 import { Logs } from "@dappnode/logger";
 import { EventBus } from "@dappnode/eventbus";
 import { subscriptionsFactory } from "@dappnode/common";
-import {
-  RpcPayload,
-  RpcResponse,
-  LoggerMiddleware,
-  Routes
-} from "@dappnode/types";
+import { RpcPayload, RpcResponse, LoggerMiddleware, Routes } from "@dappnode/types";
 import { getRpcHandler } from "./handler/index.js";
 
-export interface HttpApiParams
-  extends ClientSideCookiesParams,
-    AuthPasswordSessionParams {
+export interface HttpApiParams extends ClientSideCookiesParams, AuthPasswordSessionParams {
   AUTH_IP_ALLOW_LOCAL_IP: boolean;
   HTTP_API_PORT: number | string;
   UI_FILES_PATH: string;
@@ -128,22 +115,18 @@ export function startHttpApi({
   io.use(toSocketIoHandler(sessions.handler));
   io.use(toSocketIoHandler(auth.onlyAdmin));
 
-  io.on("connection", socket => {
+  io.on("connection", (socket) => {
     console.log(`Socket connected`, socket.id);
 
     // JSON RPC over WebSockets
-    socket.on(
-      "rpc",
-      (rpcPayload: RpcPayload, callback: (res: RpcResponse) => void) => {
-        if (typeof callback !== "function")
-          return logs.error("JSON RPC over WS req without cb", rpcPayload);
+    socket.on("rpc", (rpcPayload: RpcPayload, callback: (res: RpcResponse) => void) => {
+      if (typeof callback !== "function") return logs.error("JSON RPC over WS req without cb", rpcPayload);
 
-        rpcHandler(rpcPayload)
-          .then(callback)
-          .catch(error => callback({ error }))
-          .catch(error => logs.error("Error on JSON RPC over WS cb", error));
-      }
-    );
+      rpcHandler(rpcPayload)
+        .then(callback)
+        .catch((error) => callback({ error }))
+        .catch((error) => logs.error("Error on JSON RPC over WS cb", error));
+    });
 
     // If DAPPMANAGER's version has changed reload the client
     if (isNewDappmanagerVersion()) {
@@ -197,8 +180,6 @@ export function startHttpApi({
   // prettier-ignore
   app.get("*", (_, res) => res.sendFile(path.resolve(params.UI_FILES_PATH, "index.html")));
 
-  server.listen(params.HTTP_API_PORT, () =>
-    logs.info(`HTTP API ${params.HTTP_API_PORT}`)
-  );
+  server.listen(params.HTTP_API_PORT, () => logs.info(`HTTP API ${params.HTTP_API_PORT}`));
   return server;
 }

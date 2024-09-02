@@ -21,11 +21,7 @@ function parsePercent(s: string) {
  *   "dnpName2.dnp.dappnode.eth": "Loading...",
  * }
  */
-export function ProgressLogsView({
-  progressLogs
-}: {
-  progressLogs: ProgressLogs | undefined;
-}) {
+export function ProgressLogsView({ progressLogs }: { progressLogs: ProgressLogs | undefined }) {
   if (!progressLogs || isEmpty(progressLogs)) return null;
 
   return (

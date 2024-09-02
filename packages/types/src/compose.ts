@@ -6,9 +6,7 @@ export interface ComposeInspectVolumes {
     // NOT allowed to user, only used by DAppNode internally (if any)
     name?: string; // Volumes can only be declared locally or be external
     driver?: string; // Dangerous
-    driver_opts?:
-      | { type: "none"; device: string; o: "bind" }
-      | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
+    driver_opts?: { type: "none"; device: string; o: "bind" } | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
     labels?: { [labelName: string]: string }; // User should not use this feature
   };
 }
@@ -147,9 +145,7 @@ export interface ComposeVolume {
   external?: boolean;
   name?: string; // Volumes can only be declared locally or be external
   driver?: string; // Dangerous
-  driver_opts?:
-    | { type: "none"; device: string; o: "bind" }
-    | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
+  driver_opts?: { type: "none"; device: string; o: "bind" } | { [driverOptName: string]: string }; // driver_opts are passed down to whatever driver is being used, there's. No verification on docker's part nor detailed documentation
   labels?: { [labelName: string]: string }; // User should not use this feature
 }
 
@@ -192,5 +188,5 @@ export const dockerComposeSafeKeys: (keyof ComposeService)[] = [
   "container_name",
   "dns",
   "ulimits",
-  "deploy",
+  "deploy"
 ];

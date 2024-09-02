@@ -1,11 +1,7 @@
 import { dockerDf, dockerVolumesList } from "./api/index.js";
 import { listPackageContainers } from "./list/index.js";
 import { parseDevicePath } from "@dappnode/dockercompose";
-import {
-  VolumeData,
-  VolumeOwnershipData,
-  PackageContainer,
-} from "@dappnode/types";
+import { VolumeData, VolumeOwnershipData, PackageContainer } from "@dappnode/types";
 import { detectMountpoints } from "@dappnode/hostscriptsservices";
 
 /**
@@ -16,15 +12,12 @@ import { detectMountpoints } from "@dappnode/hostscriptsservices";
  * ```
  * https://github.com/docker/compose/blob/854c14a5bcf566792ee8a972325c37590521656b/compose/cli/command.py#L178
  */
-export const normalizeProjectName = (name: string): string =>
-  name.replace(/[^-_a-z0-9]/gi, "").toLowerCase();
+export const normalizeProjectName = (name: string): string => name.replace(/[^-_a-z0-9]/gi, "").toLowerCase();
 
 /**
  * Returns only ownership data of each volume against all installed packages
  */
-export async function getVolumesOwnershipData(): Promise<
-  VolumeOwnershipData[]
-> {
+export async function getVolumesOwnershipData(): Promise<VolumeOwnershipData[]> {
   const volumes = await dockerVolumesList();
   const containers = await listPackageContainers();
 
@@ -43,9 +36,7 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
   const containers = await listPackageContainers();
 
   // This expensive function won't be called on empty volDevicePaths
-  const callDetectMountpoints = volumes.some(
-    (vol) => (vol.Options || {}).device
-  );
+  const callDetectMountpoints = volumes.some((vol) => (vol.Options || {}).device);
   const mountpoints = callDetectMountpoints ? await detectMountpoints() : [];
 
   // TODO: Calling getHostVolumeSizes() is deactivated until UX is sorted out
@@ -67,10 +58,7 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
     const isOrphan = !refCount && !ownershipData.owner;
 
     // Custom mountpoint data
-    const pathParts =
-      vol.Options && vol.Options.device
-        ? parseDevicePath(vol.Options.device)
-        : undefined;
+    const pathParts = vol.Options && vol.Options.device ? parseDevicePath(vol.Options.device) : undefined;
 
     return {
       // Real volume and owner name to call delete on
@@ -82,9 +70,7 @@ export async function getVolumeSystemData(): Promise<VolumeData[]> {
       refCount,
       isOrphan,
       mountpoint: pathParts ? pathParts.mountpoint : "",
-      fileSystem: pathParts
-        ? mountpoints.find((fs) => fs.mountpoint === pathParts.mountpoint)
-        : undefined,
+      fileSystem: pathParts ? mountpoints.find((fs) => fs.mountpoint === pathParts.mountpoint) : undefined
     };
   });
 }
@@ -95,15 +81,13 @@ export function parseVolumeOwnershipData(
 ): VolumeOwnershipData {
   // Get the volume owner
   // TODO: Weak, derived from project name, may be exploited
-  const ownerContainer = containers.find((container) =>
-    isVolumeOwner(container, vol)
-  );
+  const ownerContainer = containers.find((container) => isVolumeOwner(container, vol));
 
   return {
     // Real volume and owner name to call delete on
     name: vol.Name,
     // Do not assign to a fallback user, if the container has no owner it can be deleted by any user
-    owner: ownerContainer?.dnpName,
+    owner: ownerContainer?.dnpName
   };
 }
 
@@ -137,10 +121,7 @@ function parseVolumeLabels(labels?: { [labelName: string]: string }): {
  * Check if `dnp` is owner of `vol`,
  * meaning they have the same docker-compose project
  */
-export function isVolumeOwner(
-  dnp: { dnpName: string },
-  vol: { Labels: { [key: string]: string } }
-): boolean {
+export function isVolumeOwner(dnp: { dnpName: string }, vol: { Labels: { [key: string]: string } }): boolean {
   const { normalizedOwnerName } = parseVolumeLabels(vol.Labels || {});
   return normalizeProjectName(dnp.dnpName) === normalizedOwnerName;
 }

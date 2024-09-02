@@ -37,6 +37,7 @@ const useLocalStorage = <T extends string>(
       // Assert that either the item or initialValue is of type T
       return (item as T) || initialValue;
     } catch (error) {
+      console.error(error);
       return initialValue;
     }
   });
@@ -55,12 +56,14 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
-  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<
-    UiModuleStatus
-  >("stakersModuleStatus", "enabled");
-  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<
-    UiModuleStatus
-  >("rollupsModuleStatus", "disabled");
+  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<UiModuleStatus>(
+    "stakersModuleStatus",
+    "enabled"
+  );
+  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<UiModuleStatus>(
+    "rollupsModuleStatus",
+    "disabled"
+  );
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -78,16 +81,11 @@ function MainApp({ username }: { username: string }) {
     theme,
     stakersModuleStatus,
     rollupsModuleStatus,
-    toggleTheme: () =>
-      setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
+    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
     toggleStakersModuleStatus: () =>
-      setStakersModuleStatus((curr: UiModuleStatus) =>
-        curr === "enabled" ? "disabled" : "enabled"
-      ),
+      setStakersModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled")),
     toggleRollupsModuleStatus: () =>
-      setRollupsModuleStatus((curr: UiModuleStatus) =>
-        curr === "enabled" ? "disabled" : "enabled"
-      )
+      setRollupsModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled"))
   };
 
   return (
@@ -161,10 +159,7 @@ export default function App() {
 
   // Start API and Socket.io once user has logged in
   useEffect(() => {
-    if (isLoggedIn)
-      startApi(onFetchLoginStatus).catch(e =>
-        console.error("Error on startApi", e)
-      );
+    if (isLoggedIn) startApi(onFetchLoginStatus).catch((e) => console.error("Error on startApi", e));
   }, [isLoggedIn, onFetchLoginStatus]);
 
   // Keep retrying if there is a loggin error, probably due a network error

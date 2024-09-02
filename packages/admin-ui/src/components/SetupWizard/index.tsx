@@ -54,9 +54,7 @@ export function SetupWizard({
   const formData = userSettingsToFormData(userSettings, setupTarget);
   const setupWizardActive = filterActiveSetupWizard(setupWizard, formData);
   const dataErrors = parseSetupWizardErrors(setupWizardActive, formData);
-  const visibleDataErrors = dataErrors.filter(
-    error => submitting || error.type !== "empty"
-  );
+  const visibleDataErrors = dataErrors.filter((error) => submitting || error.type !== "empty");
 
   /**
    * Merge instead of setting a new value to:
@@ -68,9 +66,7 @@ export function SetupWizard({
    */
   function onNewUserSettings(newUserSettings: UserSettingsAllDnps) {
     setSubmitting(false);
-    setUserSettings(prevUserSettings =>
-      deepmerge(prevUserSettings, newUserSettings)
-    );
+    setUserSettings((prevUserSettings) => deepmerge(prevUserSettings, newUserSettings));
   }
 
   /**
@@ -93,10 +89,7 @@ export function SetupWizard({
   return (
     <Card spacing noscroll className="setup-wizard">
       {showAdvanced ? (
-        <EditorAdvanced
-          userSettings={userSettings}
-          onChange={onNewUserSettings}
-        />
+        <EditorAdvanced userSettings={userSettings} onChange={onNewUserSettings} />
       ) : (
         <EditorV2
           formData={formData}
@@ -122,19 +115,14 @@ export function SetupWizard({
           <Button
             onClick={handleSubmit}
             variant="dappnode"
-            disabled={
-              disableIfEqual && isEqual(initialUserSettings, userSettings)
-            }
+            disabled={disableIfEqual && isEqual(initialUserSettings, userSettings)}
           >
             {submitTag || "Submit"}
           </Button>
         </div>
         {/* Only allow to toggle between editors if the setup wizard is available */}
         {!isWizardEmpty && (
-          <div
-            className="subtle-header"
-            onClick={() => setShowAdvanced(x => !x)}
-          >
+          <div className="subtle-header" onClick={() => setShowAdvanced((x) => !x)}>
             {showAdvanced ? "Hide" : "Show"} advanced editor
           </div>
         )}

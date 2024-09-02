@@ -1,15 +1,11 @@
 import { AutoUpdateDataView, Routes } from "@dappnode/types";
 import { pause } from "./utils/pause";
 
-export const autoUpdate: Pick<
-  Routes,
-  "autoUpdateDataGet" | "autoUpdateSettingsEdit"
-> = {
+export const autoUpdate: Pick<Routes, "autoUpdateDataGet" | "autoUpdateSettingsEdit"> = {
   autoUpdateDataGet: async () => autoUpdateData,
   autoUpdateSettingsEdit: async ({ id, enabled }) => {
     await pause(500);
-    if (autoUpdateData.settings[id])
-      autoUpdateData.settings[id].enabled = enabled;
+    if (autoUpdateData.settings[id]) autoUpdateData.settings[id].enabled = enabled;
 
     for (const dnp of autoUpdateData.dnpsToShow) {
       if (dnp.id === id) dnp.enabled = enabled;
@@ -79,8 +75,7 @@ const autoUpdateData: AutoUpdateDataView = {
       enabled: true,
       feedback: {
         inQueue: true,
-        errorMessage:
-          "More lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum"
+        errorMessage: "More lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum"
       }
     }
   ]

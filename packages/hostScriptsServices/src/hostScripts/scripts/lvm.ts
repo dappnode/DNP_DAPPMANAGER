@@ -6,7 +6,7 @@ import {
   HostVolumeGroup,
   HostVolumeGroupReport,
   HostLogicalVolume,
-  HostLogicalVolumeReport,
+  HostLogicalVolumeReport
 } from "@dappnode/types";
 
 /**
@@ -27,8 +27,7 @@ export const getHostHardDisks = memoize(
 export const getHostVolumeGroups = memoize(
   async function (): Promise<HostVolumeGroup[]> {
     const volumeGroupsInfo = await runScript("lvm.sh", "-- --get-vg");
-    const volumeGroupReport: HostVolumeGroupReport =
-      JSON.parse(volumeGroupsInfo);
+    const volumeGroupReport: HostVolumeGroupReport = JSON.parse(volumeGroupsInfo);
     const volumeGroups = volumeGroupReport.report[0].vg;
     return volumeGroups;
   },
@@ -42,8 +41,7 @@ export const getHostVolumeGroups = memoize(
 export const getHostLogicalVolumes = memoize(
   async function (): Promise<HostLogicalVolume[]> {
     const logicalVolumeInfo = await runScript("lvm.sh", "-- --get-lv");
-    const logicalVolumeReport: HostLogicalVolumeReport =
-      JSON.parse(logicalVolumeInfo);
+    const logicalVolumeReport: HostLogicalVolumeReport = JSON.parse(logicalVolumeInfo);
     const logicalVolumes = logicalVolumeReport.report[0].lv;
     return logicalVolumes;
   },
@@ -54,15 +52,8 @@ export const getHostLogicalVolumes = memoize(
  * Extends host disk space
  */
 export const extendHostDiskSpace = memoize(
-  async function (
-    disk: string,
-    volumeGroup: string,
-    logicalVolume: string
-  ): Promise<string> {
-    return await runScript(
-      "lvm.sh",
-      `-- --extend ${disk} ${volumeGroup} ${logicalVolume}`
-    );
+  async function (disk: string, volumeGroup: string, logicalVolume: string): Promise<string> {
+    return await runScript("lvm.sh", `-- --extend ${disk} ${volumeGroup} ${logicalVolume}`);
   },
   { promise: true, maxAge: 2000 }
 );

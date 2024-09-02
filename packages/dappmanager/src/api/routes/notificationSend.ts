@@ -1,6 +1,7 @@
 import { getDnpFromIp } from "./sign.js";
 import { eventBus } from "@dappnode/eventbus";
 import { HttpError, wrapHandler } from "../utils.js";
+import { NotificationType } from "@dappnode/types";
 
 /**
  * Receive arbitrary notifications from packages to be shown in the UI
@@ -11,16 +12,16 @@ export const notificationSend = wrapHandler(async (req, res) => {
   const body = req.query.body; // "Some text about notification"
 
   try {
-    if (typeof type === undefined) throw Error("missing");
+    if (typeof type === "undefined") throw Error("missing");
     if (typeof type !== "string") throw Error("must be a string");
-    if (type !== ("danger" || "warning" || "success" || "info"))
+    if (!["danger", "warning", "success", "info"].includes(type))
       throw Error("must be danger, warning, success or info");
   } catch (e) {
     throw new HttpError({ statusCode: 400, name: `Arg type ${e.message}` });
   }
 
   try {
-    if (typeof title === undefined) throw Error("missing");
+    if (typeof title === "undefined") throw Error("missing");
     if (typeof title !== "string") throw Error("must be a string");
     if (!title) throw Error("must not be empty");
   } catch (e) {
@@ -28,7 +29,7 @@ export const notificationSend = wrapHandler(async (req, res) => {
   }
 
   try {
-    if (typeof body === undefined) throw Error("missing");
+    if (typeof body === "undefined") throw Error("missing");
     if (typeof body !== "string") throw Error("must be a string");
     if (!body) throw Error("must not be empty");
   } catch (e) {
@@ -39,7 +40,7 @@ export const notificationSend = wrapHandler(async (req, res) => {
 
   eventBus.notification.emit({
     id: `notification-${dnpName}`,
-    type,
+    type: type as NotificationType, // TODO: fix this type cast by using enum instead
     title,
     body
   });

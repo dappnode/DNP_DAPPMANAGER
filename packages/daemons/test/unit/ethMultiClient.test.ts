@@ -8,7 +8,7 @@ import {
   InstalledPackageData,
   Eth2ClientTarget,
   EthClientRemote,
-  EthClientInstallStatus,
+  EthClientInstallStatus
 } from "@dappnode/types";
 import { mockDnp, mockContainer, dappnodeInstaller } from "../testUtils.js";
 
@@ -19,13 +19,12 @@ interface State {
 
 describe.skip("daemons > ethMultiClient > runWatcher", () => {
   it("Simulate a client change process", async () => {
-    let currentExecClient: string | null | undefined =
-      "besu.public.dappnode.eth";
+    let currentExecClient: string | null | undefined = "besu.public.dappnode.eth";
     let currentConsClient: string | null | undefined = "prysm.dnp.dappnode.eth";
     let currentRemote: EthClientRemote | null = EthClientRemote.on;
     const newTarget: Eth2ClientTarget = {
       execClient: "geth.dnp.dappnode.eth",
-      consClient: "lighthouse.dnp.dappnode.eth",
+      consClient: "lighthouse.dnp.dappnode.eth"
     };
 
     /**
@@ -33,7 +32,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
      */
     const state: State = {
       target: "remote",
-      status: {},
+      status: {}
     };
 
     /**
@@ -48,19 +47,19 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         get: (): string | null | undefined => currentExecClient,
         set: async (execClient: string | null | undefined) => {
           currentExecClient = execClient;
-        },
+        }
       },
       consensusClientMainnet: {
         get: (): string | null | undefined => currentConsClient,
         set: async (consClient: string | null | undefined) => {
           currentConsClient = consClient;
-        },
+        }
       },
       ethClientRemote: {
         get: (): EthClientRemote | null => currentRemote,
         set: (target: EthClientRemote | null) => {
           currentRemote = target;
-        },
+        }
       },
       ethExecClientInstallStatus: {
         getAll: () => ({}),
@@ -70,7 +69,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         },
         remove: (keyArg: string) => {
           keyArg;
-        },
+        }
       },
       ethConsClientInstallStatus: {
         getAll: () => ({}),
@@ -80,13 +79,13 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         },
         remove: (keyArg: string) => {
           keyArg;
-        },
+        }
       },
       fullnodeDomainTarget: {
         get: (): string => "",
         set: (dnpName: string) => {
           dnpName;
-        },
+        }
       },
       ethClientUserSettings: {
         getAll: () => ({}),
@@ -100,16 +99,11 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         },
         remove: (keyArg: Eth2ClientTarget) => {
           keyArg;
-        },
-      },
+        }
+      }
     };
-    /* eslint-enable @typescript-eslint/explicit-function-return-type */
 
-    async function listPackageNoThrow({
-      dnpName,
-    }: {
-      dnpName: string;
-    }): Promise<InstalledPackageData | null> {
+    async function listPackageNoThrow({ dnpName }: { dnpName: string }): Promise<InstalledPackageData | null> {
       return dnpList.find((d) => d.dnpName === dnpName) || null;
     }
 
@@ -141,11 +135,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
       if (target && target !== "remote") {
         const { execClient, consClient } = target;
         for (const client of [consClient, execClient]) {
-          const nextStatus = await runEthClientInstaller(
-            dappnodeInstaller,
-            client,
-            state.status[client]
-          );
+          const nextStatus = await runEthClientInstaller(dappnodeInstaller, client, state.status[client]);
           if (nextStatus) state.status[client] = nextStatus;
         }
       }
@@ -160,7 +150,7 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
     expect(state).to.deep.equal(
       {
         target: "remote",
-        status: {},
+        status: {}
       } as State,
       "State should be equal to initial"
     );
@@ -173,8 +163,8 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         target: newTarget,
         status: {
           [newTarget.execClient]: { status: "INSTALLED" },
-          [newTarget.consClient]: { status: "INSTALLED" },
-        },
+          [newTarget.consClient]: { status: "INSTALLED" }
+        }
       } as State,
       "After the user selects a new target it should start installing"
     );
@@ -185,12 +175,12 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
       {
         ...mockDnp,
         dnpName: newTarget.execClient,
-        containers: [{ ...mockContainer, running: true }],
+        containers: [{ ...mockContainer, running: true }]
       },
       {
         ...mockDnp,
         dnpName: newTarget.consClient,
-        containers: [{ ...mockContainer, running: true }],
+        containers: [{ ...mockContainer, running: true }]
       }
     );
 
@@ -200,8 +190,8 @@ describe.skip("daemons > ethMultiClient > runWatcher", () => {
         target: newTarget,
         status: {
           [newTarget.execClient]: { status: "INSTALLED" },
-          [newTarget.consClient]: { status: "INSTALLED" },
-        },
+          [newTarget.consClient]: { status: "INSTALLED" }
+        }
       } as State,
       "After installation, the loop does nothing"
     );

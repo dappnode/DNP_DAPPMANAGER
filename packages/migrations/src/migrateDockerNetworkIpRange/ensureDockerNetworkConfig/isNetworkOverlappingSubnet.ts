@@ -7,14 +7,8 @@ import { subnetsOverlap } from "./subnetsOverlap.js";
  * @param subnet - A string representing the subnet in CIDR notation to check for overlap.
  * @returns True if there is an overlap with any of the network's subnets, false otherwise.
  */
-export function isNetworkOverlappingSubnet(
-  network: Dockerode.NetworkInspectInfo,
-  subnet: string
-): boolean {
-  const networkSubnets =
-    network.IPAM?.Config?.map((config) => config.Subnet) ?? [];
+export function isNetworkOverlappingSubnet(network: Dockerode.NetworkInspectInfo, subnet: string): boolean {
+  const networkSubnets = network.IPAM?.Config?.map((config) => config.Subnet) ?? [];
 
-  return networkSubnets.some(
-    (networkSubnet) => networkSubnet && subnetsOverlap(networkSubnet, subnet)
-  );
+  return networkSubnets.some((networkSubnet) => networkSubnet && subnetsOverlap(networkSubnet, subnet));
 }

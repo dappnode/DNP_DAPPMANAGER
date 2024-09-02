@@ -12,28 +12,15 @@ function getVersion(
   return ((dnps[name] || {}).versions || {})[version];
 }
 
-export function hasVersion(
-  dnps: DappGetDnps,
-  name: string,
-  version: string
-): boolean {
+export function hasVersion(dnps: DappGetDnps, name: string, version: string): boolean {
   return Boolean(getVersion(dnps, name, version));
 }
 
-export function getDependencies(
-  dnps: DappGetDnps,
-  name: string,
-  version: string
-): Dependencies {
+export function getDependencies(dnps: DappGetDnps, name: string, version: string): Dependencies {
   return getVersion(dnps, name, version);
 }
 
-export function setVersion(
-  dnps: DappGetDnps,
-  name: string,
-  version: string,
-  dependencies: Dependencies
-): void {
+export function setVersion(dnps: DappGetDnps, name: string, version: string, dependencies: Dependencies): void {
   if (!dnps[name]) dnps[name] = { versions: {} };
   dnps[name].versions[version] = sanitizeDependencies(dependencies);
 }

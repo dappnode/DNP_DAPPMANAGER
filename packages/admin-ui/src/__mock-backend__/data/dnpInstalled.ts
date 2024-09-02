@@ -12,10 +12,7 @@ import { mockDnps } from "./dnps";
 function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
   const dnpName = dnp.manifest.name;
 
-  function getContainer(
-    serviceName: string,
-    container: Partial<PackageContainer>
-  ): PackageContainer {
+  function getContainer(serviceName: string, container: Partial<PackageContainer>): PackageContainer {
     return {
       ...sampleContainer,
       containerId: `0000000000000${dnpName}`,
@@ -48,17 +45,13 @@ function getInstalledDnp(dnp: MockDnp): InstalledPackageDetailData {
     userSettings: { environment: dnp.userSettings?.environment },
     setupWizard: dnp.setupWizard && {
       ...dnp.setupWizard,
-      fields: dnp.setupWizard.fields.filter(
-        f => f.target?.type === "environment"
-      )
+      fields: dnp.setupWizard.fields.filter((f) => f.target?.type === "environment")
     },
     containers: dnp.installedContainers
-      ? Object.entries(dnp.installedContainers).map(
-          ([serviceName, container]) => ({
-            ...getContainer(serviceName, container),
-            ...container
-          })
-        )
+      ? Object.entries(dnp.installedContainers).map(([serviceName, container]) => ({
+          ...getContainer(serviceName, container),
+          ...container
+        }))
       : [getContainer(dnpName, {})],
 
     ...dnp.installedData
@@ -75,21 +68,10 @@ const getContainerName = ({
   isCore: boolean;
 }): string =>
   // Note: _PREFIX variables already end with the character "-"
-  [
-    isCore ? "DAppNodeCore-" : "DAppNodePackage-",
-    getContainerDomain({ dnpName, serviceName })
-  ].join("");
+  [isCore ? "DAppNodeCore-" : "DAppNodePackage-", getContainerDomain({ dnpName, serviceName })].join("");
 
-const getContainerDomain = ({
-  dnpName,
-  serviceName
-}: {
-  serviceName?: string;
-  dnpName: string;
-}): string => {
-  return !serviceName || serviceName === dnpName
-    ? dnpName
-    : `${serviceName}.${dnpName}`;
+const getContainerDomain = ({ dnpName, serviceName }: { serviceName?: string; dnpName: string }): string => {
+  return !serviceName || serviceName === dnpName ? dnpName : `${serviceName}.${dnpName}`;
 };
 
 const getImageTag = ({

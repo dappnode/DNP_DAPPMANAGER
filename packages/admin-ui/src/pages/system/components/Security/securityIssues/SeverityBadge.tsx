@@ -12,13 +12,8 @@ const CriticalSeverity = styled.span`
   border-radius: 2px;
 `;
 
-export default function SecurityBadge({
-  severity
-}: {
-  severity: SeverityLevel;
-}) {
-  if (severity === "critical")
-    return <CriticalSeverity>Address immediately</CriticalSeverity>;
+export default function SecurityBadge({ severity }: { severity: SeverityLevel }) {
+  if (severity === "critical") return <CriticalSeverity>Address immediately</CriticalSeverity>;
   // Develop other levels as they become necessary
   else return <CriticalSeverity>Address immediately</CriticalSeverity>;
 }

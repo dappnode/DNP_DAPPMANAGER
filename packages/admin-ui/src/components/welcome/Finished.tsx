@@ -4,13 +4,7 @@ import BottomButtons from "./BottomButtons";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
 
-export default function Finished({
-  onBack,
-  onNext
-}: {
-  onBack: () => void;
-  onNext?: () => void;
-}) {
+export default function Finished({ onBack, onNext }: { onBack: () => void; onNext?: () => void }) {
   return (
     <>
       <div className="header">
@@ -24,11 +18,7 @@ export default function Finished({
         </div>
       </div>
 
-      <Button
-        className="big-centered-button"
-        onClick={onNext}
-        variant="dappnode"
-      >
+      <Button className="big-centered-button" onClick={onNext} variant="dappnode">
         Finish
       </Button>
 

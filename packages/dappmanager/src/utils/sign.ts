@@ -1,24 +1,10 @@
 import { ethers } from "ethers";
 import { params } from "@dappnode/params";
 
-export function prepareMessageFromPackage({
-  packageEnsName,
-  data
-}: {
-  packageEnsName: string;
-  data: string;
-}): string {
+export function prepareMessageFromPackage({ packageEnsName, data }: { packageEnsName: string; data: string }): string {
   // Adding a custom prefix to signature to prevent signing arbitrary data.
   // See https://github.com/ethereum/wiki/wiki/JSON-RPC#eth_sign
-  return (
-    params.SIGNATURE_PREFIX +
-    "\n" +
-    packageEnsName +
-    "\n" +
-    data.length +
-    "\n" +
-    data
-  );
+  return params.SIGNATURE_PREFIX + "\n" + packageEnsName + "\n" + data.length + "\n" + data;
 }
 
 export function hashMessage(message: string): string {

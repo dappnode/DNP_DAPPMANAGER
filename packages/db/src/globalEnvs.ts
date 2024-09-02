@@ -17,7 +17,7 @@ import {
   mevBoostPrater,
   mevBoostHolesky,
   consensusClientHolesky,
-  executionClientHolesky,
+  executionClientHolesky
 } from "./stakerConfig.js";
 import { serverName } from "./system.js";
 import { upnpAvailable } from "./upnp.js";
@@ -61,7 +61,7 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}EXECUTION_CLIENT_LUKSO`]: executionClientLukso.get(),
     [`${prefix}MEVBOOST_LUKSO`]: mevBoostLukso.get(),
     [`${prefix}OP_ENABLE_HISTORICAL_RPC`]: opEnableHistoricalRpc.get(),
-    [`${prefix}OP_EXECUTION_CLIENT`]: opExecutionClient.get(),
+    [`${prefix}OP_EXECUTION_CLIENT`]: opExecutionClient.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any;
 }

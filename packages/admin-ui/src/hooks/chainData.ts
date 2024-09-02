@@ -26,7 +26,5 @@ export function useChainData(): ChainData[] {
     return [];
   }
 
-  return repositorySourceChainItem
-    ? [repositorySourceChainItem, ...chainDataRes.data]
-    : chainDataRes.data;
+  return repositorySourceChainItem ? [repositorySourceChainItem, ...chainDataRes.data] : chainDataRes.data;
 }

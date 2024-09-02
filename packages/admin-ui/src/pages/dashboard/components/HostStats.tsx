@@ -97,9 +97,12 @@ export function HostStats() {
   }, [cpuStats, diskStats, memoryStats, hostUptime]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      hostUptime.revalidate();
-    }, 60 * 5 * 1000);
+    const interval = setInterval(
+      () => {
+        hostUptime.revalidate();
+      },
+      60 * 5 * 1000
+    );
     return () => {
       clearInterval(interval);
     };
@@ -144,11 +147,7 @@ export function HostStats() {
           <StatsCardOk
             percent={memoryStats.data.usedPercentage}
             label="%"
-            text={
-              humanFileSize(memoryStats.data.used) +
-              " / " +
-              humanFileSize(memoryStats.data.total)
-            }
+            text={humanFileSize(memoryStats.data.used) + " / " + humanFileSize(memoryStats.data.total)}
           />
         ) : memoryStats.error ? (
           <StatsCardError error={memoryStats.error} />
@@ -162,11 +161,7 @@ export function HostStats() {
           <StatsCardOk
             percent={diskStats.data.usedPercentage}
             label="%"
-            text={
-              humanFileSize(diskStats.data.used) +
-              " / " +
-              humanFileSize(diskStats.data.total)
-            }
+            text={humanFileSize(diskStats.data.used) + " / " + humanFileSize(diskStats.data.total)}
           />
         ) : diskStats.error ? (
           <StatsCardError error={diskStats.error} />

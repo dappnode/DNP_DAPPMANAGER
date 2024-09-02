@@ -50,8 +50,7 @@ export function Info({
       try {
         setLoading(true);
         setGettingStartedIsShown(false);
-        if (gettingStartedShow)
-          await api.packageGettingStartedToggle({ dnpName, show: false });
+        if (gettingStartedShow) await api.packageGettingStartedToggle({ dnpName, show: false });
       } catch (e) {
         console.error(`Error on packageGettingStartedToggle: ${e.stack}`);
       } finally {
@@ -65,9 +64,7 @@ export function Info({
     <>
       {gettingStarted && gettingStartedShowLocal && (
         <>
-          <SubTitle
-            className={`getting-started-header ${loading ? "loading" : ""}`}
-          >
+          <SubTitle className={`getting-started-header ${loading ? "loading" : ""}`}>
             <div>Getting started</div>
             <div>
               <MdClose onClick={hideGettingStarted} />
@@ -92,8 +89,7 @@ export function Info({
 
           <div className="version-info">
             <strong>Version: </strong>
-            {version}{" "}
-            {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`}{" "}
+            {version} {parsedUpstreamVersion && `(${parsedUpstreamVersion} upstream)`}{" "}
             {origin ? (
               <a href={`${ipfsGatewayUrl}${origin}`} {...newTabProps}>
                 {origin}
@@ -104,10 +100,7 @@ export function Info({
           {gettingStarted && !gettingStartedShowLocal && (
             <div>
               <strong>Getting started: </strong>
-              <span
-                className="a-style"
-                onClick={() => setGettingStartedIsShown(true)}
-              >
+              <span className="a-style" onClick={() => setGettingStartedIsShown(true)}>
                 show
               </span>
             </div>
@@ -116,16 +109,15 @@ export function Info({
           <div>
             {/* Support legacy manifests,  homepage = {userui: "http://some.link"} */}
             <Links
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               links={links || ((manifest as any) || {}).homepage || {}}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               bugs={bugs || ((manifest as any) || {}).url || {}}
             />
           </div>
         </div>
 
-        <RenderPackageSentData
-          dnpName={dnp.dnpName}
-          data={dnp.packageSentData}
-        />
+        <RenderPackageSentData dnpName={dnp.dnpName} data={dnp.packageSentData} />
 
         <ContainerList dnp={dnp} />
 

@@ -1,9 +1,4 @@
-import {
-  disconnectConflictingContainerIfAny,
-  docker,
-  dockerComposeUp,
-  findContainerByIP,
-} from "@dappnode/dockerapi";
+import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
@@ -34,7 +29,7 @@ export async function connectContainerWithIp({
   network,
   containerName,
   containerIp,
-  aliasesIpsMap,
+  aliasesIpsMap
 }: {
   network: Dockerode.Network;
   containerName: string;
@@ -48,9 +43,7 @@ export async function connectContainerWithIp({
   >;
 }) {
   // check if there are any docker containers connected to the network with that IP different than the container requested
-  const conflictingContainerName = (
-    await findContainerByIP(network, containerIp)
-  )?.Name;
+  const conflictingContainerName = (await findContainerByIP(network, containerIp))?.Name;
   if (conflictingContainerName && conflictingContainerName !== containerName)
     await disconnectConflictingContainerIfAny(network, containerIp);
 
@@ -60,47 +53,35 @@ export async function connectContainerWithIp({
     // There has been edge cases where docker containers are in an intermedium state with a different docker container name
     // i.e b7903a289091_DAppNodeCore-bind.dnp.dappnode.eth instead of DAppNodeCore-bind.dnp.dappnode.eth
     const containerInfo = await targetContainer.inspect();
-    if (
-      !containerInfo.State.Running &&
-      containerName !== params.dappmanagerContainerName
-    ) {
+    if (!containerInfo.State.Running && containerName !== params.dappmanagerContainerName) {
       logs.warn(`container ${containerName} is not running, restarting it`);
       await targetContainer.restart();
     }
 
-    const hasContainerRightIp =
-      removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") ===
-      containerIp;
+    const hasContainerRightIp = removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") === containerIp;
 
-    if (hasContainerRightIp)
-      logs.info(
-        `container ${containerName} has right IP and is connected to docker network`
-      );
+    if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
     else {
-      logs.info(
-        `container ${containerName} does not have right IP and/or is not connected to docker network`
-      );
+      logs.info(`container ${containerName} does not have right IP and/or is not connected to docker network`);
       await connectContainerRetryOnIpUsed({
         network,
         containerName,
         maxAttempts: 20,
         ip: containerIp,
-        aliasesIpsMap,
+        aliasesIpsMap
       });
     }
   } catch (e) {
     // check if container does not exist 404
     if (containerName === params.bindContainerName && e.statusCode === 404) {
-      logs.warn(
-        `container ${params.bindContainerName} not found and it might be in an intermedium state`
-      );
+      logs.warn(`container ${params.bindContainerName} not found and it might be in an intermedium state`);
       // the container might be in intermedium state with different name
       // TODO: what if there is a docker container already using this IP.
       // This would be extremley dangerous once the migration to the private ip range is done
       // and less ips are available.
       logs.info(`recreating container ${containerName} with compose up`);
       await dockerComposeUp(getDockerComposePath(params.bindDnpName, true), {
-        forceRecreate: true,
+        forceRecreate: true
       });
     } else throw e;
   }
@@ -119,7 +100,7 @@ async function connectContainerRetryOnIpUsed({
   containerName,
   maxAttempts,
   ip,
-  aliasesIpsMap,
+  aliasesIpsMap
 }: {
   network: Dockerode.Network;
   containerName: string;
@@ -142,25 +123,20 @@ async function connectContainerRetryOnIpUsed({
     Container: containerName,
     EndpointConfig: {
       IPAMConfig: {
-        IPv4Address: ip,
+        IPv4Address: ip
       },
-      Aliases: aliases,
-    },
+      Aliases: aliases
+    }
   };
 
   while (attemptCount < maxAttempts) {
     try {
       await network.connect(networkOptions);
-      logs.info(
-        `Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`
-      );
+      logs.info(`Successfully connected ${containerName} with ip ${ip} and aliases ${aliases}`);
       // The disconnected containers will be reconnected later (in the IP range migration)
       return;
     } catch (error) {
-      if (
-        error.statusCode === 403 &&
-        error.message.includes("Address already in use")
-      )
+      if (error.statusCode === 403 && error.message.includes("Address already in use"))
         await disconnectConflictingContainerIfAny(network, ip);
       else if (
         error.statusCode === 403 &&
@@ -168,13 +144,11 @@ async function connectContainerRetryOnIpUsed({
         error.message.includes("already exists")
       ) {
         // IP is not right, reconnect container with proper IP
-        logs.warn(
-          `container ${containerName} already connected to network ${network.id} with wrong IP`
-        );
+        logs.warn(`container ${containerName} already connected to network ${network.id} with wrong IP`);
 
         // TODO: What if this fails?
         await network.disconnect({
-          Container: containerName,
+          Container: containerName
         });
 
         // The container will be reconnected in the next iteration
@@ -186,7 +160,5 @@ async function connectContainerRetryOnIpUsed({
     }
     attemptCount++;
   }
-  logs.error(
-    `Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`
-  );
+  logs.error(`Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`);
 }

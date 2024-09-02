@@ -5,18 +5,8 @@ import { mapValues } from "lodash-es";
 import { shell } from "@dappnode/utils";
 import { yamlDump } from "@dappnode/utils";
 import { getContainerName, getImageTag } from "@dappnode/utils";
-import {
-  Manifest,
-  Compose,
-  SetupWizard,
-  ComposeService,
-} from "@dappnode/types";
-import {
-  testDir,
-  manifestFileName,
-  composeFileName,
-  ipfs,
-} from "../../testUtils.js";
+import { Manifest, Compose, SetupWizard, ComposeService } from "@dappnode/types";
+import { testDir, manifestFileName, composeFileName, ipfs } from "../../testUtils.js";
 import { ipfsAddAll } from "../../testUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";
 import { saveMockAvatarTo } from "./mockAvatar.js";
@@ -44,7 +34,7 @@ export async function uploadDirectoryRelease({
   compose,
   setupWizard,
   disclaimer,
-  signReleaseWithPrivKey,
+  signReleaseWithPrivKey
 }: {
   manifest: Manifest;
   compose: ComposeUncomplete;
@@ -56,20 +46,15 @@ export async function uploadDirectoryRelease({
   await shell(`rm -rf ${releaseDir}`); // Clean dir before populating
   fs.mkdirSync(releaseDir, { recursive: true });
 
-  const writeAsset = (fileName: string, data: string): void =>
-    fs.writeFileSync(path.join(releaseDir, fileName), data);
-  const writeJson = <T>(fileName: string, jsonData: T): void =>
-    writeAsset(fileName, JSON.stringify(jsonData, null, 2));
+  const writeAsset = (fileName: string, data: string): void => fs.writeFileSync(path.join(releaseDir, fileName), data);
+  const writeJson = <T>(fileName: string, jsonData: T): void => writeAsset(fileName, JSON.stringify(jsonData, null, 2));
 
   writeJson(manifestFileName, manifest); // Manifest
   writeAsset(composeFileName, yamlDump(completeCompose(compose, manifest))); // Compose
   saveMockAvatarTo(path.join(releaseDir, "avatar.png")); // Avatar
   // const filesToUpload = [manifestFileNoImage, composeFile, imageFile];
   const serviceNames = Object.keys(compose.services);
-  await saveNewImageToDisk(
-    { dnpName: manifest.name, version: manifest.version, serviceNames },
-    releaseDir
-  );
+  await saveNewImageToDisk({ dnpName: manifest.name, version: manifest.version, serviceNames }, releaseDir);
 
   // Other optional files
   if (setupWizard) writeJson("setup-wizard.json", setupWizard);
@@ -86,8 +71,7 @@ export async function uploadDirectoryRelease({
     filesNames.push(file.name);
   }
   for (const fileToCheck of [manifestFileName, composeFileName])
-    if (!filesNames.includes(fileToCheck))
-      throw Error(`No ${fileToCheck} uploaded`);
+    if (!filesNames.includes(fileToCheck)) throw Error(`No ${fileToCheck} uploaded`);
 
   if (signReleaseWithPrivKey) {
     const wallet = new ethers.Wallet(signReleaseWithPrivKey);
@@ -101,10 +85,7 @@ export async function uploadDirectoryRelease({
  * Utility to write valid compose files
  * prevents having to write valid container_name, image per service
  */
-export function completeCompose(
-  composeUncomplete: ComposeUncomplete,
-  manifest: Manifest
-): Compose {
+export function completeCompose(composeUncomplete: ComposeUncomplete, manifest: Manifest): Compose {
   const dnpName = manifest.name;
   const version = manifest.version;
   const isCore = manifest.type === "dncore";
@@ -113,7 +94,7 @@ export function completeCompose(
     services: mapValues(composeUncomplete.services, (service, serviceName) => ({
       container_name: getContainerName({ dnpName, serviceName, isCore }),
       image: getImageTag({ dnpName, serviceName, version }),
-      ...service,
-    })),
+      ...service
+    }))
   };
 }

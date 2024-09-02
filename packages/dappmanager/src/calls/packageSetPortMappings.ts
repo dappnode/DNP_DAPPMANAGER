@@ -3,11 +3,7 @@ import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PortMapping } from "@dappnode/types";
 import { mapValues } from "lodash-es";
-import {
-  getContainersStatus,
-  dockerComposeUpPackage,
-  listPackage
-} from "@dappnode/dockerapi";
+import { getContainersStatus, dockerComposeUpPackage, listPackage } from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "@dappnode/utils";
 
 /**
@@ -23,23 +19,17 @@ export async function packageSetPortMappings({
   options?: { merge: boolean };
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg id must be defined");
-  if (!portMappingsByService)
-    throw Error("kwarg portMappingsByService must be defined");
+  if (!portMappingsByService) throw Error("kwarg portMappingsByService must be defined");
 
-  if (dnpName === params.dappmanagerDnpName)
-    throw Error("Can not edit DAPPMANAGER ports");
+  if (dnpName === params.dappmanagerDnpName) throw Error("Can not edit DAPPMANAGER ports");
 
   const dnp = await listPackage({ dnpName });
 
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   const services = compose.services();
-  const previousPortMappings = mapValues(services, service =>
-    service.getPortMappings()
-  );
+  const previousPortMappings = mapValues(services, (service) => service.getPortMappings());
 
-  for (const [serviceName, portMappings] of Object.entries(
-    portMappingsByService
-  )) {
+  for (const [serviceName, portMappings] of Object.entries(portMappingsByService)) {
     const service = services[serviceName];
     if (!service) throw Error(`No service ${serviceName} in dnp ${dnpName}`);
     if (options && options.merge) service.mergePortMapping(portMappings);
@@ -50,45 +40,27 @@ export async function packageSetPortMappings({
 
   const containersStatus = await getContainersStatus({ dnpName });
 
-  const dockerComposeUpOptions =
-    (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {};
+  const dockerComposeUpOptions = (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {};
 
   try {
-    await dockerComposeUpPackage(
-      { dnpName },
-      false,
-      containersStatus,
-      dockerComposeUpOptions
-    );
+    await dockerComposeUpPackage({ dnpName }, false, containersStatus, dockerComposeUpOptions);
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
-      for (const [serviceName, portMappings] of Object.entries(
-        previousPortMappings
-      ))
-        if (services[serviceName])
-          services[serviceName].setPortMapping(portMappings);
+      for (const [serviceName, portMappings] of Object.entries(previousPortMappings))
+        if (services[serviceName]) services[serviceName].setPortMapping(portMappings);
       compose.write();
 
-      await dockerComposeUpPackage(
-        { dnpName },
-        false,
-        containersStatus,
-        dockerComposeUpOptions
-      );
+      await dockerComposeUpPackage({ dnpName }, false, containersStatus, dockerComposeUpOptions);
 
       // Try to get the port colliding from the error
-      const ipAndPort = (e.message.match(
-        /(?:Bind for)(.+)(?:failed: port is already allocated)/
-      ) || [])[1];
+      const ipAndPort = (e.message.match(/(?:Bind for)(.+)(?:failed: port is already allocated)/) || [])[1];
       const collidingPortNumber = (ipAndPort || "").split(":")[1] || "";
 
       // Throw error
       throw Error(
         `${
-          collidingPortNumber
-            ? `Port ${collidingPortNumber} is already mapped`
-            : "Port collision"
+          collidingPortNumber ? `Port ${collidingPortNumber} is already mapped` : "Port collision"
         }. Reverted port mapping update`
       );
     }
