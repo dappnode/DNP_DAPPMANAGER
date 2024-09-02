@@ -13,6 +13,7 @@ import "./network.scss";
 import { InstalledPackageData, PortMapping, PortProtocol } from "@dappnode/types";
 
 const maxRegisteredPortNumber = 32768 - 1;
+const maxRegisteredPortNumberPlusOne = maxRegisteredPortNumber + 1;
 const maxPortNumber = 65535;
 // Wireguard port is inside ephemeral range
 const wireguardPort = 51820;
@@ -129,10 +130,9 @@ export function PortsByService({
   }
 
   function getPortStatusSummary(): PortStatusSummary {
-
     const isInEphemeralRange = (port: number) =>
       port > maxRegisteredPortNumber && port <= maxPortNumber && port !== wireguardPort;
-  
+
     const isOverTheMax = (port: number) => port > maxPortNumber;
 
     return ports.reduce<PortStatusSummary>(
@@ -143,7 +143,6 @@ export function PortsByService({
 
         if (isOverTheMax(container)) {
           acc.container.overTheMax.push(portMapping);
-
         } else if (isInEphemeralRange(container)) {
           acc.container.inEphemeralRange.push(portMapping);
         }
@@ -152,7 +151,6 @@ export function PortsByService({
 
         if (isOverTheMax(host)) {
           acc.host.overTheMax.push(portMapping);
-
         } else if (isInEphemeralRange(host)) {
           acc.host.inEphemeralRange.push(portMapping);
         }
@@ -198,38 +196,46 @@ export function PortsByService({
   for (const conflictingPort of conflictingPorts) {
     const portName = `${conflictingPort.host}/${conflictingPort.protocol}`;
     const ownerName = prettyDnpName(conflictingPort.owner);
-    errors.push(
-      `❌ Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
-    );
+    errors.push(`❌ Port ${portName} is already mapped by the DAppNode Package ${ownerName}`);
   }
 
   // Adjusting the loops for error and warning outputs accordingly
-  portStatusSummary.container.overTheMax.forEach(port => {
-    errors.push(`❌ Container port mapping ${port.container}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`);
+  portStatusSummary.container.overTheMax.forEach((port) => {
+    errors.push(
+      `❌ Container port mapping ${port.container}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
+    );
   });
 
-  portStatusSummary.host.overTheMax.forEach(port => {
-    errors.push(`❌ Host port mapping ${port.host}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`);
+  portStatusSummary.host.overTheMax.forEach((port) => {
+    errors.push(
+      `❌ Host port mapping ${port.host}/${port.protocol} exceeds the maximum allowed port number of ${maxPortNumber} and can't be used.`
+    );
   });
 
-  portStatusSummary.container.inEphemeralRange.forEach(port => {
-    warnings.push(`⚠️ Package Port mapping ${port.container}/${port.protocol} is in the ephemeral port range (${maxRegisteredPortNumber + 1}-${maxPortNumber}).`);
+  portStatusSummary.container.inEphemeralRange.forEach((port) => {
+    warnings.push(
+      `⚠️ Package Port mapping ${port.container}/${
+        port.protocol
+      } is in the ephemeral port range (${maxRegisteredPortNumber + 1}-${maxPortNumber}).`
+    );
   });
 
-  portStatusSummary.host.inEphemeralRange.forEach(port => {
-    warnings.push(`⚠️ Host Port mapping ${port.host}/${port.protocol} is in the ephemeral port range (${maxRegisteredPortNumber + 1}-${maxPortNumber}).`);
+  portStatusSummary.host.inEphemeralRange.forEach((port) => {
+    warnings.push(
+      `⚠️ Host Port mapping ${port.host}/${port.protocol} is in the ephemeral port range (${maxRegisteredPortNumberPlusOne}-${maxPortNumber}).`
+    );
   });
 
   // Aggregate conditions to disable the update
   const disableUpdate = Boolean(
     areNewMappingsInvalid ||
-    duplicatedContainerPorts.length > 0 ||
-    duplicatedHostPorts.length > 0 ||
-    conflictingPorts.length > 0 ||
-    arePortsTheSame ||
-    updating ||
-    portStatusSummary.container.overTheMax.length > 0 ||
-    portStatusSummary.host.overTheMax.length > 0
+      duplicatedContainerPorts.length > 0 ||
+      duplicatedHostPorts.length > 0 ||
+      conflictingPorts.length > 0 ||
+      arePortsTheSame ||
+      updating ||
+      portStatusSummary.container.overTheMax.length > 0 ||
+      portStatusSummary.host.overTheMax.length > 0
   );
 
   return (
@@ -260,11 +266,7 @@ export function PortsByService({
                     onValueChange={(value: string) => editPort(i, { container: parseInt(value) || undefined })}
                   />
                 ) : (
-                  <Input
-                    lock={true}
-                    value={container}
-                    onValueChange={() => { }}
-                  />
+                  <Input lock={true} value={container} onValueChange={() => {}} />
                 )}
               </td>
               <td>
@@ -279,11 +281,7 @@ export function PortsByService({
                     }
                   />
                 ) : (
-                  <Input
-                    lock={true}
-                    value={protocol}
-                    onValueChange={() => { }}
-                  />
+                  <Input lock={true} value={protocol} onValueChange={() => {}} />
                 )}
               </td>
 
@@ -305,10 +303,8 @@ export function PortsByService({
         </div>
       ))}
 
-      {warnings.map(warning => (
-        <div key={warning}>
-          {warning}
-        </div>
+      {warnings.map((warning) => (
+        <div key={warning}>{warning}</div>
       ))}
 
       <div className="button-row">
