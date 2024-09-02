@@ -1,6 +1,1 @@
-export type TelegramCommandMessageHeader =
-  | "Fail"
-  | "Success"
-  | "Stats"
-  | "Help"
-  | "Note";
+export type TelegramCommandMessageHeader = "Fail" | "Success" | "Stats" | "Help" | "Note";

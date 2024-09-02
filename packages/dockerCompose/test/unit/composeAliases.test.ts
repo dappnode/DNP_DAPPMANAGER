@@ -1,10 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import {
-  ComposeFileEditor,
-  ComposeServiceEditor,
-  parseServiceNetworks,
-} from "../../src/index.js";
+import { ComposeFileEditor, ComposeServiceEditor, parseServiceNetworks } from "../../src/index.js";
 import { params } from "@dappnode/params";
 import fs from "fs";
 import path from "path";
@@ -55,30 +51,20 @@ networks:
     // Create necessary dir
     fs.mkdirSync(dnpRepoExamplePath, { recursive: true });
     // Create example compose
-    fs.writeFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      exampleCompose
-    );
+    fs.writeFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, exampleCompose);
   });
 
   describe("Add/remove network aliases", () => {
     it("Should remove alias: example.dappnode", () => {
       const { compose, composeService, serviceNetwork } = {
-        ...getComposeEditors(dnpName, serviceName),
+        ...getComposeEditors(dnpName, serviceName)
       };
       // Edit existing compose
-      composeService.removeNetworkAliases(
-        params.DOCKER_PRIVATE_NETWORK_NAME,
-        ["goerli-geth.dappnode"],
-        serviceNetwork
-      );
+      composeService.removeNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, ["goerli-geth.dappnode"], serviceNetwork);
       compose.write();
 
       // Get edited compose
-      const composeAfter = fs.readFileSync(
-        `${dnpRepoExamplePath}/docker-compose.yml`,
-        "utf-8"
-      );
+      const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
 version: '3.5'
@@ -117,21 +103,14 @@ networks:
 
     it("Should add alias: goerli-geth.dappnode", () => {
       const { compose, composeService, serviceNetwork } = {
-        ...getComposeEditors(dnpName, serviceName),
+        ...getComposeEditors(dnpName, serviceName)
       };
       // Edit existing compose
-      composeService.addNetworkAliases(
-        params.DOCKER_PRIVATE_NETWORK_NAME,
-        ["example.dappnode"],
-        serviceNetwork
-      );
+      composeService.addNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, ["example.dappnode"], serviceNetwork);
       compose.write();
 
       // Get edited compose
-      const composeAfter = fs.readFileSync(
-        `${dnpRepoExamplePath}/docker-compose.yml`,
-        "utf-8"
-      );
+      const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
 version: '3.5'
@@ -173,7 +152,7 @@ networks:
   describe("Setglobal envs", () => {
     it("Should add global env file", () => {
       const { compose, composeService } = {
-        ...getComposeEditors(dnpName, serviceName),
+        ...getComposeEditors(dnpName, serviceName)
       };
 
       // Edit existing compose
@@ -181,10 +160,7 @@ networks:
       compose.write();
 
       // Get edited compose
-      const composeAfter = fs.readFileSync(
-        `${dnpRepoExamplePath}/docker-compose.yml`,
-        "utf-8"
-      );
+      const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
 version: '3.5'
@@ -226,12 +202,12 @@ networks:
 
     it("Should add selected global envs", () => {
       const { compose, composeService } = {
-        ...getComposeEditors(dnpName, serviceName),
+        ...getComposeEditors(dnpName, serviceName)
       };
 
       const GlobalEnvsPrefixed: GlobalEnvsPrefixed = {
         _DAPPNODE_GLOBAL_ACTIVE: "true",
-        _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK: "false",
+        _DAPPNODE_GLOBAL_NO_NAT_LOOPBACK: "false"
       };
 
       // Edit existing compose
@@ -239,8 +215,8 @@ networks:
         [
           {
             envs: ["ACTIVE", "NO_NAT_LOOPBACK"],
-            services: ["goerli-geth.dnp.dappnode.eth"],
-          },
+            services: ["goerli-geth.dnp.dappnode.eth"]
+          }
         ],
         GlobalEnvsPrefixed,
         false
@@ -248,10 +224,7 @@ networks:
       compose.write();
 
       // Get edited compose
-      const composeAfter = fs.readFileSync(
-        `${dnpRepoExamplePath}/docker-compose.yml`,
-        "utf-8"
-      );
+      const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
 version: '3.5'
@@ -294,10 +267,7 @@ networks:
 
   afterEach(() => {
     // Overwrite the compose to be used in more tests
-    fs.writeFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      exampleCompose
-    );
+    fs.writeFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, exampleCompose);
   });
 });
 
@@ -312,14 +282,11 @@ function getComposeEditors(
   // Create compose editors
   const compose = new ComposeFileEditor(dnpName, false);
   const composeService = compose.services()[serviceName];
-  const serviceNetworks = parseServiceNetworks(
-    composeService.get().networks || {}
-  );
-  const serviceNetwork =
-    serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] ?? null;
+  const serviceNetworks = parseServiceNetworks(composeService.get().networks || {});
+  const serviceNetwork = serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] ?? null;
   return {
     compose,
     composeService,
-    serviceNetwork,
+    serviceNetwork
   };
 }

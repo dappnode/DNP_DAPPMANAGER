@@ -48,10 +48,8 @@ export async function setUpIpfsNode(): Promise<void> {
   }
 
   // Get dappnode ipfs gateway ID
-  const dappnodeIpfsGatewayId = await remoteIpfsApi.id().catch(e => {
-    throw Error(
-      `Error getting dappnode ipfs gateway ID, dappnode ipfs gateway not available ${e}`
-    );
+  const dappnodeIpfsGatewayId = await remoteIpfsApi.id().catch((e) => {
+    throw Error(`Error getting dappnode ipfs gateway ID, dappnode ipfs gateway not available ${e}`);
   });
 
   // Connect to ipfs.dappnode.io

@@ -14,7 +14,7 @@ export function ChainCards() {
 
   return (
     <div className="dashboard-cards">
-      {chainData.map(chain => (
+      {chainData.map((chain) => (
         <ChainCard key={chain.dnpName} {...chain} />
       ))}
     </div>
@@ -22,16 +22,7 @@ export function ChainCards() {
 }
 
 function ChainCard(chain: ChainData) {
-  const {
-    dnpName,
-    name,
-    message,
-    help,
-    progress,
-    error,
-    syncing,
-    peers
-  } = chain;
+  const { dnpName, name, message, help, progress, error, syncing, peers } = chain;
   return (
     <Card className="chain-card">
       <div className="name">
@@ -57,15 +48,11 @@ function ChainCard(chain: ChainData) {
       )}
 
       <div className="message">
-        {(dnpName === "repository-source" ||
-          !syncing ||
-          (typeof progress === "number" && progress !== 0)) && (
+        {(dnpName === "repository-source" || !syncing || (typeof progress === "number" && progress !== 0)) && (
           <RenderMarkdown source={message} noMargin />
         )}
         {peers && <RenderMarkdown source={`Peers: ${peers}`} noMargin />}
-        {error ? (
-          <Link to={`/${packagesRelativePath}/${dnpName}/logs`}>More info</Link>
-        ) : null}
+        {error ? <Link to={`/${packagesRelativePath}/${dnpName}/logs`}>More info</Link> : null}
       </div>
     </Card>
   );

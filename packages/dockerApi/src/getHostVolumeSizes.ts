@@ -19,9 +19,7 @@ interface VolSizes {
  *   bitcoin_data: "823203"
  * }
  */
-export async function getHostVolumeSizes(
-  volDevicePaths: VolDevicePaths
-): Promise<VolSizes> {
+export async function getHostVolumeSizes(volDevicePaths: VolDevicePaths): Promise<VolSizes> {
   // if there are no volDevicePaths, return early
   if (isEmpty(volDevicePaths)) return {};
 
@@ -73,12 +71,9 @@ async function duHostMountpoints(mountpointPath: string): Promise<SizeByPath> {
   // -d 2 = Show directories of max depth 2
   // -B 1 = User SIZE-byte blocks of 1, bytes
   const duOutput = await shellHost(`du -- -d 2 -B 1 ${mountpointPath}`);
-  return parseDuOutput(duOutput, mountpointPath).reduce(
-    (obj: SizeByPath, { size, path }) => {
-      return { ...obj, [path]: size };
-    },
-    {}
-  );
+  return parseDuOutput(duOutput, mountpointPath).reduce((obj: SizeByPath, { size, path }) => {
+    return { ...obj, [path]: size };
+  }, {});
 }
 
 import path from "path";
@@ -102,20 +97,15 @@ export interface DuResult {
  *   { size: "824212", path: "." }
  * ]
  */
-export function parseDuOutput(
-  output: string,
-  relativeFrom?: string
-): DuResult[] {
+export function parseDuOutput(output: string, relativeFrom?: string): DuResult[] {
   return output
     .trim()
     .split("\n")
     .map((line) => {
       const [size, subpath] = line.trim().split(/\s+/);
       return {
-        path: path.normalize(
-          relativeFrom ? path.relative(relativeFrom, subpath) : subpath
-        ),
-        size,
+        path: path.normalize(relativeFrom ? path.relative(relativeFrom, subpath) : subpath),
+        size
       };
     });
 }

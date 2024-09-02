@@ -7,19 +7,13 @@ import {
   createTestDir,
   cleanRepos,
   cleanContainers,
-  shellSafe,
+  shellSafe
 } from "../../../dappmanager/test/testUtils.js";
 import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { dockerComposeUp } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
 import { validatePath } from "@dappnode/utils";
-import {
-  RequestedDnp,
-  Manifest,
-  SetupWizard,
-  getContainerName,
-  getImageTag,
-} from "@dappnode/types";
+import { RequestedDnp, Manifest, SetupWizard, getContainerName, getImageTag } from "@dappnode/types";
 
 describe("Fetch releases", () => {
   const dnpNameMain = "main.dnp.dappnode.eth";
@@ -57,7 +51,7 @@ describe("Fetch releases", () => {
       description: "Main DNP",
       license: "GPL-3.0",
       type: "service",
-      avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt",
+      avatar: "/ipfs/QmNrfF93ppvjDGeabQH8H8eeCDLci2F8fptkvj94WN78pt"
     };
 
     const composeMain = new ComposeEditor({
@@ -67,15 +61,15 @@ describe("Fetch releases", () => {
           container_name: getContainerName({
             dnpName: dnpNameMain,
             serviceName: dnpNameMain,
-            isCore: false,
+            isCore: false
           }),
           image: getImageTag({
             dnpName: dnpNameMain,
             serviceName: dnpNameMain,
-            version: mainVersion,
-          }),
-        },
-      },
+            version: mainVersion
+          })
+        }
+      }
     });
 
     const setupWizard: SetupWizard = {
@@ -85,9 +79,9 @@ describe("Fetch releases", () => {
           id: "mockVar",
           target: { type: "environment", name: "MOCK_VAR" },
           title: "Mock var",
-          description: "Mock var description",
-        },
-      ],
+          description: "Mock var description"
+        }
+      ]
     };
 
     const disclaimer = "Warning!\n\nThis is really dangerous";
@@ -98,7 +92,7 @@ describe("Fetch releases", () => {
         manifest: mainDnpManifest,
         compose: composeMain.output(),
         setupWizard,
-        disclaimer,
+        disclaimer
       });
 
       // Up mock docker packages
@@ -123,8 +117,8 @@ describe("Fetch releases", () => {
           version: mainVersion,
           type: "service",
           disclaimer: {
-            message: disclaimer,
-          },
+            message: disclaimer
+          }
         },
         specialPermissions: { [dnpNameMain]: [] },
 
@@ -134,7 +128,7 @@ describe("Fetch releases", () => {
         isUpdated: false,
         isInstalled: true,
         settings: {
-          [dnpNameMain]: {},
+          [dnpNameMain]: {}
         },
         compatible: {
           requiresDockerUpdate: false,
@@ -144,24 +138,22 @@ describe("Fetch releases", () => {
           isCompatible: true,
           error: "",
           dnps: {
-            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash },
-          },
+            [dnpNameMain]: { from: mainVersion, to: mainDnpReleaseHash }
+          }
         },
         available: {
           isAvailable: true,
-          message: "",
+          message: ""
         },
         // Mock, ommited below
         imageSize: 0,
         signedSafeAll: false,
         signedSafe: {
-          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" },
-        },
+          [dnpNameMain]: { safe: false, message: "Unsafe origin, not signed" }
+        }
       };
 
-      expect(omit(result, ["imageSize"])).to.deep.equal(
-        omit(expectRequestDnp, ["imageSize"])
-      );
+      expect(omit(result, ["imageSize"])).to.deep.equal(omit(expectRequestDnp, ["imageSize"]));
 
       after(async () => {
         await shellSafe(`docker compose -f ${composePathMain} down -v`);

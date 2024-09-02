@@ -1,31 +1,24 @@
 import { isEqual, uniq } from "lodash-es";
-import {
-  Eth2ClientTarget,
-  EthClientRemote,
-  InstalledPackageDetailData,
-} from "@dappnode/types";
+import { Eth2ClientTarget, EthClientRemote, InstalledPackageDetailData } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { getConsensusUserSettings } from "@dappnode/utils";
 import { packageInstall, packageGet, packageRemove } from "../calls/index.js";
-import {
-  ComposeFileEditor,
-  parseServiceNetworks,
-} from "@dappnode/dockercompose";
+import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import { params } from "@dappnode/params";
 import {
   dockerComposeUpPackage,
   dockerNetworkReconnect,
   listPackageNoThrow,
-  getNetworkContainerConfig,
+  getNetworkContainerConfig
 } from "@dappnode/dockerapi";
 import { Network } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export enum ComposeAliasEditorAction {
   ADD,
-  REMOVE,
+  REMOVE
 }
 
 export class EthereumClient {
@@ -45,12 +38,11 @@ export class EthereumClient {
         return { target: "remote", ethRemoteRpc: db.ethRemoteRpc.get() };
 
       case EthClientRemote.off:
-        if (!executionClient || !consensusClient)
-          return { target: "remote", ethRemoteRpc: db.ethRemoteRpc.get() };
+        if (!executionClient || !consensusClient) return { target: "remote", ethRemoteRpc: db.ethRemoteRpc.get() };
 
         return {
           target: { execClient: executionClient, consClient: consensusClient },
-          ethRemoteRpc: db.ethRemoteRpc.get(),
+          ethRemoteRpc: db.ethRemoteRpc.get()
         };
     }
   }
@@ -70,7 +62,7 @@ export class EthereumClient {
     deletePrevExecClientVolumes,
     deletePrevConsClient,
     deletePrevConsClientVolumes,
-    ethRemoteRpc,
+    ethRemoteRpc
   }: {
     dappnodeInstaller: DappnodeInstaller;
     nextTarget: Eth2ClientTarget;
@@ -81,48 +73,35 @@ export class EthereumClient {
     deletePrevConsClientVolumes: boolean;
     ethRemoteRpc?: string;
   }): Promise<void> {
-    const { target: currentTarget, ethRemoteRpc: currentEthRemoteRpc } =
-      this.computeEthereumTarget();
+    const { target: currentTarget, ethRemoteRpc: currentEthRemoteRpc } = this.computeEthereumTarget();
     // Return if the target is the same
-    if (
-      isEqual(nextTarget, currentTarget) &&
-      ethRemoteRpc === currentEthRemoteRpc
-    )
-      return;
+    if (isEqual(nextTarget, currentTarget) && ethRemoteRpc === currentEthRemoteRpc) return;
     // Remove clients if currentTarge is !== remote
     if (currentTarget !== "remote") {
       // Remove Execution client
       if (deletePrevExecClient)
         await packageRemove({
           dnpName: currentTarget.execClient,
-          deleteVolumes: deletePrevExecClientVolumes,
+          deleteVolumes: deletePrevExecClientVolumes
         }).catch((e) => logs.error(`Error removing prev exec client: ${e}`));
       // Remove Consensus client
       if (deletePrevConsClient)
         await packageRemove({
           dnpName: currentTarget.consClient,
-          deleteVolumes: deletePrevConsClientVolumes,
+          deleteVolumes: deletePrevConsClientVolumes
         }).catch((e) => logs.error(`Error removing prev cons client: ${e}`));
     }
 
     if (nextTarget === "remote") {
-      if (!ethRemoteRpc)
-        throw Error(
-          `Argument ethRemoteRpc must be defined if target is remote`
-        );
+      if (!ethRemoteRpc) throw Error(`Argument ethRemoteRpc must be defined if target is remote`);
       db.ethClientRemote.set(EthClientRemote.on);
       db.ethRemoteRpc.set(ethRemoteRpc);
       // Remove alias fullnode.dappnode from the eth client if not removed by the user
       if (!deletePrevExecClient && currentTarget !== "remote")
         await this.updateFullnodeAlias({
           network: Network.Mainnet,
-          prevExecClientDnpName: currentTarget.execClient,
-        }).catch((e) =>
-          logs.error(
-            "Error removing fullnode.dappnode alias from previous ETH exec client",
-            e
-          )
-        );
+          prevExecClientDnpName: currentTarget.execClient
+        }).catch((e) => logs.error("Error removing fullnode.dappnode alias from previous ETH exec client", e));
     } else {
       const { execClient, consClient } = nextTarget;
       db.ethClientRemote.set(EthClientRemote.off);
@@ -131,17 +110,15 @@ export class EthereumClient {
       if (sync)
         await this.changeEthClientSync({
           dappnodeInstaller,
-          prevExecClient:
-            currentTarget !== "remote" ? currentTarget.execClient : undefined,
+          prevExecClient: currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
-          consClient,
+          consClient
         });
       else
         await this.changeEthClientNotAsync({
-          prevExecClient:
-            currentTarget !== "remote" ? currentTarget.execClient : undefined,
+          prevExecClient: currentTarget !== "remote" ? currentTarget.execClient : undefined,
           execClient,
-          consClient,
+          consClient
         });
     }
   }
@@ -157,16 +134,13 @@ export class EthereumClient {
   async updateFullnodeAlias({
     prevExecClientDnpName,
     newExecClientDnpName,
-    network = Network.Mainnet,
+    network = Network.Mainnet
   }: {
     prevExecClientDnpName?: string;
     newExecClientDnpName?: string | null;
     network?: Network;
   }): Promise<void> {
-    const fullnodeAlias =
-      network === "mainnet"
-        ? params.FULLNODE_ALIAS
-        : `${network}.${params.FULLNODE_ALIAS}`;
+    const fullnodeAlias = network === "mainnet" ? params.FULLNODE_ALIAS : `${network}.${params.FULLNODE_ALIAS}`;
 
     logs.info(
       `Updating fullnode alias (${fullnodeAlias}) for network ${network} from ${prevExecClientDnpName} to ${newExecClientDnpName}`
@@ -180,7 +154,7 @@ export class EthereumClient {
       );
       await this.removeAliasFromPreviousExecClient({
         execClientDnpName: prevExecClientDnpName,
-        fullnodeAlias,
+        fullnodeAlias
       });
     }
 
@@ -191,14 +165,14 @@ export class EthereumClient {
       );
       this.addAliasToNewExecClient({
         execClientDnpName: newExecClientDnpName,
-        fullnodeAlias,
+        fullnodeAlias
       });
     }
   }
 
   private async removeAliasFromPreviousExecClient({
     execClientDnpName,
-    fullnodeAlias,
+    fullnodeAlias
   }: {
     execClientDnpName: string;
     fullnodeAlias: string;
@@ -206,27 +180,24 @@ export class EthereumClient {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
 
     const serviceName = this.getServiceNameFromPackage(execClientPkg);
-    const containerName = this.getContainerNameFromService(
-      execClientPkg,
-      serviceName
-    );
+    const containerName = this.getContainerNameFromService(execClientPkg, serviceName);
 
     await this.removeContainerAliasFromDockerNetwork({
       containerName,
-      aliasToRemove: fullnodeAlias,
+      aliasToRemove: fullnodeAlias
     });
 
     this.editFullnodeAliasInCompose({
       action: ComposeAliasEditorAction.REMOVE,
       execClientDnpName,
       execClientServiceName: serviceName,
-      alias: fullnodeAlias,
+      alias: fullnodeAlias
     });
   }
 
   private async addAliasToNewExecClient({
     execClientDnpName,
-    fullnodeAlias,
+    fullnodeAlias
   }: {
     execClientDnpName: string;
     fullnodeAlias: string;
@@ -234,21 +205,18 @@ export class EthereumClient {
     const execClientPkg = await packageGet({ dnpName: execClientDnpName });
 
     const serviceName = this.getServiceNameFromPackage(execClientPkg);
-    const containerName = this.getContainerNameFromService(
-      execClientPkg,
-      serviceName
-    );
+    const containerName = this.getContainerNameFromService(execClientPkg, serviceName);
 
     this.addContainerAliasToDockerNetwork({
       containerName,
-      aliasToAdd: fullnodeAlias,
+      aliasToAdd: fullnodeAlias
     });
 
     this.editFullnodeAliasInCompose({
       action: ComposeAliasEditorAction.ADD,
       execClientDnpName,
       execClientServiceName: serviceName,
-      alias: fullnodeAlias,
+      alias: fullnodeAlias
     });
   }
 
@@ -256,66 +224,47 @@ export class EthereumClient {
     return pkg.manifest?.mainService || pkg.containers[0].serviceName;
   }
 
-  private getContainerNameFromService(
-    pkg: InstalledPackageDetailData,
-    serviceName: string
-  ): string {
+  private getContainerNameFromService(pkg: InstalledPackageDetailData, serviceName: string): string {
     return (
-      pkg.containers.find((container) => container.serviceName === serviceName)
-        ?.containerName || pkg.containers[0].containerName
+      pkg.containers.find((container) => container.serviceName === serviceName)?.containerName ||
+      pkg.containers[0].containerName
     );
   }
 
   private async removeContainerAliasFromDockerNetwork({
     containerName,
-    aliasToRemove,
+    aliasToRemove
   }: {
     containerName: string;
     aliasToRemove: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getNetworkContainerConfig(
-      containerName,
-      params.DOCKER_PRIVATE_NETWORK_NAME
-    );
+    const currentEndpointConfig = await getNetworkContainerConfig(containerName, params.DOCKER_PRIVATE_NETWORK_NAME);
 
-    const updatedAliases = (currentEndpointConfig?.Aliases || []).filter(
-      (alias: string) => alias !== aliasToRemove
-    );
+    const updatedAliases = (currentEndpointConfig?.Aliases || []).filter((alias: string) => alias !== aliasToRemove);
 
     const endpointConfig = {
       ...currentEndpointConfig,
-      Aliases: updatedAliases,
+      Aliases: updatedAliases
     };
 
-    await dockerNetworkReconnect(
-      params.DOCKER_PRIVATE_NETWORK_NAME,
-      containerName,
-      endpointConfig
-    );
+    await dockerNetworkReconnect(params.DOCKER_PRIVATE_NETWORK_NAME, containerName, endpointConfig);
   }
 
   private async addContainerAliasToDockerNetwork({
     containerName,
-    aliasToAdd,
+    aliasToAdd
   }: {
     containerName: string;
     aliasToAdd: string;
   }): Promise<void> {
-    const currentEndpointConfig = await getNetworkContainerConfig(
-      containerName,
-      params.DOCKER_PRIVATE_NETWORK_NAME
-    );
+    const currentEndpointConfig = await getNetworkContainerConfig(containerName, params.DOCKER_PRIVATE_NETWORK_NAME);
 
     const endpointConfig = {
       ...currentEndpointConfig,
-      Aliases: uniq([...(currentEndpointConfig?.Aliases || []), aliasToAdd]),
+      Aliases: uniq([...(currentEndpointConfig?.Aliases || []), aliasToAdd])
     };
 
-    await dockerNetworkReconnect(
-      params.DOCKER_PRIVATE_NETWORK_NAME,
-      containerName,
-      endpointConfig
-    );
+    await dockerNetworkReconnect(params.DOCKER_PRIVATE_NETWORK_NAME, containerName, endpointConfig);
   }
 
   /**
@@ -325,7 +274,7 @@ export class EthereumClient {
     dappnodeInstaller,
     prevExecClient,
     execClient,
-    consClient,
+    consClient
   }: {
     dappnodeInstaller: DappnodeInstaller;
     prevExecClient?: string;
@@ -335,7 +284,7 @@ export class EthereumClient {
     try {
       // Install execution client and set default fullnode alias
       const execClientPackage = await listPackageNoThrow({
-        dnpName: execClient,
+        dnpName: execClient
       });
 
       if (!execClientPackage) {
@@ -345,7 +294,7 @@ export class EthereumClient {
             await this.updateFullnodeAlias({
               network: Network.Mainnet,
               newExecClientDnpName: execClient,
-              prevExecClientDnpName: prevExecClient,
+              prevExecClientDnpName: prevExecClient
             })
         );
       } else {
@@ -357,24 +306,24 @@ export class EthereumClient {
               await this.updateFullnodeAlias({
                 network: Network.Mainnet,
                 newExecClientDnpName: execClient,
-                prevExecClientDnpName: prevExecClient,
+                prevExecClientDnpName: prevExecClient
               })
           );
       }
 
       // Install consensus client
       const consClientPkg = await listPackageNoThrow({
-        dnpName: execClient,
+        dnpName: execClient
       });
       if (!consClientPkg) {
         // Get default cons client user settings and install cons client
         const userSettings = getConsensusUserSettings({
           dnpName: consClient,
-          network: Network.Mainnet,
+          network: Network.Mainnet
         });
         await packageInstall(dappnodeInstaller, {
           name: consClient,
-          userSettings,
+          userSettings
         });
       } else {
         // Start pkg if not running
@@ -392,20 +341,20 @@ export class EthereumClient {
   private async changeEthClientNotAsync({
     prevExecClient,
     execClient,
-    consClient,
+    consClient
   }: {
     prevExecClient?: string;
     execClient: string;
     consClient: string;
   }): Promise<void> {
     db.ethExecClientInstallStatus.set(execClient, {
-      status: "TO_INSTALL",
+      status: "TO_INSTALL"
     });
     db.ethConsClientInstallStatus.set(consClient, {
-      status: "TO_INSTALL",
+      status: "TO_INSTALL"
     });
     eventBus.runEthClientInstaller.emit({
-      prevExecClientDnpName: prevExecClient,
+      prevExecClientDnpName: prevExecClient
     });
   }
 
@@ -416,7 +365,7 @@ export class EthereumClient {
     action,
     execClientDnpName,
     execClientServiceName,
-    alias = params.FULLNODE_ALIAS,
+    alias = params.FULLNODE_ALIAS
   }: {
     action: ComposeAliasEditorAction;
     execClientDnpName: string;
@@ -425,24 +374,13 @@ export class EthereumClient {
   }): void {
     const compose = new ComposeFileEditor(execClientDnpName, false);
     const composeService = compose.services()[execClientServiceName];
-    const serviceNetworks = parseServiceNetworks(
-      composeService.get().networks || {}
-    );
-    const serviceNetwork =
-      serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || null;
+    const serviceNetworks = parseServiceNetworks(composeService.get().networks || {});
+    const serviceNetwork = serviceNetworks[params.DOCKER_PRIVATE_NETWORK_NAME] || null;
 
     if (action === ComposeAliasEditorAction.REMOVE) {
-      composeService.removeNetworkAliases(
-        params.DOCKER_PRIVATE_NETWORK_NAME,
-        [alias],
-        serviceNetwork
-      );
+      composeService.removeNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, [alias], serviceNetwork);
     } else {
-      composeService.addNetworkAliases(
-        params.DOCKER_PRIVATE_NETWORK_NAME,
-        [alias],
-        serviceNetwork
-      );
+      composeService.addNetworkAliases(params.DOCKER_PRIVATE_NETWORK_NAME, [alias], serviceNetwork);
     }
 
     compose.write();

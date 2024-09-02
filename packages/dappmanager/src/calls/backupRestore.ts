@@ -43,8 +43,7 @@ export async function backupRestore({
   // Fetch the filePath and the file with fileId
   const filePath = db.fileTransferPath.get(fileId);
   if (!filePath) throw Error(`No file found for id: ${fileId}`);
-  if (!fs.existsSync(filePath))
-    throw Error(`No file found at path: ${filePath}`);
+  if (!fs.existsSync(filePath)) throw Error(`No file found at path: ${filePath}`);
   await shell(`mv ${filePath} ${backupDirCompressed}`);
 
   try {
@@ -62,17 +61,13 @@ export async function backupRestore({
     let lastError: Error | null = null;
     for (const { name, path: toPath, service } of backup) {
       try {
-        const container = dnp.containers.find(
-          c => !service || c.serviceName === service
-        );
-        if (!container)
-          throw Error(`No container found for service ${service}`);
+        const container = dnp.containers.find((c) => !service || c.serviceName === service);
+        if (!container) throw Error(`No container found for service ${service}`);
         const containerName = container.containerName;
 
         const fromPath = path.join(backupDir, name);
         // lstatSync throws if path does not exist, so must call existsSync first
-        if (!fs.existsSync(fromPath))
-          throw Error(`path ${fromPath} does not exist`);
+        if (!fs.existsSync(fromPath)) throw Error(`path ${fromPath} does not exist`);
 
         // Make sure the base dir exists on the container (will throw otherwise)
         const toPathDir = path.parse(toPath).dir;

@@ -25,7 +25,7 @@ export const mockContainer: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  avatarUrl: "",
+  avatarUrl: ""
 };
 
 export const mockDnp: InstalledPackageData = {
@@ -37,5 +37,5 @@ export const mockDnp: InstalledPackageData = {
   dependencies: {},
   origin: "",
   avatarUrl: "",
-  containers: [mockContainer],
+  containers: [mockContainer]
 };

@@ -28,7 +28,7 @@ export function buildNetworkAlias({
   dnpName,
   serviceName,
   isMainOrMonoservice,
-  isExternal = false,
+  isExternal = false
 }: {
   dnpName: string;
   serviceName: string;

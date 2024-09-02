@@ -31,8 +31,7 @@ export default function ErrorView({
 }
 
 function parseError(error: Error | string) {
-  if (error instanceof Error)
-    return { message: error.message, detail: error.stack };
+  if (error instanceof Error) return { message: error.message, detail: error.stack };
   if (typeof error === "string") return { message: error };
   return { message: JSON.stringify(error), detail: "" };
 }

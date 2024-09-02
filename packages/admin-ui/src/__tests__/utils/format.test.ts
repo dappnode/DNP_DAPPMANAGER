@@ -4,9 +4,7 @@ describe("utils > format", () => {
   describe("prettyVolumeName", () => {
     const dnpName = "geth-user.dnp.dappnode.eth";
     it("Prettify own volume name", () => {
-      expect(
-        prettyVolumeName("dncore_gethdnpdappnodeeth_data", dnpName)
-      ).toEqual({
+      expect(prettyVolumeName("dncore_gethdnpdappnodeeth_data", dnpName)).toEqual({
         name: "Data",
         owner: "Geth"
       });

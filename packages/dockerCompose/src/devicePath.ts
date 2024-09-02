@@ -22,19 +22,12 @@ export function getDevicePath({
   volumeName: string;
 }): string {
   if (!path.isAbsolute(mountpoint))
-    throw Error(
-      `mountpoint path for '${dnpName} - ${volumeName}' must be an absolute path: ${mountpoint}`
-    );
+    throw Error(`mountpoint path for '${dnpName} - ${volumeName}' must be an absolute path: ${mountpoint}`);
 
   const stripCharacters = (s: string): string =>
     s.replace(/[`~!@#$%^&*()|+=?;:'",<>{}[\]\\/]/gi, "").replace(/\.+/, ".");
 
-  return path.join(
-    mountpoint,
-    params.MOUNTPOINT_DEVICE_PREFIX,
-    stripCharacters(dnpName),
-    stripCharacters(volumeName)
-  );
+  return path.join(mountpoint, params.MOUNTPOINT_DEVICE_PREFIX, stripCharacters(dnpName), stripCharacters(volumeName));
 }
 
 /**
@@ -58,9 +51,7 @@ export function parseDevicePath(devicePath: string):
     }
   | undefined {
   // The docker API is not perfectly typed, devicePath may be undefined
-  const [mountpoint, dnpNameAndVolumeName] = (devicePath || "").split(
-    "/" + params.MOUNTPOINT_DEVICE_PREFIX + "/"
-  );
+  const [mountpoint, dnpNameAndVolumeName] = (devicePath || "").split("/" + params.MOUNTPOINT_DEVICE_PREFIX + "/");
   if (!dnpNameAndVolumeName) return;
   const [dnpName, volumeName] = (dnpNameAndVolumeName || "").split("/");
   if (!volumeName) return;
@@ -73,9 +64,7 @@ export function parseDevicePath(devicePath: string):
   };
 }
 
-export function parseDevicePathMountpoint(
-  devicePath: string
-): string | undefined {
+export function parseDevicePathMountpoint(devicePath: string): string | undefined {
   const pathParts = parseDevicePath(devicePath);
   return pathParts ? pathParts.mountpoint : undefined;
 }

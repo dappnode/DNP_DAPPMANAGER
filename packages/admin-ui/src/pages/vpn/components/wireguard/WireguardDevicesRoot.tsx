@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React from "react";
 import { useApi } from "api";
 import { useNavigate, Route, Routes } from "react-router-dom";
@@ -18,39 +17,28 @@ export const WireguardDevicesRoot: React.FC = () => {
   const dnpsRequest = useApi.packagesGet();
   const navigate = useNavigate();
 
-  return renderResponse(
-    dnpsRequest,
-    ["Loading installed DAppNode Packages"],
-    dnps => {
-      const wireguardDnp = dnps.find(dnp => dnp.dnpName === wireguardDnpName);
-      if (!wireguardDnp) {
-        return (
-          <>
-            <Title title={title} />
-            <Alert variant="secondary">
-              You must{" "}
-              <a
-                href="#"
-                onClick={() =>
-                  navigate(
-                    `${getInstallerPath(wireguardDnpName)}/${wireguardDnpName}`
-                  )
-                }
-              >
-                install the Wireguard package
-              </a>{" "}
-              to use this feature
-            </Alert>
-          </>
-        );
-      }
-
+  return renderResponse(dnpsRequest, ["Loading installed DAppNode Packages"], (dnps) => {
+    const wireguardDnp = dnps.find((dnp) => dnp.dnpName === wireguardDnpName);
+    if (!wireguardDnp) {
       return (
-        <Routes>
-          <Route path={"/"} element={<WireguardDevicesHome />} />
-          <Route path=":id" element={<WireguardDeviceDetails />} />
-        </Routes>
+        <>
+          <Title title={title} />
+          <Alert variant="secondary">
+            You must{" "}
+            <a href="#" onClick={() => navigate(`${getInstallerPath(wireguardDnpName)}/${wireguardDnpName}`)}>
+              install the Wireguard package
+            </a>{" "}
+            to use this feature
+          </Alert>
+        </>
       );
     }
-  );
+
+    return (
+      <Routes>
+        <Route path={"/"} element={<WireguardDevicesHome />} />
+        <Route path=":id" element={<WireguardDeviceDetails />} />
+      </Routes>
+    );
+  });
 };

@@ -12,10 +12,7 @@ import { startTemperatureDaemon } from "./temperature/index.js";
 
 // DAEMONS EXPORT
 
-export function startDaemons(
-  dappnodeInstaller: DappnodeInstaller,
-  signal: AbortSignal
-): void {
+export function startDaemons(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
   startAutoUpdatesDaemon(dappnodeInstaller, signal);
   startDiskUsageDaemon(signal);
   startDynDnsDaemon(signal);

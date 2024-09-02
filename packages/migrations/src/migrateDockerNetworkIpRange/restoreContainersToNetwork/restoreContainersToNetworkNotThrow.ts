@@ -7,7 +7,7 @@ export async function restoreContainersToNetworkNotThrow({
   containersToRestart,
   network,
   containersToRecreate,
-  aliasesIpsMap,
+  aliasesIpsMap
 }: {
   containersToRestart: string[];
   network: Dockerode.Network;

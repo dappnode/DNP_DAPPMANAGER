@@ -11,18 +11,11 @@ import {
   PackageRequest,
   SetupWizard,
   GrafanaDashboard,
-  PrometheusTarget,
+  PrometheusTarget
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
-import {
-  validateDappnodeCompose,
-  validateManifestSchema,
-} from "@dappnode/schemas";
-import {
-  ComposeEditor,
-  setDappnodeComposeDefaults,
-  writeMetadataToLabels,
-} from "@dappnode/dockercompose";
+import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
+import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
@@ -67,7 +60,7 @@ export class DappnodeInstaller extends DappnodeRepository {
       dnpNameOrHash: name,
       trustedKeys: db.releaseKeysTrusted.get(),
       os: process.arch,
-      version,
+      version
     });
 
     // validate manifest and compose files
@@ -79,7 +72,7 @@ export class DappnodeInstaller extends DappnodeRepository {
       disclaimer: pkgRelease.disclaimer,
       gettingStarted: pkgRelease.gettingStarted,
       grafanaDashboards: pkgRelease.grafanaDashboards,
-      prometheusTargets: pkgRelease.prometheusTargets,
+      prometheusTargets: pkgRelease.prometheusTargets
     });
 
     // set compose to custom dappnode compose in release
@@ -96,16 +89,10 @@ export class DappnodeInstaller extends DappnodeRepository {
   /**
    * Get multiple release assets for multiple requests
    */
-  async getReleases(packages: {
-    [name: string]: string;
-  }): Promise<PackageRelease[]> {
+  async getReleases(packages: { [name: string]: string }): Promise<PackageRelease[]> {
     await this.updateProviders();
 
-    const pkgReleases = await this.getPkgsReleases(
-      packages,
-      db.releaseKeysTrusted.get(),
-      process.arch
-    );
+    const pkgReleases = await this.getPkgsReleases(packages, db.releaseKeysTrusted.get(), process.arch);
 
     // validate manifest and compose files
     pkgReleases.forEach((pkgRelease) => {
@@ -120,7 +107,7 @@ export class DappnodeInstaller extends DappnodeRepository {
         disclaimer: pkgRelease.disclaimer,
         gettingStarted: pkgRelease.gettingStarted,
         grafanaDashboards: pkgRelease.grafanaDashboards,
-        prometheusTargets: pkgRelease.prometheusTargets,
+        prometheusTargets: pkgRelease.prometheusTargets
       });
     });
 
@@ -154,7 +141,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     const releases = await this.getReleases(result.state);
     return {
       ...result,
-      releases,
+      releases
     };
   }
 
@@ -164,7 +151,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     disclaimer,
     gettingStarted,
     prometheusTargets,
-    grafanaDashboards,
+    grafanaDashboards
   }: {
     manifest: Manifest;
     SetupWizard?: SetupWizard;
@@ -177,8 +164,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     if (disclaimer) manifest.disclaimer = { message: disclaimer };
     if (gettingStarted) manifest.gettingStarted = gettingStarted;
     if (prometheusTargets) manifest.prometheusTargets = prometheusTargets;
-    if (grafanaDashboards && grafanaDashboards.length > 0)
-      manifest.grafanaDashboards = grafanaDashboards;
+    if (grafanaDashboards && grafanaDashboards.length > 0) manifest.grafanaDashboards = grafanaDashboards;
 
     return manifest;
   }
@@ -200,20 +186,14 @@ export class DappnodeInstaller extends DappnodeRepository {
     avatarFile: DistributedFile | undefined,
     origin?: string
   ): Compose {
-    const customCompose = new ComposeEditor(
-      setDappnodeComposeDefaults(compose, manifest)
-    );
+    const customCompose = new ComposeEditor(setDappnodeComposeDefaults(compose, manifest));
 
     const services = Object.values(customCompose.services());
     const globalEnvsFromDbPrefixed = computeGlobalEnvsFromDb(true);
     const isCore = getIsCore(manifest);
     const metadata = this.parseMetadataFromManifest(manifest);
     for (const service of services) {
-      service.setGlobalEnvs(
-        manifest.globalEnvs,
-        globalEnvsFromDbPrefixed,
-        isCore
-      );
+      service.setGlobalEnvs(manifest.globalEnvs, globalEnvsFromDbPrefixed, isCore);
 
       service.mergeLabels(
         writeMetadataToLabels({
@@ -232,7 +212,7 @@ export class DappnodeInstaller extends DappnodeRepository {
             services.length === 1
               ? true
               : undefined,
-          dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout),
+          dockerTimeout: parseTimeoutSeconds(metadata.dockerTimeout)
         })
       );
     }
@@ -247,8 +227,7 @@ export class DappnodeInstaller extends DappnodeRepository {
   private fileToMultiaddress(distributedFile?: DistributedFile): string {
     if (!distributedFile || !distributedFile.hash) return "";
 
-    if (distributedFile.source === "ipfs")
-      return `/ipfs/${this.normalizeHash(distributedFile.hash)}`;
+    if (distributedFile.source === "ipfs") return `/ipfs/${this.normalizeHash(distributedFile.hash)}`;
     else return "";
   }
 
@@ -286,16 +265,10 @@ export class DappnodeInstaller extends DappnodeRepository {
     return {
       // TODO: research if this omit can be removed since none packages should have been publish with this
       // format from long time ago
-      ...omit(manifest as ManifestWithImage, [
-        "avatar",
-        "image",
-        "setupSchema",
-        "setupTarget",
-        "setupUiJson",
-      ]),
+      ...omit(manifest as ManifestWithImage, ["avatar", "image", "setupSchema", "setupTarget", "setupUiJson"]),
       ...(setupWizard ? { setupWizard } : {}),
       // ##### Is this necessary? Correct manifest: type missing
-      type: manifest.type || "service",
+      type: manifest.type || "service"
     };
   }
 }

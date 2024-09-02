@@ -1,8 +1,6 @@
 export function parseUpnpErrors(terminalOutput: string): UpnpError {
-  if (isUpnpAvailable(terminalOutput))
-    return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_AVAILABLE);
-  if (isNotExistingPort(terminalOutput))
-    return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_PORT);
+  if (isUpnpAvailable(terminalOutput)) return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_AVAILABLE);
+  if (isNotExistingPort(terminalOutput)) return new UpnpError(terminalOutput, UPnPErrors.UPNP_NOT_PORT);
   return new UpnpError(terminalOutput, UPnPErrors.UNKNOWN);
 }
 

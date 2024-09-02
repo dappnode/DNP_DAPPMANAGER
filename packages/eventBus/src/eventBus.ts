@@ -6,7 +6,7 @@ import {
   ProgressLog,
   UserActionLog,
   PackageNotification,
-  DirectoryItem,
+  DirectoryItem
 } from "@dappnode/types";
 
 interface EventTypes {
@@ -54,18 +54,14 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   runEthClientInstaller: {},
   runEthicalMetricsInstaller: {},
   runNatRenewal: {},
-  runStakerCacheUpdate: {},
+  runStakerCacheUpdate: {}
 };
 
 const eventEmitter = new EventEmitter();
 
 type GetEventBus<T> = {
   [P in keyof T]: {
-    on: (
-      listener: T[P] extends void
-        ? () => void | Promise<void>
-        : (arg: T[P]) => void | Promise<void>
-    ) => void;
+    on: (listener: T[P] extends void ? () => void | Promise<void> : (arg: T[P]) => void | Promise<void>) => void;
     emit: T[P] extends void ? () => void : (arg: T[P]) => void;
   };
 };
@@ -87,6 +83,7 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
        */
       try {
         await listener(...args);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (e) {
         // Do not use logger module to avoud cirucular dependencies
         /**  logs.error(
@@ -99,5 +96,5 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
 
   emit: (...args: EventArg[]): void => {
     eventEmitter.emit(eventName, ...args);
-  },
+  }
 }));

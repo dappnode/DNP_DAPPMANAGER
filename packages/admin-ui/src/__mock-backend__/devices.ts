@@ -8,9 +8,7 @@ const initialDevices: VpnDevice[] = [
   { id: "second-admin", admin: true, hasChangedPassword: false, password }
 ];
 
-const devicesState = new Map<string, VpnDevice>(
-  initialDevices.map(device => [device.id, device])
-);
+const devicesState = new Map<string, VpnDevice>(initialDevices.map((device) => [device.id, device]));
 
 export const devices: Pick<
   Routes,

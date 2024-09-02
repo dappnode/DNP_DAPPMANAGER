@@ -11,19 +11,12 @@ import { forumUrl } from "params";
 
 export default function Ipfs() {
   const ipfsRepository = useApi.ipfsClientTargetGet();
-  const [
-    ipfsClientTarget,
-    setIpfsClientTarget
-  ] = useState<IpfsClientTarget | null>(null);
-  const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string | null>(
-    null
-  );
+  const [ipfsClientTarget, setIpfsClientTarget] = useState<IpfsClientTarget | null>(null);
+  const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string | null>(null);
 
   useEffect(() => {
-    if (ipfsRepository.data)
-      setIpfsClientTarget(ipfsRepository.data.ipfsClientTarget);
-    if (ipfsRepository.data)
-      setIpfsGatewayTarget(ipfsRepository.data.ipfsGateway);
+    if (ipfsRepository.data) setIpfsClientTarget(ipfsRepository.data.ipfsClientTarget);
+    if (ipfsRepository.data) setIpfsGatewayTarget(ipfsRepository.data.ipfsGateway);
   }, [ipfsRepository.data]);
 
   async function changeIpfsClient() {
@@ -48,12 +41,9 @@ export default function Ipfs() {
     <Card className="dappnode-identity">
       <SubTitle>IPFS</SubTitle>
       <div>
-        DAppNode uses IPFS to distribute DAppNode packages in a decentralized
-        way. Choose to connect to a remote IPFS gateway or use your own local
-        IPFS node. More information at:{" "}
-        <LinkDocs href={forumUrl.ipfsRemoteHowTo}>
-          How to use DAppNode IPFS remote
-        </LinkDocs>
+        DAppNode uses IPFS to distribute DAppNode packages in a decentralized way. Choose to connect to a remote IPFS
+        gateway or use your own local IPFS node. More information at:{" "}
+        <LinkDocs href={forumUrl.ipfsRemoteHowTo}>How to use DAppNode IPFS remote</LinkDocs>
       </div>
       {ipfsRepository.data ? (
         <>

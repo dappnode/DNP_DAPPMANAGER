@@ -12,12 +12,7 @@ export const AlertDismissible: React.FC<{
 }> = ({ children, className, variant }) => {
   const [show, setShow] = useState(true);
   return show ? (
-    <Alert
-      variant={variant}
-      onClose={() => setShow(false)}
-      dismissible
-      className={className}
-    >
+    <Alert variant={variant} onClose={() => setShow(false)} dismissible className={className}>
       {children}
     </Alert>
   ) : null;

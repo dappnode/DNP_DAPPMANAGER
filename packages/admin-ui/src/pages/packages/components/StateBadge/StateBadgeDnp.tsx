@@ -15,15 +15,11 @@ export function StateBadgeDnp({ dnp }: { dnp: InstalledPackageData }) {
 
   return (
     <span className="state-badge state-badge-dnp center">
-      {dnp.containers.map(container => {
+      {dnp.containers.map((container) => {
         const { variant, title } = parseContainerState(container);
 
         return (
-          <span
-            key={container.serviceName}
-            className={`state-badge badge-${variant}`}
-            title={title}
-          >
+          <span key={container.serviceName} className={`state-badge badge-${variant}`} title={title}>
             {/* Use a single character to force consistent height */}
             <span className="content">|</span>
           </span>

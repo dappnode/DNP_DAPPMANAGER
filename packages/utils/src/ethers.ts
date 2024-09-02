@@ -44,7 +44,7 @@ export type NetPeersCount = number;
 export function parseEthersSyncing(syncing: EthSyncingReturn): EthSyncing {
   if (!syncing) return false;
 
-  const parsedSyncing = mapValues(syncing, hexValue => {
+  const parsedSyncing = mapValues(syncing, (hexValue) => {
     switch (typeof hexValue) {
       case "string":
         return parseInt(hexValue);

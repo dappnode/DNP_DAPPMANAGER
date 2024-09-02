@@ -28,7 +28,7 @@ export const getHostInfoMemoized = memoize(
       os: info.os.toLowerCase().trim(),
       versionCodename: info.versionCodename.toLowerCase().trim(),
       architecture: info.architecture.toLowerCase().trim(),
-      kernel: info.kernel.toLowerCase().trim(),
+      kernel: info.kernel.toLowerCase().trim()
     };
   },
 

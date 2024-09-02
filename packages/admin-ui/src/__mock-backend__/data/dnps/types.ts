@@ -15,9 +15,7 @@ export interface MockDnp {
   specialPermissions?: SpecialPermission[];
   gettingStarted?: string;
   dependencies?: MockDnp[];
-  installedData?: Partial<
-    InstalledPackageDetailData & { containers: PackageContainer[] }
-  >;
+  installedData?: Partial<InstalledPackageDetailData & { containers: PackageContainer[] }>;
   installedContainers?: { [serviceName: string]: Partial<PackageContainer> };
   requestDnp?: Partial<RequestedDnp>;
 }

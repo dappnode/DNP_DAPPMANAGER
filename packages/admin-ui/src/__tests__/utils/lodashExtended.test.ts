@@ -1,6 +1,6 @@
 import { UserSettingsAllDnps } from "@dappnode/types";
 import deepmerge from "deepmerge";
-import { difference, isDeepEmpty } from "utils/lodashExtended";
+import { difference, isDeepEmpty } from "../../utils/lodashExtended";
 
 describe("lodashExtended", () => {
   describe("difference", () => {
@@ -37,8 +37,7 @@ describe("lodashExtended", () => {
       [dnpName]: {
         fileUploads: {
           [dnpName]: {
-            "/usr/src/app/config.json":
-              "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
+            "/usr/src/app/config.json": "data:text/plain;base64,SGVsbG8sIFdvcmxkIQ%3D%3D"
           }
         }
       },
@@ -56,13 +55,12 @@ describe("lodashExtended", () => {
 
     it("Should return the difference of an object with new keys", () => {
       const newUserSettings = deepmerge(userSettings, additionalUserSettings);
-      expect(difference(userSettings, newUserSettings)).toEqual(
-        additionalUserSettings
-      );
+      expect(difference(userSettings, newUserSettings)).toEqual(additionalUserSettings);
     });
   });
 
   describe("isDeepEmpty", () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const jsons: { json: any; empty: boolean; id: string }[] = [
       // First level
       { id: "Empty object", json: {}, empty: true },

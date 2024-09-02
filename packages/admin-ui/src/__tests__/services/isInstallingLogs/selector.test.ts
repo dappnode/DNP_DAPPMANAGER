@@ -35,9 +35,7 @@ describe("service/isInstallingLogs", () => {
     // Cast Partial state to state to keep the test without writing the rest of the state
     const state = { [mountPoint]: isInstallingLogsState } as Partial<RootState>;
     it("Should a nicely formated object ready to query", () => {
-      expect(getProgressLogsByDnp(state as RootState)).toEqual(
-        progressLogsByDnpExpected
-      );
+      expect(getProgressLogsByDnp(state as RootState)).toEqual(progressLogsByDnpExpected);
     });
 
     it("Should check that dnpName1 is installing", () => {

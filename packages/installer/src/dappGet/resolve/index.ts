@@ -1,9 +1,5 @@
 import verifyState from "./verifyState.js";
-import {
-  getPermutationsTable,
-  getTotalPermutations,
-  getPermutation
-} from "./permutations.js";
+import { getPermutationsTable, getTotalPermutations, getPermutation } from "./permutations.js";
 import { pickBy, mapValues } from "lodash-es";
 import generateErrorMessage from "./generateErrorMessage.js";
 import { DappGetDnps, DappGetErrors } from "../types.js";

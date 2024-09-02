@@ -38,40 +38,40 @@ const dnpList: InstalledPackageData[] = [
     ...mockDnp,
     dependencies: {
       [nginxId]: "latest",
-      "letsencrypt-nginx.dnp.dappnode.eth": "latest",
+      "letsencrypt-nginx.dnp.dappnode.eth": "latest"
     },
     dnpName: "web.dnp.dappnode.eth",
     version: "0.0.0",
-    origin: undefined,
+    origin: undefined
   },
   {
     ...mockDnp,
     dependencies: {},
     dnpName: "vpn.dnp.dappnode.eth",
     version: "0.1.16",
-    origin: undefined,
+    origin: undefined
   },
   {
     ...mockDnp,
     dependencies: { [nginxId]: "latest" },
     dnpName: nginxId,
     version: "0.0.3",
-    origin: undefined,
+    origin: undefined
   },
   {
     ...mockDnp,
     dependencies: { "web.dnp.dappnode.eth": "latest" },
     dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
     version: "0.0.4",
-    origin: "/ipfs/Qm1234",
-  },
+    origin: "/ipfs/Qm1234"
+  }
 ];
 
 const aggregateDependenciesSpy = sinon.spy();
 async function aggregateDependencies({
   name,
   versionRange,
-  dnps,
+  dnps
 }: {
   name: string;
   versionRange: string;
@@ -82,15 +82,15 @@ async function aggregateDependencies({
     dnps[nginxId] = {
       versions: {
         ...(dnps[nginxId] ? dnps[nginxId].versions || {} : {}),
-        "0.1.0": { [depId]: "^0.1.1" },
-      },
+        "0.1.0": { [depId]: "^0.1.1" }
+      }
     };
     dnps[depId] = {
       versions: {
         ...(dnps[depId] ? dnps[depId].versions || {} : {}),
         "0.1.1": {},
-        "0.1.2": {},
-      },
+        "0.1.2": {}
+      }
     };
     return;
   }
@@ -99,20 +99,15 @@ async function aggregateDependencies({
     dnps[dnp.dnpName] = {
       versions: {
         ...(dnps[dnp.dnpName] ? dnps[dnp.dnpName].versions || {} : {}),
-        [dnp.version]: dnp.dependencies,
-      },
+        [dnp.version]: dnp.dependencies
+      }
     };
   }
 }
 
 function getRelevantInstalledDnps(): InstalledPackageData[] {
-  const relevantInstalledDnpNames = [
-    "web.dnp.dappnode.eth",
-    "letsencrypt-nginx.dnp.dappnode.eth",
-  ];
-  return dnpList.filter((dnp) =>
-    relevantInstalledDnpNames.includes(dnp.dnpName)
-  );
+  const relevantInstalledDnpNames = ["web.dnp.dappnode.eth", "letsencrypt-nginx.dnp.dappnode.eth"];
+  return dnpList.filter((dnp) => relevantInstalledDnpNames.includes(dnp.dnpName));
 }
 
 const dappGetFetcherEmpty = new DappGetFetcherMock({});
@@ -124,18 +119,10 @@ describe.skip("dappGet/aggregate", () => {
     const mock = await rewiremock.around(
       () => import("../../../../src/dappGet/aggregate/index.js"),
       (mock) => {
-        mock(
-          () =>
-            import(
-              "../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js"
-            )
-        )
+        mock(() => import("../../../../src/dappGet/aggregate/getRelevantInstalledDnps.js"))
           .withDefault(getRelevantInstalledDnps)
           .toBeUsed();
-        mock(
-          () =>
-            import("../../../../src/dappGet/aggregate/aggregateDependencies.js")
-        )
+        mock(() => import("../../../../src/dappGet/aggregate/aggregateDependencies.js"))
           .withDefault(aggregateDependencies)
           .toBeUsed();
       }
@@ -146,21 +133,19 @@ describe.skip("dappGet/aggregate", () => {
   it("Should label the packages correctly", async () => {
     const req = {
       name: nginxId,
-      ver: "^0.1.0",
+      ver: "^0.1.0"
     };
 
     const dappnodeInstaller = new DappnodeInstaller(
       "https://api.ipfs.dappnode.io",
-      new ethers.JsonRpcProvider(
-        `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
-      )
+      new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`)
     );
 
     const dnps = await aggregate({
       req,
       dnpList,
       dappGetFetcher: dappGetFetcherEmpty,
-      dappnodeInstaller,
+      dappnodeInstaller
     });
 
     expect(dnps).to.deep.equal(
@@ -168,34 +153,34 @@ describe.skip("dappGet/aggregate", () => {
         [depId]: {
           versions: {
             "0.1.1": {},
-            "0.1.2": {},
-          },
+            "0.1.2": {}
+          }
         },
         "letsencrypt-nginx.dnp.dappnode.eth": {
           isInstalled: true,
           versions: {
             "0.0.4": {
-              "web.dnp.dappnode.eth": "*",
-            },
-          },
+              "web.dnp.dappnode.eth": "*"
+            }
+          }
         },
         [nginxId]: {
           isRequest: true,
           versions: {
             "0.1.0": {
-              [depId]: "^0.1.1",
-            },
-          },
+              [depId]: "^0.1.1"
+            }
+          }
         },
         "web.dnp.dappnode.eth": {
           isInstalled: true,
           versions: {
             "0.0.0": {
               "letsencrypt-nginx.dnp.dappnode.eth": "latest",
-              [nginxId]: "latest",
-            },
-          },
-        },
+              [nginxId]: "latest"
+            }
+          }
+        }
       },
       "Should label the packages correctly"
     );
@@ -204,25 +189,18 @@ describe.skip("dappGet/aggregate", () => {
       // For user request, the version range is the one set by the user
       { name: nginxId, versionRange: "^0.1.0" },
       // For state packages, the version range is greater or equal than the current
-      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" },
+      { name: "web.dnp.dappnode.eth", versionRange: ">=0.0.0" }
       // For state packages, if there is a specified origin, use cached local dependencies
       // {
       //   name: "letsencrypt-nginx.dnp.dappnode.eth",
       //   versionRange: "/ipfs/Qm1234"
       // }
     ];
-    sinon.assert.callCount(
-      aggregateDependenciesSpy,
-      dnpAggregateDependenciesCalls.length
-    );
+    sinon.assert.callCount(aggregateDependenciesSpy, dnpAggregateDependenciesCalls.length);
 
     dnpAggregateDependenciesCalls.forEach((callArgs, i) => {
-      const { name, versionRange } =
-        aggregateDependenciesSpy.getCall(i).lastArg;
-      expect({ name, versionRange }).to.deep.equal(
-        callArgs,
-        `Wrong arguments for call ${i} to aggregateDependencies`
-      );
+      const { name, versionRange } = aggregateDependenciesSpy.getCall(i).lastArg;
+      expect({ name, versionRange }).to.deep.equal(callArgs, `Wrong arguments for call ${i} to aggregateDependencies`);
     });
   });
 });

@@ -19,9 +19,7 @@ import { ethers } from "ethers";
 
 export const dappnodeInstaller = new DappnodeInstaller(
   "https://api.ipfs.dappnode.io",
-  new ethers.JsonRpcProvider(
-    `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
-  )
+  new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`)
 );
 
 export const testDir = "./test_files/";
@@ -31,9 +29,7 @@ const testMountpoint = "./test_mountpoints";
 export const manifestFileName = "dappnode_package.json";
 export const composeFileName = "docker-compose.yml";
 
-export const beforeAndAfter = (
-  ...args: Parameters<Mocha.HookFunction>
-): void => {
+export const beforeAndAfter = (...args: Parameters<Mocha.HookFunction>): void => {
   before(...args);
   after(...args);
 };
@@ -55,6 +51,7 @@ function ignoreErrors<A, R>(fn: (arg: A) => R) {
       return await fn(arg);
     } catch (e) {
       // Ignore
+      console.error(e);
     }
   };
 }
@@ -73,19 +70,13 @@ export async function cleanRepos(): Promise<void> {
   await shell(`rm -rf ${params.REPO_DIR} ${params.DNCORE_DIR}/*.yml`);
 }
 
-export async function cleanContainers(
-  ...containerIds: string[]
-): Promise<void> {
+export async function cleanContainers(...containerIds: string[]): Promise<void> {
   for (const containerId of containerIds) {
     // Clean containers
-    await shellSafe(
-      `docker rm -f -v $(docker ps -aq --filter name=${containerId})`
-    );
+    await shellSafe(`docker rm -f -v $(docker ps -aq --filter name=${containerId})`);
     // Clean associated volumes
     const volumePrefix = containerId;
-    await shellSafe(
-      `docker volume rm -f $(docker volume ls --filter name=${volumePrefix} -q)`
-    );
+    await shellSafe(`docker volume rm -f $(docker volume ls --filter name=${volumePrefix} -q)`);
   }
 }
 
@@ -157,9 +148,7 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
       Id: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
       ParentId: "",
       RepoTags: ["busybox:latest"],
-      RepoDigests: [
-        "busybox@sha256:a59906e33509d14c036c8678d687bd4eec81ed7c4b8ce907b888c607f6a1e0e6"
-      ],
+      RepoDigests: ["busybox@sha256:a59906e33509d14c036c8678d687bd4eec81ed7c4b8ce907b888c607f6a1e0e6"],
       Created: 1466724217,
       Size: 101010101,
       SharedSize: 0,
@@ -173,8 +162,7 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
       Id: "e575172ed11dc01bfce087fb27bee502db149e1a0fad7c296ad300bbff178148",
       Names: ["/top"],
       Image: "busybox",
-      ImageID:
-        "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
+      ImageID: "sha256:2b8fd9751c4c0f5dd266fcae00707e67a2545ef34f9a29354585f93dac906749",
       Command: "top",
       Created: 1472592424,
       SizeRootFs: 101010101,
@@ -190,10 +178,8 @@ export const mockDockerSystemDfDataSample: DockerApiSystemDfReturn = {
             IPAMConfig: null,
             Links: null,
             Aliases: null,
-            NetworkID:
-              "d687bc59335f0e5c9ee8193e5612e8aee000c8c62ea170cfb99c098f95899d92",
-            EndpointID:
-              "8ed5115aeaad9abb174f68dcf135b49f11daf597678315231a32ca28441dec6a",
+            NetworkID: "d687bc59335f0e5c9ee8193e5612e8aee000c8c62ea170cfb99c098f95899d92",
+            EndpointID: "8ed5115aeaad9abb174f68dcf135b49f11daf597678315231a32ca28441dec6a",
             Gateway: "172.18.0.1",
             IPAddress: "172.18.0.2",
             IPPrefixLen: 16,

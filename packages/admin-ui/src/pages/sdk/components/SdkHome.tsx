@@ -25,37 +25,24 @@ export default function SdkHome() {
       <SubTitle>What is the SDK?</SubTitle>
       <Card>
         <p>
-          The Dappnode Software Development Kit (dappnodesdk) is a tool to make
-          as simple as possible the creation of new Dappnode packages. It helps
-          to initialize and publish an Aragon Package Manager Repo in the
-          Ethereum mainnet.
+          The Dappnode Software Development Kit (dappnodesdk) is a tool to make as simple as possible the creation of
+          new Dappnode packages. It helps to initialize and publish an Aragon Package Manager Repo in the Ethereum
+          mainnet.
         </p>
         <p>
-          We have deployed a public APM (Aragon Package Manager) registry in
-          which anyone can create their own APM repository:{" "}
-          <a href="https://etherscan.io/address/public.dappnode.eth">
-            public.dappnode.eth
-          </a>
+          We have deployed a public APM (Aragon Package Manager) registry in which anyone can create their own APM
+          repository: <a href="https://etherscan.io/address/public.dappnode.eth">public.dappnode.eth</a>
         </p>
-        <div
-          className="alert alert-secondary"
-          role="alert"
-          style={{ backgroundColor: "#f1f1f3" }}
-        >
-          The <strong>dappnodesdk</strong> is a <strong>CLI tool</strong>. This
-          section provides only additional complimentary functionality
+        <div className="alert alert-secondary" role="alert" style={{ backgroundColor: "#f1f1f3" }}>
+          The <strong>dappnodesdk</strong> is a <strong>CLI tool</strong>. This section provides only additional
+          complimentary functionality
         </div>
         <p>
-          The dappnodesdk can be installed locally with npm. Then you can
-          initialize a Dappnode Package, build it's docker image and publish it
-          on the Aragon Package Manager (APM) on the Ethereum mainnet
+          The dappnodesdk can be installed locally with npm. Then you can initialize a Dappnode Package, build it's
+          docker image and publish it on the Aragon Package Manager (APM) on the Ethereum mainnet
         </p>
 
-        <a
-          className="btn btn-outline-secondary float-right"
-          href={sdkGuideUrl}
-          {...newTabProps}
-        >
+        <a className="btn btn-outline-secondary float-right" href={sdkGuideUrl} {...newTabProps}>
           Full Guide
         </a>
       </Card>

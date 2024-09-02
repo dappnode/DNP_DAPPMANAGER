@@ -29,8 +29,7 @@ export async function wifiReportGet(): Promise<WifiReport> {
       info = "Wifi restarting. Wait until it starts";
       break;
     case "dead":
-      info =
-        "Wifi service dead, you must manually remove it and install it again";
+      info = "Wifi service dead, you must manually remove it and install it again";
       report = {
         lastLog: parseWifiLogs(await getWifiLastLog()),
         exitCode: wifiContainer.exitCode
@@ -61,13 +60,8 @@ export async function wifiCredentialsGet(): Promise<CurrentWifiCredentials> {
   const composeWifi = new ComposeFileEditor(params.wifiDnpName, true);
   const wifiService = composeWifi.services()[params.wifiDnpName];
   const wifiEnvs = wifiService.getEnvs();
-  if (
-    wifiEnvs[params.WIFI_KEY_SSID] === undefined ||
-    wifiEnvs[params.WIFI_KEY_PASSWORD] === undefined
-  )
-    throw Error(
-      "Wifi SSID and/or Wifi password does not exist on compose file"
-    );
+  if (wifiEnvs[params.WIFI_KEY_SSID] === undefined || wifiEnvs[params.WIFI_KEY_PASSWORD] === undefined)
+    throw Error("Wifi SSID and/or Wifi password does not exist on compose file");
   return {
     ssid: wifiEnvs[params.WIFI_KEY_SSID],
     password: wifiEnvs[params.WIFI_KEY_PASSWORD]

@@ -12,17 +12,16 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
       get: (): EthClientSyncedNotificationStatus => notificationStatus,
       set: (newValue: EthClientSyncedNotificationStatus): void => {
         notificationStatus = newValue;
-      },
+      }
     };
 
     const notificationEmit = sinon.stub();
     const mockEventBus: EventBus = {
       ...eventBus,
       notification: {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         on: (): void => {},
-        emit: notificationEmit,
-      },
+        emit: notificationEmit
+      }
     };
 
     const { emitSyncedNotification } = await rewiremock.around(
@@ -40,75 +39,60 @@ describe.skip("modules / ethClient / emitSyncedNotification", () => {
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
       },
       { ok: false, code: "IS_SYNCING" }
     );
-    expect(notificationEmit.callCount).to.equal(
-      0,
-      "Should not emit when syncing"
-    );
+    expect(notificationEmit.callCount).to.equal(0, "Should not emit when syncing");
 
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
       },
       { ok: true, url: "", dnpName: "" }
     );
-    expect(notificationEmit.callCount).to.equal(
-      1,
-      "Should emit when sync is complete"
-    );
+    expect(notificationEmit.callCount).to.equal(1, "Should emit when sync is complete");
 
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
       },
       { ok: true, url: "", dnpName: "" }
     );
-    expect(notificationEmit.callCount).to.equal(
-      1,
-      "Should not emit again on complete"
-    );
+    expect(notificationEmit.callCount).to.equal(1, "Should not emit again on complete");
 
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
       },
       { ok: false, code: "IS_SYNCING" }
     );
     emitSyncedNotification(
       {
         execClient: "geth.dnp.dappnode.eth",
-        consClient: "lighthouse.dnp.dappnode.eth",
+        consClient: "lighthouse.dnp.dappnode.eth"
       },
       { ok: true, url: "", dnpName: "" }
     );
-    expect(notificationEmit.callCount).to.equal(
-      1,
-      "Should not emit again after synced"
-    );
+    expect(notificationEmit.callCount).to.equal(1, "Should not emit again after synced");
 
     emitSyncedNotification(
       {
         execClient: "nethermind.public.dappnode.eth",
-        consClient: "nimbus.dnp.dappnode.eth",
+        consClient: "nimbus.dnp.dappnode.eth"
       },
       { ok: false, code: "IS_SYNCING" }
     );
     emitSyncedNotification(
       {
         execClient: "nethermind.public.dappnode.eth",
-        consClient: "nimbus.dnp.dappnode.eth",
+        consClient: "nimbus.dnp.dappnode.eth"
       },
       { ok: true, url: "", dnpName: "" }
     );
-    expect(notificationEmit.callCount).to.equal(
-      2,
-      "Should emit when changing target"
-    );
+    expect(notificationEmit.callCount).to.equal(2, "Should emit when changing target");
   });
 });

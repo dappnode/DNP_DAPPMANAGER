@@ -67,28 +67,20 @@ function Modal({
     <div
       className="confirm-dialog-root"
       ref={modalEl}
-      onClick={e => {
+      onClick={(e) => {
         if (modalEl.current === e.target) onClose();
       }}
     >
       <div className="dialog no-p-style">
         {title && <h3 className="title">{title}</h3>}
-        {text && (
-          <div className="text">
-            {typeof text === "string" ? <RenderMarkdown source={text} /> : text}
-          </div>
-        )}
+        {text && <div className="text">{typeof text === "string" ? <RenderMarkdown source={text} /> : text}</div>}
         {list && Array.isArray(list) && list.length > 0 && (
           <div className="list">
             {list.map((item, i) => (
               <div key={i} className="list-item">
                 <strong>{item.title}</strong>
                 <div className="text">
-                  {typeof item.body === "string" ? (
-                    <RenderMarkdown source={item.body} />
-                  ) : (
-                    item.body
-                  )}
+                  {typeof item.body === "string" ? <RenderMarkdown source={item.body} /> : item.body}
                 </div>
               </div>
             ))}
@@ -127,14 +119,11 @@ export function confirm(props: ConfirmDialogProps) {
     document.body.appendChild(root);
   }
   // render (or re-render) and mount the dialog
-  render(
-    <Modal {...props} onClose={() => unmountComponentAtNode(root)} />,
-    root
-  );
+  render(<Modal {...props} onClose={() => unmountComponentAtNode(root)} />, root);
 }
 
 export function confirmPromise(props: ConfirmDialogProps): Promise<void> {
-  return new Promise<void>(resolve =>
+  return new Promise<void>((resolve) =>
     confirm({
       ...props,
       onClick: resolve

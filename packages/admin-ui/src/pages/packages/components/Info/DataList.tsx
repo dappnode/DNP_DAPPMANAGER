@@ -1,12 +1,6 @@
 import React from "react";
 
-export function DataList({
-  title,
-  data
-}: {
-  title: string;
-  data: React.ReactElement[];
-}) {
+export function DataList({ title, data }: { title: string; data: React.ReactElement[] }) {
   if (!data.length) return null;
   return (
     <div>

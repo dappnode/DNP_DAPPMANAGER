@@ -2,51 +2,44 @@ import "mocha";
 import { CID } from "kubo-rpc-client";
 import { ethers } from "ethers";
 import { expect } from "chai";
-import {
-  ReleaseSignature,
-  ReleaseSignatureStatusCode,
-  TrustedReleaseKey,
-} from "@dappnode/types";
+import { ReleaseSignature, ReleaseSignatureStatusCode, TrustedReleaseKey } from "@dappnode/types";
 import { IPFSEntry } from "../../src/repository/types.js";
-import {
-  serializeIpfsDirectory,
-  getReleaseSignatureStatus,
-} from "../../src/repository/releaseSignature.js";
+import { serializeIpfsDirectory, getReleaseSignatureStatus } from "../../src/repository/releaseSignature.js";
 
 describe("modules / release / verifyReleaseSignature", () => {
   const files: IPFSEntry[] = [
     {
       name: "avatar.png",
-      hash: "QmfTpBLzoSdrG88ETRnDus27DTDRUrTXyyVmhXDuMNYVaN",
+      hash: "QmfTpBLzoSdrG88ETRnDus27DTDRUrTXyyVmhXDuMNYVaN"
     },
     {
       name: "dappmanager.dnp.dappnode.eth_0.2.43.tar.xz",
-      hash: "QmbaLry6tVScoBXgcSHmdH7fGrFKdhfxWSDGiWMDUUaP8U",
+      hash: "QmbaLry6tVScoBXgcSHmdH7fGrFKdhfxWSDGiWMDUUaP8U"
     },
     {
       name: "dappmanager.dnp.dappnode.eth_0.2.43_linux-amd64.txz",
-      hash: "QmbaLry6tVScoBXgcSHmdH7fGrFKdhfxWSDGiWMDUUaP8U",
+      hash: "QmbaLry6tVScoBXgcSHmdH7fGrFKdhfxWSDGiWMDUUaP8U"
     },
     {
       name: "dappmanager.dnp.dappnode.eth_0.2.43_linux-arm64.txz",
-      hash: "QmaGWq3zhwpoGQhg78c1H8nLUeEv892i5pFndpPvwz8GuM",
+      hash: "QmaGWq3zhwpoGQhg78c1H8nLUeEv892i5pFndpPvwz8GuM"
     },
     {
       name: "dappnode_package.json",
-      hash: "QmUPXWJ29dm5Rifwn6SD7w8J6LUKUQmf9bHeFFNB1fB9KN",
+      hash: "QmUPXWJ29dm5Rifwn6SD7w8J6LUKUQmf9bHeFFNB1fB9KN"
     },
     {
       name: "signature.json",
-      hash: "QmaonPyyb1N74GiPJLUjQ7E6sepmSSRi5VgSaZnn3YP16x",
-    },
+      hash: "QmaonPyyb1N74GiPJLUjQ7E6sepmSSRi5VgSaZnn3YP16x"
+    }
   ].map((file) => ({
     name: file.name,
     path: "QmRhdmquYoiMR5GB2dKqhLipMzdFUeyZ2eSVvTLDvndTvh/-----------",
     size: 1000,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
     cid: CID.parse(file.hash),
     type: "file",
-    depth: 1,
+    depth: 1
   }));
 
   it("serialize ipfs directory v0 base58btc", () => {
@@ -58,7 +51,7 @@ dappnode_package.json QmUPXWJ29dm5Rifwn6SD7w8J6LUKUQmf9bHeFFNB1fB9KN`;
 
     const serialized = serializeIpfsDirectory(files, {
       version: 0,
-      base: "base58btc",
+      base: "base58btc"
     });
     expect(serialized).to.equal(serializedExpected);
   });
@@ -72,7 +65,7 @@ dappnode_package.json bafybeicz4k4adz7g6ketn6ogv2ot7hvklfgv6ovtjrzq24ez7urphanmh
 
     const serialized = serializeIpfsDirectory(files, {
       version: 1,
-      base: "base32",
+      base: "base32"
     });
     expect(serialized).to.equal(serializedExpected);
   });
@@ -81,8 +74,7 @@ dappnode_package.json bafybeicz4k4adz7g6ketn6ogv2ot7hvklfgv6ovtjrzq24ez7urphanmh
     const cidOpts: ReleaseSignature["cid"] = { version: 0, base: "base58btc" };
     const signedData = serializeIpfsDirectory(files, cidOpts);
 
-    const privateKey =
-      "0x0123456789012345678901234567890123456789012345678901234567890123";
+    const privateKey = "0x0123456789012345678901234567890123456789012345678901234567890123";
     const wallet = new ethers.Wallet(privateKey);
 
     // Sign the string message
@@ -93,7 +85,7 @@ dappnode_package.json bafybeicz4k4adz7g6ketn6ogv2ot7hvklfgv6ovtjrzq24ez7urphanmh
       version: 1,
       cid: cidOpts,
       signature_protocol: "ECDSA_256",
-      signature: flatSig,
+      signature: flatSig
     };
 
     const dnpName = "dappmanager.dnp.dappnode.eth";
@@ -102,18 +94,14 @@ dappnode_package.json bafybeicz4k4adz7g6ketn6ogv2ot7hvklfgv6ovtjrzq24ez7urphanmh
       name: "DAppNode association",
       signatureProtocol: "ECDSA_256",
       dnpNameSuffix: ".dnp.dappnode.eth",
-      key: wallet.address,
+      key: wallet.address
     };
 
-    const signatureStatus = getReleaseSignatureStatus(
-      dnpName,
-      { signature, signedData },
-      [trustedKey]
-    );
+    const signatureStatus = getReleaseSignatureStatus(dnpName, { signature, signedData }, [trustedKey]);
 
     expect(signatureStatus).to.deep.equal({
       status: ReleaseSignatureStatusCode.signedByKnownKey,
-      keyName: trustedKey.name,
+      keyName: trustedKey.name
     });
   });
 });

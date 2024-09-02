@@ -21,11 +21,7 @@ import { GoCopy } from "react-icons/go";
 import { urlJoin } from "utils/url";
 import { VpnDeviceCredentials } from "@dappnode/types";
 
-function OpenVpnDeviceDetailsLoaded({
-  device
-}: {
-  device: VpnDeviceCredentials;
-}) {
+function OpenVpnDeviceDetailsLoaded({ device }: { device: VpnDeviceCredentials }) {
   const [showQr, setShowQr] = useState(false);
   const { id, url } = device;
 
@@ -66,15 +62,12 @@ function OpenVpnDeviceDetailsLoaded({
         />
       </Form.Group>
 
-      <Button onClick={() => setShowQr(!showQr)}>
-        {showQr ? "Hide" : "Show"} VPN credentials URL QR code
-      </Button>
+      <Button onClick={() => setShowQr(!showQr)}>{showQr ? "Hide" : "Show"} VPN credentials URL QR code</Button>
 
       {device.admin ? (
         device.hasChangedPassword ? (
           <Alert variant="info">
-            This admin user has already changed the password. Only the initial
-            auto-generated password is visible
+            This admin user has already changed the password. Only the initial auto-generated password is visible
           </Alert>
         ) : (
           <>
@@ -87,10 +80,7 @@ function OpenVpnDeviceDetailsLoaded({
                 className="copy-input"
                 append={
                   <>
-                    <Button
-                      className="copy-input-copy"
-                      data-clipboard-text={device.id}
-                    >
+                    <Button className="copy-input-copy" data-clipboard-text={device.id}>
                       <GoCopy />
                     </Button>
                   </>
@@ -106,10 +96,7 @@ function OpenVpnDeviceDetailsLoaded({
                 className="copy-input"
                 append={
                   <>
-                    <Button
-                      className="copy-input-copy"
-                      data-clipboard-text={device.password}
-                    >
+                    <Button className="copy-input-copy" data-clipboard-text={device.password}>
                       <GoCopy />
                     </Button>
                   </>
@@ -123,8 +110,7 @@ function OpenVpnDeviceDetailsLoaded({
       {showQr && url && <QrCode url={url} width={"400px"} />}
 
       <div className="alert alert-secondary" role="alert">
-        Beware of shoulder surfing attacks (unsolicited observers), This data
-        grants admin access to your DAppNode
+        Beware of shoulder surfing attacks (unsolicited observers), This data grants admin access to your DAppNode
       </div>
     </Card>
   );

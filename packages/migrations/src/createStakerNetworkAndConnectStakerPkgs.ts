@@ -19,7 +19,7 @@ export async function createStakerNetworkAndConnectStakerPkgs(
       await execution.persistSelectedExecutionIfInstalled(network),
       await consensus.persistSelectedConsensusIfInstalled(network),
       await signer.persistSignerIfInstalledAndRunning(network),
-      await mevBoost.persistMevBoostIfInstalledAndRunning(network),
+      await mevBoost.persistMevBoostIfInstalledAndRunning(network)
     ]);
   }
 }
@@ -39,8 +39,8 @@ async function createDockerStakerNetwork(network: string): Promise<void> {
         Name: network,
         Driver: "bridge",
         IPAM: {
-          Driver: "default",
-        },
+          Driver: "default"
+        }
       });
     } else {
       logs.error(`Failed to create docker network ${network}`);

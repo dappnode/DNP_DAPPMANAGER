@@ -10,11 +10,7 @@ import { prettyDnpName } from "utils/format";
 import { MdAdd, MdClose } from "react-icons/md";
 // Style
 import "./network.scss";
-import {
-  InstalledPackageData,
-  PortMapping,
-  PortProtocol
-} from "@dappnode/types";
+import { InstalledPackageData, PortMapping, PortProtocol } from "@dappnode/types";
 
 const maxPortNumber = 32768 - 1;
 const maxEphemeralPortNumber = 65535;
@@ -69,17 +65,15 @@ export function PortsByService({
       protocol: PortProtocol.TCP,
       deletable: true
     };
-    setPorts(ps => [...ps, newPort]);
+    setPorts((ps) => [...ps, newPort]);
   }
 
   function editPort(i: number, data: Partial<PortMapping>) {
-    setPorts(ps =>
-      ps.map((p, _i): PortMapping => (i === _i ? { ...p, ...data } : p))
-    );
+    setPorts((ps) => ps.map((p, _i): PortMapping => (i === _i ? { ...p, ...data } : p)));
   }
 
   function removePort(i: number) {
-    setPorts(ps =>
+    setPorts((ps) =>
       ps.filter(({ deletable }, _i) => {
         return _i !== i || !deletable;
       })
@@ -88,7 +82,7 @@ export function PortsByService({
 
   function getDuplicatedContainerPorts(): PortMapping[] {
     const existingPorts = new Set<string>();
-    return ports.filter(port => {
+    return ports.filter((port) => {
       if (port.container) {
         const key = `${port.container}-${port.protocol}`;
         if (existingPorts.has(key)) return true;
@@ -100,7 +94,7 @@ export function PortsByService({
 
   function getDuplicatedHostPorts(): PortMapping[] {
     const existingPorts = new Set<string>();
-    return ports.filter(port => {
+    return ports.filter((port) => {
       if (port.host) {
         const key = `${port.host}-${port.protocol}`;
         if (existingPorts.has(key)) return true;
@@ -123,15 +117,13 @@ export function PortsByService({
   function getPortsOverTheMax(): PortMapping[] {
     return ports.filter(
       ({ host, container, deletable }) =>
-        (deletable &&
-          (container > maxPortNumber || (host && host > maxPortNumber))) ||
+        (deletable && (container > maxPortNumber || (host && host > maxPortNumber))) ||
         (host && host > maxEphemeralPortNumber)
     );
   }
 
   const areNewMappingsInvalid = ports.some(
-    ({ container, protocol, deletable }) =>
-      deletable && (!container || !protocol)
+    ({ container, protocol, deletable }) => deletable && (!container || !protocol)
   );
   const duplicatedContainerPorts = getDuplicatedContainerPorts();
   const duplicatedHostPorts = getDuplicatedHostPorts();
@@ -154,9 +146,7 @@ export function PortsByService({
   for (const conflictingPort of conflictingPorts) {
     const portName = `${conflictingPort.host}/${conflictingPort.protocol}`;
     const ownerName = prettyDnpName(conflictingPort.owner);
-    errors.push(
-      `Port ${portName} is already mapped by the DAppNode Package ${ownerName}`
-    );
+    errors.push(`Port ${portName} is already mapped by the DAppNode Package ${ownerName}`);
   }
 
   for (const portOverTheMax of portsOverTheMax)
@@ -192,9 +182,7 @@ export function PortsByService({
                 <Input
                   placeholder="Ephemeral port if unspecified"
                   value={host || ""}
-                  onValueChange={(value: string) =>
-                    editPort(i, { host: parseInt(value) || undefined })
-                  }
+                  onValueChange={(value: string) => editPort(i, { host: parseInt(value) || undefined })}
                 />
               </td>
               <td>
@@ -202,16 +190,10 @@ export function PortsByService({
                   <Input
                     placeholder="enter container port..."
                     value={container}
-                    onValueChange={(value: string) =>
-                      editPort(i, { container: parseInt(value) || undefined })
-                    }
+                    onValueChange={(value: string) => editPort(i, { container: parseInt(value) || undefined })}
                   />
                 ) : (
-                  <Input
-                    lock={true}
-                    value={container}
-                    onValueChange={() => {}}
-                  />
+                  <Input lock={true} value={container} onValueChange={() => {}} />
                 )}
               </td>
               <td>
@@ -221,26 +203,18 @@ export function PortsByService({
                     value={protocol}
                     onValueChange={(value: string) =>
                       editPort(i, {
-                        protocol:
-                          value === "UDP" ? PortProtocol.UDP : PortProtocol.TCP
+                        protocol: value === "UDP" ? PortProtocol.UDP : PortProtocol.TCP
                       })
                     }
                   />
                 ) : (
-                  <Input
-                    lock={true}
-                    value={protocol}
-                    onValueChange={() => {}}
-                  />
+                  <Input lock={true} value={protocol} onValueChange={() => {}} />
                 )}
               </td>
 
               {deletable && (
                 <td className="delete">
-                  <Button
-                    className="network-delete-port-row"
-                    onClick={() => removePort(i)}
-                  >
+                  <Button className="network-delete-port-row" onClick={() => removePort(i)}>
                     <MdClose />
                   </Button>
                 </td>
@@ -250,18 +224,14 @@ export function PortsByService({
         </tbody>
       </table>
 
-      {errors.map(error => (
+      {errors.map((error) => (
         <div className="error" key={error}>
           {error}
         </div>
       ))}
 
       <div className="button-row">
-        <Button
-          variant={"dappnode"}
-          onClick={onUpdateEnvsSubmit}
-          disabled={disableUpdate}
-        >
+        <Button variant={"dappnode"} onClick={onUpdateEnvsSubmit} disabled={disableUpdate}>
           Update port mappings
         </Button>
 
@@ -278,11 +248,7 @@ export function PortsByService({
  * @param portMappings
  */
 function portsToId(portMappings: PortMapping[]): string {
-  return portMappings
-    .map(({ host, container, protocol }) =>
-      [host, container, protocol].join("")
-    )
-    .join("");
+  return portMappings.map(({ host, container, protocol }) => [host, container, protocol].join("")).join("");
 }
 
 /**
@@ -296,8 +262,7 @@ function getHostPortMappings(dnps: InstalledPackageData[]) {
   const hostPortMappings: { [portId: string]: string } = {};
   for (const dnp of dnps)
     for (const container of dnp.containers)
-      for (const port of container.ports || [])
-        if (port.host) hostPortMappings[getHostPortId(port)] = dnp.dnpName;
+      for (const port of container.ports || []) if (port.host) hostPortMappings[getHostPortId(port)] = dnp.dnpName;
   return hostPortMappings;
 }
 

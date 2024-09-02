@@ -22,8 +22,7 @@ import { getEthClientTarget } from "services/dappnodeStatus/selectors";
 
 export const fallbackToBoolean = (fallback: EthClientFallback): boolean =>
   fallback === "on" ? true : fallback === "off" ? false : false;
-export const booleanToFallback = (bool: boolean): EthClientFallback =>
-  bool ? "on" : "off";
+export const booleanToFallback = (bool: boolean): EthClientFallback => (bool ? "on" : "off");
 
 /**
  * Get client type from a target
@@ -37,9 +36,7 @@ export function getEthClientType(target: Eth2ClientTarget): string {
   }
 }
 
-export function getEthClientPrettyStatusError(
-  statusError: EthClientStatusError
-): string {
+export function getEthClientPrettyStatusError(statusError: EthClientStatusError): string {
   switch (statusError.code) {
     case "UNKNOWN_ERROR":
       return `unknown error: ${(statusError.error || {}).message}`;
@@ -186,7 +183,7 @@ function EthMultiClients({
         }
         const getSvgClass = (_highlight: keyof EthClientDataStats) =>
           joinCssClass({
-            active: highlights.find(highlight => highlight === _highlight)
+            active: highlights.find((highlight) => highlight === _highlight)
           });
         return (
           <Card
@@ -221,54 +218,39 @@ function EthMultiClients({
               </div>
             )}
 
-            {selected &&
-              selectedTarget &&
-              selectedTarget !== "remote" &&
-              options !== "remote" && (
-                <>
-                  <Select
-                    value={
-                      selectedTarget && prettyDnpName(selectedTarget.execClient)
+            {selected && selectedTarget && selectedTarget !== "remote" && options !== "remote" && (
+              <>
+                <Select
+                  value={selectedTarget && prettyDnpName(selectedTarget.execClient)}
+                  options={options.execClients.filter(Boolean).map(prettyDnpName)}
+                  onValueChange={(newOpt: string) => {
+                    const newEc = Object.values(ExecutionClientMainnet).find((ec) => prettyDnpName(ec) === newOpt);
+                    if (newEc) {
+                      onTargetChange({
+                        ...(selectedTarget || {}),
+                        execClient: newEc
+                      });
                     }
-                    options={options.execClients
-                      .filter(Boolean)
-                      .map(prettyDnpName)}
-                    onValueChange={(newOpt: string) => {
-                      const newEc = Object.values(ExecutionClientMainnet).find(
-                        ec => prettyDnpName(ec) === newOpt
-                      );
-                      if (newEc) {
-                        onTargetChange({
-                          ...(selectedTarget || {}),
-                          execClient: newEc
-                        });
-                      }
-                    }}
-                    prepend="Execution client"
-                  />
+                  }}
+                  prepend="Execution client"
+                />
 
-                  <Select
-                    value={
-                      selectedTarget && prettyDnpName(selectedTarget.consClient)
+                <Select
+                  value={selectedTarget && prettyDnpName(selectedTarget.consClient)}
+                  options={options.consClients.filter(Boolean).map(prettyDnpName)}
+                  onValueChange={(newOpt: string) => {
+                    const newCc = Object.values(ConsensusClientMainnet).find((ec) => prettyDnpName(ec) === newOpt);
+                    if (newCc) {
+                      onTargetChange({
+                        ...(selectedTarget || {}),
+                        consClient: newCc
+                      });
                     }
-                    options={options.consClients
-                      .filter(Boolean)
-                      .map(prettyDnpName)}
-                    onValueChange={(newOpt: string) => {
-                      const newCc = Object.values(ConsensusClientMainnet).find(
-                        ec => prettyDnpName(ec) === newOpt
-                      );
-                      if (newCc) {
-                        onTargetChange({
-                          ...(selectedTarget || {}),
-                          consClient: newCc
-                        });
-                      }
-                    }}
-                    prepend="Consensus client"
-                  />
-                </>
-              )}
+                  }}
+                  prepend="Consensus client"
+                />
+              </>
+            )}
           </Card>
         );
       })}
@@ -296,7 +278,7 @@ function EthMultiClientFallback({
     <Switch
       className="eth-multi-clients-fallback"
       checked={fallbackToBoolean(fallback)}
-      onToggle={bool => onFallbackChange(booleanToFallback(bool))}
+      onToggle={(bool) => onFallbackChange(booleanToFallback(bool))}
       label="Use remote during syncing or errors"
       id="eth-multi-clients-fallback-switch"
     />
@@ -337,16 +319,11 @@ export function EthMultiClientsAndFallback({
         showStats={showStats}
       />
 
-      <EthMultiClientFallback
-        target={target}
-        fallback={fallback}
-        onFallbackChange={onFallbackChange}
-      />
+      <EthMultiClientFallback target={target} fallback={fallback} onFallbackChange={onFallbackChange} />
 
       {target && target !== "remote" && fallback === "off" && (
         <Alert variant="warning">
-          If your node is not available, you won't be able to update packages or
-          access the DAppStore.
+          If your node is not available, you won't be able to update packages or access the DAppStore.
         </Alert>
       )}
     </div>

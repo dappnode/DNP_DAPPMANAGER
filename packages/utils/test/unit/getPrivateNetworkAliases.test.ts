@@ -9,8 +9,8 @@ describe("getPrivateNetworkAliases", () => {
       "dappmanager.dnp.dappnode.eth.dappmanager.dappnode",
       "dappmanager.dappnode",
       "my.dappnode",
-      "dappnode.local",
-    ],
+      "dappnode.local"
+    ]
   };
 
   it("should return an array with the full alias for any container", () => {
@@ -18,32 +18,27 @@ describe("getPrivateNetworkAliases", () => {
     const container = {
       serviceName: "testService",
       dnpName: "testDnp",
-      isMainOrMonoservice: false,
+      isMainOrMonoservice: false
     };
     const result = getPrivateNetworkAliases(container);
-    expect(result)
-      .to.be.an("array")
-      .that.includes("testService.testDnp.dappnode");
+    expect(result).to.be.an("array").that.includes("testService.testDnp.dappnode");
   });
 
   it("should include the short alias for main or monoservice containers", () => {
     const container = {
       serviceName: "mainService",
       dnpName: "mainDnp",
-      isMainOrMonoservice: true,
+      isMainOrMonoservice: true
     };
     const result = getPrivateNetworkAliases(container);
-    expect(result).to.include(
-      "mainService.mainDnp.dappnode",
-      "'mainDnp.dappnode'"
-    );
+    expect(result).to.include("mainService.mainDnp.dappnode", "'mainDnp.dappnode'");
   });
 
   it("should not include the short alias for non-main/monoservice containers", () => {
     const container = {
       serviceName: "regularService",
       dnpName: "regularDnp",
-      isMainOrMonoservice: false,
+      isMainOrMonoservice: false
     };
     const result = getPrivateNetworkAliases(container);
     expect(result).to.not.include("regularService");
@@ -53,7 +48,7 @@ describe("getPrivateNetworkAliases", () => {
     const container = {
       serviceName: "dappmanager.dnp.dappnode.eth",
       dnpName: params.dappmanagerDnpName,
-      isMainOrMonoservice: true,
+      isMainOrMonoservice: true
     };
     const result = getPrivateNetworkAliases(container);
     console.log(result);
@@ -65,7 +60,7 @@ describe("getPrivateNetworkAliases", () => {
     const container = {
       serviceName: "admin",
       dnpName: params.dappmanagerDnpName,
-      isMainOrMonoservice: true,
+      isMainOrMonoservice: true
     };
     const result = getPrivateNetworkAliases(container);
     expect(result).to.have.members([...new Set(result)]);

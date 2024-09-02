@@ -76,7 +76,7 @@ describe.skip("Call function: packageInstall", function () {
   before("Mock", async () => {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/packageInstall.js"),
-      mock => {
+      (mock) => {
         mock(() => import("@dappnode/installer"))
           .with({ DappnodeInstaller: DappnodeInstallerMock })
           .toBeUsed();
@@ -139,10 +139,7 @@ describe.skip("Call function: packageInstall", function () {
   // Step 4: Download requested packages
   it("should have called download", async () => {
     sinon.assert.callCount(packages.download, 2);
-    expect([
-      packages.download.getCall(0).args[0],
-      packages.download.getCall(1).args[0]
-    ]).deep.equal(
+    expect([packages.download.getCall(0).args[0], packages.download.getCall(1).args[0]]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.download for ${pkgName} and ${depName}`
     );
@@ -151,10 +148,7 @@ describe.skip("Call function: packageInstall", function () {
   it("should have called load", async () => {
     sinon.assert.callCount(packages.load, 2);
 
-    expect([
-      packages.load.getCall(0).args[0],
-      packages.load.getCall(1).args[0]
-    ]).deep.equal(
+    expect([packages.load.getCall(0).args[0], packages.load.getCall(1).args[0]]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.load for ${pkgName} and ${depName}`
     );
@@ -164,10 +158,7 @@ describe.skip("Call function: packageInstall", function () {
   it("should have called run", async () => {
     sinon.assert.callCount(packages.run, 2);
 
-    expect([
-      packages.run.getCall(0).args[0],
-      packages.run.getCall(1).args[0]
-    ]).deep.equal(
+    expect([packages.run.getCall(0).args[0], packages.run.getCall(1).args[0]]).deep.equal(
       [callKwargPkg, callKwargDep],
       `should call packages.run for ${pkgName} and ${depName}`
     );

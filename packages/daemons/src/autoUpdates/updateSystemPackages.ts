@@ -17,9 +17,7 @@ const coreDnpName = params.coreDnpName;
  * - Send notification if this specific DNP_CORE version has not been seen
  * - Auto-update system according if DNP_CORE or any dependency is not updated
  */
-export async function checkSystemPackagesVersion(
-  dappnodeInstaller: DappnodeInstaller
-): Promise<void> {
+export async function checkSystemPackagesVersion(dappnodeInstaller: DappnodeInstaller): Promise<void> {
   const coreUpdateData = await getCoreUpdateData(dappnodeInstaller);
 
   if (!coreUpdateData.available) return;
@@ -47,7 +45,7 @@ export async function autoUpdateSystemPackages(
   try {
     await packageInstall(dappnodeInstaller, {
       name: coreDnpName,
-      options: { BYPASS_RESOLVER: true },
+      options: { BYPASS_RESOLVER: true }
     });
 
     /**

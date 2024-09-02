@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import { packageRestart } from "../../actions";
-import {
-  StateBadgeDnp,
-  StateBadgeContainer,
-  StateBadgeLegend
-} from "../StateBadge";
-import {
-  MdRefresh,
-  MdPauseCircleOutline,
-  MdPlayCircleOutline
-} from "react-icons/md";
+import { StateBadgeDnp, StateBadgeContainer, StateBadgeLegend } from "../StateBadge";
+import { MdRefresh, MdPauseCircleOutline, MdPlayCircleOutline } from "react-icons/md";
 import { BsChevronExpand, BsChevronContract } from "react-icons/bs";
 import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 import { withToastNoThrow } from "components/toast/Toast";
@@ -28,20 +20,17 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
   async function onStartStop(container?: PackageContainer) {
     const dnpName = dnp.dnpName;
     if (dnpName === "wifi.dnp.dappnode.eth")
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         confirm({
           title: `Disabling Wifi package`,
-          text:
-            "Warning, if you are connected via WIFI you will lose access to your DAppNode. Make sure to have another way to connect to it before disabling WIFI",
+          text: "Warning, if you are connected via WIFI you will lose access to your DAppNode. Make sure to have another way to connect to it before disabling WIFI",
           label: "Disable",
           onClick: resolve
         });
       });
 
     const serviceNames = container && [container.serviceName];
-    const name = container
-      ? [prettyFullName(container)].join(" ")
-      : prettyDnpName(dnpName);
+    const name = container ? [prettyFullName(container)].join(" ") : prettyDnpName(dnpName);
 
     withToastNoThrow(() => api.packageStartStop({ dnpName, serviceNames }), {
       message: `Toggling ${name}...`,
@@ -49,7 +38,7 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
     });
   }
 
-  const allContainersRunning = dnp.containers.every(c => c.running);
+  const allContainersRunning = dnp.containers.every((c) => c.running);
 
   return (
     <div className="info-container-list">
@@ -64,14 +53,10 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
           <StateBadgeDnp dnp={dnp} />
 
           <span className="name">
-            {dnp.containers.length > 1 ? (
-              <span>All containers</span>
-            ) : (
-              <span>{prettyDnpName(dnp.dnpName)}</span>
-            )}
+            {dnp.containers.length > 1 ? <span>All containers</span> : <span>{prettyDnpName(dnp.dnpName)}</span>}
 
             {dnp.containers.length > 1 && (
-              <span className="see-all" onClick={() => setShowAll(x => !x)}>
+              <span className="see-all" onClick={() => setShowAll((x) => !x)}>
                 {showAll ? <BsChevronContract /> : <BsChevronExpand />}
               </span>
             )}
@@ -88,12 +73,10 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
 
         {/* Container display */}
         {showAll &&
-          dnp.containers.map(container => (
+          dnp.containers.map((container) => (
             <React.Fragment key={container.serviceName}>
               <StateBadgeContainer container={container} />
-              <span className="name">
-                {prettyDnpName(container.serviceName)}
-              </span>
+              <span className="name">{prettyDnpName(container.serviceName)}</span>
               {container.running ? (
                 <MdPauseCircleOutline onClick={() => onStartStop(container)} />
               ) : (

@@ -7,10 +7,7 @@ interface HorizontalStepperProps {
   currentIndex: number;
 }
 
-const HorizontalStepper: React.FC<HorizontalStepperProps> = ({
-  routes,
-  currentIndex
-}) => (
+const HorizontalStepper: React.FC<HorizontalStepperProps> = ({ routes, currentIndex }) => (
   <div className="horizontal-stepper">
     {routes.map((route, i) => {
       const active = currentIndex === i;
@@ -27,9 +24,7 @@ const HorizontalStepper: React.FC<HorizontalStepperProps> = ({
             <span />
           </div>
           <span className="step-label">
-            <span className="icon-container circle">
-              {completed ? <span>✔</span> : <span>{i + 1}</span>}
-            </span>
+            <span className="icon-container circle">{completed ? <span>✔</span> : <span>{i + 1}</span>}</span>
             <span className="text-container">
               <span className="text">{route}</span>
             </span>

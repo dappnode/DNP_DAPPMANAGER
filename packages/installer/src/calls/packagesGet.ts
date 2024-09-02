@@ -1,11 +1,7 @@
 import * as db from "@dappnode/db";
 import { shouldUpdate } from "@dappnode/utils";
 import { listPackages } from "@dappnode/dockerapi";
-import {
-  InstalledPackageData,
-  InstalledPackageDataApiReturn,
-  UpdateAvailable,
-} from "@dappnode/types";
+import { InstalledPackageData, InstalledPackageDataApiReturn, UpdateAvailable } from "@dappnode/types";
 
 /**
  * Returns the list of current containers associated to packages
@@ -17,15 +13,11 @@ export async function packagesGet(): Promise<InstalledPackageDataApiReturn[]> {
   const latestKnownVersions = db.packageLatestKnownVersion.getAll();
 
   return dnps.map((dnp) => {
-    const latestKnownVersion: UpdateAvailable | undefined =
-      latestKnownVersions[dnp.dnpName];
+    const latestKnownVersion: UpdateAvailable | undefined = latestKnownVersions[dnp.dnpName];
     return {
       ...dnp,
       updateAvailable:
-        latestKnownVersion &&
-        shouldUpdate(dnp.version, latestKnownVersion.newVersion)
-          ? latestKnownVersion
-          : null,
+        latestKnownVersion && shouldUpdate(dnp.version, latestKnownVersion.newVersion) ? latestKnownVersion : null
     };
   });
 }
@@ -34,9 +26,7 @@ export async function packagesGet(): Promise<InstalledPackageDataApiReturn[]> {
  * Sort packages by dnpName
  * Sort their containers by isMain first, then by serviceName
  */
-export function sortPackages(
-  dnps: InstalledPackageData[]
-): InstalledPackageData[] {
+export function sortPackages(dnps: InstalledPackageData[]): InstalledPackageData[] {
   for (const dnp of dnps) {
     dnp.containers = dnp.containers.sort((a, b) => {
       if (a.isMain && !b.isMain) return -1;

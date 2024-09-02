@@ -30,7 +30,7 @@ export interface MockDnps {
 }
 
 // No need to re-define a nested module object type
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+
 export class DappGetFetcherMock extends DappGetFetcher {
   dnps: MockDnps;
 
@@ -45,33 +45,20 @@ export class DappGetFetcherMock extends DappGetFetcher {
     return dnp;
   }
 
-  async dependencies(
-    dappnodeInstaller: DappnodeInstaller,
-    name: string,
-    version: string
-  ): Promise<Dependencies> {
+  async dependencies(dappnodeInstaller: DappnodeInstaller, name: string, version: string): Promise<Dependencies> {
     const dnp = this.getDnp(name);
     const dependencies = dnp[version];
-    if (!dependencies)
-      throw Error(`Version ${name} @ ${version} is not in the case definition`);
+    if (!dependencies) throw Error(`Version ${name} @ ${version} is not in the case definition`);
     return dependencies;
   }
 
-  async versions(
-    dappnodeInstaller: DappnodeInstaller,
-    name: string,
-    versionRange: string
-  ): Promise<string[]> {
+  async versions(dappnodeInstaller: DappnodeInstaller, name: string, versionRange: string): Promise<string[]> {
     const dnp = this.getDnp(name);
     const allVersions = Object.keys(dnp);
-    const validVersions = allVersions.filter((version) =>
-      safeSemver.satisfies(version, versionRange)
-    );
+    const validVersions = allVersions.filter((version) => safeSemver.satisfies(version, versionRange));
     if (!validVersions.length) {
       const versions = allVersions.join(", ");
-      throw Error(
-        `No version satisfy ${name} @ ${versionRange}, versions: ${versions}`
-      );
+      throw Error(`No version satisfy ${name} @ ${versionRange}, versions: ${versions}`);
     }
     return validVersions;
   }

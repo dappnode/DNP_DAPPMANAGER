@@ -45,13 +45,11 @@ interface PrioritizeDnpReturn extends DappGetDnp {
  *   {name: 'A', isRequest: true, versions: []},
  * ]
  */
-export default function prioritizeDnps(
-  dnps: DappGetDnps
-): PrioritizeDnpReturn[] {
+export default function prioritizeDnps(dnps: DappGetDnps): PrioritizeDnpReturn[] {
   // Convert the dnps object into an array of objects appending the name
   return (
     Object.keys(dnps)
-      .map(name => ({ ...dnps[name], name }))
+      .map((name) => ({ ...dnps[name], name }))
       // Sort the package ordening
       .sort((dnpA, dnpB) => {
         if (dnpA.isRequest) return 1;

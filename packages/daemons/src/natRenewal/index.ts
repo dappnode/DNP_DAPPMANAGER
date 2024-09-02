@@ -5,10 +5,7 @@ import * as db from "@dappnode/db";
 import { getPortsToOpen } from "./getPortsToOpen.js";
 import { getLocalIp } from "./getLocalIp.js";
 // Utils
-import {
-  runAtMostEveryIntervals,
-  runOnlyOneSequentially,
-} from "@dappnode/utils";
+import { runAtMostEveryIntervals, runOnlyOneSequentially } from "@dappnode/utils";
 import { PackagePort } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { listPackageContainers } from "@dappnode/dockerapi";
@@ -36,9 +33,7 @@ async function natRenewal(): Promise<void> {
       if (isFirstRun) {
         logs.info(
           "UPnP device available. Current UPNP port mappings\n",
-          portMappings
-            .map((p) => `${p.ip} ${p.exPort}:${p.inPort}/${p.protocol}`)
-            .join("\n")
+          portMappings.map((p) => `${p.ip} ${p.exPort}:${p.inPort}/${p.protocol}`).join("\n")
         );
       }
     } catch (e) {
@@ -56,10 +51,7 @@ async function natRenewal(): Promise<void> {
     const portsToOpen = getPortsToOpen(containers);
     db.portsToOpen.set(portsToOpen);
     if (isFirstRun)
-      logs.info(
-        "NAT renewal portsToOpen\n",
-        portsToOpen.map((p) => `${p.portNumber}/${p.protocol}`).join(", ")
-      );
+      logs.info("NAT renewal portsToOpen\n", portsToOpen.map((p) => `${p.portNumber}/${p.protocol}`).join(", "));
 
     // Fetch the localIp only once for all the portsToOpen
     const localIp = await getLocalIp();
@@ -101,8 +93,7 @@ async function natRenewal(): Promise<void> {
         );
         const portIsOpen = Boolean(currentPort);
         if (portIsOpen) {
-          if (isFirstRun)
-            logs.info(`Port ${portId(portToOpen)} successfully opened`);
+          if (isFirstRun) logs.info(`Port ${portId(portToOpen)} successfully opened`);
         } else {
           logs.error(`Port ${portId(portToOpen)} is not open`);
         }
@@ -154,7 +145,7 @@ export function startNatRenewalDaemon(signal: AbortSignal): void {
       // So run this daemon 2 times a bit more frequently for that case.
       5 * 60 * 1000,
       15 * 60 * 1000,
-      params.NAT_RENEWAL_DAEMON_INTERVAL,
+      params.NAT_RENEWAL_DAEMON_INTERVAL
     ],
     signal
   );

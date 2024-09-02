@@ -17,19 +17,13 @@ const isAbsolute = (path: string) => /^\/[^\/]+/.test(path);
  * Enforces rules on user settings:
  * - namedVolumeMountpoints: must be absolute paths. Renaming for a different named volume is not allowed
  */
-export function getUserSettingsDataErrors(
-  dataAllDnps: UserSettingsAllDnps
-): string[] {
+export function getUserSettingsDataErrors(dataAllDnps: UserSettingsAllDnps): string[] {
   const errors: string[] = [];
   for (const [dnpName, data] of Object.entries(dataAllDnps)) {
     if (data.namedVolumeMountpoints) {
-      for (const [volName, volPath] of Object.entries(
-        data.namedVolumeMountpoints
-      )) {
+      for (const [volName, volPath] of Object.entries(data.namedVolumeMountpoints)) {
         if (volPath && !isAbsolute(volPath))
-          errors.push(
-            `Mountpoint path for '${dnpName}' '${volName}' must be an absolute path`
-          );
+          errors.push(`Mountpoint path for '${dnpName}' '${volName}' must be an absolute path`);
       }
     }
   }
@@ -48,8 +42,7 @@ export function parseSetupWizardErrors(
   const dataErrors: SetupWizardError[] = [];
   for (const [dnpName, setupWizardDnp] of Object.entries(setupWizard)) {
     for (const field of setupWizardDnp.fields) {
-      const value =
-        (formData[dnpName] ? formData[dnpName][field.id] : "") || "";
+      const value = (formData[dnpName] ? formData[dnpName][field.id] : "") || "";
       const addError = (type: SetupWizardErrorType, message: string) =>
         dataErrors.push({
           dnpName,
@@ -67,8 +60,7 @@ export function parseSetupWizardErrors(
       } else if (field.pattern) {
         const regExp = new RegExp(field.pattern);
         if (!regExp.test(value))
-          if (field.patternErrorMessage)
-            addError("pattern", field.patternErrorMessage);
+          if (field.patternErrorMessage) addError("pattern", field.patternErrorMessage);
           else addError("pattern", `Must match pattern '${field.pattern}'`);
       }
     }

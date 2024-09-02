@@ -10,8 +10,7 @@ export const wireguard: MockDnp = {
     version: "0.1.0",
     description: "Wireguard",
     type: "service",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     links: {
       WebApplication: "http://wireguard.dappnode/",
       homepage: "https://github.com/dappnode/DAppNodePackage-wireguard#readme"

@@ -3,8 +3,7 @@ import { Routes, UserActionLog } from "@dappnode/types";
 const userActionLogsState: UserActionLog[] = [];
 
 export const userActionLogs: Pick<Routes, "getUserActionLogs"> = {
-  getUserActionLogs: async ({ first = 20, after = 0 }) =>
-    userActionLogsState.slice(after, after + first)
+  getUserActionLogs: async ({ first = 20, after = 0 }) => userActionLogsState.slice(after, after + first)
 };
 
 // Generate initial data

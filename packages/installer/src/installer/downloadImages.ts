@@ -1,10 +1,6 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import {
-  InstallPackageData,
-  DistributedFile,
-  getImageTag,
-} from "@dappnode/types";
+import { InstallPackageData, DistributedFile, getImageTag } from "@dappnode/types";
 import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath } from "@dappnode/utils";
 import { getDockerImageManifest } from "@dappnode/dockerapi";
@@ -88,8 +84,7 @@ export async function getImage(
   progress: (n: number) => void
 ): Promise<void> {
   // Validate parameters
-  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/"))
-    throw Error(`Invalid path: "${path}"`);
+  if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) throw Error(`Invalid path: "${path}"`);
   validatePath(path);
 
   // Check if cache exist and validate it
@@ -98,6 +93,7 @@ export async function getImage(
     return; // Image OK
   } catch (e) {
     // Continue, bad image
+    logs.error(`Image at ${path} is invalid: ${e}`);
   }
 
   const { hash, size } = imageFile;
@@ -112,9 +108,7 @@ export async function getImage(
 
   // Validate downloaded image
   await validateTarImage(path).catch((e) => {
-    throw Error(
-      `Downloaded image from ${imageFile.hash} to ${path} failed validation: ${e.message}`
-    );
+    throw Error(`Downloaded image from ${imageFile.hash} to ${path} failed validation: ${e.message}`);
   });
 }
 
@@ -126,7 +120,7 @@ export async function getImage(
 async function verifyDockerImage({
   imagePath,
   dnpName,
-  version,
+  version
 }: {
   imagePath: string;
   dnpName: string;
@@ -135,13 +129,12 @@ async function verifyDockerImage({
   const expectedTagSuffix = getImageTag({
     dnpName,
     serviceName: dnpName,
-    version,
+    version
   });
   const images = await getDockerImageManifest(imagePath);
   for (const image of images) {
     for (const repoTag of image.RepoTags) {
-      if (!repoTag.endsWith(expectedTagSuffix))
-        throw Error(`Invalid image tag '${repoTag}' for ${dnpName} ${version}`);
+      if (!repoTag.endsWith(expectedTagSuffix)) throw Error(`Invalid image tag '${repoTag}' for ${dnpName} ${version}`);
     }
   }
 }
@@ -180,10 +173,10 @@ async function verifyXz(xzFilePath: string): Promise<{
   return shell(`xz -t ${xzFilePath}`)
     .then(() => ({
       success: true,
-      message: "",
+      message: ""
     }))
     .catch((e: Error) => ({
       success: false,
-      message: e.message,
+      message: e.message
     }));
 }

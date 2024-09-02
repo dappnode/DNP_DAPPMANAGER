@@ -72,8 +72,7 @@ export const zkevmUiUrl = "http://ui.zkevm-tokens-withdrawal.dappnode/";
 
 export const sdkPublishAppUrl = "https://dappnode.github.io/sdk-publish/";
 export const sdkGuideUrl = "https://github.com/dappnode/DAppNodeSDK";
-export const githubNewIssueDappnodeUrl =
-  "https://github.com/dappnode/DAppNode/issues/new";
+export const githubNewIssueDappnodeUrl = "https://github.com/dappnode/DAppNode/issues/new";
 
 export const surveyUrl = "https://goo.gl/forms/DSy1J1OlQGpdyhD22";
 export const packageSurveyLink = "https://goo.gl/forms/EjVTHu6UBWBk60Z62";
@@ -100,16 +99,12 @@ export const docsUrl = {
 };
 
 export const forumUrl = {
-  telegramHowTo:
-    "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
-  ipfsRemoteHowTo:
-    "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
-  expandFileSystemHowTo:
-    "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
+  telegramHowTo: "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
+  ipfsRemoteHowTo: "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
+  expandFileSystemHowTo: "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
 };
 
-export const troubleShootMountpointsGuideUrl =
-  "https://docs.dappnode.io/developers/package-dev/wizard#target";
+export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
 export const explorerGitcoinUrl =
   "https://explorer.gitcoin.co/#/round/1/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094/0xdf22a2c8f6ba9376ff17ee13e6154b784ee92094-17";
@@ -129,8 +124,7 @@ export const dappnodeLogicalVolume = "root";
 
 // IPFS
 export const IPFS_DAPPNODE_GATEWAY = "https://gateway.ipfs.dappnode.io";
-export const IPFS_GATEWAY_CHECKER =
-  "https://ipfs.github.io/public-gateway-checker/";
+export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-checker/";
 
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";

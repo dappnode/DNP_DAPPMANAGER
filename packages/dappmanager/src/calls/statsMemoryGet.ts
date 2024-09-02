@@ -13,9 +13,7 @@ export async function statsMemoryGet(): Promise<HostStatMemory> {
  * Parses memory statistics
  * @param memData Memory data from systeminformation
  */
-export function parseMemoryStats(
-  memData: si.Systeminformation.MemData
-): HostStatMemory {
+export function parseMemoryStats(memData: si.Systeminformation.MemData): HostStatMemory {
   return {
     total: memData.total,
     used: memData.active, // Using 'active' as it's closer to 'used' in most contexts

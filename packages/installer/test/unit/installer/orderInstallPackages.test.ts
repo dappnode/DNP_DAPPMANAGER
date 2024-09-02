@@ -9,7 +9,7 @@ describe("Module > Installer", () => {
     function getPackagesData(names: string[]): InstallPackageData[] {
       return names.map((dnpName) => ({
         ...mockPackageData,
-        dnpName,
+        dnpName
       }));
     }
     const coreName = "core.dnp.dappnode.eth";
@@ -25,7 +25,7 @@ describe("Module > Installer", () => {
         "wamp.dnp.dappnode.eth",
         "admin.dnp.dappnode.eth",
         dappmanagerName,
-        "wifi.dnp.dappnode.eth",
+        "wifi.dnp.dappnode.eth"
       ]);
 
       const expectedOrderedPackagesData = [
@@ -37,13 +37,10 @@ describe("Module > Installer", () => {
         "vpn.dnp.dappnode.eth",
         "wamp.dnp.dappnode.eth",
         "wifi.dnp.dappnode.eth",
-        dappmanagerName,
+        dappmanagerName
       ];
 
-      const orderedPackagesData = orderInstallPackages(
-        packagesData,
-        coreName
-      ).map(({ dnpName }) => dnpName);
+      const orderedPackagesData = orderInstallPackages(packagesData, coreName).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(expectedOrderedPackagesData);
     });
 
@@ -59,15 +56,15 @@ describe("Module > Installer", () => {
         "wamp.dnp.dappnode.eth",
         "admin.dnp.dappnode.eth",
         dappmanagerName,
-        "wifi.dnp.dappnode.eth",
+        "wifi.dnp.dappnode.eth"
       ]).map((pkg) => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
             manifest: {
               ...pkg.manifest,
-              runOrder,
-            },
+              runOrder
+            }
           };
         else return pkg;
       });
@@ -81,13 +78,10 @@ describe("Module > Installer", () => {
         "wamp.dnp.dappnode.eth",
         "wifi.dnp.dappnode.eth",
         coreName,
-        dappmanagerName,
+        dappmanagerName
       ];
 
-      const orderedPackagesData = orderInstallPackages(
-        packagesData,
-        coreName
-      ).map(({ dnpName }) => dnpName);
+      const orderedPackagesData = orderInstallPackages(packagesData, coreName).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(expectedOrderedPackagesData);
     });
 
@@ -101,7 +95,7 @@ describe("Module > Installer", () => {
         "wamp.dnp.dappnode.eth",
         "wifi.dnp.dappnode.eth",
         "vpn.dnp.dappnode.eth",
-        dappmanagerName,
+        dappmanagerName
       ];
 
       const packagesData = getPackagesData([
@@ -113,23 +107,20 @@ describe("Module > Installer", () => {
         "wamp.dnp.dappnode.eth",
         "admin.dnp.dappnode.eth",
         dappmanagerName,
-        "wifi.dnp.dappnode.eth",
+        "wifi.dnp.dappnode.eth"
       ]).map((pkg) => {
         if (pkg.dnpName === coreName)
           return {
             ...pkg,
             manifest: {
               ...pkg.manifest,
-              runOrder,
-            },
+              runOrder
+            }
           };
         else return pkg;
       });
 
-      const orderedPackagesData = orderInstallPackages(
-        packagesData,
-        coreName
-      ).map(({ dnpName }) => dnpName);
+      const orderedPackagesData = orderInstallPackages(packagesData, coreName).map(({ dnpName }) => dnpName);
       expect(orderedPackagesData).to.deep.equal(runOrder);
     });
   });

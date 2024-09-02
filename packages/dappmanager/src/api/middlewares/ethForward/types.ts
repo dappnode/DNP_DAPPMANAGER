@@ -24,11 +24,7 @@ export type Content =
 /**
  * Custom errors
  */
-export type EthForwardErrorCode =
-  | "NOTFOUND"
-  | "RESOLVERNOTFOUND"
-  | "PROXYERROR"
-  | "NODENOTAVAILABLE";
+export type EthForwardErrorCode = "NOTFOUND" | "RESOLVERNOTFOUND" | "PROXYERROR" | "NODENOTAVAILABLE";
 
 export class EthForwardError extends Error {
   code: EthForwardErrorCode;

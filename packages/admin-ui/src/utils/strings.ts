@@ -53,10 +53,7 @@ export const stringEndsWith = (s: string, content: string): boolean => {
  * @param separator = ".", /\.(.+)/
  * @returns ["vpn", "eth"]
  */
-export const stringSplit = (
-  s: string,
-  separator: string | RegExp
-): string[] => {
+export const stringSplit = (s: string, separator: string | RegExp): string[] => {
   if (!s || typeof s !== "string") return [""];
   if (!separator) return [""];
   return s.split(separator);

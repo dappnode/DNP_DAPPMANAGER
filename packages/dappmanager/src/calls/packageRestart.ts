@@ -26,14 +26,11 @@ export async function packageRestart({
   // DAPPMANAGER patch
   if (dnp.dnpName === params.dappmanagerDnpName) {
     const composePath = getDockerComposePathSmart(dnpName);
-    if (!fs.existsSync(composePath))
-      throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
+    if (!fs.existsSync(composePath)) throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
     return await restartDappmanagerPatch({ composePath });
   }
 
-  const targetContainers = dnp.containers.filter(
-    c => !serviceNames || serviceNames.includes(c.serviceName)
-  );
+  const targetContainers = dnp.containers.filter((c) => !serviceNames || serviceNames.includes(c.serviceName));
 
   if (targetContainers.length === 0) {
     const queryId = [dnpName, ...(serviceNames || [])].join(", ");
@@ -44,13 +41,13 @@ export async function packageRestart({
 
   if (servicesSharingPid) {
     // First restart targetPid services (Process MUST exist)
-    const targetContainersPid = dnp.containers.filter(c =>
+    const targetContainersPid = dnp.containers.filter((c) =>
       servicesSharingPid.targetPidServices.includes(c.serviceName)
     );
     await containersRestart(targetContainersPid);
 
     // Second restart dependandtPidServices (Process exists)
-    const dependantContainersPid = dnp.containers.filter(c =>
+    const dependantContainersPid = dnp.containers.filter((c) =>
       servicesSharingPid.dependantPidServices.includes(c.serviceName)
     );
     await containersRestart(dependantContainersPid);
@@ -65,12 +62,8 @@ export async function packageRestart({
 
 // Utils
 
-async function containersRestart(
-  targetContainers: PackageContainer[]
-): Promise<void> {
+async function containersRestart(targetContainers: PackageContainer[]): Promise<void> {
   await Promise.all(
-    targetContainers.map(async c =>
-      dockerContainerRestart(c.containerName, { timeout: c.dockerTimeout })
-    )
+    targetContainers.map(async (c) => dockerContainerRestart(c.containerName, { timeout: c.dockerTimeout }))
   );
 }

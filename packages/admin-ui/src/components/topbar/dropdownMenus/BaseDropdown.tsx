@@ -11,20 +11,13 @@ type BubbleColor = "danger" | "warning" | "success" | "light";
 // Utilities
 
 const ProgressBarWrapper = ({ progress }: { progress: number }) => {
-  return (
-    <ProgressBar
-      now={progress * 100}
-      animated={true}
-      label={`${(progress * 100).toFixed(2)}%`}
-    />
-  );
+  return <ProgressBar now={progress * 100} animated={true} label={`${(progress * 100).toFixed(2)}%`} />;
 };
 
 function parseMessagesType(messages: BaseDropdownMessage[]): BubbleColor {
   const types = new Set<MessageType>();
 
-  for (const message of messages)
-    if (!message.viewed && message.type) types.add(message.type);
+  for (const message of messages) if (!message.viewed && message.type) types.add(message.type);
 
   // Don't show any color if there are no not-viewed notifications
   if (types.size === 0) return "light";
@@ -37,7 +30,7 @@ function parseMessagesType(messages: BaseDropdownMessage[]): BubbleColor {
 }
 
 function areMessagesUnread(messages: BaseDropdownMessage[]) {
-  return messages.some(message => message && !message.viewed);
+  return messages.some((message) => message && !message.viewed);
 }
 
 type MessageType = "danger" | "warning" | "success" | "info";
@@ -61,6 +54,7 @@ interface BaseDropdownProps {
   messages: BaseDropdownMessage[];
   className?: string;
   placeholder?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   Icon: any;
   onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   offset?: number;
@@ -99,19 +93,10 @@ function BaseDropdown({
     if (collapsed) return; // Prevent unnecessary listeners
     function handleMouseUp(e: MouseEvent) {
       document.removeEventListener("mouseup", handleMouseUp);
-      if (
-        dropdownEl.current &&
-        e.target &&
-        !dropdownEl.current.contains(e.target as Node)
-      )
-        setCollapsed(true);
+      if (dropdownEl.current && e.target && !dropdownEl.current.contains(e.target as Node)) setCollapsed(true);
     }
     function handleMouseDown(e: MouseEvent) {
-      if (
-        dropdownEl.current &&
-        e.target &&
-        !dropdownEl.current.contains(e.target as Node)
-      )
+      if (dropdownEl.current && e.target && !dropdownEl.current.contains(e.target as Node))
         document.addEventListener("mouseup", handleMouseUp);
     }
     document.addEventListener("mousedown", handleMouseDown);
@@ -134,9 +119,7 @@ function BaseDropdown({
     <div ref={dropdownEl} className={`tn-dropdown ${className}`}>
       <div
         onClick={onToggle}
-        className={
-          "tn-dropdown-toggle" + (attentionGrab ? " atention-grab" : "")
-        }
+        className={"tn-dropdown-toggle" + (attentionGrab ? " atention-grab" : "")}
         data-toggle="tooltip"
         data-placement="bottom"
         title={name}
@@ -151,40 +134,29 @@ function BaseDropdown({
         by placing them as right as possible */}
       <div className={`menu ${collapsed ? "" : "show"}`}>
         <div className="header">{name}</div>
-        {messages.map(
-          ({ type, title, toggle, body, progress, showProgress, help }, i) => (
-            <div key={i}>
-              {title && (
-                <div className="title">
-                  <span className={`text text-${type}`}>{title}</span>
-                  <div className="title-actions">
-                    {help && <HelpTo url={help} />}
-                    {toggle && (
-                      <Switch
-                        checked={toggle.checked}
-                        onToggle={toggle.onToggle}
-                      />
-                    )}
-                  </div>
+        {messages.map(({ type, title, toggle, body, progress, showProgress, help }, i) => (
+          <div key={i}>
+            {title && (
+              <div className="title">
+                <span className={`text text-${type}`}>{title}</span>
+                <div className="title-actions">
+                  {help && <HelpTo url={help} />}
+                  {toggle && <Switch checked={toggle.checked} onToggle={toggle.onToggle} />}
                 </div>
-              )}
+              </div>
+            )}
 
-              {body && (
-                <div className="text">
-                  <RenderMarkdown source={body} noMargin />
-                </div>
-              )}
+            {body && (
+              <div className="text">
+                <RenderMarkdown source={body} noMargin />
+              </div>
+            )}
 
-              {showProgress && typeof progress === "number" && (
-                <ProgressBarWrapper progress={progress} />
-              )}
-            </div>
-          )
-        )}
+            {showProgress && typeof progress === "number" && <ProgressBarWrapper progress={progress} />}
+          </div>
+        ))}
         {children && children}
-        {!messages.length && placeholder && !children && (
-          <div className="placeholder">{placeholder}</div>
-        )}
+        {!messages.length && placeholder && !children && <div className="placeholder">{placeholder}</div>}
       </div>
     </div>
   );

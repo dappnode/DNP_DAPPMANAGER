@@ -59,10 +59,7 @@ const DependencyList: React.FC<DependencyListProps> = ({ deps }) => {
               </SpanCenter>
             </InfoContainer>
             {warningOnInstall && (
-              <div
-                className="alert alert-warning"
-                style={{ margin: "12px 0 6px 0" }}
-              >
+              <div className="alert alert-warning" style={{ margin: "12px 0 6px 0" }}>
                 <RenderMarkdown source={warningOnInstall} />
               </div>
             )}

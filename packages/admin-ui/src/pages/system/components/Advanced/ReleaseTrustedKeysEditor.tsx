@@ -7,11 +7,7 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import Card from "components/Card";
 import { confirm } from "components/ConfirmDialog";
-import {
-  TrustedReleaseKey,
-  ReleaseSignatureProtocol,
-  releaseSignatureProtocols
-} from "@dappnode/types";
+import { TrustedReleaseKey, ReleaseSignatureProtocol, releaseSignatureProtocols } from "@dappnode/types";
 import "./releaseTrustedKeysEditor.scss";
 import { MdClose } from "react-icons/md";
 
@@ -22,10 +18,7 @@ export function ReleaseTrustedKeysEditor() {
   return (
     <Card spacing>
       {trustedKeys.data ? (
-        <ReleaseTrustedKeysGrid
-          keys={trustedKeys.data}
-          onEdit={trustedKeys.revalidate}
-        />
+        <ReleaseTrustedKeysGrid keys={trustedKeys.data} onEdit={trustedKeys.revalidate} />
       ) : trustedKeys.error ? (
         <ErrorView error={trustedKeys.error} hideIcon red />
       ) : trustedKeys.isValidating ? (
@@ -46,19 +39,12 @@ export function ReleaseTrustedKeysEditor() {
   );
 }
 
-function ReleaseTrustedKeysGrid({
-  keys,
-  onEdit
-}: {
-  keys: TrustedReleaseKey[];
-  onEdit: () => void;
-}) {
+function ReleaseTrustedKeysGrid({ keys, onEdit }: { keys: TrustedReleaseKey[]; onEdit: () => void }) {
   async function removeTrustedKey(keyName: string) {
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: `Are you sure you want to remove the key ${keyName}?`,
-        text:
-          "Your DAppNode won't be to safely verify releases signed by this key.",
+        text: "Your DAppNode won't be to safely verify releases signed by this key.",
         label: "Remove",
         variant: "danger",
         onClick: resolve
@@ -84,7 +70,7 @@ function ReleaseTrustedKeysGrid({
 
       <hr />
 
-      {keys.map(key => (
+      {keys.map((key) => (
         <React.Fragment key={key.name}>
           <span>{key.name}</span>
           <span>{key.dnpNameSuffix}</span>
@@ -106,9 +92,7 @@ function ReleaseTrustedKeysGrid({
 function ReleaseTrustedKeysAdder({ onEdit }: { onEdit: () => void }) {
   const [keyName, setKeyName] = useState("");
   const [dnpNameSuffix, setDnpNameSuffix] = useState("");
-  const [signatureProtocol, setSignatureProtocol] = useState<string>(
-    releaseSignatureProtocols[0]
-  );
+  const [signatureProtocol, setSignatureProtocol] = useState<string>(releaseSignatureProtocols[0]);
   const [key, setKey] = useState("");
 
   async function addTrustedKey() {

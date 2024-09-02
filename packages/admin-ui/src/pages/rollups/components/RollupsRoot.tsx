@@ -4,40 +4,35 @@ import Title from "components/Title";
 import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
 
-
 const RollupsRoot: React.FC = () => {
   const rollupsItems: {
     subPath: string;
     title: string;
     component: () => React.JSX.Element;
   }[] = [
-      {
-        subPath: "optimism",
-        title: "Optimism",
-        component: () =>
-          Optimism({
-            description: "Optimism is a Layer 2 scaling solution for Ethereum."
-          })
-      },
-      /*   {
+    {
+      subPath: "optimism",
+      title: "Optimism",
+      component: () =>
+        Optimism({
+          description: "Optimism is a Layer 2 scaling solution for Ethereum."
+        })
+    }
+    /*   {
           title: "zkEVM",
           subPath: "zkevm",
           component: () =>
             Zkevm()
         } */
-    ];
+  ];
 
   return (
     <>
       <Title title={title} />
       <div className="horizontal-navbar">
-        {rollupsItems.map(route => (
+        {rollupsItems.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subPath}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.title}
             </NavLink>
           </button>
@@ -46,12 +41,8 @@ const RollupsRoot: React.FC = () => {
 
       <div className="section-spacing">
         <Routes>
-          {rollupsItems.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={route.component()}
-            />
+          {rollupsItems.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={route.component()} />
           ))}
         </Routes>
       </div>

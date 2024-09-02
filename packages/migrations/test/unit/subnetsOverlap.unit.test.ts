@@ -16,9 +16,7 @@ describe("Subnet Overlap Tests", () => {
   });
 
   it("should throw an error for invalid inputs", () => {
-    expect(() =>
-      subnetsOverlap("192.168.1.300/24", "192.168.2.0/24")
-    ).to.throw();
+    expect(() => subnetsOverlap("192.168.1.300/24", "192.168.2.0/24")).to.throw();
     expect(() => subnetsOverlap("192.168.1.0/24", "invalid")).to.throw();
     expect(() => subnetsOverlap("172.33.0.0/40", "172.33.0.0/16")).to.throw();
   });

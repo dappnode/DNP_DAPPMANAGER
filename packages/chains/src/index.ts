@@ -34,19 +34,18 @@ export async function getChainsData(): Promise<ChainData[]> {
         if (chainData)
           chainsData.push({
             dnpName: dnp.dnpName,
-            ...chainData,
+            ...chainData
           });
       } catch (e) {
         // Only log chain errors the first time they are seen
-        if (loggedErrors.get(dnp.dnpName) !== e.message)
-          logs.debug(`Error getting chain data ${dnp.dnpName}`, e);
+        if (loggedErrors.get(dnp.dnpName) !== e.message) logs.debug(`Error getting chain data ${dnp.dnpName}`, e);
         loggedErrors.set(dnp.dnpName, e.message);
 
         chainsData.push({
           dnpName: dnp.dnpName,
           syncing: false,
           error: true,
-          message: parseChainErrors(e),
+          message: parseChainErrors(e)
         });
       }
     })

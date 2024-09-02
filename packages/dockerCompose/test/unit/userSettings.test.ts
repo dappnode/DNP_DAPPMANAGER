@@ -12,14 +12,14 @@ const mockDnpName = "mock-dnp.dnp.dappnode.eth";
 const mockDnpVersion = "0.0.0";
 const mockComposeService: ComposeService = {
   image: `${mockDnpName}:${mockDnpVersion}`,
-  container_name: `DAppNodePackage-${mockDnpName}`,
+  container_name: `DAppNodePackage-${mockDnpName}`
 };
 
 const mockCompose: Compose = {
   version: "3.5",
   services: {
-    [mockDnpName]: mockComposeService,
-  },
+    [mockDnpName]: mockComposeService
+  }
 };
 
 const polkadotServiceName = "polkadot-kusama.public.dappnode.eth";
@@ -34,32 +34,32 @@ const polkadotNewCompose = {
         NODE_NAME: "DAppNodeNodler",
         VALIDATOR_ENABLE: "no",
         TELEMETRY_ENABLE: "no",
-        EXTRA_OPTS: "--out-peers 10 --in-peers 10",
+        EXTRA_OPTS: "--out-peers 10 --in-peers 10"
       },
       restart: "unless-stopped",
       container_name: "DAppNodePackage-polkadot-kusama.public.dappnode.eth",
       networks: {
-        dncore_network: {},
-      },
-    },
+        dncore_network: {}
+      }
+    }
   },
   volumes: {
-    polkadot: {},
+    polkadot: {}
   },
   networks: {
     dncore_network: {
-      external: true,
-    },
-  },
+      external: true
+    }
+  }
 };
 
 const polkadotCurrentCompose = {
   ...polkadotNewCompose,
   services: {
     [polkadotServiceName]: {
-      ...polkadotNewCompose.services[polkadotServiceName],
-    },
-  },
+      ...polkadotNewCompose.services[polkadotServiceName]
+    }
+  }
 };
 
 describe("parseUserSettings", () => {
@@ -71,20 +71,16 @@ describe("parseUserSettings", () => {
           ...mockComposeService,
           environment: {
             ORIGINAL: "0",
-            USERSET: "1",
+            USERSET: "1"
           },
           ports: ["4001:4001", "9090:9090", "32764:6000"],
-          volumes: [
-            "/dev1/custom-path:/usr/data0",
-            "moredata:/usr/data1",
-            `${bitcoinVolumeNameNew}:/usr/data2`,
-          ],
+          volumes: ["/dev1/custom-path:/usr/data0", "moredata:/usr/data1", `${bitcoinVolumeNameNew}:/usr/data2`],
           networks: {
             holesky_network: {
-              aliases: ["mock-dnp"],
+              aliases: ["mock-dnp"]
             }
           }
-        },
+        }
       },
       volumes: {
         moredata: {},
@@ -93,13 +89,13 @@ describe("parseUserSettings", () => {
           driver_opts: {
             device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
             o: "bind",
-            type: "none",
-          },
-        },
+            type: "none"
+          }
+        }
       },
       networks: {
         holesky_network: {
-          external: true,
+          external: true
         }
       }
     };
@@ -110,30 +106,30 @@ describe("parseUserSettings", () => {
       environment: {
         [mockDnpName]: {
           ORIGINAL: "0",
-          USERSET: "1",
-        },
+          USERSET: "1"
+        }
       },
       portMappings: {
         [mockDnpName]: {
           "4001/TCP": "4001",
           "6000/TCP": "32764",
-          "9090/TCP": "9090",
-        },
+          "9090/TCP": "9090"
+        }
       },
       namedVolumeMountpoints: {
         [bitcoinVolumeNameNew]: "/dev0/data",
-        moredata: "",
+        moredata: ""
       },
       networks: {
         rootNetworks: {
           holesky_network: {
-            external: true,
+            external: true
           }
         },
         serviceNetworks: {
           [mockDnpName]: {
             holesky_network: {
-              aliases: ["mock-dnp"],
+              aliases: ["mock-dnp"]
             }
           }
         }
@@ -151,25 +147,25 @@ describe("parseUserSettings", () => {
       services: {
         [bitcoinName]: {
           ...mockComposeService,
-          volumes: ["/dev1/custom-path:/root/.bitcoin", "moredata:/usr/data2"],
-        },
+          volumes: ["/dev1/custom-path:/root/.bitcoin", "moredata:/usr/data2"]
+        }
       },
       volumes: {
         [bitcoinVolumeName]: {},
-        moredata: {},
-      },
+        moredata: {}
+      }
     };
 
     const userSettings = parseUserSettings(compose);
 
     const expectedUserSet: UserSettings = {
       namedVolumeMountpoints: {
-        moredata: "",
+        moredata: ""
       },
       legacyBindVolumes: {
         [bitcoinName]: {
-          [bitcoinVolumeName]: "/dev1/custom-path",
-        },
+          [bitcoinVolumeName]: "/dev1/custom-path"
+        }
       }
     };
 
@@ -185,27 +181,27 @@ describe("parseUserSettings", () => {
           EXTRA_OPTS: "--out-peers 10 --in-peers 10",
           NODE_NAME: "DAppNodeNodler",
           TELEMETRY_ENABLE: "no",
-          VALIDATOR_ENABLE: "no",
-        },
+          VALIDATOR_ENABLE: "no"
+        }
       },
       portMappings: {
         [polkadotServiceName]: {
-          "30333/TCP": "30333",
-        },
+          "30333/TCP": "30333"
+        }
       },
       namedVolumeMountpoints: {
-        polkadot: "",
+        polkadot: ""
       },
       networks: {
         rootNetworks: {
           dncore_network: {
-            external: true,
-          },
+            external: true
+          }
         },
         serviceNetworks: {
           [polkadotServiceName]: {
-            dncore_network: {},
-          },
+            dncore_network: {}
+          }
         }
       }
     };
@@ -220,14 +216,14 @@ describe("parseUserSettings", () => {
       networks: {
         network: {
           driver: "bridge",
-          ipam: { config: [{ subnet: "172.33.0.0/16" }] },
-        },
+          ipam: { config: [{ subnet: "172.33.0.0/16" }] }
+        }
       },
       volumes: {
         ethchaindnpdappnodeeth_data: {},
         ethchaindnpdappnodeeth_geth: {},
         ethchaindnpdappnodeeth_identity: {},
-        ethchaindnpdappnodeeth_ipc: {},
+        ethchaindnpdappnodeeth_ipc: {}
       },
       services: {
         [serviceName]: {
@@ -238,21 +234,21 @@ describe("parseUserSettings", () => {
             "ethchaindnpdappnodeeth_data:/root/.local/share/io.parity.ethereum",
             "ethchaindnpdappnodeeth_geth:/root/.ethereum",
             "ethchaindnpdappnodeeth_identity:/root/identity",
-            "ethchaindnpdappnodeeth_ipc:/root/.ethereum/ipc",
+            "ethchaindnpdappnodeeth_ipc:/root/.ethereum/ipc"
           ],
           environment: {
             EXTRA_OPTS: "--warp-barrier 9530000",
             EXTRA_OPTS_GETH: "",
-            DEFAULT_CLIENT: "PARITY",
+            DEFAULT_CLIENT: "PARITY"
           },
           ports: ["35353:30303", "35353:30303/udp", "35354:30304/udp"],
           networks: {
             network: {
-              ipv4_address: "172.33.1.6",
-            },
-          },
-        },
-      },
+              ipv4_address: "172.33.1.6"
+            }
+          }
+        }
+      }
     };
 
     const expectedUserSet: UserSettings = {
@@ -260,37 +256,37 @@ describe("parseUserSettings", () => {
         [serviceName]: {
           EXTRA_OPTS: "--warp-barrier 9530000",
           EXTRA_OPTS_GETH: "",
-          DEFAULT_CLIENT: "PARITY",
-        },
+          DEFAULT_CLIENT: "PARITY"
+        }
       },
       portMappings: {
         [serviceName]: {
           "30303/TCP": "35353",
           "30303/UDP": "35353",
-          "30304/UDP": "35354",
-        },
+          "30304/UDP": "35354"
+        }
       },
       namedVolumeMountpoints: {
         ethchaindnpdappnodeeth_data: "",
         ethchaindnpdappnodeeth_geth: "",
         ethchaindnpdappnodeeth_identity: "",
-        ethchaindnpdappnodeeth_ipc: "",
+        ethchaindnpdappnodeeth_ipc: ""
       },
       networks: {
         rootNetworks: {
           network: {
             driver: "bridge",
-            ipam: { config: [{ subnet: "172.33.0.0/16" }] },
-          },
+            ipam: { config: [{ subnet: "172.33.0.0/16" }] }
+          }
         },
         serviceNetworks: {
           [serviceName]: {
             network: {
-              ipv4_address: "172.33.1.6",
-            },
+              ipv4_address: "172.33.1.6"
+            }
           }
         }
-      },
+      }
     };
 
     const userSettings = parseUserSettings(compose);
@@ -305,8 +301,7 @@ describe("applyUserSettings", () => {
    */
   const applyUserSettingsTest: typeof applyUserSettings = (...args) => {
     const nextCompose = applyUserSettings(...args);
-    for (const serviceName in nextCompose.services)
-      delete nextCompose.services[serviceName].labels;
+    for (const serviceName in nextCompose.services) delete nextCompose.services[serviceName].labels;
     return nextCompose;
   };
 
@@ -324,40 +319,40 @@ describe("applyUserSettings", () => {
           volumes: [
             `${bitcoinVolumeNameNew}:/usr/data0`,
             "/dev1/custom-path:/usr/data1",
-            `${bitcoinVolumeName}:/usr/data2`,
-          ],
-        },
+            `${bitcoinVolumeName}:/usr/data2`
+          ]
+        }
       },
       volumes: {
         [bitcoinVolumeNameNew]: {},
-        [bitcoinVolumeName]: {},
-      },
+        [bitcoinVolumeName]: {}
+      }
     };
 
     const userSet: UserSettings = {
       environment: {
         [mockDnpName]: {
-          USERSET: "NEW_VALUE",
-        },
+          USERSET: "NEW_VALUE"
+        }
       },
       portMappings: {
         [mockDnpName]: {
           "4001/TCP": "4111",
-          "9090/UDP": "",
-        },
+          "9090/UDP": ""
+        }
       },
       namedVolumeMountpoints: {
-        [bitcoinVolumeNameNew]: "/dev0/data",
+        [bitcoinVolumeNameNew]: "/dev0/data"
       },
       legacyBindVolumes: {
         [mockDnpName]: {
-          [bitcoinVolumeName]: "/dev2/user-set-path",
-        },
-      },
+          [bitcoinVolumeName]: "/dev2/user-set-path"
+        }
+      }
     };
 
     const composeReturn = applyUserSettingsTest(compose, userSet, {
-      dnpName: mockDnpName,
+      dnpName: mockDnpName
     });
     const expectedCompose: Compose = {
       ...compose,
@@ -369,9 +364,9 @@ describe("applyUserSettings", () => {
           volumes: [
             `${bitcoinVolumeNameNew}:/usr/data0`,
             "/dev1/custom-path:/usr/data1",
-            "/dev2/user-set-path:/usr/data2",
-          ],
-        },
+            "/dev2/user-set-path:/usr/data2"
+          ]
+        }
       },
       volumes: {
         ...compose.volumes,
@@ -379,10 +374,10 @@ describe("applyUserSettings", () => {
           driver_opts: {
             device: `/dev0/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/${bitcoinVolumeNameNew}`,
             o: "bind",
-            type: "none",
-          },
-        },
-      },
+            type: "none"
+          }
+        }
+      }
     };
     expect(composeReturn).to.deep.equal(expectedCompose);
   });
@@ -393,22 +388,22 @@ describe("applyUserSettings", () => {
       services: {
         [mockDnpName]: {
           ...mockComposeService,
-          ports: ["3333/udp", "4444:4444/udp"],
-        },
-      },
+          ports: ["3333/udp", "4444:4444/udp"]
+        }
+      }
     };
 
     const userSet: UserSettings = {
       portMappings: {
-        [mockDnpName]: { "3333/UDP": "3330", "4444/UDP": "" },
-      },
+        [mockDnpName]: { "3333/UDP": "3330", "4444/UDP": "" }
+      }
     };
 
     const expectedServiceParts = {
-      ports: ["3330:3333/udp", "4444/udp"],
+      ports: ["3330:3333/udp", "4444/udp"]
     };
     const composeReturn = applyUserSettingsTest(compose, userSet, {
-      dnpName: mockDnpName,
+      dnpName: mockDnpName
     });
     const serviceParts = pick(composeReturn.services[mockDnpName], ["ports"]);
 
@@ -417,11 +412,7 @@ describe("applyUserSettings", () => {
 
   it("Should return the same compose if re-applying it's own user settings", () => {
     const userSettings = parseUserSettings(polkadotCurrentCompose);
-    const composeReturn = applyUserSettingsTest(
-      polkadotNewCompose,
-      userSettings,
-      { dnpName: mockDnpName }
-    );
+    const composeReturn = applyUserSettingsTest(polkadotNewCompose, userSettings, { dnpName: mockDnpName });
     expect(composeReturn).to.deep.equal(polkadotCurrentCompose);
   });
 
@@ -433,17 +424,17 @@ describe("applyUserSettings", () => {
       services: {
         [mockDnpName]: {
           ...mockComposeService,
-          volumes: ["data:/usr/data", "identity:/usr/id"],
-        },
+          volumes: ["data:/usr/data", "identity:/usr/id"]
+        }
       },
       volumes: {
         data: {},
-        identity: {},
-      },
+        identity: {}
+      }
     };
 
     const userSet: UserSettings = {
-      allNamedVolumeMountpoint: mountpoint,
+      allNamedVolumeMountpoint: mountpoint
     };
 
     const expectedComposeAfterFirstInstall: Compose = {
@@ -451,50 +442,44 @@ describe("applyUserSettings", () => {
       services: {
         [mockDnpName]: {
           ...originalCompose.services[mockDnpName],
-          volumes: ["data:/usr/data", "identity:/usr/id"],
-        },
+          volumes: ["data:/usr/data", "identity:/usr/id"]
+        }
       },
       volumes: {
         data: {
           driver_opts: {
-            device:
-              "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/data",
+            device: "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/data",
             o: "bind",
-            type: "none",
-          },
+            type: "none"
+          }
         },
         identity: {
           driver_opts: {
-            device:
-              "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/identity",
+            device: "/dev1/data/dappnode-volumes/mock-dnp.dnp.dappnode.eth/identity",
             o: "bind",
-            type: "none",
-          },
-        },
-      },
+            type: "none"
+          }
+        }
+      }
     };
 
     const expectedUserSettingsOnUpdate: UserSettings = {
       namedVolumeMountpoints: {
         data: mountpoint,
-        identity: mountpoint,
-      },
+        identity: mountpoint
+      }
     };
 
-    expect(
-      applyUserSettingsTest(originalCompose, userSet, { dnpName: mockDnpName })
-    ).to.deep.equal(
+    expect(applyUserSettingsTest(originalCompose, userSet, { dnpName: mockDnpName })).to.deep.equal(
       expectedComposeAfterFirstInstall,
       "allNamedVolumeMountpoint setting should be applied in first install"
     );
 
-    const userSettingsOnUpdate = parseUserSettings(
-      expectedComposeAfterFirstInstall
-    );
+    const userSettingsOnUpdate = parseUserSettings(expectedComposeAfterFirstInstall);
     expect(userSettingsOnUpdate).to.deep.equal(expectedUserSettingsOnUpdate);
     expect(
       applyUserSettingsTest(originalCompose, userSettingsOnUpdate, {
-        dnpName: mockDnpName,
+        dnpName: mockDnpName
       })
     ).to.deep.equal(
       expectedComposeAfterFirstInstall,
@@ -512,12 +497,12 @@ describe("applyUserSettings", () => {
         [dnpName]: {
           container_name: dnpName,
           image: `${dnpName}:0.1.0`,
-          volumes: [`${customBind}:/root/.bitcoin`],
-        },
+          volumes: [`${customBind}:/root/.bitcoin`]
+        }
       },
       volumes: {
-        bitcoin_data: {},
-      },
+        bitcoin_data: {}
+      }
     };
 
     const newCompose: Compose = {
@@ -526,12 +511,12 @@ describe("applyUserSettings", () => {
         [dnpName]: {
           container_name: dnpName,
           image: `${dnpName}:0.2.0`,
-          volumes: ["bitcoin_data:/root/.bitcoin"],
-        },
+          volumes: ["bitcoin_data:/root/.bitcoin"]
+        }
       },
       volumes: {
-        bitcoin_data: {},
-      },
+        bitcoin_data: {}
+      }
     };
 
     const expectedComposeAfterUpdate: Compose = {
@@ -539,26 +524,24 @@ describe("applyUserSettings", () => {
       services: {
         [dnpName]: {
           ...newCompose.services[dnpName],
-          volumes: [`${customBind}:/root/.bitcoin`],
-        },
-      },
+          volumes: [`${customBind}:/root/.bitcoin`]
+        }
+      }
     };
 
     const expectedUserSettingsOnUpdate: UserSettings = {
       legacyBindVolumes: {
         [dnpName]: {
-          bitcoin_data: customBind,
-        },
-      },
+          bitcoin_data: customBind
+        }
+      }
     };
 
     const userSettingsOnUpdate = parseUserSettings(oldLocalCompose);
-    expect(userSettingsOnUpdate).to.deep.equal(
-      expectedUserSettingsOnUpdate,
-      "Wrong userSettingsOnUpdate"
+    expect(userSettingsOnUpdate).to.deep.equal(expectedUserSettingsOnUpdate, "Wrong userSettingsOnUpdate");
+    expect(applyUserSettingsTest(newCompose, userSettingsOnUpdate, { dnpName })).to.deep.equal(
+      expectedComposeAfterUpdate,
+      "Wrong composeAfterUpdate"
     );
-    expect(
-      applyUserSettingsTest(newCompose, userSettingsOnUpdate, { dnpName })
-    ).to.deep.equal(expectedComposeAfterUpdate, "Wrong composeAfterUpdate");
   });
 });

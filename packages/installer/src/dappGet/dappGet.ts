@@ -65,8 +65,7 @@ export async function dappGet(
    * It will not use the fetch or resolver module and only
    * fetch the first level dependencies of the request
    */
-  if (options && options.BYPASS_RESOLVER)
-    return await dappGetBasic(dappnodeInstaller, req);
+  if (options && options.BYPASS_RESOLVER) return await dappGetBasic(dappnodeInstaller, req);
 
   const dnpList = await listPackages();
 
@@ -78,7 +77,7 @@ export async function dappGet(
       dappnodeInstaller,
       req,
       dnpList,
-      dappGetFetcher: dappGetFetcher || new DappGetFetcher(),
+      dappGetFetcher: dappGetFetcher || new DappGetFetcher()
     });
   } catch (e) {
     logs.debug("dappGet/aggregate error", e);
@@ -121,6 +120,6 @@ export async function dappGet(
     message,
     state,
     alreadyUpdated,
-    currentVersions,
+    currentVersions
   };
 }

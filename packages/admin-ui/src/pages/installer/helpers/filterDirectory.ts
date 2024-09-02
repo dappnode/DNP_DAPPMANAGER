@@ -25,17 +25,13 @@ export default function filterDirectory({
   query: string;
   selectedCategories: SelectedCategories;
 }): DirectoryItem[] {
-  const isSomeCategorySelected = Object.values(selectedCategories).reduce(
-    (acc, val) => acc || val,
-    false
-  );
+  const isSomeCategorySelected = Object.values(selectedCategories).reduce((acc, val) => acc || val, false);
   return directory
-    .filter(dnp => !query || includesSafe(dnp, query))
+    .filter((dnp) => !query || includesSafe(dnp, query))
     .filter(
-      dnp =>
+      (dnp) =>
         !isSomeCategorySelected ||
-        (dnp.status === "ok" &&
-          (dnp.categories || []).some(category => selectedCategories[category]))
+        (dnp.status === "ok" && (dnp.categories || []).some((category) => selectedCategories[category]))
     );
 }
 
@@ -46,6 +42,7 @@ export default function filterDirectory({
  * @param sourceObj = { hello: "world" }
  * @param target = "hell"
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function includesSafe(sourceObj: any, target: string): boolean {
   try {
     return JSON.stringify(sourceObj).includes(target);

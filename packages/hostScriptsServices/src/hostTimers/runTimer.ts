@@ -26,8 +26,7 @@ export async function runTimer(timer: Timer): Promise<string> {
   const timerPath = path.resolve(params.HOST_TIMERS_SOURCE_DIR, timer.name);
   try {
     // Check if timer exists
-    if (!fs.existsSync(timerPath))
-      throw Error(`Host timer ${timer.name} not found`);
+    if (!fs.existsSync(timerPath)) throw Error(`Host timer ${timer.name} not found`);
 
     // Copy timer and service into shared volume
     await copyHostService(timer.dependantService);

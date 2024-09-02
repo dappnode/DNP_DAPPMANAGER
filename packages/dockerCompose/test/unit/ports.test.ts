@@ -1,12 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { PortProtocol } from "@dappnode/types";
-import {
-  parsePortMappings,
-  stringifyPortMappings,
-  mergePortMappings,
-  mergePortArrays,
-} from "../../src/index.js";
+import { parsePortMappings, stringifyPortMappings, mergePortMappings, mergePortArrays } from "../../src/index.js";
 
 describe("portMappings: parse, stringify and merge", () => {
   it("should parse and stringify port mappings", () => {
@@ -15,18 +10,12 @@ describe("portMappings: parse, stringify and merge", () => {
       { container: 4001, protocol: PortProtocol.TCP },
       { container: 5001, protocol: PortProtocol.UDP },
       { host: 30303, container: 30303, protocol: PortProtocol.TCP },
-      { host: 30303, container: 30303, protocol: PortProtocol.UDP },
+      { host: 30303, container: 30303, protocol: PortProtocol.UDP }
     ];
 
-    expect(parsePortMappings(portArray)).to.deep.equal(
-      portMappings,
-      "Wrong parse"
-    );
+    expect(parsePortMappings(portArray)).to.deep.equal(portMappings, "Wrong parse");
 
-    expect(stringifyPortMappings(portMappings)).to.deep.equal(
-      portArray,
-      "Wrong stringify"
-    );
+    expect(stringifyPortMappings(portMappings)).to.deep.equal(portArray, "Wrong stringify");
   });
 
   it("should merge port mappings", () => {
@@ -34,14 +23,14 @@ describe("portMappings: parse, stringify and merge", () => {
       { container: 5001, protocol: PortProtocol.UDP },
       { host: 30304, container: 30303, protocol: PortProtocol.TCP },
       { host: 30304, container: 30303, protocol: PortProtocol.UDP },
-      { container: 60606, protocol: PortProtocol.TCP },
+      { container: 60606, protocol: PortProtocol.TCP }
     ];
 
     const portMappings2 = [
       { container: 4001, protocol: PortProtocol.TCP },
       { host: 30303, container: 30303, protocol: PortProtocol.TCP },
       { host: 30303, container: 30303, protocol: PortProtocol.UDP },
-      { host: 60606, container: 60606, protocol: PortProtocol.TCP },
+      { host: 60606, container: 60606, protocol: PortProtocol.TCP }
     ];
 
     const mergedPortMappings = mergePortMappings(portMappings1, portMappings2);
@@ -51,7 +40,7 @@ describe("portMappings: parse, stringify and merge", () => {
       { host: 30304, container: 30303, protocol: PortProtocol.TCP },
       { host: 30304, container: 30303, protocol: PortProtocol.UDP },
       { container: 60606, protocol: PortProtocol.TCP },
-      { container: 4001, protocol: PortProtocol.TCP },
+      { container: 4001, protocol: PortProtocol.TCP }
     ]);
   });
 
@@ -62,10 +51,6 @@ describe("portMappings: parse, stringify and merge", () => {
 
     const mergedPortMappings = mergePortArrays(portArray1, portArray2);
 
-    expect(mergedPortMappings).to.deep.equal([
-      "30656:30303/udp",
-      "8080:8080",
-      "4001:4001",
-    ]);
+    expect(mergedPortMappings).to.deep.equal(["30656:30303/udp", "8080:8080", "4001:4001"]);
   });
 });

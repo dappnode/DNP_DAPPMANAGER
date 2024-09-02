@@ -6,7 +6,7 @@ import {
   EthClientFallback,
   EthClientStatus,
   EthClientSyncedNotificationStatus,
-  EthClientInstallStatus,
+  EthClientInstallStatus
 } from "@dappnode/types";
 
 // User chosen properties
@@ -19,24 +19,16 @@ const ETH_CONS_CLIENT_INSTALL_STATUS = "eth-cons-client-install-status";
 const ETH_EXEC_CLIENT_STATUS = "eth-exec-client-status";
 const ETH_CONS_CLIENT_STATUS = "eth-cons-client-status";
 // Cached temp status
-const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS =
-  "eth-client-synced-notification-status";
+const ETH_CLIENT_SYNCED_NOTIFICATION_STATUS = "eth-client-synced-notification-status";
 
-export const ethRemoteRpc = dbMain.staticKey<string>(
-  ETH_REMOTE_RPC,
-  params.ETH_MAINNET_RPC_URL_REMOTE
-);
+export const ethRemoteRpc = dbMain.staticKey<string>(ETH_REMOTE_RPC, params.ETH_MAINNET_RPC_URL_REMOTE);
 
 /**
  * New introduced in dappmanager v0.2.54
  */
-export const ethClientRemote = interceptOnSet(
-  dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null)
-);
+export const ethClientRemote = interceptOnSet(dbMain.staticKey<EthClientRemote | null>(ETH_CLIENT_REMOTE, null));
 
-export const ethClientFallback = interceptOnSet(
-  dbMain.staticKey<EthClientFallback>(ETH_CLIENT_FALLBACK, "off")
-);
+export const ethClientFallback = interceptOnSet(dbMain.staticKey<EthClientFallback>(ETH_CLIENT_FALLBACK, "off"));
 
 // Cached status, not critical
 
@@ -47,8 +39,7 @@ export const ethExecClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, string>({
     rootKey: ETH_EXEC_CLIENT_INSTALL_STATUS,
     getKey: (target) => target,
-    validate: (id, installStatus) =>
-      typeof id === "string" && typeof installStatus === "object",
+    validate: (id, installStatus) => typeof id === "string" && typeof installStatus === "object"
   })
 );
 
@@ -59,8 +50,7 @@ export const ethConsClientInstallStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientInstallStatus, string>({
     rootKey: ETH_CONS_CLIENT_INSTALL_STATUS,
     getKey: (target) => target,
-    validate: (id, installStatus) =>
-      typeof id === "string" && typeof installStatus === "object",
+    validate: (id, installStatus) => typeof id === "string" && typeof installStatus === "object"
   })
 );
 
@@ -71,8 +61,7 @@ export const ethExecClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, string>({
     rootKey: ETH_EXEC_CLIENT_STATUS,
     getKey: (target) => target,
-    validate: (id, status) =>
-      typeof id === "string" && typeof status === "object",
+    validate: (id, status) => typeof id === "string" && typeof status === "object"
   })
 );
 
@@ -83,8 +72,7 @@ export const ethConsClientStatus = interceptOnSet(
   dbCache.indexedByKey<EthClientStatus, string>({
     rootKey: ETH_CONS_CLIENT_STATUS,
     getKey: (target) => target,
-    validate: (id, status) =>
-      typeof id === "string" && typeof status === "object",
+    validate: (id, status) => typeof id === "string" && typeof status === "object"
   })
 );
 
@@ -104,15 +92,14 @@ function interceptOnSet<
     set: function (...args: any[]): void {
       dbSetter.set(...args);
       eventBus.requestSystemInfo.emit();
-    },
+    }
   };
 }
 
 /**
  * Cache the status of the eth client install loop
  */
-export const ethClientSyncedNotificationStatus =
-  dbCache.staticKey<EthClientSyncedNotificationStatus>(
-    ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
-    null
-  );
+export const ethClientSyncedNotificationStatus = dbCache.staticKey<EthClientSyncedNotificationStatus>(
+  ETH_CLIENT_SYNCED_NOTIFICATION_STATUS,
+  null
+);

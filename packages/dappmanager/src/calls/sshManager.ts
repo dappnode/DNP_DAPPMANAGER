@@ -113,9 +113,7 @@ class SshManager {
     if (port >= 65536) throw Error(`Port must be < 65536: ${port}`);
 
     // NOTE: "--" MUST be used to make the flag and the command work
-    await this.shellHost(
-      `sed -- -i "s/.*Port .*/Port ${port}/g" /etc/ssh/sshd_config`
-    );
+    await this.shellHost(`sed -- -i "s/.*Port .*/Port ${port}/g" /etc/ssh/sshd_config`);
     await this.shellHost("systemctl restart ssh.service");
   }
 
@@ -139,18 +137,12 @@ class SshManager {
 
   async removeRootAccess(): Promise<void> {
     // NOTE: "--" MUST be used to make the flag and the command work
-    await this.shellHost(
-      `sed -- -i "s/.*PermitRootLogin .*/PermitRootLogin no/g" /etc/ssh/sshd_config`
-    );
+    await this.shellHost(`sed -- -i "s/.*PermitRootLogin .*/PermitRootLogin no/g" /etc/ssh/sshd_config`);
   }
 
   // Public methods from SshCalls are added below:
 
-  public async sshStatusSet({
-    status
-  }: {
-    status: "enabled" | "disabled";
-  }): Promise<void> {
+  public async sshStatusSet({ status }: { status: "enabled" | "disabled" }): Promise<void> {
     switch (status) {
       case "enabled":
         return await this.enable();
@@ -167,10 +159,8 @@ class SshManager {
 
   public async sshPortSet({ port }: { port: number }): Promise<void> {
     if (isNaN(port) || !isFinite(port)) throw Error(`Invalid port ${port}`);
-    if (port > this.maxPortNumber)
-      throw Error(`Port ${port} over maxPortNumber ${this.maxPortNumber}`);
-    if (port < this.minPortNumber)
-      throw Error(`Port ${port} under minPortNumber ${this.minPortNumber}`);
+    if (port > this.maxPortNumber) throw Error(`Port ${port} over maxPortNumber ${this.maxPortNumber}`);
+    if (port < this.minPortNumber) throw Error(`Port ${port} under minPortNumber ${this.minPortNumber}`);
 
     await this.setPort(port);
   }
@@ -192,11 +182,7 @@ export async function sshPortGet(): Promise<number> {
   return await sshManager.sshPortGet();
 }
 
-export async function sshStatusSet({
-  status
-}: {
-  status: "enabled" | "disabled";
-}): Promise<void> {
+export async function sshStatusSet({ status }: { status: "enabled" | "disabled" }): Promise<void> {
   return await sshManager.sshStatusSet({ status });
 }
 

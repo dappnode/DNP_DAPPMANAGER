@@ -1,12 +1,6 @@
 import { ContainerState } from "./pkg.js";
 import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.js";
-import {
-  Manifest,
-  Dependencies,
-  ChainDriver,
-  PackageBackup,
-  ManifestUpdateAlert,
-} from "./manifest.js";
+import { Manifest, Dependencies, ChainDriver, PackageBackup, ManifestUpdateAlert } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
 
 /**
@@ -132,13 +126,9 @@ export type ShhStatus = "enabled" | "disabled";
  * =======
  */
 
-export type VpnDeviceAdminPassword =
-  | { hasChangedPassword: true }
-  | { hasChangedPassword: false; password: string };
+export type VpnDeviceAdminPassword = { hasChangedPassword: true } | { hasChangedPassword: false; password: string };
 
-export type VpnDevice =
-  | { id: string; admin: false }
-  | ({ id: string; admin: true } & VpnDeviceAdminPassword);
+export type VpnDevice = { id: string; admin: false } | ({ id: string; admin: true } & VpnDeviceAdminPassword);
 
 export type VpnDeviceCredentials = VpnDevice & {
   url: string;
@@ -250,8 +240,8 @@ export interface UserSettings {
   // For keeping staker network in case client is selected
   networks?: {
     rootNetworks: ComposeNetworks;
-    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks; }
-  }
+    serviceNetworks: { [serviceName: string]: ComposeServiceNetworks };
+  };
 
   domainAlias?: string[]; // ["fullnode", "my-custom-name"]
   // ### DEPRECATED Kept for legacy compatibility
@@ -333,7 +323,7 @@ export interface SetupWizardAllDnps {
 
 export enum PortProtocol {
   UDP = "UDP",
-  TCP = "TCP",
+  TCP = "TCP"
 }
 
 export interface UpnpPortMapping {
@@ -787,9 +777,7 @@ export interface CoreUpdateDataAvailable {
   versionId: string;
   coreVersion: string;
 }
-export type CoreUpdateData =
-  | CoreUpdateDataNotAvailable
-  | CoreUpdateDataAvailable;
+export type CoreUpdateData = CoreUpdateDataNotAvailable | CoreUpdateDataAvailable;
 
 /**
  * Releases types
@@ -855,11 +843,7 @@ export interface AvahiDaemonStatus {
   avahiResolves: boolean;
 }
 
-export type LocalProxyingStatus =
-  | "running"
-  | "stopped"
-  | "crashed"
-  | "https missing";
+export type LocalProxyingStatus = "running" | "stopped" | "crashed" | "https missing";
 
 /**
  * Aggregated DAppNode system info
@@ -952,7 +936,7 @@ export interface IpfsRepository {
 
 export enum IpfsClientTarget {
   local = "local",
-  remote = "remote",
+  remote = "remote"
 }
 
 /**
@@ -1035,9 +1019,9 @@ export type EthClientSyncedNotificationStatus = {
 
 export type Eth2ClientTarget =
   | {
-    execClient: string;
-    consClient: string;
-  }
+      execClient: string;
+      consClient: string;
+    }
   | "remote";
 
 /**
@@ -1047,7 +1031,7 @@ export type EthClientFallback = "on" | "off";
 
 export enum EthClientRemote {
   on = "on",
-  off = "off",
+  off = "off"
 }
 
 export type EthClientStatus = EthClientStatusOk | EthClientStatusError;

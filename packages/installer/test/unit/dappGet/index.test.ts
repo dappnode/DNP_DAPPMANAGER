@@ -9,8 +9,6 @@ import { dappnodeInstaller, mockDnp } from "../../testUtils.js";
 import { DappGetDnps } from "../../../src/dappGet/types.js";
 import { DappGetFetcher } from "../../../src/dappGet/fetch/index.js";
 
-/* eslint-disable max-len */
-
 /**
  * Purpose of the test. Make sure packages are moved to the alreadyUpgraded object
  */
@@ -29,26 +27,26 @@ describe.skip("dappGet", function () {
           ...mockDnp,
           dependencies: {
             "nginx-proxy.dnp.dappnode.eth": "latest",
-            "letsencrypt-nginx.dnp.dappnode.eth": "latest",
+            "letsencrypt-nginx.dnp.dappnode.eth": "latest"
           },
           dnpName: "web.dnp.dappnode.eth",
           version: "0.1.0",
-          origin: undefined,
+          origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "nginx-proxy.dnp.dappnode.eth": "latest" },
           dnpName: "nginx-proxy.dnp.dappnode.eth",
           version: "0.0.3",
-          origin: undefined,
+          origin: undefined
         },
         {
           ...mockDnp,
           dependencies: { "web.dnp.dappnode.eth": "latest" },
           dnpName: "letsencrypt-nginx.dnp.dappnode.eth",
           version: "0.0.4",
-          origin: "/ipfs/Qm1234",
-        },
+          origin: "/ipfs/Qm1234"
+        }
       ];
     }
 
@@ -57,7 +55,7 @@ describe.skip("dappGet", function () {
     }
 
     // IDE and rewiremock can figure out the type on their own
-    /* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
+
     function resolve() {
       return {
         success: true,
@@ -65,8 +63,8 @@ describe.skip("dappGet", function () {
         state: {
           "nginx-proxy.dnp.dappnode.eth": "0.0.4",
           "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
-          "web.dnp.dappnode.eth": "0.1.0",
-        },
+          "web.dnp.dappnode.eth": "0.1.0"
+        }
       };
     }
 
@@ -94,18 +92,18 @@ describe.skip("dappGet", function () {
       dappnodeInstaller,
       {
         name: "nginx-proxy.dnp.dappnode.eth",
-        ver: "^0.1.0",
+        ver: "^0.1.0"
       },
       dappGetOptions,
       dappGetFetcher
     );
 
     expect(state).to.deep.equal({
-      "nginx-proxy.dnp.dappnode.eth": "0.0.4",
+      "nginx-proxy.dnp.dappnode.eth": "0.0.4"
     });
     expect(alreadyUpdated).to.deep.equal({
       "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
-      "web.dnp.dappnode.eth": "0.1.0",
+      "web.dnp.dappnode.eth": "0.1.0"
     });
   });
 

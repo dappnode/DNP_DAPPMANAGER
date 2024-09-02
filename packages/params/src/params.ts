@@ -57,22 +57,16 @@ export const params = {
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
-  HOST_SCRIPTS_SOURCE_DIR: process.env.TEST
-    ? "/app/packages/hostScriptsServices/hostScripts"
-    : "hostScripts",
+  HOST_SCRIPTS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostScripts" : "hostScripts",
   // Host services paths
   HOST_SERVICES_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/services/host"),
   HOST_SYSTEMD_DIR_FROM_HOST: "/etc/systemd/system",
   HOST_SERVICES_DIR: "DNCORE/services/host",
-  HOST_SERVICES_SOURCE_DIR: process.env.TEST
-    ? "/app/packages/hostScriptsServices/hostServices"
-    : "hostServices",
+  HOST_SERVICES_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostServices" : "hostServices",
   // Host timer paths
   HOST_TIMERS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/timers/host"),
   HOST_TIMERS_DIR: "DNCORE/timers/host",
-  HOST_TIMERS_SOURCE_DIR: process.env.TEST
-    ? "/app/packages/hostScriptsServices/hostTimers"
-    : "hostTimers",
+  HOST_TIMERS_SOURCE_DIR: process.env.TEST ? "/app/packages/hostScriptsServices/hostTimers" : "hostTimers",
   // Local fallback versions, to be able to install and eth client without connecting to remote
   FALLBACK_VERSIONS_PATH: path.join(DNCORE_DIR, "packages-content-hash.csv"),
   // Version data file, created in the docker image build process
@@ -92,7 +86,7 @@ export const params = {
     "http://localhost:3000",
     "http://localhost:3001",
     "http://my.dappnode",
-    "http://dappnode.local",
+    "http://dappnode.local"
   ],
 
   // API auth sessions
@@ -127,7 +121,7 @@ export const params = {
     [Network.Holesky]: "holesky_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
-    [Network.Lukso]: "lukso_network",
+    [Network.Lukso]: "lukso_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2", // "10.20.0.2"
@@ -164,8 +158,7 @@ export const params = {
 
   // Web3 parameters
   ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
-  ETH_MAINNET_RPC_URL_REMOTE:
-    process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
+  ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.io",
 
   // Prysm legacy specs for: prater, gnosis and mainnet
@@ -179,8 +172,8 @@ export const params = {
         "teku-prater.dnp.dappnode.eth",
         "lighthouse-prater.dnp.dappnode.eth",
         "nimbus-prater.dnp.dappnode.eth",
-        "lodestar-prater.dnp.dappnode.eth",
-      ],
+        "lodestar-prater.dnp.dappnode.eth"
+      ]
     },
     // v0.2.51
     {
@@ -191,8 +184,8 @@ export const params = {
         "teku-gnosis.dnp.dappnode.eth",
         "lighthouse-gnosis.dnp.dappnode.eth",
         "nimbus-gnosis.dnp.dappnode.eth",
-        "lodestar-gnosis.dnp.dappnode.eth",
-      ],
+        "lodestar-gnosis.dnp.dappnode.eth"
+      ]
     },
     // v0.2.52
     {
@@ -203,17 +196,13 @@ export const params = {
         "teku.dnp.dappnode.eth",
         "lighthouse.dnp.dappnode.eth",
         "nimbus.dnp.dappnode.eth",
-        "lodestar.dnp.dappnode.eth",
-      ],
-    },
+        "lodestar.dnp.dappnode.eth"
+      ]
+    }
   ],
 
   // DAPPMANAGER alias
-  DAPPMANAGER_ALIASES: [
-    "dappmanager.dappnode",
-    "my.dappnode",
-    "dappnode.local",
-  ],
+  DAPPMANAGER_ALIASES: ["dappmanager.dappnode", "my.dappnode", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -231,26 +220,20 @@ export const params = {
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
-  restartDnpVolumes: [
-    "/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/",
-    "/var/run/docker.sock:/var/run/docker.sock",
-  ],
-  corePackagesThatMustBeRunning: [
-    "bind.dnp.dappnode.eth",
-    "dappmanager.dnp.dappnode.eth",
-  ],
+  restartDnpVolumes: ["/usr/src/dappnode/DNCORE/:/usr/src/app/DNCORE/", "/var/run/docker.sock:/var/run/docker.sock"],
+  corePackagesThatMustBeRunning: ["bind.dnp.dappnode.eth", "dappmanager.dnp.dappnode.eth"],
   corePackagesNotAutoupdatable: [
     "core.dnp.dappnode.eth",
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "wifi.dnp.dappnode.eth",
+    "wifi.dnp.dappnode.eth"
   ],
   corePackagesNotRemovable: [
     "bind.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "ipfs.dnp.dappnode.eth",
-    "wifi.dnp.dappnode.eth",
+    "wifi.dnp.dappnode.eth"
   ],
 
   // DYNDNS parameters
@@ -274,18 +257,14 @@ export const params = {
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
 
   // nsenter line to run commands on host
-  NSENTER_COMMAND:
-    "docker run --rm --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i",
+  NSENTER_COMMAND: "docker run --rm --privileged --pid=host -t alpine:3.8 nsenter -t 1 -m -u -n -i",
 
   // Use a deterministic predefined key for the ADMIN side (DAPPMANAGER's is generated)
   ADMIN_NACL_SECRET_KEY: "DAppNodeDAppNodeDAppNodeDAppNodeDAppNodeDao=",
   ADMIN_NACL_PUBLIC_KEY: "cYo1NA7/+PQ22PeqrRNGhs1B84SY/fuomNtURj5SUmQ=",
 
   // Fullnode names
-  ALLOWED_FULLNODE_DNP_NAMES: [
-    "geth.dnp.dappnode.eth",
-    "parity.dnp.dappnode.eth",
-  ],
+  ALLOWED_FULLNODE_DNP_NAMES: ["geth.dnp.dappnode.eth", "parity.dnp.dappnode.eth"],
   // Default fullnode alias
   FULLNODE_ALIAS: "fullnode.dappnode",
 
@@ -307,81 +286,81 @@ export const params = {
       name: "DAppNode Association (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
     },
     {
       name: "DAppNode Association (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1",
+      key: "0xf35960302a07022aba880dffaec2fdd64d5bf1c1"
     },
     {
       name: "Nethermind Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6"
     },
     {
       name: "Nethermind Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6",
+      key: "0xA6264173430bd3FdFF7414c617CBa299d85661E6"
     },
     {
       name: "Lodestar Ethereum consensus client team",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0x9D055dd23de15114EC95921208c741873eDE8558",
+      key: "0x9D055dd23de15114EC95921208c741873eDE8558"
     },
     {
       name: "ETC Cooperative",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xfB737B2bb2067C3f9E1448AA2D70D32Db4fb51C4",
+      key: "0xfB737B2bb2067C3f9E1448AA2D70D32Db4fb51C4"
     },
     {
       name: "Besu Ethereum client team (public)",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
     },
     {
       name: "Besu Ethereum client team (dnp)",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA",
+      key: "0xD88457e1B6e304900190b4a74f3c7D9a89896dBA"
     },
     {
       name: "Mgarciate",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6"
     },
     {
       name: "Mgarciate",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6",
+      key: "0x86C4C5D83Ae936d32Ce46E8F256eC382A4F111d6"
     },
     {
       name: "HOPR Team",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E",
+      key: "0x7305356ad936A06c4ea5DF45AD5E5C3ff9Db818E"
     },
     {
       name: "Gnosis Team",
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1",
+      key: "0x2BdB9b9b477268C1e7C04459F79DCc22401BBcd1"
     },
     {
       name: "Blockswap Labs",
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
-      key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a",
-    },
-  ],
+      key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a"
+    }
+  ]
 };
 
 if (devMode) {

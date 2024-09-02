@@ -20,9 +20,7 @@ export const getVersionData = memoize(function (): {
   message?: string;
 } {
   try {
-    const data: PackageVersionData = JSON.parse(
-      fs.readFileSync(params.GIT_DATA_PATH, "utf8")
-    );
+    const data: PackageVersionData = JSON.parse(fs.readFileSync(params.GIT_DATA_PATH, "utf8"));
 
     const previousData = db.versionData.get();
     const isNewVersion = !isEqual(previousData, data);

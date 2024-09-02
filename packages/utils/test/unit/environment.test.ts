@@ -7,7 +7,7 @@ describe("environment: parse, stringify", () => {
   const envs = {
     NAME: "VALUE",
     NOVAL: "",
-    COMPLEX: "D=D=D  = 2",
+    COMPLEX: "D=D=D  = 2"
   };
 
   it("Should parse an envsArray", () => {

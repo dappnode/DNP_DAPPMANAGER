@@ -10,7 +10,7 @@ import {
   rollbackPackages,
   writeAndValidateFiles,
   postInstallClean,
-  afterInstall,
+  afterInstall
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
@@ -31,40 +31,27 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
  */
 export async function packageInstall(
   dappnodeInstaller: DappnodeInstaller,
-  {
-    name: reqName,
-    version: reqVersion,
-    userSettings = {},
-    options = {},
-  }: Parameters<Routes["packageInstall"]>[0]
+  { name: reqName, version: reqVersion, userSettings = {}, options = {} }: Parameters<Routes["packageInstall"]>[0]
 ): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
     name: sanitizeRequestName(reqName),
-    ver: sanitizeRequestVersion(reqVersion),
+    ver: sanitizeRequestVersion(reqVersion)
   };
   const id = req.name;
   const log = getLogUi(id);
 
   try {
     log(id, "Resolving dependencies...");
-    const { state, currentVersions, releases } =
-      await dappnodeInstaller.getReleasesResolved(req, options);
+    const { state, currentVersions, releases } = await dappnodeInstaller.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
 
     // Throw any errors found in the release
     for (const release of releases) {
-      if (
-        release.warnings.coreFromForeignRegistry &&
-        !options.BYPASS_CORE_RESTRICTION
-      )
-        throw Error(
-          `Core package ${release.dnpName} is from a foreign registry`
-        );
+      if (release.warnings.coreFromForeignRegistry && !options.BYPASS_CORE_RESTRICTION)
+        throw Error(`Core package ${release.dnpName} is from a foreign registry`);
       if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
-        throw Error(
-          `Package ${release.dnpName} is from untrusted origin and is not signed`
-        );
+        throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
     }
 
@@ -73,15 +60,14 @@ export async function packageInstall(
       releases,
       userSettings,
       currentVersions,
-      reqName,
+      reqName
     });
     logs.debug("Packages data", packagesData);
     logs.debug("User settings", userSettings);
 
     // Make sure that no package is already being installed
     const dnpNames = packagesData.map(({ dnpName }) => dnpName);
-    for (const dnpName of dnpNames)
-      if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
+    for (const dnpName of dnpNames) if (packageIsInstalling(dnpName)) throw Error(`${dnpName} is installing`);
 
     try {
       flagPackagesAreInstalling(dnpNames);

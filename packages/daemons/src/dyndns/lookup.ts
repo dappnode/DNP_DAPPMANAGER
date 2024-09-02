@@ -13,10 +13,7 @@ import dns from "dns";
  *
  *  Error: getaddrinfo EAI_AGAIN
  */
-export async function lookup(
-  hostname: string,
-  ignoreErrors?: boolean
-): Promise<string | null> {
+export async function lookup(hostname: string, ignoreErrors?: boolean): Promise<string | null> {
   try {
     const { address } = await dns.promises.lookup(hostname);
     return address;

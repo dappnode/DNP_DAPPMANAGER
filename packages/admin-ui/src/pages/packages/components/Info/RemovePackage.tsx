@@ -19,13 +19,7 @@ interface WarningItem {
 }
 
 export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
-  const {
-    dnpName,
-    areThereVolumesToRemove,
-    dependantsOf,
-    notRemovable,
-    manifest
-  } = dnp;
+  const { dnpName, areThereVolumesToRemove, dependantsOf, notRemovable, manifest } = dnp;
 
   const navigate = useNavigate();
 
@@ -33,40 +27,36 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     // Dialog to confirm warning onRemove from manifest
     const removeWarnings = manifest?.warnings?.onRemove;
     if (removeWarnings) {
-      await new Promise(
-        (resolve: (confirmOnRemoveWarning: boolean) => void) => {
-          confirm({
-            title: `Removal warning`,
-            text: removeWarnings,
-            buttons: [
-              {
-                label: "Continue",
-                onClick: () => resolve(true)
-              }
-            ]
-          });
-        }
-      );
+      await new Promise((resolve: (confirmOnRemoveWarning: boolean) => void) => {
+        confirm({
+          title: `Removal warning`,
+          text: removeWarnings,
+          buttons: [
+            {
+              label: "Continue",
+              onClick: () => resolve(true)
+            }
+          ]
+        });
+      });
     }
 
     // Dialog to confirm remove + USER INPUT for delete volumes
-    const deleteVolumes = await new Promise(
-      (resolve: (_deleteVolumes: boolean) => void) => {
-        const title = `Removing ${prettyDnpName(dnpName)}`;
-        let text = `This action cannot be undone.`;
-        const buttons = [{ label: "Remove", onClick: () => resolve(false) }];
-        if (areThereVolumesToRemove) {
-          // Only show the remove data related text if necessary
-          text += ` If you do NOT want to keep ${dnpName}'s data, remove it permanently clicking the "Remove and delete data" option.`;
-          // Only display the "Remove and delete data" button if necessary
-          buttons.push({
-            label: "Remove and delete data",
-            onClick: () => resolve(true)
-          });
-        }
-        confirm({ title, text, buttons });
+    const deleteVolumes = await new Promise((resolve: (_deleteVolumes: boolean) => void) => {
+      const title = `Removing ${prettyDnpName(dnpName)}`;
+      let text = `This action cannot be undone.`;
+      const buttons = [{ label: "Remove", onClick: () => resolve(false) }];
+      if (areThereVolumesToRemove) {
+        // Only show the remove data related text if necessary
+        text += ` If you do NOT want to keep ${dnpName}'s data, remove it permanently clicking the "Remove and delete data" option.`;
+        // Only display the "Remove and delete data" button if necessary
+        buttons.push({
+          label: "Remove and delete data",
+          onClick: () => resolve(true)
+        });
       }
-    );
+      confirm({ title, text, buttons });
+    });
 
     const dnpsToRemoveWarningsList: WarningItem[] = [];
     // Don't show the same DNP in both dnpsToRemove and dependantsOf
@@ -80,7 +70,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
     }
 
     if (dnpsToRemoveWarningsList.length > 0)
-      await new Promise<void>(resolve =>
+      await new Promise<void>((resolve) =>
         confirm({
           title: `Removing ${prettyDnpName(dnpName)}`,
           text: `This action cannot be undone.`,
@@ -114,12 +104,7 @@ export function RemovePackage({ dnp }: { dnp: InstalledPackageDetailData }) {
         <strong>Remove</strong>
         <div>Delete {prettyDnpName(dnpName)} package permanently.</div>
       </div>
-      <Button
-        variant="outline-danger"
-        onClick={packageRemove}
-        style={{ whiteSpace: "normal" }}
-        disabled={notRemovable}
-      >
+      <Button variant="outline-danger" onClick={packageRemove} style={{ whiteSpace: "normal" }} disabled={notRemovable}>
         <BsTrash />
       </Button>
     </div>

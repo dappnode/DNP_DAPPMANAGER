@@ -62,7 +62,7 @@ export function generateKeysIfNotExistOrNotValid(): void {
   db.dyndnsIdentity.set({
     address,
     privateKey,
-    publicKey,
+    publicKey
   });
 
   db.domain.set(getDomainFromIdentityAddress(address));

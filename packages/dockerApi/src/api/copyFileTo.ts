@@ -30,7 +30,7 @@ export async function copyFileToDockerContainer({
   containerName,
   dataUri,
   filename,
-  toPath,
+  toPath
 }: {
   containerName: string;
   dataUri: string;
@@ -42,17 +42,14 @@ export async function copyFileToDockerContainer({
   if (!dataUri) throw Error("Argument dataUri must be defined");
   if (!filename) throw Error("Argument filename must be defined");
   // Allow only alphanumeric, underscores, hyphens, and dots to prevent command injection
-  if (!/^[a-zA-Z0-9._-]+$/.test(containerName))
-    throw Error(`Invalid container name: ${containerName}`);
+  if (!/^[a-zA-Z0-9._-]+$/.test(containerName)) throw Error(`Invalid container name: ${containerName}`);
   // Validate file name and path to prevent directory traversal or command execution
   if (/[^a-zA-Z0-9._/-]/.test(toPath)) throw Error(`Invalid path: ${toPath}`);
-  if (/[^a-zA-Z0-9._/-]/.test(filename))
-    throw Error(`Invalid file name: ${filename}`);
+  if (/[^a-zA-Z0-9._/-]/.test(filename)) throw Error(`Invalid file name: ${filename}`);
 
   // toPath is allowed to be empty, it will default to WORKDIR
   // if (!toPath) throw Error("Argument toPath must be defined")
-  if (filename.includes("/"))
-    throw Error(`filename must not be a path: ${filename}`);
+  if (filename.includes("/")) throw Error(`filename must not be a path: ${filename}`);
 
   // Construct relative paths to container
   // Fetch the WORKDIR from a docker inspect
@@ -64,12 +61,10 @@ export async function copyFileToDockerContainer({
   }
 
   // Intermediate step, the file is in local file system
-  if (!fs.existsSync(tempTransferDir))
-    fs.mkdirSync(tempTransferDir, { recursive: true });
+  if (!fs.existsSync(tempTransferDir)) fs.mkdirSync(tempTransferDir, { recursive: true });
   const fromPath = path.join(tempTransferDir, filename);
   // Remove existing file if it exists
-  if (fs.existsSync(fromPath))
-    fs.rmSync(fromPath, { recursive: true, force: true });
+  if (fs.existsSync(fromPath)) fs.rmSync(fromPath, { recursive: true, force: true });
 
   /**
    * Convert dataUri to local file
@@ -85,27 +80,21 @@ export async function copyFileToDockerContainer({
   const containerInspect = await dockerContainerInspect(containerName);
   const isInitiallyRunning = containerInspect.State.Running;
 
-  if (!isInitiallyRunning)
-    await dockerContainerStart(containerName);
+  if (!isInitiallyRunning) await dockerContainerStart(containerName);
 
   // Copy file from local file system to container
   await dockerCopyFileTo(containerName, fromPath, toPath);
 
   // Clean intermediate file
-  if (fs.existsSync(fromPath))
-    fs.rmSync(fromPath, { recursive: true, force: true });
+  if (fs.existsSync(fromPath)) fs.rmSync(fromPath, { recursive: true, force: true });
 
   if (!isInitiallyRunning)
-    dockerContainerStop(containerName).catch(
-      (err) => logs.error(`Error stopping container ${containerName} after copying a file to it: ${err}`)
+    dockerContainerStop(containerName).catch((err) =>
+      logs.error(`Error stopping container ${containerName} after copying a file to it: ${err}`)
     );
 }
 
-function dockerCopyFileTo(
-  id: string,
-  fromPath: string,
-  toPath: string
-): Promise<string> {
+function dockerCopyFileTo(id: string, fromPath: string, toPath: string): Promise<string> {
   return shell(`docker cp --follow-link ${fromPath} ${id}:${toPath}`);
 }
 

@@ -5,10 +5,7 @@ import { Eth2ClientTarget, EthClientStatus } from "@dappnode/types";
 /**
  * Send a notification when going from syncing to synced only once per target
  */
-export function emitSyncedNotification(
-  target: Eth2ClientTarget,
-  status: EthClientStatus
-): void {
+export function emitSyncedNotification(target: Eth2ClientTarget, status: EthClientStatus): void {
   if (target === "remote" || !target.execClient) return;
   const syncedStatus = db.ethClientSyncedNotificationStatus.get();
 
@@ -20,7 +17,7 @@ export function emitSyncedNotification(
     // None -> AwaitingSynced
     db.ethClientSyncedNotificationStatus.set({
       execClientTarget: target.execClient,
-      status: "AwaitingSynced",
+      status: "AwaitingSynced"
     });
   } else if (
     status.ok &&
@@ -31,13 +28,13 @@ export function emitSyncedNotification(
     // AwaitingSynced -> Synced
     db.ethClientSyncedNotificationStatus.set({
       execClientTarget: target.execClient,
-      status: "Synced",
+      status: "Synced"
     });
     eventBus.notification.emit({
       id: `eth-client-synced-${target}`,
       type: "success",
       title: "Ethereum node synced",
-      body: `Your DAppNode's Ethereum node ${target} is synced.`,
+      body: `Your DAppNode's Ethereum node ${target} is synced.`
     });
   }
 }

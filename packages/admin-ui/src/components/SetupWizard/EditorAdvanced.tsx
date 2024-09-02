@@ -14,13 +14,7 @@ interface EditableTableProps {
   setValue: (valueId: string, value: string) => void;
 }
 
-const EditableTable: React.FC<EditableTableProps> = ({
-  headers,
-  placeholder,
-  values,
-  disabledValues,
-  setValue
-}) => {
+const EditableTable: React.FC<EditableTableProps> = ({ headers, placeholder, values, disabledValues, setValue }) => {
   if (!values || isEmpty(values)) return null;
   const valuesArray = orderBy(
     Object.entries(values).map(([key, value]) => ({ id: key, value })),
@@ -30,7 +24,7 @@ const EditableTable: React.FC<EditableTableProps> = ({
     <table className="editor-advanced-table">
       <thead>
         <tr>
-          {headers.map(header => (
+          {headers.map((header) => (
             <td key={header} className="subtle-header">
               {header}
             </td>
@@ -71,54 +65,46 @@ export function EditorAdvanced({
         <div className="dnp-section" key={dnpName}>
           <div className="dnp-name">{prettyDnpName(dnpName)}</div>
           {dnpSettings.environment &&
-            Object.entries(dnpSettings.environment).map(
-              ([serviceName, environment]) => (
-                <div className="service-section" key={serviceName}>
-                  <div className="service-name">
-                    {prettyDnpName(serviceName)}
-                  </div>
-                  <EditableTable
-                    headers={["Env name", "Env value"]}
-                    placeholder="enter value..."
-                    values={environment}
-                    setValue={(valueId, envValue) =>
-                      onChange({
-                        [dnpName]: {
-                          environment: {
-                            [serviceName]: { [valueId]: envValue }
-                          }
+            Object.entries(dnpSettings.environment).map(([serviceName, environment]) => (
+              <div className="service-section" key={serviceName}>
+                <div className="service-name">{prettyDnpName(serviceName)}</div>
+                <EditableTable
+                  headers={["Env name", "Env value"]}
+                  placeholder="enter value..."
+                  values={environment}
+                  setValue={(valueId, envValue) =>
+                    onChange({
+                      [dnpName]: {
+                        environment: {
+                          [serviceName]: { [valueId]: envValue }
                         }
-                      })
-                    }
-                  />
-                </div>
-              )
-            )}
+                      }
+                    })
+                  }
+                />
+              </div>
+            ))}
 
           {dnpSettings.portMappings &&
-            Object.entries(dnpSettings.portMappings).map(
-              ([serviceName, portMappings]) => (
-                <div className="service-section" key={serviceName}>
-                  <div className="service-name">
-                    {prettyDnpName(serviceName)}
-                  </div>
-                  <EditableTable
-                    headers={["Port - container", "Port - host"]}
-                    placeholder="Ephemeral port if unspecified"
-                    values={portMappings}
-                    setValue={(valueId, hostPort) =>
-                      onChange({
-                        [dnpName]: {
-                          portMappings: {
-                            [serviceName]: { [valueId]: hostPort }
-                          }
+            Object.entries(dnpSettings.portMappings).map(([serviceName, portMappings]) => (
+              <div className="service-section" key={serviceName}>
+                <div className="service-name">{prettyDnpName(serviceName)}</div>
+                <EditableTable
+                  headers={["Port - container", "Port - host"]}
+                  placeholder="Ephemeral port if unspecified"
+                  values={portMappings}
+                  setValue={(valueId, hostPort) =>
+                    onChange({
+                      [dnpName]: {
+                        portMappings: {
+                          [serviceName]: { [valueId]: hostPort }
                         }
-                      })
-                    }
-                  />
-                </div>
-              )
-            )}
+                      }
+                    })
+                  }
+                />
+              </div>
+            ))}
 
           {/* Rules for volumes: Can't be edited if they are already set */}
           <EditableTable

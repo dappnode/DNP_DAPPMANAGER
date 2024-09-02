@@ -8,7 +8,7 @@ import {
   dockerContainerRemove,
   dockerContainerStop,
   dockerComposeDown,
-  listPackage,
+  listPackage
 } from "@dappnode/dockerapi";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
@@ -21,7 +21,7 @@ import { ethicalMetricsDnpName, unregister } from "@dappnode/ethicalmetrics";
  */
 export async function packageRemove({
   dnpName,
-  deleteVolumes = false,
+  deleteVolumes = false
 }: {
   dnpName: string;
   deleteVolumes?: boolean;
@@ -44,10 +44,7 @@ export async function packageRemove({
     httpsPortal.removeMappings(dnp);
   } catch (e) {
     // Bypass error to continue deleting the package
-    logs.error(
-      `Error trying to remove https mappings from ${dnp.dnpName}. Continue with package remove`,
-      e
-    );
+    logs.error(`Error trying to remove https mappings from ${dnp.dnpName}. Continue with package remove`, e);
   }
 
   // If Ethical Metrics is being removed, unregister the instance first
@@ -75,7 +72,7 @@ export async function packageRemove({
       await dockerComposeDown(composePath, {
         volumes: deleteVolumes,
         // Ignore timeout is user doesn't want to keep any data
-        timeout: deleteVolumes ? undefined : timeout,
+        timeout: deleteVolumes ? undefined : timeout
       });
       hasRemoved = true; // To mimic an early return
     } catch (e) {
@@ -89,11 +86,7 @@ export async function packageRemove({
       containerNames.map(async (containerName) => {
         // Continue removing package even if container is already stopped
         await dockerContainerStop(containerName, { timeout }).catch((e) => {
-          if (
-            e.reason.includes("container already stopped") &&
-            e.statusCode === 304
-          )
-            return;
+          if (e.reason.includes("container already stopped") && e.statusCode === 304) return;
           else throw e;
         });
         await dockerContainerRemove(containerName, { volumes: deleteVolumes });

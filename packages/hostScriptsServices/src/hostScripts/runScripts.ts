@@ -23,13 +23,9 @@ type ScriptName =
  * Run a script for the hostScripts folder
  * @param scriptName "detect_fs.sh"
  */
-export async function runScript(
-  scriptName: ScriptName,
-  args = ""
-): Promise<string> {
+export async function runScript(scriptName: ScriptName, args = ""): Promise<string> {
   const scriptPath = path.resolve(hostScriptsDir, scriptName);
-  if (!fs.existsSync(scriptPath))
-    throw Error(`Host script ${scriptName} not found`);
+  if (!fs.existsSync(scriptPath)) throw Error(`Host script ${scriptName} not found`);
 
   const scriptPathFromHost = path.resolve(hostScriptsDirFromHost, scriptName);
   return await shellHost(`/bin/bash ${scriptPathFromHost} ${args}`);

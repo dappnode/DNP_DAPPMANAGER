@@ -16,8 +16,7 @@ const prefix = "exited (";
  * ```
  */
 export function parseExitCodeFromStatus(status: string): number | null {
-  if (typeof status !== "string" || !status.toLowerCase().startsWith(prefix))
-    return null;
+  if (typeof status !== "string" || !status.toLowerCase().startsWith(prefix)) return null;
 
   const rest = status.slice(prefix.length);
   const closingParensIndex = rest.indexOf(")");

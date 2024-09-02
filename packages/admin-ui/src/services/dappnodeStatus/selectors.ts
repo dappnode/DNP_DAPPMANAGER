@@ -1,8 +1,5 @@
 import { RootState } from "rootReducer";
-import {
-  getEthClientPrettyStatusError,
-  getEthClientType
-} from "components/EthMultiClient";
+import { getEthClientPrettyStatusError, getEthClientType } from "components/EthMultiClient";
 import { ChainData } from "@dappnode/types";
 import { activateFallbackPath } from "pages/system/data";
 import { getDnpInstalled } from "services/dnpInstalled/selectors";
@@ -13,27 +10,18 @@ import { wifiDnpName } from "params";
 // Sub-local properties
 const getSystemInfo = (state: RootState) => state.dappnodeStatus.systemInfo;
 export const getDappnodeParams = (state: RootState) => getSystemInfo(state);
-export const getPasswordIsSecure = (state: RootState) =>
-  state.dappnodeStatus.passwordIsSecure;
-export const getRebootIsRequired = (state: RootState) =>
-  state.dappnodeStatus.rebootRequiredScript;
+export const getPasswordIsSecure = (state: RootState) => state.dappnodeStatus.passwordIsSecure;
+export const getRebootIsRequired = (state: RootState) => state.dappnodeStatus.rebootRequiredScript;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
-export const getShouldShowSmooth = (state: RootState) =>
-  state.dappnodeStatus.shouldShowSmooth;
-export const getIsConnectedToInternet = (state: RootState) =>
-  state.dappnodeStatus.isConnectedToInternet;
+export const getShouldShowSmooth = (state: RootState) => state.dappnodeStatus.shouldShowSmooth;
+export const getIsConnectedToInternet = (state: RootState) => state.dappnodeStatus.isConnectedToInternet;
 
 // Sub-sub local properties
-export const getEthRemoteRpc = (state: RootState) =>
-  (getSystemInfo(state) || {}).ethRemoteRpc;
-export const getEthClientTarget = (state: RootState) =>
-  (getSystemInfo(state) || {}).eth2ClientTarget;
-export const getEthClientFallback = (state: RootState) =>
-  (getSystemInfo(state) || {}).ethClientFallback;
-export const getEthClientStatus = (state: RootState) =>
-  (getSystemInfo(state) || {}).ethClientStatus;
-export const getNewFeatureIds = (state: RootState) =>
-  (getSystemInfo(state) || {}).newFeatureIds;
+export const getEthRemoteRpc = (state: RootState) => (getSystemInfo(state) || {}).ethRemoteRpc;
+export const getEthClientTarget = (state: RootState) => (getSystemInfo(state) || {}).eth2ClientTarget;
+export const getEthClientFallback = (state: RootState) => (getSystemInfo(state) || {}).ethClientFallback;
+export const getEthClientStatus = (state: RootState) => (getSystemInfo(state) || {}).ethClientStatus;
+export const getNewFeatureIds = (state: RootState) => (getSystemInfo(state) || {}).newFeatureIds;
 
 /**
  * Returns a pretty warning about the eth client only if the user has to see it
@@ -72,15 +60,13 @@ export const getDappnodeIdentityClean = (state: RootState) => {
   }
 };
 
-export const getDappnodeName = (state: RootState) =>
-  (getSystemInfo(state) || {}).dappnodeWebName || "";
+export const getDappnodeName = (state: RootState) => (getSystemInfo(state) || {}).dappnodeWebName || "";
 
-export const getStaticIp = (state: RootState) =>
-  (getSystemInfo(state) || {}).staticIp || "";
+export const getStaticIp = (state: RootState) => (getSystemInfo(state) || {}).staticIp || "";
 
 function isWifiFirstContainerRunning(state: RootState): boolean {
   const installedPackages = getDnpInstalled(state);
-  const wifiDnp = installedPackages.find(dnp => dnp.dnpName === wifiDnpName);
+  const wifiDnp = installedPackages.find((dnp) => dnp.dnpName === wifiDnpName);
   if (!wifiDnp) return false;
 
   const wifiContainer = wifiDnp.containers[0];
@@ -90,8 +76,7 @@ function isWifiFirstContainerRunning(state: RootState): boolean {
 }
 
 export const getWifiStatus = (state: RootState) => ({
-  isDefaultPassphrase:
-    state.dappnodeStatus.wifiCredentials?.isDefaultPassphrase,
+  isDefaultPassphrase: state.dappnodeStatus.wifiCredentials?.isDefaultPassphrase,
   isRunning: isWifiFirstContainerRunning(state),
   ssid: state.dappnodeStatus.wifiCredentials?.ssid
 });
@@ -101,9 +86,7 @@ export const getWifiStatus = (state: RootState) => ({
  * To be shown alongside other chain data
  * @param state
  */
-export function getRepositorySourceChainItem(
-  state: RootState
-): ChainData | null {
+export function getRepositorySourceChainItem(state: RootState): ChainData | null {
   const repositoryResult = _getRepositorySourceChainItem(state);
   return repositoryResult
     ? {
@@ -115,9 +98,7 @@ export function getRepositorySourceChainItem(
     : null;
 }
 
-function _getRepositorySourceChainItem(
-  state: RootState
-): Omit<ChainData, "dnpName"> | null {
+function _getRepositorySourceChainItem(state: RootState): Omit<ChainData, "dnpName"> | null {
   const target = getEthClientTarget(state);
   const fallback = getEthClientFallback(state);
   const status = getEthClientStatus(state);

@@ -8,16 +8,11 @@ import { loadImage, getDockerImageManifest } from "@dappnode/dockerapi";
  * If a dependency fails, some future version of another DNP could be loaded
  * creating wierd bugs with unstable versions
  */
-export async function loadImages(
-  packagesData: InstallPackageData[],
-  log: Log
-): Promise<void> {
+export async function loadImages(packagesData: InstallPackageData[], log: Log): Promise<void> {
   await Promise.all(
     packagesData.map(async function ({ dnpName, imagePath }) {
       log(dnpName, "Loading image...");
-      await loadImageWithProgress(imagePath, (message) =>
-        log(dnpName, message)
-      );
+      await loadImageWithProgress(imagePath, (message) => log(dnpName, message));
       log(dnpName, "Package Loaded");
     })
   );
@@ -27,14 +22,10 @@ export async function loadImages(
  * Logs image load progress without knowing the total uncompress image size
  * Assumes all image layers have the same size
  */
-async function loadImageWithProgress(
-  imagePath: string,
-  log: (message: string) => void
-): Promise<void> {
+async function loadImageWithProgress(imagePath: string, log: (message: string) => void): Promise<void> {
   const imageManifests = await getDockerImageManifest(imagePath);
   let totalLayers = 0;
-  for (const manifest of imageManifests)
-    totalLayers += (manifest.Layers || []).length;
+  for (const manifest of imageManifests) totalLayers += (manifest.Layers || []).length;
 
   const seenLayers = new Set<string>();
   let lastPercent = -1;
@@ -45,14 +36,9 @@ async function loadImageWithProgress(
 
     seenLayers.add(layerId);
 
-    if (
-      Number.isInteger(current) &&
-      Number.isInteger(total) &&
-      totalLayers > 0
-    ) {
+    if (Number.isInteger(current) && Number.isInteger(total) && totalLayers > 0) {
       const layerProgress = current / total;
-      const totalProgress =
-        (seenLayers.size - 1) / totalLayers + layerProgress / totalLayers;
+      const totalProgress = (seenLayers.size - 1) / totalLayers + layerProgress / totalLayers;
       const roundedPercent = Math.min(100, Math.round(100 * totalProgress));
       if (lastPercent !== roundedPercent) {
         log(`Loading image ${roundedPercent}%`);

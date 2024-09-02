@@ -3,22 +3,15 @@ import {
   OptimismItem,
   executionClientsOptimism,
   optimismL2Geth,
-  optimismNode,
+  optimismNode
 } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { listPackages } from "@dappnode/dockerapi";
 import { DappnodeInstaller, packageGetData } from "@dappnode/installer";
-import {
-  getIsInstalled,
-  getIsRunning,
-  getIsUpdated,
-  fileToGatewayUrl,
-} from "@dappnode/utils";
+import { getIsInstalled, getIsRunning, getIsUpdated, fileToGatewayUrl } from "@dappnode/utils";
 import { getOptimismNodeRpcUrlIfExists } from "./getOptimismNodeRpcUrlIfExists.js";
 
-export async function getOptimismConfig(
-  dappnodeInstaller: DappnodeInstaller
-): Promise<OptimismConfigGet> {
+export async function getOptimismConfig(dappnodeInstaller: DappnodeInstaller): Promise<OptimismConfigGet> {
   try {
     const currentOptimismExecutionClient = db.opExecutionClient.get();
     const enableHistorical = db.opEnableHistoricalRpc.get();
@@ -42,14 +35,14 @@ export async function getOptimismConfig(
               isRunning: getIsRunning(pkgData, dnpList),
               data: pkgData,
               isSelected: execClient === currentOptimismExecutionClient,
-              enableHistorical,
+              enableHistorical
             };
           } catch (error) {
             return {
               status: "error",
               dnpName: execClient,
               error,
-              enableHistorical,
+              enableHistorical
             };
           }
         })
@@ -60,10 +53,7 @@ export async function getOptimismConfig(
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismNode);
 
-            const pkgData = await packageGetData(
-              dappnodeInstaller,
-              optimismNode
-            );
+            const pkgData = await packageGetData(dappnodeInstaller, optimismNode);
             const mainnetRpcUrl = getOptimismNodeRpcUrlIfExists();
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
@@ -75,14 +65,14 @@ export async function getOptimismConfig(
               isRunning,
               data: pkgData,
               isSelected: isRunning,
-              mainnetRpcUrl,
+              mainnetRpcUrl
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: optimismNode,
               error,
-              mainnetRpcUrl: "",
+              mainnetRpcUrl: ""
             });
           }
         })();
@@ -94,10 +84,7 @@ export async function getOptimismConfig(
             // make sure the repo exists
             await dappnodeInstaller.getRepoContract(optimismL2Geth);
 
-            const pkgData = await packageGetData(
-              dappnodeInstaller,
-              optimismL2Geth
-            );
+            const pkgData = await packageGetData(dappnodeInstaller, optimismL2Geth);
             const isRunning = getIsRunning(pkgData, dnpList);
             resolve({
               status: "ok",
@@ -107,17 +94,17 @@ export async function getOptimismConfig(
               isUpdated: getIsUpdated(pkgData, dnpList),
               isRunning,
               data: pkgData,
-              isSelected: isRunning && enableHistorical,
+              isSelected: isRunning && enableHistorical
             });
           } catch (error) {
             resolve({
               status: "error",
               dnpName: optimismL2Geth,
-              error,
+              error
             });
           }
         })();
-      }),
+      })
     };
   } catch (e) {
     throw Error(`Error getting Optimism config: ${e}`);

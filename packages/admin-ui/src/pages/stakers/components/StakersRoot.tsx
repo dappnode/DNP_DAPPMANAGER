@@ -64,9 +64,7 @@ const StakersRoot: React.FC = () => {
   ];
 
   // Remove the "Prater" tab from the stakersItems array
-  const filteredStakersItems = stakersItems.filter(
-    item => item.subPath !== "prater"
-  );
+  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater");
 
   return (
     <>
@@ -74,13 +72,9 @@ const StakersRoot: React.FC = () => {
 
       <div className="horizontal-navbar">
         {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
-        {filteredStakersItems.map(route => (
+        {filteredStakersItems.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subPath}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.title}
             </NavLink>
           </button>
@@ -89,12 +83,8 @@ const StakersRoot: React.FC = () => {
 
       <div className="section-spacing">
         <Routes>
-          {stakersItems.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<route.component />}
-            />
+          {stakersItems.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
           ))}
         </Routes>
       </div>

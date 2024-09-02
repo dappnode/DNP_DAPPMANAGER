@@ -35,12 +35,7 @@ interface ToastProps {
   hideDetailsButton?: boolean;
 }
 
-const Toast = ({
-  message,
-  pending,
-  success,
-  hideDetailsButton
-}: ToastProps) => {
+const Toast = ({ message, pending, success, hideDetailsButton }: ToastProps) => {
   const { SUCCESS, ERROR } = toast.TYPE;
   const position = toast.POSITION.BOTTOM_RIGHT;
   const autoClose = 5000;
@@ -112,10 +107,7 @@ interface ToastOptions {
   onError?: boolean | string;
 }
 
-export async function withToast<R>(
-  fn: () => Promise<R>,
-  toastOptions?: ToastOptions
-): Promise<R> {
+export async function withToast<R>(fn: () => Promise<R>, toastOptions?: ToastOptions): Promise<R> {
   const { message, onSuccess, onError } = toastOptions || {};
 
   const pendingToast = message ? Toast({ message, pending: true }) : null;
@@ -138,10 +130,7 @@ export async function withToast<R>(
   }
 }
 
-export async function withToastNoThrow<R>(
-  fn: () => Promise<R>,
-  toastOptions?: ToastOptions
-): Promise<void> {
+export async function withToastNoThrow<R>(fn: () => Promise<R>, toastOptions?: ToastOptions): Promise<void> {
   try {
     await withToast(fn, toastOptions);
   } catch (e) {

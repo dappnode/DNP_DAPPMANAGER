@@ -48,10 +48,7 @@ export function StaticIp() {
               {staticIp ? "Update" : "Enable"}
             </Button>
             {staticIp && (
-              <Button
-                variant="outline-dappnode"
-                onClick={() => updateStaticIp("")}
-              >
+              <Button variant="outline-dappnode" onClick={() => updateStaticIp("")}>
                 Disable
               </Button>
             )}

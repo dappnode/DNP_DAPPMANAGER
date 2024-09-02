@@ -16,9 +16,7 @@ import { clearRegistry } from "./clearRegistry.js";
  * All code is sequential, to not perform more than one update at once.
  * One of the update might be the core and crash the other updates.
  */
-async function checkAutoUpdates(
-  dappnodeInstaller: DappnodeInstaller
-): Promise<void> {
+async function checkAutoUpdates(dappnodeInstaller: DappnodeInstaller): Promise<void> {
   try {
     // Make sure the eth client provider is available before checking each package
     // Do it once and return for expected errors to reduce cluttering
@@ -59,10 +57,7 @@ async function checkForCompletedCoreUpdates(): Promise<void> {
 /**
  * Auto updates daemon, run at most every interval
  */
-export function startAutoUpdatesDaemon(
-  dappnodeInstaller: DappnodeInstaller,
-  signal: AbortSignal
-): void {
+export function startAutoUpdatesDaemon(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
   eventBus.packagesModified.on(({ dnpNames, removed }) => {
     for (const dnpName of dnpNames) {
       if (removed) clearPendingUpdates(dnpName);
@@ -74,9 +69,5 @@ export function startAutoUpdatesDaemon(
     logs.error("Error on checkForCompletedCoreUpdates", e);
   });
 
-  runAtMostEvery(
-    () => checkAutoUpdates(dappnodeInstaller),
-    params.AUTO_UPDATE_DAEMON_INTERVAL,
-    signal
-  );
+  runAtMostEvery(() => checkAutoUpdates(dappnodeInstaller), params.AUTO_UPDATE_DAEMON_INTERVAL, signal);
 }

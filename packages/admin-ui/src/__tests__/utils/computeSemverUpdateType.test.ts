@@ -1,4 +1,5 @@
-import computeSemverUpdateType from "../../utils/computeSemverUpdateType";
+import { expect } from "chai";
+import computeSemverUpdateType from "../../utils/computeSemverUpdateType.js";
 
 describe("utils > computeSemverUpdateType", () => {
   it("Should deal with invalid versions", () => {
@@ -10,7 +11,7 @@ describe("utils > computeSemverUpdateType", () => {
       { from: null, to: "/ipfs/Amasjdnja" }
     ];
     for (const { from, to } of cases) {
-      expect(computeSemverUpdateType(from, to)).toEqual(null);
+      expect(computeSemverUpdateType(from, to)).equal(null);
     }
   });
 
@@ -21,7 +22,7 @@ describe("utils > computeSemverUpdateType", () => {
       { from: "0.2.2", to: "0.2.1" }
     ];
     for (const { from, to } of cases) {
-      expect(computeSemverUpdateType(from, to)).toEqual("downgrade");
+      expect(computeSemverUpdateType(from, to)).equal("downgrade");
     }
   });
 
@@ -32,7 +33,7 @@ describe("utils > computeSemverUpdateType", () => {
       { from: "1.2.3", to: "2.1.2" }
     ];
     for (const { from, to } of cases) {
-      expect(computeSemverUpdateType(from, to)).toEqual("major");
+      expect(computeSemverUpdateType(from, to)).equal("major");
     }
   });
 
@@ -42,14 +43,14 @@ describe("utils > computeSemverUpdateType", () => {
       { from: "1.2.3", to: "1.3.2" }
     ];
     for (const { from, to } of cases) {
-      expect(computeSemverUpdateType(from, to)).toEqual("minor");
+      expect(computeSemverUpdateType(from, to)).equal("minor");
     }
   });
 
   it("Should detect different types of patch", () => {
     const cases = [{ from: "1.2.3", to: "1.2.4" }];
     for (const { from, to } of cases) {
-      expect(computeSemverUpdateType(from, to)).toEqual("patch");
+      expect(computeSemverUpdateType(from, to)).equal("patch");
     }
   });
 });

@@ -12,13 +12,11 @@ export const raidenTestnet: MockDnp = {
     description:
       "The Raiden Network is an off-chain scaling solution, enabling near-instant, low-fee and scalable payments. It’s complementary to the Ethereum blockchain and works with any ERC20 compatible token. \n\n\n **Getting started** \n\n Once you have installed the Raiden DAppNode Package you **must** upload your own keystore. Go to this [getting started guide](https://github.com/dappnode/DAppNodePackage-raiden) to learn how to do so.  \n\n\n All set? Check out the [documentation and introductory guides](https://raiden-network.readthedocs.io/en/stable/#how-to-get-started) to quickly get started doing payments.",
     type: "service",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: ["Abel Boldú (@vdo)", "Eduardo Antuña (@eduadiez)"],
     links: {
       WebApplication: "http://raiden-testnet.dappnode/",
-      homepage:
-        "https://github.com/dappnode/DAppNodePackage-raiden-testnet#readme"
+      homepage: "https://github.com/dappnode/DAppNodePackage-raiden-testnet#readme"
     },
     repository: {
       type: "git",

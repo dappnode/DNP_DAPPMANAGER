@@ -24,13 +24,10 @@ export async function recreateContainersIfLegacyDns(): Promise<void> {
   );
 }
 
-async function pkgHasLegacyDns(
-  containers: PackageContainer[]
-): Promise<boolean> {
+async function pkgHasLegacyDns(containers: PackageContainer[]): Promise<boolean> {
   for (const c of containers) {
     try {
-      const dns = (await docker.getContainer(c.containerName).inspect())
-        .HostConfig.Dns;
+      const dns = (await docker.getContainer(c.containerName).inspect()).HostConfig.Dns;
       if (dns && dns.includes(params.DOCKER_LEGACY_DNS)) return true;
 
       return false;

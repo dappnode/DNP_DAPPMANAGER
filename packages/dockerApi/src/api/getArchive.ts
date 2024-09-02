@@ -13,10 +13,7 @@ import { Writable, pipeline } from "stream";
  * @param containerNameOrId "DAppNodePackage-geth.dnp.dappnode.eth"
  * @param rootTarPath Path to tar
  */
-export async function dockerGetArchive(
-  containerNameOrId: string,
-  rootTarPath: string
-): Promise<NodeJS.ReadableStream> {
+export async function dockerGetArchive(containerNameOrId: string, rootTarPath: string): Promise<NodeJS.ReadableStream> {
   const container = docker.getContainer(containerNameOrId);
   const readableStream = await container.getArchive({ path: rootTarPath });
 
@@ -34,10 +31,7 @@ export async function dockerGetArchiveSingleFile(
   filePathAbsolute: string,
   fileContentSink: Writable
 ): Promise<void> {
-  const tarReadableStream = await dockerGetArchive(
-    containerNameOrId,
-    filePathAbsolute
-  );
+  const tarReadableStream = await dockerGetArchive(containerNameOrId, filePathAbsolute);
 
   const targetFile = path.parse(filePathAbsolute).base;
   await tarExtractSingleFile(tarReadableStream, fileContentSink, targetFile);
@@ -57,7 +51,7 @@ export async function tarExtractSingleFile(
   return new Promise((resolve, reject) => {
     let fileFound = false;
 
-    extract.on("entry", async function(header, stream, next) {
+    extract.on("entry", async function (header, stream, next) {
       if (!fileFound && header.name === targetFile && header.type === "file") {
         fileFound = true;
 
@@ -76,7 +70,7 @@ export async function tarExtractSingleFile(
       }
     });
 
-    extract.on("finish", function() {
+    extract.on("finish", function () {
       if (fileFound) resolve();
       else reject(Error(`file ${targetFile} not found in tar`));
     });

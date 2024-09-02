@@ -12,14 +12,8 @@ export const upnpAvailable = interceptGlobalEnvOnSet(
   Object.keys({ UPNP_AVAILABLE })[0]
 );
 
-export const upnpPortMappings = dbCache.staticKey<UpnpPortMapping[]>(
-  UPNP_PORT_MAPPINGS,
-  []
-);
+export const upnpPortMappings = dbCache.staticKey<UpnpPortMapping[]>(UPNP_PORT_MAPPINGS, []);
 
 export const portsToOpen = dbCache.staticKey<PackagePort[]>(PORTS_TO_OPEN, []);
 
-export const isNatRenewalDisabled = dbCache.staticKey<boolean>(
-  IS_NAT_RENEWAL_DISABLED,
-  false
-);
+export const isNatRenewalDisabled = dbCache.staticKey<boolean>(IS_NAT_RENEWAL_DISABLED, false);

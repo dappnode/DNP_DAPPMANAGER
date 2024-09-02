@@ -7,7 +7,7 @@ import { withToastNoThrow } from "components/toast/Toast";
 
 export function ClearCacheDb() {
   async function cleanCache() {
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: `Deleting cache`,
         text: `This action cannot be undone. You should only delete the cache in response to a problem.`,
@@ -25,9 +25,8 @@ export function ClearCacheDb() {
   return (
     <Card spacing>
       <p>
-        Remove the local cache of Aragon Package Manager (APM) entries,
-        manifests, avatars. Also remove the user action logs shown in the
-        Activity tab.
+        Remove the local cache of Aragon Package Manager (APM) entries, manifests, avatars. Also remove the user action
+        logs shown in the Activity tab.
       </p>
 
       <Button variant="outline-danger" onClick={cleanCache}>

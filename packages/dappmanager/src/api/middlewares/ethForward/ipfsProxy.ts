@@ -5,13 +5,7 @@ import { params } from "@dappnode/params";
 import { urlJoin } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
-import {
-  NodeNotAvailable,
-  ProxyError,
-  EnsResolverError,
-  NotFoundError,
-  Content
-} from "./types.js";
+import { NodeNotAvailable, ProxyError, EnsResolverError, NotFoundError, Content } from "./types.js";
 import { EthProviderError } from "@dappnode/types";
 
 export enum ProxyType {
@@ -27,7 +21,7 @@ export function getIpfsProxyHandler<T>(
   getContent: (req: express.Request, data: T) => Promise<Content>
 ): (req: express.Request, res: express.Response, data: T) => Promise<void> {
   const proxy = httpProxy.createProxyServer({});
-  proxy.on("error", e => {
+  proxy.on("error", (e) => {
     logs.error(`${proxyType} proxy error`, e);
   });
 
@@ -35,11 +29,7 @@ export function getIpfsProxyHandler<T>(
     `Starting ${proxyType} proxy: IPFS -> ${params.ETHFORWARD_IPFS_REDIRECT} SWARM -> ${params.ETHFORWARD_SWARM_REDIRECT}`
   );
 
-  return async function ethForwardProxyHttpHandler(
-    req,
-    res,
-    data
-  ): Promise<void> {
+  return async function ethForwardProxyHttpHandler(req, res, data): Promise<void> {
     try {
       const content = await getContent(req, data);
       const target = getTargetUrl(proxyType, content);
@@ -58,8 +48,7 @@ export function getIpfsProxyHandler<T>(
           if (!e) return resolve(proxyRes);
           // Indicates that the host is unreachable.
           // Usually happens when the node is not running
-          if (e.message.includes("EHOSTUNREACH"))
-            reject(new NodeNotAvailable(e.message, content.location));
+          if (e.message.includes("EHOSTUNREACH")) reject(new NodeNotAvailable(e.message, content.location));
           else reject(new ProxyError(e.message, target));
         });
       });
@@ -114,8 +103,7 @@ function errorToResponseHtml(e: Error, domain?: string): string {
   logs.debug(`ETHFORWARD Error: ${e.message}`);
 
   // Not found views
-  if (e instanceof EnsResolverError || e instanceof NotFoundError)
-    return views.notFound(e);
+  if (e instanceof EnsResolverError || e instanceof NotFoundError) return views.notFound(e);
 
   // Node not available views
   if (e instanceof EthProviderError) return views.noEth(e);

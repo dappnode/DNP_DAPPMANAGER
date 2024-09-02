@@ -2,10 +2,7 @@ import * as db from "@dappnode/db";
 import { setPending } from "./setPending.js";
 import { params } from "@dappnode/params";
 
-export const updateDelay = getRandomizedInterval(
-  params.AUTO_UPDATE_DELAY,
-  params.AUTO_UPDATE_DELAY_VARIATION
-);
+export const updateDelay = getRandomizedInterval(params.AUTO_UPDATE_DELAY, params.AUTO_UPDATE_DELAY_VARIATION);
 
 /**
  * Randomize an interval
@@ -17,10 +14,7 @@ export const updateDelay = getRandomizedInterval(
  * @param variation
  * @returns
  */
-function getRandomizedInterval(
-  baseInterval: number,
-  variation: number
-): number {
+function getRandomizedInterval(baseInterval: number, variation: number): number {
   const randomAdjustment = Math.round((Math.random() * 2 - 1) * variation); // Random integer between -variation and +variation
   return baseInterval + randomAdjustment;
 }
@@ -37,11 +31,7 @@ function getRandomizedInterval(
  * @param version "0.2.5"
  * @param timestamp Use ONLY to make tests deterministic
  */
-export function isUpdateDelayCompleted(
-  dnpName: string,
-  version: string,
-  timestamp?: number
-): boolean {
+export function isUpdateDelayCompleted(dnpName: string, version: string, timestamp?: number): boolean {
   if (!timestamp) timestamp = Date.now();
 
   const pending = db.autoUpdatePending.get();

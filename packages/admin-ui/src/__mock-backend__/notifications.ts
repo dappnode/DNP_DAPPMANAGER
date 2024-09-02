@@ -1,9 +1,6 @@
 import { PackageNotificationDb, Routes } from "@dappnode/types";
 
-export const notifications: Pick<
-  Routes,
-  "notificationsGet" | "notificationsRemove" | "notificationsTest"
-> = {
+export const notifications: Pick<Routes, "notificationsGet" | "notificationsRemove" | "notificationsTest"> = {
   notificationsGet: async () => sampleNotifications,
   notificationsRemove: async () => {},
   notificationsTest: async () => {}
@@ -14,8 +11,7 @@ const sampleNotifications: PackageNotificationDb[] = [
     id: "notification-web3signer-gnosis.dnp.dappnode.eth",
     type: "danger",
     title: "Web3signer eth2 client selected is not available",
-    body:
-      "Make sure you hace selected an available client at packages > web3signer > config > eth2 client",
+    body: "Make sure you hace selected an available client at packages > web3signer > config > eth2 client",
     timestamp: 153834826,
     viewed: false
   },

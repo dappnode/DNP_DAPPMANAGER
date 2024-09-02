@@ -10,10 +10,7 @@ import { shell } from "@dappnode/utils";
  * - temp transfer folder
  */
 export async function cleanCache(): Promise<void> {
-  const pathsToDelete = [
-    params.userActionLogsFilename,
-    params.TEMP_TRANSFER_DIR
-  ];
+  const pathsToDelete = [params.userActionLogsFilename, params.TEMP_TRANSFER_DIR];
 
   await shell(`rm -rf ${pathsToDelete.join(" ")}`);
 

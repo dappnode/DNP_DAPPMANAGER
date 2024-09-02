@@ -35,7 +35,7 @@ export const getAvahiDaemonStatus = memoize(
     return {
       isAvahiRunning: status.isAvahiRunning === "true",
       isAvahiEnabled: status.isAvahiEnabled === "true",
-      avahiResolves: status.avahiResolves === "true",
+      avahiResolves: status.avahiResolves === "true"
     };
   },
   // Prevent running this script more than once

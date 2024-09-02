@@ -19,27 +19,27 @@ describe.skip("dappGet/resolve/resolve", () => {
       "dependency.dnp.dappnode.eth": {
         versions: {
           "0.1.1": {},
-          "0.1.2": {},
-        },
+          "0.1.2": {}
+        }
       },
       "letsencrypt-nginx.dnp.dappnode.eth": {
         isInstalled: true,
         versions: {
-          "0.0.4": { "web.dnp.dappnode.eth": "*" },
-        },
+          "0.0.4": { "web.dnp.dappnode.eth": "*" }
+        }
       },
       "nginx-proxy.dnp.dappnode.eth": {
         isRequest: true,
         versions: {
-          "0.0.3": { "dependency.dnp.dappnode.eth": "*" },
-        },
+          "0.0.3": { "dependency.dnp.dappnode.eth": "*" }
+        }
       },
       "web.dnp.dappnode.eth": {
         isInstalled: true,
         versions: {
-          "0.1.0": { "letsencrypt-nginx.dnp.dappnode.eth": "*" },
-        },
-      },
+          "0.1.0": { "letsencrypt-nginx.dnp.dappnode.eth": "*" }
+        }
+      }
     };
     const { success, message, state } = resolve(dnps);
     expect(success).to.equal(true);
@@ -48,7 +48,7 @@ describe.skip("dappGet/resolve/resolve", () => {
       "dependency.dnp.dappnode.eth": "0.1.2",
       "letsencrypt-nginx.dnp.dappnode.eth": "0.0.4",
       "nginx-proxy.dnp.dappnode.eth": "0.0.3",
-      "web.dnp.dappnode.eth": "0.1.0",
+      "web.dnp.dappnode.eth": "0.1.0"
     });
   });
 
@@ -57,15 +57,15 @@ describe.skip("dappGet/resolve/resolve", () => {
       "kovan.dnp.dappnode.eth": {
         isRequest: true,
         versions: {
-          "0.1.1": {},
-        },
-      },
+          "0.1.1": {}
+        }
+      }
     };
     const { success, message, state } = resolve(dnps);
     expect(success).to.equal(true);
     expect(message).to.equal("Found compatible state at case 1/1");
     expect(state).to.deep.equal({
-      "kovan.dnp.dappnode.eth": "0.1.1",
+      "kovan.dnp.dappnode.eth": "0.1.1"
     });
   });
 
@@ -75,10 +75,9 @@ describe.skip("dappGet/resolve/resolve", () => {
         isRequest: true,
         versions: {
           "/ipfs/QmV33iaboYzMgtcKur9JXbRmvkeeKbQSav8DSk1Emeyw1X": {
-            "bitcoind.dnp.dappnode.eth":
-              "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws",
-          },
-        },
+            "bitcoind.dnp.dappnode.eth": "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws"
+          }
+        }
       },
       "bitcoind.dnp.dappnode.eth": {
         isInstalled: true,
@@ -87,18 +86,16 @@ describe.skip("dappGet/resolve/resolve", () => {
           "0.1.0": {},
           "0.1.1": {},
           "0.1.2": {},
-          "0.1.3": {},
-        },
-      },
+          "0.1.3": {}
+        }
+      }
     };
     const { success, message, state } = resolve(dnps);
     expect(success).to.equal(true);
     expect(message).to.equal("Found compatible state at case 1/5");
     expect(state).to.deep.equal({
-      "bitcoind.dnp.dappnode.eth":
-        "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws",
-      "lnd.dnp.dappnode.eth":
-        "/ipfs/QmV33iaboYzMgtcKur9JXbRmvkeeKbQSav8DSk1Emeyw1X",
+      "bitcoind.dnp.dappnode.eth": "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws",
+      "lnd.dnp.dappnode.eth": "/ipfs/QmV33iaboYzMgtcKur9JXbRmvkeeKbQSav8DSk1Emeyw1X"
     });
   });
 
@@ -107,15 +104,15 @@ describe.skip("dappGet/resolve/resolve", () => {
       "dependency.dnp.dappnode.eth": {
         versions: {
           "0.1.0": {},
-          "0.1.1": {},
-        },
+          "0.1.1": {}
+        }
       },
       "mainDnp.dnp.dappnode.eth": {
         isRequest: true,
         versions: {
-          "0.1.0": { "dependency.dnp.dappnode.eth": "0.1.2" },
-        },
-      },
+          "0.1.0": { "dependency.dnp.dappnode.eth": "0.1.2" }
+        }
+      }
     };
     const { success, message, state } = resolve(dnps);
     expect(success).to.equal(false);

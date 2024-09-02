@@ -56,9 +56,6 @@ export function processError(
   releaseFileType: "compose" | "manifest" | "setupWizard"
 ): string {
   const { schemaPath, message } = errorObject;
-  const path = `${releaseFileType}${schemaPath}`.replace(
-    new RegExp("/", "g"),
-    "."
-  );
+  const path = `${releaseFileType}${schemaPath}`.replace(new RegExp("/", "g"), ".");
   return `${path} ${message}`;
 }

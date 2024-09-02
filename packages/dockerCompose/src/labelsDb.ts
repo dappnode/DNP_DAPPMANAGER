@@ -6,7 +6,7 @@ import {
   ChainDriver,
   ChainDriverSpecs,
   ChainDriverType,
-  chainDriversTypes,
+  chainDriversTypes
 } from "@dappnode/types";
 import { pick, omitBy, mapValues } from "lodash-es";
 
@@ -27,22 +27,19 @@ const parseJsonSafe = <T>(value: string | undefined): T | undefined => {
   try {
     return JSON.parse(value);
   } catch (e) {
+    console.error("Error parsing JSON", e);
     return undefined;
   }
 };
 
 const writeString = (data: string | undefined): string | undefined => data;
-const writeNumber = (num: number | undefined): string | undefined =>
-  num === undefined ? undefined : String(num);
+const writeNumber = (num: number | undefined): string | undefined => (num === undefined ? undefined : String(num));
 const writeBool = (data: boolean | undefined): string | undefined =>
   data === true ? "true" : data === false ? "false" : undefined;
-const writeJson = (data: Record<string, unknown> | string[]): string =>
-  JSON.stringify(data);
+const writeJson = (data: Record<string, unknown> | string[]): string => JSON.stringify(data);
 
 const labelParseFns: {
-  [K in keyof Required<ContainerLabelTypes>]: (
-    labelValue: string | undefined
-  ) => ContainerLabelTypes[K] | undefined;
+  [K in keyof Required<ContainerLabelTypes>]: (labelValue: string | undefined) => ContainerLabelTypes[K] | undefined;
 } = {
   "dappnode.dnp.dnpName": parseString,
   "dappnode.dnp.version": parseString,
@@ -56,12 +53,7 @@ const labelParseFns: {
       return value as ChainDriverType;
     }
     const valueParsed = parseJsonSafe(value);
-    if (
-      valueParsed &&
-      chainDriversTypes.includes(
-        (valueParsed as ChainDriverSpecs).driver as ChainDriverType
-      )
-    )
+    if (valueParsed && chainDriversTypes.includes((valueParsed as ChainDriverSpecs).driver as ChainDriverType))
       return valueParsed as ChainDriver;
     return undefined;
   },
@@ -70,13 +62,11 @@ const labelParseFns: {
   "dappnode.dnp.dockerTimeout": parseNumber,
   "dappnode.dnp.default.environment": (value) => parseJsonSafe(value),
   "dappnode.dnp.default.ports": (value) => parseJsonSafe(value),
-  "dappnode.dnp.default.volumes": (value) => parseJsonSafe(value),
+  "dappnode.dnp.default.volumes": (value) => parseJsonSafe(value)
 };
 
 const labelStringifyFns: {
-  [K in keyof Required<ContainerLabelTypes>]: (
-    data: ContainerLabelTypes[K]
-  ) => string | undefined;
+  [K in keyof Required<ContainerLabelTypes>]: (data: ContainerLabelTypes[K]) => string | undefined;
 } = {
   "dappnode.dnp.dnpName": writeString,
   "dappnode.dnp.version": writeString,
@@ -94,48 +84,30 @@ const labelStringifyFns: {
   "dappnode.dnp.dockerTimeout": writeNumber,
   "dappnode.dnp.default.environment": writeJson,
   "dappnode.dnp.default.ports": writeJson,
-  "dappnode.dnp.default.volumes": writeJson,
+  "dappnode.dnp.default.volumes": writeJson
 };
 
-function parseContainerLabels(
-  labelsRaw: ContainerLabelsRaw
-): Partial<ContainerLabelTypes> {
+function parseContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<ContainerLabelTypes> {
   return mapValues(labelParseFns, (labelParseFn, label) =>
     labelParseFn(labelsRaw[label])
   ) as Partial<ContainerLabelTypes>;
 }
 
-function stringifyContainerLabels(
-  labels: Partial<ContainerLabelTypes>
-): ContainerLabelsRaw {
-  const labelsRaw = mapValues(
-    pick(labelStringifyFns, Object.keys(labels)),
-    (labelStringifyFn, label) =>
-      (labelStringifyFn as <T>(data: T) => string)(
-        labels[label as keyof ContainerLabelTypes]
-      )
+function stringifyContainerLabels(labels: Partial<ContainerLabelTypes>): ContainerLabelsRaw {
+  const labelsRaw = mapValues(pick(labelStringifyFns, Object.keys(labels)), (labelStringifyFn, label) =>
+    (labelStringifyFn as <T>(data: T) => string)(labels[label as keyof ContainerLabelTypes])
   ) as ContainerLabelsRaw;
   return omitBy(labelsRaw, (value) => value === undefined);
 }
 
-type ServiceDefaultSettings = Pick<
-  ComposeService,
-  "environment" | "ports" | "volumes"
->;
+type ServiceDefaultSettings = Pick<ComposeService, "environment" | "ports" | "volumes">;
 
-export function writeDefaultsToLabels({
-  environment,
-  ports,
-  volumes,
-}: ServiceDefaultSettings): ContainerLabelsRaw {
+export function writeDefaultsToLabels({ environment, ports, volumes }: ServiceDefaultSettings): ContainerLabelsRaw {
   return stringifyContainerLabels({
     "dappnode.dnp.default.environment":
-      environment &&
-      (Array.isArray(environment)
-        ? environment
-        : stringifyEnvironment(environment)),
+      environment && (Array.isArray(environment) ? environment : stringifyEnvironment(environment)),
     "dappnode.dnp.default.ports": ports,
-    "dappnode.dnp.default.volumes": volumes,
+    "dappnode.dnp.default.volumes": volumes
   });
 }
 
@@ -170,7 +142,7 @@ export function readContainerLabels(labelsRaw: ContainerLabelsRaw): Partial<{
     dockerTimeout: labelValues["dappnode.dnp.dockerTimeout"],
     defaultEnvironment: labelValues["dappnode.dnp.default.environment"],
     defaultPorts: labelValues["dappnode.dnp.default.ports"],
-    defaultVolumes: labelValues["dappnode.dnp.default.volumes"],
+    defaultVolumes: labelValues["dappnode.dnp.default.volumes"]
   };
 }
 
@@ -184,7 +156,7 @@ export function writeMetadataToLabels({
   origin,
   isCore,
   isMain,
-  dockerTimeout,
+  dockerTimeout
 }: {
   dnpName: string;
   version: string;
@@ -207,6 +179,6 @@ export function writeMetadataToLabels({
     "dappnode.dnp.chain": chain,
     "dappnode.dnp.isCore": isCore,
     "dappnode.dnp.isMain": isMain,
-    "dappnode.dnp.dockerTimeout": dockerTimeout,
+    "dappnode.dnp.dockerTimeout": dockerTimeout
   });
 }

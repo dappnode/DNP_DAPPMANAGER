@@ -23,11 +23,7 @@ export default function RemoteSigner({
   const navigate = useNavigate();
 
   return (
-    <Card
-      {...props}
-      className={`remote-signer ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
-    >
+    <Card {...props} className={`remote-signer ${joinCssClass({ isSelected })}`} shadow={isSelected}>
       <div
         onClick={
           signer.status === "ok"
@@ -50,51 +46,32 @@ export default function RemoteSigner({
         <div className="title">{prettyDnpName(signer.dnpName)} </div>
       </div>
 
-      {signer.status === "ok" &&
-        isSelected &&
-        signer.isInstalled &&
-        !signer.isUpdated && (
-          <>
-            <Button
-              onClick={() =>
-                navigate(
-                  `${getInstallerPath(signer.dnpName)}/${signer.dnpName}`
-                )
-              }
-              variant="dappnode"
-            >
-              UPDATE
-            </Button>
-            <br />
-            <br />
-          </>
-        )}
+      {signer.status === "ok" && isSelected && signer.isInstalled && !signer.isUpdated && (
+        <>
+          <Button onClick={() => navigate(`${getInstallerPath(signer.dnpName)}/${signer.dnpName}`)} variant="dappnode">
+            UPDATE
+          </Button>
+          <br />
+          <br />
+        </>
+      )}
 
-      {signer.status === "ok" &&
-        isSelected &&
-        signer.isInstalled &&
-        signer.data?.manifest?.links?.ui && (
-          <div
-            style={{
-              alignItems: "center",
-              textTransform: "capitalize",
-              whiteSpace: "nowrap"
-            }}
-          >
-            <a
-              href={signer.data.manifest.links.ui}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              <FaKey /> {"  "} Upload keystores
-            </a>
-          </div>
-        )}
+      {signer.status === "ok" && isSelected && signer.isInstalled && signer.data?.manifest?.links?.ui && (
+        <div
+          style={{
+            alignItems: "center",
+            textTransform: "capitalize",
+            whiteSpace: "nowrap"
+          }}
+        >
+          <a href={signer.data.manifest.links.ui} target="_blank" rel="noreferrer noopener">
+            <FaKey /> {"  "} Upload keystores
+          </a>
+        </div>
+      )}
 
       {signer.status === "ok" && (
-        <div className="description">
-          {isSelected && signer.data?.manifest?.shortDescription}
-        </div>
+        <div className="description">{isSelected && signer.data?.manifest?.shortDescription}</div>
       )}
     </Card>
   );

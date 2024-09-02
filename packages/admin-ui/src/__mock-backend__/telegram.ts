@@ -6,10 +6,7 @@ let telegramUserId: string = "";
 
 export const telegram: Pick<
   Routes,
-  | "telegramStatusGet"
-  | "telegramStatusSet"
-  | "telegramConfigGet"
-  | "telegramConfigSet"
+  "telegramStatusGet" | "telegramStatusSet" | "telegramConfigGet" | "telegramConfigSet"
 > = {
   telegramStatusGet: async () => isEnabled,
   telegramStatusSet: async ({ telegramStatus }) => {

@@ -5,9 +5,7 @@ import { parseUpnpErrors } from "./upnpError.js";
 export async function getExternalUpnpIp(): Promise<string> {
   try {
     const res = await upnpcCommand("-l");
-    const externalIp = ((res || "").match(
-      /ExternalIPAddress.=.((\d+\.?){4})/
-    ) || [])[1];
+    const externalIp = ((res || "").match(/ExternalIPAddress.=.((\d+\.?){4})/) || [])[1];
     if (isIp(externalIp)) return externalIp;
     else throw Error("Wrong IP");
   } catch (e) {

@@ -1,21 +1,13 @@
 import Ajv from "ajv";
 import { routesArgumentsSchema } from "@dappnode/common";
-import {
-  LoggerMiddleware,
-  RpcPayload,
-  Routes,
-  RpcResponse
-} from "@dappnode/types";
+import { LoggerMiddleware, RpcPayload, Routes, RpcResponse } from "@dappnode/types";
 
 const ajv = new Ajv({ allErrors: true });
 
 /**
  * Given a set of method handlers, parse a RPC request and handle it
  */
-export const getRpcHandler = (
-  methods: Routes,
-  loggerMiddleware?: LoggerMiddleware
-) => {
+export const getRpcHandler = (methods: Routes, loggerMiddleware?: LoggerMiddleware) => {
   const validateParams = ajv.compile(routesArgumentsSchema);
   const { onCall, onSuccess, onError } = loggerMiddleware || {};
 
@@ -31,8 +23,7 @@ export const getRpcHandler = (
 
       // Validate params
       const valid = validateParams({ [method]: params });
-      if (!valid)
-        throw new JsonRpcReqError(formatErrors(validateParams.errors, method));
+      if (!valid) throw new JsonRpcReqError(formatErrors(validateParams.errors, method));
 
       const result = await handler(...params);
       if (onSuccess) onSuccess(method, result, params);
@@ -59,13 +50,11 @@ function parseRpcRequest(body: RpcPayload): {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any[];
 } {
-  if (typeof body !== "object")
-    throw Error(`body request must be an object, ${typeof body}`);
+  if (typeof body !== "object") throw Error(`body request must be an object, ${typeof body}`);
   const { method, params } = body;
   if (!method) throw new JsonRpcReqError("request body missing method");
   if (!params) throw new JsonRpcReqError("request body missing params");
-  if (!Array.isArray(params))
-    throw new JsonRpcReqError("request body params must be an array");
+  if (!Array.isArray(params)) throw new JsonRpcReqError("request body params must be an array");
   return { method: method as keyof Routes, params };
 }
 
@@ -78,17 +67,11 @@ function tryToParseRpcRequest(body: any): { method?: string; params?: any[] } {
   }
 }
 
-function formatErrors(
-  errors: Array<Ajv.ErrorObject> | null | undefined,
-  method: string
-): string {
+function formatErrors(errors: Array<Ajv.ErrorObject> | null | undefined, method: string): string {
   const dataVar = `root_prop`;
   const toReplace = `${dataVar}.${method}`;
   const errorsText = ajv.errorsText(errors, { separator: "\n", dataVar });
-  return (
-    "Validation error:\n" +
-    errorsText.replace(new RegExp(toReplace, "g"), "params")
-  );
+  return "Validation error:\n" + errorsText.replace(new RegExp(toReplace, "g"), "params");
 }
 
 /**

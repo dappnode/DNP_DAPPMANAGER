@@ -25,12 +25,10 @@ const WelcomeModalContainer: React.FC<{
     let timeout: unknown;
     if (show) {
       if (status === "null") setStatus("opacity-0");
-      if (status === "opacity-0")
-        timeout = setTimeout(() => setStatus("opacity-1"), transitionMs / 2);
+      if (status === "opacity-0") timeout = setTimeout(() => setStatus("opacity-1"), transitionMs / 2);
     } else {
       if (status === "opacity-1") setStatus("opacity-0");
-      if (status === "opacity-0")
-        timeout = setTimeout(() => setStatus("null"), transitionMs);
+      if (status === "opacity-0") timeout = setTimeout(() => setStatus("null"), transitionMs);
     }
 
     return () => {

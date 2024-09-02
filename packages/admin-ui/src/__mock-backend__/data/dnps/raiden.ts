@@ -24,11 +24,9 @@ export const raiden: MockDnp = {
       featuredColor: "white",
       featuredAvatarFilter: "invert(1)"
     },
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: ["Abel Boldú (@vdo)"],
-    //@ts-ignore
-    homepage: {
+    links: {
       homepage: "https://github.com/dappnode/DAppNodePackage-raiden#readme"
     },
     repository: {

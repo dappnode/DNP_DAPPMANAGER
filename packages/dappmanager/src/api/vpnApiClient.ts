@@ -7,9 +7,7 @@ export interface VpnApiClient {
   removeDevice: (kwargs: { id: string }) => Promise<void>;
   resetDevice: (kwargs: { id: string }) => Promise<void>;
   listDevices: () => Promise<{ id: string }[]>;
-  getDeviceCredentials: (kwargs: {
-    id: string;
-  }) => Promise<{ filename: string; key: string; url: string }>;
+  getDeviceCredentials: (kwargs: { id: string }) => Promise<{ filename: string; key: string; url: string }>;
   getVersionData: () => Promise<PackageVersionData>;
 }
 
@@ -30,7 +28,6 @@ export interface VpnApiClientParams {
 type Args = any[];
 
 export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return mapValues(
     vpnApiRoutesData,
     (_, route) =>
@@ -45,11 +42,7 @@ export function getVpnApiClient(params: VpnApiClientParams): VpnApiClient {
  * @param route "addDevice"
  * @param args [ { id: "name" } ]
  */
-async function vpnRpcCall<R>(
-  params: VpnApiClientParams,
-  route: string,
-  ...args: Args
-): Promise<R> {
+async function vpnRpcCall<R>(params: VpnApiClientParams, route: string, ...args: Args): Promise<R> {
   const res = await fetch(params.VPN_API_RPC_URL, {
     method: "post",
     body: JSON.stringify({ method: route, params: args }),
@@ -62,9 +55,7 @@ async function vpnRpcCall<R>(
   try {
     body = JSON.parse(bodyText);
   } catch (e) {
-    throw Error(
-      `Error parsing JSON body (${res.status} ${res.statusText}): ${e.message}\n${bodyText}`
-    );
+    throw Error(`Error parsing JSON body (${res.status} ${res.statusText}): ${e.message}\n${bodyText}`);
   }
 
   if (!res.ok) {

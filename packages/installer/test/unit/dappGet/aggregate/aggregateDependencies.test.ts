@@ -32,14 +32,14 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
         "0.1.1": { "dependency.dnp.dappnode.eth": "^0.1.1" },
         "0.1.2": { "dependency.dnp.dappnode.eth": "^0.1.1" },
         "0.2.0": { "dependency.dnp.dappnode.eth": "^0.1.1" },
-        "0.2.1": { "dependency.dnp.dappnode.eth": "^0.1.1" },
+        "0.2.1": { "dependency.dnp.dappnode.eth": "^0.1.1" }
       },
       "dependency.dnp.dappnode.eth": {
         "0.1.0": {},
         "0.1.1": {},
         "0.1.2": {},
-        "0.2.0": {},
-      },
+        "0.2.0": {}
+      }
     };
 
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
@@ -52,35 +52,35 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       name: dnpName,
       versionRange,
       dnps,
-      dappGetFetcher,
+      dappGetFetcher
     });
 
     expect(dnps).to.deep.equal({
       "kovan.dnp.dappnode.eth": {
         versions: {
-          "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" },
-        },
+          "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" }
+        }
       },
       "dependency.dnp.dappnode.eth": {
         versions: {
           "0.1.1": {},
-          "0.1.2": {},
-        },
-      },
+          "0.1.2": {}
+        }
+      }
     });
   });
 
   it("should not crash with circular dependencies", async () => {
     const mockDnps: MockDnps = {
       "dnpA.dnp.dappnode.eth": {
-        "0.1.0": { "dnpB.dnp.dappnode.eth": "^0.1.0" },
+        "0.1.0": { "dnpB.dnp.dappnode.eth": "^0.1.0" }
       },
       "dnpB.dnp.dappnode.eth": {
-        "0.1.0": { "dnpC.dnp.dappnode.eth": "^0.1.0" },
+        "0.1.0": { "dnpC.dnp.dappnode.eth": "^0.1.0" }
       },
       "dnpC.dnp.dappnode.eth": {
-        "0.1.0": { "dnpA.dnp.dappnode.eth": "^0.1.0" },
-      },
+        "0.1.0": { "dnpA.dnp.dappnode.eth": "^0.1.0" }
+      }
     };
 
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
@@ -93,19 +93,19 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       name: dnpName,
       versionRange,
       dnps,
-      dappGetFetcher,
+      dappGetFetcher
     });
 
     expect(dnps).to.deep.equal({
       "dnpA.dnp.dappnode.eth": {
-        versions: { "0.1.0": { "dnpB.dnp.dappnode.eth": "^0.1.0" } },
+        versions: { "0.1.0": { "dnpB.dnp.dappnode.eth": "^0.1.0" } }
       },
       "dnpB.dnp.dappnode.eth": {
-        versions: { "0.1.0": { "dnpC.dnp.dappnode.eth": "^0.1.0" } },
+        versions: { "0.1.0": { "dnpC.dnp.dappnode.eth": "^0.1.0" } }
       },
       "dnpC.dnp.dappnode.eth": {
-        versions: { "0.1.0": { "dnpA.dnp.dappnode.eth": "^0.1.0" } },
-      },
+        versions: { "0.1.0": { "dnpA.dnp.dappnode.eth": "^0.1.0" } }
+      }
     });
   });
 });

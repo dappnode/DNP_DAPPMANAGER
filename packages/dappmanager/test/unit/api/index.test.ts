@@ -19,15 +19,13 @@ describe.skip("Test server auth", function () {
   async function parseRes(res: Response): Promise<RequestRes> {
     return {
       code: res.status,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       body: (await res.json()) as any
     };
   }
 
   function expectRes(res: RequestRes, expectedRes: Partial<RequestRes>): void {
-    expect(res).to.deep.include(
-      expectedRes,
-      `Bad res\n${JSON.stringify(res, null, 2)}\n`
-    );
+    expect(res).to.deep.include(expectedRes, `Bad res\n${JSON.stringify(res, null, 2)}\n`);
   }
 
   before("start server", () => {

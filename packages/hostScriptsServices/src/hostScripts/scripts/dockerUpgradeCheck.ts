@@ -8,9 +8,7 @@ export async function dockerUpgradeCheck(): Promise<DockerUpgradeRequirements> {
   return {
     dockerHostVersion: requirementsParsed.dockerHostVersion,
     dockerLatestVersion: requirementsParsed.dockerLatestVersion || undefined, // check if dockerLatestVersion is empty string and set it to undefined if so
-    isDockerInstalledThroughApt:
-      requirementsParsed.isDockerInstalledThroughApt === "true", // check if isDockerInstalledThroughApt is a string and set it to boolean if so
-    isDockerInUnattendedUpgrades:
-      requirementsParsed.isDockerInUnattendedUpgrades === "true", // check if isDockerInUnattendedUpgrades is a string and set it to boolean if so
+    isDockerInstalledThroughApt: requirementsParsed.isDockerInstalledThroughApt === "true", // check if isDockerInstalledThroughApt is a string and set it to boolean if so
+    isDockerInUnattendedUpgrades: requirementsParsed.isDockerInUnattendedUpgrades === "true" // check if isDockerInUnattendedUpgrades is a string and set it to boolean if so
   };
 }

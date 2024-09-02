@@ -1,9 +1,4 @@
-import {
-  SetupSchema,
-  SetupTarget,
-  SetupUiJson,
-  SetupWizard,
-} from "./setupWizard.js";
+import { SetupSchema, SetupTarget, SetupUiJson, SetupWizard } from "./setupWizard.js";
 
 export interface Manifest {
   // Package metadata
@@ -157,7 +152,7 @@ export const chainDriversTypes = [
   "ethereum",
   "ethereum-beacon-chain",
   "ethereum2-beacon-chain-prysm",
-  "monero",
+  "monero"
 ] as const;
 
 // HTTPS ports

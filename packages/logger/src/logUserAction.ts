@@ -13,8 +13,7 @@ import { eventBus } from "@dappnode/eventbus";
 
 let db: JsonFileDb<UserActionLog[]> | null = null;
 function getDb(): JsonFileDb<UserActionLog[]> {
-  if (!db)
-    db = new JsonFileDb<UserActionLog[]>(params.USER_ACTION_LOGS_DB_PATH, []);
+  if (!db) db = new JsonFileDb<UserActionLog[]>(params.USER_ACTION_LOGS_DB_PATH, []);
   return db;
 }
 
@@ -33,14 +32,12 @@ function push(log: UserActionLogPartial, level: UserActionLog["level"]): void {
     timestamp: Date.now(),
     ...log,
     ...(log.args ? { args: logSafeObjects(log.args) } : {}),
-    ...(log.result ? { result: logSafeObjects(log.result) } : {}),
+    ...(log.result ? { result: logSafeObjects(log.result) } : {})
   };
 
   // Skip for logs greater than 3 KB
   if (isLogTooBig(userActionLog)) {
-    logs.warn(
-      `The log ${userActionLog.event} is too big. It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`
-    );
+    logs.warn(`The log ${userActionLog.event} is too big. It will not be stored in ${params.USER_ACTION_LOGS_DB_PATH}`);
     return;
   }
 

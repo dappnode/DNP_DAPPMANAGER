@@ -33,9 +33,9 @@ export const httpsPortalResponseSchema = {
     required: ["from", "to"],
     properties: {
       from: { type: "string" },
-      to: { type: "string" },
-    },
-  },
+      to: { type: "string" }
+    }
+  }
 };
 
 export class HttpsPortalApiClient {
@@ -65,7 +65,7 @@ export class HttpsPortalApiClient {
     const search = querystring.encode({
       from: fromSubdomain,
       to: toHost,
-      auth: auth && (await this.getHtpasswdEntry(auth)),
+      auth: auth && (await this.getHtpasswdEntry(auth))
     });
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
@@ -80,7 +80,7 @@ export class HttpsPortalApiClient {
   async remove({ fromSubdomain, toHost }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
-      to: toHost,
+      to: toHost
     });
     await this.get(urlJoin(this.baseUrl, `/remove?${search}`));
   }
@@ -92,9 +92,9 @@ export class HttpsPortalApiClient {
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
-    const entries = await this.get<
-      { from: string; to: string; auth?: string }[]
-    >(urlJoin(this.baseUrl, `/?format=json`));
+    const entries = await this.get<{ from: string; to: string; auth?: string }[]>(
+      urlJoin(this.baseUrl, `/?format=json`)
+    );
 
     if (!ajv.validate(httpsPortalResponseSchema, entries)) {
       throw Error(`Invalid response: ${JSON.stringify(ajv.errors, null, 2)}`);
@@ -106,9 +106,9 @@ export class HttpsPortalApiClient {
       auth: entry.auth
         ? {
             username: entry.auth.split(":")[0],
-            password: entry.auth.split(":")[1],
+            password: entry.auth.split(":")[1]
           }
-        : undefined,
+        : undefined
     }));
   }
 
@@ -140,13 +140,7 @@ export class HttpsPortalApiClient {
    * @param {string} params.password - The password.
    * @returns {Promise<string>}`exampleUser:{SSHA}5ZCbZYs5Pn5T6Z9wXV5YWZRp+mgc0e3cLQFklHQbU3W5bg==`.
    */
-  private async getHtpasswdEntry({
-    username,
-    password,
-  }: {
-    username: string;
-    password: string;
-  }): Promise<string> {
+  private async getHtpasswdEntry({ username, password }: { username: string; password: string }): Promise<string> {
     const saltLength = 16; // Length of the salt in bytes
 
     // Generate a random salt

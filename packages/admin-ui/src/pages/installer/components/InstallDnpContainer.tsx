@@ -17,8 +17,7 @@ const InstallDnpContainer: React.FC = () => {
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // TODO: return a beautiful error page
-  if (!id)
-    return <div>No ID provided in route parameters.</div>;
+  if (!id) return <div>No ID provided in route parameters.</div>;
 
   const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id });
 

@@ -14,6 +14,6 @@ const hostTimersDirSource = params.HOST_TIMERS_SOURCE_DIR;
 export async function copyHostTimers(): Promise<void> {
   await copyOnHost({
     hostDir: hostTimersDir,
-    hostDirSource: hostTimersDirSource,
+    hostDirSource: hostTimersDirSource
   });
 }

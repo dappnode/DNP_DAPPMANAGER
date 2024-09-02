@@ -1,10 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import * as a from "../../../actions";
-import {
-  validatePasswordsMatch,
-  validateStrongPasswordAsDockerEnv
-} from "utils/validation";
+import { validatePasswordsMatch, validateStrongPasswordAsDockerEnv } from "utils/validation";
 // Components
 import Card from "components/Card";
 import Button from "components/Button";
@@ -25,9 +22,8 @@ export default function ChangeHostUserPassword() {
   return (
     <Card spacing>
       <div>
-        Please change the host user password. The current password is the
-        factory insecure default. Changing it to a strong password will protect
-        your DAppNode from external attackers.
+        Please change the host user password. The current password is the factory insecure default. Changing it to a
+        strong password will protect your DAppNode from external attackers.
       </div>
 
       <InputForm
@@ -54,12 +50,7 @@ export default function ChangeHostUserPassword() {
           }
         ]}
       >
-        <Button
-          type="submit"
-          variant="dappnode"
-          disabled={!isValid}
-          onClick={onChangePassword}
-        >
+        <Button type="submit" variant="dappnode" disabled={!isValid} onClick={onChangePassword}>
           Change password
         </Button>
       </InputForm>

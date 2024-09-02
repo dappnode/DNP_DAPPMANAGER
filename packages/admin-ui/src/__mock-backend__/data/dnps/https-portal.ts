@@ -10,8 +10,7 @@ export const httpsPortal: MockDnp = {
     version: "0.1.0",
     description: "HTTPs Portal",
     type: "service",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     links: {
       WebApplication: "http://https.dappnode/",
       homepage: "https://github.com/dappnode/DNP_HTTPS#readme"

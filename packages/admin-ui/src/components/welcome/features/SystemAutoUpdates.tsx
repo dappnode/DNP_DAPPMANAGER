@@ -8,13 +8,7 @@ import { autoUpdateIds } from "params";
 /**
  * Offer the option to turn on system auto-updates
  */
-export default function SystemAutoUpdates({
-  onBack,
-  onNext
-}: {
-  onBack?: () => void;
-  onNext: () => void;
-}) {
+export default function SystemAutoUpdates({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   // By default, activate system auto-updates if user doesn't change anything
   const [autoUpdateOn, setAutoUpdateOn] = useState(true);
 
@@ -26,7 +20,7 @@ export default function SystemAutoUpdates({
   function onSetAutoUpdates() {
     const id = autoUpdateIds.SYSTEM_PACKAGES;
     if (autoUpdateOn)
-      api.autoUpdateSettingsEdit({ id, enabled: true }).catch(e => {
+      api.autoUpdateSettingsEdit({ id, enabled: true }).catch((e) => {
         console.error(`Error on autoUpdateSettingsEdit ${id}: ${e.stack}`);
       });
     onNext();
@@ -37,8 +31,7 @@ export default function SystemAutoUpdates({
       <div className="header">
         <div className="title">System auto updates</div>
         <div className="description">
-          Enable system auto-updates for DAppNode to install automatically the
-          latest versions.
+          Enable system auto-updates for DAppNode to install automatically the latest versions.
           <br />
           For major breaking updates, your approval will always be required.
         </div>

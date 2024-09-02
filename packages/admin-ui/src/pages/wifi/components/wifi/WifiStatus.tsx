@@ -27,13 +27,9 @@ function WifiInfo({ wifiStatus }: { wifiStatus: ContainerState }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   return (
     <p>
-      Connect to the Wi-Fi hotspot exposed by your DAppNode using your
-      credentials. More information at:{" "}
-      <LinkDocs href={docsUrl.connectWifi}>
-        How to connect to DAppNode WiFi
-      </LinkDocs>
-      {dappnodeIdentity.internalIp === dappnodeIdentity.ip &&
-      wifiStatus !== "running"
+      Connect to the Wi-Fi hotspot exposed by your DAppNode using your credentials. More information at:{" "}
+      <LinkDocs href={docsUrl.connectWifi}>How to connect to DAppNode WiFi</LinkDocs>
+      {dappnodeIdentity.internalIp === dappnodeIdentity.ip && wifiStatus !== "running"
         ? "Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not require Wi-Fi."
         : null}
     </p>
@@ -47,9 +43,7 @@ function WifiLog({ wifiReport }: { wifiReport: WifiReport }) {
       <p>{wifiReport.info}</p>
 
       {wifiReport.report ? (
-        <div className="error-stack">
-          {`${wifiReport.report.lastLog}. Exit code: ${wifiReport.report.exitCode}`}
-        </div>
+        <div className="error-stack">{`${wifiReport.report.lastLog}. Exit code: ${wifiReport.report.exitCode}`}</div>
       ) : null}
     </>
   );
@@ -72,7 +66,7 @@ export default function WifiStatus(): JSX.Element {
     try {
       if (wifiDnp.data) {
         if (wifiDnp.data.containers[0].state === "running")
-          await new Promise<void>(resolve => {
+          await new Promise<void>((resolve) => {
             confirm({
               title: `Pause wifi service`,
               text: `Warning, if you are connected to your DAppNode's WIFI you may lose access to your DAppNode. Make sure to have an alternative way to connect to it, like a VPN connection.`,
@@ -82,26 +76,17 @@ export default function WifiStatus(): JSX.Element {
           });
 
         await withToast(
-          continueIfCalleDisconnected(
-            () => api.packageStartStop({ dnpName: wifiDnpName }),
-            wifiDnpName
-          ),
+          continueIfCalleDisconnected(() => api.packageStartStop({ dnpName: wifiDnpName }), wifiDnpName),
           {
-            message:
-              wifiDnp.data.containers[0].state === "running"
-                ? "Pausing wifi"
-                : "Starting wifi",
-            onSuccess:
-              wifiDnp.data.containers[0].state === "running"
-                ? "Paused wifi"
-                : "Started wifi"
+            message: wifiDnp.data.containers[0].state === "running" ? "Pausing wifi" : "Starting wifi",
+            onSuccess: wifiDnp.data.containers[0].state === "running" ? "Paused wifi" : "Started wifi"
           }
         );
 
         wifiReport.revalidate();
       }
     } catch (e) {
-      console.error("Error on start/stop wifi package");
+      console.error(`Error on start/stop wifi package: ${e}`);
     }
   }
 
@@ -115,10 +100,7 @@ export default function WifiStatus(): JSX.Element {
             <div className="wifi-local-status-container">
               <StateBadgeContainer container={wifiDnp.data.containers[0]} />
               <MdWifi className="wifi-local-status-icon" />
-              <NavLink
-                className="wifi-status-name"
-                to="http://my.dappnode/packages/wifi.dnp.dappnode.eth"
-              >
+              <NavLink className="wifi-status-name" to="http://my.dappnode/packages/wifi.dnp.dappnode.eth">
                 {prettyDnpName(wifiDnpName)}
               </NavLink>
             </div>
@@ -126,9 +108,7 @@ export default function WifiStatus(): JSX.Element {
               <Switch
                 checked={wifiDnp.data.containers[0].state === "running"}
                 onToggle={pauseWifi}
-                label={
-                  wifiDnp.data.containers[0].state === "running" ? "On" : "Off"
-                }
+                label={wifiDnp.data.containers[0].state === "running" ? "On" : "Off"}
               ></Switch>
             </div>
           </div>

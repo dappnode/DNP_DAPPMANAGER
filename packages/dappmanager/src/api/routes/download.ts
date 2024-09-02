@@ -20,9 +20,9 @@ export const download = wrapHandlerHtml<Params>((req, res) => {
 
   // Remove the fileId from the DB FIRST to prevent reply attacks
   db.fileTransferPath.remove(fileId);
-  return res.download(filePath, errHttp => {
+  return res.download(filePath, (errHttp) => {
     if (!errHttp)
-      fs.unlink(filePath, errFs => {
+      fs.unlink(filePath, (errFs) => {
         if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
       });
   });

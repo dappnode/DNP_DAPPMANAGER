@@ -11,9 +11,7 @@ const { MY_PACKAGES } = autoUpdateIds;
  * while keeping auto-update related logic in this file
  * @param dnpName
  */
-export async function enableAutoUpdatesForPackageWithConfirm(
-  dnpName: string
-): Promise<void> {
+export async function enableAutoUpdatesForPackageWithConfirm(dnpName: string): Promise<void> {
   const { settings } = await api.autoUpdateDataGet();
   const autoUpdatesEnabledForAllPackages = settings[MY_PACKAGES]?.enabled;
   const autoUpdatesEnabledForThisPackage = settings[dnpName]?.enabled;
@@ -21,7 +19,7 @@ export async function enableAutoUpdatesForPackageWithConfirm(
 
   if (!autoUpdatesEnabledForAllPackages && !autoUpdatesEnabledForThisPackage) {
     // Allow user to enable for all packages or just this package
-    const enableForAll = await new Promise<boolean>(resolve => {
+    const enableForAll = await new Promise<boolean>((resolve) => {
       confirm({
         title: "Enable auto-updates",
         text: `Do you want to enable auto-update for ${prettyName} so DAppNode to installs automatically the latest versions?`,
@@ -42,12 +40,9 @@ export async function enableAutoUpdatesForPackageWithConfirm(
 
     const id = enableForAll ? MY_PACKAGES : dnpName;
     const logId = enableForAll ? "all packages" : prettyName;
-    await withToastNoThrow(
-      () => api.autoUpdateSettingsEdit({ id, enabled: true }),
-      {
-        message: `Enabling auto-updates for ${logId}`,
-        onSuccess: `Enabled auto-updates for ${logId}`
-      }
-    );
+    await withToastNoThrow(() => api.autoUpdateSettingsEdit({ id, enabled: true }), {
+      message: `Enabling auto-updates for ${logId}`,
+      onSuccess: `Enabled auto-updates for ${logId}`
+    });
   }
 }

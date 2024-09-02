@@ -6,11 +6,7 @@ export async function isUpnpAvailable(): Promise<boolean> {
     await list();
     return true;
   } catch (e) {
-    if (
-      e instanceof UpnpError &&
-      e.typeUpnpError === UPnPErrors.UPNP_NOT_AVAILABLE
-    )
-      return false;
+    if (e instanceof UpnpError && e.typeUpnpError === UPnPErrors.UPNP_NOT_AVAILABLE) return false;
     return true;
   }
 }

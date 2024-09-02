@@ -1,9 +1,6 @@
 import { DNPRegistryEntry, PublicRegistryEntry, Registry } from "./types.js";
 import { request, gql } from "graphql-request";
-import {
-  dnpRegistryGraphEndpoint,
-  publicRegistryGraphEndpoint,
-} from "./params.js";
+import { dnpRegistryGraphEndpoint, publicRegistryGraphEndpoint } from "./params.js";
 
 // TODO: Consider adding scanning functions for events
 
@@ -25,8 +22,7 @@ export class DappNodeRegistry {
     if (registry === "dnp") this.graphEndpoint = dnpRegistryGraphEndpoint;
     else this.graphEndpoint = publicRegistryGraphEndpoint;
 
-    this.nameSuffix =
-      this.registry === "dnp" ? ".dnp.dappnode.eth" : ".public.dappnode.eth";
+    this.nameSuffix = this.registry === "dnp" ? ".dnp.dappnode.eth" : ".public.dappnode.eth";
   }
 
   /**

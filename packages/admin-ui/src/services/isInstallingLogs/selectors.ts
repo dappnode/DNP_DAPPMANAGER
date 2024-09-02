@@ -12,15 +12,12 @@ import { ProgressLogsByDnp, ProgressLogs } from "types";
 export const getProgressLogsByDnp = (state: RootState): ProgressLogsByDnp => {
   const isInstallingLogs = state.isInstallingLogs;
   return pickBy(
-    mapValues(isInstallingLogs.dnpNameToLogId, id => isInstallingLogs.logs[id]),
-    progressLogs => progressLogs
+    mapValues(isInstallingLogs.dnpNameToLogId, (id) => isInstallingLogs.logs[id]),
+    (progressLogs) => progressLogs
   );
 };
 
-export const getProgressLogsOfDnp = (
-  state: RootState,
-  dnpName: string
-): ProgressLogs | undefined => {
+export const getProgressLogsOfDnp = (state: RootState, dnpName: string): ProgressLogs | undefined => {
   const progressLogsByDnp = getProgressLogsByDnp(state);
   return progressLogsByDnp[dnpName];
 };

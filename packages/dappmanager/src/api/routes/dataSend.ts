@@ -14,7 +14,7 @@ export const dataSend = wrapHandler(async (req, res) => {
   const data = req.query.data || req.body;
 
   try {
-    if (typeof key === undefined) throw Error("missing");
+    if (typeof key === "undefined") throw Error("missing");
     if (typeof key !== "string") throw Error("must be a string");
     if (!key) throw Error("must not be empty");
   } catch (e) {
@@ -22,7 +22,7 @@ export const dataSend = wrapHandler(async (req, res) => {
   }
 
   try {
-    if (typeof data === undefined) throw Error("missing");
+    if (typeof data === "undefined") throw Error("missing");
     if (typeof data !== "string") throw Error("must be a string");
     // OK to be empty
     if (data.length > MAX_LENGTH) throw Error("too long");

@@ -1,12 +1,7 @@
 import * as logUserAction from "./logUserAction.js";
 import { logs } from "./logs.js";
 import { routesData, Routes } from "@dappnode/types";
-import {
-  LoggerMiddleware,
-  Args,
-  Result,
-  EthProviderError,
-} from "@dappnode/types";
+import { LoggerMiddleware, Args, Result, EthProviderError } from "@dappnode/types";
 
 export const routesLogger: LoggerMiddleware = {
   onCall: (route: string, args: Args = []): void => {
@@ -19,7 +14,7 @@ export const routesLogger: LoggerMiddleware = {
         event: route,
         message: `${route} success`,
         result,
-        args,
+        args
       });
       logs.info("RPC success", route);
     } else {
@@ -34,17 +29,16 @@ export const routesLogger: LoggerMiddleware = {
     } else if (isSyncingError(msg)) {
       logs.warn(`Chain is still syncing, on ${route}: ${msg}`);
     } else {
-      if (isNodeConnectionError(msg))
-        logs.warn(`Error connecting to ethchain node, on ${route}: ${msg}`);
+      if (isNodeConnectionError(msg)) logs.warn(`Error connecting to ethchain node, on ${route}: ${msg}`);
       else logs.error("RPC error", route, error);
       logUserAction.error({
         event: route,
         message: error.message,
         stack: error.stack,
-        args,
+        args
       });
     }
-  },
+  }
 };
 
 export const subscriptionsLogger: LoggerMiddleware = {
@@ -55,7 +49,7 @@ export const subscriptionsLogger: LoggerMiddleware = {
   onError: (route: string, error: Error, args: Args = []): void => {
     logs.error("Subscription error", route, error);
     logs.debug("Subscription error", route, args);
-  },
+  }
 };
 
 /**
@@ -69,8 +63,5 @@ function isNodeConnectionError(msg: string): boolean {
  * When attempting to call a contract while the chain is syncing
  */
 function isSyncingError(msg: string): boolean {
-  return (
-    msg.includes("decode 0x from ABI") ||
-    msg.includes("decode address from ABI")
-  );
+  return msg.includes("decode 0x from ABI") || msg.includes("decode address from ABI");
 }

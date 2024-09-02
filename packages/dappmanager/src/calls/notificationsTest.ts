@@ -12,11 +12,7 @@ import { PackageNotification, NotificationType } from "@dappnode/types";
  *   body: "Some text about notification" {string}
  * }
  */
-export async function notificationsTest({
-  notification
-}: {
-  notification?: PackageNotification;
-}): Promise<void> {
+export async function notificationsTest({ notification }: { notification?: PackageNotification }): Promise<void> {
   if (!notification) {
     notification = {
       id: String(Math.random()).slice(2),

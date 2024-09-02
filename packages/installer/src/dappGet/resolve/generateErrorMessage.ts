@@ -1,3 +1,4 @@
+import { logs } from "@dappnode/logger";
 import { DappGetErrors } from "../types.js";
 
 /**
@@ -37,15 +38,12 @@ export default function generateErrorMessage({
       if (!blameDepReq[dep]) blameDepReq[dep] = {};
       blameDepReq[dep][req] = true;
     }
-    const highestDep = Object.keys(blameDep).reduce((a, b) =>
-      blameDep[a] > blameDep[b] ? a : b
-    );
+    const highestDep = Object.keys(blameDep).reduce((a, b) => (blameDep[a] > blameDep[b] ? a : b));
     const blamePackages = Object.keys(blameDepReq[highestDep]).join(", ");
-    errorMsgs.push(
-      `Packages ${blamePackages} request incompatible versions of ${highestDep}.`
-    );
+    errorMsgs.push(`Packages ${blamePackages} request incompatible versions of ${highestDep}.`);
   } catch (e) {
     // Ignore possible errors from the message processing
+    logs.error("Error generating blame message", e);
   }
   // Report how many cases have been checked
   errorMsgs.push(`Checked ${caseId}/${totalCases} possible states.`);

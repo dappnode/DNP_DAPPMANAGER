@@ -18,13 +18,7 @@ import Modules from "./dropdownMenus/Modules";
 import { useSelector } from "react-redux";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
-export const TopBar = ({
-  username,
-  appContext
-}: {
-  username: string;
-  appContext: AppContextIface;
-}) => {
+export const TopBar = ({ username, appContext }: { username: string; appContext: AppContextIface }) => {
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
   const isPkgInstalling = Object.keys(progressLogsByDnp).length !== 0;
 

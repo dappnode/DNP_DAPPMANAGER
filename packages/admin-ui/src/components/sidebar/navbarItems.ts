@@ -36,8 +36,7 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
     logo: EfgLogo,
     text: "Ethereum Foundation",
-    link:
-      "https://blog.ethereum.org/2018/08/17/ethereum-foundation-grants-update-wave-3/"
+    link: "https://blog.ethereum.org/2018/08/17/ethereum-foundation-grants-update-wave-3/"
   },
   {
     logo: AragonLogo,
@@ -59,6 +58,7 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
 export const sidenavItems: {
   name: string;
   href: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   icon: (props: any) => JSX.Element;
   show: boolean;
 }[] = [

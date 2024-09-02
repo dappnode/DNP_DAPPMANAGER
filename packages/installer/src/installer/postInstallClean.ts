@@ -13,17 +13,8 @@ import { dockerCleanOldImages } from "@dappnode/dockerapi";
  * @param packagesData
  * @param log
  */
-export async function postInstallClean(
-  packagesData: InstallPackageDataPaths[],
-  log: Log
-): Promise<void> {
-  for (const {
-    dnpName,
-    semVersion,
-    imagePath,
-    manifestBackupPath,
-    composeBackupPath,
-  } of packagesData) {
+export async function postInstallClean(packagesData: InstallPackageDataPaths[], log: Log): Promise<void> {
+  for (const { dnpName, semVersion, imagePath, manifestBackupPath, composeBackupPath } of packagesData) {
     db.addPackageInstalledMetadata(dnpName);
 
     // [Clean] old files and images
@@ -62,6 +53,5 @@ function unlinkIfExists(path: string): void {
  * @param ext ".tar.xz"
  */
 function unlinkFilesWithExt(dir: string, ext: string): void {
-  for (const file of fs.readdirSync(dir))
-    if (file.endsWith(ext)) unlinkIfExists(path.join(dir, file));
+  for (const file of fs.readdirSync(dir)) if (file.endsWith(ext)) unlinkIfExists(path.join(dir, file));
 }

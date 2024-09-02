@@ -8,27 +8,19 @@ import { PackageContainer } from "@dappnode/types";
 import { ServiceSelector } from "../ServiceSelector";
 import SubTitle from "components/SubTitle";
 
-export const FileManager = ({
-  containers
-}: {
-  containers: PackageContainer[];
-}) => {
-  const serviceNames = containers.map(c => c.serviceName);
+export const FileManager = ({ containers }: { containers: PackageContainer[] }) => {
+  const serviceNames = containers.map((c) => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const location = useLocation();
   const { from, to } = fetchParamsFromExtraUrl(location.search);
 
-  const container = containers.find(c => c.serviceName === serviceName);
+  const container = containers.find((c) => c.serviceName === serviceName);
 
   return (
     <>
       {containers.length > 1 && (
         <Card spacing divider className="file-manager">
-          <ServiceSelector
-            serviceName={serviceName}
-            setServiceName={setServiceName}
-            containers={containers}
-          />
+          <ServiceSelector serviceName={serviceName} setServiceName={setServiceName} containers={containers} />
         </Card>
       )}
 
@@ -54,9 +46,7 @@ export const FileManager = ({
  * Since it's not critical, errors are logged and ignored
  * @param searchQuery
  */
-function fetchParamsFromExtraUrl(
-  searchQuery: string
-): {
+function fetchParamsFromExtraUrl(searchQuery: string): {
   from?: string;
   to?: string;
 } {

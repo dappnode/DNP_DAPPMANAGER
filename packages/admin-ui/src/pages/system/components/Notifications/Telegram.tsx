@@ -66,13 +66,10 @@ export function TelegramNotifications() {
   async function updateTelegramStatus(newStatus: boolean) {
     try {
       setReqStatusStatus({ loading: true });
-      await withToast(
-        () => api.telegramStatusSet({ telegramStatus: newStatus }),
-        {
-          message: newStatus ? "Enabling telegram..." : "Disabling telegram...",
-          onSuccess: newStatus ? "Telegram ON" : "Telegram OFF"
-        }
-      );
+      await withToast(() => api.telegramStatusSet({ telegramStatus: newStatus }), {
+        message: newStatus ? "Enabling telegram..." : "Disabling telegram...",
+        onSuccess: newStatus ? "Telegram ON" : "Telegram OFF"
+      });
       await telegramStatus.revalidate();
       setReqStatusStatus({ result: true });
     } catch (e) {
@@ -99,16 +96,15 @@ export function TelegramNotifications() {
   return (
     <Card spacing>
       <div>
-        Receive important notifications directly to your telegram account. To
-        get your own token from Telegram botfather follow{" "}
-        <a href={forumUrl.telegramHowTo}>this guide</a>
+        Receive important notifications directly to your telegram account. To get your own token from Telegram botfather
+        follow <a href={forumUrl.telegramHowTo}>this guide</a>
       </div>
       <div>
         Available commands in to start your bot chat
         <ul>
           <li>
-            <strong>/start</strong>: Send after starting a conversation
-            (channel) with your bot. You subscribe to future notifications
+            <strong>/start</strong>: Send after starting a conversation (channel) with your bot. You subscribe to future
+            notifications
           </li>
           <li>
             <strong>/help</strong>: Display all available commands
@@ -136,11 +132,7 @@ export function TelegramNotifications() {
       ) : telegramStatus.error ? (
         <Ok msg={"Error getting status"} style={{ margin: "auto" }} />
       ) : (
-        <Ok
-          msg={"Loading status..."}
-          loading={true}
-          style={{ margin: "auto" }}
-        />
+        <Ok msg={"Loading status..."} loading={true} style={{ margin: "auto" }} />
       )}
 
       <Form.Group>
@@ -156,19 +148,13 @@ export function TelegramNotifications() {
               className="register-button"
               onClick={updateTelegramConfig}
               variant="dappnode"
-              disabled={
-                !token || token === telegramConfig.data?.token || tokenError
-              }
+              disabled={!token || token === telegramConfig.data?.token || tokenError}
             >
               Submit
             </Button>
           }
         />
-        {tokenError && (
-          <span style={{ fontSize: "12px", color: "red" }}>
-            Telegram token format is incorrect
-          </span>
-        )}
+        {tokenError && <span style={{ fontSize: "12px", color: "red" }}>Telegram token format is incorrect</span>}
         <br />
         <Form.Label>Telegram user ID</Form.Label>
         <Input
@@ -182,9 +168,7 @@ export function TelegramNotifications() {
               className="register-button"
               onClick={updateTelegramConfig}
               variant="dappnode"
-              disabled={
-                !userId || userId === telegramConfig.data?.userId || userIdError
-              }
+              disabled={!userId || userId === telegramConfig.data?.userId || userIdError}
             >
               Submit
             </Button>
@@ -198,12 +182,8 @@ export function TelegramNotifications() {
               className="accordion-notifications"
             >
               <div className="header">
-                <BsInfoCircleFill
-                  className="links-icon"
-                  style={{ fontSize: "14px" }}
-                />
-                How can I get my telegram user Id?{" "}
-                {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+                <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
+                How can I get my telegram user Id? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
               </div>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey="0">
@@ -211,11 +191,7 @@ export function TelegramNotifications() {
                 <ol>
                   <li>
                     Open{" "}
-                    <a
-                      href="https://web.telegram.org/a/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
                       Telegram web
                     </a>
                     .
@@ -224,32 +200,22 @@ export function TelegramNotifications() {
                     Search for the bot <span>@raw_data_bot</span>.
                   </li>
                   <li>
-                    Write the command <span>/start</span> and copy the user ID
-                    returned.
+                    Write the command <span>/start</span> and copy the user ID returned.
                   </li>
                   <li>
-                    Paste the user ID into the user ID field and enable Telegram
-                    to secure your dappnode telegram bot and ensure only you are
-                    the only one allowed to write authenticated commands to it.
+                    Paste the user ID into the user ID field and enable Telegram to secure your dappnode telegram bot
+                    and ensure only you are the only one allowed to write authenticated commands to it.
                   </li>
                 </ol>
               </div>
             </Accordion.Collapse>
           </div>
         </Accordion>
-        {userIdError && (
-          <span style={{ fontSize: "12px", color: "red" }}>
-            Telegram user ID format is incorrect
-          </span>
-        )}
+        {userIdError && <span style={{ fontSize: "12px", color: "red" }}>Telegram user ID format is incorrect</span>}
       </Form.Group>
 
-      {reqStatusConfig.error && (
-        <ErrorView error={reqStatusConfig.error} hideIcon red />
-      )}
-      {reqStatusStatus.error && (
-        <ErrorView error={reqStatusStatus.error} hideIcon red />
-      )}
+      {reqStatusConfig.error && <ErrorView error={reqStatusConfig.error} hideIcon red />}
+      {reqStatusStatus.error && <ErrorView error={reqStatusStatus.error} hideIcon red />}
 
       <hr />
 

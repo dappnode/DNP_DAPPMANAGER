@@ -13,7 +13,7 @@ import { getContainerDomain } from "./getContainerDomain.js";
 export const getImageTag = ({
   dnpName,
   serviceName,
-  version,
+  version
 }: {
   dnpName: string;
   serviceName: string;

@@ -8,11 +8,7 @@ import { DappGetDnps } from "../types.js";
 import { logs } from "@dappnode/logger";
 import { DappGetFetcher } from "../fetch/DappGetFetcher.js";
 import { setVersion } from "../utils/dnpUtils.js";
-import {
-  ErrorDappGetDowngrade,
-  ErrorDappGetNotSatisfyRange,
-  ErrorDappGetNoVersions,
-} from "../errors.js";
+import { ErrorDappGetDowngrade, ErrorDappGetNotSatisfyRange, ErrorDappGetNoVersions } from "../errors.js";
 import { InstalledPackageData, PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
@@ -64,7 +60,7 @@ export default async function aggregate({
   dappnodeInstaller,
   req,
   dnpList,
-  dappGetFetcher,
+  dappGetFetcher
 }: {
   dappnodeInstaller: DappnodeInstaller;
   req: PackageRequest;
@@ -82,7 +78,7 @@ export default async function aggregate({
     name: req.name,
     versionRange: req.ver,
     dnps,
-    dappGetFetcher, // #### Injected dependency
+    dappGetFetcher // #### Injected dependency
   });
 
   const relevantInstalledDnps = getRelevantInstalledDnps({
@@ -90,9 +86,7 @@ export default async function aggregate({
     requestedDnps: Object.keys(dnps),
     // Ignore invalid versions as: dnp.dnp.dappnode.eth:dev, :c5ashf61
     // Ignore 'core.dnp.dappnode.eth': it's dependencies are not real and its compatibility doesn't need to be guaranteed
-    installedDnps: dnpList.filter(
-      (dnp) => valid(dnp.version) && dnp.dnpName !== params.coreDnpName
-    ),
+    installedDnps: dnpList.filter((dnp) => valid(dnp.version) && dnp.dnpName !== params.coreDnpName)
   });
   // Add relevant installed dnps and their dependencies to the dnps object
   await Promise.all(
@@ -110,7 +104,7 @@ export default async function aggregate({
             name: dnpName,
             versionRange: `>=${version}`,
             dnps,
-            dappGetFetcher, // #### Injected dependency
+            dappGetFetcher // #### Injected dependency
           });
         }
       } catch (e) {
@@ -132,8 +126,7 @@ export default async function aggregate({
           delete dnps[dnpName].versions[version];
         }
       }
-      if (!Object.keys(dnps[dnpName].versions).length)
-        throw new ErrorDappGetNotSatisfyRange(req);
+      if (!Object.keys(dnps[dnpName].versions).length) throw new ErrorDappGetNotSatisfyRange(req);
     }
     // > Label isInstalled + Enfore conditions:
     //   - installed DNPs cannot be downgraded (don't apply this condition to the request)
@@ -150,8 +143,7 @@ export default async function aggregate({
         )
           delete dnps[dnpName].versions[version];
       }
-      if (!Object.keys(dnps[dnpName].versions).length)
-        throw new ErrorDappGetDowngrade({ dnpName, dnpVersion });
+      if (!Object.keys(dnps[dnpName].versions).length) throw new ErrorDappGetDowngrade({ dnpName, dnpVersion });
     } else {
       // Validate aggregated dnps
       // - dnps must contain at least one version of the requested package

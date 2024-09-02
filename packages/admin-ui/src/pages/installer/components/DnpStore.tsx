@@ -6,20 +6,10 @@ import errorAvatar from "img/errorAvatarTrim.png";
 import Card from "components/Card";
 import Button from "components/Button";
 import DnpNameVerified from "components/DnpNameVerified";
-import {
-  DirectoryItem,
-  DirectoryItemOk,
-  DirectoryItemError
-} from "@dappnode/types";
+import { DirectoryItem, DirectoryItemOk, DirectoryItemError } from "@dappnode/types";
 import "./dnpStore.scss";
 
-function getTag({
-  isUpdated,
-  isInstalled
-}: {
-  isUpdated: boolean;
-  isInstalled: boolean;
-}) {
+function getTag({ isUpdated, isInstalled }: { isUpdated: boolean; isInstalled: boolean }) {
   return isUpdated ? "UPDATED" : isInstalled ? "UPDATE" : "GET";
 }
 
@@ -33,19 +23,11 @@ function DnpCardFeaturedOk({
 }: {
   directoryItem: DirectoryItemOk;
 }) {
-  const { featuredBackground, featuredColor, featuredAvatarFilter } =
-    featuredStyle || {};
+  const { featuredBackground, featuredColor, featuredAvatarFilter } = featuredStyle || {};
   return (
-    <Card
-      {...props}
-      style={{ background: featuredBackground, color: featuredColor }}
-    >
+    <Card {...props} style={{ background: featuredBackground, color: featuredColor }}>
       <div className="avatar-big">
-        <img
-          style={{ filter: featuredAvatarFilter }}
-          src={avatarUrl || defaultAvatar}
-          alt="avatar"
-        />
+        <img style={{ filter: featuredAvatarFilter }} src={avatarUrl || defaultAvatar} alt="avatar" />
       </div>
       <div className="info-big">
         <div className="badge gray featured">Featured</div>
@@ -56,12 +38,7 @@ function DnpCardFeaturedOk({
   );
 }
 
-function DnpCardOk({
-  directoryItem,
-  ...props
-}: {
-  directoryItem: DirectoryItemOk;
-}) {
+function DnpCardOk({ directoryItem, ...props }: { directoryItem: DirectoryItemOk }) {
   const { name, description, avatarUrl, isUpdated } = directoryItem;
   return (
     <Card {...props}>
@@ -115,7 +92,7 @@ export default function DnpStore({
 
   return (
     <div className={`dnp-cards ${featured ? "featured" : ""}`}>
-      {directory.map(directoryItem => {
+      {directory.map((directoryItem) => {
         const cardProps = {
           onClick: () => openDnp(directoryItem.name),
           className: "dnp-card",
