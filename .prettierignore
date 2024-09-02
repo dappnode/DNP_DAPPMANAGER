@@ -2,6 +2,9 @@
 packages/*/dist
 packages/*/build
 
+# Ignore schemas
+packages/common/validation/schemas
+
 # Ignore node_modules
 node_modules
 packages/*/node_modules
