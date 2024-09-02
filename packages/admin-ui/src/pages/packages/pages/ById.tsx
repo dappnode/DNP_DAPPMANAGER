@@ -69,17 +69,13 @@ export const PackageById: React.FC = () => {
     {
       name: "Info",
       subPath: "info",
-      render: () => (
-        <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />
-      ),
+      render: () => <Info dnp={dnp} {...{ manifest, gettingStarted, gettingStartedShow }} />,
       available: true
     },
     {
       name: "Config",
       subPath: "config",
-      render: () => (
-        <Config dnpName={dnpName} {...{ userSettings, setupWizard }} />
-      ),
+      render: () => <Config dnpName={dnpName} {...{ userSettings, setupWizard }} />,
       available: userSettings && !isEmpty(userSettings.environment)
     },
     {
@@ -106,20 +102,16 @@ export const PackageById: React.FC = () => {
       render: () => <FileManager containers={containers} />,
       available: true
     }
-  ].filter(route => route.available);
+  ].filter((route) => route.available);
 
   return (
     <>
       <Title title={title} subtitle={prettyDnpName(dnpName)} />
 
       <div className="horizontal-navbar">
-        {availableRoutes.map(route => (
+        {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subPath}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.name}
             </NavLink>
           </button>
@@ -127,20 +119,13 @@ export const PackageById: React.FC = () => {
       </div>
 
       {updateAvailable && (
-        <AlertPackageUpdateAvailable
-          dnpName={dnpName}
-          updateAvailable={updateAvailable}
-        ></AlertPackageUpdateAvailable>
+        <AlertPackageUpdateAvailable dnpName={dnpName} updateAvailable={updateAvailable}></AlertPackageUpdateAvailable>
       )}
 
       <div className="packages-content">
         <Routes>
-          {availableRoutes.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={route.render()}
-            />
+          {availableRoutes.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={route.render()} />
           ))}
         </Routes>
       </div>

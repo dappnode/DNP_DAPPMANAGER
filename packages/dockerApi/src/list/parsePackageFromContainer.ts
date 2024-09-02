@@ -4,9 +4,7 @@ import { InstalledPackageData, PackageContainer } from "@dappnode/types";
 /**
  * Return containers grouped by parent package. Necessary for multi-service packages
  */
-export function groupPackagesFromContainers(
-  containers: PackageContainer[]
-): InstalledPackageData[] {
+export function groupPackagesFromContainers(containers: PackageContainer[]): InstalledPackageData[] {
   const dnpMap = new Map<string, InstalledPackageData>();
   for (const container of containers) {
     let dnp = dnpMap.get(container.dnpName);
@@ -23,9 +21,9 @@ export function groupPackagesFromContainers(
           "origin",
           "chain",
           "domainAlias",
-          "canBeFullnode",
+          "canBeFullnode"
         ]),
-        containers: [],
+        containers: []
       };
       dnpMap.set(container.dnpName, dnp);
     }

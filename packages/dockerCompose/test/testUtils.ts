@@ -8,7 +8,7 @@ export const mockCompose: Compose = {
   services: {
     [mockDnpName]: {
       image: `${mockDnpName}:${mockDnpVersion}`,
-      container_name: `DAppNodePackage-${mockDnpName}`,
-    },
-  },
+      container_name: `DAppNodePackage-${mockDnpName}`
+    }
+  }
 };

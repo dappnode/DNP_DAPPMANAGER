@@ -20,9 +20,7 @@ export function clearCompletedCoreUpdatesIfAny(
   const pending = db.autoUpdatePending.get();
 
   const { version: pendingVersionId } = pending[params.coreDnpName] || {};
-  const pendingVersionsAreInstalled =
-    pendingVersionId &&
-    isVersionIdUpdated(pendingVersionId, currentCorePackages);
+  const pendingVersionsAreInstalled = pendingVersionId && isVersionIdUpdated(pendingVersionId, currentCorePackages);
 
   if (pendingVersionsAreInstalled && pendingVersionId) {
     flagCompletedUpdate(params.coreDnpName, pendingVersionId, timestamp);

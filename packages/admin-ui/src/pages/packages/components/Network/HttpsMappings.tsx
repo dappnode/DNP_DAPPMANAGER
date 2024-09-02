@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
@@ -26,13 +25,7 @@ import "./https-mapping.scss";
 import { urlJoin } from "utils/url";
 import { ReqStatus } from "types";
 
-export function HttpsMappings({
-  dnpName,
-  serviceName
-}: {
-  dnpName: string;
-  serviceName: string;
-}) {
+export function HttpsMappings({ dnpName, serviceName }: { dnpName: string; serviceName: string }) {
   const navigate = useNavigate();
   const [showAll, setShowAll] = useState(false);
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
@@ -43,9 +36,7 @@ export function HttpsMappings({
   const [password, setPassword] = useState("");
   const [fromError, setFromError] = useState<string | null>(null);
   const [portError, setPortError] = useState<string | null>(null);
-  const [userAndPasswordError, setUserAndPasswordError] = useState<
-    string | null
-  >(null);
+  const [userAndPasswordError, setUserAndPasswordError] = useState<string | null>(null);
   const [isValid, setIsValid] = useState(false);
 
   const mappings = useApi.httpsPortalMappingsGet();
@@ -87,8 +78,7 @@ export function HttpsMappings({
     try {
       await confirmPromise({
         title: "Exposing service",
-        text:
-          "Are you sure you want to expose this service to the public internet?",
+        text: "Are you sure you want to expose this service to the public internet?",
         label: "Expose",
         variant: "dappnode"
       });
@@ -137,13 +127,9 @@ export function HttpsMappings({
 
   // Helper UI in case the HTTPs Portal is bad
   if (dnpsRequest.data) {
-    const httpsPortalDnp = dnpsRequest.data.find(
-      dnp => dnp.dnpName === httpsPortalDnpName
-    );
+    const httpsPortalDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === httpsPortalDnpName);
     if (!httpsPortalDnp) {
-      const url = `${getInstallerPath(
-        httpsPortalDnpName
-      )}/${httpsPortalDnpName}`;
+      const url = `${getInstallerPath(httpsPortalDnpName)}/${httpsPortalDnpName}`;
       return (
         <Alert variant="secondary">
           You must{" "}
@@ -158,20 +144,15 @@ export function HttpsMappings({
 
   if (mappings.data) {
     const serviceMappings = mappings.data.filter(
-      mapping =>
-        showAll ||
-        (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
+      (mapping) => showAll || (mapping.dnpName === dnpName && mapping.serviceName === serviceName)
     );
 
     return (
       <div className="network-mappings">
         <p>
           It recommended to only expose the pre-approved safe services listed in{" "}
-          <NavLink to={urlJoin(systemPathName, systemSubPaths.network)}>
-            System / Network
-          </NavLink>
-          . Please, only add custom mappings manually if you understand the
-          security risks
+          <NavLink to={urlJoin(systemPathName, systemSubPaths.network)}>System / Network</NavLink>. Please, only add
+          custom mappings manually if you understand the security risks
         </p>
 
         <div className="list-grid">
@@ -185,11 +166,9 @@ export function HttpsMappings({
 
           <hr />
 
-          {serviceMappings.length === 0 && (
-            <span className="no-mappings">No mappings</span>
-          )}
+          {serviceMappings.length === 0 && <span className="no-mappings">No mappings</span>}
 
-          {serviceMappings.map(mapping => (
+          {serviceMappings.map((mapping) => (
             <React.Fragment key={mapping.fromSubdomain}>
               <span className="name">
                 {prettyFullName(mapping)} : {mapping.port}
@@ -199,18 +178,13 @@ export function HttpsMappings({
               </span>
 
               <span className="name">
-                <a
-                  href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
-                  {...newTabProps}
-                >
+                <a href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`} {...newTabProps}>
                   {mapping.fromSubdomain}
                   <wbr />.{dappnodeIdentity.domain}
                 </a>
               </span>
 
-              <span className="name">
-                {mapping.auth ? `${mapping.auth.username}` : "-"}
-              </span>
+              <span className="name">{mapping.auth ? `${mapping.auth.username}` : "-"}</span>
 
               <MdClose onClick={() => removeMapping(mapping)} />
             </React.Fragment>
@@ -254,33 +228,19 @@ export function HttpsMappings({
               }
             ]}
           >
-            <Button
-              type="submit"
-              variant="dappnode"
-              onClick={addMapping}
-              disabled={!isValid || reqStatus.loading}
-            >
+            <Button type="submit" variant="dappnode" onClick={addMapping} disabled={!isValid || reqStatus.loading}>
               Add mapping
             </Button>
           </InputForm>
         )}
 
         <div className="bottom-buttons">
-          <Switch
-            className="show-all"
-            checked={showAll}
-            onToggle={setShowAll}
-            label="Show all"
-          />
+          <Switch className="show-all" checked={showAll} onToggle={setShowAll} label="Show all" />
 
           {editing ? (
             <Button onClick={() => setEditing(false)}>Cancel</Button>
           ) : (
-            <Button
-              className="new-mapping-button"
-              variant="dappnode"
-              onClick={() => setEditing(true)}
-            >
+            <Button className="new-mapping-button" variant="dappnode" onClick={() => setEditing(true)}>
               New mapping <MdAdd />
             </Button>
           )}
@@ -289,26 +249,21 @@ export function HttpsMappings({
     );
   }
 
-  if (dnpsRequest.error)
-    return <ErrorView error={dnpsRequest.error} hideIcon red />;
+  if (dnpsRequest.error) return <ErrorView error={dnpsRequest.error} hideIcon red />;
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
 
-  if (dnpsRequest.isValidating)
-    return <Ok loading msg="Loading HTTPS portal" />;
+  if (dnpsRequest.isValidating) return <Ok loading msg="Loading HTTPS portal" />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
 
   return <ErrorView error={"No data"} hideIcon red />;
 }
 
-function validateFromSubdomain(
-  from: string,
-  mappings: HttpsPortalMapping[]
-): string | null {
+function validateFromSubdomain(from: string, mappings: HttpsPortalMapping[]): string | null {
   if (!from) {
     return "from subdomain is empty";
   }
 
-  const dupMapping = mappings.find(m => m.fromSubdomain === from);
+  const dupMapping = mappings.find((m) => m.fromSubdomain === from);
   if (dupMapping) {
     return `subdomain is already used to map to ${prettyFullName(dupMapping)}`;
   }
@@ -324,21 +279,15 @@ function validatePort(port: string): string | null {
   return null;
 }
 
-function validateUserAndPassword(
-  user: string,
-  password: string
-): string | null {
+function validateUserAndPassword(user: string, password: string): string | null {
   if (!user && !password) return null;
   if (!password) return "Invalid empty password";
   if (!user) return "Invalid empty user";
   // regex for user. it must not contain special characters
   const userRegex = new RegExp("^[a-zA-Z0-9]*$");
-  if (!userRegex.test(user))
-    return "User must contain only letters and numbers";
+  if (!userRegex.test(user)) return "User must contain only letters and numbers";
 
-  const passwordRegex = new RegExp(
-    "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})"
-  );
+  const passwordRegex = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.{8,})");
   if (!passwordRegex.test(password))
     return "Password must contain at least 8 characters, one uppercase, one lowercase, one number";
 

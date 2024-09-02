@@ -15,6 +15,7 @@ function getMinBlockDiffSync(dnpName: string): number {
 }
 
 // Cache the block data to prevent unnecessary calls
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const blockCache = new Map<string, { block: any; blockIndex: number }>();
 
 /**
@@ -31,7 +32,9 @@ async function rpcCall(
   username: string,
   password: string,
   method: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Promise<any> {
   return new Promise((resolve, reject) => {
     const url = new URL(rpcUrl);
@@ -40,7 +43,7 @@ async function rpcCall(
       jsonrpc: "1.0",
       id: "dappnode_monitoring",
       method,
-      params,
+      params
     });
 
     const auth = Buffer.from(`${username}:${password}`).toString("base64");
@@ -53,8 +56,8 @@ async function rpcCall(
       headers: {
         "Content-Type": "application/json",
         "Content-Length": Buffer.byteLength(postData),
-        Authorization: `Basic ${auth}`,
-      },
+        Authorization: `Basic ${auth}`
+      }
     };
 
     const req = request(options, (res) => {
@@ -99,9 +102,7 @@ async function rpcCall(
  *   - message: string
  *   - error: boolean
  */
-export async function bitcoin(
-  dnp: InstalledPackageData
-): Promise<ChainDataResult> {
+export async function bitcoin(dnp: InstalledPackageData): Promise<ChainDataResult> {
   try {
     const container = dnp.containers[0];
     if (!container) throw new Error("No container found");
@@ -111,15 +112,13 @@ export async function bitcoin(
     const containerDomain = buildNetworkAlias({
       dnpName,
       serviceName,
-      isMainOrMonoservice: true,
+      isMainOrMonoservice: true
     });
 
     // Retrieve RPC credentials from container environment variables
     const containerName = container.containerName;
     const containerData = await dockerContainerInspect(containerName);
-    const { username, password, port } = parseCredentialsFromEnvs(
-      containerData.Config.Env
-    );
+    const { username, password, port } = parseCredentialsFromEnvs(containerData.Config.Env);
 
     if (!port) {
       throw new Error("RPC port not defined");
@@ -128,33 +127,21 @@ export async function bitcoin(
     const apiUrl = `http://${containerDomain}:${port}/`;
 
     // Fetch block count
-    const blockIndex = await rpcCall(
-      apiUrl,
-      username,
-      password,
-      "getblockcount"
-    );
+    const blockIndex = await rpcCall(apiUrl, username, password, "getblockcount");
 
     // Check and utilize cached block data if available
     const cachedBlockData = blockCache.get(apiUrl);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let block: any;
 
     if (cachedBlockData && cachedBlockData.blockIndex === blockIndex) {
       block = cachedBlockData.block;
     } else {
       // Fetch block hash
-      const blockHash = await rpcCall(
-        apiUrl,
-        username,
-        password,
-        "getblockhash",
-        [blockIndex]
-      );
+      const blockHash = await rpcCall(apiUrl, username, password, "getblockhash", [blockIndex]);
 
       // Fetch block data
-      block = await rpcCall(apiUrl, username, password, "getblock", [
-        blockHash,
-      ]);
+      block = await rpcCall(apiUrl, username, password, "getblock", [blockHash]);
 
       // Update cache
       blockCache.set(apiUrl, { blockIndex, block });
@@ -174,20 +161,20 @@ export async function bitcoin(
         syncing: true,
         error: false,
         message: `Blocks synced: ${blockIndex} / ${estimatedTotalBlocks}`,
-        progress,
+        progress
       };
     } else {
       return {
         syncing: false,
         error: false,
-        message: `Synced #${blockIndex}`,
+        message: `Synced #${blockIndex}`
       };
     }
-  } catch (error: any) {
+  } catch (error) {
     return {
       syncing: false,
       error: true,
-      message: `Error: ${error.message}`,
+      message: `Error: ${error.message}`
     };
   }
 }
@@ -213,8 +200,7 @@ export function parseCredentialsFromEnvs(envsArray: string[]): {
   const portKey = keys.find((key) => key.includes("_RPCPORT"));
 
   if (!userKey) throw new Error("RPCUSER not defined in environment variables");
-  if (!passKey)
-    throw new Error("RPCPASSWORD not defined in environment variables");
+  if (!passKey) throw new Error("RPCPASSWORD not defined in environment variables");
 
   const username = envs[userKey];
   const password = envs[passKey];

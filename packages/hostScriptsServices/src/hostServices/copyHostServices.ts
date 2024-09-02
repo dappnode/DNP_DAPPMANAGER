@@ -14,6 +14,6 @@ const hostServicesDirSource = params.HOST_SERVICES_SOURCE_DIR;
 export async function copyHostServices(): Promise<void> {
   await copyOnHost({
     hostDir: hostServicesDir,
-    hostDirSource: hostServicesDirSource,
+    hostDirSource: hostServicesDirSource
   });
 }

@@ -27,7 +27,7 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
 
     // If there are NOT conflicting volumes,
     // Display a dialog to confirm volumes reset
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: `Removing ${prettyName} data`,
         text: `This action cannot be undone. If this DAppNode Package is a blockchain node, it will lose all the chain data and start syncing from scratch.`,
@@ -37,36 +37,28 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
       })
     );
 
-    await withToastNoThrow(
-      () => api.packageRestartVolumes({ dnpName, volumeId: volumeName }),
-      {
-        message: `Removing volumes of ${prettyName}...`,
-        onSuccess: `Removed volumes of ${prettyName}`
-      }
-    );
+    await withToastNoThrow(() => api.packageRestartVolumes({ dnpName, volumeId: volumeName }), {
+      message: `Removing volumes of ${prettyName}...`,
+      onSuccess: `Removed volumes of ${prettyName}`
+    });
   }
 
   const volumesData = useSelector(getVolumes);
-  const volumes = uniqBy(
-    flatten(dnp.containers.map(container => container.volumes)),
-    vol => vol.name
-  )
-    .filter(vol => vol.name)
+  const volumes = uniqBy(flatten(dnp.containers.map((container) => container.volumes)), (vol) => vol.name)
+    .filter((vol) => vol.name)
     // Order volumes before bind mounts
-    .sort(v1 => (v1.name ? -1 : 1))
+    .sort((v1) => (v1.name ? -1 : 1))
     // Order volumes with a bigger size first
-    .sort(v1 => ((v1.name || "").includes("data") ? -1 : 0))
+    .sort((v1) => ((v1.name || "").includes("data") ? -1 : 0))
     // Display style:
     // - dncore_vpndnpdappnodeeth_data: 866B
     // - /etc/hostname: - (bind)
     .map(({ name, container, host }) => {
-      const volumeData = volumesData.find(v => v.name === name);
+      const volumeData = volumesData.find((v) => v.name === name);
       const size = volumeData?.size;
       const mountpoint = volumeData?.mountpoint;
       const prettyVol = prettyVolumeName(name || "", dnp.dnpName);
-      const prettyVolString = [prettyVol.owner, prettyVol.name]
-        .filter(s => s)
-        .join(" - ");
+      const prettyVolString = [prettyVol.owner, prettyVol.name].filter((s) => s).join(" - ");
       return {
         name: name || host,
         prettyName: name ? prettyVolString : container || "Unknown",
@@ -79,12 +71,9 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
     return null;
   }
 
-  const totalVolumeSize = volumes.reduce(
-    (total, vol) => (vol.size != null ? total + vol.size : total),
-    0
-  );
+  const totalVolumeSize = volumes.reduce((total, vol) => (vol.size != null ? total + vol.size : total), 0);
 
-  const sortVolumesByKeys: (keyof typeof volumes[0])[] = ["size", "prettyName"];
+  const sortVolumesByKeys: (keyof (typeof volumes)[0])[] = ["size", "prettyName"];
 
   return (
     <div className="list-grid container-volumes">
@@ -97,32 +86,22 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
         <span className="name">
           <span>All volumes</span>
 
-          <span className="see-all" onClick={() => setShowAll(x => !x)}>
+          <span className="see-all" onClick={() => setShowAll((x) => !x)}>
             {showAll ? <BsChevronContract /> : <BsChevronExpand />}
           </span>
         </span>
-        <span>
-          {prettyBytes(totalVolumeSize)}
-        </span>
+        <span>{prettyBytes(totalVolumeSize)}</span>
 
-        <BsTrash
-          className="trash-icon"
-          onClick={() => packageRestartVolumes()}
-        />
+        <BsTrash className="trash-icon" onClick={() => packageRestartVolumes()} />
       </React.Fragment>
 
       {showAll &&
-        orderBy(volumes, sortVolumesByKeys, ["desc", "asc"]).map(vol => (
+        orderBy(volumes, sortVolumesByKeys, ["desc", "asc"]).map((vol) => (
           <React.Fragment key={vol.name}>
             <span className="name">{prettyDnpName(vol.prettyName)}</span>
-            <span>
-              {typeof vol.size === "number" ? prettyBytes(vol.size) : "-"}
-            </span>
+            <span>{typeof vol.size === "number" ? prettyBytes(vol.size) : "-"}</span>
 
-            <BsTrash
-              className="trash-icon"
-              onClick={() => packageRestartVolumes(vol.name)}
-            />
+            <BsTrash className="trash-icon" onClick={() => packageRestartVolumes(vol.name)} />
           </React.Fragment>
         ))}
     </div>

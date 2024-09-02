@@ -45,32 +45,21 @@ export default function ExecutionClient({
 
       <div className="title">{prettyDnpName(executionClient.dnpName)} </div>
 
-      {executionClient.status === "ok" &&
-        isSelected &&
-        executionClient.isInstalled &&
-        !executionClient.isUpdated && (
-          <>
-            <Button
-              onClick={() =>
-                navigate(
-                  `${getInstallerPath(executionClient.dnpName)}/${
-                    executionClient.dnpName
-                  }`
-                )
-              }
-              variant="dappnode"
-            >
-              UPDATE
-            </Button>
-            <br />
-            <br />
-          </>
-        )}
+      {executionClient.status === "ok" && isSelected && executionClient.isInstalled && !executionClient.isUpdated && (
+        <>
+          <Button
+            onClick={() => navigate(`${getInstallerPath(executionClient.dnpName)}/${executionClient.dnpName}`)}
+            variant="dappnode"
+          >
+            UPDATE
+          </Button>
+          <br />
+          <br />
+        </>
+      )}
 
       {executionClient.status === "ok" && (
-        <div className="description">
-          {isSelected && executionClient.data?.manifest?.shortDescription}
-        </div>
+        <div className="description">{isSelected && executionClient.data?.manifest?.shortDescription}</div>
       )}
     </Card>
   );

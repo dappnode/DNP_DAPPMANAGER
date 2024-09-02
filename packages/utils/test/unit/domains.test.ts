@@ -7,7 +7,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: true,
+        isMainOrMonoservice: true
       });
       expect(result).to.equal("dappmanager.dappnode");
     });
@@ -16,7 +16,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: false,
+        isMainOrMonoservice: false
       });
       expect(result).to.equal("serviceName.dappmanager.dappnode");
     });
@@ -26,7 +26,7 @@ describe("determineNetworkAlias", () => {
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true,
-        isExternal: true,
+        isExternal: true
       });
       expect(result).to.equal("dappmanager.dappnode.external");
     });
@@ -36,7 +36,7 @@ describe("determineNetworkAlias", () => {
         dnpName: "dappmanager.dnp.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false,
-        isExternal: true,
+        isExternal: true
       });
       expect(result).to.equal("serviceName.dappmanager.dappnode.external");
     });
@@ -47,7 +47,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: true,
+        isMainOrMonoservice: true
       });
       expect(result).to.equal("dappmanager.public.dappnode");
     });
@@ -56,7 +56,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: false,
+        isMainOrMonoservice: false
       });
       expect(result).to.equal("serviceName.dappmanager.public.dappnode");
     });
@@ -66,7 +66,7 @@ describe("determineNetworkAlias", () => {
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: true,
-        isExternal: true,
+        isExternal: true
       });
       expect(result).to.equal("dappmanager.public.dappnode.external");
     });
@@ -76,11 +76,9 @@ describe("determineNetworkAlias", () => {
         dnpName: "dappmanager.public.dappnode.eth",
         serviceName: "serviceName",
         isMainOrMonoservice: false,
-        isExternal: true,
+        isExternal: true
       });
-      expect(result).to.equal(
-        "serviceName.dappmanager.public.dappnode.external"
-      );
+      expect(result).to.equal("serviceName.dappmanager.public.dappnode.external");
     });
   });
 
@@ -89,7 +87,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "example.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: false,
+        isMainOrMonoservice: false
       });
       expect(result).to.equal("serviceName.example.dappnode");
     });
@@ -98,7 +96,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "example.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: false,
+        isMainOrMonoservice: false
       });
       expect(result).to.equal("serviceName.example.dappnode");
     });
@@ -107,7 +105,7 @@ describe("determineNetworkAlias", () => {
       const result = buildNetworkAlias({
         dnpName: "example_name.dnp.dappnode.eth",
         serviceName: "serviceName",
-        isMainOrMonoservice: false,
+        isMainOrMonoservice: false
       });
       expect(result).to.equal("serviceName.examplename.dappnode");
     });

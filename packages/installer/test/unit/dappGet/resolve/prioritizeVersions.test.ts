@@ -17,7 +17,7 @@ describe.skip("dappGet/resolve/prioritizeVersions", () => {
   it("should order versions: requested DNP. Prioritize newer versions", async () => {
     const dnp = {
       isRequest: true,
-      versions: { "0.1.0": {}, "0.1.1": {} },
+      versions: { "0.1.0": {}, "0.1.1": {} }
     };
     const versions = prioritizeVersions(dnp);
     expect(versions).to.deep.equal(["0.1.1", "0.1.0"]);
@@ -29,21 +29,17 @@ describe.skip("dappGet/resolve/prioritizeVersions", () => {
       versions: {
         "0.1.0": {},
         "0.1.1": {},
-        "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws": {},
-      },
+        "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws": {}
+      }
     };
     const versions = prioritizeVersions(dnp);
-    expect(versions).to.deep.equal([
-      "/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws",
-      "0.1.1",
-      "0.1.0",
-    ]);
+    expect(versions).to.deep.equal(["/ipfs/QmbPVaVVLHoFyJyzxHmok9kJYFAzq6R2UBvhEAuAQYc3ws", "0.1.1", "0.1.0"]);
   });
 
   it("should order versions: state DNP. Prioritize older versions", async () => {
     const dnp = {
       isInstalled: true,
-      versions: { "0.1.0": {}, "0.1.1": {} },
+      versions: { "0.1.0": {}, "0.1.1": {} }
     };
     const versions = prioritizeVersions(dnp);
     expect(versions).to.deep.equal(["0.1.0", "0.1.1"]);
@@ -51,7 +47,7 @@ describe.skip("dappGet/resolve/prioritizeVersions", () => {
 
   it("should order versions: not installed DNP. Prioritize newer versions + null", async () => {
     const dnp = {
-      versions: { "0.1.0": {}, "0.1.1": {} },
+      versions: { "0.1.0": {}, "0.1.1": {} }
     };
     const versions = prioritizeVersions(dnp);
     expect(versions).to.deep.equal([null, "0.1.1", "0.1.0"]);

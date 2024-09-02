@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState } from "react";
 import { api, useApi } from "api";
 import { useSelector } from "react-redux";
@@ -34,8 +33,7 @@ export function HttpsMappings() {
     try {
       await confirmPromise({
         title: "Recreate HTTPs mappings",
-        text:
-          "You are about to recreate the HTTPs mappings. You should execute this action only in response to an error",
+        text: "You are about to recreate the HTTPs mappings. You should execute this action only in response to an error",
         label: "Recreate",
         variant: "dappnode"
       });
@@ -61,20 +59,16 @@ export function HttpsMappings() {
     try {
       await confirmPromise({
         title: "Exposing service",
-        text:
-          "Are you sure you want to expose this service to the public internet?",
+        text: "Are you sure you want to expose this service to the public internet?",
         label: "Expose",
         variant: "dappnode"
       });
 
       setReqStatus({ loading: true });
-      await withToast(
-        () => api.httpsPortalMappingAdd({ mapping: mappingInfo }),
-        {
-          message: "Adding HTTPs mapping...",
-          onSuccess: "Added HTTPs mapping"
-        }
-      );
+      await withToast(() => api.httpsPortalMappingAdd({ mapping: mappingInfo }), {
+        message: "Adding HTTPs mapping...",
+        onSuccess: "Added HTTPs mapping"
+      });
       setReqStatus({ result: true });
     } catch (e) {
       setReqStatus({ error: e.message });
@@ -110,13 +104,9 @@ export function HttpsMappings() {
 
   // Helper UI in case the HTTPs Portal is bad
   if (dnpsRequest.data) {
-    const httpsPortalDnp = dnpsRequest.data.find(
-      dnp => dnp.dnpName === httpsPortalDnpName
-    );
+    const httpsPortalDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === httpsPortalDnpName);
     if (!httpsPortalDnp) {
-      const url = `${getInstallerPath(
-        httpsPortalDnpName
-      )}/${httpsPortalDnpName}`;
+      const url = `${getInstallerPath(httpsPortalDnpName)}/${httpsPortalDnpName}`;
       return (
         <Alert variant="secondary">
           You must{" "}
@@ -142,9 +132,7 @@ export function HttpsMappings() {
 
           <hr />
 
-          {mappings.data.length === 0 && (
-            <span className="no-mappings">No exposable services available</span>
-          )}
+          {mappings.data.length === 0 && <span className="no-mappings">No exposable services available</span>}
 
           {mappings.data.map((mapping, i) => (
             <React.Fragment key={i}>
@@ -160,10 +148,7 @@ export function HttpsMappings() {
               </span>
               <span className="subdomain">
                 {mapping.exposed ? (
-                  <a
-                    href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`}
-                    {...newTabProps}
-                  >
+                  <a href={`https://${mapping.fromSubdomain}.${dappnodeIdentity.domain}`} {...newTabProps}>
                     {mapping.fromSubdomain}
                     <wbr />.{dappnodeIdentity.domain}
                   </a>
@@ -174,9 +159,7 @@ export function HttpsMappings() {
 
               <Switch
                 checked={mapping.exposed}
-                onToggle={() =>
-                  mapping.exposed ? removeMapping(mapping) : addMapping(mapping)
-                }
+                onToggle={() => (mapping.exposed ? removeMapping(mapping) : addMapping(mapping))}
               />
             </React.Fragment>
           ))}
@@ -193,12 +176,10 @@ export function HttpsMappings() {
     );
   }
 
-  if (dnpsRequest.error)
-    return <ErrorView error={dnpsRequest.error} hideIcon red />;
+  if (dnpsRequest.error) return <ErrorView error={dnpsRequest.error} hideIcon red />;
   if (mappings.error) return <ErrorView error={mappings.error} hideIcon red />;
 
-  if (dnpsRequest.isValidating)
-    return <Ok loading msg="Loading HTTPS portal" />;
+  if (dnpsRequest.isValidating) return <Ok loading msg="Loading HTTPS portal" />;
   if (mappings.isValidating) return <Ok loading msg="Loading mappings" />;
 
   return <ErrorView error={"No data"} hideIcon red />;

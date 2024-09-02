@@ -8,8 +8,7 @@
  *   saveAs(blob, file.name);
  */
 export default function dataUriToBlob(dataURI: string): Blob {
-  if (!dataURI || typeof dataURI !== "string")
-    throw Error("dataUri must be a string");
+  if (!dataURI || typeof dataURI !== "string") throw Error("dataUri must be a string");
 
   // Credit: https://stackoverflow.com/questions/12168909/blob-from-dataurl
   // convert base64 to raw binary data held in a string
@@ -17,10 +16,7 @@ export default function dataUriToBlob(dataURI: string): Blob {
   const byteString = atob(dataURI.split(",")[1]);
   // separate out the mime component
   // dataURI = data:application/zip;base64,UEsDBBQAAAg...
-  const mimeString = dataURI
-    .split(",")[0]
-    .split(":")[1]
-    .split(";")[0];
+  const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
   // write the bytes of the string to an ArrayBuffer
   const ab = new ArrayBuffer(byteString.length);
   // create a view into the buffer

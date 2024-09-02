@@ -10,11 +10,7 @@ import { logs } from "@dappnode/logger";
  * - To enable: "85.84.83.82"
  * - To disable: null
  */
-export async function setStaticIp({
-  staticIp
-}: {
-  staticIp: string;
-}): Promise<void> {
+export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<void> {
   const oldStaticIp = db.staticIp.get();
   db.staticIp.set(staticIp);
 

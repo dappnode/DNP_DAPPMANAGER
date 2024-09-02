@@ -55,13 +55,13 @@ Action code
 
 ```javascript
 function create() {
-  return function(dispatch) {
+  return function (dispatch) {
     dispatch(createStart());
     return getBooking().then(
-      function(data) {
+      function (data) {
         dispatch(createFinish(data));
       },
-      function(err) {
+      function (err) {
         dispatch(createFail(err));
       }
     );
@@ -73,7 +73,7 @@ Test code
 
 ```javascript
 describe("create", () => {
-  it("dispatch start and finish", done => {
+  it("dispatch start and finish", (done) => {
     const middlewares = [thunk];
     const mockStore = configureStore(middlewares);
     const store = mockStore({});

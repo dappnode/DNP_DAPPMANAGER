@@ -25,19 +25,11 @@ import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 
-export default function StakerNetwork({
-  network,
-  description
-}: {
-  network: Network;
-  description: string;
-}) {
+export default function StakerNetwork({ network, description }: { network: Network; description: string }) {
   // Context
   const { theme } = React.useContext(AppContext);
 
-  const currentStakerConfigReq = useApi.stakerConfigGet(
-    network
-  ) as responseInterface<StakerConfigGet, Error>;
+  const currentStakerConfigReq = useApi.stakerConfigGet(network) as responseInterface<StakerConfigGet, Error>;
 
   // hooks
   const {
@@ -65,35 +57,30 @@ export default function StakerNetwork({
       if (changes) {
         // TODO: Ask for removing the previous Execution Client and/or Consensus Client if its different
         if (!isLaunchpad) {
-          await new Promise(
-            (resolve: (confirmOnSetConfig: boolean) => void) => {
-              confirm({
-                title: `Staker configuration`,
-                text:
-                  "Are you sure you want to implement this staker configuration?",
-                buttons: [
-                  {
-                    label: "Continue",
-                    onClick: () => resolve(true)
-                  }
-                ]
-              });
-            }
-          );
-          await new Promise(
-            (resolve: (confirmOnSetConfig: boolean) => void) => {
-              confirm({
-                title: `Disclaimer`,
-                text: disclaimer,
-                buttons: [
-                  {
-                    label: "Continue",
-                    onClick: () => resolve(true)
-                  }
-                ]
-              });
-            }
-          );
+          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+            confirm({
+              title: `Staker configuration`,
+              text: "Are you sure you want to implement this staker configuration?",
+              buttons: [
+                {
+                  label: "Continue",
+                  onClick: () => resolve(true)
+                }
+              ]
+            });
+          });
+          await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
+            confirm({
+              title: `Disclaimer`,
+              text: disclaimer,
+              buttons: [
+                {
+                  label: "Continue",
+                  onClick: () => resolve(true)
+                }
+              ]
+            });
+          });
         }
 
         setReqStatus({ loading: true });
@@ -136,8 +123,7 @@ export default function StakerNetwork({
       {network === "prater" && (
         <AlertDismissible variant="warning">
           <p>
-            The prater network is about to be deprecated, please migrate to{" "}
-            <b>Holesky</b>.
+            The prater network is about to be deprecated, please migrate to <b>Holesky</b>.
           </p>
         </AlertDismissible>
       )}
@@ -146,10 +132,9 @@ export default function StakerNetwork({
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
-            <b>Smooth is out!</b> Discover the new MEV Smoothing Pool designed
-            for solo validators. It allows you to pool your MEV rewards,
-            ensuring consistent higher rewards. Subscribing is as easy as
-            changing your fee recipient!{" "}
+            <b>Smooth is out!</b> Discover the new MEV Smoothing Pool designed for solo validators. It allows you to
+            pool your MEV rewards, ensuring consistent higher rewards. Subscribing is as easy as changing your fee
+            recipient!{" "}
             <b>
               <a href={docsSmooth} target="_blank" rel="noopener noreferrer">
                 Learn more
@@ -163,16 +148,15 @@ export default function StakerNetwork({
         {currentStakerConfigReq.data ? (
           <Card>
             <p>
-              Set up your Proof-of-Stake validator configuration for Ethereum
-              and Ethereum-based chains. You will need to: <br />
+              Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will need
+              to: <br />
               (1) Choose an Execution Layer client <br />
               (2) Choose a Consensus Layer client (+ validator) <br />
-              (3) Install the web3signer, which will hold the validator keys and
-              sign <br />
+              (3) Install the web3signer, which will hold the validator keys and sign <br />
               {network !== "gnosis" && network !== "lukso" && (
                 <>
-                  (4) Optional; delegate block-building capacities through the
-                  MEV Boost network and potentially profit from MEV
+                  (4) Optional; delegate block-building capacities through the MEV Boost network and potentially profit
+                  from MEV
                 </>
               )}
             </p>
@@ -183,34 +167,26 @@ export default function StakerNetwork({
             <Row className="staker-network">
               <Col>
                 <SubTitle>Execution Clients</SubTitle>
-                {currentStakerConfigReq.data.executionClients.map(
-                  (executionClient, i) => (
-                    <ExecutionClient
-                      key={i}
-                      executionClient={executionClient}
-                      setNewExecClient={setNewExecClient}
-                      isSelected={
-                        executionClient.dnpName === newExecClient?.dnpName
-                      }
-                    />
-                  )
-                )}
+                {currentStakerConfigReq.data.executionClients.map((executionClient, i) => (
+                  <ExecutionClient
+                    key={i}
+                    executionClient={executionClient}
+                    setNewExecClient={setNewExecClient}
+                    isSelected={executionClient.dnpName === newExecClient?.dnpName}
+                  />
+                ))}
               </Col>
 
               <Col>
                 <SubTitle>Consensus Clients</SubTitle>
-                {currentStakerConfigReq.data.consensusClients.map(
-                  (consensusClient, i) => (
-                    <ConsensusClient
-                      key={i}
-                      consensusClient={consensusClient}
-                      setNewConsClient={setNewConsClient}
-                      isSelected={
-                        consensusClient.dnpName === newConsClient?.dnpName
-                      }
-                    />
-                  )
-                )}
+                {currentStakerConfigReq.data.consensusClients.map((consensusClient, i) => (
+                  <ConsensusClient
+                    key={i}
+                    consensusClient={consensusClient}
+                    setNewConsClient={setNewConsClient}
+                    isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+                  />
+                ))}
               </Col>
 
               <Col>
@@ -221,24 +197,20 @@ export default function StakerNetwork({
                   isSelected={Boolean(newWeb3signer)}
                 />
               </Col>
-              {["prater", "mainnet", "holesky"].includes(network) &&
-                currentStakerConfigReq.data.mevBoost && (
-                  <Col>
-                    <SubTitle>Mev Boost</SubTitle>
-                    <MevBoost
-                      network={network}
-                      mevBoost={currentStakerConfigReq.data.mevBoost}
-                      newMevBoost={newMevBoost}
-                      setNewMevBoost={setNewMevBoost}
-                      newRelays={newRelays}
-                      setNewRelays={setNewRelays}
-                      isSelected={
-                        currentStakerConfigReq.data.mevBoost.dnpName ===
-                        newMevBoost?.dnpName
-                      }
-                    />
-                  </Col>
-                )}
+              {["prater", "mainnet", "holesky"].includes(network) && currentStakerConfigReq.data.mevBoost && (
+                <Col>
+                  <SubTitle>Mev Boost</SubTitle>
+                  <MevBoost
+                    network={network}
+                    mevBoost={currentStakerConfigReq.data.mevBoost}
+                    newMevBoost={newMevBoost}
+                    setNewMevBoost={setNewMevBoost}
+                    newRelays={newRelays}
+                    setNewRelays={setNewRelays}
+                    isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                  />
+                </Col>
+              )}
             </Row>
             <hr />
             <div>
@@ -262,9 +234,7 @@ export default function StakerNetwork({
                 </>
               )}
 
-              {reqStatus.error && (
-                <ErrorView error={reqStatus.error} hideIcon red />
-              )}
+              {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
             </div>
           </Card>
         ) : currentStakerConfigReq.error ? (

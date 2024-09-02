@@ -10,9 +10,7 @@
   "architectures": ["linux/amd64", "linux/arm64"],
   "mainService": "validator",
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-  "contributors": [
-    "dappLion <dapplion@dappnode.io> (https://github.com/dapplion)"
-  ],
+  "contributors": ["dappLion <dapplion@dappnode.io> (https://github.com/dapplion)"],
   "license": "GPL-3.0",
   "repository": {
     "type": "git",

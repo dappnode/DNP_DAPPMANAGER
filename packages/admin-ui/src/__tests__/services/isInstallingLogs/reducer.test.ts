@@ -1,8 +1,5 @@
 import { reducer } from "services/isInstallingLogs/reducer";
-import {
-  updateIsInstallingLog,
-  clearIsInstallingLog
-} from "services/isInstallingLogs/actions";
+import { updateIsInstallingLog, clearIsInstallingLog } from "services/isInstallingLogs/actions";
 
 describe("services > isInstallingLogs > reducer", () => {
   describe("isInstallingLog dedicated reducers", () => {

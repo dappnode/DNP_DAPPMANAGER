@@ -49,8 +49,7 @@ export default function Optimism({ description }: { description: string }) {
         await new Promise((resolve: (confirmOnSetConfig: boolean) => void) => {
           confirm({
             title: `Optimism configuration`,
-            text:
-              "Are you sure you want to implement this Optimism configuration?",
+            text: "Are you sure you want to implement this Optimism configuration?",
             buttons: [
               {
                 label: "Continue",
@@ -80,9 +79,7 @@ export default function Optimism({ description }: { description: string }) {
               rollup: newRollup
                 ? {
                     ...newRollup,
-                    mainnetRpcUrl: customMainnetRpcUrl
-                      ? customMainnetRpcUrl
-                      : newRollup?.mainnetRpcUrl
+                    mainnetRpcUrl: customMainnetRpcUrl ? customMainnetRpcUrl : newRollup?.mainnetRpcUrl
                   }
                 : undefined,
               executionClient: newExecClient
@@ -117,11 +114,10 @@ export default function Optimism({ description }: { description: string }) {
             Set up your Optimism node configuration: <br />
             (1) <b>Choose</b> an <b>Execution Client</b> <br />
             (2) <b>Select</b> the <b>Optimism Node</b> <br />
-            (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you
-            are already running an Ethereum mainnet node on this Dappnode)
+            (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you are already running an Ethereum mainnet
+            node on this Dappnode)
             <br />
-            (4) [Optional] <b>Select Legacy Geth</b> to enable historical
-            transactions
+            (4) [Optional] <b>Select Legacy Geth</b> to enable historical transactions
           </p>
           <br />
 
@@ -145,18 +141,14 @@ export default function Optimism({ description }: { description: string }) {
           <Row className="staker-network">
             <Col>
               <SubTitle>Execution Clients</SubTitle>
-              {currentOptimismConfigReq.data.executionClients.map(
-                (executionClient, i) => (
-                  <ExecutionClient
-                    key={i}
-                    executionClient={executionClient}
-                    setNewExecClient={setNewExecClient}
-                    isSelected={
-                      executionClient.dnpName === newExecClient?.dnpName
-                    }
-                  />
-                )
-              )}
+              {currentOptimismConfigReq.data.executionClients.map((executionClient, i) => (
+                <ExecutionClient
+                  key={i}
+                  executionClient={executionClient}
+                  setNewExecClient={setNewExecClient}
+                  isSelected={executionClient.dnpName === newExecClient?.dnpName}
+                />
+              ))}
             </Col>
 
             <Col>
@@ -164,10 +156,7 @@ export default function Optimism({ description }: { description: string }) {
               <OptimismNode
                 rollup={currentOptimismConfigReq.data.rollup}
                 setNewRollup={setNewRollup}
-                isSelected={
-                  currentOptimismConfigReq.data.rollup.dnpName ===
-                  newRollup?.dnpName
-                }
+                isSelected={currentOptimismConfigReq.data.rollup.dnpName === newRollup?.dnpName}
               />
             </Col>
 
@@ -176,10 +165,7 @@ export default function Optimism({ description }: { description: string }) {
               <LegacyGeth
                 archive={currentOptimismConfigReq.data.archive}
                 setNewArchive={setNewArchive}
-                isSelected={
-                  currentOptimismConfigReq.data.archive.dnpName ===
-                  newArchive?.dnpName
-                }
+                isSelected={currentOptimismConfigReq.data.archive.dnpName === newArchive?.dnpName}
               />
             </Col>
           </Row>
@@ -207,9 +193,7 @@ export default function Optimism({ description }: { description: string }) {
               </>
             )}
 
-            {reqStatus.error && (
-              <ErrorView error={reqStatus.error} hideIcon red />
-            )}
+            {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
           </div>
         </Card>
       ) : currentOptimismConfigReq.error ? (

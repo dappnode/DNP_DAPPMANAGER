@@ -5,15 +5,11 @@ import { stringIncludes } from "./strings";
  * @param peer = "/dns4/1bc3641738cbe2b1.dyndns.dappnode.io/tcp/4001/ipfs/QmWAcZZCvqVnJ6J9946qxEMaAbkUj6FiiVWakizVKfnfDL"
  */
 export async function addSwarmConnection(peer: string) {
-  const res = await ipfsApi<{ Type: string; Message: string }>(
-    `swarm/connect?arg=${peer}`
-  );
+  const res = await ipfsApi<{ Type: string; Message: string }>(`swarm/connect?arg=${peer}`);
   if (res.Type === "error") {
     console.error(`Error on addSwarmConnection:`, res);
-    if (stringIncludes(res.Message, "dial attempt failed"))
-      throw Error("Can't connect to peer");
-    else if (stringIncludes(res.Message, "dial to self attempt"))
-      throw Error("You can't add yourself");
+    if (stringIncludes(res.Message, "dial attempt failed")) throw Error("Can't connect to peer");
+    else if (stringIncludes(res.Message, "dial to self attempt")) throw Error("You can't add yourself");
     else throw Error(res.Message);
   }
 }

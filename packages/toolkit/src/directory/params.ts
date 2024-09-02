@@ -7,13 +7,13 @@ export const directoryAbi = [
     inputs: [
       { name: "name", type: "string" },
       { name: "status", type: "uint128" },
-      { name: "position", type: "uint128" },
+      { name: "position", type: "uint128" }
     ],
     name: "addPackage",
     outputs: [{ name: "idPackage", type: "uint256" }],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -22,7 +22,7 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -31,7 +31,7 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -40,19 +40,19 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
     inputs: [
       { name: "idPackage", type: "uint256" },
-      { name: "newStatus", type: "uint128" },
+      { name: "newStatus", type: "uint128" }
     ],
     name: "changeStatus",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -61,19 +61,19 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
     inputs: [
       { name: "idPackage1", type: "uint256" },
-      { name: "idPackage2", type: "uint256" },
+      { name: "idPackage2", type: "uint256" }
     ],
     name: "switchPosition",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -82,19 +82,19 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
     inputs: [
       { name: "idPackage", type: "uint256" },
-      { name: "newPosition", type: "uint128" },
+      { name: "newPosition", type: "uint128" }
     ],
     name: "changePosition",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -103,7 +103,7 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -112,7 +112,7 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "bool" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -121,7 +121,7 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -130,7 +130,7 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -139,7 +139,7 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "uint256" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -148,11 +148,11 @@ export const directoryAbi = [
     outputs: [
       { name: "name", type: "string" },
       { name: "status", type: "uint128" },
-      { name: "position", type: "uint128" },
+      { name: "position", type: "uint128" }
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -160,13 +160,13 @@ export const directoryAbi = [
       { name: "idPackage", type: "uint256" },
       { name: "name", type: "string" },
       { name: "status", type: "uint128" },
-      { name: "position", type: "uint128" },
+      { name: "position", type: "uint128" }
     ],
     name: "updatePackage",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -175,7 +175,7 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -184,7 +184,7 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -193,7 +193,7 @@ export const directoryAbi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -202,96 +202,96 @@ export const directoryAbi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     inputs: [
       { name: "_escapeHatchCaller", type: "address" },
-      { name: "_escapeHatchDestination", type: "address" },
+      { name: "_escapeHatchDestination", type: "address" }
     ],
     payable: false,
     stateMutability: "nonpayable",
-    type: "constructor",
+    type: "constructor"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: "idPackage", type: "uint256" },
-      { indexed: false, name: "name", type: "string" },
+      { indexed: false, name: "name", type: "string" }
     ],
     name: "PackageAdded",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: "idPackage", type: "uint256" },
-      { indexed: false, name: "name", type: "string" },
+      { indexed: false, name: "name", type: "string" }
     ],
     name: "PackageUpdated",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: false, name: "idPackage", type: "uint256" },
-      { indexed: false, name: "newStatus", type: "uint128" },
+      { indexed: false, name: "newStatus", type: "uint128" }
     ],
     name: "StatusChanged",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: false, name: "idPackage", type: "uint256" },
-      { indexed: false, name: "newPosition", type: "uint128" },
+      { indexed: false, name: "newPosition", type: "uint128" }
     ],
     name: "PositionChanged",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [{ indexed: false, name: "newFeatured", type: "bytes32" }],
     name: "FeaturedChanged",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [{ indexed: false, name: "token", type: "address" }],
     name: "EscapeHatchBlackistedToken",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: false, name: "token", type: "address" },
-      { indexed: false, name: "amount", type: "uint256" },
+      { indexed: false, name: "amount", type: "uint256" }
     ],
     name: "EscapeHatchCalled",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: "by", type: "address" },
-      { indexed: true, name: "to", type: "address" },
+      { indexed: true, name: "to", type: "address" }
     ],
     name: "OwnershipRequested",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: "from", type: "address" },
-      { indexed: true, name: "to", type: "address" },
+      { indexed: true, name: "to", type: "address" }
     ],
     name: "OwnershipTransferred",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [],
     name: "OwnershipRemoved",
-    type: "event",
-  },
+    type: "event"
+  }
 ] as const;

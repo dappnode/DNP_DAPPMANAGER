@@ -30,11 +30,7 @@ export default function SystemUpdateDetails() {
       {coreChangelog && <RenderMarkdown source={coreChangelog} />}
 
       {updateAlerts.map(({ from, to, message }) => (
-        <div
-          key={from + to}
-          className="alert alert-warning"
-          style={{ margin: "12px 0 6px 0" }}
-        >
+        <div key={from + to} className="alert alert-warning" style={{ margin: "12px 0 6px 0" }}>
           {/* If there are multiple alerts, display the update jump */}
           {updateAlerts.length > 1 && (
             <div style={{ fontWeight: "bold" }}>
@@ -59,14 +55,10 @@ export default function SystemUpdateDetails() {
  * Returns core dependencies,
  * unless the core package is the only one, then returns it
  */
-export function getCoreDeps(
-  corePackages: DependencyListItem[]
-): DependencyListItem[] {
-  const coreDeps = corePackages.filter(
-    dnp => !(dnp.name || "").includes("core")
-  );
+export function getCoreDeps(corePackages: DependencyListItem[]): DependencyListItem[] {
+  const coreDeps = corePackages.filter((dnp) => !(dnp.name || "").includes("core"));
   if (coreDeps.length) return coreDeps;
 
-  const coreDnp = corePackages.find(dnp => (dnp.name || "").includes("core"));
+  const coreDnp = corePackages.find((dnp) => (dnp.name || "").includes("core"));
   return coreDnp ? [coreDnp] : [];
 }

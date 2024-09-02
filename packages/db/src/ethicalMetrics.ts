@@ -7,19 +7,10 @@ const NOTIFICATIONS = "notifications";
 const ETHICAL_METRICS_MAIL = "ethical-metrics-mail";
 const ETHICAL_METRICS_STATUS = "ethical-metrics-status";
 
-export const notifications = dbMain.staticKey<EthicalMetricsConfig | null>(
-  NOTIFICATIONS,
-  null
-);
+export const notifications = dbMain.staticKey<EthicalMetricsConfig | null>(NOTIFICATIONS, null);
 
 // Deprecated in favor of "notifications"
-export const ethicalMetricsMail = dbMain.staticKey<string | null>(
-  ETHICAL_METRICS_MAIL,
-  null
-);
+export const ethicalMetricsMail = dbMain.staticKey<string | null>(ETHICAL_METRICS_MAIL, null);
 
 // Deprecated in favor of "notifications"
-export const ethicalMetricsStatus = dbMain.staticKey<boolean>(
-  ETHICAL_METRICS_STATUS,
-  false
-);
+export const ethicalMetricsStatus = dbMain.staticKey<boolean>(ETHICAL_METRICS_STATUS, false);

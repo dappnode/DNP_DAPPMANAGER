@@ -30,27 +30,18 @@ export async function updateDyndnsIp(): Promise<void> {
   db.domain.set(dynDnsResponse.domain);
 }
 
-export async function updateDyndnsIpFromPrivateKey(
-  privateKey: string
-): Promise<DyndnsResponse> {
+export async function updateDyndnsIpFromPrivateKey(privateKey: string): Promise<DyndnsResponse> {
   const timestamp = Math.floor(Date.now() / 1000);
 
   // Using ethers as a raw signer (without '\x19Ethereum Signed Message:\n' prefix) to mimic previous EthCrypto signature
   const wallet = new ethers.Wallet(privateKey);
   const signingKey = new ethers.SigningKey(privateKey);
   const signDigest = signingKey.sign.bind(signingKey);
-  const hash = ethers.solidityPackedKeccak256(
-    ["string"],
-    [timestamp.toString()]
-  );
+  const hash = ethers.solidityPackedKeccak256(["string"], [timestamp.toString()]);
   const signature = ethers.Signature.from(signDigest(hash));
 
   const res = await fetch(
-    `${dyndnsHost}/?${[
-      `address=${wallet.address}`,
-      `timestamp=${timestamp}`,
-      `sig=${signature.serialized}`,
-    ].join("&")}`
+    `${dyndnsHost}/?${[`address=${wallet.address}`, `timestamp=${timestamp}`, `sig=${signature.serialized}`].join("&")}`
   );
 
   if (res.status !== 200) {

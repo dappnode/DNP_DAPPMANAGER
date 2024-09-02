@@ -12,14 +12,13 @@ export function VpnHome() {
   const dnpsRequest = useApi.packagesGet();
 
   const availableRoutes = useMemo(() => {
-    const dnpsSet = dnpsRequest.data
-      ? new Set(dnpsRequest.data.map(dnp => dnp.dnpName))
-      : new Set<string>();
+    const dnpsSet = dnpsRequest.data ? new Set(dnpsRequest.data.map((dnp) => dnp.dnpName)) : new Set<string>();
 
     const routes: {
       name: string;
       subPath: string;
       subLink: string;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
@@ -39,22 +38,16 @@ export function VpnHome() {
       }
     ];
 
-    return routes.sort((a, b) =>
-      a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0
-    );
+    return routes.sort((a, b) => (a.installed && !b.installed ? -1 : !a.installed && b.installed ? 1 : 0));
   }, [dnpsRequest.data]);
 
   return (
     <>
       <Title title={title} />
       <div className="horizontal-navbar">
-        {availableRoutes.map(route => (
+        {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subLink}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subLink} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.name}
             </NavLink>
           </button>
@@ -62,21 +55,15 @@ export function VpnHome() {
       </div>
 
       <p>
-        Create a VPN profile for each of your devices (laptop, phone) so you can
-        access your Dappnode from an external network. Learn more about VPN at:{" "}
-        <LinkDocs href={docsUrl.connectVpn}>
-          How to connect to your Dappnode VPN
-        </LinkDocs>
+        Create a VPN profile for each of your devices (laptop, phone) so you can access your Dappnode from an external
+        network. Learn more about VPN at:{" "}
+        <LinkDocs href={docsUrl.connectVpn}>How to connect to your Dappnode VPN</LinkDocs>
       </p>
 
       <div className="section-spacing">
         <Routes>
-          {availableRoutes.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<route.component />}
-            />
+          {availableRoutes.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
           ))}
         </Routes>
       </div>

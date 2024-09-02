@@ -22,8 +22,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "ok",
-    description:
-      "Turbo-Geth is a fork of Go-Ethereum with focus on performance.",
+    description: "Turbo-Geth is a fork of Go-Ethereum with focus on performance.",
     avatarUrl: "/ipfs/QmWYB5vQYnXTw1PimzemQfkPHfJHzn8qDMRVWNmFMKrxK9",
     isInstalled: false,
     isUpdated: false,
@@ -62,8 +61,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "ok",
-    description:
-      "BOINC is an open-source software platform for computing using volunteered resour",
+    description: "BOINC is an open-source software platform for computing using volunteered resour",
     avatarUrl: "/ipfs/QmRA5jyeRA2M6Ssoc1bfzvWAALXYw8ru6xF1pz4cWBDWwM",
     isInstalled: false,
     isUpdated: false,
@@ -154,8 +152,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "error",
-    message:
-      "External volumes are not allowed 'archipelpublicdappnodeeth_config'"
+    message: "External volumes are not allowed 'archipelpublicdappnodeeth_config'"
   },
   {
     index: 8,
@@ -176,8 +173,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "ok",
-    description:
-      "Polygon is a protocol and a framework for building and connecting Ethereum-compa",
+    description: "Polygon is a protocol and a framework for building and connecting Ethereum-compa",
     avatarUrl: "/ipfs/QmcpcWEdinxyJe8orsh1okp3B73KaAQBxGy4eFkuKWtLM6",
     isInstalled: false,
     isUpdated: false,
@@ -281,8 +277,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "ok",
-    description:
-      "Archipel : Divide and federate to run unsinkable services. Welcome aboard to all",
+    description: "Archipel : Divide and federate to run unsinkable services. Welcome aboard to all",
     avatarUrl: "/ipfs/QmRjKPQQSxYDuAEnfCEMyU9bwGEHmm22qV1Q1oShJvUqFu",
     isInstalled: false,
     isUpdated: false,
@@ -295,8 +290,7 @@ export const mockPublicDnps: DirectoryItem[] = [
     whitelisted: true,
     isFeatured: false,
     status: "ok",
-    description:
-      "DAppNode Package FAHClient https://foldingathome.org. More information at https:",
+    description: "DAppNode Package FAHClient https://foldingathome.org. More information at https:",
     avatarUrl: "/ipfs/Qmf7NoxkpPBeVkcVvFyw3AMuJZL4KniCLDFVjv5Rzewi5H",
     isInstalled: false,
     isUpdated: false,

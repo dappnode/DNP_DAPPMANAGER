@@ -17,8 +17,7 @@ export const multiService: MockDnp = {
     version: "0.2.0",
     description: "Sample package with two services.",
     type: "service",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: [],
     links: {
       homepage: "https://github.com/multi-service/multi-service#readme"

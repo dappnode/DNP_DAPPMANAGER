@@ -13,11 +13,7 @@ import {
   listPackage
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  ethicalMetricsDnpName,
-  ethicalMetricsTorServiceVolume,
-  unregister
-} from "@dappnode/ethicalmetrics";
+import { ethicalMetricsDnpName, ethicalMetricsTorServiceVolume, unregister } from "@dappnode/ethicalmetrics";
 import { getDockerComposePath, packageInstalledHasPid } from "@dappnode/utils";
 import { restartDappmanagerPatch } from "@dappnode/installer";
 
@@ -36,8 +32,7 @@ export async function packageRestartVolumes({
 }): Promise<void> {
   if (!dnpName) throw Error("kwarg dnpName must be defined");
 
-  if (dnpName === params.dappmanagerDnpName)
-    throw Error("The dappmanager cannot be restarted");
+  if (dnpName === params.dappmanagerDnpName) throw Error("The dappmanager cannot be restarted");
 
   // Needs the extended info that includes the volume ownership data
   // Fetching all containers to not re-fetch below
@@ -47,11 +42,9 @@ export async function packageRestartVolumes({
 
   // Make sure the compose exists before deleting it's containers
   const composePath = getDockerComposePath(dnp.dnpName, dnp.isCore);
-  if (!fs.existsSync(composePath))
-    throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
+  if (!fs.existsSync(composePath)) throw Error(`No compose found for ${dnp.dnpName}: ${composePath}`);
 
-  const { volumesToRemove, containersToRemove } =
-    getContainersAndVolumesToRemove(dnp, volumeName, volumes);
+  const { volumesToRemove, containersToRemove } = getContainersAndVolumesToRemove(dnp, volumeName, volumes);
   logs.debug({ dnpName, volumesToRemove, containersToRemove });
 
   // Skip early to prevent calling dockerComposeUp
@@ -60,10 +53,7 @@ export async function packageRestartVolumes({
   }
 
   // The Ethical Metrics instance must be unregistered if the tor hidden service volume is removed
-  if (
-    (dnp.dnpName === ethicalMetricsDnpName && !volumeName) ||
-    volumeName === ethicalMetricsTorServiceVolume
-  ) {
+  if ((dnp.dnpName === ethicalMetricsDnpName && !volumeName) || volumeName === ethicalMetricsTorServiceVolume) {
     try {
       await unregister();
     } catch (e) {

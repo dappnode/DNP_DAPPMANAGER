@@ -10,9 +10,8 @@ export default function Profile() {
       <SubTitle>Change UI password</SubTitle>
       <Card spacing>
         <div>
-          This password is used to authorize admin access to this UI. It
-          protects you from Cross Site Scripting (XSS) attacks, and un-wanted
-          access from other users in the DAppNodeWIFI network.
+          This password is used to authorize admin access to this UI. It protects you from Cross Site Scripting (XSS)
+          attacks, and un-wanted access from other users in the DAppNodeWIFI network.
         </div>
 
         <ChangePassword />

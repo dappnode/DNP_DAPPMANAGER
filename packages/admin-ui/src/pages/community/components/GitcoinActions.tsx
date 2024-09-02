@@ -1,6 +1,6 @@
 import Button from "components/Button";
 import React from "react";
-import {explorerGitcoinUrl} from "params";
+import { explorerGitcoinUrl } from "params";
 import newTabProps from "utils/newTabProps";
 
 export default function GitcoinActions() {

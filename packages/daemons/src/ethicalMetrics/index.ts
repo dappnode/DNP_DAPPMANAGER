@@ -9,10 +9,7 @@ import { DappnodeInstaller } from "@dappnode/installer";
  * Run the Ethical metrics daemon.
  * It will check that DMS, Exporter and Ethical metrics are installed and running if Ethical metrics is enabled
  */
-export function startEthicalMetricsDaemon(
-  dappnodeInstaller: DappnodeInstaller,
-  signal: AbortSignal
-): void {
+export function startEthicalMetricsDaemon(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
   const runEthicalMetricsTaskMemo = runOnlyOneSequentially(async () => {
     try {
       await checkEthicalMetricsStatus(dappnodeInstaller);
@@ -24,9 +21,5 @@ export function startEthicalMetricsDaemon(
   // Subscribe with a throttle to run only one time at once
   eventBus.runEthicalMetricsInstaller.on(() => runEthicalMetricsTaskMemo());
 
-  runAtMostEvery(
-    async () => runEthicalMetricsTaskMemo(),
-    params.ETHICAL_METRICS_DAEMON_INTERVAL,
-    signal
-  );
+  runAtMostEvery(async () => runEthicalMetricsTaskMemo(), params.ETHICAL_METRICS_DAEMON_INTERVAL, signal);
 }

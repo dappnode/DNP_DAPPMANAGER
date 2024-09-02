@@ -4,9 +4,9 @@ import { PackageItemData } from "./stakers.js";
 
 export const executionClientsOptimism = Object.freeze([
   "op-geth.dnp.dappnode.eth",
-  "op-erigon.dnp.dappnode.eth",
+  "op-erigon.dnp.dappnode.eth"
 ] as const);
-export type ExecutionClientOptimism = typeof executionClientsOptimism[number];
+export type ExecutionClientOptimism = (typeof executionClientsOptimism)[number];
 
 export type OptimismNode = "op-node.dnp.dappnode.eth";
 export const optimismNode: OptimismNode = "op-node.dnp.dappnode.eth";
@@ -15,9 +15,7 @@ export type OptimismL2Geth = "op-l2geth.dnp.dappnode.eth";
 export const optimismL2Geth: OptimismL2Geth = "op-l2geth.dnp.dappnode.eth";
 
 export type OptimismType = "archive" | "execution" | "rollup";
-export type OptimismItem<T extends OptimismType> =
-  | OptimismItemOk<T>
-  | OptimismItemError<T>;
+export type OptimismItem<T extends OptimismType> = OptimismItemOk<T> | OptimismItemError<T>;
 interface OptimismArchive {
   dnpName: OptimismL2Geth;
 }
@@ -32,10 +30,10 @@ interface OptimismRollup {
 type OptimismItemBasic<T extends OptimismType> = T extends "archive"
   ? OptimismArchive
   : T extends "execution"
-  ? OptimismExecution
-  : T extends "rollup"
-  ? OptimismRollup
-  : never;
+    ? OptimismExecution
+    : T extends "rollup"
+      ? OptimismRollup
+      : never;
 
 export type OptimismItemError<T extends OptimismType> = {
   status: "error";

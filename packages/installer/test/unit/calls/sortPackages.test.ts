@@ -8,16 +8,16 @@ describe("sortPackages for UI display", () => {
     const sampleDnps: MockDnp[] = [
       {
         dnpName: "b",
-        containers: [],
+        containers: []
       },
       {
         dnpName: "a",
         containers: [
           { serviceName: "c", isMain: false },
           { serviceName: "b", isMain: true },
-          { serviceName: "a", isMain: false },
-        ],
-      },
+          { serviceName: "a", isMain: false }
+        ]
+      }
     ];
 
     const expectedSortedDnps: MockDnp[] = [
@@ -26,13 +26,13 @@ describe("sortPackages for UI display", () => {
         containers: [
           { serviceName: "b", isMain: true },
           { serviceName: "a", isMain: false },
-          { serviceName: "c", isMain: false },
-        ],
+          { serviceName: "c", isMain: false }
+        ]
       },
       {
         dnpName: "b",
-        containers: [],
-      },
+        containers: []
+      }
     ];
 
     const sortedDnps = sortPackages(fromSampleDnps(sampleDnps));
@@ -53,8 +53,8 @@ describe("sortPackages for UI display", () => {
       ...dnp,
       containers: dnp.containers.map((container) => ({
         ...mockContainer,
-        ...container,
-      })),
+        ...container
+      }))
     }));
   }
 
@@ -63,8 +63,8 @@ describe("sortPackages for UI display", () => {
       dnpName: dnp.dnpName,
       containers: dnp.containers.map((container) => ({
         serviceName: container.serviceName,
-        isMain: container.isMain ?? false,
-      })),
+        isMain: container.isMain ?? false
+      }))
     }));
   }
 });

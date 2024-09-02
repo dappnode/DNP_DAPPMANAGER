@@ -1,11 +1,7 @@
 import { EventBus } from "@dappnode/eventbus";
 import { Routes, Subscriptions } from "@dappnode/types";
 
-export function mapSubscriptionsToEventBus(
-  subscriptions: Subscriptions,
-  calls: Routes,
-  eventBus: EventBus
-): void {
+export function mapSubscriptionsToEventBus(subscriptions: Subscriptions, calls: Routes, eventBus: EventBus): void {
   // Pipe local events to WAMP
   eventBus.logUi.on(subscriptions.progressLog.emit);
   eventBus.logUserAction.on(subscriptions.userActionLog.emit);
@@ -35,7 +31,7 @@ export function mapSubscriptionsToEventBus(
   });
 
   // Push notifications to the UI
-  eventBus.notification.on(notification => {
+  eventBus.notification.on((notification) => {
     subscriptions.pushNotification.emit(notification);
   });
 

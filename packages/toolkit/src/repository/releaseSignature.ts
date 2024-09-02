@@ -9,7 +9,7 @@ import {
   ReleaseSignatureProtocol,
   ReleaseSignature,
   ReleaseSignatureWithData,
-  releaseFiles,
+  releaseFiles
 } from "@dappnode/types";
 import { CID } from "kubo-rpc-client";
 import { IPFSEntry } from "./types.js";
@@ -24,11 +24,7 @@ export function getReleaseSignatureStatus(
   }
 
   const { signature, signedData } = signatureWithData;
-  const signingKey = getReleaseSigningKey(
-    signedData,
-    signature.signature,
-    signature.signature_protocol
-  );
+  const signingKey = getReleaseSigningKey(signedData, signature.signature, signature.signature_protocol);
 
   for (const trustedKey of trustedKeys) {
     if (
@@ -39,7 +35,7 @@ export function getReleaseSignatureStatus(
     ) {
       return {
         status: ReleaseSignatureStatusCode.signedByKnownKey,
-        keyName: trustedKey.name,
+        keyName: trustedKey.name
       };
     }
   }
@@ -47,7 +43,7 @@ export function getReleaseSignatureStatus(
   return {
     status: ReleaseSignatureStatusCode.signedByUnknownKey,
     signatureProtocol: signature.signature_protocol,
-    key: signingKey,
+    key: signingKey
   };
 }
 
@@ -76,10 +72,7 @@ export function getReleaseSigningKey(
  * docker-compose.yml zdj7Wf2pYesVyvSbcTEwWVd8TFtTjv588FET9L7qgkP47kRkf
  * ```
  */
-export function serializeIpfsDirectory(
-  files: IPFSEntry[],
-  opts: ReleaseSignature["cid"]
-): string {
+export function serializeIpfsDirectory(files: IPFSEntry[], opts: ReleaseSignature["cid"]): string {
   return (
     files
       .filter((file) => !releaseFiles.signature.regex.test(file.name))
@@ -87,10 +80,7 @@ export function serializeIpfsDirectory(
       .sort((a, b) => a.name.localeCompare(b.name))
       /** `${name} ${cidStr}` */
       .map((file) => {
-        const cidStr = cidToString(
-          getCidAtVersion(file.cid, opts.version),
-          opts.base
-        );
+        const cidStr = cidToString(getCidAtVersion(file.cid, opts.version), opts.base);
         return `${file.name} ${cidStr}`;
       })
       .join("\n")

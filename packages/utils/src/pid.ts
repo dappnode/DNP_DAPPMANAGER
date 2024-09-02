@@ -17,13 +17,8 @@ export function packageToInstallHasPid(pkg: InstallPackageData): boolean {
   return false;
 }
 
-export function isTargetPidServiceIncluded(
-  targetContainers: PackageContainer[],
-  targetPidServices: string[]
-): boolean {
-  return targetContainers.some((tc) =>
-    targetPidServices.includes(tc.serviceName)
-  );
+export function isTargetPidServiceIncluded(targetContainers: PackageContainer[], targetPidServices: string[]): boolean {
+  return targetContainers.some((tc) => targetPidServices.includes(tc.serviceName));
 }
 
 /**
@@ -46,25 +41,16 @@ export function getServicesSharingPid(
         const dependantPidService = Object.keys(compose.services)[index];
 
         // Ensure targetPidService is well formatted and exists in compose
-        if (!targetPidService)
-          throw Error(
-            `target pid service in wrong format: ${targetPidService}`
-          );
+        if (!targetPidService) throw Error(`target pid service in wrong format: ${targetPidService}`);
         if (!Object.keys(compose.services).includes(targetPidService))
-          throw Error(
-            `target pid service ${targetPidService} not found in the compose`
-          );
+          throw Error(`target pid service ${targetPidService} not found in the compose`);
 
         targetPidServices.push(targetPidService);
         dependantPidServices.push(dependantPidService);
       }
     }
     // Return null if the targetPid is not included because these
-    if (
-      targetContainers &&
-      !isTargetPidServiceIncluded(targetContainers, targetPidServices)
-    )
-      return null;
+    if (targetContainers && !isTargetPidServiceIncluded(targetContainers, targetPidServices)) return null;
     return { dependantPidServices, targetPidServices };
   }
   return null;

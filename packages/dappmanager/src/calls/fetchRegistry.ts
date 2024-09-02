@@ -1,15 +1,8 @@
 import { listPackages } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { DirectoryItem } from "@dappnode/types";
-import {
-  fileToGatewayUrl,
-  getIsInstalled,
-  getIsUpdated
-} from "@dappnode/utils";
-import {
-  getShortDescription,
-  getFallBackCategories
-} from "./fetchDirectory.js";
+import { fileToGatewayUrl, getIsInstalled, getIsUpdated } from "@dappnode/utils";
+import { getShortDescription, getFallBackCategories } from "./fetchDirectory.js";
 import { throttle } from "lodash-es";
 import { PublicRegistryEntry } from "@dappnode/toolkit";
 import { dappnodeInstaller, publicRegistry } from "../index.js";
@@ -30,9 +23,7 @@ export async function fetchRegistry(): Promise<DirectoryItem[]> {
 /**
  *  Get IPFS data from registry packages
  */
-async function fetchRegistryIpfsData(
-  registry: PublicRegistryEntry[]
-): Promise<DirectoryItem[]> {
+async function fetchRegistryIpfsData(registry: PublicRegistryEntry[]): Promise<DirectoryItem[]> {
   const dnpList = await listPackages();
 
   const registryPublicDnps: DirectoryItem[] = [];

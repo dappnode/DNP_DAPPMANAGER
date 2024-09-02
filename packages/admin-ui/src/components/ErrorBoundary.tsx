@@ -1,7 +1,8 @@
 import React from "react";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default class ErrorBoundary extends React.Component<any, any> {
-  constructor(props: {}) {
+  constructor(props: object) {
     super(props);
     this.state = { error: null, errorInfo: null };
   }

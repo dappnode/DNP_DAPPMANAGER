@@ -1,0 +1,17 @@
+# Ignore dist builds
+packages/*/dist
+packages/*/build
+
+# Ignore schemas
+packages/common/validation/schemas
+
+# Ignore node_modules
+node_modules
+packages/*/node_modules
+
+# Ignore image assets
+*.png
+
+# Ignore test assets
+*.tar.xz
+*.sh

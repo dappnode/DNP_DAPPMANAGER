@@ -33,9 +33,7 @@ interface RouteProps {
  * Return a view for each routeId
  * RouteIds will be returned by the DAPPMANAGER is a correct order
  */
-function getRouteIdComponent(
-  routeId: NewFeatureId
-): React.FC<RouteProps> | undefined {
+function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | undefined {
   switch (routeId) {
     case "system-auto-updates":
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
@@ -86,12 +84,7 @@ export default function Welcome() {
   // When modifying internal routes, reset route counter and status
   // Make sure the routes have actually changed before restarting the flow
   useEffect(() => {
-    if (
-      featureIds &&
-      featureIds.length > 0 &&
-      status !== "active" &&
-      !isEqual(intFeatureIds, featureIds)
-    ) {
+    if (featureIds && featureIds.length > 0 && status !== "active" && !isEqual(intFeatureIds, featureIds)) {
       setStatus("active");
       setRouteN(0);
       setIntFeatureIds(featureIds);
@@ -99,7 +92,7 @@ export default function Welcome() {
   }, [featureIds, intFeatureIds, status]);
 
   function onBack() {
-    setRouteN(n => (n <= 1 ? 0 : n - 1));
+    setRouteN((n) => (n <= 1 ? 0 : n - 1));
   }
 
   function onNext(id: NewFeatureId | false) {
@@ -108,12 +101,12 @@ export default function Welcome() {
       setStatus("finished");
     } else {
       // Move to next route
-      setRouteN(n => n + 1);
+      setRouteN((n) => n + 1);
     }
 
     // Persist in the DAPPMANAGER that this new feature has been seen by the user
     if (id)
-      api.newFeatureStatusSet({ featureId: id, status: "seen" }).catch(e => {
+      api.newFeatureStatusSet({ featureId: id, status: "seen" }).catch((e) => {
         console.error(`Error on newFeatureStatusSet(${featureId}, seen)`, e);
       });
   }

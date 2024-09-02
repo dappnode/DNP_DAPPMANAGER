@@ -13,11 +13,7 @@ export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
 export { ethClientTargetSet } from "./ethClientTargetSet.js";
 export { ethClientFallbackSet } from "./ethClientFallbackSet.js";
-export {
-  disableEthicalMetrics,
-  enableEthicalMetrics,
-  getEthicalMetricsConfig
-} from "./ethicalMetrics.js";
+export { disableEthicalMetrics, enableEthicalMetrics, getEthicalMetricsConfig } from "./ethicalMetrics.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";
 export { fetchDnpRequest } from "./fetchDnpRequest.js";
@@ -62,21 +58,11 @@ export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";
 export { statsCpuGet } from "./statsCpuGet.js";
-export {
-  sshPortGet,
-  sshPortSet,
-  sshStatusGet,
-  sshStatusSet
-} from "./sshManager.js";
+export { sshPortGet, sshPortSet, sshStatusGet, sshStatusSet } from "./sshManager.js";
 export { statsMemoryGet } from "./statsMemoryGet.js";
 export { statsDiskGet } from "./statsDiskGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
-export {
-  telegramConfigGet,
-  telegramConfigSet,
-  telegramStatusGet,
-  telegramStatusSet
-} from "./telegram.js";
+export { telegramConfigGet, telegramConfigSet, telegramStatusGet, telegramStatusSet } from "./telegram.js";
 export { updateUpgrade } from "./updateUpgrade.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";
 export { volumeRemove } from "./volumeRemove.js";

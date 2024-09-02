@@ -21,13 +21,7 @@ function readManifest(manfiestPath: string): Manifest {
   return parseManifest(fs.readFileSync(manfiestPath, "utf8"));
 }
 
-export function readManifestIfExists({
-  dnpName,
-  isCore,
-}: {
-  dnpName: string;
-  isCore: boolean;
-}): Manifest | null {
+export function readManifestIfExists({ dnpName, isCore }: { dnpName: string; isCore: boolean }): Manifest | null {
   const manifestPath = validatePath(getManifestPath(dnpName, isCore));
   try {
     return readManifest(manifestPath);

@@ -8,12 +8,7 @@ import { configureStore } from "@reduxjs/toolkit";
  * type once, in your store file, and then use that type whenever
  * you write a thunk:
  */
-export type AppThunk<ReturnType = void> = ThunkAction<
-  ReturnType,
-  RootState,
-  unknown,
-  Action<string>
->;
+export type AppThunk<ReturnType = void> = ThunkAction<ReturnType, RootState, unknown, Action<string>>;
 
 export const store = configureStore({
   // ### Todo: Fix type bug: 'state !== state', because state can be undefined

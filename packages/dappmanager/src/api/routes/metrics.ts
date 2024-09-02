@@ -102,13 +102,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of [
-        "mainnet",
-        "prater",
-        "gnosis",
-        "lukso",
-        "holesky"
-      ] as Network[]) {
+      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky"] as Network[]) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();
@@ -120,10 +114,7 @@ register.registerMetric(
             dnpName: executionClient
           }))
         )
-          this.set(
-            { executionClient: network },
-            parseClientToNumber(executionClient)
-          );
+          this.set({ executionClient: network }, parseClientToNumber(executionClient));
         else this.set({ executionClient: network }, 0);
 
         // Consensus client
@@ -133,10 +124,7 @@ register.registerMetric(
             dnpName: consensusClient
           }))
         )
-          this.set(
-            { consensusClient: network },
-            parseClientToNumber(consensusClient)
-          );
+          this.set({ consensusClient: network }, parseClientToNumber(consensusClient));
         else this.set({ consensusClient: network }, 0);
 
         // MEV boost
@@ -189,13 +177,8 @@ register.registerMetric(
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
       if (!isEmpty(autoUpdates) && "system-packages" in autoUpdates) {
-        const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled
-          ? 1
-          : 0;
-        this.set(
-          { autoUpdatesSystemPackages: "enabled" },
-          autoUpdatesSystemPackages
-        );
+        const autoUpdatesSystemPackages = autoUpdates["system-packages"].enabled ? 1 : 0;
+        this.set({ autoUpdatesSystemPackages: "enabled" }, autoUpdatesSystemPackages);
       } else {
         this.set({ autoUpdatesSystemPackages: "enabled" }, 0);
       }
@@ -212,13 +195,8 @@ register.registerMetric(
     collect() {
       const autoUpdates = db.autoUpdateSettings.get();
       if (!isEmpty(autoUpdates) && "my-packages" in autoUpdates) {
-        const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled
-          ? 1
-          : 0;
-        this.set(
-          { autoUpdatesUserPackages: "enabled" },
-          autoUpdatesUserPackages
-        );
+        const autoUpdatesUserPackages = autoUpdates["my-packages"].enabled ? 1 : 0;
+        this.set({ autoUpdatesUserPackages: "enabled" }, autoUpdatesUserPackages);
       } else {
         this.set({ autoUpdatesUserPackages: "enabled" }, 0);
       }

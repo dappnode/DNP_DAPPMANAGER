@@ -8,8 +8,7 @@ import { uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import { signRelease } from "./integrationSpecs/signRelease.js";
 
 // Sign the string message
-const privateKey =
-  "0x0111111111111111111111111111111111111111111111111111111111111111";
+const privateKey = "0x0111111111111111111111111111111111111111111111111111111111111111";
 
 describe("Sign release", () => {
   it("Sign uploaded release", async () => {
@@ -21,7 +20,7 @@ describe("Sign release", () => {
       version,
       description: "Main DNP",
       type: "service",
-      license: "GPL-3.0",
+      license: "GPL-3.0"
     };
 
     const composeMain = new ComposeEditor({
@@ -31,21 +30,21 @@ describe("Sign release", () => {
           container_name: getContainerName({
             dnpName: dnpName,
             serviceName: dnpName,
-            isCore: false,
+            isCore: false
           }),
           image: getImageTag({
             dnpName: dnpName,
             serviceName: dnpName,
-            version,
-          }),
-        },
-      },
+            version
+          })
+        }
+      }
     });
 
     // Create release
     const dnpReleaseHash = await uploadDirectoryRelease({
       manifest: mainDnpManifest,
-      compose: composeMain.output(),
+      compose: composeMain.output()
     });
 
     const wallet = new ethers.Wallet(privateKey);
@@ -56,7 +55,7 @@ describe("Sign release", () => {
     const expectedSignatureStatus: typeof mainRelease.signatureStatus = {
       status: ReleaseSignatureStatusCode.signedByUnknownKey,
       signatureProtocol: "ECDSA_256",
-      key: wallet.address,
+      key: wallet.address
     };
     expect(mainRelease.signatureStatus).to.deep.equal(expectedSignatureStatus);
   });

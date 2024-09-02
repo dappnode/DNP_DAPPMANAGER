@@ -1,11 +1,7 @@
 import { mapValues, isEmpty } from "lodash-es";
 import deepmerge from "deepmerge";
 import Ajv from "ajv";
-import {
-  UserSettingsAllDnps,
-  UserSettings,
-  SetupWizardAllDnps
-} from "@dappnode/types";
+import { UserSettingsAllDnps, UserSettings, SetupWizardAllDnps } from "@dappnode/types";
 import { SetupWizardFormDataReturn } from "../types";
 import { SetupSchema } from "@dappnode/types";
 import { SetupTargetAllDnps } from "types";
@@ -16,10 +12,8 @@ const ajv = new Ajv({ allErrors: true });
  * Extract setup target objects from the setupWizard
  * @param setupWizard
  */
-export function setupWizardToSetupTarget(
-  setupWizard: SetupWizardAllDnps
-): SetupTargetAllDnps {
-  return mapValues(setupWizard, setupWizardDnp =>
+export function setupWizardToSetupTarget(setupWizard: SetupWizardAllDnps): SetupTargetAllDnps {
+  return mapValues(setupWizard, (setupWizardDnp) =>
     setupWizardDnp.fields.reduce((targets, field) => {
       return { ...targets, [field.id]: field.target };
     }, {})
@@ -50,7 +44,6 @@ export function formDataToUserSettings(
       if (target && target.type)
         switch (target.type) {
           case "environment":
-            const envValue = value;
             if (target.name)
               /**
                * deepmerge function joins the properties of two objects
@@ -61,31 +54,26 @@ export function formDataToUserSettings(
               userSettings.environment = deepmerge(
                 userSettings.environment || {},
                 getServicesNames(target.service || dnpName, {
-                  [target.name]: envValue
+                  [target.name]: value
                 })
               );
             break;
 
           case "portMapping":
-            const hostPort = value;
             if (target.containerPort)
-              userSettings.portMappings = deepmerge(
-                userSettings.portMappings || {},
-                {
-                  [target.service || dnpName]: {
-                    [target.containerPort]: hostPort
-                  }
+              userSettings.portMappings = deepmerge(userSettings.portMappings || {}, {
+                [target.service || dnpName]: {
+                  [target.containerPort]: value
                 }
-              );
+              });
             break;
 
           case "namedVolumeMountpoint": {
             const mountpointHostPath = value;
             if (target.volumeName)
-              userSettings.namedVolumeMountpoints = deepmerge(
-                userSettings.namedVolumeMountpoints || {},
-                { [target.volumeName]: mountpointHostPath }
-              );
+              userSettings.namedVolumeMountpoints = deepmerge(userSettings.namedVolumeMountpoints || {}, {
+                [target.volumeName]: mountpointHostPath
+              });
             break;
           }
 
@@ -96,12 +84,10 @@ export function formDataToUserSettings(
           }
 
           case "fileUpload":
-            const fileDataUrl = value;
             if (target.path)
-              userSettings.fileUploads = deepmerge(
-                userSettings.fileUploads || {},
-                { [target.service || dnpName]: { [target.path]: fileDataUrl } }
-              );
+              userSettings.fileUploads = deepmerge(userSettings.fileUploads || {}, {
+                [target.service || dnpName]: { [target.path]: value }
+              });
             break;
         }
     }
@@ -138,26 +124,21 @@ export function userSettingsToFormData(
       if (target && target.type) {
         switch (target.type) {
           case "environment":
-            const serviceNames = target.service || dnpName;
             /**
              * The following loop check if the field service is an array or a string in order to
              * define an environment object with its properties
              *
              */
-            for (let service of Array.isArray(serviceNames)
-              ? serviceNames
-              : [serviceNames]) {
+            for (const service of Array.isArray(target.service) ? target.service : [target.service || dnpName]) {
               const environmentService = environment[service];
 
-              if (hasProperty(target.name, environmentService))
-                formDataDnp[propId] = environmentService[target.name];
+              if (hasProperty(target.name, environmentService)) formDataDnp[propId] = environmentService[target.name];
             }
             break;
 
           case "portMapping":
-            const portMappingsService = portMappings[target.service || dnpName];
-            if (hasProperty(target.containerPort, portMappingsService))
-              formDataDnp[propId] = portMappingsService[target.containerPort];
+            if (hasProperty(target.containerPort, portMappings[target.service || dnpName]))
+              formDataDnp[propId] = portMappings[target.service || dnpName][target.containerPort];
             break;
 
           case "namedVolumeMountpoint": {
@@ -172,9 +153,8 @@ export function userSettingsToFormData(
           }
 
           case "fileUpload":
-            const fileUploadsService = fileUploads[target.service || dnpName];
-            if (hasProperty(target.path, fileUploadsService))
-              formDataDnp[propId] = fileUploadsService[target.path];
+            if (hasProperty(target.path, fileUploads[target.service || dnpName]))
+              formDataDnp[propId] = fileUploads[target.service || dnpName][target.path];
             break;
         }
       }
@@ -195,7 +175,7 @@ export function filterActiveSetupWizard(
 ): SetupWizardAllDnps {
   return mapValues(setupWizard, (setupWizardDnp, dnpName) => ({
     ...setupWizardDnp,
-    fields: setupWizardDnp.fields.filter(field => {
+    fields: setupWizardDnp.fields.filter((field) => {
       if (field.if) {
         try {
           return ajv.validate(correctJsonSchema(field.if), formData[dnpName]);
@@ -213,10 +193,7 @@ export function filterActiveSetupWizard(
 /**
  * Util: Type-safe wrapper around `key in obj` which will be ok whatever type obj is
  */
-function hasProperty(
-  key: string,
-  obj: { [key: string]: string } | undefined
-): boolean {
+function hasProperty(key: string, obj: { [key: string]: string } | undefined): boolean {
   return Boolean(key && obj && key in obj);
 }
 
@@ -227,6 +204,7 @@ function hasProperty(
  * If it doesn't follow this structure, it will be forced
  * @param schemaOrProperties
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function correctJsonSchema(schemaOrProperties: any): SetupSchema {
   if (typeof schemaOrProperties.properties === "object") {
     const schema = schemaOrProperties;
@@ -252,9 +230,7 @@ export function isSetupWizardEmpty(setupWizard?: SetupWizardAllDnps): boolean {
   return (
     !setupWizard ||
     isEmpty(setupWizard) ||
-    Object.values(setupWizard).every(
-      setupWizardDnp => isEmpty(setupWizardDnp) || !setupWizardDnp.fields.length
-    )
+    Object.values(setupWizard).every((setupWizardDnp) => isEmpty(setupWizardDnp) || !setupWizardDnp.fields.length)
   );
 }
 
@@ -277,14 +253,9 @@ interface EnvVarObject<T> {
  *  @returns EnvVarObject
  */
 
-function getServicesNames<T>(
-  serviceNames: string | string[],
-  envValue: T
-): EnvVarObject<T> {
-  let envObj: EnvVarObject<T> = {};
-  for (let service of Array.isArray(serviceNames)
-    ? serviceNames
-    : [serviceNames]) {
+function getServicesNames<T>(serviceNames: string | string[], envValue: T): EnvVarObject<T> {
+  const envObj: EnvVarObject<T> = {};
+  for (const service of Array.isArray(serviceNames) ? serviceNames : [serviceNames]) {
     envObj[service] = envValue;
   }
   return envObj;

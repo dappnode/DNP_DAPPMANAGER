@@ -13,24 +13,20 @@ import { restartDappmanagerPatch } from "./restartPatch.js";
  * @param packagesData
  * @param log
  */
-export async function rollbackPackages(
-  packagesData: InstallPackageDataPaths[],
-  log: Log
-): Promise<void> {
+export async function rollbackPackages(packagesData: InstallPackageDataPaths[], log: Log): Promise<void> {
   // Restore all backup composes. Do it first to make sure the next version compose is not
   // used unintentionally if the installed package is restored
   for (const pkg of packagesData)
     for (const { from, to } of [
       { from: pkg.composeBackupPath, to: pkg.composePath },
-      { from: pkg.manifestBackupPath, to: pkg.manifestPath },
+      { from: pkg.manifestBackupPath, to: pkg.manifestPath }
     ])
       try {
         // Don't use rename as it fails if paths are in different file systems (docker volume / docker container)
         fs.copyFileSync(from, to);
         fs.unlinkSync(from);
       } catch (e) {
-        if (!isNotFoundError(e) || pkg.isUpdate)
-          logs.error(`Rollback error restoring ${pkg.dnpName} ${from}`, e);
+        if (!isNotFoundError(e) || pkg.isUpdate) logs.error(`Rollback error restoring ${pkg.dnpName} ${from}`, e);
       }
 
   // Delete image files

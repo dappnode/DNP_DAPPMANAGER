@@ -19,21 +19,21 @@ const thresholds: TemperatureThreshold[] = [
     type: "warning",
     celsius: 95,
     title: "CPU temperature is too high",
-    body: "The CPU temperature has consistently been at a warning level of 95ºC, you can ommit this waring if your dappnode is syncinga blockchain, its temperature should decrease once synced.",
+    body: "The CPU temperature has consistently been at a warning level of 95ºC, you can ommit this waring if your dappnode is syncinga blockchain, its temperature should decrease once synced."
   },
   {
     id: "cpuTemperature-danger",
     type: "danger",
     celsius: 100,
     title: "CPU temperature is too high",
-    body: "The CPU temperature is at a dangerous level of 100ºC. An unexpected shutdown might occur.",
-  },
+    body: "The CPU temperature is at a dangerous level of 100ºC. An unexpected shutdown might occur."
+  }
 ];
 
 // Store temperature exceedances
 const temperatureRecords: Record<string, TemperatureRecord> = {
   "cpuTemperature-warning": { lastEmit: 0, count: 0 },
-  "cpuTemperature-danger": { lastEmit: 0, count: 0 },
+  "cpuTemperature-danger": { lastEmit: 0, count: 0 }
 };
 
 const HOUR_IN_MS = 3600000; // 60 minutes * 60 seconds * 1000 milliseconds
@@ -84,7 +84,7 @@ function emitNotification(threshold: TemperatureThreshold): void {
     id: threshold.id,
     type: threshold.type,
     title: threshold.title,
-    body: threshold.body,
+    body: threshold.body
   });
 }
 
@@ -93,9 +93,5 @@ function emitNotification(threshold: TemperatureThreshold): void {
  * Checks CPU temperature and emit events if it's too high.
  */
 export function startTemperatureDaemon(signal: AbortSignal): void {
-  runAtMostEvery(
-    async () => monitorCpuTemperature(),
-    params.TEMPERATURE_DAEMON_INTERVAL,
-    signal
-  );
+  runAtMostEvery(async () => monitorCpuTemperature(), params.TEMPERATURE_DAEMON_INTERVAL, signal);
 }

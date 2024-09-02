@@ -5,21 +5,15 @@ import { AppThunk } from "store";
 
 // Service > dnpDirectory
 
-export const setDnpDirectory = createAction<DirectoryItem[]>(
-  "dnpDirectory/set"
-);
+export const setDnpDirectory = createAction<DirectoryItem[]>("dnpDirectory/set");
 
-export const updateDnpDirectory = createAction<DirectoryItem[]>(
-  "dnpDirectory/update"
-);
+export const updateDnpDirectory = createAction<DirectoryItem[]>("dnpDirectory/update");
 
-export const updateStatus = createAction<RequestStatus>(
-  "dnpDirectory/updateStatus"
-);
+export const updateStatus = createAction<RequestStatus>("dnpDirectory/updateStatus");
 
 // Redux-thunk actions
 
-export const fetchDnpDirectory = (): AppThunk => async dispatch => {
+export const fetchDnpDirectory = (): AppThunk => async (dispatch) => {
   try {
     dispatch(updateStatus({ loading: true }));
     const directory = await api.fetchDirectory();

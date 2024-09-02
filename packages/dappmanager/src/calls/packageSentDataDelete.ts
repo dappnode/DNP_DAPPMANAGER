@@ -4,13 +4,7 @@ import { eventBus } from "@dappnode/eventbus";
 /**
  * Delete package sent data key
  */
-export async function packageSentDataDelete({
-  dnpName,
-  key
-}: {
-  dnpName: string;
-  key?: string;
-}): Promise<void> {
+export async function packageSentDataDelete({ dnpName, key }: { dnpName: string; key?: string }): Promise<void> {
   let packageData = db.packageSentData.get(dnpName);
 
   if (!packageData) {

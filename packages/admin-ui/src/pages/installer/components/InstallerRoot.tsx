@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Routes,
-  Route,
-  NavLink,
-  useNavigate,
-  useLocation
-} from "react-router-dom";
+import { Routes, Route, NavLink, useNavigate, useLocation } from "react-router-dom";
 // Components
 import InstallDnpContainer from "./InstallDnpContainer";
 import { title, subPaths } from "../data";
@@ -24,6 +18,7 @@ const InstallerRoot: React.FC = () => {
     name: string;
     subPath: string;
     subLink: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
   }[] = [
     {
@@ -64,6 +59,7 @@ const InstallerRoot: React.FC = () => {
         })
       );
       navigate("/installer/public");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       // do nothing
     }
@@ -80,13 +76,11 @@ const InstallerRoot: React.FC = () => {
 
       {!hideNavbar && (
         <div className="horizontal-navbar">
-          {routes.map(option => (
+          {routes.map((option) => (
             <button
               key={option.subPath}
               className="item-container"
-              onClick={
-                option.subLink === "public" ? confirmPublicDappstore : undefined
-              }
+              onClick={option.subLink === "public" ? confirmPublicDappstore : undefined}
             >
               <NavLink
                 to={option.subLink}
@@ -94,11 +88,7 @@ const InstallerRoot: React.FC = () => {
                 style={{
                   whiteSpace: "nowrap"
                 }}
-                onClick={
-                  option.subLink === "public"
-                    ? confirmPublicDappstore
-                    : undefined
-                }
+                onClick={option.subLink === "public" ? confirmPublicDappstore : undefined}
               >
                 {option.name}
               </NavLink>
@@ -108,7 +98,7 @@ const InstallerRoot: React.FC = () => {
       )}
 
       <Routes>
-        {routes.map(route => (
+        {routes.map((route) => (
           <Route
             key={route.subPath}
             path={route.subPath}

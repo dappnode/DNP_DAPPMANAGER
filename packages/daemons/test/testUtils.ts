@@ -4,9 +4,7 @@ import { ethers } from "ethers";
 
 export const dappnodeInstaller = new DappnodeInstaller(
   "https://api.ipfs.dappnode.io",
-  new ethers.JsonRpcProvider(
-    `https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`
-  )
+  new ethers.JsonRpcProvider(`https://mainnet.infura.io/v3/${process.env.INFURA_MAINNET_KEY}`)
 );
 
 export const mockDnpName = "mock-dnp.dnp.dappnode.eth";
@@ -36,7 +34,7 @@ export const mockContainer: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  avatarUrl: "",
+  avatarUrl: ""
 };
 
 export const mockDnp: InstalledPackageData = {
@@ -48,5 +46,5 @@ export const mockDnp: InstalledPackageData = {
   dependencies: {},
   origin: "",
   avatarUrl: "",
-  containers: [mockContainer],
+  containers: [mockContainer]
 };

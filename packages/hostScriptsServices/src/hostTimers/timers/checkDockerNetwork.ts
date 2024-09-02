@@ -7,7 +7,7 @@ import { runTimer } from "../runTimer.js";
 export async function checkDockerNetwork(): Promise<void> {
   const response = await runTimer({
     name: "check-docker-network.timer",
-    dependantService: "check-docker-network.service",
+    dependantService: "check-docker-network.service"
   });
   logs.info(`Successfully started checker docker network service ${response}`);
 }

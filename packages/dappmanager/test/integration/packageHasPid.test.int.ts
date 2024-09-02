@@ -2,11 +2,7 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import { mockPackageData, shellSafe } from "../testUtils.js";
-import {
-  packageToInstallHasPid,
-  getServicesSharingPid,
-  ComposeServicesSharingPid
-} from "@dappnode/utils";
+import { packageToInstallHasPid, getServicesSharingPid, ComposeServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 describe("Module > compose > pid", () => {
@@ -101,8 +97,6 @@ volumes:
       dependantPidServices: ["rpcdaemon"]
     };
 
-    expect(getServicesSharingPid(compose.compose)).to.deep.equal(
-      expectedResult
-    );
+    expect(getServicesSharingPid(compose.compose)).to.deep.equal(expectedResult);
   });
 });

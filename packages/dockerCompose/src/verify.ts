@@ -28,8 +28,7 @@ function verifyServiceVolumes(volumes: string[]): void {
 
   for (const vol of volumes) {
     try {
-      if (typeof vol !== "string")
-        throw Error("service.volumes items must be strings, use short syntax");
+      if (typeof vol !== "string") throw Error("service.volumes items must be strings, use short syntax");
       const [host, container] = vol.split(/:(.*)/);
       if (!host) throw Error("volume host not defined");
       if (!container) throw Error("container path not defined");
@@ -45,13 +44,9 @@ function verifyServicePorts(ports: string[]): void {
   const portMappings = parsePortMappings(ports);
   for (const portMapping of portMappings) {
     if (portMapping.container > maxPortNumber)
-      throw Error(
-        `Port mapping container ${portMapping.container} is over the max ${maxPortNumber}`
-      );
+      throw Error(`Port mapping container ${portMapping.container} is over the max ${maxPortNumber}`);
     if (portMapping.host && portMapping.host > maxPortNumber)
-      throw Error(
-        `Port mapping host ${portMapping.host} is over the max ${maxPortNumber}`
-      );
+      throw Error(`Port mapping host ${portMapping.host} is over the max ${maxPortNumber}`);
   }
 }
 
@@ -62,7 +57,6 @@ function verifyServicePorts(ports: string[]): void {
  * ```
  */
 const assertNoSubstitution = applyRecursivelyToStringValues((value, key) => {
-  if (value.includes("${"))
-    throw Error(`variable substitution not allowed: '${key}': '${value}'`);
+  if (value.includes("${")) throw Error(`variable substitution not allowed: '${key}': '${value}'`);
   return value;
 });

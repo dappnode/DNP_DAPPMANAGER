@@ -73,10 +73,7 @@ describe.skip("Notifications", async () => {
 
   it("Should retrieve notifications", async () => {
     const result = await calls.notificationsGet();
-    expect(result).to.have.length.greaterThan(
-      0,
-      "There should be one notification"
-    );
+    expect(result).to.have.length.greaterThan(0, "There should be one notification");
     id = result[0].id;
   });
 
@@ -84,7 +81,7 @@ describe.skip("Notifications", async () => {
     if (!id) throw Error("Previous test failed");
     await calls.notificationsRemove({ ids: [id] });
     const result = await calls.notificationsGet();
-    const deletedNotification = result.find(n => n.id === id);
+    const deletedNotification = result.find((n) => n.id === id);
     if (deletedNotification) {
       logs.info("deletedNotification", result);
       throw Error(`Notification id ${id} was not deleted`);

@@ -1,10 +1,6 @@
 import { expect } from "chai";
 import { parseExposableServiceManifest } from "../../src/exposable/parseExposable.js";
-import {
-  ExposableServiceInfo,
-  ExposableServiceManifestInfo,
-  InstalledPackageData,
-} from "@dappnode/types";
+import { ExposableServiceInfo, ExposableServiceManifestInfo, InstalledPackageData } from "@dappnode/types";
 import { mockDnp, mockContainer } from "../testUtils.js";
 
 describe("modules / https-portal / exposable", () => {
@@ -12,7 +8,7 @@ describe("modules / https-portal / exposable", () => {
     const manifestExposable: ExposableServiceManifestInfo[] = [
       { name: "name1", port: 1111 },
       { broken: true } as unknown as ExposableServiceManifestInfo,
-      { name: "name3", description: "desc3", serviceName: "serv3", port: 3333 },
+      { name: "name3", description: "desc3", serviceName: "serv3", port: 3333 }
     ];
 
     const dnpName = "mock-dnp.dnp.dappnode.eth";
@@ -20,7 +16,7 @@ describe("modules / https-portal / exposable", () => {
     const dnp: InstalledPackageData = {
       ...mockDnp,
       dnpName,
-      containers: [{ ...mockContainer, serviceName }],
+      containers: [{ ...mockContainer, serviceName }]
     };
 
     const expectedExposable: ExposableServiceInfo[] = [
@@ -30,7 +26,7 @@ describe("modules / https-portal / exposable", () => {
         description: "",
         dnpName: "mock-dnp.dnp.dappnode.eth",
         serviceName: "mock-dnp.dnp.dappnode.eth",
-        port: 1111,
+        port: 1111
       },
       {
         fromSubdomain: "serv-mock-dnp",
@@ -38,8 +34,8 @@ describe("modules / https-portal / exposable", () => {
         description: "desc3",
         dnpName: "mock-dnp.dnp.dappnode.eth",
         serviceName: "serv3",
-        port: 3333,
-      },
+        port: 3333
+      }
     ];
 
     const exposable = parseExposableServiceManifest(dnp, manifestExposable);

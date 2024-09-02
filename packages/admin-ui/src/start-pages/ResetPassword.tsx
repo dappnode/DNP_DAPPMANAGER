@@ -11,11 +11,7 @@ import Ok from "components/Ok";
 import { docsUrl } from "params";
 import LinkDocs from "components/LinkDocs";
 
-export function ResetPassword({
-  onSuccessfulReset
-}: {
-  onSuccessfulReset: () => void;
-}) {
+export function ResetPassword({ onSuccessfulReset }: { onSuccessfulReset: () => void }) {
   const [token, setToken] = useState("");
   const [reqStatus, setReqStatus] = useState<ReqStatus>({});
 
@@ -32,18 +28,13 @@ export function ResetPassword({
 
   return (
     <StandaloneContainer TopIcon={BsLock} title="Reset">
-      <div className="text">
-        Use your recovery token to reset the admin password and register again
-      </div>
+      <div className="text">Use your recovery token to reset the admin password and register again</div>
 
       <Alert variant="warning">
-        If you have lost your password and recovery token you have to directly access your
-        machine via SSH or by connecting a keyboard and screen and follow this
-        guide
+        If you have lost your password and recovery token you have to directly access your machine via SSH or by
+        connecting a keyboard and screen and follow this guide
         <br />
-        <LinkDocs href={docsUrl.recoverPasswordGuide}>
-          Reset your Dappnode admin password
-        </LinkDocs>
+        <LinkDocs href={docsUrl.recoverPasswordGuide}>Reset your Dappnode admin password</LinkDocs>
       </Alert>
 
       <InputForm

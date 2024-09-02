@@ -13,10 +13,7 @@ const dappmanager = params.dappmanagerDnpName;
  *   volumes, so the packages have to be ordered
  * @param packagesData
  */
-export function orderInstallPackages(
-  packagesData: InstallPackageData[],
-  requestName: string
-): InstallPackageData[] {
+export function orderInstallPackages(packagesData: InstallPackageData[], requestName: string): InstallPackageData[] {
   // Generic order, by name and the dappmanager the last
   const basicOrder = packagesData
     .sort((a, b) => a.dnpName.localeCompare(b.dnpName))
@@ -32,9 +29,7 @@ export function orderInstallPackages(
   const requestPkg = packagesData.find((pkg) => pkg.dnpName === requestName);
   if (requestPkg && requestPkg.manifest.runOrder?.length) {
     const runOrder = requestPkg.manifest.runOrder;
-    return basicOrder.sort(
-      (a, b) => runOrder.indexOf(a.dnpName) - runOrder.indexOf(b.dnpName)
-    );
+    return basicOrder.sort((a, b) => runOrder.indexOf(a.dnpName) - runOrder.indexOf(b.dnpName));
   }
 
   // Order by volume dependencies

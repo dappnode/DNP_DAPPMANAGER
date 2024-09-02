@@ -25,21 +25,13 @@ export default function WifiCredentials(): JSX.Element {
 
   useEffect(() => {
     if (wifiCredentials.data?.ssid) setSsid(wifiCredentials.data.ssid);
-    if (wifiCredentials.data?.password)
-      setPassword(wifiCredentials.data.password);
+    if (wifiCredentials.data?.password) setPassword(wifiCredentials.data.password);
   }, [wifiCredentials.data]);
 
-  const ssidError =
-    validateDockerEnv(ssid, "SSID") || validateMinLength(ssid, "SSID");
+  const ssidError = validateDockerEnv(ssid, "SSID") || validateMinLength(ssid, "SSID");
   const passwordError = validateStrongPasswordAsDockerEnv(password);
   const password2Error = validatePasswordsMatch(password, password2);
-  const isValid =
-    ssid &&
-    password &&
-    password2 &&
-    !ssidError &&
-    !passwordError &&
-    !password2Error;
+  const isValid = ssid && password && password2 && !ssidError && !passwordError && !password2Error;
 
   async function onChangeCredentials() {
     const envs = {
@@ -100,12 +92,7 @@ export default function WifiCredentials(): JSX.Element {
                 }
               ]}
             >
-              <Button
-                type="submit"
-                variant="dappnode"
-                disabled={!isValid}
-                onClick={() => onChangeCredentials()}
-              >
+              <Button type="submit" variant="dappnode" disabled={!isValid} onClick={() => onChangeCredentials()}>
                 Change credentials
               </Button>
             </InputForm>

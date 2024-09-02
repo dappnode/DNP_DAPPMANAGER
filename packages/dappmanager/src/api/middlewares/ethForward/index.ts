@@ -32,9 +32,5 @@ function parseEthDomainHost(req: express.Request): string | null {
   // - my.dappmanager.dnp.dappnode.eth => false
   // - my.dappnode => false
   const domain = req.headers.host;
-  return typeof domain === "string" &&
-    domain.endsWith(".eth") &&
-    !domain.endsWith("dnp.dappnode.eth")
-    ? domain
-    : null;
+  return typeof domain === "string" && domain.endsWith(".eth") && !domain.endsWith("dnp.dappnode.eth") ? domain : null;
 }

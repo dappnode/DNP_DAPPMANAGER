@@ -1,19 +1,11 @@
 import fs from "fs";
 import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  dockerComposeDown,
-  dockerComposeUp,
-  DockerComposeUpOptions,
-} from "./compose/index.js";
+import { dockerComposeDown, dockerComposeUp, DockerComposeUpOptions } from "./compose/index.js";
 import { listPackageNoThrow } from "./list/index.js";
 import { getDockerTimeoutMax } from "./utils.js";
 import { logs } from "@dappnode/logger";
-import {
-  ContainersStatus,
-  InstalledPackageData,
-  PackageContainer,
-} from "@dappnode/types";
+import { ContainersStatus, InstalledPackageData, PackageContainer } from "@dappnode/types";
 import { getDockerComposePathSmart } from "@dappnode/utils";
 
 interface ComposeUpArgs {
@@ -41,26 +33,17 @@ export async function dockerComposeUpPackage(
   // because it adds a lot of complexity to create a new module for it.
 
   // Add timeout option if not previously specified
-  const timeout = containersStatus
-    ? getDockerTimeoutMax(Object.values(containersStatus))
-    : undefined;
-  if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout)
-    dockerComposeUpOptions.timeout = timeout;
+  const timeout = containersStatus ? getDockerTimeoutMax(Object.values(containersStatus)) : undefined;
+  if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout) dockerComposeUpOptions.timeout = timeout;
 
   // Check the current status of package's container if any
   const serviceNames: string[] = readComposeServiceNames(composePath);
   const servicesToStart = serviceNames.filter(
-    (serviceName) =>
-      containersStatus &&
-      containersStatus[serviceName]?.targetStatus !== "stopped"
+    (serviceName) => containersStatus && containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
   try {
-    if (
-      upAll ||
-      serviceNames.length === servicesToStart.length ||
-      dnpName === params.coreDnpName
-    ) {
+    if (upAll || serviceNames.length === servicesToStart.length || dnpName === params.coreDnpName) {
       // Run docker-compose up on all services for:
       // - packages with all services running
       // - core package, it must be executed always. No matter the previous status
@@ -70,21 +53,17 @@ export async function dockerComposeUpPackage(
       // then start only those that are running
       await dockerComposeUp(composePath, {
         ...dockerComposeUpOptions,
-        noStart: true,
+        noStart: true
       });
       if (servicesToStart.length > 0) {
         await dockerComposeUp(composePath, {
           ...dockerComposeUpOptions,
-          serviceNames: servicesToStart,
+          serviceNames: servicesToStart
         });
       }
     }
   } catch (e) {
-    if (
-      e.message.includes(
-        "Renaming a container with the same name as its current name"
-      )
-    ) {
+    if (e.message.includes("Renaming a container with the same name as its current name")) {
       // Catch error: Error response from daemon: Renaming a container with the same name as its current name
       // Ref: https://github.com/docker/compose/issues/6704
       logs.info("Catch error renaming container with the same name");
@@ -109,7 +88,7 @@ function readComposeServiceNames(composePath: string): string[] {
  */
 export async function getContainersStatus({
   dnpName,
-  dnp,
+  dnp
 }: {
   dnpName: string;
   dnp?: InstalledPackageData | null;
@@ -128,7 +107,7 @@ export async function getContainersStatus({
     dnp.containers.map(async (container) => {
       containersStatus[container.serviceName] = {
         targetStatus: await getContainerTargetStatus(container),
-        dockerTimeout: container.dockerTimeout,
+        dockerTimeout: container.dockerTimeout
       };
     })
   );
@@ -143,9 +122,7 @@ export async function getContainersStatus({
  * - Not started: status === created
  * @param container
  */
-async function getContainerTargetStatus(
-  container: PackageContainer
-): Promise<"stopped" | "running"> {
+async function getContainerTargetStatus(container: PackageContainer): Promise<"stopped" | "running"> {
   if (params.corePackagesThatMustBeRunning.includes(container.dnpName)) {
     return "running";
   }

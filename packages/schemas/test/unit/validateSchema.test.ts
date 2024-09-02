@@ -1,9 +1,5 @@
 import { expect } from "chai";
-import {
-  validateComposeSchema,
-  validateManifestSchema,
-  validateSetupWizardSchema,
-} from "../../src/index.js";
+import { validateComposeSchema, validateManifestSchema, validateSetupWizardSchema } from "../../src/index.js";
 import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
@@ -25,19 +21,16 @@ describe("schemaValidation", () => {
         globalEnvs: [
           {
             services: ["web3signer", "ui"],
-            envs: [
-              "_DAPPNODE_GLOBAL_INTERNAL_IP",
-              "_DAPPNODE_GLOBAL_PUBLIC_IP",
-            ],
+            envs: ["_DAPPNODE_GLOBAL_INTERNAL_IP", "_DAPPNODE_GLOBAL_PUBLIC_IP"]
           },
           {
             services: ["db"],
-            envs: ["_DAPPNODE_GLOBAL_PUBKEY"],
-          },
+            envs: ["_DAPPNODE_GLOBAL_PUBKEY"]
+          }
         ],
         chain: {
-          driver: "ethereum",
-        },
+          driver: "ethereum"
+        }
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
@@ -51,8 +44,8 @@ describe("schemaValidation", () => {
         type: "dncore",
         license: "1",
         chain: {
-          driver: "ethereum",
-        },
+          driver: "ethereum"
+        }
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
@@ -65,7 +58,7 @@ describe("schemaValidation", () => {
         description: "",
         type: "dncore",
         license: "1",
-        chain: "ethereum",
+        chain: "ethereum"
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
@@ -79,7 +72,7 @@ describe("schemaValidation", () => {
         description: "",
         type: "dncore",
         license: "1",
-        chain: "notAllowed",
+        chain: "notAllowed"
       };
 
       expect(() => validateManifestSchema(manifest as Manifest)).to.throw();
@@ -125,9 +118,7 @@ volumes:
   validator-data: {}`;
       const validComposePath = path.join(testDir, "valid-docker-compose.yml");
       fs.writeFileSync(validComposePath, validCompose);
-      expect(
-        async () => await validateComposeSchema([validComposePath])
-      ).to.not.throw();
+      expect(async () => await validateComposeSchema([validComposePath])).to.not.throw();
     });
 
     it("should throw error with an invalid compose", async () => {
@@ -173,15 +164,10 @@ volumes:
   web3signer_data: {}
   postgres_data: {}
   postgres_migrations: {}`;
-      const invalidComposePath = path.join(
-        testDir,
-        "invalid-docker-compose.yml"
-      );
+      const invalidComposePath = path.join(testDir, "invalid-docker-compose.yml");
       fs.writeFileSync(invalidComposePath, invalidCompose);
 
-      const error = await validateComposeSchema([invalidComposePath]).catch(
-        (e) => e
-      );
+      const error = await validateComposeSchema([invalidComposePath]).catch((e) => e);
       console.log(error);
       const expectedErrorMessage = `Invalid compose`;
       expect(error.message).to.include(expectedErrorMessage);
@@ -235,9 +221,7 @@ volumes:
       fs.writeFileSync(validComposePath1, validCompose1);
       fs.writeFileSync(validComposePath2, validCompose2);
 
-      expect(
-        async () => await validateComposeSchema([validComposePath1, validComposePath2])
-      ).to.not.throw();
+      expect(async () => await validateComposeSchema([validComposePath1, validComposePath2])).to.not.throw();
     });
   });
 
@@ -255,48 +239,47 @@ volumes:
             target: {
               type: "environment",
               name: "GRAFFITI",
-              service: "validator",
+              service: "validator"
             },
             title: "Graffiti",
             maxLength: 32,
-            description:
-              "Add a string to your proposed blocks, which will be seen on the block explorer",
+            description: "Add a string to your proposed blocks, which will be seen on the block explorer"
           },
           {
             id: "HTTP_WEB3PROVIDER",
             target: {
               type: "environment",
               name: "HTTP_WEB3PROVIDER",
-              service: ["validator", "beacon-chain"],
+              service: ["validator", "beacon-chain"]
             },
             title: "Eth1.x node URL",
-            description: "URL to the Eth1.x node need for the Beacon chain.",
+            description: "URL to the Eth1.x node need for the Beacon chain."
           },
           {
             id: "web3Backup",
             target: {
               type: "environment",
               name: "WEB3_BACKUP",
-              service: "beacon-chain",
+              service: "beacon-chain"
             },
             title: "Add a backup web3 provider",
             description:
               "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-            required: false,
+            required: false
           },
           {
             id: "checkpointSyncUrl",
             target: {
               type: "environment",
               name: "CHECKPOINT_SYNC_URL",
-              service: "beacon-chain",
+              service: "beacon-chain"
             },
             title: "Checkpoint for fast sync",
             description:
               "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-            required: false,
-          },
-        ],
+            required: false
+          }
+        ]
       } as SetupWizard;
 
       expect(() => validateSetupWizardSchema(validSetupWizard)).to.not.throw();
@@ -311,56 +294,53 @@ volumes:
             target: {
               type: "environment",
               name: "GRAFFITI",
-              service: "validator",
+              service: "validator"
             },
             title: "Graffiti",
             maxLength: 32,
-            description:
-              "Add a string to your proposed blocks, which will be seen on the block explorer",
+            description: "Add a string to your proposed blocks, which will be seen on the block explorer"
           },
           {
             id: "HTTP_WEB3PROVIDER",
             target: {
               type: "environment",
               name: "HTTP_WEB3PROVIDER",
-              service: "beacon-chain",
+              service: "beacon-chain"
             },
             title: "Eth1.x node URL",
-            description: "URL to the Eth1.x node need for the Beacon chain.",
+            description: "URL to the Eth1.x node need for the Beacon chain."
           },
           {
             id: "web3Backup",
             target: {
               type: "environment",
               name: "WEB3_BACKUP",
-              service: "beacon-chain",
+              service: "beacon-chain"
             },
             title: "Add a backup web3 provider",
             description:
               "It's a good idea to add a backup web3 provider in case your main one goes down. For example, if your primary EL client is a local Geth, but you want to use Infura as a backup. Get your web3 backup from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-            required: false,
+            required: false
           },
           {
             id: "checkpointSyncUrl",
             target: {
               type: "environment",
               name: "CHECKPOINT_SYNC_URL",
-              service: "beacon-chain",
+              service: "beacon-chain"
             },
             title: "Checkpoint for fast sync",
             description:
               "To get Prysm up and running in only a few minutes, you can start Prysm from a recent finalized checkpoint state rather than syncing from genesis. This is substantially **faster** and consumes **less resources** than syncing from genesis, while still providing all the same features. Be sure you are using a trusted node for the fast sync. Check [Prysm docs](https://docs.prylabs.network/docs/prysm-usage/parameters/) Get your checkpoint sync from [infura](https://infura.io/) (i.e https://XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX@eth2-beacon-prater.infura.io)",
-            required: false,
+            required: false
           },
           {
-            notAllowed: "random",
-          },
-        ],
+            notAllowed: "random"
+          }
+        ]
       } as SetupWizard;
 
-      expect(() =>
-        validateSetupWizardSchema(invalidSetupWizardString)
-      ).to.throw();
+      expect(() => validateSetupWizardSchema(invalidSetupWizardString)).to.throw();
     });
 
     it("should throw error with an empty service array in setupWizard", () => {
@@ -372,14 +352,13 @@ volumes:
             target: {
               type: "environment",
               name: "GRAFFITI",
-              service: [],
+              service: []
             },
             title: "Graffiti",
             maxLength: 32,
-            description:
-              "Add a string to your proposed blocks, which will be seen on the block explorer",
-          },
-        ],
+            description: "Add a string to your proposed blocks, which will be seen on the block explorer"
+          }
+        ]
       } as unknown as SetupWizard;
 
       expect(() => validateSetupWizardSchema(invalidSetupWizard)).to.throw();
@@ -420,7 +399,8 @@ volumes:
     });
 
     it("should not allow a manifest with upstream settings defined in both possible ways", () => {
-      const manifest: Manifest = {  // Using 'any' to bypass TypeScript checks for invalid schema
+      const manifest: Manifest = {
+        // Using 'any' to bypass TypeScript checks for invalid schema
         name: "example.dnp.dappnode.eth",
         version: "1.0.0",
         description: "A sample DAppNode package",
@@ -452,6 +432,5 @@ volumes:
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
     });
-
   });
 });

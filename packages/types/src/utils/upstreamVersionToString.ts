@@ -1,11 +1,13 @@
 import { UpstreamItem } from "../manifest.js";
 
 export const upstreamVersionToString = ({
-    upstreamVersion,
-    upstream
+  upstreamVersion,
+  upstream
 }: {
-    upstreamVersion?: string;
-    upstream?: UpstreamItem[];
+  upstreamVersion?: string;
+  upstream?: UpstreamItem[];
 }): string | undefined => {
-    return upstreamVersion ? upstreamVersion : upstream && upstream.map(item => `${item.repo}@${item.version}`).join(", ");
-}
+  return upstreamVersion
+    ? upstreamVersion
+    : upstream && upstream.map((item) => `${item.repo}@${item.version}`).join(", ");
+};

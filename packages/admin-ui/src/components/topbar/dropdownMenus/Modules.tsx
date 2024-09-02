@@ -4,17 +4,9 @@ import { docsUrl } from "params";
 import BaseDropdown from "./BaseDropdown";
 import { RiSoundModuleFill } from "react-icons/ri";
 
-export default function Modules({
-  modulesContext
-}: {
-  modulesContext: ModulesContext;
-}) {
-  const {
-    stakersModuleStatus,
-    rollupsModuleStatus,
-    toggleStakersModuleStatus,
-    toggleRollupsModuleStatus
-  } = modulesContext;
+export default function Modules({ modulesContext }: { modulesContext: ModulesContext }) {
+  const { stakersModuleStatus, rollupsModuleStatus, toggleStakersModuleStatus, toggleRollupsModuleStatus } =
+    modulesContext;
 
   return (
     <BaseDropdown

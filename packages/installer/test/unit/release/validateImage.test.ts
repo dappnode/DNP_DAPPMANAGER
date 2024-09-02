@@ -2,11 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import path from "path";
 import fs from "fs";
-import {
-  testDir,
-  createTestDir,
-  cleanTestDir,
-} from "../../../../dappmanager/test/testUtils.js";
+import { testDir, createTestDir, cleanTestDir } from "../../../../dappmanager/test/testUtils.js";
 import { validateTarImage } from "../../../src/installer/downloadImages.js";
 
 describe("validateTarImage", () => {

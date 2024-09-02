@@ -11,7 +11,7 @@ let apiStarted = false;
 export const apiRpc: IApiRpc = {
   async call<R>(payload: RpcPayload) {
     const socket = setupSocket();
-    return await new Promise<RpcResponse<R>>(resolve => {
+    return await new Promise<RpcResponse<R>>((resolve) => {
       socket.emit("rpc", payload, resolve);
     });
   },
@@ -26,7 +26,7 @@ export const apiRpc: IApiRpc = {
 
     const socket = setupSocket();
 
-    socket.on("connect", function() {
+    socket.on("connect", function () {
       for (const route of Object.keys(subscriptionsData)) {
         socket.on(route, (...args: Args) => {
           apiEventBridge.emit(route, ...args);
@@ -53,7 +53,6 @@ export const apiRpc: IApiRpc = {
 
 function setupSocket(): Socket {
   if (!socketGlobal) {
-    /* eslint-disable-next-line no-console */
     console.log("Connecting API with Socket.io to", socketIoUrl);
     socketGlobal = io(socketIoUrl);
   }

@@ -1,10 +1,7 @@
 import { PackageContainer } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { listPackageContainers } from "@dappnode/dockerapi";
-import {
-  signDataFromPackage,
-  getAddressFromPrivateKey
-} from "../../utils/index.js";
+import { signDataFromPackage, getAddressFromPrivateKey } from "../../utils/index.js";
 import { HttpError, wrapHandler } from "../utils.js";
 
 type Params = Record<string, unknown>;
@@ -16,7 +13,7 @@ export const sign = wrapHandler<Params>(async (req, res) => {
   const data = req.body as string | undefined;
 
   try {
-    if (typeof data === undefined) throw Error("missing");
+    if (typeof data === "undefined") throw Error("missing");
     if (typeof data !== "string") throw Error("must be a string");
     if (!data) throw Error("must not be empty");
   } catch (e) {
@@ -47,9 +44,8 @@ export const sign = wrapHandler<Params>(async (req, res) => {
 export async function getDnpFromIp(ip: string): Promise<PackageContainer> {
   const ipv4 = ip.replace("::ffff:", "");
   const dnps = await listPackageContainers();
-  const dnp = dnps.find(_dnp => _dnp.ip === ipv4);
-  if (!dnp)
-    throw new HttpError({ statusCode: 405, name: `No DNP with ip ${ipv4}` });
+  const dnp = dnps.find((_dnp) => _dnp.ip === ipv4);
+  if (!dnp) throw new HttpError({ statusCode: 405, name: `No DNP with ip ${ipv4}` });
 
   return dnp;
 }

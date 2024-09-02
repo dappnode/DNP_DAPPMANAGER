@@ -1,14 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { api } from "api";
 import { useDispatch } from "react-redux";
-import {
-  Routes,
-  Route,
-  useNavigate,
-  useLocation,
-  useParams,
-  NavLink
-} from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, useParams, NavLink } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
 import { difference } from "utils/lodashExtended";
 import { prettyDnpName, isDnpVerified } from "utils/format";
@@ -34,10 +27,7 @@ import Warnings from "./Steps/Warnings";
 import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
 import Button from "components/Button";
-import {
-  pathName as systemPathName,
-  subPaths as systemSubPaths
-} from "pages/system/data";
+import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -49,10 +39,7 @@ interface InstallDnpViewProps {
  * or do it with caution. The size of userSetFormData stringified is not found
  */
 
-const InstallDnpView: React.FC<InstallDnpViewProps> = ({
-  dnp,
-  progressLogs
-}) => {
+const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams();
@@ -66,24 +53,13 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
   const [isInstalling, setIsInstalling] = useState(false);
   const dispatch = useDispatch();
 
-  const {
-    dnpName,
-    reqVersion,
-    semVersion,
-    settings,
-    manifest,
-    setupWizard,
-    isInstalled,
-    installedVersion
-  } = dnp;
+  const { dnpName, reqVersion, semVersion, settings, manifest, setupWizard, isInstalled, installedVersion } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
   const areUpdateWarnings =
-    manifest.warnings?.onPatchUpdate ||
-    manifest.warnings?.onMinorUpdate ||
-    manifest.warnings?.onMajorUpdate;
+    manifest.warnings?.onPatchUpdate || manifest.warnings?.onMinorUpdate || manifest.warnings?.onMajorUpdate;
   const isCore = manifest.type === "dncore";
   const permissions = dnp.specialPermissions;
-  const hasPermissions = Object.values(permissions).some(p => p.length > 0);
+  const hasPermissions = Object.values(permissions).some((p) => p.length > 0);
   const requiresCoreUpdate = dnp.compatible.requiresCoreUpdate;
   const requiresDockerUpdate = dnp.compatible.requiresDockerUpdate;
   const packagesToBeUninstalled = dnp.compatible.packagesToBeUninstalled;
@@ -102,15 +78,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     };
   }, []); // Using an empty dependency array ensures this only runs on unmount
 
-  const onInstall = async (newData?: {
-    newUserSettings: UserSettingsAllDnps;
-  }) => {
+  const onInstall = async (newData?: { newUserSettings: UserSettingsAllDnps }) => {
     // Since React update order is not guaranteed, pass newUserSettings as a
     // parameter if necessary to ensure it has the latest state
-    const _userSettings =
-      newData && newData.newUserSettings
-        ? newData.newUserSettings
-        : userSettings;
+    const _userSettings = newData && newData.newUserSettings ? newData.newUserSettings : userSettings;
 
     // Do the process here to control when the installation finishes,
     // and do some nice transition to the package
@@ -149,7 +120,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         }, 1000);
       }
 
-      enableAutoUpdatesForPackageWithConfirm(dnpName).catch(e => {
+      enableAutoUpdatesForPackageWithConfirm(dnpName).catch((e) => {
         console.error("Error on enableAutoUpdatesForPackageWithConfirm", e);
       });
     } catch (e) {
@@ -185,27 +156,24 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       name: "Show advanced editor",
       available: isWizardEmpty && oldEditorAvailable,
       checked: showAdvancedEditor,
-      toggle: () => setShowAdvancedEditor(x => !x)
+      toggle: () => setShowAdvancedEditor((x) => !x)
     },
     {
       name: "Bypass core restriction",
       available: dnp.origin && isCore,
       checked: bypassCoreOpt ?? false,
-      toggle: () => setBypassCoreOpt(x => !x)
+      toggle: () => setBypassCoreOpt((x) => !x)
     },
     {
       name: "Bypass only signed safe restriction",
       available: !dnp.signedSafeAll,
       checked: bypassSignedOpt ?? false,
-      toggle: () => setBypassSignedOpt(x => !x)
+      toggle: () => setBypassSignedOpt((x) => !x)
     }
-  ].filter(option => option.available);
+  ].filter((option) => option.available);
 
   const disableInstallation =
-    !isEmpty(progressLogs) ||
-    requiresCoreUpdate ||
-    requiresDockerUpdate ||
-    packagesToBeUninstalled.length > 0;
+    !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
 
   const setupSubPath = "setup";
   const permissionsSubPath = "permissions";
@@ -237,13 +205,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
     {
       name: "Permissions",
       subPath: permissionsSubPath,
-      render: () => (
-        <Permissions
-          permissions={permissions}
-          onAccept={goNext}
-          goBack={goBack}
-        />
-      ),
+      render: () => <Permissions permissions={permissions} onAccept={goNext} goBack={goBack} />,
       available: hasPermissions
     },
     {
@@ -258,20 +220,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           updateType={updateType}
         />
       ),
-      available:
-        manifest.warnings?.onInstall ||
-        (areUpdateWarnings && isInstalled && updateType)
+      available: manifest.warnings?.onInstall || (areUpdateWarnings && isInstalled && updateType)
     },
     {
       name: "Disclaimer",
       subPath: disclaimerSubPath,
-      render: () => (
-        <Disclaimer
-          disclaimers={disclaimers}
-          onAccept={goNext}
-          goBack={goBack}
-        />
-      ),
+      render: () => <Disclaimer disclaimers={disclaimers} onAccept={goNext} goBack={goBack} />,
       available: disclaimers.length > 0
     },
     // Placeholder for the final step in the horizontal stepper
@@ -280,14 +234,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       subPath: installSubPath,
       available: true
     }
-  ].filter(route => route.available);
+  ].filter((route) => route.available);
 
   // Compute the route index for the stepper display
-  const currentSubRoute =
-    location.pathname.split(`${encodeURIComponent(params.id || "")}/`)[1] || "";
-  const currentIndex = availableRoutes.findIndex(
-    ({ subPath }) => subPath && currentSubRoute.includes(subPath)
-  );
+  const currentSubRoute = location.pathname.split(`${encodeURIComponent(params.id || "")}/`)[1] || "";
+  const currentIndex = availableRoutes.findIndex(({ subPath }) => subPath && currentSubRoute.includes(subPath));
 
   const requiredDockerVersion = manifest.requirements?.minimumDockerVersion;
 
@@ -298,7 +249,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
    */
   useEffect(() => {
     if (currentSubRoute) navigate(".");
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, []);
 
   // Do this in a different way
@@ -321,8 +271,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
 
   function goBack() {
     const prevStep = availableRoutes[currentIndex - 1];
-    if (prevStep)
-      navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
+    if (prevStep) navigate(`../${encodeURIComponent(params.id || "")}/${prevStep.subPath}`);
     else navigate("..");
   }
 
@@ -338,17 +287,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         </Card>
       ) : isInstalling ? (
         <Card>
-          <ProgressLogsView
-            progressLogs={{ [dnpName]: "Sending request..." }}
-          />
+          <ProgressLogsView progressLogs={{ [dnpName]: "Sending request..." }} />
         </Card>
       ) : null}
 
       {requiresCoreUpdate && (
         <div className="alert alert-danger">
-          <strong>{prettyDnpName(dnpName)}</strong> requires a more recent
-          version of DAppNode. <strong>Update your DAppNode</strong> before
-          continuing the installation.
+          <strong>{prettyDnpName(dnpName)}</strong> requires a more recent version of DAppNode.{" "}
+          <strong>Update your DAppNode</strong> before continuing the installation.
         </div>
       )}
 
@@ -363,9 +309,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
         >
           <div>
             <strong>{prettyDnpName(dnpName)}</strong> requires at least the
-            <strong>{requiredDockerVersion}</strong> version of Docker.{" "}
-            <strong>Update your DAppNode</strong> before continuing the
-            installation. You can do it with our update Docker button in{" "}
+            <strong>{requiredDockerVersion}</strong> version of Docker. <strong>Update your DAppNode</strong> before
+            continuing the installation. You can do it with our update Docker button in{" "}
             <strong> System / Advanced</strong> tab.
           </div>
           <NavLink to={"/" + systemPathName + "/" + systemSubPaths.advanced}>
@@ -376,8 +321,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
 
       {packagesToBeUninstalled.length > 0 && (
         <div className="alert alert-danger">
-          <strong>{prettyDnpName(dnpName)}</strong> requires the following
-          packages to be uninstalled:{" "}
+          <strong>{prettyDnpName(dnpName)}</strong> requires the following packages to be uninstalled:{" "}
           {packagesToBeUninstalled.map((pkg, i) => (
             <span key={pkg}>
               <strong>{pkg}</strong>
@@ -389,10 +333,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
       )}
 
       {currentIndex >= 0 && availableRoutes.length > 1 && (
-        <HorizontalStepper
-          routes={availableRoutes.map(route => route.name)}
-          currentIndex={currentIndex}
-        />
+        <HorizontalStepper routes={availableRoutes.map((route) => route.name)} currentIndex={currentIndex} />
       )}
 
       <Routes>
@@ -408,13 +349,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({
           }
         />
         {availableRoutes
-          .filter(route => route.render)
-          .map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<>{route.render && route.render()}</>}
-            />
+          .filter((route) => route.render)
+          .map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<>{route.render && route.render()}</>} />
           ))}
       </Routes>
     </>

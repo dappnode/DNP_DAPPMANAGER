@@ -4,12 +4,8 @@ import { mapValues, isObject } from "lodash-es";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type GenericObject = { [key: string]: any };
 
-export function applyRecursivelyToStringValues(
-  stringModifier: (value: string, key: string) => string
-) {
-  return function objectModifier<T extends GenericObject>(
-    obj: T | T[]
-  ): T | T[] {
+export function applyRecursivelyToStringValues(stringModifier: (value: string, key: string) => string) {
+  return function objectModifier<T extends GenericObject>(obj: T | T[]): T | T[] {
     if (typeof obj === "object") {
       if (Array.isArray(obj)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

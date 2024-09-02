@@ -7,6 +7,6 @@ export function getBackupPath(anyPath: string): string {
   // `name` + `ext` will be used if `base` is not specified.
   return path.format({
     ...omit(pathObj, "base"),
-    ext: `.backup${pathObj.ext}`,
+    ext: `.backup${pathObj.ext}`
   });
 }

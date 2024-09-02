@@ -26,11 +26,8 @@ export const trustlines: MockDnp = {
       featuredBackground: "linear-gradient(67deg, #140a0a, #512424)",
       featuredColor: "white"
     },
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-    contributors: [
-      "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"
-    ],
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    contributors: ["Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"],
     categories: ["Blockchain"],
     links: {
       homepage: "https://github.com/dappnode/DAppNodePackage-trustlines#readme",
@@ -50,8 +47,7 @@ export const trustlines: MockDnp = {
   specialPermissions: [
     {
       name: "Fake permissions of host access",
-      details:
-        "Fake permissions that does not mean anything\n\n - **markdown** _test_"
+      details: "Fake permissions that does not mean anything\n\n - **markdown** _test_"
     }
   ],
   userSettings: {
@@ -86,8 +82,7 @@ export const trustlines: MockDnp = {
           path: "/config/custom/keys/Trustlines/main-keystore.json"
         },
         title: "Keystore",
-        description:
-          "Your Keystore/JSON file containing the private key that you want to use for this node",
+        description: "Your Keystore/JSON file containing the private key that you want to use for this node",
         required: true
       },
       {

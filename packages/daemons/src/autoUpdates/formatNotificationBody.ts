@@ -9,7 +9,7 @@ export function formatPackageUpdateNotification({
   currentVersion,
   newVersion,
   upstreamVersion,
-  autoUpdatesEnabled,
+  autoUpdatesEnabled
 }: {
   dnpName: string;
   currentVersion: string;
@@ -23,35 +23,30 @@ export function formatPackageUpdateNotification({
   return [
     `New version ready to install for ${prettyName} (current version ${currentVersion})`,
     upstreamVersion
-      ? ` - package version: ${newVersion}\n` +
-      ` - upstream version: ${upstreamVersion}`
+      ? ` - package version: ${newVersion}\n` + ` - upstream version: ${upstreamVersion}`
       : ` - version: ${newVersion}`,
 
     `Connect to your DAppNode to install this new version [install / ${prettyName}](${installUrl}).`,
     autoUpdatesEnabled
       ? `You may also wait for auto-updates to automatically install this version for you`
-      : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  /enable_auto_updates`,
+      : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  /enable_auto_updates`
   ].join("\n\n");
 }
 
 export function formatSystemUpdateNotification({
   packages,
-  autoUpdatesEnabled,
+  autoUpdatesEnabled
 }: {
   packages: CoreUpdateDataAvailable["packages"];
   autoUpdatesEnabled: boolean;
 }): string {
   return [
     "New system version ready to install",
-    packages.map(
-      (p) =>
-        ` - ${prettyDnpName(p.name)}: ${p.to} ${p.from ? `(current: ${p.from})` : ""
-        }`
-    ),
+    packages.map((p) => ` - ${prettyDnpName(p.name)}: ${p.to} ${p.from ? `(current: ${p.from})` : ""}`),
 
     `Connect to your DAppNode to install this [system / update](${adminUiUpdateCoreUrl}).`,
     autoUpdatesEnabled
       ? `You may also wait for auto-updates to automatically install this version for you`
-      : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  /enable_auto_updates`,
+      : `You can also enable auto-updates so packages are updated automatically by responding with the command: \n\n  /enable_auto_updates`
   ].join("\n\n");
 }

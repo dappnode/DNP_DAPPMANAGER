@@ -7,8 +7,7 @@ import yaml from "js-yaml";
 export function yamlParse<T>(yamlString: string): T {
   try {
     const parsedData = yaml.load(yamlString);
-    if (!parsedData || typeof parsedData === "string")
-      throw Error(`returned invalid object`);
+    if (!parsedData || typeof parsedData === "string") throw Error(`returned invalid object`);
     return parsedData as unknown as T;
   } catch (e) {
     throw Error(`Error parsing YAML: ${e.message}`);

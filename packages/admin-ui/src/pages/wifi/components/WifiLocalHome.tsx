@@ -13,6 +13,7 @@ export const WifiLocalHome: React.FC = () => {
   const availableRoutes: {
     name: string;
     subPath: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
   }[] = [
     {
@@ -31,13 +32,9 @@ export const WifiLocalHome: React.FC = () => {
     <>
       <Title title={title} />
       <div className="horizontal-navbar">
-        {availableRoutes.map(route => (
+        {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subPath}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.name}
             </NavLink>
           </button>
@@ -46,12 +43,8 @@ export const WifiLocalHome: React.FC = () => {
 
       <div className="section-spacing">
         <Routes>
-          {availableRoutes.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<route.component />}
-            />
+          {availableRoutes.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
           ))}
         </Routes>
       </div>

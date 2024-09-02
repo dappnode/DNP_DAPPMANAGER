@@ -2,11 +2,7 @@ import { expect } from "chai";
 import http from "http";
 import express from "express";
 import bodyParser from "body-parser";
-import {
-  docker,
-  dockerGetArchiveSingleFile,
-  dockerPutArchiveSingleFile
-} from "@dappnode/dockerapi";
+import { docker, dockerGetArchiveSingleFile, dockerPutArchiveSingleFile } from "@dappnode/dockerapi";
 import { fileDownload } from "../../src/api/routes/fileDownload.js";
 import { URL } from "url";
 import { MemoryWritable } from "./testStreamUtils.js";
@@ -14,11 +10,7 @@ import { MemoryWritable } from "./testStreamUtils.js";
 describe("file transfer - docker archive put, get", function () {
   const containerName = "DAppNodeTest-file-transfer";
   const filePath = "/a/b/c/sample.json";
-  const fileContent = JSON.stringify(
-    { sampleConfig: true, someValue: 22 },
-    null,
-    2
-  );
+  const fileContent = JSON.stringify({ sampleConfig: true, someValue: 22 }, null, 2);
 
   async function removeContainer(): Promise<void> {
     const container = docker.getContainer(containerName);
@@ -53,26 +45,15 @@ describe("file transfer - docker archive put, get", function () {
 
   describe("through docker", () => {
     it("Should put and get a file", async () => {
-      await dockerPutArchiveSingleFile(
-        containerName,
-        filePath,
-        Buffer.from(fileContent)
-      );
+      await dockerPutArchiveSingleFile(containerName, filePath, Buffer.from(fileContent));
 
       const fileContentSink = new MemoryWritable<Buffer>();
 
-      await dockerGetArchiveSingleFile(
-        containerName,
-        filePath,
-        fileContentSink
-      );
+      await dockerGetArchiveSingleFile(containerName, filePath, fileContentSink);
 
       const returnedFileBuffer = Buffer.concat(fileContentSink.chunks);
       const returnedFileContent = returnedFileBuffer.toString("utf8");
-      expect(returnedFileContent).to.equal(
-        fileContent,
-        "returned file does not match put file"
-      );
+      expect(returnedFileContent).to.equal(fileContent, "returned file does not match put file");
     });
   });
 
@@ -86,11 +67,7 @@ describe("file transfer - docker archive put, get", function () {
     });
 
     beforeEach("Add file to container", async () => {
-      await dockerPutArchiveSingleFile(
-        containerName,
-        filePath,
-        Buffer.from(fileContent)
-      );
+      await dockerPutArchiveSingleFile(containerName, filePath, Buffer.from(fileContent));
     });
 
     it("Sould put and get a file from the API directly", async () => {
@@ -100,14 +77,11 @@ describe("file transfer - docker archive put, get", function () {
       app.use(bodyParser.urlencoded({ extended: true }));
 
       const port = 8965;
-      app.get<{ containerName: string }>(
-        "/file-download/:containerName",
-        fileDownload
-      );
+      app.get<{ containerName: string }>("/file-download/:containerName", fileDownload);
 
       const server = new http.Server(app);
 
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         server.listen(port, () => {
           resolve();
         });
@@ -130,10 +104,7 @@ describe("file transfer - docker archive put, get", function () {
         throw Error(`${res.statusText}\n${resText}`);
       }
 
-      expect(resText).to.equal(
-        fileContent,
-        "returned file does not match put file"
-      );
+      expect(resText).to.equal(fileContent, "returned file does not match put file");
     });
   });
 });

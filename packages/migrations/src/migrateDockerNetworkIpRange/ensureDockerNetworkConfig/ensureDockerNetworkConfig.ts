@@ -22,7 +22,7 @@ import { removeNetworksOverlappingSubnetIfNeeded } from "./removeNetworksOverlap
 export async function ensureDockerNetworkConfig({
   networkName,
   networkSubnet,
-  aliasesIpsMap,
+  aliasesIpsMap
 }: {
   networkName: string;
   networkSubnet: string;
@@ -46,35 +46,31 @@ export async function ensureDockerNetworkConfig({
       Driver: "default",
       Config: [
         {
-          Subnet: networkSubnet,
-        },
-      ],
-    },
+          Subnet: networkSubnet
+        }
+      ]
+    }
   };
 
   try {
     const dncoreNetwork = docker.getNetwork(networkName);
     // docker network inspect
     // https://docs.docker.com/engine/api/v1.43/#tag/Network/operation/NetworkInspect
-    const networkInspect: Dockerode.NetworkInspectInfo =
-      await dncoreNetwork.inspect(); // throws 404 if network not found
+    const networkInspect: Dockerode.NetworkInspectInfo = await dncoreNetwork.inspect(); // throws 404 if network not found
 
     logs.info(`docker network ${networkName} exists`);
 
-    const networkSubnets =
-      networkInspect.IPAM?.Config?.map((config) => config.Subnet) ?? [];
+    const networkSubnets = networkInspect.IPAM?.Config?.map((config) => config.Subnet) ?? [];
 
     // Check subnet is as expected
     if (networkSubnets.some((subnet) => subnet === networkSubnet)) {
       // network subnet is as expected
-      logs.info(
-        `docker network ${networkName} has correct subnet ${networkSubnet}`
-      );
+      logs.info(`docker network ${networkName} has correct subnet ${networkSubnet}`);
       return {
         network: dncoreNetwork,
         containersToRestart: [],
         containersToRecreate: [],
-        isNetworkRecreated: false,
+        isNetworkRecreated: false
       };
     } else {
       logs.warn(
@@ -84,17 +80,16 @@ export async function ensureDockerNetworkConfig({
         logs.error(`error removing overlapping networks: ${e}`)
       );
       // CRITICAL: if this step fails migration failure
-      const { network, containersToRestart, containersToRecreate } =
-        await recreateDockerNetwork(
-          dncoreNetwork,
-          networkOptions,
-          aliasesIpsMap
-        );
+      const { network, containersToRestart, containersToRecreate } = await recreateDockerNetwork(
+        dncoreNetwork,
+        networkOptions,
+        aliasesIpsMap
+      );
       return {
         network,
         containersToRestart,
         containersToRecreate,
-        isNetworkRecreated: true,
+        isNetworkRecreated: true
       };
     }
   } catch (e) {
@@ -110,7 +105,7 @@ export async function ensureDockerNetworkConfig({
         network: await docker.createNetwork(networkOptions),
         containersToRestart: [],
         containersToRecreate: [],
-        isNetworkRecreated: true,
+        isNetworkRecreated: true
       };
     } else {
       // TODO: What do we do here?

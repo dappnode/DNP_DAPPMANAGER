@@ -7,10 +7,8 @@ import { stringSplit } from "utils/strings";
 
 type DappnodeIdentityType = ReturnType<typeof getDappnodeIdentityClean>;
 
-function renderIdentityValue(
-  key: keyof DappnodeIdentityType,
-  value?: string
-): JSX.Element | string | null {
+function renderIdentityValue(key: keyof DappnodeIdentityType, value?: string): JSX.Element | string | null {
+  const [hex, rootDomain] = stringSplit(value || "", /\.(.+)/);
   switch (key) {
     /**
      * Patch to fix the visual issue of the domain being too long.
@@ -19,7 +17,6 @@ function renderIdentityValue(
      *  .dyndns.dappnode.io
      */
     case "domain":
-      const [hex, rootDomain] = stringSplit(value || "", /\.(.+)/);
       return (
         <>
           {hex}
@@ -50,26 +47,18 @@ export default function DappnodeIdentity() {
   const seed = stringSplit(domain, ".")[0] || `${name}${ip}`;
 
   const Icon = () => (
-    <React.Fragment>
-      {seed ? (
-        <img src={makeBlockie(seed)} className="blockies-icon" alt="icon" />
-      ) : (
-        "?"
-      )}
-    </React.Fragment>
+    <React.Fragment>{seed ? <img src={makeBlockie(seed)} className="blockies-icon" alt="icon" /> : "?"}</React.Fragment>
   );
 
   return (
     <BaseDropdown
       name="DAppNode Identity"
       messages={Object.entries(dappnodeIdentity)
+
         .filter(([_, value]) => value)
         .map(
           ([key, value]): BaseDropdownMessage => ({
-            title: renderIdentityValue(
-              key as keyof typeof dappnodeIdentity,
-              value
-            )
+            title: renderIdentityValue(key as keyof typeof dappnodeIdentity, value)
           })
         )}
       Icon={Icon}

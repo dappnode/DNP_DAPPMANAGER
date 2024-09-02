@@ -9,7 +9,7 @@ describe("Util / format", () => {
       "nethermind.public.dappnode.eth": "Nethermind",
       "prysm-beacon-chain.public.dappnode.eth": "Prysm Beacon Chain",
       "bitcoin.dnp.dappnode.eth": "Bitcoin",
-      "package0-1-2.public.dappnode.eth": "Package0 1 2",
+      "package0-1-2.public.dappnode.eth": "Package0 1 2"
     };
 
     for (const dnpName of Object.keys(cases)) {

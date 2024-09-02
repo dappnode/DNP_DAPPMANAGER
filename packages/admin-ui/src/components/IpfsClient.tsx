@@ -47,8 +47,7 @@ export function IpfsClient({
       {clients
         .filter(({ option }) => option.length > 0)
         .map(({ title, description, option }) => {
-          const selected =
-            selectedClientTarget && option === selectedClientTarget;
+          const selected = selectedClientTarget && option === selectedClientTarget;
 
           return (
             <Card

@@ -1,13 +1,7 @@
 import * as db from "@dappnode/db";
 import { list } from "@dappnode/upnpc";
 import { logs } from "@dappnode/logger";
-import {
-  PortToOpen,
-  UpnpTablePortStatus,
-  ApiTablePortStatus,
-  UpnpPortMapping,
-  PackagePort
-} from "@dappnode/types";
+import { PortToOpen, UpnpTablePortStatus, ApiTablePortStatus, UpnpPortMapping, PackagePort } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import Ajv from "ajv";
 
@@ -98,14 +92,12 @@ async function performPortsScan({
   portsToOpen: PackagePort[];
 }): Promise<PortScanResult[]> {
   const tcpPorts = portsToOpen
-    .filter(port => port.protocol === "TCP")
-    .map(port => port.portNumber.toString())
+    .filter((port) => port.protocol === "TCP")
+    .map((port) => port.portNumber.toString())
     .join(",");
 
   try {
-    const response = await fetch(
-      `${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`
-    );
+    const response = await fetch(`${apiEndpoint}/${publicIp}?tcpPorts=${tcpPorts}`);
 
     const responseJson = await response.json();
     const responseJsonSanitized = sanitizeApiResponse(responseJson);
@@ -114,7 +106,7 @@ async function performPortsScan({
   } catch (e) {
     // Returns ports with status "error" when an error occurs fetching the API
     logs.error(`Error fetching port scanner ${e.message}`);
-    return tcpPorts.split(",").map(tcpPort => {
+    return tcpPorts.split(",").map((tcpPort) => {
       return {
         port: parseInt(tcpPort),
         status: "error",
@@ -148,16 +140,12 @@ export async function portsUpnpStatusGet({
 }): Promise<UpnpTablePortStatus[]> {
   const upnpPortMappings: UpnpPortMapping[] = await list(); // Ports opened, mapped with UPnP
 
-  return portsToOpen.map(port => ({
+  return portsToOpen.map((port) => ({
     port: port.portNumber,
     protocol: port.protocol,
     dnpName: port.dnpName,
     serviceName: port.serviceName,
-    status: upnpPortMappings.find(
-      upnpPort => parseInt(upnpPort.inPort) === port.portNumber
-    )
-      ? "open"
-      : "closed"
+    status: upnpPortMappings.find((upnpPort) => parseInt(upnpPort.inPort) === port.portNumber) ? "open" : "closed"
   }));
 }
 
@@ -165,21 +153,15 @@ export async function portsUpnpStatusGet({
  * API call that returns the ports status to be displayed in the ports table
  * using API scan service
  */
-export async function portsApiStatusGet({
-  portsToOpen
-}: {
-  portsToOpen: PortToOpen[];
-}): Promise<ApiTablePortStatus[]> {
+export async function portsApiStatusGet({ portsToOpen }: { portsToOpen: PortToOpen[] }): Promise<ApiTablePortStatus[]> {
   const apiTcpPortsStatus = await performPortsScan({
     publicIp: db.publicIp.get(),
     portsToOpen
   });
 
-  return portsToOpen.map(port => {
+  return portsToOpen.map((port) => {
     const tcpPort =
-      port.protocol === "TCP"
-        ? apiTcpPortsStatus.find(tcpPort => tcpPort.port === port.portNumber)
-        : undefined;
+      port.protocol === "TCP" ? apiTcpPortsStatus.find((tcpPort) => tcpPort.port === port.portNumber) : undefined;
     return {
       port: port.portNumber,
       protocol: port.protocol,

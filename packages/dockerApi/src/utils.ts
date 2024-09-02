@@ -35,7 +35,7 @@ import { isPortMappingDeletable } from "./list/isPortMappingDeletable.js";
 export function stripDockerApiLogsHeaderAndAnsi(logs: string): string {
   const pattern = [
     "[\\u001B\\u009B][[\\]()#;?]*(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)",
-    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))",
+    "(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-nq-uy=><~]))"
   ].join("|");
 
   const regex = new RegExp(pattern, "g");
@@ -60,9 +60,7 @@ function stripDockerApiLogHeader(line: string): string {
  * Returns the maximum dockerTimeout param from the container or undefined if none
  * @param containers
  */
-export function getDockerTimeoutMax(
-  containers: { dockerTimeout?: number }[]
-): number | undefined {
+export function getDockerTimeoutMax(containers: { dockerTimeout?: number }[]): number | undefined {
   let timeout: number | undefined = undefined;
 
   for (const container of containers) {
@@ -123,13 +121,13 @@ export function ensureUniquePortsFromDockerApi(
         ({
           ...(PublicPort ? { host: PublicPort } : {}),
           container: PrivatePort,
-          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP,
+          protocol: Type === "udp" ? PortProtocol.UDP : PortProtocol.TCP
         })
     )
     .map(
       (port): PortMapping => ({
         ...port,
-        deletable: isPortMappingDeletable(port, defaultPorts),
+        deletable: isPortMappingDeletable(port, defaultPorts)
       })
     );
 

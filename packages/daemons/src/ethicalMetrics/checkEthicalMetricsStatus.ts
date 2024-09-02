@@ -9,9 +9,7 @@ import { InstalledPackageData } from "@dappnode/types";
  * Make sure that on Ethical metrics enabled and existing email,
  * the packages DMS and Ethical metrics are installed and running
  */
-export async function checkEthicalMetricsStatus(
-  dappnodeInstaller: DappnodeInstaller
-): Promise<void> {
+export async function checkEthicalMetricsStatus(dappnodeInstaller: DappnodeInstaller): Promise<void> {
   const dmsDnpName = "dms.dnp.dappnode.eth";
 
   try {
@@ -26,18 +24,17 @@ export async function checkEthicalMetricsStatus(
 
       // Check ethical metrics pkg
       const ethicalMetricsPkg = await listPackageNoThrow({
-        dnpName: ethicalMetricsDnpName,
+        dnpName: ethicalMetricsDnpName
       });
       if (!ethicalMetricsPkg)
         await packageInstall(dappnodeInstaller, {
-          name: ethicalMetricsDnpName,
+          name: ethicalMetricsDnpName
         });
       else ensureAllContainersRunning(ethicalMetricsPkg);
 
       // check dms package
       const dmsPkg = await listPackageNoThrow({ dnpName: dmsDnpName });
-      if (!dmsPkg)
-        await packageInstall(dappnodeInstaller, { name: dmsDnpName });
+      if (!dmsPkg) await packageInstall(dappnodeInstaller, { name: dmsDnpName });
       else ensureAllContainersRunning(dmsPkg);
 
       // Register instance
@@ -48,9 +45,7 @@ export async function checkEthicalMetricsStatus(
   }
 }
 
-async function ensureAllContainersRunning(
-  pkg: InstalledPackageData
-): Promise<void> {
+async function ensureAllContainersRunning(pkg: InstalledPackageData): Promise<void> {
   for (const container of pkg.containers) {
     if (!container.running) {
       await dockerContainerStart(container.containerName);

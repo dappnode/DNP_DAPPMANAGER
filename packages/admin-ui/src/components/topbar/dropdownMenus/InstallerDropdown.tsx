@@ -4,11 +4,7 @@ import { FiDownload } from "react-icons/fi";
 import { ProgressLogs, ProgressLogsByDnp } from "types";
 import { ProgressLogsView } from "pages/installer/components/InstallCardComponents/ProgressLogsView";
 
-export default function InstallerDropdown({
-  installLogs
-}: {
-  installLogs: ProgressLogsByDnp;
-}) {
+export default function InstallerDropdown({ installLogs }: { installLogs: ProgressLogsByDnp }) {
   const progressCardLogs: ProgressLogs[] = [];
 
   for (const key in installLogs) {
@@ -27,7 +23,7 @@ export default function InstallerDropdown({
       unCollapsed
       children={
         <div style={{ width: "100%" }}>
-          {progressCardLogs.map(log => (
+          {progressCardLogs.map((log) => (
             <ProgressLogsView progressLogs={log} />
           ))}
         </div>

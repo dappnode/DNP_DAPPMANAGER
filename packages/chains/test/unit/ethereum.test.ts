@@ -14,7 +14,7 @@ describe("Watchers > chains > ethereum", () => {
         highestBlock: "0x958116",
         startingBlock: "0x0",
         warpChunksAmount: "0x11a3",
-        warpChunksProcessed: "0x111f",
+        warpChunksProcessed: "0x111f"
       };
       const blockNumber = 0;
 
@@ -23,14 +23,10 @@ describe("Watchers > chains > ethereum", () => {
         error: false,
         message: "Syncing snapshot: 4383 / 4515",
         progress: 0.9707641196013289,
-        peers: 23,
+        peers: 23
       };
 
-      const chainData = parseEthereumState(
-        parseEthersSyncing(syncing),
-        blockNumber,
-        23
-      );
+      const chainData = parseEthereumState(parseEthersSyncing(syncing), blockNumber, 23);
 
       expect(chainData).to.deep.equal(expectedChainData);
     });
@@ -41,7 +37,7 @@ describe("Watchers > chains > ethereum", () => {
         highestBlock: "0x958362",
         startingBlock: "0x947885",
         warpChunksAmount: null,
-        warpChunksProcessed: null,
+        warpChunksProcessed: null
       };
 
       const blockNumber = 0;
@@ -51,14 +47,10 @@ describe("Watchers > chains > ethereum", () => {
         error: false,
         message: "Blocks synced: 9730183 / 9798498",
         progress: 0.9930280130689418,
-        peers: 23,
+        peers: 23
       };
 
-      const chainData = parseEthereumState(
-        parseEthersSyncing(syncing),
-        blockNumber,
-        23
-      );
+      const chainData = parseEthereumState(parseEthersSyncing(syncing), blockNumber, 23);
 
       expect(chainData).to.deep.equal(expecteChainData);
     });

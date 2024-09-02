@@ -1,8 +1,7 @@
 import { MockDnp } from "./types";
 
 export const prysm: MockDnp = {
-  avatar:
-    "https://github.com/dappnode/DAppNodePackage-prysm/blob/main/avatar-prysm.png",
+  avatar: "https://github.com/dappnode/DAppNodePackage-prysm/blob/main/avatar-prysm.png",
 
   manifest: {
     name: "prysm.dnp.dappnode.eth",
@@ -16,11 +15,8 @@ export const prysm: MockDnp = {
     type: "service",
     architectures: ["linux/amd64"],
     mainService: "validator",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-    contributors: [
-      "dappLion <dapplion@dappnode.io> (https://github.com/dapplion)"
-    ],
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    contributors: ["dappLion <dapplion@dappnode.io> (https://github.com/dapplion)"],
     license: "GPL-3.0",
     repository: {
       type: "git",
@@ -69,8 +65,7 @@ export const prysm: MockDnp = {
           service: "validator"
         },
         title: "Graffiti",
-        description:
-          "Add a string to your proposed blocks, which will be seen on the block explorer"
+        description: "Add a string to your proposed blocks, which will be seen on the block explorer"
       },
       {
         id: "HTTP_WEB3PROVIDER",

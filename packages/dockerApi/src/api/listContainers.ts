@@ -1,9 +1,7 @@
 import Docker from "dockerode";
 import { docker } from "./docker.js";
 
-export function listContainers(
-  options: DockerApiListContainerOptions
-): Promise<Docker.ContainerInfo[]> {
+export function listContainers(options: DockerApiListContainerOptions): Promise<Docker.ContainerInfo[]> {
   // Change all default value from false to true
   return docker.listContainers({ all: true, ...options });
 }

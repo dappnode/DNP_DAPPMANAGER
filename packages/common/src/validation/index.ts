@@ -6,7 +6,6 @@ import { Args } from "typescript-json-schema";
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function validateRoutesArgsFactory() {
   const validate = ajv.compile(routesArgumentsSchema);
   return function validateRoutesArgs(route: string, args: Args): void {
@@ -22,7 +21,6 @@ export function validateRoutesReturn(route: string, returnData: any): void {
   if (!valid) throw Error(formatErrors(validate.errors, "routeReturn"));
 }
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
 export function validateSubscriptionsArgsFactory() {
   const validate = ajv.compile(subscriptionsArgumentsSchema);
   return function validateSubscriptionsArgs(route: string, args: Args): void {
@@ -36,7 +34,5 @@ function formatErrors(
   errors: any[] | null | undefined,
   dataVar: string
 ): string {
-  return (
-    "Validation error:\n" + ajv.errorsText(errors, { separator: "\n", dataVar })
-  );
+  return "Validation error:\n" + ajv.errorsText(errors, { separator: "\n", dataVar });
 }

@@ -8,10 +8,7 @@ import { UserActionLog } from "@dappnode/types";
  * @param first for pagination
  * @param after for pagination
  */
-export async function getUserActionLogs({
-  first = 50,
-  after = 0
-}): Promise<UserActionLog[]> {
+export async function getUserActionLogs({ first = 50, after = 0 }): Promise<UserActionLog[]> {
   return collapseEqualLogs(logUserAction.get().slice(after, after + first));
 }
 

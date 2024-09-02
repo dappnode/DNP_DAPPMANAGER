@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { transform, isEqual, isObject, isEmpty } from "lodash-es";
 
 export function difference<T>(base: T, object: T): T {
@@ -6,10 +7,7 @@ export function difference<T>(base: T, object: T): T {
       object,
       (result: any, value, key) => {
         if (!isEqual(value, base[key])) {
-          result[key] =
-            isObject(value) && isObject(base[key])
-              ? changes(base[key], value)
-              : value;
+          result[key] = isObject(value) && isObject(base[key]) ? changes(base[key], value) : value;
         }
       },
       {}
@@ -25,7 +23,7 @@ export function difference<T>(base: T, object: T): T {
  */
 export function isDeepEmpty(value: any) {
   function areValuesEmpty(object: any): boolean {
-    return Object.values(object).every(val => {
+    return Object.values(object).every((val) => {
       if (!isObject(val)) return false;
       if (isEmpty(val)) return true;
       return areValuesEmpty(val);

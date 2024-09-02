@@ -2,10 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { shellSafe } from "@dappnode/utils";
 import fs from "fs";
-import {
-  ethereumClient,
-  ComposeAliasEditorAction,
-} from "../../../src/ethClient/index.js";
+import { ethereumClient, ComposeAliasEditorAction } from "../../../src/ethClient/index.js";
 import { params } from "@dappnode/params";
 
 // The following test will wite a compose with the alias fullnode.dappnode:
@@ -95,10 +92,7 @@ networks:
     // Create necessary dir
     await shellSafe(`mkdir ${dnpRepoExamplePath}`);
     // Create example compose with fullnode
-    fs.writeFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      composeWithFullnodeAlias
-    );
+    fs.writeFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, composeWithFullnodeAlias);
   });
 
   it("Should remove alias: fullnode.dappnode", () => {
@@ -107,14 +101,11 @@ networks:
       action: ComposeAliasEditorAction.REMOVE,
       execClientDnpName: dnpName,
       execClientServiceName: serviceName,
-      alias: params.FULLNODE_ALIAS,
+      alias: params.FULLNODE_ALIAS
     });
 
     // Get edited compose
-    const composeAfter = fs.readFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      "utf-8"
-    );
+    const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
     expect(composeAfter.trim()).to.equal(composeWithOutFullnodeAlias.trim());
   });
@@ -125,14 +116,11 @@ networks:
       action: ComposeAliasEditorAction.ADD,
       execClientDnpName: dnpName,
       execClientServiceName: serviceName,
-      alias: params.FULLNODE_ALIAS,
+      alias: params.FULLNODE_ALIAS
     });
 
     // Get edited compose
-    const composeAfter = fs.readFileSync(
-      `${dnpRepoExamplePath}/docker-compose.yml`,
-      "utf-8"
-    );
+    const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
     expect(composeAfter.trim()).to.equal(composeWithFullnodeAlias.trim());
   });

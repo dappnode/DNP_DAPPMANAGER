@@ -8,7 +8,7 @@ const coreName = params.coreDnpName;
  */
 export async function getCoreVersion(): Promise<string> {
   const dnpList = await listPackages();
-  const coreDnp = dnpList.find(_dnp => _dnp.dnpName === coreName);
+  const coreDnp = dnpList.find((_dnp) => _dnp.dnpName === coreName);
 
   return coreDnp ? coreDnp.version : "";
 }

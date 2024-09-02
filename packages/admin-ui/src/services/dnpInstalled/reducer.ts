@@ -11,10 +11,7 @@ export const dnpInstalledSlice = createSlice({
     dnpInstalled: InstalledPackageData[];
   },
   reducers: {
-    setDnpInstalled: (
-      state,
-      action: PayloadAction<InstalledPackageData[]>
-    ) => ({
+    setDnpInstalled: (state, action: PayloadAction<InstalledPackageData[]>) => ({
       ...state,
       dnpInstalled: action.payload
     })

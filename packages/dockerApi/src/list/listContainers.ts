@@ -7,20 +7,14 @@ import { parseContainerInfo } from "./parseContainerInfo.js";
  * [NOTE] On a full DAppNode will 14 containers the call takes 17ms on average
  * @returns
  */
-export async function listPackageContainers(filters?: {
-  containerName: string;
-}): Promise<PackageContainer[]> {
-  const containers = await dockerApiListContainers(
-    filters ? { filters: { name: [filters.containerName] } } : {}
-  );
+export async function listPackageContainers(filters?: { containerName: string }): Promise<PackageContainer[]> {
+  const containers = await dockerApiListContainers(filters ? { filters: { name: [filters.containerName] } } : {});
 
-  return containers
-    .map(parseContainerInfo)
-    .filter((pkg) => pkg.isDnp || pkg.isCore);
+  return containers.map(parseContainerInfo).filter((pkg) => pkg.isDnp || pkg.isCore);
 }
 
 export async function listPackageContainerNoThrow({
-  containerName,
+  containerName
 }: {
   containerName: string;
 }): Promise<PackageContainer | null> {
@@ -30,19 +24,12 @@ export async function listPackageContainerNoThrow({
   // Return an exact match for
   // - containerName "DAppNodePackage-geth.dnp.dappnode.eth"
   // - name: "geth.dnp.dappnode.eth"
-  const matches = containers.filter(
-    (container) => container.containerName === containerName
-  );
-  if (matches.length > 1)
-    throw Error(`Multiple matches found for ${containerName}`);
+  const matches = containers.filter((container) => container.containerName === containerName);
+  if (matches.length > 1) throw Error(`Multiple matches found for ${containerName}`);
   return matches[0] || null;
 }
 
-export async function listContainer({
-  containerName,
-}: {
-  containerName: string;
-}): Promise<PackageContainer> {
+export async function listContainer({ containerName }: { containerName: string }): Promise<PackageContainer> {
   const container = await listPackageContainerNoThrow({ containerName });
   if (!container) throw Error(`${containerName} package not found`);
   return container;

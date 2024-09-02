@@ -11,14 +11,8 @@ export interface IApiAuth {
   fetchLoginStatus(): Promise<LoginStatus>;
   login(data: { username: string; password: string }): Promise<{ ok: true }>;
   logoutAndReload(): Promise<void>;
-  register(data: {
-    username: string;
-    password: string;
-  }): Promise<{ recoveryToken: string }>;
-  changePass(data: {
-    password: string;
-    newPassword: string;
-  }): Promise<{ ok: true }>;
+  register(data: { username: string; password: string }): Promise<{ recoveryToken: string }>;
+  changePass(data: { password: string; newPassword: string }): Promise<{ ok: true }>;
   recoverPass(data: { token: string }): Promise<{ ok: true }>;
 }
 
@@ -34,18 +28,11 @@ export interface IApiRoutes {
   /** Per container URL to download all of its logs */
   containerLogsUrl(data: { containerName: string }): string;
   /** Upload file to Dappnode and get a fileId */
-  uploadFile(
-    file: File,
-    onProgress: (data: { loaded: number; total: number }) => void
-  ): Promise<{ fileId: string }>;
+  uploadFile(file: File, onProgress: (data: { loaded: number; total: number }) => void): Promise<{ fileId: string }>;
 }
 
 export interface IApiRpc {
-  start(
-    apiEventBridge: Emitter,
-    onConnect: () => void,
-    onError: (errorMessage: string) => void
-  ): void;
+  start(apiEventBridge: Emitter, onConnect: () => void, onError: (errorMessage: string) => void): void;
   call<R>(payload: RpcPayload): Promise<RpcResponse<R>>;
 }
 

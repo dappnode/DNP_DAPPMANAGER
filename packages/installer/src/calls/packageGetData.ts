@@ -8,10 +8,7 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
 // TODO: find a proper place for these functions. The functions inside this file
 // are not used as the other files within this same folder
 
-export async function packageGetData(
-  dappnodeInstaller: DappnodeInstaller,
-  dnpName: string
-): Promise<PackageItemData> {
+export async function packageGetData(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<PackageItemData> {
   const cachedDnp = db.pkgItemMetadata.get(dnpName);
   if (cachedDnp) {
     // Update cache in the background
@@ -25,9 +22,7 @@ export async function packageGetData(
   }
 }
 
-export function packagePickItemData(
-  pkgRelease: PackageRelease
-): PackageItemData {
+export function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
   return {
     manifest: packagePickManifestData(pkgRelease.manifest),
     ...pick(pkgRelease, [
@@ -38,19 +33,11 @@ export function packagePickItemData(
       "avatarFile",
       "warnings",
       "origin",
-      "signedSafe",
-    ] as const),
+      "signedSafe"
+    ] as const)
   };
 }
 
 function packagePickManifestData(manifest: Manifest): Manifest {
-  return pick(manifest, [
-    "name",
-    "version",
-    "shortDescription",
-    "avatar",
-    "links",
-    "chain",
-    "warnings",
-  ] as const);
+  return pick(manifest, ["name", "version", "shortDescription", "avatar", "links", "chain", "warnings"] as const);
 }

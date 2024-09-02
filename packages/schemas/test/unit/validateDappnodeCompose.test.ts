@@ -17,42 +17,41 @@ describe("files / compose / validateDappnodeCompose", () => {
     chain: {
       driver: "ethereum-beacon-chain",
       serviceName: "beacon-chain",
-      portNumber: 3500,
+      portNumber: 3500
     },
     mainService: "validator",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: [
       "dappLion <dapplion@dappnode.io> (https://github.com/dapplion)",
       "tropicar <tropicar@dappnode.io> (https://github.com/tropicar)",
-      "pablo <pablo@dappnode.io> (https://github.com/pablomendezroyo)",
+      "pablo <pablo@dappnode.io> (https://github.com/pablomendezroyo)"
     ],
     license: "GPL-3.0",
     repository: {
       type: "git",
-      url: "git+https://github.com/dappnode/DAppNodePackage-prysm-prater.git",
+      url: "git+https://github.com/dappnode/DAppNodePackage-prysm-prater.git"
     },
     bugs: {
-      url: "https://github.com/dappnode/DAppNodePackage-prysm-prater/issues",
+      url: "https://github.com/dappnode/DAppNodePackage-prysm-prater/issues"
     },
     requirements: {
-      minimumDappnodeVersion: "0.2.51",
+      minimumDappnodeVersion: "0.2.51"
     },
     categories: ["Blockchain", "ETH2.0"],
     warnings: {
       onMajorUpdate:
-        "This is a major update of Prysm Prater, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update",
+        "This is a major update of Prysm Prater, it will start validating with the web3signer. There will be a migration where your keystores will be replaced to another location, pay attention to the update"
     },
     links: {
       ui: "http://ui.web3signer-prater.dappnode?signer_url=http://web3signer.web3signer-prater.dappnode:9000",
       homepage: "https://prysmaticlabs.com/",
       readme: "https://github.com/dappnode/DAppNodePackage-prysm-prater",
-      docs: "https://docs.prylabs.network/docs/getting-started",
+      docs: "https://docs.prylabs.network/docs/getting-started"
     },
     dependencies: {
       "goerli-geth.dnp.dappnode.eth": "latest",
-      "web3signer-prater.dnp.dappnode.eth": "latest",
-    },
+      "web3signer-prater.dnp.dappnode.eth": "latest"
+    }
   };
 
   const compose: Compose = {
@@ -63,8 +62,8 @@ describe("files / compose / validateDappnodeCompose", () => {
         build: {
           context: "beacon-chain",
           args: {
-            UPSTREAM_VERSION: "v2.1.2",
-          },
+            UPSTREAM_VERSION: "v2.1.2"
+          }
         },
         volumes: ["beacon-chain-data:/data"],
         ports: ["13000", "12000/udp"],
@@ -74,8 +73,8 @@ describe("files / compose / validateDappnodeCompose", () => {
           CHECKPOINT_SYNC_URL: "",
           CORSDOMAIN: "http://prysm-prater.dappnode",
           WEB3_BACKUP: "",
-          EXTRA_OPTS: "",
-        },
+          EXTRA_OPTS: ""
+        }
       },
       validator: {
         image: "validator.prysm-prater.dnp.dappnode.eth:1.0.0",
@@ -84,25 +83,24 @@ describe("files / compose / validateDappnodeCompose", () => {
           dockerfile: "Dockerfile",
           args: {
             UPSTREAM_VERSION: "v2.1.2",
-            BRANCH: "develop",
-          },
+            BRANCH: "develop"
+          }
         },
         volumes: ["validator-data:/root/"],
         restart: "unless-stopped",
         environment: {
           LOG_TYPE: "INFO",
           BEACON_RPC_PROVIDER: "beacon-chain.prysm-prater.dappnode:4000",
-          BEACON_RPC_GATEWAY_PROVIDER:
-            "beacon-chain.prysm-prater.dappnode:3500",
+          BEACON_RPC_GATEWAY_PROVIDER: "beacon-chain.prysm-prater.dappnode:3500",
           GRAFFITI: "validating_from_DAppNode",
-          EXTRA_OPTS: "",
-        },
-      },
+          EXTRA_OPTS: ""
+        }
+      }
     },
     volumes: {
       "beacon-chain-data": {},
-      "validator-data": {},
-    },
+      "validator-data": {}
+    }
   };
 
   it("Should validate the compose file", () => {
@@ -117,9 +115,9 @@ describe("files / compose / validateDappnodeCompose", () => {
           networks: {
             danger_network: {
               name: "danger_network",
-              external: true,
-            },
-          },
+              external: true
+            }
+          }
         },
         manifest
       )
@@ -137,9 +135,9 @@ The docker network danger_network is not allowed. Only docker networks dncore_ne
             ...compose.services,
             validator: {
               ...compose.services.validator,
-              volumes: ["/var/run/docker.sock:/var/run/docker.sock"],
-            },
-          },
+              volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+            }
+          }
         },
         manifest
       )
@@ -157,9 +155,9 @@ service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mou
             ...compose.services,
             validator: {
               ...compose.services.validator,
-              credential_spec: "random",
-            },
-          },
+              credential_spec: "random"
+            }
+          }
         } as Compose,
         manifest
       )
@@ -173,7 +171,7 @@ service validator has key credential_spec that is not allowed. Allowed keys are:
       validateDappnodeCompose(
         {
           ...compose,
-          version: "3.3",
+          version: "3.3"
         },
         manifest
       )
@@ -191,9 +189,9 @@ Compose version 3.3 is not supported. Minimum version is 3.4`);
             ...compose.services,
             validator: {
               ...compose.services.validator,
-              networks: ["danger_network"],
-            },
-          },
+              networks: ["danger_network"]
+            }
+          }
         },
         manifest
       )
@@ -214,15 +212,15 @@ service validator has a non-whitelisted docker network: danger_network. Only doc
               networks: {
                 danger_network: {
                   ipv4_address: "172.33.4.5",
-                  aliases: ["dappmanager.dappnode"],
+                  aliases: ["dappmanager.dappnode"]
                 },
                 other_network: {
                   ipv4_address: "",
-                  aliases: ["core.dappnode"],
-                },
-              },
-            },
-          },
+                  aliases: ["core.dappnode"]
+                }
+              }
+            }
+          }
         },
         manifest
       )
@@ -243,9 +241,9 @@ service validator has a non-whitelisted docker network: other_network. Only dock
             ...compose.services,
             validator: {
               ...compose.services.validator,
-              volumes: ["/var/run/docker.sock:/var/run/docker.sock"],
-            },
-          },
+              volumes: ["/var/run/docker.sock:/var/run/docker.sock"]
+            }
+          }
         },
         manifest
       )

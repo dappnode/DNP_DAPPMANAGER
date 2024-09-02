@@ -21,8 +21,7 @@ export type Log = (dnpName: string, message: string) => void;
 function logUi(progressLog: ProgressLog): void {
   const { dnpName, message } = progressLog;
   // Log them internally. But skip download progress logs, too spam-y
-  if (message && !message.includes("%"))
-    logs.info("Progress log", dnpName, message);
+  if (message && !message.includes("%")) logs.info("Progress log", dnpName, message);
 
   eventBus.logUi.emit(progressLog);
 }

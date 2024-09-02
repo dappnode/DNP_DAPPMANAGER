@@ -50,25 +50,17 @@ function RequirementsList({ items }: { items: DockerUpgradeRequirements }) {
 
 export function DockerUpgrade() {
   const [updateReq, setUpdateReq] = useState<ReqStatus>({});
-  const [checkReq, setCheckReq] = useState<
-    ReqStatus<DockerUpgradeRequirements>
-  >({});
+  const [checkReq, setCheckReq] = useState<ReqStatus<DockerUpgradeRequirements>>({});
   const [canUpdate, setCanUpdate] = useState<boolean>(false);
 
   useEffect(() => {
     if (checkReq.result) {
-      const {
-        isDockerInUnattendedUpgrades,
-        isDockerInstalledThroughApt,
-        dockerHostVersion,
-        dockerLatestVersion
-      } = checkReq.result;
+      const { isDockerInUnattendedUpgrades, isDockerInstalledThroughApt, dockerHostVersion, dockerLatestVersion } =
+        checkReq.result;
       const canUpdate =
         !isDockerInUnattendedUpgrades ||
         !isDockerInstalledThroughApt ||
-        Boolean(
-          dockerLatestVersion && lt(dockerHostVersion, dockerLatestVersion)
-        );
+        Boolean(dockerLatestVersion && lt(dockerHostVersion, dockerLatestVersion));
       setCanUpdate(canUpdate);
     }
   }, [checkReq.result]);
@@ -85,7 +77,7 @@ export function DockerUpgrade() {
 
   async function dockerUpdate() {
     try {
-      await new Promise<void>(resolve => {
+      await new Promise<void>((resolve) => {
         confirm({
           title: `Docker update`,
           text: `Warning, you are about to update Docker . It is possible that the system will need to reboot. Make sure you can sustain some minutes of downtime and backup your most important data.`,
@@ -110,9 +102,8 @@ export function DockerUpgrade() {
   return (
     <Card spacing>
       <p>
-        Update docker to latest version, make sure its installed through the
-        standard apt package manager and enable unattended upgrades for docker
-        so you do not worry about updating docker anymore
+        Update docker to latest version, make sure its installed through the standard apt package manager and enable
+        unattended upgrades for docker so you do not worry about updating docker anymore
       </p>
 
       {!canUpdate && (

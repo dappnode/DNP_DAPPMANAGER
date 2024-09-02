@@ -8,8 +8,7 @@ import { isCoreUpdateEnabled } from "@dappnode/daemons";
  * Returns the current DAppNode system info
  */
 export async function systemInfoGet(): Promise<SystemInfo> {
-  const { target: eth2ClientTarget, ethRemoteRpc } =
-    ethereumClient.computeEthereumTarget();
+  const { target: eth2ClientTarget, ethRemoteRpc } = ethereumClient.computeEthereumTarget();
 
   return {
     // Git version data
@@ -29,10 +28,7 @@ export async function systemInfoGet(): Promise<SystemInfo> {
     publicIp: db.publicIp.get(),
     // Eth provider configured URL
     eth2ClientTarget,
-    ethClientStatus:
-      eth2ClientTarget !== "remote"
-        ? db.ethExecClientStatus.get(eth2ClientTarget.execClient)
-        : null,
+    ethClientStatus: eth2ClientTarget !== "remote" ? db.ethExecClientStatus.get(eth2ClientTarget.execClient) : null,
     ethClientFallback: db.ethClientFallback.get(),
     ethRemoteRpc,
     // Domain map
@@ -54,10 +50,7 @@ function getNewFeatureIds(): NewFeatureId[] {
   if (db.executionClientMainnet.get() && db.consensusClientMainnet.get()) {
     // If the user does not has the fallback on and has not seen the full
     // repository view, show a specific one just asking for the fallback
-    if (
-      db.ethClientFallback.get() === "off" &&
-      db.newFeatureStatus.get("repository") !== "seen"
-    )
+    if (db.ethClientFallback.get() === "off" && db.newFeatureStatus.get("repository") !== "seen")
       newFeatureIds.push("repository-fallback");
   } else {
     // repository: Show only if nothing is selected
@@ -68,14 +61,13 @@ function getNewFeatureIds(): NewFeatureId[] {
   if (!isCoreUpdateEnabled()) newFeatureIds.push("system-auto-updates");
 
   // enable-ethical-metrics: Show only if not seen
-  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen")
-    newFeatureIds.push("enable-ethical-metrics");
+  if (db.newFeatureStatus.get("enable-ethical-metrics") !== "seen") newFeatureIds.push("enable-ethical-metrics");
 
   // change-host-password: Show only if insecure
   if (!db.passwordIsSecure.get()) newFeatureIds.push("change-host-password");
 
   // Filter out features that the user has already seen or set
-  return newFeatureIds.filter(featureId => {
+  return newFeatureIds.filter((featureId) => {
     const status = db.newFeatureStatus.get(featureId);
     return status !== "seen";
   });

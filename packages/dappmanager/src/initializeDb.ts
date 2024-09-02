@@ -2,12 +2,7 @@ import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { generateKeysIfNotExistOrNotValid } from "@dappnode/dyndns";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
-import {
-  getInternalIp,
-  getServerName,
-  getStaticIp,
-  ping
-} from "./utils/index.js";
+import { getInternalIp, getServerName, getStaticIp, ping } from "./utils/index.js";
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
@@ -21,10 +16,7 @@ const getInternalIpSafe = returnNullIfError(getInternalIp);
 const getExternalUpnpIpSafe = returnNullIfError(getExternalUpnpIp, true);
 const getPublicIpFromUrlsSafe = returnNullIfError(getPublicIpFromUrls);
 
-function returnNullIfError(
-  fn: () => Promise<string>,
-  silent?: boolean
-): () => Promise<string | null> {
+function returnNullIfError(fn: () => Promise<string>, silent?: boolean): () => Promise<string | null> {
   return async function (): Promise<string | null> {
     try {
       return await fn();
@@ -60,8 +52,7 @@ export async function initializeDb(): Promise<void> {
    * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
    * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
    */
-  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081")
-    db.ipfsGateway.set(params.IPFS_REMOTE);
+  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081") db.ipfsGateway.set(params.IPFS_REMOTE);
 
   /**
    *
@@ -111,12 +102,9 @@ export async function initializeDb(): Promise<void> {
       });
       db.domain.set(vpndb.domain);
     }
-    if (vpndb.staticIp && !db.staticIp.get())
-      db.staticIp.set(vpndb.staticIp || "");
+    if (vpndb.staticIp && !db.staticIp.get()) db.staticIp.set(vpndb.staticIp || "");
     if (vpndb["imported-installation-staticIp"])
-      db.importedInstallationStaticIp.set(
-        Boolean(vpndb["imported-installation-staticIp"])
-      );
+      db.importedInstallationStaticIp.set(Boolean(vpndb["imported-installation-staticIp"]));
 
     db.isVpnDbMigrated.set(true);
 
@@ -150,10 +138,7 @@ export async function initializeDb(): Promise<void> {
   // > External IP
   //   If the host is exposed to the internet and the staticIp is set, avoid calling UPnP.
   //   Otherwise, get the externalIp from UPnP
-  const externalIp: string | null =
-    staticIp && staticIp === internalIp
-      ? staticIp
-      : await getExternalUpnpIpSafe();
+  const externalIp: string | null = staticIp && staticIp === internalIp ? staticIp : await getExternalUpnpIpSafe();
 
   // > Public IP
   //   `getPublicIpFromUrls` is a call to a centralized service.
@@ -165,15 +150,10 @@ export async function initializeDb(): Promise<void> {
   //   UPnP is available and necessary only if the internalIp is not equal to the public IP
   //   and the external IP from UPnP command succeeded
   const upnpAvailable =
-    Boolean(publicIp && externalIp && internalIp !== publicIp) &&
-    (await isUpnpAvailable())
-      ? true
-      : false;
+    Boolean(publicIp && externalIp && internalIp !== publicIp) && (await isUpnpAvailable()) ? true : false;
 
   // >
-  const doubleNat = publicIp
-    ? Boolean(externalIp && externalIp !== publicIp)
-    : false;
+  const doubleNat = publicIp ? Boolean(externalIp && externalIp !== publicIp) : false;
 
   // > No NAT Loopback
   //   This boolean will trigger a warning in the ADMIN UI to alert the user to use different VPN profiles
@@ -181,16 +161,12 @@ export async function initializeDb(): Promise<void> {
   //   to connect from the same network as the DAppNode
   //   * The ping command is really slow, only execute it if necessary
   //   * Ping does not throw
-  const noNatLoopback = publicIp
-    ? Boolean(internalIp !== publicIp ? !(await ping(publicIp)) : false)
-    : false;
+  const noNatLoopback = publicIp ? Boolean(internalIp !== publicIp ? !(await ping(publicIp)) : false) : false;
 
   // > Alert user to open ports
   //   This boolean will trigger a warning in the ADMIN UI to alert the user to open ports
   //   Will be true if the DAppNode is behind a router but the external IP from UPnP command failed
-  const alertUserToOpenPorts = publicIp
-    ? Boolean(internalIp !== publicIp && !upnpAvailable)
-    : false;
+  const alertUserToOpenPorts = publicIp ? Boolean(internalIp !== publicIp && !upnpAvailable) : false;
 
   const serverName = getServerName();
   db.publicIp.set(publicIp || "");
@@ -220,7 +196,7 @@ export async function initializeDb(): Promise<void> {
     logs.info("Exposed to the public internet, disabling local proxying");
     localProxyingEnableDisable(false).then(
       () => logs.info("Disabled local proxying"),
-      e => logs.error("Error disabling local proxying", e)
+      (e) => logs.error("Error disabling local proxying", e)
     );
   }
 }

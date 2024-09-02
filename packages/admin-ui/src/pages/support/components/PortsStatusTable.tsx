@@ -10,11 +10,7 @@ import { ReqStatus } from "types";
 import { useApi } from "api";
 import { api } from "api";
 import { prettyDnpName } from "utils/format";
-import {
-  ApiTablePortStatus,
-  PortToOpen,
-  UpnpTablePortStatus
-} from "@dappnode/types";
+import { ApiTablePortStatus, PortToOpen, UpnpTablePortStatus } from "@dappnode/types";
 import Switch from "components/Switch";
 
 function RenderApiStatus({
@@ -24,9 +20,7 @@ function RenderApiStatus({
   apiScanResult: ApiTablePortStatus[];
   portToOpen: PortToOpen;
 }) {
-  const apiPortMatch = apiScanResult.find(
-    apiPort => apiPort.port === portToOpen.portNumber
-  );
+  const apiPortMatch = apiScanResult.find((apiPort) => apiPort.port === portToOpen.portNumber);
 
   if (!apiPortMatch) return <Ok unknown={true} msg="Not found" />;
 
@@ -38,12 +32,7 @@ function RenderApiStatus({
     case "closed":
       return <Ok ok={false} msg="Closed" />;
     case "error":
-      return (
-        <Ok
-          ok={false}
-          msg={"Error " + (apiPortMatch.message ? apiPortMatch.message : "")}
-        />
-      );
+      return <Ok ok={false} msg={"Error " + (apiPortMatch.message ? apiPortMatch.message : "")} />;
   }
 }
 
@@ -54,9 +43,7 @@ function RenderUpnpStatus({
   upnpScanResult: UpnpTablePortStatus[];
   portToOpen: PortToOpen;
 }) {
-  const upnpPortMatch = upnpScanResult.find(
-    upnpPort => upnpPort.port === portToOpen.portNumber
-  );
+  const upnpPortMatch = upnpScanResult.find((upnpPort) => upnpPort.port === portToOpen.portNumber);
 
   if (!upnpPortMatch) return <Ok unknown={true} msg="Not found" />;
 
@@ -72,17 +59,9 @@ function ScanningPort() {
   return <Ok loading={true} msg="Scanning" />;
 }
 
-export function PortsStatusTable({
-  isUpnpEnabled
-}: {
-  isUpnpEnabled: boolean;
-}) {
-  const [upnpReqStatus, setUpnpReqStatus] = useState<
-    ReqStatus<UpnpTablePortStatus[]>
-  >({});
-  const [apiReqStatus, setApiReqStatus] = useState<
-    ReqStatus<ApiTablePortStatus[]>
-  >({});
+export function PortsStatusTable({ isUpnpEnabled }: { isUpnpEnabled: boolean }) {
+  const [upnpReqStatus, setUpnpReqStatus] = useState<ReqStatus<UpnpTablePortStatus[]>>({});
+  const [apiReqStatus, setApiReqStatus] = useState<ReqStatus<ApiTablePortStatus[]>>({});
   const [upnpOpenReqStatus, setUpnpOpenReqStatus] = useState<ReqStatus>({});
 
   const portsToOpen = useApi.portsToOpenGet();
@@ -118,13 +97,10 @@ export function PortsStatusTable({
   async function onUpnpSwitchToggle(checked: boolean) {
     try {
       setUpnpOpenReqStatus({ loading: true });
-      await withToast(
-        () => api.natRenewalEnable({ enableNatRenewal: checked }),
-        {
-          message: "Refreshing UPnP port mapping..",
-          onSuccess: "Successfully mapped ports using UPnP"
-        }
-      );
+      await withToast(() => api.natRenewalEnable({ enableNatRenewal: checked }), {
+        message: "Refreshing UPnP port mapping..",
+        onSuccess: "Successfully mapped ports using UPnP"
+      });
       setUpnpOpenReqStatus({ result: true });
       if (upnpReqStatus.result) await upnpStatusGet();
       if (apiReqStatus.result) await apiStatusGet();
@@ -167,22 +143,14 @@ export function PortsStatusTable({
               <th>Port</th>
               <th>Protocol</th>
               <th>Service</th>
-              {(apiReqStatus.result || apiReqStatus.loading) && (
-                <th>Status (API) *</th>
-              )}
-              {apiReqStatus.error && (
-                <ErrorView hideIcon red error={apiReqStatus.error} />
-              )}
-              {(upnpReqStatus.result || upnpReqStatus.loading) && (
-                <th>Status (UPnP) **</th>
-              )}
-              {upnpReqStatus.error && (
-                <ErrorView hideIcon red error={upnpReqStatus.error} />
-              )}
+              {(apiReqStatus.result || apiReqStatus.loading) && <th>Status (API) *</th>}
+              {apiReqStatus.error && <ErrorView hideIcon red error={apiReqStatus.error} />}
+              {(upnpReqStatus.result || upnpReqStatus.loading) && <th>Status (UPnP) **</th>}
+              {upnpReqStatus.error && <ErrorView hideIcon red error={upnpReqStatus.error} />}
             </tr>
           </thead>
           <tbody>
-            {portsToOpen.data.map(port => (
+            {portsToOpen.data.map((port) => (
               <tr>
                 <td>{port.portNumber}</td>
                 <td>{port.protocol}</td>
@@ -190,10 +158,7 @@ export function PortsStatusTable({
 
                 {apiReqStatus.result && (
                   <td>
-                    <RenderApiStatus
-                      apiScanResult={apiReqStatus.result}
-                      portToOpen={port}
-                    />
+                    <RenderApiStatus apiScanResult={apiReqStatus.result} portToOpen={port} />
                   </td>
                 )}
                 {apiReqStatus.loading && (
@@ -204,10 +169,7 @@ export function PortsStatusTable({
 
                 {upnpReqStatus.result && (
                   <td>
-                    <RenderUpnpStatus
-                      upnpScanResult={upnpReqStatus.result}
-                      portToOpen={port}
-                    />
+                    <RenderUpnpStatus upnpScanResult={upnpReqStatus.result} portToOpen={port} />
                   </td>
                 )}
                 {upnpReqStatus.loading && (
@@ -224,16 +186,14 @@ export function PortsStatusTable({
         {apiReqStatus.result ? (
           <p>
             <br />
-            <strong>Status API*: </strong>ports status according to API scan.
-            Not valid for UDP ports.
+            <strong>Status API*: </strong>ports status according to API scan. Not valid for UDP ports.
           </p>
         ) : null}
 
         {upnpReqStatus.result ? (
           <p>
             <br />
-            <strong>Status UPnP**: </strong>ports status according to UPnP scan.
-            Only available if UPnP is enabled.
+            <strong>Status UPnP**: </strong>ports status according to UPnP scan. Only available if UPnP is enabled.
           </p>
         ) : null}
 
@@ -251,7 +211,6 @@ export function PortsStatusTable({
       </>
     );
   if (portsToOpen.error) return <ErrorView error={portsToOpen.error} />;
-  if (portsToOpen.isValidating)
-    return <Loading steps={["Loading ports table"]} />;
+  if (portsToOpen.isValidating) return <Loading steps={["Loading ports table"]} />;
   return <ErrorView error={"No data available"} />;
 }

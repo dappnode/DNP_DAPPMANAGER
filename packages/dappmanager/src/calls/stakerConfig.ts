@@ -5,19 +5,8 @@ import { execution, consensus, mevBoost, signer } from "../index.js";
  * Sets the staker configuration: execution and consensus clients, remote signer,
  * mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigSet({
-  stakerConfig
-}: {
-  stakerConfig: StakerConfigSet;
-}): Promise<void> {
-  const {
-    network,
-    executionDnpName,
-    consensusDnpName,
-    mevBoostDnpName,
-    relays,
-    web3signerDnpName
-  } = stakerConfig;
+export async function stakerConfigSet({ stakerConfig }: { stakerConfig: StakerConfigSet }): Promise<void> {
+  const { network, executionDnpName, consensusDnpName, mevBoostDnpName, relays, web3signerDnpName } = stakerConfig;
   await Promise.all([
     await execution.setNewExecution(network, executionDnpName),
     await consensus.setNewConsensus(network, consensusDnpName),
@@ -34,9 +23,7 @@ export async function stakerConfigSet({
  * Returns the current staker configuration: execution and consensus clients,
  * remote signer, mev boost, graffiti, fee recipient address and checkpoint sync url
  */
-export async function stakerConfigGet(
-  network: Network
-): Promise<StakerConfigGet> {
+export async function stakerConfigGet(network: Network): Promise<StakerConfigGet> {
   return await Promise.all([
     await execution.getAllExecutions(network),
     await consensus.getAllConsensus(network),

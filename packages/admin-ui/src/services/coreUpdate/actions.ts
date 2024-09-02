@@ -50,7 +50,7 @@ const updateCoreRequestStatus = coreUpdate.actions.requestStatus;
  * to know if there is an update available. If so, it fetches the manifests
  * of the core DNP and all the necessary dependencies
  */
-export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
+export const fetchCoreUpdateData = (): AppThunk => async (dispatch) => {
   try {
     dispatch(updateCoreRequestStatus({ loading: true }));
     const coreUpdateData = await api.fetchCoreUpdateData({ version });
@@ -58,13 +58,8 @@ export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
     dispatch(updateCoreUpdateData(coreUpdateData));
 
     if (coreUpdateData.available) {
-      /* eslint-disable-next-line no-console */
-      console.log(
-        `DAppNode ${coreDnpName} (${coreUpdateData.versionId})`,
-        coreUpdateData
-      );
+      console.log(`DAppNode ${coreDnpName} (${coreUpdateData.versionId})`, coreUpdateData);
     } else {
-      /* eslint-disable-next-line no-console */
       console.log(`DAppNode is updated`);
     }
   } catch (e) {
@@ -82,8 +77,7 @@ export const fetchCoreUpdateData = (): AppThunk => async dispatch => {
 export const updateCore = (): AppThunk => async (dispatch, getState) => {
   try {
     // Prevent double installations
-    if (getUpdatingCore(getState()))
-      return console.error("Error: DAppNode core is already updating");
+    if (getUpdatingCore(getState())) return console.error("Error: DAppNode core is already updating");
 
     // blacklist the current package
     dispatch(updateUpdatingCore(true));

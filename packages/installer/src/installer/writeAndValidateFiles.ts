@@ -13,19 +13,9 @@ import { isNotFoundError, writeManifest } from "@dappnode/utils";
  * Backup the previous compose if exists to .backup.yml
  * @param packagesData
  */
-export async function writeAndValidateFiles(
-  packagesData: InstallPackageData[],
-  log: Log
-): Promise<void> {
+export async function writeAndValidateFiles(packagesData: InstallPackageData[], log: Log): Promise<void> {
   for (const packageData of packagesData) {
-    const {
-      dnpName,
-      composePath,
-      composeBackupPath,
-      manifest,
-      manifestPath,
-      manifestBackupPath,
-    } = packageData;
+    const { dnpName, composePath, composeBackupPath, manifest, manifestPath, manifestBackupPath } = packageData;
     log(dnpName, "Writing files...");
 
     // Create the repoDir if necessary

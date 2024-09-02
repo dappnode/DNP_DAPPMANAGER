@@ -14,12 +14,7 @@ interface DependenciesProps {
   dnps: CompatibleDnps;
 }
 
-const Dependencies: React.FC<DependenciesProps> = ({
-  noCard,
-  resolving,
-  error,
-  dnps
-}) => {
+const Dependencies: React.FC<DependenciesProps> = ({ noCard, resolving, error, dnps }) => {
   const body = resolving ? (
     <div>
       <ProgressBar now={100} animated={true} label={"Resolving..."} />
@@ -31,9 +26,7 @@ const Dependencies: React.FC<DependenciesProps> = ({
       <Ok ok={true} msg={`DAppNode Package is compatible`} />
       <div style={{ marginTop: 12, marginLeft: 28 }}>
         <DependencyList
-          deps={Object.entries(dnps).map(
-            ([name, { from, to }]): DependencyListItem => ({ from, to, name })
-          )}
+          deps={Object.entries(dnps).map(([name, { from, to }]): DependencyListItem => ({ from, to, name }))}
         />
       </div>
     </>

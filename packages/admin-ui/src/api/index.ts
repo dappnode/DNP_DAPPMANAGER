@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from "react";
 import useSWR, { responseInterface } from "swr";
 import { mapValues } from "lodash-es";
@@ -28,14 +29,12 @@ export { apiRoutes };
 // Inject mock API code to have a workable UI offline
 // Usefull for developing and testing UI elements without any server
 if (import.meta.env.VITE_APP_MOCK) {
-  import("./mock").then(mock => {
+  import("./mock").then((mock) => {
     Object.assign(apiAuth, mock.apiAuth);
     Object.assign(apiRoutes, mock.apiRoutes);
     Object.assign(apiRpc, mock.apiRpc);
   });
 }
-
-/* eslint-disable no-console */
 
 /**
  * Bridges events from the API websockets client to any consumer in the App
@@ -49,9 +48,7 @@ if (import.meta.env.VITE_APP_MOCK) {
 const apiEventBridge = mitt();
 
 // Map redux subscriptions to eventBridge
-mapSubscriptionsToRedux(
-  subscriptionsFactory(apiEventBridge, subscriptionsLogger)
-);
+mapSubscriptionsToRedux(subscriptionsFactory(apiEventBridge, subscriptionsLogger));
 
 export async function startApi(refetchStatus: () => void) {
   apiRpc.start(
@@ -70,11 +67,9 @@ export async function startApi(refetchStatus: () => void) {
   );
 }
 
-const routeSubscription: Partial<
-  {
-    [K in keyof Routes]: keyof Subscriptions;
-  }
-> = {
+const routeSubscription: Partial<{
+  [K in keyof Routes]: keyof Subscriptions;
+}> = {
   autoUpdateDataGet: "autoUpdateData",
   devicesList: "devices",
   getUserActionLogs: "userActionLog",
@@ -100,7 +95,9 @@ async function callRoute<R>(method: string, params: any[]): Promise<R> {
  */
 export const api: Routes = mapValues(
   routesData,
-  (_data, route) => (...args: any[]) => callRoute<any>(route, args)
+  (_data, route) =>
+    (...args: any[]) =>
+      callRoute<any>(route, args)
 );
 
 /**
@@ -108,11 +105,9 @@ export const api: Routes = mapValues(
  * Useful to keep track of changing data that may need to be revalidated
  */
 export const useApi: {
-  [K in keyof Routes]: (
-    ...args: Parameters<Routes[K]>
-  ) => responseInterface<ResolvedType<Routes[K]>, Error>;
+  [K in keyof Routes]: (...args: Parameters<Routes[K]>) => responseInterface<ResolvedType<Routes[K]>, Error>;
 } = mapValues(routesData, (_data, route) => {
-  return function(...args: any[]) {
+  return function (...args: any[]) {
     const argsKey = args.length > 0 ? JSON.stringify(args) : "";
     const fetcher = (...args: any[]) => callRoute<any>(route, args);
     const res = useSWR([route, argsKey], () => fetcher(...args));
@@ -130,10 +125,7 @@ export const useApi: {
  * Bridges a single event from the websockets API client to any consumer in the App
  * **Note**: this callback MUST be memoized
  */
-export function useSubscribe(
-  route: keyof Subscriptions,
-  callback: (data: any) => void
-): void {
+export function useSubscribe(route: keyof Subscriptions, callback: (data: any) => void): void {
   useEffect(() => {
     apiEventBridge.on(route, callback);
     return () => {
@@ -163,11 +155,9 @@ export function useSubscribe(
  * ```
  */
 export const useSubscription: {
-  [K in keyof Subscriptions]: (
-    callback: (...args: Parameters<SubscriptionsTypes[K]>) => void
-  ) => void;
+  [K in keyof Subscriptions]: (callback: (...args: Parameters<SubscriptionsTypes[K]>) => void) => void;
 } = mapValues(subscriptionsData, (_data, route) => {
-  return function(callback: (...args: any) => void) {
+  return function (callback: (...args: any) => void) {
     useSubscribe(route as keyof Subscriptions, callback);
   };
 });

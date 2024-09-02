@@ -6,18 +6,10 @@ import { dappnodeInstaller } from "../index.js";
 /**
  * Changes the IPFS client
  */
-export async function ipfsClientTargetSet({
-  ipfsRepository
-}: {
-  ipfsRepository: IpfsRepository;
-}): Promise<void> {
-  if (!ipfsRepository.ipfsClientTarget)
-    throw Error(`Argument target must be defined`);
+export async function ipfsClientTargetSet({ ipfsRepository }: { ipfsRepository: IpfsRepository }): Promise<void> {
+  if (!ipfsRepository.ipfsClientTarget) throw Error(`Argument target must be defined`);
 
-  await changeIpfsClient(
-    ipfsRepository.ipfsClientTarget,
-    ipfsRepository.ipfsGateway
-  );
+  await changeIpfsClient(ipfsRepository.ipfsClientTarget, ipfsRepository.ipfsGateway);
 }
 
 /**
@@ -27,10 +19,7 @@ export async function ipfsClientTargetSet({
  * @param nextTarget "local" | "remote"
  * @param nextGateway Gateway endpoint to be used by remote node. By default dappnode gateway
  */
-async function changeIpfsClient(
-  nextTarget: IpfsClientTarget,
-  nextGateway?: string
-): Promise<void> {
+async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: string): Promise<void> {
   try {
     // Return if targets and gateways are equal
     const currentTarget = db.ipfsClientTarget.get();

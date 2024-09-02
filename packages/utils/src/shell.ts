@@ -30,8 +30,7 @@ export async function shell(
   } catch (e) {
     // Rethrow a typed error, and ignore the internal NodeJS stack trace
     const err: child.ExecException = e;
-    if (err.signal === "SIGTERM")
-      throw new ShellError(e, `process timeout ${timeout} ms, cmd: ${cmd}`);
+    if (err.signal === "SIGTERM") throw new ShellError(e, `process timeout ${timeout} ms, cmd: ${cmd}`);
     else throw new ShellError(e);
   }
 }
@@ -43,10 +42,7 @@ export async function shell(
  * part of the `docker run ... nsenter` command
  * `mkdir -- -p /some/dir` will succeed
  */
-export function shellHost(
-  cmd: string,
-  options?: { timeout?: number }
-): Promise<string> {
+export function shellHost(cmd: string, options?: { timeout?: number }): Promise<string> {
   return shell(`${nsenterCommand} ${cmd}`, options);
 }
 
@@ -61,10 +57,7 @@ export class ShellError extends Error implements child.ExecException {
   signal?: NodeJS.Signals;
   stdout?: string;
   stderr?: string;
-  constructor(
-    e: child.ExecException & { stdout?: string; stderr?: string },
-    message?: string
-  ) {
+  constructor(e: child.ExecException & { stdout?: string; stderr?: string }, message?: string) {
     super(message || e.message);
     this.cmd = e.cmd;
     this.killed = e.killed;

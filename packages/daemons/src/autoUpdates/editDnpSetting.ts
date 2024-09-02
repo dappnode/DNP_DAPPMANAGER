@@ -17,8 +17,7 @@ export function editDnpSetting(enabled: boolean, dnpName = MY_PACKAGES): void {
 
   // When disabling MY_PACKAGES, turn off all DNPs settings by
   // Ignoring all entries but the system packages
-  if (dnpName === MY_PACKAGES && !enabled)
-    db.autoUpdateSettings.set(pick(autoUpdateSettings, SYSTEM_PACKAGES));
+  if (dnpName === MY_PACKAGES && !enabled) db.autoUpdateSettings.set(pick(autoUpdateSettings, SYSTEM_PACKAGES));
 
   // When disabling any DNP, clear their pending updates
   // Ignoring all entries but the system packages

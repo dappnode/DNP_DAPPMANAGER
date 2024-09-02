@@ -15,21 +15,21 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         isCore: true,
         dnpName: "admin.dnp.dappnode.eth",
         ports: [{ container: 80, host: 8090, protocol: PortProtocol.TCP }],
-        running: true,
+        running: true
       },
       {
         ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth",
         ports: [{ container: 1194, host: 1194, protocol: PortProtocol.UDP }],
-        running: true,
+        running: true
       },
       {
         ...mockContainer,
         isCore: true,
         dnpName: "vpn.dnp.dappnode.eth2",
         ports: [{ container: 1194, host: 1194, protocol: PortProtocol.UDP }],
-        running: true,
+        running: true
       },
       {
         ...mockContainer,
@@ -38,16 +38,16 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         ports: [
           { container: 30303, host: 32769, protocol: PortProtocol.TCP },
           { container: 30303, host: 32771, protocol: PortProtocol.UDP },
-          { container: 30304, host: 32770, protocol: PortProtocol.UDP },
+          { container: 30304, host: 32770, protocol: PortProtocol.UDP }
         ],
-        running: true,
+        running: true
       },
       {
         ...mockContainer,
         isCore: false,
         dnpName: stoppedDnp,
-        running: false,
-      },
+        running: false
+      }
     ];
 
     async function listContainers(): Promise<PackageContainer[]> {
@@ -60,13 +60,13 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
       services: {
         [stoppedDnp]: {
           container_name: stoppedDnp,
-          image: stoppedDnp,
-        },
-      },
+          image: stoppedDnp
+        }
+      }
     });
     compose.services()[stoppedDnp].setPortMapping([
       { host: 4001, container: 4001, protocol: PortProtocol.UDP },
-      { host: 4001, container: 4001, protocol: PortProtocol.TCP },
+      { host: 4001, container: 4001, protocol: PortProtocol.TCP }
     ]);
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
@@ -79,14 +79,14 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         dnpName: "admin.dnp.dappnode.eth",
         protocol: "TCP",
         portNumber: 8090,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
+        serviceName: "mock-dnp.dnp.dappnode.eth"
       },
       // From  "vpn.dnp.dappnode.eth"
       {
         dnpName: "vpn.dnp.dappnode.eth2",
         protocol: "UDP",
         portNumber: 1194,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
+        serviceName: "mock-dnp.dnp.dappnode.eth"
       },
       // From "goerli.dnp.dappnode.eth"
 
@@ -94,20 +94,20 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         dnpName: "goerli.dnp.dappnode.eth",
         protocol: "TCP",
         portNumber: 32769,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
+        serviceName: "mock-dnp.dnp.dappnode.eth"
       },
       {
         dnpName: "goerli.dnp.dappnode.eth",
         protocol: "UDP",
         portNumber: 32771,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
+        serviceName: "mock-dnp.dnp.dappnode.eth"
       },
       {
         dnpName: "goerli.dnp.dappnode.eth",
         protocol: "UDP",
         portNumber: 32770,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
-      },
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      }
       // From "stopped.dnp.dappnode.eth"
     ]);
   });
@@ -122,13 +122,13 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
           isCore: true,
           dnpName: "admin.dnp.dappnode.eth",
           ports: [{ container: 80, host: 8090, protocol: PortProtocol.TCP }],
-          running: true,
+          running: true
         },
         {
           ...mockContainer,
           dnpName: throwsDnp,
-          running: false,
-        },
+          running: false
+        }
       ];
     }
 
@@ -152,8 +152,8 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         dnpName: "admin.dnp.dappnode.eth",
         protocol: "TCP",
         portNumber: 8090,
-        serviceName: "mock-dnp.dnp.dappnode.eth",
-      },
+        serviceName: "mock-dnp.dnp.dappnode.eth"
+      }
     ]);
   });
 });

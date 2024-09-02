@@ -14,9 +14,7 @@ export function clearPendingUpdates(dnpName: string): void {
   const pending = db.autoUpdatePending.get();
 
   if (dnpName === MY_PACKAGES) {
-    const dnpNames = Object.keys(pending).filter(
-      dnpName => dnpName !== params.coreDnpName
-    );
+    const dnpNames = Object.keys(pending).filter((dnpName) => dnpName !== params.coreDnpName);
     for (const dnpName of dnpNames) {
       clearPendingUpdatesOfDnp(dnpName);
     }

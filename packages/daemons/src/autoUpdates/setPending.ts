@@ -9,17 +9,14 @@ import { eventBus } from "@dappnode/eventbus";
  * @param dnpName "bitcoin.dnp.dappnode.eth"
  * @param data { version: "0.2.6", param: "value" }
  */
-export function setPending(
-  dnpName: string,
-  data: AutoUpdatePendingEntry
-): void {
+export function setPending(dnpName: string, data: AutoUpdatePendingEntry): void {
   const pending = db.autoUpdatePending.get();
   db.autoUpdatePending.set({
     ...pending,
     [dnpName]: {
       ...(pending[dnpName] || {}),
-      ...data,
-    },
+      ...data
+    }
   });
 
   eventBus.requestAutoUpdateData.emit();

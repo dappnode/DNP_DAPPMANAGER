@@ -6,11 +6,7 @@ import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PackageContainer } from "@dappnode/types";
 
-const dnpsAllowedToStop = [
-  params.ipfsDnpName,
-  params.wifiDnpName,
-  params.HTTPS_PORTAL_DNPNAME
-];
+const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName, params.HTTPS_PORTAL_DNPNAME];
 
 /**
  * Stops or starts a package containers
@@ -36,9 +32,7 @@ export async function packageStartStop({
     }
   }
 
-  const targetContainers = dnp.containers.filter(
-    c => !serviceNames || serviceNames.includes(c.serviceName)
-  );
+  const targetContainers = dnp.containers.filter((c) => !serviceNames || serviceNames.includes(c.serviceName));
 
   if (targetContainers.length === 0) {
     const queryId = [dnpName, ...(serviceNames || [])].join(", ");
@@ -48,14 +42,14 @@ export async function packageStartStop({
   const servicesSharingPid = getServicesSharingPid(compose, targetContainers);
 
   if (servicesSharingPid) {
-    const targetContainersPid = dnp.containers.filter(c =>
+    const targetContainersPid = dnp.containers.filter((c) =>
       servicesSharingPid.targetPidServices.includes(c.serviceName)
     );
-    const dependantContainersPid = dnp.containers.filter(c =>
+    const dependantContainersPid = dnp.containers.filter((c) =>
       servicesSharingPid.dependantPidServices.includes(c.serviceName)
     );
 
-    if (targetContainers.every(container => container.running)) {
+    if (targetContainers.every((container) => container.running)) {
       // STOP: first stop dependatPid containers (pid must exist), second stop targetPid containers
       await containersStop(dependantContainersPid);
       await containersStop(targetContainersPid);
@@ -65,7 +59,7 @@ export async function packageStartStop({
       await containersStart(dependantContainersPid);
     }
   } else {
-    if (targetContainers.every(container => container.running)) {
+    if (targetContainers.every((container) => container.running)) {
       await containersStop(targetContainers);
     } else {
       await containersStart(targetContainers);
@@ -78,22 +72,12 @@ export async function packageStartStop({
 
 // Utils
 
-async function containersStop(
-  targetContainers: PackageContainer[]
-): Promise<void> {
+async function containersStop(targetContainers: PackageContainer[]): Promise<void> {
   await Promise.all(
-    targetContainers.map(async c =>
-      dockerContainerStop(c.containerName, { timeout: c.dockerTimeout })
-    )
+    targetContainers.map(async (c) => dockerContainerStop(c.containerName, { timeout: c.dockerTimeout }))
   );
 }
 
-async function containersStart(
-  targetContainers: PackageContainer[]
-): Promise<void> {
-  await Promise.all(
-    targetContainers.map(async container =>
-      dockerContainerStart(container.containerName)
-    )
-  );
+async function containersStart(targetContainers: PackageContainer[]): Promise<void> {
+  await Promise.all(targetContainers.map(async (container) => dockerContainerStart(container.containerName)));
 }

@@ -2,18 +2,11 @@ import "mocha";
 import { expect } from "chai";
 import { mapValues } from "lodash-es";
 import * as calls from "../../../dappmanager/src/calls/index.js";
-import {
-  createTestDir,
-  beforeAndAfter,
-  cleanTestDir,
-} from "../../../dappmanager/test/testUtils.js";
+import { createTestDir, beforeAndAfter, cleanTestDir } from "../../../dappmanager/test/testUtils.js";
 import { params } from "@dappnode/params";
 import { shell } from "@dappnode/utils";
 import { TrustedReleaseKey } from "@dappnode/types";
-import {
-  cleanInstallationArtifacts,
-  uploadDirectoryRelease,
-} from "./integrationSpecs/index.js";
+import { cleanInstallationArtifacts, uploadDirectoryRelease } from "./integrationSpecs/index.js";
 import * as db from "@dappnode/db";
 import { mockImageEnvNAME } from "./integrationSpecs/mockImage.js";
 
@@ -40,9 +33,7 @@ describe("Release format tests", () => {
   // The mockImage used for this test will print to stdout the value
   // of the env `mockImageEnvNAME`. It will be used to assert that the
   // package is running correctly
-  const mockEnvs = (expectedValue: string): string[] => [
-    [mockImageEnvNAME, expectedValue].join("="),
-  ];
+  const mockEnvs = (expectedValue: string): string[] => [[mockImageEnvNAME, expectedValue].join("=")];
 
   interface TestCase {
     id: string;
@@ -70,18 +61,18 @@ describe("Release format tests", () => {
               version: version,
               type: "service",
               license: "GPL-3.0",
-              description: "mock-test description",
+              description: "mock-test description"
             },
             compose: {
               version: "3.5",
               services: {
                 [dnpName]: {
                   restart: "unless-stopped",
-                  environment: mockEnvs(expectedEnvValue),
-                },
-              },
-            },
-          }),
+                  environment: mockEnvs(expectedEnvValue)
+                }
+              }
+            }
+          })
       };
     },
 
@@ -89,9 +80,7 @@ describe("Release format tests", () => {
       const dnpName = testMockPrefix + "multi-service.dnp.dappnode.eth";
       const version = "0.3.0";
       const serviceNames = { frontend: "frontend", backend: "backend" };
-      const expectedEnvValues = mapValues(serviceNames, (value) =>
-        [value, dnpName].join(".")
-      );
+      const expectedEnvValues = mapValues(serviceNames, (value) => [value, dnpName].join("."));
       return {
         id: "Multi-service-type",
         dnpName,
@@ -104,29 +93,28 @@ describe("Release format tests", () => {
               version: version,
               type: "service",
               license: "GPL-3.0",
-              description: "mock-test description",
+              description: "mock-test description"
             },
             compose: {
               version: "3.5",
               services: {
                 [serviceNames.frontend]: {
                   restart: "unless-stopped",
-                  environment: mockEnvs(expectedEnvValues.frontend),
+                  environment: mockEnvs(expectedEnvValues.frontend)
                 },
                 [serviceNames.backend]: {
                   restart: "unless-stopped",
-                  environment: mockEnvs(expectedEnvValues.backend),
-                },
-              },
-            },
-          }),
+                  environment: mockEnvs(expectedEnvValues.backend)
+                }
+              }
+            }
+          })
       };
     },
 
     (): TestCase => {
       // Sign the string message
-      const privateKey =
-        "0x0123456789012345678901234567890123456789012345678901234567890123";
+      const privateKey = "0x0123456789012345678901234567890123456789012345678901234567890123";
       const pubkey = "0x14791697260E4c9A71f18484C9f997B308e59325";
 
       const dnpName = testMockPrefix + "directory.dnp.dappnode.eth";
@@ -142,7 +130,7 @@ describe("Release format tests", () => {
           name: "Test key",
           signatureProtocol: "ECDSA_256",
           dnpNameSuffix: ".dnp.dappnode.eth",
-          key: pubkey,
+          key: pubkey
         },
         prepareRelease: async (): Promise<string> =>
           uploadDirectoryRelease({
@@ -151,40 +139,31 @@ describe("Release format tests", () => {
               version: version,
               type: "service",
               license: "GPL-3.0",
-              description: "mock-test description",
+              description: "mock-test description"
             },
             compose: {
               version: "3.5",
               services: {
                 [dnpName]: {
                   restart: "unless-stopped",
-                  environment: mockEnvs(expectedEnvValue),
-                },
-              },
+                  environment: mockEnvs(expectedEnvValue)
+                }
+              }
             },
-            signReleaseWithPrivKey: privateKey,
-          }),
+            signReleaseWithPrivKey: privateKey
+          })
       };
-    },
+    }
   ];
 
   before("Create DAppNode docker network", async () => {
     const dncoreNetwork = params.DOCKER_PRIVATE_NETWORK_NAME;
-    const networkExists = await shell(
-      `docker network ls --filter name=${dncoreNetwork} -q`
-    );
+    const networkExists = await shell(`docker network ls --filter name=${dncoreNetwork} -q`);
     if (!networkExists) await shell(`docker network create ${dncoreNetwork}`);
   });
 
   for (const releaseTest of releaseTests) {
-    const {
-      id,
-      dnpName,
-      version,
-      prepareRelease,
-      expectedEnvValues,
-      trustedReleaseKey,
-    } = releaseTest();
+    const { id, dnpName, version, prepareRelease, expectedEnvValues, trustedReleaseKey } = releaseTest();
 
     describe(id, () => {
       let releaseHash: string;
@@ -214,8 +193,7 @@ describe("Release format tests", () => {
         if (trustedReleaseKey) {
           // Persist trustedPubkey to local db
           const trustedKeysAdded = db.releaseKeysTrusted.get();
-          if (!trustedKeysAdded.includes(trustedReleaseKey))
-            await calls.releaseTrustedKeyAdd(trustedReleaseKey);
+          if (!trustedKeysAdded.includes(trustedReleaseKey)) await calls.releaseTrustedKeyAdd(trustedReleaseKey);
         }
 
         await calls.packageInstall({
@@ -224,8 +202,8 @@ describe("Release format tests", () => {
           // userSetEnvs: { [releaseDnpName]: { NAME: nameEnv } }
           options: {
             // Only bypass signed restriction if no release key is specified
-            BYPASS_SIGNED_RESTRICTION: trustedReleaseKey === undefined,
-          },
+            BYPASS_SIGNED_RESTRICTION: trustedReleaseKey === undefined
+          }
         });
 
         // Verify it is running correctly
@@ -233,22 +211,14 @@ describe("Release format tests", () => {
         const dnp = dnps.find((d) => d.dnpName === dnpName);
         if (!dnp) throw Error(`DNP ${dnpName} not found`);
 
-        for (const [serviceName, expectedEnvValue] of Object.entries(
-          expectedEnvValues
-        )) {
-          const container = dnp.containers.find(
-            (c) => c.serviceName === serviceName
-          );
-          if (!container)
-            throw Error(`No service found for ${serviceName} ${dnpName}`);
+        for (const [serviceName, expectedEnvValue] of Object.entries(expectedEnvValues)) {
+          const container = dnp.containers.find((c) => c.serviceName === serviceName);
+          if (!container) throw Error(`No service found for ${serviceName} ${dnpName}`);
 
           // The mockImage used for this test will print to stdout the value of an ENV
           // It is used to assert that the package is running correctly
           const result = await calls.packageLog(container);
-          expect(result).to.include(
-            expectedEnvValue,
-            `Wrong log from ${serviceName} ${dnpName} after installation`
-          );
+          expect(result).to.include(expectedEnvValue, `Wrong log from ${serviceName} ${dnpName} after installation`);
         }
       });
     });

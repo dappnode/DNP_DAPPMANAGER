@@ -12,16 +12,10 @@ export const noNatLoopback = interceptGlobalEnvOnSet(
   Object.keys({ NO_NAT_LOOPBACK })[0]
 );
 export const doubleNat = dbMain.staticKey<boolean>(DOUBLE_NAT, false);
-export const alertToOpenPorts = dbMain.staticKey<boolean>(
-  ALERT_TO_OPEN_PORTS,
-  false
-);
+export const alertToOpenPorts = dbMain.staticKey<boolean>(ALERT_TO_OPEN_PORTS, false);
 export const internalIp = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(INTERNAL_IP, ""),
   Object.keys({ INTERNAL_IP })[0]
 );
 
-export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(
-  AVAHI_SHOULD_BE_DISABLED,
-  false
-);
+export const avahiPublishCmdShouldNotRun = dbMain.staticKey<boolean>(AVAHI_SHOULD_BE_DISABLED, false);

@@ -60,32 +60,26 @@ export async function getMultiClientStatus(
       if (await isSyncing(execUrl)) {
         return { ok: false, code: "IS_SYNCING" };
       } else {
-        const _isApmStateCorrect = await isApmStateCorrect(execUrl).catch(
-          (eFromTestCall) => {
-            // APM state call failed, syncing call succeeded and is not working
-            // = Likely an error related to fetching state content
-            return {
-              ok: false,
-              code: "STATE_CALL_ERROR",
-              error: serializeError(eFromTestCall),
-            };
-          }
-        );
+        const _isApmStateCorrect = await isApmStateCorrect(execUrl).catch((eFromTestCall) => {
+          // APM state call failed, syncing call succeeded and is not working
+          // = Likely an error related to fetching state content
+          return {
+            ok: false,
+            code: "STATE_CALL_ERROR",
+            error: serializeError(eFromTestCall)
+          };
+        });
         if (_isApmStateCorrect) {
           // State contract is okay!!
           // Check is synced with consensus and remote execution
           if (
             (await isSyncedWithConsensus(execUrl, consUrl).catch((e) => {
-              throw Error(
-                `Error while checking if synced with consensus: ${e.message}`
-              );
+              throw Error(`Error while checking if synced with consensus: ${e.message}`);
             })) &&
             (await isSyncedWithRemoteExecution(execUrl).catch((e) => {
               // Do not throw if checking remote execution fails
               // Otherwise the fallback will be triggered and the remote node may not be available
-              logs.error(
-                `Error while checking if synced with remote execution: ${e.message}`
-              );
+              logs.error(`Error while checking if synced with remote execution: ${e.message}`);
             }))
           )
             return { ok: true, url: execUrl, dnpName: execClientDnpName };
@@ -94,7 +88,7 @@ export async function getMultiClientStatus(
           // State is not correct, node is not synced but eth_syncing did not picked it up
           return {
             ok: false,
-            code: "STATE_NOT_SYNCED",
+            code: "STATE_NOT_SYNCED"
           };
         }
       }
@@ -110,47 +104,46 @@ export async function getMultiClientStatus(
           return {
             ok: false,
             code: "NOT_AVAILABLE",
-            error: serializeError(clientError),
+            error: serializeError(clientError)
           };
         } else {
           return {
             ok: false,
-            code: "NOT_RUNNING",
+            code: "NOT_RUNNING"
           };
         }
       } else {
         // DNP is not installed, figure out why
-        const installStatus =
-          db.ethExecClientInstallStatus.get(execClientDnpName);
+        const installStatus = db.ethExecClientInstallStatus.get(execClientDnpName);
         if (installStatus) {
           switch (installStatus.status) {
             case "TO_INSTALL":
             case "INSTALLING":
               return {
                 ok: false,
-                code: "INSTALLING",
+                code: "INSTALLING"
               };
             case "INSTALLING_ERROR":
               return {
                 ok: false,
                 code: "INSTALLING_ERROR",
-                error: installStatus.error,
+                error: installStatus.error
               };
             case "INSTALLED":
               return {
                 ok: false,
-                code: "UNINSTALLED",
+                code: "UNINSTALLED"
               };
             case "UNINSTALLED":
               return {
                 ok: false,
-                code: "NOT_INSTALLED",
+                code: "NOT_INSTALLED"
               };
           }
         } else {
           return {
             ok: false,
-            code: "NOT_INSTALLED",
+            code: "NOT_INSTALLED"
           };
         }
       }
@@ -159,7 +152,7 @@ export async function getMultiClientStatus(
     return {
       ok: false,
       code: "UNKNOWN_ERROR",
-      error: eGeneric,
+      error: eGeneric
     };
   }
 }
@@ -173,13 +166,9 @@ export async function getMultiClientStatus(
 async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
   if (db.ethClientFallback.get() === "off") return true;
   // Check is synced with remote execution
-  const latestLocalBlock = await (await getEthersProvider(localUrl))
-    .send("eth_blockNumber", [])
-    .then(parseEthersBlock);
+  const latestLocalBlock = await (await getEthersProvider(localUrl)).send("eth_blockNumber", []).then(parseEthersBlock);
 
-  const latestRemoteBlock = await (
-    await getEthersProvider(params.ETH_MAINNET_RPC_URL_REMOTE)
-  )
+  const latestRemoteBlock = await (await getEthersProvider(params.ETH_MAINNET_RPC_URL_REMOTE))
     .send("eth_blockNumber", [])
     .then(parseEthersBlock);
 
@@ -194,9 +183,7 @@ async function isSyncedWithRemoteExecution(localUrl: string): Promise<boolean> {
  */
 async function isSyncing(url: string): Promise<boolean> {
   const provider = await getEthersProvider(url);
-  const syncing = await provider
-    .send("eth_syncing", [])
-    .then(parseEthersSyncing);
+  const syncing = await provider.send("eth_syncing", []).then(parseEthersSyncing);
 
   if (!syncing) return false;
 
@@ -220,7 +207,7 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
   // Returns (uint16[3] semanticVersion, address contractAddress, bytes contentURI)
   const testTxData = {
     to: "0x0c564ca7b948008fb324268d8baedaeb1bd47bce",
-    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023",
+    data: "0x737e7d4f0000000000000000000000000000000000000000000000000000000000000023"
   };
   const result =
     "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000342f697066732f516d63516958454c42745363646278464357454a517a69664d54736b4e5870574a7a7a5556776d754e336d4d4361000000000000000000000000";
@@ -238,22 +225,15 @@ async function isApmStateCorrect(url: string): Promise<boolean> {
  * @param consUrl
  * @returns true if synced, false if not synced
  */
-async function isSyncedWithConsensus(
-  execUrl: string,
-  consUrl: string
-): Promise<boolean> {
+async function isSyncedWithConsensus(execUrl: string, consUrl: string): Promise<boolean> {
   const provider = await getEthersProvider(execUrl);
   const execBlockNumber = await provider.getBlockNumber();
-  const execBlockHeadersResponse = await fetch(
-    consUrl + "/eth/v2/beacon/blocks/head"
-  );
+  const execBlockHeadersResponse = await fetch(consUrl + "/eth/v2/beacon/blocks/head");
   // TODO: do better type checking
   const consBlockHeadersResponseParsed =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (await execBlockHeadersResponse.json()) as any;
-  const consBlockNumber =
-    consBlockHeadersResponseParsed.data.message.body.execution_payload
-      .block_number;
+  const consBlockNumber = consBlockHeadersResponseParsed.data.message.body.execution_payload.block_number;
 
   if (execBlockNumber - consBlockNumber < ETHEREUM_BLOCKS_PER_DAY) {
     return true;

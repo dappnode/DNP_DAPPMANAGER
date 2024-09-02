@@ -21,7 +21,7 @@ export default function CommunityHome() {
             </SubTitle>
             <p>{communityItem.text}</p>
             <div className="community-actions">
-              {communityItem.actions.map(CommunityItemAction => (
+              {communityItem.actions.map((CommunityItemAction) => (
                 <CommunityItemAction />
               ))}
             </div>

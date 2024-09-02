@@ -23,11 +23,9 @@ export function EditorV2({
       {Object.entries(setupWizard).map(([dnpName, setupWizardDnp]) => (
         <div className="dnp-section" key={dnpName}>
           <div className="dnp-name">{prettyDnpName(dnpName)}</div>
-          {setupWizardDnp.fields.map(field => {
+          {setupWizardDnp.fields.map((field) => {
             const { id } = field;
-            const ownErrors = errors.filter(
-              error => error.dnpName === dnpName && error.id === id
-            );
+            const ownErrors = errors.filter((error) => error.dnpName === dnpName && error.id === id);
             return (
               <div key={id} className="field">
                 <div className="title">{field.title}</div>
@@ -37,11 +35,9 @@ export function EditorV2({
                 <InputField
                   field={field}
                   value={(formData[dnpName] || {})[id] || ""}
-                  onValueChange={newValue =>
-                    onNewFormData({ [dnpName]: { [id]: newValue } })
-                  }
+                  onValueChange={(newValue) => onNewFormData({ [dnpName]: { [id]: newValue } })}
                 />
-                {ownErrors.map(error => (
+                {ownErrors.map((error) => (
                   <div key={error.type} className="error">
                     {error.message}
                   </div>

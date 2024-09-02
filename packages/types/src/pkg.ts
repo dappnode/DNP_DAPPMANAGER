@@ -115,7 +115,7 @@ export interface ReleasePkgAssets extends DirectoryFiles {
 export enum FileFormat {
   JSON = "JSON",
   YAML = "YAML",
-  TEXT = "TEXT",
+  TEXT = "TEXT"
 }
 
 /**
@@ -145,7 +145,7 @@ export interface ReleaseSignature {
 export enum ReleaseSignatureStatusCode {
   notSigned = "notSigned",
   signedByKnownKey = "signedByKnownKey",
-  signedByUnknownKey = "signedByUnknownKey",
+  signedByUnknownKey = "signedByUnknownKey"
 }
 
 export type ReleaseSignatureStatus =
@@ -165,9 +165,7 @@ export type ReleaseSignatureWithData = {
 /** TODO: Add RSA_2048, OpenPGP */
 export type ReleaseSignatureProtocol = "ECDSA_256";
 // NOTE: Must list all available protocols to be shown in the UI select component
-export const releaseSignatureProtocols: ReleaseSignatureProtocol[] = [
-  "ECDSA_256",
-];
+export const releaseSignatureProtocols: ReleaseSignatureProtocol[] = ["ECDSA_256"];
 
 export interface TrustedReleaseKey {
   /** Metadata name to identify this key: `DAppnode association` */

@@ -21,22 +21,19 @@ describe("Util: dataUriToFile", () => {
     // Check PNG signature
     const pngSignature = "89504e470d0a1a0a";
     // Buffer 89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48
-    expect(dataBuffer.toString("hex").slice(0, pngSignature.length)).to.equal(
-      pngSignature
-    );
+    expect(dataBuffer.toString("hex").slice(0, pngSignature.length)).to.equal(pngSignature);
   });
 
   it("should convert a JSON dataUri a valid json file", () => {
     const pathTo = `${testDir}/filedemo.json`;
-    const dataUri =
-      "data:application/json;base64,ewogICJuYW1lIjogIkFkYW0iLAogICJhZ2UiOiAyMwp9Cg==";
+    const dataUri = "data:application/json;base64,ewogICJuYW1lIjogIkFkYW0iLAogICJhZ2UiOiAyMwp9Cg==";
     dataUriToFile(dataUri, pathTo);
 
     // Verify written file
     const jsonData = JSON.parse(fs.readFileSync(pathTo, "utf8"));
     expect(jsonData).to.deep.equal({
       name: "Adam",
-      age: 23,
+      age: 23
     });
   });
 });

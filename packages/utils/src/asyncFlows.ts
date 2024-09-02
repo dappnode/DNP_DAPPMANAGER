@@ -29,14 +29,10 @@ export function memoizeDebounce<F extends AnyFunction>(
   resolver?: Options<(...args: Parameters<F>) => DebouncedFunc<F>>
 ): MemoizeDebouncedFunction<F> {
   const debounceMemo = memoize<(...args: Parameters<F>) => DebouncedFunc<F>>(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     (..._args: Parameters<F>) => debounce(func, wait, options),
     resolver
   );
-  function wrappedFunction(
-    this: MemoizeDebouncedFunction<F>,
-    ...args: Parameters<F>
-  ): ReturnType<F> | undefined {
+  function wrappedFunction(this: MemoizeDebouncedFunction<F>, ...args: Parameters<F>): ReturnType<F> | undefined {
     return debounceMemo(...args)(...args);
   }
 
@@ -54,8 +50,7 @@ export function memoizeDebounce<F extends AnyFunction>(
   return wrappedFunction;
 }
 
-interface MemoizeDebouncedFunction<F extends AnyFunction>
-  extends DebouncedFunc<F> {
+interface MemoizeDebouncedFunction<F extends AnyFunction> extends DebouncedFunc<F> {
   (...args: Parameters<F>): ReturnType<F> | undefined;
   flush: (...args: Parameters<F>) => ReturnType<F> | undefined;
   cancel: (...args: Parameters<F>) => void;
@@ -97,10 +92,8 @@ export async function runAtMostEveryIntervals(
   let lastRunMs = 0;
 
   const intervalMsFinal = intervalsMs[intervalsMs.length - 1];
-  if (intervalMsFinal === undefined)
-    throw Error(`msArray must have at least one element`);
+  if (intervalMsFinal === undefined) throw Error(`msArray must have at least one element`);
 
-  // eslint-disable-next-line no-constant-condition
   while (true) {
     lastRunMs = Date.now();
 
@@ -128,7 +121,6 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
   return new Promise((resolve, reject) => {
     if (signal && signal.aborted) return reject(new ErrorAborted());
 
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
     let onDone: () => void = () => {};
 
     const timeout = setTimeout(() => {
@@ -167,26 +159,17 @@ export async function sleep(ms: number, signal?: AbortSignal): Promise<void> {
  *
  * @param fn Target function
  */
-export function runOnlyOneSequentially<A, R>(
-  fn: (arg?: A) => Promise<R>
-): (arg?: A) => void {
+export function runOnlyOneSequentially<A, R>(fn: (arg?: A) => Promise<R>): (arg?: A) => void {
   // create a cargo object with an infinite payload
-  const cargo = async.cargo(function (
-    tasks: { arg: A }[],
-    callback: () => void
-  ) {
+  const cargo = async.cargo(function (tasks: { arg: A }[], callback: () => void) {
     fn(tasks[0]?.arg)
       .then(() => {
         callback();
       })
       .catch((e) => {
-        console.error(
-          `WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks`,
-          e
-        );
+        console.error(`WARNING! functions in runOnlyOneSequentially MUST not throw, wrap them in try/catch blocks`, e);
       });
-  },
-  1e9);
+  }, 1e9);
 
   return function (arg?: A): void {
     cargo.push({ arg: arg as A });
@@ -208,15 +191,13 @@ export function runOnlyOneSequentially<A, R>(
  * @param fn Target function (Callback style)
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(
-  f: F
-): F {
+export function runOnlyOneReturnToAll<F extends (...args: any[]) => any>(f: F): F {
   return memoize(f, {
     // Wait for Promises to resolve. Do not cache rejections
     promise: true,
     // Return the computed cached result to only waiting calls while the
     // result if being computed. Right as it is resolved, compute it again
-    maxAge: 1,
+    maxAge: 1
   });
 }
 

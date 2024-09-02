@@ -37,9 +37,7 @@ export const detectMountpoints = memoize(
     }[] = JSON.parse(rawMountpointsJson);
 
     if (!Array.isArray(mountpointsDaraRaw))
-      throw Error(
-        `detect_fs script must return an array but returned: ${rawMountpointsJson}`
-      );
+      throw Error(`detect_fs script must return an array but returned: ${rawMountpointsJson}`);
 
     const mountpoints = mountpointsDaraRaw.map(
       (dataRaw): MountpointData => ({
@@ -49,7 +47,7 @@ export const detectMountpoints = memoize(
         total: parseInt(dataRaw.total),
         free: parseInt(dataRaw.free),
         vendor: dataRaw.vendor,
-        model: dataRaw.model,
+        model: dataRaw.model
       })
     );
 

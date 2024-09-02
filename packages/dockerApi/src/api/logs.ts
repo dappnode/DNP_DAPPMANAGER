@@ -5,10 +5,7 @@ import { stripDockerApiLogsHeaderAndAnsi } from "../utils.js";
  * Returns container's logs as a string with escape codes
  * @param containerNameOrId
  */
-export async function logContainer(
-  containerNameOrId: string,
-  options?: LogOptions
-): Promise<string> {
+export async function logContainer(containerNameOrId: string, options?: LogOptions): Promise<string> {
   const container = docker.getContainer(containerNameOrId);
   const res = await container.logs({ stdout: true, stderr: true, ...options });
   // Return is incorrectly typed as NodeJS.ReadableStream, but it's string

@@ -5,10 +5,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
 import { CoreUpdateDataAvailable, upstreamVersionToString } from "@dappnode/types";
-import {
-  formatPackageUpdateNotification,
-  formatSystemUpdateNotification,
-} from "./formatNotificationBody.js";
+import { formatPackageUpdateNotification, formatSystemUpdateNotification } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
@@ -16,7 +13,7 @@ export async function sendUpdatePackageNotificationMaybe({
   dappnodeInstaller,
   dnpName,
   currentVersion,
-  newVersion,
+  newVersion
 }: {
   dappnodeInstaller: DappnodeInstaller;
   dnpName: string;
@@ -25,18 +22,13 @@ export async function sendUpdatePackageNotificationMaybe({
 }): Promise<void> {
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
-  if (
-    lastEmittedVersion &&
-    valid(lastEmittedVersion) &&
-    lte(newVersion, lastEmittedVersion)
-  )
-    return; // Already emitted update available for this version
+  if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version
 
   // Ensure the release resolves on IPFS
   const release = await dappnodeInstaller.getRelease(dnpName, newVersion);
   const upstreamVersion = upstreamVersionToString({
     upstreamVersion: release.manifest.upstreamVersion,
-    upstream: release.manifest.upstream,
+    upstream: release.manifest.upstream
   });
 
   // Emit notification about new version available
@@ -49,8 +41,8 @@ export async function sendUpdatePackageNotificationMaybe({
       newVersion,
       upstreamVersion,
       currentVersion,
-      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName),
-    }),
+      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+    })
   });
 
   // Register version to prevent sending notification again
@@ -58,20 +50,13 @@ export async function sendUpdatePackageNotificationMaybe({
   db.notificationLastEmitVersion.set(dnpName, newVersion);
 }
 
-export async function sendUpdateSystemNotificationMaybe(
-  data: CoreUpdateDataAvailable
-): Promise<void> {
+export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvailable): Promise<void> {
   const newVersion = data.coreVersion;
   const dnpName = params.coreDnpName;
 
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
-  if (
-    lastEmittedVersion &&
-    valid(lastEmittedVersion) &&
-    lte(newVersion, lastEmittedVersion)
-  )
-    return; // Already emitted update available for this version
+  if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version
 
   // Emit notification about new version available
   eventBus.notification.emit({
@@ -80,8 +65,8 @@ export async function sendUpdateSystemNotificationMaybe(
     title: "System update available",
     body: formatSystemUpdateNotification({
       packages: data.packages,
-      autoUpdatesEnabled: isCoreUpdateEnabled(),
-    }),
+      autoUpdatesEnabled: isCoreUpdateEnabled()
+    })
   });
 
   data.packages;

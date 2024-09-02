@@ -5,14 +5,9 @@ import { pause } from "./utils/pause";
 
 const pkgRestartMs = 2000;
 
-const packagesState = new Map<string, InstalledPackageDetailData>(
-  dnpInstalled.map(dnp => [dnp.dnpName, dnp])
-);
+const packagesState = new Map<string, InstalledPackageDetailData>(dnpInstalled.map((dnp) => [dnp.dnpName, dnp]));
 
-function update(
-  dnpName: string,
-  fn: (dnp: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>
-) {
+function update(dnpName: string, fn: (dnp: InstalledPackageDetailData) => Partial<InstalledPackageDetailData>) {
   const dnp = packagesState.get(dnpName);
   if (!dnp) throw Error(`dnpName ${dnpName} not found`);
   packagesState.set(dnpName, { ...dnp, ...fn(dnp) });
@@ -80,16 +75,16 @@ export const packages: Pick<
 
   packageRestart: async ({ dnpName }) => {
     await pause(pkgRestartMs);
-    update(dnpName, dnp => ({
-      containers: dnp.containers.map(container => ({
+    update(dnpName, (dnp) => ({
+      containers: dnp.containers.map((container) => ({
         ...container,
         state: "exited"
       }))
     }));
 
     await pause(pkgRestartMs);
-    update(dnpName, dnp => ({
-      containers: dnp.containers.map(container => ({
+    update(dnpName, (dnp) => ({
+      containers: dnp.containers.map((container) => ({
         ...container,
         state: "running"
       }))
@@ -102,10 +97,8 @@ export const packages: Pick<
 
   packageSetEnvironment: async ({ dnpName, environmentByService }) => {
     await pause(pkgRestartMs);
-    for (const [serviceName, environment] of Object.entries(
-      environmentByService
-    )) {
-      update(dnpName, dnp => ({
+    for (const [serviceName, environment] of Object.entries(environmentByService)) {
+      update(dnpName, (dnp) => ({
         userSettings: {
           ...dnp.userSettings,
           environment: {
@@ -121,14 +114,10 @@ export const packages: Pick<
 
   packageSetPortMappings: async ({ dnpName, portMappingsByService }) => {
     await pause(pkgRestartMs);
-    for (const [serviceName, portMappings] of Object.entries(
-      portMappingsByService
-    )) {
-      update(dnpName, dnp => ({
-        containers: dnp.containers.map(container =>
-          container.serviceName === serviceName
-            ? { ...container, ports: portMappings }
-            : container
+    for (const [serviceName, portMappings] of Object.entries(portMappingsByService)) {
+      update(dnpName, (dnp) => ({
+        containers: dnp.containers.map((container) =>
+          container.serviceName === serviceName ? { ...container, ports: portMappings } : container
         )
       }));
     }
@@ -139,8 +128,8 @@ export const packages: Pick<
     const dnp = packagesState.get(dnpName);
     if (!dnp) throw Error(`dnpName ${dnpName} not found`);
 
-    update(dnp.dnpName, d => ({
-      containers: d.containers.map(container =>
+    update(dnp.dnpName, (d) => ({
+      containers: d.containers.map((container) =>
         !serviceNames || serviceNames?.includes(container.serviceName)
           ? {
               ...container,

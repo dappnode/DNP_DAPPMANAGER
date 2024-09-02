@@ -8,5 +8,5 @@ export const historicalRpcUrl = "http://op-l2geth.dappnode:8545";
 
 export const opClientToServiceMap: Record<ExecutionClientOptimism, string> = {
   "op-geth.dnp.dappnode.eth": "geth",
-  "op-erigon.dnp.dappnode.eth": "erigon",
+  "op-erigon.dnp.dappnode.eth": "erigon"
 };
