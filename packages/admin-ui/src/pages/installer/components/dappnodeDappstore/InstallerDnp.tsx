@@ -89,7 +89,7 @@ export const InstallerDnp: React.FC = () => {
       const encodedDnpName = encodeURIComponent(dnpName);
       const encodedVersion = version ? encodeURIComponent(version) : null;
 
-      const pkgPath = encodedVersion ? `${encodedDnpName}/${encodedVersion}` : encodedDnpName;
+      const pkgPath = encodedVersion ? `${encodedDnpName}?version=${encodedVersion}` : encodedDnpName;
 
       navigate(pkgPath);
     }
