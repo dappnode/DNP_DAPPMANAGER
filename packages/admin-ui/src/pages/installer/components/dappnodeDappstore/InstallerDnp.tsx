@@ -67,8 +67,7 @@ export const InstallerDnp: React.FC = () => {
       // open a dialog that says it will open an external link, are you sure?
       confirmPromise({
         title: "Ready to Explore Stakehouse?",
-        text:
-          "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
+        text: "Clicking 'Open' will direct you to external Stakehouse App in a new tab. It's not part of Dappnode, but it's a trusted platform. Happy journey!",
         buttons: [
           {
             label: "Cancel",
