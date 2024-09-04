@@ -108,7 +108,7 @@ export class Consensus extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
       userSettings: newConsensusDnpName
-        ? this.getUserSettings(!Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })), network)
+        ? this.getUserSettings(!(await listPackageNoThrow({ dnpName: newConsensusDnpName })), network)
         : {},
       prevClient: prevConsClientDnpName
     });
