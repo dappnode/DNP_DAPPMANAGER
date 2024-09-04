@@ -1,7 +1,7 @@
 import React from "react";
 import { useApi } from "api";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { title } from "../data";
 // This module
 import InstallDnpView from "./InstallDnpView";
@@ -13,7 +13,9 @@ import ErrorView from "components/ErrorView";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
 const InstallDnpContainer: React.FC = () => {
-  const { id, version } = useParams<{ id: string; version: string }>();
+  const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const version = searchParams.get("version") || undefined;
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // TODO: return a beautiful error page
