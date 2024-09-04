@@ -94,7 +94,7 @@ export class Consensus extends StakerComponent {
       }
       await this.persistSelectedIfInstalled({
         dnpName: currentConsensusDnpName,
-        userSettings: this.getUserSettings(currentConsensusDnpName, isInstalled, network)
+        userSettings: this.getUserSettings(isInstalled, network)
       });
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
@@ -108,11 +108,7 @@ export class Consensus extends StakerComponent {
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
       userSettings: newConsensusDnpName
-        ? this.getUserSettings(
-            newConsensusDnpName,
-            !Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })),
-            network
-          )
+        ? this.getUserSettings(!Boolean(await listPackageNoThrow({ dnpName: newConsensusDnpName })), network)
         : {},
       prevClient: prevConsClientDnpName
     });
