@@ -19,8 +19,8 @@ import {
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 
-export async function fetchDnpRequest({ id }: { id: string }): Promise<RequestedDnp> {
-  const mainRelease = await dappnodeInstaller.getRelease(id);
+export async function fetchDnpRequest({ id, version }: { id: string; version?: string }): Promise<RequestedDnp> {
+  const mainRelease = await dappnodeInstaller.getRelease(id, version);
 
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
@@ -69,6 +69,7 @@ export async function fetchDnpRequest({ id }: { id: string }): Promise<Requested
       name: dnpName,
       ver: reqVersion
     });
+
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
       from: currentVersions[dnpName],
       to: nextVersion
