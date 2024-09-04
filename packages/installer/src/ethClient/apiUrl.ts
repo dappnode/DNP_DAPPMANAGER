@@ -30,6 +30,8 @@ export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
   const defaultPort = 3500;
   const defaultServiceName = "beacon-chain";
 
+  // TODO: Use beacon-chain.<network>.dncore.dappnode
+
   const dnp = await listPackageNoThrow({ dnpName });
 
   if (!dnp || typeof dnp.chain !== "object") {

@@ -1,5 +1,7 @@
 import { UserSettings, Network } from "@dappnode/types";
 
+// TODO: The code in this file should be included in the stakers module
+
 /**
  * Get the user settings for the consensus client.
  * It may be different depending if it is multiservice or monoservice and all the envs are
