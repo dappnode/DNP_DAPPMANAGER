@@ -70,10 +70,11 @@ export async function runEthClientInstaller(
             if (isConsensusClientMainnet(target))
               await packageInstall(dappnodeInstaller, {
                 name: target,
-                userSettings: getConsensusUserSettings({
-                  dnpName: target,
-                  network: Network.Mainnet
-                })
+                userSettings: {
+                  [target]: getConsensusUserSettings({
+                    network: Network.Mainnet
+                  })
+                }
               });
             else await packageInstall(dappnodeInstaller, { name: target });
           } catch (e) {
