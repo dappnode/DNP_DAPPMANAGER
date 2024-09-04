@@ -13,6 +13,7 @@ import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
+import { getConsensusUserSettings } from "@dappnode/utils";
 
 // TODO: move ethereumClient logic here
 
@@ -29,13 +30,6 @@ export class Consensus extends StakerComponent {
     [Network.Prater]: db.consensusClientPrater,
     [Network.Holesky]: db.consensusClientHolesky,
     [Network.Lukso]: db.consensusClientLukso
-  };
-  protected static readonly DefaultCheckpointSync: Record<Network, string> = {
-    [Network.Mainnet]: "https://checkpoint-sync.dappnode.io",
-    [Network.Prater]: "https://checkpoint-sync-prater.dappnode.io",
-    [Network.Gnosis]: "https://checkpoint-sync-gnosis.dappnode.io",
-    [Network.Holesky]: "https://checkpoint-sync-holesky.dappnode.io",
-    [Network.Lukso]: "https://checkpoints.mainnet.lukso.network"
   };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -103,13 +97,14 @@ export class Consensus extends StakerComponent {
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
 
+    const mustInstallPkg = !!newConsensusDnpName && !(await listPackageNoThrow({ dnpName: newConsensusDnpName }));
+    const userSettings = newConsensusDnpName ? this.getUserSettings(mustInstallPkg, network) : {};
+
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Consensus.CompatibleConsensus[network],
-      userSettings: newConsensusDnpName
-        ? this.getUserSettings(!(await listPackageNoThrow({ dnpName: newConsensusDnpName })), network)
-        : {},
+      userSettings,
       prevClient: prevConsClientDnpName
     });
     // persist on db
@@ -119,26 +114,11 @@ export class Consensus extends StakerComponent {
   private getUserSettings(shouldSetEnvironment: boolean, network: Network): UserSettings {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
-    const defaultDappnodeGraffiti = "validating_from_DAppNode";
-    const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
-    return {
-      environment: shouldSetEnvironment
-        ? {
-            [validatorServiceName]: {
-              // Fee recipient is set as global env, keep this for backwards compatibility
-              ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-              // Graffiti is a mandatory value
-              ["GRAFFITI"]: defaultDappnodeGraffiti
-            },
 
-            [beaconServiceName]: {
-              // Fee recipient is set as global env, keep this for backwards compatibility
-              ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-              // Checkpoint sync is an optional value
-              ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
-            }
-          }
-        : {},
+    const consensusDefaultUserSettings = getConsensusUserSettings({ network });
+
+    return {
+      environment: shouldSetEnvironment ? consensusDefaultUserSettings.environment : {},
       networks: {
         rootNetworks: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
@@ -149,20 +129,20 @@ export class Consensus extends StakerComponent {
           }
         },
         serviceNetworks: {
-          "beacon-chain": {
+          [beaconServiceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`beacon-chain.${network}.staker.dappnode`]
+              aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`beacon-chain.${network}.dncore.dappnode`]
+              aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
             }
           },
-          validator: {
+          [validatorServiceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`validator.${network}.staker.dappnode`]
+              aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`validator.${network}.dncore.dappnode`]
+              aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
             }
           }
         }

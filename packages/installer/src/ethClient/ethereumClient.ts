@@ -317,10 +317,12 @@ export class EthereumClient {
       });
       if (!consClientPkg) {
         // Get default cons client user settings and install cons client
-        const userSettings = getConsensusUserSettings({
-          dnpName: consClient,
-          network: Network.Mainnet
-        });
+        const userSettings = {
+          [consClient]: getConsensusUserSettings({
+            network: Network.Mainnet
+          })
+        };
+
         await packageInstall(dappnodeInstaller, {
           name: consClient,
           userSettings

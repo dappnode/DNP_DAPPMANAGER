@@ -1,37 +1,40 @@
-import { UserSettingsAllDnps, Network } from "@dappnode/types";
+import { UserSettings, Network } from "@dappnode/types";
 
 /**
  * Get the user settings for the consensus client.
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-export function getConsensusUserSettings({
-  dnpName,
-  network
-}: {
-  dnpName: string;
-  network: Network;
-}): UserSettingsAllDnps {
+export function getConsensusUserSettings({ network }: { network: Network }): UserSettings {
   const validatorServiceName = "validator";
   const beaconServiceName = "beacon-chain";
+  const beaconValidatorServiceName = "beacon-validator";
   const defaultDappnodeGraffiti = "validating_from_DAppNode";
   const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
   return {
-    [dnpName]: {
-      environment: {
-        [validatorServiceName]: {
-          // Fee recipient is set as global env, keep this for backwards compatibility
-          ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-          // Graffiti is a mandatory value
-          ["GRAFFITI"]: defaultDappnodeGraffiti
-        },
+    environment: {
+      // TODO: Remove once Nimbus is split into 2 services
+      [beaconValidatorServiceName]: {
+        // Fee recipient is set as global env, keep this for backwards compatibility
+        ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient, // TODO: consider setting the MEV fee recipient as the default
+        // Graffiti is a mandatory value
+        ["GRAFFITI"]: defaultDappnodeGraffiti,
+        // Checkpoint sync is an optional value
+        ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network)
+      },
 
-        [beaconServiceName]: {
-          // Fee recipient is set as global env, keep this for backwards compatibility
-          ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
-          // Checkpoint sync is an optional value
-          ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network)
-        }
+      [validatorServiceName]: {
+        // Fee recipient is set as global env, keep this for backwards compatibility
+        ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+        // Graffiti is a mandatory value
+        ["GRAFFITI"]: defaultDappnodeGraffiti
+      },
+
+      [beaconServiceName]: {
+        // Fee recipient is set as global env, keep this for backwards compatibility
+        ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
+        // Checkpoint sync is an optional value
+        ["CHECKPOINT_SYNC_URL"]: getDefaultCheckpointSync(network)
       }
     }
   };
