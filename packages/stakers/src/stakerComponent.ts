@@ -151,7 +151,7 @@ export class StakerComponent {
     }
 
     // start all containers
-    await dockerComposeUpPackage({ dnpName }, true);
+    await dockerComposeUpPackage({ dnpName }, true, undefined, { forceRecreate: true });
   }
 
   /**
