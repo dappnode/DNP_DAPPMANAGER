@@ -13,7 +13,7 @@ import ErrorView from "components/ErrorView";
 import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
 const InstallDnpContainer: React.FC = () => {
-  const { id, version } = useParams<{ id: string, version: string }>();
+  const { id, version } = useParams<{ id: string; version: string }>();
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // TODO: return a beautiful error page
