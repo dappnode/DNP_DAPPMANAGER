@@ -27,22 +27,28 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
  * @param dnpName
  */
 export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
-  let port = 3500;
-  let domain = "";
+  const defaultPort = 3500;
+  const defaultServiceName = "beacon-chain";
+
   const dnp = await listPackageNoThrow({ dnpName });
-  if (dnp && typeof dnp.chain === "object" && dnp.chain.portNumber && dnp.chain.serviceName) {
-    port = dnp.chain.portNumber;
-    domain = buildNetworkAlias({
-      dnpName: dnpName,
-      serviceName: dnp.chain.serviceName,
+
+  if (!dnp || typeof dnp.chain !== "object") {
+    const domain = buildNetworkAlias({
+      dnpName,
+      serviceName: defaultServiceName,
       isMainOrMonoservice: false
     });
-  } else {
-    domain = buildNetworkAlias({
-      dnpName: dnpName,
-      serviceName: "beacon-chain",
-      isMainOrMonoservice: false
-    });
+
+    return `http://${domain}:${defaultPort}`;
   }
-  return `http://${domain}:${port}`;
+
+  const { chain: { portNumber = defaultPort, serviceName = defaultServiceName } = {} } = dnp;
+
+  const domain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: false
+  });
+
+  return `http://${domain}:${portNumber}`;
 }
