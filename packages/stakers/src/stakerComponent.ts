@@ -128,13 +128,11 @@ export class StakerComponent {
 
   protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
     return {
-      rootNetworks: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          external: true
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          external: true
-        }
+      [params.DOCKER_STAKER_NETWORKS[network]]: {
+        external: true
+      },
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+        external: true
       }
     };
   }
