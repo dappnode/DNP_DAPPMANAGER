@@ -11,9 +11,8 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { getConsensusUserSettings } from "@dappnode/utils";
+import { getDefaultConsensusUserSettings } from "@dappnode/utils";
 
 // TODO: move ethereumClient logic here
 
@@ -79,7 +78,7 @@ export class Consensus extends StakerComponent {
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
     if (currentConsensusDnpName) {
-      const isInstalled = Boolean(await listPackageNoThrow({ dnpName: currentConsensusDnpName }));
+      const isInstalled = await this.isPackageInstalled(currentConsensusDnpName);
 
       if (!isInstalled) {
         // update status in db
@@ -87,11 +86,7 @@ export class Consensus extends StakerComponent {
         return;
       }
 
-      const userSettings = {
-        // No need to add default environment if the package is already installed
-        environment: isInstalled ? {} : getConsensusUserSettings({ network }).environment,
-        networks: this.getStakerNetworkSettings(network)
-      };
+      const userSettings = await this.getUserSettings(network, currentConsensusDnpName);
 
       await this.persistSelectedIfInstalled({
         dnpName: currentConsensusDnpName,
@@ -118,10 +113,13 @@ export class Consensus extends StakerComponent {
   }
 
   private async getUserSettings(network: Network, newConsensusDnpName: string | null): Promise<UserSettings> {
-    const mustInstallPkg = !!newConsensusDnpName && !(await listPackageNoThrow({ dnpName: newConsensusDnpName }));
+    if (!newConsensusDnpName) return {};
+
+    const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
 
     const userSettings = {
-      environment: mustInstallPkg ? getConsensusUserSettings({ network }).environment : {},
+      // If the package is not installed, we use the default environment
+      environment: isPkgInstalled ? {} : getDefaultConsensusUserSettings({ network }).environment,
       networks: this.getStakerNetworkSettings(network)
     };
 
@@ -133,14 +131,7 @@ export class Consensus extends StakerComponent {
     const beaconServiceName = "beacon-chain";
 
     return {
-      rootNetworks: {
-        [params.DOCKER_STAKER_NETWORKS[network]]: {
-          external: true
-        },
-        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-          external: true
-        }
-      },
+      rootNetworks: this.getComposeRootNetworks(network),
       serviceNetworks: {
         [beaconServiceName]: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {

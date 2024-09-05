@@ -14,11 +14,13 @@ import {
   UserSettingsAllDnps,
   PackageContainer,
   StakerItem,
-  UserSettings
+  UserSettings,
+  Network
 } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { isMatch } from "lodash-es";
+import { params } from "@dappnode/params";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -116,6 +118,25 @@ export class StakerComponent {
       isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
       userSettings
     });
+  }
+
+  protected async isPackageInstalled(dnpName: string): Promise<boolean> {
+    const dnp = await listPackageNoThrow({ dnpName });
+
+    return Boolean(dnp);
+  }
+
+  protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
+    return {
+      rootNetworks: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          external: true
+        },
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          external: true
+        }
+      }
+    };
   }
 
   /**
