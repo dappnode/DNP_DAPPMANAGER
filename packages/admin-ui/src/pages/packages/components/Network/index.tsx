@@ -16,6 +16,12 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
   const [serviceName, setServiceName] = useState(serviceNames[0]);
   const container = containers.find(c => c.serviceName === serviceName);
   const [alisases, setAliases] = useState([]);
+  const mappings = [
+    "Public port mapping",
+    "HTTPs domain mapping",
+    "TOR domain mapping"
+  ];
+  const [mappingSelected, setMappingSelected] = useState(0);
   useEffect(() => {
     if (container) {
       async function getContainerAliases(): Promise<void> {
@@ -23,9 +29,8 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
       }
       getContainerAliases();
     }
-
   }, [container]);
-  
+
   return (
     <>
       <Card spacing className="network-editor">
@@ -50,35 +55,46 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
                 </ul>
               </>
             )}
-         
+
             {/* TODO: include docu "Network tab" url when done */}
             <LinkDocs href={docsUrl.main}>
-          Learn more about Network tab in our Documentation
-        </LinkDocs>
+              Learn more about Network tab in our Documentation
+            </LinkDocs>
           </div>
         )}
-      
 
-      {container && (
-        <>
-          <SubTitle>Public port mapping</SubTitle>
-          <div  className="network-editor">
-            <PortsByService
-              dnpName={container.dnpName}
-              serviceName={container.serviceName}
-              ports={container.ports}
-            />
-          </div>
+        {container && (
+          <>
+            <div className="mappings-navbar">
+              {mappings.map((mapping, i) => (
+                  <div
+                    onClick={() => setMappingSelected(i)}
+                    className={mappingSelected === i ? 'selected':undefined}                 
+                  >
+                    {mapping}
+                  </div>
+              ))}
+            </div>
 
-          <SubTitle>HTTPs domain mapping</SubTitle>
-          <div  className="network-editor">
-            <HttpsMappings
-              dnpName={container.dnpName}
-              serviceName={container.serviceName}
-            />
-          </div>
-        </>
-      )}
+            <SubTitle>{mappings[mappingSelected]}</SubTitle>
+            <div className="network-editor">
+              {mappingSelected === 0 ? (
+                <PortsByService
+                  dnpName={container.dnpName}
+                  serviceName={container.serviceName}
+                  ports={container.ports}
+                />
+              ) : mappingSelected === 1 ? (
+                <HttpsMappings
+                  dnpName={container.dnpName}
+                  serviceName={container.serviceName}
+                />
+              ) : (
+                <div>TODO TOR IMPLEMENTATION</div>
+              )}
+            </div>
+          </>
+        )}
       </Card>
     </>
   );
