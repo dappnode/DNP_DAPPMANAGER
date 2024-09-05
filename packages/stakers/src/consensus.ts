@@ -86,9 +86,16 @@ export class Consensus extends StakerComponent {
         this.DbHandlers[network].set(undefined);
         return;
       }
+
+      const userSettings = {
+        // No need to add default environment if the package is already installed
+        environment: isInstalled ? {} : getConsensusUserSettings({ network }).environment,
+        networks: this.getStakerNetworkSettings(network)
+      };
+
       await this.persistSelectedIfInstalled({
         dnpName: currentConsensusDnpName,
-        userSettings: this.getUserSettings(isInstalled, network)
+        userSettings
       });
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
@@ -97,8 +104,7 @@ export class Consensus extends StakerComponent {
   async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
 
-    const mustInstallPkg = !!newConsensusDnpName && !(await listPackageNoThrow({ dnpName: newConsensusDnpName }));
-    const userSettings = newConsensusDnpName ? this.getUserSettings(mustInstallPkg, network) : {};
+    const userSettings = await this.getUserSettings(network, newConsensusDnpName);
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
@@ -111,39 +117,45 @@ export class Consensus extends StakerComponent {
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getUserSettings(shouldSetEnvironment: boolean, network: Network): UserSettings {
+  private async getUserSettings(network: Network, newConsensusDnpName: string | null): Promise<UserSettings> {
+    const mustInstallPkg = !!newConsensusDnpName && !(await listPackageNoThrow({ dnpName: newConsensusDnpName }));
+
+    const userSettings = {
+      environment: mustInstallPkg ? getConsensusUserSettings({ network }).environment : {},
+      networks: this.getStakerNetworkSettings(network)
+    };
+
+    return userSettings;
+  }
+
+  private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
-    const consensusDefaultUserSettings = getConsensusUserSettings({ network });
-
     return {
-      environment: shouldSetEnvironment ? consensusDefaultUserSettings.environment : {},
-      networks: {
-        rootNetworks: {
+      rootNetworks: {
+        [params.DOCKER_STAKER_NETWORKS[network]]: {
+          external: true
+        },
+        [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+          external: true
+        }
+      },
+      serviceNetworks: {
+        [beaconServiceName]: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
-            external: true
+            aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            external: true
+            aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
           }
         },
-        serviceNetworks: {
-          [beaconServiceName]: {
-            [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
-            },
-            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
-            }
+        [validatorServiceName]: {
+          [params.DOCKER_STAKER_NETWORKS[network]]: {
+            aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
           },
-          [validatorServiceName]: {
-            [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
-            },
-            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
-            }
+          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+            aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
           }
         }
       }

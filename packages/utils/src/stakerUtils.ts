@@ -7,7 +7,7 @@ import { UserSettings, Network } from "@dappnode/types";
  * It may be different depending if it is multiservice or monoservice and all the envs are
  * set in the same service
  */
-export function getConsensusUserSettings({ network }: { network: Network }): UserSettings {
+export function getDefaultConsensusUserSettings({ network }: { network: Network }): UserSettings {
   const validatorServiceName = "validator";
   const beaconServiceName = "beacon-chain";
   const beaconValidatorServiceName = "beacon-validator";
