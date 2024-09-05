@@ -193,7 +193,11 @@ export class StakerComponent {
     const connectedContainers = pkgContainers
       .filter((container) => container.networks.some((network) => network.name === networkName))
       .map((container) => container.containerName);
-    for (const container of connectedContainers) await dockerNetworkDisconnect(networkName, container);
+    for (const container of connectedContainers)
+      await dockerNetworkDisconnect(networkName, container).catch((e) =>
+        // TODO: What if the restarting container is started again? Will it reconnect to the docker network?
+        logs.error(`Could not disconnect container from ${networkName}: ${e.message}`)
+      );
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
