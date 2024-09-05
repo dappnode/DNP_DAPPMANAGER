@@ -3,7 +3,7 @@ import { Eth2ClientTarget, EthClientRemote, InstalledPackageDetailData } from "@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
-import { getConsensusUserSettings } from "@dappnode/utils";
+import { getDefaultConsensusUserSettings } from "@dappnode/utils";
 import { packageInstall, packageGet, packageRemove } from "../calls/index.js";
 import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import { params } from "@dappnode/params";
@@ -318,7 +318,7 @@ export class EthereumClient {
       if (!consClientPkg) {
         // Get default cons client user settings and install cons client
         const userSettings = {
-          [consClient]: getConsensusUserSettings({
+          [consClient]: getDefaultConsensusUserSettings({
             network: Network.Mainnet
           })
         };
