@@ -1,22 +1,13 @@
 import {
   dockerComposeUpPackage,
-  dockerContainerStop,
-  dockerNetworkDisconnect,
+  dockerRecreatePackageContainers,
   listPackageNoThrow,
   listPackages
 } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import {
-  InstalledPackageDataApiReturn,
-  InstalledPackageData,
-  UserSettingsAllDnps,
-  PackageContainer,
-  StakerItem,
-  UserSettings,
-  Network
-} from "@dappnode/types";
+import { InstalledPackageData, UserSettingsAllDnps, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { isMatch } from "lodash-es";
@@ -180,24 +171,10 @@ export class StakerComponent {
    * - removes the staker network from the docker-compose file
    */
   private async unsetStakerPkgConfig(pkg: InstalledPackageData, dockerNetworkName: string): Promise<void> {
-    // disconnect pkg from staker network
-    await this.disconnectPkgFromStakerNetwork(dockerNetworkName, pkg.containers);
-
-    // stop all containers
-    await this.stopAllPkgContainers(pkg);
-    // remove staker network from the compose file
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
-  }
 
-  private async disconnectPkgFromStakerNetwork(networkName: string, pkgContainers: PackageContainer[]): Promise<void> {
-    const connectedContainers = pkgContainers
-      .filter((container) => container.networks.some((network) => network.name === networkName))
-      .map((container) => container.containerName);
-    for (const container of connectedContainers)
-      await dockerNetworkDisconnect(networkName, container).catch((e) =>
-        // TODO: What if the restarting container is started again? Will it reconnect to the docker network?
-        logs.error(`Could not disconnect container from ${networkName}: ${e.message}`)
-      );
+    // Check if we can lose info not included in the package volumes
+    await dockerRecreatePackageContainers(pkg.dnpName);
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
@@ -243,17 +220,5 @@ export class StakerComponent {
         `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
-  }
-
-  /**
-   * Stop all the containers from a given package dnpName
-   */
-  // TODO: Move this to where packages and containers are started/stopped
-  private async stopAllPkgContainers(pkg: InstalledPackageDataApiReturn | InstalledPackageData): Promise<void> {
-    await Promise.all(
-      pkg.containers
-        .filter((c) => c.running)
-        .map(async (c) => dockerContainerStop(c.containerName, { timeout: c.dockerTimeout }))
-    ).catch((e) => logs.error(e.message));
   }
 }
