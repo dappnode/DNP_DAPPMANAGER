@@ -1,10 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import {
-  runOnlyOneSequentially,
-  runOnlyOneReturnToAll,
-  pause,
-} from "../../src/asyncFlows.js";
+import { runOnlyOneSequentially, runOnlyOneReturnToAll, pause } from "../../src/asyncFlows.js";
 
 describe("Util: asyncFlows", () => {
   describe("runOnlyOneSequentially", () => {
@@ -35,7 +31,7 @@ describe("Util: asyncFlows", () => {
         "Requesting 2",
         "Requesting 3",
         "success async 0",
-        "success async 1",
+        "success async 1"
       ]);
     });
 
@@ -55,12 +51,7 @@ describe("Util: asyncFlows", () => {
         await pause(callDelay);
       }
 
-      expect(mockLog).to.deep.equal([
-        "Requesting 0",
-        "Requesting 1",
-        "Requesting 2",
-        "Requesting 3",
-      ]);
+      expect(mockLog).to.deep.equal(["Requesting 0", "Requesting 1", "Requesting 2", "Requesting 3"]);
     });
   });
 
@@ -113,20 +104,16 @@ Error 15: 0.616938341865086
         console.log(s);
         mockLog.push(s);
       }
-      const throttledCallback = runOnlyOneReturnToAll(
-        async (c: { a: number }) => {
-          c;
-          if (isProcessing)
-            throw Error(`Cannot process twice at the same time`);
-          isProcessing = true;
-          log(`processing...`);
-          await pause(internalFunctionPause);
-          isProcessing = false;
-          const res = Math.random();
-          if (res > 0.5) throw Error(String(res));
-          else return res;
-        }
-      );
+      const throttledCallback = runOnlyOneReturnToAll(async (c: { a: number }) => {
+        if (isProcessing) throw Error(`Cannot process twice at the same time`);
+        isProcessing = true;
+        log(`processing ${c} ...`);
+        await pause(internalFunctionPause);
+        isProcessing = false;
+        const res = Math.random();
+        if (res > 0.5) throw Error(String(res));
+        else return res;
+      });
 
       for (let i = 0; i < 100; i++) {
         log(`Requesting ${i}`);
@@ -164,7 +151,7 @@ Error 15: 0.616938341865086
         "Requesting 1",
         "Requesting 2",
         "Requesting 3",
-        "success async 0",
+        "success async 0"
       ]);
     });
 
@@ -196,7 +183,7 @@ Error 15: 0.616938341865086
         "Requesting 2",
         "Requesting 3",
         "success async 2",
-        "success async 3",
+        "success async 3"
       ]);
     });
 
@@ -231,7 +218,7 @@ Error 15: 0.616938341865086
         "Requesting 2",
         "Requesting 3",
         "mock error async 2",
-        "mock error async 3",
+        "mock error async 3"
       ]);
     });
   });

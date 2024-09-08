@@ -2,11 +2,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { DirectoryItem, DirectoryItemOk } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
-import {
-  fileToGatewayUrl,
-  getIsInstalled,
-  getIsUpdated
-} from "@dappnode/utils";
+import { fileToGatewayUrl, getIsInstalled, getIsUpdated } from "@dappnode/utils";
 import { throttle } from "lodash-es";
 import { getEthersProvider } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
@@ -18,7 +14,7 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const directory = new DappNodeDirectory(await getEthersProvider()) ;
+  const directory = new DappNodeDirectory(await getEthersProvider());
 
   const installedDnpList = await listPackages();
 
@@ -81,12 +77,8 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
 /**
  * Get a short description and trim it
  */
-export function getShortDescription(metadata: {
-  description?: string;
-  shortDescription?: string;
-}): string {
-  const desc =
-    metadata.shortDescription || metadata.description || "No description";
+export function getShortDescription(metadata: { description?: string; shortDescription?: string }): string {
+  const desc = metadata.shortDescription || metadata.description || "No description";
   // Don't send big descriptions, the UI crops them anyway
   return desc.slice(0, 80);
 }
@@ -98,10 +90,7 @@ const fallbackCategories: { [dnpName: string]: string[] } = {
   "vipnode.dnp.dappnode.eth": ["Economic incentive"],
   "ropsten.dnp.dappnode.eth": ["Developer tools"],
   "rinkeby.dnp.dappnode.eth": ["Developer tools"],
-  "lightning-network.dnp.dappnode.eth": [
-    "Payment channels",
-    "Economic incentive"
-  ],
+  "lightning-network.dnp.dappnode.eth": ["Payment channels", "Economic incentive"],
   "swarm.dnp.dappnode.eth": ["Storage", "Communications"],
   "goerli-geth.dnp.dappnode.eth": ["Developer tools"],
   "bitcoin.dnp.dappnode.eth": ["Blockchain"],
@@ -168,8 +157,7 @@ const stakeHouseCard: DirectoryItemOk = {
   whitelisted: true,
   isFeatured: true,
   status: "ok",
-  description:
-    "Join or create an LSD Network and stake a validator with 4 ETH.",
+  description: "Join or create an LSD Network and stake a validator with 4 ETH.",
   avatarUrl: fileToGatewayUrl({
     hash: "QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw",
     source: "ipfs",

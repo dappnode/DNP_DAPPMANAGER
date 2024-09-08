@@ -1,27 +1,20 @@
 import { Routes } from "@dappnode/types";
 
-const initialDevices = [
-  "dappnode_admin",
-  "other-user",
-  "wireguard-other-user-2"
-];
+const initialDevices = ["dappnode_admin", "other-user", "wireguard-other-user-2"];
 const devicesState = new Set<string>(initialDevices);
 
 export const wireguard: Pick<
   Routes,
-  | "wireguardDeviceAdd"
-  | "wireguardDeviceGet"
-  | "wireguardDeviceRemove"
-  | "wireguardDevicesGet"
+  "wireguardDeviceAdd" | "wireguardDeviceGet" | "wireguardDeviceRemove" | "wireguardDevicesGet"
 > = {
-  wireguardDeviceAdd: async id => {
+  wireguardDeviceAdd: async (id) => {
     devicesState.add(id);
   },
-  wireguardDeviceRemove: async id => {
+  wireguardDeviceRemove: async (id) => {
     devicesState.delete(id);
   },
   wireguardDevicesGet: async () => Array.from(devicesState.values()),
-  wireguardDeviceGet: async id => {
+  wireguardDeviceGet: async (id) => {
     if (!devicesState.has(id)) throw Error(`No device id ${id}`);
     const configRemote = `[Interface]
 Address = 172.34.1.2

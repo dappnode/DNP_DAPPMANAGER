@@ -1,11 +1,7 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import {
-  runAtMostEvery,
-  runOnlyOneSequentially,
-  getConsensusUserSettings,
-} from "@dappnode/utils";
+import { runAtMostEvery, runOnlyOneSequentially, getConsensusUserSettings } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import {
   EthClientRemote,
@@ -13,19 +9,16 @@ import {
   EthClientInstallStatus,
   ExecutionClientMainnet,
   ConsensusClientMainnet,
-  Network,
+  Network
 } from "@dappnode/types";
 import {
   ethereumClient,
   getLocalFallbackContentHash,
   serializeError,
   packageInstall,
-  DappnodeInstaller,
+  DappnodeInstaller
 } from "@dappnode/installer";
-import {
-  dockerComposeUpPackage,
-  listPackageNoThrow,
-} from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
  * Check status of the Ethereum client and do next actions
@@ -52,8 +45,7 @@ export async function runEthClientInstaller(
 
   if (dnp) {
     // OK: Client is already installed, ensure it's running
-    if (dnp.containers.some((c) => !c.running))
-      await dockerComposeUpPackage({ dnpName: target }, true);
+    if (dnp.containers.some((c) => !c.running)) await dockerComposeUpPackage({ dnpName: target }, true);
     return { status: "INSTALLED" };
   } else {
     // Client is not installed
@@ -70,13 +62,9 @@ export async function runEthClientInstaller(
         try {
           // check target belongs to enum ExecutionClientMainnet
 
-          if (isExecutionClientMainnet(target))
-            db.ethExecClientInstallStatus.set(target, { status: "INSTALLING" });
+          if (isExecutionClientMainnet(target)) db.ethExecClientInstallStatus.set(target, { status: "INSTALLING" });
           else if (isConsensusClientMainnet(target))
-            db.ethConsClientInstallStatus.set(
-              target as ConsensusClientMainnet,
-              { status: "INSTALLING" }
-            );
+            db.ethConsClientInstallStatus.set(target as ConsensusClientMainnet, { status: "INSTALLING" });
 
           try {
             if (isConsensusClientMainnet(target))
@@ -84,8 +72,8 @@ export async function runEthClientInstaller(
                 name: target,
                 userSettings: getConsensusUserSettings({
                   dnpName: target,
-                  network: Network.Mainnet,
-                }),
+                  network: Network.Mainnet
+                })
               });
             else await packageInstall(dappnodeInstaller, { name: target });
           } catch (e) {
@@ -99,7 +87,7 @@ export async function runEthClientInstaller(
               if (!contentHash) throw Error(`No local version for ${target}`);
               await packageInstall(dappnodeInstaller, {
                 name: target,
-                version: contentHash,
+                version: contentHash
               });
             } else {
               throw e;
@@ -153,10 +141,7 @@ function verifyInitialStatusIsNotInstalling(): void {
  * - after changing the client
  * - after completing a run if the status has changed
  */
-export function startEthMultiClientDaemon(
-  dappnodeInstaller: DappnodeInstaller,
-  signal: AbortSignal
-): void {
+export function startEthMultiClientDaemon(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
   verifyInitialStatusIsNotInstalling();
 
   const runEthMultiClientTaskMemo = runOnlyOneSequentially(
@@ -171,12 +156,7 @@ export function startEthMultiClientDaemon(
         const execClient = db.executionClientMainnet.get();
         const consClient = db.consensusClientMainnet.get();
 
-        if (
-          db.ethClientRemote.get() === EthClientRemote.on ||
-          !execClient ||
-          !consClient
-        )
-          return; // Nothing to install
+        if (db.ethClientRemote.get() === EthClientRemote.on || !execClient || !consClient) return; // Nothing to install
 
         for (const client of [execClient, consClient]) {
           if (!client) continue;
@@ -184,11 +164,7 @@ export function startEthMultiClientDaemon(
           const prev = isExecutionClientMainnet(client)
             ? db.ethExecClientInstallStatus.get(client)
             : db.ethConsClientInstallStatus.get(client);
-          const next = await runEthClientInstaller(
-            dappnodeInstaller,
-            client,
-            prev
-          );
+          const next = await runEthClientInstaller(dappnodeInstaller, client, prev);
 
           if (!next) continue; // Package is uninstalled
           isExecutionClientMainnet(client)
@@ -199,10 +175,7 @@ export function startEthMultiClientDaemon(
             // Next run MUST be defered to next event loop for prevStatus to refresh
             setTimeout(eventBus.runEthClientInstaller.emit, 1000);
 
-            if (
-              isExecutionClientMainnet(client) &&
-              next.status === "INSTALLED"
-            ) {
+            if (isExecutionClientMainnet(client) && next.status === "INSTALLED") {
               // If status switched to "INSTALLED", map to fullnode.dappnode
               // Must be done here in case the package is already installed
               // 1. Domain for BIND package
@@ -211,7 +184,7 @@ export function startEthMultiClientDaemon(
               ethereumClient.updateFullnodeAlias({
                 prevExecClientDnpName: multiClientArgs?.prevExecClientDnpName,
                 newExecClientDnpName: client,
-                network: Network.Mainnet,
+                network: Network.Mainnet
               });
             }
           }
@@ -227,25 +200,13 @@ export function startEthMultiClientDaemon(
     runEthMultiClientTaskMemo({ prevExecClientDnpName })
   );
 
-  runAtMostEvery(
-    async () => runEthMultiClientTaskMemo(),
-    params.AUTO_UPDATE_DAEMON_INTERVAL,
-    signal
-  );
+  runAtMostEvery(async () => runEthMultiClientTaskMemo(), params.AUTO_UPDATE_DAEMON_INTERVAL, signal);
 }
 
-function isExecutionClientMainnet(
-  value: string
-): value is ExecutionClientMainnet {
-  return Object.values(ExecutionClientMainnet).includes(
-    value as ExecutionClientMainnet
-  );
+function isExecutionClientMainnet(value: string): value is ExecutionClientMainnet {
+  return Object.values(ExecutionClientMainnet).includes(value as ExecutionClientMainnet);
 }
 
-function isConsensusClientMainnet(
-  value: string
-): value is ConsensusClientMainnet {
-  return Object.values(ConsensusClientMainnet).includes(
-    value as ConsensusClientMainnet
-  );
+function isConsensusClientMainnet(value: string): value is ConsensusClientMainnet {
+  return Object.values(ConsensusClientMainnet).includes(value as ConsensusClientMainnet);
 }

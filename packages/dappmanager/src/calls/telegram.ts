@@ -12,11 +12,7 @@ export async function telegramStatusGet(): Promise<boolean> {
  * Sets the telegram status
  * @param telegramStatus switch telegram bot status
  */
-export async function telegramStatusSet({
-  telegramStatus
-}: {
-  telegramStatus: boolean;
-}): Promise<void> {
+export async function telegramStatusSet({ telegramStatus }: { telegramStatus: boolean }): Promise<void> {
   db.telegramStatus.set(telegramStatus);
   eventBus.telegramStatusChanged.emit();
 }
@@ -37,13 +33,7 @@ export async function telegramConfigGet(): Promise<{
 /**
  * Set telegram configuration: token and user ID
  */
-export async function telegramConfigSet({
-  token,
-  userId
-}: {
-  token: string;
-  userId: string;
-}): Promise<void> {
+export async function telegramConfigSet({ token, userId }: { token: string; userId: string }): Promise<void> {
   db.telegramToken.set(token);
   db.telegramUserId.set(userId);
   eventBus.telegramStatusChanged.emit();

@@ -12,7 +12,7 @@ import { logs } from "@dappnode/logger";
  */
 export async function copyOnHost({
   hostDir,
-  hostDirSource,
+  hostDirSource
 }: {
   hostDir: string;
   hostDirSource: string;

@@ -19,26 +19,17 @@ export async function dockerGetFileOrDirBasedOnExtension(
 ): Promise<void> {
   if (options?.isSingleFile) {
     // Download single file
-    await dockerGetArchiveSingleFile(
-      containerNameOrId,
-      filePathAbsolute,
-      fileContentSink
-    );
+    await dockerGetArchiveSingleFile(containerNameOrId, filePathAbsolute, fileContentSink);
   } else {
     // Download path as tar
-    const tarReadableStream = await dockerGetArchive(
-      containerNameOrId,
-      filePathAbsolute
-    );
+    const tarReadableStream = await dockerGetArchive(containerNameOrId, filePathAbsolute);
     await promisify(pipeline)(tarReadableStream, fileContentSink);
   }
 }
 
 type FileType = "file" | "directory";
 
-export async function dockerGetPathType(
-  filePathAbsolute: string
-): Promise<FileType> {
+export async function dockerGetPathType(filePathAbsolute: string): Promise<FileType> {
   if (path.parse(filePathAbsolute).ext) {
     return "file";
   } else {

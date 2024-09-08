@@ -1,8 +1,4 @@
-import {
-  ChainDriver,
-  ChainDriverSpecs,
-  InstalledPackageData,
-} from "@dappnode/types";
+import { ChainDriver, ChainDriverSpecs, InstalledPackageData } from "@dappnode/types";
 import { ChainDataResult } from "../types.js";
 // Drivers
 import { bitcoin } from "./bitcoin.js";
@@ -24,7 +20,7 @@ export async function runWithChainDriver(
   let chainDriverSpecs: ChainDriverSpecs;
   if (typeof chainDriver === "string") {
     chainDriverSpecs = {
-      driver: chainDriver,
+      driver: chainDriver
     };
   } else {
     chainDriverSpecs = chainDriver;

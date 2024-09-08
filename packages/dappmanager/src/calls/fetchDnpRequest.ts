@@ -2,22 +2,10 @@ import { mapValues, omit } from "lodash-es";
 import { valid, gt } from "semver";
 import { params } from "@dappnode/params";
 import deepmerge from "deepmerge";
-import {
-  fileToGatewayUrl,
-  getIsUpdated,
-  getIsInstalled
-} from "@dappnode/utils";
+import { fileToGatewayUrl, getIsUpdated, getIsInstalled } from "@dappnode/utils";
 import { dappnodeInstaller } from "../index.js";
-import {
-  dockerInfoArchive,
-  listPackages,
-  getDockerVersion
-} from "@dappnode/dockerapi";
-import {
-  ComposeEditor,
-  ComposeFileEditor,
-  parseSpecialPermissions
-} from "@dappnode/dockercompose";
+import { dockerInfoArchive, listPackages, getDockerVersion } from "@dappnode/dockerapi";
+import { ComposeEditor, ComposeFileEditor, parseSpecialPermissions } from "@dappnode/dockercompose";
 import {
   RequestedDnp,
   UserSettingsAllDnps,
@@ -29,13 +17,10 @@ import {
   ReleaseSignatureStatusCode
 } from "@dappnode/types";
 import { Manifest, SetupWizardField } from "@dappnode/types";
+import { logs } from "@dappnode/logger";
 
-export async function fetchDnpRequest({
-  id
-}: {
-  id: string;
-}): Promise<RequestedDnp> {
-  const mainRelease = await dappnodeInstaller.getRelease(id);
+export async function fetchDnpRequest({ id, version }: { id: string; version?: string }): Promise<RequestedDnp> {
+  const mainRelease = await dappnodeInstaller.getRelease(id, version);
 
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
@@ -47,13 +32,10 @@ export async function fetchDnpRequest({
   async function addReleaseToSettings(release: PackageRelease): Promise<void> {
     const { dnpName, compose, isCore } = release;
 
-    const dnp = dnpList.find(d => d.dnpName === dnpName);
+    const dnp = dnpList.find((d) => d.dnpName === dnpName);
 
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
-    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(
-      dnpName,
-      isCore
-    );
+    const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
     settings[dnpName] = deepmerge(defaultUserSet, prevUserSet);
 
     specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
@@ -61,8 +43,7 @@ export async function fetchDnpRequest({
     if (release.setupWizard) {
       const activeSetupWizardFields: SetupWizardField[] = [];
       for (const field of release.setupWizard.fields) {
-        if (await shouldAddSetupWizardField(field, dnp))
-          activeSetupWizardFields.push(field);
+        if (await shouldAddSetupWizardField(field, dnp)) activeSetupWizardFields.push(field);
       }
       setupWizard[dnpName] = {
         ...release.setupWizard,
@@ -84,11 +65,11 @@ export async function fetchDnpRequest({
   let compatibleDnps: CompatibleDnps = {};
   try {
     const { dnpName, reqVersion } = mainRelease;
-    const { state, currentVersions, releases } =
-      await dappnodeInstaller.getReleasesResolved({
-        name: dnpName,
-        ver: reqVersion
-      });
+    const { state, currentVersions, releases } = await dappnodeInstaller.getReleasesResolved({
+      name: dnpName,
+      ver: reqVersion
+    });
+
     compatibleDnps = mapValues(state, (nextVersion, dnpName) => ({
       from: currentVersions[dnpName],
       to: nextVersion
@@ -137,45 +118,25 @@ export async function fetchDnpRequest({
     },
 
     signedSafe,
-    signedSafeAll: Object.values(signedSafe).every(r => r.safe === true)
+    signedSafeAll: Object.values(signedSafe).every((r) => r.safe === true)
   };
 }
 
-async function getRequiresUninstallPackages({
-  manifest
-}: {
-  manifest: Manifest;
-}): Promise<string[]> {
+async function getRequiresUninstallPackages({ manifest }: { manifest: Manifest }): Promise<string[]> {
   const { notInstalledPackages } = manifest.requirements || {};
   if (!notInstalledPackages || notInstalledPackages.length === 0) return [];
   const installedPackages = await listPackages();
-  return notInstalledPackages.filter(dnpName =>
-    installedPackages.find(dnp => dnp.dnpName === dnpName)
-  );
+  return notInstalledPackages.filter((dnpName) => installedPackages.find((dnp) => dnp.dnpName === dnpName));
 }
 
-function getRequiresCoreUpdate(
-  { manifest }: { manifest: Manifest },
-  dnpList: InstalledPackageData[]
-): boolean {
-  const coreDnp = dnpList.find(dnp => dnp.dnpName === params.coreDnpName);
+function getRequiresCoreUpdate({ manifest }: { manifest: Manifest }, dnpList: InstalledPackageData[]): boolean {
+  const coreDnp = dnpList.find((dnp) => dnp.dnpName === params.coreDnpName);
   if (!coreDnp) return false;
   const coreVersion = coreDnp.version;
-  const minDnVersion = manifest.requirements
-    ? manifest.requirements.minimumDappnodeVersion
-    : "";
-  return Boolean(
-    minDnVersion &&
-      valid(minDnVersion) &&
-      valid(coreVersion) &&
-      gt(minDnVersion, coreVersion)
-  );
+  const minDnVersion = manifest.requirements ? manifest.requirements.minimumDappnodeVersion : "";
+  return Boolean(minDnVersion && valid(minDnVersion) && valid(coreVersion) && gt(minDnVersion, coreVersion));
 }
-async function getRequiresDockerUpdate({
-  manifest
-}: {
-  manifest: Manifest;
-}): Promise<boolean> {
+async function getRequiresDockerUpdate({ manifest }: { manifest: Manifest }): Promise<boolean> {
   const minDockerVersion = manifest.requirements?.minimumDockerVersion;
   if (!minDockerVersion) return false;
   const currentDockerVersion = await getDockerVersion();
@@ -206,19 +167,15 @@ async function shouldAddSetupWizardField(
       if (dnp) {
         const serviceName = field.target.service;
         // Find the container referenced by the target or the first one if unspecified
-        const container = dnp.containers.find(
-          c => !serviceName || c.serviceName === serviceName
-        );
+        const container = dnp.containers.find((c) => !serviceName || c.serviceName === serviceName);
         if (container)
           try {
-            const fileInfo = await dockerInfoArchive(
-              container.containerId,
-              field.target.path
-            );
+            const fileInfo = await dockerInfoArchive(container.containerId, field.target.path);
             return !fileInfo.size;
           } catch (e) {
             // Ignore all errors: 404 Container not found,
             // 404 path not found, Base64 parsing, JSON parsing, etc.
+            logs.error(`Error fetching file info for ${dnp.dnpName} ${serviceName} ${field.target.path}`, e);
           }
       }
       return true;
@@ -250,9 +207,6 @@ function getReleaseSignedSafeMessage(release: PackageRelease): string {
   }
 }
 
-function getInstalledVersion(
-  { dnpName }: { dnpName: string },
-  dnpList: InstalledPackageData[]
-): string | undefined {
-  return dnpList.find(dnp => dnp.dnpName === dnpName)?.version;
+function getInstalledVersion({ dnpName }: { dnpName: string }, dnpList: InstalledPackageData[]): string | undefined {
+  return dnpList.find((dnp) => dnp.dnpName === dnpName)?.version;
 }

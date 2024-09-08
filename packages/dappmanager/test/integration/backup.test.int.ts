@@ -4,13 +4,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
-import {
-  testDir,
-  cleanTestDir,
-  createTestDir,
-  clearDbs,
-  shellSafe
-} from "../testUtils.js";
+import { testDir, cleanTestDir, createTestDir, clearDbs, shellSafe } from "../testUtils.js";
 
 // Calls
 import { backupGet } from "../../src/calls/backupGet.js";
@@ -26,10 +20,8 @@ describe("Integration test for backup to and from:", function () {
   const dnpName = "test-backup.dnp.dappnode.eth";
   const containerName = `DAppNodePackage-${dnpName}`;
   const backupFileCompName = "test-backup.dnp.dappnode.eth_backup.tar.xz";
-  const fileId =
-    "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908";
-  const dockerComposePath =
-    "dnp_repo/test-backup.dnp.dappnode.eth/docker-compose.yml";
+  const fileId = "e08dbd0f654c0ae06c08570e731c8f14c079ec54ab7e58915d52290612b0a908";
+  const dockerComposePath = "dnp_repo/test-backup.dnp.dappnode.eth/docker-compose.yml";
 
   const filePath = ".temp-transfer/test-backup.dnp.dappnode.eth_backup.tar.xz";
 
@@ -81,9 +73,7 @@ volumes:
     // Create the backup data structure
     await shell(`mkdir -p ${path.join(testDir, "test")}`);
     await shell(`echo "${content}" > ${path.join(testDir, "config")}`);
-    await shell(
-      `echo "${content}" > ${path.join(testDir, "test", "data.conf")}`
-    );
+    await shell(`echo "${content}" > ${path.join(testDir, "test", "data.conf")}`);
     // Create tar.xz backup file
     const dirListToComp = ["config", "test"].join(" ");
     const backupFileComp = path.join(testDir, backupFileCompName);
@@ -125,21 +115,11 @@ volumes:
     await shell(`tar -xf ${filePath} -C ${testDir}`);
 
     // Check the file contents
-    const backupFileContent = await shell(
-      `cat ${path.join(testDir, "config")}`
-    );
-    expect(backupFileContent).to.equal(
-      content,
-      `Backup file (config) contents are incorrect`
-    );
+    const backupFileContent = await shell(`cat ${path.join(testDir, "config")}`);
+    expect(backupFileContent).to.equal(content, `Backup file (config) contents are incorrect`);
     // Check the dir contents
-    const backupSubDirContent = await shell(
-      `cat ${path.join(testDir, "test/data.conf")}`
-    );
-    expect(backupSubDirContent).to.equal(
-      content,
-      `Backup sub dir file (test/data.conf) contents are incorrect`
-    );
+    const backupSubDirContent = await shell(`cat ${path.join(testDir, "test/data.conf")}`);
+    expect(backupSubDirContent).to.equal(content, `Backup sub dir file (test/data.conf) contents are incorrect`);
   });
 
   after("Clean test docker container", async function () {

@@ -20,7 +20,7 @@ describe.skip("dappGet/resolve/prioritizeDnps", () => {
       B: { isInstalled: true, versions: {} },
       C: { isInstalled: true, versions: {} },
       D: { versions: {} },
-      E: { versions: {} },
+      E: { versions: {} }
     };
     const dnpsArray = prioritizeDnps(dnps);
     expect(dnpsArray).to.deep.equal([
@@ -28,7 +28,7 @@ describe.skip("dappGet/resolve/prioritizeDnps", () => {
       { name: "E", versions: {} },
       { name: "B", isInstalled: true, versions: {} },
       { name: "C", isInstalled: true, versions: {} },
-      { name: "A", isRequest: true, versions: {} },
+      { name: "A", isRequest: true, versions: {} }
     ]);
   });
 });

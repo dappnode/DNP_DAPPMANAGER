@@ -33,9 +33,7 @@ export function isIpfsHash(hash: string): boolean {
  * Parses a timeout string and returns a number in seconds
  * @param timeout "20min", "5", undefined
  */
-export function parseTimeoutSeconds(
-  timeout: number | string | undefined
-): number | undefined {
+export function parseTimeoutSeconds(timeout: number | string | undefined): number | undefined {
   switch (typeof timeout) {
     case "number": {
       return timeout;

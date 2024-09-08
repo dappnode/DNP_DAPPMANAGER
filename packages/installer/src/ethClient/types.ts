@@ -6,5 +6,5 @@ import { ErrorSerialized } from "@dappnode/types";
  */
 export const serializeError = (e: Error): ErrorSerialized => ({
   message: e.message,
-  stack: e.stack,
+  stack: e.stack
 });

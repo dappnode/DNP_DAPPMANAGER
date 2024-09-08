@@ -16,14 +16,12 @@ export function cleanCompose(compose: Compose): Compose {
     services: mapValues(compose.services, (service) => ({
       ...omitBy(service, isOmitable),
       // Add mandatory properties for the ts compiler
-      ...pick(service, ["container_name", "image"]),
-    })),
+      ...pick(service, ["container_name", "image"])
+    }))
   };
 }
 
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export function isOmitable(value: any): boolean {
-  return (
-    value === undefined || value === null || (isObject(value) && isEmpty(value))
-  );
+  return value === undefined || value === null || (isObject(value) && isEmpty(value));
 }

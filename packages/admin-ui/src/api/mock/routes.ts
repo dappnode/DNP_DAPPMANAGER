@@ -31,7 +31,7 @@ export const apiRoutes: IApiRoutes = {
     const total = file.size;
     for (let percent = 0; percent <= 100; percent++) {
       onProgress({ total, loaded: (total * percent) / 100 });
-      await new Promise(r => setTimeout(r, 20));
+      await new Promise((r) => setTimeout(r, 20));
     }
 
     return {

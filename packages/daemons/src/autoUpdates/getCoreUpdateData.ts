@@ -26,7 +26,7 @@ export async function getCoreUpdateData(
   try {
     const dappgetResult = await dappnodeInstaller.getReleasesResolved({
       name: coreName,
-      ver: coreVersion,
+      ver: coreVersion
     });
     releases = dappgetResult.releases;
   } catch (e) {
@@ -51,9 +51,7 @@ export async function getCoreUpdateData(
    * Ignore it to compute the update type
    */
   const coreDnp = dnpList.find((_dnp) => _dnp.dnpName === coreName);
-  const coreDnpsToBeInstalled = releases.filter(
-    ({ dnpName }) => coreDnp || dnpName !== coreName
-  );
+  const coreDnpsToBeInstalled = releases.filter(({ dnpName }) => coreDnp || dnpName !== coreName);
 
   const packages = coreDnpsToBeInstalled.map((release) => {
     const dnp = dnpList.find((_dnp) => _dnp.dnpName === release.dnpName);
@@ -63,9 +61,7 @@ export async function getCoreUpdateData(
       from: dnp ? dnp.version : undefined,
       to: depManifest.version,
       warningOnInstall:
-        depManifest.warnings && depManifest.warnings.onInstall
-          ? depManifest.warnings.onInstall
-          : undefined,
+        depManifest.warnings && depManifest.warnings.onInstall ? depManifest.warnings.onInstall : undefined
     };
   });
 
@@ -73,24 +69,21 @@ export async function getCoreUpdateData(
    * If there's no from version, it should be the max jump from "0.0.0",
    * from = "", to = "0.2.7": updateType = "minor"
    */
-  const updateTypes = packages.map(({ from, to }) =>
-    computeSemverUpdateType(from || "0.0.0", to)
-  );
+  const updateTypes = packages.map(({ from, to }) => computeSemverUpdateType(from || "0.0.0", to));
 
   const type = updateTypes.includes("major")
     ? "major"
     : updateTypes.includes("minor")
-    ? "minor"
-    : updateTypes.includes("patch")
-    ? "patch"
-    : undefined;
+      ? "minor"
+      : updateTypes.includes("patch")
+        ? "patch"
+        : undefined;
 
   /**
    * Compute updateAlerts
    */
   const coreRelease =
-    releases.find(({ dnpName }) => dnpName === coreName) ||
-    (await dappnodeInstaller.getRelease(coreName, coreVersion));
+    releases.find(({ dnpName }) => dnpName === coreName) || (await dappnodeInstaller.getRelease(coreName, coreVersion));
   const { manifest: coreManifest } = coreRelease;
   const dnpCore = dnpList.find((dnp) => dnp.dnpName === coreName);
   const from = dnpCore ? dnpCore.version : "";
@@ -106,9 +99,7 @@ export async function getCoreUpdateData(
   );
 
   // versionId = "admin@0.2.4,vpn@0.2.2,core@0.2.6"
-  const versionId = getCoreVersionId(
-    packages.map(({ name, to }) => ({ dnpName: name, version: to }))
-  );
+  const versionId = getCoreVersionId(packages.map(({ name, to }) => ({ dnpName: name, version: to })));
 
   return {
     available: coreDnpsToBeInstalled.length > 0,
@@ -117,6 +108,6 @@ export async function getCoreUpdateData(
     changelog: coreManifest.changelog || "",
     updateAlerts,
     versionId,
-    coreVersion: coreManifest.version,
+    coreVersion: coreManifest.version
   };
 }

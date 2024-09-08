@@ -16,12 +16,12 @@ describe("Modules > compose", () => {
           privileged: true,
           networks: {
             network: {
-              ipv4_address: "172.33.10.4",
-            },
+              ipv4_address: "172.33.10.4"
+            }
           },
           cap_add: ["NET_ADMIN", "SYS_ADMIN"],
-          network_mode: "host",
-        })),
+          network_mode: "host"
+        }))
       };
 
       const specialPermissions = parseSpecialPermissions(compose, isCore);
@@ -31,7 +31,7 @@ describe("Modules > compose", () => {
         "Admin privileges in DAppNode's API",
         "Privileged system capability NET_ADMIN",
         "Privileged system capability SYS_ADMIN",
-        "Access to the host network",
+        "Access to the host network"
       ]);
     });
   });

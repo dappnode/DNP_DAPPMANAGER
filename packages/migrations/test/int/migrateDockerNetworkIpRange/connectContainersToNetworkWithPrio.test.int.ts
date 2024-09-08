@@ -1,10 +1,6 @@
 import "mocha";
 import { expect } from "chai";
-import {
-  docker,
-  dockerNetworkConnect,
-  getNetworkAliasesIpsMapNotThrow,
-} from "@dappnode/dockerapi";
+import { docker, dockerNetworkConnect, getNetworkAliasesIpsMapNotThrow } from "@dappnode/dockerapi";
 import { connectContainersToNetworkWithPrio } from "../../../src/migrateDockerNetworkIpRange/connectContainersToNetworkWithPrio/index.js";
 import Dockerode from "dockerode";
 
@@ -16,15 +12,14 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
   const dappmanagerIp = "172.30.0.7";
   const bindContainerName = "DAppNodeCore-bind.dnp.dappnode.eth";
   const bindIp = "172.30.0.2";
-  const containerUsingDappmanagerIp =
-    "DAppNodePackage-validator.web3signer.dnp.dappnode.eth";
+  const containerUsingDappmanagerIp = "DAppNodePackage-validator.web3signer.dnp.dappnode.eth";
   const containerUsingBindIp = "DAppNodePackage-rotki.dnp.dappnode.eth";
 
   const containerNames = [
     dappmanagerContainerName,
     bindContainerName,
     containerUsingDappmanagerIp,
-    containerUsingBindIp,
+    containerUsingBindIp
   ];
 
   let network: Dockerode.Network;
@@ -38,7 +33,7 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
         const container = await docker.createContainer({
           Image: dockerImageTest,
           Cmd: ["tail", "-f", "/dev/null"], // Keep the container running
-          name: cn,
+          name: cn
         });
         await container.start();
       })
@@ -51,22 +46,22 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
         Driver: "default",
         Config: [
           {
-            Subnet: dockerNetworkSubnet,
-          },
-        ],
-      },
+            Subnet: dockerNetworkSubnet
+          }
+        ]
+      }
     })) as Dockerode.Network;
     // connect duplicate of dappmanager
     await dockerNetworkConnect(networkName, containerUsingDappmanagerIp, {
       IPAMConfig: {
-        IPv4Address: dappmanagerIp,
-      },
+        IPv4Address: dappmanagerIp
+      }
     });
     // connect duplicate of bind
     await dockerNetworkConnect(networkName, containerUsingBindIp, {
       IPAMConfig: {
-        IPv4Address: bindIp,
-      },
+        IPv4Address: bindIp
+      }
     });
   });
 
@@ -77,25 +72,21 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
       network,
       dappmanagerContainer: {
         name: dappmanagerContainerName,
-        ip: dappmanagerIp,
+        ip: dappmanagerIp
       },
       bindContainer: {
         name: bindContainerName,
-        ip: bindIp,
+        ip: bindIp
       },
       aliasesIpsMap,
       containersToRestart: [],
-      containersToRecreate: [],
+      containersToRecreate: []
     });
-    const ipResult = (await docker.getContainer(bindContainerName).inspect())
-      .NetworkSettings.Networks[networkName].IPAddress;
+    const ipResult = (await docker.getContainer(bindContainerName).inspect()).NetworkSettings.Networks[networkName]
+      .IPAddress;
     // verify bind container with expected ip
     expect(ipResult).to.deep.equal(bindIp);
-    const containers = (
-      (await docker
-        .getNetwork(networkName)
-        .inspect()) as Dockerode.NetworkInspectInfo
-    ).Containers;
+    const containers = ((await docker.getNetwork(networkName).inspect()) as Dockerode.NetworkInspectInfo).Containers;
     if (!containers) throw Error("containers not exist");
     const containerNames = Object.values(containers).map((c) => c.Name);
     expect(containerNames).to.include(containerUsingBindIp);
@@ -105,8 +96,7 @@ describe("Ensure docker network config migration =>  connectContainersToNetworkW
   });
 
   after(async () => {
-    for (const cn of containerNames)
-      await docker.getContainer(cn).remove({ force: true });
+    for (const cn of containerNames) await docker.getContainer(cn).remove({ force: true });
 
     // remove docker network
     await docker.getNetwork(networkName).remove();

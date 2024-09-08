@@ -16,8 +16,7 @@
     "build": "tsc -p tsconfig.json",
     "test:int": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/int --timeout 180000",
     "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit --timeout 180000",
-    "dev": "tsc -w",
-    "lint": "eslint . --ext .ts --fix src"
+    "dev": "tsc -w"
   },
   "dependencies": {
     "@dappnode/db": "workspace:^0.1.0",

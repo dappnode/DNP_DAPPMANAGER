@@ -37,10 +37,7 @@ describe("Util: autoUpdateHelper", () => {
 
   beforeEach("Make sure the autosettings are restarted", async () => {
     clearDbs();
-    expect(db.autoUpdateSettings.get()).to.deep.equal(
-      {},
-      "autoUpdateSettings are not empty"
-    );
+    expect(db.autoUpdateSettings.get()).to.deep.equal({}, "autoUpdateSettings are not empty");
   });
 
   describe("Auto update settings", () => {
@@ -97,10 +94,7 @@ describe("Util: autoUpdateHelper", () => {
     it("Should NOT allow the update if the delay is NOT completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now();
-      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
-        false,
-        "Should not allow on first check"
-      );
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(false, "Should not allow on first check");
 
       expect(db.autoUpdatePending.get()).to.deep.equal(
         {
@@ -123,10 +117,7 @@ describe("Util: autoUpdateHelper", () => {
     it("Should allow the update if the delay is completed", () => {
       const version = "0.2.6";
       const timestamp = Date.now() - (updateDelay + 1);
-      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
-        false,
-        "Should not allow on first check"
-      );
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(false, "Should not allow on first check");
 
       expect(db.autoUpdatePending.get()).to.deep.equal(
         {
@@ -157,10 +148,7 @@ describe("Util: autoUpdateHelper", () => {
       const version2 = "0.2.5";
       const timestamp2 = Date.now() - 2 * updateDelay;
 
-      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(
-        false,
-        "Should not allow on first check"
-      );
+      expect(isUpdateDelayCompleted(dnpName, version, timestamp)).to.equal(false, "Should not allow on first check");
 
       expect(db.autoUpdatePending.get()).to.deep.equal(
         {
@@ -174,10 +162,7 @@ describe("Util: autoUpdateHelper", () => {
         "Should have one entry with firstSeen set"
       );
 
-      expect(isUpdateDelayCompleted(dnpName, version2, timestamp2)).to.equal(
-        false,
-        "Should not allow on first check"
-      );
+      expect(isUpdateDelayCompleted(dnpName, version2, timestamp2)).to.equal(false, "Should not allow on first check");
 
       expect(db.autoUpdatePending.get()).to.deep.equal(
         {
@@ -486,10 +471,7 @@ describe("Util: autoUpdateHelper", () => {
       ]);
       const microDelay = 20;
 
-      expect(getCoreFeedbackMessage(currentCorePackagesBefore)).to.deep.equal(
-        {},
-        "1. Should be empty"
-      );
+      expect(getCoreFeedbackMessage(currentCorePackagesBefore)).to.deep.equal({}, "1. Should be empty");
 
       const timestampIsUpdated = Date.now() - (updateDelay - microDelay);
       isUpdateDelayCompleted(coreDnpName, nextVersionId, timestampIsUpdated);
@@ -521,13 +503,8 @@ describe("Util: autoUpdateHelper", () => {
         "3B. Should be completed"
       );
 
-      const timestampIsCompletedNext =
-        Date.now() - (24 * 60 * 60 * 1000 - microDelay);
-      isUpdateDelayCompleted(
-        coreDnpName,
-        nextVersion2Id,
-        timestampIsCompletedNext
-      );
+      const timestampIsCompletedNext = Date.now() - (24 * 60 * 60 * 1000 - microDelay);
+      isUpdateDelayCompleted(coreDnpName, nextVersion2Id, timestampIsCompletedNext);
 
       expect(getCoreFeedbackMessage(currentCorePackagesAfter)).to.deep.equal(
         { scheduled: timestampIsCompletedNext + updateDelay },
@@ -565,10 +542,7 @@ describe("Util: autoUpdateHelper", () => {
 
       clearCompletedCoreUpdatesIfAny(currentCorePackages, timestamp);
 
-      expect(db.autoUpdatePending.get()).to.deep.equal(
-        {},
-        "Pending version should be removed"
-      );
+      expect(db.autoUpdatePending.get()).to.deep.equal({}, "Pending version should be removed");
 
       expect(db.autoUpdateRegistry.get()).to.deep.equal(
         {
@@ -620,10 +594,7 @@ describe("Util: autoUpdateHelper", () => {
         "Pending version should still be there"
       );
 
-      expect(db.autoUpdateRegistry.get()).to.deep.equal(
-        {},
-        "Registry should be empty, no new version added"
-      );
+      expect(db.autoUpdateRegistry.get()).to.deep.equal({}, "Registry should be empty, no new version added");
     });
   });
 

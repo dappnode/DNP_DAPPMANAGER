@@ -4,13 +4,8 @@ import { packageSetEnvironment } from "./packageSetEnvironment.js";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { WireguardDeviceCredentials } from "@dappnode/types";
 
-const {
-  WIREGUARD_API_URL,
-  WIREGUARD_DEVICES_ENVNAME,
-  WIREGUARD_DNP_NAME,
-  WIREGUARD_ISCORE,
-  WIREGUARD_MAIN_SERVICE
-} = params;
+const { WIREGUARD_API_URL, WIREGUARD_DEVICES_ENVNAME, WIREGUARD_DNP_NAME, WIREGUARD_ISCORE, WIREGUARD_MAIN_SERVICE } =
+  params;
 
 class WireguardClient {
   getDevices(): string[] {
@@ -19,16 +14,14 @@ class WireguardClient {
     // So it's easier and cleaner to just parse the docker-compose.yml
     const compose = new ComposeFileEditor(WIREGUARD_DNP_NAME, WIREGUARD_ISCORE);
     const service = compose.services()[WIREGUARD_MAIN_SERVICE];
-    if (!service)
-      throw Error(`Wireguard service ${WIREGUARD_MAIN_SERVICE} does not exist`);
+    if (!service) throw Error(`Wireguard service ${WIREGUARD_MAIN_SERVICE} does not exist`);
     const peersCsv = service.getEnvs()[WIREGUARD_DEVICES_ENVNAME] || "";
     return peersCsv.split(",");
   }
 
   async addDevice(device: string): Promise<void> {
     if (!device) throw Error("Device name must not be empty");
-    if (!/^[a-z0-9]+$/i.test(device))
-      throw Error("Device name must contain only alphanumeric characters");
+    if (!/^[a-z0-9]+$/i.test(device)) throw Error("Device name must contain only alphanumeric characters");
 
     const devices = new Set(this.getDevices());
     if (devices.has(device)) throw Error(`Device ${device} already exists`);
@@ -59,9 +52,7 @@ class WireguardClient {
   // - remote qr: '/dappnode_admin?qr'
   // - local:     '/dappnode_admin?local'
   // - local qr:  '/dappnode_admin?local&qr'
-  async getDeviceCredentials(
-    device: string
-  ): Promise<WireguardDeviceCredentials> {
+  async getDeviceCredentials(device: string): Promise<WireguardDeviceCredentials> {
     const url = urlJoin(WIREGUARD_API_URL, device);
     const remoteConfigUrl = url;
     const localConfigUrl = `${url}?local=true`;
@@ -100,9 +91,7 @@ export async function wireguardDeviceRemove(device: string): Promise<void> {
   await wireguardClient.removeDevice(device);
 }
 
-export async function wireguardDeviceGet(
-  device: string
-): Promise<WireguardDeviceCredentials> {
+export async function wireguardDeviceGet(device: string): Promise<WireguardDeviceCredentials> {
   return wireguardClient.getDeviceCredentials(device);
 }
 

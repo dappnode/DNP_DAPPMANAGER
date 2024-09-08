@@ -4,11 +4,7 @@ import { prettyDnpName } from "utils/format";
 import "./signedStatus.scss";
 import { RequestedDnp } from "@dappnode/types";
 
-export function SignedStatus({
-  signedSafe
-}: {
-  signedSafe: RequestedDnp["signedSafe"];
-}) {
+export function SignedStatus({ signedSafe }: { signedSafe: RequestedDnp["signedSafe"] }) {
   return (
     <div className="signed-status-grid">
       {Object.entries(signedSafe).map(([dnpName, { safe, message }]) => (

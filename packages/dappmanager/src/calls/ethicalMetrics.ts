@@ -4,11 +4,7 @@ import { listPackageNoThrow } from "@dappnode/dockerapi";
 import * as db from "@dappnode/db";
 import { packageInstall } from "./packageInstall.js";
 import { logs } from "@dappnode/logger";
-import {
-  ethicalMetricsDnpName,
-  register,
-  unregister
-} from "@dappnode/ethicalmetrics";
+import { ethicalMetricsDnpName, register, unregister } from "@dappnode/ethicalmetrics";
 import { dockerContainerStart, dockerContainerStop } from "@dappnode/dockerapi";
 
 /**
@@ -55,8 +51,7 @@ export async function enableEthicalMetrics({
   tgChannelId: string | null;
   sync: boolean;
 }): Promise<void> {
-  if (!mail && !tgChannelId)
-    throw new Error("You must provide an email or a telegram channel id");
+  if (!mail && !tgChannelId) throw new Error("You must provide an email or a telegram channel id");
 
   db.notifications.set({
     mail,
@@ -74,8 +69,7 @@ export async function enableEthicalMetrics({
   } else {
     // Make sure pkg is running
     for (const container of ethicalMetricsPkg.containers)
-      if (!container.running)
-        await dockerContainerStart(container.containerName);
+      if (!container.running) await dockerContainerStart(container.containerName);
 
     // Make sure the instance is registered
     await register({

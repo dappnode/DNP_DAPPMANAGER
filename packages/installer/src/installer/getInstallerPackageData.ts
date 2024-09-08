@@ -8,14 +8,9 @@ import {
   UserSettings,
   PackageRelease,
   InstallPackageData,
-  ContainersStatus,
+  ContainersStatus
 } from "@dappnode/types";
-import {
-  getBackupPath,
-  getDockerComposePath,
-  getImagePath,
-  getManifestPath,
-} from "@dappnode/utils";
+import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath } from "@dappnode/utils";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -28,7 +23,7 @@ export async function getInstallerPackagesData({
   releases,
   userSettings,
   currentVersions,
-  reqName,
+  reqName
 }: GetInstallerPackageDataArg): Promise<InstallPackageData[]> {
   // Gather packageData first to prevent calling multiple times
   // listPackage inside of getContainersStatus
@@ -43,7 +38,7 @@ export async function getInstallerPackagesData({
           currentVersions[release.dnpName],
           await getContainersStatus({
             dnpName: release.dnpName,
-            dnp: dnps.find((pkg) => pkg.dnpName === release.dnpName),
+            dnp: dnps.find((pkg) => pkg.dnpName === release.dnpName)
           })
         )
     )
@@ -101,6 +96,6 @@ function getInstallerPackageData(
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
-    containersStatus,
+    containersStatus
   };
 }

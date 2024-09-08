@@ -43,8 +43,7 @@ async function checkTelegramStatus(): Promise<void> {
   }
 }
 
-const checkTelegramStatusThrottled =
-  runOnlyOneSequentially(checkTelegramStatus);
+const checkTelegramStatusThrottled = runOnlyOneSequentially(checkTelegramStatus);
 
 /**
  * Telegram bot

@@ -7,10 +7,7 @@ const OP_ENABLE_HISTORICAL_RPC = "op-enable-historical-rpc";
 
 // Global env to be in the op-node package
 export const opExecutionClient = interceptGlobalEnvOnSet(
-  dbMain.staticKey<ExecutionClientOptimism | null | undefined>(
-    OP_EXECUTION_CLIENT,
-    null
-  ),
+  dbMain.staticKey<ExecutionClientOptimism | null | undefined>(OP_EXECUTION_CLIENT, null),
   Object.keys({ OP_EXECUTION_CLIENT })[0]
 );
 

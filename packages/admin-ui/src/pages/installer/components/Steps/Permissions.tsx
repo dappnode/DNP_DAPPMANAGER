@@ -14,11 +14,7 @@ interface PermissionsProps {
   goBack: () => void;
 }
 
-const Permissions: React.FC<PermissionsProps> = ({
-  permissions,
-  onAccept,
-  goBack
-}) => {
+const Permissions: React.FC<PermissionsProps> = ({ permissions, onAccept, goBack }) => {
   /**
    * @param permissions = [{
    *   name: "Short description",
@@ -29,9 +25,7 @@ const Permissions: React.FC<PermissionsProps> = ({
     <Card className="permissions-list" spacing divider>
       {Object.entries(permissions).map(([dnpName, permissionsDnp]) => (
         <div key={dnpName}>
-          <div className="card-section-header">
-            {prettyDnpName(dnpName)} special permissions
-          </div>
+          <div className="card-section-header">{prettyDnpName(dnpName)} special permissions</div>
 
           <div className="special-permission">
             {permissionsDnp.map(({ name, details }) => (
@@ -43,9 +37,7 @@ const Permissions: React.FC<PermissionsProps> = ({
               </div>
             ))}
 
-            {permissionsDnp.length === 0 && (
-              <StatusIcon success message={"Requires no special permissions"} />
-            )}
+            {permissionsDnp.length === 0 && <StatusIcon success message={"Requires no special permissions"} />}
           </div>
         </div>
       ))}

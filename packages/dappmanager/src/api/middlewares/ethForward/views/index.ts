@@ -8,8 +8,7 @@ const adminUiPackagesUrl = `${adminUiUrl}/packages`;
 const ropstenName = "ropsten.dnp.dappnode.eth";
 const swarmName = "swarm.dnp.dappnode.eth";
 
-const a = (url: string, text?: string): string =>
-  `<a href="${url}">${text || url}</a>`;
+const a = (url: string, text?: string): string => `<a href="${url}">${text || url}</a>`;
 
 export function notFound(e: NotFoundError): string {
   return base(

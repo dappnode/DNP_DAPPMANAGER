@@ -43,18 +43,11 @@ export function PackageUpdates() {
             {updatesAvailable.map(({ dnpName, updateAvailable }) => (
               <div className="package-update-item">
                 <span>
-                  <strong>{prettyDnpName(dnpName)}</strong> to version{" "}
-                  {updateAvailable.newVersion}{" "}
-                  {updateAvailable.upstreamVersion &&
-                    `(${updateAvailable.upstreamVersion} upstream)`}
+                  <strong>{prettyDnpName(dnpName)}</strong> to version {updateAvailable.newVersion}{" "}
+                  {updateAvailable.upstreamVersion && `(${updateAvailable.upstreamVersion} upstream)`}
                 </span>
 
-                <Button
-                  onClick={() =>
-                    navigate(`${getInstallerPath(dnpName)}/${dnpName}`)
-                  }
-                  variant="dappnode"
-                >
+                <Button onClick={() => navigate(`${getInstallerPath(dnpName)}/${dnpName}`)} variant="dappnode">
                   Update
                 </Button>
               </div>

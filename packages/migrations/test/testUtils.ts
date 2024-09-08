@@ -28,7 +28,7 @@ export const mockContainer: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  avatarUrl: "",
+  avatarUrl: ""
 };
 
 function ignoreErrors<A, R>(fn: (arg: A) => R) {
@@ -37,6 +37,7 @@ function ignoreErrors<A, R>(fn: (arg: A) => R) {
       return await fn(arg);
     } catch (e) {
       // Ignore
+      console.error(e);
     }
   };
 }

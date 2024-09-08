@@ -8,11 +8,12 @@ export async function getInstance(): Promise<string> {
         await fetch(url.resolve(ethicalMetricsEndpoint, "/instance"), {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
-          },
+            "Content-Type": "application/json"
+          }
         })
       )
         // TODO: do better type checking
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .json()) as any
     ).instance
   );

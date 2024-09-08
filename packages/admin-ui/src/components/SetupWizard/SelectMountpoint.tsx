@@ -47,11 +47,7 @@ function renderMountpointDataSummary({
   );
 }
 
-export function MountpointDataView({
-  fileSystem
-}: {
-  fileSystem: MountpointData;
-}) {
+export function MountpointDataView({ fileSystem }: { fileSystem: MountpointData }) {
   const { mountpoint, vendor, model, total, use, free } = fileSystem;
   const isHost = !mountpoint;
   const showFree = Boolean(free) || mountpoint;
@@ -104,15 +100,12 @@ export default function SelectMountpoint({
   ];
 
   const { alreadySet, isLegacy, prevPath } = options || {};
-  const selectedMountpoint = mountpoints.find(
-    ({ mountpoint }) => mountpoint === value
-  );
+  const selectedMountpoint = mountpoints.find(({ mountpoint }) => mountpoint === value);
 
   // If the user has selected an invalid mountpoint and is not loading or already set,
   // reset the value to the host (default) to prevent problems
   useEffect(() => {
-    if (value && !selectedMountpoint && !alreadySet && !isValidating)
-      onValueChange("");
+    if (value && !selectedMountpoint && !alreadySet && !isValidating) onValueChange("");
   }, [value, selectedMountpoint, alreadySet, isValidating, onValueChange]);
 
   async function onSelectMountpoint(mountpoint: string) {
@@ -122,10 +115,7 @@ export default function SelectMountpoint({
 
   return (
     <>
-      <div
-        className="display-mountpoints"
-        onClick={alreadySet && !showHelp ? () => setShowHelp(true) : undefined}
-      >
+      <div className="display-mountpoints" onClick={alreadySet && !showHelp ? () => setShowHelp(true) : undefined}>
         <Dropdown drop="down" id="select-mountpoint">
           <Dropdown.Toggle
             variant="outline-secondary"
@@ -154,7 +144,7 @@ export default function SelectMountpoint({
             </div>
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            {mountpoints.map(fileSystem => (
+            {mountpoints.map((fileSystem) => (
               <Dropdown.Item
                 key={fileSystem.mountpoint}
                 onClick={() => {
@@ -165,15 +155,9 @@ export default function SelectMountpoint({
               </Dropdown.Item>
             ))}
 
-            {isValidating && !mountpointsRequest.data && (
-              <Dropdown.Item>Loading...</Dropdown.Item>
-            )}
+            {isValidating && !mountpointsRequest.data && <Dropdown.Item>Loading...</Dropdown.Item>}
 
-            <Dropdown.Item
-              href={troubleShootMountpointsGuideUrl}
-              {...newTabProps}
-              className="troubleshoot"
-            >
+            <Dropdown.Item href={troubleShootMountpointsGuideUrl} {...newTabProps} className="troubleshoot">
               Not seeing your drive? Click here
             </Dropdown.Item>
           </Dropdown.Menu>
@@ -194,15 +178,12 @@ export default function SelectMountpoint({
 
       {showHelp && (
         <div className="change-mountpoint-help">
-          Existing volumes can't be changed. To do so, unistall this package and
-          remove its data
+          Existing volumes can't be changed. To do so, unistall this package and remove its data
         </div>
       )}
 
       {mountpointsRequest.error && (
-        <div className="change-mountpoint-error">
-          Error detecting mountpoints: {mountpointsRequest.error.message}
-        </div>
+        <div className="change-mountpoint-error">Error detecting mountpoints: {mountpointsRequest.error.message}</div>
       )}
     </>
   );

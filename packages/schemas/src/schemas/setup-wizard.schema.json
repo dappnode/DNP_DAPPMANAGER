@@ -161,10 +161,7 @@
           "patternErrorMessage": {
             "type": "string",
             "title": "Error to show if the regex pattern validation fails",
-            "examples": [
-              "Must be a valid address (0x1fd16a...)",
-              "Must be at least 8 characters long"
-            ]
+            "examples": ["Must be a valid address (0x1fd16a...)", "Must be at least 8 characters long"]
           },
           "enum": {
             "type": "array",

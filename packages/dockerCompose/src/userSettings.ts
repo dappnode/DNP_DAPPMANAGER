@@ -7,16 +7,10 @@ import {
   parseDevicePathMountpoint,
   getDevicePath,
   ComposeFileEditor,
-  parseServiceNetworks,
+  parseServiceNetworks
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
-import {
-  Compose,
-  ComposeServiceNetworks,
-  PortMapping,
-  UserSettings,
-  VolumeMapping,
-} from "@dappnode/types";
+import { Compose, ComposeServiceNetworks, PortMapping, UserSettings, VolumeMapping } from "@dappnode/types";
 import { cleanCompose, isOmitable } from "./clean.js";
 import { stringifyVolumeMappings } from "./volumes.js";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
@@ -28,16 +22,13 @@ import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
  * volumes = ["/dev0/user-set-path:/usr/data"]
  */
 const legacyDefaultVolumes: { [dnpName: string]: string[] } = {
-  "bitcoin.dnp.dappnode.eth": ["bitcoin_data:/root/.bitcoin"],
+  "bitcoin.dnp.dappnode.eth": ["bitcoin_data:/root/.bitcoin"]
 };
 
 export const parseUserSettingsFns: {
   [P in keyof Required<UserSettings>]: (compose: Compose) => UserSettings[P];
 } = {
-  environment: (compose) =>
-    mapValues(compose.services, (service) =>
-      parseEnvironment(service.environment || [])
-    ),
+  environment: (compose) => mapValues(compose.services, (service) => parseEnvironment(service.environment || [])),
 
   networks: (compose) => {
     // There can't be service networks without root networks
@@ -47,9 +38,7 @@ export const parseUserSettingsFns: {
       (acc, [serviceName, service]) => {
         if (Array.isArray(service.networks)) {
           // Convert array to object
-          acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(
-            service.networks
-          );
+          acc[serviceName] = ComposeFileEditor.convertNetworkArrayToObject(service.networks);
         } else {
           acc[serviceName] = service.networks || {};
         }
@@ -62,7 +51,7 @@ export const parseUserSettingsFns: {
 
     return {
       serviceNetworks,
-      rootNetworks,
+      rootNetworks
     };
   },
 
@@ -113,7 +102,7 @@ export const parseUserSettingsFns: {
 
   allNamedVolumeMountpoint: () => undefined,
   domainAlias: () => undefined,
-  fileUploads: () => ({}),
+  fileUploads: () => ({})
 };
 
 /**
@@ -123,9 +112,7 @@ export const parseUserSettingsFns: {
  * user and which are not
  */
 export function parseUserSettings(compose: Compose): UserSettings {
-  const userSettings = mapValues(parseUserSettingsFns, (parseUserSettingsFn) =>
-    parseUserSettingsFn(compose)
-  );
+  const userSettings = mapValues(parseUserSettingsFns, (parseUserSettingsFn) => parseUserSettingsFn(compose));
   // Ignore objects that are empty to make tests and payloads cleaner
   return omitBy(
     userSettings,
@@ -155,61 +142,44 @@ export function applyUserSettings(
     const networks = parseServiceNetworks(service.networks || {});
 
     // User set
-    const userSetEnvironment =
-      (userSettings.environment || {})[serviceName] || {};
-    const userSetPortMappings =
-      (userSettings.portMappings || {})[serviceName] || {};
-    const userSetLegacyBindVolumes =
-      (userSettings.legacyBindVolumes || {})[serviceName] || {};
-    const userSetNetworks =
-      (userSettings.networks?.serviceNetworks || {})[serviceName] || {};
+    const userSetEnvironment = (userSettings.environment || {})[serviceName] || {};
+    const userSetPortMappings = (userSettings.portMappings || {})[serviceName] || {};
+    const userSetLegacyBindVolumes = (userSettings.legacyBindVolumes || {})[serviceName] || {};
+    const userSetNetworks = (userSettings.networks?.serviceNetworks || {})[serviceName] || {};
 
     // New values
-    const nextEnvironment = mapValues(
-      environment,
-      (envValue, envName) => userSetEnvironment[envName] || envValue
-    );
+    const nextEnvironment = mapValues(environment, (envValue, envName) => userSetEnvironment[envName] || envValue);
 
     const nextPorts = stringifyPortMappings(
       portMappings.map((portMapping): PortMapping => {
         const portId = getPortMappingId(portMapping);
         const userSetHost = parseInt(userSetPortMappings[portId]);
         // Use `in` operator to tolerate empty hosts (= ephemeral port)
-        return portId in userSetPortMappings
-          ? { ...portMapping, host: userSetHost || undefined }
-          : portMapping;
+        return portId in userSetPortMappings ? { ...portMapping, host: userSetHost || undefined } : portMapping;
       })
     );
 
     // docker aliases must be uinique
     // TODO: use docker compose merge to automatically merge these dappnode docker compose properties
     // see https://github.com/dappnode/DNP_DAPPMANAGER/issues/1983
-    const nextNetworks = mergeWith(
-      networks,
-      userSetNetworks,
-      (value1, value2) => {
-        return mergeWith(value1, value2, (subvalue1, subvalue2) => {
-          return union(subvalue1, subvalue2);
-        });
-      }
-    );
+    const nextNetworks = mergeWith(networks, userSetNetworks, (value1, value2) => {
+      return mergeWith(value1, value2, (subvalue1, subvalue2) => {
+        return union(subvalue1, subvalue2);
+      });
+    });
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
       volumeMappings.map((vol): VolumeMapping => {
         const hostUserSet = vol.name && userSetLegacyBindVolumes[vol.name];
-        return hostUserSet && path.isAbsolute(hostUserSet)
-          ? { host: hostUserSet, container: vol.container }
-          : vol;
+        return hostUserSet && path.isAbsolute(hostUserSet) ? { host: hostUserSet, container: vol.container } : vol;
       })
     );
     // ##### </DEPRECATED>
 
     const nextLabels = {
       ...(service.labels || {}),
-      ...writeDefaultsToLabels(
-        pick(service, ["environment", "ports", "volumes"])
-      ),
+      ...writeDefaultsToLabels(pick(service, ["environment", "ports", "volumes"]))
     };
 
     return {
@@ -218,23 +188,21 @@ export function applyUserSettings(
       ports: nextPorts,
       volumes: nextServiceVolumes,
       labels: nextLabels,
-      networks: nextNetworks,
+      networks: nextNetworks
     };
   });
 
   // Volume section edits
   // Apply general mountpoint to all volumes + specific mountpoints to named volumes
   const nextVolumes = mapValues(compose.volumes || {}, (vol, volumeName) => {
-    const mountpoint =
-      (userSettings.namedVolumeMountpoints || {})[volumeName] ||
-      userSettings.allNamedVolumeMountpoint;
+    const mountpoint = (userSettings.namedVolumeMountpoints || {})[volumeName] || userSettings.allNamedVolumeMountpoint;
     return mountpoint
       ? {
           driver_opts: {
             type: "none",
             device: getDevicePath({ mountpoint, dnpName, volumeName }),
-            o: "bind",
-          },
+            o: "bind"
+          }
         }
       : vol;
   });
@@ -242,14 +210,14 @@ export function applyUserSettings(
   // TODO: Handle networks in array format?
   const nextNetworks = {
     ...compose.networks,
-    ...userSettings.networks?.rootNetworks,
+    ...userSettings.networks?.rootNetworks
   };
 
   return cleanCompose({
     ...compose,
     services: nextServices,
     volumes: nextVolumes,
-    networks: nextNetworks,
+    networks: nextNetworks
   });
 }
 
@@ -268,7 +236,6 @@ function getPortMappingId(portMapping: PortMapping): string {
  */
 function isComposeVolumeUsed(compose: Compose, volName: string): boolean {
   return Object.values(compose.services).some(
-    (service) =>
-      service.volumes && service.volumes.some((vol) => vol.startsWith(volName))
+    (service) => service.volumes && service.volumes.some((vol) => vol.startsWith(volName))
   );
 }

@@ -3,7 +3,7 @@ import { expect } from "chai";
 import {
   generateDyndnsIdentity,
   getDomainFromIdentityAddress,
-  isPrivateKeyValid,
+  isPrivateKeyValid
 } from "../../src/generateKeysIfNotExistOrNotValid.js";
 import { ethers } from "ethers";
 import { params } from "@dappnode/params";
@@ -34,14 +34,11 @@ describe("Dyndns", () => {
     // 4e1a38a2394acd41.dyndns.dappnode.io
     const domain = getDomainFromIdentityAddress(identity.address);
     // check it ends with .dyndns.dappnode.io
-    if (!domain.endsWith(params.DYNDNS_DOMAIN))
-      throw new Error(`Domain does not end with: ${params.DYNDNS_DOMAIN}`);
+    if (!domain.endsWith(params.DYNDNS_DOMAIN)) throw new Error(`Domain does not end with: ${params.DYNDNS_DOMAIN}`);
     // check it does not start with 0x
-    if (domain.startsWith("0x"))
-      throw new Error(`Domain starts with 0x: ${domain}`);
+    if (domain.startsWith("0x")) throw new Error(`Domain starts with 0x: ${domain}`);
     // it should have 35 characters
-    if (domain.length !== 35)
-      throw new Error(`Domain length is not 35: ${domain.length}`);
+    if (domain.length !== 35) throw new Error(`Domain length is not 35: ${domain.length}`);
   });
 
   it("Should update a dyndns identity", async () => {

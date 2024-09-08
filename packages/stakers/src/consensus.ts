@@ -6,7 +6,7 @@ import {
   ConsensusClientPrater,
   Network,
   StakerItem,
-  UserSettings,
+  UserSettings
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -28,50 +28,47 @@ export class Consensus extends StakerComponent {
     [Network.Gnosis]: db.consensusClientGnosis,
     [Network.Prater]: db.consensusClientPrater,
     [Network.Holesky]: db.consensusClientHolesky,
-    [Network.Lukso]: db.consensusClientLukso,
+    [Network.Lukso]: db.consensusClientLukso
   };
   protected static readonly DefaultCheckpointSync: Record<Network, string> = {
     [Network.Mainnet]: "https://checkpoint-sync.dappnode.io",
     [Network.Prater]: "https://checkpoint-sync-prater.dappnode.io",
     [Network.Gnosis]: "https://checkpoint-sync-gnosis.dappnode.io",
     [Network.Holesky]: "https://checkpoint-sync-holesky.dappnode.io",
-    [Network.Lukso]: "https://checkpoints.mainnet.lukso.network",
+    [Network.Lukso]: "https://checkpoints.mainnet.lukso.network"
   };
-  protected static readonly CompatibleConsensus: Record<
-    Network,
-    { dnpName: string; minVersion: string }[]
-  > = {
+  protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
       { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
       { dnpName: ConsensusClientMainnet.Lighthouse, minVersion: "1.0.3" },
       { dnpName: ConsensusClientMainnet.Teku, minVersion: "2.0.4" },
       { dnpName: ConsensusClientMainnet.Nimbus, minVersion: "1.0.5" },
-      { dnpName: ConsensusClientMainnet.Lodestar, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientMainnet.Lodestar, minVersion: "0.1.0" }
     ],
     [Network.Gnosis]: [
       { dnpName: ConsensusClientGnosis.Lighthouse, minVersion: "0.1.5" },
       { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
       { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
-      { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" }
     ],
     [Network.Prater]: [
       { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
       { dnpName: ConsensusClientPrater.Lighthouse, minVersion: "0.1.9" },
       { dnpName: ConsensusClientPrater.Teku, minVersion: "0.1.10" },
       { dnpName: ConsensusClientPrater.Nimbus, minVersion: "0.1.7" },
-      { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientPrater.Lodestar, minVersion: "0.1.0" }
     ],
     [Network.Holesky]: [
       { dnpName: ConsensusClientHolesky.Lighthouse, minVersion: "0.1.2" },
       { dnpName: ConsensusClientHolesky.Prysm, minVersion: "0.1.3" },
       { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
       { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" },
+      { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" }
     ],
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
-      { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" },
-    ],
+      { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" }
+    ]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -80,19 +77,15 @@ export class Consensus extends StakerComponent {
 
   async getAllConsensus(network: Network): Promise<StakerItem[]> {
     return await super.getAll({
-      dnpNames: Consensus.CompatibleConsensus[network].map(
-        (client) => client.dnpName
-      ),
-      currentClient: this.DbHandlers[network].get(),
+      dnpNames: Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
+      currentClient: this.DbHandlers[network].get()
     });
   }
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
     if (currentConsensusDnpName) {
-      const isInstalled = Boolean(
-        await listPackageNoThrow({ dnpName: currentConsensusDnpName })
-      );
+      const isInstalled = Boolean(await listPackageNoThrow({ dnpName: currentConsensusDnpName }));
 
       if (!isInstalled) {
         // update status in db
@@ -101,11 +94,7 @@ export class Consensus extends StakerComponent {
       }
       await this.persistSelectedIfInstalled({
         dnpName: currentConsensusDnpName,
-        userSettings: this.getUserSettings(
-          currentConsensusDnpName,
-          isInstalled,
-          network
-        ),
+        userSettings: this.getUserSettings(currentConsensusDnpName, isInstalled, network)
       });
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
@@ -125,20 +114,14 @@ export class Consensus extends StakerComponent {
             network
           )
         : {},
-      prevClient: prevConsClientDnpName,
+      prevClient: prevConsClientDnpName
     });
     // persist on db
-    if (newConsensusDnpName !== prevConsClientDnpName)
-      await this.DbHandlers[network].set(newConsensusDnpName);
+    if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private getUserSettings(
-    newConsensusDnpName: string,
-    shouldSetEnvironment: boolean,
-    network: Network
-  ): UserSettings {
-    const validatorServiceName =
-      this.getValidatorServiceName(newConsensusDnpName);
+  private getUserSettings(newConsensusDnpName: string, shouldSetEnvironment: boolean, network: Network): UserSettings {
+    const validatorServiceName = this.getValidatorServiceName(newConsensusDnpName);
     const beaconServiceName = this.getBeaconServiceName(newConsensusDnpName);
     const defaultDappnodeGraffiti = "validating_from_DAppNode";
     const defaultFeeRecipient = "0x0000000000000000000000000000000000000000";
@@ -152,73 +135,65 @@ export class Consensus extends StakerComponent {
                 // Graffiti is a mandatory value
                 ["GRAFFITI"]: defaultDappnodeGraffiti,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  Consensus.DefaultCheckpointSync[network],
-              },
+                ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
+              }
             }
           : {
               [validatorServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
                 ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Graffiti is a mandatory value
-                ["GRAFFITI"]: defaultDappnodeGraffiti,
+                ["GRAFFITI"]: defaultDappnodeGraffiti
               },
 
               [beaconServiceName]: {
                 // Fee recipient is set as global env, keep this for backwards compatibility
                 ["FEE_RECIPIENT_ADDRESS"]: defaultFeeRecipient,
                 // Checkpoint sync is an optional value
-                ["CHECKPOINT_SYNC_URL"]:
-                  Consensus.DefaultCheckpointSync[network],
-              },
+                ["CHECKPOINT_SYNC_URL"]: Consensus.DefaultCheckpointSync[network]
+              }
             }
         : {},
       networks: {
         rootNetworks: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
-            external: true,
+            external: true
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            external: true,
-          },
+            external: true
+          }
         },
         serviceNetworks:
           beaconServiceName === validatorServiceName
             ? {
                 "beacon-validator": {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [
-                      `beacon-chain.${network}.staker.dappnode`,
-                      `validator.${network}.staker.dappnode`,
-                    ],
+                    aliases: [`beacon-chain.${network}.staker.dappnode`, `validator.${network}.staker.dappnode`]
                   },
                   [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [
-                      `beacon-chain.${network}.dncore.dappnode`,
-                      `validator.${network}.dncore.dappnode`,
-                    ],
-                  },
-                },
+                    aliases: [`beacon-chain.${network}.dncore.dappnode`, `validator.${network}.dncore.dappnode`]
+                  }
+                }
               }
             : {
                 "beacon-chain": {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`beacon-chain.${network}.staker.dappnode`],
+                    aliases: [`beacon-chain.${network}.staker.dappnode`]
                   },
                   [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`beacon-chain.${network}.dncore.dappnode`],
-                  },
+                    aliases: [`beacon-chain.${network}.dncore.dappnode`]
+                  }
                 },
                 validator: {
                   [params.DOCKER_STAKER_NETWORKS[network]]: {
-                    aliases: [`validator.${network}.staker.dappnode`],
+                    aliases: [`validator.${network}.staker.dappnode`]
                   },
                   [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-                    aliases: [`validator.${network}.dncore.dappnode`],
-                  },
-                },
-              },
-      },
+                    aliases: [`validator.${network}.dncore.dappnode`]
+                  }
+                }
+              }
+      }
     };
   }
 
@@ -228,11 +203,7 @@ export class Consensus extends StakerComponent {
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
   private getValidatorServiceName(newConsensusDnpName: string | null): string {
-    return newConsensusDnpName
-      ? newConsensusDnpName.includes("nimbus")
-        ? "beacon-validator"
-        : "validator"
-      : "";
+    return newConsensusDnpName ? (newConsensusDnpName.includes("nimbus") ? "beacon-validator" : "validator") : "";
   }
 
   /**
@@ -241,10 +212,6 @@ export class Consensus extends StakerComponent {
    * - Prysm, Teku, Lighthouse, and Lodestar are multiservice (beacon, validator)
    */
   private getBeaconServiceName(newConsensusDnpName: string | null): string {
-    return newConsensusDnpName
-      ? newConsensusDnpName.includes("nimbus")
-        ? "beacon-validator"
-        : "beacon-chain"
-      : "";
+    return newConsensusDnpName ? (newConsensusDnpName.includes("nimbus") ? "beacon-validator" : "beacon-chain") : "";
   }
 }

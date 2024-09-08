@@ -1,9 +1,7 @@
 import { Abi } from "../types.js";
 
-export const dnpRegistryGraphEndpoint =
-  "https://api.studio.thegraph.com/query/45661/dappnode-registry/v0.0.3";
-export const publicRegistryGraphEndpoint =
-  "https://api.studio.thegraph.com/query/45661/public-registry/v0.1.0";
+export const dnpRegistryGraphEndpoint = "https://api.studio.thegraph.com/query/45661/dappnode-registry/v0.0.3";
+export const publicRegistryGraphEndpoint = "https://api.studio.thegraph.com/query/45661/public-registry/v0.1.0";
 
 // APM REGISTRY SMART CONTRACT: https://etherscan.io/address/0x1d9bdf492e59a306dda59e5aa13e7f1c7d89197a#code
 
@@ -19,8 +17,7 @@ export const publicRegistryGraphEndpoint =
 export const registryContractName = "registry";
 export const registryAddress = "0x1d9Bdf492e59A306DDa59E5aA13E7F1C7D89197A";
 // public.dappnode.eth: 0x9f85ae5aefe4a3eff39d9a44212aae21dd15079aç
-export const registryPublicAddress =
-  "0x9f85ae5aefe4a3eff39d9a44212aae21dd15079a";
+export const registryPublicAddress = "0x9f85ae5aefe4a3eff39d9a44212aae21dd15079a";
 // dnp.dappnode.eth: 0x266bfdb2124a68beb6769dc887bd655f78778923
 export const registryDnpAddress = "0x266bfdb2124a68beb6769dc887bd655f78778923";
 export const registryAbi: Abi = [
@@ -31,7 +28,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "string" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -40,7 +37,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "string" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -49,7 +46,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "string" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -58,7 +55,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -67,13 +64,13 @@ export const registryAbi: Abi = [
       { name: "_dev", type: "address" },
       { name: "_initialSemanticVersion", type: "uint16[3]" },
       { name: "_contractAddress", type: "address" },
-      { name: "_contentURI", type: "bytes" },
+      { name: "_contentURI", type: "bytes" }
     ],
     name: "newRepoWithVersion",
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -82,7 +79,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -91,7 +88,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -100,7 +97,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -109,7 +106,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "uint256" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -118,32 +115,32 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
     inputs: [
       { name: "_sender", type: "address" },
       { name: "_role", type: "bytes32" },
-      { name: "params", type: "uint256[]" },
+      { name: "params", type: "uint256[]" }
     ],
     name: "canPerform",
     outputs: [{ name: "", type: "bool" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
     inputs: [
       { name: "_name", type: "string" },
-      { name: "_dev", type: "address" },
+      { name: "_dev", type: "address" }
     ],
     name: "newRepo",
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
@@ -152,7 +149,7 @@ export const registryAbi: Abi = [
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -161,7 +158,7 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -170,22 +167,22 @@ export const registryAbi: Abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: false, name: "id", type: "bytes32" },
       { indexed: false, name: "name", type: "string" },
-      { indexed: false, name: "repo", type: "address" },
+      { indexed: false, name: "repo", type: "address" }
     ],
     name: "NewRepo",
-    type: "event",
+    type: "event"
   },
   {
     anonymous: false,
     inputs: [{ indexed: false, name: "proxy", type: "address" }],
     name: "NewAppProxy",
-    type: "event",
-  },
+    type: "event"
+  }
 ] as const;

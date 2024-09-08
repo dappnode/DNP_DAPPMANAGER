@@ -7,7 +7,7 @@ import { withToastNoThrow } from "components/toast/Toast";
 
 export function ClearMainDb() {
   async function cleanDb() {
-    await new Promise<void>(resolve =>
+    await new Promise<void>((resolve) =>
       confirm({
         title: `Deleting main database`,
         text: `This action cannot be undone. You should only delete the database in response to a problem.`,
@@ -25,9 +25,8 @@ export function ClearMainDb() {
   return (
     <Card spacing>
       <p>
-        Remove the local database which contains critical information about your
-        DAppNode, such as the dyndns identity, Ips registry, telegram
-        configuration and more
+        Remove the local database which contains critical information about your DAppNode, such as the dyndns identity,
+        Ips registry, telegram configuration and more
       </p>
 
       <Button variant="outline-danger" onClick={cleanDb}>

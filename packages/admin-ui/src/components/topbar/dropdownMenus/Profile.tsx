@@ -11,10 +11,7 @@ export default function Profile({ username }: { username: string }) {
   return (
     <BaseDropdown
       name={`User: ${username || ""}`}
-      messages={[
-        { title: <Link to={systemProfilePath}>Change password</Link> },
-        { title: <LogoutListItem /> }
-      ]}
+      messages={[{ title: <Link to={systemProfilePath}>Change password</Link> }, { title: <LogoutListItem /> }]}
       Icon={AiOutlineUser}
       onClick={() => {}}
       className={"profile"}

@@ -44,8 +44,7 @@ export function formatTopicBody(
       items: coreDnpVersions
         .map(({ name, version }) => ({
           name,
-          data:
-            typeof version === "object" ? printVersionData(version) : version
+          data: typeof version === "object" ? printVersionData(version) : version
         }))
         .sort((a, b) => a.name.localeCompare(b.name))
     },
@@ -59,11 +58,7 @@ export function formatTopicBody(
     "*Before filing a new topic, please **provide the following information**.*",
     ...sections
       .filter(({ items }) => items.length)
-      .map(
-        ({ title, items }) =>
-          `## ${title}\n` +
-          items.map(({ name, data }) => `- **${name}**: ${data}`).join("\n")
-      )
+      .map(({ title, items }) => `## ${title}\n` + items.map(({ name, data }) => `- **${name}**: ${data}`).join("\n"))
   ].join("\n\n");
 }
 
@@ -92,11 +87,7 @@ export function formatTopicUrl(body: string) {
  */
 function printVersionData(versionData: PackageVersionData): string {
   const { branch, commit, version } = versionData || {};
-  return [
-    version,
-    branch && branch !== "master" && `branch: ${branch}`,
-    commit && `commit: ${commit.slice(0, 8)}`
-  ]
-    .filter(data => data)
+  return [version, branch && branch !== "master" && `branch: ${branch}`, commit && `commit: ${commit.slice(0, 8)}`]
+    .filter((data) => data)
     .join(", ");
 }

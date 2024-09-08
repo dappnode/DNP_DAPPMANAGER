@@ -1,9 +1,4 @@
-import {
-  DirectoryItem,
-  RequestedDnp,
-  InstalledPackageDetailData,
-  PackageContainer
-} from "@dappnode/types";
+import { DirectoryItem, RequestedDnp, InstalledPackageDetailData, PackageContainer } from "@dappnode/types";
 
 const dnpName = "test.dnp.dappnode.eth";
 export const sampleRequestState: RequestedDnp = {

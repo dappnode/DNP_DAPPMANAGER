@@ -1,8 +1,7 @@
 import { MockDnp } from "./types";
 
 export const web3signer: MockDnp = {
-  avatar:
-    "https://github.com/dappnode/DAppNodePackage-web3signer/blob/master/node-avatar.png",
+  avatar: "https://github.com/dappnode/DAppNodePackage-web3signer/blob/master/node-avatar.png",
 
   manifest: {
     name: "web3signer.dnp.dappnode.eth",
@@ -11,13 +10,11 @@ export const web3signer: MockDnp = {
     architectures: ["linux/amd64"],
     upstreamRepo: "ConsenSys/web3signer",
     mainService: "web3signer",
-    shortDescription:
-      "Remote signer + slashing protection database + User interface to import validator keystores",
+    shortDescription: "Remote signer + slashing protection database + User interface to import validator keystores",
     description:
       "Web3Signer is an open-source signing service developed under the Apache 2.0 license and written in Java. Web3Signer is capable of signing on multiple platforms using private keys stored in an external vault, or encrypted on a disk.",
     type: "service",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: [
       "mgarciate <mgarciate@gmail.com> (https://github.com/mgarciate)",
       "pablomendezroyo <mendez4a@gmail.com> (https://github.com/pablomendezroyo"
@@ -31,8 +28,7 @@ export const web3signer: MockDnp = {
       url: "https://github.com/dappnode/DAppNodePackage-web3signer/issues"
     },
     links: {
-      ui:
-        "http://ui.web3signer.dappnode?signer_url=http://web3signer.web3signer.dappnode:9000",
+      ui: "http://ui.web3signer.dappnode?signer_url=http://web3signer.web3signer.dappnode:9000",
       homepage: "https://docs.web3signer.consensys.net/en/latest/",
       readme: "https://github.com/ConsenSys/web3signer/blob/master/README.md"
     },

@@ -41,7 +41,7 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  DockerUpgradeRequirements,
+  DockerUpgradeRequirements
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -60,29 +60,19 @@ export interface Routes {
    * @param id = "my-packages", "system-packages" or "bitcoin.dnp.dappnode.eth"
    * @param enabled Auto update is enabled for ID
    */
-  autoUpdateSettingsEdit: (kwargs: {
-    id: string;
-    enabled: boolean;
-  }) => Promise<void>;
+  autoUpdateSettingsEdit: (kwargs: { id: string; enabled: boolean }) => Promise<void>;
 
   /**
    * Generates a backup of a package and sends it to the client for download.
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
-  backupGet: (kwargs: {
-    dnpName: string;
-    backup: PackageBackup[];
-  }) => Promise<string>;
+  backupGet: (kwargs: { dnpName: string; backup: PackageBackup[] }) => Promise<string>;
 
   /**
    * Restores a backup of a package from the dataUri provided by the user
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
-  backupRestore: (kwargs: {
-    dnpName: string;
-    backup: PackageBackup[];
-    fileId: string;
-  }) => Promise<void>;
+  backupRestore: (kwargs: { dnpName: string; backup: PackageBackup[]; fileId: string }) => Promise<void>;
 
   /**
    * Returns chain data for all installed packages declared as chains
@@ -151,9 +141,7 @@ export interface Routes {
    * concatenated with the device id.
    * @param id Device id name
    */
-  deviceCredentialsGet: (kwargs: {
-    id: string;
-  }) => Promise<VpnDeviceCredentials>;
+  deviceCredentialsGet: (kwargs: { id: string }) => Promise<VpnDeviceCredentials>;
 
   /**
    * Removes the device with the provided id, if exists.
@@ -172,10 +160,7 @@ export interface Routes {
    * @param id Device id name
    * @param isAdmin new admin status
    */
-  deviceAdminToggle: (kwargs: {
-    id: string;
-    isAdmin: boolean;
-  }) => Promise<void>;
+  deviceAdminToggle: (kwargs: { id: string; isAdmin: boolean }) => Promise<void>;
 
   /**
    * Returns true if a password has been created for this device
@@ -213,9 +198,7 @@ export interface Routes {
   /**
    * Sets if a fallback should be used
    */
-  ethClientFallbackSet: (kwargs: {
-    fallback: EthClientFallback;
-  }) => Promise<void>;
+  ethClientFallbackSet: (kwargs: { fallback: EthClientFallback }) => Promise<void>;
 
   /**
    * Changes the ethereum client used to fetch package data
@@ -236,11 +219,7 @@ export interface Routes {
    * @param tgChannelId
    * @param sync
    */
-  enableEthicalMetrics: (kwargs: {
-    mail: string | null;
-    tgChannelId: string | null;
-    sync: boolean;
-  }) => Promise<void>;
+  enableEthicalMetrics: (kwargs: { mail: string | null; tgChannelId: string | null; sync: boolean }) => Promise<void>;
 
   /**
    * Disables ethical metrics notifications
@@ -280,7 +259,7 @@ export interface Routes {
   /**
    * Fetch extended info about a new DNP
    */
-  fetchDnpRequest: (kwargs: { id: string }) => Promise<RequestedDnp>;
+  fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -289,10 +268,7 @@ export interface Routes {
    * @param first for pagination
    * @param after for pagination
    */
-  getUserActionLogs: (kwargs: {
-    first?: number;
-    after?: number;
-  }) => Promise<UserActionLog[]>;
+  getUserActionLogs: (kwargs: { first?: number; after?: number }) => Promise<UserActionLog[]>;
 
   /**
    * Returns the host uptime
@@ -304,9 +280,7 @@ export interface Routes {
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
-  httpsPortalMappingRemove(kwargs: {
-    mapping: HttpsPortalMapping;
-  }): Promise<void>;
+  httpsPortalMappingRemove(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: get all mappings */
   httpsPortalMappingsGet(): Promise<HttpsPortalMapping[]>;
   /** HTTPs Portal: get exposable services with metadata */
@@ -322,9 +296,7 @@ export interface Routes {
   /**
    * Sets the ipfs client target: local | remote
    */
-  ipfsClientTargetSet(kwargs: {
-    ipfsRepository: IpfsRepository;
-  }): Promise<void>;
+  ipfsClientTargetSet(kwargs: { ipfsRepository: IpfsRepository }): Promise<void>;
 
   /**
    * Gets the Ipfs client target
@@ -359,11 +331,7 @@ export interface Routes {
   lvmLogicalVolumesGet: () => Promise<HostLogicalVolume[]>;
 
   /** LVM: extend host disk space */
-  lvmDiskSpaceExtend: (kwargs: {
-    disk: string;
-    volumeGroup: string;
-    logicalVolume: string;
-  }) => Promise<string>;
+  lvmDiskSpaceExtend: (kwargs: { disk: string; volumeGroup: string; logicalVolume: string }) => Promise<string>;
 
   /**
    * Returns the list of current mountpoints in the host,
@@ -374,10 +342,7 @@ export interface Routes {
   /**
    * Flag the UI welcome flow as completed
    */
-  newFeatureStatusSet: (kwargs: {
-    featureId: NewFeatureId;
-    status: NewFeatureStatus;
-  }) => Promise<void>;
+  newFeatureStatusSet: (kwargs: { featureId: NewFeatureId; status: NewFeatureStatus }) => Promise<void>;
 
   /**
    * Returns not viewed notifications.
@@ -396,9 +361,7 @@ export interface Routes {
    * Adds a notification to be shown the UI.
    * Set the notification param to null for a random notification
    */
-  notificationsTest: (kwargs: {
-    notification?: PackageNotification;
-  }) => Promise<void>;
+  notificationsTest: (kwargs: { notification?: PackageNotification }) => Promise<void>;
 
   /**
    * Enables Optimism with the given config
@@ -440,9 +403,7 @@ export interface Routes {
   /**
    * Get package detail information
    */
-  packageGet: (kwargs: {
-    dnpName: string;
-  }) => Promise<InstalledPackageDetailData>;
+  packageGet: (kwargs: { dnpName: string }) => Promise<InstalledPackageDetailData>;
 
   /**
    * Returns the list of current containers associated to packages
@@ -453,10 +414,7 @@ export interface Routes {
    * Toggles the visibility of a getting started block
    * @param show Should be shown on hidden
    */
-  packageGettingStartedToggle: (kwargs: {
-    dnpName: string;
-    show: boolean;
-  }) => Promise<void>;
+  packageGettingStartedToggle: (kwargs: { dnpName: string; show: boolean }) => Promise<void>;
 
   /**
    * Returns the logs of the docker container of a package
@@ -466,43 +424,27 @@ export interface Routes {
    * - tail: Number of lines to return from bottom: 200
    * @returns String with escape codes
    */
-  packageLog: (kwargs: {
-    containerName: string;
-    options?: { timestamps?: boolean; tail?: number };
-  }) => Promise<string>;
+  packageLog: (kwargs: { containerName: string; options?: { timestamps?: boolean; tail?: number } }) => Promise<string>;
 
   /**
    * Remove a package and its data
    * @param id DNP .eth name
    * @param deleteVolumes flag to also clear permanent package data
    */
-  packageRemove: (kwarg: {
-    dnpName: string;
-    deleteVolumes?: boolean;
-    timeout?: number;
-  }) => Promise<void>;
+  packageRemove: (kwarg: { dnpName: string; deleteVolumes?: boolean; timeout?: number }) => Promise<void>;
 
   /**
    * Recreates a package containers
    */
-  packageRestart: (kwargs: {
-    dnpName: string;
-    serviceNames?: string[];
-  }) => Promise<void>;
+  packageRestart: (kwargs: { dnpName: string; serviceNames?: string[] }) => Promise<void>;
 
   /**
    * Removes a package volumes. The re-ups the package
    */
-  packageRestartVolumes: (kwargs: {
-    dnpName: string;
-    volumeId?: string;
-  }) => Promise<void>;
+  packageRestartVolumes: (kwargs: { dnpName: string; volumeId?: string }) => Promise<void>;
 
   /** Delete package sent data key */
-  packageSentDataDelete: (kwargs: {
-    dnpName: string;
-    key?: string;
-  }) => Promise<void>;
+  packageSentDataDelete: (kwargs: { dnpName: string; key?: string }) => Promise<void>;
 
   /**
    * Updates the .env file of a package. If requested, also re-ups it
@@ -565,16 +507,12 @@ export interface Routes {
   /**
    * Returns ports status from upnp scanning
    */
-  portsUpnpStatusGet: (kwargs: {
-    portsToOpen: PortToOpen[];
-  }) => Promise<UpnpTablePortStatus[]>;
+  portsUpnpStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<UpnpTablePortStatus[]>;
 
   /**
    * Returns ports status from API scanning
    */
-  portsApiStatusGet: (kwargs: {
-    portsToOpen: PortToOpen[];
-  }) => Promise<ApiTablePortStatus[]>;
+  portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
    * Reboots the host machine via the DBus socket
@@ -637,10 +575,7 @@ export interface Routes {
   /**
    * Set telegram configuration: token and user ID
    */
-  telegramConfigSet: (kwargs: {
-    token: string;
-    userId: string;
-  }) => Promise<void>;
+  telegramConfigSet: (kwargs: { token: string; userId: string }) => Promise<void>;
 
   /**
    * Updates and upgrades the host machine
@@ -827,7 +762,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {},
+  wireguardDevicesGet: {}
 };
 
 // DO NOT REMOVE
@@ -841,11 +776,8 @@ export type RoutesReturn = {
  * Returns the return resolved type of a function type
  */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-export type ResolvedType<T extends (...args: any) => Promise<any>> = T extends (
-  ...args: any
-) => Promise<infer R>
+export type ResolvedType<T extends (...args: any) => Promise<any>> = T extends (...args: any) => Promise<infer R>
   ? R
   : never;
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type ReplaceVoidWithNull<T> = T extends void ? null : T;

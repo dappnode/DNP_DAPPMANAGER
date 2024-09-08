@@ -9,17 +9,13 @@ import { HttpsMappings } from "./HttpsMappings";
 import "./network.scss";
 
 export function Network({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map((c) => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
-  const container = containers.find(c => c.serviceName === serviceName);
+  const container = containers.find((c) => c.serviceName === serviceName);
   return (
     <>
       <Card spacing className="network-editor">
-        <ServiceSelector
-          serviceName={serviceName}
-          setServiceName={setServiceName}
-          containers={containers}
-        />
+        <ServiceSelector serviceName={serviceName} setServiceName={setServiceName} containers={containers} />
         {container && (
           <div>
             <strong>Container IP: </strong>
@@ -32,19 +28,12 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
         <>
           <SubTitle>Public port mapping</SubTitle>
           <Card spacing className="network-editor">
-            <PortsByService
-              dnpName={container.dnpName}
-              serviceName={container.serviceName}
-              ports={container.ports}
-            />
+            <PortsByService dnpName={container.dnpName} serviceName={container.serviceName} ports={container.ports} />
           </Card>
 
           <SubTitle>HTTPs domain mapping</SubTitle>
           <Card spacing className="network-editor">
-            <HttpsMappings
-              dnpName={container.dnpName}
-              serviceName={container.serviceName}
-            />
+            <HttpsMappings dnpName={container.dnpName} serviceName={container.serviceName} />
           </Card>
         </>
       )}

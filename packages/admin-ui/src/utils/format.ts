@@ -3,13 +3,7 @@ import { stringSplit } from "./strings";
 import prettyBytesLib from "pretty-bytes";
 import { VolumeData } from "@dappnode/types";
 
-export function prettyFullName({
-  dnpName,
-  serviceName
-}: {
-  dnpName: string;
-  serviceName: string;
-}): string {
+export function prettyFullName({ dnpName, serviceName }: { dnpName: string; serviceName: string }): string {
   if (dnpName === serviceName) {
     return prettyDnpName(dnpName);
   } else {
@@ -72,19 +66,15 @@ const coreString = "dncore_";
  * @param dnpName "geth-user.dnp.dappnode.eth"
  * @returns res = { name: "Data", "owner": "Geth User" }
  */
-export function prettyVolumeName(
-  volName: string,
-  dnpName = ""
-): { name: string; owner?: string } {
+export function prettyVolumeName(volName: string, dnpName = ""): { name: string; owner?: string } {
   if (!volName) return { name: volName };
   if (!dnpName) {
     volName = volName.replace(/^dncore_/, "");
 
     for (const separator of [dnpString, publicString, "_"]) {
       if (volName.includes(separator)) {
-        let [dnpName, prettyVolName] = volName.split(separator);
-        if (dnpName === prettyVolName) prettyVolName = "data";
-        return { name: capitalize(prettyVolName), owner: capitalize(dnpName) };
+        const [dnpName, prettyVolName] = volName.split(separator);
+        return { name: capitalize(dnpName === prettyVolName ? "data" : prettyVolName), owner: capitalize(dnpName) };
       }
     }
 
@@ -119,9 +109,7 @@ export function getPrettyVolumeName(volData: VolumeData): string {
  * @returns "Geth"
  */
 export function getPrettyVolumeOwner(volData: VolumeData): string | undefined {
-  return volData.owner
-    ? prettyDnpName(volData.owner)
-    : prettyVolumeName(volData.name).owner;
+  return volData.owner ? prettyDnpName(volData.owner) : prettyVolumeName(volData.name).owner;
 }
 
 /**

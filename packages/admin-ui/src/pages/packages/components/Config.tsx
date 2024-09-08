@@ -16,9 +16,7 @@ export function Config({
   setupWizard?: SetupWizardType;
   userSettings?: UserSettings;
 }) {
-  const [localUserSettings, setLocalUserSettings] = useState<
-    UserSettingsAllDnps
-  >({});
+  const [localUserSettings, setLocalUserSettings] = useState<UserSettingsAllDnps>({});
 
   useEffect(() => {
     if (userSettings) setLocalUserSettings({ [dnpName]: userSettings });
@@ -35,14 +33,13 @@ export function Config({
 
     // Try to get a more friendly name for each ENV
     const serviceEnvs: PackageEnvs = Object.values(diffEnvs)[0];
-    const niceNames = Object.keys(serviceEnvs).map(name => {
+    const niceNames = Object.keys(serviceEnvs).map((name) => {
       for (const field of setupWizard?.fields || [])
-        if (field.target?.type === "environment" && field.target.name === name)
-          return field.title || name;
+        if (field.target?.type === "environment" && field.target.name === name) return field.title || name;
       return name;
     });
 
-    packageSetEnvironment(dnpName, diffEnvs, niceNames).catch(e => {
+    packageSetEnvironment(dnpName, diffEnvs, niceNames).catch((e) => {
       console.error("Error on packageSetEnvironment", e);
     });
   }

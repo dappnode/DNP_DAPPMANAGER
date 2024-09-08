@@ -10,7 +10,8 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
 
 export async function packageGetData(
   dappnodeInstaller: DappnodeInstaller,
-  dnpName: string
+  dnpName: string,
+  version?: string
 ): Promise<PackageItemData> {
   const cachedDnp = db.pkgItemMetadata.get(dnpName);
   if (cachedDnp) {
@@ -18,16 +19,14 @@ export async function packageGetData(
     eventBus.runStakerCacheUpdate.emit({ dnpName });
     return cachedDnp;
   } else {
-    const repository = await dappnodeInstaller.getRelease(dnpName);
+    const repository = await dappnodeInstaller.getRelease(dnpName, version);
     const dataDnp = packagePickItemData(repository);
     db.pkgItemMetadata.set(dnpName, dataDnp);
     return dataDnp;
   }
 }
 
-export function packagePickItemData(
-  pkgRelease: PackageRelease
-): PackageItemData {
+export function packagePickItemData(pkgRelease: PackageRelease): PackageItemData {
   return {
     manifest: packagePickManifestData(pkgRelease.manifest),
     ...pick(pkgRelease, [
@@ -38,19 +37,11 @@ export function packagePickItemData(
       "avatarFile",
       "warnings",
       "origin",
-      "signedSafe",
-    ] as const),
+      "signedSafe"
+    ] as const)
   };
 }
 
 function packagePickManifestData(manifest: Manifest): Manifest {
-  return pick(manifest, [
-    "name",
-    "version",
-    "shortDescription",
-    "avatar",
-    "links",
-    "chain",
-    "warnings",
-  ] as const);
+  return pick(manifest, ["name", "version", "shortDescription", "avatar", "links", "chain", "warnings"] as const);
 }

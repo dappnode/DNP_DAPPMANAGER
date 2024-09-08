@@ -19,11 +19,11 @@ export const repositoryAbi: Abi = [
     outputs: [
       { name: "semanticVersion", type: "uint16[3]" },
       { name: "contractAddress", type: "address" },
-      { name: "contentURI", type: "bytes" },
+      { name: "contentURI", type: "bytes" }
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -32,20 +32,20 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: false,
     inputs: [
       { name: "_newSemanticVersion", type: "uint16[3]" },
       { name: "_contractAddress", type: "address" },
-      { name: "_contentURI", type: "bytes" },
+      { name: "_contentURI", type: "bytes" }
     ],
     name: "newVersion",
     outputs: [],
     payable: false,
     stateMutability: "nonpayable",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -54,11 +54,11 @@ export const repositoryAbi: Abi = [
     outputs: [
       { name: "semanticVersion", type: "uint16[3]" },
       { name: "contractAddress", type: "address" },
-      { name: "contentURI", type: "bytes" },
+      { name: "contentURI", type: "bytes" }
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -67,7 +67,7 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -76,7 +76,7 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "uint256" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -85,11 +85,11 @@ export const repositoryAbi: Abi = [
     outputs: [
       { name: "semanticVersion", type: "uint16[3]" },
       { name: "contractAddress", type: "address" },
-      { name: "contentURI", type: "bytes" },
+      { name: "contentURI", type: "bytes" }
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -98,32 +98,32 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
     inputs: [
       { name: "_sender", type: "address" },
       { name: "_role", type: "bytes32" },
-      { name: "params", type: "uint256[]" },
+      { name: "params", type: "uint256[]" }
     ],
     name: "canPerform",
     outputs: [{ name: "", type: "bool" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
     inputs: [
       { name: "_oldVersion", type: "uint16[3]" },
-      { name: "_newVersion", type: "uint16[3]" },
+      { name: "_newVersion", type: "uint16[3]" }
     ],
     name: "isValidBump",
     outputs: [{ name: "", type: "bool" }],
     payable: false,
     stateMutability: "pure",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -132,7 +132,7 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "bytes32" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -141,11 +141,11 @@ export const repositoryAbi: Abi = [
     outputs: [
       { name: "semanticVersion", type: "uint16[3]" },
       { name: "contractAddress", type: "address" },
-      { name: "contentURI", type: "bytes" },
+      { name: "contentURI", type: "bytes" }
     ],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -154,7 +154,7 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "uint256" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -163,7 +163,7 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     constant: true,
@@ -172,15 +172,15 @@ export const repositoryAbi: Abi = [
     outputs: [{ name: "", type: "address" }],
     payable: false,
     stateMutability: "view",
-    type: "function",
+    type: "function"
   },
   {
     anonymous: false,
     inputs: [
       { indexed: false, name: "versionId", type: "uint256" },
-      { indexed: false, name: "semanticVersion", type: "uint16[3]" },
+      { indexed: false, name: "semanticVersion", type: "uint16[3]" }
     ],
     name: "NewVersion",
-    type: "event",
-  },
+    type: "event"
+  }
 ] as const;

@@ -27,17 +27,10 @@ export default function ChangeWifiPassword() {
     if (prevSsid) setSsid(prevSsid);
   }, [prevSsid]);
 
-  const ssidError =
-    validateDockerEnv(ssid, "SSID") || validateMinLength(ssid, "SSID");
+  const ssidError = validateDockerEnv(ssid, "SSID") || validateMinLength(ssid, "SSID");
   const passwordError = validateStrongPasswordAsDockerEnv(password);
   const password2Error = validatePasswordsMatch(password, password2);
-  const isValid =
-    ssid &&
-    password &&
-    password2 &&
-    !ssidError &&
-    !passwordError &&
-    !password2Error;
+  const isValid = ssid && password && password2 && !ssidError && !passwordError && !password2Error;
 
   function onChangePassword() {
     const envs = {
@@ -61,9 +54,8 @@ export default function ChangeWifiPassword() {
   return (
     <Card spacing>
       <div>
-        Please change the WIFI credentials. The current password is the factory
-        insecure default. Changing it to a strong password will protect your
-        DAppNode from external attackers.
+        Please change the WIFI credentials. The current password is the factory insecure default. Changing it to a
+        strong password will protect your DAppNode from external attackers.
       </div>
 
       <InputForm
@@ -99,12 +91,7 @@ export default function ChangeWifiPassword() {
           }
         ]}
       >
-        <Button
-          type="submit"
-          variant="dappnode"
-          disabled={!isValid}
-          onClick={onChangePassword}
-        >
+        <Button type="submit" variant="dappnode" disabled={!isValid} onClick={onChangePassword}>
           Change password
         </Button>
       </InputForm>

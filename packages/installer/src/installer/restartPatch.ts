@@ -1,20 +1,12 @@
 import fs from "fs";
 import path from "path";
-import {
-  getBackupPath,
-  getDockerComposePath,
-  validatePath,
-} from "@dappnode/utils";
+import { getBackupPath, getDockerComposePath, validatePath } from "@dappnode/utils";
 import * as db from "@dappnode/db";
 import { shell, pause } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import {
-  dockerContainerInspect,
-  logContainer,
-  dockerContainerRemove,
-} from "@dappnode/dockerapi";
+import { dockerContainerInspect, logContainer, dockerContainerRemove } from "@dappnode/dockerapi";
 import { getLogUi } from "@dappnode/logger";
 import { rollbackPackages } from "./rollbackPackages.js";
 import { postInstallClean } from "./postInstallClean.js";
@@ -44,7 +36,7 @@ export async function restartDappmanagerPatch({
   composeBackupPath,
   restartCommand,
   restartLaunchCommand,
-  packagesData,
+  packagesData
 }: {
   composePath: string;
   composeBackupPath?: string;
@@ -120,9 +112,9 @@ exit $UPEXIT
         volumes: params.restartDnpVolumes,
         // The entrypoint property in the docker compose overwrites
         // both the CMD [ ] and ENTRYPOINT [ ] directive in the Dockerfile
-        entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`,
-      },
-    },
+        entrypoint: restartCommand || `/bin/sh ${restartScriptPath}`
+      }
+    }
   });
 
   validatePath(composeRestartPath);
@@ -138,10 +130,7 @@ exit $UPEXIT
     //
     // [NOTE2]: Allow to customize the restart launch command with a parameter that comes from
     // the new DAPPMANAGER / CORE manifest, as an extra safety measure
-    await shell(
-      restartLaunchCommand ||
-        `docker compose -f ${composeRestartPath} up --force-recreate <&-`
-    );
+    await shell(restartLaunchCommand || `docker compose -f ${composeRestartPath} up --force-recreate <&-`);
 
     if (packagesData) db.coreUpdatePackagesData.set(null);
   } catch (e) {
@@ -197,9 +186,7 @@ export async function postRestartPatch(): Promise<void> {
  * Non-essential, so wrap in try catch to not prevent a rollback
  * @param restart
  */
-async function logRestartPatchStatus(
-  restart: Dockerode.ContainerInspectInfo
-): Promise<void> {
+async function logRestartPatchStatus(restart: Dockerode.ContainerInspectInfo): Promise<void> {
   try {
     if (!restart) {
       logs.info(`No restart patch found, assuming a manual restart`);
@@ -231,10 +218,7 @@ async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspect
   try {
     let restart = await dockerContainerInspect(restartContainerName);
     const start = Date.now();
-    while (
-      Date.now() - start < timeoutWaitForRestart &&
-      restart.State.Running
-    ) {
+    while (Date.now() - start < timeoutWaitForRestart && restart.State.Running) {
       restart = await dockerContainerInspect(restartContainerName);
       await pause(1000);
     }
@@ -251,9 +235,7 @@ async function waitForRestartPatchToFinish(): Promise<Dockerode.ContainerInspect
  * so this function ensures compatibility cross-version
  * - packageData from < v0.2.35, won't have property .dnpName
  */
-function parsePackageDataRaw(
-  packageData: InstallPackageDataPaths
-): InstallPackageDataPaths {
+function parsePackageDataRaw(packageData: InstallPackageDataPaths): InstallPackageDataPaths {
   if (packageData.dnpName) {
     // New OK data
     return packageData;
@@ -268,7 +250,7 @@ function parsePackageDataRaw(
     return {
       ...packageData,
       dnpName: pre0235Data.name,
-      semVersion: pre0235Data.version,
+      semVersion: pre0235Data.version
     };
   }
 

@@ -1,7 +1,4 @@
-import {
-  disconnectAllContainersFromNetwork,
-  docker,
-} from "@dappnode/dockerapi";
+import { disconnectAllContainersFromNetwork, docker } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { isEmpty } from "lodash-es";
@@ -33,27 +30,25 @@ export async function recreateDockerNetwork(
   containersToRestart: string[];
   containersToRecreate: string[];
 }> {
-  const containers = (
-    (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
-  ).Containers;
+  const containers = ((await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo).Containers;
 
-  const { containersToRestart, containersToRecreate } =
-    await cleanDockerNetworkBeforeRemoval(networkToRemove, containers);
+  const { containersToRestart, containersToRecreate } = await cleanDockerNetworkBeforeRemoval(
+    networkToRemove,
+    containers
+  );
 
   logs.info(`removing docker network ${networkToRemove.id}`);
   // CRITICAL: if this step fails migration failure
   await networkToRemove.remove().catch(async (e) => {
     // reconnect all docker containers before throwing error
     if (containers) {
-      logs.error(
-        `error removing docker network, reconnecting all docker containers`
-      );
+      logs.error(`error removing docker network, reconnecting all docker containers`);
 
       await restoreContainersToNetworkNotThrow({
         containersToRestart,
         network: networkToRemove,
         aliasesIpsMap,
-        containersToRecreate,
+        containersToRecreate
       });
     }
 
@@ -61,14 +56,12 @@ export async function recreateDockerNetwork(
   });
 
   // create network with valid range
-  logs.info(
-    `creating docker network ${newNetworkOptions.Name} with valid IP range`
-  );
+  logs.info(`creating docker network ${newNetworkOptions.Name} with valid IP range`);
   // CRITICAL: if this step fails migration failure
   return {
     network: await docker.createNetwork(newNetworkOptions),
     containersToRestart,
-    containersToRecreate,
+    containersToRecreate
   };
 }
 
@@ -81,39 +74,29 @@ async function cleanDockerNetworkBeforeRemoval(
     | undefined
 ): Promise<{ containersToRestart: string[]; containersToRecreate: string[] }> {
   if (containers && !isEmpty(containers)) {
-    logs.info(
-      `disconnecting containers from docker network before removing it`
-    );
+    logs.info(`disconnecting containers from docker network before removing it`);
     await disconnectAllContainersFromNetwork(networkToRemove).catch((e) =>
-      logs.error(
-        `error while disconnecting all containers from the network: ${e.message}`
-      )
+      logs.error(`error while disconnecting all containers from the network: ${e.message}`)
     );
 
-    const containersToRestart = await stopConnectedContainersIfAny(
-      networkToRemove
-    ).catch((e) => {
+    const containersToRestart = await stopConnectedContainersIfAny(networkToRemove).catch((e) => {
       logs.error(`error stopping pending connected containers: ${e.message}`);
       return [];
     });
 
-    const containersToRecreate = await removeConnectedContainersIfAny(
-      networkToRemove
-    ).catch((e) => {
-      logs.error(
-        `error removing pending containers, the docker network removal might fail!: ${e}`
-      );
+    const containersToRecreate = await removeConnectedContainersIfAny(networkToRemove).catch((e) => {
+      logs.error(`error removing pending containers, the docker network removal might fail!: ${e}`);
       return [];
     });
 
     return {
       containersToRestart,
-      containersToRecreate,
+      containersToRecreate
     };
   }
   return {
     containersToRecreate: [],
-    containersToRestart: [],
+    containersToRestart: []
   };
 }
 
@@ -122,18 +105,12 @@ async function cleanDockerNetworkBeforeRemoval(
  *
  * @param networkToRemove dockerode network to remove
  */
-async function stopConnectedContainersIfAny(
-  networkToRemove: Dockerode.Network
-): Promise<string[]> {
-  const containers = (
-    (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
-  ).Containers;
+async function stopConnectedContainersIfAny(networkToRemove: Dockerode.Network): Promise<string[]> {
+  const containers = ((await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo).Containers;
 
   if (!isEmpty(containers)) {
     const containersNames = Object.values(containers).map((c) => c.Name);
-    await Promise.all(
-      containersNames.map(async (cn) => await docker.getContainer(cn).stop())
-    );
+    await Promise.all(containersNames.map(async (cn) => await docker.getContainer(cn).stop()));
     return containersNames;
   }
   return [];
@@ -145,20 +122,12 @@ async function stopConnectedContainersIfAny(
  *
  * @param networkToRemove dockerode network to remove
  */
-async function removeConnectedContainersIfAny(
-  networkToRemove: Dockerode.Network
-): Promise<string[]> {
-  const containers = (
-    (await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo
-  ).Containers;
+async function removeConnectedContainersIfAny(networkToRemove: Dockerode.Network): Promise<string[]> {
+  const containers = ((await networkToRemove.inspect()) as Dockerode.NetworkInspectInfo).Containers;
 
   if (!isEmpty(containers)) {
     const containersNames = Object.values(containers).map((c) => c.Name);
-    await Promise.all(
-      containersNames.map(
-        async (cn) => await docker.getContainer(cn).remove({ force: true })
-      )
-    );
+    await Promise.all(containersNames.map(async (cn) => await docker.getContainer(cn).remove({ force: true })));
     return containersNames;
   }
   return [];

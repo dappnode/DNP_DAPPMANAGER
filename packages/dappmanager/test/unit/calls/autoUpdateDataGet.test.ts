@@ -1,17 +1,7 @@
 import "mocha";
 import { expect } from "chai";
-import {
-  createTestDir,
-  cleanTestDir,
-  mockDnp,
-  clearDbs
-} from "../../testUtils.js";
-import {
-  editDnpSetting,
-  editCoreSetting,
-  isUpdateDelayCompleted,
-  flagCompletedUpdate
-} from "@dappnode/daemons";
+import { createTestDir, cleanTestDir, mockDnp, clearDbs } from "../../testUtils.js";
+import { editDnpSetting, editCoreSetting, isUpdateDelayCompleted, flagCompletedUpdate } from "@dappnode/daemons";
 import { params } from "@dappnode/params";
 import rewiremock from "rewiremock/node.js";
 import { autoUpdateDataGet as autoUpdateDataGetType } from "../../../src/calls/autoUpdateDataGet.js";
@@ -61,7 +51,7 @@ describe.skip("Call function: autoUpdateDataGet", function () {
   beforeEach("Mock", async () => {
     const mock = await rewiremock.around(
       () => import("../../../src/calls/autoUpdateDataGet.js"),
-      mock => {
+      (mock) => {
         mock(() => import("@dappnode/dockerapi"))
           .with({ listPackages })
           .toBeUsed();
@@ -80,11 +70,7 @@ describe.skip("Call function: autoUpdateDataGet", function () {
     editDnpSetting(true, dnpName);
     // Trigger some versions
     isUpdateDelayCompleted(dnpName, nextVersion, timestamp);
-    flagCompletedUpdate(
-      "core.dnp.dappnode.eth",
-      "admin@0.2.1,core@0.2.1",
-      timestamp
-    );
+    flagCompletedUpdate("core.dnp.dappnode.eth", "admin@0.2.1,core@0.2.1", timestamp);
   });
 
   it("should return auto-update data", async () => {

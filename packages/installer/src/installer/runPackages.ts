@@ -4,11 +4,7 @@ import { restartDappmanagerPatch } from "./restartPatch.js";
 import { Log } from "@dappnode/logger";
 import { InstallPackageData } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
-import {
-  dockerComposeUpPackage,
-  dockerComposeUp,
-  copyFileToDockerContainer,
-} from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, dockerComposeUp, copyFileToDockerContainer } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
 import { httpsPortal } from "@dappnode/httpsportal";
 
@@ -18,10 +14,7 @@ const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
  * Create and run each package container in series
  * The order is extremely important and should be guaranteed by `orderInstallPackages`
  */
-export async function runPackages(
-  packagesData: InstallPackageData[],
-  log: Log
-): Promise<void> {
+export async function runPackages(packagesData: InstallPackageData[], log: Log): Promise<void> {
   for (const pkg of packagesData) {
     // patch to prevent installer from crashing
     if (pkg.dnpName == params.dappmanagerDnpName) {
@@ -31,7 +24,7 @@ export async function runPackages(
         composeBackupPath: pkg.composeBackupPath,
         restartCommand: pkg.manifest.restartCommand,
         restartLaunchCommand: pkg.manifest.restartLaunchCommand,
-        packagesData,
+        packagesData
       });
 
       continue;
@@ -50,7 +43,7 @@ export async function runPackages(
       // EXCEPTION!: If the compose contains: `pid:service.serviceName`
       // compose must start with: `noStart: false`
       noStart: !packageToInstallHasPid(pkg) ? true : false,
-      timeout: pkg.dockerTimeout,
+      timeout: pkg.dockerTimeout
     });
 
     // Copy fileUploads if any to the container before up-ing
@@ -58,23 +51,18 @@ export async function runPackages(
       log(pkg.dnpName, "Copying file uploads...");
       logs.debug(`${pkg.dnpName} fileUploads`, pkg.fileUploads);
 
-      for (const [serviceName, serviceFileUploads] of Object.entries(
-        pkg.fileUploads
-      ))
-        for (const [containerPath, dataUri] of Object.entries(
-          serviceFileUploads
-        )) {
+      for (const [serviceName, serviceFileUploads] of Object.entries(pkg.fileUploads))
+        for (const [containerPath, dataUri] of Object.entries(serviceFileUploads)) {
           const { dir: toPath, base: filename } = path.parse(containerPath);
           const service = pkg.compose.services[serviceName];
           if (!service) throw Error(`No service for ${serviceName}`);
           const containerName = service.container_name;
-          if (!containerName)
-            throw Error(`No container name for ${serviceName}`);
+          if (!containerName) throw Error(`No container name for ${serviceName}`);
           await copyFileToDockerContainer({
             containerName,
             dataUri,
             filename,
-            toPath,
+            toPath
           });
         }
     }
@@ -89,11 +77,7 @@ export async function runPackages(
       await restartDappmanagerPatch({ composePath: pkg.composePath });
       return;
     } else {
-      await dockerComposeUpPackage(
-        { dnpName: pkg.dnpName, composePath: pkg.composePath },
-        false,
-        pkg.containersStatus
-      );
+      await dockerComposeUpPackage({ dnpName: pkg.dnpName, composePath: pkg.composePath }, false, pkg.containersStatus);
     }
 
     log(pkg.dnpName, "Package started");

@@ -6,7 +6,7 @@ import {
   ExecutionClientPrater,
   Network,
   StakerItem,
-  UserSettings,
+  UserSettings
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
@@ -28,39 +28,34 @@ export class Execution extends StakerComponent {
     [Network.Gnosis]: db.executionClientGnosis,
     [Network.Prater]: db.executionClientPrater,
     [Network.Holesky]: db.executionClientHolesky,
-    [Network.Lukso]: db.executionClientLukso,
+    [Network.Lukso]: db.executionClientLukso
   };
 
-  protected static readonly CompatibleExecutions: Record<
-    Network,
-    { dnpName: string; minVersion: string }[]
-  > = {
+  protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
       { dnpName: ExecutionClientMainnet.Geth, minVersion: "0.1.37" },
       { dnpName: ExecutionClientMainnet.Nethermind, minVersion: "1.0.27" },
       { dnpName: ExecutionClientMainnet.Erigon, minVersion: "0.1.34" },
-      { dnpName: ExecutionClientMainnet.Besu, minVersion: "1.2.6" },
+      { dnpName: ExecutionClientMainnet.Besu, minVersion: "1.2.6" }
     ],
     [Network.Gnosis]: [
       { dnpName: ExecutionClientGnosis.Nethermind, minVersion: "1.0.18" },
-      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" }
     ],
     [Network.Prater]: [
       { dnpName: ExecutionClientPrater.Geth, minVersion: "0.4.26" },
       { dnpName: ExecutionClientPrater.Erigon, minVersion: "0.1.0" },
       { dnpName: ExecutionClientPrater.Nethermind, minVersion: "1.0.1" },
-      { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientPrater.Besu, minVersion: "0.1.0" }
     ],
     [Network.Holesky]: [
       { dnpName: ExecutionClientHolesky.Reth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Geth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
-      { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Lukso]: [
-      { dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" },
-    ],
+    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -69,10 +64,8 @@ export class Execution extends StakerComponent {
 
   async getAllExecutions(network: Network): Promise<StakerItem[]> {
     return await super.getAll({
-      dnpNames: Execution.CompatibleExecutions[network].map(
-        (client) => client.dnpName
-      ),
-      currentClient: this.DbHandlers[network].get(),
+      dnpNames: Execution.CompatibleExecutions[network].map((client) => client.dnpName),
+      currentClient: this.DbHandlers[network].get()
     });
   }
 
@@ -80,7 +73,7 @@ export class Execution extends StakerComponent {
     const currentExecutionDnpName = this.DbHandlers[network].get();
     if (currentExecutionDnpName) {
       const isInstalled = await listPackageNoThrow({
-        dnpName: currentExecutionDnpName,
+        dnpName: currentExecutionDnpName
       });
 
       if (!isInstalled) {
@@ -90,7 +83,7 @@ export class Execution extends StakerComponent {
       }
       await this.persistSelectedIfInstalled({
         dnpName: currentExecutionDnpName,
-        userSettings: this.getUserSettings(network, currentExecutionDnpName),
+        userSettings: this.getUserSettings(network, currentExecutionDnpName)
       });
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
@@ -103,10 +96,8 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      userSettings: newExecutionDnpName
-        ? this.getUserSettings(network, newExecutionDnpName)
-        : {},
-      prevClient: prevExecClientDnpName,
+      userSettings: newExecutionDnpName ? this.getUserSettings(network, newExecutionDnpName) : {},
+      prevClient: prevExecClientDnpName
     });
 
     if (newExecutionDnpName !== prevExecClientDnpName) {
@@ -116,7 +107,7 @@ export class Execution extends StakerComponent {
       await ethereumClient.updateFullnodeAlias({
         network,
         newExecClientDnpName: newExecutionDnpName,
-        prevExecClientDnpName: prevExecClientDnpName || "",
+        prevExecClientDnpName: prevExecClientDnpName || ""
       });
     }
   }
@@ -126,23 +117,23 @@ export class Execution extends StakerComponent {
       networks: {
         rootNetworks: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
-            external: true,
+            external: true
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            external: true,
-          },
+            external: true
+          }
         },
         serviceNetworks: {
           [this.getExecutionServiceName(dnpName)]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`execution.${network}.staker.dappnode`],
+              aliases: [`execution.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`execution.${network}.dncore.dappnode`],
-            },
-          },
-        },
-      },
+              aliases: [`execution.${network}.dncore.dappnode`]
+            }
+          }
+        }
+      }
     };
   }
 
@@ -153,8 +144,7 @@ export class Execution extends StakerComponent {
    */
   private getExecutionServiceName(dnpName: string): string {
     // TODO: geth mainnet is the only execution with service name === dnpName. See https://github.com/dappnode/DAppNodePackage-geth/blob/7e8e5aa860a8861986f675170bfa92215760d32e/docker-compose.yml#L3
-    if (dnpName === ExecutionClientMainnet.Geth)
-      return ExecutionClientMainnet.Geth;
+    if (dnpName === ExecutionClientMainnet.Geth) return ExecutionClientMainnet.Geth;
     if (dnpName.includes("geth")) return "geth";
     if (dnpName.includes("nethermind")) return "nethermind";
     if (dnpName.includes("erigon")) return "erigon";

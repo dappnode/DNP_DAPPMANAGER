@@ -18,7 +18,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       dockerTimeout: 10,
       defaultEnvironment: ["ENV_VAR1=value1", "ENV_VAR2=value2"],
       defaultPorts: ["8080:8080", "8081:8081"],
-      defaultVolumes: ["/var/log:/var/log"],
+      defaultVolumes: ["/var/log:/var/log"]
     };
     const labelsRaw: ContainerLabelsRaw = {
       "dappnode.dnp.dnpName": "dnp-name",
@@ -32,10 +32,9 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       "dappnode.dnp.isCore": "true",
       "dappnode.dnp.isMain": "true",
       "dappnode.dnp.dockerTimeout": "10",
-      "dappnode.dnp.default.environment":
-        '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
+      "dappnode.dnp.default.environment": '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
       "dappnode.dnp.default.ports": '["8080:8080", "8081:8081"]',
-      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]',
+      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]'
     };
     const labelValues = readContainerLabels(labelsRaw);
 
@@ -53,14 +52,14 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       avatar: "avatar-url",
       origin: "origin-url",
       chain: {
-        driver: "ethereum2-beacon-chain-prysm",
+        driver: "ethereum2-beacon-chain-prysm"
       },
       isCore: true,
       isMain: true,
       dockerTimeout: 10,
       defaultEnvironment: ["ENV_VAR1=value1", "ENV_VAR2=value2"],
       defaultPorts: ["8080:8080", "8081:8081"],
-      defaultVolumes: ["/var/log:/var/log"],
+      defaultVolumes: ["/var/log:/var/log"]
     };
     const labelsRaw: ContainerLabelsRaw = {
       "dappnode.dnp.dnpName": "dnp-name",
@@ -74,10 +73,9 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       "dappnode.dnp.isCore": "true",
       "dappnode.dnp.isMain": "true",
       "dappnode.dnp.dockerTimeout": "10",
-      "dappnode.dnp.default.environment":
-        '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
+      "dappnode.dnp.default.environment": '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
       "dappnode.dnp.default.ports": '["8080:8080", "8081:8081"]',
-      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]',
+      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]'
     };
     const labelValues = readContainerLabels(labelsRaw);
 
@@ -100,7 +98,7 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       dockerTimeout: 10,
       defaultEnvironment: ["ENV_VAR1=value1", "ENV_VAR2=value2"],
       defaultPorts: ["8080:8080", "8081:8081"],
-      defaultVolumes: ["/var/log:/var/log"],
+      defaultVolumes: ["/var/log:/var/log"]
     };
     const labelsRaw: ContainerLabelsRaw = {
       "dappnode.dnp.dnpName": "dnp-name",
@@ -114,10 +112,9 @@ describe("Parse and validate manifest labels to be used in the compose", () => {
       "dappnode.dnp.isCore": "true",
       "dappnode.dnp.isMain": "true",
       "dappnode.dnp.dockerTimeout": "10",
-      "dappnode.dnp.default.environment":
-        '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
+      "dappnode.dnp.default.environment": '["ENV_VAR1=value1", "ENV_VAR2=value2"]',
       "dappnode.dnp.default.ports": '["8080:8080", "8081:8081"]',
-      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]',
+      "dappnode.dnp.default.volumes": '["/var/log:/var/log"]'
     };
     const labelValues = readContainerLabels(labelsRaw);
 

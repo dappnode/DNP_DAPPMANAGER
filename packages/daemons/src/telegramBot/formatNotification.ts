@@ -8,10 +8,7 @@ import { bold } from "./markdown.js";
  * Format a notification as a Telegram message with emojis
  */
 export function formatNotification(notification: PackageNotification): string {
-  return [
-    `${typeToEmoji(notification.type)} ${bold(notification.title)}`,
-    notification.body,
-  ].join("\n\n");
+  return [`${typeToEmoji(notification.type)} ${bold(notification.title)}`, notification.body].join("\n\n");
 }
 
 /**

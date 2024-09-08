@@ -21,7 +21,7 @@ import { InstalledPackageData } from "@dappnode/types";
 
 export default function getRelevantInstalledDnps({
   requestedDnps,
-  installedDnps,
+  installedDnps
 }: {
   requestedDnps: string[];
   installedDnps: InstalledPackageData[];
@@ -40,9 +40,7 @@ export default function getRelevantInstalledDnps({
     if (dnp) addDependants(dnp);
   }
   // Return only packages that are not already included in the requestedDnps array
-  return Object.values(state).filter(
-    (dnp) => !requestedDnps.includes(dnp.dnpName)
-  );
+  return Object.values(state).filter((dnp) => !requestedDnps.includes(dnp.dnpName));
 
   function addDependants(dnp: InstalledPackageData): void {
     // Prevent possible recursive loops
@@ -62,10 +60,7 @@ export default function getRelevantInstalledDnps({
   function isInState(dnp: InstalledPackageData): boolean {
     return Boolean(state[dnp.dnpName]);
   }
-  function dependsOn(
-    dependantPkg: InstalledPackageData,
-    dnp: InstalledPackageData
-  ): boolean {
+  function dependsOn(dependantPkg: InstalledPackageData, dnp: InstalledPackageData): boolean {
     return Boolean(dependantPkg.dependencies[dnp.dnpName]);
   }
 }

@@ -4,21 +4,14 @@ import { NavLink } from "react-router-dom";
 import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
-import {
-  getCoreUpdateAvailable,
-  getIsCoreUpdateTypePatch,
-  getUpdatingCore
-} from "services/coreUpdate/selectors";
+import { getCoreUpdateAvailable, getIsCoreUpdateTypePatch, getUpdatingCore } from "services/coreUpdate/selectors";
 import {
   getWifiStatus,
   getPasswordIsSecure,
   getRebootIsRequired,
   getIsConnectedToInternet
 } from "services/dappnodeStatus/selectors";
-import {
-  pathName as systemPathName,
-  subPaths as systemSubPaths
-} from "pages/system/data";
+import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
@@ -39,11 +32,8 @@ export default function NotificationsView() {
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
-  const isCoreAutoUpdateActive = (
-    (autoUpdateSettingsReq.data?.settings || {})[
-      autoUpdateIds.SYSTEM_PACKAGES
-    ] || {}
-  ).enabled;
+  const isCoreAutoUpdateActive = ((autoUpdateSettingsReq.data?.settings || {})[autoUpdateIds.SYSTEM_PACKAGES] || {})
+    .enabled;
 
   const notifications = [
     /**
@@ -76,8 +66,7 @@ export default function NotificationsView() {
       id: "systemUpdate",
       linkText: "Update",
       linkPath: systemPathName + "/" + systemSubPaths.update,
-      body:
-        "**Dappnode system update available.** Click **Update** to review and approve it",
+      body: "**Dappnode system update available.** Click **Update** to review and approve it",
       active:
         coreUpdateAvailable &&
         !updatingCore &&
@@ -92,8 +81,7 @@ export default function NotificationsView() {
       id: "wifiCredentials",
       linkText: "Change",
       linkPath: systemPathName + "/" + systemSubPaths.security,
-      body:
-        "**Change the Dappnode WiFi credentials**, they are insecure default values.",
+      body: "**Change the Dappnode WiFi credentials**, they are insecure default values.",
       active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
     },
     /**
@@ -104,8 +92,7 @@ export default function NotificationsView() {
       id: "hostPasswordInsecure",
       linkText: "Change",
       linkPath: systemPathName + "/" + systemSubPaths.security,
-      body:
-        "**Change the host 'dappnode' user password**, it's an insecure default.",
+      body: "**Change the host 'dappnode' user password**, it's an insecure default.",
       active: passwordIsSecure === false
     }
   ];
@@ -115,11 +102,7 @@ export default function NotificationsView() {
       {notifications
         .filter(({ active }) => active)
         .map(({ id, linkText, linkPath, body }) => (
-          <AlertDismissible
-            key={id}
-            className="main-notification"
-            variant="warning"
-          >
+          <AlertDismissible key={id} className="main-notification" variant="warning">
             <RenderMarkdown source={body} />
             {linkText && linkPath ? (
               <NavLink to={linkPath}>

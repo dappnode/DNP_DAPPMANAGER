@@ -21,17 +21,11 @@ export const serverName = interceptGlobalEnvOnSet(
 
 // Domains
 
-export const fullnodeDomainTarget = dbMain.staticKey<string>(
-  FULLNODE_DOMAIN_TARGET,
-  ""
-);
+export const fullnodeDomainTarget = dbMain.staticKey<string>(FULLNODE_DOMAIN_TARGET, "");
 
 // Host password check
 
-export const passwordIsSecure = dbMain.staticKey<boolean>(
-  PASSWORD_IS_SECURE,
-  false
-);
+export const passwordIsSecure = dbMain.staticKey<boolean>(PASSWORD_IS_SECURE, false);
 
 // Telegram bot status
 
@@ -39,44 +33,29 @@ export const telegramStatus = dbMain.staticKey<boolean>(TELEGRAM_STATUS, false);
 
 // Telegram token
 
-export const telegramToken = dbMain.staticKey<string | null>(
-  TELEGRAM_TOKEN,
-  null
-);
+export const telegramToken = dbMain.staticKey<string | null>(TELEGRAM_TOKEN, null);
 
 // Telegram channel Id
 
-export const telegramChannelIds = dbMain.staticKey<string[]>(
-  TELEGRAM_CHANNEL_ID,
-  []
-);
+export const telegramChannelIds = dbMain.staticKey<string[]>(TELEGRAM_CHANNEL_ID, []);
 
 // Telegram user Id i.e 1461924175
 
-export const telegramUserId = dbMain.staticKey<string | null>(
-  TELEGRAM_USER_ID,
-  null
-);
+export const telegramUserId = dbMain.staticKey<string | null>(TELEGRAM_USER_ID, null);
 
 // Is dappnode AWS instance
 
-export const isDappnodeAws = dbMain.staticKey<boolean | null>(
-  IS_DAPPNODE_AWS,
-  null
-);
+export const isDappnodeAws = dbMain.staticKey<boolean | null>(IS_DAPPNODE_AWS, null);
 
 // Cache version information to detect updates
 
-export const versionData = dbCache.staticKey<PackageVersionData>(
-  VERSION_DATA,
-  {}
-);
+export const versionData = dbCache.staticKey<PackageVersionData>(VERSION_DATA, {});
 
 // Disk usage threshould records
 
 export const diskUsageThreshold = dbCache.indexedByKey<boolean, string>({
   rootKey: DISK_USAGE_THRESHOLD,
-  getKey: (id) => id,
+  getKey: (id) => id
 });
 
 // DAppNode Name appears on the UI

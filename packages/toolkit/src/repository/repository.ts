@@ -22,14 +22,11 @@ import {
   releaseFiles,
   Manifest,
   Compose,
-  Architecture,
+  Architecture
 } from "@dappnode/types";
 import YAML from "yaml";
 import { ApmRepository } from "./apmRepository.js";
-import {
-  getReleaseSignatureStatus,
-  serializeIpfsDirectory,
-} from "./releaseSignature.js";
+import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSignature.js";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { ethers } from "ethers";
@@ -69,9 +66,11 @@ export class DappnodeRepository extends ApmRepository {
    * Pins a hash to the IPFS node. Do not throw errors.
    * @param hash
    */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -97,31 +96,24 @@ export class DappnodeRepository extends ApmRepository {
             dnpNameOrHash: name,
             trustedKeys,
             os,
-            version,
+            version
           })
       )
     );
   }
 
-  public async getManifestFromDir(
-    dnpName: string,
-    version?: string
-  ): Promise<Manifest> {
+  public async getManifestFromDir(dnpName: string, version?: string): Promise<Manifest> {
     const { contentUri } = await this.getVersionAndIpfsHash({
       dnpNameOrHash: dnpName,
-      version,
+      version
     });
 
     const ipfsEntries = await this.list(contentUri);
 
     // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(
-      releaseFilesToDownload.manifest,
-      ipfsEntries
-    );
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
 
-    if (!manifest)
-      throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
+    if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
 
     return manifest;
   }
@@ -135,7 +127,7 @@ export class DappnodeRepository extends ApmRepository {
     dnpNameOrHash,
     trustedKeys,
     os = "x64",
-    version,
+    version
   }: {
     dnpNameOrHash: string;
     trustedKeys: TrustedReleaseKey[];
@@ -144,10 +136,9 @@ export class DappnodeRepository extends ApmRepository {
   }): Promise<PackageRelease> {
     const { contentUri, origin } = await this.getVersionAndIpfsHash({
       dnpNameOrHash,
-      version,
+      version
     });
-    if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri)))
-      throw Error(`Invalid IPFS hash ${contentUri}`);
+    if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
     // pin hash
     await this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
@@ -155,52 +146,40 @@ export class DappnodeRepository extends ApmRepository {
     const ipfsEntries = await this.list(contentUri);
 
     // get manifest
-    const manifest = await this.getPkgAsset<Manifest>(
-      releaseFilesToDownload.manifest,
-      ipfsEntries
-    );
+    const manifest = await this.getPkgAsset<Manifest>(releaseFilesToDownload.manifest, ipfsEntries);
     // Ensure its a directory release
-    if (!manifest)
-      throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
+    if (!manifest) throw Error(`Invalid pkg release ${contentUri}, manifest not found`);
     const dnpName = manifest.name;
     const isCore = manifest.type === "dncore";
 
     // get compose
-    const compose = await this.getPkgAsset<Compose>(
-      releaseFilesToDownload.compose,
+    const compose = await this.getPkgAsset<Compose>(releaseFilesToDownload.compose, ipfsEntries);
+    if (!compose) throw Error(`Invalid pkg release ${contentUri}, compose not found`);
+
+    const signature: ReleaseSignature | undefined = await this.getPkgAsset<ReleaseSignature>(
+      releaseFilesToDownload.signature,
       ipfsEntries
     );
-    if (!compose)
-      throw Error(`Invalid pkg release ${contentUri}, compose not found`);
-
-    const signature: ReleaseSignature | undefined =
-      await this.getPkgAsset<ReleaseSignature>(
-        releaseFilesToDownload.signature,
-        ipfsEntries
-      );
 
     const signatureStatus: ReleaseSignatureStatus = signature
       ? getReleaseSignatureStatus(
           manifest.name,
           {
             signature,
-            signedData: serializeIpfsDirectory(ipfsEntries, signature.cid),
+            signedData: serializeIpfsDirectory(ipfsEntries, signature.cid)
           },
           trustedKeys
         )
       : { status: ReleaseSignatureStatusCode.notSigned };
 
-    const signedSafe =
-      signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
+    const signedSafe = signatureStatus.status === ReleaseSignatureStatusCode.signedByKnownKey;
 
-    const avatarEntry = ipfsEntries.find((file) =>
-      releaseFiles.avatar.regex.test(file.name)
-    );
+    const avatarEntry = ipfsEntries.find((file) => releaseFiles.avatar.regex.test(file.name));
     const avatarFile: DistributedFile | undefined = avatarEntry
       ? {
           hash: avatarEntry.cid.toString(),
           size: avatarEntry.size,
-          source,
+          source
         }
       : undefined;
 
@@ -213,10 +192,7 @@ export class DappnodeRepository extends ApmRepository {
       imageFile: this.getImageByArch(manifest, ipfsEntries, os),
       avatarFile,
       manifest,
-      setupWizard: await this.getPkgAsset(
-        releaseFilesToDownload.setupWizard,
-        ipfsEntries
-      ),
+      setupWizard: await this.getPkgAsset(releaseFilesToDownload.setupWizard, ipfsEntries),
       compose,
       signature,
       signatureStatus,
@@ -224,64 +200,47 @@ export class DappnodeRepository extends ApmRepository {
       signedSafe,
       warnings: {
         coreFromForeignRegistry: isCore && !dnpName.endsWith(dappnodeRegistry),
-        requestNameMismatch:
-          isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName,
+        requestNameMismatch: isEnsDomain(dnpNameOrHash) && dnpNameOrHash !== dnpName
       },
-      disclaimer: await this.getPkgAsset(
-        releaseFilesToDownload.disclaimer,
-        ipfsEntries
-      ),
-      gettingStarted: await this.getPkgAsset(
-        releaseFilesToDownload.gettingStarted,
-        ipfsEntries
-      ),
-      prometheusTargets: await this.getPkgAsset(
-        releaseFilesToDownload.prometheusTargets,
-        ipfsEntries
-      ),
-      grafanaDashboards: await this.getPkgAsset(
-        releaseFilesToDownload.grafanaDashboards,
-        ipfsEntries
-      ),
+      disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries),
+      gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries),
+      prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries),
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries)
     };
   }
 
   /**
- * Get a given release asset for a request. It looks for an IPFS entry for
- * a given release file given a release file config.
- *
- * @param ipfsEntries - An array of IPFS entries.
- * @param fileConfig - A file configuration.
- * @throws - If the file is required and not found.
- * @returns - The release package for the request or undefined if not found.
- */
-  public async getPkgAsset<T>(
-    fileConfig: FileConfig,
-    ipfsEntries: IPFSEntry[]
-  ): Promise<T | undefined> {
+   * Get a given release asset for a request. It looks for an IPFS entry for
+   * a given release file given a release file config.
+   *
+   * @param ipfsEntries - An array of IPFS entries.
+   * @param fileConfig - A file configuration.
+   * @throws - If the file is required and not found.
+   * @returns - The release package for the request or undefined if not found.
+   */
+  public async getPkgAsset<T>(fileConfig: FileConfig, ipfsEntries: IPFSEntry[]): Promise<T | undefined> {
     const { regex, required, multiple } = fileConfig;
     // We filter the entries (files) so that we only consider the ones that match the regex.
     // for example, all grafana dashboards must pass /.*grafana-dashboard.json$/ regex
-    const matchingEntries = ipfsEntries.filter(file => regex.test(file.name));
-  
+    const matchingEntries = ipfsEntries.filter((file) => regex.test(file.name));
+
     // Handle no matches. If the file is required, throw an error, otherwise return undefined.
     if (matchingEntries.length === 0) {
       if (required) throw new Error(`Missing required file: ${regex}`);
       return undefined;
     }
-  
+
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
     const { maxSize: maxLength, format } = fileConfig;
-    const contents = await Promise.all(matchingEntries.map(entry =>
-      this.writeFileToMemory(entry.cid.toString(), maxLength)
-    ));
-  
+    const contents = await Promise.all(
+      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+    );
+
     // If multiple files are allowed, we return an array of parsed assets.
     // Otherwise, we return a single parsed asset.
     return this.parseAsset<T>(multiple ? contents : contents[0], format);
   }
-  
-  
+
   /**
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
@@ -293,10 +252,7 @@ export class DappnodeRepository extends ApmRepository {
    * @see catString
    * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(
-    hash: string,
-    maxLength?: number
-  ): Promise<string> {
+  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
     const chunks = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
@@ -312,8 +268,7 @@ export class DappnodeRepository extends ApmRepository {
       offset += chunk.length;
     });
 
-    if (maxLength && buffer.length >= maxLength)
-      throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
 
     // Convert the Uint8Array to a string
     // TODO: This assumes the data is UTF-8 encoded. If it's not, you will need a more complex conversion. Research which encoding is used by IPFS.
@@ -341,7 +296,7 @@ export class DappnodeRepository extends ApmRepository {
     path: _path,
     timeout,
     fileSize,
-    progress,
+    progress
   }: {
     hash: string;
     path: string;
@@ -354,21 +309,22 @@ export class DappnodeRepository extends ApmRepository {
 
     return new Promise((resolve, reject) => {
       async function handleDownload(): Promise<void> {
-        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute("/"))
-          reject(Error(`Invalid path: "${path}"`));
+        if (!_path || _path.startsWith("/ipfs/") || !path.isAbsolute("/")) reject(Error(`Invalid path: "${path}"`));
 
         const asyncIterableArray: Uint8Array[] = [];
 
         // Timeout cancel mechanism
-        const timeoutToCancel = setTimeout(() => {
-          reject(Error(`Timeout downloading ${hash}`));
-        }, timeout || 30 * 1000);
+        const timeoutToCancel = setTimeout(
+          () => {
+            reject(Error(`Timeout downloading ${hash}`));
+          },
+          timeout || 30 * 1000
+        );
 
         let totalData = 0;
         let previousProgress = -1;
         const resolution = 1;
-        const round = (n: number): number =>
-          resolution * Math.round((100 * n) / resolution);
+        const round = (n: number): number => resolution * Math.round((100 * n) / resolution);
 
         const onData = (chunk: Uint8Array): void => {
           clearTimeout(timeoutToCancel);
@@ -399,10 +355,7 @@ export class DappnodeRepository extends ApmRepository {
           for await (const chunk of readable) onData(chunk);
 
           const writable = fs.createWriteStream(_path);
-          await util.promisify(stream.pipeline)(
-            stream.Readable.from(asyncIterableArray),
-            writable
-          );
+          await util.promisify(stream.pipeline)(stream.Readable.from(asyncIterableArray), writable);
           onFinish();
         } catch (e) {
           onError("Error writing to fs")(e as Error);
@@ -426,10 +379,7 @@ export class DappnodeRepository extends ApmRepository {
 
   public async list(hash: string): Promise<IPFSEntry[]> {
     const files: IPFSEntry[] = [];
-    const dagGet = await this.ipfs.dag.get(
-      CID.parse(this.sanitizeIpfsPath(hash)),
-      { timeout: this.timeout }
-    );
+    const dagGet = await this.ipfs.dag.get(CID.parse(this.sanitizeIpfsPath(hash)), { timeout: this.timeout });
     if (dagGet.value.Links)
       for (const link of dagGet.value.Links)
         files.push({
@@ -437,7 +387,7 @@ export class DappnodeRepository extends ApmRepository {
           cid: CID.parse(this.sanitizeIpfsPath(link.Hash.toString())),
           name: link.Name,
           path: `${link.Hash.toString()}/${link.Name}`, // Do not use module path to be browser compatible. path.join(link.Hash.toString(), link.Name),
-          size: link.Tsize,
+          size: link.Tsize
         });
     else throw Error(`Invalid IPFS hash ${hash}`);
 
@@ -461,8 +411,7 @@ export class DappnodeRepository extends ApmRepository {
     const carReader = await CarReader.fromIterable(asynciterable);
     const roots = await carReader.getRoots();
     const root = roots[0];
-    if (cid.toString() !== root.toString())
-      throw Error(`UNTRUSTED CONTENT: Invalid root CID ${root} for ${cid}`);
+    if (cid.toString() !== root.toString()) throw Error(`UNTRUSTED CONTENT: Invalid root CID ${root} for ${cid}`);
 
     return { carReader, root };
   }
@@ -486,15 +435,14 @@ export class DappnodeRepository extends ApmRepository {
         const block = await carReader.get(cid as CID);
         if (!block) throw Error(`Could not get block ${cid}`);
         return block.bytes;
-      },
+      }
     });
 
     for await (const entry of entries) {
       if (entry.type === "file") iterable.push(entry.content());
       else throw Error(`Expected type: file, got: ${entry.type}`);
     }
-    if (iterable.length > 1)
-      throw Error(`Unexpected number of files. There must be only one`);
+    if (iterable.length > 1) throw Error(`Unexpected number of files. There must be only one`);
 
     return iterable[0];
   }
@@ -508,11 +456,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param nodeArch - The architecture of the node.
    * @returns The distributed file object of the image.
    */
-  private getImageByArch(
-    manifest: Manifest,
-    files: IPFSEntry[],
-    nodeArch: NodeJS.Architecture
-  ): DistributedFile {
+  private getImageByArch(manifest: Manifest, files: IPFSEntry[], nodeArch: NodeJS.Architecture): DistributedFile {
     let arch: Architecture;
     switch (nodeArch) {
       case "arm":
@@ -529,15 +473,11 @@ export class DappnodeRepository extends ApmRepository {
 
     const { name, version } = manifest;
     const imageAsset =
-      files.find(
-        (file) => file.name === this.getImageName(name, version, arch)
-      ) ||
+      files.find((file) => file.name === this.getImageName(name, version, arch)) ||
       (arch === defaultArch
         ? // New DAppNodes should load old single arch packages,
           // and consider their single image as amd64
-          files.find(
-            (file) => file.name === this.getLegacyImageName(name, version)
-          )
+          files.find((file) => file.name === this.getLegacyImageName(name, version))
         : undefined);
 
     if (!imageAsset) {
@@ -552,7 +492,7 @@ export class DappnodeRepository extends ApmRepository {
       return {
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source, // TODO: consdier adding different sources
+        source // TODO: consdier adding different sources
       };
     }
   }
@@ -594,7 +534,7 @@ export class DappnodeRepository extends ApmRepository {
         return parseSingle(input);
       }
     };
-  
+
     try {
       const parsedData = parseContent(data);
       return parsedData as T;
@@ -602,8 +542,6 @@ export class DappnodeRepository extends ApmRepository {
       throw new Error(`Error processing content: ${e instanceof Error ? e.message : "Unknown error"}`);
     }
   }
-
-
 
   /**
    * Sanitizes an IPFS path by removing "/ipfs/" if it is present.
@@ -622,8 +560,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param version Container version
    * @returns Legacy image path in the format <name>_<version>.tar.xz
    */
-  private getLegacyImageName = (name: string, version: string): string =>
-    `${name}_${version}.tar.xz`;
+  private getLegacyImageName = (name: string, version: string): string => `${name}_${version}.tar.xz`;
 
   /**
    * Returns the image path for the given container name, version and architecture
@@ -632,11 +569,8 @@ export class DappnodeRepository extends ApmRepository {
    * @param arch Container architecture in the format <os>/<arch>
    * @returns Image path in the format <name>_<version>_<os>-<arch>.txz
    */
-  private getImageName = (
-    name: string,
-    version: string,
-    arch: Architecture
-  ): string => `${name}_${version}_${this.getArchTag(arch)}.txz`;
+  private getImageName = (name: string, version: string, arch: Architecture): string =>
+    `${name}_${version}_${this.getArchTag(arch)}.txz`;
 
   /**
    * Returns the arch tag for the given architecture

@@ -39,13 +39,9 @@ const SupportRoot: React.FC = () => {
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {routes.map(route => (
+        {routes.map((route) => (
           <button key={route.subPath} className="item-container">
-            <NavLink
-              to={route.subPath}
-              className="item no-a-style"
-              style={{ whiteSpace: "nowrap" }}
-            >
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
               {route.name}
             </NavLink>
           </button>
@@ -54,12 +50,8 @@ const SupportRoot: React.FC = () => {
 
       <div className="packages-content">
         <Routes>
-          {routes.map(route => (
-            <Route
-              key={route.subPath}
-              path={route.subPath}
-              element={<route.component />}
-            />
+          {routes.map((route) => (
+            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
           ))}
         </Routes>
       </div>

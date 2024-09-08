@@ -7,7 +7,7 @@ import {
   PackageNotification,
   SystemInfo,
   UserActionLog,
-  VolumeData,
+  VolumeData
 } from "./calls.js";
 
 export interface SubscriptionsTypes {
@@ -104,7 +104,7 @@ export const subscriptionsData: { [P in keyof Subscriptions]: object } = {
   registry: {},
   systemInfo: {},
   userActionLog: {},
-  volumes: {},
+  volumes: {}
 };
 
 // DO NOT REMOVE

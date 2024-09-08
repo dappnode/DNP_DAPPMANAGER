@@ -2,14 +2,10 @@ import "mocha";
 import { expect } from "chai";
 import rewiremock from "rewiremock/node.js";
 
-/* eslint-disable-next-line @typescript-eslint/explicit-function-return-type */
-function getPasswordManager(
-  shellMock: (cmd: string | string[]) => Promise<string>,
-  image: string
-) {
+function getPasswordManager(shellMock: (cmd: string | string[]) => Promise<string>, image: string) {
   return rewiremock.around(
     () => import("../../../src/calls/passwordManager.js"),
-    mock => {
+    (mock) => {
       mock(() => import("@dappnode/utils"))
         .with({ shell: shellMock })
         .toBeUsed();
@@ -26,13 +22,10 @@ describe.skip("Module > passwordManager", () => {
   const passwordHash = `dappnode:$6$insecur3$rnEv9Amdjn3ctXxPYOlzj/cwvLT43GjWzkPECIHNqd8Vvza5bMG8QqMwEIBKYqnj609D.4ngi4qlmt29dLE.71:18004:0:99999:7:::`;
 
   it("Should check if the password is secure", async () => {
-    const { isPasswordSecure } = await getPasswordManager(
-      async (cmd: string | string[]) => {
-        if (cmd == grepCommand) return passwordHash;
-        throw Error(`Unknown command ${cmd}`);
-      },
-      image
-    );
+    const { isPasswordSecure } = await getPasswordManager(async (cmd: string | string[]) => {
+      if (cmd == grepCommand) return passwordHash;
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     const isSecure = await isPasswordSecure();
     expect(isSecure).to.equal(false);
@@ -40,15 +33,12 @@ describe.skip("Module > passwordManager", () => {
 
   it("Should change the password", async () => {
     let lastCmd;
-    const { changePassword } = await getPasswordManager(
-      async (cmd: string | string[]) => {
-        lastCmd = cmd;
-        if (cmd == grepCommand) return passwordHash;
-        if (cmd.includes("chpasswd")) return "";
-        throw Error(`Unknown command ${cmd}`);
-      },
-      image
-    );
+    const { changePassword } = await getPasswordManager(async (cmd: string | string[]) => {
+      lastCmd = cmd;
+      if (cmd == grepCommand) return passwordHash;
+      if (cmd.includes("chpasswd")) return "";
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     const newPassword = "secret-password";
     await changePassword(newPassword);
@@ -58,13 +48,10 @@ describe.skip("Module > passwordManager", () => {
   });
 
   it("Should block changing the password when it's secure", async () => {
-    const { changePassword } = await getPasswordManager(
-      async (cmd: string | string[]) => {
-        if (cmd == grepCommand) return "";
-        throw Error(`Unknown command ${cmd}`);
-      },
-      image
-    );
+    const { changePassword } = await getPasswordManager(async (cmd: string | string[]) => {
+      if (cmd == grepCommand) return "";
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     let errorMessage = "---did not throw---";
     try {
@@ -73,19 +60,14 @@ describe.skip("Module > passwordManager", () => {
       errorMessage = e.message;
     }
 
-    expect(errorMessage).to.equal(
-      `The password can only be changed if it's the insecure default`
-    );
+    expect(errorMessage).to.equal(`The password can only be changed if it's the insecure default`);
   });
 
   it("Should block changing the password if the input contains problematic characters", async () => {
-    const { changePassword } = await getPasswordManager(
-      async (cmd: string | string[]) => {
-        if (cmd == grepCommand) return passwordHash;
-        throw Error(`Unknown command ${cmd}`);
-      },
-      image
-    );
+    const { changePassword } = await getPasswordManager(async (cmd: string | string[]) => {
+      if (cmd == grepCommand) return passwordHash;
+      throw Error(`Unknown command ${cmd}`);
+    }, image);
 
     let errorMessage = "---did not throw---";
     try {
@@ -94,8 +76,6 @@ describe.skip("Module > passwordManager", () => {
       errorMessage = e.message;
     }
 
-    expect(errorMessage).to.equal(
-      `Password must contain only ASCII characters and not the ' character`
-    );
+    expect(errorMessage).to.equal(`Password must contain only ASCII characters and not the ' character`);
   });
 });

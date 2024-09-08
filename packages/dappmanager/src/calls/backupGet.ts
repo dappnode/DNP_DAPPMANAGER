@@ -16,13 +16,7 @@ const tempTransferDir = params.TEMP_TRANSFER_DIR;
 /**
  * Does a backup of a DNP and sends it to the client for download.
  */
-export async function backupGet({
-  dnpName,
-  backup
-}: {
-  dnpName: string;
-  backup: PackageBackup[];
-}): Promise<string> {
+export async function backupGet({ dnpName, backup }: { dnpName: string; backup: PackageBackup[] }): Promise<string> {
   if (!dnpName) throw Error("Argument dnpName must be defined");
   if (!backup) throw Error("Argument backup must be defined");
   if (!backup.length) throw Error("No backup items specified");
@@ -41,21 +35,15 @@ export async function backupGet({
     let lastError: Error | null = null;
     for (const { name, path: fromPath, service } of backup) {
       try {
-        const container = dnp.containers.find(
-          c => !service || c.serviceName === service
-        );
-        if (!container)
-          throw Error(`No container found for service ${service}`);
+        const container = dnp.containers.find((c) => !service || c.serviceName === service);
+        if (!container) throw Error(`No container found for service ${service}`);
 
         const toPath = path.join(backupDir, name);
 
-        await shell(
-          `docker cp ${container.containerName}:${fromPath} ${toPath}`
-        );
+        await shell(`docker cp ${container.containerName}:${fromPath} ${toPath}`);
         successfulBackups.push(name);
       } catch (e) {
-        if (e.message.includes("No such container:path"))
-          lastError = Error(`path ${fromPath} does not exist`);
+        if (e.message.includes("No such container:path")) lastError = Error(`path ${fromPath} does not exist`);
         logs.error("Error getting backup", { dnpName, name, fromPath }, e);
       }
     }
@@ -82,11 +70,14 @@ export async function backupGet({
     db.fileTransferPath.set(fileId, backupDirComp);
 
     // DEFER THIS ACTION: Clean intermediate file
-    setTimeout(() => {
-      fs.unlink(backupDirComp, errFs => {
-        if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
-      });
-    }, 15 * 60 * 1000);
+    setTimeout(
+      () => {
+        fs.unlink(backupDirComp, (errFs) => {
+          if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
+        });
+      },
+      15 * 60 * 1000
+    );
 
     return fileId;
   } catch (e) {

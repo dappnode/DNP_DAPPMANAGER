@@ -12,13 +12,7 @@ import { PackageContainer } from "@dappnode/types";
 
 const fileSizeWarning = 1e6;
 
-export function CopyFileTo({
-  container,
-  toPathDefault
-}: {
-  container: PackageContainer;
-  toPathDefault?: string;
-}) {
+export function CopyFileTo({ container, toPathDefault }: { container: PackageContainer; toPathDefault?: string }) {
   const [file, setFile] = useState<File>();
   const [toPath, setToPath] = useState("");
 
@@ -49,9 +43,7 @@ export function CopyFileTo({
           }
         );
       } catch (e) {
-        console.error(
-          `Error on copyFileTo ${prettyName} ${toPath}: ${e.stack}`
-        );
+        console.error(`Error on copyFileTo ${prettyName} ${toPath}: ${e.stack}`);
       }
   }
 
@@ -63,9 +55,8 @@ export function CopyFileTo({
           <input
             type="file"
             className="custom-file-input"
-            onChange={e => {
-              if (e && e.target && e.target.files && e.target.files[0])
-                setFile(e.target.files[0]);
+            onChange={(e) => {
+              if (e && e.target && e.target.files && e.target.files[0]) setFile(e.target.files[0]);
             }}
           />
           <label className="custom-file-label" htmlFor="inputGroupFile01">
@@ -76,8 +67,7 @@ export function CopyFileTo({
 
       {name && size && size > fileSizeWarning && (
         <div className="alert alert-secondary">
-          Note that this tool is not meant for large file transfers. Expect
-          unstable behaviour.
+          Note that this tool is not meant for large file transfers. Expect unstable behaviour.
         </div>
       )}
 

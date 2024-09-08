@@ -19,17 +19,13 @@ export default async function dappGetBasic(
   req: PackageRequest
 ): Promise<DappGetResult> {
   const dappGetFetcher = new DappGetFetcher();
-  const dependencies = await dappGetFetcher.dependencies(
-    dappnodeInstaller,
-    req.name,
-    req.ver
-  );
+  const dependencies = await dappGetFetcher.dependencies(dappnodeInstaller, req.name, req.ver);
 
   // Append dependencies in the list of DNPs to install
   // Add current request to pacakages to install
   const state = {
     ...dependencies,
-    [req.name]: req.ver,
+    [req.name]: req.ver
   };
   const alreadyUpdated: DappGetState = {};
   const currentVersions: DappGetState = {};
@@ -59,6 +55,6 @@ export default async function dappGetBasic(
     message: "dappGet basic resolved first level dependencies",
     state,
     alreadyUpdated: {},
-    currentVersions,
+    currentVersions
   };
 }

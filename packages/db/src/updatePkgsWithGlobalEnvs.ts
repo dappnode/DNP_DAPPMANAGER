@@ -1,11 +1,6 @@
 import { eventBus } from "@dappnode/eventbus";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  getContainersStatus,
-  dockerComposeUpPackage,
-  listPackage,
-  listPackageContainers,
-} from "@dappnode/dockerapi";
+import { getContainersStatus, dockerComposeUpPackage, listPackage, listPackageContainers } from "@dappnode/dockerapi";
 import { packageInstalledHasPid } from "@dappnode/utils";
 import { PackageEnvs } from "@dappnode/types";
 import { params } from "@dappnode/params";
@@ -20,16 +15,11 @@ import { logs } from "@dappnode/logger";
  *
  * TODO: find a proper way to restart pkgs with global envs defined in the env_file (through manifest > globalEnvs = {all: true})
  */
-export async function updatePkgsWithGlobalEnvs(
-  globalEnvKey: string,
-  globEnvValue: string
-): Promise<void> {
+export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValue: string): Promise<void> {
   const packages = await listPackageContainers();
 
   const pkgsWithGlobalEnv = packages.filter(
-    (pkg) =>
-      pkg.defaultEnvironment &&
-      Object.keys(pkg.defaultEnvironment).some((key) => key === globalEnvKey)
+    (pkg) => pkg.defaultEnvironment && Object.keys(pkg.defaultEnvironment).some((key) => key === globalEnvKey)
   );
 
   if (pkgsWithGlobalEnv.length === 0) return;
@@ -44,7 +34,7 @@ export async function updatePkgsWithGlobalEnvs(
       const serviceEnvs = service.getEnvs();
       if (globalEnvKey in serviceEnvs) {
         environmentsByService.push({
-          [pkg.serviceName]: { [globalEnvKey]: globEnvValue },
+          [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
         });
       }
     }
@@ -55,11 +45,9 @@ export async function updatePkgsWithGlobalEnvs(
 
     await packageSetEnvironment({
       dnpName: pkg.dnpName,
-      environmentByService,
+      environmentByService
     }).catch((err) => {
-      logs.error(
-        `Error updating ${pkg.dnpName} with global env ${globalEnvKey}=${globEnvValue}`
-      );
+      logs.error(`Error updating ${pkg.dnpName} with global env ${globalEnvKey}=${globEnvValue}`);
       logs.error(err);
     });
   }
@@ -72,7 +60,7 @@ export async function updatePkgsWithGlobalEnvs(
  */
 async function packageSetEnvironment({
   dnpName,
-  environmentByService,
+  environmentByService
 }: {
   dnpName: string;
   environmentByService: { [serviceName: string]: PackageEnvs };
@@ -84,9 +72,7 @@ async function packageSetEnvironment({
   const compose = new ComposeFileEditor(dnp.dnpName, dnp.isCore);
   const services = compose.services();
 
-  for (const [serviceName, environment] of Object.entries(
-    environmentByService
-  )) {
+  for (const [serviceName, environment] of Object.entries(environmentByService)) {
     const service = services[serviceName];
     if (!service) throw Error(`No service ${serviceName} in dnp ${dnpName}`);
     service.mergeEnvs(environment);
@@ -98,7 +84,7 @@ async function packageSetEnvironment({
   // Packages sharing PID or must be recreated:
   // - Packages sharing PID must be recreated to ensure startup order
   await dockerComposeUpPackage({ dnpName }, false, containersStatus, {
-    forceRecreate: packageInstalledHasPid(compose.compose),
+    forceRecreate: packageInstalledHasPid(compose.compose)
   });
 
   // Emit packages update

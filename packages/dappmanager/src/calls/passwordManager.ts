@@ -16,9 +16,7 @@ const baseCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint=""`;
 export async function isPasswordSecure(): Promise<boolean> {
   const image = await getDappmanagerImage();
   try {
-    const res = await shell(
-      `${baseCommand} ${image} sh -c "grep dappnode:.*${insecureSalt} /etc/shadow"`
-    );
+    const res = await shell(`${baseCommand} ${image} sh -c "grep dappnode:.*${insecureSalt} /etc/shadow"`);
     return !res;
   } catch (e) {
     /**
@@ -39,8 +37,7 @@ export async function isPasswordSecure(): Promise<boolean> {
  */
 export async function changePassword(newPassword: string): Promise<void> {
   if (!newPassword) throw Error("newPassword must be defined");
-  if (typeof newPassword !== "string")
-    throw Error("newPassword must be a string");
+  if (typeof newPassword !== "string") throw Error("newPassword must be a string");
 
   /**
    * Make sure the password is OK:
@@ -48,22 +45,14 @@ export async function changePassword(newPassword: string): Promise<void> {
    * - Does not contain the `'` character, which would break the command
    * - Does not contain non-ascii characters which may cause trouble in the command
    */
-  if (newPassword.length < 8)
-    throw Error("password length must be at least 8 characters");
+  if (newPassword.length < 8) throw Error("password length must be at least 8 characters");
   if (!/^((?!['])[\x20-\x7F])*$/.test(newPassword))
-    throw Error(
-      `Password must contain only ASCII characters and not the ' character`
-    );
+    throw Error(`Password must contain only ASCII characters and not the ' character`);
 
-  if (await isPasswordSecure())
-    throw Error(
-      "The password can only be changed if it's the insecure default"
-    );
+  if (await isPasswordSecure()) throw Error("The password can only be changed if it's the insecure default");
 
   const image = await getDappmanagerImage();
-  await shell(
-    `${baseCommand} -e PASS='${newPassword}' ${image} sh -c 'echo dappnode:$PASS | chpasswd'`
-  );
+  await shell(`${baseCommand} -e PASS='${newPassword}' ${image} sh -c 'echo dappnode:$PASS | chpasswd'`);
 }
 
 // API calls
@@ -97,11 +86,7 @@ export async function passwordIsSecure(): Promise<boolean> {
  *
  * @param newPassword super-secure-password
  */
-export async function passwordChange({
-  newPassword
-}: {
-  newPassword: string;
-}): Promise<void> {
+export async function passwordChange({ newPassword }: { newPassword: string }): Promise<void> {
   if (!newPassword) throw Error("Argument newPassword must be defined");
 
   await changePassword(newPassword);

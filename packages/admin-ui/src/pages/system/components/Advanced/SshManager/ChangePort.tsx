@@ -37,8 +37,7 @@ export function SshManagerChangePort() {
   }
 
   const portError = validatePort(port);
-  const portIsSame =
-    reqGetStatus.result && port && String(reqGetStatus.result) === port;
+  const portIsSame = reqGetStatus.result && port && String(reqGetStatus.result) === port;
 
   return (
     <>
@@ -52,11 +51,7 @@ export function SshManagerChangePort() {
             <Button disabled={reqGetStatus.loading} onClick={fetchPort}>
               Fetch port
             </Button>
-            <Button
-              variant="dappnode"
-              disabled={!port || portIsSame || reqSetStatus.loading}
-              onClick={updatePort}
-            >
+            <Button variant="dappnode" disabled={!port || portIsSame || reqSetStatus.loading} onClick={updatePort}>
               Change
             </Button>
           </>
@@ -69,15 +64,11 @@ export function SshManagerChangePort() {
       )}
 
       {reqGetStatus.loading && <Ok loading msg="Fetching SSH port..."></Ok>}
-      {reqGetStatus.error && (
-        <ErrorView error={reqGetStatus.error} hideIcon red />
-      )}
+      {reqGetStatus.error && <ErrorView error={reqGetStatus.error} hideIcon red />}
 
       {reqSetStatus.loading && <Ok loading msg="Changing SSH port..."></Ok>}
       {reqSetStatus.result && <Ok ok msg="Changed SSH port"></Ok>}
-      {reqSetStatus.error && (
-        <ErrorView error={reqSetStatus.error} hideIcon red />
-      )}
+      {reqSetStatus.error && <ErrorView error={reqSetStatus.error} hideIcon red />}
     </>
   );
 }

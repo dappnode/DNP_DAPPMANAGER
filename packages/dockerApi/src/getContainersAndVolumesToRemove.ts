@@ -36,6 +36,6 @@ export function getContainersAndVolumesToRemove(
 
   return {
     containersToRemove: uniq(containersToRemove),
-    volumesToRemove: uniq(volumesToRemove),
+    volumesToRemove: uniq(volumesToRemove)
   };
 }

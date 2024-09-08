@@ -2,10 +2,7 @@ import path from "path";
 import { getRepoDirPath } from "./getRepoDirPath.js";
 
 export function getManifestPath(dnpName: string, isCore: boolean): string {
-  return path.join(
-    getRepoDirPath(dnpName, isCore),
-    getManifestName(dnpName, isCore)
-  );
+  return path.join(getRepoDirPath(dnpName, isCore), getManifestName(dnpName, isCore));
 }
 
 function getManifestName(dnpName: string, isCore: boolean): string {
@@ -20,9 +17,5 @@ function getShortName(dnpName: string): string {
 
 function verifyDnpName(dnpName: string): void {
   if (typeof dnpName !== "string")
-    throw Error(
-      `dnpName must be a string, but it's ${typeof dnpName}: ${JSON.stringify(
-        dnpName
-      )}`
-    );
+    throw Error(`dnpName must be a string, but it's ${typeof dnpName}: ${JSON.stringify(dnpName)}`);
 }

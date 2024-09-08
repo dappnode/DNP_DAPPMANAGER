@@ -10,8 +10,7 @@ export const globalEnvsFilePath = params.GLOBAL_ENVS_PATH;
  * Create a global ENVs file with only a sanity check value: { ACTIVE: "true" }
  */
 export function createGlobalEnvsEnvFile(): void {
-  if (!fs.existsSync(globalEnvsFilePath))
-    writeEnvFile(globalEnvsFilePath, { ACTIVE: "true" } as GlobalEnvs);
+  if (!fs.existsSync(globalEnvsFilePath)) writeEnvFile(globalEnvsFilePath, { ACTIVE: "true" } as GlobalEnvs);
 }
 
 /**
@@ -27,10 +26,7 @@ export function createGlobalEnvsEnvFile(): void {
  * @param envs =
  */
 export function writeEnvFile(envPath: string, envs: GlobalEnvs): void {
-  const envsWithPrefix = mapKeys(
-    envs,
-    (_0, key) => GLOBAL_ENVS[key as keyof typeof envs]
-  );
+  const envsWithPrefix = mapKeys(envs, (_0, key) => GLOBAL_ENVS[key as keyof typeof envs]);
   const envData = stringifyEnvironment(envsWithPrefix).join("\n");
   fs.writeFileSync(envPath, envData);
 }

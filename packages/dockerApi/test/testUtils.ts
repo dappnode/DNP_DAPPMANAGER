@@ -1,8 +1,4 @@
-import {
-  InstalledPackageData,
-  PackageContainer,
-  VolumeMapping,
-} from "@dappnode/types";
+import { InstalledPackageData, PackageContainer, VolumeMapping } from "@dappnode/types";
 
 /**
  * Mock data
@@ -32,7 +28,7 @@ export const mockContainer: PackageContainer = {
   defaultVolumes: [],
   dependencies: {},
   origin: "",
-  avatarUrl: "",
+  avatarUrl: ""
 };
 
 export const mockDnp: InstalledPackageData = {
@@ -44,10 +40,10 @@ export const mockDnp: InstalledPackageData = {
   dependencies: {},
   origin: "",
   avatarUrl: "",
-  containers: [mockContainer],
+  containers: [mockContainer]
 };
 
 export const mockVolume: VolumeMapping = {
   host: "mock/mock/mock",
-  container: "mock/mock/mock",
+  container: "mock/mock/mock"
 };

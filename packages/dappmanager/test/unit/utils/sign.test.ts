@@ -1,11 +1,7 @@
 import "mocha";
 import { expect } from "chai";
 import { ethers } from "ethers";
-import {
-  prepareMessageFromPackage,
-  signDataFromPackage,
-  hashMessage
-} from "../../../src/utils/index.js";
+import { prepareMessageFromPackage, signDataFromPackage, hashMessage } from "../../../src/utils/index.js";
 
 describe("Util / sign", () => {
   describe("prepareMessageFromPackage", () => {
@@ -48,10 +44,7 @@ test.dnp.dappnode.eth
       const digest = hashMessage(message);
       const address = ethers.recoverAddress(digest, signature);
 
-      expect(address).to.deep.equal(
-        wallet.address,
-        "Recovered address does not match"
-      );
+      expect(address).to.deep.equal(wallet.address, "Recovered address does not match");
     });
   });
 });

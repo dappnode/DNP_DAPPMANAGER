@@ -13,7 +13,7 @@ describe("daemons > telegramBot > formatNotification", () => {
 - Line 1
 - Line 2
 
-Final line`,
+Final line`
     };
 
     const message = formatNotification(notification);

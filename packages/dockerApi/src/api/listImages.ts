@@ -10,12 +10,8 @@ import { docker } from "./docker.js";
  *   }
  * }
  */
-export async function imagesList(
-  options?: DockerApiListImagesOptions
-): Promise<Dockerode.ImageInfo[]> {
-  return docker.listImages(options as Dockerode.ListImagesOptions) as Promise<
-    Dockerode.ImageInfo[]
-  >;
+export async function imagesList(options?: DockerApiListImagesOptions): Promise<Dockerode.ImageInfo[]> {
+  return docker.listImages(options as Dockerode.ListImagesOptions) as Promise<Dockerode.ImageInfo[]>;
 }
 
 export interface DockerApiListImagesOptions {

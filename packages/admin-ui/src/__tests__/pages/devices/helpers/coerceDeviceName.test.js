@@ -1,5 +1,6 @@
 import coerceDeviceName from "../../../../pages/vpn/helpers/coerceDeviceName";
 import { maxIdLength } from "../../../../pages/vpn/data";
+import { expect, describe, it } from "@jest/globals";
 
 describe("devices > helpers > coerceDeviceName", () => {
   it("Should remove non-alphanumeric characters", () => {

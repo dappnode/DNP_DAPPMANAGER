@@ -1,11 +1,7 @@
 import isIp from "is-ip";
 import retry from "async-retry";
 
-const urls = [
-  "https://ns.dappnode.io/myip",
-  "http://ipv4.icanhazip.com",
-  "http://ident.me",
-];
+const urls = ["https://ns.dappnode.io/myip", "http://ipv4.icanhazip.com", "http://ident.me"];
 
 /**
  * Attempts to get an IP from the above list of urls sequentially
@@ -15,10 +11,7 @@ const urls = [
  * @param silent suppress logs
  * @returns public IP: 85.84.83.82
  */
-export async function getPublicIpFromUrls(options?: {
-  timeout?: number;
-  retries?: number;
-}): Promise<string> {
+export async function getPublicIpFromUrls(options?: { timeout?: number; retries?: number }): Promise<string> {
   const timeout = options?.timeout || 15 * 1000;
   const retries = options?.retries || 10;
 

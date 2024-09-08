@@ -13,15 +13,14 @@ export async function getNetworkAliasesIpsMapNotThrow(
 ): Promise<Map<string, { aliases: string[]; ip: string }>> {
   try {
     const network = docker.getNetwork(networkName);
-    const networkInfo: Dockerode.NetworkInspectInfo =
-      (await network.inspect()) as Dockerode.NetworkInspectInfo;
+    const networkInfo: Dockerode.NetworkInspectInfo = (await network.inspect()) as Dockerode.NetworkInspectInfo;
 
     const containersInfo = Object.values(networkInfo.Containers ?? []);
 
     return await getContainerAliasesIpsForNetwork(containersInfo, networkName);
   } catch (e) {
     // This should not stop migration, as it is not critical
-    logs.error(`Aliases map could not be generated for network ${networkName}`);
+    logs.error(`Aliases map could not be generated for network ${networkName}: ${e}`);
     return new Map<string, { aliases: string[]; ip: string }>();
   }
 }
@@ -32,44 +31,31 @@ async function getContainerAliasesIpsForNetwork(
 ): Promise<Map<string, { aliases: string[]; ip: string }>> {
   const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
     try {
-      const aliases: string[] =
-        (await getNetworkContainerConfig(containerInfo.Name, networkName))
-          ?.Aliases ?? [];
+      const aliases: string[] = (await getNetworkContainerConfig(containerInfo.Name, networkName))?.Aliases ?? [];
       return {
         name: containerInfo.Name,
         aliases,
-        ip: containerInfo.IPv4Address,
+        ip: containerInfo.IPv4Address
       };
     } catch (error) {
-      console.error(
-        `Failed to get aliases for container ${containerInfo.Name}:`,
-        error
-      );
+      console.error(`Failed to get aliases for container ${containerInfo.Name}:`, error);
       return { name: containerInfo.Name, aliases: [], ip: "" };
     }
   });
 
   const containersAliases = await Promise.all(fetchAliasesTasks);
-  return new Map(
-    containersAliases.map(({ name, aliases, ip }) => [name, { aliases, ip }])
-  );
+  return new Map(containersAliases.map(({ name, aliases, ip }) => [name, { aliases, ip }]));
 }
 
 /**
  * Disconnect all docker containers from a docker network
  * @param network "dncore_network"
  */
-export async function disconnectAllContainersFromNetwork(
-  network: Dockerode.Network
-): Promise<void> {
-  const containers = ((await network.inspect()) as Dockerode.NetworkInspectInfo)
-    .Containers;
+export async function disconnectAllContainersFromNetwork(network: Dockerode.Network): Promise<void> {
+  const containers = ((await network.inspect()) as Dockerode.NetworkInspectInfo).Containers;
   if (containers)
     await Promise.all(
-      Object.values(containers).map(
-        async (c) =>
-          await network.disconnect({ Container: c.Name, Force: true })
-      )
+      Object.values(containers).map(async (c) => await network.disconnect({ Container: c.Name, Force: true }))
     );
 }
 
@@ -87,7 +73,7 @@ export async function dockerNetworkConnect(
   const network = docker.getNetwork(networkName);
   await network.connect({
     Container: containerName,
-    EndpointConfig: endpointConfig,
+    EndpointConfig: endpointConfig
   });
 }
 
@@ -106,7 +92,7 @@ export async function dockerNetworkConnectNotThrow(
     const network = docker.getNetwork(networkName);
     await network.connect({
       Container: containerName,
-      EndpointConfig: endpointConfig,
+      EndpointConfig: endpointConfig
     });
   } catch (e) {
     logs.debug(e);
@@ -119,15 +105,12 @@ export async function dockerNetworkConnectNotThrow(
  * @param containerName "3613f73ba0e4" or "fullcontainername"
  * @param aliases `["network-alias"]`
  */
-export async function dockerNetworkDisconnect(
-  networkName: string,
-  containerName: string
-): Promise<void> {
+export async function dockerNetworkDisconnect(networkName: string, containerName: string): Promise<void> {
   const network = docker.getNetwork(networkName);
   await network.disconnect({
     Container: containerName,
     // Force the container to disconnect from the network
-    Force: true,
+    Force: true
   });
 }
 
@@ -161,13 +144,11 @@ export async function dockerCreateNetwork(networkName: string): Promise<void> {
     // collisions.
     CheckDuplicate: true,
     // Default plugin
-    Driver: "bridge",
+    Driver: "bridge"
   });
 }
 
-export async function dockerListNetworks(): Promise<
-  Dockerode.NetworkInspectInfo[]
-> {
+export async function dockerListNetworks(): Promise<Dockerode.NetworkInspectInfo[]> {
   return await docker.listNetworks();
 }
 

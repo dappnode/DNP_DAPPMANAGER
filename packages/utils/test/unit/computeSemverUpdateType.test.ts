@@ -18,14 +18,11 @@ describe("Util: computeSemverUpdateType", () => {
       // Incorrect from
       { result: null, from: "/ipfs/asudbqbwif", to: "0.1.8" },
       // Incorrect to
-      { result: null, from: "0.2.0", to: "/ipfs/asudbqbwif" },
+      { result: null, from: "0.2.0", to: "/ipfs/asudbqbwif" }
     ];
 
     for (const { from, to, result } of updates) {
-      expect(computeSemverUpdateType(from, to)).to.equal(
-        result,
-        `from ${from} to ${to} should be ${result}`
-      );
+      expect(computeSemverUpdateType(from, to)).to.equal(result, `from ${from} to ${to} should be ${result}`);
     }
   });
 });

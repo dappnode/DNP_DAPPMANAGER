@@ -4,9 +4,7 @@ import { TrustedReleaseKey, releaseSignatureProtocols } from "@dappnode/types";
 /**
  * Add a release key to trusted keys db
  */
-export async function releaseTrustedKeyAdd(
-  newTrustedKey: TrustedReleaseKey
-): Promise<void> {
+export async function releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void> {
   if (!newTrustedKey.name) throw Error("Empty key name");
   if (!newTrustedKey.dnpNameSuffix) throw Error("Empty dnpNameSuffix");
   if (!newTrustedKey.signatureProtocol) throw Error("Empty signatureProtocol");
@@ -19,7 +17,7 @@ export async function releaseTrustedKeyAdd(
 
   // Ensure uniqueness
   const existingKeyIds = new Set(trustedKeys.map(getKeyId));
-  const existingKeyNames = new Set(trustedKeys.map(k => k.name));
+  const existingKeyNames = new Set(trustedKeys.map((k) => k.name));
   const newKeyId = getKeyId(newTrustedKey);
   if (existingKeyIds.has(newKeyId)) {
     throw Error(`Trusted release key already added: ${newKeyId}`);
@@ -39,13 +37,13 @@ export async function releaseTrustedKeyAdd(
  */
 export async function releaseTrustedKeyRemove(keyName: string): Promise<void> {
   const trustedKeys = db.releaseKeysTrusted.get();
-  const existingKeyNames = new Set(trustedKeys.map(k => k.name));
+  const existingKeyNames = new Set(trustedKeys.map((k) => k.name));
 
   if (!existingKeyNames.has(keyName)) {
     throw Error(`No key with name ${keyName}`);
   }
 
-  trustedKeys.filter(key => key.name !== keyName);
+  trustedKeys.filter((key) => key.name !== keyName);
   db.releaseKeysTrusted.set(trustedKeys);
 }
 

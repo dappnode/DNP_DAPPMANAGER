@@ -6,7 +6,7 @@
  * ipToInteger("192.168.1.1"); // returns 3232235777
  */
 function ipToInteger(ip: string): number {
-    return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0);
+  return ip.split(".").reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0);
 }
 
 /**
@@ -17,7 +17,7 @@ function ipToInteger(ip: string): number {
  * calculateSubnetMask(24); // returns 4294967040 (255.255.255.0)
  */
 function calculateSubnetMask(bits: number): number {
-    return -1 << (32 - bits);
+  return -1 << (32 - bits);
 }
 
 /**
@@ -29,8 +29,8 @@ function calculateSubnetMask(bits: number): number {
  * isValidIp("999.999.999.999"); // returns false
  */
 function isValidIp(ip: string): boolean {
-    const octets = ip.split('.').map(Number);
-    return octets.length === 4 && octets.every(octet => !isNaN(octet) && octet >= 0 && octet <= 255);
+  const octets = ip.split(".").map(Number);
+  return octets.length === 4 && octets.every((octet) => !isNaN(octet) && octet >= 0 && octet <= 255);
 }
 
 /**
@@ -42,8 +42,8 @@ function isValidIp(ip: string): boolean {
  * isValidCidr("33"); // returns false
  */
 function isValidCidr(cidr: string): boolean {
-    const mask = parseInt(cidr, 10);
-    return !isNaN(mask) && mask >= 0 && mask <= 32;
+  const mask = parseInt(cidr, 10);
+  return !isNaN(mask) && mask >= 0 && mask <= 32;
 }
 
 /**
@@ -55,7 +55,7 @@ function isValidCidr(cidr: string): boolean {
  * getNetworkAddress(3232235777, 24); // returns 3232235776 (192.168.1.0)
  */
 function getNetworkAddress(ip: number, bits: number): number {
-    return ip & calculateSubnetMask(bits);
+  return ip & calculateSubnetMask(bits);
 }
 
 /**
@@ -69,21 +69,21 @@ function getNetworkAddress(ip: number, bits: number): number {
  * subnetsOverlap("192.168.1.0/24", "192.168.2.0/24"); // returns false
  */
 export function subnetsOverlap(subnetA: string, subnetB: string): boolean {
-    const [ipA, maskBitsA] = subnetA.split('/');
-    const [ipB, maskBitsB] = subnetB.split('/');
+  const [ipA, maskBitsA] = subnetA.split("/");
+  const [ipB, maskBitsB] = subnetB.split("/");
 
-    if (!isValidIp(ipA) || !isValidIp(ipB) || !isValidCidr(maskBitsA) || !isValidCidr(maskBitsB)) {
-        throw new Error("Invalid IP address or CIDR notation");
-    }
+  if (!isValidIp(ipA) || !isValidIp(ipB) || !isValidCidr(maskBitsA) || !isValidCidr(maskBitsB)) {
+    throw new Error("Invalid IP address or CIDR notation");
+  }
 
-    const ipIntA = ipToInteger(ipA);
-    const ipIntB = ipToInteger(ipB);
+  const ipIntA = ipToInteger(ipA);
+  const ipIntB = ipToInteger(ipB);
 
-    const netA = getNetworkAddress(ipIntA, parseInt(maskBitsA, 10));
-    const netB = getNetworkAddress(ipIntB, parseInt(maskBitsB, 10));
+  const netA = getNetworkAddress(ipIntA, parseInt(maskBitsA, 10));
+  const netB = getNetworkAddress(ipIntB, parseInt(maskBitsB, 10));
 
-    const maskA = calculateSubnetMask(parseInt(maskBitsA, 10));
-    const maskB = calculateSubnetMask(parseInt(maskBitsB, 10));
+  const maskA = calculateSubnetMask(parseInt(maskBitsA, 10));
+  const maskB = calculateSubnetMask(parseInt(maskBitsB, 10));
 
-    return (netA & maskB) === (netB & maskB) || (netB & maskA) === (netA & maskA);
+  return (netA & maskB) === (netB & maskB) || (netB & maskA) === (netA & maskA);
 }

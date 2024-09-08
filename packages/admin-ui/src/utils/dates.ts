@@ -3,10 +3,7 @@
  * @param [hideTime]
  * @returns Today, 15 min ago
  */
-export function parseStaticDate(
-  rawDate: string | number,
-  hideTime = false
-): string {
+export function parseStaticDate(rawDate: string | number, hideTime = false): string {
   if (!rawDate) return "";
 
   const date = new Date(rawDate);
@@ -37,11 +34,7 @@ export function parseStaticDate(
  * @returns isSameDay
  */
 function sameDay(d1: Date, d2: Date): boolean {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
+  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate();
 }
 
 /**
@@ -49,10 +42,7 @@ function sameDay(d1: Date, d2: Date): boolean {
  * @param rawDateNext 1563728142
  * @returns Today, 15 min ago
  */
-export function parseDiffDates(
-  prevRaw: string | number,
-  nextRaw: string | number = Date.now()
-) {
+export function parseDiffDates(prevRaw: string | number, nextRaw: string | number = Date.now()) {
   const prev = typeof prevRaw === "string" ? parseInt(prevRaw) : prevRaw;
   const next = typeof nextRaw === "string" ? parseInt(nextRaw) : nextRaw;
 

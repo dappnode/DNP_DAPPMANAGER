@@ -14,9 +14,7 @@ export async function disconnectConflictingContainerIfAny(
 ): Promise<Dockerode.NetworkContainer | null> {
   const conflictingContainer = await findContainerByIP(network, ipAddress);
   if (conflictingContainer) {
-    logs.info(
-      `address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`
-    );
+    logs.info(`address ${ipAddress} already in used by ${conflictingContainer.Name}, freeing it`);
     await network.disconnect({ Container: conflictingContainer.Name });
   } else logs.info("Conflicting container not found.");
   return conflictingContainer;

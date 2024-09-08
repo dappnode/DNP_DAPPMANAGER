@@ -7,8 +7,7 @@ function getDirectoryDnp(dnp: MockDnp, index: number): DirectoryItemOk {
     index,
     status: "ok",
     name: dnp.manifest.name,
-    description:
-      dnp.manifest.shortDescription || dnp.manifest.description || "",
+    description: dnp.manifest.shortDescription || dnp.manifest.description || "",
     avatarUrl: dnp.avatar || "",
     isFeatured: false,
     isInstalled: Boolean(dnp.installedData),

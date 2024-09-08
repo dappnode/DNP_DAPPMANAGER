@@ -7,11 +7,7 @@ import path from "path";
 import { shell } from "@dappnode/utils";
 import child from "child_process";
 import { testDir, cleanTestDir, createTestDir } from "../../testUtils.js";
-import {
-  listContainer,
-  listPackageContainers,
-  dockerContainerInspect
-} from "@dappnode/dockerapi";
+import { listContainer, listPackageContainers, dockerContainerInspect } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
 /**
  * Dangerous docker-compose behaviour. If starting the container fails,
@@ -28,20 +24,14 @@ const versionNext = "2.0.0";
 const labelVersion = "test.dappnode.version";
 
 const testDirContainer = path.resolve("/", testDir);
-const volumes = [
-  "/var/run/docker.sock:/var/run/docker.sock",
-  `${path.resolve(testDir)}:${testDirContainer}`
-];
+const volumes = ["/var/run/docker.sock:/var/run/docker.sock", `${path.resolve(testDir)}:${testDirContainer}`];
 const prevComposeName = `docker-compose-previous.yml`;
 const nextComposeName = `docker-compose-next.yml`;
 const restartComposeName = `docker-compose-restart.yml`;
 const restartEntrypoint = "restart-entrypoint.sh";
 
 const inHost = (_path: string): string => path.join(testDir, _path);
-const inContainer = (_path: string): string =>
-  path.join(testDirContainer, _path);
-
-/* eslint-disable @typescript-eslint/explicit-function-return-type */
+const inContainer = (_path: string): string => path.join(testDirContainer, _path);
 
 /**
  * Skip until the image 'danielguerra/dind-compose' is publicly available
@@ -50,13 +40,10 @@ const inContainer = (_path: string): string =>
 describe.skip("Test a container restarting itself", function () {
   async function cleanContainers(): Promise<void> {
     try {
-      await shell(
-        `docker rm -f $(docker ps -aq --filter ancestor=${dindComposeImage})`
-      );
+      await shell(`docker rm -f $(docker ps -aq --filter ancestor=${dindComposeImage})`);
     } catch (e) {
       // Ignore errors when there are no containers to delete
-      if (!e.message.includes("requires at least 1 argument"))
-        console.warn(`Error cleaning containers`, e);
+      if (!e.message.includes("requires at least 1 argument")) console.warn(`Error cleaning containers`, e);
     }
   }
 
@@ -98,9 +85,7 @@ then
         docker compose -f ${inContainer(prevComposeName)} up -d -t 0
     else
         echo "${mainContainerName} is not running, using --force-recreate"
-        docker compose -f ${inContainer(
-          prevComposeName
-        )} up -d -t 0 --force-recreate
+        docker compose -f ${inContainer(prevComposeName)} up -d -t 0 --force-recreate
     fi
 fi
 exit $UPEXIT
@@ -116,20 +101,14 @@ exit $UPEXIT
   });
 
   beforeEach("Start main container", async () => {
-    await runUntilExited(
-      `docker compose -f ${inHost(prevComposeName)} up -d`,
-      "main"
-    );
+    await runUntilExited(`docker compose -f ${inHost(prevComposeName)} up -d`, "main");
   });
 
   function callRestart() {
     const doRestartCmd = `docker compose -f ${inContainer(
       restartComposeName
     )} up --exit-code-from ${restartContainerName}`;
-    return runUntilExited(
-      `docker exec ${mainContainerName} /bin/sh -c "${doRestartCmd}"`,
-      "call-restart"
-    );
+    return runUntilExited(`docker exec ${mainContainerName} /bin/sh -c "${doRestartCmd}"`, "call-restart");
   }
 
   it("Should restart itself", async () => {
@@ -150,10 +129,7 @@ exit $UPEXIT
     console.log(`Launched prev, ID: ${prev.containerId}`);
 
     const restartCallExit = await callRestart();
-    console.log(
-      `EXITED: ${mainContainerName} ${prev.containerId}`,
-      restartCallExit
-    );
+    console.log(`EXITED: ${mainContainerName} ${prev.containerId}`, restartCallExit);
     expect(restartCallExit.error.code).to.equal(
       137,
       "Restart call should exit with 137, killed by docker with SIGKILL"
@@ -163,14 +139,9 @@ exit $UPEXIT
     const restart = await listContainer({
       containerName: restartContainerName
     });
-    console.log(
-      `Restart container ${restart.state}, ID: ${restart.containerId}`
-    );
+    console.log(`Restart container ${restart.state}, ID: ${restart.containerId}`);
     const restartExit = await logUntilExited(restart.containerId, "restart");
-    console.log(
-      `${restartContainerName} ${restart.containerId} exited`,
-      restartExit
-    );
+    console.log(`${restartContainerName} ${restart.containerId} exited`, restartExit);
 
     // Query the next container that should be running
     const next = await listContainer({ containerName: mainContainerName });
@@ -180,18 +151,10 @@ exit $UPEXIT
       prev.containerId,
       `${mainContainerName} prev and next containers should NOT have the same ID`
     );
-    assert.strictEqual(
-      next.state,
-      "running",
-      "Next container should be running"
-    );
+    assert.strictEqual(next.state, "running", "Next container should be running");
 
     // Make sure the next container has been updated
-    assert.strictEqual(
-      await getVersion(next.containerId),
-      versionNext,
-      "Final container should have the next version"
-    );
+    assert.strictEqual(await getVersion(next.containerId), versionNext, "Final container should have the next version");
 
     const restartInspect = await dockerContainerInspect(restartContainerName);
 
@@ -236,10 +199,7 @@ exit $UPEXIT
     // The exit code should be 137 which means killed by docker with SIGKILL (kill -9) `kill -9 (128 + 9 = 137)`
     // https://success.docker.com/article/what-causes-a-container-to-exit-with-code-137
     const restartCallExit = await callRestart();
-    console.log(
-      `EXITED: ${mainContainerName} ${prev.containerId}`,
-      restartCallExit
-    );
+    console.log(`EXITED: ${mainContainerName} ${prev.containerId}`, restartCallExit);
     expect(restartCallExit.error.code).to.equal(
       137,
       "Restart call should exit with 137, killed by docker with SIGKILL"
@@ -249,22 +209,15 @@ exit $UPEXIT
     const restart = await listContainer({
       containerName: restartContainerName
     });
-    console.log(
-      `Restart container ${restart.state}, ID: ${restart.containerId}`
-    );
+    console.log(`Restart container ${restart.state}, ID: ${restart.containerId}`);
     const restartExit = await logUntilExited(restart.containerId, "restart");
-    console.log(
-      `EXITED ${restartContainerName} ${restart.containerId}`,
-      restartExit
-    );
+    console.log(`EXITED ${restartContainerName} ${restart.containerId}`, restartExit);
 
     // Query the next container that should be running
     // Because it had failed to be brought up, it will be the temp renamed container
     // cea8fecfa936_DAppNodeTest-main-service
     const [next] = await listPackageContainers();
-    console.log(
-      `Next container ${next.containerName} ${next.state}, ID: ${next.containerId}`
-    );
+    console.log(`Next container ${next.containerName} ${next.state}, ID: ${next.containerId}`);
     assert.strictEqual(
       next.containerName,
       "/" + mainContainerName,
@@ -275,11 +228,7 @@ exit $UPEXIT
       prev.containerId,
       `${mainContainerName} prev and next containers should have the same ID ${prev.containerId}`
     );
-    assert.strictEqual(
-      next.state,
-      "running",
-      "Next container should be running"
-    );
+    assert.strictEqual(next.state, "running", "Next container should be running");
 
     assert.strictEqual(
       await getVersion(next.containerId),
@@ -314,16 +263,10 @@ exit $UPEXIT
 
     // Attach to prev container to see logs and know when it stops
     const restartCallExit = await callRestart();
-    console.log(
-      `EXITED: ${mainContainerName} ${prev.containerId}`,
-      restartCallExit
-    );
+    console.log(`EXITED: ${mainContainerName} ${prev.containerId}`, restartCallExit);
 
     // The restart call should have failed for a parsing error
-    expect(restartCallExit.error.code).to.equal(
-      1,
-      "Wrong exit code in restart call"
-    );
+    expect(restartCallExit.error.code).to.equal(1, "Wrong exit code in restart call");
     expect(restartCallExit.stdout).to.include(
       `needs to be an object not '<type 'str'>'`,
       "restart call stdou should include a parsing error message"
@@ -333,9 +276,7 @@ exit $UPEXIT
     const restart = await listContainer({
       containerName: restartContainerName
     });
-    console.log(
-      `Restart container ${restart.state}, ID: ${restart.containerId}`
-    );
+    console.log(`Restart container ${restart.state}, ID: ${restart.containerId}`);
     assert.strictEqual(
       restart.state,
       "exited",
@@ -343,20 +284,14 @@ exit $UPEXIT
     );
 
     // Query the next container that should be running
-    const next = await retry(() =>
-      listContainer({ containerName: mainContainerName })
-    );
+    const next = await retry(() => listContainer({ containerName: mainContainerName }));
     console.log(`Next container ${next.state}, ID: ${next.containerId}`);
     assert.strictEqual(
       next.containerId,
       prev.containerId,
       `${mainContainerName} prev and next containers should have the same ID ${prev.containerId}`
     );
-    assert.strictEqual(
-      next.state,
-      "running",
-      "Next container should be running"
-    );
+    assert.strictEqual(next.state, "running", "Next container should be running");
 
     assert.strictEqual(
       await getVersion(next.containerId),
@@ -414,9 +349,7 @@ function writeCompose({
  * @param id
  */
 async function getVersion(id: string) {
-  return await shell(
-    `docker inspect --format '{{ index .Config.Labels "${labelVersion}"}}' ${id}`
-  );
+  return await shell(`docker inspect --format '{{ index .Config.Labels "${labelVersion}"}}' ${id}`);
 }
 
 interface ProcessResult {
@@ -430,11 +363,8 @@ interface ProcessResult {
  * Await for the process to exit
  * @param id
  */
-async function runUntilExited(
-  cmd: string,
-  tag: string
-): Promise<ProcessResult> {
-  return new Promise(resolve => {
+async function runUntilExited(cmd: string, tag: string): Promise<ProcessResult> {
+  return new Promise((resolve) => {
     const proc = child.exec(cmd, (error, stdout, stderr) => {
       resolve({ error, stdout, stderr } as ProcessResult);
     });
@@ -449,7 +379,7 @@ function logWithTag(tag: string) {
       chunk
         .toString()
         .split("\n")
-        .map(line => `${tag} | ${line}`)
+        .map((line) => `${tag} | ${line}`)
         .join("\n")
     );
   };

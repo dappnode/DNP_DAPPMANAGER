@@ -32,22 +32,21 @@ export const apiRoutes: IApiRoutes = {
       formData.append("file", file);
 
       // Define what happens on successful data submission
-      xhr.addEventListener("load", e => {
+      xhr.addEventListener("load", (e) => {
         if (!e.target) return reject(Error("No upload responseText"));
         // ### Pending bug: .responseText is not typed in XMLHttpRequestEventTarget
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const fileId = (e.target as any).responseText;
         // if responseText is not a 32bytes hex, abort
-        if (!/[0-9A-Fa-f]{64}/.test(fileId))
-          return reject(Error(`Wrong response: ${fileId}`));
+        if (!/[0-9A-Fa-f]{64}/.test(fileId)) return reject(Error(`Wrong response: ${fileId}`));
 
         resolve({ fileId });
       });
 
       // Define what happens in case of error
-      xhr.addEventListener("error", _e => reject(Error("Error loading file")));
+      xhr.addEventListener("error", () => reject(Error("Error loading file")));
 
-      if (xhr.upload)
-        xhr.upload.addEventListener("progress", onProgress, false);
+      if (xhr.upload) xhr.upload.addEventListener("progress", onProgress, false);
 
       // Set up our request
       xhr.open("POST", apiUrls.upload);

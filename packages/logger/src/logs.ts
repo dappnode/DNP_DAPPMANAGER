@@ -25,11 +25,9 @@ const tags = {
   debug: "DEBUG",
   info: "INFO ",
   warn: "WARN ",
-  error: "ERROR",
+  error: "ERROR"
 };
 
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable no-console */
 export const logs: Logs = {
   /**
    * Allows to log any type of data. Strings will be shown first.
@@ -60,10 +58,8 @@ export const logs: Logs = {
    * logs.error("error fetching", new Error("DAMNN"));
    * ```
    */
-  error: formatLogger(tags.error, console.error),
+  error: formatLogger(tags.error, console.error)
 };
-/* eslint-enable @typescript-eslint/no-empty-function */
-/* eslint-enable no-console */
 
 export class ErrorNoStack extends Error {}
 
@@ -97,7 +93,6 @@ function formatLogger(tag: string, logger: (...args: LogArguments[]) => void) {
         });
       logger(tag, `${process.env.TEST ? "[" + caller + "]" : ""}`, ...data);
     } catch (e) {
-      /* eslint-disable-next-line no-console */
       console.error("ERROR LOGGING ITEMS", e);
       logger(items);
     }

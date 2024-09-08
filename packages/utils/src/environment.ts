@@ -11,12 +11,9 @@ import { pickBy } from "lodash-es";
  * @returns envs =
  * { NAME: "VALUE", NOVAL: "", COMPLEX: "D=D=D  = 2" }
  */
-export function parseEnvironment(
-  envsArray: string[] | PackageEnvs
-): PackageEnvs {
+export function parseEnvironment(envsArray: string[] | PackageEnvs): PackageEnvs {
   // Make sure ENVs are in array format
-  if (typeof envsArray === "object" && !Array.isArray(envsArray))
-    return envsArray;
+  if (typeof envsArray === "object" && !Array.isArray(envsArray)) return envsArray;
 
   return envsArray
     .filter((row) => (row || "").trim())
@@ -53,7 +50,7 @@ export function mergeEnvs(envs1: PackageEnvs, envs2: PackageEnvs): PackageEnvs {
   return pickBy(
     {
       ...envs2,
-      ...envs1,
+      ...envs1
     },
     (_0, key) => key
   );

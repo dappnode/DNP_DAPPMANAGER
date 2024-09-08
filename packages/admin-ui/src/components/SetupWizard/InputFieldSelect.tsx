@@ -13,10 +13,7 @@ export default function InputFieldSelect({
   return (
     <Select
       value={value}
-      options={[
-        ...(!options.includes(value) ? ["Select value"] : []),
-        ...options
-      ]}
+      options={[...(!options.includes(value) ? ["Select value"] : []), ...options]}
       onValueChange={onValueChange}
     />
   );

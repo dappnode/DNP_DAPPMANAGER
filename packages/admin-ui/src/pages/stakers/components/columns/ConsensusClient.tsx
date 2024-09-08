@@ -23,11 +23,7 @@ export default function ConsensusClient({
   const navigate = useNavigate();
 
   return (
-    <Card
-      {...props}
-      className={`consensus-client ${joinCssClass({ isSelected })}`}
-      shadow={isSelected}
-    >
+    <Card {...props} className={`consensus-client ${joinCssClass({ isSelected })}`} shadow={isSelected}>
       <div
         onClick={
           consensusClient.status === "ok"
@@ -43,10 +39,7 @@ export default function ConsensusClient({
       >
         {consensusClient.status === "ok" ? (
           <div className="avatar">
-            <img
-              src={consensusClient.avatarUrl || defaultAvatar}
-              alt="avatar"
-            />
+            <img src={consensusClient.avatarUrl || defaultAvatar} alt="avatar" />
           </div>
         ) : consensusClient.status === "error" ? (
           <div className="avatar">
@@ -62,13 +55,7 @@ export default function ConsensusClient({
           {consensusClient.isInstalled && !consensusClient.isUpdated && (
             <>
               <Button
-                onClick={() =>
-                  navigate(
-                    `${getInstallerPath(consensusClient.dnpName)}/${
-                      consensusClient.dnpName
-                    }`
-                  )
-                }
+                onClick={() => navigate(`${getInstallerPath(consensusClient.dnpName)}/${consensusClient.dnpName}`)}
                 variant="dappnode"
               >
                 UPDATE
@@ -79,9 +66,7 @@ export default function ConsensusClient({
           )}
           <>
             {consensusClient.data && (
-              <div className="description">
-                {consensusClient.data?.manifest?.shortDescription}
-              </div>
+              <div className="description">{consensusClient.data?.manifest?.shortDescription}</div>
             )}
           </>
         </>
@@ -89,12 +74,10 @@ export default function ConsensusClient({
 
       {isSelected &&
         // cast to any as long as the gnosis prysm was deprecated
-        (consensusClient.dnpName as any) ===
-          "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
+        (consensusClient.dnpName as string) === "gnosis-beacon-chain-prysm.dnp.dappnode.eth" && (
           <Alert variant="warning">
-            It is <b>not recommended</b> to use <b>Prysm</b> as a consensus
-            client <b>in Gnosis</b>. Use it at your own risk or change to
-            another alternative.
+            It is <b>not recommended</b> to use <b>Prysm</b> as a consensus client <b>in Gnosis</b>. Use it at your own
+            risk or change to another alternative.
           </Alert>
         )}
     </Card>

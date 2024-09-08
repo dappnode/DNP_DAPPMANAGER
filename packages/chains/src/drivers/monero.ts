@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error the library monoro-rpc is not typed
 import { Daemon } from "monero-rpc";
 import { InstalledPackageData } from "@dappnode/types";
 import { buildNetworkAlias } from "@dappnode/utils";
@@ -20,9 +20,7 @@ const MIN_BLOCK_DIFF_SYNC = 15;
  *   error: true {bool},
  * }
  */
-export async function monero(
-  dnp: InstalledPackageData
-): Promise<ChainDataResult> {
+export async function monero(dnp: InstalledPackageData): Promise<ChainDataResult> {
   const container = dnp.containers[0];
   if (!container) throw Error("no container");
 
@@ -31,21 +29,19 @@ export async function monero(
   const containerDomain = buildNetworkAlias({
     dnpName,
     serviceName,
-    isMainOrMonoservice: true,
+    isMainOrMonoservice: true
   });
 
   // http://monero.dappnode:18081
   const apiUrl = `http://${containerDomain}:18081`;
 
-  const info: MoneroRpcGetInfoResult = await new Promise(
-    (resolve, reject): void => {
-      const daemon = new Daemon(apiUrl);
-      daemon.getInfo((err: Error, res: MoneroRpcGetInfoResult) => {
-        if (err) reject(err);
-        else resolve(res);
-      });
-    }
-  );
+  const info: MoneroRpcGetInfoResult = await new Promise((resolve, reject): void => {
+    const daemon = new Daemon(apiUrl);
+    daemon.getInfo((err: Error, res: MoneroRpcGetInfoResult) => {
+      if (err) reject(err);
+      else resolve(res);
+    });
+  });
 
   const highestBlock = info.target_height;
   const currentBlock = info.height;
@@ -54,13 +50,13 @@ export async function monero(
       syncing: true,
       error: false,
       message: `Blocks synced: ${currentBlock} / ${highestBlock}`,
-      progress: currentBlock / highestBlock,
+      progress: currentBlock / highestBlock
     };
   } else {
     return {
       syncing: false,
       error: false,
-      message: `Synced #${currentBlock}`,
+      message: `Synced #${currentBlock}`
     };
   }
 }

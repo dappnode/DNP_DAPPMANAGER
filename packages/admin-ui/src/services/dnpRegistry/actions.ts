@@ -7,17 +7,13 @@ import { AppThunk } from "store";
 
 export const setDnpRegistry = createAction<DirectoryItem[]>("dnpRegistry/set");
 
-export const updateDnpRegistry = createAction<DirectoryItem[]>(
-  "dnpRegistry/update"
-);
+export const updateDnpRegistry = createAction<DirectoryItem[]>("dnpRegistry/update");
 
-export const updateStatus = createAction<RequestStatus>(
-  "dnpRegistry/updateStatus"
-);
+export const updateStatus = createAction<RequestStatus>("dnpRegistry/updateStatus");
 
 // Redux-thunk actions
 
-export const fetchDnpRegistry = (): AppThunk => async dispatch => {
+export const fetchDnpRegistry = (): AppThunk => async (dispatch) => {
   try {
     dispatch(updateStatus({ loading: true }));
     const registry = await api.fetchRegistry();

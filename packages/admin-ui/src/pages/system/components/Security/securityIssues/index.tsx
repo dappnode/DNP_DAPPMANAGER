@@ -9,10 +9,7 @@ import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
 import Ok from "components/Ok";
 // External
-import {
-  getPasswordIsSecure,
-  getWifiStatus
-} from "services/dappnodeStatus/selectors";
+import { getPasswordIsSecure, getWifiStatus } from "services/dappnodeStatus/selectors";
 // Style
 import "./securityIssues.scss";
 
@@ -40,16 +37,12 @@ export default function SecurityIssues() {
       name: "Change WIFI default password",
       severity: "critical",
       component: ChangeWifiPassword,
-      isActive: Boolean(
-        wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
-      ),
-      okMessage: wifiStatus?.isRunning
-        ? "WIFI credentials changed"
-        : "WIFI is disabled"
+      isActive: Boolean(wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning),
+      okMessage: wifiStatus?.isRunning ? "WIFI credentials changed" : "WIFI is disabled"
     }
   ];
 
-  const issuesToShow = securityIssues.filter(issue => issue.isActive);
+  const issuesToShow = securityIssues.filter((issue) => issue.isActive);
   const areActiveIssues = issuesToShow.length > 0;
 
   return (
@@ -57,25 +50,17 @@ export default function SecurityIssues() {
       <Card spacing>
         <StatusIcon
           success={!areActiveIssues}
-          message={
-            areActiveIssues
-              ? "Some issues require your attention"
-              : "Issues addressed"
-          }
+          message={areActiveIssues ? "Some issues require your attention" : "Issues addressed"}
         />
         <hr />
         <div>
-          {securityIssues.map(issue => (
-            <Ok
-              key={issue.name}
-              msg={issue.isActive ? issue.name : issue.okMessage}
-              ok={!issue.isActive}
-            />
+          {securityIssues.map((issue) => (
+            <Ok key={issue.name} msg={issue.isActive ? issue.name : issue.okMessage} ok={!issue.isActive} />
           ))}
         </div>
       </Card>
 
-      {issuesToShow.map(issue => (
+      {issuesToShow.map((issue) => (
         <React.Fragment key={issue.name}>
           <div className="security-issue-header">
             <SubTitle>{issue.name}</SubTitle>

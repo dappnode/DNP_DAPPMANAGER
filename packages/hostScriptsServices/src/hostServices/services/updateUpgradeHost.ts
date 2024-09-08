@@ -11,7 +11,7 @@ import { runService } from "../runService.js";
  * - When running this host service containers will restart and connection with the dappnode will be lost for a while
  */
 export const updateUpgradeHost = memoize(
-  async function(): Promise<string> {
+  async function (): Promise<string> {
     return await runService("update-upgrade-host.service", false);
   },
   // Prevent running this service more than once

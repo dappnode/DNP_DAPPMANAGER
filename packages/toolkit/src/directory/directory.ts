@@ -15,11 +15,7 @@ export class DappNodeDirectory {
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
   constructor(ethersProvider: ethers.AbstractProvider) {
-    this.directoryContract = new ethers.Contract(
-      directoryAddress,
-      directoryAbi,
-      ethersProvider
-    );
+    this.directoryContract = new ethers.Contract(directoryAddress, directoryAbi, ethersProvider);
   }
 
   /**
@@ -30,10 +26,7 @@ export class DappNodeDirectory {
     const numberOfDappnodePackages = await this.fetchNumberOfPackages();
     const featuredIndexes = await this.fetchFeaturedPackagesIndexes();
 
-    const directoryPkgs = await this.fetchPackageDetails(
-      numberOfDappnodePackages,
-      featuredIndexes
-    );
+    const directoryPkgs = await this.fetchPackageDetails(numberOfDappnodePackages, featuredIndexes);
 
     return this.sortDirectoryPkgs(directoryPkgs);
   }
@@ -43,9 +36,7 @@ export class DappNodeDirectory {
    * @returns - A promise that resolves to the number of Dappnode packages.
    */
   private async fetchNumberOfPackages(): Promise<number> {
-    return parseInt(
-      (await this.directoryContract.numberOfDAppNodePackages()).toString()
-    );
+    return parseInt((await this.directoryContract.numberOfDAppNodePackages()).toString());
   }
 
   /**
@@ -57,10 +48,7 @@ export class DappNodeDirectory {
 
     return (featuredBytes.replace("0x", "").match(/.{1,2}/g) ?? [])
       .filter((value: string) => value !== "00")
-      .filter(
-        (value: string, index: number, self: string[]) =>
-          self.indexOf(value) === index
-      )
+      .filter((value: string, index: number, self: string[]) => self.indexOf(value) === index)
       .map((base64: string) => parseInt(base64, 16));
   }
 
@@ -70,22 +58,12 @@ export class DappNodeDirectory {
    * @param featuredIndexes - The indexes of featured packages.
    * @returns - A promise that resolves to an array of package details.
    */
-  private async fetchPackageDetails(
-    numberOfPackages: number,
-    featuredIndexes: number[]
-  ): Promise<DirectoryDnp[]> {
-    const packageIndices = Array.from(
-      { length: numberOfPackages },
-      (_, i) => i
-    );
+  private async fetchPackageDetails(numberOfPackages: number, featuredIndexes: number[]): Promise<DirectoryDnp[]> {
+    const packageIndices = Array.from({ length: numberOfPackages }, (_, i) => i);
 
-    const packages = await Promise.all(
-      packageIndices.map((i) => this.fetchPackageDetail(i, featuredIndexes))
-    );
+    const packages = await Promise.all(packageIndices.map((i) => this.fetchPackageDetail(i, featuredIndexes)));
 
-    return packages.filter(
-      (dnp): dnp is DirectoryDnp => typeof dnp !== "undefined"
-    );
+    return packages.filter((dnp): dnp is DirectoryDnp => typeof dnp !== "undefined");
   }
 
   /**
@@ -94,16 +72,9 @@ export class DappNodeDirectory {
    * @param featuredIndexes - The indexes of featured packages.
    * @returns - A promise that resolves to the package details or undefined if there was an error.
    */
-  private async fetchPackageDetail(
-    index: number,
-    featuredIndexes: number[]
-  ): Promise<DirectoryDnp | undefined> {
+  private async fetchPackageDetail(index: number, featuredIndexes: number[]): Promise<DirectoryDnp | undefined> {
     try {
-      const {
-        name,
-        status: statusBn,
-        position: positionBn,
-      } = await this.directoryContract.getPackage(index);
+      const { name, status: statusBn, position: positionBn } = await this.directoryContract.getPackage(index);
       const status = parseInt(statusBn.toString());
 
       if (!isEnsDomain(name) || status === 0) return;
@@ -114,11 +85,10 @@ export class DappNodeDirectory {
         statusName: directoryDnpStatus[status],
         position: parseInt(positionBn.toString()),
         isFeatured: featuredIndex > -1,
-        featuredIndex: featuredIndex,
+        featuredIndex: featuredIndex
       };
     } catch (e) {
-      if (e instanceof Error)
-        e.message = `Error retrieving DNP #${index} from directory ${e}`;
+      if (e instanceof Error) e.message = `Error retrieving DNP #${index} from directory ${e}`;
       console.log(e);
       return;
     }
@@ -136,7 +106,7 @@ export class DappNodeDirectory {
     const notFeatured = dnps.filter((dnp) => !dnp.isFeatured);
     return [
       ...featured.sort((a, b) => a.featuredIndex - b.featuredIndex),
-      ...notFeatured.sort((a, b) => b.position - a.position),
+      ...notFeatured.sort((a, b) => b.position - a.position)
     ];
   }
 }

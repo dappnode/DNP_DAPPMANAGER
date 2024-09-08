@@ -19,7 +19,7 @@ const terminalID = "terminal";
 const validateLines = (lines: number) => !isNaN(lines) && lines > 0;
 
 export function Logs({ containers }: { containers: PackageContainer[] }) {
-  const serviceNames = containers.map(c => c.serviceName);
+  const serviceNames = containers.map((c) => c.serviceName);
   const [serviceName, setServiceName] = useState(serviceNames[0]);
 
   // User options
@@ -30,7 +30,7 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
   // Fetched data
   const [logs, setLogs] = useState("");
 
-  const container = containers.find(c => c.serviceName === serviceName);
+  const container = containers.find((c) => c.serviceName === serviceName);
   const containerName = container?.containerName;
 
   /**
@@ -88,62 +88,36 @@ export function Logs({ containers }: { containers: PackageContainer[] }) {
    * If the lines parameter is not valid, display custom message
    */
   const logsArray = stringSplit(logs, /\r?\n/);
-  let logsFiltered = query
-    ? logsArray.filter(line => stringIncludes(line, query)).join("\n")
-    : logs;
+  let logsFiltered = query ? logsArray.filter((line) => stringIncludes(line, query)).join("\n") : logs;
   if (logs && query && !logsFiltered) logsFiltered = "No match found";
 
-  const terminalText = validateLines(lines)
-    ? logsFiltered
-    : "Lines must be a number > 0";
+  const terminalText = validateLines(lines) ? logsFiltered : "Lines must be a number > 0";
 
   return (
     <Card spacing>
-      <ServiceSelector
-        serviceName={serviceName}
-        setServiceName={setServiceName}
-        containers={containers}
-      />
+      <ServiceSelector serviceName={serviceName} setServiceName={setServiceName} containers={containers} />
 
       <div className="logs-switches">
-        <Switch
-          checked={autoRefresh}
-          onToggle={setAutoRefresh}
-          label="Auto-refresh logs"
-          id="switch-ar"
-        />
-        <Switch
-          checked={timestamps}
-          onToggle={setTimestamps}
-          label="Display timestamps"
-          id="switch-ts"
-        />
+        <Switch checked={autoRefresh} onToggle={setAutoRefresh} label="Auto-refresh logs" id="switch-ar" />
+        <Switch checked={timestamps} onToggle={setTimestamps} label="Display timestamps" id="switch-ts" />
       </div>
 
       <Input
         placeholder="Number of lines to display..."
         value={lines}
-        onValueChange={newLines => setLines(parseInt(newLines) || 0)}
+        onValueChange={(newLines) => setLines(parseInt(newLines) || 0)}
         type="number"
         prepend="Lines"
         append={
           containerName && (
-            <a
-              href={apiRoutes.containerLogsUrl({ containerName })}
-              {...newTabProps}
-            >
+            <a href={apiRoutes.containerLogsUrl({ containerName })} {...newTabProps}>
               <Button>Download all</Button>
             </a>
           )
         }
       />
 
-      <Input
-        placeholder="Filter by..."
-        value={query}
-        onValueChange={setQuery}
-        prepend="Search"
-      />
+      <Input placeholder="Filter by..." value={query} onValueChange={setQuery} prepend="Search" />
 
       <Terminal text={terminalText} id={terminalID} />
     </Card>

@@ -1,4 +1,4 @@
-import { CID } from "kubo-rpc-client";
+import type { CID } from "kubo-rpc-client";
 
 /**
  * IPFS
@@ -13,6 +13,7 @@ export interface IPFSEntry {
   readonly name: string;
   readonly path: string;
   mode?: number;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   mtime?: any;
   size: number;
 }

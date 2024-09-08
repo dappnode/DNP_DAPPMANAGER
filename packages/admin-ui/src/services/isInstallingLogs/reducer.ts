@@ -19,10 +19,7 @@ export const isInstallingLogsSlice = createSlice({
   name: "isInstallingLogs",
   initialState: { logs: {}, dnpNameToLogId: {} } as IsInstallingLogsState,
   reducers: {
-    updateIsInstallingLog: (
-      state,
-      action: PayloadAction<{ id: string; dnpName: string; log: string }>
-    ) => {
+    updateIsInstallingLog: (state, action: PayloadAction<{ id: string; dnpName: string; log: string }>) => {
       const id = stripVersion(action.payload.id);
       const dnpName = stripVersion(action.payload.dnpName);
       const log = action.payload.log;
@@ -45,7 +42,7 @@ export const isInstallingLogsSlice = createSlice({
       return {
         ...state,
         logs: omit(state.logs, id),
-        dnpNameToLogId: omitBy(state.dnpNameToLogId, _id => _id === id)
+        dnpNameToLogId: omitBy(state.dnpNameToLogId, (_id) => _id === id)
       };
     }
   }

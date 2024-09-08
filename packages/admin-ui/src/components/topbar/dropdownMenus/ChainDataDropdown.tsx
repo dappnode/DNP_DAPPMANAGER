@@ -11,15 +11,7 @@ export default function ChainDataDropdown() {
     <BaseDropdown
       name="Chain status"
       messages={chainData.map(
-        ({
-          dnpName,
-          name,
-          message,
-          help,
-          error,
-          syncing,
-          progress
-        }): BaseDropdownMessage => ({
+        ({ dnpName, name, message, help, error, syncing, progress }): BaseDropdownMessage => ({
           title: name || prettyDnpName(dnpName),
           body: message,
           help: help,

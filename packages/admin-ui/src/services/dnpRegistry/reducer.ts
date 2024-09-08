@@ -8,7 +8,7 @@ import { DirectoryItem, RequestStatus } from "@dappnode/types";
 export const reducer = createReducer<{
   registry: DirectoryItem[];
   requestStatus: RequestStatus;
-}>({ registry: [], requestStatus: {} }, builder => {
+}>({ registry: [], requestStatus: {} }, (builder) => {
   builder.addCase(setDnpRegistry, (state, action) => ({
     ...state,
     registry: action.payload
@@ -17,8 +17,8 @@ export const reducer = createReducer<{
   builder.addCase(updateDnpRegistry, (state, action) => ({
     ...state,
     registry: Object.values({
-      ...keyBy(state.registry, dnp => dnp.name),
-      ...keyBy(action.payload, dnp => dnp.name)
+      ...keyBy(state.registry, (dnp) => dnp.name),
+      ...keyBy(action.payload, (dnp) => dnp.name)
     })
   }));
 

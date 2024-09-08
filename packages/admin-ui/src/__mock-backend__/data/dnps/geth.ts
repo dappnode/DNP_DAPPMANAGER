@@ -1,8 +1,7 @@
 import { MockDnp } from "./types";
 
 export const geth: MockDnp = {
-  avatar:
-    "https://github.com/dappnode/DAppNodePackage-geth/blob/master/geth-avatar.png",
+  avatar: "https://github.com/dappnode/DAppNodePackage-geth/blob/master/geth-avatar.png",
 
   manifest: {
     name: "geth.dnp.dappnode.eth",
@@ -10,16 +9,14 @@ export const geth: MockDnp = {
     upstreamVersion: "v1.10.21",
     upstreamRepo: "ethereum/go-ethereum",
     upstreamArg: "UPSTREAM_VERSION",
-    shortDescription:
-      "Geth is the official Go implementation of the Ethereum protocol.",
+    shortDescription: "Geth is the official Go implementation of the Ethereum protocol.",
     description:
       "Ethereum is a global, open-source platform for decentralized applications where you can write code that controls digital value, runs exactly as programmed, and is accessible anywhere in the world.",
     type: "service",
     architectures: ["linux/amd64", "linux/arm64"],
     chain: "ethereum",
     dockerTimeout: "20min",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
     contributors: [
       "Mariano Conti (nanexcool) (hhttps://github.com/nanexcool)",
       "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)",

@@ -1,9 +1,6 @@
 import { wrapHandlerHtml } from "../utils.js";
 import { dockerInfoArchive } from "@dappnode/dockerapi";
-import {
-  dockerGetFileOrDirBasedOnExtension,
-  dockerGetPathType
-} from "@dappnode/dockerapi";
+import { dockerGetFileOrDirBasedOnExtension, dockerGetPathType } from "@dappnode/dockerapi";
 
 interface Params {
   containerName: string;
@@ -34,10 +31,5 @@ export const fileDownload = wrapHandlerHtml<Params>(async (req, res) => {
   // Download single file as same mimetype, directory as .tar
   res.attachment(isSingleFile ? filepath : `${filepath}.tar`);
 
-  await dockerGetFileOrDirBasedOnExtension(
-    containerNameOrId,
-    filePathAbsolute,
-    res,
-    { isSingleFile }
-  );
+  await dockerGetFileOrDirBasedOnExtension(containerNameOrId, filePathAbsolute, res, { isSingleFile });
 });

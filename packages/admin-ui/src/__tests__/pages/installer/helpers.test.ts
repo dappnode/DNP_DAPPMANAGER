@@ -34,9 +34,7 @@ describe("pages > installer > helpers", () => {
     it("Should filter directory by input", () => {
       const query = dnp1Name;
       const selectedCategories: SelectedCategories = {};
-      expect(
-        filterDirectory({ directory, query, selectedCategories })
-      ).toEqual([dnp1]);
+      expect(filterDirectory({ directory, query, selectedCategories })).toEqual([dnp1]);
     });
 
     it("Should filter directory by type", () => {
@@ -45,9 +43,7 @@ describe("pages > installer > helpers", () => {
         Blockchain: false,
         Storage: true
       };
-      expect(
-        filterDirectory({ directory, query, selectedCategories })
-      ).toEqual([dnp2]);
+      expect(filterDirectory({ directory, query, selectedCategories })).toEqual([dnp2]);
     });
   });
 });

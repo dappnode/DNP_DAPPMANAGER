@@ -1,7 +1,7 @@
 import React from "react";
 import { useApi } from "api";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { title } from "../data";
 // This module
 import InstallDnpView from "./InstallDnpView";
@@ -14,13 +14,14 @@ import { getProgressLogsByDnp } from "services/isInstallingLogs/selectors";
 
 const InstallDnpContainer: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const version = searchParams.get("version") || undefined;
   const progressLogsByDnp = useSelector(getProgressLogsByDnp);
 
   // TODO: return a beautiful error page
-  if (!id)
-    return <div>No ID provided in route parameters.</div>;
+  if (!id) return <div>No ID provided in route parameters.</div>;
 
-  const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id });
+  const { data: dnp, error, isValidating } = useApi.fetchDnpRequest({ id, version });
 
   // Get progressLogs
   const dnpName = dnp?.dnpName;

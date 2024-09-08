@@ -5,26 +5,18 @@ import {
   optimismNode,
   optimismL2Geth,
   executionClientsOptimism,
-  ExecutionClientOptimism,
+  ExecutionClientOptimism
 } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import {
-  dockerContainerStart,
-  dockerContainerStop,
-  listPackageNoThrow,
-} from "@dappnode/dockerapi";
-import {
-  packageSetEnvironment,
-  packageInstall,
-  DappnodeInstaller,
-} from "@dappnode/installer";
+import { dockerContainerStart, dockerContainerStop, listPackageNoThrow } from "@dappnode/dockerapi";
+import { packageSetEnvironment, packageInstall, DappnodeInstaller } from "@dappnode/installer";
 import {
   opNodeServiceName,
   opNodeRpcUrlEnvName,
   historicalRpcUrl,
   opExecutionClientHistoricalRpcUrlEnvName,
-  opClientToServiceMap,
+  opClientToServiceMap
 } from "./params.js";
 
 export async function setOptimismConfig(
@@ -33,7 +25,7 @@ export async function setOptimismConfig(
 ): Promise<void> {
   // l2geth;
   const l2gethPackage = await listPackageNoThrow({
-    dnpName: optimismL2Geth,
+    dnpName: optimismL2Geth
   });
 
   if (archive) {
@@ -43,41 +35,37 @@ export async function setOptimismConfig(
     } else {
       await startAllContainers(l2gethPackage);
     }
-    if (db.opEnableHistoricalRpc.get() !== true)
-      await db.opEnableHistoricalRpc.set(true);
+    if (db.opEnableHistoricalRpc.get() !== true) await db.opEnableHistoricalRpc.set(true);
   } else {
     if (l2gethPackage) await stopAllContainers([l2gethPackage]);
 
-    if (db.opEnableHistoricalRpc.get() !== false)
-      await db.opEnableHistoricalRpc.set(false);
+    if (db.opEnableHistoricalRpc.get() !== false) await db.opEnableHistoricalRpc.set(false);
   }
 
   // op Execution clients: op-geth || op-erigon
   if (executionClient) {
     const targetOpExecutionClientPackage = await listPackageNoThrow({
-      dnpName: executionClient.dnpName,
+      dnpName: executionClient.dnpName
     });
 
     const userSettings: UserSettings = {
       environment: {
         [opClientToServiceMap[executionClient.dnpName]]: {
-          [opExecutionClientHistoricalRpcUrlEnvName]: historicalRpcUrl, // TODO: Empty if not archive?
-        },
-      },
+          [opExecutionClientHistoricalRpcUrlEnvName]: historicalRpcUrl // TODO: Empty if not archive?
+        }
+      }
     };
 
     if (!targetOpExecutionClientPackage) {
       // make sure target package is installed
       await packageInstall(dappnodeInstaller, {
         name: executionClient.dnpName,
-        userSettings: { [executionClient.dnpName]: userSettings },
+        userSettings: { [executionClient.dnpName]: userSettings }
       });
     } else {
       await packageSetEnvironment({
         dnpName: executionClient.dnpName,
-        environmentByService: userSettings.environment
-          ? userSettings.environment
-          : {},
+        environmentByService: userSettings.environment ? userSettings.environment : {}
       });
 
       await startAllContainers(targetOpExecutionClientPackage);
@@ -99,36 +87,29 @@ export async function setOptimismConfig(
       const userSettings: UserSettings = {
         environment: {
           [opNodeServiceName]: {
-            [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl,
-          },
-        },
+            [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl
+          }
+        }
       };
       // make sure op-node is installed
       await packageInstall(dappnodeInstaller, {
         name: optimismNode,
-        userSettings: { [optimismNode]: userSettings },
+        userSettings: { [optimismNode]: userSettings }
       });
     } else {
       await startAllContainers(opNodePackage);
 
       // check if the current env is the same as the new one
-      const opNodeUserSettings = new ComposeFileEditor(
-        optimismNode,
-        false
-      ).getUserSettings();
+      const opNodeUserSettings = new ComposeFileEditor(optimismNode, false).getUserSettings();
 
-      if (
-        opNodeUserSettings.environment?.[opNodeServiceName]?.[
-          opNodeRpcUrlEnvName
-        ] !== rollup.mainnetRpcUrl
-      ) {
+      if (opNodeUserSettings.environment?.[opNodeServiceName]?.[opNodeRpcUrlEnvName] !== rollup.mainnetRpcUrl) {
         await packageSetEnvironment({
           dnpName: optimismNode,
           environmentByService: {
             [opNodeServiceName]: {
-              [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl,
-            },
-          },
+              [opNodeRpcUrlEnvName]: rollup.mainnetRpcUrl
+            }
+          }
         });
       }
     }
@@ -137,12 +118,8 @@ export async function setOptimismConfig(
   }
 }
 
-async function stopOtherOpExecutionClients(
-  executionClient: ExecutionClientOptimism
-): Promise<void> {
-  const otherOpExecutionClientDnps = executionClientsOptimism.filter(
-    (client) => client !== executionClient
-  );
+async function stopOtherOpExecutionClients(executionClient: ExecutionClientOptimism): Promise<void> {
+  const otherOpExecutionClientDnps = executionClientsOptimism.filter((client) => client !== executionClient);
 
   await stopPkgsByDnpNames(otherOpExecutionClientDnps);
 }
@@ -160,11 +137,9 @@ async function stopPkgsByDnpNames(dnpNames: ExecutionClientOptimism[]) {
 
 async function stopAllContainers(pkgs: InstalledPackageData[]): Promise<void> {
   for (const pkg of pkgs)
-    for (const container of pkg.containers)
-      if (container.running) await dockerContainerStop(container.containerName);
+    for (const container of pkg.containers) if (container.running) await dockerContainerStop(container.containerName);
 }
 
 async function startAllContainers(pkg: InstalledPackageData): Promise<void> {
-  for (const container of pkg.containers)
-    if (!container.running) await dockerContainerStart(container.containerName);
+  for (const container of pkg.containers) if (!container.running) await dockerContainerStart(container.containerName);
 }

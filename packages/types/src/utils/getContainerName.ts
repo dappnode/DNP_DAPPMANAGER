@@ -10,14 +10,11 @@ import { getContainerDomain } from "./getContainerDomain.js";
 export const getContainerName = ({
   dnpName,
   serviceName,
-  isCore,
+  isCore
 }: {
   dnpName: string;
   serviceName: string;
   isCore: boolean;
 }): string =>
   // Note: _PREFIX variables already end with the character "-"
-  [
-    isCore ? "DAppNodeCore-" : "DAppNodePackage-",
-    getContainerDomain({ dnpName, serviceName }),
-  ].join("");
+  [isCore ? "DAppNodeCore-" : "DAppNodePackage-", getContainerDomain({ dnpName, serviceName })].join("");

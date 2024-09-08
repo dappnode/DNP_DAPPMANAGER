@@ -1,10 +1,6 @@
 import { ethers } from "ethers";
 import { valid, parse, validRange } from "semver";
-import {
-  ApmRepoVersionReturn,
-  ApmVersionRawAndOrigin,
-  ApmVersionState,
-} from "./types.js";
+import { ApmRepoVersionReturn, ApmVersionRawAndOrigin, ApmVersionState } from "./types.js";
 import * as isIPFS from "is-ipfs";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { repositoryAbi } from "./params.js";
@@ -39,18 +35,11 @@ export class ApmRepository {
    * @returns - A promise that resolves to the Repo instance.
    */
   public async getRepoContract(dnpName: string): Promise<ethers.Contract> {
-    const contractAddress = await this.ethProvider.resolveName(
-      this.ensureValidDnpName(dnpName)
-    );
+    const contractAddress = await this.ethProvider.resolveName(this.ensureValidDnpName(dnpName));
 
     // This error should include "NOREPO" in order to handle it properly in SDK publish code
-    if (!contractAddress)
-      throw new Error(`Could not resolve name ${dnpName}: NOREPO`);
-    return new ethers.Contract(
-      contractAddress,
-      repositoryAbi,
-      this.ethProvider
-    );
+    if (!contractAddress) throw new Error(`Could not resolve name ${dnpName}: NOREPO`);
+    return new ethers.Contract(contractAddress, repositoryAbi, this.ethProvider);
   }
 
   /**
@@ -62,7 +51,7 @@ export class ApmRepository {
    */
   public async getVersionAndIpfsHash({
     dnpNameOrHash,
-    version = "*",
+    version = "*"
   }: {
     dnpNameOrHash: string;
     version?: string;
@@ -73,22 +62,18 @@ export class ApmRepository {
     // Normal cases:
     // - name = eth domain & ver = semverVersion
     // - name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
-    if (
-      isEnsDomain(dnpNameOrHash) &&
-      (this.isSemver(version) || this.isSemverRange(version))
-    ) {
+    if (isEnsDomain(dnpNameOrHash) && (this.isSemver(version) || this.isSemverRange(version))) {
       const repoContract = await this.getRepoContract(dnpNameOrHash);
       const res =
         version && valid(version)
-          ? await repoContract.getBySemanticVersion(
-              this.toApmVersionArray(version)
-            )
+          ? await repoContract.getBySemanticVersion(this.toApmVersionArray(version))
           : await repoContract.getLatest();
 
       return this.parseApmVersionReturn({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         semanticVersion: res[0].map((v: any) => parseInt(v.toString())),
         contractAddress: res[1],
-        contentURI: res[2],
+        contentURI: res[2]
       });
     }
 
@@ -97,7 +82,7 @@ export class ApmRepository {
       return {
         version,
         contentUri: version,
-        origin: version,
+        origin: version
       };
     }
 
@@ -107,14 +92,12 @@ export class ApmRepository {
       return {
         version,
         contentUri: dnpNameOrHash,
-        origin: dnpNameOrHash,
+        origin: dnpNameOrHash
       };
 
     // All other cases are invalid
-    if (isEnsDomain(dnpNameOrHash))
-      throw Error(`Invalid version, must be a semver or a hash: ${version}`);
-    else
-      throw Error(`Invalid DNP name, must be a ENS domain: ${dnpNameOrHash}`);
+    if (isEnsDomain(dnpNameOrHash)) throw Error(`Invalid version, must be a semver or a hash: ${version}`);
+    else throw Error(`Invalid DNP name, must be a ENS domain: ${dnpNameOrHash}`);
   }
 
   /**
@@ -133,10 +116,7 @@ export class ApmRepository {
    * If provided version request range, only returns satisfying versions
    * @param dnpName "bitcoin.dnp.dappnode.eth"
    */
-  public async fetchApmVersionsState(
-    dnpName: string,
-    lastVersionId = 0
-  ): Promise<ApmVersionState[]> {
+  public async fetchApmVersionsState(dnpName: string, lastVersionId = 0): Promise<ApmVersionState[]> {
     const repo = new ethers.Contract(dnpName, repositoryAbi, this.ethProvider);
 
     const versionCount: number = await repo.getVersionsCount().then(parseFloat);
@@ -159,12 +139,10 @@ export class ApmRepository {
     const versionIndexes = this.linspace(lastVersionId + 1, versionCount);
     return await Promise.all(
       versionIndexes.map(async (i): Promise<ApmVersionState> => {
-        const versionData = await repo
-          .getByVersionId(i)
-          .then(this.parseApmVersionReturn);
+        const versionData = await repo.getByVersionId(i).then(this.parseApmVersionReturn);
         return {
           ...versionData,
-          versionId: i,
+          versionId: i
         };
       })
     );
@@ -179,13 +157,12 @@ export class ApmRepository {
     version: string;
     contentUri: string;
   } {
-    if (!Array.isArray(res.semanticVersion))
-      throw Error(`property 'semanticVersion' must be an array`);
+    if (!Array.isArray(res.semanticVersion)) throw Error(`property 'semanticVersion' must be an array`);
     return {
       version: res.semanticVersion.join("."),
       // Second argument = true: ignore UTF8 parsing errors
       // Let downstream code identify the content hash as wrong
-      contentUri: ethers.toUtf8String(res.contentURI),
+      contentUri: ethers.toUtf8String(res.contentURI)
     };
   }
 
@@ -195,11 +172,9 @@ export class ApmRepository {
    * @returns - The valid DNP name.
    */
   private ensureValidDnpName(dnpName: string): string {
-    if (!isEnsDomain(dnpName))
-      throw Error(`Invalid ENS domain for dnpName ${dnpName}`);
+    if (!isEnsDomain(dnpName)) throw Error(`Invalid ENS domain for dnpName ${dnpName}`);
 
-    if (!dnpName.endsWith(".dappnode.eth"))
-      throw Error(`Invalid dnpName ${dnpName}`);
+    if (!dnpName.endsWith(".dappnode.eth")) throw Error(`Invalid dnpName ${dnpName}`);
     return dnpName;
   }
 

@@ -13,9 +13,7 @@ import { isIpfsHash } from "../../utils.js";
  * @param sortFunction can be semver.rcompare for example
  * @returns wrapped sort function
  */
-function safeSort(
-  sortFunction: (a: string, b: string) => number
-): (a: string, b: string) => number {
+function safeSort(sortFunction: (a: string, b: string) => number): (a: string, b: string) => number {
   return (v1: string, v2: string): number => {
     // 1. Put IPFS versions the first
     if (isIpfsHash(v1)) return -1;
@@ -40,5 +38,5 @@ export const safeSemver = {
     if (!valid(ver)) return false;
     if (!validRange(range)) return false;
     return satisfies(ver, range);
-  },
+  }
 };

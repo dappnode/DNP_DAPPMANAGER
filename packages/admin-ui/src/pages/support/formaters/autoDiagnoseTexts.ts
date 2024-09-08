@@ -1,10 +1,5 @@
 import { DiagnoseResult } from "../types";
-import {
-  SystemInfo,
-  InstalledPackageData,
-  HostStatDisk,
-  PublicIpResponse
-} from "@dappnode/types";
+import { SystemInfo, InstalledPackageData, HostStatDisk, PublicIpResponse } from "@dappnode/types";
 import { docsUrl, mandatoryCoreDnps } from "params";
 import { responseInterface } from "swr";
 
@@ -26,13 +21,7 @@ type DiagnoseResultOrNull = DiagnoseResult | null;
  * can also return null, and that diagnose will be ignored
  */
 
-export function connection({
-  isOpen,
-  error
-}: {
-  isOpen: boolean;
-  error: string | null;
-}): DiagnoseResultOrNull {
+export function connection({ isOpen, error }: { isOpen: boolean; error: string | null }): DiagnoseResultOrNull {
   return {
     ok: isOpen,
     msg: isOpen ? "Session is open" : `Session is closed: ${error || ""}`,
@@ -50,8 +39,7 @@ export function internetConnection(
   publicIpRes: responseInterface<PublicIpResponse, Error>,
   systemInfo: responseInterface<SystemInfo, Error>
 ): DiagnoseResultOrNull {
-  if (publicIpRes.isValidating)
-    return { loading: true, msg: "Fetching public IP..." };
+  if (publicIpRes.isValidating) return { loading: true, msg: "Fetching public IP..." };
 
   if (publicIpRes.data?.publicIp) {
     return {
@@ -59,10 +47,7 @@ export function internetConnection(
       msg: "Has connected to the internet, and detected own public IP"
     };
   } else {
-    const msgs: string[] = [
-      "Cannot connect to the internet",
-      "Could not fetch own public IP"
-    ];
+    const msgs: string[] = ["Cannot connect to the internet", "Could not fetch own public IP"];
     if (systemInfo.data?.publicIp) {
       msgs.push("Was previously connected but got disconnected");
     }
@@ -117,20 +102,13 @@ export function noNatLoopback({
   const { noNatLoopback, internalIp } = dappnodeParams;
   return {
     ok: !noNatLoopback,
-    msg: noNatLoopback
-      ? "No NAT loopback, external IP did not resolve"
-      : "NAT loopback enabled, external IP resolves",
-    solutions: [
-      `Please use the internal IP: ${internalIp} when you are in the same network as your DAppNode`
-    ]
+    msg: noNatLoopback ? "No NAT loopback, external IP did not resolve" : "NAT loopback enabled, external IP resolves",
+    solutions: [`Please use the internal IP: ${internalIp} when you are in the same network as your DAppNode`]
   };
 }
 
-export function ipfs(
-  ipfsTestRes: responseInterface<void, Error>
-): DiagnoseResultOrNull {
-  if (ipfsTestRes.isValidating)
-    return { loading: true, msg: "Checking if IPFS resolves..." };
+export function ipfs(ipfsTestRes: responseInterface<void, Error>): DiagnoseResultOrNull {
+  if (ipfsTestRes.isValidating) return { loading: true, msg: "Checking if IPFS resolves..." };
   const error = ipfsTestRes.error;
   return {
     ok: !error,
@@ -180,21 +158,14 @@ export function coreDnpsRunning({
   const notFound = [];
   const notRunning = [];
   for (const coreDnpName of mandatoryCoreDnps) {
-    const coreDnp = dnpInstalled.find(dnp => dnp.dnpName === coreDnpName);
+    const coreDnp = dnpInstalled.find((dnp) => dnp.dnpName === coreDnpName);
     if (!coreDnp) notFound.push(coreDnpName);
-    else if (coreDnp.containers.some(container => !container.running))
-      notRunning.push(coreDnpName);
+    else if (coreDnp.containers.some((container) => !container.running)) notRunning.push(coreDnpName);
   }
 
   const errorMsgs: string[] = [];
-  if (notFound.length > 0)
-    errorMsgs.push(
-      `Core DAppNode Packages ${notFound.join(", ")} are not found`
-    );
-  if (notRunning.length > 0)
-    errorMsgs.push(
-      `Core DAppNode Packages ${notRunning.join(", ")} are not running`
-    );
+  if (notFound.length > 0) errorMsgs.push(`Core DAppNode Packages ${notFound.join(", ")} are not found`);
+  if (notRunning.length > 0) errorMsgs.push(`Core DAppNode Packages ${notRunning.join(", ")} are not running`);
   const ok = notFound.length === 0 && notRunning.length === 0;
   return {
     ok,

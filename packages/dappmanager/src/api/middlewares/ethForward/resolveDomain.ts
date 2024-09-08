@@ -3,12 +3,7 @@ import { getEthersProvider, getEthUrl } from "@dappnode/installer";
 import resolverAbi from "./abi/resolverAbi.json" assert { type: "json" };
 import ensAbi from "./abi/ens.json" assert { type: "json" };
 import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
-import {
-  decodeContentHash,
-  isEmpty,
-  decodeDnsLink,
-  decodeContent
-} from "./utils/index.js";
+import { decodeContentHash, isEmpty, decodeDnsLink, decodeContent } from "./utils/index.js";
 import memoize from "memoizee";
 
 const providerUrlCacheMs = 60 * 1000;
@@ -24,11 +19,7 @@ const ropstenJsonRpc = "http://ropsten.dappnode:8545";
 const CONTENTHASH_INTERFACE_ID = "0xbc1c58d1";
 const TEXT_INTERFACE_ID = "0x59d1d43c";
 const CONTENT_INTERFACE_ID = "0xd8389dc5";
-const interfaces = [
-  CONTENTHASH_INTERFACE_ID,
-  TEXT_INTERFACE_ID,
-  CONTENT_INTERFACE_ID
-];
+const interfaces = [CONTENTHASH_INTERFACE_ID, TEXT_INTERFACE_ID, CONTENT_INTERFACE_ID];
 
 interface InterfacesAvailable {
   [interfaceHash: string]: boolean;
@@ -75,15 +66,11 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
  * @param domain
  * @returns content object
  */
-export async function resolveDomain(
-  domain: string,
-  provider: ethers.Provider
-): Promise<Content> {
+export async function resolveDomain(domain: string, provider: ethers.Provider): Promise<Content> {
   const node = ethers.namehash(domain);
   const ens = new ethers.Contract(ensAddress, ensAbi, provider);
   const resolverAddress = await ens.resolver(node);
-  if (parseInt(resolverAddress) === 0)
-    throw new EnsResolverError("resolver not found", { domain });
+  if (parseInt(resolverAddress) === 0) throw new EnsResolverError("resolver not found", { domain });
 
   const resolver = new ethers.Contract(resolverAddress, resolverAbi, provider);
   const interfacesAvailable = await getInterfacesAvailable(resolver);
@@ -138,12 +125,10 @@ function parseNetworkFromDomain(domain: string): Network {
  *   [TEXT_INTERFACE_ID]: true,
  * }
  */
-async function getInterfacesAvailable(
-  resolver: ethers.Contract
-): Promise<InterfacesAvailable> {
+async function getInterfacesAvailable(resolver: ethers.Contract): Promise<InterfacesAvailable> {
   const iAvail: InterfacesAvailable = {};
   await Promise.all(
-    interfaces.map(async iHash => {
+    interfaces.map(async (iHash) => {
       iAvail[iHash] = await resolver.supportsInterface(iHash);
     })
   );

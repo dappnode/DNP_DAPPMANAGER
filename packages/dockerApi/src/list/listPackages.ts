@@ -10,11 +10,7 @@ export async function listPackages(): Promise<InstalledPackageData[]> {
   return groupPackagesFromContainers(containers);
 }
 
-export async function listPackageNoThrow({
-  dnpName,
-}: {
-  dnpName: string;
-}): Promise<InstalledPackageData | null> {
+export async function listPackageNoThrow({ dnpName }: { dnpName: string }): Promise<InstalledPackageData | null> {
   if (!dnpName) return null;
 
   // Optimize call are request only containers mapping to this package
@@ -25,11 +21,7 @@ export async function listPackageNoThrow({
   return dnps.find((d) => d.dnpName === dnpName) || null;
 }
 
-export async function listPackage({
-  dnpName,
-}: {
-  dnpName: string;
-}): Promise<InstalledPackageData> {
+export async function listPackage({ dnpName }: { dnpName: string }): Promise<InstalledPackageData> {
   const dnp = await listPackageNoThrow({ dnpName });
   if (!dnp) throw Error(`No DNP was found for name ${dnpName}`);
   return dnp;

@@ -19,19 +19,14 @@ export default function Ports() {
                 <Ok ok={true} msg={"Dappnode has detected UPnP as enabled"} />
               ) : (
                 <>
-                  <Ok
-                    ok={false}
-                    msg={"Dappnode has detected UPnP as disabled"}
-                  />
+                  <Ok ok={false} msg={"Dappnode has detected UPnP as disabled"} />
                   <p>
-                    Enable UPnP or manually open and associate the necessary
-                    ports in the router to the Dappnode local IP:
+                    Enable UPnP or manually open and associate the necessary ports in the router to the Dappnode local
+                    IP:
                     <strong>{systemInfo.data.internalIp}</strong>
                   </p>
                   <br />
-                  <strong>
-                    UDP ports must be manually checked in the router
-                  </strong>
+                  <strong>UDP ports must be manually checked in the router</strong>
                 </>
               )}
             </>

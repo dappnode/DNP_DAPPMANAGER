@@ -12,12 +12,8 @@ export default function Select({
   prepend?: string | React.ReactElement;
 }) {
   const select = (
-    <select
-      value={value}
-      className="form-control"
-      onChange={e => onValueChange(e.target.value)}
-    >
-      {options.map(option => (
+    <select value={value} className="form-control" onChange={(e) => onValueChange(e.target.value)}>
+      {options.map((option) => (
         <option key={option}>{option}</option>
       ))}
     </select>
@@ -27,11 +23,7 @@ export default function Select({
     return (
       <div className="input-group">
         <div className="input-group-prepend">
-          {typeof prepend === "string" ? (
-            <span className="input-group-text">{prepend}</span>
-          ) : (
-            prepend
-          )}
+          {typeof prepend === "string" ? <span className="input-group-text">{prepend}</span> : prepend}
         </div>
         {select}
       </div>

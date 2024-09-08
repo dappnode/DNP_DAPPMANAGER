@@ -71,16 +71,13 @@ export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
   return (
     <>
       <Card spacing>
-        <div>
-          Add an IPFS peer to your own boostrap list and immediately connect to
-          it.
-        </div>
+        <div>Add an IPFS peer to your own boostrap list and immediately connect to it.</div>
 
         <Input
           placeholder="Peer address /ip4/85.200.85.20/tcp/4001/ipfs/QmWas..."
           value={peerInput}
           // Ensure id contains only alphanumeric characters
-          onValueChange={value => {
+          onValueChange={(value) => {
             setAddStat({});
             setPeerInput(value);
           }}
@@ -88,23 +85,14 @@ export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
             if (!addStat.loading) addIpfsPeer(peerInput);
           }}
           append={
-            <Button
-              variant="dappnode"
-              onClick={() => addIpfsPeer(peerInput)}
-              disabled={addStat.loading || !peerInput}
-            >
+            <Button variant="dappnode" onClick={() => addIpfsPeer(peerInput)} disabled={addStat.loading || !peerInput}>
               Add peer
             </Button>
           }
         />
 
         {addStat.msg && (
-          <Ok
-            msg={addStat.msg}
-            ok={addStat.ok}
-            loading={addStat.loading}
-            style={{ marginTop: "1rem" }}
-          />
+          <Ok msg={addStat.msg} ok={addStat.ok} loading={addStat.loading} style={{ marginTop: "1rem" }} />
         )}
       </Card>
     </>

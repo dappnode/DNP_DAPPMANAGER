@@ -1,21 +1,13 @@
 import React from "react";
 import { InstalledPackageData } from "@dappnode/types";
-import {
-  allContainersHaveSameVariant,
-  BadgeVariant,
-  parseContainerState,
-  SimpleState
-} from "./utils";
+import { allContainersHaveSameVariant, BadgeVariant, parseContainerState, SimpleState } from "./utils";
 import "./stateBadge.scss";
 
 /**
  * Renders a state badge color legend only if necessary
  */
 export function StateBadgeLegend({ dnps }: { dnps: InstalledPackageData[] }) {
-  const states = new Map<
-    string,
-    { variant: BadgeVariant; state: SimpleState }
-  >();
+  const states = new Map<string, { variant: BadgeVariant; state: SimpleState }>();
 
   // Find out if a legend is needed, and for what colors
   for (const dnp of dnps) {

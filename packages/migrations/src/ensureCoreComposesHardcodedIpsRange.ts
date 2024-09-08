@@ -1,8 +1,5 @@
 import { listPackages } from "@dappnode/dockerapi";
-import {
-  ComposeFileEditor,
-  parseServiceNetworks,
-} from "@dappnode/dockercompose";
+import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
 
@@ -26,39 +23,30 @@ export async function ensureCoreComposesHardcodedIpsRange(): Promise<void> {
   for (const service of Object.values(bindCompose.compose.services)) {
     if (service.networks) {
       const serviceCoreNetwork = parseServiceNetworks(service.networks);
-      const coreNetwork =
-        serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
+      const coreNetwork = serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
       if (coreNetwork.ipv4_address !== params.BIND_IP) {
-        logs.info(
-          `editing service ${params.bindDnpName} ip from ${coreNetwork.ipv4_address} to ${params.BIND_IP}`
-        );
+        logs.info(`editing service ${params.bindDnpName} ip from ${coreNetwork.ipv4_address} to ${params.BIND_IP}`);
         coreNetwork.ipv4_address = params.BIND_IP;
         bindCompose.write();
       }
     }
   }
 
-  const pkgsToRemoveHardcodedIps = [
-    params.dappmanagerDnpName,
-    params.wifiDnpName,
-    params.ipfsDnpName,
-  ];
+  const pkgsToRemoveHardcodedIps = [params.dappmanagerDnpName, params.wifiDnpName, params.ipfsDnpName];
   const pkgs = await listPackages();
   // Optional pkgs
   if (pkgs.find((pkg) => pkg.dnpName === params.HTTPS_PORTAL_DNPNAME))
     pkgsToRemoveHardcodedIps.push(params.HTTPS_PORTAL_DNPNAME);
   if (pkgs.find((pkg) => pkg.dnpName === params.WIREGUARD_DNP_NAME))
     pkgsToRemoveHardcodedIps.push(params.WIREGUARD_DNP_NAME);
-  if (pkgs.find((pkg) => pkg.dnpName === params.vpnDnpName))
-    pkgsToRemoveHardcodedIps.push(params.vpnDnpName);
+  if (pkgs.find((pkg) => pkg.dnpName === params.vpnDnpName)) pkgsToRemoveHardcodedIps.push(params.vpnDnpName);
 
   for (const core of pkgsToRemoveHardcodedIps) {
     const compose = new ComposeFileEditor(core, true);
     for (const service of Object.values(compose.compose.services)) {
       if (service.networks) {
         const serviceCoreNetwork = parseServiceNetworks(service.networks);
-        const coreNetwork =
-          serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
+        const coreNetwork = serviceCoreNetwork[params.DOCKER_PRIVATE_NETWORK_NAME];
         if (coreNetwork.ipv4_address) {
           logs.info(`removing ip ${coreNetwork.ipv4_address} from ${core}`);
           delete coreNetwork.ipv4_address;

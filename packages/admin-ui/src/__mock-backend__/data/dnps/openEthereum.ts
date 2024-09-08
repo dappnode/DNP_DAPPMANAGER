@@ -8,16 +8,12 @@ export const openEthereum: MockDnp = {
   manifest: {
     name: dnpName,
     version: "0.2.6",
-    description:
-      "Dappnode package responsible for providing the Ethereum blockchain, based on Parity v2.5.8-stable",
+    description: "Dappnode package responsible for providing the Ethereum blockchain, based on Parity v2.5.8-stable",
     type: "dncore",
     chain: "ethereum",
     upstreamVersion: "v2.5.8-stable",
-    author:
-      "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
-    contributors: [
-      "Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"
-    ],
+    author: "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
+    contributors: ["Eduardo Antuña <eduadiez@gmail.com> (https://github.com/eduadiez)"],
     keywords: ["DAppNodeCore", "Parity", "Mainnet", "Ethereum"],
     links: {
       homepage: "https://your-project-homepage-or-docs.io"

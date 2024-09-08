@@ -12,20 +12,14 @@ import { FetchRequest } from "ethers";
  * If the package target is not active it returns the remote URL
  * @returns initialized ethers instance
  */
-export async function getEthersProvider(
-  url?: string,
-  network?: string
-): Promise<ethers.JsonRpcProvider> {
+export async function getEthersProvider(url?: string, network?: string): Promise<ethers.JsonRpcProvider> {
   const rpcUrl = url ?? (await getEthUrl());
   const rpcNetwork = network ?? "mainnet";
   const fetchRequest = new FetchRequest(rpcUrl);
   const versionData = db.versionData.get();
-  fetchRequest.setHeader(
-    "x-dappmanager-version",
-    `${versionData.version}-${db.versionData.get().commit?.slice(0, 8)}`
-  );
+  fetchRequest.setHeader("x-dappmanager-version", `${versionData.version}-${db.versionData.get().commit?.slice(0, 8)}`);
   return new ethers.JsonRpcProvider(fetchRequest, rpcNetwork, {
-    staticNetwork: true,
+    staticNetwork: true
   });
 }
 
@@ -35,8 +29,7 @@ export async function getEthersProvider(
  * @returns ethProvier http://geth.dappnode:8545
  */
 export async function getEthUrl(): Promise<string> {
-  if (params.ETH_MAINNET_RPC_URL_OVERRIDE)
-    return params.ETH_MAINNET_RPC_URL_OVERRIDE;
+  if (params.ETH_MAINNET_RPC_URL_OVERRIDE) return params.ETH_MAINNET_RPC_URL_OVERRIDE;
 
   const { target, ethRemoteRpc } = ethereumClient.computeEthereumTarget();
 
@@ -50,10 +43,7 @@ export async function getEthUrl(): Promise<string> {
   if (!target.execClient) throw Error("No execution client selected yet");
   if (!target.consClient) throw Error("No consensus client selected yet");
 
-  const status = await getMultiClientStatus(
-    target.execClient,
-    target.consClient
-  );
+  const status = await getMultiClientStatus(target.execClient, target.consClient);
   db.ethExecClientStatus.set(target.execClient, status);
   emitSyncedNotification(target, status);
 
