@@ -11,9 +11,9 @@ import {
   PackageRelease,
   ReleaseSignatureStatusCode,
   InstallPackageData,
-  Compose
+  Compose,
+  Manifest
 } from "@dappnode/types";
-import { Manifest } from "@dappnode/types";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { ethers } from "ethers";
 

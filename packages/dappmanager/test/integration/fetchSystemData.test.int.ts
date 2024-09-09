@@ -1,6 +1,15 @@
 import "mocha";
 import { expect } from "chai";
-import * as calls from "../../src/calls/index.js";
+import { autoUpdateSettingsEdit } from "../../src/calls/autoUpdateSettingsEdit.js";
+import { autoUpdateDataGet } from "../../src/calls/autoUpdateDataGet.js";
+import { statsDiskGet } from "../../src/calls/statsDiskGet.js";
+import { statsMemoryGet } from "../../src/calls/statsMemoryGet.js";
+import { statsCpuGet } from "../../src/calls/statsCpuGet.js";
+import { systemInfoGet } from "../../src/calls/systemInfoGet.js";
+import { getUserActionLogs } from "../../src/calls/getUserActionLogs.js";
+import { notificationsTest } from "../../src/calls/notificationsTest.js";
+import { notificationsGet } from "../../src/calls/notificationsGet.js";
+import { notificationsRemove } from "../../src/calls/notificationsRemove.js";
 import { logs } from "@dappnode/logger";
 import { AutoUpdateSettings } from "@dappnode/types";
 import { MY_PACKAGES, SYSTEM_PACKAGES } from "@dappnode/daemons";
@@ -14,8 +23,8 @@ describe("Auto update data", () => {
   const enabled = true;
 
   it("Should edit auto-update data", async () => {
-    await calls.autoUpdateSettingsEdit({ id: MY_PACKAGES, enabled });
-    await calls.autoUpdateSettingsEdit({ id: SYSTEM_PACKAGES, enabled });
+    await autoUpdateSettingsEdit({ id: MY_PACKAGES, enabled });
+    await autoUpdateSettingsEdit({ id: SYSTEM_PACKAGES, enabled });
   });
 
   it("Should retrieve modified auto-update data", async () => {
@@ -23,7 +32,7 @@ describe("Auto update data", () => {
       [MY_PACKAGES]: { enabled },
       [SYSTEM_PACKAGES]: { enabled }
     };
-    const { settings } = await calls.autoUpdateDataGet();
+    const { settings } = await autoUpdateDataGet();
     expect(settings).to.deep.equal(expectedSettings);
   });
 });
@@ -34,27 +43,27 @@ describe("Get system data", () => {
   });
 
   it("Should return parsed disk stats from host machine", async () => {
-    const result = await calls.statsDiskGet();
+    const result = await statsDiskGet();
     expect(result).to.be.ok;
   }).timeout(10 * 1000);
 
   it("Should return parsed memory stats from host machine", async () => {
-    const result = await calls.statsMemoryGet();
+    const result = await statsMemoryGet();
     expect(result).to.be.ok;
   }).timeout(10 * 1000);
 
   it("Should return parsed CPU stats from host machine", async () => {
-    const result = await calls.statsCpuGet();
+    const result = await statsCpuGet();
     expect(result).to.be.ok;
   }).timeout(10 * 1000);
 
   it("Should get DAPPMANAGER system info", async () => {
-    await calls.systemInfoGet();
+    await systemInfoGet();
     // Can't check return because is only exists on full build :(
   }).timeout(10 * 1000);
 
   it("Should getUserActionLogs", async () => {
-    const result = await calls.getUserActionLogs({});
+    const result = await getUserActionLogs({});
     // User logs should be empty since nothing happened that was registered
     expect(result).to.be.a("array");
   });
@@ -66,21 +75,21 @@ describe("Get system data", () => {
 describe.skip("Notifications", async () => {
   before("Should post a test notification", async () => {
     clearDbs();
-    await calls.notificationsTest({});
+    await notificationsTest({});
   });
 
   let id: string;
 
   it("Should retrieve notifications", async () => {
-    const result = await calls.notificationsGet();
+    const result = await notificationsGet();
     expect(result).to.have.length.greaterThan(0, "There should be one notification");
     id = result[0].id;
   });
 
   it("Should remove a notification", async () => {
     if (!id) throw Error("Previous test failed");
-    await calls.notificationsRemove({ ids: [id] });
-    const result = await calls.notificationsGet();
+    await notificationsRemove({ ids: [id] });
+    const result = await notificationsGet();
     const deletedNotification = result.find((n) => n.id === id);
     if (deletedNotification) {
       logs.info("deletedNotification", result);
