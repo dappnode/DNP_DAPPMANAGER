@@ -1,9 +1,4 @@
-import {
-  dockerComposeUpPackage,
-  dockerRecreatePackageContainers,
-  listPackageNoThrow,
-  listPackages
-} from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
@@ -173,8 +168,9 @@ export class StakerComponent {
   private async unsetStakerPkgConfig(pkg: InstalledPackageData, dockerNetworkName: string): Promise<void> {
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
 
-    // Check if we can lose info not included in the package volumes
-    await dockerRecreatePackageContainers(pkg.dnpName);
+    // This recreates the package containers so that they include the recently added configuration
+    // The flag --no-start is added so that the containers remain stopped after recreation
+    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, false, undefined, { forceRecreate: true, noStart: true });
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {

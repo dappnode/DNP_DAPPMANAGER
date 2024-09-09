@@ -10,5 +10,4 @@ export * from "./cleanOldImages.js";
 export * from "./list/index.js";
 export * from "./compose/index.js";
 export * from "./api/index.js";
-export * from "./dockerRecreatePackageContainers.js";
 export { getDappmanagerImage } from "./getDappmanagerImage.js";
