@@ -70,7 +70,7 @@ export class MevBoost extends StakerComponent {
       }
       await this.persistSelectedIfInstalled({
         dnpName: currentMevBoostDnpName,
-        userSettings: this.getUserSettings([], false, network)
+        userSettings: this.getUserSettings(network, null)
       });
       this.DbHandlers[network].set(true);
     }
@@ -82,7 +82,7 @@ export class MevBoost extends StakerComponent {
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
-      userSettings: newMevBoostDnpName ? this.getUserSettings(newRelays, true, network) : {},
+      userSettings: newMevBoostDnpName ? this.getUserSettings(network, newRelays) : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null
     });
     // persist on db
@@ -90,11 +90,14 @@ export class MevBoost extends StakerComponent {
       await this.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
-  private getUserSettings(newRelays: string[], shouldSetEnvironment: boolean, network: Network): UserSettings {
-    return {
-      environment: shouldSetEnvironment
+  private getUserSettings(network: Network, newRelays: string[] | null): UserSettings {
+    const mevBoostServiceName = "mev-boost";
+
+    const userSettings: UserSettings = {
+      // If the package is not installed, we use the default environment
+      environment: newRelays
         ? {
-            "mev-boost": {
+            [mevBoostServiceName]: {
               ["RELAYS"]:
                 newRelays
                   .join(",")
@@ -103,23 +106,24 @@ export class MevBoost extends StakerComponent {
             }
           }
         : {},
-      networks: {
-        rootNetworks: {
+      networks: this.getStakerNetworkSettings(network)
+    };
+
+    return userSettings;
+  }
+
+  private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
+    const mevBoostServiceName = "mev-boost";
+
+    return {
+      rootNetworks: this.getComposeRootNetworks(network),
+      serviceNetworks: {
+        [mevBoostServiceName]: {
           [params.DOCKER_STAKER_NETWORKS[network]]: {
-            external: true
+            aliases: [`${mevBoostServiceName}.${network}.staker.dappnode`]
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            external: true
-          }
-        },
-        serviceNetworks: {
-          ["mev-boost"]: {
-            [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`mev-boost.${network}.staker.dappnode`]
-            },
-            [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`mev-boost.${network}.dncore.dappnode`]
-            }
+            aliases: [`${mevBoostServiceName}.${network}.dncore.dappnode`]
           }
         }
       }
