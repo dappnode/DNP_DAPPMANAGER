@@ -359,6 +359,12 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xF84eeDc34257018Ba77353b9F5b3e11AeAeecC2a"
+    },
+    {
+      name: "LUKSO Team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7"
     }
   ]
 };
