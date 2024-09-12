@@ -365,6 +365,12 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x6109dcd72b8a2485A5b3Ac4E76965159e9893aB7"
+    },
+    {
+      name: "Lighthouse Team",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xad734Bef91920621B3D2cb30E0f65461e324647E"
     }
   ]
 };
