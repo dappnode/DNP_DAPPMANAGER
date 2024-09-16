@@ -1,4 +1,4 @@
-import { buildNetworkAlias, getBeaconServiceName } from "@dappnode/utils";
+import { buildNetworkAlias } from "@dappnode/utils";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
 /**
@@ -27,27 +27,30 @@ export function getEthExecClientApiUrl(dnpName: string, port = 8545): string {
  * @param dnpName
  */
 export async function getEthConsClientApiUrl(dnpName: string): Promise<string> {
-  let port = 3500;
-  let domain = "";
+  const defaultPort = 3500;
+  const defaultServiceName = "beacon-chain";
+
+  // TODO: Use beacon-chain.<network>.dncore.dappnode
+
   const dnp = await listPackageNoThrow({ dnpName });
-  if (dnp && typeof dnp.chain === "object" && dnp.chain.portNumber && dnp.chain.serviceName) {
-    port = dnp.chain.portNumber;
-    domain = buildNetworkAlias({
-      dnpName: dnpName,
-      serviceName: dnp.chain.serviceName,
+
+  if (!dnp || typeof dnp.chain !== "object") {
+    const domain = buildNetworkAlias({
+      dnpName,
+      serviceName: defaultServiceName,
       isMainOrMonoservice: false
     });
-  } else {
-    // Lighthouse, Teku and Prysm use 3500
-    // Nimbus uses 4500 because it is a monoservice and the validator API is using that port
-    if (dnpName.includes("nimbus")) {
-      port = 4500;
-    }
-    domain = buildNetworkAlias({
-      dnpName: dnpName,
-      serviceName: getBeaconServiceName(dnpName),
-      isMainOrMonoservice: false
-    });
+
+    return `http://${domain}:${defaultPort}`;
   }
-  return `http://${domain}:${port}`;
+
+  const { chain: { portNumber = defaultPort, serviceName = defaultServiceName } = {} } = dnp;
+
+  const domain = buildNetworkAlias({
+    dnpName,
+    serviceName,
+    isMainOrMonoservice: false
+  });
+
+  return `http://${domain}:${portNumber}`;
 }

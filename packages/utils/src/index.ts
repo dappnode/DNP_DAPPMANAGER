@@ -27,7 +27,7 @@ export * from "./asyncFlows.js";
 export * from "./pid.js";
 export { urlJoin } from "./urlJoin.js";
 export { prettyDnpName } from "./prettyDnpName.js";
-export { getBeaconServiceName, getConsensusUserSettings } from "./stakerUtils.js";
+export { getDefaultConsensusUserSettings } from "./stakerUtils.js";
 export * from "./ethers.js";
 export { shellSafe } from "./shellSafe.js";
 export { getIsInstalled } from "./getIsInstalled.js";

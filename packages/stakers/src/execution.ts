@@ -11,7 +11,6 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
 // TODO: move ethereumClient logic here
@@ -72,15 +71,14 @@ export class Execution extends StakerComponent {
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
     const currentExecutionDnpName = this.DbHandlers[network].get();
     if (currentExecutionDnpName) {
-      const isInstalled = await listPackageNoThrow({
-        dnpName: currentExecutionDnpName
-      });
+      const isInstalled = await this.isPackageInstalled(currentExecutionDnpName);
 
       if (!isInstalled) {
         // update status in db
         this.DbHandlers[network].set(undefined);
         return;
       }
+
       await this.persistSelectedIfInstalled({
         dnpName: currentExecutionDnpName,
         userSettings: this.getUserSettings(network, currentExecutionDnpName)
@@ -96,7 +94,7 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      userSettings: newExecutionDnpName ? this.getUserSettings(network, newExecutionDnpName) : {},
+      userSettings: this.getUserSettings(network, newExecutionDnpName),
       prevClient: prevExecClientDnpName
     });
 
@@ -112,17 +110,12 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private getUserSettings(network: Network, dnpName: string): UserSettings {
+  private getUserSettings(network: Network, dnpName: string | null): UserSettings {
+    if (!dnpName) return {};
+
     return {
       networks: {
-        rootNetworks: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
-            external: true
-          },
-          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            external: true
-          }
-        },
+        rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
           [this.getExecutionServiceName(dnpName)]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {

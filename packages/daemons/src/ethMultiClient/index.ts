@@ -1,7 +1,7 @@
 import * as db from "@dappnode/db";
 import { eventBus } from "@dappnode/eventbus";
 import { params } from "@dappnode/params";
-import { runAtMostEvery, runOnlyOneSequentially, getConsensusUserSettings } from "@dappnode/utils";
+import { runAtMostEvery, runOnlyOneSequentially, getDefaultConsensusUserSettings } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import {
   EthClientRemote,
@@ -70,10 +70,11 @@ export async function runEthClientInstaller(
             if (isConsensusClientMainnet(target))
               await packageInstall(dappnodeInstaller, {
                 name: target,
-                userSettings: getConsensusUserSettings({
-                  dnpName: target,
-                  network: Network.Mainnet
-                })
+                userSettings: {
+                  [target]: getDefaultConsensusUserSettings({
+                    network: Network.Mainnet
+                  })
+                }
               });
             else await packageInstall(dappnodeInstaller, { name: target });
           } catch (e) {

@@ -1,24 +1,12 @@
-import {
-  dockerComposeUpPackage,
-  dockerContainerStop,
-  dockerNetworkDisconnect,
-  listPackageNoThrow,
-  listPackages
-} from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import {
-  InstalledPackageDataApiReturn,
-  InstalledPackageData,
-  UserSettingsAllDnps,
-  PackageContainer,
-  StakerItem,
-  UserSettings
-} from "@dappnode/types";
+import { InstalledPackageData, UserSettingsAllDnps, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { isMatch } from "lodash-es";
+import { params } from "@dappnode/params";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -118,6 +106,23 @@ export class StakerComponent {
     });
   }
 
+  protected async isPackageInstalled(dnpName: string): Promise<boolean> {
+    const dnp = await listPackageNoThrow({ dnpName });
+
+    return Boolean(dnp);
+  }
+
+  protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
+    return {
+      [params.DOCKER_STAKER_NETWORKS[network]]: {
+        external: true
+      },
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+        external: true
+      }
+    };
+  }
+
   /**
    * Set the staker pkg:
    * - ensures the staker pkg is installed
@@ -151,7 +156,7 @@ export class StakerComponent {
     }
 
     // start all containers
-    await dockerComposeUpPackage({ dnpName }, true);
+    await dockerComposeUpPackage({ dnpName }, true, undefined, { forceRecreate: true });
   }
 
   /**
@@ -161,20 +166,11 @@ export class StakerComponent {
    * - removes the staker network from the docker-compose file
    */
   private async unsetStakerPkgConfig(pkg: InstalledPackageData, dockerNetworkName: string): Promise<void> {
-    // disconnect pkg from staker network
-    await this.disconnectPkgFromStakerNetwork(dockerNetworkName, pkg.containers);
-
-    // stop all containers
-    await this.stopAllPkgContainers(pkg);
-    // remove staker network from the compose file
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
-  }
 
-  private async disconnectPkgFromStakerNetwork(networkName: string, pkgContainers: PackageContainer[]): Promise<void> {
-    const connectedContainers = pkgContainers
-      .filter((container) => container.networks.some((network) => network.name === networkName))
-      .map((container) => container.containerName);
-    for (const container of connectedContainers) await dockerNetworkDisconnect(networkName, container);
+    // This recreates the package containers so that they include the recently added configuration
+    // The flag --no-start is added so that the containers remain stopped after recreation
+    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, false, undefined, { forceRecreate: true, noStart: true });
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
@@ -220,17 +216,5 @@ export class StakerComponent {
         `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
-  }
-
-  /**
-   * Stop all the containers from a given package dnpName
-   */
-  // TODO: Move this to where packages and containers are started/stopped
-  private async stopAllPkgContainers(pkg: InstalledPackageDataApiReturn | InstalledPackageData): Promise<void> {
-    await Promise.all(
-      pkg.containers
-        .filter((c) => c.running)
-        .map(async (c) => dockerContainerStop(c.containerName, { timeout: c.dockerTimeout }))
-    ).catch((e) => logs.error(e.message));
   }
 }
