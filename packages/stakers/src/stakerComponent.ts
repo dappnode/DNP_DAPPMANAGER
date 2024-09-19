@@ -61,7 +61,7 @@ export class StakerComponent {
     userSettings: UserSettings;
   }): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
+    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings, forceRecreate: false });
   }
 
   protected async setNew({
@@ -133,11 +133,13 @@ export class StakerComponent {
   private async setStakerPkgConfig({
     dnpName,
     isInstalled,
-    userSettings
+    userSettings,
+    forceRecreate = true
   }: {
     dnpName: string;
     isInstalled: boolean;
     userSettings: UserSettings;
+    forceRecreate?: boolean;
   }): Promise<void> {
     // ensure pkg installed
     if (!isInstalled)
@@ -159,7 +161,7 @@ export class StakerComponent {
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
       upAll: true,
-      dockerComposeUpOptions: { forceRecreate: true }
+      dockerComposeUpOptions: { forceRecreate }
     });
   }
 
