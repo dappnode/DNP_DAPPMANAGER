@@ -77,7 +77,11 @@ export async function runPackages(packagesData: InstallPackageData[], log: Log):
       await restartDappmanagerPatch({ composePath: pkg.composePath });
       return;
     } else {
-      await dockerComposeUpPackage({ dnpName: pkg.dnpName, composePath: pkg.composePath }, false, pkg.containersStatus);
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName: pkg.dnpName, composePath: pkg.composePath },
+        upAll: false,
+        containersStatus: pkg.containersStatus
+      });
     }
 
     log(pkg.dnpName, "Package started");

@@ -43,7 +43,12 @@ export async function packageSetPortMappings({
   const dockerComposeUpOptions = (packageInstalledHasPid(compose.compose) && { forceRecreate: true }) || {};
 
   try {
-    await dockerComposeUpPackage({ dnpName }, false, containersStatus, dockerComposeUpOptions);
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName },
+      upAll: false,
+      containersStatus,
+      dockerComposeUpOptions
+    });
   } catch (e) {
     if (e.message.toLowerCase().includes("port is already allocated")) {
       // Rollback port mappings are re-up
@@ -51,7 +56,12 @@ export async function packageSetPortMappings({
         if (services[serviceName]) services[serviceName].setPortMapping(portMappings);
       compose.write();
 
-      await dockerComposeUpPackage({ dnpName }, false, containersStatus, dockerComposeUpOptions);
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName },
+        upAll: false,
+        containersStatus,
+        dockerComposeUpOptions
+      });
 
       // Try to get the port colliding from the error
       const ipAndPort = (e.message.match(/(?:Bind for)(.+)(?:failed: port is already allocated)/) || [])[1];

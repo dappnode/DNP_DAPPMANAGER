@@ -54,12 +54,12 @@ export async function rollbackPackages(packagesData: InstallPackageDataPaths[], 
           await restartDappmanagerPatch({ composePath: pkg.composePath });
           return;
         } else {
-          await dockerComposeUpPackage(
-            { dnpName: pkg.dnpName, composePath: pkg.composePath },
-            false,
-            pkg.containersStatus,
-            { timeout: pkg.dockerTimeout }
-          );
+          await dockerComposeUpPackage({
+            composeArgs: { dnpName: pkg.dnpName },
+            upAll: false,
+            containersStatus: pkg.containersStatus,
+            dockerComposeUpOptions: { timeout: pkg.dockerTimeout }
+          });
         }
       } else {
         // Remove new containers that were NOT installed before this install call

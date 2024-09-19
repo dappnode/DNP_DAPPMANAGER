@@ -4,7 +4,7 @@ import { stripVersion } from "./utils";
 
 // Service > isInstallingLogs
 
-interface IsInstallingLogsState {
+export interface IsInstallingLogsState {
   logs: {
     [logId: string]: {
       [dnpName: string]: string; // Log: "Downloading 57%"

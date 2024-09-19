@@ -4,7 +4,7 @@ import { CoreUpdateData, RequestStatus } from "@dappnode/types";
 
 // Service > coreUpdate
 
-interface CoreUpdateState {
+export interface CoreUpdateState {
   data: CoreUpdateData | null;
   updatingCore: boolean;
   requestStatus: RequestStatus;
