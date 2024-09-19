@@ -18,13 +18,19 @@ interface ComposeUpArgs {
  * - Uses a custom timeout defined by the package developer
  * - Prevents starting stoped containers if any
  */
-export async function dockerComposeUpPackage(
-  { dnpName, composePath }: ComposeUpArgs,
-  upAll: boolean,
-  containersStatus?: ContainersStatus,
-  dockerComposeUpOptions?: DockerComposeUpOptions
-): Promise<void> {
-  if (!composePath) composePath = getDockerComposePathSmart(dnpName);
+export async function dockerComposeUpPackage({
+  composeArgs,
+  upAll,
+  containersStatus,
+  dockerComposeUpOptions
+}: {
+  composeArgs: ComposeUpArgs;
+  upAll: boolean;
+  containersStatus?: ContainersStatus;
+  dockerComposeUpOptions?: DockerComposeUpOptions;
+}): Promise<void> {
+  if (!composeArgs.composePath) composeArgs.composePath = getDockerComposePathSmart(composeArgs.dnpName);
+  const { dnpName, composePath } = composeArgs;
   if (!fs.existsSync(composePath)) {
     throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
   }

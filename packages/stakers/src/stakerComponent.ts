@@ -156,7 +156,11 @@ export class StakerComponent {
     }
 
     // start all containers
-    await dockerComposeUpPackage({ dnpName }, true, undefined, { forceRecreate: true });
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName },
+      upAll: true,
+      dockerComposeUpOptions: { forceRecreate: true }
+    });
   }
 
   /**
@@ -170,7 +174,11 @@ export class StakerComponent {
 
     // This recreates the package containers so that they include the recently added configuration
     // The flag --no-start is added so that the containers remain stopped after recreation
-    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, false, undefined, { forceRecreate: true, noStart: true });
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName: pkg.dnpName },
+      upAll: false,
+      dockerComposeUpOptions: { forceRecreate: true, noStart: true }
+    });
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
