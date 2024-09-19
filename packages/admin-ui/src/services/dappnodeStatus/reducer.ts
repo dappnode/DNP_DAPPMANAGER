@@ -5,7 +5,7 @@ import { WifiCredentials } from "types";
 
 // Service > dappnodeStatus
 
-interface DappnodeStatusState {
+export interface DappnodeStatusState {
   systemInfo: SystemInfo | null;
   wifiCredentials: WifiCredentials | null;
   /**
