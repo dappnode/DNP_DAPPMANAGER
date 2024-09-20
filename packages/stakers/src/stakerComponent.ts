@@ -61,7 +61,7 @@ export class StakerComponent {
     userSettings: UserSettings;
   }): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings, forceRecreate: false });
+    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
   }
 
   protected async setNew({
@@ -133,14 +133,13 @@ export class StakerComponent {
   private async setStakerPkgConfig({
     dnpName,
     isInstalled,
-    userSettings,
-    forceRecreate = true
+    userSettings
   }: {
     dnpName: string;
     isInstalled: boolean;
     userSettings: UserSettings;
-    forceRecreate?: boolean;
   }): Promise<void> {
+    let forceRecreate = false;
     // ensure pkg installed
     if (!isInstalled)
       await packageInstall(this.dappnodeInstaller, {
@@ -154,6 +153,7 @@ export class StakerComponent {
       if (!isMatch(userSettingsPrev, userSettings)) {
         composeEditor.applyUserSettings(userSettings, { dnpName });
         composeEditor.write();
+        forceRecreate = true; // Only recreate if userSettings changed
       }
     }
 
