@@ -61,7 +61,7 @@ export class StakerComponent {
     userSettings: UserSettings;
   }): Promise<void> {
     logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings, forceRecreate: false });
+    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
   }
 
   protected async setNew({
@@ -133,27 +133,42 @@ export class StakerComponent {
   private async setStakerPkgConfig({
     dnpName,
     isInstalled,
-    userSettings,
-    forceRecreate = true
+    userSettings
   }: {
     dnpName: string;
     isInstalled: boolean;
     userSettings: UserSettings;
-    forceRecreate?: boolean;
   }): Promise<void> {
-    // ensure pkg installed
-    if (!isInstalled)
+    if (isInstalled) {
+      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
+    } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings: userSettings ? { [dnpName]: userSettings } : {}
       });
-    else if (userSettings) {
+    }
+  }
+
+  private async setInstalledStakerPkgConfig({
+    dnpName,
+    userSettings
+  }: {
+    dnpName: string;
+    userSettings: UserSettings;
+  }): Promise<void> {
+    let forceRecreate = false;
+
+    if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
-      const userSettingsPrev: UserSettingsAllDnps = {};
-      userSettingsPrev[dnpName] = composeEditor.getUserSettings();
-      if (!isMatch(userSettingsPrev, userSettings)) {
+
+      const previousSettings: UserSettingsAllDnps = {
+        [dnpName]: composeEditor.getUserSettings()
+      };
+
+      if (!isMatch(previousSettings, userSettings)) {
         composeEditor.applyUserSettings(userSettings, { dnpName });
         composeEditor.write();
+        forceRecreate = true; // Only recreate if userSettings changed
       }
     }
 
