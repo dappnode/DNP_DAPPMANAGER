@@ -94,12 +94,12 @@ export async function packageRestartVolumes({
     await restartDappmanagerPatch({ composePath });
     return;
   } else {
-    await dockerComposeUpPackage(
-      { dnpName },
-      false,
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName },
+      upAll: false,
       containersStatus,
-      (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
-    );
+      dockerComposeUpOptions: (packageInstalledHasPid(compose) && { forceRecreate: true }) || {}
+    });
   }
 
   if (err) {

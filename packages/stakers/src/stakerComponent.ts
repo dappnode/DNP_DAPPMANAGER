@@ -139,24 +139,45 @@ export class StakerComponent {
     isInstalled: boolean;
     userSettings: UserSettings;
   }): Promise<void> {
-    // ensure pkg installed
-    if (!isInstalled)
+    if (isInstalled) {
+      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
+    } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
         userSettings: userSettings ? { [dnpName]: userSettings } : {}
       });
-    else if (userSettings) {
+    }
+  }
+
+  private async setInstalledStakerPkgConfig({
+    dnpName,
+    userSettings
+  }: {
+    dnpName: string;
+    userSettings: UserSettings;
+  }): Promise<void> {
+    let forceRecreate = false;
+
+    if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
-      const userSettingsPrev: UserSettingsAllDnps = {};
-      userSettingsPrev[dnpName] = composeEditor.getUserSettings();
-      if (!isMatch(userSettingsPrev, userSettings)) {
+
+      const previousSettings: UserSettingsAllDnps = {
+        [dnpName]: composeEditor.getUserSettings()
+      };
+
+      if (!isMatch(previousSettings, userSettings)) {
         composeEditor.applyUserSettings(userSettings, { dnpName });
         composeEditor.write();
+        forceRecreate = true; // Only recreate if userSettings changed
       }
     }
 
     // start all containers
-    await dockerComposeUpPackage({ dnpName }, true, undefined, { forceRecreate: true });
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName },
+      upAll: true,
+      dockerComposeUpOptions: { forceRecreate }
+    });
   }
 
   /**
@@ -170,7 +191,11 @@ export class StakerComponent {
 
     // This recreates the package containers so that they include the recently added configuration
     // The flag --no-start is added so that the containers remain stopped after recreation
-    await dockerComposeUpPackage({ dnpName: pkg.dnpName }, false, undefined, { forceRecreate: true, noStart: true });
+    await dockerComposeUpPackage({
+      composeArgs: { dnpName: pkg.dnpName },
+      upAll: false,
+      dockerComposeUpOptions: { forceRecreate: true, noStart: true }
+    });
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
