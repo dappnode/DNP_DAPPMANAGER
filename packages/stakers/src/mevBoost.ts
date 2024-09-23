@@ -56,22 +56,25 @@ export class MevBoost extends StakerComponent {
   }
 
   async persistMevBoostIfInstalledAndRunning(network: Network): Promise<void> {
-    const currentMevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
-    if (currentMevBoostDnpName) {
-      const isInstalledAndRunning = (
-        await listPackageNoThrow({
-          dnpName: currentMevBoostDnpName
-        })
-      )?.containers.some((container) => container.running);
+    const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
 
-      if (!isInstalledAndRunning) {
+    if (mevBoostDnpName) {
+      const mevBoostDnp = await listPackageNoThrow({ dnpName: mevBoostDnpName });
+      const isRunning = mevBoostDnp?.containers.some((container) => container.running);
+
+      if (!isRunning) {
         this.DbHandlers[network].set(false);
         return;
       }
-      await this.persistSelectedIfInstalled({
-        dnpName: currentMevBoostDnpName,
-        userSettings: this.getUserSettings(network, null)
+
+      const userSettings = this.getUserSettings(network, null);
+
+      await this.setStakerPkgConfig({
+        dnpName: mevBoostDnpName,
+        isInstalled: true,
+        userSettings
       });
+
       this.DbHandlers[network].set(true);
     }
   }

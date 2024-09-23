@@ -79,10 +79,10 @@ export class Execution extends StakerComponent {
         return;
       }
 
-      await this.persistSelectedIfInstalled({
-        dnpName: currentExecutionDnpName,
-        userSettings: this.getUserSettings(network, currentExecutionDnpName)
-      });
+      const userSettings = this.getUserSettings(network, currentExecutionDnpName);
+
+      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
+
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
   }

@@ -2,7 +2,7 @@ import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappn
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import { InstalledPackageData, UserSettingsAllDnps, StakerItem, UserSettings, Network } from "@dappnode/types";
+import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { isMatch } from "lodash-es";
@@ -51,17 +51,6 @@ export class StakerComponent {
         }
       })
     );
-  }
-
-  protected async persistSelectedIfInstalled({
-    dnpName,
-    userSettings
-  }: {
-    dnpName: string;
-    userSettings: UserSettings;
-  }): Promise<void> {
-    logs.info(`Persisting ${dnpName}`);
-    await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
   }
 
   protected async setNew({
@@ -130,7 +119,7 @@ export class StakerComponent {
    * - adds the staker network to the docker-compose file
    * - starts the staker pkg
    */
-  private async setStakerPkgConfig({
+  protected async setStakerPkgConfig({
     dnpName,
     isInstalled,
     userSettings
@@ -161,14 +150,15 @@ export class StakerComponent {
     if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
 
-      const previousSettings: UserSettingsAllDnps = {
-        [dnpName]: composeEditor.getUserSettings()
-      };
+      const previousSettings = composeEditor.getUserSettings();
 
-      if (!isMatch(previousSettings, userSettings)) {
-        composeEditor.applyUserSettings(userSettings, { dnpName });
+      composeEditor.applyUserSettings(userSettings, { dnpName });
+      const newSettings = composeEditor.getUserSettings();
+
+      if (!isMatch(previousSettings, newSettings)) {
         composeEditor.write();
-        forceRecreate = true; // Only recreate if userSettings changed
+        forceRecreate = true;
+        logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
       }
     }
 
