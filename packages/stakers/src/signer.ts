@@ -51,17 +51,16 @@ export class Signer extends StakerComponent {
   }
 
   async persistSignerIfInstalledAndRunning(network: Network): Promise<void> {
-    if (
-      (
-        await listPackageNoThrow({
-          dnpName: Signer.CompatibleSigners[network].dnpName
-        })
-      )?.containers.some((container) => container.running)
-    )
-      await this.persistSelectedIfInstalled({
-        dnpName: Signer.CompatibleSigners[network].dnpName,
-        userSettings: this.getUserSettings(network)
-      });
+    const signerDnpName = Signer.CompatibleSigners[network].dnpName;
+    const signerDnp = await listPackageNoThrow({ dnpName: signerDnpName });
+    const isRunning = signerDnp?.containers.some((container) => container.running);
+
+    if (isRunning) {
+      const dnpName = Signer.CompatibleSigners[network].dnpName;
+      const userSettings = this.getUserSettings(network);
+
+      await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
+    }
   }
 
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
