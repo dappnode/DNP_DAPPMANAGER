@@ -44,6 +44,7 @@ export async function packageInstall({
 function ensureNimbusConnection(dnpName: string): void {
   if (!dnpName.includes("nimbus")) {
     logs.debug("Not a Nimbus package, skipping network reconnection");
+    return;
   }
 
   logs.info("Ensuring Nimbus services are connected to the staker network");
