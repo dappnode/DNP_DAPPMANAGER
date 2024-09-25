@@ -65,6 +65,5 @@ async function ensureNimbusConnection(dnpName: string): Promise<void> {
     return;
   }
 
-  // Not awaited
   await consensus.persistSelectedConsensusIfInstalled(network);
 }
