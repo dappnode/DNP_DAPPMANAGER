@@ -29,7 +29,7 @@ export async function packageInstall({
     options
   });
 
-  ensureNimbusConnection(reqName);
+  await ensureNimbusConnection(reqName);
 }
 
 /**
@@ -41,7 +41,7 @@ export async function packageInstall({
  *
  * TODO: Remove this once all Nimbus packages are multiservice
  */
-function ensureNimbusConnection(dnpName: string): void {
+async function ensureNimbusConnection(dnpName: string): Promise<void> {
   if (!dnpName.includes("nimbus")) {
     logs.debug("Not a Nimbus package, skipping network reconnection");
     return;
@@ -66,5 +66,5 @@ function ensureNimbusConnection(dnpName: string): void {
   }
 
   // Not awaited
-  consensus.persistSelectedConsensusIfInstalled(network);
+  await consensus.persistSelectedConsensusIfInstalled(network);
 }
