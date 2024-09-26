@@ -30,6 +30,7 @@ import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSign
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
 import { ethers } from "ethers";
+import { createVerifiedFetch } from "@helia/verified-fetch";
 
 const source = "ipfs" as const;
 
@@ -42,6 +43,7 @@ const source = "ipfs" as const;
 export class DappnodeRepository extends ApmRepository {
   protected ipfs: KuboRPCClient;
   protected timeout: number;
+  protected ipfsGatewayUrl: string;
 
   /**
    * Constructs an instance of DappnodeRepository
@@ -51,6 +53,7 @@ export class DappnodeRepository extends ApmRepository {
   constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
     super(ethersProvider);
     this.timeout = timeout || 30 * 1000;
+    this.ipfsGatewayUrl = ipfsUrl;
     this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });
   }
 
@@ -231,9 +234,9 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     // Process matched entries. If multiple files are allowed, and more than one file matches, we parse all of them.
-    const { maxSize: maxLength, format } = fileConfig;
+    const { format } = fileConfig;
     const contents = await Promise.all(
-      matchingEntries.map((entry) => this.writeFileToMemory(entry.cid.toString(), maxLength))
+      matchingEntries.map((entry) => this.getVerifiedContentFromGateway(entry.cid.toString()))
     );
 
     // If multiple files are allowed, we return an array of parsed assets.
@@ -246,34 +249,22 @@ export class DappnodeRepository extends ApmRepository {
    * This function is intended for small files.
    *
    * @param hash - The content identifier (CID) of the file to download.
-   * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
    * @returns The downloaded file content as a UTF8 string.
-   * @throws Error when the maximum size is exceeded.
-   * @see catString
-   * @see catCarReaderToMemory
    */
-  public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
-    const chunks = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
-    const content = await this.unpackCarReader(carReader, root);
-    for await (const chunk of content) chunks.push(chunk);
+  private async getVerifiedContentFromGateway(hash: string): Promise<string> {
+    // TODO: Add max leght?
+    const cid = CID.parse(this.sanitizeIpfsPath(hash));
 
-    // Concatenate the chunks into a single Uint8Array
-    let totalLength = 0;
-    chunks.forEach((chunk) => (totalLength += chunk.length));
-    const buffer = new Uint8Array(totalLength);
-    let offset = 0;
-    chunks.forEach((chunk) => {
-      buffer.set(chunk, offset);
-      offset += chunk.length;
+    const customGatewayFetch = await createVerifiedFetch({
+      gateways: [this.ipfsGatewayUrl]
     });
 
-    if (maxLength && buffer.length >= maxLength) throw Error(`Maximum size ${maxLength} bytes exceeded`);
+    const response = await customGatewayFetch(cid);
 
-    // Convert the Uint8Array to a string
-    // TODO: This assumes the data is UTF-8 encoded. If it's not, you will need a more complex conversion. Research which encoding is used by IPFS.
-    const decoder = new TextDecoder("utf-8");
-    return decoder.decode(buffer);
+    // Log the full response body (assuming it's text-based)
+    const content = await response.text();
+
+    return content;
   }
 
   /**
@@ -379,7 +370,9 @@ export class DappnodeRepository extends ApmRepository {
 
   public async list(hash: string): Promise<IPFSEntry[]> {
     const files: IPFSEntry[] = [];
-    const dagGet = await this.ipfs.dag.get(CID.parse(this.sanitizeIpfsPath(hash)), { timeout: this.timeout });
+    const cid = CID.parse(this.sanitizeIpfsPath(hash));
+
+    const dagGet = await this.ipfs.dag.get(cid, { timeout: this.timeout });
     if (dagGet.value.Links)
       for (const link of dagGet.value.Links)
         files.push({
