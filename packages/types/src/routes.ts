@@ -227,6 +227,11 @@ export interface Routes {
   disableEthicalMetrics: () => Promise<void>;
 
   /**
+   * Returns current docker aliases from provided container
+   */
+  getContainerAliases: (containerId: string) => Promise<any>;
+
+  /**
    * Returns current core version in string if core was installed, else returns empty string
    */
   getCoreVersion: () => Promise<string>;
@@ -682,6 +687,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ethClientFallbackSet: {},
   ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
+  getContainerAliases: {},
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
   getIsConnectedToInternet: {},
