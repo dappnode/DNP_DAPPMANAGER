@@ -371,6 +371,12 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0xad734Bef91920621B3D2cb30E0f65461e324647E"
+    },
+    {
+      name: "Swarm Team",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0xdAD64d07A318476dc48257a0bB53a8e9a26C6B33"
     }
   ]
 };
