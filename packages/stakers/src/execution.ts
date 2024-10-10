@@ -32,6 +32,7 @@ export class Execution extends StakerComponent {
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
+      { dnpName: ExecutionClientHolesky.Reth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientMainnet.Geth, minVersion: "0.1.37" },
       { dnpName: ExecutionClientMainnet.Nethermind, minVersion: "1.0.27" },
       { dnpName: ExecutionClientMainnet.Erigon, minVersion: "0.1.34" },
