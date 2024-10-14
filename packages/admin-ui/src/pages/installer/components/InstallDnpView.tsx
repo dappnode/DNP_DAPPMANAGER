@@ -47,6 +47,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const [userSettings, setUserSettings] = useState({} as UserSettingsAllDnps);
   const [bypassCoreOpt, setBypassCoreOpt] = useState<boolean>();
   const [bypassSignedOpt, setBypassSignedOpt] = useState<boolean>();
+  const [bypassResolverOpt, setBypassResolverOpt] = useState<boolean>();
 
   const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -98,7 +99,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
               userSettings: difference(settings || {}, _userSettings),
               options: {
                 BYPASS_CORE_RESTRICTION: bypassCoreOpt,
-                BYPASS_SIGNED_RESTRICTION: bypassSignedOpt
+                BYPASS_SIGNED_RESTRICTION: bypassSignedOpt,
+                BYPASS_RESOLVER: bypassResolverOpt
               }
             }),
           dnpName
@@ -169,6 +171,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       available: !dnp.signedSafeAll,
       checked: bypassSignedOpt ?? false,
       toggle: () => setBypassSignedOpt((x) => !x)
+    },
+    {
+      name: "Bypass not compatible restriction",
+      available: !dnp.compatible,
+      checked: bypassResolverOpt ?? false,
+      toggle: () => setBypassResolverOpt((x) => !x)
     }
   ].filter((option) => option.available);
 
