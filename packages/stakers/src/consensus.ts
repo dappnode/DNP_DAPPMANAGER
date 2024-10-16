@@ -4,6 +4,7 @@ import {
   ConsensusClientLukso,
   ConsensusClientMainnet,
   ConsensusClientPrater,
+  ConsensusClientEphemery,
   Network,
   StakerItem,
   UserSettings
@@ -28,7 +29,8 @@ export class Consensus extends StakerComponent {
     [Network.Gnosis]: db.consensusClientGnosis,
     [Network.Prater]: db.consensusClientPrater,
     [Network.Holesky]: db.consensusClientHolesky,
-    [Network.Lukso]: db.consensusClientLukso
+    [Network.Lukso]: db.consensusClientLukso,
+    [Network.Ephemery]: db.consensusClientEphemery
   };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -61,6 +63,10 @@ export class Consensus extends StakerComponent {
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
       { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" }
+    ],
+    [Network.Ephemery]: [
+      { dnpName: ConsensusClientEphemery.Lodestar, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientEphemery.Teku, minVersion: "0.1.0" }
     ]
   };
 
