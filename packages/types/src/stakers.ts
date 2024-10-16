@@ -22,7 +22,8 @@ export enum ExecutionClientMainnet {
   Geth = "geth.dnp.dappnode.eth",
   Besu = "besu.public.dappnode.eth",
   Erigon = "erigon.dnp.dappnode.eth",
-  Nethermind = "nethermind.public.dappnode.eth"
+  Nethermind = "nethermind.public.dappnode.eth",
+  Reth = "reth.dnp.dappnode.eth"
 }
 export enum SignerMainnet {
   Web3signer = "web3signer.dnp.dappnode.eth"
