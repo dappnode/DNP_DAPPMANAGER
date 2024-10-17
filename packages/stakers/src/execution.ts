@@ -4,7 +4,7 @@ import {
   ExecutionClientLukso,
   ExecutionClientMainnet,
   ExecutionClientPrater,
-  ExecutionClientEphemery
+  ExecutionClientEphemery,
   Network,
   StakerItem,
   UserSettings
