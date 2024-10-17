@@ -4,6 +4,7 @@ import {
   ExecutionClientLukso,
   ExecutionClientMainnet,
   ExecutionClientPrater,
+  ExecutionClientEphemery
   Network,
   StakerItem,
   UserSettings
@@ -27,7 +28,8 @@ export class Execution extends StakerComponent {
     [Network.Gnosis]: db.executionClientGnosis,
     [Network.Prater]: db.executionClientPrater,
     [Network.Holesky]: db.executionClientHolesky,
-    [Network.Lukso]: db.executionClientLukso
+    [Network.Lukso]: db.executionClientLukso,
+    [Network.Ephemery]: db.executionClientEphemery
   };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
@@ -55,7 +57,11 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
+    [Network.Lukso]: [
+      { dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }
+    ],
+    [Network.Ephemery]: [
+      { dnpName: ExecutionClientEphemery.Besu, minVersion: "0.1.0" }]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
