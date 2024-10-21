@@ -201,10 +201,16 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
           url: "https://0xb0b07cd0abef743db4260b0ed50619cf6ad4d82064cb4fbec9d3ec530f7c5e6793d9f286c4e082c0244ffb9f2658fe88@bloxroute.regulated.blxrbdn.com"
         },
         {
-          operator: "Eden Network",
+          operator: " Titan (Non-Filtered)",
+          ofacCompliant: false,
+          docs: "https://docs.titanrelay.xyz/",
+          url: "https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@global.titanrelay.xyz"
+        },
+        {
+          operator: " Titan (Filtered)",
           ofacCompliant: true,
-          docs: "https://docs.edennetwork.io/",
-          url: "https://0xb3ee7afcf27f1f1259ac1787876318c6584ee353097a50ed84f51a1f21a323b3736f271a895c7ce918c038e4265918be@relay.edennetwork.io"
+          docs: "https://docs.titanrelay.xyz/",
+          url: "https://0x8c4ed5e24fe5c6ae21018437bde147693f68cda427cd1122cf20819c30eda7ed74f72dece09bb313f2a1855595ab677d@regional.titanrelay.xyz"
         },
         {
           operator: "Aestus",
