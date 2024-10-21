@@ -57,11 +57,8 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Lukso]: [
-      { dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }
-    ],
-    [Network.Ephemery]: [
-      { dnpName: ExecutionClientEphemery.Besu, minVersion: "0.1.0" }]
+    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }],
+    [Network.Ephemery]: [{ dnpName: ExecutionClientEphemery.Geth, minVersion: "0.1.0" }]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {

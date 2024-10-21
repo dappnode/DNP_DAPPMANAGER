@@ -129,3 +129,28 @@ export const mevBoostLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
   Object.keys({ MEVBOOST_LUKSO })[0]
 );
+
+// Ephemery
+
+const CONSENSUS_CLIENT_EPHEMERY = "consensus-client-ephemery";
+const EXECUTION_CLIENT_EPHEMERY = "execution-client-ephemery";
+const MEVBOOST_EPHEMERY = "mevboost-ephemery";
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusClientEphemery = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_EPHEMERY, null),
+  Object.keys({ CONSENSUS_CLIENT_EPHEMERY })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionClientEphemery = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_EPHEMERY, null),
+  Object.keys({ EXECUTION_CLIENT_EPHEMERY })[0]
+);
+
+export const mevBoostEphemery = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_EPHEMERY, false),
+  Object.keys({ MEVBOOST_EPHEMERY })[0]
+);

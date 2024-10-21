@@ -7,7 +7,8 @@ export enum Network {
   Prater = "prater",
   Gnosis = "gnosis",
   Lukso = "lukso",
-  Holesky = "holesky"
+  Holesky = "holesky",
+  Ephemery = "ephemery"
 }
 
 // MAINNET
@@ -30,6 +31,20 @@ export enum SignerMainnet {
 }
 export enum MevBoostMainnet {
   Mevboost = "mev-boost.dnp.dappnode.eth"
+}
+
+// EPHEMERY
+export enum ConsensusClientEphemery {
+  Lodestar = "lodestar-ephemery.dnp.dappnode.eth",
+  Teku = "teku-ephemery.dnp.dappnode.eth"
+}
+
+export enum ExecutionClientEphemery {
+  Geth = "ephemery-geth.dnp.dappnode.eth"
+}
+
+export enum SignerEphemery {
+  Web3signer = "web3signer-ephemery.dnp.dappnode.eth"
 }
 
 // PRATER
