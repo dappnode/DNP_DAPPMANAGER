@@ -60,6 +60,16 @@ const StakersRoot: React.FC = () => {
           description:
             "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
         })
+    },
+    {
+      subPath: "ephemery",
+      title: "Ephemery",
+      component: () =>
+        StakerNetwork({
+          network: Network.Ephemery,
+          description:
+            "The Ephemery testnet is a single network that rolls back to the genesis after a set period of time. This kind of network is focused on short term and heavy testing usecases. The purpose of this is also to avoid problems like insufficient testnet funds, inactive validators, state bloat, and similar issues faced by long-running testnets."
+        })
     }
   ];
 
