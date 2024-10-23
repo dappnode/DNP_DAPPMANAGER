@@ -40,7 +40,8 @@ export enum ConsensusClientEphemery {
 }
 
 export enum ExecutionClientEphemery {
-  Geth = "ephemery-geth.dnp.dappnode.eth"
+  Geth = "ephemery-geth.dnp.dappnode.eth",
+  Besu = "ephemery-besu.dnp.dappnode.eth"
 }
 
 export enum SignerEphemery {
