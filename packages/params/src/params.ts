@@ -121,7 +121,8 @@ export const params = {
     [Network.Holesky]: "holesky_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
-    [Network.Lukso]: "lukso_network"
+    [Network.Lukso]: "lukso_network",
+    [Network.Ephemery]: "ephemery_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2", // "10.20.0.2"
