@@ -15,7 +15,7 @@ export class MevBoost extends StakerComponent {
     [Network.Lukso]: db.mevBoostLukso
   };
 
-  protected static readonly CompatibleMevBoost: Record<Network, { dnpName: string; minVersion: string } | null> = {
+  static readonly CompatibleMevBoost: Record<Network, { dnpName: string; minVersion: string } | null> = {
     [Network.Mainnet]: {
       dnpName: MevBoostMainnet.Mevboost,
       minVersion: "0.1.0"
