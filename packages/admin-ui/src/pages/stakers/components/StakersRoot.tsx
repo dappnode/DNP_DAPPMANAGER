@@ -82,13 +82,17 @@ const StakersRoot: React.FC = () => {
 
       <div className="horizontal-navbar">
         {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
-        {filteredStakersItems.map((route) => (
-          <button key={route.subPath} className="item-container">
-            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-              {route.title}
-            </NavLink>
-          </button>
-        ))}
+        {filteredStakersItems.map(
+          (route) =>
+          // hide "ephemery" tab until clients and pkgs are published
+            route.subPath !== "ephemery" && (
+              <button key={route.subPath} className="item-container">
+                <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+                  {route.title}
+                </NavLink>
+              </button>
+            )
+        )}
       </div>
 
       <div className="section-spacing">
