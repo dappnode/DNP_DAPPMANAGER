@@ -12,6 +12,7 @@ import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js"
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { removeBannedRelays } from "./removeBannedRelays.js";
 
 export class MigrationError extends Error {
   migration: string;
@@ -146,6 +147,15 @@ export async function executeMigrations(
     migrationErrors.push({
       migration: "create docker staker network and persist selected staker pkgs per network",
       coreVersion: "0.2.95",
+      name: "MIGRATION_ERROR",
+      message: e
+    })
+  );
+
+  await removeBannedRelays(mevBoost).catch((e) =>
+    migrationErrors.push({
+      migration: "remove banned relays from the mevboost package",
+      coreVersion: "0.2.99",
       name: "MIGRATION_ERROR",
       message: e
     })
