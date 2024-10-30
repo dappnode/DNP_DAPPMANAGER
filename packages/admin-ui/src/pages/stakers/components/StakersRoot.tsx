@@ -74,25 +74,21 @@ const StakersRoot: React.FC = () => {
   ];
 
   // Remove the "Prater" tab from the stakersItems array
-  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater");
-
+  // hide "ephemery" tab until clients and pkgs are published
+  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater" && item.subPath !== "ephemery");
   return (
     <>
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
-        {filteredStakersItems.map(
-          (route) =>
-          // hide "ephemery" tab until clients and pkgs are published
-            route.subPath !== "ephemery" && (
-              <button key={route.subPath} className="item-container">
-                <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                  {route.title}
-                </NavLink>
-              </button>
-            )
-        )}
+        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation and "Ephemery"*/}
+        {filteredStakersItems.map((route) => (
+          <button key={route.subPath} className="item-container">
+            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+              {route.title}
+            </NavLink>
+          </button>
+        ))}
       </div>
 
       <div className="section-spacing">
