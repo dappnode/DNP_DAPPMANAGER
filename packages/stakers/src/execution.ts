@@ -12,6 +12,9 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
+import { listPackage } from "@dappnode/dockerapi";
+import { logs } from "@dappnode/logger";
+import { gt } from "semver";
 
 // TODO: move ethereumClient logic here
 
@@ -80,7 +83,7 @@ export class Execution extends StakerComponent {
         return;
       }
 
-      const userSettings = this.getUserSettings(network, currentExecutionDnpName);
+      const userSettings = await this.getUserSettings(network, currentExecutionDnpName);
 
       await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
 
@@ -95,7 +98,7 @@ export class Execution extends StakerComponent {
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       compatibleClients: Execution.CompatibleExecutions[network],
-      userSettings: this.getUserSettings(network, newExecutionDnpName),
+      userSettings: await this.getUserSettings(network, newExecutionDnpName),
       prevClient: prevExecClientDnpName
     });
 
@@ -111,14 +114,14 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private getUserSettings(network: Network, dnpName: string | null): UserSettings {
+  private async getUserSettings(network: Network, dnpName: string | null): Promise<UserSettings> {
     if (!dnpName) return {};
 
     return {
       networks: {
         rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
-          [this.getExecutionServiceName(dnpName)]: {
+          [await this.getExecutionServiceName(dnpName)]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
               aliases: [`execution.${network}.staker.dappnode`]
             },
@@ -136,9 +139,19 @@ export class Execution extends StakerComponent {
    *
    * TODO: find a better way to get the service name of the execution client or force execution clients to have same service name "execution", similar as consensus clients with beacon-chain and validator services
    */
-  private getExecutionServiceName(dnpName: string): string {
+  private async getExecutionServiceName(dnpName: string): Promise<string> {
     // TODO: geth mainnet is the only execution with service name === dnpName. See https://github.com/dappnode/DAppNodePackage-geth/blob/7e8e5aa860a8861986f675170bfa92215760d32e/docker-compose.yml#L3
-    if (dnpName === ExecutionClientMainnet.Geth) return ExecutionClientMainnet.Geth;
+    if (dnpName === ExecutionClientMainnet.Geth) {
+      logs.info(`Execution mainnet ${dnpName} has service name ${dnpName}`);
+      const version = await this.getExecutionVersion(dnpName);
+      if (gt(version, "0.1.43")) {
+        logs.info(`Version ${version} is greater than 0.1.43. Using service name "geth"`);
+        return "geth";
+      }
+      logs.info(`Version ${version} is less than 0.1.44. Using service name ${dnpName}`);
+      return ExecutionClientMainnet.Geth;
+    }
+
     if (dnpName.includes("geth")) return "geth";
     if (dnpName.includes("nethermind")) return "nethermind";
     if (dnpName.includes("erigon")) return "erigon";
@@ -146,5 +159,19 @@ export class Execution extends StakerComponent {
     if (dnpName.includes("reth")) return "reth";
 
     return dnpName;
+  }
+
+  private async getExecutionVersion(dnpName: string): Promise<string> {
+    const isInstalled = await this.isPackageInstalled(dnpName);
+
+    if (isInstalled) {
+      const version = (await listPackage({ dnpName })).version;
+      logs.info(`Execution ${dnpName} is installed. Using version ${version}`);
+      return version;
+    } else {
+      const version = (await this.dappnodeInstaller.getVersionAndIpfsHash({ dnpNameOrHash: dnpName })).version;
+      logs.info(`Execution ${dnpName} is not installed. Using version ${version} from APM`);
+      return version;
+    }
   }
 }
