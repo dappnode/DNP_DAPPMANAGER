@@ -11,6 +11,8 @@ import {
   ContainersStatus
 } from "@dappnode/types";
 import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath } from "@dappnode/utils";
+import { gt } from "semver";
+import { logs } from "@dappnode/logger";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -74,6 +76,7 @@ function getInstallerPackageData(
 
   // If composePath does not exist, or is invalid: returns {}
   const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
+  migrateGethUserSettingsIfNeeded(prevUserSet, dnpName, semVersion);
   const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
   // Append to compose
@@ -98,4 +101,33 @@ function getInstallerPackageData(
     dockerTimeout,
     containersStatus
   };
+}
+
+/**
+ * Migrates the user settings from the old service name to the new service name
+ *
+ * Edge case for dnpName "geth.dnp.dappnode.eth" and serviceName "geth.dnp.dappnode.eth"
+ * The service name of the geth package has migrated to "geth" and the user settings should be applied to the new service name
+ * This edge case is implemented in core release 0.3.0 and should be safe to remove in the future
+ */
+function migrateGethUserSettingsIfNeeded(prevUserSet: UserSettings, dnpName: string, semVersion: string) {
+  const gethDnpName = "geth.dnp.dappnode.eth";
+  const legacyGethServiceName = gethDnpName;
+  // migrate networks
+  if (dnpName === gethDnpName && gt(semVersion, "0.1.43")) {
+    logs.info(`Version ${semVersion} is greater than 0.1.43. Using service name "geth"`);
+    if (prevUserSet.networks) {
+      logs.info(`Migrating user settings networks from geth.dnp.dappnode.eth to geth`);
+
+      prevUserSet.networks.serviceNetworks.geth = prevUserSet.networks.serviceNetworks[legacyGethServiceName];
+      delete prevUserSet.networks.serviceNetworks[legacyGethServiceName];
+    }
+
+    // migrate envs
+    if (prevUserSet.environment) {
+      logs.info(`Migrating user settings environment from geth.dnp.dappnode.eth to geth`);
+      prevUserSet.environment.geth = prevUserSet.environment[legacyGethServiceName];
+      delete prevUserSet.environment[legacyGethServiceName];
+    }
+  }
 }
