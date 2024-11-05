@@ -7,3 +7,4 @@ export * from "./rollbackPackages.js";
 export * from "./runPackages.js";
 export * from "./restartPatch.js";
 export * from "./writeAndValidateFiles.js";
+export * from "./checkInstallRequirements.js";

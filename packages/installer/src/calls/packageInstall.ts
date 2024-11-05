@@ -10,7 +10,8 @@ import {
   rollbackPackages,
   writeAndValidateFiles,
   postInstallClean,
-  afterInstall
+  afterInstall,
+  checkInstallRequirements
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
@@ -53,6 +54,7 @@ export async function packageInstall(
       if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
         throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
+      if (!release.isCore) await checkInstallRequirements({ manifest: release.manifest });
     }
 
     // Gather all data necessary for the install
