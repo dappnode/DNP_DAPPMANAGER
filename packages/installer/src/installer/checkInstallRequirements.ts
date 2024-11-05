@@ -7,6 +7,7 @@ import { valid, gt } from "semver";
  * Get the install requirements and throw an error if they are not met
  */
 export async function checkInstallRequirements({ manifest }: { manifest: Manifest }): Promise<void> {
+  if (manifest.type === "dncore") return;
   const installedPackages = await listPackages();
   const packagesRequiredToBeUninstalled = getRequiresUninstallPackages({ manifest, installedPackages });
   const requiresCoreUpdate = getRequiresCoreUpdate({ manifest, installedPackages });
