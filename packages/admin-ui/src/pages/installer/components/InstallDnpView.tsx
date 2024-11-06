@@ -174,7 +174,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
 
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
-  console.log("disableInstallation", disableInstallation);
 
   const setupSubPath = "setup";
   const permissionsSubPath = "permissions";
@@ -344,7 +343,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
             <InstallerStepInfo
               dnp={dnp}
               onInstall={() => goNext()}
-              disableInstallation={false}
+              disableInstallation={disableInstallation}
               optionsArray={optionsArray}
             />
           }
