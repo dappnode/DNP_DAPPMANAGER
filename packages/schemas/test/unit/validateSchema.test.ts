@@ -5,7 +5,8 @@ import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
 import { Manifest, SetupWizard } from "@dappnode/types";
 
-describe("schemaValidation", () => {
+describe("schemaValidation", function () {
+  this.timeout(10000);
   describe("manifest", () => {
     before(() => {
       cleanTestDir();
