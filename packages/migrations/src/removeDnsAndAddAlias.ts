@@ -48,7 +48,7 @@ export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean
       // print composeService.dns
       logs.info(`DNS from ${serviceName} in ${dnpName} compose file: ${composeService.dns}`);
       // check composeService has the key dns
-      if (Object.prototype.hasOwnProperty.call(composeService, "dns")) {
+      if ("dns" in composeService) {
         logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
         // setting undefined a yaml property might result into an error afterwards making js-yaml
         // adding the following value to the undefined `Error parsing YAML: unknown tag !<tag:yaml.org,2002:js/undefined>`
