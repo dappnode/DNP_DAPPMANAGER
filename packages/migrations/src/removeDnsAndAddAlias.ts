@@ -8,7 +8,8 @@ import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getNetworkContainerConfig
+  getNetworkContainerConfig,
+  listPackages
 } from "@dappnode/dockerapi";
 import { gte, lt, clean } from "semver";
 import { getDockerComposePath, getIsMonoService, getPrivateNetworkAliases, shell } from "@dappnode/utils";
@@ -26,9 +27,34 @@ const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
  * "service1.example.dappnode" if the package is multiservice
  * "service1.example.dappnode" and "example.dappnode" if the package is multiservice and has in manifest mainservice
  */
-export async function addAliasToRunningContainers(): Promise<void> {
+export async function removeDnsAndAddAlias(): Promise<void> {
+  const packages = await listPackages();
+  for (const pkg of packages) removeDnsFromPackageComposeFile(pkg.dnpName, pkg.isCore);
+
   const containers = await listPackageContainers();
   await addAliasToGivenContainers(containers);
+}
+
+export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
+  const compose = new ComposeFileEditor(dnpName, isCore);
+  const services = compose.services();
+
+  for (const serviceName of Object.keys(services)) {
+    try {
+      const composeService = services[serviceName].get();
+      // check composeService has the key dns
+
+      if (Object.prototype.hasOwnProperty.call(composeService, "dns")) {
+        logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
+        // setting undefined a yaml property might result into an error afterwards making js-yaml
+        // adding the following value to the undefined `Error parsing YAML: unknown tag !<tag:yaml.org,2002:js/undefined>`
+        delete composeService.dns;
+        compose.write();
+      }
+    } catch (e) {
+      logs.error(`Error removing DNS from ${serviceName} in ${dnpName} compose file`, e);
+    }
+  }
 }
 
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {

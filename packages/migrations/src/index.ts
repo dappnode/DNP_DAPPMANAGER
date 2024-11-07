@@ -1,8 +1,7 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
-import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
+import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
@@ -62,15 +61,6 @@ export async function executeMigrations(
     })
   );
 
-  await removeDnsFromComposeFiles().catch((e) =>
-    migrationErrors.push({
-      migration: "remove bind DNS from docker compose files",
-      coreVersion: "0.2.82",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
   await ensureCoreComposesHardcodedIpsRange().catch((e) =>
     migrationErrors.push({
       migration: "ensure core composes files has correct hardcoded IPs in range",
@@ -106,7 +96,7 @@ export async function executeMigrations(
     })
   );
 
-  await addAliasToRunningContainers().catch((e) =>
+  await removeDnsAndAddAlias().catch((e) =>
     migrationErrors.push({
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80",
