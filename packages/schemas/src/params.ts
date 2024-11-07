@@ -16,7 +16,8 @@ export const dockerParams = {
     "wireguard.dnp.dappnode.eth",
     "core.dnp.dappnode.eth",
     "dappnode-exporter.dnp.dappnode.eth",
-    "dms.dnp.dappnode.eth"
+    "dms.dnp.dappnode.eth",
+    "tailscale.dnp.dappnode.eth"
   ],
   DOCKER_CORE_ALIASES: [
     "dappmanager.dappnode",
