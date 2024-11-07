@@ -47,7 +47,7 @@ jobs:
       - name: Build and Publish
         run: |
           cd packages/${{ github.event.inputs.packageName }}
-          yarn npm publish --tag ${{ github.event.inputs.version }} --access public
+          yarn npm publish --tag ${{ github.event.inputs.version }} --access public --otp ${{ secrets.NPM_TOKEN }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
