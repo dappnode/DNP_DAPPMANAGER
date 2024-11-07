@@ -18,6 +18,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Validate package name
         run: |
           if [[ ${{ github.event.inputs.packageName }} != "schemas" && ${{ github.event.inputs.packageName }} != "types" && ${{ github.event.inputs.packageName }} != "toolkit" ]]; then
