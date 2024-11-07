@@ -26,7 +26,9 @@ export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean
     const composeService = services[serviceName].get();
     if (composeService.dns) {
       logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
-      composeService.dns = undefined;
+      // setting undefined a yaml property might result into an error afterwards making js-yaml
+      // adding the following value to the undefined `Error parsing YAML: unknown tag !<tag:yaml.org,2002:js/undefined>`
+      delete composeService.dns;
       compose.write();
     }
   }
