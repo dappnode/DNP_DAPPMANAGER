@@ -3,7 +3,7 @@ import { uniq } from "lodash-es";
 import { ComposeNetwork, ComposeServiceNetwork, PackageContainer } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
+import { ComposeFileEditor, ComposeServiceEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
   dockerNetworkReconnect,
@@ -44,16 +44,15 @@ export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean
   for (const serviceName of Object.keys(services)) {
     logs.info(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
     try {
-      const composeService = services[serviceName].get();
-      // print composeService.dns
-      logs.info(`DNS from ${serviceName} in ${dnpName} compose file: ${composeService.dns}`);
+      const composeServiceEditor = new ComposeServiceEditor(compose, serviceName);
+      const composeService = composeServiceEditor.get();
+
       // check composeService has the key dns
       if ("dns" in composeService) {
         logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
         // setting undefined a yaml property might result into an error afterwards making js-yaml
         // adding the following value to the undefined `Error parsing YAML: unknown tag !<tag:yaml.org,2002:js/undefined>`
-        delete composeService.dns;
-        compose.write();
+        composeServiceEditor.removeDns();
       }
     } catch (e) {
       logs.error(`Error removing DNS from ${serviceName} in ${dnpName} compose file`, e);
