@@ -26,7 +26,7 @@
     "@dappnode/httpsportal": "workspace:^0.1.0",
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
-    "@dappnode/schemas": "^0.1.14",
+    "@dappnode/schemas": "workspace:^0.1.22",
     "@dappnode/toolkit": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
