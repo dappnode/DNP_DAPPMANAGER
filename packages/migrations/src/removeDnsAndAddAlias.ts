@@ -36,14 +36,18 @@ export async function removeDnsAndAddAlias(): Promise<void> {
 }
 
 export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
+  logs.info(`Checking DNS from ${dnpName} compose file`);
+
   const compose = new ComposeFileEditor(dnpName, isCore);
   const services = compose.services();
 
   for (const serviceName of Object.keys(services)) {
+    logs.info(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
     try {
       const composeService = services[serviceName].get();
+      // print composeService.dns
+      logs.info(`DNS from ${serviceName} in ${dnpName} compose file: ${composeService.dns}`);
       // check composeService has the key dns
-
       if (Object.prototype.hasOwnProperty.call(composeService, "dns")) {
         logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
         // setting undefined a yaml property might result into an error afterwards making js-yaml
