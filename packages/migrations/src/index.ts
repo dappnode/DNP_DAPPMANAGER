@@ -21,8 +21,6 @@ export async function executeMigrations(
   signer: Signer,
   mevBoost: MevBoost
 ): Promise<void> {
-  const migrationErrors = [];
-
   const migrations = [
     {
       fn: removeLegacyDockerAssets,
@@ -90,13 +88,15 @@ export async function executeMigrations(
     }
   ];
 
-  for (const { fn, migration, coreVersion } of migrations) {
-    try {
-      await fn();
-    } catch (e) {
-      migrationErrors.push(new Error(`Migration ${migration} (${coreVersion}) failed: ${e.message}`));
-    }
-  }
+  const migrationPromises = migrations.map(({ fn, migration, coreVersion }) =>
+    fn().catch((e) => new Error(`Migration ${migration} (${coreVersion}) failed: ${e.message}`))
+  );
+
+  // Run all migrations concurrently and wait for all to settle
+  const results = await Promise.allSettled(migrationPromises);
+
+  // Collect any errors
+  const migrationErrors = results.filter((result) => result.status === "rejected").map((result) => result.reason);
 
   if (migrationErrors.length > 0) {
     throw new AggregateError(migrationErrors, "One or more migrations failed");
