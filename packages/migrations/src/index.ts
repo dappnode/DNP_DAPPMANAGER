@@ -12,16 +12,33 @@ import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAn
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
-/**
- * Executes migrations required for the current DAppNode core version.
- */
+class MigrationError extends Error {
+  errors: Error[];
+
+  constructor(errors: Error[]) {
+    super("One or more migrations failed");
+    this.name = "MigrationError";
+    this.errors = errors; // Retain the original error details
+  }
+
+  toString(): string {
+    return `${this.name}: ${this.message}\n` + this.errors.map((err) => err.message).join("\n");
+  }
+}
+
+interface Migration {
+  fn: () => Promise<void>;
+  migration: string;
+  coreVersion: string;
+}
+
 export async function executeMigrations(
   execution: Execution,
   consensus: Consensus,
   signer: Signer,
   mevBoost: MevBoost
 ): Promise<void> {
-  const migrations = [
+  const migrations: Migration[] = [
     {
       fn: removeLegacyDockerAssets,
       migration: "bundle legacy ops to prevent spamming the docker API",
@@ -96,9 +113,11 @@ export async function executeMigrations(
   const results = await Promise.allSettled(migrationPromises);
 
   // Collect any errors
-  const migrationErrors = results.filter((result) => result.status === "rejected").map((result) => result.reason);
+  const migrationErrors = results
+    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+    .map((result) => result.reason);
 
   if (migrationErrors.length > 0) {
-    throw new AggregateError(migrationErrors, "One or more migrations failed");
+    throw new MigrationError(migrationErrors);
   }
 }
