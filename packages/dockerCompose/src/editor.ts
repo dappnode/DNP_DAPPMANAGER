@@ -77,15 +77,13 @@ export class ComposeServiceEditor {
   }
 
   /**
-   * Remove the property, dont append undefined to the yaml
+   * Remove the property directly from the service.
    */
   removeDns(): void {
-    this.edit((service) => {
-      if (!service.dns) return service;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { dns, ...rest } = service;
-      return rest;
-    });
+    const service = this.get();
+    if ("dns" in service) {
+      delete service.dns;
+    }
   }
 
   removeNetworkAliases(networkName: string, aliasesToRemove: string[], serviceNetwork: ComposeServiceNetwork): void {
