@@ -81,10 +81,10 @@ export class ComposeServiceEditor {
    */
   removeDns(): void {
     const service = this.get();
-    if ('dns' in service) {
+    if ("dns" in service) {
       delete service.dns;
     }
-  }  
+  }
 
   removeNetworkAliases(networkName: string, aliasesToRemove: string[], serviceNetwork: ComposeServiceNetwork): void {
     this.edit((service) => {
