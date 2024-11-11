@@ -3,12 +3,13 @@ import { uniq } from "lodash-es";
 import { ComposeNetwork, ComposeServiceNetwork, PackageContainer } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { params } from "@dappnode/params";
-import { ComposeFileEditor, parseServiceNetworks } from "@dappnode/dockercompose";
+import { ComposeFileEditor, ComposeServiceEditor, parseServiceNetworks } from "@dappnode/dockercompose";
 import {
   dockerComposeUp,
   dockerNetworkReconnect,
   listPackageContainers,
-  getNetworkContainerConfig
+  getNetworkContainerConfig,
+  listPackages
 } from "@dappnode/dockerapi";
 import { gte, lt, clean } from "semver";
 import { getDockerComposePath, getIsMonoService, getPrivateNetworkAliases, shell } from "@dappnode/utils";
@@ -26,9 +27,37 @@ const dncoreNetworkName = params.DOCKER_PRIVATE_NETWORK_NAME;
  * "service1.example.dappnode" if the package is multiservice
  * "service1.example.dappnode" and "example.dappnode" if the package is multiservice and has in manifest mainservice
  */
-export async function addAliasToRunningContainers(): Promise<void> {
+export async function removeDnsAndAddAlias(): Promise<void> {
+  const packages = await listPackages();
+  for (const pkg of packages) removeDnsFromPackageComposeFile(pkg.dnpName, pkg.isCore);
+
   const containers = await listPackageContainers();
   await addAliasToGivenContainers(containers);
+}
+
+export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
+  logs.info(`Checking DNS from ${dnpName} compose file`);
+
+  const compose = new ComposeFileEditor(dnpName, isCore);
+  const services = compose.services();
+
+  for (const serviceName of Object.keys(services)) {
+    logs.info(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
+    try {
+      const composeServiceEditor = new ComposeServiceEditor(compose, serviceName);
+      const composeService = composeServiceEditor.get();
+
+      // check composeService has the key dns
+      if ("dns" in composeService) {
+        logs.info(`Removing DNS from ${serviceName} in ${dnpName} compose file`);
+        // setting undefined a yaml property might result into an error afterwards making js-yaml
+        // adding the following value to the undefined `Error parsing YAML: unknown tag !<tag:yaml.org,2002:js/undefined>`
+        composeServiceEditor.removeDns();
+      }
+    } catch (e) {
+      logs.error(`Error removing DNS from ${serviceName} in ${dnpName} compose file`, e);
+    }
+  }
 }
 
 export async function addAliasToGivenContainers(containers: PackageContainer[]): Promise<void> {

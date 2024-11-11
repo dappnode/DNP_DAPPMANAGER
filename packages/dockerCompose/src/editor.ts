@@ -76,6 +76,16 @@ export class ComposeServiceEditor {
     }));
   }
 
+  /**
+   * Remove the property directly from the service.
+   */
+  removeDns(): void {
+    const service = this.get();
+    if ("dns" in service) {
+      delete service.dns;
+    }
+  }
+
   removeNetworkAliases(networkName: string, aliasesToRemove: string[], serviceNetwork: ComposeServiceNetwork): void {
     this.edit((service) => {
       const networks = parseServiceNetworks(service.networks || {});
@@ -233,7 +243,9 @@ export class ComposeEditor {
 
   static readFrom(composePath: string): Compose {
     const yamlString = fs.readFileSync(composePath, "utf8");
-    return yamlParse<Compose>(yamlString);
+    // Replace problematic tag with a placeholder value such as null
+    const yamlStringParsed = yamlString.replace(/!<tag:yaml\.org,2002:js\/undefined>/g, "null");
+    return yamlParse<Compose>(yamlStringParsed);
   }
 
   static getComposePath(dnpName: string, isCore: boolean): string {
