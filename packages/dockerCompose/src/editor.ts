@@ -243,7 +243,9 @@ export class ComposeEditor {
 
   static readFrom(composePath: string): Compose {
     const yamlString = fs.readFileSync(composePath, "utf8");
-    return yamlParse<Compose>(yamlString);
+    // Replace problematic tag with a placeholder value such as null
+    const yamlStringParsed = yamlString.replace(/!<tag:yaml\.org,2002:js\/undefined>/g, "null");
+    return yamlParse<Compose>(yamlStringParsed);
   }
 
   static getComposePath(dnpName: string, isCore: boolean): string {
