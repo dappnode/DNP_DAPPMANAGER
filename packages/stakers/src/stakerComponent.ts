@@ -155,7 +155,9 @@ export class StakerComponent {
       composeEditor.applyUserSettings(userSettings, { dnpName });
       const newSettings = composeEditor.getUserSettings();
 
-      if (!isMatch(previousSettings, newSettings)) {
+      // TODO: remove nimbus condition once nimbus published with multi-service
+      // isMatch returns true when migrating from single-service to multi-service in the nimbus package
+      if (!isMatch(previousSettings, newSettings || dnpName.includes("nimbus"))) {
         composeEditor.write();
         forceRecreate = true;
         logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
