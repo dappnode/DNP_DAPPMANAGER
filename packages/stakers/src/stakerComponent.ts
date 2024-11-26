@@ -154,10 +154,15 @@ export class StakerComponent {
 
       composeEditor.applyUserSettings(userSettings, { dnpName });
       const newSettings = composeEditor.getUserSettings();
+      if (dnpName === "nimbus.dnp.dappnode.eth") {
+        logs.info("nimbus.dnp.dappnode.eth newSettings: ", JSON.stringify(newSettings));
+      }
+
+      logs.info("set installed staker pkg config for dnp: ", dnpName);
 
       // TODO: remove nimbus condition once nimbus published with multi-service
       // isMatch returns true when migrating from single-service to multi-service in the nimbus package
-      if (!isMatch(previousSettings, newSettings || dnpName.includes("nimbus"))) {
+      if (!isMatch(previousSettings, newSettings) || dnpName.includes("nimbus")) {
         composeEditor.write();
         forceRecreate = true;
         logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
