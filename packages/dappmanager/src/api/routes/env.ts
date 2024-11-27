@@ -9,7 +9,7 @@ interface Params {
 /**
  * Query env from a package
  */
-export const envGet = wrapHandler<Params>(async (req, res) => {
+export const env = wrapHandler<Params>(async (req, res) => {
   const { dnpName, envName } = req.params;
 
   if (!dnpName || !envName) {
