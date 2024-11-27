@@ -159,7 +159,7 @@ export function startHttpApi({
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);
-  app.get("/env", routes.env);
+  app.get("/env/:dnpName", routes.env);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
   app.get("/package-manifest/:dnpName", routes.packageManifest);
   app.get("/metrics", routes.metrics);
