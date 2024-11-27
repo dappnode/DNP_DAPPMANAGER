@@ -46,6 +46,7 @@ startHttpApi({
     download: () => {},
     downloadWireguardConfig: () => {},
     downloadUserActionLogs: () => {},
+    env: () => {},
     fileDownload: () => {},
     globalEnvs: () => {},
     notificationSend: () => {},
