@@ -11,3 +11,4 @@ export * from "./upload.js";
 export * from "./downloadWireguardConfig.js";
 export * from "./notificationSend.js";
 export * from "./metrics.js";
+export * from "./envGet.js";
