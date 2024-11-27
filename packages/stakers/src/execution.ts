@@ -97,6 +97,7 @@ export class Execution extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAlias: `execution.${network}.dncore.dappnode`,
       compatibleClients: Execution.CompatibleExecutions[network],
       userSettings: await this.getUserSettings(network, newExecutionDnpName),
       prevClient: prevExecClientDnpName

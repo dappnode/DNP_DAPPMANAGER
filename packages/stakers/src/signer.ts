@@ -67,6 +67,7 @@ export class Signer extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAlias: `signer.${network}.dncore.dappnode`,
       compatibleClients: [Signer.CompatibleSigners[network]],
       userSettings: this.getUserSettings(network),
       prevClient: Signer.CompatibleSigners[network].dnpName
