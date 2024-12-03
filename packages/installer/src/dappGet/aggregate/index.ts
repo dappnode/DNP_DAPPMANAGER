@@ -102,7 +102,7 @@ export default async function aggregate({
           await aggregateDependencies({
             dappnodeInstaller,
             name: dnpName,
-            versionRange: `>=${version}`,
+            versionRange: `*`,
             dnps,
             dappGetFetcher // #### Injected dependency
           });
