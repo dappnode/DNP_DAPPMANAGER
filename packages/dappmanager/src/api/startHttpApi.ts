@@ -31,6 +31,7 @@ export interface HttpRoutes {
   download: RequestHandler<{ fileId: string }>;
   downloadUserActionLogs: RequestHandler;
   downloadWireguardConfig: RequestHandler<{ device: string }>;
+  env: RequestHandler<{ dnpName: string; envName: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
   notificationSend: RequestHandler;
@@ -149,9 +150,7 @@ export function startHttpApi({
   app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
 
   // ADMIN ONLY methods that do not fit into RPC
-  // prettier-ignore
   app.get("/wireguard-config/:device", auth.onlyAdmin, routes.downloadWireguardConfig);
-  // prettier-ignore
   app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
   app.get("/file-download/:containerName", auth.onlyAdmin, routes.fileDownload);
   app.get("/download/:fileId", auth.onlyAdmin, routes.download);
@@ -160,10 +159,9 @@ export function startHttpApi({
 
   // Open endpoints (no auth)
   app.get("/global-envs/:name?", routes.globalEnvs);
-  // prettier-ignore
+  app.get("/env/:dnpName", routes.env);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
-  // prettier-ignore
-  app.get("/package-manifest/:dnpName",routes.packageManifest);
+  app.get("/package-manifest/:dnpName", routes.packageManifest);
   app.get("/metrics", routes.metrics);
   app.post("/sign", routes.sign);
   app.post("/data-send", routes.dataSend);
