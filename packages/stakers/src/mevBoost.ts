@@ -84,6 +84,7 @@ export class MevBoost extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAlias: `mev-boost.${network}.dncore.dappnode`,
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       userSettings: newMevBoostDnpName ? this.getUserSettings(network, newRelays) : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null
