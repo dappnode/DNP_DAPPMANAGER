@@ -102,7 +102,7 @@ export class Consensus extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
-      fullnodeAlias: `consensus.${network}.dncore.dappnode`,
+      fullnodeAliases: [`beacon-chain.${network}.dncore.dappnode`, `validator.${network}.dncore.dappnode`],
       compatibleClients: Consensus.CompatibleConsensus[network],
       userSettings,
       prevClient: prevConsClientDnpName

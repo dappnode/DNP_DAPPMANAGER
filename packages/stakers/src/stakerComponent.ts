@@ -56,14 +56,14 @@ export class StakerComponent {
   protected async setNew({
     newStakerDnpName,
     dockerNetworkName,
-    fullnodeAlias,
+    fullnodeAliases,
     compatibleClients,
     userSettings,
     prevClient
   }: {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
-    fullnodeAlias: string;
+    fullnodeAliases: string[];
     compatibleClients:
       | {
           dnpName: string;
@@ -86,7 +86,7 @@ export class StakerComponent {
       if (prevClient && compatibleClients)
         this.ensureCompatibilityRequirements(prevClient, compatibleClients, currentPkg.version);
       if (prevClient !== newStakerDnpName)
-        await this.unsetStakerPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAlias });
+        await this.unsetStakerPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
     }
 
     if (!newStakerDnpName) return;
@@ -184,14 +184,14 @@ export class StakerComponent {
   private async unsetStakerPkgConfig({
     pkg,
     dockerNetworkName,
-    fullnodeAlias
+    fullnodeAliases
   }: {
     pkg: InstalledPackageData;
     dockerNetworkName: string;
-    fullnodeAlias: string;
+    fullnodeAliases: string[];
   }): Promise<void> {
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
-    this.removeFullnodeAliasFromDncoreNetwork(pkg.dnpName, fullnodeAlias);
+    this.removeFullnodeAliasFromDncoreNetwork(pkg.dnpName, fullnodeAliases);
 
     // This recreates the package containers so that they include the recently added configuration
     // The flag --no-start is added so that the containers remain stopped after recreation
@@ -202,7 +202,7 @@ export class StakerComponent {
     });
   }
 
-  private removeFullnodeAliasFromDncoreNetwork(dnpName: string, fullnodeAlias: string): void {
+  private removeFullnodeAliasFromDncoreNetwork(dnpName: string, fullnodeAliases: string[]): void {
     const composeEditor = new ComposeFileEditor(dnpName, false);
     const services = composeEditor.compose.services;
 
@@ -214,7 +214,7 @@ export class StakerComponent {
       for (const [networkName, networkSettings] of Object.entries(serviceNetworks)) {
         if (networkName === params.DOCKER_PRIVATE_NETWORK_NAME) {
           const aliases = networkSettings.aliases;
-          if (aliases) networkSettings.aliases = aliases.filter((alias) => alias !== fullnodeAlias);
+          if (aliases) networkSettings.aliases = aliases.filter((alias) => !fullnodeAliases.includes(alias));
         }
       }
     }
