@@ -24,3 +24,4 @@ dest_file="/etc/sysctl.conf"
 
 echo 'net.ipv4.ip_forward = 1' | tee -a $dest_file
 sysctl -p $dest_file
+echo "Added ipv4 forwarding configuration to $dest_file."
