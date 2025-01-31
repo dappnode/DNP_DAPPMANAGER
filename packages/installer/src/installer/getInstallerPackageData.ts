@@ -113,7 +113,20 @@ function getInstallerPackageData(
 function migrateGethUserSettingsIfNeeded(prevUserSet: UserSettings, dnpName: string, semVersion: string) {
   const gethDnpName = "geth.dnp.dappnode.eth";
   const legacyGethServiceName = gethDnpName;
-  // migrate networks
+  const newGethServiceName = "geth";
+
+  // consider alreadyMigrated if the serviceName of the previous user settings is already the new service name
+  // use serviceNetworks, portsMappings and environment to check for the old service name
+  const alreadyMigrated =
+    prevUserSet.networks?.serviceNetworks?.[newGethServiceName] ||
+    prevUserSet.portMappings?.[newGethServiceName] ||
+    prevUserSet.environment?.[newGethServiceName];
+
+  if (alreadyMigrated) {
+    logs.info(`User settings of geth already migrated for ${dnpName}`);
+    return;
+  }
+
   if (dnpName === gethDnpName && gt(semVersion, "0.1.43")) {
     logs.info(`Version ${semVersion} is greater than 0.1.43. Using service name "geth"`);
     if (prevUserSet.networks) {
