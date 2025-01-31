@@ -9,6 +9,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           executionClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -36,6 +37,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -64,6 +66,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "besu.public.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -92,6 +95,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -122,6 +126,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -150,6 +155,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lighthouse.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -178,6 +184,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "teku.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -206,6 +213,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nimbus.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -233,6 +241,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lodestar.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -261,6 +270,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "web3signer.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -288,6 +298,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           mevBoost: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "mev-boost.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -326,6 +337,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           executionClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "goerli-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -353,6 +365,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "goerli-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -381,6 +394,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "goerli-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -408,6 +422,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "goerli-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -438,6 +453,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "prysm-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -466,6 +482,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lighthouse-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -494,6 +511,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "teku-prater.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: false,
@@ -522,6 +540,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nimbus-prater.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -550,6 +569,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "web3signer-prater.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -580,6 +600,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           mevBoost: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "mev-boost-goerli.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -618,6 +639,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           executionClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "holesky-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -645,6 +667,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "holesky-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -673,6 +696,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "holesky-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -700,6 +724,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "holesky-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -730,6 +755,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "prysm-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -758,6 +784,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lighthouse-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -786,6 +813,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "teku-holesky.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: false,
@@ -814,6 +842,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nimbus-holesky.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -842,6 +871,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "web3signer-holesky.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -872,6 +902,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           mevBoost: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "mev-boost-holesky.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -909,6 +940,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           executionClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nethermind-xdai.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -939,6 +971,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "gnosis-beacon-chain-prysm.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -967,6 +1000,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lighthouse-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -994,6 +1028,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "teku-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -1022,6 +1057,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "nimbus-gnosis.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -1051,6 +1087,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "web3signer-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -1078,6 +1115,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           mevBoost: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "mev-boost-gnosis.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -1115,6 +1153,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           executionClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lukso-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -1143,6 +1182,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             }
             /*{
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "lukso-erigon.dnp.dappnode.eth" ,
               isInstalled: true,
               isRunning: true,
@@ -1173,6 +1213,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "prysm-lukso.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
@@ -1201,6 +1242,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName: "teku-lukso.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: true,
@@ -1229,6 +1271,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             }
             /*{
               status: "ok",
+              hasFullnodeAlias: true,
               dnpName:
                 "lighthouse-lukso.dnp.dappnode.eth" ,
               isInstalled: true,
@@ -1258,6 +1301,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "web3signer-lukso.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
@@ -1285,6 +1329,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           mevBoost: {
             status: "ok",
+            hasFullnodeAlias: true,
             dnpName: "mev-boost-lukso.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
