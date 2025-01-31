@@ -5,7 +5,6 @@ import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
-import { isMatch } from "lodash-es";
 import { params } from "@dappnode/params";
 
 export class StakerComponent {
@@ -148,31 +147,18 @@ export class StakerComponent {
     dnpName: string;
     userSettings: UserSettings;
   }): Promise<void> {
-    let forceRecreate = false;
-
     if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
 
-      const previousSettings = composeEditor.getUserSettings();
-
       composeEditor.applyUserSettings(userSettings, { dnpName });
-      const newSettings = composeEditor.getUserSettings();
       // it must be called write after applying user settings otherwise the new settings will be lost and therefore the compose up will not have effect
       composeEditor.write();
-
-      // TODO: remove nimbus condition once nimbus published with multi-service
-      // isMatch returns true when migrating from single-service to multi-service in the nimbus package
-      if (!isMatch(previousSettings, newSettings) || dnpName.includes("nimbus")) {
-        forceRecreate = true;
-        logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
-      }
     }
 
     // start all containers
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
-      upAll: true,
-      dockerComposeUpOptions: { forceRecreate }
+      upAll: true
     });
   }
 
