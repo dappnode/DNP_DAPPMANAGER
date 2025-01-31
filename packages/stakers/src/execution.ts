@@ -12,7 +12,7 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { listPackage } from "@dappnode/dockerapi";
+import { listPackage, listPackages } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { gt } from "semver";
 
@@ -66,10 +66,18 @@ export class Execution extends StakerComponent {
   }
 
   async getAllExecutions(network: Network): Promise<StakerItem[]> {
-    return await super.getAll({
-      dnpNames: Execution.CompatibleExecutions[network].map((client) => client.dnpName),
-      currentClient: this.DbHandlers[network].get()
-    });
+    return await Promise.all(
+      Execution.CompatibleExecutions[network]
+        .map((client) => client.dnpName)
+        .map(async (dnpName) =>
+          super.getStakerPkg({
+            dnpName,
+            dnpList: await listPackages(),
+            userSettings: await this.getUserSettings(network, dnpName),
+            currentClient: this.DbHandlers[network].get()
+          })
+        )
+    );
   }
 
   async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
