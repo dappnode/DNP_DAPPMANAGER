@@ -157,11 +157,12 @@ export class StakerComponent {
 
       composeEditor.applyUserSettings(userSettings, { dnpName });
       const newSettings = composeEditor.getUserSettings();
+      // it must be called write after applying user settings otherwise the new settings will be lost and therefore the compose up will not have effect
+      composeEditor.write();
 
       // TODO: remove nimbus condition once nimbus published with multi-service
       // isMatch returns true when migrating from single-service to multi-service in the nimbus package
       if (!isMatch(previousSettings, newSettings) || dnpName.includes("nimbus")) {
-        composeEditor.write();
         forceRecreate = true;
         logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
       }
