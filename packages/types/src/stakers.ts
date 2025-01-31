@@ -141,6 +141,7 @@ export type StakerItemOk = {
   isRunning: boolean;
   data?: PackageItemData;
   isSelected: boolean;
+  hasFullnodeAlias: boolean;
 } & StakerItemBasic;
 
 export interface StakerConfigGet {

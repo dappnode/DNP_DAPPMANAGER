@@ -1,11 +1,12 @@
-import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, listPackageNoThrow } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
+import { InstalledPackageData, StakerItem, UserSettings, Network, PackageItemData } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
+import { isEqual } from "lodash-es";
 
 export class StakerComponent {
   protected dappnodeInstaller: DappnodeInstaller;
@@ -14,42 +15,41 @@ export class StakerComponent {
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
-  protected async getAll({
-    dnpNames,
+  protected async getStakerPkg({
+    dnpName,
+    dnpList,
+    userSettings,
     currentClient,
     relays
   }: {
-    dnpNames: string[];
+    dnpName: string;
+    dnpList: InstalledPackageData[];
+    userSettings: UserSettings;
     currentClient?: boolean | string | null;
     relays?: string[];
-  }): Promise<StakerItem[]> {
-    const dnpList = await listPackages();
-
-    return await Promise.all(
-      dnpNames.map(async (dnpName) => {
-        try {
-          await this.dappnodeInstaller.getRepoContract(dnpName);
-          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
-          return {
-            status: "ok",
-            dnpName,
-            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-            isInstalled: getIsInstalled(pkgData, dnpList),
-            isUpdated: getIsUpdated(pkgData, dnpList),
-            isRunning: getIsRunning(pkgData, dnpList),
-            data: pkgData,
-            relays, // only for mevBoost
-            isSelected: dnpName === currentClient || currentClient === true
-          };
-        } catch (error) {
-          return {
-            status: "error",
-            dnpName,
-            error
-          };
-        }
-      })
-    );
+  }): Promise<StakerItem> {
+    try {
+      await this.dappnodeInstaller.getRepoContract(dnpName);
+      const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+      return {
+        status: "ok",
+        dnpName,
+        avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+        isInstalled: getIsInstalled(pkgData, dnpList),
+        isUpdated: getIsUpdated(pkgData, dnpList),
+        isRunning: getIsRunning(pkgData, dnpList),
+        data: pkgData,
+        relays, // only for mevBoost
+        isSelected: dnpName === currentClient || currentClient === true,
+        hasFullnodeAlias: this.getHasFullnodeAlias(pkgData, dnpList, userSettings)
+      };
+    } catch (error) {
+      return {
+        status: "error",
+        dnpName,
+        error
+      };
+    }
   }
 
   protected async setNew({
@@ -252,5 +252,33 @@ export class StakerComponent {
         `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
+  }
+
+  /**
+   * Determines weather the package has a fullnode alias in the compose file in the docke networks:
+   * - `dncore_network`
+   * - `mainnet_network`
+   */
+  private getHasFullnodeAlias(
+    pkgData: PackageItemData,
+    dnpList: InstalledPackageData[],
+    userSettings: UserSettings
+  ): boolean {
+    // if the pkg is not installed it shou
+    const pkg = dnpList.find((p) => p.dnpName === pkgData.dnpName);
+    if (!pkg) return false;
+
+    const composeEditor = new ComposeFileEditor(pkgData.dnpName, false);
+    const { rootNetworks, serviceNetworks } = composeEditor.compose.networks || {};
+    if (!rootNetworks || !serviceNetworks) return false;
+
+    const { rootNetworks: rootNetworksDesired, serviceNetworks: serviceNetworksDesired } = userSettings.networks || {};
+    if (!rootNetworksDesired || !serviceNetworksDesired) return false;
+
+    // compare objects with lodash
+    if (!isEqual(rootNetworks, rootNetworksDesired)) return false;
+    if (!isEqual(serviceNetworks, serviceNetworksDesired)) return false;
+
+    return true;
   }
 }
