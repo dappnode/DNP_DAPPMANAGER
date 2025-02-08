@@ -53,7 +53,7 @@ export const params = {
   GLOBAL_ENVS_PATH_FOR_CORE: path.relative(DNCORE_DIR, GLOBAL_ENVS_PATH),
   GLOBAL_ENVS_PATH_FOR_DNP: GLOBAL_ENVS_PATH,
   GLOBAL_ENVS_PATH: GLOBAL_ENVS_PATH,
-  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
+  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".identity.private.key"),
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
