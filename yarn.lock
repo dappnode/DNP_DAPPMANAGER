@@ -2236,7 +2236,7 @@ __metadata:
   dependencies:
     "@babel/plugin-proposal-private-property-in-object": "npm:^7.21.11"
     "@dappnode/common": "workspace:^0.1.0"
-    "@dappnode/dappmanager": "npm:^0.1.0"
+    "@dappnode/dappmanager": "workspace:^0.1.0"
     "@dappnode/eventbus": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@reduxjs/toolkit": "npm:^1.3.5"
@@ -2354,7 +2354,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dappnode/dappmanager@npm:^0.1.0, @dappnode/dappmanager@workspace:packages/dappmanager":
+"@dappnode/dappmanager@workspace:^0.1.0, @dappnode/dappmanager@workspace:packages/dappmanager":
   version: 0.0.0-use.local
   resolution: "@dappnode/dappmanager@workspace:packages/dappmanager"
   dependencies:
