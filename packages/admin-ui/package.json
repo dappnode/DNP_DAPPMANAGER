@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "@dappnode/common": "workspace:^0.1.0",
-    "@dappnode/dappmanager": "^0.1.0",
+    "@dappnode/dappmanager": "workspace^0.1.0",
     "@dappnode/eventbus": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@reduxjs/toolkit": "^1.3.5",
