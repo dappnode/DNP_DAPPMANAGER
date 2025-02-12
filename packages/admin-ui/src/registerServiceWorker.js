@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import firebase from "firebase/compat/app"; // ✅ Use full compat mode
 import "firebase/compat/messaging"; // ✅ Import messaging compat mode
-import { getMessaging, getToken, onMessage } from "firebase/messaging"; // ✅ Import messaging methods
+import { getMessaging, getToken } from "firebase/messaging"; // ✅ Import messaging methods
 
 const firebaseConfig = {
   apiKey: "AIzaSyD11_NOeLR9Cj06FEYuKX31CK5vtTNx4RY",
@@ -21,16 +21,22 @@ export default function register() {
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", async () => {
       try {
-        // ✅ Register the caching service worker
-        await navigator.serviceWorker.register("/service-worker.js");
-        console.log("✅ Service Worker (Caching) Registered.");
+        if (isMobilePWA()) {
+          console.log("📱 Running as Mobile PWA. Registering service workers...");
 
-        // ✅ Register the Firebase Messaging Service Worker
-        await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-        console.log("✅ Service Worker (Firebase) Registered.");
+          // ✅ Register caching service worker
+          await navigator.serviceWorker.register("/service-worker.js");
+          console.log("✅ Service Worker (Caching) Registered.");
 
-        // ✅ Request notification permission
-        await requestNotificationPermission();
+          // ✅ Register Firebase Messaging Service Worker
+          await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+          console.log("✅ Service Worker (Firebase) Registered.");
+
+          // ✅ Request notification permission & send FCM token to backend
+          await requestNotificationPermission();
+        } else {
+          console.log("💻 Running on desktop or browser. Skipping FCM registration.");
+        }
       } catch (error) {
         console.error("❌ Error registering service workers:", error);
       }
@@ -38,7 +44,16 @@ export default function register() {
   }
 }
 
-// ✅ Request permission and get FCM token
+// ✅ Function to check if running as a Mobile PWA
+function isMobilePWA() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches || // ✅ Installed PWA (Chrome, Safari)
+    navigator.standalone === true || // ✅ Installed PWA (iOS Safari)
+    (/android|iphone|ipad|ipod/i.test(navigator.userAgent) && "Notification" in window) // ✅ Mobile device with Notification API
+  );
+}
+
+// ✅ Request permission and get FCM token (Only on Mobile PWA)
 async function requestNotificationPermission() {
   try {
     const permission = await Notification.requestPermission();
@@ -53,14 +68,13 @@ async function requestNotificationPermission() {
   }
 }
 
-// ✅ Retrieve FCM Token without VAPID Key (for mobile PWAs)
+// ✅ Retrieve FCM Token and Send to Personal Server
 async function getFCMToken() {
   try {
-    const token = await getToken(messaging); // ✅ Use messaging instance
-
+    const token = await getToken(messaging);
     if (token) {
       console.log("✅ FCM Token:", token);
-      await sendTokenToBackend(token);
+      await sendTokenToPersonalServer(token);
     } else {
       console.warn("🚫 No FCM token available. Request permission.");
     }
@@ -69,19 +83,20 @@ async function getFCMToken() {
   }
 }
 
-// ✅ Send FCM token to backend
-async function sendTokenToBackend(token) {
+// ✅ Send FCM Token to Personal Server
+async function sendTokenToPersonalServer(token) {
   try {
-    const response = await fetch("https://your-backend.com/register-token", {
+    const response = await fetch("/api/register-fcm-token", {
+      // ✅ Calls personal server
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token })
+      body: JSON.stringify({ fcmToken: token })
     });
 
     if (response.ok) {
-      console.log("✅ FCM Token successfully sent to backend.");
+      console.log("✅ FCM Token successfully sent to personal server.");
     } else {
-      console.error("❌ Failed to send FCM token to backend.");
+      console.error("❌ Failed to send FCM token to personal server.");
     }
   } catch (error) {
     console.error("❌ Error sending FCM token:", error);
