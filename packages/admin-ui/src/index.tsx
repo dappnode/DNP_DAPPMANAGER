@@ -16,6 +16,7 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+import registerServiceWorker from "registerServiceWorker";
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work
@@ -33,3 +34,6 @@ root.render(
     </Router>
   </Provider>
 );
+
+// Register the service worker after rendering
+registerServiceWorker();
