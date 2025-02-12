@@ -1,6 +1,4 @@
 /* eslint-disable no-undef */
-
-// ✅ Load Firebase SDK for service worker
 importScripts("https://www.gstatic.com/firebasejs/11.3.1/firebase-app-compat.js");
 importScripts("https://www.gstatic.com/firebasejs/11.3.1/firebase-messaging-compat.js");
 
@@ -23,11 +21,28 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] Received background push notification:", payload);
 
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload.notification?.title || "New Notification";
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: "/icons/pwa-icon.png"
+    body: payload.notification?.body || "You have a new message",
+    icon: "/icons/pwa-icon.png",
+    data: { url: payload.notification?.click_action || "/" } // ✅ Ensure it opens the app
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
+});
+
+// ✅ Handle notification click to open the app
+self.addEventListener("notificationclick", (event) => {
+  console.log("[firebase-messaging-sw.js] Notification clicked:", event.notification);
+  event.notification.close();
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      if (clientList.length > 0) {
+        clientList[0].focus();
+      } else {
+        clients.openWindow(event.notification.data.url);
+      }
+    })
+  );
 });

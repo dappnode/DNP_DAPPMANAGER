@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import firebase from "firebase/compat/app"; // ✅ Use full compat mode
 import "firebase/compat/messaging"; // ✅ Import messaging compat mode
-import { getMessaging, getToken } from "firebase/messaging"; // ✅ Import messaging methods
+import { getMessaging, getToken, onMessage } from "firebase/messaging"; // ✅ Import messaging methods
 
 const firebaseConfig = {
   apiKey: "AIzaSyD11_NOeLR9Cj06FEYuKX31CK5vtTNx4RY",
@@ -87,3 +87,21 @@ async function sendTokenToBackend(token) {
     console.error("❌ Error sending FCM token:", error);
   }
 }
+
+// ✅ Listen for foreground push notifications
+onMessage(messaging, (payload) => {
+  console.log("📩 Foreground notification received:", payload);
+
+  const notificationTitle = payload.notification?.title || "New Notification";
+  const notificationOptions = {
+    body: payload.notification?.body || "You have a new message",
+    icon: "/icons/pwa-icon.png"
+  };
+
+  // ✅ Show system notification
+  if (Notification.permission === "granted") {
+    new Notification(notificationTitle, notificationOptions);
+  } else {
+    console.warn("🚫 Notifications blocked. Request permission in browser settings.");
+  }
+});
