@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import firebase from "firebase/compat/app"; // ✅ Use full compat mode
 import "firebase/compat/messaging"; // ✅ Import messaging compat mode
-import { getMessaging, getToken } from "firebase/messaging"; // ✅ Import messaging methods
+import { getMessaging, getToken, onMessage } from "firebase/messaging"; // ✅ Import messaging methods
 
 const firebaseConfig = {
   apiKey: "AIzaSyD11_NOeLR9Cj06FEYuKX31CK5vtTNx4RY",
