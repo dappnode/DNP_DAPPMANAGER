@@ -16,7 +16,7 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
-import registerServiceWorker from "registerServiceWorker";
+import { initializePushNotifications } from "./registerServiceWorker.js";
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work
@@ -36,4 +36,4 @@ root.render(
 );
 
 // Register the service worker after rendering
-registerServiceWorker();
+initializePushNotifications();

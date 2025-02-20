@@ -1,122 +1,115 @@
 /* eslint-disable no-undef */
-import firebase from "firebase/compat/app"; // ✅ Use full compat mode
-import "firebase/compat/messaging"; // ✅ Import messaging compat mode
-import { getMessaging, getToken, onMessage } from "firebase/messaging"; // ✅ Import messaging methods
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD11_NOeLR9Cj06FEYuKX31CK5vtTNx4RY",
-  authDomain: "dappnode-pwa.firebaseapp.com",
-  projectId: "dappnode-pwa",
-  storageBucket: "dappnode-pwa.appspot.com",
-  messagingSenderId: "423547961365",
-  appId: "1:423547961365:web:60ef721b095d4726bc0e1c",
-  measurementId: "G-0HRH74BDST"
-};
+export async function initializePushNotifications() {
+  try {
+    const swRegistration = await registerServiceWorker();
+    if (!swRegistration) return;
 
-// ✅ Initialize Firebase using compat mode
-firebase.initializeApp(firebaseConfig);
-const messaging = getMessaging(); // ✅ Initialize Messaging
+    const pushManager = swRegistration.pushManager;
+    const permissionState = await pushManager.permissionState({ userVisibleOnly: true });
 
-export default function register() {
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", async () => {
-      try {
-        if (isMobilePWA()) {
-          console.log("📱 Running as Mobile PWA. Registering service workers...");
+    switch (permissionState) {
+      case "granted":
+        console.log("Push permission granted.");
+        await pushManager.getSubscription().then(async (subscription) => {
+          if (subscription) {
+            console.log("Existing subscription found:", subscription);
+            await sendSubscriptionToServer(subscription);
+          } else {
+            console.log("No existing subscription. Requesting a new one...");
+            await subscribeToPush(swRegistration);
+          }
+        });
+        break;
+      case "prompt":
+        console.log("Push permission is not granted yet.");
+        break;
+      case "denied":
+        console.warn("Push permission is denied.");
+        break;
+      default:
+        console.error("Unknown push permission state:", permissionState);
+    }
+  } catch (error) {
+    console.error("Error initializing push notifications:", error);
+  }
+}
 
-          // ✅ Register caching service worker
-          await navigator.serviceWorker.register("/service-worker.js");
-          console.log("✅ Service Worker (Caching) Registered.");
+async function registerServiceWorker() {
+  if (!("serviceWorker" in navigator)) {
+    console.warn("Service Worker is not supported in this browser.");
+    return null;
+  }
 
-          // ✅ Register Firebase Messaging Service Worker
-          await navigator.serviceWorker.register("/firebase-messaging-sw.js");
-          console.log("✅ Service Worker (Firebase) Registered.");
+  try {
+    let swRegistration = await navigator.serviceWorker.getRegistration();
 
-          // ✅ Request notification permission & send FCM token to backend
-          await requestNotificationPermission();
-        } else {
-          console.log("💻 Running on desktop or browser. Skipping FCM registration.");
-        }
-      } catch (error) {
-        console.error("❌ Error registering service workers:", error);
-      }
+    // If no registration exists, register a new one
+    if (!swRegistration) {
+      console.log("Registering Service Worker...");
+      swRegistration = await navigator.serviceWorker.register("/service-worker.js");
+      console.log("Service Worker registered:", swRegistration);
+    }
+
+    return swRegistration;
+  } catch (error) {
+    console.error("Service Worker registration failed:", error);
+    return null;
+  }
+}
+
+async function fetchVapidPublicKey() {
+  try {
+    const response = await fetch("https://your-backend/vapidPublicKey");
+    if (!response.ok) throw new Error("Failed to fetch VAPID public key");
+    return await response.text();
+  } catch (error) {
+    console.error("Error fetching VAPID public key:", error);
+    return null;
+  }
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
+}
+
+async function subscribeToPush(swRegistration) {
+  try {
+    const VAPID_PUBLIC_KEY = await fetchVapidPublicKey();
+    if (!VAPID_PUBLIC_KEY) {
+      console.error("Failed to retrieve VAPID public key.");
+      return;
+    }
+
+    const subscription = await swRegistration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
     });
-  }
-}
 
-// ✅ Function to check if running as a Mobile PWA
-function isMobilePWA() {
-  return (
-    window.matchMedia("(display-mode: standalone)").matches || // ✅ Installed PWA (Chrome, Safari)
-    navigator.standalone === true || // ✅ Installed PWA (iOS Safari)
-    (/android|iphone|ipad|ipod/i.test(navigator.userAgent) && "Notification" in window) // ✅ Mobile device with Notification API
-  );
-}
+    console.log("New Subscription:", subscription);
 
-// ✅ Request permission and get FCM token (Only on Mobile PWA)
-async function requestNotificationPermission() {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === "granted") {
-      console.log("✅ Notification permission granted.");
-      await getFCMToken();
-    } else {
-      console.warn("🚫 Notification permission denied.");
-    }
-  } catch (error) {
-    console.error("❌ Error requesting notification permission:", error);
-  }
-}
-
-// ✅ Retrieve FCM Token and Send to Personal Server
-async function getFCMToken() {
-  try {
-    const token = await getToken(messaging);
-    if (token) {
-      console.log("✅ FCM Token:", token);
-      await sendTokenToPersonalServer(token);
-    } else {
-      console.warn("🚫 No FCM token available. Request permission.");
-    }
-  } catch (error) {
-    console.error("❌ Error getting FCM token:", error);
-  }
-}
-
-// ✅ Send FCM Token to Personal Server
-async function sendTokenToPersonalServer(token) {
-  try {
-    const response = await fetch("/api/register-fcm-token", {
-      // ✅ Calls personal server
+    await fetch("https://your-backend/saveSubscription", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ fcmToken: token })
+      body: JSON.stringify(subscription),
+      headers: { "Content-Type": "application/json" }
     });
-
-    if (response.ok) {
-      console.log("✅ FCM Token successfully sent to personal server.");
-    } else {
-      console.error("❌ Failed to send FCM token to personal server.");
-    }
   } catch (error) {
-    console.error("❌ Error sending FCM token:", error);
+    console.error("Push subscription failed:", error);
   }
 }
 
-// ✅ Listen for foreground push notifications
-onMessage(messaging, (payload) => {
-  console.log("📩 Foreground notification received:", payload);
-
-  const notificationTitle = payload.notification?.title || "New Notification";
-  const notificationOptions = {
-    body: payload.notification?.body || "You have a new message",
-    icon: "/icons/pwa-icon.png"
-  };
-
-  // ✅ Show system notification
-  if (Notification.permission === "granted") {
-    new Notification(notificationTitle, notificationOptions);
-  } else {
-    console.warn("🚫 Notifications blocked. Request permission in browser settings.");
+async function sendSubscriptionToServer(subscription) {
+  try {
+    await fetch("https://your-backend/saveSubscription", {
+      method: "POST",
+      body: JSON.stringify(subscription),
+      headers: { "Content-Type": "application/json" }
+    });
+    console.log("Subscription successfully sent to the server.");
+  } catch (error) {
+    console.error("Error sending subscription to server:", error);
   }
-});
+}
