@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+import { api } from "api";
 
 export async function initializePushNotifications() {
   try {
@@ -14,10 +15,11 @@ export async function initializePushNotifications() {
         await pushManager.getSubscription().then(async (subscription) => {
           if (subscription) {
             console.log("Existing subscription found:", subscription);
-            await sendSubscriptionToServer(subscription);
+            await api.notificationsPostSubscription({ subscription });
           } else {
             console.log("No existing subscription. Requesting a new one...");
-            await subscribeToPush(swRegistration);
+            const newSubscription = await subscribeToPush(swRegistration);
+            await api.notificationsPostSubscription({ subscription: newSubscription });
           }
         });
         break;
@@ -58,27 +60,9 @@ async function registerServiceWorker() {
   }
 }
 
-async function fetchVapidPublicKey() {
-  try {
-    const response = await fetch("https://your-backend/vapidPublicKey");
-    if (!response.ok) throw new Error("Failed to fetch VAPID public key");
-    return await response.text();
-  } catch (error) {
-    console.error("Error fetching VAPID public key:", error);
-    return null;
-  }
-}
-
-function urlBase64ToUint8Array(base64String) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = atob(base64);
-  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
-}
-
 async function subscribeToPush(swRegistration) {
   try {
-    const VAPID_PUBLIC_KEY = await fetchVapidPublicKey();
+    const VAPID_PUBLIC_KEY = await api.notificationsGetVapidPublicKey();
     if (!VAPID_PUBLIC_KEY) {
       console.error("Failed to retrieve VAPID public key.");
       return;
@@ -90,26 +74,14 @@ async function subscribeToPush(swRegistration) {
     });
 
     console.log("New Subscription:", subscription);
-
-    await fetch("https://your-backend/saveSubscription", {
-      method: "POST",
-      body: JSON.stringify(subscription),
-      headers: { "Content-Type": "application/json" }
-    });
   } catch (error) {
     console.error("Push subscription failed:", error);
   }
 }
 
-async function sendSubscriptionToServer(subscription) {
-  try {
-    await fetch("https://your-backend/saveSubscription", {
-      method: "POST",
-      body: JSON.stringify(subscription),
-      headers: { "Content-Type": "application/json" }
-    });
-    console.log("Subscription successfully sent to the server.");
-  } catch (error) {
-    console.error("Error sending subscription to server:", error);
-  }
+function urlBase64ToUint8Array(base64String) {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map((char) => char.charCodeAt(0)));
 }

@@ -386,7 +386,9 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerLatestVersion: "20.10.8"
   }),
   getIsConnectedToInternet: async () => false,
-  getCoreVersion: async () => "0.2.92"
+  getCoreVersion: async () => "0.2.92",
+  notificationsGetVapidPublicKey: async () => "BQ0fwegrbetgwfegrh32",
+  notificationsPostSubscription: async () => {}
 };
 
 export const calls: Routes = {
