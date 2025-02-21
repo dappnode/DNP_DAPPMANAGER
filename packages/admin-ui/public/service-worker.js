@@ -3,7 +3,6 @@
 /* Handles caching and offline mode */
 /* TODO add offline.html page */
 
-// ✅ Service worker for caching (No Firebase logic here)
 const CACHE_NAME = "pwa-cache-v1";
 const urlsToCache = ["/", "/index.html", "/styles.css", "/app.js", "/offline.html"];
 
@@ -47,15 +46,12 @@ self.addEventListener("activate", (event) => {
 /** webpush-ios-example */
 
 self.addEventListener("push", (event) => {
-  // PushData keys structure standart https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
   let pushData = event.data.json();
   if (!pushData || !pushData.title) {
-    console.error("Received WebPush with an empty title. Received body: ", pushData);
+    console.error("Received WebPush with an empty title. Received body:", pushData);
+    return;
   }
-  self.registration.showNotification(pushData.title, pushData).then(() => {
-    // You can save to your analytics fact that push was shown
-    // fetch('https://your_backend_server.com/track_show?message_id=' + pushData.data.message_id);
-  });
+  event.waitUntil(self.registration.showNotification(pushData.title, pushData));
 });
 
 self.addEventListener("notificationclick", (event) => {
