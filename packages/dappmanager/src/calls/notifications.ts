@@ -1,7 +1,7 @@
 import { logs } from "@dappnode/logger";
 
 export async function notificationsGetVapidPublicKey(): Promise<string> {
-  return await (await fetch("http://notifications.public.dappnode:8080/vapid-publicKey")).json();
+  return (await (await fetch("http://notifications.public.dappnode:8080/vapid-publicKey")).json()).publicKey;
 }
 
 export async function notificationsPostSubscription({
