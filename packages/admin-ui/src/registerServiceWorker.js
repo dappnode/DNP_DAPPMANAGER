@@ -71,7 +71,7 @@ async function registerServiceWorker() {
 
 async function subscribeToPush(swRegistration) {
   try {
-    const VAPID_PUBLIC_KEY = await api.notificationsGetVapidPublicKey();
+    const VAPID_PUBLIC_KEY = (await api.notificationsGetVapidPublicKey()).publicKey;
     if (!VAPID_PUBLIC_KEY) {
       console.error("Failed to retrieve VAPID public key.");
       return;
