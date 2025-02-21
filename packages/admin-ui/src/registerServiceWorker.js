@@ -9,32 +9,41 @@ export async function initializePushNotifications() {
     const pushManager = swRegistration.pushManager;
     const permissionState = await pushManager.permissionState({ userVisibleOnly: true });
 
-    switch (permissionState) {
-      case "granted":
-        console.log("Push permission granted.");
-        await pushManager.getSubscription().then(async (subscription) => {
-          if (subscription) {
-            console.log("Existing subscription found:", subscription);
-            await api.notificationsPostSubscription({ subscription });
-          } else {
-            console.log("No existing subscription. Requesting a new one...");
-            const newSubscription = await subscribeToPush(swRegistration);
-            await api.notificationsPostSubscription({ subscription: newSubscription });
-          }
-        });
-        break;
-      case "prompt":
-        console.log("Push permission is not granted yet.");
-        break;
-      case "denied":
-        console.warn("Push permission is denied.");
-        break;
-      default:
-        console.error("Unknown push permission state:", permissionState);
+    if (permissionState === "granted") {
+      console.log("Push permission granted.");
+      await subscribeForPush(pushManager, swRegistration);
+    } else if (permissionState === "prompt") {
+      console.log("Push permission is not granted yet. Requesting permission...");
+      const permissionResult = await Notification.requestPermission();
+      if (permissionResult === "granted") {
+        console.log("Permission granted after prompt.");
+        await subscribeForPush(pushManager, swRegistration);
+      } else {
+        console.warn("Push permission request denied by user.");
+      }
+    } else if (permissionState === "denied") {
+      console.warn("Push permission is denied.");
+    } else {
+      console.error("Unknown push permission state:", permissionState);
     }
   } catch (error) {
     console.error("Error initializing push notifications:", error);
   }
+}
+
+async function subscribeForPush(pushManager, swRegistration) {
+  await pushManager.getSubscription().then(async (subscription) => {
+    if (subscription) {
+      console.log("Existing subscription found:", subscription);
+      await api.notificationsPostSubscription({ subscription });
+    } else {
+      console.log("No existing subscription. Requesting a new one...");
+      const newSubscription = await subscribeToPush(swRegistration);
+      if (newSubscription) {
+        await api.notificationsPostSubscription({ subscription: newSubscription });
+      }
+    }
+  });
 }
 
 async function registerServiceWorker() {
@@ -74,6 +83,7 @@ async function subscribeToPush(swRegistration) {
     });
 
     console.log("New Subscription:", subscription);
+    return subscription;
   } catch (error) {
     console.error("Push subscription failed:", error);
   }
