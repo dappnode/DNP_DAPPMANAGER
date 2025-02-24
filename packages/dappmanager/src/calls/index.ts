@@ -31,7 +31,11 @@ export * from "./localProxy.js";
 export * from "./manageLvm.js";
 export { mountpointsGet } from "./mountpointsGet.js";
 export { newFeatureStatusSet } from "./newFeatureStatusSet.js";
-export { notificationsGetVapidPublicKey, notificationsPostSubscription } from "./notifications.js";
+export {
+  notificationsGetVapidPublicKey,
+  notificationsPostSubscription,
+  notificationsPostNewNotification
+} from "./notifications.js";
 export { notificationsGet } from "./notificationsGet.js";
 export { notificationsRemove } from "./notificationsRemove.js";
 export { notificationsTest } from "./notificationsTest.js";

@@ -355,6 +355,11 @@ export interface Routes {
   notificationsPostSubscription({ subscription }: { subscription: PushSubscriptionJSON }): Promise<void>;
 
   /**
+   * Sends a notification to the user
+   */
+  notificationsPostNewNotification({ title, body }: { title: string; body: string }): Promise<void>;
+
+  /**
    * Returns not viewed notifications.
    * Use an array as the keys are not known in advance and the array form
    * is okay for RPC transport, as uniqueness is guaranteed
@@ -720,6 +725,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   newFeatureStatusSet: {},
   notificationsGetVapidPublicKey: { log: true },
   notificationsPostSubscription: { log: true },
+  notificationsPostNewNotification: { log: true },
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
