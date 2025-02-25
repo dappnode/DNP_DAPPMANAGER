@@ -3,23 +3,33 @@ import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import { initializePushNotifications } from "registerServiceWorker.js";
 
-// Optionally, if using TypeScript, you can define the BeforeInstallPromptEvent interface:
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 }
 
 export default function Pwa() {
-  // State for notification permission
   const [notificationsGranted, setNotificationsGranted] = useState<NotificationPermission>("denied");
-  // State to hold the deferred install prompt event
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
 
-  // Listen for the beforeinstallprompt event to capture the install prompt
+  useEffect(() => {
+    // Check if PWA is already installed
+    const checkPwaInstalled = () => {
+      setIsPwaInstalled(window.matchMedia("(display-mode: standalone)").matches);
+    };
+
+    checkPwaInstalled();
+    window.addEventListener("appinstalled", checkPwaInstalled);
+
+    return () => {
+      window.removeEventListener("appinstalled", checkPwaInstalled);
+    };
+  }, []);
+
   useEffect(() => {
     const beforeInstallPromptHandler = (e: Event) => {
       e.preventDefault();
-      console.log("beforeinstallprompt fired", e);
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
 
@@ -30,35 +40,23 @@ export default function Pwa() {
     };
   }, []);
 
-  // Handler for the Install PWA button
   const handleInstall = async () => {
-    if (!deferredPrompt) {
-      console.warn("Install prompt is not available.");
-      return;
-    }
-    // Show the install prompt
+    if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    // Wait for the user's choice
     const { outcome } = await deferredPrompt.userChoice;
     console.log("User response to the install prompt:", outcome);
-    // Clear the prompt so it can only be used once
     setDeferredPrompt(null);
   };
 
   const handleGrantNotifications = async () => {
     try {
-      // Request notification permission from the user
       const permissionResult = await Notification.requestPermission();
       if (permissionResult === "granted") {
         await initializePushNotifications();
-
-        // Inform the user that notifications are now enabled
         await api.notificationsPostNewNotification({
           title: "Notifications enabled",
           body: "You will now receive notifications from dappnode."
         });
-      } else {
-        console.warn("Notification permission was denied.");
       }
       setNotificationsGranted(permissionResult);
     } catch (error) {
@@ -79,9 +77,11 @@ export default function Pwa() {
 
   return (
     <>
-      <Button type="button" onClick={handleInstall} variant="dappnode">
-        Install PWA
-      </Button>
+      {!isPwaInstalled && deferredPrompt && (
+        <Button type="button" onClick={handleInstall} variant="dappnode">
+          Install PWA
+        </Button>
+      )}
       <Button
         type="button"
         onClick={handleGrantNotifications}
