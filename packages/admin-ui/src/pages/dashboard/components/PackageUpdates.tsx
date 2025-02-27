@@ -64,15 +64,12 @@ function UpdateCard({ update }: { update: UpdatesInterface }) {
 
   return (
     <div className="package-update-item">
-      <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
-        <Accordion.Toggle
-          as={"div"}
-          eventKey="0"
-          onClick={() => setIsOpen(!isOpen)}
-          style={{ cursor: "pointer", minWidth: "max-content" }}
-        >
-          {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />} <strong>{prettyDnpName(update.dnpName)}</strong> to version{" "}
-          {update.newVersion}
+      <Accordion defaultActiveKey={isOpen ? "0" : "1"} className="package-update-accordion">
+        <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)}>
+          <div>
+            <strong>{prettyDnpName(update.dnpName)}</strong> v{update.newVersion}
+            {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </div>
           <Accordion.Collapse eventKey="0">
             <div>
               {Array.isArray(update.upstreamVersion) && update.upstreamVersion.length > 0 && (
