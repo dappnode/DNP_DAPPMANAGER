@@ -37,3 +37,22 @@ export async function notificationsPostNewNotification({
     body: JSON.stringify({ title, body })
   });
 }
+
+export async function notificationsGetSubscription({
+  subscription
+}: {
+  subscription: PushSubscription;
+}): Promise<PushSubscription | null> {
+  // URL-encode the endpoint before appending it to the request URL
+  const encodedEndpoint = encodeURIComponent(subscription.endpoint);
+
+  const response = await fetch(`${notificationsUrl}/subscriptions/${encodedEndpoint}`, {
+    method: "GET"
+  });
+
+  if (response.status === 404) return null; // Return null if subscription is not found
+
+  if (!response.ok) throw new Error(`Error fetching subscription: ${response.statusText}`);
+
+  return await response.json(); // Return the subscription if found
+}

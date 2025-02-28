@@ -13,16 +13,29 @@ export async function initializePushNotifications(): Promise<void> {
 async function subscribeForPush(swRegistration: ServiceWorkerRegistration): Promise<void> {
   try {
     const pushManager = swRegistration.pushManager;
-    const subscription = await pushManager.getSubscription();
-    if (subscription) {
-      console.log("Existing subscription found:", subscription);
-      await api.notificationsPostSubscription({ subscription });
-    } else {
-      console.log("No existing subscription. Requesting a new one...");
-      const newSubscription = await subscribeToPush(swRegistration);
-      if (newSubscription) {
-        await api.notificationsPostSubscription({ subscription: newSubscription });
+    const existingSubscription = await pushManager.getSubscription();
+
+    if (existingSubscription) {
+      console.log("Existing subscription found:", existingSubscription);
+
+      // Ask backend if the subscription is still valid
+      const backendSubscription = await api.notificationsGetSubscription({ subscription: existingSubscription });
+
+      if (backendSubscription) {
+        console.log("Subscription is still valid. No need to resubscribe.");
+        return;
       }
+
+      console.log("Subscription not found in the server. Unsubscribing...");
+      await existingSubscription.unsubscribe();
+    }
+
+    console.log("Requesting a new subscription...");
+    const newSubscription = await subscribeToPush(swRegistration);
+
+    if (newSubscription) {
+      console.log("New subscription obtained:", newSubscription);
+      await api.notificationsPostSubscription({ subscription: newSubscription });
     }
   } catch (error) {
     console.error("Error subscribing for push notifications:", error);

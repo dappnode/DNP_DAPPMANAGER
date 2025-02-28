@@ -34,7 +34,8 @@ export { newFeatureStatusSet } from "./newFeatureStatusSet.js";
 export {
   notificationsGetVapidPublicKey,
   notificationsPostSubscription,
-  notificationsPostNewNotification
+  notificationsPostNewNotification,
+  notificationsGetSubscription
 } from "./notifications.js";
 export { notificationsGet } from "./notificationsGet.js";
 export { notificationsRemove } from "./notificationsRemove.js";
