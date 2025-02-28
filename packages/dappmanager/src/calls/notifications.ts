@@ -46,7 +46,7 @@ export async function notificationsGetSubscription({
   // URL-encode the endpoint before appending it to the request URL
   const encodedEndpoint = encodeURIComponent(subscription.endpoint);
 
-  const response = await fetch(`${notificationsUrl}/subscriptions/${encodedEndpoint}`, {
+  const response = await fetch(`${notificationsUrl}/subscriptions?endpoint=${encodedEndpoint}`, {
     method: "GET"
   });
 
