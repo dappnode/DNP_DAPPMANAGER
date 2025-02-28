@@ -1,6 +1,6 @@
 import { logs } from "@dappnode/logger";
 
-const notificationsUrl = "http://notifier.notifications.public.dappnode:8080";
+const notificationsUrl = "http://notifier.notifications.dappnode:8080";
 
 export async function notificationsGetVapidPublicKey(): Promise<string> {
   return (await (await fetch(`${notificationsUrl}/vapid-publicKey`)).json()).publicKey;
