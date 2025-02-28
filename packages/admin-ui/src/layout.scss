@@ -1,10 +1,15 @@
 :root {
   // widths
   --sidenav-width: 12.5rem;
-  --sidenav-collapsed-width: 4.75rem;
+  --sidenav-collapsed-width: 3rem;
   --topbar-height: 3.5rem;
   // Borders and padding
   --container-padding: 1.5rem;
+  // mobile view fixes (only for mobile, not for tablets)
+  @media (max-width: 40rem) {
+    --container-padding: 0.5rem;
+  }
+
   --border-size: 0.08rem;
   --default-spacing: 1.25rem;
   // time
@@ -95,6 +100,10 @@ body,
   transition: all 0.5s;
   width: 100%;
 
+  @media (max-width: 40rem) {
+    grid-gap: 0;
+  }
+
   /* SIDEBAR > TOP */
   &.top {
     height: var(--topbar-height);
@@ -174,7 +183,7 @@ body,
     border-right-width: 0;
 
     .sidebar-logo {
-      width: calc(0.2 * var(--sidenav-width));
+      width: 2rem;
     }
   }
   #main {
