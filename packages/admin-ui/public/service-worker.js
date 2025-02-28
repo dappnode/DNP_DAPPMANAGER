@@ -8,7 +8,7 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("fetch", (event) => {
   // Skip caching API requests
-  if (event.request.url.startsWith("https://your-api.com")) {
+  if (event.request.url.startsWith("http://my.dappnode")) {
     return;
   }
   event.respondWith(caches.match(event.request).then((response) => response || fetch(event.request)));
