@@ -2,7 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { BrowserRouter as Router } from "react-router-dom";
-
+import { registerServiceWorker } from "registerServiceWorker.js";
 import { store } from "./store";
 import App from "./App";
 import { cleanObj } from "utils/objects";
@@ -33,3 +33,6 @@ root.render(
     </Router>
   </Provider>
 );
+
+// Register service worker
+registerServiceWorker();
