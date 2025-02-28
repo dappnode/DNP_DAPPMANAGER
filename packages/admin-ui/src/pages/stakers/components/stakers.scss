@@ -102,3 +102,10 @@
   color: var(--dappnode-color) !important;
   vertical-align: sub;
 }
+
+// Hide network description in mobile view
+.network-description {
+  @media (max-width: 40rem) {
+    display: none;
+  }
+}
