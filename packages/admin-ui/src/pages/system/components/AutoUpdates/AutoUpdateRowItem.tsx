@@ -3,7 +3,6 @@ import { NavLink } from "react-router-dom";
 import Switch from "components/Switch";
 import { parseStaticDate, parseDiffDates } from "utils/dates";
 import { autoUpdateIds } from "params";
-import { MdChevronRight } from "react-icons/md";
 import { getInstallerPath } from "pages/installer";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 
