@@ -126,7 +126,7 @@ export function HttpsMappings() {
           {/* Table header */}
           <header className="hide-on-mobile">PACKAGE</header>
           <header>SERVICE</header>
-          <header className="hide-on-mobile"/>
+          <header className="hide-on-mobile" />
           <header>PUBLIC URL</header>
           <header>EXPOSE</header>
 
