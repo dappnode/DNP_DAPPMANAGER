@@ -26,8 +26,7 @@ export function SshManagerChangeStatus({ reqGetStatus, setReqGetStatus }: SshMan
       await new Promise<void>((resolve) => {
         confirm({
           title: `Disabling SSH service`,
-          text:
-            "Warning, you will loose SSH access to your DAppNode. Having direct access to your host machine may be necessary to fix bugs. Make sure to have an alternative way to access your DAppNode, such as physically with a screen and keyboard before disabling SSH access",
+          text: "Warning, you will loose SSH access to your DAppNode. Having direct access to your host machine may be necessary to fix bugs. Make sure to have an alternative way to access your DAppNode, such as physically with a screen and keyboard before disabling SSH access",
           label: "Disable",
           onClick: resolve
         });
