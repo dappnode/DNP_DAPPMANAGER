@@ -47,4 +47,11 @@
       text-align: right;
     }
   }
+
+  // Hide title labels in mobile view
+  .title-label {
+    @media (max-width: 40rem) {
+      display: none;
+    }
+  }
 }
