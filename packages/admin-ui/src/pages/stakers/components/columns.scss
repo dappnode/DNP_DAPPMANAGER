@@ -79,8 +79,7 @@
       color: var(--dappnode-color);
     }
   }
-  transition: color 0.15s, background-color 0.15s, border-color 0.15s,
-    box-shadow 0.15s;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 
   .avatar {
     --avatar-size: 6rem;
@@ -88,6 +87,12 @@
     margin: auto;
     height: var(--avatar-size);
     width: var(--avatar-size);
+  }
+
+  @media (max-width: 40rem) {
+    .hide-on-small {
+      display: none;
+    }
   }
 }
 
@@ -97,4 +102,3 @@
   color: var(--dappnode-color) !important;
   vertical-align: sub;
 }
-
