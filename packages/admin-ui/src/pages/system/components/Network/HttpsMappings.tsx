@@ -124,9 +124,9 @@ export function HttpsMappings() {
       <>
         <div className="list-grid system-network-mappings">
           {/* Table header */}
-          <header>PACKAGE</header>
+          <header className="hide-on-mobile">PACKAGE</header>
           <header>SERVICE</header>
-          <header />
+          <header className="hide-on-mobile"/>
           <header>PUBLIC URL</header>
           <header>EXPOSE</header>
 
@@ -136,14 +136,14 @@ export function HttpsMappings() {
 
           {mappings.data.map((mapping, i) => (
             <React.Fragment key={i}>
-              <span className="package">
+              <span className="package hide-on-mobile">
                 <span>{prettyFullName(mapping)}</span>
               </span>
               <span className="service">
                 <span className="title">{mapping.name}</span>
-                <span className="help-text">{mapping.description}</span>
+                <span className="help-text hide-on-mobile">{mapping.description}</span>
               </span>
-              <span className="arrow">
+              <span className="arrow hide-on-mobile">
                 <BsArrowRight />
               </span>
               <span className="subdomain">
