@@ -47,22 +47,22 @@ export function AutoUpdateRowItem({
     id === MY_PACKAGES
       ? null
       : id === SYSTEM_PACKAGES
-      ? `${systemPathName}/${systemSubPaths.update}`
-      : `${getInstallerPath(id)}/${id}`;
+        ? `${systemPathName}/${systemSubPaths.update}`
+        : `${getInstallerPath(id)}/${id}`;
 
   const feedbackText = !enabled
     ? "-"
     : isInstalling
-    ? "Updating..."
-    : manuallyUpdated
-    ? "Manually updated"
-    : inQueue
-    ? "In queue..."
-    : scheduled
-    ? `Scheduled, in ${parseDiffDates(scheduled)}`
-    : updated
-    ? parseStaticDate(updated)
-    : "-";
+      ? "Updating..."
+      : manuallyUpdated
+        ? "Manually updated"
+        : inQueue
+          ? "In queue..."
+          : scheduled
+            ? `Scheduled, in ${parseDiffDates(scheduled)}`
+            : updated
+              ? parseStaticDate(updated)
+              : "-";
 
   const showUpdateLink = isInstalling || inQueue || scheduled;
 
@@ -73,7 +73,7 @@ export function AutoUpdateRowItem({
       </span>
 
       <span className="name">
-        {isSinglePackage && <li className="bullet"/>}
+        {isSinglePackage && <li className="bullet" />}
         {displayName}
       </span>
 
