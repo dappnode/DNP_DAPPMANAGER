@@ -128,7 +128,7 @@ export function PortsStatusTable({ isUpnpEnabled }: { isUpnpEnabled: boolean }) 
               variant={"dappnode"}
               className="float-right"
               onClick={upnpStatusGet}
-                disabled={upnpReqStatus.loading === true}
+              disabled={upnpReqStatus.loading === true}
             >
               UPnP Scan
             </Button>
