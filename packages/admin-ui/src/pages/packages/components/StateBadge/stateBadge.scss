@@ -13,7 +13,9 @@
   overflow: hidden;
 
   // Force a min-size so on a packages/:id view the badge on its own is not too small
-  min-width: 4.9rem;
+  @media (min-width: 40rem) {
+    min-width: 4.9rem;
+  }
 
   > span {
     width: 100%;
