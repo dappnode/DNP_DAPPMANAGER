@@ -189,6 +189,10 @@ body,
   #main {
     margin-left: var(--sidenav-collapsed-width);
   }
+
+  .card-body{
+    padding: 0.7rem;
+  }
 }
 
 /********************
