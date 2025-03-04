@@ -84,4 +84,14 @@
     }
     text-transform: none;
   }
+
+  // Mobile view fixes
+  @media (max-width: 40rem) {
+    grid-gap: 0.5rem;
+    font-size: 12px;
+
+    .name {
+      font-size: 16px;
+    }
+  }
 }

@@ -98,13 +98,13 @@ function RelaysList({
   const defaultRelays = getDefaultRelays(network);
   if (defaultRelays.length > 0)
     return (
-      <Table striped bordered hover size="sm">
+      <Table striped hover size="sm">
         <thead>
           <tr>
             <th>Relay</th>
             <th>
               OFAC
-              <a href="https://www.mevwatch.info/" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.mevwatch.info/" target="_blank" rel="noopener noreferrer" className="hide-on-small">
                 <AiFillInfoCircle />
               </a>
             </th>

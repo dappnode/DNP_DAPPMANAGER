@@ -235,7 +235,10 @@ export function HttpsMappings({ dnpName, serviceName }: { dnpName: string; servi
         )}
 
         <div className="bottom-buttons">
-          <Switch className="show-all" checked={showAll} onToggle={setShowAll} label="Show all" />
+          <div className="show-all">
+            Show all
+            <Switch checked={showAll} onToggle={setShowAll} />
+          </div>
 
           {editing ? (
             <Button onClick={() => setEditing(false)}>Cancel</Button>

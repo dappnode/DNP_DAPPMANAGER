@@ -30,11 +30,11 @@ export const PackagesList = ({ coreDnps }: { coreDnps: boolean }) => {
         <StateBadgeLegend dnps={filteredDnps}></StateBadgeLegend>
 
         <div className="list-grid dnps no-a-style">
-          <header className="center">Status</header>
-          <header className="center"> </header>
+          <header>Status</header>
+          <header> </header>
           <header>Name</header>
           <header>Open</header>
-          <header className="hide-on-small">Restart</header>
+          <header>Restart</header>
           {sortBy(filteredDnps, (dnp) => dnp.dnpName).map((dnp) => (
             <React.Fragment key={dnp.dnpName}>
               {/* <StateBadge state={getWorstState(dnp)} /> */}

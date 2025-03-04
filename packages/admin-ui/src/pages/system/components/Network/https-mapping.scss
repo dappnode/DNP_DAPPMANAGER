@@ -1,11 +1,22 @@
 .system-network-mappings {
+  @media (max-width: 40rem) {
+   font-size: 14px;
+    }
   &.list-grid {
     grid-template-columns:
-      minmax(min-content, max-content) /* Package */
+      minmax(0, max-content) /* Package - hide in small screens */
       minmax(min-content, max-content) /* Service */
       minmax(0, max-content) /* Arrow - hide in small screens */
       minmax(min-content, auto) /* URL */
       minmax(calc(var(--icon-size) / 2), min-content); /* Switch button */
+
+      // Hid package & arrow column on mobile view
+      @media (max-width: 40rem) {
+        grid-template-columns:
+        minmax(min-content, max-content) /* Service */
+        minmax(min-content, auto) /* URL */
+        minmax(calc(var(--icon-size) / 2), min-content); /* Switch button */
+        }
 
     grid-gap: calc(var(--grid-spacing) / 2) var(--grid-spacing);
 
@@ -39,5 +50,11 @@
   .no-mappings {
     opacity: 0.5;
     grid-column: 1 / -1;
+  }
+
+  .hide-on-mobile{
+    @media (max-width: 40rem) {
+      display: none;
+    }
   }
 }
