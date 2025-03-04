@@ -1,18 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { api } from "api";
-import Button from "components/Button";
 import ErrorView from "components/ErrorView";
-import Input from "components/Input";
 import Ok from "components/Ok";
 import { confirm } from "components/ConfirmDialog";
 import { ReqStatus } from "types";
-import "./sshManager.scss";
 import { withToast } from "components/toast/Toast";
 import { ShhStatus } from "@dappnode/types";
+import Switch from "components/Switch";
+import "./sshManager.scss";
 
-export function SshManagerChangeStatus() {
-  const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});
+interface SshManagerChangeStatusProps {
+  reqGetStatus: ReqStatus<ShhStatus>;
+  setReqGetStatus: (reqGetStatus: ReqStatus<ShhStatus>) => void;
+}
+
+export function SshManagerChangeStatus({ reqGetStatus, setReqGetStatus }: SshManagerChangeStatusProps) {
   const [reqSetStatus, setReqSetStatus] = useState<ReqStatus<ShhStatus>>({});
+
+  useEffect(() => {
+    fetchSshStatus();
+  }, []);
 
   async function changeSshStatus(status: ShhStatus) {
     if (status === "disabled") {
@@ -52,30 +59,23 @@ export function SshManagerChangeStatus() {
     }
   }
 
+  const handleToggle = () => {
+    if (reqGetStatus.result === "enabled") {
+      changeSshStatus("disabled");
+    } else {
+      changeSshStatus("enabled");
+    }
+  };
+  console.log(reqGetStatus.result);
   return (
     <>
-      <Input
-        value={reqGetStatus.result || "?"}
-        onValueChange={() => {}}
-        prepend="SSH status"
-        append={
-          <Button disabled={reqGetStatus.loading} onClick={fetchSshStatus}>
-            Fetch status
-          </Button>
-        }
-      />
+      <div className="section-wrapper">
+        <div className="subtle-header">ENABLE, DISABLE SSH</div>
+        <Switch checked={reqGetStatus.result === "enabled"} onToggle={handleToggle} disabled={reqGetStatus.loading} />
+      </div>
 
       {reqGetStatus.loading && <Ok loading msg="Fetching SSH status..."></Ok>}
       {reqGetStatus.error && <ErrorView error={reqGetStatus.error} hideIcon red />}
-
-      <div className="ssh-status-manager-buttons">
-        <Button disabled={reqSetStatus.loading} onClick={() => changeSshStatus("enabled")}>
-          Enable
-        </Button>
-        <Button disabled={reqSetStatus.loading} onClick={() => changeSshStatus("disabled")}>
-          Disable
-        </Button>
-      </div>
 
       {reqSetStatus.loading && <Ok loading msg="Changing SSH status..."></Ok>}
       {reqSetStatus.result && <Ok ok msg={`Successfully ${reqSetStatus.result} SSH`}></Ok>}

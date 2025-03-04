@@ -1,5 +1,5 @@
-.ssh-status-manager-buttons {
-  > *:not(:last-child) {
-    margin-right: calc(var(--default-spacing) / 2);
-  }
+.section-wrapper{
+  display: flex;
+  flex-direction: row;
+  gap: var(--default-spacing);
 }

@@ -6,7 +6,6 @@ import ErrorView from "components/ErrorView";
 import Input from "components/Input";
 import Ok from "components/Ok";
 import { ReqStatus } from "types";
-import "./sshManager.scss";
 
 export function SshManagerChangePort() {
   const [port, setPort] = useState("");
@@ -41,6 +40,9 @@ export function SshManagerChangePort() {
 
   return (
     <>
+      <hr />
+      <div className="subtle-header">CHANGE SSH PORT</div>
+      <p>Change SSH port of your DAppNode. Port number must be greater than 0 and less than 65536</p>
       <Input
         value={port || "?"}
         onValueChange={setPort}
