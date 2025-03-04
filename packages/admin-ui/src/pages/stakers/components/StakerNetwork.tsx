@@ -17,7 +17,7 @@ import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
-import "./columns.scss";
+import "./stakers.scss";
 import { AppContext } from "App";
 import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
@@ -160,9 +160,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 </>
               )}
             </p>
-            <br />
-
-            <p>{description}</p>
+            <p className="network-description">{description}</p>
 
             <Row className="staker-network">
               <Col>
