@@ -40,10 +40,9 @@
     &.show {
       display: block;
     }
-
-    /* 22 * 90% = 19.8 (the min-width specified above) */
-    @media (max-width: 25rem) {
-      width: 90vw;
+    
+    @media (max-width: 40rem) {
+      width: 15rem;
     }
 
     /* Menu items */
