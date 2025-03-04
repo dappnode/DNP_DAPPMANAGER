@@ -244,7 +244,7 @@ export function PortsByService({
         <thead>
           <tr>
             <td className="subtle-header">Host port</td>
-            <td className="subtle-header">Package port number</td>
+            <td className="subtle-header">Package port</td>
             <td className="subtle-header">Protocol</td>
           </tr>
         </thead>
@@ -253,6 +253,7 @@ export function PortsByService({
             <tr key={i}>
               <td>
                 <Input
+                  className="port-mapping-input"
                   placeholder="Ephemeral port if unspecified"
                   value={host || ""}
                   onValueChange={(value: string) => editPort(i, { host: parseInt(value) || undefined })}
@@ -261,12 +262,13 @@ export function PortsByService({
               <td>
                 {deletable ? (
                   <Input
+                    className="port-mapping-input"
                     placeholder="enter container port..."
                     value={container}
                     onValueChange={(value: string) => editPort(i, { container: parseInt(value) || undefined })}
                   />
                 ) : (
-                  <Input lock={true} value={container} onValueChange={() => {}} />
+                  <Input className="port-mapping-input" lock={true} value={container} onValueChange={() => {}} />
                 )}
               </td>
               <td>
@@ -281,7 +283,7 @@ export function PortsByService({
                     }
                   />
                 ) : (
-                  <Input lock={true} value={protocol} onValueChange={() => {}} />
+                  <Input className="port-mapping-input" lock={true} value={protocol} onValueChange={() => {}} />
                 )}
               </td>
 
@@ -307,7 +309,7 @@ export function PortsByService({
         <div key={warning}>{warning}</div>
       ))}
 
-      <div className="button-row">
+      <div className="port-mapping-actions">
         <Button variant={"dappnode"} onClick={onUpdateEnvsSubmit} disabled={disableUpdate}>
           Update port mappings
         </Button>

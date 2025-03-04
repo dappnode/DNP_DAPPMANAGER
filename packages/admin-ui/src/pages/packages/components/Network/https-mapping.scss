@@ -49,5 +49,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+
+    // Mobile view fixes
+    gap: var(--default-spacing);
+    div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
   }
 }
