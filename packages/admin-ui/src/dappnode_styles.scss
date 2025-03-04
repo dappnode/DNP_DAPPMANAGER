@@ -126,7 +126,11 @@ p.no-p-style:last-child {
 */
 
 .list-grid {
-  --icon-size: 1.75em;
+  --icon-size: 1.75rem;
+  // Smaller icons for mobile
+  @media (max-width: 40rem) {
+    --icon-size: 1.25rem;
+  } 
   --grid-spacing: 1rem;
   display: grid;
   /* Specify a custom grid-template-columns:  */
@@ -194,6 +198,11 @@ p.no-p-style:last-child {
   overflow: hidden;
   width: 100%;
   font-size: 0.9rem;
+
+  // Hide on mobile view
+  @media (max-width: 40rem) {
+    display: none;
+  }
 }
 
 /* Generic centered container */

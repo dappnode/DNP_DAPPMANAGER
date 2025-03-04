@@ -25,7 +25,7 @@
 
   @media screen and (max-width: 40rem) {
     grid-template-columns:
-      1.65rem
+      1.5rem
       min-content
       minmax(5rem, auto)
       minmax(calc(var(--icon-size) / 2), min-content);
@@ -35,8 +35,8 @@
     }
 
     .state-badge {
-      height: 1.65rem;
-      border-radius: 1.65rem;
+      height: 1rem;
+      border-radius: 1rem;
       .content {
         display: none;
       }
