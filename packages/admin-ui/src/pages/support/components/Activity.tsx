@@ -95,9 +95,9 @@ function ActivityItem({ log }: { log: UserActionLog }) {
   return (
     <div className="user-log">
       <div className="list-group-item-action log-container" onClick={() => setCollapsed(!collapsed)}>
-        <div className="d-flex justify-content-between">
+        <div className="log-header">
           {/* Top row - left */}
-          <div className="log-header">
+          <div className="log-title">
             {/* Error badge */}
             {log.level === "error" ? <span className={badgeClass + type}>{log.level}</span> : null}
             {/* Count badge */}
