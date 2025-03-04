@@ -113,29 +113,27 @@ export function PortsStatusTable({ isUpnpEnabled }: { isUpnpEnabled: boolean }) 
   if (portsToOpen.data)
     return (
       <>
-        <SubTitle>
-          Ports table
+        <SubTitle>Ports table</SubTitle>
+        <div className="portsButtonsWrapper">
           <Button
             variant={"dappnode"}
             className="float-right"
             onClick={apiStatusGet}
-            style={{ margin: "auto 5px auto" }}
             disabled={apiReqStatus.loading === true}
           >
             API Scan
           </Button>
-          {isUpnpEnabled ? (
+          {isUpnpEnabled && (
             <Button
               variant={"dappnode"}
               className="float-right"
               onClick={upnpStatusGet}
-              style={{ margin: "auto 5px auto" }}
               disabled={upnpReqStatus.loading === true}
             >
               UPnP Scan
             </Button>
-          ) : null}
-        </SubTitle>
+          )}
+        </div>
 
         <Table striped bordered hover>
           <thead>
