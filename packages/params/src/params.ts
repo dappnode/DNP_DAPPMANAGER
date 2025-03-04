@@ -383,6 +383,12 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x837a04322815b008c3e60c864bd5712e1da468b0"
+    },
+    {
+      name: "Shutter Network",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x30eFb96763f07892d0E2f7E900c672d43A202E61"
     }
   ]
 };
