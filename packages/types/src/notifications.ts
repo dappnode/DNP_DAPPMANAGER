@@ -2,7 +2,7 @@ export interface GatusConfig {
   endpoints: Endpoint[];
 }
 
-interface Endpoint {
+export interface Endpoint {
   name: string;
   enabled: boolean;
   url: string;
@@ -11,6 +11,13 @@ interface Endpoint {
   interval: string; // e.g., "1m"
   group: string;
   alerts: Alert[];
+  description: string; // dappnode specific
+  metric?: {
+    // dappnode specific
+    min: number;
+    max: number;
+    unit: string; // e.g ºC
+  };
 }
 
 interface Alert {
