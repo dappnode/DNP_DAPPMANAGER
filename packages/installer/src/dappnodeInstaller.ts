@@ -109,7 +109,8 @@ export class DappnodeInstaller extends DappnodeRepository {
         disclaimer: pkgRelease.disclaimer,
         gettingStarted: pkgRelease.gettingStarted,
         grafanaDashboards: pkgRelease.grafanaDashboards,
-        prometheusTargets: pkgRelease.prometheusTargets
+        prometheusTargets: pkgRelease.prometheusTargets,
+        notifications: pkgRelease.notifications
       });
     });
 
