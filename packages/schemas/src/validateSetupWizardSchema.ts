@@ -1,6 +1,6 @@
 import { ajv } from "./ajv.js";
 import { processError } from "./utils.js";
-import setupWizardSchema from "./schemas/setup-wizard.schema.json" assert { type: "json" };
+import setupWizardSchema from "./schemas/setup-wizard.schema.json" with { type: "json" };
 import { CliError } from "./error.js";
 import { SetupWizard } from "@dappnode/types";
 

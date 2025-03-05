@@ -86,7 +86,7 @@ export const releaseFiles = Object.freeze({
     multiple: true as const
   }),
   notifications: Object.freeze({
-    regex: /.*notifications.yaml$/,
+    regex: /^.*notifications\.yaml$/,
     format: FileFormat.YAML,
     maxSize: 10e3,
     required: false as const,
