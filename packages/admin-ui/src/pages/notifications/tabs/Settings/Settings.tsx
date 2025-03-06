@@ -1,9 +1,9 @@
 import SubTitle from "components/SubTitle";
 import React, { useState } from "react";
 import Switch from "components/Switch";
-
-import "../notifications.scss";
 import Slider from "components/Slider";
+
+import "./settings.scss";
 
 interface GatusConfig {
   endpoints: Endpoint[];

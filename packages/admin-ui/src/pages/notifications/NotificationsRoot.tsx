@@ -2,15 +2,13 @@ import React from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
-import { title, subPaths } from "../data";
-import { Inbox } from "./tabs/Inbox";
-import { NotificationsSettings } from "./tabs/Settings";
-import { InstallNotificationsPkg } from "./InstallNotifications";
+import { title, subPaths } from "./data";
+import { Inbox } from "./tabs/Inbox/Inbox";
+import { NotificationsSettings } from "./tabs/Settings/Settings";
+import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
 import Loading from "components/Loading";
-// CSS
-import "./notifications.scss";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
