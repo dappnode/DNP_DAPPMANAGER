@@ -1,7 +1,7 @@
 import { ajv } from "./ajv.js";
 import { CliError } from "./error.js";
 import { processError } from "./utils.js";
-import manifestSchema from "./schemas/manifest.schema.json" with { type: "json" };
+import manifestSchema from "./schemas/manifest.schema.json" assert { type: "json" };
 import { Manifest } from "@dappnode/types";
 
 /**
