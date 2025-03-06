@@ -1,0 +1,58 @@
+.notifications-settings {
+  .title-switch-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  .notifications-section-title {
+    margin: 0.5rem 0;
+  }
+
+  .manage-notifications-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .notifications-pkg-name {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+  }
+
+  .endpoint-list-card {
+    border-radius: 10px;
+    background-color: #e9ecef;
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+
+    .endpoint-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    hr {
+      width: 100%;
+    }
+
+    .slider-wrapper{
+      padding-top: 15px;
+      width: 50%;
+
+      @media (max-width: 60rem) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+#dark {
+  .notifications-settings {
+    .endpoint-list-card {
+      background-color: var(--color-dark-card);
+      color: var(--color-dark-maintext);
+    }
+  }
+}

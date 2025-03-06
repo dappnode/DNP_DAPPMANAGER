@@ -5,7 +5,7 @@ import { getInstallerPath } from "pages/installer/data";
 import SubTitle from "components/SubTitle";
 import Card from "components/Card";
 
-import "./notifications.scss";
+import "./installNotifications.scss";
 
 interface InstallNotificationsPkgProps {
   pkgName: string;
