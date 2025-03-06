@@ -2243,7 +2243,6 @@ __metadata:
     "@rollup/rollup-linux-x64-gnu": "npm:4.18.0"
     "@types/clipboard": "npm:^2.0.7"
     "@types/jest": "npm:^24.9.1"
-    "@types/node": "npm:^20.14.10"
     "@types/qrcode.react": "npm:^1.0.2"
     "@types/react": "npm:^18.2.14"
     "@types/react-dom": "npm:^18.3.0"
@@ -2299,7 +2298,6 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     mocha: "npm:^10.7.0"
     monero-rpc: "npm:0.5.0"
   languageName: unknown
@@ -2312,7 +2310,7 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.6"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:20.13.0"
+    "@types/node": "npm:^22.13.9"
     ajv: "npm:^8.12.0"
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
@@ -2339,7 +2337,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.6"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/node-telegram-bot-api": "npm:^0.64.6"
     "@types/semver": "npm:^7.3.13"
     "@types/systeminformation": "npm:^3.54.1"
@@ -2392,7 +2389,6 @@ __metadata:
     "@types/memoizee": "npm:^0.4.4"
     "@types/mocha": "npm:^10"
     "@types/multicodec": "npm:^1.0.0"
-    "@types/node": "npm:^20.14.10"
     "@types/semver": "npm:^7.3.13"
     "@types/sinon": "npm:^7.0.13"
     "@types/socket.io": "npm:^3.0.2"
@@ -2441,7 +2437,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.9"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
   languageName: unknown
@@ -2458,7 +2453,6 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.9"
     "@types/memoizee": "npm:0.4.4"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/tar-stream": "npm:2.1.0"
     dargs: "npm:7.0.0"
     data-uri-to-buffer: "npm:^2.0.0"
@@ -2479,7 +2473,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.9"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
   languageName: unknown
@@ -2493,7 +2486,6 @@ __metadata:
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     ethers: "npm:^6.10.0"
     mocha: "npm:^10.7.0"
     node-fetch: "npm:^3.3.2"
@@ -2505,7 +2497,6 @@ __metadata:
   resolution: "@dappnode/ethicalmetrics@workspace:packages/ethicalMetrics"
   dependencies:
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     mocha: "npm:^10.7.0"
   languageName: unknown
   linkType: soft
@@ -2517,7 +2508,6 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@types/lodash-es": "npm:^4.17.9"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
   languageName: unknown
@@ -2532,7 +2522,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/memoizee": "npm:0.4.4"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     memoizee: "npm:0.4.14"
     mocha: "npm:^10.7.0"
   languageName: unknown
@@ -2550,7 +2539,6 @@ __metadata:
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/memoizee": "npm:0.4.4"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     ajv: "npm:6.10.2"
     memoizee: "npm:0.4.14"
     mocha: "npm:^10.7.0"
@@ -2576,7 +2564,6 @@ __metadata:
     "@types/dockerode": "npm:^3.3.23"
     "@types/lodash-es": "npm:4.17.6"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/sinon": "npm:7.0.13"
     deepmerge: "npm:2.2.1"
     ethers: "npm:^6.10.0"
@@ -2600,7 +2587,6 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/stack-trace": "npm:0.0.29"
     mocha: "npm:^10.7.0"
     stack-trace: "npm:0.0.10"
@@ -2624,7 +2610,6 @@ __metadata:
     "@types/dockerode": "npm:^3.3.23"
     "@types/lodash-es": "npm:^4.17.6"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/semver": "npm:^7.3.13"
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
@@ -2642,7 +2627,6 @@ __metadata:
     "@dappnode/installer": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
-    "@types/node": "npm:^20.14.10"
   languageName: unknown
   linkType: soft
 
@@ -2652,7 +2636,6 @@ __metadata:
   dependencies:
     "@dappnode/types": "workspace:^0.1.0"
     "@types/mocha": "npm:10.0.2"
-    "@types/node": "npm:^20.14.10"
   languageName: unknown
   linkType: soft
 
@@ -2662,7 +2645,6 @@ __metadata:
   dependencies:
     "@dappnode/types": "npm:^0.1.38"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     ajv: "npm:^8.12.0"
     mocha: "npm:^10.7.0"
     semver: "npm:^7.5.0"
@@ -2679,7 +2661,6 @@ __metadata:
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
-    "@types/node": "npm:^20.14.10"
     "@types/semver": "npm:7.3.13"
     lodash-es: "npm:^4.17.21"
     semver: "npm:7.3.8"
@@ -2693,7 +2674,6 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@ipld/car": "npm:^5.3.2"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     "@types/semver": "npm:^7.3.13"
     esm: "npm:^3.2.25"
     ethers: "npm:^6.10.0"
@@ -2723,8 +2703,6 @@ __metadata:
 "@dappnode/types@workspace:^0.1.0, @dappnode/types@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@dappnode/types@workspace:packages/types"
-  dependencies:
-    "@types/node": "npm:^20.14.10"
   languageName: unknown
   linkType: soft
 
@@ -2736,7 +2714,6 @@ __metadata:
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     is-ip: "npm:3.0.0"
     mocha: "npm:^10.7.0"
   languageName: unknown
@@ -2754,7 +2731,6 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.9"
     "@types/memoizee": "npm:0.4.4"
     "@types/mocha": "npm:^10"
-    "@types/node": "npm:^20.14.10"
     ajv: "npm:^6.10.2"
     async: "npm:^3.2.5"
     async-retry: "npm:^1.3.1"
@@ -5712,15 +5688,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.13.0":
-  version: 20.13.0
-  resolution: "@types/node@npm:20.13.0"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/4fb1ab41d622bbf3434da138bd0f23052e5df3bc59852ea1228cdfe185fd9d66ea71171a68a3106452c883808be7eaa7bc4cd87f534708754d49849e817aa566
-  languageName: node
-  linkType: hard
-
 "@types/node@npm:^10.1.0, @types/node@npm:^10.3.5":
   version: 10.17.60
   resolution: "@types/node@npm:10.17.60"
@@ -5746,15 +5713,6 @@ __metadata:
   version: 18.17.1
   resolution: "@types/node@npm:18.17.1"
   checksum: 10c0/15b9d2d5de2e8607ea0c83286de437086467223c060b6165a2c8cb7b82caf46a4d8851489220adaa93dd525d62f014047ac005a7445be795581539436fc5e08e
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.14.10":
-  version: 20.14.10
-  resolution: "@types/node@npm:20.14.10"
-  dependencies:
-    undici-types: "npm:~5.26.4"
-  checksum: 10c0/0b06cff14365c2d0085dc16cc8cbea5c40ec09cfc1fea966be9eeecf35562760bfde8f88e86de6edfaf394501236e229d9c1084fad04fb4dec472ae245d8ae69
   languageName: node
   linkType: hard
 
@@ -19768,13 +19726,6 @@ __metadata:
   version: 2.0.5
   resolution: "undefsafe@npm:2.0.5"
   checksum: 10c0/96c0466a5fbf395917974a921d5d4eee67bca4b30d3a31ce7e621e0228c479cf893e783a109af6e14329b52fe2f0cb4108665fad2b87b0018c0df6ac771261d5
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~5.26.4":
-  version: 5.26.5
-  resolution: "undici-types@npm:5.26.5"
-  checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
   languageName: node
   linkType: hard
 
