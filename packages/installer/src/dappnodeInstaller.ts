@@ -11,7 +11,8 @@ import {
   PackageRequest,
   SetupWizard,
   GrafanaDashboard,
-  PrometheusTarget
+  PrometheusTarget,
+  GatusConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
@@ -23,7 +24,6 @@ import { parseTimeoutSeconds } from "./utils.js";
 import { getEthersProvider } from "./ethClient/index.js";
 import { omit } from "lodash-es";
 import { ethers } from "ethers";
-import { GatusConfig } from "../../types/dist/notifications.js";
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
