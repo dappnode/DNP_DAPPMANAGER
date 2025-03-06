@@ -41,7 +41,6 @@
     "@types/dockerode": "^3.3.23",
     "@types/lodash-es": "4.17.6",
     "@types/mocha": "^10",
-    "@types/node": "^20.14.10",
     "@types/sinon": "7.0.13",
     "it-all": "^3.0.4",
     "mocha": "^10.7.0",
