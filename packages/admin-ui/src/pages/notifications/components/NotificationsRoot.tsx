@@ -1,15 +1,16 @@
 import React from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
+import { useApi } from "api";
 // Own module
 import { title, subPaths } from "../data";
+import { Inbox } from "./tabs/Inbox";
+import { NotificationsSettings } from "./tabs/Settings";
+import { InstallNotificationsPkg } from "./InstallNotifications";
 // Components
 import Title from "components/Title";
-import Inbox from "./tabs/Inbox";
+import Loading from "components/Loading";
 // CSS
 import "./notifications.scss";
-import { useApi } from "api";
-import { InstallNotificationsPkg } from "./InstallNotifications";
-import Loading from "components/Loading";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
@@ -26,7 +27,7 @@ export const NotificationsRoot: React.FC = () => {
     {
       name: "Settings",
       subPath: subPaths.settings,
-      component: Inbox
+      component: NotificationsSettings
     }
   ];
 
@@ -36,14 +37,14 @@ export const NotificationsRoot: React.FC = () => {
 
   const notificationsDnpName = "notifications.public.dappnode.eth";
   const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
-  
+
   return (
     <>
       <Title title={title} />
       {loading ? (
         <Loading steps={["Loading data"]} />
       ) : !isNotificationsPkgInstalled ? (
-        <InstallNotificationsPkg pkgName={notificationsDnpName}/>
+        <InstallNotificationsPkg pkgName={notificationsDnpName} />
       ) : (
         <>
           <div className="horizontal-navbar">

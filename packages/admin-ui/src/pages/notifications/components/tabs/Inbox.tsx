@@ -12,7 +12,7 @@ interface Notification {
   body: string;
 }
 
-export default function Inbox() {
+export function Inbox() {
   const newNotifications: Notification[] = [
     {
       timestamp: "2021-06-01T12:00:00Z",
@@ -81,8 +81,8 @@ function NotificationCard({ notification }: { notification: Notification }) {
           <div className="notification-img"> IMG </div>
           <div className="notification-header-data">
             <div className="notification-header-details">
-              <div>{new Date(notification.timestamp).toLocaleString()}</div>
               <div>{notification.dnp}</div>
+              <div>{new Date(notification.timestamp).toLocaleString()}</div>
             </div>
             <div className="notification-title">{notification.title}</div>
           </div>
