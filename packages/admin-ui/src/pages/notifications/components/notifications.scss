@@ -96,7 +96,6 @@
   .title-switch-row {
     display: flex;
     flex-direction: row;
-    align-items: center;
     gap: 10px;
   }
   .notifications-section-title {
@@ -106,7 +105,7 @@
   .manage-notifications-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
   }
 
   .notifications-pkg-name {
@@ -114,10 +113,10 @@
     margin: 0.5rem 0;
   }
 
-  .endpoints-card {
+  .endpoint-list-card {
     border-radius: 10px;
     background-color: #e9ecef;
-    padding: 20px 10px;
+    padding: 20px 15px;
     display: flex;
     flex-direction: column;
 
@@ -131,12 +130,21 @@
     hr {
       width: 100%;
     }
+
+    .slider-wrapper{
+      padding-top: 15px;
+      width: 50%;
+
+      @media (max-width: 60rem) {
+        width: 100%;
+      }
+    }
   }
 }
 
 #dark {
   .notifications-settings {
-    .endpoints-card {
+    .endpoint-list-card {
       background-color: var(--color-dark-card);
       color: var(--color-dark-maintext);
     }
