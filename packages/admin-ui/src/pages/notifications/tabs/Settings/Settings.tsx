@@ -1,7 +1,7 @@
 import SubTitle from "components/SubTitle";
 import React, { useState } from "react";
 import Switch from "components/Switch";
-import Slider from "components/Slider";
+import { ManagePackageSection } from "./components/ManagePackageSection";
 
 import "./settings.scss";
 
@@ -9,7 +9,7 @@ interface GatusConfig {
   endpoints: Endpoint[];
 }
 
-interface Endpoint {
+export interface Endpoint {
   name: string;
   enabled: boolean;
   url: string;
@@ -181,67 +181,5 @@ export function NotificationsSettings() {
         </div>
       )}
     </div>
-  );
-}
-
-function ManagePackageSection({ pkg, endpoints }: { pkg: string; endpoints: Endpoint[] }) {
-  const [pkgNotificationsEnabled, setPkgNotificationsEnabled] = useState(true);
-
-  const handlePkgToggle = () => {
-    // TODO: update "notifications.yaml" file
-    setPkgNotificationsEnabled(!pkgNotificationsEnabled);
-  };
-
-  return (
-    <div key={String(pkg)}>
-      <div className="title-switch-row">
-        <SubTitle className="notifications-pkg-name">{pkg}</SubTitle>
-        <Switch
-          checked={pkgNotificationsEnabled}
-          onToggle={() => {
-            handlePkgToggle();
-          }}
-        />
-      </div>
-      {pkgNotificationsEnabled && (
-        <div className="endpoint-list-card">
-          {endpoints.map((endpoint, i) => (
-            <EndpointItem endpoint={endpoint} index={i} numEndpoints={endpoints.length} />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function EndpointItem({ endpoint, index, numEndpoints }: { endpoint: Endpoint; index: number; numEndpoints: number }) {
-  const [endpointEnabled, setEndpointEnabled] = useState(endpoint.enabled);
-
-  const handleEndpointToggle = () => {
-    // TODO: update "notifications.yaml" file
-    setEndpointEnabled(!endpointEnabled);
-  };
-
-  return (
-    <>
-      <div key={index} className="endpoint-row">
-        <div>
-          <strong>{endpoint.name}</strong>
-          <div>{endpoint.description}</div>
-        </div>
-        <Switch
-          checked={endpointEnabled}
-          onToggle={() => {
-            handleEndpointToggle();
-          }}
-        />
-      </div>
-      {endpointEnabled && endpoint.metric && (
-        <div className="slider-wrapper">
-          <Slider />
-        </div>
-      )}
-      {index + 1 < numEndpoints && <hr />}
-    </>
   );
 }
