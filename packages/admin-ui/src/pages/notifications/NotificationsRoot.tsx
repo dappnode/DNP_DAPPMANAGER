@@ -33,7 +33,7 @@ export const NotificationsRoot: React.FC = () => {
   const loading = dnpsRequest.isValidating;
   const installedDnps = dnpsRequest.data;
 
-  const notificationsDnpName = "notifications.public.dappnode.eth";
+  const notificationsDnpName = "notifications.dnp.dappnode.eth";
   const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
 
   return (
