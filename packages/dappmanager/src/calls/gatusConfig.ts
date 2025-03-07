@@ -15,15 +15,17 @@ export async function gatuGetAllNotifications(): Promise<Notification[]> {
 /**
  * Get gatus endpoints indexed by dnpName
  */
-export async function gatusGetEndpoints(): Promise<Map<string, Endpoint[]>> {
+export async function gatusGetEndpoints(): Promise<{ [dnpName: string]: Endpoint[] }> {
   const packages = await listPackages();
 
   // Read all manifests files and retrieve the gatus config
-  const endpoints = new Map<string, Endpoint[]>();
+  const endpoints: { [dnpName: string]: Endpoint[] } = {};
   for (const pkg of packages) {
     const manifestPath = getManifestPath(pkg.dnpName, pkg.isCore);
     const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-    if (manifest.notifications) endpoints.set(pkg.dnpName, manifest.notifications.endpoints);
+    if (manifest.notifications) {
+      endpoints[pkg.dnpName] = manifest.notifications.endpoints;
+    }
   }
 
   return endpoints;

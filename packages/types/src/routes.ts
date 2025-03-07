@@ -271,7 +271,7 @@ export interface Routes {
   /**
    * Gatus get endpoints
    */
-  gatusGetEndpoints(): Promise<Map<string, Endpoint[]>>;
+  gatusGetEndpoints(): Promise<{ [dnpName: string]: Endpoint[] }>;
 
   /**
    * Gatus update endpoint
