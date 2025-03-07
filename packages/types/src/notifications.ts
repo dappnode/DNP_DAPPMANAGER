@@ -1,3 +1,16 @@
+export interface Notification {
+  title: string;
+  body: string;
+  dnpName: string;
+  timestamp: string;
+  category: string;
+  seen: boolean;
+  callToAction?: {
+    title: string;
+    url: string;
+  };
+}
+
 export interface GatusConfig {
   endpoints: Endpoint[];
 }
@@ -30,4 +43,9 @@ interface Alert {
   "success-threshold": number;
   "send-on-resolved": boolean;
   description: string;
+  url: string;
+  method: string;
+  body: string;
+  headers: Record<string, string>;
+  placeholders: Record<string, Record<string, string>>;
 }

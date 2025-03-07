@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Accordion } from "react-bootstrap";
-import { Notification } from "../Inbox";
+import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 
 interface NotificationCardProps {
@@ -15,10 +15,10 @@ export function NotificationCard({ notification, avatarUrl }: NotificationCardPr
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
       <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)} className="notification-card">
         <div className="notification-header">
-          <img className="avatar" src={avatarUrl} alt={notification.dnp} />
+          <img className="avatar" src={avatarUrl} alt={notification.dnpName} />
           <div className="notification-header-data">
             <div className="notification-header-row secondary-text">
-              <div>{notification.dnp}</div>
+              <div>{notification.dnpName}</div>
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
             </div>
             <div className="notification-header-row ">

@@ -1,20 +1,29 @@
 import { listPackages } from "@dappnode/dockerapi";
-import { GatusConfig, Endpoint, Manifest } from "@dappnode/types";
+import { Endpoint, Manifest, Notification } from "@dappnode/types";
 import { getManifestPath } from "@dappnode/utils";
 import fs from "fs";
 
 /**
+ * Get all the notifications
+ * @returns all the notifications
+ */
+export async function gatuGetAllNotifications(): Promise<Notification[]> {
+  const response = await fetch(`http://notifier.notifications.dappnode:8080/api/v1/notifications`);
+  return response.json();
+}
+
+/**
  * Get gatus endpoints indexed by dnpName
  */
-export async function gatusGetEndpoints(): Promise<Map<string, GatusConfig>> {
+export async function gatusGetEndpoints(): Promise<Map<string, Endpoint[]>> {
   const packages = await listPackages();
 
   // Read all manifests files and retrieve the gatus config
-  const endpoints = new Map<string, GatusConfig>();
+  const endpoints = new Map<string, Endpoint[]>();
   for (const pkg of packages) {
     const manifestPath = getManifestPath(pkg.dnpName, pkg.isCore);
     const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-    if (manifest.notifications) endpoints.set(pkg.dnpName, manifest.notifications);
+    if (manifest.notifications) endpoints.set(pkg.dnpName, manifest.notifications.endpoints);
   }
 
   return endpoints;
