@@ -1,7 +1,6 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
 import { withToast } from "components/toast/Toast";
-import Card from "components/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import { StakerConfigGet } from "@dappnode/types";
@@ -146,7 +145,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
       <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
         {currentStakerConfigReq.data ? (
-          <Card>
+          <div>
             <p>
               Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will need
               to: <br />
@@ -234,7 +233,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
               {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
             </div>
-          </Card>
+          </div>
         ) : currentStakerConfigReq.error ? (
           <ErrorView error={currentStakerConfigReq.error} hideIcon red />
         ) : currentStakerConfigReq.isValidating ? (

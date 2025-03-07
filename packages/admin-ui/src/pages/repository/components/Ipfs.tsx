@@ -5,7 +5,6 @@ import { withToast } from "components/toast/Toast";
 import SubTitle from "components/SubTitle";
 import { IpfsClient } from "components/IpfsClient";
 import Button from "components/Button";
-import Card from "components/Card";
 import LinkDocs from "components/LinkDocs";
 import { forumUrl } from "params";
 
@@ -38,7 +37,7 @@ export default function Ipfs() {
   }
 
   return (
-    <Card className="dappnode-identity">
+    <div className="dappnode-identity">
       <SubTitle>IPFS</SubTitle>
       <div>
         DAppNode uses IPFS to distribute DAppNode packages in a decentralized way. Choose to connect to a remote IPFS
@@ -71,6 +70,6 @@ export default function Ipfs() {
           </div>
         </>
       ) : null}
-    </Card>
+    </div>
   );
 }
