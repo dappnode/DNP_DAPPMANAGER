@@ -11,7 +11,11 @@ export interface Endpoint {
   interval: string; // e.g., "1m"
   group: string;
   alerts: Alert[];
-  description: string; // dappnode specific
+  definition: {
+    // dappnode specific
+    title: string;
+    description: string;
+  };
   metric?: {
     // dappnode specific
     min: number;
