@@ -19,6 +19,7 @@ export interface Endpoint {
   name: string;
   enabled: boolean;
   url: string;
+  headers: Record<string, string>;
   method: string;
   conditions: string[];
   interval: string; // e.g., "1m"
