@@ -225,6 +225,13 @@ p.no-p-style:last-child {
   border-bottom: var(--border-style);
 }
 
+.card {
+  border-radius: 10px;
+}
+.card-body {
+  padding: 0.75rem;
+}
+
 /* Center bootstrap columns */
 
 .row > .center {
