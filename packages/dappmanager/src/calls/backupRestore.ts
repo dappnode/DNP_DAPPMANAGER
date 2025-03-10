@@ -57,7 +57,7 @@ export async function backupRestore({
     await shell(`tar -xf ${backupDirCompressed} -C ${backupDir}`);
     await shell(`rm -rf ${backupDirCompressed}`);
 
-    const successfulBackups = [];
+    const successfulBackups: string[] = [];
     let lastError: Error | null = null;
     for (const { name, path: toPath, service } of backup) {
       try {

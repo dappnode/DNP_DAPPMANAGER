@@ -15,7 +15,7 @@ export async function getPublicIpFromUrls(options?: { timeout?: number; retries?
   const timeout = options?.timeout || 15 * 1000;
   const retries = options?.retries || 10;
 
-  const errors = [];
+  const errors: string[] = [];
 
   for (const url of urls) {
     try {
