@@ -26,7 +26,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/mocha": "^10",
-    "@types/node": "^20.14.10",
     "@types/semver": "^7.3.13",
     "mocha": "^10.7.0",
     "rimraf": "^5.0.0",
