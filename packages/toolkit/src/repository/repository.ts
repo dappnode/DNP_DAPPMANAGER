@@ -253,7 +253,7 @@ export class DappnodeRepository extends ApmRepository {
    * @see catCarReaderToMemory
    */
   public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
-    const chunks = [];
+    const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);

@@ -31,7 +31,7 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
 
   // Copy file from container to local file system
   try {
-    const successfulBackups = [];
+    const successfulBackups: string[] = [];
     let lastError: Error | null = null;
     for (const { name, path: fromPath, service } of backup) {
       try {
@@ -72,9 +72,9 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
     // DEFER THIS ACTION: Clean intermediate file
     setTimeout(
       () => {
-        fs.unlink(backupDirComp, (errFs) => {
-          if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
-        });
+      fs.unlink(backupDirComp, (errFs) => {
+        if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
+      });
       },
       15 * 60 * 1000
     );
