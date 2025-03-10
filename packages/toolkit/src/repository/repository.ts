@@ -70,7 +70,7 @@ export class DappnodeRepository extends ApmRepository {
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);

@@ -1,37 +1,13 @@
-import { FlatCompat } from "@eslint/eslintrc";
-import { parse } from "@typescript-eslint/parser";
-import path from "path";
-import { fileURLToPath } from "url";
-import js from "@eslint/js";
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
 
-// mimic CommonJS variables -- not needed if using CommonJS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-  resolvePluginsRelativeTo: __dirname, // optional
-  recommendedConfig: js.configs.recommended, // optional unless using "eslint:recommended"
-  allConfig: js.configs.all // optional unless using "eslint:all"
+/** @type {import("@typescript-eslint/utils").TSESLint.Linter.Config} */
+const config = tseslint.config(eslint.configs.recommended, tseslint.configs.recommended, {
+  rules: {
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "no-unexpected-multiline": "off"
+  }
 });
 
-export default [
-  {
-    // Basic settings
-    languageOptions: {
-      parser: parse,
-      parserOptions: {
-        project: "./tsconfig.json", // Adjust path if necessary
-        tsconfigRootDir: __dirname,
-        sourceType: "module"
-      }
-    },
-    ignores: [
-      "packages/common/validation/schemas",
-      "node_modules",
-      "packages/*/dist",
-      "packages/*/node_modules",
-      "packages/*/build"
-    ]
-  }
-];
+export default config;

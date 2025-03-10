@@ -83,7 +83,7 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
        */
       try {
         await listener(...args);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+         
       } catch (e) {
         // Do not use logger module to avoud cirucular dependencies
         /**  logs.error(
