@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { api } from "api";
+import { api, useApi } from "api";
 import { useDispatch } from "react-redux";
 import { Routes, Route, useNavigate, useLocation, useParams, NavLink } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
@@ -28,6 +28,7 @@ import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
+import { ManagePackageSection } from "pages/notifications/tabs/Settings/components/ManagePackageSection";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -172,6 +173,13 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     }
   ].filter((option) => option.available);
 
+  const dnpsRequest = useApi.packagesGet();
+  const installedDnps = dnpsRequest.data;
+  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === "notifications.dnp.dappnode.eth");
+
+  const endpointsCall = useApi.gatusGetEndpoints();
+  const dnpNotificationEndpoints = endpointsCall.data && endpointsCall.data[dnpName];
+
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
 
@@ -179,6 +187,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const permissionsSubPath = "permissions";
   const warningsSubPath = "warnings";
   const disclaimerSubPath = "disclaimer";
+  const notificationsSubPath = "notifications";
   const installSubPath = "install";
 
   const availableRoutes: {
@@ -227,6 +236,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       subPath: disclaimerSubPath,
       render: () => <Disclaimer disclaimers={disclaimers} onAccept={goNext} goBack={goBack} />,
       available: disclaimers.length > 0
+    },
+    {
+      name: "Notifications",
+      subPath: notificationsSubPath,
+      render: () => <ManagePackageSection dnpName="Enable notifications" endpoints={dnpNotificationEndpoints || []} />,
+      available: isNotificationsPkgInstalled && dnpNotificationEndpoints && dnpNotificationEndpoints.length > 0
     },
     // Placeholder for the final step in the horizontal stepper
     {
