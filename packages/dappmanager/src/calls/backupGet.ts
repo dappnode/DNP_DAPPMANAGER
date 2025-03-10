@@ -70,14 +70,11 @@ export async function backupGet({ dnpName, backup }: { dnpName: string; backup: 
     db.fileTransferPath.set(fileId, backupDirComp);
 
     // DEFER THIS ACTION: Clean intermediate file
-    setTimeout(
-      () => {
+    setTimeout(() => {
       fs.unlink(backupDirComp, (errFs) => {
         if (errFs) logs.error(`Error deleting file: ${errFs.message}`);
       });
-      },
-      15 * 60 * 1000
-    );
+    }, 15 * 60 * 1000);
 
     return fileId;
   } catch (e) {

@@ -17,7 +17,9 @@ function fileToDataURL(files: FileList): Promise<string> {
   });
 }
 
-function dataURLtoFile(dataURL: string): {
+function dataURLtoFile(
+  dataURL: string
+): {
   name: string;
   size: number;
   type: string;

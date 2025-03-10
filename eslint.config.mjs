@@ -33,17 +33,5 @@ export default [
       "packages/*/node_modules",
       "packages/*/build"
     ]
-  },
-
-  // Optionally, add compatibility with old configs
-  ...compat.config({
-    plugins: ["@typescript-eslint", "prettier"],
-    extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "plugin:prettier/recommended"],
-    rules: {
-      "prettier/prettier": "error",
-      "no-unused-expressions": "off", // Disable standard no-unused-expressions rule
-      "@typescript-eslint/no-unused-expressions": "off", // Disable TypeScript-specific rule
-      "@typescript-eslint/no-unused-vars": ["error", { varsIgnorePattern: "^_", argsIgnorePattern: "^_" }]
-    }
-  })
+  }
 ];
