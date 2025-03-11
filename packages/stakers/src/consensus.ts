@@ -13,6 +13,7 @@ import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getDefaultConsensusUserSettings } from "@dappnode/utils";
+import { listPackages } from "@dappnode/dockerapi";
 
 // TODO: move ethereumClient logic here
 
@@ -69,10 +70,18 @@ export class Consensus extends StakerComponent {
   }
 
   async getAllConsensus(network: Network): Promise<StakerItem[]> {
-    return await super.getAll({
-      dnpNames: Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
-      currentClient: this.DbHandlers[network].get()
-    });
+    return await Promise.all(
+      Consensus.CompatibleConsensus[network]
+        .map((client) => client.dnpName)
+        .map(async (dnpName) =>
+          super.getStakerPkg({
+            dnpName,
+            dnpList: await listPackages(),
+            userSettings: await this.getUserSettings(network, dnpName),
+            currentClient: this.DbHandlers[network].get()
+          })
+        )
+    );
   }
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
