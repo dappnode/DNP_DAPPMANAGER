@@ -240,7 +240,17 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     {
       name: "Notifications",
       subPath: notificationsSubPath,
-      render: () => <ManagePackageSection dnpName="Enable notifications" endpoints={dnpNotificationEndpoints || []} />,
+      render: () => (
+        <>
+          <ManagePackageSection dnpName="Enable notifications" endpoints={dnpNotificationEndpoints || []} />
+          <div className="button-group">
+            <Button onClick={goBack}>Back</Button>
+            <Button variant="dappnode" onClick={() => goNext()}>
+              Next
+            </Button>
+          </div>
+        </>
+      ),
       available: isNotificationsPkgInstalled && dnpNotificationEndpoints && dnpNotificationEndpoints.length > 0
     },
     // Placeholder for the final step in the horizontal stepper
