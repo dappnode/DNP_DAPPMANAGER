@@ -1325,7 +1325,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/schemas@workspace:packages/schemas"
   dependencies:
-    "@dappnode/types": "npm:^0.1.38"
+    "@dappnode/types": "npm:^0.1.40"
     "@types/mocha": "npm:^10"
     ajv: "npm:^8.12.0"
     mocha: "npm:^10.7.0"
@@ -1375,14 +1375,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@dappnode/types@npm:^0.1.38":
-  version: 0.1.38
-  resolution: "@dappnode/types@npm:0.1.38"
-  checksum: 10c0/677e4d81335e1f021c3a911385eaef376c54e5c2303a6e41a8ad89638853a32a8d0318c66cde61166205840547b8606bc298b1f4c2e6b84259907d9692c69396
-  languageName: node
-  linkType: hard
-
-"@dappnode/types@workspace:^0.1.0, @dappnode/types@workspace:packages/types":
+"@dappnode/types@npm:^0.1.40, @dappnode/types@workspace:^0.1.0, @dappnode/types@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@dappnode/types@workspace:packages/types"
   languageName: unknown
