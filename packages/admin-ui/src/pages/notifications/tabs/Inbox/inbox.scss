@@ -40,6 +40,11 @@
         justify-content: space-between;
         align-items: flex-start;
         width: 100%;
+
+        .notification-name-row {
+          display: flex;
+          gap: 5px;
+        }
       }
       .secondary-text {
         color: var(--light-text-color);
@@ -48,6 +53,20 @@
           font-size: 0.8rem;
           flex-direction: column-reverse;
         }
+      }
+
+      .group-label {
+        display: flex;
+        align-items: center;
+        background-color: var(--color-light-border);
+        padding: 0px 5px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+      }
+      .sucess-label {
+        @extend .group-label;
+        background-color: rgba(0, 109, 29, 0.7) !important;
+        color: white;
       }
     }
   }
@@ -75,6 +94,10 @@
 
       .notification-header-details {
         color: var(--light-text-color);
+      }
+
+      .group-label {
+        background-color: var(--color-dark-border);
       }
     }
   }
