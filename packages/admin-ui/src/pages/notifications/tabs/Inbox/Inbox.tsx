@@ -11,8 +11,12 @@ import dappnodeIcon from "img/dappnode-logo-only.png";
 export function Inbox() {
   const dnpsRequest = useApi.packagesGet();
   const notifications = useApi.gatuGetAllNotifications();
-  const newNotifications = notifications.data?.filter((notification) => !notification.seen);
-  const seenNotifications = notifications.data?.filter((notification) => notification.seen);
+  const newNotifications = notifications.data
+    ?.filter((notification) => !notification.seen)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  const seenNotifications = notifications.data
+    ?.filter((notification) => notification.seen)
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   const loading = dnpsRequest.isValidating;
   const installedDnps = dnpsRequest.data;
   const findPkgAvatar = (dnpName: string) => {
