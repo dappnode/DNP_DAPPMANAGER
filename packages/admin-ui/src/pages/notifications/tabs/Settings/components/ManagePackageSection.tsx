@@ -5,11 +5,16 @@ import { EndpointItem } from "./EndpointItem";
 import { Endpoint } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 
-export function ManagePackageSection({ dnpName, endpoints }: { dnpName: string; endpoints: Endpoint[] }) {
-  const [pkgNotificationsEnabled, setPkgNotificationsEnabled] = useState(true);
+interface ManagePackageSectionProps {
+  dnpName: string;
+  endpoints: Endpoint[];
+}
+export function ManagePackageSection({ dnpName, endpoints }: ManagePackageSectionProps) {
+  const [pkgNotificationsEnabled, setPkgNotificationsEnabled] = useState(endpoints.some((ep) => ep.enabled));
+  const [pkgEndpoints, setPkgEndpoints] = useState(endpoints);
 
   const handlePkgToggle = () => {
-    // TODO: update "notifications.yaml" file
+    setPkgEndpoints(pkgEndpoints.map((ep) => ({ ...ep, enabled: !pkgNotificationsEnabled })));
     setPkgNotificationsEnabled(!pkgNotificationsEnabled);
   };
 
@@ -26,8 +31,13 @@ export function ManagePackageSection({ dnpName, endpoints }: { dnpName: string; 
       </div>
       {pkgNotificationsEnabled && (
         <div className="endpoint-list-card">
-          {endpoints.map((endpoint, i) => (
-            <EndpointItem endpoint={endpoint} index={i} numEndpoints={endpoints.length} />
+          {pkgEndpoints.map((endpoint, i) => (
+            <EndpointItem
+              endpoint={endpoint}
+              index={i}
+              numEndpoints={endpoints.length}
+              setPkgEndpoints={setPkgEndpoints}
+            />
           ))}
         </div>
       )}
