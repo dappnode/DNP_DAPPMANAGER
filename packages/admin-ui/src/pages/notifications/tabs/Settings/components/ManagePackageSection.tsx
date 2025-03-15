@@ -19,7 +19,7 @@ export function ManagePackageSection({ dnpName, endpoints }: ManagePackageSectio
   };
 
   return (
-    <div key={String(dnpName)}>
+    <div key={String(dnpName)} className="notifications-settings">
       <div className="title-switch-row">
         <SubTitle className="notifications-pkg-name">{prettyDnpName(dnpName)}</SubTitle>
         <Switch
