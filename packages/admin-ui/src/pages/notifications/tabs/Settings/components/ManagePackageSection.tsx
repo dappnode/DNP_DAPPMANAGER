@@ -4,7 +4,7 @@ import Switch from "components/Switch";
 import { EndpointItem } from "./EndpointItem";
 import { Endpoint } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
-import { useApi } from "api";
+import { api } from "api";
 
 interface ManagePackageSectionProps {
   dnpName: string;
@@ -35,10 +35,7 @@ export function ManagePackageSection({ dnpName, endpoints }: ManagePackageSectio
 
   useEffect(() => {
     // TODO: Implement timeOut that waits for more config updates before sending the new Endpoints config
-    const updateConfig = async () => {
-      useApi.gatusUpdateEndpoints({ dnpName, updatedEndpoints: pkgEndpoints });
-    };
-    updateConfig();
+    api.gatusUpdateEndpoints({ dnpName, updatedEndpoints: pkgEndpoints });
   }, [pkgEndpoints]);
   return (
     <div key={String(dnpName)} className="notifications-settings">
