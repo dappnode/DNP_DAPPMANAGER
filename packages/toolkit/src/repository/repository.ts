@@ -70,7 +70,7 @@ export class DappnodeRepository extends ApmRepository {
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -253,7 +253,7 @@ export class DappnodeRepository extends ApmRepository {
    * @see catCarReaderToMemory
    */
   public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
-    const chunks = [];
+    const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);

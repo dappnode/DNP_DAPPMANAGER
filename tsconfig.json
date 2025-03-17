@@ -30,7 +30,7 @@
     "allowJs": true /* TODO: We should not need to allow JS files (we could have full TS) */,
 
     /* Language and Environment */
-    "target": "ESNext" /* TODO: Review if we can use a defined target like ES2020 */,
+    "target": "ES2022" /* TODO: Review if we can use a defined target like ES2020 */,
     "lib": ["ESNext"], // Include the latest ECMAScript library
     "types": ["node"], // Include type definitions for Node.js
 

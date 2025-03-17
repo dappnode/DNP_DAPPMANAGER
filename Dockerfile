@@ -1,5 +1,5 @@
 # Arguments
-ARG BASE_IMAGE=node:20.16.0-alpine3.19
+ARG BASE_IMAGE=node:22.14.0-alpine3.21
 ARG BUILDPLATFORM
 
 # Initial stage to gather git data

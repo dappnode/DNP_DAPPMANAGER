@@ -17,7 +17,9 @@ function fileToDataURL(files: FileList): Promise<string> {
   });
 }
 
-function dataURLtoFile(dataURL: string): {
+function dataURLtoFile(
+  dataURL: string
+): {
   name: string;
   size: number;
   type: string;
@@ -44,7 +46,7 @@ function dataURLtoFile(dataURL: string): {
 
   // Built the Uint8Array Blob parameter from the base64 string.
   const binary = atob(splitted[1]);
-  const array = [];
+  const array: number[] = [];
   for (let i = 0; i < binary.length; i++) {
     array.push(binary.charCodeAt(i));
   }
@@ -97,8 +99,8 @@ export default function InputFieldFile({
         {processing
           ? "Loading file..."
           : file
-            ? `${decodeURIComponent(file.name)} - ${humanFS(file.size)}`
-            : "Choose file"}
+          ? `${decodeURIComponent(file.name)} - ${humanFS(file.size)}`
+          : "Choose file"}
       </label>
     </div>
   );
