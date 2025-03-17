@@ -1,7 +1,7 @@
 {
   "name": "@dappnode/types",
   "type": "module",
-  "version": "0.1.36",
+  "version": "0.1.40",
   "license": "GPL-3.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -15,8 +15,5 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.10"
   }
 }

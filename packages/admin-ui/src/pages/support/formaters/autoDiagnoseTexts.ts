@@ -155,8 +155,8 @@ export function coreDnpsRunning({
 
   if (!dnpInstalled) return null;
 
-  const notFound = [];
-  const notRunning = [];
+  const notFound: string[] = [];
+  const notRunning: string[] = [];
   for (const coreDnpName of mandatoryCoreDnps) {
     const coreDnp = dnpInstalled.find((dnp) => dnp.dnpName === coreDnpName);
     if (!coreDnp) notFound.push(coreDnpName);

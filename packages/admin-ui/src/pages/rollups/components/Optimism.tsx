@@ -109,34 +109,36 @@ export default function Optimism({ description }: { description: string }) {
     <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
       <OpCommunity />
       {currentOptimismConfigReq.data ? (
-        <Card>
-          <p>
-            Set up your Optimism node configuration: <br />
-            (1) <b>Choose</b> an <b>Execution Client</b> <br />
-            (2) <b>Select</b> the <b>Optimism Node</b> <br />
-            (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you are already running an Ethereum mainnet
-            node on this Dappnode)
+        <>
+          <Card>
+            <p>
+              Set up your Optimism node configuration: <br />
+              (1) <b>Choose</b> an <b>Execution Client</b> <br />
+              (2) <b>Select</b> the <b>Optimism Node</b> <br />
+              (3) <b>Input</b> the <b>Ethereum RPC URL</b> (Not necessary if you are already running an Ethereum mainnet
+              node on this Dappnode)
+              <br />
+              (4) [Optional] <b>Select Legacy Geth</b> to enable historical transactions
+            </p>
             <br />
-            (4) [Optional] <b>Select Legacy Geth</b> to enable historical transactions
-          </p>
-          <br />
 
-          <p>{description}</p>
+            <p>{description}</p>
 
-          <>
-            <Input
-              value={customMainnetRpcUrl || ""}
-              onValueChange={(value: string) => setCustomMainnetRpcUrl(value)}
-              isInvalid={Boolean(ethRpcUrlError)}
-              prepend="Ethereum RPC URL"
-              placeholder="Ethereum mainnet RPC URL for Optimism node"
-            />
-            {customMainnetRpcUrl && ethRpcUrlError && (
-              <Form.Text className="text-danger" as="span">
-                {ethRpcUrlError}
-              </Form.Text>
-            )}
-          </>
+            <>
+              <Input
+                value={customMainnetRpcUrl || ""}
+                onValueChange={(value: string) => setCustomMainnetRpcUrl(value)}
+                isInvalid={Boolean(ethRpcUrlError)}
+                prepend="Ethereum RPC URL"
+                placeholder="Ethereum mainnet RPC URL for Optimism node"
+              />
+              {customMainnetRpcUrl && ethRpcUrlError && (
+                <Form.Text className="text-danger" as="span">
+                  {ethRpcUrlError}
+                </Form.Text>
+              )}
+            </>
+          </Card>
 
           <Row className="staker-network">
             <Col>
@@ -195,7 +197,7 @@ export default function Optimism({ description }: { description: string }) {
 
             {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
           </div>
-        </Card>
+        </>
       ) : currentOptimismConfigReq.error ? (
         <ErrorView error={currentOptimismConfigReq.error} hideIcon red />
       ) : currentOptimismConfigReq.isValidating ? (
