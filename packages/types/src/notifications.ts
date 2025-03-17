@@ -19,7 +19,6 @@ export interface Endpoint {
   name: string;
   enabled: boolean;
   url: string;
-  headers: Record<string, string>;
   method: string;
   conditions: string[];
   interval: string; // e.g., "1m"
@@ -44,9 +43,5 @@ interface Alert {
   "success-threshold": number;
   "send-on-resolved": boolean;
   description: string;
-  url: string;
-  method: string;
-  body: string;
-  headers: Record<string, string>;
-  placeholders: Record<string, Record<string, string>>;
+  enabled: boolean;
 }
