@@ -8,14 +8,14 @@ import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
-import Loading from "components/Loading";
+import { renderResponse } from "components/SwrRender";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
     name: string;
     subPath: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: () => React.JSX.Element;
+    component: React.ComponentType;
   }[] = [
     {
       name: "Inbox",
@@ -30,40 +30,38 @@ export const NotificationsRoot: React.FC = () => {
   ];
 
   const dnpsRequest = useApi.packagesGet();
-  const loading = dnpsRequest.isValidating;
-  const installedDnps = dnpsRequest.data;
 
-  const notificationsDnpName = "notifications.dnp.dappnode.eth";
-  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
+  return renderResponse(dnpsRequest, ["Loading notifications"], (dnps) => {
+    const notificationsDnpName = "notifications.dnp.dappnode.eth";
+    const isNotificationsPkgInstalled = dnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
 
-  return (
-    <>
-      <Title title={title} />
-      {loading ? (
-        <Loading steps={["Loading data"]} />
-      ) : !isNotificationsPkgInstalled ? (
-        <InstallNotificationsPkg pkgName={notificationsDnpName} />
-      ) : (
-        <>
-          <div className="horizontal-navbar">
-            {availableRoutes.map((route) => (
-              <button key={route.subPath} className="item-container">
-                <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                  {route.name}
-                </NavLink>
-              </button>
-            ))}
-          </div>
-
-          <div className="section-spacing">
-            <Routes>
+    return (
+      <>
+        <Title title={title} />
+        {!isNotificationsPkgInstalled ? (
+          <InstallNotificationsPkg pkgName={notificationsDnpName} />
+        ) : (
+          <>
+            <div className="horizontal-navbar">
               {availableRoutes.map((route) => (
-                <Route key={route.subPath} path={route.subPath} element={<route.component />} />
+                <button key={route.subPath} className="item-container">
+                  <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
+                    {route.name}
+                  </NavLink>
+                </button>
               ))}
-            </Routes>
-          </div>
-        </>
-      )}
-    </>
-  );
+            </div>
+
+            <div className="section-spacing">
+              <Routes>
+                {availableRoutes.map((route) => (
+                  <Route key={route.subPath} path={route.subPath} element={<route.component />} />
+                ))}
+              </Routes>
+            </div>
+          </>
+        )}
+      </>
+    );
+  });
 };
