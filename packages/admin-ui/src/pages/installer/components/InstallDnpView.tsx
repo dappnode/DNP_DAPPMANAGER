@@ -28,7 +28,7 @@ import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
-import { ManagePackageSection } from "pages/notifications/tabs/Settings/components/ManagePackageSection";
+import { Notifications } from "./Steps/Notifications";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -55,6 +55,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const dispatch = useDispatch();
 
   const { dnpName, reqVersion, semVersion, settings, manifest, setupWizard, isInstalled, installedVersion } = dnp;
+  console.log("manifest", manifest);
+
   const updateType = installedVersion && diff(installedVersion, semVersion);
   const areUpdateWarnings =
     manifest.warnings?.onPatchUpdate || manifest.warnings?.onMinorUpdate || manifest.warnings?.onMajorUpdate;
@@ -177,8 +179,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const installedDnps = dnpsRequest.data;
   const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === "notifications.dnp.dappnode.eth");
 
-  const endpointsCall = useApi.gatusGetEndpoints();
-  const dnpNotificationEndpoints = endpointsCall.data && endpointsCall.data[dnpName];
+  const dnpNotificationEndpoints = manifest.notifications?.endpoints || [];
 
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
@@ -240,17 +241,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     {
       name: "Notifications",
       subPath: notificationsSubPath,
-      render: () => (
-        <>
-          <ManagePackageSection dnpName="Enable notifications" endpoints={dnpNotificationEndpoints || []} />
-          <div className="button-group">
-            <Button onClick={goBack}>Back</Button>
-            <Button variant="dappnode" onClick={() => goNext()}>
-              Next
-            </Button>
-          </div>
-        </>
-      ),
+      render: () => <Notifications endpoints={dnpNotificationEndpoints || []} goBack={goBack} goNext={goNext} dnpName={dnpName}/>,
       available: isNotificationsPkgInstalled && dnpNotificationEndpoints && dnpNotificationEndpoints.length > 0
     },
     // Placeholder for the final step in the horizontal stepper

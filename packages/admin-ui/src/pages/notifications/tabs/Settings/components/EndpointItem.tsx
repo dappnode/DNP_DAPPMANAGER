@@ -26,8 +26,6 @@ export function EndpointItem({ endpoint, index, numEndpoints, setPkgEndpoints }:
     // );
   };
 
-  console.log("EndpointItem", endpoint, index);
-
   return (
     <>
       <div key={index} className="endpoint-row">
