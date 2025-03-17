@@ -8,6 +8,7 @@ interface SliderProps {
   value?: number;
   unit?: string;
   onChange?: (value: number) => void;
+  onChangeComplete?: (value: number) => void;
 }
 
 const Slider: React.FC<SliderProps> = ({
@@ -17,6 +18,7 @@ const Slider: React.FC<SliderProps> = ({
   value = 50,
   unit = "%",
   onChange,
+  onChangeComplete, // In order to trigger an action when the user releases the slider
 }) => {
   const [sliderValue, setSliderValue] = useState(value);
 
@@ -24,6 +26,14 @@ const Slider: React.FC<SliderProps> = ({
     const newValue = Number(e.target.value);
     setSliderValue(newValue);
     if (onChange) onChange(newValue);
+  };
+
+  const handleMouseUp = () => {
+    if (onChangeComplete) onChangeComplete(sliderValue);
+  };
+
+  const handleTouchEnd = () => {
+    if (onChangeComplete) onChangeComplete(sliderValue);
   };
 
   return (
@@ -35,6 +45,8 @@ const Slider: React.FC<SliderProps> = ({
         step={step}
         value={sliderValue}
         onChange={handleChange}
+        onMouseUp={handleMouseUp} // For mouse support
+        onTouchEnd={handleTouchEnd} // For mobile support
         className="slider-component"
       />
       <span className="slider-value">{sliderValue} {unit && unit}</span>

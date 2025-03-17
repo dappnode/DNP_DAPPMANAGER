@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Endpoint } from "@dappnode/types";
 import Switch from "components/Switch";
 import Slider from "components/Slider";
@@ -27,10 +27,6 @@ export function EndpointItem({ endpoint, index, numEndpoints, setPkgEndpoints }:
 
   const [sliderValue, setSliderValue] = useState<number>(parseFloat(conditionValue));
 
-  useEffect(() => {
-    console.log("sliderValue", endpoint.name, endpoint.metric, sliderValue);
-  }, [sliderValue]);
-
   const handleEndpointToggle = () => {
     setPkgEndpoints((prevEndpoints) =>
       prevEndpoints.map((ep, i) => (i === index ? { ...ep, enabled: !ep.enabled } : ep))
@@ -39,9 +35,13 @@ export function EndpointItem({ endpoint, index, numEndpoints, setPkgEndpoints }:
 
   const handleSliderUpdate = (value: number) => {
     setSliderValue(value);
+  };
+
+  const handleSliderUpdateComplete = (value: number) => {
     const updatedCondition = operator
       ? `${endpoint.conditions[0].split(operator)[0].trim()} ${operator} ${value}`
       : endpoint.conditions[0];
+
     setPkgEndpoints((prevEndpoints) =>
       prevEndpoints.map((ep, i) =>
         i === index
@@ -71,6 +71,7 @@ export function EndpointItem({ endpoint, index, numEndpoints, setPkgEndpoints }:
           <Slider
             value={sliderValue}
             onChange={handleSliderUpdate}
+            onChangeComplete={handleSliderUpdateComplete}
             min={endpoint.metric.min}
             max={endpoint.metric.max}
             unit={endpoint.metric.unit}
