@@ -34,24 +34,24 @@ export async function gatusGetEndpoints(): Promise<{ [dnpName: string]: Endpoint
 /**
  * Update endpoint properties
  * @param dnpName
- * @param updatedEndpoint
+ * @param updatedEndpoints
  */
-export async function gatusUpdateEndpoint({
+export async function gatusUpdateEndpoints({
   dnpName,
-  updatedEndpoint
+  updatedEndpoints
 }: {
   dnpName: string;
-  updatedEndpoint: Endpoint;
+  updatedEndpoints: Endpoint[];
 }): Promise<void> {
   // Get current endpoint status
   const manifest: Manifest = JSON.parse(fs.readFileSync(getManifestPath(dnpName, false), "utf8"));
   if (!manifest.notifications) throw new Error("No notifications found in manifest");
 
-  const endpoint = manifest.notifications.endpoints.find((e) => e.name === updatedEndpoint.name);
-  if (!endpoint) throw new Error(`Endpoint ${updatedEndpoint.name} not found in manifest`);
+  const endpoints = manifest.notifications.endpoints;
+  if (!endpoints) throw new Error(`No endpoints found in manifest`);
 
   // Update endpoint
-  Object.assign(endpoint, updatedEndpoint);
+  Object.assign(endpoints, updatedEndpoints);
 
   // Save manifest
   fs.writeFileSync(getManifestPath(dnpName, false), JSON.stringify(manifest, null, 2));

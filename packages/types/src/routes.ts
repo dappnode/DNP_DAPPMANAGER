@@ -276,7 +276,7 @@ export interface Routes {
   /**
    * Gatus update endpoint
    */
-  gatusUpdateEndpoint: (kwargs: { dnpName: string; updatedEndpoint: Endpoint }) => Promise<void>;
+  gatusUpdateEndpoints: (kwargs: { dnpName: string; updatedEndpoints: Endpoint[] }) => Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -709,7 +709,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDnpRequest: {},
   gatuGetAllNotifications: { log: true },
   gatusGetEndpoints: { log: true },
-  gatusUpdateEndpoint: { log: true },
+  gatusUpdateEndpoints: { log: true },
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },

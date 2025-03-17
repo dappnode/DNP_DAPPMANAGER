@@ -22,7 +22,7 @@ export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export { getIsConnectedToInternet } from "./getIsConnectedToInternet.js";
-export { gatusGetEndpoints, gatusUpdateEndpoint, gatuGetAllNotifications } from "./gatusConfig.js";
+export { gatusGetEndpoints, gatusUpdateEndpoints, gatuGetAllNotifications } from "./gatusConfig.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";

@@ -390,7 +390,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   gatusGetEndpoints: async () => {
     return { "geth.dnp.dappnode.eth": [] };
   },
-  gatusUpdateEndpoint: async () => {},
+  gatusUpdateEndpoints: async () => {},
   gatuGetAllNotifications: async () => []
 };
 
