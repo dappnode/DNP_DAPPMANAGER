@@ -56,12 +56,11 @@ export async function gatusUpdateEndpoints({
   // Save manifest
   fs.writeFileSync(getManifestPath(dnpName, false), JSON.stringify(manifest, null, 2));
 
-  // Update endpoint in gatus
-  // await fetch(`http://notifier.notifications.dappnode:8082/gatus/endpoints`, {
-  //   method: "POST",
-  //   headers: {
-  //     "Content-Type": "application/json"
-  //   },
-  //   body: JSON.stringify(endpoint)
-  // });
+  // Trigger reload. Gatus will execute reload at a minimum interval of x seconds
+  await fetch(`http://notifier.notifications.dappnode:8082/api/v1/gatus/endpoints/reload`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 }
