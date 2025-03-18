@@ -8,6 +8,7 @@ import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNoti
 import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
+import { NotificationsSettings } from "./tabs/Settings/Settings";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
@@ -20,6 +21,11 @@ export const NotificationsRoot: React.FC = () => {
       name: "Inbox",
       subPath: subPaths.inbox,
       component: Inbox
+    },
+    {
+      name: "Settings",
+      subPath: subPaths.settings,
+      component: NotificationsSettings
     }
   ];
 
