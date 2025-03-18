@@ -45,7 +45,7 @@ import {
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
-import { Endpoint } from "./notifications.js";
+import { Endpoint, Notification } from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
