@@ -6,5 +6,6 @@ export const title = "Notifications";
 
 // SubPaths
 export const subPaths = {
-  inbox: "inbox"
+  inbox: "inbox",
+  settings: "settings"
 };
