@@ -7,7 +7,8 @@ export enum Network {
   Prater = "prater",
   Gnosis = "gnosis",
   Lukso = "lukso",
-  Holesky = "holesky"
+  Holesky = "holesky",
+  Hoodie = "hoodie"
 }
 
 // MAINNET
@@ -73,6 +74,28 @@ export enum SignerHolesky {
 }
 export enum MevBoostHolesky {
   Mevboost = "mev-boost-holesky.dnp.dappnode.eth"
+}
+
+// HOODIE
+export enum ConsensusClientHoodie {
+  Prysm = "prysm-hoodie.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-hoodie.dnp.dappnode.eth",
+  Teku = "teku-hoodie.dnp.dappnode.eth",
+  Nimbus = "nimbus-hoodie.dnp.dappnode.eth",
+  Lodestar = "lodestar-hoodie.dnp.dappnode.eth"
+}
+export enum ExecutionClientHoodie {
+  Geth = "hoodie-geth.dnp.dappnode.eth",
+  Erigon = "hoodie-erigon.dnp.dappnode.eth",
+  Nethermind = "hoodie-nethermind.dnp.dappnode.eth",
+  Besu = "hoodie-besu.dnp.dappnode.eth",
+  Reth = "hoodie-reth.dnp.dappnode.eth"
+}
+export enum SignerHoodie {
+  Web3signer = "web3signer-hoodie.dnp.dappnode.eth"
+}
+export enum MevBoostHoodie {
+  Mevboost = "mev-boost-hoodie.dnp.dappnode.eth"
 }
 
 // GNOSIS

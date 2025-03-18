@@ -1,4 +1,4 @@
-import { MevBoostHolesky, MevBoostMainnet, MevBoostPrater, Network, StakerItem, UserSettings } from "@dappnode/types";
+import { MevBoostHolesky, MevBoostHoodie, MevBoostMainnet, MevBoostPrater, Network, StakerItem, UserSettings } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -12,6 +12,7 @@ export class MevBoost extends StakerComponent {
     [Network.Gnosis]: db.mevBoostGnosis,
     [Network.Prater]: db.mevBoostPrater,
     [Network.Holesky]: db.mevBoostHolesky,
+    [Network.Hoodie]: db.mevBoostHoodie,
     [Network.Lukso]: db.mevBoostLukso
   };
 
@@ -27,6 +28,10 @@ export class MevBoost extends StakerComponent {
     },
     [Network.Holesky]: {
       dnpName: MevBoostHolesky.Mevboost,
+      minVersion: "0.1.0"
+    },
+    [Network.Hoodie]: {
+      dnpName: MevBoostHoodie.Mevboost,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: null

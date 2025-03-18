@@ -1,6 +1,7 @@
 import {
   ExecutionClientGnosis,
   ExecutionClientHolesky,
+  ExecutionClientHoodie,
   ExecutionClientLukso,
   ExecutionClientMainnet,
   ExecutionClientPrater,
@@ -30,6 +31,7 @@ export class Execution extends StakerComponent {
     [Network.Gnosis]: db.executionClientGnosis,
     [Network.Prater]: db.executionClientPrater,
     [Network.Holesky]: db.executionClientHolesky,
+    [Network.Hoodie]: db.executionClientHoodie,
     [Network.Lukso]: db.executionClientLukso
   };
 
@@ -57,6 +59,13 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHolesky.Erigon, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHolesky.Besu, minVersion: "0.1.0" }
+    ],
+    [Network.Hoodie]: [
+      { dnpName: ExecutionClientHoodie.Reth, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHoodie.Geth, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHoodie.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHoodie.Nethermind, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientHoodie.Besu, minVersion: "0.1.0" }
     ],
     [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
   };

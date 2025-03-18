@@ -24,8 +24,11 @@ export const GLOBAL_ENVS = {
   EXECUTION_CLIENT_LUKSO: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_LUKSO", // "lukso-geth.dnp.dappnode.eth",
   MEVBOOST_LUKSO: "_DAPPNODE_GLOBAL_MEVBOOST_LUKSO", // "mevboost-lukso.dnp.dappnode.eth"
   CONSENSUS_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOLESKY", // "prysm-holesky.dnp.dappnode.eth"
-  EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "geth.dnp.dappnode.eth"
-  MEVBOOST_HOLESKY: "_DAPPNODE_GLOBAL_MEVBOOST_HOLESKY" // "mevboost-holesky.dnp.dappnode.eth"
+  EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "holesky-geth.dnp.dappnode.eth"
+  MEVBOOST_HOLESKY: "_DAPPNODE_GLOBAL_MEVBOOST_HOLESKY", // "mevboost-holesky.dnp.dappnode.eth"
+  CONSENSUS_CLIENT_HOODIE: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOODIE", // "prysm-hoodie.dnp.dappnode.eth"
+  EXECUTION_CLIENT_HOODIE: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOODIE", // "hoodie-geth.dnp.dappnode.eth"
+  MEVBOOST_HOODIE: "_DAPPNODE_GLOBAL_MEVBOOST_HOODIE" // "mevboost-hoodie.dnp.dappnode.eth"
 };
 
 /**

@@ -123,12 +123,20 @@ export default function StakerNetwork({ network, description }: { network: Netwo
       {network === "prater" && (
         <AlertDismissible variant="warning">
           <p>
-            The prater network is about to be deprecated, please migrate to <b>Holesky</b>.
+            The prater network is deprecated, please migrate to <b>Hoodie</b>.
+          </p>
+        </AlertDismissible>
+      )}
+      
+      {network === "holesky" && (
+        <AlertDismissible variant="warning">
+          <p>
+            The holesky network is about to be deprecated, please migrate to <b>Hoodie</b>.
           </p>
         </AlertDismissible>
       )}
 
-      {(network === "prater" || network === "mainnet") && (
+      {(network === "holesky" || network === "mainnet") && (
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
@@ -197,7 +205,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   isSelected={Boolean(newWeb3signer)}
                 />
               </Col>
-              {["prater", "mainnet", "holesky"].includes(network) && currentStakerConfigReq.data.mevBoost && (
+              {["prater", "mainnet", "holesky", "hoodie"].includes(network) && currentStakerConfigReq.data.mevBoost && (
                 <Col>
                   <SubTitle>Mev Boost</SubTitle>
                   <MevBoost

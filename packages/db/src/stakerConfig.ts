@@ -105,6 +105,31 @@ export const mevBoostHolesky = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_HOLESKY })[0]
 );
 
+// Hoodie
+
+const CONSENSUS_CLIENT_HOODIE = "consensus-client-hoodie";
+const EXECUTION_CLIENT_HOODIE = "execution-client-hoodie";
+const MEVBOOST_HOODIE = "mevboost-hoodie";
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusClientHoodie = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOODIE, null),
+  Object.keys({ CONSENSUS_CLIENT_HOODIE })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionClientHoodie = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOODIE, null),
+  Object.keys({ EXECUTION_CLIENT_HOODIE })[0]
+);
+
+export const mevBoostHoodie = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_HOODIE, false),
+  Object.keys({ MEVBOOST_HOODIE })[0]
+);
+
 // LUKSO
 
 const CONSENSUS_CLIENT_LUKSO = "consensus-client-lukso";
