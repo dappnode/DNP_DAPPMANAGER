@@ -54,7 +54,8 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
     "links",
     "repository",
     "bugs",
-    "license"
+    "license",
+    "notifications"
   ]);
 
   res.status(200).send(filteredManifest);

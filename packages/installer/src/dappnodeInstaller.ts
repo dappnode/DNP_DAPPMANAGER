@@ -11,7 +11,8 @@ import {
   PackageRequest,
   SetupWizard,
   GrafanaDashboard,
-  PrometheusTarget
+  PrometheusTarget,
+  GatusConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
@@ -72,7 +73,8 @@ export class DappnodeInstaller extends DappnodeRepository {
       disclaimer: pkgRelease.disclaimer,
       gettingStarted: pkgRelease.gettingStarted,
       grafanaDashboards: pkgRelease.grafanaDashboards,
-      prometheusTargets: pkgRelease.prometheusTargets
+      prometheusTargets: pkgRelease.prometheusTargets,
+      notifications: pkgRelease.notifications
     });
 
     // set compose to custom dappnode compose in release
@@ -107,7 +109,8 @@ export class DappnodeInstaller extends DappnodeRepository {
         disclaimer: pkgRelease.disclaimer,
         gettingStarted: pkgRelease.gettingStarted,
         grafanaDashboards: pkgRelease.grafanaDashboards,
-        prometheusTargets: pkgRelease.prometheusTargets
+        prometheusTargets: pkgRelease.prometheusTargets,
+        notifications: pkgRelease.notifications
       });
     });
 
@@ -151,7 +154,8 @@ export class DappnodeInstaller extends DappnodeRepository {
     disclaimer,
     gettingStarted,
     prometheusTargets,
-    grafanaDashboards
+    grafanaDashboards,
+    notifications
   }: {
     manifest: Manifest;
     SetupWizard?: SetupWizard;
@@ -159,12 +163,14 @@ export class DappnodeInstaller extends DappnodeRepository {
     gettingStarted?: string;
     prometheusTargets?: PrometheusTarget[];
     grafanaDashboards?: GrafanaDashboard[];
+    notifications?: GatusConfig;
   }): Manifest {
     if (SetupWizard) manifest.setupWizard = SetupWizard;
     if (disclaimer) manifest.disclaimer = { message: disclaimer };
     if (gettingStarted) manifest.gettingStarted = gettingStarted;
     if (prometheusTargets) manifest.prometheusTargets = prometheusTargets;
     if (grafanaDashboards && grafanaDashboards.length > 0) manifest.grafanaDashboards = grafanaDashboards;
+    if (notifications) manifest.notifications = notifications;
 
     return manifest;
   }
