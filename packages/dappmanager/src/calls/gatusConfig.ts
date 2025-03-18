@@ -10,7 +10,7 @@ const BASE_URL = "http://notifier.notifications.dappnode";
  * @returns all the notifications
  */
 export async function gatuGetAllNotifications(): Promise<Notification[]> {
-  const response = await fetch(new URL(":8080/api/v1/notifications", BASE_URL).toString());
+  const response = await fetch(new URL("/api/v1/notifications", `${BASE_URL}:8080`).toString());
   return response.json();
 }
 
@@ -59,7 +59,7 @@ export async function gatusUpdateEndpoints({
   fs.writeFileSync(getManifestPath(dnpName, false), JSON.stringify(manifest, null, 2));
 
   // Trigger reload. Gatus will execute reload at a minimum interval of x seconds
-  await fetch(new URL(":8082/api/v1/gatus/endpoints/reload", BASE_URL).toString(), {
+  await fetch(new URL("/api/v1/gatus/endpoints/reload", `${BASE_URL}:8082`).toString(), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
