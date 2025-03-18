@@ -22,7 +22,8 @@ export function NotificationCard({ notification, avatarUrl }: NotificationCardPr
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
                 <div className="group-label">{notification.category}</div>
-                {notification.body.includes("Resolved: ") && <div className="sucess-label">success</div>}
+                {notification.body.includes("Resolved: ") && <div className="sucess-label">resolved</div>}
+                {notification.body.includes("Triggered: ") && <div className="trigger-label">triggered</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>

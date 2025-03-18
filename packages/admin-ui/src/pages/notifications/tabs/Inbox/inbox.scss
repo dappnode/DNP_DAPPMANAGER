@@ -68,6 +68,11 @@
         background-color: rgba(0, 109, 29, 0.7) !important;
         color: white;
       }
+      .trigger-label {
+        @extend .group-label;
+        background-color: rgba(255, 30, 29, 0.5) !important;
+        color: white;
+      }
     }
   }
 
