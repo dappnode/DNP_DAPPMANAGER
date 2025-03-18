@@ -1,9 +1,14 @@
 import { expect } from "chai";
-import { validateComposeSchema, validateManifestSchema, validateSetupWizardSchema } from "../../src/index.js";
+import {
+  validateComposeSchema,
+  validateManifestSchema,
+  validateSetupWizardSchema,
+  validateNotificationsSchema
+} from "../../src/index.js";
 import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
-import { Manifest, SetupWizard } from "@dappnode/types";
+import { Manifest, SetupWizard, GatusConfig, Endpoint } from "@dappnode/types";
 
 describe("schemaValidation", function () {
   this.timeout(10000);
@@ -432,6 +437,159 @@ volumes:
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+  });
+
+  describe("notifications", () => {
+    it("should validate a valid notifications configuration", () => {
+      const validNotifications: GatusConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            metric: {
+              min: 0,
+              max: 1000,
+              unit: "ms"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for missing required fields", () => {
+      const invalidNotifications: Partial<GatusConfig> = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST"
+            // Missing required fields like conditions, interval, group, alerts, and definition
+          } as Endpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications as GatusConfig)).to.throw(
+        "Invalid notifications configuration"
+      );
+    });
+
+    it("should throw an error for invalid URL format", () => {
+      const invalidNotifications: GatusConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "invalid-url",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "1m",
+            group: "example-group",
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for invalid interval format", () => {
+      const invalidNotifications: GatusConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "invalid-interval",
+            group: "example-group",
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for missing alert fields", () => {
+      const invalidNotifications: GatusConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "1m",
+            group: "example-group",
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                // Missing success-threshold and other required fields
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          } as Endpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
     });
   });
 });
