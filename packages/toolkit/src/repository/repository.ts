@@ -70,7 +70,6 @@ export class DappnodeRepository extends ApmRepository {
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
-       
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -205,7 +204,8 @@ export class DappnodeRepository extends ApmRepository {
       disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries),
       gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries),
       prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries),
-      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries)
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries),
+      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries)
     };
   }
 
