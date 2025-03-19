@@ -91,6 +91,11 @@ export class Consensus extends StakerComponent {
       await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
 
       await this.DbHandlers[network].set(currentConsensusDnpName);
+
+      if (network === Network.Mainnet)
+        db.ethConsClientInstallStatus.set(currentConsensusDnpName, {
+          status: "INSTALLED"
+        });
     }
   }
 
@@ -109,6 +114,19 @@ export class Consensus extends StakerComponent {
     });
     // persist on db
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
+
+    // update client status
+    if (network === Network.Mainnet) {
+      if (newConsensusDnpName)
+        db.ethConsClientInstallStatus.set(newConsensusDnpName, {
+          status: "INSTALLED"
+        });
+      else if (prevConsClientDnpName) {
+        db.ethConsClientInstallStatus.set(prevConsClientDnpName, {
+          status: "UNINSTALLED"
+        });
+      }
+    }
   }
 
   private async getUserSettings(network: Network, newConsensusDnpName: string | null): Promise<UserSettings> {
