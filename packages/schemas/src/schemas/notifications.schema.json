@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dappnode/DAppNode/raw/schema/notifications.schema.json",
+  "type": "object",
+  "title": "Notifications Configuration Schema",
+  "required": ["endpoints"],
+  "properties": {
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "enabled", "url", "method", "conditions", "interval", "group", "alerts", "definition"],
+        "properties": {
+          "name": { "type": "string" },
+          "enabled": { "type": "boolean" },
+          "url": { "type": "string", "pattern": "^(https?|ftp)://[^s/$.?#].[^s]*$" },
+          "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
+          "conditions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "interval": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
+          "group": { "type": "string" },
+          "alerts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "type",
+                "failure-threshold",
+                "success-threshold",
+                "send-on-resolved",
+                "description",
+                "enabled"
+              ],
+              "properties": {
+                "type": { "type": "string" },
+                "failure-threshold": { "type": "integer", "minimum": 1 },
+                "success-threshold": { "type": "integer", "minimum": 1 },
+                "send-on-resolved": { "type": "boolean" },
+                "description": { "type": "string" },
+                "enabled": { "type": "boolean" }
+              }
+            }
+          },
+          "definition": {
+            "type": "object",
+            "required": ["title", "description"],
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          "metric": {
+            "type": "object",
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "unit": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
