@@ -3,7 +3,7 @@
   "$id": "https://github.com/dappnode/DAppNode/raw/schema/notifications.schema.json",
   "type": "object",
   "title": "Notifications Configuration Schema",
-  "required": ["endpoints"],
+  "required": [],
   "properties": {
     "endpoints": {
       "type": "array",
@@ -54,6 +54,35 @@
           "metric": {
             "type": "object",
             "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "unit": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "customEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["enabled", "name", "definition", "group"],
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "name": { "type": "string" },
+          "definition": {
+            "type": "object",
+            "required": ["title", "description"],
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          "group": { "type": "string" },
+          "metric": {
+            "type": "object",
+            "properties": {
+              "treshold": { "type": "number" },
               "min": { "type": "number" },
               "max": { "type": "number" },
               "unit": { "type": "string" }

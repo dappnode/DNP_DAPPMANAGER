@@ -12,7 +12,7 @@ import {
   SetupWizard,
   GrafanaDashboard,
   PrometheusTarget,
-  GatusConfig
+  NotificationsConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
@@ -163,7 +163,7 @@ export class DappnodeInstaller extends DappnodeRepository {
     gettingStarted?: string;
     prometheusTargets?: PrometheusTarget[];
     grafanaDashboards?: GrafanaDashboard[];
-    notifications?: GatusConfig;
+    notifications?: NotificationsConfig;
   }): Manifest {
     if (SetupWizard) manifest.setupWizard = SetupWizard;
     if (disclaimer) manifest.disclaimer = { message: disclaimer };

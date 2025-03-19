@@ -2,13 +2,13 @@ import { ajv } from "./ajv.js";
 import { CliError } from "./error.js";
 import { processError } from "./utils.js";
 import notificationsSchema from "./schemas/notifications.schema.json" with { type: "json" };
-import { GatusConfig } from "@dappnode/types";
+import { NotificationsConfig } from "@dappnode/types";
 
 /**
  * Validates notifications.yaml file with schema
  * @param config
  */
-export function validateNotificationsSchema(config: GatusConfig): void {
+export function validateNotificationsSchema(config: NotificationsConfig): void {
   const validateNotifications = ajv.compile(notificationsSchema);
   const valid = validateNotifications(config);
   if (!valid) {

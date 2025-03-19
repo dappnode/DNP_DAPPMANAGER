@@ -8,7 +8,7 @@ import {
 import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
-import { Manifest, SetupWizard, GatusConfig, Endpoint } from "@dappnode/types";
+import { Manifest, SetupWizard, NotificationsConfig, GatusEndpoint, CustomEndpoint } from "@dappnode/types";
 
 describe("schemaValidation", function () {
   this.timeout(10000);
@@ -442,7 +442,7 @@ volumes:
 
   describe("notifications", () => {
     it("should validate a valid notifications configuration", () => {
-      const validNotifications: GatusConfig = {
+      const validNotifications: NotificationsConfig = {
         endpoints: [
           {
             name: "example-endpoint",
@@ -479,7 +479,7 @@ volumes:
     });
 
     it("should throw an error for missing required fields", () => {
-      const invalidNotifications: Partial<GatusConfig> = {
+      const invalidNotifications: Partial<NotificationsConfig> = {
         endpoints: [
           {
             name: "example-endpoint",
@@ -487,17 +487,17 @@ volumes:
             url: "http://example.com",
             method: "POST"
             // Missing required fields like conditions, interval, group, alerts, and definition
-          } as Endpoint
+          } as GatusEndpoint
         ]
       };
 
-      expect(() => validateNotificationsSchema(invalidNotifications as GatusConfig)).to.throw(
+      expect(() => validateNotificationsSchema(invalidNotifications as NotificationsConfig)).to.throw(
         "Invalid notifications configuration"
       );
     });
 
     it("should throw an error for invalid URL format", () => {
-      const invalidNotifications: GatusConfig = {
+      const invalidNotifications: NotificationsConfig = {
         endpoints: [
           {
             name: "example-endpoint",
@@ -529,7 +529,7 @@ volumes:
     });
 
     it("should throw an error for invalid interval format", () => {
-      const invalidNotifications: GatusConfig = {
+      const invalidNotifications: NotificationsConfig = {
         endpoints: [
           {
             name: "example-endpoint",
@@ -561,7 +561,7 @@ volumes:
     });
 
     it("should throw an error for missing alert fields", () => {
-      const invalidNotifications: GatusConfig = {
+      const invalidNotifications: NotificationsConfig = {
         endpoints: [
           {
             name: "example-endpoint",
@@ -585,11 +585,131 @@ volumes:
               title: "Example Endpoint",
               description: "An example endpoint for testing"
             }
-          } as Endpoint
+          } as GatusEndpoint
         ]
       };
 
       expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should validate a valid notifications configuration with customEndpoints", () => {
+      const validNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            definition: {
+              title: "Custom Endpoint",
+              description: "A custom endpoint for testing"
+            },
+            group: "custom-group",
+            metric: {
+              treshold: 90,
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          } as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for missing required fields in customEndpoints", () => {
+      const invalidNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            definition: {
+              title: "Custom Endpoint"
+              // Missing description
+            },
+            group: "custom-group"
+          } as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for invalid metric in customEndpoints", () => {
+      const invalidNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            definition: {
+              title: "Custom Endpoint",
+              description: "A custom endpoint for testing"
+            },
+            group: "custom-group",
+            metric: {
+              treshold: "fd" as unknown as number, // Invalid treshold value
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          } as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should validate a configuration with both endpoints and customEndpoints", () => {
+      const validNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            metric: {
+              min: 0,
+              max: 1000,
+              unit: "ms"
+            }
+          } as GatusEndpoint
+        ],
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            definition: {
+              title: "Custom Endpoint",
+              description: "A custom endpoint for testing"
+            },
+            group: "custom-group",
+            metric: {
+              treshold: 90,
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          } as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
     });
   });
 });

@@ -1,6 +1,6 @@
 import { Compose } from "./compose.js";
 import { Manifest, PrometheusTarget, GrafanaDashboard } from "./manifest.js";
-import { GatusConfig } from "./notifications.js";
+import { NotificationsConfig } from "./notifications.js";
 import { SetupWizard } from "./setupWizard.js";
 
 /**
@@ -98,7 +98,7 @@ export type DirectoryFiles = {
   gettingStarted?: string;
   prometheusTargets?: PrometheusTarget[];
   grafanaDashboards?: GrafanaDashboard[];
-  notifications?: GatusConfig;
+  notifications?: NotificationsConfig;
 };
 
 export interface FileConfig {
