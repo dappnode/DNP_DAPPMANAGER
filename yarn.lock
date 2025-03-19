@@ -1305,6 +1305,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/notifications@workspace:packages/notifications"
   dependencies:
+    "@dappnode/dockerapi": "workspace:^0.1.0"
+    "@dappnode/types": "workspace:^0.1.0"
+    "@dappnode/utils": "workspace:^0.1.0"
     "@types/mocha": "npm:^10"
     mocha: "npm:^10.7.0"
   languageName: unknown

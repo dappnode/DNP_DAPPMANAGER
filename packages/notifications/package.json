@@ -16,6 +16,11 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsc -w"
   },
+  "dependencies": {
+    "@dappnode/dockerapi": "workspace:^0.1.0",
+    "@dappnode/types": "workspace:^0.1.0",
+    "@dappnode/utils": "workspace:^0.1.0"
+  },
   "devDependencies": {
     "@types/mocha": "^10",
     "mocha": "^10.7.0"
