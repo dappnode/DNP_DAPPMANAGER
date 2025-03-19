@@ -10,7 +10,7 @@ import dappnodeIcon from "img/dappnode-logo-only.png";
 
 export function Inbox() {
   const dnpsRequest = useApi.packagesGet();
-  const notifications = useApi.gatuGetAllNotifications();
+  const notifications = useApi.notificationsGetAll();
   const newNotifications = notifications.data
     ?.filter((notification) => !notification.seen)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());

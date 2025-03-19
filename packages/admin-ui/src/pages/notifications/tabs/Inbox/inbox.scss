@@ -1,114 +1,116 @@
 .notification-card {
-    border-radius: 10px;
-    background-color: #e9ecef;
-    padding: 10px;
-    cursor: pointer;
-  
-    .notification-header {
+  border-radius: 10px;
+  background-color: #e9ecef;
+  padding: 10px;
+  cursor: pointer;
+
+  .notification-header {
+    display: flex;
+    flex-direction: row;
+    padding-left: 10px;
+    gap: 20px;
+    align-items: center;
+    width: 100%;
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+
+      @media (max-width: 60rem) {
+        width: 35px;
+        height: 35px;
+      }
+    }
+
+    .notification-header-data {
       display: flex;
-      flex-direction: row;
-      gap: 10px;
-      align-items: center;
-      width: 100%;
-  
-      .avatar {
-        width: 40px;
-        height: 40px;
-  
-        @media (max-width: 60rem) {
-          width: 35px;
-          height: 35px;
-        }
-      }
-  
-      .notification-header-data {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        text-align: left;
-        flex-grow: 1;
-  
-        .notification-title {
-          font-size: 1.2rem;
-          @media (max-width: 40rem) {
-            font-size: 1rem;
-          }
-        }
-  
-        .notification-header-row {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          width: 100%;
-  
-          .notification-name-row {
-            display: flex;
-            gap: 5px;
-          }
-        }
-        .secondary-text {
-          color: var(--light-text-color);
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
+      flex-grow: 1;
+
+      .notification-title {
+        font-size: 1.2rem;
+        @media (max-width: 40rem) {
           font-size: 1rem;
-          @media (max-width: 60rem) {
-            font-size: 0.8rem;
-            flex-direction: column-reverse;
-          }
         }
-  
-        .group-label {
+      }
+
+      .notification-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+
+        .notification-name-row {
           display: flex;
-          align-items: center;
-          background-color: var(--color-light-border);
-          padding: 0px 5px;
-          border-radius: 8px;
-          font-size: 0.7rem;
-        }
-        .sucess-label {
-          @extend .group-label;
-          background-color: rgba(0, 109, 29, 0.7) !important;
-          color: white;
-        }
-        .trigger-label {
-          @extend .group-label;
-          background-color: rgba(255, 30, 29, 0.5) !important;
-          color: white;
+          gap: 5px;
         }
       }
-    }
-  
-    .notification-body {
-      padding-top: 10px;
-      font-size: 1rem;
+      .secondary-text {
+        color: var(--light-text-color);
+        font-size: 1rem;
+        @media (max-width: 60rem) {
+          font-size: 0.8rem;
+          flex-direction: column-reverse;
+        }
+      }
+
+      .group-label {
+        display: flex;
+        align-items: center;
+        background-color: #DCDCDC;
+        padding: 0px 5px;
+        border-radius: 10px;
+        font-size: 0.7rem;
+      }
+      .sucess-label {
+        @extend .group-label;
+        background-color: transparent !important;
+        border: 1px solid var(--success-green-color);
+        color: var(--success-green-color) !important;
+      }
+      .trigger-label {
+        @extend .group-label;
+        background-color: transparent !important;
+        border: 1px solid var(--dappnode-complimentary-color);
+        color: var(--dappnode-complimentary-color) !important;
+      }
     }
   }
+
+  .notification-body {
+    padding-top: 10px;
+    font-size: 1rem;
+  }
+}
+.notification-card:hover {
+  background-color: #f1f3f5;
+  transition: all 0.1s ease-in-out;
+}
+
+#dark {
+  .notification-card {
+    background-color: var(--color-dark-card);
+    color: var(--color-dark-maintext);
+
+    .notification-header {
+      .notification-img {
+        background-color: var(--color-dark-card-hover);
+        color: white;
+      }
+
+      .notification-header-details {
+        color: var(--light-text-color);
+      }
+
+      .group-label {
+        background-color: var(--color-dark-border);
+      }
+    }
+  }
+
   .notification-card:hover {
-    background-color: #f1f3f5;
-    transition: all 0.1s ease-in-out;
+    background-color: var(--color-dark-card-hover);
   }
-  
-  #dark {
-    .notification-card {
-      background-color: var(--color-dark-card);
-      color: var(--color-dark-maintext);
-  
-      .notification-header {
-        .notification-img {
-          background-color: var(--color-dark-card-hover);
-          color: white;
-        }
-  
-        .notification-header-details {
-          color: var(--light-text-color);
-        }
-  
-        .group-label {
-          background-color: var(--color-dark-border);
-        }
-      }
-    }
-  
-    .notification-card:hover {
-      background-color: var(--color-dark-card-hover);
-    }
-  }
-  
+}
