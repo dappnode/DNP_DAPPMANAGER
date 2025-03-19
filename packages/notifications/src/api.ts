@@ -1,4 +1,4 @@
-import { Notification } from "@dappnode/types";
+import { Notification, NotificationPayload } from "@dappnode/types";
 
 export class NotificationsApi {
   private readonly rootUrl: string;
@@ -10,13 +10,13 @@ export class NotificationsApi {
   /**
    * Send a new notification
    */
-  async sendNotification(notification: Notification): Promise<void> {
+  async sendNotification(notificationPaylaod: NotificationPayload): Promise<void> {
     await fetch(new URL("/api/v1/notifications", `${this.rootUrl}:8080`).toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(notification)
+      body: JSON.stringify(notificationPaylaod)
     });
   }
 

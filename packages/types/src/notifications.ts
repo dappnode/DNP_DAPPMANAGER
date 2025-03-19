@@ -1,19 +1,33 @@
-export interface Notification {
+export interface NotificationsConfig {
+  endpoints?: GatusEndpoint[];
+  customEndpoints?: CustomEndpoint[];
+}
+
+export interface Notification extends NotificationPayload {
+  timestamp: string;
+  seen: boolean;
+}
+
+export interface NotificationPayload {
   title: string;
   body: string;
   dnpName: string;
-  timestamp: string;
-  category: string;
-  seen: boolean;
+  category: NotificationCategory;
   callToAction?: {
     title: string;
     url: string;
   };
 }
 
-export interface NotificationsConfig {
-  endpoints?: GatusEndpoint[];
-  customEndpoints?: CustomEndpoint[];
+export enum NotificationCategory {
+  CORE = "CORE",
+  ETHEREUM = "ETHEREUM",
+  HOLESKY = "HOLESKY",
+  LUKSO = "LUKSO",
+  GNOSIS = "GNOSIS",
+  HOODI = "HOODI",
+  HOST = "HOST",
+  OTHER = "OTHER"
 }
 
 export interface CustomEndpoint {

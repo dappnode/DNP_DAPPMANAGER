@@ -49,7 +49,6 @@ startHttpApi({
     env: () => {},
     fileDownload: () => {},
     globalEnvs: () => {},
-    notificationSend: () => {},
     packageManifest: () => {},
     metrics: () => {},
     publicPackagesData: () => {},

@@ -1,6 +1,6 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from "@dappnode/types";
+import { CustomEndpoint, GatusEndpoint, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
 
 class Notifications {
   private readonly api: NotificationsApi;
@@ -14,8 +14,8 @@ class Notifications {
   /**
    * Send a new notification
    */
-  async sendNotification(notification: Notification): Promise<void> {
-    await this.api.sendNotification(notification);
+  async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
+    await this.api.sendNotification(notificationPayload);
   }
 
   /**

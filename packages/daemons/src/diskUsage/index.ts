@@ -3,6 +3,8 @@ import { shell, runAtMostEvery, prettyDnpName } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
+import { notifications } from "@dappnode/notifications";
+import { NotificationCategory } from "@dappnode/types";
 
 /**
  * Commands
@@ -93,17 +95,19 @@ async function monitorDiskUsage(): Promise<void> {
           `WARNING: DAppNode has stopped ${threshold.containersDescription} (${stoppedDnpNameList}) after the disk space reached a ${threshold.id}`
         );
 
-        eventBus.notification.emit({
-          id: "diskSpaceRanOut-stoppedPackages",
-          type: "danger",
-          title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
-          body: [
-            `Available disk space is less than a ${threshold.id}.`,
-            `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
-            stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
-            `Please, free up enough disk space and start them again.`
-          ].join("\n\n")
-        });
+        await notifications
+          .sendNotification({
+            title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
+            dnpName: "dappmanager.dnp.dappnode.eth",
+            body: [
+              `Available disk space is less than a ${threshold.id}.`,
+              `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
+              stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
+              `Please, free up enough disk space and start them again.`
+            ].join("\n\n"),
+            category: NotificationCategory.CORE
+          })
+          .catch((e) => logs.error("Error sending disk usage notification", e));
 
         // Emit packages update
         eventBus.requestPackages.emit();
