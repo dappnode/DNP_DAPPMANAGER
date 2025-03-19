@@ -11,11 +11,28 @@ export interface Notification {
   };
 }
 
-export interface GatusConfig {
-  endpoints: Endpoint[];
+export interface NotificationsConfig {
+  endpoints?: GatusEndpoint[];
+  customEndpoints?: CustomEndpoint[];
 }
 
-export interface Endpoint {
+export interface CustomEndpoint {
+  enabled: boolean;
+  name: string;
+  definition: {
+    title: string;
+    description: string;
+  };
+  group: string;
+  metric?: {
+    treshold: number;
+    min: number;
+    max: number;
+    unit: string;
+  };
+}
+
+export interface GatusEndpoint {
   name: string;
   enabled: boolean;
   url: string;

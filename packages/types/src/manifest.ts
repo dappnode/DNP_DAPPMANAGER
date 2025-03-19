@@ -1,4 +1,4 @@
-import { GatusConfig } from "./notifications.js";
+import { NotificationsConfig } from "./notifications.js";
 import { SetupSchema, SetupTarget, SetupUiJson, SetupWizard } from "./setupWizard.js";
 
 export interface Manifest {
@@ -101,7 +101,7 @@ export interface Manifest {
   setupWizard?: SetupWizard;
 
   // notifications
-  notifications?: GatusConfig;
+  notifications?: NotificationsConfig;
 }
 
 export interface UpstreamItem {

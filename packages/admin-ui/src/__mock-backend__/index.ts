@@ -387,11 +387,11 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   }),
   getIsConnectedToInternet: async () => false,
   getCoreVersion: async () => "0.2.92",
-  gatusGetEndpoints: async () => {
-    return { "geth.dnp.dappnode.eth": [] };
+  notificationsGetEndpoints: async () => {
+    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [] } };
   },
-  gatusUpdateEndpoints: async () => {},
-  gatuGetAllNotifications: async () => []
+  notificationsUpdateEndpoints: async () => {},
+  notificationsGetAll: async () => []
 };
 
 export const calls: Routes = {
