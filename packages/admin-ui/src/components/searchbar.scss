@@ -1,0 +1,40 @@
+.searchbar-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  cursor: text;
+  width: 100%;
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    font-size: 18px;
+    color: #888;
+  }
+
+  .searchbar {
+    padding: 10px 10px 10px 36px;
+    flex: 1;
+    border: none;
+    font-size: 1rem;
+    background-color: #e9ecef;
+    border-radius: 10px;
+  }
+
+  input:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: inherit;
+  }
+}
+
+#dark {
+  .searchbar {
+    background-color: var(--color-dark-card) !important;
+    color: var(--color-dark-maintext);
+  }
+
+  .search-icon {
+    color: var(--color-dark-maintext);
+  }
+}
