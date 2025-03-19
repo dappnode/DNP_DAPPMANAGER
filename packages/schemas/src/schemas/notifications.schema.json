@@ -13,7 +13,7 @@
         "properties": {
           "name": { "type": "string" },
           "enabled": { "type": "boolean" },
-          "url": { "type": "string", "format": "uri" },
+          "url": { "type": "string", "pattern": "^(https?|ftp)://[^s/$.?#].[^s]*$" },
           "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
           "conditions": {
             "type": "array",
