@@ -1,13 +1,14 @@
 import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
-import { eventBus } from "@dappnode/eventbus";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
-import { CoreUpdateDataAvailable, upstreamVersionToString } from "@dappnode/types";
+import { CoreUpdateDataAvailable, NotificationCategory, upstreamVersionToString } from "@dappnode/types";
 import { formatPackageUpdateNotification, formatSystemUpdateNotification } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
+import { notifications } from "@dappnode/notifications";
+import { logs } from "@dappnode/logger";
 
 export async function sendUpdatePackageNotificationMaybe({
   dappnodeInstaller,
@@ -31,19 +32,21 @@ export async function sendUpdatePackageNotificationMaybe({
     upstream: release.manifest.upstream
   });
 
-  // Emit notification about new version available
-  eventBus.notification.emit({
-    id: `update-available-${dnpName}-${newVersion}`,
-    type: "info",
-    title: `Update available for ${prettyDnpName(dnpName)}`,
-    body: formatPackageUpdateNotification({
-      dnpName: dnpName,
-      newVersion,
-      upstreamVersion,
-      currentVersion,
-      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+  // Send notification about new version available
+  await notifications
+    .sendNotification({
+      title: `Update available for ${prettyDnpName(dnpName)}`,
+      dnpName,
+      body: formatPackageUpdateNotification({
+        dnpName,
+        currentVersion,
+        newVersion,
+        upstreamVersion,
+        autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+      }),
+      category: NotificationCategory.CORE
     })
-  });
+    .catch((e) => logs.error("Error sending package update notification", e));
 
   // Register version to prevent sending notification again
   db.packageLatestKnownVersion.set(dnpName, { newVersion, upstreamVersion });
@@ -58,16 +61,18 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version
 
-  // Emit notification about new version available
-  eventBus.notification.emit({
-    id: `update-available-${dnpName}-${newVersion}`,
-    type: "info",
-    title: "System update available",
-    body: formatSystemUpdateNotification({
-      packages: data.packages,
-      autoUpdatesEnabled: isCoreUpdateEnabled()
+  // Send notification about new version available
+  await notifications
+    .sendNotification({
+      title: `System update available`,
+      dnpName,
+      body: formatSystemUpdateNotification({
+        packages: data.packages,
+        autoUpdatesEnabled: isCoreUpdateEnabled()
+      }),
+      category: NotificationCategory.CORE
     })
-  });
+    .catch((e) => logs.error("Error sending system update notification", e));
 
   data.packages;
 

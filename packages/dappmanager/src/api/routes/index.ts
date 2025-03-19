@@ -9,6 +9,5 @@ export * from "./publicPackagesData.js";
 export * from "./sign.js";
 export * from "./upload.js";
 export * from "./downloadWireguardConfig.js";
-export * from "./notificationSend.js";
 export * from "./metrics.js";
 export * from "./env.js";
