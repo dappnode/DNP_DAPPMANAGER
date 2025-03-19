@@ -1051,6 +1051,7 @@ __metadata:
     "@dappnode/installer": "workspace:^0.1.0"
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/migrations": "workspace:^0.1.0"
+    "@dappnode/notifications": "workspace:^0.1.0"
     "@dappnode/optimism": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
     "@dappnode/stakers": "workspace:^0.1.0"
@@ -1296,6 +1297,15 @@ __metadata:
     lodash-es: "npm:^4.17.21"
     mocha: "npm:^10.7.0"
     semver: "npm:^7.3.8"
+  languageName: unknown
+  linkType: soft
+
+"@dappnode/notifications@workspace:^0.1.0, @dappnode/notifications@workspace:packages/notifications":
+  version: 0.0.0-use.local
+  resolution: "@dappnode/notifications@workspace:packages/notifications"
+  dependencies:
+    "@types/mocha": "npm:^10"
+    mocha: "npm:^10.7.0"
   languageName: unknown
   linkType: soft
 
