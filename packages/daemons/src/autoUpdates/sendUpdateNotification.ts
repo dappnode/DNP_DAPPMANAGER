@@ -21,6 +21,13 @@ export async function sendUpdatePackageNotificationMaybe({
   currentVersion: string;
   newVersion: string;
 }): Promise<void> {
+  // Check if auto-update notifications are enabled
+  const dappmanagerCustomEndpoint = (await notifications.getEndpoints())[
+    params.dappmanagerDnpName
+  ].customEndpoints.find((customEndpoint) => customEndpoint.name === "auto-updates");
+
+  if (!dappmanagerCustomEndpoint || !dappmanagerCustomEndpoint.enabled) return;
+
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version

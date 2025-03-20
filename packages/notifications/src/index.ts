@@ -21,7 +21,7 @@ class Notifications {
   /**
    * Get all the notifications
    */
-  async getAll(): Promise<Notification[]> {
+  async getAllNotifications(): Promise<Notification[]> {
     return await this.api.getAllNotifications();
   }
 
