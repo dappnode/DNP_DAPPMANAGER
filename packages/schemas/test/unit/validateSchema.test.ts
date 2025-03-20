@@ -598,18 +598,14 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
-            definition: {
-              title: "Custom Endpoint",
-              description: "A custom endpoint for testing"
-            },
-            group: "custom-group",
+            description: "A custom endpoint for testing", // Added required description
             metric: {
               treshold: 90,
               min: 0,
               max: 100,
               unit: "%"
             }
-          } as CustomEndpoint
+          }
         ]
       };
 
@@ -622,12 +618,9 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
-            definition: {
-              title: "Custom Endpoint"
-              // Missing description
-            },
+            // Missing required description field
             group: "custom-group"
-          } as CustomEndpoint
+          } as unknown as CustomEndpoint
         ]
       };
 
@@ -640,11 +633,7 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
-            definition: {
-              title: "Custom Endpoint",
-              description: "A custom endpoint for testing"
-            },
-            group: "custom-group",
+            description: "A custom endpoint for testing",
             metric: {
               treshold: "fd" as unknown as number, // Invalid treshold value
               min: 0,
@@ -688,24 +677,20 @@ volumes:
               max: 1000,
               unit: "ms"
             }
-          } as GatusEndpoint
+          }
         ],
         customEndpoints: [
           {
             enabled: true,
             name: "custom-endpoint",
-            definition: {
-              title: "Custom Endpoint",
-              description: "A custom endpoint for testing"
-            },
-            group: "custom-group",
+            description: "A custom endpoint for testing", // Added required description
             metric: {
               treshold: 90,
               min: 0,
               max: 100,
               unit: "%"
             }
-          } as CustomEndpoint
+          }
         ]
       };
 
