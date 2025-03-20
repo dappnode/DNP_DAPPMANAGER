@@ -37,6 +37,7 @@ export function NotificationsSettings() {
                   dnpName={dnpName}
                   gatusEndpoints={endpoints.endpoints}
                   customEndpoints={endpoints.customEndpoints}
+                  isCore={endpoints.isCore}
                 />
               ))}
           </div>

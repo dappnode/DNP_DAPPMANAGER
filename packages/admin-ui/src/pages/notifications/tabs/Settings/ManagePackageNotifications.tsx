@@ -11,12 +11,14 @@ interface ManagePackageNotificationsProps {
   dnpName: string;
   gatusEndpoints: GatusEndpoint[];
   customEndpoints: CustomEndpoint[];
+  isCore: boolean;
 }
 
 export function ManagePackageNotifications({
   dnpName,
   gatusEndpoints,
-  customEndpoints
+  customEndpoints,
+  isCore
 }: ManagePackageNotificationsProps) {
   const [endpointsGatus, setEndpointsGatus] = useState([...gatusEndpoints]);
   const [endpointsCustom, setEndpointsCustom] = useState([...customEndpoints]);
@@ -33,10 +35,14 @@ export function ManagePackageNotifications({
   };
 
   useEffect(() => {
-    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { endpoints: endpointsGatus } });
+    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { endpoints: endpointsGatus }, isCore: isCore });
   }, [endpointsGatus]);
   useEffect(() => {
-    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { customEndpoints: endpointsCustom } });
+    api.notificationsUpdateEndpoints({
+      dnpName,
+      notificationsConfig: { customEndpoints: endpointsCustom },
+      isCore: isCore
+    });
   }, [endpointsCustom]);
   return (
     <div key={String(dnpName)} className="notifications-settings">
