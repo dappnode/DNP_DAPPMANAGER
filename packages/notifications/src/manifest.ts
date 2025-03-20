@@ -45,6 +45,6 @@ export class NotificationsManifest {
       Object.assign(customEndpoints, updatedCustomEndpoints);
     }
 
-    fs.writeFileSync(getManifestPath(dnpName, false), JSON.stringify(manifest, null, 2));
+    fs.writeFileSync(getManifestPath(dnpName, isCore), JSON.stringify(manifest, null, 2));
   }
 }
