@@ -27,10 +27,10 @@ export class NotificationsManifest {
   /**
    * Update endpoint properties in filesystem
    */
-  updateEndpoints(dnpName: string, notificationsConfig: NotificationsConfig): void {
+  updateEndpoints(dnpName: string, isCore: boolean, notificationsConfig: NotificationsConfig): void {
     const { endpoints: updatedEndpoints, customEndpoints: updatedCustomEndpoints } = notificationsConfig;
 
-    const manifest: Manifest = JSON.parse(fs.readFileSync(getManifestPath(dnpName, false), "utf8"));
+    const manifest: Manifest = JSON.parse(fs.readFileSync(getManifestPath(dnpName, isCore), "utf8"));
     if (!manifest.notifications) throw new Error("No notifications found in manifest");
 
     if (updatedEndpoints) {

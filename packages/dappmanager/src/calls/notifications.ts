@@ -23,10 +23,12 @@ export async function notificationsGetEndpoints(): Promise<{
  */
 export async function notificationsUpdateEndpoints({
   dnpName,
+  isCore,
   notificationsConfig
 }: {
   dnpName: string;
+  isCore: boolean;
   notificationsConfig: NotificationsConfig;
 }): Promise<void> {
-  await notifications.updateEndpoints(dnpName, notificationsConfig);
+  await notifications.updateEndpoints(dnpName, isCore, notificationsConfig);
 }

@@ -279,6 +279,7 @@ export interface Routes {
    */
   notificationsUpdateEndpoints: (kwargs: {
     dnpName: string;
+    isCore: boolean;
     notificationsConfig: NotificationsConfig;
   }) => Promise<void>;
 
