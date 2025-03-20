@@ -31,13 +31,9 @@ export enum NotificationCategory {
 }
 
 export interface CustomEndpoint {
-  enabled: boolean;
   name: string;
-  definition: {
-    title: string;
-    description: string;
-  };
-  group: string;
+  enabled: boolean;
+  description: string;
   metric?: {
     treshold: number;
     min: number;

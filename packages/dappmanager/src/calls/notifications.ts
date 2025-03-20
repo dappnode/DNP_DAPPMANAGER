@@ -6,7 +6,7 @@ import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from
  * @returns all the notifications
  */
 export async function notificationsGetAll(): Promise<Notification[]> {
-  return await notifications.getAll();
+  return await notifications.getAllNotifications();
 }
 
 /**
