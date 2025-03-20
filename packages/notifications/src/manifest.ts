@@ -27,7 +27,7 @@ export class NotificationsManifest {
   /**
    * Update endpoint properties in filesystem
    */
-  async updateEndpoints(dnpName: string, notificationsConfig: NotificationsConfig): Promise<void> {
+  updateEndpoints(dnpName: string, notificationsConfig: NotificationsConfig): void {
     const { endpoints: updatedEndpoints, customEndpoints: updatedCustomEndpoints } = notificationsConfig;
 
     const manifest: Manifest = JSON.parse(fs.readFileSync(getManifestPath(dnpName, false), "utf8"));

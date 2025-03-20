@@ -38,7 +38,7 @@ class Notifications {
    * Update endpoint properties
    */
   async updateEndpoints(dnpName: string, notificationsConfig: NotificationsConfig): Promise<void> {
-    await this.manifest.updateEndpoints(dnpName, notificationsConfig);
+    this.manifest.updateEndpoints(dnpName, notificationsConfig);
     await this.api.reloadEndpoints();
   }
 }
