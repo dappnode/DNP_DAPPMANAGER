@@ -66,19 +66,11 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["enabled", "name", "definition", "group"],
+        "required": ["enabled", "name", "description"],
         "properties": {
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
-          "definition": {
-            "type": "object",
-            "required": ["title", "description"],
-            "properties": {
-              "title": { "type": "string" },
-              "description": { "type": "string" }
-            }
-          },
-          "group": { "type": "string" },
+          "description": { "type": "string" },
           "metric": {
             "type": "object",
             "properties": {
