@@ -1,42 +1,43 @@
 import React, { useEffect, useState } from "react";
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
-import { EndpointItem } from "./EndpointItem.js";
-import { Endpoint } from "@dappnode/types";
+import { GatusEndpointItem } from "./GatusEndpointItem.js";
+import { CustomEndpointItem } from "./CustomEndpointItem.js";
+import { CustomEndpoint, GatusEndpoint } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 import { api } from "api";
 
 interface ManagePackageNotificationsProps {
   dnpName: string;
-  endpoints: Endpoint[];
+  gatusEndpoints: GatusEndpoint[];
+  customEndpoints: CustomEndpoint[];
 }
 
-export function ManagePackageNotifications({ dnpName, endpoints }: ManagePackageNotificationsProps) {
-  const [pkgEndpoints, setPkgEndpoints] = useState(endpoints);
-  const [pkgNotificationsEnabled, setPkgNotificationsEnabled] = useState(endpoints.some((ep) => ep.enabled));
-
-  // Sync state when `endpoints` prop changes, but keep user modifications
-  useEffect(() => {
-    setPkgEndpoints((prevPkgEndpoints) => {
-      const updatedEndpoints = endpoints.map((newEp) => {
-        const existingEp = prevPkgEndpoints.find((ep) => ep.name === newEp.name);
-        return existingEp ? { ...existingEp, ...newEp } : newEp;
-      });
-      return updatedEndpoints;
-    });
-  }, [endpoints]);
+export function ManagePackageNotifications({
+  dnpName,
+  gatusEndpoints,
+  customEndpoints
+}: ManagePackageNotificationsProps) {
+  const [endpointsGatus, setEndpointsGatus] = useState([...gatusEndpoints]);
+  const [endpointsCustom, setEndpointsCustom] = useState([...customEndpoints]);
+  const [pkgNotificationsEnabled, setPkgNotificationsEnabled] = useState(
+    gatusEndpoints.some((ep) => ep.enabled) || customEndpoints.some((ep) => ep.enabled)
+  );
 
   // Handle switch toggle to enable/disable all endpoints
   const handlePkgToggle = () => {
     const newEnabledState = !pkgNotificationsEnabled;
-    setPkgEndpoints((prevPkgEndpoints) => prevPkgEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
+    setEndpointsGatus((prevGatusEndpoints) => prevGatusEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
+    setEndpointsCustom((prevCustomEndpoints) => prevCustomEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
     setPkgNotificationsEnabled(newEnabledState);
   };
 
   useEffect(() => {
-    // TODO: Implement timeOut that waits for more config updates before sending the new Endpoints config
-    api.gatusUpdateEndpoints({ dnpName, updatedEndpoints: pkgEndpoints });
-  }, [pkgEndpoints]);
+    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { endpoints: endpointsGatus } });
+  }, [endpointsGatus]);
+  useEffect(() => {
+    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { customEndpoints: endpointsCustom } });
+  }, [endpointsCustom]);
   return (
     <div key={String(dnpName)} className="notifications-settings">
       <div className="title-switch-row">
@@ -45,13 +46,22 @@ export function ManagePackageNotifications({ dnpName, endpoints }: ManagePackage
       </div>
       {pkgNotificationsEnabled && (
         <div className="endpoint-list-card">
-          {pkgEndpoints.map((endpoint, i) => (
-            <EndpointItem
+          {endpointsGatus.map((endpoint, i) => (
+            <GatusEndpointItem
               key={endpoint.name}
               endpoint={endpoint}
               index={i}
-              numEndpoints={pkgEndpoints.length}
-              setPkgEndpoints={setPkgEndpoints}
+              numEndpoints={endpointsGatus.length}
+              setGatusEndpoints={setEndpointsGatus}
+            />
+          ))}
+          {endpointsCustom.map((endpoint, i) => (
+            <CustomEndpointItem
+              key={endpoint.name}
+              endpoint={endpoint}
+              index={i}
+              numEndpoints={endpointsCustom.length}
+              setCustomEndpoints={setEndpointsCustom}
             />
           ))}
         </div>
