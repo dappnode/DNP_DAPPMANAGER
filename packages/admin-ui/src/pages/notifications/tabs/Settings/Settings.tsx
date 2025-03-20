@@ -7,7 +7,7 @@ import "./settings.scss";
 
 export function NotificationsSettings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const endpointsCall = useApi.gatusGetEndpoints();
+  const endpointsCall = useApi.notificationsGetEndpoints();
 
   return (
     <div className="notifications-settings">
@@ -32,7 +32,12 @@ export function NotificationsSettings() {
           <div className="manage-notifications-wrapper">
             {endpointsCall.data &&
               Object.entries(endpointsCall.data).map(([dnpName, endpoints]) => (
-                <ManagePackageNotifications key={dnpName} dnpName={dnpName} endpoints={endpoints} />
+                <ManagePackageNotifications
+                  key={dnpName}
+                  dnpName={dnpName}
+                  gatusEndpoints={endpoints.endpoints}
+                  customEndpoints={endpoints.customEndpoints}
+                />
               ))}
           </div>
         </div>
