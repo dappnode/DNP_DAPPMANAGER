@@ -6,16 +6,25 @@ interface EndpointItemProps {
   title: string;
   description: string;
   endpointEnabled: boolean;
-  metric: any;
+  metric?: { min: number; max: number; unit: string; sliderValue: number };
   index: number;
   numEndpoints: number;
-  sliderValue: number;
   handleEndpointToggle: () => void;
   handleSliderUpdate: (value: number) => void;
   handleSliderUpdateComplete: (value: number) => void;
 }
 
-export function EndpointItem({index, title, description, endpointEnabled, metric, numEndpoints, sliderValue, handleEndpointToggle, handleSliderUpdate, handleSliderUpdateComplete}: EndpointItemProps) {  
+export function EndpointItem({
+  index,
+  title,
+  description,
+  endpointEnabled,
+  metric,
+  numEndpoints,
+  handleEndpointToggle,
+  handleSliderUpdate,
+  handleSliderUpdateComplete
+}: EndpointItemProps) {
   return (
     <>
       <div key={index} className="endpoint-row">
@@ -28,7 +37,7 @@ export function EndpointItem({index, title, description, endpointEnabled, metric
       {endpointEnabled && metric && (
         <div className="slider-wrapper">
           <Slider
-            value={sliderValue}
+            value={metric.sliderValue}
             onChange={handleSliderUpdate}
             onChangeComplete={handleSliderUpdateComplete}
             min={metric.min}
@@ -40,6 +49,4 @@ export function EndpointItem({index, title, description, endpointEnabled, metric
       {index + 1 < numEndpoints && <hr />}
     </>
   );
-
-
 }

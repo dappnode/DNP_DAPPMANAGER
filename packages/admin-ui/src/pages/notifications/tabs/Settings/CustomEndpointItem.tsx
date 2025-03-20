@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { CustomEndpoint } from "@dappnode/types";
-import Switch from "components/Switch";
-import Slider from "components/Slider";
+import { EndpointItem } from "./EndpointItem";
 
 interface CustomEndpointItemProps {
   endpoint: CustomEndpoint;
@@ -25,45 +24,44 @@ export function CustomEndpointItem({ endpoint, index, numEndpoints, setCustomEnd
     setSliderValue(value);
   };
 
-    const handleSliderUpdateComplete = (value: number) => {
-      setCustomEndpoints((prevEndpoints) =>
-        prevEndpoints.map((ep, i) =>
-          i === index && ep.metric
-            ? {
-                ...ep,
-                metric: {
-                  ...ep.metric,
-                  treshold: value,
-                },
+  const handleSliderUpdateComplete = (value: number) => {
+    setCustomEndpoints((prevEndpoints) =>
+      prevEndpoints.map((ep, i) =>
+        i === index && ep.metric
+          ? {
+              ...ep,
+              metric: {
+                ...ep.metric,
+                treshold: value
               }
-            : ep
-        )
-      );
-    };
-    
+            }
+          : ep
+      )
+    );
+  };
 
   return (
     <>
-      <div key={index} className="endpoint-row">
-        <div>
-          <strong>{endpoint.name}</strong>
-          <div>{endpoint.description}</div>
-        </div>
-        <Switch checked={endpointEnabled} onToggle={handleEndpointToggle} />
-      </div>
-      {endpointEnabled && endpoint.metric && (
-        <div className="slider-wrapper">
-          <Slider
-            value={sliderValue}
-            onChange={handleSliderUpdate}
-            onChangeComplete={handleSliderUpdateComplete}
-            min={endpoint.metric.min}
-            max={endpoint.metric.max}
-            unit={endpoint.metric.unit}
-          />
-        </div>
-      )}
-      {index + 1 < numEndpoints && <hr />}
+      <EndpointItem
+        index={index}
+        title={endpoint.name}
+        description={endpoint.description}
+        endpointEnabled={endpointEnabled}
+        handleEndpointToggle={handleEndpointToggle}
+        metric={
+          endpoint.metric
+            ? {
+                min: endpoint.metric.min,
+                max: endpoint.metric.max,
+                unit: endpoint.metric.unit,
+                sliderValue: sliderValue
+              }
+            : undefined
+        }
+        handleSliderUpdate={handleSliderUpdate}
+        handleSliderUpdateComplete={handleSliderUpdateComplete}
+        numEndpoints={numEndpoints}
+      />
     </>
   );
 }

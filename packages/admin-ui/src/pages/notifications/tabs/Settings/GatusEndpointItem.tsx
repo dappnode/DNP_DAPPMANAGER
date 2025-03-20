@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { GatusEndpoint } from "@dappnode/types";
-import Switch from "components/Switch";
-import Slider from "components/Slider";
+import { EndpointItem } from "./EndpointItem";
 
 interface GatusEndpointItemProps {
   endpoint: GatusEndpoint;
@@ -59,26 +58,26 @@ export function GatusEndpointItem({ endpoint, index, numEndpoints, setGatusEndpo
 
   return (
     <>
-      <div key={index} className="endpoint-row">
-        <div>
-          <strong>{endpoint.definition.title}</strong>
-          <div>{endpoint.definition.description}</div>
-        </div>
-        <Switch checked={endpointEnabled} onToggle={handleEndpointToggle} />
-      </div>
-      {endpointEnabled && endpoint.metric && (
-        <div className="slider-wrapper">
-          <Slider
-            value={sliderValue}
-            onChange={handleSliderUpdate}
-            onChangeComplete={handleSliderUpdateComplete}
-            min={endpoint.metric.min}
-            max={endpoint.metric.max}
-            unit={endpoint.metric.unit}
-          />
-        </div>
-      )}
-      {index + 1 < numEndpoints && <hr />}
+      <EndpointItem
+        index={index}
+        title={endpoint.definition.title}
+        description={endpoint.definition.description}
+        endpointEnabled={endpointEnabled}
+        handleEndpointToggle={handleEndpointToggle}
+        metric={
+          endpoint.metric
+            ? {
+                min: endpoint.metric.min,
+                max: endpoint.metric.max,
+                unit: endpoint.metric.unit,
+                sliderValue: sliderValue
+              }
+            : undefined
+        }
+        handleSliderUpdate={handleSliderUpdate}
+        handleSliderUpdateComplete={handleSliderUpdateComplete}
+        numEndpoints={numEndpoints}
+      />
     </>
   );
 }
