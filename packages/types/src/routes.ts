@@ -271,7 +271,7 @@ export interface Routes {
    * Gatus get endpoints
    */
   notificationsGetEndpoints(): Promise<{
-    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[] };
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }>;
 
   /**

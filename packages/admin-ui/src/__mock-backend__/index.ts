@@ -388,7 +388,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   getIsConnectedToInternet: async () => false,
   getCoreVersion: async () => "0.2.92",
   notificationsGetEndpoints: async () => {
-    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [] } };
+    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
   },
   notificationsUpdateEndpoints: async () => {},
   notificationsGetAll: async () => []

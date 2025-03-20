@@ -29,7 +29,7 @@ class Notifications {
    * Get gatus and custom endpoints indexed by dnpName
    */
   async getEndpoints(): Promise<{
-    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[] };
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }> {
     return await this.manifest.getEndpoints();
   }

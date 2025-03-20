@@ -8,20 +8,26 @@ export class NotificationsManifest {
    * Get gatus and custom endpoints indexed by dnpName from filesystem
    */
   async getEndpoints(): Promise<{
-    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[] };
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }> {
     const packages = await listPackages();
 
-    const endpoints: { [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[] } } = {};
+    const notificationsEndpoints: {
+      [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
+    } = {};
     for (const pkg of packages) {
       const manifestPath = getManifestPath(pkg.dnpName, pkg.isCore);
       const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
-      if (manifest.notifications?.endpoints) endpoints[pkg.dnpName].endpoints = manifest.notifications.endpoints;
-      if (manifest.notifications?.customEndpoints)
-        endpoints[pkg.dnpName].customEndpoints = manifest.notifications.customEndpoints;
+
+      if (!manifest.notifications) continue;
+
+      const { endpoints, customEndpoints } = manifest.notifications;
+      if (endpoints) notificationsEndpoints[pkg.dnpName].endpoints = endpoints;
+      if (customEndpoints) notificationsEndpoints[pkg.dnpName].customEndpoints = customEndpoints;
+      if (notificationsEndpoints[pkg.dnpName]) notificationsEndpoints[pkg.dnpName].isCore = pkg.isCore;
     }
 
-    return endpoints;
+    return notificationsEndpoints;
   }
 
   /**
