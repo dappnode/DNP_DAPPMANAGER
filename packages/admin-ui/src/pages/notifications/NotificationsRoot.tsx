@@ -2,11 +2,12 @@ import React from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
-import { title } from "./data";
+import { subPaths, title } from "./data";
 import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
+import { Inbox } from "./tabs/Inbox/Inbox";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
@@ -14,7 +15,13 @@ export const NotificationsRoot: React.FC = () => {
     subPath: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType;
-  }[] = [];
+  }[] = [
+    {
+      name: "Inbox",
+      subPath: subPaths.inbox,
+      component: Inbox
+    }
+  ];
 
   const dnpsRequest = useApi.packagesGet();
 
