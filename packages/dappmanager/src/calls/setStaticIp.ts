@@ -3,6 +3,7 @@ import { updateDyndnsIp } from "@dappnode/dyndns";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { notifications } from "@dappnode/notifications";
+import { params } from "@dappnode/params";
 import { NotificationCategory } from "@dappnode/types";
 
 /**
@@ -31,7 +32,7 @@ export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<v
     .sendNotification({
       title: "Static IP updated",
       body: `Your static IP was changed to ${staticIp}.`,
-      dnpName: "dappmanager.dnp.dappnode.eth",
+      dnpName: params.dappmanagerDnpName,
       category: NotificationCategory.CORE
     })
     .catch((e) => logs.error("Error sending static IP updated notification", e));

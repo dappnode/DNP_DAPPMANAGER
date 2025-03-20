@@ -98,7 +98,7 @@ async function monitorDiskUsage(): Promise<void> {
         await notifications
           .sendNotification({
             title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
-            dnpName: "dappmanager.dnp.dappnode.eth",
+            dnpName: params.dappmanagerDnpName,
             body: [
               `Available disk space is less than a ${threshold.id}.`,
               `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
