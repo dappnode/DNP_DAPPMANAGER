@@ -16,19 +16,16 @@ export class NotificationsManifest {
       [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
     } = {};
     for (const pkg of packages) {
-      const manifestPath = getManifestPath(pkg.dnpName, pkg.isCore);
+      const { dnpName, isCore } = pkg;
+      const manifestPath = getManifestPath(dnpName, isCore);
       const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
       if (!manifest.notifications) continue;
 
       const { endpoints, customEndpoints } = manifest.notifications;
-
-      if (!notificationsEndpoints[pkg.dnpName]) {
-        notificationsEndpoints[pkg.dnpName] = { endpoints: [], customEndpoints: [], isCore: pkg.isCore };
-      }
-
-      if (endpoints) notificationsEndpoints[pkg.dnpName].endpoints = endpoints;
-      if (customEndpoints) notificationsEndpoints[pkg.dnpName].customEndpoints = customEndpoints;
+      if (endpoints) notificationsEndpoints[dnpName].endpoints = endpoints;
+      if (customEndpoints) notificationsEndpoints[dnpName].customEndpoints = customEndpoints;
+      notificationsEndpoints[dnpName].isCore = isCore;
     }
 
     return notificationsEndpoints;
