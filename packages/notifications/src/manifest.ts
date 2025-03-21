@@ -22,12 +22,8 @@ export class NotificationsManifest {
 
       if (!manifest.notifications) continue;
 
-      if (!notificationsEndpoints[pkg.dnpName]) {
-        notificationsEndpoints[pkg.dnpName] = { endpoints: [], customEndpoints: [], isCore: isCore };
-      }
       const { endpoints, customEndpoints } = manifest.notifications;
-      if (endpoints) notificationsEndpoints[dnpName].endpoints = endpoints;
-      if (customEndpoints) notificationsEndpoints[dnpName].customEndpoints = customEndpoints;
+      notificationsEndpoints[dnpName] = { endpoints: endpoints || [], customEndpoints: customEndpoints || [], isCore };
     }
 
     return notificationsEndpoints;
