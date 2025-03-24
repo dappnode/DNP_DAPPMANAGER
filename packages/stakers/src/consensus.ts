@@ -61,11 +61,11 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" }
     ],
     [Network.Hoodi]: [
-      { dnpName: ConsensusClientHoodi.Lighthouse, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHoodi.Prysm, minVersion: "0.1.3" },
-      { dnpName: ConsensusClientHoodi.Teku, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHoodi.Nimbus, minVersion: "0.1.2" },
-      { dnpName: ConsensusClientHoodi.Lodestar, minVersion: "0.1.3" }
+      { dnpName: ConsensusClientHoodi.Lighthouse, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Prysm, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Teku, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Nimbus, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Lodestar, minVersion: "0.1.0" }
     ],
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
