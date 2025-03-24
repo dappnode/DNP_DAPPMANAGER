@@ -19,6 +19,9 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
     return res.status(404).send("Manifest not found");
   }
 
+  // Append avatarUrl to manifest
+  if (!manifest.avatar) manifest.avatar = dnp.avatarUrl;
+
   // Filter manifest manually to not send new private properties
   const filteredManifest = pick(manifest, [
     "name",
@@ -55,7 +58,8 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
     "repository",
     "bugs",
     "license",
-    "notifications"
+    "notifications",
+    "avatar"
   ]);
 
   res.status(200).send(filteredManifest);
