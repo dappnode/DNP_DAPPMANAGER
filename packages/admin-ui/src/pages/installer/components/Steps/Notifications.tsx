@@ -3,9 +3,10 @@ import React from "react";
 import Card from "components/Card";
 import Button from "components/Button";
 import { CustomEndpoint, GatusEndpoint } from "@dappnode/types";
-import "./permissions.scss";
+import "./../../../notifications/tabs/Settings/settings.scss";
 import { GatusEndpointItem } from "pages/notifications/tabs/Settings/GatusEndpointItem";
 import { CustomEndpointItem } from "pages/notifications/tabs/Settings/CustomEndpointItem";
+import SubTitle from "components/SubTitle";
 
 interface NotificationsProps {
   endpointsGatus: GatusEndpoint[];
@@ -25,7 +26,9 @@ export const Notifications: React.FC<NotificationsProps> = ({
   goBack
 }) => {
   return (
-    <Card>
+    <Card className="notifications-settings">
+      <SubTitle className="notifications-section-title">Manage notifications</SubTitle>
+      <div>Enable, disable and customize notifications individually.</div>
       <div className="endpoint-list-card">
         {endpointsGatus &&
           endpointsGatus.map((endpoint, i) => (
