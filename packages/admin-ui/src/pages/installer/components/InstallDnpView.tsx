@@ -24,7 +24,7 @@ import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
-import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
+import { CustomEndpoint, GatusEndpoint, RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
@@ -66,6 +66,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const packagesToBeUninstalled = dnp.compatible.packagesToBeUninstalled;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
+
+  const [endpointsGatus, setEndpointsGatus] = React.useState<GatusEndpoint[]>(manifest.notifications?.endpoints || []);
+
+  const [endpointsCustom, setEndpointsCustom] = React.useState<CustomEndpoint[]>(
+    manifest.notifications?.customEndpoints || []
+  );
 
   useEffect(() => {
     setUserSettings(settings || {});
@@ -113,6 +119,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       // Re-direct user to package page if installation is successful
       if (componentIsMounted.current) {
         setShowSuccess(true);
+
+        await setNotifications();
+
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
@@ -133,6 +142,28 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   };
   // Prevent a burst of install calls
   const onInstallThrottle = throttle(onInstall, 1000);
+
+  const setNotifications = async () => {
+    if (!manifest.notifications) {
+      return;
+    }
+
+    if (endpointsGatus.length > 0 && manifest.notifications.endpoints) {
+      await api.notificationsUpdateEndpoints({
+        dnpName,
+        notificationsConfig: { endpoints: endpointsGatus },
+        isCore
+      });
+    }
+
+    if (endpointsCustom.length > 0 && manifest.notifications.customEndpoints) {
+      await api.notificationsUpdateEndpoints({
+        dnpName,
+        notificationsConfig: { customEndpoints: endpointsCustom },
+        isCore
+      });
+    }
+  };
 
   const disclaimers: { name: string; message: string }[] = [];
   // Default disclaimer for public DNPs
@@ -173,9 +204,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     }
   ].filter((option) => option.available);
 
-  const endpointsCall = useApi.notificationsGetEndpoints();
-  const dnpNotificationEndpoints = endpointsCall.data && endpointsCall.data[dnpName];
-
   const dnpsRequest = useApi.packagesGet();
   const installedDnps = dnpsRequest.data;
   const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === "notifications.dnp.dappnode.eth");
@@ -191,10 +219,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const installSubPath = "install";
 
   // Only display notifications step if the notifications package is installed && there are endpoints in manifest
-  const showNotificationsStep =
-    isNotificationsPkgInstalled &&
-    dnpNotificationEndpoints &&
-    (dnpNotificationEndpoints.endpoints.length > 0 || dnpNotificationEndpoints.customEndpoints.length > 0);
+  const showNotificationsStep = isNotificationsPkgInstalled && manifest.notifications;
 
   const availableRoutes: {
     name: string;
@@ -247,7 +272,14 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       name: "Notifications",
       subPath: notificationsSubPath,
       render: () => (
-        <Notifications dnpNotificationEndpoints={dnpNotificationEndpoints} goNext={goNext} goBack={goBack} />
+        <Notifications
+          endpointsGatus={endpointsGatus}
+          endpointsCustom={endpointsCustom}
+          setEndpointsGatus={setEndpointsGatus}
+          setEndpointsCustom={setEndpointsCustom}
+          goNext={goNext}
+          goBack={goBack}
+        />
       ),
       available: showNotificationsStep
     },
