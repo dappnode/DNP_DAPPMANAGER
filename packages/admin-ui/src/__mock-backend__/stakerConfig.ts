@@ -904,12 +904,12 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
-      case "hoodie":
+      case "hoodi":
         return {
           executionClients: [
             {
               status: "ok",
-              dnpName: "hoodie-geth.dnp.dappnode.eth",
+              dnpName: "hoodi-geth.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -936,7 +936,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "hoodie-nethermind.dnp.dappnode.eth",
+              dnpName: "hoodi-nethermind.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -964,7 +964,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "hoodie-besu.dnp.dappnode.eth",
+              dnpName: "hoodi-besu.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: false,
@@ -991,7 +991,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "hoodie-erigon.dnp.dappnode.eth",
+              dnpName: "hoodi-erigon.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1021,7 +1021,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [
             {
               status: "ok",
-              dnpName: "prysm-hoodie.dnp.dappnode.eth",
+              dnpName: "prysm-hoodi.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1049,7 +1049,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "lighthouse-hoodie.dnp.dappnode.eth",
+              dnpName: "lighthouse-hoodi.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1077,7 +1077,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "teku-hoodie.dnp.dappnode.eth",
+              dnpName: "teku-hoodi.dnp.dappnode.eth",
               isInstalled: false,
               isRunning: false,
               isUpdated: true,
@@ -1105,7 +1105,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             },
             {
               status: "ok",
-              dnpName: "nimbus-hoodie.dnp.dappnode.eth",
+              dnpName: "nimbus-hoodi.dnp.dappnode.eth",
               isInstalled: true,
               isRunning: true,
               isUpdated: true,
@@ -1133,7 +1133,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           ],
           web3Signer: {
             status: "ok",
-            dnpName: "web3signer-hoodie.dnp.dappnode.eth",
+            dnpName: "web3signer-hoodi.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,
@@ -1157,13 +1157,13 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 version: "0.1.0"
               },
               links: {
-                ui: "http://web3signer-hoodie.dappnode:9000"
+                ui: "http://web3signer-hoodi.dappnode:9000"
               }
             }
           },
           mevBoost: {
             status: "ok",
-            dnpName: "mev-boost-hoodie.dnp.dappnode.eth",
+            dnpName: "mev-boost-hoodi.dnp.dappnode.eth",
             isInstalled: true,
             isRunning: true,
             isUpdated: true,

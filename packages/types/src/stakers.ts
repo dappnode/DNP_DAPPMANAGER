@@ -8,7 +8,7 @@ export enum Network {
   Gnosis = "gnosis",
   Lukso = "lukso",
   Holesky = "holesky",
-  Hoodie = "hoodie"
+  Hoodi = "hoodi"
 }
 
 // MAINNET
@@ -76,26 +76,26 @@ export enum MevBoostHolesky {
   Mevboost = "mev-boost-holesky.dnp.dappnode.eth"
 }
 
-// HOODIE
-export enum ConsensusClientHoodie {
-  Prysm = "prysm-hoodie.dnp.dappnode.eth",
-  Lighthouse = "lighthouse-hoodie.dnp.dappnode.eth",
-  Teku = "teku-hoodie.dnp.dappnode.eth",
-  Nimbus = "nimbus-hoodie.dnp.dappnode.eth",
-  Lodestar = "lodestar-hoodie.dnp.dappnode.eth"
+// HOODI
+export enum ConsensusClientHoodi {
+  Prysm = "prysm-hoodi.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-hoodi.dnp.dappnode.eth",
+  Teku = "teku-hoodi.dnp.dappnode.eth",
+  Nimbus = "nimbus-hoodi.dnp.dappnode.eth",
+  Lodestar = "lodestar-hoodi.dnp.dappnode.eth"
 }
-export enum ExecutionClientHoodie {
-  Geth = "hoodie-geth.dnp.dappnode.eth",
-  Erigon = "hoodie-erigon.dnp.dappnode.eth",
-  Nethermind = "hoodie-nethermind.dnp.dappnode.eth",
-  Besu = "hoodie-besu.dnp.dappnode.eth",
-  Reth = "hoodie-reth.dnp.dappnode.eth"
+export enum ExecutionClientHoodi {
+  Geth = "hoodi-geth.dnp.dappnode.eth",
+  Erigon = "hoodi-erigon.dnp.dappnode.eth",
+  Nethermind = "hoodi-nethermind.dnp.dappnode.eth",
+  Besu = "hoodi-besu.dnp.dappnode.eth",
+  Reth = "hoodi-reth.dnp.dappnode.eth"
 }
-export enum SignerHoodie {
-  Web3signer = "web3signer-hoodie.dnp.dappnode.eth"
+export enum SignerHoodi {
+  Web3signer = "web3signer-hoodi.dnp.dappnode.eth"
 }
-export enum MevBoostHoodie {
-  Mevboost = "mev-boost-hoodie.dnp.dappnode.eth"
+export enum MevBoostHoodi {
+  Mevboost = "mev-boost-hoodi.dnp.dappnode.eth"
 }
 
 // GNOSIS

@@ -42,13 +42,13 @@ const StakersRoot: React.FC = () => {
         })
     },
     {
-      subPath: "hoodie",
-      title: "Hoodie",
+      subPath: "hoodi",
+      title: "Hoodi",
       component: () =>
         StakerNetwork({
-          network: Network.Hoodie,
+          network: Network.Hoodi,
           description:
-            "Hoodie is the latest public Ethereum testnet introduced to support the Fectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
+            "Hoodi is the latest public Ethereum testnet introduced to support the Fectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
         })
     },
     {

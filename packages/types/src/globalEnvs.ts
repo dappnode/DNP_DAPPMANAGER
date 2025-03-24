@@ -26,9 +26,9 @@ export const GLOBAL_ENVS = {
   CONSENSUS_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOLESKY", // "prysm-holesky.dnp.dappnode.eth"
   EXECUTION_CLIENT_HOLESKY: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOLESKY", // "holesky-geth.dnp.dappnode.eth"
   MEVBOOST_HOLESKY: "_DAPPNODE_GLOBAL_MEVBOOST_HOLESKY", // "mevboost-holesky.dnp.dappnode.eth"
-  CONSENSUS_CLIENT_HOODIE: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOODIE", // "prysm-hoodie.dnp.dappnode.eth"
-  EXECUTION_CLIENT_HOODIE: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOODIE", // "hoodie-geth.dnp.dappnode.eth"
-  MEVBOOST_HOODIE: "_DAPPNODE_GLOBAL_MEVBOOST_HOODIE" // "mevboost-hoodie.dnp.dappnode.eth"
+  CONSENSUS_CLIENT_HOODI: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOODI", // "prysm-hoodi.dnp.dappnode.eth"
+  EXECUTION_CLIENT_HOODI: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOODI", // "hoodi-geth.dnp.dappnode.eth"
+  MEVBOOST_HOODI: "_DAPPNODE_GLOBAL_MEVBOOST_HOODI" // "mevboost-hoodi.dnp.dappnode.eth"
 };
 
 /**

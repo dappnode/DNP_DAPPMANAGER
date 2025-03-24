@@ -33,7 +33,7 @@ export class Signer extends StakerComponent {
       dnpName: SignerHolesky.Web3signer,
       minVersion: "0.1.0"
     },
-    [Network.Hoodie]: {
+    [Network.Hoodi]: {
       dnpName: SignerMainnet.Web3signer,
       minVersion: "0.1.0"
     },

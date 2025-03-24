@@ -301,13 +301,13 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
             "https://0x821f2a65afb70e7f2e820a925a9b4c80a159620582c1766b1b09729fec178b11ea22abb3a51f07b288be815a1a2ff516@bloxroute.holesky.blxrbdn.com"
         }
       ];
-    case "hoodie":
+    case "hoodi":
       return [
-        // TODO: Add relays for hoodie when available
+        // TODO: Add relays for hoodi when available
         {
           operator: "Flashbots",
           docs: "https://www.flashbots.net/",
-          url: "https://*@boost-relay-hoodie.flashbots.net"
+          url: "https://*@boost-relay-hoodi.flashbots.net"
         }
       ];
     default:

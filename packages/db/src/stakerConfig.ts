@@ -105,29 +105,29 @@ export const mevBoostHolesky = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_HOLESKY })[0]
 );
 
-// Hoodie
+// Hoodi
 
-const CONSENSUS_CLIENT_HOODIE = "consensus-client-hoodie";
-const EXECUTION_CLIENT_HOODIE = "execution-client-hoodie";
-const MEVBOOST_HOODIE = "mevboost-hoodie";
+const CONSENSUS_CLIENT_HOODI = "consensus-client-hoodi";
+const EXECUTION_CLIENT_HOODI = "execution-client-hoodi";
+const MEVBOOST_HOODI = "mevboost-hoodi";
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const consensusClientHoodie = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOODIE, null),
-  Object.keys({ CONSENSUS_CLIENT_HOODIE })[0]
+export const consensusClientHoodi = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_HOODI, null),
+  Object.keys({ CONSENSUS_CLIENT_HOODI })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const executionClientHoodie = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOODIE, null),
-  Object.keys({ EXECUTION_CLIENT_HOODIE })[0]
+export const executionClientHoodi = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_HOODI, null),
+  Object.keys({ EXECUTION_CLIENT_HOODI })[0]
 );
 
-export const mevBoostHoodie = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_HOODIE, false),
-  Object.keys({ MEVBOOST_HOODIE })[0]
+export const mevBoostHoodi = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_HOODI, false),
+  Object.keys({ MEVBOOST_HOODI })[0]
 );
 
 // LUKSO
