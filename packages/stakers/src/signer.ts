@@ -5,6 +5,7 @@ import {
   SignerLukso,
   SignerMainnet,
   SignerPrater,
+  SignerEphemery,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
@@ -35,6 +36,10 @@ export class Signer extends StakerComponent {
     },
     [Network.Lukso]: {
       dnpName: SignerLukso.Web3signer,
+      minVersion: "0.1.0"
+    },
+    [Network.Ephemery]: {
+      dnpName: SignerEphemery.Web3signer,
       minVersion: "0.1.0"
     }
   };

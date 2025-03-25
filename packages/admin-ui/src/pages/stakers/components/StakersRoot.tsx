@@ -60,18 +60,28 @@ const StakersRoot: React.FC = () => {
           description:
             "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
         })
+    },
+    {
+      subPath: "ephemery",
+      title: "Ephemery",
+      component: () =>
+        StakerNetwork({
+          network: Network.Ephemery,
+          description:
+            "The Ephemery testnet is a single network that rolls back to the genesis after a set period of time. This kind of network is focused on short term and heavy testing usecases. The purpose of this is also to avoid problems like insufficient testnet funds, inactive validators, state bloat, and similar issues faced by long-running testnets."
+        })
     }
   ];
 
   // Remove the "Prater" tab from the stakersItems array
-  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater");
-
+  // hide "ephemery" tab until clients and pkgs are published
+  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater" && item.subPath !== "ephemery");
   return (
     <>
       <Title title={title} />
 
       <div className="horizontal-navbar">
-        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
+        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation and "Ephemery"*/}
         {filteredStakersItems.map((route) => (
           <button key={route.subPath} className="item-container">
             <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
