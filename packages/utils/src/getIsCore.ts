@@ -4,7 +4,7 @@ import { params } from "@dappnode/params";
 type Custom = Pick<Manifest, "type" | "name">;
 
 export function getIsCore(manifest: Custom): boolean {
-  if (manifest.type) manifest.type === "dncore";
+  if (manifest.type) return manifest.type === "dncore";
   return coreDnpNames.includes(manifest.name);
 }
 
