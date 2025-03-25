@@ -1,6 +1,7 @@
 import { pick } from "lodash-es";
 import { readManifestIfExists } from "@dappnode/utils";
 import { wrapHandler } from "../utils.js";
+import { listPackage } from "@dappnode/dockerapi";
 interface Params {
   dnpName: string;
 }
@@ -14,6 +15,13 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
 
   const manifest = readManifestIfExists(dnpName);
   if (!manifest) return res.status(404).send("Manifest not found");
+
+  // This is a temporary fix to get the avatarUrl from the package list
+  // Intaller now sets avatarUrl in the manifest. See `dappnodeInstaller` > `joinFilesInManifest`
+  // TODO: This setter should be removed once users have updated their packages
+  if(!manifest.avatarUrl) 
+    manifest.avatarUrl = (await listPackage({dnpName})).avatarUrl
+  
 
   // Filter manifest manually to not send new private properties
   const filteredManifest = pick(manifest, [
@@ -52,7 +60,7 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
     "bugs",
     "license",
     "notifications",
-    "avatar"
+    "avatarUrl"
   ]);
 
   res.status(200).send(filteredManifest);
