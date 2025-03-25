@@ -18,8 +18,9 @@ export class NotificationsManifest {
     for (const pkg of packages) {
       const { dnpName, isCore } = pkg;
       const manifestPath = getManifestPath(dnpName, isCore);
-      const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+      if (!fs.existsSync(manifestPath)) continue;
 
+      const manifest: Manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
       if (!manifest.notifications) continue;
 
       const { endpoints, customEndpoints } = manifest.notifications;
