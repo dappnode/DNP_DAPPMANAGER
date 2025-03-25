@@ -4,6 +4,7 @@ import { getManifestPath } from "./getManifestPath.js";
 import { isNotFoundError } from "./isNotFoundError.js";
 import { validatePath } from "./validatePath.js";
 import { yamlParse } from "./yaml.js";
+import { getIsCore } from "./getIsCore.js";
 
 /**
  * Improve error reporting, know what type of parsing is failing.
@@ -21,7 +22,8 @@ function readManifest(manfiestPath: string): Manifest {
   return parseManifest(fs.readFileSync(manfiestPath, "utf8"));
 }
 
-export function readManifestIfExists({ dnpName, isCore }: { dnpName: string; isCore: boolean }): Manifest | null {
+export function readManifestIfExists(dnpName: string): Manifest | null {
+  const isCore = getIsCore({ name: dnpName });
   const manifestPath = validatePath(getManifestPath(dnpName, isCore));
   try {
     return readManifest(manifestPath);

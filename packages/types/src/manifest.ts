@@ -14,6 +14,7 @@ export interface Manifest {
   author?: string;
   license?: string;
   avatar?: string;
+  avatarUrl?: string;
   repository?: {
     type?: string;
     url?: string;

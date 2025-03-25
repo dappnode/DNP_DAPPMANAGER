@@ -1,5 +1,4 @@
 import { pick } from "lodash-es";
-import { listPackage } from "@dappnode/dockerapi";
 import { readManifestIfExists } from "@dappnode/utils";
 import { wrapHandler } from "../utils.js";
 interface Params {
@@ -13,14 +12,8 @@ export const packageManifest = wrapHandler<Params>(async (req, res) => {
   const { dnpName } = req.params;
   if (!dnpName) throw Error(`Must provide containerName`);
 
-  const dnp = await listPackage({ dnpName });
-  const manifest = readManifestIfExists(dnp);
-  if (!manifest) {
-    return res.status(404).send("Manifest not found");
-  }
-
-  // Append avatarUrl to manifest
-  if (!manifest.avatar) manifest.avatar = dnp.avatarUrl;
+  const manifest = readManifestIfExists(dnpName);
+  if (!manifest) return res.status(404).send("Manifest not found");
 
   // Filter manifest manually to not send new private properties
   const filteredManifest = pick(manifest, [
