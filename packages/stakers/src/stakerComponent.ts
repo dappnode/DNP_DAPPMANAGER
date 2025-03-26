@@ -1,6 +1,6 @@
 import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageGet, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
@@ -25,31 +25,49 @@ export class StakerComponent {
   }): Promise<StakerItem[]> {
     const dnpList = await listPackages();
 
+    // TODO: remove this code, it only allows to test not using published packages
     return await Promise.all(
-      dnpNames.map(async (dnpName) => {
-        try {
-          await this.dappnodeInstaller.getRepoContract(dnpName);
-          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+      dnpList
+        .filter((dnp) => dnpNames.includes(dnp.dnpName))
+        .map(async (dnp) => {
           return {
             status: "ok",
-            dnpName,
-            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-            isInstalled: getIsInstalled(pkgData, dnpList),
-            isUpdated: getIsUpdated(pkgData, dnpList),
-            isRunning: getIsRunning(pkgData, dnpList),
-            data: pkgData,
+            dnpName: dnp.dnpName,
+            avatarUrl: dnp.avatarUrl,
+            isInstalled: true,
+            isUpdated: true,
+            isRunning: dnp.containers.every((c) => c.running),
             relays, // only for mevBoost
-            isSelected: dnpName === currentClient || currentClient === true
+            isSelected: dnp.dnpName === currentClient || currentClient === true
           };
-        } catch (error) {
-          return {
-            status: "error",
-            dnpName,
-            error
-          };
-        }
-      })
+        })
     );
+
+    // return await Promise.all(
+    //   dnpNames.map(async (dnpName) => {
+    //     try {
+    //       await this.dappnodeInstaller.getRepoContract(dnpName);
+    //       const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+    //       return {
+    //         status: "ok",
+    //         dnpName,
+    //         avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+    //         isInstalled: getIsInstalled(pkgData, dnpList),
+    //         isUpdated: getIsUpdated(pkgData, dnpList),
+    //         isRunning: getIsRunning(pkgData, dnpList),
+    //         data: pkgData,
+    //         relays, // only for mevBoost
+    //         isSelected: dnpName === currentClient || currentClient === true
+    //       };
+    //     } catch (error) {
+    //       return {
+    //         status: "error",
+    //         dnpName,
+    //         error
+    //       };
+    //     }
+    //   })
+    // );
   }
 
   protected async setNew({
