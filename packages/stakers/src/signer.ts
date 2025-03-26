@@ -2,6 +2,7 @@ import {
   Network,
   SignerGnosis,
   SignerHolesky,
+  SignerHoodi,
   SignerLukso,
   SignerMainnet,
   SignerPrater,
@@ -34,7 +35,7 @@ export class Signer extends StakerComponent {
       minVersion: "0.1.0"
     },
     [Network.Hoodi]: {
-      dnpName: SignerMainnet.Web3signer,
+      dnpName: SignerHoodi.Web3signer,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: {
