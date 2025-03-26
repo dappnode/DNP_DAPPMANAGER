@@ -1,9 +1,9 @@
 import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
-import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
+//import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
 
