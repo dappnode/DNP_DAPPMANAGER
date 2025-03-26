@@ -9,6 +9,7 @@ import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
 import { NotificationsSettings } from "./tabs/Settings/Settings";
+import { notificationsPkgName } from "params";
 
 export const NotificationsRoot: React.FC = () => {
   const availableRoutes: {
@@ -32,14 +33,13 @@ export const NotificationsRoot: React.FC = () => {
   const dnpsRequest = useApi.packagesGet();
 
   return renderResponse(dnpsRequest, ["Loading notifications"], (dnps) => {
-    const notificationsDnpName = "notifications.dnp.dappnode.eth";
-    const isNotificationsPkgInstalled = dnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
+    const isNotificationsPkgInstalled = dnps?.some((dnp) => dnp.dnpName === notificationsPkgName);
 
     return (
       <>
         <Title title={title} />
         {!isNotificationsPkgInstalled ? (
-          <InstallNotificationsPkg pkgName={notificationsDnpName} />
+          <InstallNotificationsPkg pkgName={notificationsPkgName} />
         ) : (
           <>
             <div className="horizontal-navbar">
