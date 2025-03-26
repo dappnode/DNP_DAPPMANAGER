@@ -29,6 +29,7 @@ import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { Notifications } from "./Steps/Notifications";
+import { notificationsPkgName } from "params";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -67,9 +68,9 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
 
-  const [endpointsGatus, setEndpointsGatus] = React.useState<GatusEndpoint[]>(manifest.notifications?.endpoints || []);
+  const [endpoints, setEndpoints] = React.useState<GatusEndpoint[]>(manifest.notifications?.endpoints || []);
 
-  const [endpointsCustom, setEndpointsCustom] = React.useState<CustomEndpoint[]>(
+  const [customEndpoints, setCustomEndpoints] = React.useState<CustomEndpoint[]>(
     manifest.notifications?.customEndpoints || []
   );
 
@@ -144,22 +145,15 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const onInstallThrottle = throttle(onInstall, 1000);
 
   const setNotifications = async () => {
-    if (!manifest.notifications) {
-      return;
-    }
+    if (!manifest.notifications) return;
 
-    if (endpointsGatus.length > 0 && manifest.notifications.endpoints) {
+    if (endpoints.length > 0 || customEndpoints.length > 0) {
       await api.notificationsUpdateEndpoints({
         dnpName,
-        notificationsConfig: { endpoints: endpointsGatus },
-        isCore
-      });
-    }
-
-    if (endpointsCustom.length > 0 && manifest.notifications.customEndpoints) {
-      await api.notificationsUpdateEndpoints({
-        dnpName,
-        notificationsConfig: { customEndpoints: endpointsCustom },
+        notificationsConfig: {
+          endpoints: endpoints.length > 0 ? endpoints : undefined,
+          customEndpoints: customEndpoints.length > 0 ? customEndpoints : undefined
+        },
         isCore
       });
     }
@@ -206,7 +200,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
 
   const dnpsRequest = useApi.packagesGet();
   const installedDnps = dnpsRequest.data;
-  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === "notifications.dnp.dappnode.eth");
+  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsPkgName);
 
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
@@ -273,10 +267,10 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       subPath: notificationsSubPath,
       render: () => (
         <Notifications
-          endpointsGatus={endpointsGatus}
-          endpointsCustom={endpointsCustom}
-          setEndpointsGatus={setEndpointsGatus}
-          setEndpointsCustom={setEndpointsCustom}
+          endpointsGatus={endpoints}
+          endpointsCustom={customEndpoints}
+          setEndpointsGatus={setEndpoints}
+          setEndpointsCustom={setCustomEndpoints}
           goNext={goNext}
           goBack={goBack}
         />

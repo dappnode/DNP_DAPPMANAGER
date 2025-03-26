@@ -130,3 +130,6 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Support, where to send issues
+
+// Notifications
+export const notificationsPkgName = "notifications.dnp.dappnode.eth";
