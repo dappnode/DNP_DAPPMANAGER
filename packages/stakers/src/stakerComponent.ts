@@ -1,6 +1,6 @@
 import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { DappnodeInstaller, packageGet, packageGetData, packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
@@ -26,22 +26,20 @@ export class StakerComponent {
     const dnpList = await listPackages();
 
     // TODO: remove this code, it only allows to test not using published packages
-    return await Promise.all(
-      dnpList
-        .filter((dnp) => dnpNames.includes(dnp.dnpName))
-        .map(async (dnp) => {
-          return {
-            status: "ok",
-            dnpName: dnp.dnpName,
-            avatarUrl: dnp.avatarUrl,
-            isInstalled: true,
-            isUpdated: true,
-            isRunning: dnp.containers.every((c) => c.running),
-            relays, // only for mevBoost
-            isSelected: dnp.dnpName === currentClient || currentClient === true
-          };
-        })
-    );
+    return dnpList
+      .filter((dnp) => dnpNames.includes(dnp.dnpName))
+      .map((dnp) => {
+        return {
+          status: "ok",
+          dnpName: dnp.dnpName,
+          avatarUrl: dnp.avatarUrl,
+          isInstalled: true,
+          isUpdated: true,
+          isRunning: dnp.containers.every((c) => c.running),
+          relays, // only for mevBoost
+          isSelected: dnp.dnpName === currentClient || currentClient === true
+        };
+      });
 
     // return await Promise.all(
     //   dnpNames.map(async (dnpName) => {
