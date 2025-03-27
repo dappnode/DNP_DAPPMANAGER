@@ -278,7 +278,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   return (
     <>
       {progressLogs ? (
-        <Card>
+        <Card noscroll>
           <ProgressLogsView progressLogs={progressLogs} />
         </Card>
       ) : showSuccess ? (
@@ -286,7 +286,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
           <StatusIcon success={true} message="Successfully installed!" />
         </Card>
       ) : isInstalling ? (
-        <Card>
+        <Card noscroll>
           <ProgressLogsView progressLogs={{ [dnpName]: "Sending request..." }} />
         </Card>
       ) : null}

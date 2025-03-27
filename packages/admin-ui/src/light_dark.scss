@@ -96,12 +96,14 @@
     // ====================
 
     // ALERTS
-    .alert:not(a) {
-      color: var(--color-dark-quaternarytext);
 
-      p,
-      strong {
-        color: var(--color-dark-quaternarytext);
+    .alert-success {
+      color: #155724;
+    }
+
+    .alert-warning {
+      *:not(a) {
+        color: #433c1d;
       }
     }
 
