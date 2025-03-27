@@ -92,6 +92,7 @@ register.registerMetric(
         if (client.includes("erigon")) return 2;
         if (client.includes("geth")) return 3;
         if (client.includes("nethermind")) return 4;
+        if (client.includes("reth")) return 5;
         // Consensus clients
         if (client.includes("lighthouse")) return 1;
         if (client.includes("nimbus")) return 2;
