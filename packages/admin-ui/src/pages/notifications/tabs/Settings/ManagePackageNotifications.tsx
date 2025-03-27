@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
 import { GatusEndpointItem } from "./GatusEndpointItem.js";
@@ -26,44 +26,24 @@ export function ManagePackageNotifications({
     gatusEndpoints.some((ep) => ep.enabled) || customEndpoints.some((ep) => ep.enabled)
   );
 
-  // Needed to track if the state was updated by the user. Otherwise, api.notificationsUpdateEndpoints will be called when rendering the component
-  const isStateUpdatedByUser = useRef(false);
-
-  // Synchronize state with the latest data from props
-  useEffect(() => {
-    setEndpointsGatus([...gatusEndpoints]);
-    setEndpointsCustom([...customEndpoints]);
-    setPkgNotificationsEnabled(gatusEndpoints.some((ep) => ep.enabled) || customEndpoints.some((ep) => ep.enabled));
-  }, [gatusEndpoints, customEndpoints]);
-
   // Handle switch toggle to enable/disable all endpoints
   const handlePkgToggle = () => {
     const newEnabledState = !pkgNotificationsEnabled;
-    setEndpointsGatus((prevGatusEndpoints) => {
-      isStateUpdatedByUser.current = true;
-      return prevGatusEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState }));
-    });
-    setEndpointsCustom((prevCustomEndpoints) => {
-      isStateUpdatedByUser.current = true;
-      return prevCustomEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState }));
-    });
+    setEndpointsGatus((prevGatusEndpoints) => prevGatusEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
+    setEndpointsCustom((prevCustomEndpoints) => prevCustomEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
     setPkgNotificationsEnabled(newEnabledState);
   };
 
   useEffect(() => {
-    if (isStateUpdatedByUser.current) {
-      isStateUpdatedByUser.current = false;
-      api.notificationsUpdateEndpoints({
-        dnpName,
-        notificationsConfig: {
-          endpoints: endpointsGatus.length > 0 ? endpointsGatus : undefined,
-          customEndpoints: endpointsCustom.length > 0 ? endpointsCustom : undefined
-        },
-        isCore: isCore
-      });
-    }
-  }, [endpointsGatus, endpointsCustom]);
-
+    api.notificationsUpdateEndpoints({ dnpName, notificationsConfig: { endpoints: endpointsGatus }, isCore: isCore });
+  }, [endpointsGatus]);
+  useEffect(() => {
+    api.notificationsUpdateEndpoints({
+      dnpName,
+      notificationsConfig: { customEndpoints: endpointsCustom },
+      isCore: isCore
+    });
+  }, [endpointsCustom]);
   return (
     <div key={String(dnpName)} className="notifications-settings">
       <div className="title-switch-row">
