@@ -4,7 +4,6 @@
   // Line below to separate DNPs sections
   > div:not(:last-child) {
     border-bottom: var(--border-style);
-    padding-bottom: var(--default-spacing);
     margin-bottom: var(--default-spacing);
   }
 }
@@ -85,7 +84,11 @@
 
 .dnp-cards.featured {
   /* Must be auto-fill so when there's one card on big screens, it appears normal */
-  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  
+  > .card {
+    margin-top: 0;
+  }
 
   // Hide featured packages in mobile view
   @media (max-width: 40rem) {
@@ -96,12 +99,11 @@
     @media screen and (min-width: 40rem) {
       flex-direction: row;
       text-align: left;
-      align-items: flex-start;
     }
   }
   .avatar-big {
-    width: 135px;
-    height: 135px;
+    width: 80px;
+    height: 80px;
     flex-shrink: 0;
     @media screen and (min-width: 40rem) {
       margin-bottom: 0;
@@ -125,20 +127,14 @@
     }
 
     .title {
-      font-size: 2.2rem;
-      // Limit the number of text lines to N
-      line-height: 2.5rem; // X
-      max-height: 2.5rem; // X*N
+      font-size: 1.7rem;
     }
     // .verified-badge {
     //   height: 1.6rem;
     // }
     .description {
-      height: 7rem;
-      font-size: 1.1rem;
-      // Limit the number of text lines to N
-      line-height: 1.5rem; // X
-      max-height: 4.5rem; // X*N
+      height: auto;
+      font-size: 1rem;
     }
   }
   // Don't show the gradient if featured

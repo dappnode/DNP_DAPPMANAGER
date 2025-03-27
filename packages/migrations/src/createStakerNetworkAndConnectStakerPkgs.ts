@@ -16,10 +16,10 @@ export async function createStakerNetworkAndConnectStakerPkgs(
   for (const network of Object.values(Network)) {
     await createDockerStakerNetwork(params.DOCKER_STAKER_NETWORKS[network]);
     const results = await Promise.allSettled([
-      await execution.persistSelectedExecutionIfInstalled(network),
-      await consensus.persistSelectedConsensusIfInstalled(network),
-      await signer.persistSignerIfInstalledAndRunning(network),
-      await mevBoost.persistMevBoostIfInstalledAndRunning(network)
+      execution.persistSelectedExecutionIfInstalled(network),
+      consensus.persistSelectedConsensusIfInstalled(network),
+      signer.persistSignerIfInstalledAndRunning(network),
+      mevBoost.persistMevBoostIfInstalledAndRunning(network)
     ]);
 
     const errors = results.filter((result) => result.status === "rejected").map((result) => result.reason);
