@@ -38,7 +38,17 @@ const StakersRoot: React.FC = () => {
         StakerNetwork({
           network: Network.Holesky,
           description:
-            "Holesky is the latest public Ethereum testnet which will/has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
+            "Holesky is one Ethereum testnet which has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
+        })
+    },
+    {
+      subPath: "hoodi",
+      title: "Hoodi",
+      component: () =>
+        StakerNetwork({
+          network: Network.Hoodi,
+          description:
+            "Hoodi is the latest public Ethereum testnet introduced to support the Fectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
         })
     },
     {

@@ -119,6 +119,7 @@ export const params = {
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
     [Network.Holesky]: "holesky_network",
+    [Network.Hoodi]: "hoodi_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network"

@@ -103,7 +103,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky"] as Network[]) {
+      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky", "hoodi"] as Network[]) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();
