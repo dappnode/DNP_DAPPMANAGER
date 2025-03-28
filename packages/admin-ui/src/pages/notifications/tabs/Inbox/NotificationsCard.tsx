@@ -3,20 +3,25 @@ import { Accordion } from "react-bootstrap";
 import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { prettyDnpName } from "utils/format";
+import defaultAvatar from "img/defaultAvatar.png";
 
 interface NotificationCardProps {
   notification: Notification;
-  avatarUrl: string;
 }
 
-export function NotificationCard({ notification, avatarUrl }: NotificationCardProps) {
+export function NotificationCard({ notification }: NotificationCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const notificationAvatar = (notification: Notification) => {
+    if (notification.icon) return notification.icon;
+    else return defaultAvatar;
+  };
 
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
       <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)} className="notification-card">
         <div className="notification-header">
-          <img className="avatar" src={avatarUrl} alt={notification.dnpName} />
+          <img className="avatar" src={notificationAvatar(notification)} alt={notification.dnpName} />
           <div className="notification-header-data">
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
