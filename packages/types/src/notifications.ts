@@ -6,7 +6,6 @@ export interface NotificationsConfig {
 export interface Notification extends NotificationPayload {
   timestamp: string;
   seen: boolean;
-  icon: string;
 }
 
 export interface NotificationPayload {
@@ -14,6 +13,7 @@ export interface NotificationPayload {
   body: string;
   dnpName: string;
   category: NotificationCategory;
+  icon: string;
   errors?: string;
   callToAction?: {
     title: string;
