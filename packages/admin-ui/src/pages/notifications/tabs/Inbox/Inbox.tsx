@@ -30,7 +30,11 @@ export function Inbox() {
   const filteredNotifications = useMemo(() => {
     if (!notifications.data) return [];
 
-    return notifications.data.filter(
+    // Filter notifications that encountered an error while making the request
+    const healthyNotifications = notifications.data.filter((notification) => !notification.errors);
+
+    // Filter by search and category
+    return healthyNotifications.filter(
       (notification) =>
         (notification.title.toLowerCase().includes(search.toLowerCase()) ||
           notification.dnpName.toLowerCase().includes(search.toLowerCase())) &&
@@ -51,11 +55,8 @@ export function Inbox() {
   const findPkgAvatar = (dnpName: string) => {
     const dnp = installedDnps?.find((dnp) => dnp.dnpName === dnpName);
 
-    if (!dnp) {
-      return defaultAvatar;
-    } else if (dnp.isCore) {
-      return dappnodeIcon;
-    }
+    if (!dnp) return defaultAvatar;
+    else if (dnp.isCore) return dappnodeIcon;
     return dnp.avatarUrl;
   };
 
