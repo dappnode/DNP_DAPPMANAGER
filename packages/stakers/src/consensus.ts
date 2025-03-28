@@ -1,6 +1,7 @@
 import {
   ConsensusClientGnosis,
   ConsensusClientHolesky,
+  ConsensusClientHoodi,
   ConsensusClientLukso,
   ConsensusClientMainnet,
   ConsensusClientPrater,
@@ -28,6 +29,7 @@ export class Consensus extends StakerComponent {
     [Network.Gnosis]: db.consensusClientGnosis,
     [Network.Prater]: db.consensusClientPrater,
     [Network.Holesky]: db.consensusClientHolesky,
+    [Network.Hoodi]: db.consensusClientHoodi,
     [Network.Lukso]: db.consensusClientLukso
   };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
@@ -57,6 +59,13 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientHolesky.Teku, minVersion: "0.1.2" },
       { dnpName: ConsensusClientHolesky.Nimbus, minVersion: "0.1.2" },
       { dnpName: ConsensusClientHolesky.Lodestar, minVersion: "0.1.3" }
+    ],
+    [Network.Hoodi]: [
+      { dnpName: ConsensusClientHoodi.Lighthouse, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Prysm, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Teku, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Nimbus, minVersion: "0.1.0" },
+      { dnpName: ConsensusClientHoodi.Lodestar, minVersion: "0.1.0" }
     ],
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
