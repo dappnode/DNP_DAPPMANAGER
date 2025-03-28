@@ -13,6 +13,7 @@ export interface NotificationPayload {
   body: string;
   dnpName: string;
   category: NotificationCategory;
+  errors?: string;
   callToAction?: {
     title: string;
     url: string;
