@@ -12,7 +12,7 @@ interface NotificationCardProps {
 export function NotificationCard({ notification }: NotificationCardProps) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const notificationAvatar = (notification: Notification) => {
+  const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
     else return defaultAvatar;
   };
@@ -21,7 +21,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
       <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)} className="notification-card">
         <div className="notification-header">
-          <img className="avatar" src={notificationAvatar(notification)} alt={notification.dnpName} />
+          <img className="avatar" src={notificationAvatar()} alt={notification.dnpName} />
           <div className="notification-header-data">
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
