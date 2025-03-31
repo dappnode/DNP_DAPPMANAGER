@@ -6,11 +6,8 @@ import { NotificationCard } from "./NotificationsCard";
 import { useApi } from "api";
 import { Searchbar } from "components/Searchbar";
 import Loading from "components/Loading";
-import defaultAvatar from "img/defaultAvatar.png";
-import dappnodeIcon from "img/dappnode-logo-only.png";
 
 export function Inbox() {
-  const dnpsRequest = useApi.packagesGet();
   const notifications = useApi.notificationsGetAll();
 
   const [search, setSearch] = useState("");
@@ -50,15 +47,7 @@ export function Inbox() {
     .filter((notification) => notification.seen)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
-  const loading = dnpsRequest.isValidating;
-  const installedDnps = dnpsRequest.data;
-  const findPkgAvatar = (dnpName: string) => {
-    const dnp = installedDnps?.find((dnp) => dnp.dnpName === dnpName);
-
-    if (!dnp) return defaultAvatar;
-    else if (dnp.isCore) return dappnodeIcon;
-    return dnp.avatarUrl;
-  };
+  const loading = notifications.isValidating;
 
   return loading ? (
     <Loading steps={["Loading data"]} />
@@ -90,11 +79,7 @@ export function Inbox() {
         <>
           <SubTitle>New Notifications</SubTitle>
           {newNotifications.map((notification) => (
-            <NotificationCard
-              key={notification.timestamp}
-              notification={notification}
-              avatarUrl={findPkgAvatar(notification.dnpName)}
-            />
+            <NotificationCard key={notification.timestamp} notification={notification} />
           ))}
         </>
       )}
@@ -104,11 +89,7 @@ export function Inbox() {
         <Card>No notifications</Card>
       ) : (
         seenNotifications.map((notification) => (
-          <NotificationCard
-            key={notification.timestamp}
-            notification={notification}
-            avatarUrl={findPkgAvatar(notification.dnpName)}
-          />
+          <NotificationCard key={notification.timestamp} notification={notification} />
         ))
       )}
     </>
