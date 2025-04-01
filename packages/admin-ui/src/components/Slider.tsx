@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./slider.scss";
 
 interface SliderProps {
@@ -18,9 +18,13 @@ const Slider: React.FC<SliderProps> = ({
   value = 50,
   unit = "%",
   onChange,
-  onChangeComplete, // In order to trigger an action when the user releases the slider
+  onChangeComplete // In order to trigger an action when the user releases the slider
 }) => {
   const [sliderValue, setSliderValue] = useState(value);
+
+  useEffect(() => {
+    setSliderValue(value);
+  }, [value]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(e.target.value);
@@ -49,7 +53,9 @@ const Slider: React.FC<SliderProps> = ({
         onTouchEnd={handleTouchEnd} // For mobile support
         className="slider-component"
       />
-      <span className="slider-value">{sliderValue} {unit && unit}</span>
+      <span className="slider-value">
+        {sliderValue} {unit && unit}
+      </span>
     </div>
   );
 };

@@ -1,13 +1,30 @@
 import SubTitle from "components/SubTitle";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Switch from "components/Switch";
 import { ManagePackageNotifications } from "./ManagePackageNotifications.js";
 import { useApi } from "api";
+import { CustomEndpoint, GatusEndpoint } from "@dappnode/types";
 import "./settings.scss";
+
+interface EndpointsData {
+  [dnpName: string]: {
+    endpoints: GatusEndpoint[];
+    customEndpoints: CustomEndpoint[];
+    isCore: boolean;
+  };
+}
 
 export function NotificationsSettings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [endpointsData, setEndpointsData] = useState<EndpointsData | undefined>();
   const endpointsCall = useApi.notificationsGetEndpoints();
+
+  useEffect(() => {
+    // Fetch the latest endpoints data when the component is mounted
+    if (endpointsCall.data) {
+      setEndpointsData(endpointsCall.data as EndpointsData);
+    }
+  }, [endpointsCall.data]);
 
   return (
     <div className="notifications-settings">
@@ -30,8 +47,8 @@ export function NotificationsSettings() {
           <div>Enable, disable and customize notifications individually.</div>
           <br />
           <div className="manage-notifications-wrapper">
-            {endpointsCall.data &&
-              Object.entries(endpointsCall.data).map(([dnpName, endpoints]) => (
+            {endpointsData &&
+              Object.entries(endpointsData).map(([dnpName, endpoints]) => (
                 <ManagePackageNotifications
                   key={dnpName}
                   dnpName={dnpName}

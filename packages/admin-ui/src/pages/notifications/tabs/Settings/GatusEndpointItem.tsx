@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GatusEndpoint } from "@dappnode/types";
 import { EndpointItem } from "./EndpointItem";
 
@@ -25,6 +25,10 @@ export function GatusEndpointItem({ endpoint, index, numEndpoints, setGatusEndpo
     : "0";
 
   const [sliderValue, setSliderValue] = useState<number>(parseFloat(conditionValue));
+
+  useEffect(() => {
+    setSliderValue(parseFloat(conditionValue));
+  }, [conditionValue, endpoint]);
 
   const handleEndpointToggle = () => {
     setGatusEndpoints((prevEndpoints) =>
