@@ -24,7 +24,7 @@ export async function sendUpdatePackageNotificationMaybe({
   // Check if auto-update notifications are enabled
   const dappmanagerCustomEndpoint = notifications
     .getEndpointsIfExists(params.dappmanagerDnpName, true)
-    ?.customEndpoints.find((customEndpoint) => customEndpoint.name === "auto-updates");
+    ?.customEndpoints?.find((customEndpoint) => customEndpoint.name === "auto-updates");
 
   if (!dappmanagerCustomEndpoint || !dappmanagerCustomEndpoint.enabled) return;
 
