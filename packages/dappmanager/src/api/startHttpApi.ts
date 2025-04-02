@@ -146,9 +146,6 @@ export function startHttpApi({
   // TODO: implement a more sophisticated rate limiter for auth methods
   app.use(limiterMiddleware);
 
-  // Ping - health check
-  app.get("/ping", auth.onlyAdmin, (_, res) => res.send({}));
-
   // ADMIN ONLY methods that do not fit into RPC
   app.get("/wireguard-config/:device", auth.onlyAdmin, routes.downloadWireguardConfig);
   app.get("/container-logs/:containerName", auth.onlyAdmin, routes.containerLogs);
@@ -158,6 +155,7 @@ export function startHttpApi({
   app.post("/upload", auth.onlyAdmin, routes.upload);
 
   // Open endpoints (no auth)
+  app.get("/ping", (_, res) => res.send({}));
   app.get("/global-envs/:name?", routes.globalEnvs);
   app.get("/env/:dnpName", routes.env);
   app.get("/public-packages/:containerName?", routes.publicPackagesData);
