@@ -13,6 +13,7 @@ import {
 import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath } from "@dappnode/utils";
 import { gt } from "semver";
 import { logs } from "@dappnode/logger";
+import { notifications } from "@dappnode/notifications";
 
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
@@ -96,6 +97,13 @@ function getInstallerPackageData(
     imagePath,
     // Data to write
     compose: compose.output(),
+    manifest: release.manifest.notifications
+      ? {
+          ...release.manifest,
+          // Apply notitications user settings if any
+          notifications: notifications.applyPreviousEndpoints(dnpName, isCore, release.manifest.notifications)
+        }
+      : release.manifest,
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,

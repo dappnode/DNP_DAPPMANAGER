@@ -270,7 +270,7 @@ export interface Routes {
   /**
    * Gatus get endpoints
    */
-  notificationsGetEndpoints(): Promise<{
+  notificationsGetAllEndpoints(): Promise<{
     [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }>;
 
@@ -713,7 +713,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistry: {},
   fetchDnpRequest: {},
   notificationsGetAll: { log: true },
-  notificationsGetEndpoints: { log: true },
+  notificationsGetAllEndpoints: { log: true },
   notificationsUpdateEndpoints: { log: true },
   getUserActionLogs: {},
   getHostUptime: {},

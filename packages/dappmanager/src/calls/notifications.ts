@@ -12,10 +12,10 @@ export async function notificationsGetAll(): Promise<Notification[]> {
 /**
  * Get gatus and custom endpoints indexed by dnpName
  */
-export async function notificationsGetEndpoints(): Promise<{
+export async function notificationsGetAllEndpoints(): Promise<{
   [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
 }> {
-  return await notifications.getEndpoints();
+  return await notifications.getAllEndpoints();
 }
 
 /**
