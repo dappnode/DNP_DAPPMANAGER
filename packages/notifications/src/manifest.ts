@@ -62,38 +62,51 @@ export class NotificationsManifest {
     const { endpoints: oldEndpoints, customEndpoints: oldCustomEndpoints } = oldNotificationsConfig;
     const { endpoints: newEndpoints, customEndpoints: newCustomEndpoints } = newNotificationsConfig;
 
-    const mergedEndpoints = oldEndpoints
-      ?.map((oldEndpoint) => {
-        const newEndpoint = newEndpoints?.find((newEndpoint) => newEndpoint.name === oldEndpoint.name);
-        if (!newEndpoint) return null;
+    const mergedEndpoints = newEndpoints?.map((newEndpoint) => {
+      const oldEndpoint = oldEndpoints?.find((e) => e.name === newEndpoint.name);
+      // If no previous version exists, simply use the new endpoint.
+      if (!oldEndpoint) return newEndpoint;
 
-        const mergedEndpoint = { ...oldEndpoint, ...newEndpoint };
-        if (mergedEndpoint.conditions) {
-          mergedEndpoint.conditions = mergedEndpoint.conditions.map((condition) => {
-            const [left, operator, right] = condition.split(/([=<>]+)/);
-            if (left && operator && right && (Number(right) || right === "0")) return condition;
-            return condition;
-          });
-        }
+      // Start with new endpoint properties but persist the old "enabled" flag.
+      const mergedEndpoint = { ...newEndpoint, ...oldEndpoint };
+      mergedEndpoint.enabled = oldEndpoint.enabled;
 
-        return mergedEndpoint;
-      })
-      .filter((endpoint) => endpoint !== null);
+      // For each condition in the new endpoint, if there is a corresponding old condition,
+      // persist its right-hand side value.
+      if (newEndpoint.conditions && Array.isArray(newEndpoint.conditions)) {
+        mergedEndpoint.conditions = newEndpoint.conditions.map((condition, index) => {
+          // Split the new condition into parts using any operator as separator.
+          const newParts = condition.split(/([=<>]+)/);
+          // If we don't have a complete condition format, use it as is.
+          if (newParts.length < 3) return condition;
+          const newLeft = newParts[0];
+          const newOperator = newParts[1];
+          // Default right-hand value from the new condition.
+          let newRight = newParts.slice(2).join("");
 
-    const mergedCustomEndpoints = oldCustomEndpoints
-      ?.map((oldCustomEndpoint) => {
-        const newCustomEndpoint = newCustomEndpoints?.find(
-          (newCustomEndpoint) => newCustomEndpoint.name === oldCustomEndpoint.name
-        );
-        if (!newCustomEndpoint) return null;
+          // If there's an old condition at the same index, use its right-hand side.
+          if (oldEndpoint.conditions && oldEndpoint.conditions[index]) {
+            const oldParts = oldEndpoint.conditions[index].split(/([=<>]+)/);
+            if (oldParts.length >= 3) newRight = oldParts.slice(2).join("");
+          }
+          return `${newLeft}${newOperator}${newRight}`;
+        });
+      }
+      return mergedEndpoint;
+    });
 
-        const mergedCustomEndpoint = { ...oldCustomEndpoint, ...newCustomEndpoint };
-        if (mergedCustomEndpoint.metric && oldCustomEndpoint.metric)
-          mergedCustomEndpoint.metric.treshold = oldCustomEndpoint.metric.treshold;
+    const mergedCustomEndpoints = newCustomEndpoints?.map((newCustomEndpoint) => {
+      const oldCustomEndpoint = oldCustomEndpoints?.find((e) => e.name === newCustomEndpoint.name);
+      if (!oldCustomEndpoint) return newCustomEndpoint;
 
-        return mergedCustomEndpoint;
-      })
-      .filter((customEndpoint) => customEndpoint !== null);
+      // Merge and persist the old "enabled" flag and metric.treshold.
+      const mergedCustomEndpoint = { ...newCustomEndpoint, ...oldCustomEndpoint };
+      mergedCustomEndpoint.enabled = oldCustomEndpoint.enabled;
+      if (mergedCustomEndpoint.metric && oldCustomEndpoint.metric && oldCustomEndpoint.metric.treshold !== undefined)
+        mergedCustomEndpoint.metric.treshold = oldCustomEndpoint.metric.treshold;
+
+      return mergedCustomEndpoint;
+    });
 
     return { endpoints: mergedEndpoints, customEndpoints: mergedCustomEndpoints };
   }
