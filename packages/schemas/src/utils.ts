@@ -53,7 +53,7 @@ import { ErrorObject } from "ajv";
  */
 export function processError(
   errorObject: ErrorObject,
-  releaseFileType: "compose" | "manifest" | "setupWizard"
+  releaseFileType: "compose" | "manifest" | "setupWizard" | "notifications"
 ): string {
   const { schemaPath, message } = errorObject;
   const path = `${releaseFileType}${schemaPath}`.replace(new RegExp("/", "g"), ".");

@@ -1,10 +1,10 @@
 import fs from "fs";
 import { Log } from "@dappnode/logger";
 import { validatePath } from "@dappnode/utils";
-import { InstallPackageData } from "@dappnode/types";
+import { InstallPackageData, Manifest } from "@dappnode/types";
 import { dockerComposeConfig } from "@dappnode/dockerapi";
 import { ComposeEditor } from "@dappnode/dockercompose";
-import { isNotFoundError, writeManifest } from "@dappnode/utils";
+import { isNotFoundError } from "@dappnode/utils";
 
 /**
  * Write the new compose and test it with config
@@ -46,4 +46,13 @@ function copyIfExists(src: string, dest: string): void {
   } catch (e) {
     if (!isNotFoundError(e)) throw e;
   }
+}
+
+/**
+ * Util: Write manifest to file
+ * @param manfiestPath
+ * @param manifest
+ */
+function writeManifest(manfiestPath: string, manifest: Manifest): void {
+  fs.writeFileSync(manfiestPath, JSON.stringify(manifest, null, 2));
 }

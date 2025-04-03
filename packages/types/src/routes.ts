@@ -45,6 +45,7 @@ import {
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
+import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
@@ -260,6 +261,27 @@ export interface Routes {
    * Fetch extended info about a new DNP
    */
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
+
+  /**
+   * Get all the notifications
+   */
+  notificationsGetAll(): Promise<Notification[]>;
+
+  /**
+   * Gatus get endpoints
+   */
+  notificationsGetAllEndpoints(): Promise<{
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
+  }>;
+
+  /**
+   * Gatus update endpoint
+   */
+  notificationsUpdateEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    notificationsConfig: NotificationsConfig;
+  }) => Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -690,6 +712,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsGetAll: { log: true },
+  notificationsGetAllEndpoints: { log: true },
+  notificationsUpdateEndpoints: { log: true },
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },

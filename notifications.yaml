@@ -1,0 +1,4 @@
+customEndpoints:
+  - name: "Package updates notifications"
+    description: string
+    enabled: true

@@ -84,6 +84,13 @@ export const releaseFiles = Object.freeze({
     maxSize: 10e6, // ~ 10MB
     required: false as const,
     multiple: true as const
+  }),
+  notifications: Object.freeze({
+    regex: /^.*notifications\.yaml$/,
+    format: FileFormat.YAML,
+    maxSize: 10e3,
+    required: false as const,
+    multiple: false as const
   })
 } as const);
 
@@ -95,5 +102,6 @@ export const releaseFilesToDownload = {
   disclaimer: releaseFiles.disclaimer,
   gettingStarted: releaseFiles.gettingStarted,
   prometheusTargets: releaseFiles.prometheusTargets,
-  grafanaDashboards: releaseFiles.grafanaDashboards
+  grafanaDashboards: releaseFiles.grafanaDashboards,
+  notifications: releaseFiles.notifications
 };

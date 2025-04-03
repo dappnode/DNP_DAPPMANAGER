@@ -45,7 +45,7 @@ export async function packageGet({ dnpName }: { dnpName: string }): Promise<Inst
 
   // Add non-blocking data
   try {
-    const manifest = readManifestIfExists(dnp);
+    const manifest = readManifestIfExists(dnp.dnpName);
     if (manifest) {
       // Append manifest for general info
       dnpData.manifest = omit(manifest, ["setupWizard", "gettingStarted", "backup"]);

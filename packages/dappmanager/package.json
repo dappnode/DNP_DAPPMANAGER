@@ -32,6 +32,7 @@
     "@dappnode/installer": "workspace:^0.1.0",
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/migrations": "workspace:^0.1.0",
+    "@dappnode/notifications": "workspace:^0.1.0",
     "@dappnode/optimism": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
     "@dappnode/stakers": "workspace:^0.1.0",

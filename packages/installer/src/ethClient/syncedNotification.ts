@@ -1,5 +1,4 @@
 import * as db from "@dappnode/db";
-import { eventBus } from "@dappnode/eventbus";
 import { Eth2ClientTarget, EthClientStatus } from "@dappnode/types";
 
 /**
@@ -29,12 +28,6 @@ export function emitSyncedNotification(target: Eth2ClientTarget, status: EthClie
     db.ethClientSyncedNotificationStatus.set({
       execClientTarget: target.execClient,
       status: "Synced"
-    });
-    eventBus.notification.emit({
-      id: `eth-client-synced-${target}`,
-      type: "success",
-      title: "Ethereum node synced",
-      body: `Your DAppNode's Ethereum node ${target} is synced.`
     });
   }
 }

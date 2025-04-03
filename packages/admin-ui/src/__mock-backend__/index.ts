@@ -386,7 +386,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerLatestVersion: "20.10.8"
   }),
   getIsConnectedToInternet: async () => false,
-  getCoreVersion: async () => "0.2.92"
+  getCoreVersion: async () => "0.2.92",
+  notificationsGetAllEndpoints: async () => {
+    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
+  },
+  notificationsUpdateEndpoints: async () => {},
+  notificationsGetAll: async () => []
 };
 
 export const calls: Routes = {

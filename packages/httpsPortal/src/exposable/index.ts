@@ -11,7 +11,7 @@ import { parseExposableServiceManifest } from "./parseExposable.js";
 const getExposableServicesByDnpMemo = memoizee(
   function getExposableServicesByDnp(dnp: InstalledPackageData): ExposableServiceInfo[] | null {
     // Read disk
-    const manifest = readManifestIfExists(dnp);
+    const manifest = readManifestIfExists(dnp.dnpName);
     return manifest?.exposable ? parseExposableServiceManifest(dnp, manifest.exposable) : null;
   },
   {

@@ -11,13 +11,14 @@ import {
   PackageRequest,
   SetupWizard,
   GrafanaDashboard,
-  PrometheusTarget
+  PrometheusTarget,
+  NotificationsConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
 import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
-import { getIsCore } from "@dappnode/utils";
+import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
 import { getEthersProvider } from "./ethClient/index.js";
@@ -72,7 +73,9 @@ export class DappnodeInstaller extends DappnodeRepository {
       disclaimer: pkgRelease.disclaimer,
       gettingStarted: pkgRelease.gettingStarted,
       grafanaDashboards: pkgRelease.grafanaDashboards,
-      prometheusTargets: pkgRelease.prometheusTargets
+      prometheusTargets: pkgRelease.prometheusTargets,
+      notifications: pkgRelease.notifications,
+      avatarFile: pkgRelease.avatarFile
     });
 
     // set compose to custom dappnode compose in release
@@ -107,7 +110,9 @@ export class DappnodeInstaller extends DappnodeRepository {
         disclaimer: pkgRelease.disclaimer,
         gettingStarted: pkgRelease.gettingStarted,
         grafanaDashboards: pkgRelease.grafanaDashboards,
-        prometheusTargets: pkgRelease.prometheusTargets
+        prometheusTargets: pkgRelease.prometheusTargets,
+        notifications: pkgRelease.notifications,
+        avatarFile: pkgRelease.avatarFile
       });
     });
 
@@ -151,7 +156,9 @@ export class DappnodeInstaller extends DappnodeRepository {
     disclaimer,
     gettingStarted,
     prometheusTargets,
-    grafanaDashboards
+    grafanaDashboards,
+    notifications,
+    avatarFile
   }: {
     manifest: Manifest;
     SetupWizard?: SetupWizard;
@@ -159,12 +166,16 @@ export class DappnodeInstaller extends DappnodeRepository {
     gettingStarted?: string;
     prometheusTargets?: PrometheusTarget[];
     grafanaDashboards?: GrafanaDashboard[];
+    notifications?: NotificationsConfig;
+    avatarFile?: DistributedFile;
   }): Manifest {
     if (SetupWizard) manifest.setupWizard = SetupWizard;
     if (disclaimer) manifest.disclaimer = { message: disclaimer };
     if (gettingStarted) manifest.gettingStarted = gettingStarted;
     if (prometheusTargets) manifest.prometheusTargets = prometheusTargets;
     if (grafanaDashboards && grafanaDashboards.length > 0) manifest.grafanaDashboards = grafanaDashboards;
+    if (notifications) manifest.notifications = notifications;
+    if (avatarFile) manifest.avatarUrl = fileToGatewayUrl(avatarFile);
 
     return manifest;
   }
