@@ -66,7 +66,7 @@ export interface GatusEndpoint {
   };
 }
 
-interface Alert {
+export interface Alert {
   type: string;
   "failure-threshold": number;
   "success-threshold": number;

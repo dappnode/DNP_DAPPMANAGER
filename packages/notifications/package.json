@@ -14,6 +14,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit",
     "dev": "tsc -w"
   },
   "dependencies": {
