@@ -22,14 +22,14 @@ export interface NotificationPayload {
 }
 
 export enum NotificationCategory {
-  CORE = "CORE",
-  ETHEREUM = "ETHEREUM",
-  HOLESKY = "HOLESKY",
-  LUKSO = "LUKSO",
-  GNOSIS = "GNOSIS",
-  HOODI = "HOODI",
-  HOST = "HOST",
-  OTHER = "OTHER"
+  core = "core",
+  ethereum = "ethereum",
+  holesky = "holesky",
+  lukso = "lukso",
+  gnosis = "gnosis",
+  hoodi = "hoodi",
+  host = "host",
+  other = "other"
 }
 
 export interface CustomEndpoint {

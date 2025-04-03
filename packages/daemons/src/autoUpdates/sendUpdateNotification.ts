@@ -51,7 +51,7 @@ export async function sendUpdatePackageNotificationMaybe({
         upstreamVersion,
         autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
       }),
-      category: NotificationCategory.CORE
+      category: NotificationCategory.core
     })
     .catch((e) => logs.error("Error sending package update notification", e));
 
@@ -77,7 +77,7 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
         packages: data.packages,
         autoUpdatesEnabled: isCoreUpdateEnabled()
       }),
-      category: NotificationCategory.CORE
+      category: NotificationCategory.core
     })
     .catch((e) => logs.error("Error sending system update notification", e));
 

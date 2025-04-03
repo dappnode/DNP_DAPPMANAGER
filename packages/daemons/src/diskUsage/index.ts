@@ -105,7 +105,7 @@ async function monitorDiskUsage(): Promise<void> {
               stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
               `Please, free up enough disk space and start them again.`
             ].join("\n\n"),
-            category: NotificationCategory.CORE
+            category: NotificationCategory.core
           })
           .catch((e) => logs.error("Error sending disk usage notification", e));
 
