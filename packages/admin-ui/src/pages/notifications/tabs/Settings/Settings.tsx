@@ -17,7 +17,7 @@ interface EndpointsData {
 export function NotificationsSettings() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [endpointsData, setEndpointsData] = useState<EndpointsData | undefined>();
-  const endpointsCall = useApi.notificationsGetEndpoints();
+  const endpointsCall = useApi.notificationsGetAllEndpoints();
 
   useEffect(() => {
     // Fetch the latest endpoints data when the component is mounted

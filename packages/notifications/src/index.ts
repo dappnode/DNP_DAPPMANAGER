@@ -28,10 +28,28 @@ class Notifications {
   /**
    * Get gatus and custom endpoints indexed by dnpName
    */
-  async getEndpoints(): Promise<{
+  async getAllEndpoints(): Promise<{
     [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }> {
-    return await this.manifest.getEndpoints();
+    return await this.manifest.getAllEndpoints();
+  }
+
+  /**
+   * Get package endpoints (if exists) properties
+   */
+  getEndpointsIfExists(dnpName: string, isCore: boolean): NotificationsConfig | null {
+    return this.manifest.getEndpointsIfExists(dnpName, isCore);
+  }
+
+  /**
+   * Joins new endpoints with previous ones
+   */
+  applyPreviousEndpoints(
+    dnpName: string,
+    isCore: boolean,
+    newNotificationsConfig: NotificationsConfig
+  ): NotificationsConfig {
+    return this.manifest.applyPreviousEndpoints(dnpName, isCore, newNotificationsConfig);
   }
 
   /**
