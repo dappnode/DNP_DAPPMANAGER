@@ -32,3 +32,18 @@ export async function notificationsUpdateEndpoints({
 }): Promise<void> {
   await notifications.updateEndpoints(dnpName, isCore, notificationsConfig);
 }
+
+/**
+ * Joins new endpoints with previous ones
+ */
+export async function notificationsApplyPreviousEndpoints({
+  dnpName,
+  isCore,
+  newNotificationsConfig
+}: {
+  dnpName: string;
+  isCore: boolean;
+  newNotificationsConfig: NotificationsConfig;
+}): Promise<NotificationsConfig> {
+  return await notifications.applyPreviousEndpoints(dnpName, isCore, newNotificationsConfig);
+}

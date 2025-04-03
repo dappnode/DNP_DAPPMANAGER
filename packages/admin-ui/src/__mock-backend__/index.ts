@@ -391,7 +391,10 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
   },
   notificationsUpdateEndpoints: async () => {},
-  notificationsGetAll: async () => []
+  notificationsGetAll: async () => [],
+  notificationsApplyPreviousEndpoints: async () => {
+    return { endpoints: [], customEndpoints: [] };
+  },
 };
 
 export const calls: Routes = {
