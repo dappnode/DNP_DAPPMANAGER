@@ -54,9 +54,10 @@ export class NotificationsManifest {
   applyPreviousEndpoints(
     dnpName: string,
     isCore: boolean,
-    newNotificationsConfig: NotificationsConfig
+    newNotificationsConfig: NotificationsConfig,
+    oldNotificationsConfig?: NotificationsConfig | null
   ): NotificationsConfig {
-    const oldNotificationsConfig = this.getEndpointsIfExists(dnpName, isCore);
+    if (!oldNotificationsConfig) oldNotificationsConfig = this.getEndpointsIfExists(dnpName, isCore);
     if (!oldNotificationsConfig) return newNotificationsConfig;
 
     const { endpoints: oldEndpoints, customEndpoints: oldCustomEndpoints } = oldNotificationsConfig;
