@@ -284,6 +284,15 @@ export interface Routes {
   }) => Promise<void>;
 
   /**
+   * Applies the previous endpoints configuration to the new ones if their names match
+   */
+  notificationsApplyPreviousEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    newNotificationsConfig: NotificationsConfig;
+  }) => Promise<NotificationsConfig>;
+
+  /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
    * The list is ordered from newest to oldest. Newest log has index = 0
@@ -715,6 +724,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGetAll: { log: true },
   notificationsGetAllEndpoints: { log: true },
   notificationsUpdateEndpoints: { log: true },
+  notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },

@@ -74,6 +74,20 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     manifest.notifications?.customEndpoints || []
   );
 
+  const mergedNotificationsConfig = useApi.notificationsApplyPreviousEndpoints({
+    dnpName: dnpName,
+    isCore,
+    newNotificationsConfig: manifest.notifications || {}
+  });
+
+  useEffect(() => {
+    if (mergedNotificationsConfig.data) {
+      const { endpoints: newEndpoints, customEndpoints: newCustomEndpoints } = mergedNotificationsConfig.data;
+      setEndpoints(newEndpoints || []);
+      setCustomEndpoints(newCustomEndpoints || []);
+    }
+  }, [mergedNotificationsConfig.data]);
+
   useEffect(() => {
     setUserSettings(settings || {});
   }, [settings, setUserSettings]);
