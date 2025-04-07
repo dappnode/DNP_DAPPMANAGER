@@ -1,11 +1,31 @@
 import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
+import { readManifestIfExists } from "@dappnode/utils";
+import { listPackages } from "@dappnode/dockerapi";
 
-export function getPortsToOpen(containers: PackageContainer[]): PortToOpen[] {
+export async function getPortsToOpen(containers: PackageContainer[]): Promise<PortToOpen[]> {
   // Aggreate ports with an object form to prevent duplicates
   const portsToOpen = new Map<string, PortToOpen>();
-  const addPortToOpen = (port: PortMapping, container: PackageContainer): void => {
+
+  const addPortToOpen = async(port: PortMapping, container: PackageContainer): Promise<void> => {
+
+    const packages = await listPackages();
+    const dnp =  packages.find(dnp => dnp.dnpName === container.dnpName);
+    if(!dnp) return;
+    const manifest = readManifestIfExists(dnp);
+    if(manifest && manifest.upnpDisable) {
+      if (Array.isArray(manifest.upnpDisable)) {
+        if (port.host && manifest.upnpDisable.includes(port.host)) {
+          logs.info(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
+          return; // Skip this port if it's in the disable list
+        }
+      } else if (manifest.upnpDisable === true) {
+        // It's a boolean true, skip all ports
+        logs.info(`UPnP disabled for ${manifest.name} package`);
+        return;
+      }
+    }
     if (port.host) {
       portsToOpen.set(`${port.host}-${port.protocol}`, {
         protocol: port.protocol,

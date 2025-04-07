@@ -48,7 +48,7 @@ async function natRenewal(): Promise<void> {
 
     // Fetch portsToOpen and store them in the DB
     const containers = await listPackageContainers();
-    const portsToOpen = getPortsToOpen(containers);
+    const portsToOpen = await getPortsToOpen(containers);
     db.portsToOpen.set(portsToOpen);
     if (isFirstRun)
       logs.info("NAT renewal portsToOpen\n", portsToOpen.map((p) => `${p.portNumber}/${p.protocol}`).join(", "));

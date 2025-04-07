@@ -95,6 +95,7 @@ export interface Manifest {
 
   // Network metadata
   exposable?: ExposableServiceManifestInfo[];
+  upnpDisable?: boolean | number[];
 
   // setupWizard for compacted manifests in core packages
   setupWizard?: SetupWizard;
