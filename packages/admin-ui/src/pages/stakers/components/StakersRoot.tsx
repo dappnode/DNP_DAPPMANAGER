@@ -48,7 +48,7 @@ const StakersRoot: React.FC = () => {
         StakerNetwork({
           network: Network.Hoodi,
           description:
-            "Hoodi is the latest public Ethereum testnet introduced to support the Fectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
+            "Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
         })
     },
     {

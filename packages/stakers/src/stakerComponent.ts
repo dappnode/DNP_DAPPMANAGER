@@ -1,8 +1,9 @@
 import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
-import { DappnodeInstaller, packageInstall } from "@dappnode/installer";
+import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
+import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
 
@@ -24,21 +25,19 @@ export class StakerComponent {
   }): Promise<StakerItem[]> {
     const dnpList = await listPackages();
 
-    // TODO: rollback this return to the original one, just for testing purposes
     return await Promise.all(
       dnpNames.map(async (dnpName) => {
         try {
-          //await this.dappnodeInstaller.getRepoContract(dnpName);
-          //const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
-          const dnp = dnpList.find((dnp) => dnp.dnpName === dnpName);
+          await this.dappnodeInstaller.getRepoContract(dnpName);
+          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
           return {
             status: "ok",
             dnpName,
-            avatarUrl: dnp?.avatarUrl || "",
-            isInstalled: Boolean(dnp),
-            isUpdated: true,
-            isRunning: dnp?.containers.every((c) => c.state === "running") || false,
-            //data: pkgData,
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+            isInstalled: getIsInstalled(pkgData, dnpList),
+            isUpdated: getIsUpdated(pkgData, dnpList),
+            isRunning: getIsRunning(pkgData, dnpList),
+            data: pkgData,
             relays, // only for mevBoost
             isSelected: dnpName === currentClient || currentClient === true
           };
