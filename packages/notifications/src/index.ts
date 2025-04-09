@@ -26,6 +26,13 @@ class Notifications {
   }
 
   /**
+   * Get the count of unseen notifications
+   */
+  async getUnseenNotificationsCount(): Promise<number> {
+    return (await this.api.getUnseenNotificationsCount()).unseenCount;
+  }
+
+  /**
    * Get gatus and custom endpoints indexed by dnpName
    */
   async getAllEndpoints(): Promise<{

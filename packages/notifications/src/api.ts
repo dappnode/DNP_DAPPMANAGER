@@ -28,6 +28,13 @@ export class NotificationsApi {
   }
 
   /**
+   * Get the count of unseen notifications
+   */
+  async getUnseenNotificationsCount(): Promise<{unseenCount: number}> {
+    return await (await fetch(new URL("/api/v1/notifications/unseen", `${this.rootUrl}:8080`).toString())).json();          
+  }
+
+  /**
    * Trigger reload of endpoint to make changes effective
    */
   async reloadEndpoints(): Promise<void> {

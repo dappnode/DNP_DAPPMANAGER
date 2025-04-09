@@ -266,6 +266,11 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
+ 
+  /**
+   * Get unseen notifications count
+   */
+  notificationsGetUnseenCount(): Promise<number>;
 
   /**
    * Gatus get endpoints
@@ -722,6 +727,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistry: {},
   fetchDnpRequest: {},
   notificationsGetAll: { log: true },
+  notificationsGetUnseenCount: { log: true },
   notificationsGetAllEndpoints: { log: true },
   notificationsUpdateEndpoints: { log: true },
   notificationsApplyPreviousEndpoints: {},
