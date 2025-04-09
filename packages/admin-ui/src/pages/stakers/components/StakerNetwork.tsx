@@ -3,7 +3,6 @@ import SubTitle from "components/SubTitle";
 import { withToast } from "components/toast/Toast";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
-import { StakerConfigGet } from "@dappnode/types";
 import { api, useApi } from "api";
 import ErrorView from "components/ErrorView";
 import { confirm } from "components/ConfirmDialog";
@@ -14,7 +13,6 @@ import ExecutionClient from "./columns/ExecutionClient";
 import Button from "components/Button";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
-import { responseInterface } from "swr";
 import { Alert } from "react-bootstrap";
 import "./stakers.scss";
 import { AppContext } from "App";
@@ -29,7 +27,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   // Context
   const { theme } = React.useContext(AppContext);
 
-  const currentStakerConfigReq = useApi.stakerConfigGet(network) as responseInterface<StakerConfigGet, Error>;
+  const currentStakerConfigReq = useApi.stakerConfigGet({ network });
 
   // hooks
   const {
@@ -127,7 +125,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
           </p>
         </AlertDismissible>
       )}
-      
+
       {network === "holesky" && (
         <AlertDismissible variant="warning">
           <p>
