@@ -10,6 +10,13 @@ export async function notificationsGetAll(): Promise<Notification[]> {
 }
 
 /**
+ * Get unseen notifications count
+ */
+export async function notificationsGetUnseenCount(): Promise<number> {
+  return await notifications.getUnseenNotificationsCount();
+}
+
+/**
  * Get gatus and custom endpoints indexed by dnpName
  */
 export async function notificationsGetAllEndpoints(): Promise<{
