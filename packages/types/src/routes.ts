@@ -266,7 +266,7 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
-
+ 
   /**
    * Get unseen notifications count
    */
