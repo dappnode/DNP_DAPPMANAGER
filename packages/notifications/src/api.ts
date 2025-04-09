@@ -30,8 +30,8 @@ export class NotificationsApi {
   /**
    * Get the count of unseen notifications
    */
-  async getUnseenNotificationsCount(): Promise<{unseenCount: number}> {
-    return await (await fetch(new URL("/api/v1/notifications/unseen", `${this.rootUrl}:8080`).toString())).json();          
+  async getUnseenNotificationsCount(): Promise<{ unseenCount: number }> {
+    return await (await fetch(new URL("/api/v1/notifications/unseen", `${this.rootUrl}:8080`).toString())).json();
   }
 
   /**
@@ -40,6 +40,18 @@ export class NotificationsApi {
   async reloadEndpoints(): Promise<void> {
     await fetch(new URL("/api/v1/gatus/endpoints/reload", `${this.rootUrl}:8082`).toString(), {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
+
+  /**
+   * Set all notifications as seen
+   */
+  async setAllNotificationsSeen(): Promise<void> {
+    await fetch(new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`).toString(), {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json"
       }

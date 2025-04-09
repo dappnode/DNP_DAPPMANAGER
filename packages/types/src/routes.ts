@@ -266,7 +266,7 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
- 
+
   /**
    * Get unseen notifications count
    */
@@ -278,6 +278,11 @@ export interface Routes {
   notificationsGetAllEndpoints(): Promise<{
     [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
   }>;
+
+  /**
+   * Set all notifications as seen
+   */
+  notificationsSetAllSeen(): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -729,6 +734,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGetAll: { log: true },
   notificationsGetUnseenCount: { log: true },
   notificationsGetAllEndpoints: { log: true },
+  notificationsSetAllSeen: { log: true },
   notificationsUpdateEndpoints: { log: true },
   notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},
