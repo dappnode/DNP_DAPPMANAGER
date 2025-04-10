@@ -4,7 +4,7 @@ import { TelegramNotifications } from "./Telegram";
 import EthicalMetrics from "./EthicalMetrics";
 import "./notifications.scss";
 
-export function Notifications() {
+export function LegacyNotifications() {
   return (
     <>
       <SubTitle>Ethical metrics</SubTitle>
