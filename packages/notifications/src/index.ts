@@ -33,6 +33,13 @@ class Notifications {
   }
 
   /**
+   * Set all notifications as seen
+   */
+  async setAllNotificationsSeen(): Promise<void> {
+    return await this.api.setAllNotificationsSeen();
+  }
+
+  /**
    * Get gatus and custom endpoints indexed by dnpName
    */
   async getAllEndpoints(): Promise<{

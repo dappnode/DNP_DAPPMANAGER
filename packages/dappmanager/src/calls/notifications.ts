@@ -17,6 +17,13 @@ export async function notificationsGetUnseenCount(): Promise<number> {
 }
 
 /**
+ * Set all notifications as seen
+ */
+export async function notificationsSetAllSeen(): Promise<void> {
+  return await notifications.setAllNotificationsSeen();
+}
+
+/**
  * Get gatus and custom endpoints indexed by dnpName
  */
 export async function notificationsGetAllEndpoints(): Promise<{

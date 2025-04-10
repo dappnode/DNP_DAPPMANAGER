@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import Card from "components/Card";
 import "./inbox.scss";
 import { NotificationCard } from "./NotificationsCard";
-import { useApi } from "api";
+import { useApi, api } from "api";
 import { Searchbar } from "components/Searchbar";
 import Loading from "components/Loading";
 
@@ -22,6 +22,7 @@ export function Inbox() {
 
     const uniqueCategories = Array.from(new Set(notifications.data.map((n) => n.category).filter(Boolean)));
     setCategories(uniqueCategories);
+    api.notificationsSetAllSeen();
   }, [notifications.data]);
 
   const filteredNotifications = useMemo(() => {
