@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Alert from "react-bootstrap/esm/Alert";
 import { useApi } from "api";
 import { getInstallerPath } from "pages/installer";
 import { UpdateAvailable } from "@dappnode/types";
@@ -38,9 +37,9 @@ export function PackageUpdates() {
     <div className="dashboard-cards">
       <div className="package-updates">
         {updatesAvailable.length === 0 ? (
-          <Alert className="package-updates-card" variant="success">
+          <div className="card card-body" >
             All packages are up to date
-          </Alert>
+          </div>
         ) : (
           <>
             {updatesAvailable.map((update) => (
