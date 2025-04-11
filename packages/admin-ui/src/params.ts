@@ -97,7 +97,7 @@ export const docsUrl = {
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
   ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`,
-  notifications: `${docsBaseUrl}/docs/user/notifications/overview`
+  notificationsOverview: `${docsBaseUrl}/docs/user/notifications/overview`
 };
 
 export const forumUrl = {

@@ -1081,7 +1081,8 @@ export type NewFeatureId =
   | "repository-fallback"
   | "system-auto-updates"
   | "enable-ethical-metrics"
-  | "change-host-password";
+  | "change-host-password"
+  | "enable-notifications";
 
 /**
  * =======

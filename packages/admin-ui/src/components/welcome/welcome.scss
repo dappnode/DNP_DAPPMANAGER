@@ -43,7 +43,11 @@
     minmax(min-content, max-content)
     1fr
     auto;
-  grid-gap: 2rem;
+
+  // Add spacing between rows manually
+  > *:not(:last-child) {
+    margin-bottom: 2rem;
+  }
 
   // align-items: center;
   // min-height: 100vh;
