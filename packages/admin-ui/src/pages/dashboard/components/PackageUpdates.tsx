@@ -36,7 +36,7 @@ export function PackageUpdates() {
   return (
     <div className="dashboard-cards">
       <div className="package-updates">
-        {updatesAvailable.length !== 0 ? (
+        {updatesAvailable.length === 0 ? (
           <div className="card card-body" >
             All packages are up to date
           </div>
