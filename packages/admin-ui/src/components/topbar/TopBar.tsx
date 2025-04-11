@@ -27,12 +27,7 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       {/* Right justified items */}
 
       {appContext.theme === "light" ? (
-        <div className="beta">
-          <span>BETA</span>
-          {/* Theme usage requires more feedback */}
-          {/*<UsageSwitch toggleUsage={toggleUsage} /> */}
-          <ThemeSwitch toggleTheme={appContext.toggleTheme} />
-        </div>
+        <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       ) : (
         <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       )}
