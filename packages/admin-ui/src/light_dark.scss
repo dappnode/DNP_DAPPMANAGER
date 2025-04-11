@@ -188,6 +188,12 @@
         opacity: 1;
       }
     }
+    .sidenav-item {
+      &.selectable:hover,
+      &.selectable.active {
+        background-color: var(--color-dark-card);
+      }
+    }
   }
   #topbar {
     background-color: var(--color-dark-background-topbar);
