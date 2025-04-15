@@ -17,12 +17,12 @@ export async function getPortsToOpen(containers: PackageContainer[]): Promise<Po
     if(manifest && manifest.upnpDisable) {
       if (Array.isArray(manifest.upnpDisable)) {
         if (port.host && manifest.upnpDisable.includes(port.host)) {
-          logs.info(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
+          logs.debug(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
           return; // Skip this port if it's in the disable list
         }
       } else if (manifest.upnpDisable === true) {
         // It's a boolean true, skip all ports
-        logs.info(`UPnP disabled for ${manifest.name} package`);
+        logs.debug(`UPnP disabled for ${manifest.name} package`);
         return;
       }
     }
