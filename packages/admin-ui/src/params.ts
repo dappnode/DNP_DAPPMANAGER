@@ -95,7 +95,8 @@ export const docsUrl = {
   ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
-  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`
+  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`,
+  notifications: `${docsBaseUrl}/docs/user/notifications/overview`
 };
 
 export const forumUrl = {

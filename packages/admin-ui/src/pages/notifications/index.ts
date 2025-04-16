@@ -1,4 +1,4 @@
 import { NotificationsRoot } from "./NotificationsRoot";
 
-export { rootPath, relativePath } from "./data";
+export { rootPath, relativePath, subPaths } from "./data";
 export const RootComponent = NotificationsRoot;
