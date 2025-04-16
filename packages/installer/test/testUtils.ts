@@ -92,7 +92,6 @@ export const mockDnp: InstalledPackageData = {
 };
 
 export const mockCompose: Compose = {
-  version: "3.5",
   services: {
     [mockDnpName]: {
       image: `${mockDnpName}:${mockDnpVersion}`,

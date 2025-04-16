@@ -1,4 +1,4 @@
-version: "3.5"
+---
 services:
   vpn.dnp.dappnode.eth:
     container_name: DAppNodeCore-vpn.dnp.dappnode.eth

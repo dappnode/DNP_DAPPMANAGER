@@ -11,7 +11,6 @@ import {
   getNetworkContainerConfig,
   listPackages
 } from "@dappnode/dockerapi";
-import { gte, lt, clean } from "semver";
 import { getDockerComposePath, getIsMonoService, getPrivateNetworkAliases, shell } from "@dappnode/utils";
 
 /** Alias for code succinctness */
@@ -35,11 +34,21 @@ export async function removeDnsAndAddAlias(): Promise<void> {
   await addAliasToGivenContainers(containers);
 }
 
+export async function removeComposeVersion() {
+  const packages = await listPackages();
+  for (const pkg of packages) {
+    const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
+    compose.removeVersion();   
+  }
+}
+
 export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
   logs.info(`Checking DNS from ${dnpName} compose file`);
 
   const compose = new ComposeFileEditor(dnpName, isCore);
   const services = compose.services();
+
+  compose.removeVersion();
 
   for (const serviceName of Object.keys(services)) {
     logs.info(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
@@ -125,16 +134,8 @@ export function migrateCoreNetworkAndAliasInCompose(container: PackageContainer,
   const dncoreComposeNetwork = compose.getComposeNetwork(params.DOCKER_PRIVATE_NETWORK_NAME);
 
   // Return if migration was done, compose is already updated
-  if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, compose.compose.version, newAliases))
+  if (isComposeNetworkAndAliasMigrated(dncoreComposeNetwork, dncoreServiceNetwork, newAliases))
     return;
-
-  // Ensure/update compose file version 3.5
-  // check if its lower than 3.5. Docker aliases was introduced in docker compose version 3.5
-  if (lt(parseComposeSemver(compose.compose.version), parseComposeSemver("3.5")))
-    compose.compose = {
-      ...compose.compose,
-      version: params.MINIMUM_COMPOSE_VERSION
-    };
 
   // Add aliases to service
   compose
@@ -196,7 +197,6 @@ function hasAliases(endpointConfig: Dockerode.NetworkInfo | null, aliases: strin
 function isComposeNetworkAndAliasMigrated(
   dncoreComposeNetwork: ComposeNetwork | null,
   dncoreServiceNetwork: ComposeServiceNetwork | null,
-  composeVersion: string,
   aliases: string[]
 ): boolean {
   // 1. If dncore_network is NOT defined both for the service we are checking
@@ -210,33 +210,9 @@ function isComposeNetworkAndAliasMigrated(
   if (
     dncoreComposeNetwork?.name === params.DOCKER_PRIVATE_NETWORK_NAME && // Check expected name
     dncoreComposeNetwork?.external && // Check is external network
-    gte(parseComposeSemver(composeVersion), parseComposeSemver(params.MINIMUM_COMPOSE_VERSION)) && // Check version is at least 3.5
     aliases.every((alias) => dncoreServiceNetwork.aliases?.includes(alias)) // Check every alias is already present
   )
     return true;
 
   return false; // In other cases return false
-}
-
-// UTILS
-
-/**
- * Return a version with low level of constraints that can be used by semver
- * Or throw an error if cannot be cleaned
- */
-function sanitizeVersion(version: string): string {
-  const sanitizedVersion = clean(version, {
-    loose: true
-  });
-  if (!sanitizedVersion) throw Error(`Error: ${version} cannot be used by semver`);
-  return sanitizedVersion;
-}
-
-/**
- * A compose version has format `major.minor` (i.e. `3.5`) which is not valid semver.
- * This function returns a valid semver by setting `patch = 0`, allowing to compare with semver fns,
- * i.e. `semver.gt()`
- */
-function parseComposeSemver(composeVersion: string): string {
-  return sanitizeVersion(composeVersion + ".0");
 }

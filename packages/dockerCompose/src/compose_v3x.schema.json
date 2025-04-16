@@ -1,7 +1,6 @@
 {
   "title": "compose",
   "type": "object",
-  "required": ["version"],
   "properties": {
     "version": { "type": "string" },
 

@@ -20,5 +20,5 @@ export function yamlParse<T>(yamlString: string): T {
 export function yamlDump<T>(obj: T): string {
   // skipInvalid (default: false) - do not throw on invalid types (like function in
   // the safe schema) and skip pairs and single values with such types.
-  return yaml.dump(obj, { indent: 2, skipInvalid: true });
+  return "---\n" + yaml.dump(obj, { indent: 2, skipInvalid: true });
 }
