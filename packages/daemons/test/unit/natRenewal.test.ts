@@ -71,7 +71,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
     const containersListed = await listContainers();
-    const portsToOpen = await getPortsToOpen(containersListed);
+    const portsToOpen = await getPortsToOpen(containersListed, true);
 
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
@@ -144,7 +144,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     // }
 
     const containers = await listContainers();
-    const portsToOpen = await getPortsToOpen(containers);
+    const portsToOpen = await getPortsToOpen(containers, true);
     expect(portsToOpen).to.deep.equal([
       // Should return only the admin's ports and ignore the other DNP's
       // From "admin.dnp.dappnode.eth"
