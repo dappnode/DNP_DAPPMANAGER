@@ -4,7 +4,7 @@ import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { notifications } from "@dappnode/notifications";
-import { NotificationCategory } from "@dappnode/types";
+import { NotificationCategory, NotificationPriority } from "@dappnode/types";
 
 /**
  * Commands
@@ -105,7 +105,8 @@ async function monitorDiskUsage(): Promise<void> {
               stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
               `Please, free up enough disk space and start them again.`
             ].join("\n\n"),
-            category: NotificationCategory.core
+            category: NotificationCategory.core,
+            priority: NotificationPriority.critical
           })
           .catch((e) => logs.error("Error sending disk usage notification", e));
 

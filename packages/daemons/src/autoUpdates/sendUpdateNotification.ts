@@ -3,7 +3,12 @@ import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { prettyDnpName } from "@dappnode/utils";
-import { CoreUpdateDataAvailable, NotificationCategory, upstreamVersionToString } from "@dappnode/types";
+import {
+  CoreUpdateDataAvailable,
+  NotificationCategory,
+  NotificationPriority,
+  upstreamVersionToString
+} from "@dappnode/types";
 import { formatPackageUpdateNotification, formatSystemUpdateNotification } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
@@ -51,7 +56,8 @@ export async function sendUpdatePackageNotificationMaybe({
         upstreamVersion,
         autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
       }),
-      category: NotificationCategory.core
+      category: NotificationCategory.core,
+      priority: NotificationPriority.low
     })
     .catch((e) => logs.error("Error sending package update notification", e));
 
@@ -77,7 +83,8 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
         packages: data.packages,
         autoUpdatesEnabled: isCoreUpdateEnabled()
       }),
-      category: NotificationCategory.core
+      category: NotificationCategory.core,
+      priority: NotificationPriority.low
     })
     .catch((e) => logs.error("Error sending system update notification", e));
 
