@@ -13,12 +13,20 @@ export interface NotificationPayload {
   body: string;
   dnpName: string;
   category: NotificationCategory;
+  priority: NotificationPriority;
   icon?: string;
   errors?: string;
   callToAction?: {
     title: string;
     url: string;
   };
+}
+
+export enum NotificationPriority {
+  low = "low",
+  medium = "medium",
+  high = "high",
+  critical = "critical"
 }
 
 export enum NotificationCategory {
@@ -36,6 +44,7 @@ export interface CustomEndpoint {
   name: string;
   enabled: boolean;
   description: string;
+  priority: NotificationPriority;
   metric?: {
     treshold: number;
     min: number;
@@ -52,6 +61,7 @@ export interface GatusEndpoint {
   conditions: string[];
   interval: string; // e.g., "1m"
   group: string;
+  priority: NotificationPriority;
   alerts: Alert[];
   definition: {
     // dappnode specific
