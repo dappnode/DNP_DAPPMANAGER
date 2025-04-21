@@ -452,13 +452,14 @@ volumes:
             conditions: ["response-time < 500ms", "status == 200"],
             interval: "1m",
             group: "example-group",
+            priority: "high",
             alerts: [
               {
-                type: "response-time",
+                type: "custom",
                 "failure-threshold": 3,
                 "success-threshold": 2,
                 "send-on-resolved": true,
-                description: "Response time exceeded",
+                description: "Custom alert description",
                 enabled: true
               }
             ],
