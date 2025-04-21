@@ -8,7 +8,6 @@ describe("ComposeServiceEditor", function () {
     it("should remove the dns field from the service", function () {
       // Create a mock compose object
       const mockCompose: Compose = {
-        version: "3",
         services: {
           myservice: {
             image: "myimage",
@@ -39,6 +38,43 @@ describe("ComposeServiceEditor", function () {
       // Output the compose and check that dns is not present
       const outputCompose = composeEditor.output();
       expect(outputCompose.services["myservice"].dns).to.be.undefined;
+
+      // Ensure other fields remain unchanged
+      expect(outputCompose.services["myservice"].image).to.equal("myimage");
+    });
+  });
+  describe("removeVersion()", function () {
+    it("should remove the version field from the service", function () {
+      // Create a mock compose object
+      const mockCompose: Compose = {
+        version: "3.5",
+        services: {
+          myservice: {
+            image: "myimage",
+            dns: "8.8.8.8",
+            environment: []
+          }
+        }
+      };
+
+      // Create a ComposeEditor instance with the mock compose
+      const composeEditor = new ComposeEditor(mockCompose);
+
+      // Ensure version field is present before removal
+      expect(composeEditor.compose.version).to.deep.equal("3.5");
+
+      // Call removeVersion()
+      composeEditor.removeVersion();
+
+      // Get the updated service
+      const updatedCompose = composeEditor.compose;
+
+      // Verify that the verison field is removed
+      expect(updatedCompose.version).to.be.undefined;
+
+      // Output the compose and check that version is not present
+      const outputCompose = composeEditor.output();
+      expect(outputCompose.version).to.be.undefined;
 
       // Ensure other fields remain unchanged
       expect(outputCompose.services["myservice"].image).to.equal("myimage");

@@ -1,6 +1,6 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
-import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
+import { removeDnsAndAddAlias, removeComposeVersion } from "./removeFieldsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
@@ -102,6 +102,11 @@ export async function executeMigrations(
       fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
       migration: "create docker staker network and persist selected staker pkgs per network",
       coreVersion: "0.2.95"
+    },
+    {
+      fn: removeComposeVersion,
+      migration: "removes compose version from compose file",
+      coreVersion: "0.2.105"
     }
   ];
 

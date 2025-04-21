@@ -7,7 +7,6 @@ import { setDappnodeComposeDefaults } from "../../src/index.js";
 describe("setDappnodeComposeDefaults", () => {
   it("Should set dappnode defaults to a validated compose from a non-core package", () => {
     const compose: Compose = {
-      version: "3.5",
       services: {
         "beacon-chain": {
           build: {
@@ -98,7 +97,6 @@ describe("setDappnodeComposeDefaults", () => {
     };
 
     const expectedCompose: Compose = {
-      version: "3.5",
       services: {
         "beacon-chain": {
           container_name: "DAppNodePackage-beacon-chain.teku-gnosis.dnp.dappnode.eth",
@@ -153,7 +151,6 @@ describe("setDappnodeComposeDefaults", () => {
 
   it("Should set dappnode defaults to a validated compose from a core package", () => {
     const compose: Compose = {
-      version: "3.5",
       networks: {
         dncore_network: {
           name: "dncore_network",
@@ -224,7 +221,6 @@ describe("setDappnodeComposeDefaults", () => {
     };
 
     const expectedCompose: Compose = {
-      version: "3.5",
       services: {
         "dappmanager.dnp.dappnode.eth": {
           container_name: "DAppNodeCore-dappmanager.dnp.dappnode.eth",

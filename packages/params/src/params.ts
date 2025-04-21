@@ -129,8 +129,6 @@ export const params = {
   DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
 
   // Docker compose parameters
-  // Use of new compose file feature: network name
-  MINIMUM_COMPOSE_VERSION: "3.5",
 
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",

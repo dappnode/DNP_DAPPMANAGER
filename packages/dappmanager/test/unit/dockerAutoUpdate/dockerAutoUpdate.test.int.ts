@@ -327,7 +327,6 @@ function writeCompose({
   ports?: string[];
 }) {
   const compose = new ComposeEditor({
-    version: "3.5",
     services: {
       [container_name]: {
         image: dindComposeImage,

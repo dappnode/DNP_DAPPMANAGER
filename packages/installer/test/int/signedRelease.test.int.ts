@@ -24,7 +24,6 @@ describe("Sign release", () => {
     };
 
     const composeMain = new ComposeEditor({
-      version: "3.5",
       services: {
         [dnpName]: {
           container_name: getContainerName({

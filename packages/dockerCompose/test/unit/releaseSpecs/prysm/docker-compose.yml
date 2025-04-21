@@ -1,4 +1,4 @@
-version: "3.5"
+---
 services:
   beacon-chain:
     image: "beacon-chain.prysm.dnp.dappnode.eth:1.0.0"

@@ -265,6 +265,12 @@ export class ComposeEditor {
     );
   }
 
+  removeVersion(): void {
+    if ("version" in this.compose) {
+      delete this.compose.version;
+    }
+  }
+
   firstService(): ComposeServiceEditor {
     const firstServiceName = Object.keys(this.compose.services)[0];
     if (!firstServiceName) throw Error("Compose has no service");

@@ -10,7 +10,7 @@ describe("Module > compose > pid", () => {
   const dnpName = "erigon.dnp.dappnode.eth";
   const dnpErigonPath = process.cwd() + "/dnp_repo/" + dnpName;
   const erigonCompose = `
-version: "3.4"
+---
 services:
   erigon:
     image: "erigon.erigon.dnp.dappnode.eth:0.1.0"
@@ -58,7 +58,6 @@ volumes:
   it("Should return true because compose to install contains pid", () => {
     const examplePackage = mockPackageData;
     examplePackage.compose = {
-      version: "3.5",
       services: {
         "erigon.dnp.dappnode.eth": {
           volumes: ["data:/home/erigon/.local/share/erigon"],

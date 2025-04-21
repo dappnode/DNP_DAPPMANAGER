@@ -14,7 +14,7 @@ describe.skip("Call function: packageRemove", function () {
   const dnpName = "test.dnp.dappnode.eth";
   const dockerComposePath = getDockerComposePath(dnpName, false);
   const dockerComposeTemplate = `
-  version: '3.5'
+  ---
       services:
           ${dnpName}:
               image: 'chentex/random-logger:latest'

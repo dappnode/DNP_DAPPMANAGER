@@ -26,7 +26,7 @@ describe("Migration", () => {
   };
 
   const composeNoDns = `
-version: '3.5'
+---
 networks:
   ${dncoreNetwork}:
     name: ${dncoreNetwork}
@@ -44,7 +44,7 @@ services:
           - ${serviceName}.dappnode`;
 
   const composeAlreadyMigrated = `
-version: '3.5'
+---
 networks:
   ${dncoreNetwork}:
     name: ${dncoreNetwork}
@@ -62,7 +62,7 @@ services:
           - ${serviceName}.dappnode`;
 
   const composeToBeMigratedBefore = `
-version: '3.4'
+---
 networks:
   ${dncoreNetwork}:
     name: ${dncoreNetwork}

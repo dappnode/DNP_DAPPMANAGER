@@ -64,7 +64,6 @@ describe("Release format tests", () => {
               description: "mock-test description"
             },
             compose: {
-              version: "3.5",
               services: {
                 [dnpName]: {
                   restart: "unless-stopped",
@@ -96,7 +95,6 @@ describe("Release format tests", () => {
               description: "mock-test description"
             },
             compose: {
-              version: "3.5",
               services: {
                 [serviceNames.frontend]: {
                   restart: "unless-stopped",
@@ -142,7 +140,6 @@ describe("Release format tests", () => {
               description: "mock-test description"
             },
             compose: {
-              version: "3.5",
               services: {
                 [dnpName]: {
                   restart: "unless-stopped",
