@@ -9,7 +9,6 @@ import {
   fetchWifiCredentials,
   fetchRebootIsRequired,
   fetchShouldShowSmooth,
-  fetchIsConnectedToInternet
 } from "services/dappnodeStatus/actions";
 
 export function initialCallsOnOpen() {
@@ -21,5 +20,4 @@ export function initialCallsOnOpen() {
   store.dispatch<any>(fetchWifiCredentials());
   store.dispatch<any>(fetchRebootIsRequired());
   store.dispatch<any>(fetchShouldShowSmooth());
-  store.dispatch<any>(fetchIsConnectedToInternet());
 }

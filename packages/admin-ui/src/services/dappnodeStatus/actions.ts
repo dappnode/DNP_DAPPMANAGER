@@ -22,11 +22,6 @@ export const fetchShouldShowSmooth = (): AppThunk => async (dispatch) =>
     dispatch(updateShouldShowSmooth(await api.getShouldShowSmooth()));
   }, "getShouldShowSmooth");
 
-export const fetchIsConnectedToInternet = (): AppThunk => async (dispatch) =>
-  withTryCatch(async () => {
-    dispatch(setIsConnectedToInternet(await api.getIsConnectedToInternet()));
-  }, "getIsConnectedToInternet");
-
 export const fetchRebootIsRequired = (): AppThunk => async (dispatch) =>
   withTryCatch(async () => {
     dispatch(setRebootHostIsRequired(await api.rebootHostIsRequiredGet()));

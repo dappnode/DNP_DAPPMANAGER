@@ -237,10 +237,6 @@ export interface Routes {
    */
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
-  /**
-   * Returns true if dappnode connected to internet
-   */
-  getIsConnectedToInternet: () => Promise<boolean>;
 
   /**
    * Return formated core update data
@@ -725,7 +721,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
