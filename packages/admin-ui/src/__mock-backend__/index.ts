@@ -183,10 +183,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
-  rebootHostIsRequiredGet: async () => ({
-    rebootRequired: true,
-    pkgs: "docker"
-  }),
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -395,7 +391,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsGetAll: async () => [],
   notificationsApplyPreviousEndpoints: async () => {
     return { endpoints: [], customEndpoints: [] };
-  },
+  }
 };
 
 export const calls: Routes = {

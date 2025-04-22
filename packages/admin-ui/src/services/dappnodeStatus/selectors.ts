@@ -11,7 +11,6 @@ import { wifiDnpName } from "params";
 const getSystemInfo = (state: RootState) => state.dappnodeStatus.systemInfo;
 export const getDappnodeParams = (state: RootState) => getSystemInfo(state);
 export const getPasswordIsSecure = (state: RootState) => state.dappnodeStatus.passwordIsSecure;
-export const getRebootIsRequired = (state: RootState) => state.dappnodeStatus.rebootRequiredScript;
 export const getVolumes = (state: RootState) => state.dappnodeStatus.volumes;
 export const getShouldShowSmooth = (state: RootState) => state.dappnodeStatus.shouldShowSmooth;
 

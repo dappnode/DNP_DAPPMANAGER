@@ -5,11 +5,7 @@ import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
 import { getCoreUpdateAvailable, getIsCoreUpdateTypePatch, getUpdatingCore } from "services/coreUpdate/selectors";
-import {
-  getWifiStatus,
-  getPasswordIsSecure,
-  getRebootIsRequired,
-} from "services/dappnodeStatus/selectors";
+import { getWifiStatus, getPasswordIsSecure } from "services/dappnodeStatus/selectors";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import Button from "components/Button";
 // Style
@@ -26,7 +22,6 @@ export default function NotificationsView() {
   const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
   const wifiStatus = useSelector(getWifiStatus);
   const passwordIsSecure = useSelector(getPasswordIsSecure);
-  const rebootHostIsRequired = useSelector(getRebootIsRequired);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -34,17 +29,6 @@ export default function NotificationsView() {
     .enabled;
 
   const notifications = [
-    /**
-     * [HOST-REBOOT]
-     * Tell the user to reboot the host
-     */
-    {
-      id: "hostReboot",
-      linkText: "Reboot",
-      linkPath: systemPathName + "/" + systemSubPaths.power,
-      body: `**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes. The following packages will be updated: ${rebootHostIsRequired?.pkgs}`,
-      active: rebootHostIsRequired?.rebootRequired
-    },
     /**
      * [SYSTEM-UPDATE]
      * Tell the user to update the core DNPs

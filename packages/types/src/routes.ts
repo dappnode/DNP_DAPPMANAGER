@@ -30,7 +30,6 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  RebootRequiredScript,
   HostStatCpu,
   HostStatMemory,
   HostStatDisk,
@@ -237,7 +236,6 @@ export interface Routes {
    */
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
-
   /**
    * Return formated core update data
    */
@@ -262,7 +260,7 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
- 
+
   /**
    * Get unseen notifications count
    */
@@ -556,11 +554,6 @@ export interface Routes {
    */
   rebootHost: () => Promise<void>;
 
-  /**
-   *  Returns true if a reboot is required
-   */
-  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
-
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
@@ -774,7 +767,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
-  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
