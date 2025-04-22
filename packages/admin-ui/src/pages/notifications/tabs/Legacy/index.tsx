@@ -13,7 +13,7 @@ export function LegacyNotifications() {
   return (
     <>
       <AlertDismissible variant="warning">
-        <h4>📣 Heads up! Changes are coming to Notifications</h4>
+        <h4>📣 Legacy Notifications will be deprecated!</h4>
         <p>
           The current notification system using email and Telegram will be deprecated in upcoming Dappnode core
           releases. We're transitioning to a new and improved in-app Notifications experience, designed to be more
@@ -25,7 +25,7 @@ export function LegacyNotifications() {
             Settings Notifications tab
           </Link>{" "}
           <br />
-          📘 For full details on how to migrate and set up the new system, see our{" "}
+          📘 For full details about the new system, see our{" "}
           <Link to={docsUrl.notifications} target="_blank" rel="noopener noreferrer">
             Notifications Documentation
           </Link>
