@@ -138,10 +138,24 @@
   }
 }
 
+#dark {
+  .welcome-container {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .welcome {
+    background: var(--color-dark-card);
+    color: var(--color-dark-maintext);
+
+    .description {
+      color: var(--color-dark-secondarytext);
+    }
+  }
+}
+
 // Ethical Metrics modal container
 
 .ethical-container {
   display: grid;
   gap: 1rem;
 }
-
