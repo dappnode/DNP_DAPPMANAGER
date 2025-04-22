@@ -1,82 +1,39 @@
 import React, { useState } from "react";
 import BottomButtons from "../BottomButtons";
-import { api } from "api";
 import { docsUrl } from "params";
 
-import { prettyDnpName } from "utils/format";
-import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
-import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
-import { withToast } from "components/toast/Toast";
-import { continueIfCalleDisconnected } from "api/utils";
-import { useDispatch } from "react-redux";
-import Button from "components/Button";
+import SubTitle from "components/SubTitle";
+import Switch from "components/Switch";
 
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
-  const [isInstalling, setIsInstalling] = useState(false);
-
-  const dispatch = useDispatch();
-
-  const notificationsPkgName = "testing.dnp.dappnode.eth"; // TODO: Change to notifications.dnp.dappnode.eth (import it from params)
-
-  const installNotisPkg = async () => {
-    try {
-      setIsInstalling(true);
-      await withToast(
-        // If call errors with "callee disconnected", resolve with success
-        continueIfCalleDisconnected(
-          () =>
-            api.packageInstall({
-              name: notificationsPkgName
-            }),
-          notificationsPkgName
-        ),
-        {
-          message: `Installing ${prettyDnpName(notificationsPkgName)}...`,
-          onSuccess: `Installed ${prettyDnpName(notificationsPkgName)}`
-        }
-      );
-
-      enableAutoUpdatesForPackageWithConfirm(notificationsPkgName).catch((e) => {
-        console.error("Error on enableAutoUpdatesForPackageWithConfirm", e);
-      });
-    } catch (e) {
-      console.error(e);
-    } finally {
-      dispatch(clearIsInstallingLog({ id: notificationsPkgName }));
-      setIsInstalling(false);
-    }
-  };
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   return (
     <div>
       <div className="header">
         <div className="title">Enable Dappnode's Notifications</div>
         <br />
-        <div className="description">
-          <p className="description-text">
-            In order, to configure and recieve notifications from your installed packages, you need to install the
-            notifications package first.
-          </p>
-          <Button
-            variant="dappnode"
-            disabled={isInstalling}
-            onClick={() => {
-              installNotisPkg();
-            }}
-          >
-            {isInstalling ? "Installing..." : "Install Notifications"}
-          </Button>
-          <br />
-          <br />
-
-          <p>After the installation you can configure them in the Notifications tab.</p>
-          <p>
-            Learn more about notifications package and how to configure it in the{" "}
-            <a href={docsUrl.notificationsOverview} className="learn-more">
-              Dappnode's documentation
-            </a>
-          </p>
-        </div>
+        <h4>📣 Heads up! Changes are coming to Notifications</h4>
+        <p>
+          The current notification system will be <b>deprecated</b> in upcoming Dappnode core releases.
+        </p>
+        <p>
+          We're transitioning to a new and improved in-app Notifications experience, designed to be more reliable,
+          configurable and scalable.
+        </p>
+        <SubTitle className="notifications-section-title">Enable new notifications</SubTitle>
+        <Switch
+          checked={notificationsEnabled}
+          onToggle={() => {
+            setNotificationsEnabled(!notificationsEnabled);
+          }}
+        />
+        <br />
+        <br />
+        <p>
+          Learn more about notifications package and how to configure it in the{" "}
+          <a href={docsUrl.notificationsOverview}>Dappnode's documentation</a>
+        </p>
       </div>
 
       <BottomButtons onBack={onBack} onNext={() => onNext()} />

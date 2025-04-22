@@ -108,7 +108,7 @@ export default function Welcome() {
     }
 
     // Persist in the DAPPMANAGER that this new feature has been seen by the user
-    if (id && id !== "enable-notifications")
+    if (id && id !== "enable-notifications") // TODO: remove this when notifications are implemented
       api.newFeatureStatusSet({ featureId: id, status: "seen" }).catch((e) => {
         console.error(`Error on newFeatureStatusSet(${featureId}, seen)`, e);
       });
