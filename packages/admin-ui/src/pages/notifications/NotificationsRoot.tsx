@@ -20,7 +20,7 @@ export const NotificationsRoot: React.FC = () => {
     const availableRoutes: {
       name: string;
       subPath: string;
-      component: React.FC;
+      component: React.ComponentType;
     }[] = [
       {
         name: "Inbox",
