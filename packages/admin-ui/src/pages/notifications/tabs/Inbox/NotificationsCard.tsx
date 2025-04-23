@@ -7,10 +7,11 @@ import defaultAvatar from "img/defaultAvatar.png";
 
 interface NotificationCardProps {
   notification: Notification;
+  openByDefault?: boolean;
 }
 
-export function NotificationCard({ notification }: NotificationCardProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function NotificationCard({ notification, openByDefault = false }: NotificationCardProps) {
+  const [isOpen, setIsOpen] = useState(openByDefault);
 
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
@@ -26,9 +27,8 @@ export function NotificationCard({ notification }: NotificationCardProps) {
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
-                <div className="group-label">{notification.category}</div>
-                {notification.body.includes("Resolved: ") && <div className="sucess-label">resolved</div>}
-                {notification.body.includes("Triggered: ") && <div className="trigger-label">triggered</div>}
+                <div className={`${notification.priority}-label`}>{notification.priority}</div>
+                {notification.body.includes("resolved: ") && <div className="sucess-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
