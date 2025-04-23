@@ -11,6 +11,7 @@ import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js"
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { migrateNotificationsStatus } from "./migrateNotificationsStatus.js";
 
 class MigrationError extends Error {
   errors: Error[];
@@ -102,6 +103,11 @@ export async function executeMigrations(
       fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
       migration: "create docker staker network and persist selected staker pkgs per network",
       coreVersion: "0.2.95"
+    },
+    {
+      fn: migrateNotificationsStatus,
+      migration: "enables notifications if Legacy notifications were enabled",
+      coreVersion: "0.2.106"
     }
   ];
 

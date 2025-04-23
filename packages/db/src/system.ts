@@ -13,6 +13,7 @@ const TELEGRAM_CHANNEL_ID = "telegram-channel-id";
 const DISK_USAGE_THRESHOLD = "disk-usage-threshold";
 const DAPPNODE_WEB_NAME = "dappnode-web-name";
 const IS_DAPPNODE_AWS = "is-dappnode-aws";
+const NOTIFICATIONS_ENABLED = "notifications-enabled";
 
 export const serverName = interceptGlobalEnvOnSet(
   dbMain.staticKey<string>(SERVER_NAME, ""),
@@ -46,6 +47,10 @@ export const telegramUserId = dbMain.staticKey<string | null>(TELEGRAM_USER_ID, 
 // Is dappnode AWS instance
 
 export const isDappnodeAws = dbMain.staticKey<boolean | null>(IS_DAPPNODE_AWS, null);
+
+// Are notifications enabled
+
+export const notificationsEnabled = dbMain.staticKey<boolean | null>(NOTIFICATIONS_ENABLED, null);
 
 // Cache version information to detect updates
 
