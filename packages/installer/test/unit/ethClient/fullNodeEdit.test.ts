@@ -12,7 +12,7 @@ import { params } from "@dappnode/params";
 describe("Edit fullnode in eth client", () => {
   before(() => {
     // create dnp_repo dir
-    shellSafe("mkdir dnp_repo");
+    shellSafe("mkdir -p dnp_repo");
   });
   const composeWithFullnodeAlias = `
 version: '3.5'
