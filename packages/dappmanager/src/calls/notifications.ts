@@ -1,5 +1,14 @@
 import { notifications } from "@dappnode/notifications";
 import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from "@dappnode/types";
+import * as db from "@dappnode/db";
+
+/**
+ * Get the notifications config
+ * @returns the if notifications are enabled
+ */
+export async function notificationsGetStatus(): Promise<boolean | null> {
+  return db.notificationsEnabled.get();
+}
 
 /**
  * Get all the notifications

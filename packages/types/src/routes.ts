@@ -263,6 +263,11 @@ export interface Routes {
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
 
   /**
+   * Get notifications status from the db
+   */
+  notificationsGetStatus(): Promise<boolean | null>;
+ 
+  /**
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
@@ -731,6 +736,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsGetStatus: { log: true },
   notificationsGetAll: { log: true },
   notificationsGetUnseenCount: { log: true },
   notificationsGetAllEndpoints: { log: true },
