@@ -1,7 +1,7 @@
 import { logs } from "@dappnode/logger";
 import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
-import { NotificationCategory, NotificationPriority } from "@dappnode/types";
+import { Category, Priority, Status } from "@dappnode/types";
 import { getRebootRequiredMemoized } from "@dappnode/hostscriptsservices";
 
 const CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -26,8 +26,9 @@ async function monitorHostReboot(): Promise<void> {
             title: "DAppNode host reboot required",
             dnpName: "dappmanager",
             body: `**Dappnode host reboot required.** The following packages will be updated: ${rebootRequired.pkgs}. Please reboot the host to apply the changes.`,
-            category: NotificationCategory.core,
-            priority: NotificationPriority.low
+            category: Category.system,
+            priority: Priority.low,
+            status: Status.triggered
           })
           .catch((e) => logs.error("Error sending host reboot notification", e));
         notificationSent = true;
@@ -41,8 +42,9 @@ async function monitorHostReboot(): Promise<void> {
             title: "DAppNode host reboot no longer required",
             dnpName: "dappmanager",
             body: `**Dappnode host no longer requires a reboot.** All changes have been applied successfully.`,
-            category: NotificationCategory.core,
-            priority: NotificationPriority.low
+            category: Category.system,
+            priority: Priority.low,
+            status: Status.resolved
           })
           .catch((e) => logs.error("Error sending host reboot resolve notification", e));
         notificationSent = false;

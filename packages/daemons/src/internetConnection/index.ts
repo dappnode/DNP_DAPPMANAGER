@@ -1,7 +1,7 @@
 import { logs } from "@dappnode/logger";
 import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
-import { NotificationCategory, NotificationPriority } from "@dappnode/types";
+import { Category, Priority, Status } from "@dappnode/types";
 import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 2 * 60 * 1000; // 2 minutes
@@ -40,8 +40,9 @@ async function monitorInternetConnection(): Promise<void> {
             title: NOTIFICATION_TITLE,
             dnpName: params.dappmanagerDnpName,
             body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
-            category: NotificationCategory.core,
-            priority: NotificationPriority.critical,
+            category: Category.system,
+            priority: Priority.critical,
+            status: Status.triggered,
             callToAction: {
               title: "Navigate",
               url: "http://my.dappnode/support/auto-diagnose"
@@ -59,8 +60,9 @@ async function monitorInternetConnection(): Promise<void> {
             title: NOTIFICATION_TITLE,
             dnpName: params.dappmanagerDnpName,
             body: `**Dappnode host has regained internet connectivity.**`,
-            category: NotificationCategory.core,
-            priority: NotificationPriority.low
+            category: Category.system,
+            priority: Priority.low,
+            status: Status.resolved,
           })
           .catch((e) => logs.error("Error sending internet connectivity resolve notification", e));
         notificationSent = false;
