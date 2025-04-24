@@ -80,7 +80,7 @@ export function Inbox() {
         <>
           <SubTitle>New Notifications</SubTitle>
           {newNotifications.map((notification) => (
-            <NotificationCard key={notification.timestamp} notification={notification} openByDefault/>
+            <NotificationCard key={notification.timestamp} notification={notification} openByDefault />
           ))}
         </>
       )}

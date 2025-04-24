@@ -4,6 +4,8 @@ import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
+import { Priority } from "@dappnode/types";
+
 
 interface NotificationCardProps {
   notification: Notification;
@@ -12,6 +14,13 @@ interface NotificationCardProps {
 
 export function NotificationCard({ notification, openByDefault = false }: NotificationCardProps) {
   const [isOpen, setIsOpen] = useState(openByDefault);
+
+  const priorityLabels: Record<Priority, string> = {
+    [Priority.low]: "Informational",
+    [Priority.medium]: "Relevant",
+    [Priority.high]: "Important",
+    [Priority.critical]: "Critical",
+  };
 
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
@@ -27,8 +36,9 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
-                <div className={`${notification.priority}-label`}>{notification.priority}</div>
-                {notification.body.includes("resolved: ") && <div className="sucess-label">Resolved</div>}
+                <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
+                <div className="category-label">{notification.category}</div>
+                {notification.body.includes("resolved: ") && <div className="resolved-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
