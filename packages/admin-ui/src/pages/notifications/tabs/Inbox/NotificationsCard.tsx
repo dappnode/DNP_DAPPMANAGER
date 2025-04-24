@@ -6,7 +6,6 @@ import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
 import { Priority } from "@dappnode/types";
 
-
 interface NotificationCardProps {
   notification: Notification;
   openByDefault?: boolean;
@@ -19,12 +18,20 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
     [Priority.low]: "Informational",
     [Priority.medium]: "Relevant",
     [Priority.high]: "Important",
-    [Priority.critical]: "Critical",
+    [Priority.critical]: "Critical"
   };
 
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
     else return defaultAvatar;
+  };
+
+  const prettifiedBody = (body: string) => {
+    if (body.includes("resolved: ")) {
+      return body.replace("resolved:", "Resolved:");
+    } else if (body.includes("triggered: ")) {
+      return body.replace("triggered:", "Attention:");
+    } else return body;
   };
 
   return (
@@ -50,7 +57,7 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
           </div>
         </div>
         <Accordion.Collapse eventKey="0">
-          <div className="notification-body">{notification.body}</div>
+          <div className="notification-body">{prettifiedBody(notification.body)}</div>
         </Accordion.Collapse>
       </Accordion.Toggle>
     </Accordion>
