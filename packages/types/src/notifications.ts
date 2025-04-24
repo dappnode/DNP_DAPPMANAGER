@@ -12,8 +12,9 @@ export interface NotificationPayload {
   title: string;
   body: string;
   dnpName: string;
-  category: NotificationCategory;
-  priority: NotificationPriority;
+  category: Category;
+  priority: Priority;
+  status: Status;
   icon?: string;
   errors?: string;
   callToAction?: {
@@ -22,21 +23,26 @@ export interface NotificationPayload {
   };
 }
 
-export enum NotificationPriority {
+export enum Priority {
   low = "low",
   medium = "medium",
   high = "high",
   critical = "critical"
 }
 
-export enum NotificationCategory {
-  core = "core",
+export enum Status {
+  triggered = "triggered",
+  resolved = "resolved"
+}
+
+export enum Category {
+  system = "system",
   ethereum = "ethereum",
   holesky = "holesky",
   lukso = "lukso",
   gnosis = "gnosis",
   hoodi = "hoodi",
-  host = "host",
+  hardware = "hardware",
   other = "other"
 }
 
@@ -44,7 +50,7 @@ export interface CustomEndpoint {
   name: string;
   enabled: boolean;
   description: string;
-  priority: NotificationPriority;
+  priority: Priority;
   metric?: {
     treshold: number;
     min: number;
@@ -61,7 +67,7 @@ export interface GatusEndpoint {
   conditions: string[];
   interval: string; // e.g., "1m"
   group: string;
-  priority: NotificationPriority;
+  priority: Priority;
   alerts: Alert[];
   definition: {
     // dappnode specific

@@ -4,7 +4,7 @@ import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
 import { notifications } from "@dappnode/notifications";
 import { params } from "@dappnode/params";
-import { NotificationCategory, NotificationPriority } from "@dappnode/types";
+import { Category, Priority, Status } from "@dappnode/types";
 
 /**
  * Sets the static IP
@@ -33,8 +33,9 @@ export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<v
       title: "Static IP updated",
       body: `Your static IP was changed to ${staticIp}.`,
       dnpName: params.dappmanagerDnpName,
-      category: NotificationCategory.core,
-      priority: NotificationPriority.low
+      category: Category.system,
+      priority: Priority.low,
+      status: Status.triggered
     })
     .catch((e) => logs.error("Error sending static IP updated notification", e));
 
