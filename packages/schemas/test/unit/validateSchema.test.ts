@@ -9,9 +9,9 @@ import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
 import { Manifest, SetupWizard, NotificationsConfig, GatusEndpoint, CustomEndpoint } from "@dappnode/types";
-import { NotificationPriority } from "../../../types/src/notifications.js";
+import { Priority } from "../../../types/src/notifications.js";
 
-describe("schemaValidation", function () {
+describe.only("schemaValidation", function () {
   this.timeout(10000);
   describe("manifest", () => {
     before(() => {
@@ -453,7 +453,7 @@ volumes:
             conditions: ["response-time < 500ms", "status == 200"],
             interval: "1m",
             group: "example-group",
-            priority: NotificationPriority.low,
+            priority: Priority.low,
             alerts: [
               {
                 type: "custom",
@@ -509,7 +509,7 @@ volumes:
             conditions: ["response-time < 500ms"],
             interval: "1m",
             group: "example-group",
-            priority: NotificationPriority.low,
+            priority: Priority.low,
             alerts: [
               {
                 type: "response-time",
@@ -542,7 +542,7 @@ volumes:
             conditions: ["response-time < 500ms"],
             interval: "invalid-interval",
             group: "example-group",
-            priority: NotificationPriority.low,
+            priority: Priority.low,
             alerts: [
               {
                 type: "response-time",
@@ -603,7 +603,7 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
-            priority: NotificationPriority.high,
+            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
@@ -663,7 +663,7 @@ volumes:
             conditions: ["response-time < 500ms", "status == 200"],
             interval: "1m",
             group: "example-group",
-            priority: NotificationPriority.low,
+            priority: Priority.low,
             alerts: [
               {
                 type: "custom",
@@ -690,7 +690,7 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
-            priority: NotificationPriority.high,
+            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
