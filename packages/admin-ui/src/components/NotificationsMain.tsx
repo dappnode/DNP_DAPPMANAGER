@@ -2,7 +2,6 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
-import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
