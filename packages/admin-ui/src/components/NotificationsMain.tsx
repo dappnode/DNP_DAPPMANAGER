@@ -1,48 +1,22 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
-import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
-import { getCoreUpdateAvailable, getIsCoreUpdateTypePatch, getUpdatingCore } from "services/coreUpdate/selectors";
 import { getWifiStatus } from "services/dappnodeStatus/selectors";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import Button from "components/Button";
 // Style
 import "./notificationsMain.scss";
-import { autoUpdateIds } from "params";
 import { AlertDismissible } from "./AlertDismissible";
 
 /**
  * Aggregate notification and display logic
  */
 export default function NotificationsView() {
-  const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);
-  const updatingCore = useSelector(getUpdatingCore);
-  const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
   const wifiStatus = useSelector(getWifiStatus);
 
-  // Check is auto updates are enabled for the core
-  const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
-  const isCoreAutoUpdateActive = ((autoUpdateSettingsReq.data?.settings || {})[autoUpdateIds.SYSTEM_PACKAGES] || {})
-    .enabled;
-
   const notifications = [
-    /**
-     * [SYSTEM-UPDATE]
-     * Tell the user to update the core DNPs
-     */
-    {
-      id: "systemUpdate",
-      linkText: "Update",
-      linkPath: systemPathName + "/" + systemSubPaths.update,
-      body: "**Dappnode system update available.** Click **Update** to review and approve it",
-      active:
-        coreUpdateAvailable &&
-        !updatingCore &&
-        // Show if NOT patch, or if patch is must not be active
-        (!isCoreUpdateTypePatch || !isCoreAutoUpdateActive)
-    },
     /**
      * [WIFI-PASSWORD]
      * Tell the user to change the wifi credentials
