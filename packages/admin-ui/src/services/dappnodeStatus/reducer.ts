@@ -12,7 +12,6 @@ export interface DappnodeStatusState {
    * Will trigger alerts when it's a boolean and false, x === false
    * Must be null at start
    */
-  passwordIsSecure: boolean | null;
   volumes: VolumeData[];
   shouldShowSmooth: boolean | null;
 }
@@ -20,7 +19,6 @@ export interface DappnodeStatusState {
 const initialState: DappnodeStatusState = {
   systemInfo: null,
   wifiCredentials: null,
-  passwordIsSecure: null,
   volumes: [],
   shouldShowSmooth: null
 };

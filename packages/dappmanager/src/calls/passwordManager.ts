@@ -1,6 +1,10 @@
 import * as db from "@dappnode/db";
 import { shell } from "@dappnode/utils";
 import { getDappmanagerImage } from "@dappnode/dockerapi";
+import { notifications } from "@dappnode/notifications";
+import { logs } from "@dappnode/logger";
+import { Category, Priority, Status } from "@dappnode/types";
+import { params } from "@dappnode/params";
 
 const insecureSalt = "insecur3";
 
@@ -76,6 +80,21 @@ export async function passwordIsSecure(): Promise<boolean> {
   } else {
     const isSecure = await isPasswordSecure();
     if (isSecure) db.passwordIsSecure.set(isSecure);
+    else
+      await notifications
+        .sendNotification({
+          title: "**Insecure host password",
+          dnpName: params.dappmanagerDnpName,
+          body: `**Change the host 'dappnode' user password**, it's an insecure default. Click **Change** to edit the host password.`,
+          category: Category.system,
+          priority: Priority.low,
+          status: Status.triggered,
+          callToAction: {
+            title: "Change",
+            url: "http://my.dappnode/system/security"
+          }
+        })
+        .catch((e) => logs.error("Error sending host reboot notification", e));
     return isSecure;
   }
 }

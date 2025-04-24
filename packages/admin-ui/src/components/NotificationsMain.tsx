@@ -5,7 +5,7 @@ import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
 // Selectors
 import { getCoreUpdateAvailable, getIsCoreUpdateTypePatch, getUpdatingCore } from "services/coreUpdate/selectors";
-import { getWifiStatus, getPasswordIsSecure } from "services/dappnodeStatus/selectors";
+import { getWifiStatus } from "services/dappnodeStatus/selectors";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import Button from "components/Button";
 // Style
@@ -21,7 +21,6 @@ export default function NotificationsView() {
   const updatingCore = useSelector(getUpdatingCore);
   const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
   const wifiStatus = useSelector(getWifiStatus);
-  const passwordIsSecure = useSelector(getPasswordIsSecure);
 
   // Check is auto updates are enabled for the core
   const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
@@ -54,17 +53,6 @@ export default function NotificationsView() {
       linkPath: systemPathName + "/" + systemSubPaths.security,
       body: "**Change the Dappnode WiFi credentials**, they are insecure default values.",
       active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
-    },
-    /**
-     * [HOST-USER-PASSWORD]
-     * Tell the user to change the host's "dappnode" user password
-     */
-    {
-      id: "hostPasswordInsecure",
-      linkText: "Change",
-      linkPath: systemPathName + "/" + systemSubPaths.security,
-      body: "**Change the host 'dappnode' user password**, it's an insecure default.",
-      active: passwordIsSecure === false
     }
   ];
 

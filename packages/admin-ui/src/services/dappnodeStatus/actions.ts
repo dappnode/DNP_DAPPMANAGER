@@ -10,7 +10,6 @@ import { wifiDnpName, wifiEnvWPA_PASSPHRASE, wifiEnvSSID, wifiDefaultWPA_PASSPHR
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
 const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
-const updatePasswordIsSecure = dappnodeStatus.actions.passwordIsSecure;
 const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
 
 // Fetch
@@ -19,11 +18,6 @@ export const fetchShouldShowSmooth = (): AppThunk => async (dispatch) =>
   withTryCatch(async () => {
     dispatch(updateShouldShowSmooth(await api.getShouldShowSmooth()));
   }, "getShouldShowSmooth");
-
-export const fetchPasswordIsSecure = (): AppThunk => async (dispatch) =>
-  withTryCatch(async () => {
-    dispatch(updatePasswordIsSecure(await api.passwordIsSecure()));
-  }, "passwordIsSecure");
 
 export const fetchVolumes = (): AppThunk => async (dispatch) =>
   withTryCatch(async () => {

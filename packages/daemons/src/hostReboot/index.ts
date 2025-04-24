@@ -3,6 +3,7 @@ import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
 import { Category, Priority, Status } from "@dappnode/types";
 import { getRebootRequiredMemoized } from "@dappnode/hostscriptsservices";
+import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
@@ -24,8 +25,12 @@ async function monitorHostReboot(): Promise<void> {
         await notifications
           .sendNotification({
             title: "DAppNode host reboot required",
-            dnpName: "dappmanager",
-            body: `**Dappnode host reboot required.** The following packages will be updated: ${rebootRequired.pkgs}. Please reboot the host to apply the changes.`,
+            dnpName: params.dappmanagerDnpName,
+            body: `**Dappnode host reboot required.** The following packages will be updated: ${rebootRequired.pkgs}. Click **Reboot** to apply the changes.`,
+            callToAction: {
+              title: "Reboot",
+              url: "http://my.dappnode/system/power"
+            },
             category: Category.system,
             priority: Priority.low,
             status: Status.triggered
@@ -40,7 +45,7 @@ async function monitorHostReboot(): Promise<void> {
         await notifications
           .sendNotification({
             title: "DAppNode host reboot no longer required",
-            dnpName: "dappmanager",
+            dnpName: params.dappmanagerDnpName,
             body: `**Dappnode host no longer requires a reboot.** All changes have been applied successfully.`,
             category: Category.system,
             priority: Priority.low,
