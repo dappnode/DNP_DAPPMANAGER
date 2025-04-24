@@ -67,7 +67,7 @@ export interface GatusEndpoint {
   conditions: string[];
   interval: string; // e.g., "1m"
   group: string;
-  priority: Priority;
+  priority: Priority; // dappnode specific
   alerts: Alert[];
   definition: {
     // dappnode specific
