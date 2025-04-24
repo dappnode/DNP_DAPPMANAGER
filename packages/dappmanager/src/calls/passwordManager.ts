@@ -83,11 +83,11 @@ export async function passwordIsSecure(): Promise<boolean> {
     else
       await notifications
         .sendNotification({
-          title: "**Insecure host password",
+          title: "**Insecure host password**",
           dnpName: params.dappmanagerDnpName,
           body: `**Change the host 'dappnode' user password**, it's an insecure default. Click **Change** to edit the host password.`,
           category: Category.system,
-          priority: Priority.low,
+          priority: Priority.high,
           status: Status.triggered,
           callToAction: {
             title: "Change",
