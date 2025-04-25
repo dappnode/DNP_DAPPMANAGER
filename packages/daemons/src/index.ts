@@ -11,10 +11,14 @@ import { startBindDaemon } from "./bind/index.js";
 import { startInternetConnectionDaemon } from "./internetConnection/index.js";
 import { startHostRebootDaemon } from "./hostReboot/index.js";
 import { startRepositoryHealthDaemon } from "./repositoryHealth/index.js";
+import { setMaxListeners } from "events"; // Import setMaxListeners
 
 // DAEMONS EXPORT
 
 export function startDaemons(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
+  // Increase the max listeners for AbortSignal. default is 10
+  setMaxListeners(12, signal);
+
   startAutoUpdatesDaemon(dappnodeInstaller, signal);
   startDiskUsageDaemon(signal);
   startDynDnsDaemon(signal);
