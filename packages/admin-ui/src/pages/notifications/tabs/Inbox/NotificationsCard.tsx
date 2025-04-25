@@ -43,11 +43,13 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
-                <div className="category-label">
-                  {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
+                <div className="labels-wrapper">
+                  <div className="category-label">
+                    {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
+                  </div>
+                  <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
+                  {notification.status === "resolved" && <div className="resolved-label">Resolved</div>}
                 </div>
-                <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
-                {notification.status === "resolved" && <div className="resolved-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
