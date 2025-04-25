@@ -38,7 +38,7 @@ async function checkIpfsHealth(): Promise<void> {
         dnpName: params.dappmanagerDnpName,
         body: `**IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is now healthy.**`,
         category: Category.system,
-        priority: Priority.low,
+        priority: Priority.high,
         status: Status.resolved
       });
       ipfsNotificationSent = false;
@@ -99,7 +99,7 @@ async function checkEthHealth(): Promise<void> {
         dnpName: params.dappmanagerDnpName,
         body: `**Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is now healthy.**`,
         category: Category.system,
-        priority: Priority.low,
+        priority: Priority.high,
         status: Status.resolved
       });
       ethNotificationSent = false;

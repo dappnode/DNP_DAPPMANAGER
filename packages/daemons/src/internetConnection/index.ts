@@ -61,7 +61,7 @@ async function monitorInternetConnection(): Promise<void> {
             dnpName: params.dappmanagerDnpName,
             body: `**Dappnode host has regained internet connectivity.**`,
             category: Category.system,
-            priority: Priority.low,
+            priority: Priority.critical,
             status: Status.resolved,
           })
           .catch((e) => logs.error("Error sending internet connectivity resolve notification", e));
