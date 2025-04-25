@@ -5,6 +5,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
 import { Priority } from "@dappnode/types";
+import RenderMarkdown from "components/RenderMarkdown";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -56,7 +57,9 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
           </div>
         </div>
         <Accordion.Collapse eventKey="0">
-          <div className="notification-body">{prettifiedBody(notification.body)}</div>
+          <div className="notification-body">
+            <RenderMarkdown source={prettifiedBody(notification.body)} />
+          </div>
         </Accordion.Collapse>
       </Accordion.Toggle>
     </Accordion>
