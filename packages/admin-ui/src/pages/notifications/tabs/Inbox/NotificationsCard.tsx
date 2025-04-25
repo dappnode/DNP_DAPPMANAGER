@@ -6,6 +6,8 @@ import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
 import { Priority } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
+import Button from "components/Button";
+import { NavLink } from "react-router-dom";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -45,7 +47,7 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
                   {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
                 </div>
                 <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
-                {notification.status === 'resolved' && <div className="resolved-label">Resolved</div>}
+                {notification.status === "resolved" && <div className="resolved-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
@@ -59,6 +61,11 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
         <Accordion.Collapse eventKey="0">
           <div className="notification-body">
             <RenderMarkdown source={prettifiedBody(notification.body)} />
+            {notification.callToAction && (
+              <NavLink to={notification.callToAction.url}>
+                <Button variant="dappnode">{notification.callToAction.title}</Button>{" "}
+              </NavLink>
+            )}
           </div>
         </Accordion.Collapse>
       </Accordion.Toggle>
