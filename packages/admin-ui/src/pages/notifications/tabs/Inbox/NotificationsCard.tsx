@@ -4,18 +4,33 @@ import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
+import { Priority } from "@dappnode/types";
+import RenderMarkdown from "components/RenderMarkdown";
 
 interface NotificationCardProps {
   notification: Notification;
+  openByDefault?: boolean;
 }
 
-export function NotificationCard({ notification }: NotificationCardProps) {
-  const [isOpen, setIsOpen] = useState(false);
+const priorityLabels: Record<Priority, string> = {
+  [Priority.low]: "Informational",
+  [Priority.medium]: "Relevant",
+  [Priority.high]: "Important",
+  [Priority.critical]: "Critical"
+};
 
+const prettifiedBody = (body: string) => {
+  if (body.includes("resolved: ")) return body.replace("resolved:", "Resolved:");
+  else if (body.includes("triggered: ")) return body.replace("triggered:", "Attention:");
+  else return body;
+};
+
+export function NotificationCard({ notification, openByDefault = false }: NotificationCardProps) {
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
     else return defaultAvatar;
   };
+  const [isOpen, setIsOpen] = useState(openByDefault);
 
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
@@ -26,9 +41,11 @@ export function NotificationCard({ notification }: NotificationCardProps) {
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
-                <div className="group-label">{notification.category}</div>
-                {notification.body.includes("Resolved: ") && <div className="sucess-label">resolved</div>}
-                {notification.body.includes("Triggered: ") && <div className="trigger-label">triggered</div>}
+                <div className="category-label">
+                  {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
+                </div>
+                <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
+                {notification.body.includes("resolved: ") && <div className="resolved-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
@@ -40,7 +57,9 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           </div>
         </div>
         <Accordion.Collapse eventKey="0">
-          <div className="notification-body">{notification.body}</div>
+          <div className="notification-body">
+            <RenderMarkdown source={prettifiedBody(notification.body)} />
+          </div>
         </Accordion.Collapse>
       </Accordion.Toggle>
     </Accordion>
