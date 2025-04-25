@@ -9,9 +9,10 @@ import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
 import Ok from "components/Ok";
 // External
-import { getPasswordIsSecure, getWifiStatus } from "services/dappnodeStatus/selectors";
+import { getWifiStatus } from "services/dappnodeStatus/selectors";
 // Style
 import "./securityIssues.scss";
+import { useApi } from "api";
 
 interface SecurityIssue {
   name: string;
@@ -22,7 +23,7 @@ interface SecurityIssue {
 }
 
 export default function SecurityIssues() {
-  const passwordIsSecure = useSelector(getPasswordIsSecure);
+  const passwordIsSecureReq = useApi.passwordIsSecure();
   const wifiStatus = useSelector(getWifiStatus);
 
   const securityIssues: SecurityIssue[] = [
@@ -30,7 +31,7 @@ export default function SecurityIssues() {
       name: "Change host user password",
       severity: "critical",
       component: ChangeHostUserPassword,
-      isActive: passwordIsSecure === false,
+      isActive: passwordIsSecureReq.data === false,
       okMessage: "Host user password changed"
     },
     {
