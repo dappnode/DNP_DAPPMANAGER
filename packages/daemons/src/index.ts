@@ -8,6 +8,9 @@ import { startNatRenewalDaemon } from "./natRenewal/index.js";
 import { startStakerDaemon } from "./stakerConfig/index.js";
 import { startTelegramBotDaemon } from "./telegramBot/index.js";
 import { startBindDaemon } from "./bind/index.js";
+import { startInternetConnectionDaemon } from "./internetConnection/index.js";
+import { startHostRebootDaemon } from "./hostReboot/index.js";
+import { startRepositoryHealthDaemon } from "./repositoryHealth/index.js";
 
 // DAEMONS EXPORT
 
@@ -21,6 +24,9 @@ export function startDaemons(dappnodeInstaller: DappnodeInstaller, signal: Abort
   startStakerDaemon(dappnodeInstaller);
   startTelegramBotDaemon();
   startBindDaemon(signal);
+  startInternetConnectionDaemon(signal);
+  startHostRebootDaemon(signal);
+  startRepositoryHealthDaemon(signal);
 }
 
 export { startAvahiDaemon } from "./avahi/index.js";
