@@ -11,28 +11,25 @@ interface NotificationCardProps {
   openByDefault?: boolean;
 }
 
+const priorityLabels: Record<Priority, string> = {
+  [Priority.low]: "Informational",
+  [Priority.medium]: "Relevant",
+  [Priority.high]: "Important",
+  [Priority.critical]: "Critical"
+};
+
+const prettifiedBody = (body: string) => {
+  if (body.includes("resolved: ")) return body.replace("resolved:", "Resolved:");
+  else if (body.includes("triggered: ")) return body.replace("triggered:", "Attention:");
+  else return body;
+};
+
 export function NotificationCard({ notification, openByDefault = false }: NotificationCardProps) {
-  const [isOpen, setIsOpen] = useState(openByDefault);
-
-  const priorityLabels: Record<Priority, string> = {
-    [Priority.low]: "Informational",
-    [Priority.medium]: "Relevant",
-    [Priority.high]: "Important",
-    [Priority.critical]: "Critical"
-  };
-
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
     else return defaultAvatar;
   };
-
-  const prettifiedBody = (body: string) => {
-    if (body.includes("resolved: ")) {
-      return body.replace("resolved:", "Resolved:");
-    } else if (body.includes("triggered: ")) {
-      return body.replace("triggered:", "Attention:");
-    } else return body;
-  };
+  const [isOpen, setIsOpen] = useState(openByDefault);
 
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
