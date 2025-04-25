@@ -33,11 +33,7 @@ export function NotificationsSettings() {
 
   useEffect(() => {
     if (notificationsDnp.data) {
-      console.log("notificationsDnp.data", notificationsDnp.data);
-
       const isStopped = notificationsDnp.data.containers.some((c) => c.state !== "running");
-      console.log("isStopped", isStopped);
-
       setNotificationsDisabled(isStopped);
     }
   }, [notificationsDnp.data]);
