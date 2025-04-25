@@ -45,7 +45,7 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
                   {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
                 </div>
                 <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
-                {notification.body.includes("resolved: ") && <div className="resolved-label">Resolved</div>}
+                {notification.status === 'resolved' && <div className="resolved-label">Resolved</div>}
               </div>
 
               <i>{new Date(notification.timestamp).toLocaleString()}</i>
