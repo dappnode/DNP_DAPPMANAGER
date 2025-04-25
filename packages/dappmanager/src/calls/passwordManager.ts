@@ -10,6 +10,8 @@ const insecureSalt = "insecur3";
 
 const baseCommand = `docker run --rm -v /etc:/etc --privileged --entrypoint=""`;
 
+let passwordInsecureNotificationSent = false;
+
 /**
  * Checks if the user `dappnode`'s password in the host machine
  * is NOT the insecure default set at installation time.
@@ -80,9 +82,10 @@ export async function passwordIsSecure(): Promise<boolean> {
   } else {
     const isSecure = await isPasswordSecure();
     if (isSecure) db.passwordIsSecure.set(isSecure);
-    else
-      await notifications
-        .sendNotification({
+    // Send notification if the password is insecure. It will be sent only once on app lifetime
+    else if (!passwordInsecureNotificationSent) {
+      try {
+        await notifications.sendNotification({
           title: "**Insecure host password**",
           dnpName: params.dappmanagerDnpName,
           body: `**Change the host 'dappnode' user password**, it's an insecure default. Click **Change** to edit the host password.`,
@@ -93,8 +96,13 @@ export async function passwordIsSecure(): Promise<boolean> {
             title: "Change",
             url: "http://my.dappnode/system/security"
           }
-        })
-        .catch((e) => logs.error("Error sending host reboot notification", e));
+        });
+        passwordInsecureNotificationSent = true;
+      } catch (e) {
+        logs.error("Error sending host reboot notification", e);
+      }
+    }
+
     return isSecure;
   }
 }

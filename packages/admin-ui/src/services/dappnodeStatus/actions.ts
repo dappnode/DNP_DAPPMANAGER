@@ -1,7 +1,6 @@
 import { api } from "api";
 import { dappnodeStatus } from "./reducer";
 import { AppThunk } from "store";
-import { wifiDnpName, wifiEnvWPA_PASSPHRASE, wifiEnvSSID, wifiDefaultWPA_PASSPHRASE } from "params";
 
 // Service > dappnodeStatus
 
@@ -9,7 +8,6 @@ import { wifiDnpName, wifiEnvWPA_PASSPHRASE, wifiEnvSSID, wifiDefaultWPA_PASSPHR
 
 export const setSystemInfo = dappnodeStatus.actions.systemInfo;
 export const updateVolumes = dappnodeStatus.actions.volumes;
-const updateWifiCredentials = dappnodeStatus.actions.wifiCredentials;
 const updateShouldShowSmooth = dappnodeStatus.actions.shouldShowSmooth;
 
 // Fetch
@@ -28,21 +26,6 @@ export const fetchSystemInfo = (): AppThunk => async (dispatch) =>
   withTryCatch(async () => {
     dispatch(setSystemInfo(await api.systemInfoGet()));
   }, "systemInfoGet");
-
-/**
- * Check if the wifi DNP has the same credentials as the default ones
- * @returns credentials are the same as the default ones
- */
-export const fetchWifiCredentials = (): AppThunk => async (dispatch) =>
-  withTryCatch(async () => {
-    const wifiDnp = await api.packageGet({ dnpName: wifiDnpName });
-    const environment = (wifiDnp.userSettings?.environment || {})[wifiDnpName] || {};
-    const ssid: string = environment[wifiEnvSSID];
-    const pass: string = environment[wifiEnvWPA_PASSPHRASE];
-    const isDefaultPassphrase = pass === wifiDefaultWPA_PASSPHRASE;
-
-    dispatch(updateWifiCredentials({ ssid, isDefaultPassphrase }));
-  }, "wifiStatus");
 
 /**
  * Util to guard against throws in thunk actions

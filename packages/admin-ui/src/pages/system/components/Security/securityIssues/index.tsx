@@ -1,5 +1,4 @@
 import React from "react";
-import { useSelector } from "react-redux";
 // Components
 import SubTitle from "components/SubTitle";
 import Card from "components/Card";
@@ -8,8 +7,6 @@ import SeverityBadge, { SeverityLevel } from "./SeverityBadge";
 import ChangeHostUserPassword from "./ChangeHostUserPassword";
 import ChangeWifiPassword from "./ChangeWifiPassword";
 import Ok from "components/Ok";
-// External
-import { getWifiStatus } from "services/dappnodeStatus/selectors";
 // Style
 import "./securityIssues.scss";
 import { useApi } from "api";
@@ -24,7 +21,7 @@ interface SecurityIssue {
 
 export default function SecurityIssues() {
   const passwordIsSecureReq = useApi.passwordIsSecure();
-  const wifiStatus = useSelector(getWifiStatus);
+  const wifiReportReq = useApi.wifiReportGet();
 
   const securityIssues: SecurityIssue[] = [
     {
@@ -38,8 +35,8 @@ export default function SecurityIssues() {
       name: "Change WIFI default password",
       severity: "critical",
       component: ChangeWifiPassword,
-      isActive: Boolean(wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning),
-      okMessage: wifiStatus?.isRunning ? "WIFI credentials changed" : "WIFI is disabled"
+      isActive: Boolean(wifiReportReq.data && wifiReportReq.data.isDefaultPassphrase && wifiReportReq.data.isRunning),
+      okMessage: wifiReportReq.data?.isRunning ? "WIFI credentials changed" : "WIFI is disabled"
     }
   ];
 

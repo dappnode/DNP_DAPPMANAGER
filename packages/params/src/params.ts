@@ -253,6 +253,7 @@ export const params = {
   // Wi-Fi ENVs
   WIFI_KEY_SSID: "SSID",
   WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
+  WIFI_DEFAULT_PASSWORD: "dappnode",
 
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",

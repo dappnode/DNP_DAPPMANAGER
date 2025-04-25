@@ -1,7 +1,10 @@
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { listContainer, logContainer } from "@dappnode/dockerapi";
-import { CurrentWifiCredentials, WifiReport } from "@dappnode/types";
+import { CurrentWifiCredentials, WifiReport, Category, Priority, Status } from "@dappnode/types";
 import { params } from "@dappnode/params";
+import { notifications } from "@dappnode/notifications";
+
+let wifiDefaultPasswordNotificationSent = false;
 
 /**
  * Return wifi report
@@ -47,9 +50,37 @@ export async function wifiReportGet(): Promise<WifiReport> {
       break;
   }
 
+  const { password } = await wifiCredentialsGet();
+  const isDefaultPassphrase = password === params.WIFI_DEFAULT_PASSWORD;
+
+  // Send notification if the password is insecure. Only once in the app lifetime
+  if (isDefaultPassphrase && !wifiDefaultPasswordNotificationSent) {
+    try {
+      await notifications
+        .sendNotification({
+          title: "**Insecure wifi password**",
+          dnpName: params.dappmanagerDnpName,
+          body: `**Change the wifi password**, it's an insecure default. Click **Change** to edit the wifi password.`,
+          category: Category.system,
+          priority: Priority.high,
+          status: Status.triggered,
+          callToAction: {
+            title: "Change",
+            url: "http://my.dappnode/system/wifi"
+          }
+        })
+        .catch((e) => console.error("Error sending wifi password notification", e));
+      wifiDefaultPasswordNotificationSent = true;
+    } catch (e) {
+      console.error("Error sending wifi password notification", e);
+    }
+  }
+
   return {
     info,
-    report
+    report,
+    isDefaultPassphrase,
+    isRunning: wifiContainer.state === "running"
   };
 }
 
