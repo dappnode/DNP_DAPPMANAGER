@@ -26,7 +26,7 @@ async function monitorHostReboot(): Promise<void> {
           .sendNotification({
             title: "DAppNode host reboot required",
             dnpName: params.dappmanagerDnpName,
-            body: `**Dappnode host reboot required.** The following packages will be updated: ${rebootRequired.pkgs}. Click **Reboot** to apply the changes.`,
+            body: `A reboot is required to install updates from some linux packages`,
             callToAction: {
               title: "Reboot",
               url: "http://my.dappnode/system/power"
@@ -34,7 +34,7 @@ async function monitorHostReboot(): Promise<void> {
             category: Category.system,
             priority: Priority.low,
             status: Status.triggered,
-            isBanner: true
+            isBanner: true,
           })
           .catch((e) => logs.error("Error sending host reboot notification", e));
         notificationSent = true;
@@ -45,9 +45,9 @@ async function monitorHostReboot(): Promise<void> {
 
         await notifications
           .sendNotification({
-            title: "DAppNode host reboot no longer required",
+            title: "Dappnode host reboot was successful",
             dnpName: params.dappmanagerDnpName,
-            body: `**Dappnode host no longer requires a reboot.** All changes have been applied successfully.`,
+            body: `All packages have been installed successfully.`,
             category: Category.system,
             priority: Priority.low,
             status: Status.resolved
