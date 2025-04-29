@@ -58,9 +58,9 @@ export async function wifiReportGet(): Promise<WifiReport> {
     try {
       await notifications
         .sendNotification({
-          title: "**Insecure wifi password**",
+          title: "Insecure wifi password",
           dnpName: params.dappmanagerDnpName,
-          body: `**Change the wifi password**, it's an insecure default. Click **Change** to edit the wifi password.`,
+          body: `Change the wifi password.`,
           category: Category.system,
           priority: Priority.high,
           status: Status.triggered,
