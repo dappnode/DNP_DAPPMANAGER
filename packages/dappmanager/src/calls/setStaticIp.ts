@@ -35,7 +35,8 @@ export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<v
       dnpName: params.dappmanagerDnpName,
       category: Category.system,
       priority: Priority.low,
-      status: Status.triggered
+      status: Status.triggered,
+      isBanner: true,
     })
     .catch((e) => logs.error("Error sending static IP updated notification", e));
 

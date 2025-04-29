@@ -15,6 +15,8 @@ export interface NotificationPayload {
   category: Category;
   priority: Priority;
   status: Status;
+  isBanner?: boolean;
+  isRemote?: boolean;
   icon?: string;
   errors?: string;
   callToAction?: {

@@ -33,7 +33,8 @@ async function monitorHostReboot(): Promise<void> {
             },
             category: Category.system,
             priority: Priority.low,
-            status: Status.triggered
+            status: Status.triggered,
+            isBanner: true
           })
           .catch((e) => logs.error("Error sending host reboot notification", e));
         notificationSent = true;
