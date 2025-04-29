@@ -23,6 +23,7 @@ export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export {
   notificationsGetAllEndpoints,
+  notificationsGetBanner,
   notificationsUpdateEndpoints,
   notificationsGetAll,
   notificationsApplyPreviousEndpoints,

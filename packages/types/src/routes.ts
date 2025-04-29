@@ -260,6 +260,11 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
+  
+  /**
+   * Get banner notifications that should be displayed within the given timestamp range
+   */
+  notificationsGetBanner(timestamp: string): Promise<Notification[]>;
 
   /**
    * Get unseen notifications count
@@ -720,6 +725,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchRegistry: {},
   fetchDnpRequest: {},
   notificationsGetAll: {},
+  notificationsGetBanner: {},
   notificationsGetUnseenCount: {},
   notificationsGetAllEndpoints: {},
   notificationsSetAllSeen: {},

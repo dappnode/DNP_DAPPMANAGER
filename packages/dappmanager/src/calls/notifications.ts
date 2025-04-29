@@ -10,6 +10,14 @@ export async function notificationsGetAll(): Promise<Notification[]> {
 }
 
 /**
+ * Get all the notifications
+ * @returns all the notifications
+ */
+export async function notificationsGetBanner(timestamp:string): Promise<Notification[]> {
+  return await notifications.getBannerNotifications(timestamp);
+}
+
+/**
  * Get unseen notifications count
  */
 export async function notificationsGetUnseenCount(): Promise<number> {

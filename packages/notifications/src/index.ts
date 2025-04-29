@@ -24,6 +24,13 @@ class Notifications {
   async getAllNotifications(): Promise<Notification[]> {
     return await this.api.getAllNotifications();
   }
+  
+  /**
+   * Get banner notifications that should be displayed within the given timestamp range
+   */
+  async getBannerNotifications(timestamp?: string): Promise<Notification[]> {
+    return await this.api.getBannerNotifications(timestamp);
+  }
 
   /**
    * Get the count of unseen notifications
