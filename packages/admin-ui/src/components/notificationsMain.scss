@@ -1,26 +1,119 @@
-.main-notification {
+.banner-notifications-col {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 5px;
 
-  p {
-    margin-bottom: 0;
-  }
-  a {
-    margin-left: 0.5rem;
-  }
+  .banner-card {
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #e9ecef;
 
-  > a,
-  > button {
-    flex: none;
-  }
-
-  @media screen and (max-width: 40rem) {
-    display: block;
-    p {
-      margin-bottom: 0.5rem;
+    &.medium-priority {
+      background-color: #d1ecf1;
+      color: #0c5460 !important;
     }
-    a {
-      margin-left: 0;
+
+    &.high-priority {
+      background-color: #ffeda6;
+      color: #433c1d !important;
+    }
+
+    &.critical-priority {
+      background-color: #f8d7da;
+      color: #721c24 !important;
+    }
+
+    h5 {
+      margin: 0px;
+    }
+
+    .notification-body {
+      font-size: 1rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+
+      @media (max-width: 60rem) {
+        flex-direction: column;
+      }
     }
   }
 }
+
+#dark {
+  #main {
+    .banner-notifications-col {
+      .banner-card {
+        color: black;
+
+        &.medium-priority {
+          color: #0c5460 !important;
+        }
+
+        &.high-priority {
+          color: #433c1d !important;
+        }
+
+        &.critical-priority {
+          color: #721c24 !important;
+        }
+
+        .notification-body {
+          p,
+          strong {
+            color: black !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+// #dark {
+//   #main {
+//     .banner-notifications-col {
+//       .banner-card {
+//         color: black;
+
+//         &.medium-priority {
+//           color: #0c5460 !important;
+//           .notification-body {
+//             p,
+//             strong {
+//               color: #0c5460 !important;
+//             }
+//           }
+//         }
+
+//         &.high-priority {
+//           color: #433c1d !important;
+//           .notification-body {
+//             p,
+//             strong {
+//               color: #433c1d !important;
+//             }
+//           }
+//         }
+
+//         &.critical-priority {
+//           color: #721c24 !important;
+//           .notification-body {
+//             p,
+//             strong {
+//               color: #721c24 !important;
+//             }
+//           }
+//         }
+
+//         .notification-body {
+//           p,
+//           strong {
+//             color: black !important;
+//           }
+//         }
+//       }
+//     }
+//   }
+// }
