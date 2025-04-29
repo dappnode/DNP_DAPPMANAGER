@@ -5,7 +5,6 @@ import { Category, Priority, Status } from "@dappnode/types";
 import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 2 * 60 * 1000; // 2 minutes
-const NOTIFICATION_TITLE = "DAppNode host internet connectivity check";
 let notificationSent = false;
 
 /**
@@ -37,14 +36,15 @@ async function monitorInternetConnection(): Promise<void> {
       if (!notificationSent) {
         await notifications
           .sendNotification({
-            title: NOTIFICATION_TITLE,
+            title: "Your Dappnode is not connected to internet",
             dnpName: params.dappmanagerDnpName,
-            body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
+            body: `Your DAppNode host machine is currently offline and cannot access the internet. This may disrupt the operation of your nodes and prevent updates or remote access.
+                   Please check your network connection and ensure your router or modem is functioning properly.`,
             category: Category.system,
             priority: Priority.critical,
             status: Status.triggered,
             callToAction: {
-              title: "Navigate",
+              title: "Diagnose",
               url: "http://my.dappnode/support/auto-diagnose"
             }
           })
@@ -57,12 +57,12 @@ async function monitorInternetConnection(): Promise<void> {
 
         await notifications
           .sendNotification({
-            title: NOTIFICATION_TITLE,
+            title: "Your Dappnode is back online",
             dnpName: params.dappmanagerDnpName,
-            body: `**Dappnode host has regained internet connectivity.**`,
+            body: `Your Dappnode connection is functioning properly`,
             category: Category.system,
             priority: Priority.critical,
-            status: Status.resolved,
+            status: Status.resolved
           })
           .catch((e) => logs.error("Error sending internet connectivity resolve notification", e));
         notificationSent = false;
