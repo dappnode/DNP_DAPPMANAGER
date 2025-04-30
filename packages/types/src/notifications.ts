@@ -4,6 +4,7 @@ export interface NotificationsConfig {
 }
 
 export interface Notification extends NotificationPayload {
+  id: number;
   timestamp: string;
   seen: boolean;
 }

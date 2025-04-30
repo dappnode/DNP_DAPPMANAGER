@@ -63,11 +63,25 @@ export class NotificationsApi {
   }
 
   /**
-   * Set all notifications as seen
+   * Set all non-banner notifications as seen
    */
   async setAllNotificationsSeen(): Promise<void> {
     const url = new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`);
     url.searchParams.append("isBanner", "false");
+
+    await fetch(url.toString(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
+
+  /**
+   * Set a notification as seen by providing its ID
+   */
+  async setNotificationSeenByID(id: number): Promise<void> {
+    const url = new URL(`/api/v1/notifications/${id}/seen`, `${this.rootUrl}:8080`);
 
     await fetch(url.toString(), {
       method: "PUT",

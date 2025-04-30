@@ -279,9 +279,14 @@ export interface Routes {
   }>;
 
   /**
-   * Set all notifications as seen
+   * Set all non-banner notifications as seen
    */
   notificationsSetAllSeen(): Promise<void>;
+ 
+  /**
+   * Set a notification as seen by providing its ID
+   */
+  notificationSetSeenByID(id:number): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -729,6 +734,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGetUnseenCount: {},
   notificationsGetAllEndpoints: {},
   notificationsSetAllSeen: {},
+  notificationSetSeenByID: {},
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},

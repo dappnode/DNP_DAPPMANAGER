@@ -40,10 +40,16 @@ class Notifications {
   }
 
   /**
-   * Set all notifications as seen
+   * Set all non-banner notifications as seen
    */
   async setAllNotificationsSeen(): Promise<void> {
     return await this.api.setAllNotificationsSeen();
+  }
+  /**
+   * Set a notification as seen by providing its ID
+   */
+  async setNotificationSeenByID(id:number): Promise<void> {
+    return await this.api.setNotificationSeenByID(id);
   }
 
   /**

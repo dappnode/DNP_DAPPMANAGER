@@ -6,7 +6,7 @@ import * as db from "@dappnode/db";
 import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 
-const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
+const CHECK_INTERVAL = 0.2 * 60 * 1000; // 10 minutes
 
 let ipfsNotificationSent = false;
 let ethNotificationSent = false;
