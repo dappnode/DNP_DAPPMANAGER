@@ -66,7 +66,10 @@ export class NotificationsApi {
    * Set all notifications as seen
    */
   async setAllNotificationsSeen(): Promise<void> {
-    await fetch(new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`).toString(), {
+    const url = new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`);
+    url.searchParams.append("isBanner", "false");
+
+    await fetch(url.toString(), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
