@@ -16,13 +16,13 @@ import { Category, Priority, Status } from "@dappnode/types";
 
 const thresholds = [
   {
-    id: "dangerous level of 5 GB",
+    id: "5 GB",
     kb: 5 * 1e6, // ~ 5 GB
     filterCommand: `--filter "name=DAppNodePackage"`,
     containersDescription: "all non-core DAppNode packages"
   },
   {
-    id: "critical level of 1 GB",
+    id: "1 GB",
     kb: 1 * 1e6, // ~ 1 GB
     filterCommand: `--filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth"`,
     containersDescription: "all non-core DAppNode packages and the IPFS package"
@@ -97,10 +97,9 @@ async function monitorDiskUsage(): Promise<void> {
 
         await notifications
           .sendNotification({
-            title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
+            title: `Available disk space is less than a ${threshold.id}`,
             dnpName: params.dappmanagerDnpName,
             body: [
-              `Available disk space is less than a ${threshold.id}.`,
               `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
               stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
               `Please, free up enough disk space and start them again.`

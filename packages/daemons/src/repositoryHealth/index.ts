@@ -7,8 +7,6 @@ import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
-const IPFS_NOTIFICATION_TITLE = "IPFS Endpoint Health Check";
-const ETH_NOTIFICATION_TITLE = "Ethereum Endpoint Health Check";
 
 let ipfsNotificationSent = false;
 let ethNotificationSent = false;
@@ -34,9 +32,9 @@ async function checkIpfsHealth(): Promise<void> {
 
     if (ipfsNotificationSent) {
       await notifications.sendNotification({
-        title: IPFS_NOTIFICATION_TITLE,
+        title: "Your Dappnode IPFS endpoint is resolving content correctly",
         dnpName: params.dappmanagerDnpName,
-        body: `**IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is now healthy.**`,
+        body: `Access to decentralized content has been restored and is functioning as expected.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.resolved
@@ -49,14 +47,14 @@ async function checkIpfsHealth(): Promise<void> {
 
     if (!ipfsNotificationSent) {
       await notifications.sendNotification({
-        title: IPFS_NOTIFICATION_TITLE,
+        title: "Your Dappnode IPFS endpoint is not resolving content correctly.",
         dnpName: params.dappmanagerDnpName,
-        body: `**IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is not working.** Click **Change** to switch the IPFS repository.`,
+        body: `Dappnode IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is currently unreachable or not resolving content correctly. This may affect access to decentralized content or applications relying on IPFS.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: `Navigate to ${ipfsClientTarget}`,
+          title: `Switch to ${ipfsClientTarget && ipfsClientTarget === "local" ? "Remote" : "Local"} IPFS`,
           url: "http://my.dappnode/repository/ipfs"
         }
       });
@@ -95,9 +93,10 @@ async function checkEthHealth(): Promise<void> {
 
     if (ethNotificationSent) {
       await notifications.sendNotification({
-        title: ETH_NOTIFICATION_TITLE,
+        title: "Ethereum Repository Accessible",
         dnpName: params.dappmanagerDnpName,
-        body: `**Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is now healthy.**`,
+        body: `Your DAppNode has successfully reconnected to the Ethereum repository.
+Syncing and access to Ethereum chain data should now resume normally.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.resolved
@@ -110,14 +109,14 @@ async function checkEthHealth(): Promise<void> {
 
     if (!ethNotificationSent) {
       await notifications.sendNotification({
-        title: ETH_NOTIFICATION_TITLE,
+        title: "Ethereum Repository Unreachable",
         dnpName: params.dappmanagerDnpName,
-        body: `**Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is not working.** Click **Change** to switch the Ethereum repository.`,
+        body: `Your Dappnode is currently unable to connect to the Ethereum endpoint (${ethClientTarget}) at ${ethUrl}`,
         category: Category.system,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: `Navigate to ${ethClientTarget}`,
+          title: `Change to ${ethClientTarget && ethClientTarget === "on" ? "Full Node" : "Remote"}`,
           url: "http://my.dappnode/repository/ethereum"
         }
       });
