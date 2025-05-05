@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -8,6 +8,7 @@ import { Priority } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
 import { NavLink } from "react-router-dom";
+import { api } from "api";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -33,6 +34,12 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
     else return defaultAvatar;
   };
   const [isOpen, setIsOpen] = useState(openByDefault);
+
+  useEffect(() => {
+    if (!notification.seen && notification.isBanner && notification.status === "resolved") {
+      api.notificationSetSeenByID(notification.id);
+    }
+  }, []);
 
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
