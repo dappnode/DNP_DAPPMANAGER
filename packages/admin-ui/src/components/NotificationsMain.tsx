@@ -1,16 +1,21 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
-import { useApi } from "api";
+import { api, useApi } from "api";
 import { Notification, Priority, Status } from "@dappnode/types";
 import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
+import { Accordion } from "react-bootstrap";
 
 /**
  * Displays banner notifications among all tabs
  */
 export default function NotificationsView() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+
+  const numOfBannersShown = 3; // Number of banners that will be shown in the UI
+
   // gets the timestamp of one month ago in ISO format
   const oneMonthAgoTimestamp = useMemo(() => {
     const now = new Date();
@@ -18,13 +23,21 @@ export default function NotificationsView() {
     return now.toISOString().split(".")[0] + "Z";
   }, []);
 
-  const notifications = useApi.notificationsGetBanner(oneMonthAgoTimestamp);
+  const notificationsCall = useApi.notificationsGetBanner(oneMonthAgoTimestamp);
+
+  useEffect(() => {
+    if (notificationsCall.data) {
+      setNotifications(filterNotifications(notificationsCall.data));
+    }
+  }, [notificationsCall.data]);
 
   /**
-   *filters notifications:
-   * 1. Filters out notifications that are not triggered or have errors
+   * filters notifications:
+   * 1. Filters out notifications that have errors
    * 2. Filters out duplicate notifications by title, keeping the most recent one
-   * 3. Sorts notifications by priority
+   * 3. Filters out notifications that are not triggered status
+   * 4. Filters out seen notifications
+   * 5. Sorts notifications by priority
    */
 
   function filterNotifications(notifications: Notification[]): Notification[] {
@@ -33,7 +46,7 @@ export default function NotificationsView() {
     const map = new Map<string, Notification>();
 
     notifications
-      .filter((n) => n.status === Status.triggered && !n.errors)
+      .filter((n) => !n.errors) // Filter out notifications with errors
       .forEach((notification) => {
         const existing = map.get(notification.title);
 
@@ -42,17 +55,22 @@ export default function NotificationsView() {
         }
       });
 
-    return Array.from(map.values()).sort(
-      (a, b) => priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority)
-    );
+    return Array.from(map.values())
+      .filter((n) => n.status === Status.triggered) // Filter by triggered status after deduplication
+      .filter((n) => n.seen === false) // Filter out seen notifications
+      .sort((a, b) => priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority));
   }
 
   return (
-    notifications.data &&
-    notifications.data.length > 0 && (
+    notifications &&
+    notifications.length > 0 && (
       <div className="banner-notifications-col">
-        {filterNotifications(notifications.data).map((notification) => (
-          <BannerNotification notification={notification} key={notification.title} />
+        {notifications.slice(0, numOfBannersShown).map((notification) => (
+          <CollapsableBannerNotification
+            notification={notification}
+            key={notification.id}
+            onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))}
+          />
         ))}
       </div>
     )
@@ -66,23 +84,51 @@ const priorityBtnVariants: Record<Priority, ButtonVariant> = {
   [Priority.critical]: "danger"
 };
 
-function BannerNotification({ notification }: { notification: Notification }) {
+export function CollapsableBannerNotification({
+  notification,
+  onClose
+}: {
+  notification: Notification;
+  onClose: () => void;
+}) {
+  const [isOpen, setIsOpen] = useState(notification.priority === Priority.critical);
+  const [hasClosed, setHasClosed] = useState(false);
+
+  const handleClose = () => {
+    api.notificationSetSeenByID(notification.id);
+    setHasClosed(true);
+    onClose();
+  };
+
   return (
-    <div className={`banner-card ${notification.priority}-priority`}>
-      <div className="banner-header">
-        <h5>{notification.title}</h5>
-        <button className="close-btn">
-          <MdClose />
-        </button>
-      </div>
-      <div className="banner-body">
-        <RenderMarkdown source={notification.body} />
-        {notification.callToAction && (
-          <NavLink to={notification.callToAction.url}>
-            <Button variant={priorityBtnVariants[notification.priority]}>{notification.callToAction.title}</Button>
-          </NavLink>
-        )}
-      </div>
-    </div>
+    !hasClosed && (
+      <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
+        <Accordion.Toggle
+          as={"div"}
+          eventKey="0"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`banner-card ${notification.priority}-priority`}
+        >
+          <div className="banner-header">
+            <h5>{notification.title}</h5>
+            <button className="close-btn" onClick={handleClose}>
+              <MdClose />
+            </button>
+          </div>
+          <Accordion.Collapse eventKey="0">
+            <div className="banner-body">
+              <RenderMarkdown source={notification.body} />
+              {notification.callToAction && (
+                <NavLink to={notification.callToAction.url}>
+                  <Button variant={priorityBtnVariants[notification.priority]}>
+                    {notification.callToAction.title}
+                  </Button>
+                </NavLink>
+              )}
+            </div>
+          </Accordion.Collapse>
+        </Accordion.Toggle>
+      </Accordion>
+    )
   );
 }

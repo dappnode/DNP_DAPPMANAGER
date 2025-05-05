@@ -4,12 +4,17 @@
   gap: 5px;
 
   .banner-card {
-    padding: 15px;
+    padding: 10px 15px;
     border-radius: 5px;
     background-color: #e9ecef;
     display: flex;
     flex-direction: column;
     gap: 5px;
+
+    &:hover {
+      opacity: 0.8;
+      cursor: pointer;
+    }
 
     &.medium-priority {
       background-color: #d1ecf1;
@@ -36,7 +41,7 @@
       align-items: center;
       justify-content: space-between;
 
-      .close-btn{
+      .close-btn {
         padding: 0px;
         border: none;
         background: none;
@@ -49,7 +54,6 @@
         &:hover {
           opacity: 0.5;
         }
-       
       }
     }
 
