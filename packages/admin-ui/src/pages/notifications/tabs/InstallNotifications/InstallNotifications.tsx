@@ -6,19 +6,17 @@ import SubTitle from "components/SubTitle";
 import Card from "components/Card";
 
 import "./installNotifications.scss";
+import { notificationsDnpName } from "params";
 
-interface InstallNotificationsPkgProps {
-  pkgName: string;
-}
 
-export const InstallNotificationsPkg: React.FC<InstallNotificationsPkgProps> = ({ pkgName }) => {
-  const installerPath = getInstallerPath(pkgName);
+export const InstallNotificationsPkg: React.FC = () => {
+  const installerPath = getInstallerPath(notificationsDnpName);
 
   return (
     <Card className="install-notifications-card">
       <SubTitle>Install notifications package</SubTitle>
       <p>To receive notifications on your Dappnode, you must install the Notifications Dappnode Package.</p>
-      <NavLink to={installerPath + "/" + pkgName}>
+      <NavLink to={installerPath + "/" + notificationsDnpName}>
         <Button variant="dappnode">Install</Button>
       </NavLink>
     </Card>

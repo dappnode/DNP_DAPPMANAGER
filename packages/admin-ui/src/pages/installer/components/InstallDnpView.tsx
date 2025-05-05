@@ -29,7 +29,7 @@ import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { Notifications } from "./Steps/Notifications";
-import { notificationsPkgName } from "params";
+import { notificationsDnpName } from "params";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -214,7 +214,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
 
   const dnpsRequest = useApi.packagesGet();
   const installedDnps = dnpsRequest.data;
-  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsPkgName);
+  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
 
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
