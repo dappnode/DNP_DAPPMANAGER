@@ -26,7 +26,7 @@ export function LegacyNotifications() {
           </Link>{" "}
           <br />
           📘 For full details about the new system, see our{" "}
-          <Link to={docsUrl.notifications} target="_blank" rel="noopener noreferrer">
+          <Link to={docsUrl.notificationsOverview} target="_blank" rel="noopener noreferrer">
             Notifications Documentation
           </Link>
           .
