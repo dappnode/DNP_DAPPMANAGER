@@ -41,6 +41,7 @@ const source = "ipfs" as const;
  */
 export class DappnodeRepository extends ApmRepository {
   protected ipfs: KuboRPCClient;
+  protected gatewayUrl: string;
   protected timeout: number;
 
   /**
@@ -51,7 +52,8 @@ export class DappnodeRepository extends ApmRepository {
   constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
     super(ethersProvider);
     this.timeout = timeout || 30 * 1000;
-    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout }); // keep for pin/list if needed
   }
 
   /**
@@ -70,7 +72,6 @@ export class DappnodeRepository extends ApmRepository {
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
       await this.ipfs.pin.add(hash);
-       
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -404,16 +405,26 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async getAndVerifyContentFromGateway(hash: string): Promise<{
     carReader: CarReader;
-    root: CID<unknown, number, number, Version>;
+    root: CID;
   }> {
-    const cid = CID.parse(this.sanitizeIpfsPath(hash));
-    const asynciterable = this.ipfs.dag.export(cid, { timeout: this.timeout });
-    const carReader = await CarReader.fromIterable(asynciterable);
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (cid.toString() !== root.toString()) throw Error(`UNTRUSTED CONTENT: Invalid root CID ${root} for ${cid}`);
+    // 1. Download the CAR
+    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.car" }
+    });
+    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
 
-    return { carReader, root };
+    // 2. Parse into a CarReader
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const carReader = await CarReader.fromBytes(bytes);
+
+    // 3. Verify the root CID
+    const roots = await carReader.getRoots();
+    if (roots.length !== 1 || roots[0].toString() !== hash) {
+      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+    }
+
+    return { carReader, root: roots[0] };
   }
 
   /**
