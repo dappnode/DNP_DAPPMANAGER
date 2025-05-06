@@ -120,7 +120,7 @@ export function Inbox() {
             <NotificationCard key={notification.timestamp} notification={notification} />
           ))}
           <div className="pagination">
-            {currentPage != 1 && (
+            {currentPage !== 1 && (
               <>
                 <button onClick={handleFirstPage} className="page-item">
                   1
@@ -141,7 +141,7 @@ export function Inbox() {
               </button>
             )}
 
-            {currentPage != totalPages && (
+            {currentPage !== totalPages && (
               <>
                 {totalPages - 1 > currentPage && <span className="dots">. . .</span>}
                 <button onClick={handleLastPage} className="page-item">
