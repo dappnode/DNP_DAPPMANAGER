@@ -432,11 +432,12 @@ export class DappnodeRepository extends ApmRepository {
 
     // 3. Verify the root CID
     const roots = await carReader.getRoots();
-    if (roots.length !== 1 || roots[0].toString() !== CID.parse(hash).toString()) {
+    const root = roots[0];
+    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
       throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
     }
 
-    return { carReader, root: roots[0] };
+    return { carReader, root };
   }
 
   /**
