@@ -1,11 +1,11 @@
 import SubTitle from "components/SubTitle";
 import React, { useEffect, useMemo, useState } from "react";
 import Card from "components/Card";
-import "./inbox.scss";
 import { NotificationCard } from "./NotificationsCard";
 import { useApi, api } from "api";
 import { Searchbar } from "components/Searchbar";
 import Loading from "components/Loading";
+import "./inbox.scss";
 
 export function Inbox() {
   const notifications = useApi.notificationsGetAll();
@@ -13,6 +13,8 @@ export function Inbox() {
   const [search, setSearch] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 15;
 
   useEffect(() => {
     if (!notifications.data) {
@@ -47,6 +49,30 @@ export function Inbox() {
   const seenNotifications = filteredNotifications
     .filter((notification) => notification.seen)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+  const paginatedSeenNotifications = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return seenNotifications.slice(startIndex, endIndex);
+  }, [seenNotifications, currentPage]);
+
+  const totalPages = Math.ceil(seenNotifications.length / itemsPerPage);
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) setCurrentPage((prev) => prev - 1);
+  };
+
+  const handleFirstPage = () => {
+    setCurrentPage(1);
+  };
+
+  const handleLastPage = () => {
+    setCurrentPage(totalPages);
+  };
 
   const loading = notifications.isValidating;
 
@@ -89,9 +115,42 @@ export function Inbox() {
       {!seenNotifications || seenNotifications.length === 0 ? (
         <Card>No notifications</Card>
       ) : (
-        seenNotifications.map((notification) => (
-          <NotificationCard key={notification.timestamp} notification={notification} />
-        ))
+        <>
+          {paginatedSeenNotifications.map((notification) => (
+            <NotificationCard key={notification.timestamp} notification={notification} />
+          ))}
+          <div className="pagination">
+            {currentPage != 1 && (
+              <>
+                <button onClick={handleFirstPage} className="page-item">
+                  1
+                </button>
+                {currentPage > 2 && <span className="dots">. . .</span>}
+              </>
+            )}
+
+            {currentPage > 2 && (
+              <button onClick={handlePreviousPage} className="page-item">
+                {currentPage - 1}
+              </button>
+            )}
+            <span className="active">{currentPage}</span>
+            {totalPages - 1 > currentPage && (
+              <button onClick={handleNextPage} className="page-item">
+                {currentPage + 1}
+              </button>
+            )}
+
+            {currentPage != totalPages && (
+              <>
+                {totalPages - 1 > currentPage && <span className="dots">. . .</span>}
+                <button onClick={handleLastPage} className="page-item">
+                  {totalPages}
+                </button>
+              </>
+            )}
+          </div>
+        </>
       )}
     </>
   );
