@@ -1,6 +1,5 @@
 import * as isIPFS from "is-ipfs";
-import { IPFSEntry } from "./types.js";
-import { CID, KuboRPCClient, create } from "kubo-rpc-client";
+import { CID, KuboRPCClient, create, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
@@ -377,22 +376,35 @@ export class DappnodeRepository extends ApmRepository {
    * @returns An array of entries in the directory.
    * @throws Error when the provided hash is invalid.
    */
-
   public async list(hash: string): Promise<IPFSEntry[]> {
-    const files: IPFSEntry[] = [];
-    const dagGet = await this.ipfs.dag.get(CID.parse(this.sanitizeIpfsPath(hash)), { timeout: this.timeout });
-    if (dagGet.value.Links)
-      for (const link of dagGet.value.Links)
-        files.push({
-          type: "file",
-          cid: CID.parse(this.sanitizeIpfsPath(link.Hash.toString())),
-          name: link.Name,
-          path: `${link.Hash.toString()}/${link.Name}`, // Do not use module path to be browser compatible. path.join(link.Hash.toString(), link.Name),
-          size: link.Tsize
-        });
-    else throw Error(`Invalid IPFS hash ${hash}`);
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.dag-json" }
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    }
 
-    return files;
+    const dagJson = (await res.json()) as {
+      Links?: Array<{
+        Name: string;
+        Hash: { "/": string };
+        Tsize: number;
+      }>;
+    };
+
+    if (!dagJson.Links) {
+      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+    }
+
+    return dagJson.Links.map((link) => ({
+      type: "file",
+      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
+      name: link.Name,
+      path: `${link.Hash["/"]}/${link.Name}`,
+      size: link.Tsize
+    }));
   }
 
   /**
