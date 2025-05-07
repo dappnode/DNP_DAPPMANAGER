@@ -61,7 +61,6 @@ export function IpfsClient({
               }}
             >
               <div className="title">{title}</div>
-
               <div className="description">
                 <RenderMarkdown source={description} />
               </div>
