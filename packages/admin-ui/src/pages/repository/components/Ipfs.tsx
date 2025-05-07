@@ -42,11 +42,11 @@ export default function Ipfs() {
       <SubTitle>IPFS</SubTitle>
       <Card>
         <div>
-          DAppNode uses IPFS to distribute DAppNode packages in a decentralized way. Choose to connect to a remote IPFS
+          Dappnode uses IPFS to distribute Dappnode packages in a decentralized way. Choose to connect to a remote IPFS
           gateway or use your own local IPFS node.
         </div>
         <div>
-          More information at: <LinkDocs href={forumUrl.ipfsRemoteHowTo}>How to use DAppNode IPFS remote</LinkDocs>
+          More information at: <LinkDocs href={forumUrl.ipfsRemoteHowTo}>How to use Dappnode IPFS remote</LinkDocs>
         </div>
       </Card>
       {ipfsRepository.data ? (
