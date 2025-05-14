@@ -43,7 +43,11 @@
     minmax(min-content, max-content)
     1fr
     auto;
-  grid-gap: 2rem;
+
+  // Add spacing between rows manually
+  > *:not(:last-child) {
+    margin-bottom: 2rem;
+  }
 
   // align-items: center;
   // min-height: 100vh;
@@ -134,10 +138,24 @@
   }
 }
 
+#dark {
+  .welcome-container {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .welcome {
+    background: var(--color-dark-card);
+    color: var(--color-dark-maintext);
+
+    .description {
+      color: var(--color-dark-secondarytext);
+    }
+  }
+}
+
 // Ethical Metrics modal container
 
 .ethical-container {
   display: grid;
   gap: 1rem;
 }
-
