@@ -30,7 +30,6 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  RebootRequiredScript,
   HostStatCpu,
   HostStatMemory,
   HostStatDisk,
@@ -238,11 +237,6 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
-   * Returns true if dappnode connected to internet
-   */
-  getIsConnectedToInternet: () => Promise<boolean>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -266,7 +260,7 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
- 
+
   /**
    * Get unseen notifications count
    */
@@ -560,11 +554,6 @@ export interface Routes {
    */
   rebootHost: () => Promise<void>;
 
-  /**
-   *  Returns true if a reboot is required
-   */
-  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
-
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
@@ -725,17 +714,16 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
-  notificationsGetAll: { log: true },
-  notificationsGetUnseenCount: { log: true },
-  notificationsGetAllEndpoints: { log: true },
-  notificationsSetAllSeen: { log: true },
-  notificationsUpdateEndpoints: { log: true },
+  notificationsGetAll: {},
+  notificationsGetUnseenCount: {},
+  notificationsGetAllEndpoints: {},
+  notificationsSetAllSeen: {},
+  notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},
   getHostUptime: {},
@@ -779,7 +767,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
-  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },

@@ -51,7 +51,7 @@ export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersP
 
 export const publicRegistry = new DappNodeRegistry("public");
 
-// TODO: find a way to move the velow constants to the api itself
+// TODO: find a way to move the below constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
 const adminPasswordDb = new AdminPasswordDb(params);
 const deviceCalls = new DeviceCalls({

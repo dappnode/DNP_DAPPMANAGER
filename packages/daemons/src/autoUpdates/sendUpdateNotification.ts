@@ -80,7 +80,7 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
         autoUpdatesEnabled: isCoreUpdateEnabled()
       }),
       category: Category.system,
-      priority: Priority.low,
+      priority: Priority.high,
       status: Status.triggered
     })
     .catch((e) => logs.error("Error sending system update notification", e));

@@ -34,7 +34,9 @@ export const wifi: Pick<Routes, "wifiCredentialsGet" | "wifiReportGet"> = {
       report: {
         lastLog: "[Error] any wifi error".replace(/\[.*?\]/g, ""),
         exitCode: 57
-      }
+      },
+      isDefaultPassphrase: false,
+      isRunning: false
     };
   }
 };

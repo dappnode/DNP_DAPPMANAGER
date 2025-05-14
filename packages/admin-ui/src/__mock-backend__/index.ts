@@ -183,10 +183,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
-  rebootHostIsRequiredGet: async () => ({
-    rebootRequired: true,
-    pkgs: "docker"
-  }),
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -385,7 +381,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerHostVersion: "20.10.7",
     dockerLatestVersion: "20.10.8"
   }),
-  getIsConnectedToInternet: async () => false,
   getCoreVersion: async () => "0.2.92",
   notificationsGetAllEndpoints: async () => {
     return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
@@ -396,7 +391,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsGetAll: async () => [],
   notificationsApplyPreviousEndpoints: async () => {
     return { endpoints: [], customEndpoints: [] };
-  },
+  }
 };
 
 export const calls: Routes = {

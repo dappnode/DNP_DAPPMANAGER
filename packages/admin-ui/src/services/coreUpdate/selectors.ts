@@ -10,8 +10,3 @@ export const getCoreUpdateAvailable = (state: RootState): boolean => {
   const coreUpdateData = getCoreUpdateData(state);
   return coreUpdateData !== null && coreUpdateData.available;
 };
-
-export const getIsCoreUpdateTypePatch = (state: RootState): boolean => {
-  const coreUpdateData = getCoreUpdateData(state);
-  return coreUpdateData !== null && coreUpdateData.available && coreUpdateData.type === "patch";
-};

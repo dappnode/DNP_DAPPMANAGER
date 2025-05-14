@@ -1,5 +1,5 @@
 import { mapValues } from "lodash-es";
-import { RebootRequiredScript, SystemInfo, VolumeData } from "@dappnode/types";
+import { SystemInfo, VolumeData } from "@dappnode/types";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { WifiCredentials } from "types";
 
@@ -12,21 +12,15 @@ export interface DappnodeStatusState {
    * Will trigger alerts when it's a boolean and false, x === false
    * Must be null at start
    */
-  passwordIsSecure: boolean | null;
   volumes: VolumeData[];
-  rebootRequiredScript: RebootRequiredScript | null;
   shouldShowSmooth: boolean | null;
-  isConnectedToInternet: boolean | null;
 }
 
 const initialState: DappnodeStatusState = {
   systemInfo: null,
   wifiCredentials: null,
-  passwordIsSecure: null,
   volumes: [],
-  rebootRequiredScript: null,
-  shouldShowSmooth: null,
-  isConnectedToInternet: null
+  shouldShowSmooth: null
 };
 
 export const dappnodeStatus = createSlice({
