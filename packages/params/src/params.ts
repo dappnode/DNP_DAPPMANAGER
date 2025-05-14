@@ -391,6 +391,24 @@ export const params = {
       dnpNameSuffix: ".dnp.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x30eFb96763f07892d0E2f7E900c672d43A202E61"
+    },
+    {
+      name: "ethPandaOps",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x67e5fEB0F1d184cC189614d8903ABcadD677c1E0"
+    },
+    {
+      name: "Dappnode Association - Pol (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Dappnode Association - Pol (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
     }
   ]
 };

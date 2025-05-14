@@ -2,7 +2,7 @@ import { Routes, Network } from "@dappnode/types";
 
 export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> = {
   stakerConfigSet: async () => {},
-  stakerConfigGet: async <T extends Network>(network: T) => {
+  stakerConfigGet: async ({ network }: { network: Network }) => {
     switch (network) {
       case "mainnet":
         return {
