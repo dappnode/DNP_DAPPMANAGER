@@ -219,3 +219,49 @@
     background-color: var(--color-dark-card-hover);
   }
 }
+
+.pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin: 30px 0px;
+
+  .page-item {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+    border: none;
+
+    &:hover {
+      background-color: #ced4da;
+    }
+  }
+  .dots{
+    padding-bottom: 8px;
+  }
+
+  .active {
+    background-color: #ced4da !important;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+}
+
+#dark {
+  .pagination {
+    .page-item {
+      background-color: var(--color-dark-card);
+      color: var(--color-dark-maintext);
+
+      &:hover {
+        background-color: var(--color-dark-card-hover);
+      }
+    }
+    .active {
+      background-color: var(--color-dark-card-hover) !important;
+    }
+  }
+}

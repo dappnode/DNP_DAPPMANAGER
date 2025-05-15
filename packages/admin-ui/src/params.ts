@@ -51,6 +51,7 @@ export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
 export const coreDnpName = "core.dnp.dappnode.eth";
 export const bindDnpName = "bind.dnp.dappnode.eth";
 export const vpnDnpName = "vpn.dnp.dappnode.eth";
+export const notificationsDnpName = "notifications.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
@@ -96,7 +97,7 @@ export const docsUrl = {
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
   ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`,
-  notifications: `${docsBaseUrl}/docs/user/notifications/overview`
+  notificationsOverview: `${docsBaseUrl}/docs/user/notifications/overview`
 };
 
 export const forumUrl = {
@@ -131,6 +132,3 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Support, where to send issues
-
-// Notifications
-export const notificationsPkgName = "notifications.dnp.dappnode.eth";

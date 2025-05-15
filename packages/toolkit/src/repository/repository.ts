@@ -1,6 +1,5 @@
 import * as isIPFS from "is-ipfs";
-import { IPFSEntry } from "./types.js";
-import { CID, KuboRPCClient, create } from "kubo-rpc-client";
+import { CID, KuboRPCClient, create, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
@@ -41,6 +40,7 @@ const source = "ipfs" as const;
  */
 export class DappnodeRepository extends ApmRepository {
   protected ipfs: KuboRPCClient;
+  protected gatewayUrl: string;
   protected timeout: number;
 
   /**
@@ -51,7 +51,8 @@ export class DappnodeRepository extends ApmRepository {
   constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
     super(ethersProvider);
     this.timeout = timeout || 30 * 1000;
-    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout }); // keep for pin/list if needed
   }
 
   /**
@@ -376,22 +377,35 @@ export class DappnodeRepository extends ApmRepository {
    * @returns An array of entries in the directory.
    * @throws Error when the provided hash is invalid.
    */
-
   public async list(hash: string): Promise<IPFSEntry[]> {
-    const files: IPFSEntry[] = [];
-    const dagGet = await this.ipfs.dag.get(CID.parse(this.sanitizeIpfsPath(hash)), { timeout: this.timeout });
-    if (dagGet.value.Links)
-      for (const link of dagGet.value.Links)
-        files.push({
-          type: "file",
-          cid: CID.parse(this.sanitizeIpfsPath(link.Hash.toString())),
-          name: link.Name,
-          path: `${link.Hash.toString()}/${link.Name}`, // Do not use module path to be browser compatible. path.join(link.Hash.toString(), link.Name),
-          size: link.Tsize
-        });
-    else throw Error(`Invalid IPFS hash ${hash}`);
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.dag-json" }
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    }
 
-    return files;
+    const dagJson = (await res.json()) as {
+      Links?: Array<{
+        Name: string;
+        Hash: { "/": string };
+        Tsize: number;
+      }>;
+    };
+
+    if (!dagJson.Links) {
+      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+    }
+
+    return dagJson.Links.map((link) => ({
+      type: "file",
+      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
+      name: link.Name,
+      path: `${link.Hash["/"]}/${link.Name}`,
+      size: link.Tsize
+    }));
   }
 
   /**
@@ -404,14 +418,25 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async getAndVerifyContentFromGateway(hash: string): Promise<{
     carReader: CarReader;
-    root: CID<unknown, number, number, Version>;
+    root: CID;
   }> {
-    const cid = CID.parse(this.sanitizeIpfsPath(hash));
-    const asynciterable = this.ipfs.dag.export(cid, { timeout: this.timeout });
-    const carReader = await CarReader.fromIterable(asynciterable);
+    // 1. Download the CAR
+    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.car" }
+    });
+    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
+
+    // 2. Parse into a CarReader
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const carReader = await CarReader.fromBytes(bytes);
+
+    // 3. Verify the root CID
     const roots = await carReader.getRoots();
     const root = roots[0];
-    if (cid.toString() !== root.toString()) throw Error(`UNTRUSTED CONTENT: Invalid root CID ${root} for ${cid}`);
+    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+    }
 
     return { carReader, root };
   }

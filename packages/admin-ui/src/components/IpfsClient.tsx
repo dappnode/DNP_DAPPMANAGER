@@ -5,6 +5,7 @@ import Card from "components/Card";
 import { joinCssClass } from "utils/css";
 import Input from "./Input";
 import { IPFS_DAPPNODE_GATEWAY, IPFS_GATEWAY_CHECKER } from "params";
+import RenderMarkdown from "./RenderMarkdown";
 
 interface IpfsClientData {
   title: string;
@@ -15,7 +16,7 @@ interface IpfsClientData {
 const clients: IpfsClientData[] = [
   {
     title: "Remote",
-    description: `Public IPFS node API mantained by DAppNode ${IPFS_DAPPNODE_GATEWAY} or choose one from ${IPFS_GATEWAY_CHECKER}`,
+    description: `Public IPFS node API mantained by Dappnode [${IPFS_DAPPNODE_GATEWAY}](${IPFS_DAPPNODE_GATEWAY}) or choose one from [${IPFS_GATEWAY_CHECKER}](${IPFS_GATEWAY_CHECKER})`,
     option: IpfsClientTarget.remote
   },
   {
@@ -60,7 +61,9 @@ export function IpfsClient({
               }}
             >
               <div className="title">{title}</div>
-              <div className="description">{description}</div>
+              <div className="description">
+                <RenderMarkdown source={description} />
+              </div>
 
               {option === "remote" && (
                 <Input

@@ -6,7 +6,7 @@ import { getServicesSharingPid } from "@dappnode/utils";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { PackageContainer } from "@dappnode/types";
 
-const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName, params.HTTPS_PORTAL_DNPNAME];
+const dnpsAllowedToStop = [params.ipfsDnpName, params.wifiDnpName, params.HTTPS_PORTAL_DNPNAME, params.notificationsDnpName];
 
 /**
  * Stops or starts a package containers
