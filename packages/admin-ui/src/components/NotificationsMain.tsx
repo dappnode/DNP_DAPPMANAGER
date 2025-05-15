@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
 import { api, useApi } from "api";
-import { Notification, Priority, Status } from "@dappnode/types";
+import { Notification, Priority } from "@dappnode/types";
 import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
 import { Accordion } from "react-bootstrap";
