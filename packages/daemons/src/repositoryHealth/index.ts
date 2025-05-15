@@ -6,7 +6,7 @@ import * as db from "@dappnode/db";
 import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 
-const CHECK_INTERVAL = 0.2 * 60 * 1000; // 10 minutes
+const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
 let ipfsNotificationSent = false;
 let ethNotificationSent = false;
@@ -129,7 +129,7 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: `Change to ${ethClientTarget && ethClientTarget === "on" ? "Full Node" : "Remote"}`,
+          title: (ethClientTarget && ethClientTarget  === "off")  ? "Change to Remote" :  "Make sure your Ethereum RPC is reachable",
           url: "http://my.dappnode/repository/ethereum"
         },
         isBanner: true,
