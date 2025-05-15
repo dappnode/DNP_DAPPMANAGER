@@ -52,9 +52,10 @@ export enum Category {
 
 export interface CustomEndpoint {
   name: string;
+  correlationId: string;
   enabled: boolean;
   description: string;
-  priority: Priority;
+  isBanner?: boolean;
   metric?: {
     treshold: number;
     min: number;
@@ -65,6 +66,7 @@ export interface CustomEndpoint {
 
 export interface GatusEndpoint {
   name: string;
+  correlationId: string;
   enabled: boolean;
   url: string;
   method: string;
@@ -72,6 +74,7 @@ export interface GatusEndpoint {
   interval: string; // e.g., "1m"
   group: string;
   priority: Priority; // dappnode specific
+  isBanner?: boolean; // dappnode specific
   alerts: Alert[];
   definition: {
     // dappnode specific

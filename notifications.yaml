@@ -1,5 +1,6 @@
 customEndpoints:
   - name: "Package updates notifications"
+    correlation-id: "package-updates-notifications"
     description: "This endpoint notifies users about available package updates."
     priority: low
     enabled: true

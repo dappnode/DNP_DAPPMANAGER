@@ -23,6 +23,7 @@
           "interval": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
           "group": { "type": "string" },
           "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "isBanner": { "type": "boolean" },
           "alerts": {
             "type": "array",
             "minItems": 1,
@@ -75,6 +76,7 @@
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
           "correlation-id": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
+          "isBanner": { "type": "boolean" },
           "description": { "type": "string" },
           "metric": {
             "type": "object",

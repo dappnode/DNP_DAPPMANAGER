@@ -447,6 +447,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -503,6 +504,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "invalid-url",
             method: "POST",
@@ -536,6 +538,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -602,8 +605,8 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
             description: "A custom endpoint for testing", // Added required description
-            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
@@ -657,6 +660,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -689,8 +693,9 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
+            isBanner: true,
             description: "A custom endpoint for testing", // Added required description
-            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
