@@ -20,11 +20,13 @@ export interface NotificationPayload {
   isRemote: boolean;
   icon?: string;
   errors?: string;
-  callToAction?: {
-    title: string;
-    url: string;
-  };
+  callToAction?: CallToAction;
   correlationId: string;
+}
+
+export interface CallToAction {
+  title: string;
+  url: string;
 }
 
 export enum Priority {
@@ -52,10 +54,8 @@ export enum Category {
 
 export interface CustomEndpoint {
   name: string;
-  correlationId: string;
   enabled: boolean;
   description: string;
-  isBanner?: boolean;
   metric?: {
     treshold: number;
     min: number;
@@ -66,27 +66,34 @@ export interface CustomEndpoint {
 
 export interface GatusEndpoint {
   name: string;
-  correlationId: string;
   enabled: boolean;
   url: string;
   method: string;
   conditions: string[];
   interval: string; // e.g., "1m"
   group: string;
-  priority: Priority; // dappnode specific
-  isBanner?: boolean; // dappnode specific
   alerts: Alert[];
+
+  // Dappnode specific
+  correlationId: string;
+  priority: Priority;
+  isBanner?: boolean;
+  callToAction?: CallToAction;
+  requirements?: Requirements;
   definition: {
-    // dappnode specific
     title: string;
     description: string;
   };
   metric?: {
-    // dappnode specific
     min: number;
     max: number;
     unit: string; // e.g ºC
   };
+}
+
+export interface Requirements {
+  pkgsInstalled: { [key: string]: string }; // i.e { "geth.dnp.dappnode.eth": "^0.1.2" }
+  pkgsNotInstalled: string[];
 }
 
 export interface Alert {

@@ -9,10 +9,22 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "correlation-id", "enabled", "url", "method", "conditions", "interval", "group", "alerts", "definition", "priority"],
+        "required": [
+          "name",
+          "correlationId",
+          "enabled",
+          "url",
+          "method",
+          "conditions",
+          "interval",
+          "group",
+          "alerts",
+          "definition",
+          "priority"
+        ],
         "properties": {
           "name": { "type": "string" },
-          "correlation-id": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
+          "correlationId": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
           "enabled": { "type": "boolean" },
           "url": { "type": "string", "pattern": "^(https?|ftp)://[^s/$.?#].[^s]*$" },
           "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
@@ -63,6 +75,34 @@
               "max": { "type": "number" },
               "unit": { "type": "string" }
             }
+          },
+          "callToAction": {
+            "type": "object",
+            "required": ["title", "url"],
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          },
+          "requirements": {
+            "type": "object",
+            "required": ["pkgsInstalled", "pkgsNotInstalled"],
+            "properties": {
+              "pkgsInstalled": {
+                "type": "object",
+                "patternProperties": {
+                  ".*": {
+                    "type": "string",
+                    "pattern": "^(\\^|~|>|>=|<|<=)?\\d+\\.\\d+\\.\\d+$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "pkgsNotInstalled": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
           }
         }
       }
@@ -71,12 +111,10 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["enabled", "name", "correlation-id", "description"],
+        "required": ["enabled", "name", "description"],
         "properties": {
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
-          "correlation-id": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
-          "isBanner": { "type": "boolean" },
           "description": { "type": "string" },
           "metric": {
             "type": "object",
