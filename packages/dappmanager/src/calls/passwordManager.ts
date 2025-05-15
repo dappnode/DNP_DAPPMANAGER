@@ -95,7 +95,10 @@ export async function passwordIsSecure(): Promise<boolean> {
           callToAction: {
             title: "Change",
             url: "http://my.dappnode/system/security"
-          }
+          },
+          isBanner: true,
+          isRemote: false,
+          correlationId: "core-password-insecure"
         });
         passwordInsecureNotificationSent = true;
       } catch (e) {

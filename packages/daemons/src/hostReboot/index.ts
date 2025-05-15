@@ -17,6 +17,7 @@ let notificationSent = false;
 async function monitorHostReboot(): Promise<void> {
   try {
     const rebootRequired = await getRebootRequiredMemoized();
+    const correlationId = "core-reboot-required";
 
     if (rebootRequired?.rebootRequired) {
       logs.warn("Host reboot is required");
@@ -35,6 +36,8 @@ async function monitorHostReboot(): Promise<void> {
             priority: Priority.low,
             status: Status.triggered,
             isBanner: true,
+            isRemote: false,
+            correlationId
           })
           .catch((e) => logs.error("Error sending host reboot notification", e));
         notificationSent = true;
@@ -50,7 +53,10 @@ async function monitorHostReboot(): Promise<void> {
             body: `All packages have been installed successfully.`,
             category: Category.system,
             priority: Priority.low,
-            status: Status.resolved
+            status: Status.resolved,
+            isBanner: false,
+            isRemote: false,
+            correlationId
           })
           .catch((e) => logs.error("Error sending host reboot resolve notification", e));
         notificationSent = false;

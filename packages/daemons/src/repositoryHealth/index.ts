@@ -18,6 +18,8 @@ async function checkIpfsHealth(): Promise<void> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
 
+  const correlationId = "core-ipfs-check";
+
   try {
     const res = await fetch(`${ipfsUrl}/api/v0/version`, {
       method: "GET",
@@ -37,7 +39,10 @@ async function checkIpfsHealth(): Promise<void> {
         body: `Access to decentralized content has been restored and is functioning as expected.`,
         category: Category.system,
         priority: Priority.high,
-        status: Status.resolved
+        status: Status.resolved,
+        isBanner: false,
+        isRemote: false,
+        correlationId
       });
       ipfsNotificationSent = false;
     }
@@ -56,7 +61,10 @@ async function checkIpfsHealth(): Promise<void> {
         callToAction: {
           title: `Switch to ${ipfsClientTarget && ipfsClientTarget === "local" ? "Remote" : "Local"} IPFS`,
           url: "http://my.dappnode/repository/ipfs"
-        }
+        },
+        isBanner: true,
+        isRemote: false,
+        correlationId
       });
       ipfsNotificationSent = true;
     }
@@ -69,6 +77,8 @@ async function checkEthHealth(): Promise<void> {
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
+
+  const correlationId = "core-eth-check";
 
   try {
     const res = await fetch(ethUrl, {
@@ -99,7 +109,10 @@ async function checkEthHealth(): Promise<void> {
 Syncing and access to Ethereum chain data should now resume normally.`,
         category: Category.system,
         priority: Priority.high,
-        status: Status.resolved
+        status: Status.resolved,
+        isBanner: false,
+        isRemote: false,
+        correlationId
       });
       ethNotificationSent = false;
     }
@@ -118,7 +131,10 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         callToAction: {
           title: `Change to ${ethClientTarget && ethClientTarget === "on" ? "Full Node" : "Remote"}`,
           url: "http://my.dappnode/repository/ethereum"
-        }
+        },
+        isBanner: true,
+        isRemote: false,
+        correlationId
       });
       ethNotificationSent = true;
     }

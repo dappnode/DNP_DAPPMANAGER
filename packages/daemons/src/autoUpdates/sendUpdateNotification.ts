@@ -57,7 +57,10 @@ export async function sendUpdatePackageNotificationMaybe({
       callToAction: {
         title: "Update",
         url: urlJoin(adminUiInstallPackageUrl, dnpName)
-      }
+      },
+      isBanner: false,
+      isRemote: false,
+      correlationId : 'core-update-pkg',
     })
     .catch((e) => logs.error("Error sending package update notification", e));
 
@@ -91,7 +94,10 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
       callToAction: {
         title: "Update",
         url: adminUiUpdateCoreUrl
-      }
+      },
+      isBanner: true,
+      isRemote: false,
+      correlationId : 'core-update-system-pkg',
     })
     .catch((e) => logs.error("Error sending system update notification", e));
 

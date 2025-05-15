@@ -106,7 +106,10 @@ async function monitorDiskUsage(): Promise<void> {
             ].join("\n\n"),
             category: Category.hardware,
             priority: Priority.critical,
-            status: Status.triggered
+            status: Status.triggered,
+            isBanner: true,
+            isRemote: false,
+            correlationId : 'core-disk-usage',
           })
           .catch((e) => logs.error("Error sending disk usage notification", e));
 

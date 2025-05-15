@@ -16,14 +16,15 @@ export interface NotificationPayload {
   category: Category;
   priority: Priority;
   status: Status;
-  isBanner?: boolean;
-  isRemote?: boolean;
+  isBanner: boolean;
+  isRemote: boolean;
   icon?: string;
   errors?: string;
   callToAction?: {
     title: string;
     url: string;
   };
+  correlationId: string;
 }
 
 export enum Priority {

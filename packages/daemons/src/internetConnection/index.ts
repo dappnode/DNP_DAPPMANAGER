@@ -30,6 +30,8 @@ async function monitorInternetConnection(): Promise<void> {
   try {
     const isConnected = await getIsConnectedToInternet();
 
+    const correlationId = "core-internet-connection";
+
     if (!isConnected) {
       logs.warn("DAppNode is not connected to the internet");
 
@@ -46,7 +48,10 @@ async function monitorInternetConnection(): Promise<void> {
             callToAction: {
               title: "Diagnose",
               url: "http://my.dappnode/support/auto-diagnose"
-            }
+            },
+            isBanner: true,
+            isRemote: false,
+            correlationId
           })
           .catch((e) => logs.error("Error sending internet connectivity notification", e));
         notificationSent = true;
@@ -62,7 +67,10 @@ async function monitorInternetConnection(): Promise<void> {
             body: `Your Dappnode connection is functioning properly`,
             category: Category.system,
             priority: Priority.critical,
-            status: Status.resolved
+            status: Status.resolved,
+            isBanner: false,
+            isRemote: false,
+            correlationId
           })
           .catch((e) => logs.error("Error sending internet connectivity resolve notification", e));
         notificationSent = false;

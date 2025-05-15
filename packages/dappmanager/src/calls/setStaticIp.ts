@@ -36,7 +36,9 @@ export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<v
       category: Category.system,
       priority: Priority.low,
       status: Status.triggered,
-      isBanner: true
+      isBanner: true,
+      isRemote: false,
+      correlationId: "core-static-ip-update"
     })
     .catch((e) => logs.error("Error sending static IP updated notification", e));
 

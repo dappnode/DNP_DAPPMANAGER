@@ -9,9 +9,10 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "enabled", "url", "method", "conditions", "interval", "group", "alerts", "definition", "priority"],
+        "required": ["name", "correlation-id", "enabled", "url", "method", "conditions", "interval", "group", "alerts", "definition", "priority"],
         "properties": {
           "name": { "type": "string" },
+          "correlation-id": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
           "enabled": { "type": "boolean" },
           "url": { "type": "string", "pattern": "^(https?|ftp)://[^s/$.?#].[^s]*$" },
           "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
@@ -69,10 +70,11 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["enabled", "name", "description"],
+        "required": ["enabled", "name", "correlation-id", "description"],
         "properties": {
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
+          "correlation-id": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
           "description": { "type": "string" },
           "metric": {
             "type": "object",

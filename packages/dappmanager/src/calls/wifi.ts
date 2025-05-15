@@ -67,7 +67,10 @@ export async function wifiReportGet(): Promise<WifiReport> {
           callToAction: {
             title: "Change",
             url: "http://my.dappnode/system/wifi"
-          }
+          },
+          isBanner: true,
+          isRemote: false,
+          correlationId: "core-wifi-default-password"
         })
         .catch((e) => console.error("Error sending wifi password notification", e));
       wifiDefaultPasswordNotificationSent = true;
