@@ -49,6 +49,10 @@
     align-items: center;
     width: 100%;
 
+    @media (max-width: 60rem) {
+      gap: 10px;
+    }
+
     .avatar {
       width: 40px;
       height: 40px;
@@ -82,6 +86,16 @@
         .notification-name-row {
           display: flex;
           gap: 5px;
+
+          @media (max-width: 40rem) {
+            flex-direction: column-reverse;
+            gap: 0px;
+          }
+
+          .labels-wrapper {
+            display: flex;
+            gap: 5px;
+          }
         }
       }
       .secondary-text {
@@ -100,6 +114,10 @@
         padding: 0px 5px;
         border-radius: 10px;
         font-size: 0.7rem;
+
+        @media (max-width: 60rem) {
+          font-size: 0.65rem;
+        }
       }
       .resolved-label {
         @extend .base-label;
@@ -117,7 +135,7 @@
         border: 1px solid rgb(228, 156, 0);
         color: rgb(228, 156, 0) !important;
       }
-      .normal-label {
+      .medium-label {
         @extend .base-label;
         border: 1px solid var(--success-color);
         color: var(--success-color) !important;
@@ -139,6 +157,15 @@
   .notification-body {
     padding-top: 10px;
     font-size: 1rem;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+    }
   }
 }
 .notification-card:hover {

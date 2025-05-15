@@ -2,11 +2,10 @@ import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { DappnodeInstaller } from "@dappnode/installer";
-import { prettyDnpName } from "@dappnode/utils";
+import { prettyDnpName, urlJoin } from "@dappnode/utils";
 import { CoreUpdateDataAvailable, Category, Priority, upstreamVersionToString, Status } from "@dappnode/types";
 import { formatPackageUpdateNotification, formatSystemUpdateNotification } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
-import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 import { notifications } from "@dappnode/notifications";
 import { logs } from "@dappnode/logger";
 
@@ -39,6 +38,8 @@ export async function sendUpdatePackageNotificationMaybe({
     upstream: release.manifest.upstream
   });
 
+  const adminUiInstallPackageUrl = "http://my.dappnode/installer";
+
   // Send notification about new version available
   await notifications
     .sendNotification({
@@ -48,12 +49,18 @@ export async function sendUpdatePackageNotificationMaybe({
         dnpName,
         currentVersion,
         newVersion,
-        upstreamVersion,
-        autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+        upstreamVersion
       }),
       category: Category.system,
       priority: Priority.low,
-      status: Status.triggered
+      status: Status.triggered,
+      callToAction: {
+        title: "Update",
+        url: urlJoin(adminUiInstallPackageUrl, dnpName)
+      },
+      isBanner: false,
+      isRemote: false,
+      correlationId : 'core-update-pkg',
     })
     .catch((e) => logs.error("Error sending package update notification", e));
 
@@ -65,6 +72,8 @@ export async function sendUpdatePackageNotificationMaybe({
 export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvailable): Promise<void> {
   const newVersion = data.coreVersion;
   const dnpName = params.coreDnpName;
+
+  const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
 
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
@@ -80,8 +89,15 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
         autoUpdatesEnabled: isCoreUpdateEnabled()
       }),
       category: Category.system,
-      priority: Priority.low,
-      status: Status.triggered
+      priority: Priority.high,
+      status: Status.triggered,
+      callToAction: {
+        title: "Update",
+        url: adminUiUpdateCoreUrl
+      },
+      isBanner: true,
+      isRemote: false,
+      correlationId : 'core-update-system-pkg',
     })
     .catch((e) => logs.error("Error sending system update notification", e));
 

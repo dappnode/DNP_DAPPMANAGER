@@ -21,8 +21,16 @@ export { fetchRegistry } from "./fetchRegistry.js";
 export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
-export { getIsConnectedToInternet } from "./getIsConnectedToInternet.js";
-export { notificationsGetAllEndpoints, notificationsUpdateEndpoints, notificationsGetAll, notificationsApplyPreviousEndpoints, notificationsGetUnseenCount, notificationsSetAllSeen } from "./notifications.js";
+export {
+  notificationsGetAllEndpoints,
+  notificationsGetBanner,
+  notificationsUpdateEndpoints,
+  notificationsGetAll,
+  notificationsApplyPreviousEndpoints,
+  notificationsGetUnseenCount,
+  notificationsSetAllSeen,
+  notificationSetSeenByID
+} from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
@@ -54,7 +62,6 @@ export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
 export { rebootHost } from "./rebootHost.js";
-export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";

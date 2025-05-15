@@ -75,6 +75,8 @@ export interface LoginStatusReturn {
 
 export interface WifiReport {
   info: string;
+  isDefaultPassphrase: boolean;
+  isRunning: boolean;
   report?: {
     lastLog: string;
     exitCode: number | null;

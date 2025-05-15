@@ -30,7 +30,6 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  RebootRequiredScript,
   HostStatCpu,
   HostStatMemory,
   HostStatDisk,
@@ -238,11 +237,6 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
-   * Returns true if dappnode connected to internet
-   */
-  getIsConnectedToInternet: () => Promise<boolean>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -266,7 +260,12 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
- 
+  
+  /**
+   * Get banner notifications that should be displayed within the given timestamp range
+   */
+  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
+
   /**
    * Get unseen notifications count
    */
@@ -280,9 +279,14 @@ export interface Routes {
   }>;
 
   /**
-   * Set all notifications as seen
+   * Set all non-banner notifications as seen
    */
   notificationsSetAllSeen(): Promise<void>;
+ 
+  /**
+   * Set a notification as seen by providing its ID
+   */
+  notificationSetSeenByID(id:number): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -560,11 +564,6 @@ export interface Routes {
    */
   rebootHost: () => Promise<void>;
 
-  /**
-   *  Returns true if a reboot is required
-   */
-  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
-
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
   /** List all keys from trusted keys db */
@@ -725,17 +724,18 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
-  notificationsGetAll: { log: true },
-  notificationsGetUnseenCount: { log: true },
-  notificationsGetAllEndpoints: { log: true },
-  notificationsSetAllSeen: { log: true },
-  notificationsUpdateEndpoints: { log: true },
+  notificationsGetAll: {},
+  notificationsGetBanner: {},
+  notificationsGetUnseenCount: {},
+  notificationsGetAllEndpoints: {},
+  notificationsSetAllSeen: {},
+  notificationSetSeenByID: {},
+  notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},
   getHostUptime: {},
@@ -779,7 +779,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
-  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },

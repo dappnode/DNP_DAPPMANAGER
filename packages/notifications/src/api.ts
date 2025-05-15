@@ -28,6 +28,16 @@ export class NotificationsApi {
   }
 
   /**
+   * Retrieve all "banner" notifications that should be displayed within the given timestamp range
+   */
+  async getBannerNotifications(timestamp?: number): Promise<Notification[]> {
+    const url = new URL(`/api/v1/notifications?isBanner=true&timestamp=${timestamp}`, `${this.rootUrl}:8080`);
+ 
+    const response = await fetch(url);
+    return await response.json();
+  }
+
+  /**
    * Get the count of unseen notifications
    */
   async getUnseenNotificationsCount(): Promise<{ unseenCount: number }> {
@@ -47,10 +57,27 @@ export class NotificationsApi {
   }
 
   /**
-   * Set all notifications as seen
+   * Set all non-banner notifications as seen
    */
   async setAllNotificationsSeen(): Promise<void> {
-    await fetch(new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`).toString(), {
+    const url = new URL("/api/v1/notifications/seen", `${this.rootUrl}:8080`);
+    url.searchParams.append("isBanner", "false");
+
+    await fetch(url.toString(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
+
+  /**
+   * Set a notification as seen by providing its ID
+   */
+  async setNotificationSeenByID(id: number): Promise<void> {
+    const url = new URL(`/api/v1/notifications/${id}/seen`, `${this.rootUrl}:8080`);
+
+    await fetch(url.toString(), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"

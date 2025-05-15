@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
@@ -6,6 +6,9 @@ import { prettyDnpName } from "utils/format";
 import defaultAvatar from "img/defaultAvatar.png";
 import { Priority } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
+import Button from "components/Button";
+import { NavLink } from "react-router-dom";
+import { api } from "api";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -32,6 +35,12 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
   };
   const [isOpen, setIsOpen] = useState(openByDefault);
 
+  useEffect(() => {
+    if (!notification.seen && notification.isBanner && notification.status === "resolved") {
+      api.notificationSetSeenByID(notification.id);
+    }
+  }, []);
+
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
       <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)} className="notification-card">
@@ -41,14 +50,24 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
             <div className="notification-header-row secondary-text">
               <div className="notification-name-row">
                 <div>{prettyDnpName(notification.dnpName)}</div>
-                <div className="category-label">
-                  {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
+                <div className="labels-wrapper">
+                  <div className="category-label">
+                    {notification.category.charAt(0).toUpperCase() + notification.category.slice(1)}
+                  </div>
+                  <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
+                  {notification.status === "resolved" && <div className="resolved-label">Resolved</div>}
                 </div>
-                <div className={`${notification.priority}-label`}>{priorityLabels[notification.priority]}</div>
-                {notification.status === 'resolved' && <div className="resolved-label">Resolved</div>}
               </div>
 
-              <i>{new Date(notification.timestamp).toLocaleString()}</i>
+              <i>
+                {new Date(notification.timestamp * 1000).toLocaleString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </i>
             </div>
             <div className="notification-header-row ">
               <div className="notification-title">{notification.title}</div>
@@ -59,6 +78,11 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
         <Accordion.Collapse eventKey="0">
           <div className="notification-body">
             <RenderMarkdown source={prettifiedBody(notification.body)} />
+            {notification.callToAction && (
+              <NavLink to={notification.callToAction.url}>
+                <Button variant="dappnode">{notification.callToAction.title}</Button>{" "}
+              </NavLink>
+            )}
           </div>
         </Accordion.Collapse>
       </Accordion.Toggle>

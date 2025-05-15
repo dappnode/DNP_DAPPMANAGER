@@ -10,6 +10,14 @@ export async function notificationsGetAll(): Promise<Notification[]> {
 }
 
 /**
+ * Get all the notifications
+ * @returns all the notifications
+ */
+export async function notificationsGetBanner(timestamp:number): Promise<Notification[]> {
+  return await notifications.getBannerNotifications(timestamp);
+}
+
+/**
  * Get unseen notifications count
  */
 export async function notificationsGetUnseenCount(): Promise<number> {
@@ -17,10 +25,17 @@ export async function notificationsGetUnseenCount(): Promise<number> {
 }
 
 /**
- * Set all notifications as seen
+ * Set all non-banner notifications as seen
  */
 export async function notificationsSetAllSeen(): Promise<void> {
   return await notifications.setAllNotificationsSeen();
+}
+
+/**
+ * Set a notification as seen by providing its ID
+ */
+export async function notificationSetSeenByID(id:number): Promise<void> {
+  return await notifications.setNotificationSeenByID(id);
 }
 
 /**

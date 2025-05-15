@@ -1,116 +1,134 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { useApi } from "api";
 import RenderMarkdown from "components/RenderMarkdown";
-// Selectors
-import { getCoreUpdateAvailable, getIsCoreUpdateTypePatch, getUpdatingCore } from "services/coreUpdate/selectors";
-import {
-  getWifiStatus,
-  getPasswordIsSecure,
-  getRebootIsRequired,
-  getIsConnectedToInternet
-} from "services/dappnodeStatus/selectors";
-import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
-import Button from "components/Button";
-// Style
+import Button, { ButtonVariant } from "components/Button";
+import { api, useApi } from "api";
+import { Notification, Priority, Status } from "@dappnode/types";
 import "./notificationsMain.scss";
-import { autoUpdateIds } from "params";
-import { AlertDismissible } from "./AlertDismissible";
+import { MdClose } from "react-icons/md";
+import { Accordion } from "react-bootstrap";
 
 /**
- * Aggregate notification and display logic
+ * Displays banner notifications among all tabs
  */
 export default function NotificationsView() {
-  const coreUpdateAvailable = useSelector(getCoreUpdateAvailable);
-  const updatingCore = useSelector(getUpdatingCore);
-  const isCoreUpdateTypePatch = useSelector(getIsCoreUpdateTypePatch);
-  const wifiStatus = useSelector(getWifiStatus);
-  const passwordIsSecure = useSelector(getPasswordIsSecure);
-  const rebootHostIsRequired = useSelector(getRebootIsRequired);
-  const isConnectedToInternet = useSelector(getIsConnectedToInternet);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
-  // Check is auto updates are enabled for the core
-  const autoUpdateSettingsReq = useApi.autoUpdateDataGet();
-  const isCoreAutoUpdateActive = ((autoUpdateSettingsReq.data?.settings || {})[autoUpdateIds.SYSTEM_PACKAGES] || {})
-    .enabled;
+  const numOfBannersShown = 3; // Number of banners that will be shown in the UI
 
-  const notifications = [
-    /**
-     * [HOST-CONNECTED-TO-INTERNET]
-     * Tell the user if is connected to internet
-     */
-    {
-      id: "connectedToInternet",
-      linkText: "Navigate",
-      linkPath: "support/auto-diagnose",
-      body: `**Dappnode host is not connected to internet.** Click **Navigate** to autodiagnose and check the dappnode health.`,
-      active: isConnectedToInternet === false
-    },
-    /**
-     * [HOST-REBOOT]
-     * Tell the user to reboot the host
-     */
-    {
-      id: "hostReboot",
-      linkText: "Reboot",
-      linkPath: systemPathName + "/" + systemSubPaths.power,
-      body: `**Dappnode host reboot required.** Click **Reboot** to reboot the host and apply the changes. The following packages will be updated: ${rebootHostIsRequired?.pkgs}`,
-      active: rebootHostIsRequired?.rebootRequired
-    },
-    /**
-     * [SYSTEM-UPDATE]
-     * Tell the user to update the core DNPs
-     */
-    {
-      id: "systemUpdate",
-      linkText: "Update",
-      linkPath: systemPathName + "/" + systemSubPaths.update,
-      body: "**Dappnode system update available.** Click **Update** to review and approve it",
-      active:
-        coreUpdateAvailable &&
-        !updatingCore &&
-        // Show if NOT patch, or if patch is must not be active
-        (!isCoreUpdateTypePatch || !isCoreAutoUpdateActive)
-    },
-    /**
-     * [WIFI-PASSWORD]
-     * Tell the user to change the wifi credentials
-     */
-    {
-      id: "wifiCredentials",
-      linkText: "Change",
-      linkPath: systemPathName + "/" + systemSubPaths.security,
-      body: "**Change the Dappnode WiFi credentials**, they are insecure default values.",
-      active: wifiStatus?.isDefaultPassphrase && wifiStatus?.isRunning
-    },
-    /**
-     * [HOST-USER-PASSWORD]
-     * Tell the user to change the host's "dappnode" user password
-     */
-    {
-      id: "hostPasswordInsecure",
-      linkText: "Change",
-      linkPath: systemPathName + "/" + systemSubPaths.security,
-      body: "**Change the host 'dappnode' user password**, it's an insecure default.",
-      active: passwordIsSecure === false
+  // gets the timestamp of one month ago in UNIX format
+  const oneMonthAgoTimestamp = useMemo(() => {
+    const now = new Date();
+    now.setMonth(now.getMonth() - 1);
+    return Math.floor(now.getTime() / 1000); // Convert to seconds
+  }, []);
+
+  const notificationsCall = useApi.notificationsGetBanner(oneMonthAgoTimestamp);
+
+  useEffect(() => {
+    if (notificationsCall.data) {
+      setNotifications(filterNotifications(notificationsCall.data));
     }
-  ];
+  }, [notificationsCall.data]);
+
+  /**
+   * filters notifications:
+   * 1. Filters out notifications that have errors
+   * 2. Filters out duplicate notifications by title, keeping the most recent one
+   * 3. Filters out notifications that are not triggered status
+   * 4. Filters out seen notifications
+   * 5. Sorts notifications by priority
+   */
+
+  function filterNotifications(notifications: Notification[]): Notification[] {
+    const priorityOrder = [Priority.critical, Priority.high, Priority.medium, Priority.low];
+
+    const map = new Map<string, Notification>();
+
+    notifications
+      .filter((n) => !n.errors) // Filter out notifications with errors
+      .forEach((notification) => {
+        const existing = map.get(notification.title);
+
+        if (!existing || new Date(notification.timestamp) > new Date(existing.timestamp)) {
+          map.set(notification.title, notification);
+        }
+      });
+
+    return Array.from(map.values())
+      .filter((n) => n.status === Status.triggered) // Filter by triggered status after deduplication
+      .filter((n) => n.seen === false) // Filter out seen notifications
+      .sort((a, b) => priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority));
+  }
 
   return (
-    <div>
-      {notifications
-        .filter(({ active }) => active)
-        .map(({ id, linkText, linkPath, body }) => (
-          <AlertDismissible key={id} className="main-notification" variant="warning">
-            <RenderMarkdown source={body} />
-            {linkText && linkPath ? (
-              <NavLink to={linkPath}>
-                <Button variant="warning">{linkText}</Button>
-              </NavLink>
-            ) : null}
-          </AlertDismissible>
+    notifications &&
+    notifications.length > 0 && (
+      <div className="banner-notifications-col">
+        {notifications.slice(0, numOfBannersShown).map((notification) => (
+          <CollapsableBannerNotification
+            notification={notification}
+            key={notification.id}
+            onClose={() => setNotifications((prev) => prev.filter((n) => n.id !== notification.id))}
+          />
         ))}
-    </div>
+      </div>
+    )
+  );
+}
+
+const priorityBtnVariants: Record<Priority, ButtonVariant> = {
+  [Priority.low]: "dappnode",
+  [Priority.medium]: "dappnode",
+  [Priority.high]: "warning",
+  [Priority.critical]: "danger"
+};
+
+export function CollapsableBannerNotification({
+  notification,
+  onClose
+}: {
+  notification: Notification;
+  onClose: () => void;
+}) {
+  const [isOpen, setIsOpen] = useState(notification.priority === Priority.critical);
+  const [hasClosed, setHasClosed] = useState(false);
+
+  const handleClose = () => {
+    api.notificationSetSeenByID(notification.id);
+    setHasClosed(true);
+    onClose();
+  };
+
+  return (
+    !hasClosed && (
+      <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
+        <Accordion.Toggle
+          as={"div"}
+          eventKey="0"
+          onClick={() => setIsOpen(!isOpen)}
+          className={`banner-card ${notification.priority}-priority`}
+        >
+          <div className="banner-header">
+            <h5>{notification.title}</h5>
+            <button className="close-btn" onClick={handleClose}>
+              <MdClose />
+            </button>
+          </div>
+          <Accordion.Collapse eventKey="0">
+            <div className="banner-body">
+              <RenderMarkdown source={notification.body} />
+              {notification.callToAction && (
+                <NavLink to={notification.callToAction.url}>
+                  <Button variant={priorityBtnVariants[notification.priority]}>
+                    {notification.callToAction.title}
+                  </Button>
+                </NavLink>
+              )}
+            </div>
+          </Accordion.Collapse>
+        </Accordion.Toggle>
+      </Accordion>
+    )
   );
 }

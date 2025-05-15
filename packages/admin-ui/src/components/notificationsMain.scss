@@ -1,26 +1,105 @@
-.main-notification {
+.banner-notifications-col {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 5px;
 
-  p {
-    margin-bottom: 0;
-  }
-  a {
-    margin-left: 0.5rem;
-  }
+  .banner-card {
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #e9ecef;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 
-  > a,
-  > button {
-    flex: none;
-  }
-
-  @media screen and (max-width: 40rem) {
-    display: block;
-    p {
-      margin-bottom: 0.5rem;
+    &:hover {
+      opacity: 0.8;
+      cursor: pointer;
     }
-    a {
-      margin-left: 0;
+
+    &.medium-priority {
+      background-color: #d1ecf1;
+      color: #0c5460 !important;
+    }
+
+    &.high-priority {
+      background-color: #ffeda6;
+      color: #433c1d !important;
+    }
+
+    &.critical-priority {
+      background-color: #f8d7da;
+      color: #721c24 !important;
+    }
+
+    h5 {
+      margin: 0px;
+    }
+
+    .banner-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+
+      .close-btn {
+        padding: 0px;
+        border: none;
+        background: none;
+
+        cursor: pointer;
+        color: #000;
+        font-size: 1.2rem;
+        font-weight: 700;
+
+        &:hover {
+          opacity: 0.5;
+        }
+      }
+    }
+
+    .banner-body {
+      font-size: 1rem;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+
+      @media (max-width: 60rem) {
+        flex-direction: column;
+      }
+    }
+  }
+}
+
+#dark {
+  #main {
+    .banner-notifications-col {
+      .banner-card {
+        .banner-header {
+          color: black;
+        }
+
+        &.medium-priority {
+          color: #0c5460 !important;
+        }
+
+        &.high-priority {
+          color: #433c1d !important;
+        }
+
+        &.critical-priority {
+          color: #721c24 !important;
+        }
+
+        .banner-body {
+          p,
+          strong,
+          li {
+            color: black !important;
+          }
+        }
+      }
     }
   }
 }

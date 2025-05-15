@@ -447,6 +447,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -503,6 +504,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "invalid-url",
             method: "POST",
@@ -536,6 +538,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -603,7 +606,6 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
-            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
@@ -657,6 +659,7 @@ volumes:
         endpoints: [
           {
             name: "example-endpoint",
+            correlationId: "example-correlation-id",
             enabled: true,
             url: "http://example.com",
             method: "POST",
@@ -690,7 +693,6 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
-            priority: Priority.high,
             metric: {
               treshold: 90,
               min: 0,
@@ -702,6 +704,85 @@ volumes:
       };
 
       expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should validate a notifications configuration with valid requirements and pkgsInstalled version ranges", () => {
+      const validNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "abc-example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Custom alert description",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            requirements: {
+              pkgsInstalled: {
+                "geth.dnp.dappnode.eth": ">=0.4.3",
+                "other.dnp.dappnode.eth": "^1.2.3"
+              },
+              pkgsNotInstalled: ["foo.dnp.dappnode.eth"]
+            }
+          }
+        ]
+      };
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for requirements with invalid pkgsInstalled version range", () => {
+      const invalidNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "abc-example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Custom alert description",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            requirements: {
+              pkgsInstalled: {
+                "geth.dnp.dappnode.eth": "invalid-version"
+              },
+              pkgsNotInstalled: ["foo.dnp.dappnode.eth"]
+            }
+          }
+        ]
+      };
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
     });
   });
 });
