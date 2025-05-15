@@ -1,5 +1,4 @@
 customEndpoints:
   - name: "Package updates notifications"
     description: "This endpoint notifies users about available package updates."
-    priority: low
     enabled: true
