@@ -59,7 +59,15 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
                 </div>
               </div>
 
-              <i>{new Date(notification.timestamp).toLocaleString()}</i>
+              <i>
+                {new Date(notification.timestamp * 1000).toLocaleString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}
+              </i>
             </div>
             <div className="notification-header-row ">
               <div className="notification-title">{notification.title}</div>

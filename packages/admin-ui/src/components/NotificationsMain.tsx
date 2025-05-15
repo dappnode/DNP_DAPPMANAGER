@@ -16,11 +16,11 @@ export default function NotificationsView() {
 
   const numOfBannersShown = 3; // Number of banners that will be shown in the UI
 
-  // gets the timestamp of one month ago in ISO format
+  // gets the timestamp of one month ago in UNIX format
   const oneMonthAgoTimestamp = useMemo(() => {
     const now = new Date();
     now.setMonth(now.getMonth() - 1);
-    return now.toISOString().split(".")[0] + "Z";
+    return Math.floor(now.getTime() / 1000); // Convert to seconds
   }, []);
 
   const notificationsCall = useApi.notificationsGetBanner(oneMonthAgoTimestamp);

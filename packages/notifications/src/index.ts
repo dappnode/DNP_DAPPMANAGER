@@ -28,7 +28,7 @@ class Notifications {
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
-  async getBannerNotifications(timestamp?: string): Promise<Notification[]> {
+  async getBannerNotifications(timestamp?: number): Promise<Notification[]> {
     return await this.api.getBannerNotifications(timestamp);
   }
 

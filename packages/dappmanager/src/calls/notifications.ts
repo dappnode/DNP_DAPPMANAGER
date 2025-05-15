@@ -13,7 +13,7 @@ export async function notificationsGetAll(): Promise<Notification[]> {
  * Get all the notifications
  * @returns all the notifications
  */
-export async function notificationsGetBanner(timestamp:string): Promise<Notification[]> {
+export async function notificationsGetBanner(timestamp:number): Promise<Notification[]> {
   return await notifications.getBannerNotifications(timestamp);
 }
 

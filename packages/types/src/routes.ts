@@ -264,7 +264,7 @@ export interface Routes {
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
-  notificationsGetBanner(timestamp: string): Promise<Notification[]>;
+  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
 
   /**
    * Get unseen notifications count

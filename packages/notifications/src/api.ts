@@ -30,16 +30,10 @@ export class NotificationsApi {
   /**
    * Retrieve all "banner" notifications that should be displayed within the given timestamp range
    */
-  async getBannerNotifications(timestamp?: string): Promise<Notification[]> {
-    const url = new URL("/api/v1/notifications", `${this.rootUrl}:8080`);
-
-    url.searchParams.append("isBanner", "true");
-
-    if (timestamp) {
-      url.searchParams.append("timestamp", timestamp);
-    }
-
-    const response = await fetch(url.toString());
+  async getBannerNotifications(timestamp?: number): Promise<Notification[]> {
+    const url = new URL(`/api/v1/notifications?isBanner=true&timestamp=${timestamp}`, `${this.rootUrl}:8080`);
+ 
+    const response = await fetch(url);
     return await response.json();
   }
 
