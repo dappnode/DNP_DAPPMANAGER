@@ -56,6 +56,7 @@ export interface CustomEndpoint {
   name: string;
   enabled: boolean;
   description: string;
+  isBanner: boolean;
   metric?: {
     treshold: number;
     min: number;
@@ -77,7 +78,7 @@ export interface GatusEndpoint {
   // Dappnode specific
   correlationId: string;
   priority: Priority;
-  isBanner?: boolean;
+  isBanner: boolean;
   callToAction?: CallToAction;
   requirements?: Requirements;
   definition: {

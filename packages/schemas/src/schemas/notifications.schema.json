@@ -20,7 +20,8 @@
           "group",
           "alerts",
           "definition",
-          "priority"
+          "priority",
+          "isBanner"
         ],
         "properties": {
           "name": { "type": "string" },

@@ -455,6 +455,7 @@ volumes:
             interval: "1m",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "custom",
@@ -512,6 +513,7 @@ volumes:
             interval: "1m",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "response-time",
@@ -546,6 +548,7 @@ volumes:
             interval: "invalid-interval",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "response-time",
@@ -578,6 +581,7 @@ volumes:
             conditions: ["response-time < 500ms"],
             interval: "1m",
             group: "example-group",
+            isBanner: false,
             alerts: [
               {
                 type: "response-time",
@@ -606,6 +610,7 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
+            isBanner: false,
             metric: {
               treshold: 90,
               min: 0,
@@ -667,6 +672,7 @@ volumes:
             interval: "1m",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "custom",
@@ -693,6 +699,7 @@ volumes:
             enabled: true,
             name: "custom-endpoint",
             description: "A custom endpoint for testing", // Added required description
+            isBanner: false,
             metric: {
               treshold: 90,
               min: 0,
@@ -719,6 +726,7 @@ volumes:
             interval: "1m",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "custom",
@@ -759,6 +767,7 @@ volumes:
             interval: "1m",
             group: "example-group",
             priority: Priority.low,
+            isBanner: false,
             alerts: [
               {
                 type: "custom",
