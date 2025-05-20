@@ -15,16 +15,12 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { AppContextIface, Theme, UiModuleStatus } from "types";
+import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
-  stakersModuleStatus: "enabled",
-  rollupsModuleStatus: "disabled",
-  toggleTheme: () => {},
-  toggleStakersModuleStatus: () => {},
-  toggleRollupsModuleStatus: () => {}
+  toggleTheme: () => {}
 });
 
 const useLocalStorage = <T extends string>(
@@ -56,14 +52,6 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
-  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<UiModuleStatus>(
-    "stakersModuleStatus",
-    "enabled"
-  );
-  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<UiModuleStatus>(
-    "rollupsModuleStatus",
-    "disabled"
-  );
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -79,13 +67,7 @@ function MainApp({ username }: { username: string }) {
 
   const appContext: AppContextIface = {
     theme,
-    stakersModuleStatus,
-    rollupsModuleStatus,
-    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
-    toggleStakersModuleStatus: () =>
-      setStakersModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled")),
-    toggleRollupsModuleStatus: () =>
-      setRollupsModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled"))
+    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light"))
   };
 
   return (
