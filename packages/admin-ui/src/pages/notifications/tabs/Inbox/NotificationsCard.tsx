@@ -3,7 +3,7 @@ import { Accordion } from "react-bootstrap";
 import { Notification } from "@dappnode/types";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { prettyDnpName } from "utils/format";
-import defaultAvatar from "img/defaultAvatar.png";
+import dappnodeLogo from "img/dappnode-logo-only.png";
 import { Priority } from "@dappnode/types";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button from "components/Button";
@@ -31,7 +31,7 @@ const prettifiedBody = (body: string) => {
 export function NotificationCard({ notification, openByDefault = false }: NotificationCardProps) {
   const notificationAvatar = () => {
     if (notification.icon) return notification.icon;
-    else return defaultAvatar;
+    else return dappnodeLogo;
   };
   const [isOpen, setIsOpen] = useState(openByDefault);
 
