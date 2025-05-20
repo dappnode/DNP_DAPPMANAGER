@@ -1,7 +1,6 @@
 import React from "react";
 // DropdownMenu components
 import DappnodeIdentity from "./dropdownMenus/DappnodeIdentity";
-import ChainDataDropdown from "./dropdownMenus/ChainDataDropdown";
 import InstallerDropdown from "./dropdownMenus/InstallerDropdown";
 import Notifications from "./dropdownMenus/Notifications";
 import Profile from "./dropdownMenus/Profile";
@@ -34,7 +33,6 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       <DappnodeIdentity />
       <div className="topnav-icon-separator" />
       {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
-      <ChainDataDropdown />
       <Notifications />
       <Profile username={username} />
     </div>
