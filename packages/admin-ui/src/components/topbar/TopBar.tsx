@@ -29,9 +29,7 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       ) : (
         <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       )}
-
       <DappnodeIdentity />
-      <div className="topnav-icon-separator" />
       {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
       <Notifications />
       <Profile username={username} />

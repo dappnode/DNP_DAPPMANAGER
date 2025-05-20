@@ -120,6 +120,7 @@
 
 .tn-dropdown-toggle {
   /* flex automatically centers the toggle icons */
+  padding: 3px;
   display: flex;
   opacity: 0.6;
   transition: opacity 150ms;
