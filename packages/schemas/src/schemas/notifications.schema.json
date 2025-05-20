@@ -112,11 +112,12 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["enabled", "name", "description"],
+        "required": ["enabled", "name", "description", "isBanner"],
         "properties": {
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
           "description": { "type": "string" },
+          "isBanner": { "type": "boolean" },
           "metric": {
             "type": "object",
             "properties": {
