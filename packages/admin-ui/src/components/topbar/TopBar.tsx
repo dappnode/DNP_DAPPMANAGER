@@ -3,7 +3,6 @@ import React from "react";
 import DappnodeIdentity from "./dropdownMenus/DappnodeIdentity";
 import InstallerDropdown from "./dropdownMenus/InstallerDropdown";
 import Notifications from "./dropdownMenus/Notifications";
-import Profile from "./dropdownMenus/Profile";
 import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 // Styles
 import "./topbar.scss";
@@ -29,10 +28,9 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       ) : (
         <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       )}
-      <DappnodeIdentity />
-      {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
       <Notifications />
-      <Profile username={username} />
+      {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
+      <DappnodeIdentity username={username} />
     </div>
   );
 };
