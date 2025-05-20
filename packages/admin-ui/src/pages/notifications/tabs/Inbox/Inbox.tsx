@@ -50,13 +50,18 @@ export function Inbox() {
     .filter((notification) => notification.seen)
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
+  const totalPages = Math.ceil(seenNotifications.length / itemsPerPage);
+
   const paginatedSeenNotifications = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return seenNotifications.slice(startIndex, endIndex);
   }, [seenNotifications, currentPage]);
 
-  const totalPages = Math.ceil(seenNotifications.length / itemsPerPage);
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, selectedCategory]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1);
@@ -119,37 +124,39 @@ export function Inbox() {
           {paginatedSeenNotifications.map((notification) => (
             <NotificationCard key={notification.timestamp} notification={notification} />
           ))}
-          <div className="pagination">
-            {currentPage !== 1 && (
-              <>
-                <button onClick={handleFirstPage} className="page-item">
-                  1
-                </button>
-                {currentPage > 2 && <span className="dots">. . .</span>}
-              </>
-            )}
+          {totalPages > 1 && (
+            <div className="pagination">
+              {currentPage !== 1 && (
+                <>
+                  <button onClick={handleFirstPage} className="page-item">
+                    1
+                  </button>
+                  {currentPage > 3 && <span className="dots">. . .</span>}
+                </>
+              )}
 
-            {currentPage > 2 && (
-              <button onClick={handlePreviousPage} className="page-item">
-                {currentPage - 1}
-              </button>
-            )}
-            <span className="active">{currentPage}</span>
-            {totalPages - 1 > currentPage && (
-              <button onClick={handleNextPage} className="page-item">
-                {currentPage + 1}
-              </button>
-            )}
-
-            {currentPage !== totalPages && (
-              <>
-                {totalPages - 1 > currentPage && <span className="dots">. . .</span>}
-                <button onClick={handleLastPage} className="page-item">
-                  {totalPages}
+              {currentPage > 2 && (
+                <button onClick={handlePreviousPage} className="page-item">
+                  {currentPage - 1}
                 </button>
-              </>
-            )}
-          </div>
+              )}
+              <span className="active">{currentPage}</span>
+              {totalPages - 1 > currentPage && (
+                <button onClick={handleNextPage} className="page-item">
+                  {currentPage + 1}
+                </button>
+              )}
+
+              {currentPage !== totalPages && (
+                <>
+                  {totalPages - 2 > currentPage && <span className="dots">. . .</span>}
+                  <button onClick={handleLastPage} className="page-item">
+                    {totalPages}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
         </>
       )}
     </>
