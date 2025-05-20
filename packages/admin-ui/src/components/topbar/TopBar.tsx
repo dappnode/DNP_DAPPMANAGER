@@ -12,7 +12,6 @@ import "./notifications.scss";
 // import UsageSwitch from "./dropdownMenus/UsageSwitch";
 // Types
 import { AppContextIface } from "types";
-import Modules from "./dropdownMenus/Modules";
 
 // Pkgs Installing data
 import { useSelector } from "react-redux";
@@ -35,7 +34,6 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       <DappnodeIdentity />
       <div className="topnav-icon-separator" />
       {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
-      <Modules modulesContext={appContext} />
       <ChainDataDropdown />
       <Notifications />
       <Profile username={username} />
