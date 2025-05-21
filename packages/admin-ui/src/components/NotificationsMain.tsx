@@ -35,8 +35,9 @@ export default function NotificationsView() {
    * filters notifications:
    * 1. Filters out notifications that have errors
    * 2. Filters out duplicate notifications by title, keeping the most recent one
-   * 3. Filters out seen notifications
-   * 4. Sorts notifications by priority
+   * 3. Filters out resolved notifications
+   * 4. Filters out seen notifications
+   * 5. Sorts notifications by priority
    */
 
   function filterNotifications(notifications: Notification[]): Notification[] {
@@ -55,6 +56,7 @@ export default function NotificationsView() {
       });
 
     return Array.from(map.values())
+      .filter((n) => n.status === "triggered") // Filter out resolved notifications
       .filter((n) => n.seen === false) // Filter out seen notifications
       .sort((a, b) => priorityOrder.indexOf(a.priority) - priorityOrder.indexOf(b.priority));
   }
