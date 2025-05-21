@@ -345,6 +345,26 @@ export interface Routes {
   newFeatureStatusSet: (kwargs: { featureId: NewFeatureId; status: NewFeatureStatus }) => Promise<void>;
 
   /**
+   * Returns the vapid public key for notifications
+   */
+  notificationsGetVapidPublicKey(): Promise<string>;
+
+  /**
+   * Subscribes a user to notifications
+   */
+  notificationsPostSubscription({ subscription }: { subscription: PushSubscriptionJSON }): Promise<void>;
+
+  /**
+   * Sends a notification to the user
+   */
+  notificationsPostNewNotification({ title, body }: { title: string; body: string }): Promise<void>;
+
+  /**
+   * Returns the subscription of a user
+   */
+  notificationsGetSubscription({ subscription }: { subscription: PushSubscription }): Promise<PushSubscription | null>;
+
+  /**
    * Returns not viewed notifications.
    * Use an array as the keys are not known in advance and the array form
    * is okay for RPC transport, as uniqueness is guaranteed
@@ -708,6 +728,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   lvmDiskSpaceExtend: { log: true },
   mountpointsGet: {},
   newFeatureStatusSet: {},
+  notificationsGetVapidPublicKey: { log: true },
+  notificationsPostSubscription: { log: true },
+  notificationsPostNewNotification: { log: true },
+  notificationsGetSubscription: { log: true },
   notificationsGet: {},
   notificationsRemove: {},
   notificationsTest: {},
