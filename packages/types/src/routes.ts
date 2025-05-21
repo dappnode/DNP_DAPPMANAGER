@@ -284,9 +284,9 @@ export interface Routes {
   notificationsSetAllSeen(): Promise<void>;
  
   /**
-   * Set a notification as seen by providing its ID
+   * Set a notification as seen by providing its correlationId
    */
-  notificationSetSeenByID(id:number): Promise<void>;
+  notificationSetSeenByCorrelationID(correlationId:string): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -734,7 +734,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsGetUnseenCount: {},
   notificationsGetAllEndpoints: {},
   notificationsSetAllSeen: {},
-  notificationSetSeenByID: {},
+  notificationSetSeenByCorrelationID: {},
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   getUserActionLogs: {},

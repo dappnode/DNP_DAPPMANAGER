@@ -37,7 +37,7 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
 
   useEffect(() => {
     if (!notification.seen && notification.isBanner && notification.status === "resolved") {
-      api.notificationSetSeenByID(notification.id);
+      api.notificationSetSeenByCorrelationID(notification.correlationId);
     }
   }, []);
 
