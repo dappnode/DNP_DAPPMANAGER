@@ -8,7 +8,6 @@ import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
 import * as stakers from "./stakers";
-import * as rollups from "./rollups";
 import * as repository from "./repository";
 
 export const pages = {
@@ -18,7 +17,6 @@ export const pages = {
   installer,
   packages,
   stakers,
-  rollups,
   sdk,
   support,
   community,

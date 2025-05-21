@@ -4,6 +4,7 @@ import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
 import StakerNetwork from "./StakerNetwork";
 import { Network } from "@dappnode/types";
+import Optimism from "pages/rollups/components/Optimism";
 
 const StakersRoot: React.FC = () => {
   const stakersItems: {
@@ -69,6 +70,13 @@ const StakersRoot: React.FC = () => {
           network: Network.Lukso,
           description:
             "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
+        })
+    },{
+      subPath: "optimism",
+      title: "Optimism",
+      component: () =>
+        Optimism({
+          description: "Optimism is a Layer 2 scaling solution for Ethereum. Rather than operating as an independent EVM chain, Optimism executes transactions off-chain and posts compressed data to Ethereum"
         })
     }
   ];

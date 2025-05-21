@@ -25,42 +25,48 @@
     /* Does not need a z-index, it has the topbar z-index */
     background-color: white;
     border: var(--border-style);
-    border-radius: 0.25rem;
-    padding: 0.25rem 0;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     /* Positioning */
     position: absolute;
-    top: 2rem;
+    top: 2.5rem;
     /* Display control */
     display: none;
     /* Sizing */
-    width: 22.5rem;
+    width: 25rem;
+    right: 0;
     max-height: 30rem;
     overflow-y: auto;
 
     &.show {
       display: block;
     }
-    
+
     @media (max-width: 40rem) {
-      width: 15rem;
+      width: calc(100vw - 1rem);
+      max-width: 16rem;
     }
 
     /* Menu items */
     > div {
-      padding: 0.5rem 1rem;
+      padding: 0.75rem 1rem;
       overflow-wrap: break-word;
 
       .title {
         display: flex;
+        align-items: center;
         .text {
           flex: auto;
         }
         .title-actions {
           display: flex;
+          align-items: center;
+          gap: 0.5rem;
           .help {
             font-size: 140%;
             display: flex;
-            margin-right: 10px;
+            color: #6c757d;
           }
         }
       }
@@ -70,61 +76,58 @@
     }
     > .header {
       color: #6c757d;
+      font-weight: 600;
+      font-size: 1.1rem;
+      padding: 0.75rem 1rem;
+      background-color: rgba(0, 0, 0, 0.02);
     }
     > .placeholder {
       color: #6c757d;
       opacity: 0.8;
+      text-align: center;
+      padding: 1rem;
     }
     .progress {
-      margin: 0.25rem 0;
+      margin: 0.5rem 0;
     }
   }
 
   /* Right position of the dropdown to prevent clipping on small screens */
-  &.profile > .menu {
-    right: -0.5rem;
+
+  &.installer {
+    > .menu {
+      right: -3rem;
+      > div {
+        padding: 1rem;
+      }
+    }
+
+    .progress-logs {
+      width: 100%;
+      margin: 0.5rem 0;
+    }
   }
-  &.notifications > .menu {
-    right: -3.1rem;
-  }
-  &.chainstatus > .menu {
-    right: -5.6rem;
-  }
-  &.installer > .menu {
-    right: -9rem;
-  }
-  &.dappnodeidentity > .menu {
-    right: -9.2rem;
-  }
-  &.modules > .menu {
-    right: -8rem;
+  &.dappnodeidentity {
+    > .menu {
+      width: 20rem;
+    }
+
+    .sign-out {
+      cursor: pointer;
+      color: #dc3545 !important;
+    }
   }
 
   // Regulate size of toggle icons
   &.notifications .tn-dropdown-toggle svg {
     font-size: 1.3rem;
   }
-
-  &.profile {
-    a {
-      color: inherit;
-    }
-    .tn-dropdown-toggle svg {
-      font-size: 1.6rem;
-    }
-    .sign-out {
-      cursor: pointer;
-    }
-  }
 }
 
 .tn-dropdown-toggle {
   /* flex automatically centers the toggle icons */
+  padding: 0.25rem;
   display: flex;
   opacity: 0.6;
-  transition: opacity 150ms;
   cursor: pointer;
-}
-.tn-dropdown-toggle:hover {
-  opacity: 1;
 }
