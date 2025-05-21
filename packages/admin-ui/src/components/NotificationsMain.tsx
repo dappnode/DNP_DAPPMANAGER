@@ -93,7 +93,7 @@ export function CollapsableBannerNotification({
   const [hasClosed, setHasClosed] = useState(false);
 
   const handleClose = () => {
-    api.notificationSetSeenByID(notification.id);
+    api.notificationSetSeenByCorrelationID(notification.correlationId);
     setHasClosed(true);
     onClose();
   };

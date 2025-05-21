@@ -29,7 +29,7 @@ export {
   notificationsApplyPreviousEndpoints,
   notificationsGetUnseenCount,
   notificationsSetAllSeen,
-  notificationSetSeenByID
+  notificationSetSeenByCorrelationID
 } from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";

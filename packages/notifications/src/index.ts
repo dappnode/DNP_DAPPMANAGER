@@ -48,8 +48,8 @@ class Notifications {
   /**
    * Set a notification as seen by providing its ID
    */
-  async setNotificationSeenByID(id:number): Promise<void> {
-    return await this.api.setNotificationSeenByID(id);
+  async setNotificationSeenByCorrelationID(correlationId:string): Promise<void> {
+    return await this.api.setNotificationSeenByCorrelationID(correlationId);
   }
 
   /**

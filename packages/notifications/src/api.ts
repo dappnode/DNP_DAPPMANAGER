@@ -72,10 +72,10 @@ export class NotificationsApi {
   }
 
   /**
-   * Set a notification as seen by providing its ID
+   * Set a notification as seen by providing its correlationId
    */
-  async setNotificationSeenByID(id: number): Promise<void> {
-    const url = new URL(`/api/v1/notifications/${id}/seen`, `${this.rootUrl}:8080`);
+  async setNotificationSeenByCorrelationID(correlationId: string): Promise<void> {
+    const url = new URL(`/api/v1/notifications/${correlationId}/seen`, `${this.rootUrl}:8080`);
 
     await fetch(url.toString(), {
       method: "PUT",

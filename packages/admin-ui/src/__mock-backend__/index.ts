@@ -387,7 +387,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   },
   notificationsGetUnseenCount: async () => 2,
   notificationsSetAllSeen: async () => {},
-  notificationSetSeenByID: async () => {},
+  notificationSetSeenByCorrelationID: async () => {},
   notificationsUpdateEndpoints: async () => {},
   notificationsGetAll: async () => [],
   notificationsGetBanner: async () => [],
