@@ -3,6 +3,10 @@
   flex-direction: row;
   gap: 10px;
   margin-top: 10px;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 5px;
 
   .category {
     padding: 3px 5px;
@@ -11,6 +15,7 @@
     font-size: 1rem;
     color: var(--light-text-color);
     border: #ced4da 1px solid;
+    flex-shrink: 0;
   }
 
   .selected {
@@ -239,7 +244,7 @@
       background-color: #ced4da;
     }
   }
-  .dots{
+  .dots {
     padding-bottom: 8px;
   }
 
