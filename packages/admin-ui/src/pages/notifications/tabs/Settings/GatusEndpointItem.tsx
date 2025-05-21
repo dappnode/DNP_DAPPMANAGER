@@ -12,7 +12,7 @@ interface GatusEndpointItemProps {
 export function GatusEndpointItem({ endpoint, index, numEndpoints, setGatusEndpoints }: GatusEndpointItemProps) {
   const endpointEnabled = endpoint.enabled;
 
-  const operators = ["<", ">", "==", "!=", ">=", "<="];
+  const operators = [">=", "<=", "<", ">", "==", "!="];
 
   // Extract the operator and number from the condition string from the 1ST CONDITION. Rn, is only supporting 1 slider (from 1st condition) per endpoint
   const conditionString = endpoint.conditions[0];
