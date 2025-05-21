@@ -19,7 +19,7 @@ interface EndpointsData {
 }
 
 export function NotificationsSettings() {
-  const [notificationsDisabled, setNotificationsDisabled] = useState<boolean>(false);
+  const [notRunningServices, setNotRunningServices] = useState<string[]>([]);
   const [endpointsData, setEndpointsData] = useState<EndpointsData | undefined>();
   const endpointsCall = useApi.notificationsGetAllEndpoints();
   const notificationsDnp = useApi.packageGet({ dnpName: notificationsDnpName });
@@ -33,10 +33,14 @@ export function NotificationsSettings() {
 
   useEffect(() => {
     if (notificationsDnp.data) {
-      const isStopped = notificationsDnp.data.containers.some((c) => c.state !== "running");
-      setNotificationsDisabled(isStopped);
+      const notRunningServices = notificationsDnp.data.containers
+        .filter((c) => c.state !== "running")
+        .map((c) => c.serviceName);
+      setNotRunningServices(notRunningServices);
     }
   }, [notificationsDnp.data]);
+
+  const notificationsDisabled = notRunningServices.length > 0;
 
   async function startStopNotifications(): Promise<void> {
     try {
@@ -53,7 +57,13 @@ export function NotificationsSettings() {
 
         await withToast(
           continueIfCalleDisconnected(
-            () => api.packageStartStop({ dnpName: notificationsDnpName }),
+            () =>
+              api.packageStartStop({
+                dnpName: notificationsDnpName,
+                serviceNames: notificationsDisabled
+                  ? notRunningServices
+                  : notificationsDnp.data!.containers.map((c) => c.serviceName)
+              }),
             notificationsDnpName
           ),
           {
