@@ -15,7 +15,7 @@ import {
   NotificationsConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
-import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
+import { validateDappnodeCompose, validateManifestSchema, validateNotificationsSchema, validateSetupWizardSchema } from "@dappnode/schemas";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
@@ -64,8 +64,8 @@ export class DappnodeInstaller extends DappnodeRepository {
       version
     });
 
-    // validate manifest and compose files
-    this.validateManifestAndComposeSchemas(pkgRelease);
+    // validate manifest and compose and notifications and setupwizard files
+    this.validateSchemas(pkgRelease);
 
     // join metadata files in manifest
     pkgRelease.manifest = this.joinFilesInManifest({
@@ -97,9 +97,9 @@ export class DappnodeInstaller extends DappnodeRepository {
 
     const pkgReleases = await this.getPkgsReleases(packages, db.releaseKeysTrusted.get(), process.arch);
 
-    // validate manifest and compose files
+    // validate manifest and compose and notifications and setupwizard files
     pkgReleases.forEach((pkgRelease) => {
-      this.validateManifestAndComposeSchemas(pkgRelease);
+      this.validateSchemas(pkgRelease);
     });
 
     // join metadata files in manifest
@@ -181,11 +181,13 @@ export class DappnodeInstaller extends DappnodeRepository {
   }
 
   /**
-   * Validates manifest and compose schemas
+   * Validates manifest and compose and notifications and setupwizard schemas
    */
-  private validateManifestAndComposeSchemas(pkgRelease: PackageRelease): void {
+  private validateSchemas(pkgRelease: PackageRelease): void {
     validateManifestSchema(pkgRelease.manifest);
     validateDappnodeCompose(pkgRelease.compose, pkgRelease.manifest);
+    if (pkgRelease.setupWizard) validateSetupWizardSchema(pkgRelease.setupWizard);
+    if (pkgRelease.notifications) validateNotificationsSchema(pkgRelease.notifications);
   }
 
   /**
