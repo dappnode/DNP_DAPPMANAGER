@@ -130,7 +130,7 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         status: Status.triggered,
         callToAction: {
           title: (ethClientTarget && ethClientTarget  === "off")  ? "Change to Remote" :  "Make sure your Ethereum RPC is reachable",
-          url: "http://my.dappnode/repository/ethereum"
+          url: "http://my.dappnode/repository/eth"
         },
         isBanner: true,
         isRemote: false,

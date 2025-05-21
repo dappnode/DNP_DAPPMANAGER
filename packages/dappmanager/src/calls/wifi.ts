@@ -66,7 +66,7 @@ export async function wifiReportGet(): Promise<WifiReport> {
           status: Status.triggered,
           callToAction: {
             title: "Change",
-            url: "http://my.dappnode/system/wifi"
+            url: "http://my.dappnode/wireless-network/wifi"
           },
           isBanner: true,
           isRemote: false,
