@@ -27,6 +27,13 @@
 }
 
 /* 
+  Ensure Bootstrap Tooltip appears above sidebar since it renders outside root element
+*/
+div[role="tooltip"].tooltip {
+  z-index: 2000;
+}
+
+/* 
   TEXT STYLES 
 */
 body {
