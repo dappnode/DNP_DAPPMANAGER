@@ -27,7 +27,7 @@
           "name": { "type": "string" },
           "correlationId": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
           "enabled": { "type": "boolean" },
-          "url": { "type": "string", "pattern": "^(https?|ftp)://[^s/$.?#].[^s]*$" },
+          "url": { "type": "string", "pattern": "^(https?|ftp)://\\S+$" },
           "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
           "conditions": {
             "type": "array",
