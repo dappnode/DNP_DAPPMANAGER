@@ -30,12 +30,12 @@ export function ManagePackageNotifications({
   const isStateUpdatedByUser = useRef(false);
 
   const dnpCall = useApi.packageGet({ dnpName: dnpName });
-  const [anyServiceNotRunning, setAnyServiceNotRunning] = useState(false);
+  const [allServicesNotRunning, setAllServicesNotRunning] = useState(false);
 
   useEffect(() => {
     if (dnpCall.data) {
       const notRunningServices = dnpCall.data.containers.filter((c) => c.state !== "running").map((c) => c.serviceName);
-      setAnyServiceNotRunning(notRunningServices.length > 0);
+      setAllServicesNotRunning(notRunningServices.length === dnpCall.data.containers.length);
     }
   }, [dnpCall.data]);
 
@@ -73,22 +73,15 @@ export function ManagePackageNotifications({
     <div key={String(dnpName)} className="notifications-settings">
       <div className="title-switch-row">
         <SubTitle className="notifications-pkg-name">{prettyDnpName(dnpName)}</SubTitle>
-        {anyServiceNotRunning && (
+        <Switch checked={pkgNotificationsEnabled} onToggle={handlePkgToggle} />
+        {allServicesNotRunning && (
           <OverlayTrigger
-            overlay={
-              <Tooltip id="not-running-tooltip">
-                If some services of the package are not running, notifications may not be sent (depending on the
-                service). However, the notification settings will still be updated.
-              </Tooltip>
-            }
+            overlay={<Tooltip id="not-running-tooltip">Package not running, notifications will not be sent</Tooltip>}
             placement="top"
           >
             <div className="not-running-label">i</div>
           </OverlayTrigger>
         )}
-        <div className="switch-container">
-          <Switch checked={pkgNotificationsEnabled} onToggle={handlePkgToggle} />
-        </div>
       </div>
       {pkgNotificationsEnabled && (
         <div className="endpoint-list-card">
