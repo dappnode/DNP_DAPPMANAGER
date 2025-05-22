@@ -106,6 +106,13 @@ export const forumUrl = {
   expandFileSystemHowTo: "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
 };
 
+export const dappmanagerAliases = ["dappmanager.dappnode", "my.dappnode", "dappnode.local"];
+
+export const externalUrlProps = {
+  target: "_blank",
+  rel: "noopener noreferrer"
+};
+
 export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/developers/package-dev/wizard#target";
 export const dappnodeUserGuideUrl = "https://docs.dappnode.io/user/faq/general";
 export const explorerGitcoinUrl =

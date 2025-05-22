@@ -7,6 +7,7 @@ import { Notification, Priority } from "@dappnode/types";
 import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
 import { Accordion } from "react-bootstrap";
+import { dappmanagerAliases, externalUrlProps } from "params";
 
 /**
  * Displays banner notifications among all tabs
@@ -100,6 +101,9 @@ export function CollapsableBannerNotification({
     onClose();
   };
 
+  const isExternalUrl =
+    notification.callToAction && !dappmanagerAliases.some((alias) => notification.callToAction!.url.includes(alias));
+
   return (
     !hasClosed && (
       <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
@@ -119,7 +123,7 @@ export function CollapsableBannerNotification({
             <div className="banner-body">
               <RenderMarkdown source={notification.body} />
               {notification.callToAction && (
-                <NavLink to={notification.callToAction.url}>
+                <NavLink to={notification.callToAction.url} {...(isExternalUrl ? externalUrlProps : {})}>
                   <Button variant={priorityBtnVariants[notification.priority]}>
                     {notification.callToAction.title}
                   </Button>
