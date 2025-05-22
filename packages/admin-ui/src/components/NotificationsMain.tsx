@@ -34,7 +34,7 @@ export default function NotificationsView() {
   /**
    * filters notifications:
    * 1. Filters out notifications that have errors
-   * 2. Filters out duplicate notifications by title, keeping the most recent one
+   * 2. Filters out duplicate notifications by correlationId, keeping the most recent one
    * 3. Filters out resolved notifications
    * 4. Filters out seen notifications
    * 5. Sorts notifications by priority
@@ -48,10 +48,10 @@ export default function NotificationsView() {
     notifications
       .filter((n) => !n.errors) // Filter out notifications with errors
       .forEach((notification) => {
-        const existing = map.get(notification.title);
+        const existing = map.get(notification.correlationId);
 
         if (!existing || new Date(notification.timestamp) > new Date(existing.timestamp)) {
-          map.set(notification.title, notification);
+          map.set(notification.correlationId, notification);
         }
       });
 
