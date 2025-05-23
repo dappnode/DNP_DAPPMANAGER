@@ -64,7 +64,7 @@ export class NotificationsManifest {
     const { endpoints: newEndpoints, customEndpoints: newCustomEndpoints } = newNotificationsConfig;
 
     const mergedEndpoints = newEndpoints?.map((newEndpoint) => {
-      const oldEndpoint = oldEndpoints?.find((e) => e.name === newEndpoint.name);
+      const oldEndpoint = oldEndpoints?.find((e) => e.correlationId === newEndpoint.correlationId);
       // If no previous version exists, simply use the new endpoint.
       if (!oldEndpoint) return newEndpoint;
 

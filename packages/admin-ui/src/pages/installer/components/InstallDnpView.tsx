@@ -55,7 +55,17 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const [isInstalling, setIsInstalling] = useState(false);
   const dispatch = useDispatch();
 
-  const { dnpName, reqVersion, semVersion, settings, manifest, setupWizard, isInstalled, installedVersion } = dnp;
+  const {
+    dnpName,
+    reqVersion,
+    semVersion,
+    settings,
+    manifest,
+    setupWizard,
+    isInstalled,
+    installedVersion,
+    notificationsSettings
+  } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
   const areUpdateWarnings =
     manifest.warnings?.onPatchUpdate || manifest.warnings?.onMinorUpdate || manifest.warnings?.onMajorUpdate;
@@ -74,19 +84,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     manifest.notifications?.customEndpoints || []
   );
 
-  const mergedNotificationsConfig = useApi.notificationsApplyPreviousEndpoints({
-    dnpName: dnpName,
-    isCore,
-    newNotificationsConfig: manifest.notifications || {}
-  });
-
   useEffect(() => {
-    if (mergedNotificationsConfig.data) {
-      const { endpoints: newEndpoints, customEndpoints: newCustomEndpoints } = mergedNotificationsConfig.data;
-      setEndpoints(newEndpoints || []);
-      setCustomEndpoints(newCustomEndpoints || []);
+    if (notificationsSettings && notificationsSettings[dnpName]) {
+      setEndpoints(notificationsSettings[dnpName].endpoints || []);
+      setCustomEndpoints(notificationsSettings[dnpName].customEndpoints || []);
     }
-  }, [mergedNotificationsConfig.data]);
+  }, [notificationsSettings]);
 
   useEffect(() => {
     setUserSettings(settings || {});
@@ -121,6 +124,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
               options: {
                 BYPASS_CORE_RESTRICTION: bypassCoreOpt,
                 BYPASS_SIGNED_RESTRICTION: bypassSignedOpt
+              },
+              notificationsSettings: {
+                [dnpName]: {
+                  endpoints: endpoints.length > 0 ? endpoints : undefined,
+                  customEndpoints: customEndpoints.length > 0 ? customEndpoints : undefined
+                }
               }
             }),
           dnpName

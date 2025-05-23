@@ -85,9 +85,6 @@ function getInstallerPackageData(
   migrateGethUserSettingsIfNeeded(prevUserSet, dnpName, semVersion);
   const nextUserSet = deepmerge(prevUserSet, userSettings || {});
 
-  // TODO: merge notificationsSettings with the previous ones
-  console.log("notificationsSettings", notificationsSettings);
-
   // Append to compose
   const compose = new ComposeEditor(release.compose);
   compose.applyUserSettings(nextUserSet, { dnpName });
@@ -105,7 +102,13 @@ function getInstallerPackageData(
     imagePath,
     // Data to write
     compose: compose.output(),
-    manifest,
+    manifest: release.manifest.notifications
+      ? {
+          ...release.manifest,
+          // Apply notitications user settings if any
+          notifications: notificationsSettings
+        }
+      : manifest,
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,
