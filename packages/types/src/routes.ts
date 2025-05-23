@@ -44,7 +44,13 @@ import {
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from "./notifications.js";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  Notification,
+  NotificationsConfig,
+  NotificationsSettingsAllDnps
+} from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
@@ -260,7 +266,7 @@ export interface Routes {
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
-  
+
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
@@ -282,11 +288,11 @@ export interface Routes {
    * Set all non-banner notifications as seen
    */
   notificationsSetAllSeen(): Promise<void>;
- 
+
   /**
    * Set a notification as seen by providing its correlationId
    */
-  notificationSetSeenByCorrelationID(correlationId:string): Promise<void>;
+  notificationSetSeenByCorrelationID(correlationId: string): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -434,6 +440,7 @@ export interface Routes {
     name: string;
     version?: string;
     userSettings?: UserSettingsAllDnps;
+    notificationsSettings?: NotificationsSettingsAllDnps;
     options?: {
       /**
        * Forwarded option to dappGet
