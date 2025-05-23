@@ -13,7 +13,7 @@ export async function notificationsGetAll(): Promise<Notification[]> {
  * Get all the notifications
  * @returns all the notifications
  */
-export async function notificationsGetBanner(timestamp:number): Promise<Notification[]> {
+export async function notificationsGetBanner(timestamp: number): Promise<Notification[]> {
   return await notifications.getBannerNotifications(timestamp);
 }
 
@@ -34,7 +34,7 @@ export async function notificationsSetAllSeen(): Promise<void> {
 /**
  * Set a notification as seen by providing its correlationId
  */
-export async function notificationSetSeenByCorrelationID(correlationId:string): Promise<void> {
+export async function notificationSetSeenByCorrelationID(correlationId: string): Promise<void> {
   return await notifications.setNotificationSeenByCorrelationID(correlationId);
 }
 
