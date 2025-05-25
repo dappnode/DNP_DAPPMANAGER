@@ -8,7 +8,9 @@ import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
+let ipfsFailureCount = 0;
 let ipfsNotificationSent = false;
+let ethFailureCount = 0;
 let ethNotificationSent = false;
 
 async function checkIpfsHealth(): Promise<void> {
@@ -32,6 +34,8 @@ async function checkIpfsHealth(): Promise<void> {
 
     logs.info(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is healthy`);
 
+    // reset failure count on success
+    ipfsFailureCount = 0;
     if (ipfsNotificationSent) {
       await notifications.sendNotification({
         title: "Your Dappnode IPFS endpoint is resolving content correctly",
@@ -50,7 +54,9 @@ async function checkIpfsHealth(): Promise<void> {
     clearTimeout(timeout);
     logs.error(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is unhealthy: ${error}`);
 
-    if (!ipfsNotificationSent) {
+    // increment failure count and send notification after threshold
+    ipfsFailureCount += 1;
+    if (ipfsFailureCount >= 3 && !ipfsNotificationSent) {
       await notifications.sendNotification({
         title: "Your Dappnode IPFS endpoint is not resolving content correctly.",
         dnpName: params.dappmanagerDnpName,
@@ -101,6 +107,8 @@ async function checkEthHealth(): Promise<void> {
 
     logs.info(`Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is healthy`);
 
+    // reset failure count on success
+    ethFailureCount = 0;
     if (ethNotificationSent) {
       await notifications.sendNotification({
         title: "Ethereum Repository Accessible",
@@ -120,7 +128,9 @@ Syncing and access to Ethereum chain data should now resume normally.`,
     clearTimeout(timeout);
     logs.error(`Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is unhealthy: ${error}`);
 
-    if (!ethNotificationSent) {
+    // increment failure count and send notification after threshold
+    ethFailureCount += 1;
+    if (ethFailureCount >= 3 && !ethNotificationSent) {
       await notifications.sendNotification({
         title: "Ethereum Repository Unreachable",
         dnpName: params.dappmanagerDnpName,
@@ -129,7 +139,10 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: (ethClientTarget && ethClientTarget  === "off")  ? "Change to Remote" :  "Make sure your Ethereum RPC is reachable",
+          title:
+            ethClientTarget && ethClientTarget === "off"
+              ? "Change to Remote"
+              : "Make sure your Ethereum RPC is reachable",
           url: "http://my.dappnode/repository/eth"
         },
         isBanner: true,
