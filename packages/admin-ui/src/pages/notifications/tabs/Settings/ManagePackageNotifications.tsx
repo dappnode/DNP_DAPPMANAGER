@@ -5,7 +5,9 @@ import { GatusEndpointItem } from "./GatusEndpointItem.js";
 import { CustomEndpointItem } from "./CustomEndpointItem.js";
 import { CustomEndpoint, GatusEndpoint } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
-import { api } from "api";
+import { api, useApi } from "api";
+import Tooltip from "react-bootstrap/Tooltip";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 
 interface ManagePackageNotificationsProps {
   dnpName: string;
@@ -27,25 +29,28 @@ export function ManagePackageNotifications({
   );
   const isStateUpdatedByUser = useRef(false);
 
+  const dnpCall = useApi.packageGet({ dnpName: dnpName });
+  const [allServicesNotRunning, setAllServicesNotRunning] = useState(false);
+
+  useEffect(() => {
+    if (dnpCall.data) {
+      setAllServicesNotRunning(dnpCall.data.containers.every((c) => c.state !== "running"));
+    }
+  }, [dnpCall.data]);
+
   // Synchronize state with props when they change
   useEffect(() => {
     setEndpointsGatus([...gatusEndpoints]);
     setEndpointsCustom([...customEndpoints]);
-    setPkgNotificationsEnabled(
-      gatusEndpoints.some((ep) => ep.enabled) || customEndpoints.some((ep) => ep.enabled)
-    );
+    setPkgNotificationsEnabled(gatusEndpoints.some((ep) => ep.enabled) || customEndpoints.some((ep) => ep.enabled));
   }, [gatusEndpoints, customEndpoints]);
 
   // Handle switch toggle to enable/disable all endpoints
   const handlePkgToggle = () => {
     const newEnabledState = !pkgNotificationsEnabled;
     isStateUpdatedByUser.current = true;
-    setEndpointsGatus((prevGatusEndpoints) =>
-      prevGatusEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState }))
-    );
-    setEndpointsCustom((prevCustomEndpoints) =>
-      prevCustomEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState }))
-    );
+    setEndpointsGatus((prevGatusEndpoints) => prevGatusEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
+    setEndpointsCustom((prevCustomEndpoints) => prevCustomEndpoints.map((ep) => ({ ...ep, enabled: newEnabledState })));
     setPkgNotificationsEnabled(newEnabledState);
   };
 
@@ -68,6 +73,14 @@ export function ManagePackageNotifications({
       <div className="title-switch-row">
         <SubTitle className="notifications-pkg-name">{prettyDnpName(dnpName)}</SubTitle>
         <Switch checked={pkgNotificationsEnabled} onToggle={handlePkgToggle} />
+        {allServicesNotRunning && (
+          <OverlayTrigger
+            overlay={<Tooltip id="not-running-tooltip">Package not running, notifications will not be sent</Tooltip>}
+            placement="top"
+          >
+            <div className="not-running-label">i</div>
+          </OverlayTrigger>
+        )}
       </div>
       {pkgNotificationsEnabled && (
         <div className="endpoint-list-card">
