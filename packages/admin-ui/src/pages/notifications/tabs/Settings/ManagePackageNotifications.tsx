@@ -34,8 +34,7 @@ export function ManagePackageNotifications({
 
   useEffect(() => {
     if (dnpCall.data) {
-      const notRunningServices = dnpCall.data.containers.filter((c) => c.state !== "running").map((c) => c.serviceName);
-      setAllServicesNotRunning(notRunningServices.length === dnpCall.data.containers.length);
+      setAllServicesNotRunning(dnpCall.data.containers.every((c) => c.state !== "running"));
     }
   }, [dnpCall.data]);
 
