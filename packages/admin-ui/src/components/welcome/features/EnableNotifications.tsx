@@ -15,6 +15,7 @@ import { prettyDnpName } from "utils/format";
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   const [notificationsDisabled, setNotificationsDisabled] = useState<boolean>(false);
   const [notificationsNotInstalled, setNotificationsNotInstalled] = useState<boolean>(false);
+  const [isNotificationsInstalling, setIsNotificationsInstalling] = useState<boolean>(true);
 
   const notificationsDnp = useApi.packageGet({ dnpName: notificationsDnpName });
   // Ref to keep track of the previous error message
@@ -37,20 +38,27 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
       if (notificationsDnp.error) {
         if (notificationsDnp.error.message.includes("No DNP was found")) {
           setNotificationsNotInstalled(true);
-          await withToast(
-            continueIfCalleDisconnected(
-              () =>
-                api.packageInstall({
-                  name: notificationsDnpName
-                }),
-              notificationsDnpName
-            ),
-            {
-              message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
-              onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
-            }
-          );
+          try {
+            setIsNotificationsInstalling(true);
+            await withToast(
+              continueIfCalleDisconnected(
+                () =>
+                  api.packageInstall({
+                    name: notificationsDnpName
+                  }),
+                notificationsDnpName
+              ),
+              {
+                message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
+                onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
+              }
+            );
+          } catch (error) {
+            console.error(`Error while installing notifications package: ${error}`);
+            setIsNotificationsInstalling(false);
+          }
           notificationsDnp.revalidate();
+          setIsNotificationsInstalling(false);
         }
       } else {
         setNotificationsNotInstalled(false);
@@ -93,9 +101,11 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           configurable and scalable.
         </div>
         {notificationsNotInstalled ? (
-          <>
+          isNotificationsInstalling ? (
             <Loading steps={["Installing notifications package"]} />
-          </>
+          ) : (
+            <SubTitle>Error while installing notifications package</SubTitle>
+          )
         ) : (
           <>
             <SubTitle>Enable new notifications</SubTitle>
@@ -122,7 +132,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
         )}
       </div>
 
-      <BottomButtons onBack={onBack} onNext={() => onNext()} nextDisabled={notificationsNotInstalled} />
+      <BottomButtons onBack={onBack} onNext={() => onNext()} nextDisabled={isNotificationsInstalling} />
       <br />
       <br />
     </div>
