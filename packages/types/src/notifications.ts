@@ -3,6 +3,10 @@ export interface NotificationsConfig {
   customEndpoints?: CustomEndpoint[];
 }
 
+export interface NotificationsSettingsAllDnps {
+  [dnpName: string]: NotificationsConfig;
+}
+
 export interface Notification extends NotificationPayload {
   id: number;
   timestamp: number;

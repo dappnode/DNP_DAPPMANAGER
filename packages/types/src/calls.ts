@@ -2,6 +2,7 @@ import { ContainerState } from "./pkg.js";
 import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.js";
 import { Manifest, Dependencies, ChainDriver, PackageBackup, ManifestUpdateAlert } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
+import { NotificationsSettingsAllDnps } from "./notifications.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -278,6 +279,7 @@ export interface RequestedDnp {
   // Setup
   setupWizard?: SetupWizardAllDnps;
   settings: UserSettingsAllDnps; // MUST include the previous user settings
+  notificationsSettings?: NotificationsSettingsAllDnps;
   // Additional data
   imageSize: number;
   isUpdated: boolean;

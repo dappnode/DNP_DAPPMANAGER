@@ -2,7 +2,7 @@ import "mocha";
 import { expect } from "chai";
 
 import { NotificationsManifest } from "../../src/manifest.js";
-import { NotificationsConfig, Alert } from "@dappnode/types";
+import { NotificationsConfig, Alert, Priority } from "@dappnode/types";
 
 // Dummy objects to satisfy required properties.
 const dummyAlert: Alert = {
@@ -38,6 +38,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Test Endpoint",
           enabled: true,
+          isBanner: false,
+          correlationId: "Test Endpoint",
+          priority: Priority.medium,
           url: "http://example.com",
           method: "GET",
           conditions: ["[BODY].value < 80"],
@@ -52,6 +55,7 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Test Custom",
           enabled: true,
+          isBanner: false,
           description: "Test custom endpoint",
           metric: { treshold: 50, min: 0, max: 100, unit: "%" }
         }
@@ -68,6 +72,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Test Endpoint",
           enabled: true,
+          isBanner: false,
+          correlationId: "Test Endpoint",
+          priority: Priority.medium,
           url: "http://example.com",
           method: "GET",
           conditions: ["[BODY].value < 80"],
@@ -82,6 +89,7 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Test Custom",
           enabled: true,
+          isBanner: false,
           description: "Test custom endpoint",
           metric: { treshold: 50, min: 0, max: 100, unit: "%" }
         }
@@ -98,6 +106,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "High CPU Usage Check",
           enabled: true,
+          isBanner: false,
+          correlationId: "High CPU Usage Check",
+          priority: Priority.medium,
           url: "http://cpu.example.com",
           method: "GET",
           conditions: ["[BODY].data.result[0].value[1] < 80"],
@@ -116,6 +127,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "High CPU Usage Check",
           enabled: false,
+          isBanner: false,
+          correlationId: "High CPU Usage Check",
+          priority: Priority.medium,
           url: "http://cpu.example.com",
           method: "GET",
           conditions: ["[BODY].data.result[0].value[1] < 75"],
@@ -145,6 +159,7 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Custom Check",
           enabled: true,
+          isBanner: false,
           description: "Custom check description",
           metric: { treshold: 50, min: 0, max: 100, unit: "%" }
         }
@@ -157,6 +172,7 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Custom Check",
           enabled: false,
+          isBanner: false,
           description: "Custom check description",
           metric: { treshold: 25, min: 0, max: 100, unit: "%" }
         }
@@ -176,6 +192,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "New Endpoint",
           enabled: true,
+          isBanner: false,
+          correlationId: "New Endpoint",
+          priority: Priority.medium,
           url: "http://new.example.com",
           method: "GET",
           conditions: ["[BODY].value < 50"],
@@ -194,6 +213,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Old Endpoint",
           enabled: false,
+          isBanner: false,
+          correlationId: "Old Endpoint",
+          priority: Priority.medium,
           url: "http://old.example.com",
           method: "GET",
           conditions: ["[BODY].value < 30"],
@@ -218,6 +240,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Malformed Condition Endpoint",
           enabled: true,
+          isBanner: false,
+          correlationId: "Malformed Condition Endpoint",
+          priority: Priority.medium,
           url: "http://malformed.example.com",
           method: "GET",
           conditions: ["malformed condition"],
@@ -236,6 +261,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Malformed Condition Endpoint",
           enabled: false,
+          isBanner: false,
+          correlationId: "Malformed Condition Endpoint",
+          priority: Priority.medium,
           url: "http://malformed.example.com",
           method: "GET",
           conditions: ["ignored condition"],
@@ -260,6 +288,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Multiple Conditions Endpoint",
           enabled: true,
+          isBanner: false,
+          correlationId: "Multiple Conditions Endpoint",
+          priority: Priority.medium,
           url: "http://multiple.example.com",
           method: "GET",
           conditions: ["[BODY].data[0] < 80", "[BODY].data[1] > 20"],
@@ -278,6 +309,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Multiple Conditions Endpoint",
           enabled: false,
+          isBanner: false,
+          correlationId: "Multiple Conditions Endpoint",
+          priority: Priority.medium,
           url: "http://multiple.example.com",
           method: "GET",
           conditions: [
@@ -304,6 +338,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "High CPU Usage Check",
           enabled: true,
+          isBanner: false,
+          correlationId: "High CPU Usage Check",
+          priority: Priority.medium,
           url: "http://cpu.example.com",
           method: "GET",
           conditions: ["[BODY].cpu < 80"],
@@ -316,6 +353,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Host out of memory check",
           enabled: true,
+          isBanner: false,
+          correlationId: "Host out of memory check",
+          priority: Priority.medium,
           url: "http://memory.example.com",
           method: "GET",
           conditions: ["[BODY].memory > 10"],
@@ -330,12 +370,14 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Custom Check A",
           enabled: true,
+          isBanner: false,
           description: "Custom Check A description",
           metric: { treshold: 50, min: 0, max: 100, unit: "%" }
         },
         {
           name: "Custom Check B",
           enabled: true,
+          isBanner: false,
           description: "Custom Check B description",
           metric: { treshold: 60, min: 0, max: 100, unit: "%" }
         }
@@ -347,6 +389,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "High CPU Usage Check",
           enabled: false,
+          isBanner: false,
+          correlationId: "High CPU Usage Check",
+          priority: Priority.medium,
           url: "http://cpu.example.com",
           method: "GET",
           conditions: ["[BODY].cpu < 70"],
@@ -359,6 +404,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Host out of memory check",
           enabled: false,
+          isBanner: false,
+          correlationId: "Host out of memory check",
+          priority: Priority.medium,
           url: "http://memory.example.com",
           method: "GET",
           conditions: ["[BODY].memory > 20"],
@@ -371,6 +419,9 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Obsolete Endpoint",
           enabled: false,
+          isBanner: false,
+          correlationId: "Obsolete Endpoint",
+          priority: Priority.medium,
           url: "http://obsolete.example.com",
           method: "GET",
           conditions: ["[BODY].obsolete < 10"],
@@ -385,6 +436,7 @@ describe("applyPreviousEndpoints", () => {
         {
           name: "Custom Check A",
           enabled: false,
+          isBanner: false,
           description: "Custom Check A description",
           metric: { treshold: 40, min: 0, max: 100, unit: "%" }
         }

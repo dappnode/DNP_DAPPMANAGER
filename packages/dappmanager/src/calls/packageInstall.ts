@@ -20,12 +20,14 @@ export async function packageInstall({
   name: reqName,
   version: reqVersion,
   userSettings = {},
+  notificationsSettings = {},
   options = {}
 }: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
   await pkgInstall(dappnodeInstaller, {
     name: reqName,
     version: reqVersion,
     userSettings,
+    notificationsSettings,
     options
   });
 

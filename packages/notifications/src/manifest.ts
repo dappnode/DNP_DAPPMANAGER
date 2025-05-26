@@ -50,6 +50,8 @@ export class NotificationsManifest {
    * - CustomEndpoint: check the metric.treshold and keep the old one.
    *
    * Do not keep old endpoints that are not present in the new ones.
+   * 
+   * @returns New NotificationsConfig with merged endpoints.
    */
   applyPreviousEndpoints(
     dnpName: string,
@@ -64,7 +66,7 @@ export class NotificationsManifest {
     const { endpoints: newEndpoints, customEndpoints: newCustomEndpoints } = newNotificationsConfig;
 
     const mergedEndpoints = newEndpoints?.map((newEndpoint) => {
-      const oldEndpoint = oldEndpoints?.find((e) => e.name === newEndpoint.name);
+      const oldEndpoint = oldEndpoints?.find((e) => e.correlationId === newEndpoint.correlationId);
       // If no previous version exists, simply use the new endpoint.
       if (!oldEndpoint) return newEndpoint;
 
