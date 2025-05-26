@@ -609,6 +609,7 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
             description: "A custom endpoint for testing", // Added required description
             isBanner: false,
             metric: {
@@ -698,6 +699,7 @@ volumes:
           {
             enabled: true,
             name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
             description: "A custom endpoint for testing", // Added required description
             isBanner: false,
             metric: {
