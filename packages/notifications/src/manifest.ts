@@ -50,6 +50,8 @@ export class NotificationsManifest {
    * - CustomEndpoint: check the metric.treshold and keep the old one.
    *
    * Do not keep old endpoints that are not present in the new ones.
+   * 
+   * @returns New NotificationsConfig with merged endpoints.
    */
   applyPreviousEndpoints(
     dnpName: string,
