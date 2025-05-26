@@ -23,7 +23,7 @@ export async function sendUpdatePackageNotificationMaybe({
   // Check if auto-update notifications are enabled
   const dappmanagerCustomEndpoint = notifications
     .getEndpointsIfExists(params.dappmanagerDnpName, true)
-    ?.customEndpoints?.find((customEndpoint) => customEndpoint.name === "Package updates notifications");
+    ?.customEndpoints?.find((customEndpoint) => customEndpoint.correlationId === "dappmanager-update-pkg");
 
   if (!dappmanagerCustomEndpoint || !dappmanagerCustomEndpoint.enabled) return;
 
@@ -60,7 +60,7 @@ export async function sendUpdatePackageNotificationMaybe({
       },
       isBanner: false,
       isRemote: false,
-      correlationId : 'core-update-pkg',
+      correlationId: "dappmanager-update-pkg"
     })
     .catch((e) => logs.error("Error sending package update notification", e));
 
@@ -97,7 +97,7 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
       },
       isBanner: true,
       isRemote: false,
-      correlationId : 'core-update-system-pkg',
+      correlationId: "dappmanager-update-systemPkg"
     })
     .catch((e) => logs.error("Error sending system update notification", e));
 
