@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
 import { docsUrl, externalUrlProps } from "params";
 
@@ -15,57 +15,59 @@ import { prettyDnpName } from "utils/format";
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   const [notificationsDisabled, setNotificationsDisabled] = useState<boolean>(false);
   const [notificationsNotInstalled, setNotificationsNotInstalled] = useState<boolean>(false);
-  const [isNotificationsInstalling, setIsNotificationsInstalling] = useState<boolean>(true);
+  const [isNotificationsInstalling, setIsNotificationsInstalling] = useState<boolean>(false);
+
+  const dnps = useApi.packagesGet();
+  useEffect(() => {
+    if (dnps.data) {
+      setNotificationsNotInstalled(dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName) === undefined);
+    }
+  }, [dnps.data]);
+
+  useEffect(() => {
+    async function installNotificationsPkg() {
+      try {
+        setIsNotificationsInstalling(true);
+        await withToast(
+          continueIfCalleDisconnected(
+            () =>
+              api.packageInstall({
+                name: notificationsDnpName,
+                // TODO: Delete the version once the package notifications package is releasedsxº
+                version: "/ipfs/QmUMZfGt15CE8yifCAbeUybm75qUxAe1SucnqsbGjGEiKn",
+                options: {
+                  BYPASS_SIGNED_RESTRICTION: true
+                }
+              }),
+            notificationsDnpName
+          ),
+          {
+            message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
+            onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
+          }
+        );
+      } catch (error) {
+        console.error(`Error while installing notifications package: ${error}`);
+        setIsNotificationsInstalling(false);
+        return;
+      } finally {
+        setIsNotificationsInstalling(false);
+        notificationsDnp.revalidate();
+      }
+    }
+
+    if (notificationsNotInstalled) {
+      installNotificationsPkg();
+    }
+  }, [notificationsNotInstalled]);
 
   const notificationsDnp = useApi.packageGet({ dnpName: notificationsDnpName });
-  // Ref to keep track of the previous error message
-  const prevErrorMessageRef = useRef<string | undefined>(undefined);
-
   useEffect(() => {
     if (notificationsDnp.data) {
       const isStopped = notificationsDnp.data.containers.some((c) => c.state !== "running");
       setNotificationsDisabled(isStopped);
     }
   }, [notificationsDnp.data]);
-
-  useEffect(() => {
-    async function handleNotificationsError() {
-      const errorMessage = notificationsDnp.error?.message;
-      // only proceed when error message truly changes
-      if (errorMessage === prevErrorMessageRef.current) return;
-      prevErrorMessageRef.current = errorMessage;
-
-      if (notificationsDnp.error) {
-        if (notificationsDnp.error.message.includes("No DNP was found")) {
-          setNotificationsNotInstalled(true);
-          try {
-            setIsNotificationsInstalling(true);
-            await withToast(
-              continueIfCalleDisconnected(
-                () =>
-                  api.packageInstall({
-                    name: notificationsDnpName
-                  }),
-                notificationsDnpName
-              ),
-              {
-                message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
-                onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
-              }
-            );
-          } catch (error) {
-            console.error(`Error while installing notifications package: ${error}`);
-            setIsNotificationsInstalling(false);
-          }
-          notificationsDnp.revalidate();
-          setIsNotificationsInstalling(false);
-        }
-      } else {
-        setNotificationsNotInstalled(false);
-      }
-    }
-    handleNotificationsError();
-  }, [notificationsDnp.error]);
 
   async function startStopNotifications(): Promise<void> {
     try {
@@ -104,7 +106,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           isNotificationsInstalling ? (
             <Loading steps={["Installing notifications package"]} />
           ) : (
-            <SubTitle>Error while installing notifications package</SubTitle>
+            notificationsDnp.error && <SubTitle>Error while installing notifications package</SubTitle>
           )
         ) : (
           <>
