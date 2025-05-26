@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
-import { docsUrl } from "params";
+import { docsUrl, externalUrlProps } from "params";
 
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
@@ -70,7 +70,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
         </p>
         <p>
           Learn more about notifications package and how to configure it in the{" "}
-          <a href={docsUrl.notificationsOverview}>Dappnode's documentation</a>
+          <a href={docsUrl.notificationsOverview} {...externalUrlProps}>Dappnode's documentation</a>
         </p>
       </div>
 
