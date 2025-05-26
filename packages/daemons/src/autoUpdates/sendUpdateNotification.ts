@@ -38,7 +38,7 @@ export async function sendUpdatePackageNotificationMaybe({
     upstream: release.manifest.upstream
   });
 
-  const adminUiInstallPackageUrl = "http://my.dappnode/installer";
+  const adminUiInstallPackageUrl = "http://my.dappnode/installer/dnp";
 
   // Send notification about new version available
   await notifications
