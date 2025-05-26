@@ -11,14 +11,33 @@ let notificationSent = false;
  * Checks whether the DAppNode is connected to the internet.
  */
 async function getIsConnectedToInternet(): Promise<boolean> {
-  try {
-    // Simulate fetching public IP to check connectivity
-    await new Promise((resolve, _) => setTimeout(resolve, 3000)); // Mock delay
-    return true;
-  } catch (error) {
-    logs.error(`Error while checking DAppNode internet connectivity: ${error}`);
-    return false;
+  const urlsCheckList = [
+    "https://1.1.1.1", // Cloudfare DNS
+    "https://8.8.8.8" // Google DNS
+  ];
+  const timeoutMs = 3000;
+
+  for (const url of urlsCheckList) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+      const response = await fetch(url, {
+        method: "HEAD",
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (response.ok) {
+        return true; // Internet is reachable
+      }
+    } catch (error) {
+      logs.info(`Error while checking DAppNode internet connectivity: ${error}`);
+      continue;
+    }
   }
+  return false;
 }
 
 /**
@@ -29,7 +48,6 @@ async function getIsConnectedToInternet(): Promise<boolean> {
 async function monitorInternetConnection(): Promise<void> {
   try {
     const isConnected = await getIsConnectedToInternet();
-
     const correlationId = "core-internet-connection";
 
     if (!isConnected) {
