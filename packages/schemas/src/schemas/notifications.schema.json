@@ -112,8 +112,9 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["enabled", "name", "description", "isBanner"],
+        "required": ["enabled", "name", "description", "isBanner", "correlationId"],
         "properties": {
+          "correlationId": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
           "enabled": { "type": "boolean" },
           "name": { "type": "string" },
           "description": { "type": "string" },

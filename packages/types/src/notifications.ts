@@ -61,6 +61,7 @@ export interface CustomEndpoint {
   enabled: boolean;
   description: string;
   isBanner: boolean;
+  correlationId: string;
   metric?: {
     treshold: number;
     min: number;
