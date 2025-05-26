@@ -1,6 +1,7 @@
 import React from "react";
 import Switch from "components/Switch";
 import Slider from "components/Slider";
+import RenderMarkdown from "components/RenderMarkdown";
 
 interface EndpointItemProps {
   title: string;
@@ -30,7 +31,7 @@ export function EndpointItem({
       <div key={index} className="endpoint-row">
         <div>
           <strong>{title}</strong>
-          <div>{description}</div>
+          <RenderMarkdown source={description} />
         </div>
         <Switch checked={endpointEnabled} onToggle={handleEndpointToggle} />
       </div>
