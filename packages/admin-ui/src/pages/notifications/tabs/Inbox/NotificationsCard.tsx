@@ -84,7 +84,7 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
             <RenderMarkdown source={prettifiedBody(notification.body)} />
             {notification.callToAction && (
               <NavLink to={notification.callToAction.url} {...isExternalUrl ? externalUrlProps : {}}>
-                <Button variant="dappnode">{notification.callToAction.title}</Button>{" "}
+                <Button variant="dappnode"><div>{notification.callToAction.title}</div></Button>
               </NavLink>
             )}
           </div>

@@ -171,6 +171,12 @@
     @media (max-width: 60rem) {
       flex-direction: column;
     }
+
+    button {
+      > div {
+        white-space: nowrap; // Prevent CTA text from wrapping
+      }
+    }
   }
 }
 .notification-card:hover {
