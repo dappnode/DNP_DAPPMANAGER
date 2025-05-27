@@ -9,11 +9,59 @@ import { notificationsDnpName } from "params.js";
 import { withToast } from "components/toast/Toast";
 import { continueIfCalleDisconnected } from "api/utils";
 
+import Loading from "components/Loading";
+import { prettyDnpName } from "utils/format";
+
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   const [notificationsDisabled, setNotificationsDisabled] = useState<boolean>(false);
+  const [notificationsNotInstalled, setNotificationsNotInstalled] = useState<boolean>(false);
+  const [isNotificationsInstalling, setIsNotificationsInstalling] = useState<boolean>(false);
+
+  const dnps = useApi.packagesGet();
+  useEffect(() => {
+    if (dnps.data) {
+      setNotificationsNotInstalled(dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName) === undefined);
+    }
+  }, [dnps.data]);
+
+  useEffect(() => {
+    async function installNotificationsPkg() {
+      try {
+        setIsNotificationsInstalling(true);
+        await withToast(
+          continueIfCalleDisconnected(
+            () =>
+              api.packageInstall({
+                name: notificationsDnpName,
+                // TODO: Delete the version once the notifications package is released
+                version: "/ipfs/QmUMZfGt15CE8yifCAbeUybm75qUxAe1SucnqsbGjGEiKn",
+                options: {
+                  BYPASS_SIGNED_RESTRICTION: true
+                }
+              }),
+            notificationsDnpName
+          ),
+          {
+            message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
+            onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
+          }
+        );
+      } catch (error) {
+        console.error(`Error while installing notifications package: ${error}`);
+        setIsNotificationsInstalling(false);
+        return;
+      } finally {
+        setIsNotificationsInstalling(false);
+        notificationsDnp.revalidate();
+      }
+    }
+
+    if (notificationsNotInstalled) {
+      installNotificationsPkg();
+    }
+  }, [notificationsNotInstalled]);
 
   const notificationsDnp = useApi.packageGet({ dnpName: notificationsDnpName });
-
   useEffect(() => {
     if (notificationsDnp.data) {
       const isStopped = notificationsDnp.data.containers.some((c) => c.state !== "running");
@@ -54,27 +102,39 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           We're transitioning to a new and improved in-app Notifications experience, designed to be more reliable,
           configurable and scalable.
         </div>
-        <SubTitle>Enable new notifications</SubTitle>
-        <Switch
-          checked={!notificationsDisabled}
-          disabled={notificationsDnp.isValidating}
-          onToggle={() => {
-            startStopNotifications();
-          }}
-        />
-        <br />
-        <br />
-        <p>
-          This notifications may alert you to critical issues if they arise. Disabling them could result in missing
-          critical notifications
-        </p>
-        <p>
-          Learn more about notifications package and how to configure it in the{" "}
-          <a href={docsUrl.notificationsOverview} {...externalUrlProps}>Dappnode's documentation</a>
-        </p>
+        {notificationsNotInstalled ? (
+          isNotificationsInstalling ? (
+            <Loading steps={["Installing notifications package"]} />
+          ) : (
+            notificationsDnp.error && <SubTitle>Error while installing notifications package</SubTitle>
+          )
+        ) : (
+          <>
+            <SubTitle>Enable new notifications</SubTitle>
+            <Switch
+              checked={!notificationsDisabled}
+              disabled={notificationsDnp.isValidating}
+              onToggle={() => {
+                startStopNotifications();
+              }}
+            />
+            <br />
+            <br />
+            <p>
+              This notifications may alert you to critical issues if they arise. Disabling them could result in missing
+              critical notifications
+            </p>
+            <p>
+              Learn more about notifications package and how to configure it in the{" "}
+              <a href={docsUrl.notificationsOverview} {...externalUrlProps}>
+                Dappnode's documentation
+              </a>
+            </p>
+          </>
+        )}
       </div>
 
-      <BottomButtons onBack={onBack} onNext={() => onNext()} />
+      <BottomButtons onBack={onBack} onNext={() => onNext()} nextDisabled={isNotificationsInstalling} />
       <br />
       <br />
     </div>
