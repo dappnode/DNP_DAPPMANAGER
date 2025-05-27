@@ -33,7 +33,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
             () =>
               api.packageInstall({
                 name: notificationsDnpName,
-                // TODO: Delete the version once the package notifications package is releasedsxº
+                // TODO: Delete the version once the notifications package is released
                 version: "/ipfs/QmUMZfGt15CE8yifCAbeUybm75qUxAe1SucnqsbGjGEiKn",
                 options: {
                   BYPASS_SIGNED_RESTRICTION: true
