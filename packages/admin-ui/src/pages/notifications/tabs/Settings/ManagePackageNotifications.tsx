@@ -59,7 +59,6 @@ export function ManagePackageNotifications({
     const updateEndpoints = async () => {
       if (isStateUpdatedByUser.current) {
         isStateUpdatedByUser.current = false;
-        try {
           await withToast(
             () =>
               api.notificationsUpdateEndpoints({
@@ -72,12 +71,10 @@ export function ManagePackageNotifications({
               }),
             {
               message: `Updating settings for ${prettyDnpName(dnpName)}...`,
-              onSuccess: `${prettyDnpName(dnpName)} settings updated`
+              onSuccess: `${prettyDnpName(dnpName)} settings updated`,
+              onError: `Error updating settings for ${prettyDnpName(dnpName)}`
             }
           );
-        } catch (error) {
-          console.error("Error updating endpoints:", error);
-        }
       }
     };
 
