@@ -34,7 +34,7 @@
             "items": { "type": "string" }
           },
           "interval": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
-          "group": { "type": "string" },
+          "group": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
           "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
           "isBanner": { "type": "boolean" },
           "alerts": {
@@ -71,6 +71,7 @@
           },
           "metric": {
             "type": "object",
+            "required": ["min", "max"],
             "properties": {
               "min": { "type": "number" },
               "max": { "type": "number" },
@@ -87,12 +88,11 @@
           },
           "requirements": {
             "type": "object",
-            "required": ["pkgsInstalled", "pkgsNotInstalled"],
             "properties": {
               "pkgsInstalled": {
                 "type": "object",
                 "patternProperties": {
-                  ".*": {
+                  "^[a-zA-Z0-9._-]+\\.(dnp|public)\\.dappnode\\.eth$": {
                     "type": "string",
                     "pattern": "^(\\^|~|>|>=|<|<=)?\\d+\\.\\d+\\.\\d+$"
                   }
@@ -101,7 +101,7 @@
               },
               "pkgsNotInstalled": {
                 "type": "array",
-                "items": { "type": "string" }
+                "items": { "type": "string", "pattern": "^[a-zA-Z0-9._-]+\\.(dnp|public)\\.dappnode\\.eth$" }
               }
             }
           }
@@ -121,6 +121,7 @@
           "isBanner": { "type": "boolean" },
           "metric": {
             "type": "object",
+            "required": ["treshold", "min", "max"],
             "properties": {
               "treshold": { "type": "number" },
               "min": { "type": "number" },
