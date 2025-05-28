@@ -8,6 +8,7 @@ import { prettyDnpName } from "utils/format";
 import { api, useApi } from "api";
 import Tooltip from "react-bootstrap/Tooltip";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import { withToast } from "components/toast/Toast";
 
 interface ManagePackageNotificationsProps {
   dnpName: string;
@@ -55,17 +56,32 @@ export function ManagePackageNotifications({
   };
 
   useEffect(() => {
-    if (isStateUpdatedByUser.current) {
-      isStateUpdatedByUser.current = false;
-      api.notificationsUpdateEndpoints({
-        dnpName,
-        notificationsConfig: {
-          endpoints: endpointsGatus.length > 0 ? endpointsGatus : undefined,
-          customEndpoints: endpointsCustom.length > 0 ? endpointsCustom : undefined
-        },
-        isCore: isCore
-      });
-    }
+    const updateEndpoints = async () => {
+      if (isStateUpdatedByUser.current) {
+        isStateUpdatedByUser.current = false;
+        try {
+          await withToast(
+            () =>
+              api.notificationsUpdateEndpoints({
+                dnpName,
+                notificationsConfig: {
+                  endpoints: endpointsGatus.length > 0 ? endpointsGatus : undefined,
+                  customEndpoints: endpointsCustom.length > 0 ? endpointsCustom : undefined
+                },
+                isCore: isCore
+              }),
+            {
+              message: `Updating settings for ${prettyDnpName(dnpName)}...`,
+              onSuccess: `${prettyDnpName(dnpName)} settings updated`
+            }
+          );
+        } catch (error) {
+          console.error("Error updating endpoints:", error);
+        }
+      }
+    };
+
+    updateEndpoints();
   }, [endpointsGatus, endpointsCustom]);
 
   return (
