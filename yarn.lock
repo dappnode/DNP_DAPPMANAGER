@@ -1013,6 +1013,7 @@ __metadata:
     "@dappnode/hostscriptsservices": "workspace:^0.1.0"
     "@dappnode/installer": "workspace:^0.1.0"
     "@dappnode/logger": "workspace:^0.1.0"
+    "@dappnode/notifications": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/upnpc": "workspace:^0.1.0"
@@ -1051,6 +1052,7 @@ __metadata:
     "@dappnode/installer": "workspace:^0.1.0"
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/migrations": "workspace:^0.1.0"
+    "@dappnode/notifications": "workspace:^0.1.0"
     "@dappnode/optimism": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
     "@dappnode/stakers": "workspace:^0.1.0"
@@ -1299,6 +1301,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dappnode/notifications@workspace:^0.1.0, @dappnode/notifications@workspace:packages/notifications":
+  version: 0.0.0-use.local
+  resolution: "@dappnode/notifications@workspace:packages/notifications"
+  dependencies:
+    "@dappnode/dockerapi": "workspace:^0.1.0"
+    "@dappnode/types": "workspace:^0.1.0"
+    "@dappnode/utils": "workspace:^0.1.0"
+    "@types/mocha": "npm:^10"
+    mocha: "npm:^10.7.0"
+  languageName: unknown
+  linkType: soft
+
 "@dappnode/optimism@workspace:^0.1.0, @dappnode/optimism@workspace:packages/optimism":
   version: 0.0.0-use.local
   resolution: "@dappnode/optimism@workspace:packages/optimism"
@@ -1327,7 +1341,7 @@ __metadata:
   dependencies:
     "@dappnode/types": "npm:^0.1.40"
     "@types/mocha": "npm:^10"
-    ajv: "npm:^8.12.0"
+    ajv: "npm:^8.17.1"
     mocha: "npm:^10.7.0"
     semver: "npm:^7.5.0"
   languageName: unknown
@@ -5269,6 +5283,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"ajv@npm:^8.17.1":
+  version: 8.17.1
+  resolution: "ajv@npm:8.17.1"
+  dependencies:
+    fast-deep-equal: "npm:^3.1.3"
+    fast-uri: "npm:^3.0.1"
+    json-schema-traverse: "npm:^1.0.0"
+    require-from-string: "npm:^2.0.2"
+  checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
+  languageName: node
+  linkType: hard
+
 "ansi-colors@npm:4.1.1":
   version: 4.1.1
   resolution: "ansi-colors@npm:4.1.1"
@@ -8765,6 +8791,13 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 10c0/111972b37338bcb88f7d9e2c5907862c280ebf4234433b95bc611e518d192ccb2d38119c4ac86e26b668d75f7f3894f4ff5c4982899afced7ca78633b08287c4
+  languageName: node
+  linkType: hard
+
+"fast-uri@npm:^3.0.1":
+  version: 3.0.6
+  resolution: "fast-uri@npm:3.0.6"
+  checksum: 10c0/74a513c2af0584448aee71ce56005185f81239eab7a2343110e5bad50c39ad4fb19c5a6f99783ead1cac7ccaf3461a6034fda89fffa2b30b6d99b9f21c2f9d29
   languageName: node
   linkType: hard
 

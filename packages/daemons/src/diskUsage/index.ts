@@ -3,6 +3,8 @@ import { shell, runAtMostEvery, prettyDnpName } from "@dappnode/utils";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
+import { notifications } from "@dappnode/notifications";
+import { Category, Priority, Status } from "@dappnode/types";
 
 /**
  * Commands
@@ -14,13 +16,13 @@ import { logs } from "@dappnode/logger";
 
 const thresholds = [
   {
-    id: "dangerous level of 5 GB",
+    id: "5 GB",
     kb: 5 * 1e6, // ~ 5 GB
     filterCommand: `--filter "name=DAppNodePackage"`,
     containersDescription: "all non-core DAppNode packages"
   },
   {
-    id: "critical level of 1 GB",
+    id: "1 GB",
     kb: 1 * 1e6, // ~ 1 GB
     filterCommand: `--filter "name=DAppNodePackage" --filter "name=DAppNodeCore-ipfs.dnp.dappnode.eth"`,
     containersDescription: "all non-core DAppNode packages and the IPFS package"
@@ -93,17 +95,23 @@ async function monitorDiskUsage(): Promise<void> {
           `WARNING: DAppNode has stopped ${threshold.containersDescription} (${stoppedDnpNameList}) after the disk space reached a ${threshold.id}`
         );
 
-        eventBus.notification.emit({
-          id: "diskSpaceRanOut-stoppedPackages",
-          type: "danger",
-          title: `Disk space is running out, ${threshold.id.split(" ")[0]}`,
-          body: [
-            `Available disk space is less than a ${threshold.id}.`,
-            `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
-            stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
-            `Please, free up enough disk space and start them again.`
-          ].join("\n\n")
-        });
+        await notifications
+          .sendNotification({
+            title: `Available disk space is less than a ${threshold.id}`,
+            dnpName: params.dappmanagerDnpName,
+            body: [
+              `To prevent your DAppNode from becoming unusable ${threshold.containersDescription} where stopped.`,
+              stoppedDnpNames.map((dnpName) => ` - ${prettyDnpName(dnpName)}`).join("\n"),
+              `Please, free up enough disk space and start them again.`
+            ].join("\n\n"),
+            category: Category.hardware,
+            priority: Priority.critical,
+            status: Status.triggered,
+            isBanner: true,
+            isRemote: false,
+            correlationId : 'core-disk-usage',
+          })
+          .catch((e) => logs.error("Error sending disk usage notification", e));
 
         // Emit packages update
         eventBus.requestPackages.emit();

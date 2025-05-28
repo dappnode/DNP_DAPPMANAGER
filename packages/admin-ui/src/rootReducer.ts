@@ -7,7 +7,6 @@ import { reducer as dnpDirectory } from "services/dnpDirectory/reducer";
 import { reducer as dnpRegistry } from "services/dnpRegistry/reducer";
 import { reducer as dnpInstalled } from "services/dnpInstalled/reducer";
 import { reducer as isInstallingLogs } from "services/isInstallingLogs/reducer";
-import { reducer as notifications } from "services/notifications/reducer";
 
 export const rootReducer = combineReducers({
   coreUpdate,
@@ -16,7 +15,6 @@ export const rootReducer = combineReducers({
   dnpRegistry,
   dnpInstalled,
   isInstallingLogs,
-  notifications
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

@@ -15,6 +15,7 @@ import {
   MdWifi,
   MdPeople
 } from "react-icons/md";
+import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
 // URLs
@@ -29,6 +30,7 @@ import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
 import { relativePath as repositoryRelativePath } from "pages/repository";
+import { relativePath as notificationsRelativePath } from "pages/notifications";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -106,6 +108,12 @@ export const sidenavItems: {
     name: "System",
     href: systemRelativePath,
     icon: MdSettings,
+    show: true
+  },
+  {
+    name: "Notifications",
+    href: notificationsRelativePath,
+    icon: FaRegBell,
     show: true
   },
   {

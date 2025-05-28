@@ -218,6 +218,7 @@ export const params = {
   wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+  notificationsDnpName: "notifications.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
@@ -253,6 +254,7 @@ export const params = {
   // Wi-Fi ENVs
   WIFI_KEY_SSID: "SSID",
   WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
+  WIFI_DEFAULT_PASSWORD: "dappnode",
 
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
