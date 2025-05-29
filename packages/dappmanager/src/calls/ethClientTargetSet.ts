@@ -1,6 +1,7 @@
 import { Eth2ClientTarget } from "@dappnode/types";
 import { ethereumClient } from "@dappnode/installer";
 import { dappnodeInstaller } from "../index.js";
+import { eventBus } from "@dappnode/eventbus";
 
 /**
  * Changes the ethereum client used to fetch package data
@@ -34,4 +35,7 @@ export async function ethClientTargetSet({
     deletePrevConsClientVolumes,
     ethRemoteRpc
   });
+
+  // Emit event to trigger notifier healthcheck notification
+  eventBus.ethRepositoryChanged.emit();
 }

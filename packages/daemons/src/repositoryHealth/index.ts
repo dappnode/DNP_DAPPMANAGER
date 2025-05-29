@@ -5,6 +5,7 @@ import { Category, Priority, Status } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
 
 const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
@@ -157,4 +158,11 @@ Syncing and access to Ethereum chain data should now resume normally.`,
 export function startRepositoryHealthDaemon(signal: AbortSignal): void {
   runAtMostEvery(() => checkIpfsHealth(), CHECK_INTERVAL, signal);
   runAtMostEvery(() => checkEthHealth(), CHECK_INTERVAL, signal);
+  // Immediate health checks when repository targets change
+  eventBus.ipfsRepositoryChanged.on(() => {
+    checkIpfsHealth().catch((error) => logs.error("Error on IPFS health check after repository change", error));
+  });
+  eventBus.ethRepositoryChanged.on(() => {
+    checkEthHealth().catch((error) => logs.error("Error on Ethereum health check after repository change", error));
+  });
 }
