@@ -28,14 +28,14 @@ async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: stri
 
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
-      dappnodeInstaller.changeIpfsProvider(params.IPFS_LOCAL);
+      dappnodeInstaller.changeIpfsGatewayUrl(params.IPFS_LOCAL);
     } else {
       // Set new values in db
       db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
-      dappnodeInstaller.changeIpfsProvider(db.ipfsGateway.get());
+      dappnodeInstaller.changeIpfsGatewayUrl(db.ipfsGateway.get());
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

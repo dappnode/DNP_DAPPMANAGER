@@ -15,7 +15,12 @@ import {
   NotificationsConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
-import { validateDappnodeCompose, validateManifestSchema, validateNotificationsSchema, validateSetupWizardSchema } from "@dappnode/schemas";
+import {
+  validateDappnodeCompose,
+  validateManifestSchema,
+  validateNotificationsSchema,
+  validateSetupWizardSchema
+} from "@dappnode/schemas";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
@@ -41,14 +46,14 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider, timeout?: number) {
-    super(ipfsUrl, ethersProvider, timeout);
+  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider) {
+    super(ipfsUrl, ethersProvider);
   }
 
   private async updateProviders(): Promise<void> {
     const newIpfsUrl = getIpfsUrl();
     super.changeEthProvider(await getEthersProvider());
-    super.changeIpfsProvider(newIpfsUrl);
+    super.changeIpfsGatewayUrl(newIpfsUrl);
   }
 
   /**
