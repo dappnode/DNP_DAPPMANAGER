@@ -32,6 +32,8 @@ interface EventTypes {
   runEthicalMetricsInstaller: void;
   runNatRenewal: void;
   runStakerCacheUpdate: { dnpName: string };
+  ethRepositoryChanged: void;
+  ipfsRepositoryChanged: void;
 }
 
 const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
@@ -54,7 +56,9 @@ const eventBusData: { [P in keyof EventTypes]: Record<string, never> } = {
   runEthClientInstaller: {},
   runEthicalMetricsInstaller: {},
   runNatRenewal: {},
-  runStakerCacheUpdate: {}
+  runStakerCacheUpdate: {},
+  ethRepositoryChanged: {},
+  ipfsRepositoryChanged: {}
 };
 
 const eventEmitter = new EventEmitter();
@@ -83,7 +87,6 @@ export const eventBus: EventBus = mapValues(eventBusData, (_, eventName) => ({
        */
       try {
         await listener(...args);
-         
       } catch (e) {
         // Do not use logger module to avoud cirucular dependencies
         /**  logs.error(

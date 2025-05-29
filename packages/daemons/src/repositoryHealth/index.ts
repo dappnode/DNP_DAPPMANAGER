@@ -5,6 +5,7 @@ import { Category, Priority, Status } from "@dappnode/types";
 import * as db from "@dappnode/db";
 import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
+import { eventBus } from "@dappnode/eventbus";
 
 const CHECK_INTERVAL = 10 * 60 * 1000; // 10 minutes
 
@@ -23,8 +24,11 @@ async function checkIpfsHealth(): Promise<void> {
   const correlationId = "core-ipfs-check";
 
   try {
-    const res = await fetch(`${ipfsUrl}/api/v0/version`, {
+    // check health by fetching CID of empty directory QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn. Most of ipfs nodes should have it.
+    // checked against: https://ipfs.io https://gateway-dev.ipfs.dappnode.io https://gateway.ipfs.dappnode.io
+    const res = await fetch(`${ipfsUrl}/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn`, {
       method: "GET",
+      headers: { "Content-Type": "application/json" },
       signal: controller.signal
     });
 
@@ -157,4 +161,11 @@ Syncing and access to Ethereum chain data should now resume normally.`,
 export function startRepositoryHealthDaemon(signal: AbortSignal): void {
   runAtMostEvery(() => checkIpfsHealth(), CHECK_INTERVAL, signal);
   runAtMostEvery(() => checkEthHealth(), CHECK_INTERVAL, signal);
+  // Immediate health checks when repository targets change
+  eventBus.ipfsRepositoryChanged.on(() => {
+    checkIpfsHealth().catch((error) => logs.error("Error on IPFS health check after repository change", error));
+  });
+  eventBus.ethRepositoryChanged.on(() => {
+    checkEthHealth().catch((error) => logs.error("Error on Ethereum health check after repository change", error));
+  });
 }
