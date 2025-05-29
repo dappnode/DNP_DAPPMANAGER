@@ -69,7 +69,7 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
       }
     }
 
-    if (notificationsNotInstalled) installNotificationsPkg();
+    if (notificationsNotInstalled && !errorInstallingNotifications) installNotificationsPkg();
   }, [notificationsNotInstalled]);
 
   async function startStopNotifications(): Promise<void> {
