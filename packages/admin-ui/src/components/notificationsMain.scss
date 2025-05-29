@@ -18,17 +18,17 @@
 
     &.medium-priority {
       background-color: #d1ecf1;
-      color: #0c5460 !important;
+      color: #0c5460;
     }
 
     &.high-priority {
       background-color: #ffeda6;
-      color: #433c1d !important;
+      color: #433c1d;
     }
 
     &.critical-priority {
       background-color: #f8d7da;
-      color: #721c24 !important;
+      color: #721c24;
     }
 
     h5 {
@@ -82,27 +82,31 @@
   #main {
     .banner-notifications-col {
       .banner-card {
-        .banner-header {
-          color: black;
+        button > .btn-text {
+          color: white;
         }
 
+        &.low-priority {
+          * {
+            color: black;
+          }
+        }
         &.medium-priority {
-          color: #0c5460 !important;
+          * {
+            color: #0c5460;
+          }
         }
 
         &.high-priority {
-          color: #433c1d !important;
+          *,
+          .btn-text {
+            color: #433c1d;
+          }
         }
 
         &.critical-priority {
-          color: #721c24 !important;
-        }
-
-        .banner-body {
-          p,
-          strong,
-          li {
-            color: black !important;
+          * {
+            color: #721c24;
           }
         }
       }
