@@ -1,26 +1,35 @@
 import React, { useEffect, useState } from "react";
 import BottomButtons from "../BottomButtons";
 import { docsUrl, externalUrlProps } from "params";
-
 import SubTitle from "components/SubTitle";
 import Switch from "components/Switch";
 import { api, useApi } from "api";
 import { notificationsDnpName } from "params.js";
 import { withToast } from "components/toast/Toast";
 import { continueIfCalleDisconnected } from "api/utils";
-
 import Loading from "components/Loading";
 import { prettyDnpName } from "utils/format";
+import ErrorBoundary from "components/ErrorBoundary";
 
 export default function EnableNotifications({ onBack, onNext }: { onBack?: () => void; onNext: () => void }) {
   const [notificationsDisabled, setNotificationsDisabled] = useState<boolean>(false);
   const [notificationsNotInstalled, setNotificationsNotInstalled] = useState<boolean>(false);
   const [isNotificationsInstalling, setIsNotificationsInstalling] = useState<boolean>(false);
+  const [errorInstallingNotifications, setErrorInstallingNotifications] = useState<string | null>(null);
 
   const dnps = useApi.packagesGet();
+
   useEffect(() => {
     if (dnps.data) {
       setNotificationsNotInstalled(dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName) === undefined);
+      // update notifications package state
+      const notificationsPkg = dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName);
+      if (notificationsPkg) {
+        const isStopped = notificationsPkg.containers.some((c) => c.state !== "running");
+        setNotificationsDisabled(isStopped);
+      } else {
+        setNotificationsDisabled(true);
+      }
     }
   }, [dnps.data]);
 
@@ -32,54 +41,51 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           continueIfCalleDisconnected(
             () =>
               api.packageInstall({
-                name: notificationsDnpName
+                name: notificationsDnpName,
+                version: "/ipfs/QmZfC3Nux86aodbuqEGLQZeVizudVa6PxdeGKvWBWPCmUC",
+                options: {
+                  BYPASS_CORE_RESTRICTION: true, // allow installation even if the core version is not compatible
+                  BYPASS_SIGNED_RESTRICTION: true // allow installation even if the package is not signed
+                }
               }),
             notificationsDnpName
           ),
           {
             message: `Installing ${prettyDnpName(notificationsDnpName)}...`,
-            onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`
+            onSuccess: `Installed ${prettyDnpName(notificationsDnpName)}`,
+            onError: `Error while installing ${prettyDnpName(notificationsDnpName)}`
           }
         );
+
+        setErrorInstallingNotifications(null);
+        setNotificationsNotInstalled(false);
       } catch (error) {
         console.error(`Error while installing notifications package: ${error}`);
-        setIsNotificationsInstalling(false);
+        setErrorInstallingNotifications(`Error while installing notifications package: ${error}`);
         return;
       } finally {
         setIsNotificationsInstalling(false);
-        notificationsDnp.revalidate();
+        await dnps.revalidate();
       }
     }
 
-    if (notificationsNotInstalled) {
-      installNotificationsPkg();
-    }
+    if (notificationsNotInstalled && !errorInstallingNotifications) installNotificationsPkg();
   }, [notificationsNotInstalled]);
-
-  const notificationsDnp = useApi.packageGet({ dnpName: notificationsDnpName });
-  useEffect(() => {
-    if (notificationsDnp.data) {
-      const isStopped = notificationsDnp.data.containers.some((c) => c.state !== "running");
-      setNotificationsDisabled(isStopped);
-    }
-  }, [notificationsDnp.data]);
 
   async function startStopNotifications(): Promise<void> {
     try {
-      if (notificationsDnp.data) {
-        await withToast(
-          continueIfCalleDisconnected(
-            () => api.packageStartStop({ dnpName: notificationsDnpName }),
-            notificationsDnpName
-          ),
-          {
-            message: notificationsDisabled ? "Enabling notifications" : "Disabling notifications",
-            onSuccess: notificationsDisabled ? "Notifications Enabled" : "Notifications disabled"
-          }
-        );
+      await withToast(
+        continueIfCalleDisconnected(
+          () => api.packageStartStop({ dnpName: notificationsDnpName }),
+          notificationsDnpName
+        ),
+        {
+          message: notificationsDisabled ? "Enabling notifications" : "Disabling notifications",
+          onSuccess: notificationsDisabled ? "Notifications Enabled" : "Notifications disabled"
+        }
+      );
 
-        notificationsDnp.revalidate();
-      }
+      await dnps.revalidate();
     } catch (e) {
       console.error(`Error on start/stop notifications package: ${e}`);
     }
@@ -97,21 +103,21 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           We're transitioning to a new and improved in-app Notifications experience, designed to be more reliable,
           configurable and scalable.
         </div>
-        {notificationsNotInstalled ? (
-          isNotificationsInstalling ? (
-            <Loading steps={["Installing notifications package"]} />
+        {dnps.isValidating || isNotificationsInstalling ? (
+          <Loading steps={["Installing notifications package"]} />
+        ) : notificationsNotInstalled ? (
+          errorInstallingNotifications ? (
+            <ErrorBoundary> {errorInstallingNotifications} </ErrorBoundary>
           ) : (
-            notificationsDnp.error && <SubTitle>Error while installing notifications package</SubTitle>
+            <>Could not install {prettyDnpName(notificationsDnpName)}. A manual installation may be required.</>
           )
         ) : (
           <>
             <SubTitle>Enable new notifications</SubTitle>
             <Switch
               checked={!notificationsDisabled}
-              disabled={notificationsDnp.isValidating}
-              onToggle={() => {
-                startStopNotifications();
-              }}
+              disabled={dnps.isValidating}
+              onToggle={() => startStopNotifications()}
             />
             <br />
             <br />
