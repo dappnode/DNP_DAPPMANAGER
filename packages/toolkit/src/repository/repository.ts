@@ -1,5 +1,5 @@
 import * as isIPFS from "is-ipfs";
-import { CID, KuboRPCClient, create, IPFSEntry } from "kubo-rpc-client";
+import { CID, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
@@ -39,28 +39,24 @@ const source = "ipfs" as const;
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected ipfs: KuboRPCClient;
   protected gatewayUrl: string;
-  protected timeout: number;
 
   /**
    * Constructs an instance of DappnodeRepository
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
+  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider) {
     super(ethersProvider);
-    this.timeout = timeout || 30 * 1000;
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
-    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout }); // keep for pin/list if needed
   }
 
   /**
    * Changes the IPFS provider and target.
    * @param ipfsUrl - The new URL of the IPFS network node.
    */
-  public changeIpfsProvider(ipfsUrl: string): void {
-    this.ipfs = create({ url: ipfsUrl, timeout: 30 * 1000 });
+  public changeIpfsGatewayUrl(ipfsUrl: string): void {
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
   }
 
   /**
@@ -70,7 +66,12 @@ export class DappnodeRepository extends ApmRepository {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
-      await this.ipfs.pin.add(hash);
+      await fetch(`${this.gatewayUrl}/api/v0/pin/add?arg=${hash}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -140,8 +141,8 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    // pin hash
-    await this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
+    // pin hash asynchronously
+    this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
 
     const ipfsEntries = await this.list(contentUri);
 
