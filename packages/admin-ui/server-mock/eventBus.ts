@@ -24,5 +24,7 @@ export const eventBus: EventBus = {
   runEthClientInstaller: emptySubscription,
   runEthicalMetricsInstaller: emptySubscription,
   runNatRenewal: emptySubscription,
-  runStakerCacheUpdate: emptySubscription
+  runStakerCacheUpdate: emptySubscription,
+  ethRepositoryChanged: emptySubscription,
+  ipfsRepositoryChanged: emptySubscription
 };
