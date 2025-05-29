@@ -20,8 +20,17 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
   const dnps = useApi.packagesGet();
 
   useEffect(() => {
-    if (dnps.data)
+    if (dnps.data) {
       setNotificationsNotInstalled(dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName) === undefined);
+      // update notifications package state
+      const notificationsPkg = dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName);
+      if (notificationsPkg) {
+        const isStopped = notificationsPkg.containers.some((c) => c.state !== "running");
+        setNotificationsDisabled(isStopped);
+      } else {
+        setNotificationsDisabled(true);
+      }
+    }
   }, [dnps.data]);
 
   useEffect(() => {
@@ -32,7 +41,12 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
           continueIfCalleDisconnected(
             () =>
               api.packageInstall({
-                name: notificationsDnpName
+                name: notificationsDnpName,
+                version: "/ipfs/QmZfC3Nux86aodbuqEGLQZeVizudVa6PxdeGKvWBWPCmUC",
+                options: {
+                  BYPASS_CORE_RESTRICTION: true, // allow installation even if the core version is not compatible
+                  BYPASS_SIGNED_RESTRICTION: true // allow installation even if the package is not signed
+                }
               }),
             notificationsDnpName
           ),
@@ -44,11 +58,6 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
         );
 
         setErrorInstallingNotifications(null);
-
-        const notificationsPkg = await api.packageGet({ dnpName: notificationsDnpName });
-        const isStopped = notificationsPkg.containers.some((c) => c.state !== "running");
-
-        setNotificationsDisabled(isStopped);
         setNotificationsNotInstalled(false);
       } catch (error) {
         console.error(`Error while installing notifications package: ${error}`);
