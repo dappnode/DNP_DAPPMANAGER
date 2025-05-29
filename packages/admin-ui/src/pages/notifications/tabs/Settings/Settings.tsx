@@ -9,6 +9,7 @@ import { notificationsDnpName } from "params.js";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 import { continueIfCalleDisconnected } from "api/utils";
+import Loading from "components/Loading.js";
 
 interface EndpointsData {
   [dnpName: string]: {
@@ -81,38 +82,43 @@ export function NotificationsSettings() {
 
   return (
     <div className="notifications-settings">
-      <div>
-        <div className="title-switch-row">
-          <SubTitle className="notifications-section-title">Enable notifications</SubTitle>
-          <Switch
-            checked={!notificationsDisabled}
-            disabled={notificationsDnp.isValidating}
-            onToggle={() => {
-              startStopNotifications();
-            }}
-          />
-        </div>
-        <div>Enable notifications to retrieve a registry of notifications on your Dappnode.</div>
-      </div>
-      <br />
-      {!notificationsDisabled && !notificationsDnp.isValidating && (
-        <div>
-          <SubTitle className="notifications-section-title">Manage notifications</SubTitle>
-          <div>Enable, disable and customize notifications individually.</div>
-          <br />
-          <div className="manage-notifications-wrapper">
-            {endpointsData &&
-              Object.entries(endpointsData).map(([dnpName, endpoints]) => (
-                <ManagePackageNotifications
-                  key={dnpName}
-                  dnpName={dnpName}
-                  gatusEndpoints={endpoints.endpoints}
-                  customEndpoints={endpoints.customEndpoints}
-                  isCore={endpoints.isCore}
-                />
-              ))}
+      {notificationsDnp.isValidating || endpointsCall.isValidating ? (
+        <Loading steps={["Fetching settings"]} />
+      ) : (
+        <>
+          <div>
+            <div className="title-switch-row">
+              <SubTitle className="notifications-section-title">Enable notifications</SubTitle>
+              <Switch
+                checked={!notificationsDisabled}
+                onToggle={() => {
+                  startStopNotifications();
+                }}
+              />
+            </div>
+            <div>Enable notifications to retrieve a registry of notifications on your Dappnode.</div>
           </div>
-        </div>
+          <br />
+          {!notificationsDisabled && !notificationsDnp.isValidating && (
+            <div>
+              <SubTitle className="notifications-section-title">Manage notifications</SubTitle>
+              <div>Enable, disable and customize notifications individually.</div>
+              <br />
+              <div className="manage-notifications-wrapper">
+                {endpointsData &&
+                  Object.entries(endpointsData).map(([dnpName, endpoints]) => (
+                    <ManagePackageNotifications
+                      key={dnpName}
+                      dnpName={dnpName}
+                      gatusEndpoints={endpoints.endpoints}
+                      customEndpoints={endpoints.customEndpoints}
+                      isCore={endpoints.isCore}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
