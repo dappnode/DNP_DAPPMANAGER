@@ -125,7 +125,7 @@ export function CollapsableBannerNotification({
               {notification.callToAction && (
                 <NavLink to={notification.callToAction.url} {...(isExternalUrl ? externalUrlProps : {})}>
                   <Button variant={priorityBtnVariants[notification.priority]}>
-                    <div>{notification.callToAction.title}</div>
+                    <div className="btn-text">{notification.callToAction.title}</div>
                   </Button>
                 </NavLink>
               )}
