@@ -1,6 +1,8 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
 import { CustomEndpoint, GatusEndpoint, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
 
 class Notifications {
   private readonly api: NotificationsApi;
@@ -24,7 +26,7 @@ class Notifications {
   async getAllNotifications(): Promise<Notification[]> {
     return await this.api.getAllNotifications();
   }
-  
+
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
@@ -48,7 +50,7 @@ class Notifications {
   /**
    * Set a notification as seen by providing its ID
    */
-  async setNotificationSeenByCorrelationID(correlationId:string): Promise<void> {
+  async setNotificationSeenByCorrelationID(correlationId: string): Promise<void> {
     return await this.api.setNotificationSeenByCorrelationID(correlationId);
   }
 
@@ -85,6 +87,21 @@ class Notifications {
   async updateEndpoints(dnpName: string, isCore: boolean, notificationsConfig: NotificationsConfig): Promise<void> {
     this.manifest.updateEndpoints(dnpName, isCore, notificationsConfig);
     await this.api.reloadEndpoints();
+  }
+
+  /**
+   * Update endpoints only API
+   */
+  async updateEndpointsApi(): Promise<void> {
+    await this.api.reloadEndpoints();
+  }
+
+  /**
+   * Determine if notifications package is installed
+   */
+  async isNotificationsPackageInstalled(): Promise<boolean> {
+    if (await listPackageNoThrow({ dnpName: params.notificationsDnpName })) return true;
+    return false;
   }
 }
 
