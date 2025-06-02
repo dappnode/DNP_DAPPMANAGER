@@ -9,13 +9,12 @@ import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
 import { NotificationsSettings } from "./tabs/Settings/Settings";
-import { notificationsDnpName } from "params";
 import { LegacyNotifications } from "./tabs/Legacy";
 
 export const NotificationsRoot: React.FC = () => {
   const dnpsRequest = useApi.packagesGet();
-  return renderResponse(dnpsRequest, ["Loading notifications"], (dnps) => {
-    const isNotificationsPkgInstalled = dnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
+  return renderResponse(dnpsRequest, ["Loading notifications"], () => {
+  const isNotificationsPkgInstalled = useApi.notificationsIsInstalled();
 
     const availableRoutes: {
       name: string;
@@ -25,12 +24,12 @@ export const NotificationsRoot: React.FC = () => {
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: isNotificationsPkgInstalled ? Inbox : () => <InstallNotificationsPkg />
+        component: isNotificationsPkgInstalled.data ? Inbox : () => <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: isNotificationsPkgInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        component: isNotificationsPkgInstalled.data ? NotificationsSettings : () => <InstallNotificationsPkg />
       },
       {
         name: "Legacy",

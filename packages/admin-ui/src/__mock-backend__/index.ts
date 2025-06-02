@@ -393,7 +393,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsGetBanner: async () => [],
   notificationsApplyPreviousEndpoints: async () => {
     return { endpoints: [], customEndpoints: [] };
-  }
+  },
+  notificationsIsInstalled: async () => true
 };
 
 export const calls: Routes = {

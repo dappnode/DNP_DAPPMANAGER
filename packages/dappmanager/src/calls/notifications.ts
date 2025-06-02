@@ -76,3 +76,10 @@ export async function notificationsApplyPreviousEndpoints({
 }): Promise<NotificationsConfig> {
   return await notifications.applyPreviousEndpoints(dnpName, isCore, newNotificationsConfig);
 }
+
+/**
+ * Retrieve if notifications pkg is installed
+ */
+export async function notificationsIsInstalled(): Promise<boolean> {
+  return await notifications.isNotificationsPackageInstalled();
+}

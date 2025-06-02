@@ -313,6 +313,11 @@ export interface Routes {
   }) => Promise<NotificationsConfig>;
 
   /**
+   * Returns true if the notifications package is installed
+   */
+  notificationsIsInstalled: () => Promise<boolean>;
+
+  /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
    * The list is ordered from newest to oldest. Newest log has index = 0
@@ -744,6 +749,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationSetSeenByCorrelationID: {},
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
+  notificationsIsInstalled: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },

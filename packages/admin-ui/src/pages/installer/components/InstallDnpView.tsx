@@ -29,7 +29,6 @@ import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
 import { Notifications } from "./Steps/Notifications";
-import { notificationsDnpName } from "params";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -204,9 +203,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     }
   ].filter((option) => option.available);
 
-  const dnpsRequest = useApi.packagesGet();
-  const installedDnps = dnpsRequest.data;
-  const isNotificationsPkgInstalled = installedDnps?.some((dnp) => dnp.dnpName === notificationsDnpName);
+  const isNotificationsPkgInstalled = useApi.notificationsIsInstalled();
 
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
@@ -219,7 +216,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const installSubPath = "install";
 
   // Only display notifications step if the notifications package is installed && there are endpoints in manifest
-  const showNotificationsStep = isNotificationsPkgInstalled && manifest.notifications;
+  const showNotificationsStep = isNotificationsPkgInstalled.data && manifest.notifications;
 
   const availableRoutes: {
     name: string;
