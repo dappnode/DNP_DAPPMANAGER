@@ -144,8 +144,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       if (componentIsMounted.current) {
         setShowSuccess(true);
 
-        await setNotifications();
-
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
@@ -166,21 +164,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   };
   // Prevent a burst of install calls
   const onInstallThrottle = throttle(onInstall, 1000);
-
-  const setNotifications = async () => {
-    if (!manifest.notifications) return;
-
-    if (endpoints.length > 0 || customEndpoints.length > 0) {
-      await api.notificationsUpdateEndpoints({
-        dnpName,
-        notificationsConfig: {
-          endpoints: endpoints.length > 0 ? endpoints : undefined,
-          customEndpoints: customEndpoints.length > 0 ? customEndpoints : undefined
-        },
-        isCore
-      });
-    }
-  };
 
   const disclaimers: { name: string; message: string }[] = [];
   // Default disclaimer for public DNPs
