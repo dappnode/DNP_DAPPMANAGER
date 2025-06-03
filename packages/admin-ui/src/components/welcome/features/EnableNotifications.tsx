@@ -42,7 +42,6 @@ export default function EnableNotifications({ onBack, onNext }: { onBack?: () =>
             () =>
               api.packageInstall({
                 name: notificationsDnpName,
-                version: "/ipfs/QmZfC3Nux86aodbuqEGLQZeVizudVa6PxdeGKvWBWPCmUC",
                 options: {
                   BYPASS_CORE_RESTRICTION: true, // allow installation even if the core version is not compatible
                   BYPASS_SIGNED_RESTRICTION: true // allow installation even if the package is not signed
