@@ -14,7 +14,6 @@ import { Compose, ComposeServiceNetworks, PortMapping, UserSettings, VolumeMappi
 import { cleanCompose, isOmitable } from "./clean.js";
 import { stringifyVolumeMappings } from "./volumes.js";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
-import { params } from "../../params/dist/params.js";
 
 /**
  * To be backwards compatible with older versions that do not store
@@ -160,27 +159,14 @@ export function applyUserSettings(
       })
     );
 
-    // docker aliases must be uinique
-    // TODO: use docker compose merge to automatically merge these dappnode docker compose properties
-    // see https://github.com/dappnode/DNP_DAPPMANAGER/issues/1983
-    let nextNetworks = mergeWith(networks, userSetNetworks, (value1, value2) => {
-      return mergeWith(value1, value2, (subvalue1, subvalue2) => {
-        return union(subvalue1, subvalue2);
-      });
-    });
-
-    // Special handling for bindDnpName (ipv4_address persistence)
-    if (dnpName === params.bindDnpName) {
-      nextNetworks = mapValues(nextNetworks, (networkConfig) => {
-        if (networkConfig && Array.isArray(networkConfig.ipv4_address)) {
-          if (networkConfig.ipv4_address.length === 0) {
-            const { ipv4_address, ...rest } = networkConfig;
-            return rest;
-          }
-        }
-        return networkConfig;
-      });
-    }
+    // docker aliases must be unique
+    // merge base and user networks, then remove any empty/nullish props (e.g. empty ipv4_address)
+    const mergedNetworks = mergeWith(networks, userSetNetworks, (value1, value2) =>
+      mergeWith(value1, value2, (subvalue1, subvalue2) => union(subvalue1, subvalue2))
+    );
+    const nextNetworks = mapValues(mergedNetworks, (config) =>
+      omitBy(config, (v) => v == null || (Array.isArray(v) && v.length === 0))
+    );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
