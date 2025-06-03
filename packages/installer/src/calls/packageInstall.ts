@@ -32,7 +32,13 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
  */
 export async function packageInstall(
   dappnodeInstaller: DappnodeInstaller,
-  { name: reqName, version: reqVersion, userSettings = {}, options = {} }: Parameters<Routes["packageInstall"]>[0]
+  {
+    name: reqName,
+    version: reqVersion,
+    userSettings = {},
+    notificationsSettings = {},
+    options = {}
+  }: Parameters<Routes["packageInstall"]>[0]
 ): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
@@ -61,6 +67,7 @@ export async function packageInstall(
     const packagesData = await getInstallerPackagesData({
       releases,
       userSettings,
+      notificationsSettings,
       currentVersions,
       reqName
     });

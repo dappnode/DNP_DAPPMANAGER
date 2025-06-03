@@ -134,27 +134,30 @@ function BaseDropdown({
         by placing them as right as possible */}
       <div className={`menu ${collapsed ? "" : "show"}`}>
         <div className="header">{name}</div>
-        {messages.map(({ type, title, toggle, body, progress, showProgress, help }, i) => (
-          <div key={i}>
-            {title && (
-              <div className="title">
-                <span className={`text text-${type}`}>{title}</span>
-                <div className="title-actions">
-                  {help && <HelpTo url={help} />}
-                  {toggle && <Switch checked={toggle.checked} onToggle={toggle.onToggle} />}
-                </div>
-              </div>
-            )}
+        {messages.map(
+          ({ type, title, toggle, body, progress, showProgress, help }, i) =>
+            (title || body || showProgress) && (
+              <div key={i}>
+                {title && (
+                  <div className="title">
+                    <span className={`text text-${type}`}>{title}</span>
+                    <div className="title-actions">
+                      {help && <HelpTo url={help} />}
+                      {toggle && <Switch checked={toggle.checked} onToggle={toggle.onToggle} />}
+                    </div>
+                  </div>
+                )}
 
-            {body && (
-              <div className="text">
-                <RenderMarkdown source={body} noMargin />
-              </div>
-            )}
+                {body && (
+                  <div className="text">
+                    <RenderMarkdown source={body} noMargin />
+                  </div>
+                )}
 
-            {showProgress && typeof progress === "number" && <ProgressBarWrapper progress={progress} />}
-          </div>
-        ))}
+                {showProgress && typeof progress === "number" && <ProgressBarWrapper progress={progress} />}
+              </div>
+            )
+        )}
         {children && children}
         {!messages.length && placeholder && !children && <div className="placeholder">{placeholder}</div>}
       </div>

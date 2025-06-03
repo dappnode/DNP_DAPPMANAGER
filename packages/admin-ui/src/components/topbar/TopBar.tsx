@@ -1,10 +1,8 @@
 import React from "react";
 // DropdownMenu components
 import DappnodeIdentity from "./dropdownMenus/DappnodeIdentity";
-import ChainDataDropdown from "./dropdownMenus/ChainDataDropdown";
 import InstallerDropdown from "./dropdownMenus/InstallerDropdown";
 import Notifications from "./dropdownMenus/Notifications";
-import Profile from "./dropdownMenus/Profile";
 import ThemeSwitch from "./dropdownMenus/ThemeSwitch";
 // Styles
 import "./topbar.scss";
@@ -12,7 +10,6 @@ import "./notifications.scss";
 // import UsageSwitch from "./dropdownMenus/UsageSwitch";
 // Types
 import { AppContextIface } from "types";
-import Modules from "./dropdownMenus/Modules";
 
 // Pkgs Installing data
 import { useSelector } from "react-redux";
@@ -31,14 +28,9 @@ export const TopBar = ({ username, appContext }: { username: string; appContext:
       ) : (
         <ThemeSwitch toggleTheme={appContext.toggleTheme} />
       )}
-
-      <DappnodeIdentity />
-      <div className="topnav-icon-separator" />
-      {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
-      <Modules modulesContext={appContext} />
-      <ChainDataDropdown />
       <Notifications />
-      <Profile username={username} />
+      {isPkgInstalling && <InstallerDropdown installLogs={progressLogsByDnp} />}
+      <DappnodeIdentity username={username} />
     </div>
   );
 };

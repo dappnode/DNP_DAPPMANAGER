@@ -11,13 +11,19 @@ import {
   PackageRequest,
   SetupWizard,
   GrafanaDashboard,
-  PrometheusTarget
+  PrometheusTarget,
+  NotificationsConfig
 } from "@dappnode/types";
 import { DappGetState, DappgetOptions, dappGet } from "./dappGet/index.js";
-import { validateDappnodeCompose, validateManifestSchema } from "@dappnode/schemas";
+import {
+  validateDappnodeCompose,
+  validateManifestSchema,
+  validateNotificationsSchema,
+  validateSetupWizardSchema
+} from "@dappnode/schemas";
 import { ComposeEditor, setDappnodeComposeDefaults, writeMetadataToLabels } from "@dappnode/dockercompose";
 import { computeGlobalEnvsFromDb } from "@dappnode/db";
-import { getIsCore } from "@dappnode/utils";
+import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
 import { getEthersProvider } from "./ethClient/index.js";
@@ -40,14 +46,14 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider, timeout?: number) {
-    super(ipfsUrl, ethersProvider, timeout);
+  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider) {
+    super(ipfsUrl, ethersProvider);
   }
 
   private async updateProviders(): Promise<void> {
     const newIpfsUrl = getIpfsUrl();
     super.changeEthProvider(await getEthersProvider());
-    super.changeIpfsProvider(newIpfsUrl);
+    super.changeIpfsGatewayUrl(newIpfsUrl);
   }
 
   /**
@@ -63,8 +69,8 @@ export class DappnodeInstaller extends DappnodeRepository {
       version
     });
 
-    // validate manifest and compose files
-    this.validateManifestAndComposeSchemas(pkgRelease);
+    // validate manifest and compose and notifications and setupwizard files
+    this.validateSchemas(pkgRelease);
 
     // join metadata files in manifest
     pkgRelease.manifest = this.joinFilesInManifest({
@@ -72,7 +78,9 @@ export class DappnodeInstaller extends DappnodeRepository {
       disclaimer: pkgRelease.disclaimer,
       gettingStarted: pkgRelease.gettingStarted,
       grafanaDashboards: pkgRelease.grafanaDashboards,
-      prometheusTargets: pkgRelease.prometheusTargets
+      prometheusTargets: pkgRelease.prometheusTargets,
+      notifications: pkgRelease.notifications,
+      avatarFile: pkgRelease.avatarFile
     });
 
     // set compose to custom dappnode compose in release
@@ -94,9 +102,9 @@ export class DappnodeInstaller extends DappnodeRepository {
 
     const pkgReleases = await this.getPkgsReleases(packages, db.releaseKeysTrusted.get(), process.arch);
 
-    // validate manifest and compose files
+    // validate manifest and compose and notifications and setupwizard files
     pkgReleases.forEach((pkgRelease) => {
-      this.validateManifestAndComposeSchemas(pkgRelease);
+      this.validateSchemas(pkgRelease);
     });
 
     // join metadata files in manifest
@@ -107,7 +115,9 @@ export class DappnodeInstaller extends DappnodeRepository {
         disclaimer: pkgRelease.disclaimer,
         gettingStarted: pkgRelease.gettingStarted,
         grafanaDashboards: pkgRelease.grafanaDashboards,
-        prometheusTargets: pkgRelease.prometheusTargets
+        prometheusTargets: pkgRelease.prometheusTargets,
+        notifications: pkgRelease.notifications,
+        avatarFile: pkgRelease.avatarFile
       });
     });
 
@@ -151,7 +161,9 @@ export class DappnodeInstaller extends DappnodeRepository {
     disclaimer,
     gettingStarted,
     prometheusTargets,
-    grafanaDashboards
+    grafanaDashboards,
+    notifications,
+    avatarFile
   }: {
     manifest: Manifest;
     SetupWizard?: SetupWizard;
@@ -159,22 +171,28 @@ export class DappnodeInstaller extends DappnodeRepository {
     gettingStarted?: string;
     prometheusTargets?: PrometheusTarget[];
     grafanaDashboards?: GrafanaDashboard[];
+    notifications?: NotificationsConfig;
+    avatarFile?: DistributedFile;
   }): Manifest {
     if (SetupWizard) manifest.setupWizard = SetupWizard;
     if (disclaimer) manifest.disclaimer = { message: disclaimer };
     if (gettingStarted) manifest.gettingStarted = gettingStarted;
     if (prometheusTargets) manifest.prometheusTargets = prometheusTargets;
     if (grafanaDashboards && grafanaDashboards.length > 0) manifest.grafanaDashboards = grafanaDashboards;
+    if (notifications) manifest.notifications = notifications;
+    if (avatarFile) manifest.avatarUrl = fileToGatewayUrl(avatarFile);
 
     return manifest;
   }
 
   /**
-   * Validates manifest and compose schemas
+   * Validates manifest and compose and notifications and setupwizard schemas
    */
-  private validateManifestAndComposeSchemas(pkgRelease: PackageRelease): void {
+  private validateSchemas(pkgRelease: PackageRelease): void {
     validateManifestSchema(pkgRelease.manifest);
     validateDappnodeCompose(pkgRelease.compose, pkgRelease.manifest);
+    if (pkgRelease.setupWizard) validateSetupWizardSchema(pkgRelease.setupWizard);
+    if (pkgRelease.notifications) validateNotificationsSchema(pkgRelease.notifications);
   }
 
   /**

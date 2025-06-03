@@ -2,6 +2,9 @@ import * as db from "@dappnode/db";
 import { updateDyndnsIp } from "@dappnode/dyndns";
 import { eventBus } from "@dappnode/eventbus";
 import { logs } from "@dappnode/logger";
+import { notifications } from "@dappnode/notifications";
+import { params } from "@dappnode/params";
+import { Category, Priority, Status } from "@dappnode/types";
 
 /**
  * Sets the static IP
@@ -25,12 +28,19 @@ export async function setStaticIp({ staticIp }: { staticIp: string }): Promise<v
     logs.info(`Updated static IP: ${staticIp}`);
   }
 
-  eventBus.notification.emit({
-    id: "staticIpUpdated",
-    type: "warning",
-    title: "Update connection profiles",
-    body: "Your static IP was changed, please download and install your VPN connection profile again. Instruct your users to do so also."
-  });
+  await notifications
+    .sendNotification({
+      title: "Static IP has changed",
+      body: `Your static IP has changed to ${staticIp}.`,
+      dnpName: params.dappmanagerDnpName,
+      category: Category.system,
+      priority: Priority.low,
+      status: Status.triggered,
+      isBanner: true,
+      isRemote: false,
+      correlationId: "core-static-ip-update"
+    })
+    .catch((e) => logs.error("Error sending static IP updated notification", e));
 
   // Dynamic update with the new staticIp
   eventBus.requestSystemInfo.emit();

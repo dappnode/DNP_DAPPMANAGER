@@ -1,0 +1,79 @@
+.notifications-settings {
+  .title-switch-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 5px;
+
+    .not-running-label {
+      color: rgb(228, 156, 0) !important;
+      display: flex;
+      align-items: center;
+      background-color: transparent;
+      padding: 0px 6px 0px 5px;
+      border-radius: 10px;
+      border: 1px solid rgb(228, 156, 0);
+      font-size: 0.75rem;
+      cursor: help;
+      height: 15px;
+      width: 15px;
+      font-weight: bold;
+    }
+
+    .switch-container {
+      margin-left: 5px;
+    }
+  }
+
+  .notifications-section-title {
+    margin: 0.5rem 0;
+  }
+
+  .manage-notifications-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .notifications-pkg-name {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+  }
+
+  .endpoint-list-card {
+    border-radius: 10px;
+    background-color: #e9ecef;
+    margin: 10px 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+
+    .endpoint-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+
+    hr {
+      width: 100%;
+    }
+
+    .slider-wrapper {
+      padding-top: 15px;
+      width: 30%;
+
+      @media (max-width: 60rem) {
+        width: 100%;
+      }
+    }
+  }
+}
+
+#dark {
+  .notifications-settings {
+    .endpoint-list-card {
+      background-color: var(--color-dark-card);
+      color: var(--color-dark-maintext);
+    }
+  }
+}

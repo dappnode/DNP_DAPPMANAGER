@@ -1,6 +1,5 @@
 import { store } from "../store";
 // Actions to push received content
-import { pushNotification } from "services/notifications/actions";
 import { clearIsInstallingLog, updateIsInstallingLog } from "services/isInstallingLogs/actions";
 import { updateVolumes, setSystemInfo } from "services/dappnodeStatus/actions";
 import { setDnpInstalled } from "services/dnpInstalled/actions";
@@ -25,10 +24,6 @@ export function mapSubscriptionsToRedux(subscriptions: Subscriptions): void {
     const { id, dnpName, message: log, clear } = progressLog;
     if (clear) store.dispatch(clearIsInstallingLog({ id }));
     else store.dispatch(updateIsInstallingLog({ id, dnpName, log }));
-  });
-
-  subscriptions.pushNotification.on((notification) => {
-    store.dispatch(pushNotification(notification));
   });
 
   subscriptions.systemInfo.on((systemInfo) => {

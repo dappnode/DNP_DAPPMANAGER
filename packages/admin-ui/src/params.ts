@@ -51,6 +51,7 @@ export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
 export const coreDnpName = "core.dnp.dappnode.eth";
 export const bindDnpName = "bind.dnp.dappnode.eth";
 export const vpnDnpName = "vpn.dnp.dappnode.eth";
+export const notificationsDnpName = "notifications.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
@@ -95,13 +96,21 @@ export const docsUrl = {
   ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
-  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`
+  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`,
+  notificationsOverview: `${docsBaseUrl}/docs/user/notifications/overview`
 };
 
 export const forumUrl = {
   telegramHowTo: "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
   ipfsRemoteHowTo: "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
   expandFileSystemHowTo: "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
+};
+
+export const dappmanagerAliases = ["dappmanager.dappnode", "my.dappnode", "dappnode.local"];
+
+export const externalUrlProps = {
+  target: "_blank",
+  rel: "noopener noreferrer"
 };
 
 export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/developers/package-dev/wizard#target";
