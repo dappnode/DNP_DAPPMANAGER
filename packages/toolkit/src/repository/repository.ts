@@ -180,7 +180,8 @@ export class DappnodeRepository extends ApmRepository {
       ? {
           hash: avatarEntry.cid.toString(),
           size: avatarEntry.size,
-          source
+          source,
+          imageName: avatarEntry.name
         }
       : undefined;
 
@@ -498,8 +499,9 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     const { name, version } = manifest;
+    const imageName = this.getImageName(name, version, arch);
     const imageAsset =
-      files.find((file) => file.name === this.getImageName(name, version, arch)) ||
+      files.find((file) => file.name === imageName) ||
       (arch === defaultArch
         ? // New DAppNodes should load old single arch packages,
           // and consider their single image as amd64
@@ -516,6 +518,7 @@ export class DappnodeRepository extends ApmRepository {
       );
     } else {
       return {
+        imageName,
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
         source // TODO: consdier adding different sources

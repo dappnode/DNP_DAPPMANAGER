@@ -105,5 +105,5 @@ export function parseDnpNameFromContainerName(containerName: string): string {
  */
 export function multiaddressToIpfsGatewayUrl(multiaddress: string): string {
   const hash = normalizeHash(multiaddress);
-  return fileToGatewayUrl({ source: "ipfs", hash, size: 0 });
+  return fileToGatewayUrl({ source: "ipfs", hash, size: 0, imageName: hash });
 }

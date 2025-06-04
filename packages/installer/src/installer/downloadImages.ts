@@ -1,10 +1,11 @@
 import fs from "fs";
 import { isAbsolute } from "path";
-import { InstallPackageData, DistributedFile, getImageTag } from "@dappnode/types";
+import { InstallPackageData, DistributedFile, getImageTag, Manifest } from "@dappnode/types";
 import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath } from "@dappnode/utils";
 import { getDockerImageManifest } from "@dappnode/dockerapi";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
+import path from "path";
 
 /**
  * Download the .tar.xz docker image of each package in paralel
@@ -28,7 +29,7 @@ export async function downloadImages(
       }
 
       try {
-        await getImage(dappnodeInstaller, imageFile, imagePath, onProgress);
+        await getImage(dappnodeInstaller, imageFile, imagePath, onProgress, pkg.manifest);
       } catch (e) {
         e.message = `Can't download ${dnpName} image: ${e.message}`;
         throw e; // Use this format to keep the stack trace
@@ -49,6 +50,85 @@ export async function downloadImages(
   );
 }
 
+export async function downloadImageFromGithub(
+  imageFile: DistributedFile,
+  downloadPath: string,
+  progress: (n: number) => void,
+  manifest: Manifest
+): Promise<void> {
+  // Extract repo owner, repo name, and version
+  const { repository, version } = manifest;
+  if (!repository?.url) throw new Error(`No repository URL found in manifest for ${manifest.name}`);
+
+  const { owner, repo } = repository.url.match(/github\.com\/([^/]+)\/([^/]+)/)?.groups || {};
+  if (!owner || !repo) throw new Error(`Invalid repository URL: ${repository.url}`);
+
+  const { hash, size, imageName } = imageFile;
+
+  if (!hash) throw new Error(`No hash found for image file in manifest for ${manifest.name}`);
+  if (!size) throw new Error(`No size found for image file in manifest for ${manifest.name}`);
+
+  // Build the download URL
+  const url = `https://github.com/${owner}/${repo}/releases/download/${version}/${imageName}`;
+  logs.info(`Downloading image from GitHub: ${url}`);
+
+  try {
+    // Start downloading the file from the URL
+    const response = await fetch(url);
+
+    // Check if the response is successful
+    if (!response.ok) {
+      throw new Error(`Failed to download asset: ${response.statusText}`);
+    }
+
+    // Get the total size of the file from the headers
+    const totalSize = parseInt(response.headers.get("content-length") || "0", 10);
+
+    // Define the file path to save the image
+    const filePath = path.join(downloadPath, imageName);
+
+    // Create a writable stream to save the file
+    const writer = fs.createWriteStream(filePath);
+
+    let downloaded = 0; // Track how much has been downloaded
+
+    // Get the reader for the stream
+    const reader = response.body?.getReader();
+
+    if (!reader) throw new Error("Failed to get stream reader");
+
+    // Read the stream in chunks
+    const pump = async () => {
+      const { done, value } = await reader.read();
+
+      if (done) {
+        writer.end(); // End the writable stream when done
+        logs.info(`Download complete: ${imageName} saved to ${filePath}`);
+        return;
+      }
+
+      // Calculate how much has been downloaded so far
+      downloaded += value.length;
+
+      // Update the progress
+      const progressPercentage = (downloaded / totalSize) * 100;
+      progress(progressPercentage);
+
+      // Write the chunk to the file
+      writer.write(value);
+
+      // Continue reading the next chunk
+      pump();
+    };
+
+    // Start pumping data from the stream
+    pump();
+  } catch (error) {
+    logs.error(`Error downloading image: ${error.message}`);
+    throw error; // Rethrow the error if you want to propagate it
+  }
+}
+
 /**
  * Handles the download of a DNP .xz image.
  * This function handles cache and type validation, while the IPFS
@@ -63,7 +143,7 @@ export async function downloadImages(
  * @param options see "modules/ipfs/methods/catStreamToFs"
  */
 
-export async function downloadImage(
+export async function downloadImageFromIpfs(
   dappnodeInstaller: DappnodeInstaller,
   hash: string,
   path: string,
@@ -81,7 +161,8 @@ export async function getImage(
   dappnodeInstaller: DappnodeInstaller,
   imageFile: DistributedFile,
   path: string,
-  progress: (n: number) => void
+  progress: (n: number) => void,
+  manifest: Manifest
 ): Promise<void> {
   // Validate parameters
   if (!path || path.startsWith("/ipfs/") || !isAbsolute("/")) throw Error(`Invalid path: "${path}"`);
@@ -100,7 +181,10 @@ export async function getImage(
 
   switch (imageFile.source) {
     case "ipfs":
-      await downloadImage(dappnodeInstaller, hash, path, size, progress);
+      await downloadImageFromIpfs(dappnodeInstaller, hash, path, size, progress);
+      break;
+    case "github":
+      await downloadImageFromGithub(imageFile, path, progress, manifest);
       break;
     default:
       throw Error(`Unsupported source ${imageFile.source}`);
