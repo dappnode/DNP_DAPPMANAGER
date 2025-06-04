@@ -154,7 +154,7 @@ export const params = {
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
-  IPFS_LOCAL: "http://ipfs.dappnode:5001",
+  IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
