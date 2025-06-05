@@ -22,7 +22,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "geth.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -49,7 +50,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nethermind.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -77,7 +79,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "besu.public.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -105,7 +108,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "erigon.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -135,7 +139,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -163,7 +168,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lighthouse.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -191,7 +197,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -219,7 +226,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nimbus.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -246,7 +254,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lodestar.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -274,7 +283,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -306,7 +316,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -339,7 +350,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "geth.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -366,7 +378,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nethermind.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -394,7 +407,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "besu.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -421,7 +435,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "erigon.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -451,7 +466,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -479,7 +495,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lighthouse.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -507,7 +524,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -535,7 +553,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nimbus.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -563,7 +582,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -598,7 +618,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -631,7 +652,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "geth.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -658,7 +680,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nethermind.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -686,7 +709,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "besu.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -713,7 +737,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "erigon.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -743,7 +768,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -771,7 +797,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lighthouse.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -799,7 +826,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -827,7 +855,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nimbus.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -855,7 +884,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -890,7 +920,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -922,7 +953,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "geth.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -949,7 +981,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nethermind.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -977,7 +1010,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "besu.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1004,7 +1038,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "erigon.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1034,7 +1069,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1062,7 +1098,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lighthouse.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1090,7 +1127,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1118,7 +1156,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nimbus.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1146,7 +1185,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -1181,7 +1221,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -1213,7 +1254,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nethermind.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1243,7 +1285,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1271,7 +1314,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "lighthouse.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1298,7 +1342,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1326,7 +1371,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "nimbus.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1355,7 +1401,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -1387,7 +1434,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -1419,7 +1467,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "geth.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1477,7 +1526,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "prysm.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1505,7 +1555,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                 imageFile: {
                   hash: "QM..",
                   source: "ipfs",
-                  size: 123
+                  size: 123,
+                  imageName: "teku.dnp.dappnode.eth"
                 },
                 warnings: {},
                 signedSafe: true,
@@ -1562,7 +1613,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "web3signer.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
@@ -1594,7 +1646,8 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               imageFile: {
                 hash: "QM..",
                 source: "ipfs",
-                size: 123
+                size: 123,
+                imageName: "mev-boost.dnp.dappnode.eth"
               },
               warnings: {},
               signedSafe: true,
