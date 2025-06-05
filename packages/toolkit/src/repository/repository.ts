@@ -521,7 +521,7 @@ export class DappnodeRepository extends ApmRepository {
         imageName,
         hash: imageAsset.cid.toString(),
         size: imageAsset.size,
-        source // TODO: consdier adding different sources
+        source: "github"
       };
     }
   }

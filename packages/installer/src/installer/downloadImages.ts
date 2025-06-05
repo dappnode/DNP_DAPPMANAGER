@@ -5,7 +5,6 @@ import { Log, logs } from "@dappnode/logger";
 import { shell, validatePath } from "@dappnode/utils";
 import { getDockerImageManifest } from "@dappnode/dockerapi";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
-import path from "path";
 
 /**
  * Download the .tar.xz docker image of each package in paralel
@@ -56,12 +55,31 @@ export async function downloadImageFromGithub(
   progress: (n: number) => void,
   manifest: Manifest
 ): Promise<void> {
+  logs.info(`Starting download from GitHub: ${imageFile.imageName} to ${downloadPath}`);
+
   // Extract repo owner, repo name, and version
   const { repository, version } = manifest;
   if (!repository?.url) throw new Error(`No repository URL found in manifest for ${manifest.name}`);
 
-  const { owner, repo } = repository.url.match(/github\.com\/([^/]+)\/([^/]+)/)?.groups || {};
-  if (!owner || !repo) throw new Error(`Invalid repository URL: ${repository.url}`);
+  // append to version v if not present
+  const versionWithV = version.startsWith("v") ? version : `v${version}`;
+
+  // The repository url could be in the format: git+https://github.com/dappnode/DAppNodePackage-rotki.git
+  // clean it to get the owner and repo name: remove "git+" and ensure it starts with "https://" and remove ".git" if present
+  if (!repository.url.startsWith("https://")) 
+    repository.url = repository.url.replace("git+", "").replace("https://", "");
+  if (repository.url.endsWith(".git"))
+    repository.url = repository.url.slice(0, -4); // Remove the trailing .git
+  
+  const { owner, repo } = (() => {
+    const urlParts = repository.url.split("/");
+    if (urlParts.length < 2) throw new Error(`Invalid repository URL: ${repository.url}`);
+    const owner = urlParts[urlParts.length - 2];
+    const repo = urlParts[urlParts.length - 1];
+    return { owner, repo };
+  })();
+
+
 
   const { hash, size, imageName } = imageFile;
 
@@ -69,11 +87,11 @@ export async function downloadImageFromGithub(
   if (!size) throw new Error(`No size found for image file in manifest for ${manifest.name}`);
 
   // Build the download URL
-  const url = `https://github.com/${owner}/${repo}/releases/download/${version}/${imageName}`;
+  const url = `https://github.com/${owner}/${repo}/releases/download/${versionWithV}/${imageName}`;
   logs.info(`Downloading image from GitHub: ${url}`);
 
   try {
-    // Start downloading the file from the URL
+    // Start downloading the file from the URL 
     const response = await fetch(url);
 
     // Check if the response is successful
@@ -84,8 +102,10 @@ export async function downloadImageFromGithub(
     // Get the total size of the file from the headers
     const totalSize = parseInt(response.headers.get("content-length") || "0", 10);
 
-    // Define the file path to save the image
-    const filePath = path.join(downloadPath, imageName);
+    // Define the file path to save the image (downloadPath is the full file path)
+    const filePath = downloadPath;
+    // Ensure parent directory exists
+    validatePath(filePath);
 
     // Create a writable stream to save the file
     const writer = fs.createWriteStream(filePath);
@@ -118,11 +138,11 @@ export async function downloadImageFromGithub(
       writer.write(value);
 
       // Continue reading the next chunk
-      pump();
+      await pump();
     };
 
     // Start pumping data from the stream
-    pump();
+    await pump();
   } catch (error) {
     logs.error(`Error downloading image: ${error.message}`);
     throw error; // Rethrow the error if you want to propagate it
