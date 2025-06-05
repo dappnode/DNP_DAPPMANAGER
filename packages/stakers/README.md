@@ -7,7 +7,7 @@
 - `getStakerConfig`: returns the current staker configuration for a given network
 - `setStakerConfig`: sets the current staker configuration for a given network
 
-This package includes all the logic related with the stakers UI, includiing the networks: **Holesky, Ethereum, Lukso, Prater and Gnosis chain**.
+This package includes all the logic related with the stakers UI, includiing the networks: **Holesky, Hoodi, Ethereum, Lukso, Prater and Gnosis chain**.
 
 ## Testing
 

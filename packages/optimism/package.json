@@ -23,8 +23,5 @@
     "@dappnode/installer": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0"
-  },
-  "devDependencies": {
-    "@types/node": "^20.14.10"
   }
 }

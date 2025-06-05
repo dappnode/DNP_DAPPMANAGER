@@ -2,6 +2,7 @@ import { IpfsRepository, IpfsClientTarget } from "@dappnode/types";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
 import { dappnodeInstaller } from "../index.js";
+import { eventBus } from "@dappnode/eventbus";
 
 /**
  * Changes the IPFS client
@@ -10,6 +11,9 @@ export async function ipfsClientTargetSet({ ipfsRepository }: { ipfsRepository: 
   if (!ipfsRepository.ipfsClientTarget) throw Error(`Argument target must be defined`);
 
   await changeIpfsClient(ipfsRepository.ipfsClientTarget, ipfsRepository.ipfsGateway);
+
+  // Emit event to trigger notifier healthcheck notification
+  eventBus.ipfsRepositoryChanged.emit();
 }
 
 /**
@@ -28,14 +32,14 @@ async function changeIpfsClient(nextTarget: IpfsClientTarget, nextGateway?: stri
 
     if (nextTarget === IpfsClientTarget.local) {
       db.ipfsClientTarget.set(IpfsClientTarget.local);
-      dappnodeInstaller.changeIpfsProvider(params.IPFS_LOCAL);
+      dappnodeInstaller.changeIpfsGatewayUrl(params.IPFS_LOCAL);
     } else {
       // Set new values in db
       db.ipfsGateway.set(nextGateway || params.IPFS_GATEWAY);
       db.ipfsClientTarget.set(IpfsClientTarget.remote);
 
       // Change IPFS host
-      dappnodeInstaller.changeIpfsProvider(db.ipfsGateway.get());
+      dappnodeInstaller.changeIpfsGatewayUrl(db.ipfsGateway.get());
     }
   } catch (e) {
     throw Error(`Error changing ipfs client to ${nextTarget}, ${e}`);

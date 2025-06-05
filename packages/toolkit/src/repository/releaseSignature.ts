@@ -11,8 +11,7 @@ import {
   ReleaseSignatureWithData,
   releaseFiles
 } from "@dappnode/types";
-import { CID } from "kubo-rpc-client";
-import { IPFSEntry } from "./types.js";
+import { CID, IPFSEntry } from "kubo-rpc-client";
 
 export function getReleaseSignatureStatus(
   dnpName: string,

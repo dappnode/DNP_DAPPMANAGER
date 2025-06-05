@@ -34,7 +34,6 @@ export interface HttpRoutes {
   env: RequestHandler<{ dnpName: string; envName: string }>;
   fileDownload: RequestHandler<{ containerName: string }>;
   globalEnvs: RequestHandler<{ name: string }>;
-  notificationSend: RequestHandler;
   packageManifest: RequestHandler<{ dnpName: string }>;
   metrics: RequestHandler;
   publicPackagesData: RequestHandler<{ containerName: string }>;
@@ -165,7 +164,6 @@ export function startHttpApi({
   app.get("/metrics", routes.metrics);
   app.post("/sign", routes.sign);
   app.post("/data-send", routes.dataSend);
-  app.post("/notification-send", routes.notificationSend);
 
   // Rest of RPC methods
   // prettier-ignore

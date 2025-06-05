@@ -97,6 +97,9 @@
 /* Controls the layout of the logos, all in one row with equal spacing */
 .funded-by-logos {
   --spacing: 0.7rem;
+  @media (max-width: 40rem ){
+    --spacing: 0.3rem
+  }
   display: grid;
   grid-auto-columns: auto;
   grid-auto-flow: column;
@@ -128,7 +131,7 @@
   }
   .funded-by-text-light,
   .funded-by-text-dark {
-    font-size: 8px;
+    font-size: 6px;
   }
   .funded-by-logo-light,
   .funded-by-logo-dark {
@@ -146,6 +149,6 @@
   }
 
   #core-version span {
-    font-size: small;
+    font-size: 0.7rem;
   }
 }

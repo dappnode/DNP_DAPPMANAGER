@@ -77,9 +77,9 @@ export const VolumesList = ({ dnp }: { dnp: InstalledPackageDetailData }) => {
 
   return (
     <div className="list-grid container-volumes">
-      <header>Volume</header>
-      <header className="center">Size</header>
-      <header className="center">Remove</header>
+      <header className="title-label">Volume</header>
+      <header className="title-label">Size</header>
+      <header className="title-label">Remove</header>
 
       {/* All containers entry */}
       <React.Fragment>

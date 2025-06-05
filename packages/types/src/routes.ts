@@ -30,7 +30,6 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  RebootRequiredScript,
   HostStatCpu,
   HostStatMemory,
   HostStatDisk,
@@ -45,6 +44,13 @@ import {
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  Notification,
+  NotificationsConfig,
+  NotificationsSettingsAllDnps
+} from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
@@ -120,7 +126,7 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: <T extends Network>(network: T) => Promise<StakerConfigGet>;
+  stakerConfigGet: (kwargs: { network: Network }) => Promise<StakerConfigGet>;
 
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
@@ -237,11 +243,6 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
-   * Returns true if dappnode connected to internet
-   */
-  getIsConnectedToInternet: () => Promise<boolean>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -260,6 +261,61 @@ export interface Routes {
    * Fetch extended info about a new DNP
    */
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
+
+  /**
+   * Get all the notifications
+   */
+  notificationsGetAll(): Promise<Notification[]>;
+
+  /**
+   * Get banner notifications that should be displayed within the given timestamp range
+   */
+  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
+
+  /**
+   * Get unseen notifications count
+   */
+  notificationsGetUnseenCount(): Promise<number>;
+
+  /**
+   * Gatus get endpoints
+   */
+  notificationsGetAllEndpoints(): Promise<{
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
+  }>;
+
+  /**
+   * Set all non-banner notifications as seen
+   */
+  notificationsSetAllSeen(): Promise<void>;
+
+  /**
+   * Set a notification as seen by providing its correlationId
+   */
+  notificationSetSeenByCorrelationID(correlationId: string): Promise<void>;
+
+  /**
+   * Gatus update endpoint
+   */
+  notificationsUpdateEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    notificationsConfig: NotificationsConfig;
+  }) => Promise<void>;
+
+  /**
+   * Applies the previous endpoints configuration to the new ones if their names match
+   */
+  notificationsApplyPreviousEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    newNotificationsConfig: NotificationsConfig;
+  }) => Promise<NotificationsConfig>;
+
+  /**
+   * Returns true if the notifications package is installed
+   */
+  notificationsIsInstalled: () => Promise<boolean>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -389,6 +445,7 @@ export interface Routes {
     name: string;
     version?: string;
     userSettings?: UserSettingsAllDnps;
+    notificationsSettings?: NotificationsSettingsAllDnps;
     options?: {
       /**
        * Forwarded option to dappGet
@@ -518,11 +575,6 @@ export interface Routes {
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
-
-  /**
-   *  Returns true if a reboot is required
-   */
-  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
 
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
@@ -684,12 +736,20 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsGetAll: {},
+  notificationsGetBanner: {},
+  notificationsGetUnseenCount: {},
+  notificationsGetAllEndpoints: {},
+  notificationsSetAllSeen: {},
+  notificationSetSeenByCorrelationID: {},
+  notificationsUpdateEndpoints: {},
+  notificationsApplyPreviousEndpoints: {},
+  notificationsIsInstalled: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },
@@ -732,7 +792,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
   rebootHost: { log: true },
-  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },

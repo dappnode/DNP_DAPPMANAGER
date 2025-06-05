@@ -1,23 +1,3 @@
-import type { CID } from "kubo-rpc-client";
-
-/**
- * IPFS
- */
-
-/**
- * TODO: the interface IPFSEntry is not properly exported by library ipfs-core-types. If importing it directly then the compiler throws an error. Version: 0.14.0
- */
-export interface IPFSEntry {
-  readonly type: "dir" | "file";
-  readonly cid: CID;
-  readonly name: string;
-  readonly path: string;
-  mode?: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  mtime?: any;
-  size: number;
-}
-
 /**
  * APM version
  */

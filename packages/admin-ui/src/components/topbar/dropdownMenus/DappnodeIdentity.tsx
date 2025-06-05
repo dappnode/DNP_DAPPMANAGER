@@ -1,9 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { AiOutlineUser } from "react-icons/ai";
 import BaseDropdown, { BaseDropdownMessage } from "./BaseDropdown";
 import makeBlockie from "ethereum-blockies-base64";
 import { getDappnodeIdentityClean } from "services/dappnodeStatus/selectors";
 import { stringSplit } from "utils/strings";
+import { apiAuth } from "api";
+import ErrorView from "components/ErrorView";
+import { systemProfilePath } from "pages/system/data";
+import { ReqStatus } from "types";
 
 type DappnodeIdentityType = ReturnType<typeof getDappnodeIdentityClean>;
 
@@ -35,7 +41,28 @@ function renderIdentityValue(key: keyof DappnodeIdentityType, value?: string): J
   }
 }
 
-export default function DappnodeIdentity() {
+function LogoutListItem() {
+  const [reqStatus, setReqStatus] = useState<ReqStatus>({});
+
+  async function onLogout() {
+    try {
+      setReqStatus({ loading: true });
+      await apiAuth.logoutAndReload();
+      setReqStatus({ result: true });
+    } catch (e) {
+      setReqStatus({ error: e });
+    }
+  }
+
+  return (
+    <div onClick={onLogout}>
+      <div className="sign-out">Sign out</div>
+      {reqStatus.error && <ErrorView error={reqStatus.error} hideIcon red />}
+    </div>
+  );
+}
+
+export default function DappnodeIdentity({ username }: { username: string }) {
   const dappnodeIdentity = useSelector(getDappnodeIdentityClean);
   if (!dappnodeIdentity || typeof dappnodeIdentity !== "object") {
     console.error("dappnodeIdentity must be an object");
@@ -47,20 +74,29 @@ export default function DappnodeIdentity() {
   const seed = stringSplit(domain, ".")[0] || `${name}${ip}`;
 
   const Icon = () => (
-    <React.Fragment>{seed ? <img src={makeBlockie(seed)} className="blockies-icon" alt="icon" /> : "?"}</React.Fragment>
+    <>
+      {seed ? <img src={makeBlockie(seed)} className="blockies-icon" alt="icon" /> : <AiOutlineUser className="user-icon" />}
+    </>
+
   );
+
+  const identityMessages = Object.entries(dappnodeIdentity)
+    .filter(([_, value]) => value)
+    .map(
+      ([key, value]): BaseDropdownMessage => ({
+        title: renderIdentityValue(key as keyof typeof dappnodeIdentity, value)
+      })
+    );
+
+  const profileMessages: BaseDropdownMessage[] = [
+    { title: <Link to={systemProfilePath}>Change password</Link> },
+    { title: <LogoutListItem /> }
+  ];
 
   return (
     <BaseDropdown
-      name="DAppNode Identity"
-      messages={Object.entries(dappnodeIdentity)
-
-        .filter(([_, value]) => value)
-        .map(
-          ([key, value]): BaseDropdownMessage => ({
-            title: renderIdentityValue(key as keyof typeof dappnodeIdentity, value)
-          })
-        )}
+      name={`DAppNode Identity - ${username || "User"}`}
+      messages={[...identityMessages, ...profileMessages]}
       Icon={Icon}
       className={"dappnodeidentity"}
       placeholder="No identity available, click the report icon"

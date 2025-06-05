@@ -21,13 +21,12 @@ export default function InstallerDropdown({ installLogs }: { installLogs: Progre
       className="installer"
       placeholder="No packages installing"
       unCollapsed
-      children={
-        <div style={{ width: "100%" }}>
-          {progressCardLogs.map((log) => (
-            <ProgressLogsView progressLogs={log} />
-          ))}
-        </div>
-      }
-    />
+    >
+      <div className="progress-logs">
+        {progressCardLogs.map((log, index) => (
+          <ProgressLogsView key={`progress-log-${index}`} progressLogs={log} />
+        ))}
+      </div>
+    </BaseDropdown>
   );
 }

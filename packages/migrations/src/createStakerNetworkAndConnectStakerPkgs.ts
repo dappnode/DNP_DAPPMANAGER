@@ -15,12 +15,15 @@ export async function createStakerNetworkAndConnectStakerPkgs(
 ): Promise<void> {
   for (const network of Object.values(Network)) {
     await createDockerStakerNetwork(params.DOCKER_STAKER_NETWORKS[network]);
-    await Promise.all([
-      await execution.persistSelectedExecutionIfInstalled(network),
-      await consensus.persistSelectedConsensusIfInstalled(network),
-      await signer.persistSignerIfInstalledAndRunning(network),
-      await mevBoost.persistMevBoostIfInstalledAndRunning(network)
+    const results = await Promise.allSettled([
+      execution.persistSelectedExecutionIfInstalled(network),
+      consensus.persistSelectedConsensusIfInstalled(network),
+      signer.persistSignerIfInstalledAndRunning(network),
+      mevBoost.persistMevBoostIfInstalledAndRunning(network)
     ]);
+
+    const errors = results.filter((result) => result.status === "rejected").map((result) => result.reason);
+    logs.error(`Errors while connecting staker packages to the network ${network}`, errors);
   }
 }
 

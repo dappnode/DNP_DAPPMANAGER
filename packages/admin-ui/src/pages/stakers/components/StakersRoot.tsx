@@ -4,6 +4,7 @@ import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
 import StakerNetwork from "./StakerNetwork";
 import { Network } from "@dappnode/types";
+import Optimism from "pages/rollups/components/Optimism";
 
 const StakersRoot: React.FC = () => {
   const stakersItems: {
@@ -38,7 +39,17 @@ const StakersRoot: React.FC = () => {
         StakerNetwork({
           network: Network.Holesky,
           description:
-            "Holesky is the latest public Ethereum testnet which will/has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
+            "Holesky is one Ethereum testnet which has replaced Goerli as a staking, infrastructure, and protocol-developer testnet. This network is primarily focused on testing the Ethereum protocol in a Post-Merged environment, best reflecting the latest iteration of the Ethereum Mainnet chain."
+        })
+    },
+    {
+      subPath: "hoodi",
+      title: "Hoodi",
+      component: () =>
+        StakerNetwork({
+          network: Network.Hoodi,
+          description:
+            "Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
         })
     },
     {
@@ -59,6 +70,13 @@ const StakersRoot: React.FC = () => {
           network: Network.Lukso,
           description:
             "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
+        })
+    },{
+      subPath: "optimism",
+      title: "Optimism",
+      component: () =>
+        Optimism({
+          description: "Optimism is a Layer 2 scaling solution for Ethereum. Rather than operating as an independent EVM chain, Optimism executes transactions off-chain and posts compressed data to Ethereum"
         })
     }
   ];

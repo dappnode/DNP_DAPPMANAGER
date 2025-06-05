@@ -16,6 +16,7 @@ import { isEqual } from "lodash-es";
 import { NewFeatureId } from "@dappnode/types";
 // styles
 import "./welcome.scss";
+import EnableNotifications from "./features/EnableNotifications";
 
 /**
  * This internal Welcome status allows to freeze featureIds
@@ -45,6 +46,8 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
       return (props: RouteProps) => <RepositoryFallback {...props} />;
     case "enable-ethical-metrics":
       return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
+    case "enable-notifications":
+      return (props: RouteProps) => <EnableNotifications {...props} />;
     default:
       return undefined;
   }

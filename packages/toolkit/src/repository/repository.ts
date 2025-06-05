@@ -1,6 +1,5 @@
 import * as isIPFS from "is-ipfs";
-import { IPFSEntry } from "./types.js";
-import { CID, KuboRPCClient, create } from "kubo-rpc-client";
+import { CID, IPFSEntry } from "kubo-rpc-client";
 import { CarReader } from "@ipld/car";
 import { recursive as exporter } from "ipfs-unixfs-exporter";
 import { Version } from "multiformats";
@@ -40,26 +39,24 @@ const source = "ipfs" as const;
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected ipfs: KuboRPCClient;
-  protected timeout: number;
+  protected gatewayUrl: string;
 
   /**
    * Constructs an instance of DappnodeRepository
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider, timeout?: number) {
+  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider) {
     super(ethersProvider);
-    this.timeout = timeout || 30 * 1000;
-    this.ipfs = create({ url: ipfsUrl, timeout: this.timeout });
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
   }
 
   /**
    * Changes the IPFS provider and target.
    * @param ipfsUrl - The new URL of the IPFS network node.
    */
-  public changeIpfsProvider(ipfsUrl: string): void {
-    this.ipfs = create({ url: ipfsUrl, timeout: 30 * 1000 });
+  public changeIpfsGatewayUrl(ipfsUrl: string): void {
+    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
   }
 
   /**
@@ -69,8 +66,12 @@ export class DappnodeRepository extends ApmRepository {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private async pinAddNoThrow(hash: any): Promise<void> {
     try {
-      await this.ipfs.pin.add(hash);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      await fetch(`${this.gatewayUrl}/api/v0/pin/add?arg=${hash}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
     } catch (e) {
       // Do not spam the terminal
       // console.error(`Error pinning ${hash}`, e);
@@ -140,8 +141,8 @@ export class DappnodeRepository extends ApmRepository {
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
 
-    // pin hash
-    await this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
+    // pin hash asynchronously
+    this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
 
     const ipfsEntries = await this.list(contentUri);
 
@@ -205,7 +206,8 @@ export class DappnodeRepository extends ApmRepository {
       disclaimer: await this.getPkgAsset(releaseFilesToDownload.disclaimer, ipfsEntries),
       gettingStarted: await this.getPkgAsset(releaseFilesToDownload.gettingStarted, ipfsEntries),
       prometheusTargets: await this.getPkgAsset(releaseFilesToDownload.prometheusTargets, ipfsEntries),
-      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries)
+      grafanaDashboards: await this.getPkgAsset(releaseFilesToDownload.grafanaDashboards, ipfsEntries),
+      notifications: await this.getPkgAsset(releaseFilesToDownload.notifications, ipfsEntries)
     };
   }
 
@@ -253,7 +255,7 @@ export class DappnodeRepository extends ApmRepository {
    * @see catCarReaderToMemory
    */
   public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
-    const chunks = [];
+    const chunks: Uint8Array[] = [];
     const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);
@@ -376,22 +378,35 @@ export class DappnodeRepository extends ApmRepository {
    * @returns An array of entries in the directory.
    * @throws Error when the provided hash is invalid.
    */
-
   public async list(hash: string): Promise<IPFSEntry[]> {
-    const files: IPFSEntry[] = [];
-    const dagGet = await this.ipfs.dag.get(CID.parse(this.sanitizeIpfsPath(hash)), { timeout: this.timeout });
-    if (dagGet.value.Links)
-      for (const link of dagGet.value.Links)
-        files.push({
-          type: "file",
-          cid: CID.parse(this.sanitizeIpfsPath(link.Hash.toString())),
-          name: link.Name,
-          path: `${link.Hash.toString()}/${link.Name}`, // Do not use module path to be browser compatible. path.join(link.Hash.toString(), link.Name),
-          size: link.Tsize
-        });
-    else throw Error(`Invalid IPFS hash ${hash}`);
+    const cidStr = this.sanitizeIpfsPath(hash.toString());
+    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.dag-json" }
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    }
 
-    return files;
+    const dagJson = (await res.json()) as {
+      Links?: Array<{
+        Name: string;
+        Hash: { "/": string };
+        Tsize: number;
+      }>;
+    };
+
+    if (!dagJson.Links) {
+      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+    }
+
+    return dagJson.Links.map((link) => ({
+      type: "file",
+      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
+      name: link.Name,
+      path: `${link.Hash["/"]}/${link.Name}`,
+      size: link.Tsize
+    }));
   }
 
   /**
@@ -404,14 +419,25 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async getAndVerifyContentFromGateway(hash: string): Promise<{
     carReader: CarReader;
-    root: CID<unknown, number, number, Version>;
+    root: CID;
   }> {
-    const cid = CID.parse(this.sanitizeIpfsPath(hash));
-    const asynciterable = this.ipfs.dag.export(cid, { timeout: this.timeout });
-    const carReader = await CarReader.fromIterable(asynciterable);
+    // 1. Download the CAR
+    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.car" }
+    });
+    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
+
+    // 2. Parse into a CarReader
+    const bytes = new Uint8Array(await res.arrayBuffer());
+    const carReader = await CarReader.fromBytes(bytes);
+
+    // 3. Verify the root CID
     const roots = await carReader.getRoots();
     const root = roots[0];
-    if (cid.toString() !== root.toString()) throw Error(`UNTRUSTED CONTENT: Invalid root CID ${root} for ${cid}`);
+    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+    }
 
     return { carReader, root };
   }

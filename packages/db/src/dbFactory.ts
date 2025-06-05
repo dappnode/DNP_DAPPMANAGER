@@ -37,7 +37,7 @@ export function dbFactory(dbPath: string): {
   logs.info(`New DB instance at ${dbPath}`);
 
   // Initialize db
-  // DB returns are of unkown type. External methods below are typed
+  // DB returns are of unknown type. External methods below are typed
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const jsonFileDb = new JsonFileDb<Record<string, any>>(dbPath, {});
 
@@ -110,7 +110,7 @@ export function dbFactory(dbPath: string): {
     };
   }
 
-  // DB returns are of unkown type. External methods below are typed
+  // DB returns are of unknown type. External methods below are typed
 
   // function getEntireDb(): any {
   //   return Object.freeze(JSON.parse(JSON.stringify(db.getState())));

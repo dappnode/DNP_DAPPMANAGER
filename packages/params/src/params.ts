@@ -53,7 +53,7 @@ export const params = {
   GLOBAL_ENVS_PATH_FOR_CORE: path.relative(DNCORE_DIR, GLOBAL_ENVS_PATH),
   GLOBAL_ENVS_PATH_FOR_DNP: GLOBAL_ENVS_PATH,
   GLOBAL_ENVS_PATH: GLOBAL_ENVS_PATH,
-  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".indentity.private.key"),
+  PRIVATE_KEY_PATH: path.join(DNCORE_DIR, ".identity.private.key"),
   // Host script paths
   HOST_SCRIPTS_DIR_FROM_HOST: path.join(HOST_HOME, "DNCORE/scripts/host"),
   HOST_SCRIPTS_DIR: "DNCORE/scripts/host",
@@ -119,6 +119,7 @@ export const params = {
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
     [Network.Holesky]: "holesky_network",
+    [Network.Hoodi]: "hoodi_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network"
@@ -153,7 +154,7 @@ export const params = {
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
-  IPFS_LOCAL: "http://ipfs.dappnode:5001",
+  IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
@@ -217,6 +218,7 @@ export const params = {
   wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+  notificationsDnpName: "notifications.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
@@ -252,6 +254,7 @@ export const params = {
   // Wi-Fi ENVs
   WIFI_KEY_SSID: "SSID",
   WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
+  WIFI_DEFAULT_PASSWORD: "dappnode",
 
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
@@ -383,6 +386,30 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x837a04322815b008c3e60c864bd5712e1da468b0"
+    },
+    {
+      name: "Shutter Network",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x30eFb96763f07892d0E2f7E900c672d43A202E61"
+    },
+    {
+      name: "ethPandaOps",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x67e5fEB0F1d184cC189614d8903ABcadD677c1E0"
+    },
+    {
+      name: "Dappnode Association - Pol (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Dappnode Association - Pol (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
     }
   ]
 };

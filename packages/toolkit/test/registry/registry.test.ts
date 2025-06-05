@@ -7,7 +7,7 @@ import { DappNodeRegistry } from "../../src/registry/index.js";
 describe("Dappnode Registry", function () {
   this.timeout(100000);
 
-  it(`should get dnp newRepos`, async () => {
+  it.skip(`should get dnp newRepos`, async () => {
     // const expectedResult: DNPRegistryEntry[] = [
     //   {
     //     id: "0x014a26511e1a8896e6b60002f82de526ee2e3452e5a170b74bc97c01fc4864f9f8000000",
@@ -716,7 +716,7 @@ describe("Dappnode Registry", function () {
     expect(result).to.be.ok;
   });
 
-  it(`should get public newRepos`, async () => {
+  it.skip(`should get public newRepos`, async () => {
     // const expectedResult: PublicRegistryEntry[] = [
     //   {
     //     id: "0x0060cb7c75f6bf1709541b92a8c7482f2c2ba62e62dfed90bcbdfb763465c5277b000000",

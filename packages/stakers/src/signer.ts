@@ -2,6 +2,7 @@ import {
   Network,
   SignerGnosis,
   SignerHolesky,
+  SignerHoodi,
   SignerLukso,
   SignerMainnet,
   SignerPrater,
@@ -31,6 +32,10 @@ export class Signer extends StakerComponent {
     },
     [Network.Holesky]: {
       dnpName: SignerHolesky.Web3signer,
+      minVersion: "0.1.0"
+    },
+    [Network.Hoodi]: {
+      dnpName: SignerHoodi.Web3signer,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: {
@@ -67,6 +72,7 @@ export class Signer extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAliases: [`signer.${network}.dncore.dappnode`],
       compatibleClients: [Signer.CompatibleSigners[network]],
       userSettings: this.getUserSettings(network),
       prevClient: Signer.CompatibleSigners[network].dnpName

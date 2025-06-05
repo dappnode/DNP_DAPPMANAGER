@@ -1,5 +1,5 @@
 import { getSchemaValidator } from "@dappnode/utils";
-import compose3xSchema from "./compose_v3x.schema.json" assert { type: "json" };
+import compose3xSchema from "./compose_v3x.schema.json" with { type: "json" };
 import { Compose } from "@dappnode/types";
 
 /**

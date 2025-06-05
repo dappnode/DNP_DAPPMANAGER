@@ -8,7 +8,7 @@ const corruptedPrivateKeyMessage = `
 
 =====================================================================
     Found corrupted privateKey.
-    Reseting DYNDNS subdomain, please update your user's profiles
+    Resetting DYNDNS subdomain, please update your user's profiles
 =====================================================================
 
 

@@ -1,20 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "components/Card";
 import { SshManagerChangePort } from "./ChangePort";
 import { SshManagerChangeStatus } from "./ChangeStatus";
+import { ShhStatus } from "@dappnode/types";
+import { ReqStatus } from "types";
 
 export function SshManager() {
+  const [reqGetStatus, setReqGetStatus] = useState<ReqStatus<ShhStatus>>({});
+
   return (
     <Card spacing>
-      <div className="subtle-header">ENABLE, DISABLE SSH</div>
-      <p>Enable and start or disable and stop the ssh.service of your DAppNode</p>
-      <SshManagerChangeStatus />
-
-      <hr />
-
-      <div className="subtle-header">CHANGE SSH PORT</div>
-      <p>Change SSH port of your DAppNode. Port number must be greater than 0 and less than 65536</p>
-      <SshManagerChangePort />
+      <SshManagerChangeStatus reqGetStatus={reqGetStatus} setReqGetStatus={setReqGetStatus} />
+      {reqGetStatus.result === "enabled" && <SshManagerChangePort />}
     </Card>
   );
 }
