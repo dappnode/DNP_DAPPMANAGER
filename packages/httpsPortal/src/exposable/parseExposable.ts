@@ -25,7 +25,7 @@ export function parseExposableServiceManifest(
         serviceName
       });
 
-      if (info.fromSubdomain && !rootSubdomain.includes(info.fromSubdomain)) {
+      if (info.fromSubdomain && !info.fromSubdomain.includes(rootSubdomain)) {
         // Illegal fromSubdomain, MUST include root dnpName
         continue;
       }
