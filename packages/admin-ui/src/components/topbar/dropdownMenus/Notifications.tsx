@@ -21,7 +21,7 @@ export default function Notifications() {
   }, [unseenNotificationsReq]);
 
   useEffect(() => {
-    if (unseenNotificationsReq.data !== undefined && unseenNotificationsReq.data !== null) {
+    if (unseenNotificationsReq.data) {
       setNewNotifications(unseenNotificationsReq.data > 0);
     }
   }, [unseenNotificationsReq.data]);

@@ -30,7 +30,7 @@ export {
   notificationsGetUnseenCount,
   notificationsSetAllSeen,
   notificationSetSeenByCorrelationID,
-  notificationsIsInstalled
+  notificationsPackageStatus,
 } from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";

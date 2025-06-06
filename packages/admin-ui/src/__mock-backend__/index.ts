@@ -394,7 +394,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsApplyPreviousEndpoints: async () => {
     return { endpoints: [], customEndpoints: [] };
   },
-  notificationsIsInstalled: async () => true
+  notificationsPackageStatus: async () => ({
+    notificationsDnp: null,
+    isInstalled: false,
+    isRunning: false,
+    isNotifierRunning: false,
+    servicesNotRunning: [],
+  }),
 };
 
 export const calls: Routes = {
