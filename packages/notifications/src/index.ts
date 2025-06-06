@@ -1,6 +1,13 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, InstalledPackageData, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  InstalledPackageData,
+  Notification,
+  NotificationPayload,
+  NotificationsConfig
+} from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
@@ -17,7 +24,12 @@ class Notifications {
    * Send a new notification
    */
   async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
-    await this.api.sendNotification(notificationPayload);
+    const { isNotifierRunning } = await this.notificationsPackageStatus();
+
+    // Only send custom notifications if the notifier service is running
+    if (isNotifierRunning) {
+      await this.api.sendNotification(notificationPayload);
+    }
   }
 
   /**
@@ -112,7 +124,7 @@ class Notifications {
       notificationsDnp?.containers.filter((c) => c.state !== "running").map((c) => c.serviceName) || [];
     const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
     const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
-    return {notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
+    return { notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
   }
 }
 
