@@ -99,13 +99,6 @@ class Notifications {
   /**
    * Determine if notifications package is installed
    */
-  async isNotificationsPackageInstalled(): Promise<boolean> {
-    if (await listPackageNoThrow({ dnpName: params.notificationsDnpName })) return true;
-    return false;
-  }
-  /**
-   * Determine if notifications package is installed
-   */
   async notificationsPackageStatus(): Promise<{
     notificationsDnp: InstalledPackageData | null;
     isInstalled: boolean;
