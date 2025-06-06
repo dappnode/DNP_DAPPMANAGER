@@ -159,14 +159,14 @@ export function applyUserSettings(
       })
     );
 
-    // docker aliases must be uinique
-    // TODO: use docker compose merge to automatically merge these dappnode docker compose properties
-    // see https://github.com/dappnode/DNP_DAPPMANAGER/issues/1983
-    const nextNetworks = mergeWith(networks, userSetNetworks, (value1, value2) => {
-      return mergeWith(value1, value2, (subvalue1, subvalue2) => {
-        return union(subvalue1, subvalue2);
-      });
-    });
+    // docker aliases must be unique
+    // merge base and user networks, then remove any empty/nullish props (e.g. empty ipv4_address)
+    const mergedNetworks = mergeWith(networks, userSetNetworks, (value1, value2) =>
+      mergeWith(value1, value2, (subvalue1, subvalue2) => union(subvalue1, subvalue2))
+    );
+    const nextNetworks = mapValues(mergedNetworks, (config) =>
+      omitBy(config, (v) => v == null || (Array.isArray(v) && v.length === 0))
+    );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
     const nextServiceVolumes = stringifyVolumeMappings(
