@@ -113,7 +113,7 @@ await aggregateDependencies({
           await aggregateDependencies({
             dappnodeInstaller,
             name: dnpName,
-            versionRange: `*`,
+            versionRange: `>=${version}`,
             dnps,
             dappGetFetcher // #### Injected dependency
           });
