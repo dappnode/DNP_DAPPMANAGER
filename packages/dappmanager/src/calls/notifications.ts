@@ -1,5 +1,11 @@
 import { notifications } from "@dappnode/notifications";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationsConfig } from "@dappnode/types";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  InstalledPackageData,
+  Notification,
+  NotificationsConfig
+} from "@dappnode/types";
 
 /**
  * Get all the notifications
@@ -14,14 +20,16 @@ export async function notificationsGetAll(): Promise<Notification[]> {
  * @returns all the notifications
  */
 export async function notificationsGetBanner(timestamp: number): Promise<Notification[]> {
-  return await notifications.getBannerNotifications(timestamp);
+  const { isNotifierRunning } = await notifications.notificationsPackageStatus();
+  return isNotifierRunning ? await notifications.getBannerNotifications(timestamp) : [];
 }
 
 /**
  * Get unseen notifications count
  */
 export async function notificationsGetUnseenCount(): Promise<number> {
-  return await notifications.getUnseenNotificationsCount();
+  const { isNotifierRunning } = await notifications.notificationsPackageStatus();
+  return isNotifierRunning ? await notifications.getUnseenNotificationsCount() : 0;
 }
 
 /**
@@ -78,8 +86,14 @@ export async function notificationsApplyPreviousEndpoints({
 }
 
 /**
- * Retrieve if notifications pkg is installed
+ * Retrieve notifications pkg status
  */
-export async function notificationsIsInstalled(): Promise<boolean> {
-  return await notifications.isNotificationsPackageInstalled();
+export async function notificationsPackageStatus(): Promise<{
+  notificationsDnp: InstalledPackageData | null;
+  isInstalled: boolean;
+  isRunning: boolean;
+  servicesNotRunning: string[];
+  isNotifierRunning: boolean;
+}> {
+  return await notifications.notificationsPackageStatus();
 }

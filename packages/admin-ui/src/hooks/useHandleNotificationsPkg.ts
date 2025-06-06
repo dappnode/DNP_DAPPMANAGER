@@ -4,38 +4,35 @@ import { notificationsDnpName } from "params.js";
 import { confirm } from "components/ConfirmDialog";
 import { withToast } from "components/toast/Toast";
 import { continueIfCalleDisconnected } from "api/utils";
-import { InstalledPackageDataApiReturn } from "@dappnode/types";
+import { InstalledPackageData } from "@dappnode/types";
 import { prettyDnpName } from "utils/format";
 
 export function useHandleNotificationsPkg() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isInstalling, setIsInstalling] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
+  const [isInstalling, setIsInstalling] = useState<boolean>(false);
+  const [isRunning, setIsRunning] = useState<boolean>(false);
   const [notRunningServices, setNotRunningServices] = useState<string[]>([]);
-  const [notificationsPkg, setNotificationsPkg] = useState<InstalledPackageDataApiReturn | undefined>(undefined);
+  const [isNotifierRunning, setIsNotifierRunning] = useState<boolean>(false);
+  const [notificationsPkg, setNotificationsPkg] = useState<InstalledPackageData | null>(null);
   const [errorInstallingNotifications, setErrorInstallingNotifications] = useState<string | null>(null);
 
-  const dnps = useApi.packagesGet();
-
+    const notificationsStatusRequest = useApi.notificationsPackageStatus();
+  
+    useEffect(() => {
+      setIsLoading(notificationsStatusRequest.isValidating);
+    }, [notificationsStatusRequest.isValidating]);
+    
   useEffect(() => {
-    setIsLoading(dnps.isValidating);
-  }, [dnps.isValidating]);
-
-  useEffect(() => {
-    if (dnps.data) {
-      const notificationsPkg = dnps.data.find((dnp) => dnp.dnpName === notificationsDnpName);
-      setIsInstalled(Boolean(notificationsPkg));
-      setNotificationsPkg(notificationsPkg ?? undefined);
-
-      if (notificationsPkg) {
-        setNotRunningServices(
-          notificationsPkg.containers.filter((c) => c.state !== "running").map((c) => c.serviceName)
-        );
-      } else {
-        setNotRunningServices([]);
-      }
+    if (notificationsStatusRequest.data) {
+      const {notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning } = notificationsStatusRequest.data;
+      setIsInstalled(isInstalled);
+      setNotRunningServices(servicesNotRunning);
+      setIsRunning(isRunning);
+      setIsNotifierRunning(isNotifierRunning);
+      setNotificationsPkg(notificationsDnp);
     }
-  }, [dnps.data]);
+  }, [notificationsStatusRequest.data]);
 
   const startStopNotifications = useCallback(async (): Promise<void> => {
     try {
@@ -70,12 +67,12 @@ export function useHandleNotificationsPkg() {
           }
         );
 
-        dnps.revalidate();
+        notificationsStatusRequest.revalidate();
       }
     } catch (e) {
       console.error(`Error on start/stop notifications package: ${e}`);
     }
-  }, [isInstalled, notificationsPkg, notRunningServices, dnps]);
+  }, [isInstalled, notificationsPkg, notRunningServices, notificationsStatusRequest]);
 
   const installNotificationsPkg = useCallback(async (): Promise<void> => {
     try {
@@ -105,17 +102,18 @@ export function useHandleNotificationsPkg() {
       setErrorInstallingNotifications(`Error while installing notifications package: ${error}`);
     } finally {
       setIsInstalling(false);
-      await dnps.revalidate();
+      await notificationsStatusRequest.revalidate();
     }
-  }, [dnps]);
+  }, [notificationsStatusRequest]);
 
   return {
     isLoading,
     isInstalled,
-    isRunning: isInstalled && notRunningServices.length === 0,
+    isRunning,
     startStopNotifications,
     installNotificationsPkg,
     isInstalling,
+    isNotifierRunning,
     errorInstallingNotifications
   };
 }

@@ -1,6 +1,6 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
+import { CustomEndpoint, GatusEndpoint, InstalledPackageData, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
@@ -102,6 +102,24 @@ class Notifications {
   async isNotificationsPackageInstalled(): Promise<boolean> {
     if (await listPackageNoThrow({ dnpName: params.notificationsDnpName })) return true;
     return false;
+  }
+  /**
+   * Determine if notifications package is installed
+   */
+  async notificationsPackageStatus(): Promise<{
+    notificationsDnp: InstalledPackageData | null;
+    isInstalled: boolean;
+    isRunning: boolean;
+    isNotifierRunning: boolean;
+    servicesNotRunning: string[];
+  }> {
+    const notificationsDnp = await listPackageNoThrow({ dnpName: params.notificationsDnpName });
+    const isInstalled = Boolean(notificationsDnp);
+    const servicesNotRunning =
+      notificationsDnp?.containers.filter((c) => c.state !== "running").map((c) => c.serviceName) || [];
+    const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
+    const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
+    return {notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
   }
 }
 

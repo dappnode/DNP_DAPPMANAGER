@@ -8,7 +8,8 @@ export default function BottomButtons({
   nextTag = "Next",
   backVariant = "outline-secondary",
   nextVariant = "dappnode",
-  nextDisabled = false
+  nextDisabled = false,
+  backDisabled = false
 }: {
   onBack?: () => void;
   onNext?: () => void;
@@ -17,11 +18,12 @@ export default function BottomButtons({
   backVariant?: ButtonVariant;
   nextVariant?: ButtonVariant;
   nextDisabled?: boolean;
+  backDisabled?: boolean;
 }) {
   return (
     <div className="bottom-buttons">
       {onBack && (
-        <Button onClick={onBack} variant={backVariant} className="back">
+        <Button onClick={onBack} variant={backVariant} className="back" disabled={backDisabled}>
           {backTag}
         </Button>
       )}
