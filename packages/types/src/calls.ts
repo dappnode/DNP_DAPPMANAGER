@@ -926,13 +926,6 @@ export interface LocalIpResponse {
  * ====
  */
 
-export type DistributedFileSource = "ipfs" | "swarm";
-export interface DistributedFile {
-  hash: string;
-  source: DistributedFileSource;
-  size: number;
-}
-
 export interface IpfsRepository {
   ipfsClientTarget: IpfsClientTarget;
   ipfsGateway: string;
