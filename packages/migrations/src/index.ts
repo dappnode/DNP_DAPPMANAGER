@@ -5,7 +5,6 @@ import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
 import { params } from "@dappnode/params";
 import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
@@ -82,11 +81,6 @@ export async function executeMigrations(
       fn: removeDnsAndAddAlias,
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80"
-    },
-    {
-      fn: addDappnodePeerToLocalIpfsNode,
-      migration: "add Dappnode peer to local IPFS node",
-      coreVersion: "0.2.88"
     },
     {
       fn: changeEthicalMetricsDbFormat,
