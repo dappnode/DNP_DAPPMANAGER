@@ -12,9 +12,9 @@ import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
 
 export const NotificationsRoot: React.FC = () => {
-  const isNotificationsPkgInstalledRequest = useApi.notificationsIsInstalled();
+  const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
 
-  return renderResponse(isNotificationsPkgInstalledRequest, ["Loading notifications"], (isInstalled) => {
+  return renderResponse(notificationsPkgStatusRequest, ["Loading notifications"], (data) => {
     const availableRoutes: {
       name: string;
       subPath: string;
@@ -23,12 +23,12 @@ export const NotificationsRoot: React.FC = () => {
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: isInstalled ? Inbox : () => <InstallNotificationsPkg />
+        component: data.isInstalled ? Inbox : () => <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        component: data.isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
       },
       {
         name: "Legacy",

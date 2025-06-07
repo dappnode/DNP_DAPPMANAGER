@@ -40,7 +40,8 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  DockerUpgradeRequirements
+  DockerUpgradeRequirements,
+  InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -313,9 +314,15 @@ export interface Routes {
   }) => Promise<NotificationsConfig>;
 
   /**
-   * Returns true if the notifications package is installed
+   * Returns notifications package status
    */
-  notificationsIsInstalled: () => Promise<boolean>;
+  notificationsPackageStatus: () => Promise<{
+    notificationsDnp: InstalledPackageData | null;
+    isInstalled: boolean;
+    isRunning: boolean;
+    isNotifierRunning: boolean;
+    servicesNotRunning: string[];
+  }> ;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -749,7 +756,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationSetSeenByCorrelationID: {},
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
-  notificationsIsInstalled: {},
+  notificationsPackageStatus: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalMappingAdd: { log: true },

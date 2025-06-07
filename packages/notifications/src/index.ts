@@ -1,6 +1,13 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  InstalledPackageData,
+  Notification,
+  NotificationPayload,
+  NotificationsConfig
+} from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
@@ -17,7 +24,12 @@ class Notifications {
    * Send a new notification
    */
   async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
-    await this.api.sendNotification(notificationPayload);
+    const { isNotifierRunning } = await this.notificationsPackageStatus();
+
+    // Only send custom notifications if the notifier service is running
+    if (isNotifierRunning) {
+      await this.api.sendNotification(notificationPayload);
+    }
   }
 
   /**
@@ -99,9 +111,20 @@ class Notifications {
   /**
    * Determine if notifications package is installed
    */
-  async isNotificationsPackageInstalled(): Promise<boolean> {
-    if (await listPackageNoThrow({ dnpName: params.notificationsDnpName })) return true;
-    return false;
+  async notificationsPackageStatus(): Promise<{
+    notificationsDnp: InstalledPackageData | null;
+    isInstalled: boolean;
+    isRunning: boolean;
+    isNotifierRunning: boolean;
+    servicesNotRunning: string[];
+  }> {
+    const notificationsDnp = await listPackageNoThrow({ dnpName: params.notificationsDnpName });
+    const isInstalled = Boolean(notificationsDnp);
+    const servicesNotRunning =
+      notificationsDnp?.containers.filter((c) => c.state !== "running").map((c) => c.serviceName) || [];
+    const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
+    const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
+    return { notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
   }
 }
 
