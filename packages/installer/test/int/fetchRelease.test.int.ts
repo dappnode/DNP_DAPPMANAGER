@@ -55,7 +55,6 @@ describe("Fetch releases", () => {
     };
 
     const composeMain = new ComposeEditor({
-      version: "3.5",
       services: {
         [dnpNameMain]: {
           container_name: getContainerName({

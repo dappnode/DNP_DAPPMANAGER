@@ -92,7 +92,7 @@ describe.only("schemaValidation", function () {
       fs.mkdirSync(testDir, { recursive: true });
     });
     it("should validate a valid compose", async () => {
-      const validCompose = `version: "3.4"
+      const validCompose = `---
 services:
   beacon-chain:
     image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
@@ -129,7 +129,7 @@ volumes:
     });
 
     it("should throw error with an invalid compose", async () => {
-      const invalidCompose = `version: "3.5"
+      const invalidCompose = `---
 services:
   ui:
     image: "ui.web3signer-gnosis.dnp.dappnode.eth:0.1.0"
@@ -181,7 +181,7 @@ volumes:
     });
 
     it("should validate a merged compose file", async () => {
-      const validCompose1 = `version: "3.4"
+      const validCompose1 = `---
   services:
   beacon-chain:
     image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0"
@@ -213,7 +213,7 @@ volumes:
   beacon-chain-data: {}
   validator-data: {}`;
 
-      const validCompose2 = `version: "3.4"
+      const validCompose2 = `---
   services:
   beacon-chain:
     environment:

@@ -50,7 +50,7 @@ describe("Integration test for backup to and from:", function () {
     await shell(`mkdir -p ${path.parse(dockerComposePath).dir}`);
     fs.writeFileSync(
       dockerComposePath,
-      `version: '3.5'
+      `---'
 services:
   ${dnpName}:
     image: 'nginx:alpine'

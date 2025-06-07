@@ -1,4 +1,4 @@
-version: "3.5"
+---
 services:
   s1:
     container_name: DAppNodeCore-s1.sample-core.dnp.dappnode.eth

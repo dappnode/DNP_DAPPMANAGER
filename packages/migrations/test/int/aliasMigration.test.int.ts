@@ -89,7 +89,7 @@ const containers = [
 ];
 
 const CONTAINER_COMPOSE = `
-version: '3.4'
+---
 services:
   notmainService:
     image: "chentex/random-logger"
@@ -107,7 +107,7 @@ networks:
 `;
 
 const CONTAINER_COMPOSE_PUBLIC = `
-version: '3.4'
+---
 services:
   notmainService:
     image: "chentex/random-logger"
@@ -125,7 +125,7 @@ networks:
 `;
 
 const MONO_COMPOSE = `
-version: '3.4'
+---
 services:
   ${DNP_NAME_MONO}:
     image: "chentex/random-logger"
@@ -138,7 +138,7 @@ networks:
 `;
 
 const MONO_COMPOSE_PUBLIC = `
-version: '3.4'
+---
 services:
   service:
     image: "chentex/random-logger"

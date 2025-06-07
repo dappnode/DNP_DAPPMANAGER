@@ -8,7 +8,7 @@ import { GlobalEnvsPrefixed, ComposeServiceNetwork } from "@dappnode/types";
 
 describe("compose service editor", () => {
   const exampleCompose = `
-version: '3.5'
+---
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
@@ -67,7 +67,7 @@ networks:
       const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
-version: '3.5'
+---
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
@@ -113,7 +113,7 @@ networks:
       const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
-version: '3.5'
+---
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
@@ -163,7 +163,7 @@ networks:
       const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
-version: '3.5'
+---
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth
@@ -227,7 +227,7 @@ networks:
       const composeAfter = fs.readFileSync(`${dnpRepoExamplePath}/docker-compose.yml`, "utf-8");
 
       const composeExpected = `
-version: '3.5'
+---
 services:
   goerli-geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-goerli-geth.dnp.dappnode.eth

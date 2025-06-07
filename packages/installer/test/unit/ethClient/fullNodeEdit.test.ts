@@ -15,7 +15,7 @@ describe("Edit fullnode in eth client", () => {
     shellSafe("mkdir -p dnp_repo");
   });
   const composeWithFullnodeAlias = `
-version: '3.5'
+---
 services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth
@@ -50,7 +50,7 @@ networks:
 `;
 
   const composeWithOutFullnodeAlias = `
-version: '3.5'
+---
 services:
   geth.dnp.dappnode.eth:
     container_name: DAppNodePackage-geth.dnp.dappnode.eth

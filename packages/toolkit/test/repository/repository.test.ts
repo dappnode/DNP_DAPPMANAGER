@@ -119,7 +119,6 @@ describe.skip("Dappnode Repository", function () {
         ]
       };
       const expectedCompose = {
-        version: "3.4",
         services: {
           "beacon-chain": {
             environment: {

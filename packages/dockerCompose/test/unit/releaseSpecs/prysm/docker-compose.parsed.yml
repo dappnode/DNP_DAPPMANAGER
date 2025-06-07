@@ -1,4 +1,4 @@
-version: "3.5"
+---
 services:
   beacon-chain:
     container_name: DAppNodePackage-beacon-chain.prysm.dnp.dappnode.eth

@@ -55,7 +55,6 @@ describe("files / compose / validateDappnodeCompose", () => {
   };
 
   const compose: Compose = {
-    version: "3.5",
     services: {
       "beacon-chain": {
         image: "beacon-chain.prysm-prater.dnp.dappnode.eth:1.0.0",
@@ -166,20 +165,6 @@ service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mou
 service validator has key credential_spec that is not allowed. Allowed keys are: cap_add,cap_drop,command,depends_on,devices,entrypoint,environment,expose,extra_hosts,healthcheck,labels,logging,network_mode,networks,ports,privileged,restart,stop_grace_period,stop_signal,user,volumes,working_dir,security_opt,image,build,volumes,environment`);
   });
 
-  it("Should throw an error due to unsafe compose version", () => {
-    expect(() =>
-      validateDappnodeCompose(
-        {
-          ...compose,
-          version: "3.3"
-        },
-        manifest
-      )
-    ).to.throw(`Error validating compose file with dappnode requirements:
-
-Compose version 3.3 is not supported. Minimum version is 3.4`);
-  });
-
   it("Should throw an error due to unsafe service networks in string format", () => {
     expect(() =>
       validateDappnodeCompose(
@@ -236,7 +221,6 @@ service validator has a non-whitelisted docker network: other_network. Only dock
       validateDappnodeCompose(
         {
           ...compose,
-          version: "3.3",
           services: {
             ...compose.services,
             validator: {
@@ -249,7 +233,6 @@ service validator has a non-whitelisted docker network: other_network. Only dock
       )
     ).to.throw(`Error validating compose file with dappnode requirements:
 
-Compose version 3.3 is not supported. Minimum version is 3.4
 service validator volume /var/run/docker.sock:/var/run/docker.sock is a bind-mount, only named non-external volumes are allowed`);
   });
 });
