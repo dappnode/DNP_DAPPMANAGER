@@ -5,8 +5,7 @@ import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
 import { WireguardDevicesRoot } from "./wireguard/WireguardDevicesRoot";
 import Title from "components/Title";
-import { docsUrl, vpnDnpName, wireguardDnpName, tailscaleDnpName } from "params";
-import LinkDocs from "components/LinkDocs";
+import { vpnDnpName, wireguardDnpName, tailscaleDnpName } from "params";
 import { TailscaleVpn } from "./TailscaleVpn";
 
 export function VpnHome() {
@@ -61,12 +60,6 @@ export function VpnHome() {
           </button>
         ))}
       </div>
-
-      <p>
-        Create a VPN profile for each of your devices (laptop, phone) so you can access your Dappnode from an external
-        network. Learn more about VPN at:{" "}
-        <LinkDocs href={docsUrl.connectVpn}>How to connect to your Dappnode VPN</LinkDocs>
-      </p>
 
       <div className="section-spacing">
         <Routes>
