@@ -5,8 +5,9 @@ import { title, subPaths } from "../data";
 import { OpenVpnDevicesRoot } from "./openvpn/OpenVpnDevicesRoot";
 import { WireguardDevicesRoot } from "./wireguard/WireguardDevicesRoot";
 import Title from "components/Title";
-import { docsUrl, vpnDnpName, wireguardDnpName } from "params";
+import { docsUrl, vpnDnpName, wireguardDnpName, tailscaleDnpName } from "params";
 import LinkDocs from "components/LinkDocs";
+import { TailscaleVpn } from "./TailscaleVpn";
 
 export function VpnHome() {
   const dnpsRequest = useApi.packagesGet();
@@ -22,6 +23,13 @@ export function VpnHome() {
       component: React.ComponentType<any>;
       installed: boolean;
     }[] = [
+      {
+        name: "Tailscale",
+        subPath: subPaths.tailscale,
+        subLink: "tailscale",
+        component: TailscaleVpn,
+        installed: dnpsSet.has(tailscaleDnpName)
+      },
       {
         name: "OpenVPN",
         subPath: subPaths.openVpn,
