@@ -36,13 +36,13 @@ export async function removeDnsAndAddAlias(): Promise<void> {
 }
 
 export function removeDnsFromPackageComposeFile(dnpName: string, isCore: boolean): void {
-  logs.info(`Checking DNS from ${dnpName} compose file`);
+  logs.debug(`Checking DNS from ${dnpName} compose file`);
 
   const compose = new ComposeFileEditor(dnpName, isCore);
   const services = compose.services();
 
   for (const serviceName of Object.keys(services)) {
-    logs.info(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
+    logs.debug(`Checking DNS from ${serviceName} in ${dnpName} compose file`);
     try {
       const composeServiceEditor = new ComposeServiceEditor(compose, serviceName);
       const composeService = composeServiceEditor.get();
