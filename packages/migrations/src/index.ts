@@ -5,7 +5,6 @@ import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { params } from "@dappnode/params";
-import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
@@ -75,11 +74,6 @@ export async function executeMigrations(
       fn: removeDnsAndAddAlias,
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80"
-    },
-    {
-      fn: changeEthicalMetricsDbFormat,
-      migration: "change ethical metrics db format",
-      coreVersion: "0.2.92"
     },
     {
       fn: determineIsDappnodeAws,
