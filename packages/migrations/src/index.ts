@@ -1,5 +1,4 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
-import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
 import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
@@ -38,11 +37,6 @@ export async function executeMigrations(
   mevBoost: MevBoost
 ): Promise<void> {
   const migrations: Migration[] = [
-    {
-      fn: removeLegacyDockerAssets,
-      migration: "bundle legacy ops to prevent spamming the docker API",
-      coreVersion: "0.2.30"
-    },
     {
       fn: migrateUserActionLogs,
       migration: "migrate winston .log JSON file to a lowdb",
