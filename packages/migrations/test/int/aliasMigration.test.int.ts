@@ -2,7 +2,7 @@ import "mocha";
 import fs from "fs";
 import { expect } from "chai";
 import { PackageContainer } from "@dappnode/types";
-import { addAliasToGivenContainers } from "../../src/addAliasToRunningContainers.js";
+import { addAliasToGivenContainers } from "../../src/removeDnsAndAddAlias.js";
 import { mockContainer, shellSafe } from "../testUtils.js";
 import { params } from "@dappnode/params";
 

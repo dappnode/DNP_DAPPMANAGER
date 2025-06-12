@@ -1,8 +1,9 @@
-import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { params } from "@dappnode/params";
-import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
 import Dockerode from "dockerode";
+import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
+import { params } from "@dappnode/params";
+import { getDockerComposePath, getPrivateNetworkAliases, removeCidrSuffix } from "@dappnode/utils";
+import { InstalledPackageDataApiReturn } from "@dappnode/types";
 
 /**
  * Connect a container to a docker network with an IP.
@@ -23,24 +24,17 @@ import Dockerode from "dockerode";
  * @param network dockerode network instance container must be connected to
  * @param containerName containername of the container to be connected to
  * @param containerIp container IP fo the container to be connected with
- * @param aliasesIpsMap aliases
  */
 export async function connectContainerWithIp({
+  pkg,
   network,
   containerName,
-  containerIp,
-  aliasesIpsMap
+  containerIp
 }: {
+  pkg: InstalledPackageDataApiReturn;
   network: Dockerode.Network;
   containerName: string;
   containerIp: string;
-  aliasesIpsMap: Map<
-    string,
-    {
-      aliases: string[];
-      ip: string;
-    }
-  >;
 }) {
   // check if there are any docker containers connected to the network with that IP different than the container requested
   const conflictingContainerName = (await findContainerByIP(network, containerIp))?.Name;
@@ -57,8 +51,8 @@ export async function connectContainerWithIp({
       logs.warn(`container ${containerName} is not running, restarting it`);
       await targetContainer.restart();
     }
-
-    const hasContainerRightIp = removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") === containerIp;
+    // TODO: check this ip is good
+    const hasContainerRightIp = removeCidrSuffix(containerInfo.NetworkSettings.IPAddress) === containerIp;
 
     if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
     else {
@@ -67,8 +61,7 @@ export async function connectContainerWithIp({
         network,
         containerName,
         maxAttempts: 20,
-        ip: containerIp,
-        aliasesIpsMap
+        ip: containerIp
       });
     }
   } catch (e) {
@@ -99,25 +92,17 @@ async function connectContainerRetryOnIpUsed({
   network,
   containerName,
   maxAttempts,
-  ip,
-  aliasesIpsMap
+  ip
 }: {
   network: Dockerode.Network;
   containerName: string;
   maxAttempts: number;
   ip: string;
-  aliasesIpsMap: Map<
-    string,
-    {
-      aliases: string[];
-      ip: string;
-    }
-  >;
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
-  const aliases = aliasesIpsMap.get(containerName)?.aliases ?? [];
+  const aliases = getPrivateNetworkAliases({ dnpName, serviceName, isMainOrMonoservice });
   let attemptCount = 0;
   const networkOptions = {
     Container: containerName,
@@ -146,14 +131,12 @@ async function connectContainerRetryOnIpUsed({
         // IP is not right, reconnect container with proper IP
         logs.warn(`container ${containerName} already connected to network ${network.id} with wrong IP`);
 
-        // TODO: What if this fails?
         await network.disconnect({
           Container: containerName
         });
 
         // The container will be reconnected in the next iteration
       } else {
-        // TODO: What if we cannot connect dappmanager because of this error?
         logs.error(error);
         return;
       }
