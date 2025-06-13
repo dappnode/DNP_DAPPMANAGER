@@ -62,12 +62,14 @@ export async function ensureDockerNetworkConfig({
   if (rollback) {
     const network = docker.getNetwork(networkName);
     logs.info(`Rolling back docker network configuration for ${networkName}...`);
+
+    // 1. Disconnect containers from the network
+    await disconnectAllContainersFromNetwork(network);
+
     for (const pkg of packages) {
-      // 1. Disconnect containers from the network
       logs.info(
         `Rolling back docker network configuration for ${pkg.dnpName} compose file, disconnecting containers...`
       );
-      await disconnectAllContainersFromNetwork(network);
 
       // 2. Remove the config from the compose file if needed
       writeDockerNetworkConfig({
@@ -87,6 +89,8 @@ export async function ensureDockerNetworkConfig({
 
     // 4. remove the docker network
     await network.remove();
+
+    return;
   }
 
   // 1. create the new docker network
