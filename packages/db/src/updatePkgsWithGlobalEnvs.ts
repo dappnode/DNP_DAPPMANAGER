@@ -30,15 +30,24 @@ export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValu
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
     const environmentsByService: { [serviceName: string]: PackageEnvs }[] = [];
+    let needsUpdate = false;
     for (const service of services) {
       const serviceEnvs = service.getEnvs();
       if (globalEnvKey in serviceEnvs) {
-        environmentsByService.push({
-          [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
-        });
+        const currentVal = serviceEnvs[globalEnvKey];
+        if (currentVal === globEnvValue) {
+          logs.info(`Global env ${globalEnvKey} for ${pkg.dnpName} already set to ${globEnvValue}, skipping update`);
+        } else {
+          needsUpdate = true;
+          environmentsByService.push({
+            [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
+          });
+        }
       }
     }
-    if (environmentsByService.length === 0) continue;
+    if (!needsUpdate) {
+      continue;
+    }
     const environmentByService: {
       [serviceName: string]: PackageEnvs;
     } = environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});

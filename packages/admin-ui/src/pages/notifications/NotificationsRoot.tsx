@@ -3,16 +3,24 @@ import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
 import { subPaths, title } from "./data";
-import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
 import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
+import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
+import { notificationsDnpName } from "params";
 
 export const NotificationsRoot: React.FC = () => {
   const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
+
+  const InstallNotificationsPkg = () => (
+    <NoDnpInstalled
+      customCopy="To receive notifications on your Dappnode, you must install the Notifications Dappnode Package."
+      id={notificationsDnpName}
+    />
+  );
 
   return renderResponse(notificationsPkgStatusRequest, ["Loading notifications"], (data) => {
     const availableRoutes: {
