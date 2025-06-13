@@ -1,7 +1,11 @@
 import { urlJoin } from "utils/url";
 
 // JSON RPC API
-export const apiUrl = import.meta.env.VITE_APP_API_URL || "http://my.dappnode/";
+// because is the backend server that hosts the frontend, the backend API URL must is the same as the frontend URL
+const { protocol, hostname, port } = window.location;
+const baseUrl = `${protocol}//${hostname}${port ? `:${port}` : ""}`; // Reconstruct base URL with protocol, hostname, and port (if it exists and is not default)
+const apiUrl = baseUrl || import.meta.env.VITE_APP_API_URL || baseUrl;
+
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
 
