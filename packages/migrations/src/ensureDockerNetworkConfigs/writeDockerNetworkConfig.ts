@@ -88,7 +88,7 @@ function ensureServiceNetworkConfig({
     return;
   }
 
-  const aliases = getPrivateNetworkAliases({ dnpName, serviceName, isMainOrMonoservice });
+  const aliases = getPrivateNetworkAliases({ dnpName, serviceName, isMainOrMonoservice }, networkName);
   const serviceNetwork = serviceNetworks[networkName];
 
   if (!serviceNetwork) {

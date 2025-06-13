@@ -98,7 +98,10 @@ function setServiceNetworksWithAliases(
   if (!serviceNetworks)
     return {
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-        aliases: getPrivateNetworkAliases(service)
+        aliases: getPrivateNetworkAliases(service, params.DOCKER_PRIVATE_NETWORK_NAME)
+      },
+      [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+        aliases: getPrivateNetworkAliases(service, params.DOCKER_PRIVATE_NETWORK_NEW_NAME)
       }
     };
 
@@ -111,7 +114,10 @@ function setServiceNetworksWithAliases(
     ...serviceNetworks,
     [params.DOCKER_PRIVATE_NETWORK_NAME]: {
       ...dncoreServiceNetwork,
-      aliases: getPrivateNetworkAliases(service)
+      aliases: getPrivateNetworkAliases(service, params.DOCKER_PRIVATE_NETWORK_NAME)
+    },
+    [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+      aliases: getPrivateNetworkAliases(service, params.DOCKER_PRIVATE_NETWORK_NEW_NAME)
     }
   };
 }

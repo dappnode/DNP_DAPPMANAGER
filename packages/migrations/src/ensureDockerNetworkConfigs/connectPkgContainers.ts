@@ -20,11 +20,14 @@ export async function connectPkgContainers({
 }): Promise<void> {
   for (const container of pkg.containers) {
     const { containerName } = container;
-    const aliases = getPrivateNetworkAliases({
-      serviceName: container.serviceName,
-      dnpName: pkg.dnpName,
-      isMainOrMonoservice: container.isMain || pkg.containers.length === 1
-    });
+    const aliases = getPrivateNetworkAliases(
+      {
+        serviceName: container.serviceName,
+        dnpName: pkg.dnpName,
+        isMainOrMonoservice: container.isMain || pkg.containers.length === 1
+      },
+      network.id
+    );
 
     // Special handling for bind and dappmanager containers
     const isBindContainer = containerName === params.bindContainerName;

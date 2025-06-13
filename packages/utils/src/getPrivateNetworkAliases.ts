@@ -9,9 +9,10 @@ import { buildNetworkAlias } from "./buildNetworkAlias.js";
  */
 export function getPrivateNetworkAliases(
   container: ContainerNames & { isMainOrMonoservice: boolean },
-  isPrivate = false
+  networkName: string
 ): string[] {
   const { isMainOrMonoservice, dnpName, serviceName } = container;
+  const isPrivate = networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME;
 
   const aliases: string[] = [];
 
