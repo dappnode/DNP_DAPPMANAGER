@@ -3,6 +3,7 @@ import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
 import { Category, Priority, Status } from "@dappnode/types";
 import { params } from "@dappnode/params";
+import { promises as dns } from "dns";
 
 const CHECK_INTERVAL = 2 * 60 * 1000; // 2 minutes
 let internetFailureCount = 0;
@@ -12,33 +13,13 @@ let internetNotificationSent = false;
  * Checks whether the DAppNode is connected to the internet.
  */
 async function getIsConnectedToInternet(): Promise<boolean> {
-  const urlsCheckList = [
-    "https://1.1.1.1", // Cloudfare DNS
-    "https://8.8.8.8" // Google DNS
-  ];
-  const timeoutMs = 3000;
-
-  for (const url of urlsCheckList) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), timeoutMs);
-
-      const response = await fetch(url, {
-        method: "HEAD",
-        signal: controller.signal
-      });
-
-      clearTimeout(timeout);
-
-      if (response.ok) {
-        return true; // Internet is reachable
-      }
-    } catch (error) {
-      logs.info(`Error while checking DAppNode internet connectivity: ${error}`);
-      continue;
-    }
+  try {
+    await dns.resolve("google.com");
+    return true;
+  } catch (error) {
+    logs.info(`Error while resolving DNS for internet connectivity: ${error}`);
+    return false;
   }
-  return false;
 }
 
 /**
