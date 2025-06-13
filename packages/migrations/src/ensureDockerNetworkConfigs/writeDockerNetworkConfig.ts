@@ -5,21 +5,18 @@ import { getIsMonoService, getPrivateNetworkAliases } from "@dappnode/utils";
 
 export function writeDockerNetworkConfig({
   pkg,
-  networkName,
-  subnet
+  networkName
 }: {
   pkg: InstalledPackageDataApiReturn;
   networkName: string;
-  subnet: string;
 }): void {
   const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
   const composeNetwork = compose.getComposeNetwork(networkName);
   if (!composeNetwork) {
-    logs.info(`No network found in ${pkg.dnpName} compose file for ${networkName}`);
+    logs.info(`No network found in ${pkg.dnpName} compose file for ${networkName}, adding it...`);
     addDockerNetworkToCompose({
       compose,
-      networkName,
-      subnet
+      networkName
     });
   }
 
@@ -75,7 +72,7 @@ function ensureServiceNetworkConfig({
   const serviceNetwork = serviceNetworks[networkName];
 
   if (!serviceNetwork) {
-    logs.info(`No network ${networkName} found in ${dnpName} compose file for service ${serviceName}`);
+    logs.info(`No network ${networkName} found in ${dnpName} compose file for service ${serviceName}, adding it...`);
     const newNetwork: ComposeServiceNetwork = {
       aliases
     };
@@ -85,7 +82,7 @@ function ensureServiceNetworkConfig({
     const missingAliases = aliases.filter((alias) => !serviceNetwork.aliases?.includes(alias));
     if (missingAliases.length > 0) {
       logs.info(
-        `Service ${serviceName} in ${dnpName} compose file is missing aliases for network ${networkName}: ${missingAliases.join(", ")}`
+        `Service ${serviceName} in ${dnpName} compose file is missing aliases for network ${networkName}: ${missingAliases.join(", ")}, adding them...`
       );
       serviceEditor.addNetworkAliases(networkName, missingAliases, serviceNetwork);
     }
@@ -101,25 +98,14 @@ function ensureServiceNetworkConfig({
  */
 function addDockerNetworkToCompose({
   compose,
-  networkName,
-  subnet
+  networkName
 }: {
   compose: ComposeFileEditor;
   networkName: string;
-  subnet: string;
 }): void {
   const networkConfig: ComposeNetworks = {
     [networkName]: {
-      name: networkName,
-      external: true,
-      driver: "bridge",
-      ipam: {
-        config: [
-          {
-            subnet
-          }
-        ]
-      }
+      external: true
     }
   };
 

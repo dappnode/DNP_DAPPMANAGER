@@ -66,8 +66,7 @@ export async function ensureDockerNetworkConfig({
     // 2. write the config in the compose file if needed
     writeDockerNetworkConfig({
       pkg,
-      networkName,
-      subnet
+      networkName
     });
     // 3. compose up --no-recreate
     await dockerComposeUpPackage({
