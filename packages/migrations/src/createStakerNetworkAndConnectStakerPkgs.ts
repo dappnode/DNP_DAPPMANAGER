@@ -23,7 +23,7 @@ export async function createStakerNetworkAndConnectStakerPkgs(
     ]);
 
     const errors = results.filter((result) => result.status === "rejected").map((result) => result.reason);
-    logs.error(`Errors while connecting staker packages to the network ${network}`, errors);
+    if (errors.length > 0) logs.error(`Errors while connecting staker packages to the network ${network}`, errors);
   }
 }
 

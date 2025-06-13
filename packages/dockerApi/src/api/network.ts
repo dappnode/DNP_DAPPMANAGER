@@ -4,50 +4,6 @@ import { dockerContainerInspect } from "../index.js";
 import { logs } from "@dappnode/logger";
 
 /**
- * Returns a map of container names to their network aliases
- * @param networkName "dncore_network"
- * @returns { "DAppNodeCore-dappmanager.dnp.dappnode.eth": { aliases: ["my.dappnode", "dappmanager.dappnode", "dappmanager.dnp.dappnode.eth.dappnode", "dappnode.local"], ip: "172.33.1.7"} }
- */
-export async function getNetworkAliasesIpsMapNotThrow(
-  networkName: string
-): Promise<Map<string, { aliases: string[]; ip: string }>> {
-  try {
-    const network = docker.getNetwork(networkName);
-    const networkInfo: Dockerode.NetworkInspectInfo = (await network.inspect()) as Dockerode.NetworkInspectInfo;
-
-    const containersInfo = Object.values(networkInfo.Containers ?? []);
-
-    return await getContainerAliasesIpsForNetwork(containersInfo, networkName);
-  } catch (e) {
-    // This should not stop migration, as it is not critical
-    logs.error(`Aliases map could not be generated for network ${networkName}: ${e}`);
-    return new Map<string, { aliases: string[]; ip: string }>();
-  }
-}
-
-async function getContainerAliasesIpsForNetwork(
-  containersInfo: Dockerode.NetworkContainer[],
-  networkName: string
-): Promise<Map<string, { aliases: string[]; ip: string }>> {
-  const fetchAliasesTasks = containersInfo.map(async (containerInfo) => {
-    try {
-      const aliases: string[] = (await getNetworkContainerConfig(containerInfo.Name, networkName))?.Aliases ?? [];
-      return {
-        name: containerInfo.Name,
-        aliases,
-        ip: containerInfo.IPv4Address
-      };
-    } catch (error) {
-      console.error(`Failed to get aliases for container ${containerInfo.Name}:`, error);
-      return { name: containerInfo.Name, aliases: [], ip: "" };
-    }
-  });
-
-  const containersAliases = await Promise.all(fetchAliasesTasks);
-  return new Map(containersAliases.map(({ name, aliases, ip }) => [name, { aliases, ip }]));
-}
-
-/**
  * Disconnect all docker containers from a docker network
  * @param network "dncore_network"
  */

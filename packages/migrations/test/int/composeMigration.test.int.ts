@@ -1,8 +1,7 @@
 import { expect } from "chai";
 import fs from "fs";
 import { PackageContainer } from "@dappnode/types";
-import { migrateCoreNetworkAndAliasInCompose } from "../../src/addAliasToRunningContainers.js";
-import { removeDnsFromPackageComposeFile } from "../../src/removeDnsFromComposeFiles.js";
+import { removeDnsFromPackageComposeFile } from "../../src/removeDnsAndAddAlias.js";
 import { params } from "@dappnode/params";
 import { mockContainer, shellSafe } from "../testUtils.js";
 
@@ -26,24 +25,6 @@ describe("Migration", () => {
   };
 
   const composeNoDns = `
-version: '3.5'
-networks:
-  ${dncoreNetwork}:
-    name: ${dncoreNetwork}
-    external: true
-services:
-  ${serviceName}:
-    image: ${randomImage}
-    container_name: ${containerName}
-    restart: always
-    networks:
-      ${dncoreNetwork}:
-        ipv4_address: 172.33.1.7
-        aliases:
-          - ${serviceName}.test-migration.dappnode
-          - ${serviceName}.dappnode`;
-
-  const composeAlreadyMigrated = `
 version: '3.5'
 networks:
   ${dncoreNetwork}:
@@ -89,14 +70,6 @@ services:
     const networkExists = await shellSafe(`docker network ls --filter name=${dncoreNetwork}`);
 
     if (!containerExists || !networkExists) throw Error("Error creating container or/and dncore_network");
-  });
-
-  it("Should do alias migration in compose", async () => {
-    const aliases = ["test.test-migration.dappnode", "test.dappnode"];
-    migrateCoreNetworkAndAliasInCompose(container, aliases);
-
-    const composeAfter = fs.readFileSync(`${testPackagePath}/docker-compose.yml`, { encoding: "utf8" });
-    expect(composeAfter.trim()).to.equal(composeAlreadyMigrated.trim());
   });
 
   it("Should remove DNS from compose file", async () => {

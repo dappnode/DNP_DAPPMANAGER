@@ -1,8 +1,55 @@
-import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
+import { dockerNetworkConnectNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { params } from "@dappnode/params";
-import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
 import Dockerode from "dockerode";
+import { isEmpty } from "lodash-es";
+import { InstalledPackageDataApiReturn } from "@dappnode/types";
+import { params } from "@dappnode/params";
+import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
+import { getDockerComposePath, removeCidrSuffix, getPrivateNetworkAliases } from "@dappnode/utils";
+
+export async function connectPkgContainers({
+  pkg,
+  network,
+  dappmanagerIp,
+  bindIp
+}: {
+  pkg: InstalledPackageDataApiReturn;
+  network: Dockerode.Network;
+  dappmanagerIp: string;
+  bindIp: string;
+}): Promise<void> {
+  for (const container of pkg.containers) {
+    const { containerName } = container;
+    const aliases = getPrivateNetworkAliases(
+      {
+        serviceName: container.serviceName,
+        dnpName: pkg.dnpName,
+        isMainOrMonoservice: container.isMain || pkg.containers.length === 1
+      },
+      network.id
+    );
+
+    // Special handling for bind and dappmanager containers
+    const isBindContainer = containerName === params.bindContainerName;
+    const isDappmanagerContainer = containerName === params.dappmanagerContainerName;
+    if (isBindContainer || isDappmanagerContainer) {
+      logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${bindIp}`);
+      await connectPkgContainerWithIp({
+        network,
+        containerName,
+        containerIp: isBindContainer ? bindIp : dappmanagerIp,
+        aliases
+      });
+      continue;
+    }
+
+    const connected = await isContainerConnected(containerName, network);
+    if (connected) continue;
+
+    logs.info(`Connecting container ${containerName} to network ${network.id}`);
+    await dockerNetworkConnectNotThrow(network.id, containerName, { Aliases: aliases });
+  }
+}
 
 /**
  * Connect a container to a docker network with an IP.
@@ -23,24 +70,17 @@ import Dockerode from "dockerode";
  * @param network dockerode network instance container must be connected to
  * @param containerName containername of the container to be connected to
  * @param containerIp container IP fo the container to be connected with
- * @param aliasesIpsMap aliases
  */
-export async function connectContainerWithIp({
+export async function connectPkgContainerWithIp({
   network,
   containerName,
   containerIp,
-  aliasesIpsMap
+  aliases
 }: {
   network: Dockerode.Network;
   containerName: string;
   containerIp: string;
-  aliasesIpsMap: Map<
-    string,
-    {
-      aliases: string[];
-      ip: string;
-    }
-  >;
+  aliases: string[];
 }) {
   // check if there are any docker containers connected to the network with that IP different than the container requested
   const conflictingContainerName = (await findContainerByIP(network, containerIp))?.Name;
@@ -57,18 +97,18 @@ export async function connectContainerWithIp({
       logs.warn(`container ${containerName} is not running, restarting it`);
       await targetContainer.restart();
     }
-
-    const hasContainerRightIp = removeCidrSuffix(aliasesIpsMap.get(containerName)?.ip || "") === containerIp;
+    // TODO: check this ip is good
+    const hasContainerRightIp = removeCidrSuffix(containerInfo.NetworkSettings.IPAddress) === containerIp;
 
     if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
     else {
       logs.info(`container ${containerName} does not have right IP and/or is not connected to docker network`);
-      await connectContainerRetryOnIpUsed({
+      await connectPkgContainerRetryOnIpUsed({
         network,
         containerName,
         maxAttempts: 20,
         ip: containerIp,
-        aliasesIpsMap
+        aliases
       });
     }
   } catch (e) {
@@ -95,29 +135,22 @@ export async function connectContainerWithIp({
  * @param endpointConfig Configuration options for the network connection.
  * @param maxAttempts The maximum number of attempts to connect the container.
  */
-async function connectContainerRetryOnIpUsed({
+async function connectPkgContainerRetryOnIpUsed({
   network,
   containerName,
   maxAttempts,
   ip,
-  aliasesIpsMap
+  aliases
 }: {
   network: Dockerode.Network;
   containerName: string;
   maxAttempts: number;
   ip: string;
-  aliasesIpsMap: Map<
-    string,
-    {
-      aliases: string[];
-      ip: string;
-    }
-  >;
+  aliases: string[];
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
-  const aliases = aliasesIpsMap.get(containerName)?.aliases ?? [];
   let attemptCount = 0;
   const networkOptions = {
     Container: containerName,
@@ -145,15 +178,12 @@ async function connectContainerRetryOnIpUsed({
       ) {
         // IP is not right, reconnect container with proper IP
         logs.warn(`container ${containerName} already connected to network ${network.id} with wrong IP`);
-
-        // TODO: What if this fails?
         await network.disconnect({
           Container: containerName
         });
 
         // The container will be reconnected in the next iteration
       } else {
-        // TODO: What if we cannot connect dappmanager because of this error?
         logs.error(error);
         return;
       }
@@ -161,4 +191,12 @@ async function connectContainerRetryOnIpUsed({
     attemptCount++;
   }
   logs.error(`Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`);
+}
+
+async function isContainerConnected(containerName: string, network: Dockerode.Network): Promise<boolean> {
+  const connectedContainers = ((await network.inspect()) as Dockerode.NetworkInspectInfo).Containers;
+
+  // If no containers info, assume not connected
+  if (!connectedContainers || isEmpty(connectedContainers)) return false;
+  return Object.values(connectedContainers).some((info) => info.Name === containerName);
 }

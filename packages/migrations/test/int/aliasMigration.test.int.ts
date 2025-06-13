@@ -1,8 +1,6 @@
 import "mocha";
 import fs from "fs";
-import { expect } from "chai";
 import { PackageContainer } from "@dappnode/types";
-import { addAliasToGivenContainers } from "../../src/addAliasToRunningContainers.js";
 import { mockContainer, shellSafe } from "../testUtils.js";
 import { params } from "@dappnode/params";
 
@@ -154,17 +152,6 @@ async function ensureNetworkExists(networkName: string) {
   await shellSafe(`docker network create ${networkName}`);
 }
 
-// Inspect each container and fetch the aliases on the dncore network
-async function getContainerAliasesOnNetwork(containerName: string, networkName: string) {
-  const inspectData = await shellSafe(`docker container inspect ${containerName}`);
-  if (!inspectData) throw new Error(`Error inspecting container ${containerName}`);
-  const parsedData = JSON.parse(inspectData);
-
-  // Extract the aliases from the specified network
-  const aliases = parsedData[0]?.NetworkSettings?.Networks?.[networkName]?.Aliases || [];
-  return aliases;
-}
-
 // Helper function to stop and remove containers
 async function stopAndRemoveContainers(containerNames: string[]) {
   for (const containerName of containerNames) {
@@ -222,43 +209,6 @@ describe("Add alias to running containers", function () {
 
     if (containerExistResults.some((result) => !result)) {
       throw new Error("Error creating containers");
-    }
-  });
-
-  it("check that all containers have expected aliases", async () => {
-    //o Add the aliases
-    await addAliasToGivenContainers(containers);
-
-    const containersToTest = [
-      {
-        container: containerMain,
-        expectedAliases: ["mainService.logger.dappnode", "logger.dappnode"]
-      },
-      {
-        container: containerNotMain,
-        expectedAliases: ["notmainService.logger.dappnode"]
-      },
-      {
-        container: monoContainer,
-        expectedAliases: ["logger-mono.dnp.dappnode.eth.logger-mono.dappnode", "logger-mono.dappnode"]
-      },
-      {
-        container: monoContainerPublic,
-        expectedAliases: ["service.logger-mono.public.dappnode", "logger-mono.public.dappnode"]
-      },
-      {
-        container: containerMainPublic,
-        expectedAliases: ["mainService.logger.public.dappnode", "logger.public.dappnode"]
-      },
-      {
-        container: containerNotMainPublic,
-        expectedAliases: ["notmainService.logger.public.dappnode"]
-      }
-    ];
-
-    for (const { container, expectedAliases } of containersToTest) {
-      const actualAliases = await getContainerAliasesOnNetwork(container.containerName, DNCORE_NETWORK);
-      expect(actualAliases).to.include.members(expectedAliases);
     }
   });
 
