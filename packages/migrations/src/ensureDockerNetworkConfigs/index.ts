@@ -64,12 +64,11 @@ export async function ensureDockerNetworkConfig({
     logs.info(`Rolling back docker network configuration for ${networkName}...`);
 
     // 1. Disconnect containers from the network
+    logs.info(`Disconnecting all containers from network ${networkName}...`);
     await disconnectAllContainersFromNetwork(network);
 
     for (const pkg of packages) {
-      logs.info(
-        `Rolling back docker network configuration for ${pkg.dnpName} compose file, disconnecting containers...`
-      );
+      logs.info(`Rolling back docker network configuration for ${pkg.dnpName} compose file`);
 
       // 2. Remove the config from the compose file if needed
       writeDockerNetworkConfig({

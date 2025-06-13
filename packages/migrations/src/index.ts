@@ -71,7 +71,7 @@ export async function executeMigrations(
       coreVersion: "0.2.95"
     },
     {
-      fn: () => ensureDockerNetworkConfigs(true),
+      fn: () => ensureDockerNetworkConfigs(),
       migration: "ensure docker network configurations",
       coreVersion: "0.2.104"
     }

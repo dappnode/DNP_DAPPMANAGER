@@ -198,5 +198,5 @@ async function isContainerConnected(containerName: string, network: Dockerode.Ne
 
   // If no containers info, assume not connected
   if (!connectedContainers || isEmpty(connectedContainers)) return false;
-  return !Object.values(connectedContainers).some((info) => info.Name === containerName);
+  return Object.values(connectedContainers).some((info) => info.Name === containerName);
 }
