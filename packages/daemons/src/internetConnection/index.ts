@@ -5,7 +5,8 @@ import { Category, Priority, Status } from "@dappnode/types";
 import { params } from "@dappnode/params";
 
 const CHECK_INTERVAL = 2 * 60 * 1000; // 2 minutes
-let notificationSent = false;
+let internetFailureCount = 0;
+let internetNotificationSent = false;
 
 /**
  * Checks whether the DAppNode is connected to the internet.
@@ -53,7 +54,9 @@ async function monitorInternetConnection(): Promise<void> {
     if (!isConnected) {
       logs.warn("DAppNode is not connected to the internet");
 
-      if (!notificationSent) {
+      // increment failure count and only notify after threshold
+      internetFailureCount += 1;
+      if (internetFailureCount >= 5 && !internetNotificationSent) {
         await notifications
           .sendNotification({
             title: "Your Dappnode is not connected to internet",
@@ -72,10 +75,12 @@ async function monitorInternetConnection(): Promise<void> {
             correlationId
           })
           .catch((e) => logs.error("Error sending internet connectivity notification", e));
-        notificationSent = true;
+        internetNotificationSent = true;
       }
     } else {
-      if (notificationSent) {
+      // reset on success
+      internetFailureCount = 0;
+      if (internetNotificationSent) {
         logs.info("Internet connection restored, sending resolve notification");
 
         await notifications
@@ -91,7 +96,7 @@ async function monitorInternetConnection(): Promise<void> {
             correlationId
           })
           .catch((e) => logs.error("Error sending internet connectivity resolve notification", e));
-        notificationSent = false;
+        internetNotificationSent = false;
       }
     }
   } catch (e) {
