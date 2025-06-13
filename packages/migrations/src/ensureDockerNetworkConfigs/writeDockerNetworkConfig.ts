@@ -51,6 +51,8 @@ export function writeDockerNetworkConfig({
       networkName
     });
   }
+
+  compose.write();
 }
 
 /**
@@ -133,6 +135,4 @@ function addDockerNetworkToCompose({
     ...compose.compose.networks,
     ...networkConfig
   };
-
-  compose.write();
 }
