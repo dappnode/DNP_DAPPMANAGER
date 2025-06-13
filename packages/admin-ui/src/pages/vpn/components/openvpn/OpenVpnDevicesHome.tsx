@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api, useApi } from "api";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 // Own module
 import { maxIdLength } from "../../data";
 import coerceDeviceName from "../../helpers/coerceDeviceName";
@@ -12,19 +12,22 @@ import Card from "components/Card";
 import Switch from "components/Switch";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
-import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete, MdRefresh } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 // Params
 import { vpnDnpName } from "params";
-import { getInstallerPath } from "pages/installer";
+import Loading from "components/Loading";
+import { prettyDnpName } from "utils/format";
+import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
+import ErrorView from "components/ErrorView";
+import { VpnDocsGuide } from "../VpnDocsGuide";
 
 export default function OpenVpnDevicesHome() {
   const [input, setInput] = useState("");
   const devicesReq = useApi.devicesList();
-  const dnpsRequest = useApi.packagesGet();
-  const navigate = useNavigate();
+  const dnpRequest = useApi.packageGet({ dnpName: vpnDnpName });
+  const dnp = dnpRequest.data;
 
   // Actions
 
@@ -76,24 +79,25 @@ export default function OpenVpnDevicesHome() {
   if (input.length > maxIdLength) errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
   // If the OpenVPN package (known as vpn) is not installed, invite the user to install it
-  if (dnpsRequest.data) {
-    const vpnDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === vpnDnpName);
-    if (!vpnDnp) {
-      const url = `${getInstallerPath(vpnDnpName)}/${vpnDnpName}`;
-      return (
-        <Alert variant="secondary">
-          You must
-          <a href="#" onClick={() => navigate(url)}>
-            install the OpenVPN package
-          </a>
-          to use this feature
-        </Alert>
-      );
-    }
+  if (!dnp) {
+    return (
+      <>
+        {dnpRequest.isValidating ? (
+          <Loading steps={[`Loading ${prettyDnpName(vpnDnpName)}`]} />
+        ) : dnpRequest.error ? (
+          dnpRequest.error.message.includes("No DNP was found") ? (
+            <NoDnpInstalled id={vpnDnpName} />
+          ) : (
+            <ErrorView error={dnpRequest.error} />
+          )
+        ) : null}
+      </>
+    );
   }
 
   return (
     <>
+      <VpnDocsGuide variant="openvpn" />
       <Input
         placeholder="Device's unique name"
         value={input}

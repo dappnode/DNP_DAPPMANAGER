@@ -46,6 +46,7 @@ export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const zkevmDnpName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
+export const tailscaleDnpName = "tailscale.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
 export const coreDnpName = "core.dnp.dappnode.eth";
@@ -92,6 +93,9 @@ export const docsUrl = {
   connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
   connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
   connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
+  tailscaleVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/tailscale`,
+  wireguardVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/wireguard`,
+  openVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/openvpn`,
   httpsExplanation: `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
   ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
