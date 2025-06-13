@@ -1,10 +1,9 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
+import { ensureDockerNetworkConfigs } from "./ensureDockerNetworkConfigs/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { params } from "@dappnode/params";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
@@ -57,20 +56,6 @@ export async function executeMigrations(
       coreVersion: "0.2.85"
     },
     {
-      fn: () =>
-        migrateDockerNetworkIpRange({
-          dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
-          dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
-          dappmanagerContainer: {
-            name: params.dappmanagerContainerName,
-            ip: params.DAPPMANAGER_IP
-          },
-          bindContainer: { name: params.bindContainerName, ip: params.BIND_IP }
-        }),
-      migration: "ensure docker network configuration",
-      coreVersion: "0.2.85"
-    },
-    {
       fn: removeDnsAndAddAlias,
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80"
@@ -84,6 +69,11 @@ export async function executeMigrations(
       fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
       migration: "create docker staker network and persist selected staker pkgs per network",
       coreVersion: "0.2.95"
+    },
+    {
+      fn: () => ensureDockerNetworkConfigs(),
+      migration: "ensure docker network configurations",
+      coreVersion: "0.2.104"
     }
   ];
 

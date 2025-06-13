@@ -3,6 +3,34 @@ import { createDockerNetwork } from "./createDockerNetwork.js";
 import { packagesGet } from "@dappnode/installer";
 import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
+import { params } from "@dappnode/params";
+import { connectPkgContainers } from "./connectPkgContainers.js";
+
+export async function ensureDockerNetworkConfigs(): Promise<void> {
+  const networksConfigs = [
+    {
+      networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
+      subnet: params.DOCKER_NETWORK_SUBNET,
+      dappmanagerIp: params.DAPPMANAGER_IP,
+      bindIp: params.BIND_IP
+    },
+    {
+      networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
+      subnet: params.DOCKER_NETWORK_NEW_SUBNET,
+      dappmanagerIp: params.DAPPMANAGER_NEW_IP,
+      bindIp: params.BIND_NEW_IP
+    }
+  ];
+
+  for (const config of networksConfigs) {
+    try {
+      logs.info(`Ensuring docker network config for ${config.networkName}`);
+      await ensureDockerNetworkConfig(config);
+    } catch (error) {
+      logs.error(`Failed to ensure docker network config for ${config.networkName}: ${error.message}`);
+    }
+  }
+}
 
 /**
  * Ensures the docker network defined has the following config:
@@ -16,22 +44,25 @@ import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
 export async function ensureDockerNetworkConfig({
   networkName,
   subnet,
-  dappmanagerContainer,
-  bindContainer
+  dappmanagerIp,
+  bindIp
 }: {
   networkName: string;
   subnet: string;
-  dappmanagerContainer: {
-    name: string;
-    ip: string;
-  };
-  bindContainer: {
-    name: string;
-    ip: string;
-  };
+  dappmanagerIp: string;
+  bindIp: string;
 }): Promise<void> {
   // consider calling packagges get every time to ensure we have the latest packages
   const packages = await packagesGet();
+
+  // filter packages so first are bind and then dappmanager and then rest
+  packages.sort((a, b) => {
+    if (a.dnpName === params.bindContainerName) return -1; // bind should be first
+    if (b.dnpName === params.bindContainerName) return 1; // bind should be first
+    if (a.dnpName === params.dappmanagerContainerName) return 1; // dappmanager should be second
+    if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
+    return 0; // rest can be in any order
+  });
 
   // 1. create the new docker network
   const network = await createDockerNetwork({
@@ -58,26 +89,6 @@ export async function ensureDockerNetworkConfig({
     );
 
     // 4. connect container to the network
+    await connectPkgContainers({ pkg, network, dappmanagerIp, bindIp });
   }
-
-  // 2. write the config in the compose file if needed
-
-  // 3. compose up --no-recreate
-  const responses = await Promise.allSettled(
-    packages.map(
-      async (pkg) =>
-        await dockerComposeUpPackage({
-          composeArgs: { dnpName: pkg.dnpName },
-          upAll: true,
-          dockerComposeUpOptions: { noRecreate: true }
-        })
-    )
-  );
-  responses.forEach((response, index) => {
-    if (response.status === "rejected") {
-      logs.error(
-        `Failed to run docker compose up --no-recreate for package ${packages[index].dnpName}: ${response.reason}`
-      );
-    }
-  });
 }

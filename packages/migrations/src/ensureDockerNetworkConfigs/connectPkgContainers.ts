@@ -1,9 +1,61 @@
+import { dockerNetworkConnectNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
-import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
-import { params } from "@dappnode/params";
-import { getDockerComposePath, getPrivateNetworkAliases, removeCidrSuffix } from "@dappnode/utils";
+import { isEmpty } from "lodash-es";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
+import { params } from "@dappnode/params";
+import { getPrivateNetworkAliases } from "@dappnode/utils";
+import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
+import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
+
+export async function connectPkgContainers({
+  pkg,
+  network,
+  dappmanagerIp,
+  bindIp
+}: {
+  pkg: InstalledPackageDataApiReturn;
+  network: Dockerode.Network;
+  dappmanagerIp: string;
+  bindIp: string;
+}): Promise<void> {
+  for (const container of pkg.containers) {
+    const { containerName, dnpName } = container;
+    const aliases = getPrivateNetworkAliases({
+      serviceName: container.serviceName,
+      dnpName: pkg.dnpName,
+      isMainOrMonoservice: container.isMain || pkg.containers.length === 1
+    });
+
+    if (dnpName === params.bindContainerName) {
+      // Special handling for bind and dappmanager containers
+      logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${bindIp}`);
+      await connectPkgContainerWithIp({
+        network,
+        containerName,
+        containerIp: bindIp,
+        aliases
+      });
+      continue;
+    }
+    if (dnpName === params.dappmanagerContainerName) {
+      logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${dappmanagerIp}`);
+      await connectPkgContainerWithIp({
+        network,
+        containerName,
+        containerIp: dappmanagerIp,
+        aliases
+      });
+      continue;
+    }
+
+    const connected = await isContainerConnected(containerName, network);
+    if (connected) continue;
+
+    logs.info(`Connecting container ${containerName} to network ${network.id}`);
+    await dockerNetworkConnectNotThrow(network.id, containerName, { Aliases: aliases });
+  }
+}
 
 /**
  * Connect a container to a docker network with an IP.
@@ -25,16 +77,16 @@ import { InstalledPackageDataApiReturn } from "@dappnode/types";
  * @param containerName containername of the container to be connected to
  * @param containerIp container IP fo the container to be connected with
  */
-export async function connectContainerWithIp({
-  pkg,
+export async function connectPkgContainerWithIp({
   network,
   containerName,
-  containerIp
+  containerIp,
+  aliases
 }: {
-  pkg: InstalledPackageDataApiReturn;
   network: Dockerode.Network;
   containerName: string;
   containerIp: string;
+  aliases: string[];
 }) {
   // check if there are any docker containers connected to the network with that IP different than the container requested
   const conflictingContainerName = (await findContainerByIP(network, containerIp))?.Name;
@@ -57,11 +109,12 @@ export async function connectContainerWithIp({
     if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
     else {
       logs.info(`container ${containerName} does not have right IP and/or is not connected to docker network`);
-      await connectContainerRetryOnIpUsed({
+      await connectPkgContainerRetryOnIpUsed({
         network,
         containerName,
         maxAttempts: 20,
-        ip: containerIp
+        ip: containerIp,
+        aliases
       });
     }
   } catch (e) {
@@ -88,21 +141,22 @@ export async function connectContainerWithIp({
  * @param endpointConfig Configuration options for the network connection.
  * @param maxAttempts The maximum number of attempts to connect the container.
  */
-async function connectContainerRetryOnIpUsed({
+async function connectPkgContainerRetryOnIpUsed({
   network,
   containerName,
   maxAttempts,
-  ip
+  ip,
+  aliases
 }: {
   network: Dockerode.Network;
   containerName: string;
   maxAttempts: number;
   ip: string;
+  aliases: string[];
 }): Promise<void> {
   // prevent function from running too many times
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
-  const aliases = getPrivateNetworkAliases({ dnpName, serviceName, isMainOrMonoservice });
   let attemptCount = 0;
   const networkOptions = {
     Container: containerName,
@@ -144,4 +198,12 @@ async function connectContainerRetryOnIpUsed({
     attemptCount++;
   }
   logs.error(`Failed to connect after ${maxAttempts} attempts due to repeated IP conflicts.`);
+}
+
+async function isContainerConnected(containerName: string, network: Dockerode.Network): Promise<boolean> {
+  const connectedContainers = ((await network.inspect()) as Dockerode.NetworkInspectInfo).Containers;
+
+  // If no containers info, assume not connected
+  if (!connectedContainers || isEmpty(connectedContainers)) return false;
+  return !Object.values(connectedContainers).some((info) => info.Name === containerName);
 }
