@@ -77,13 +77,14 @@ export async function ensureDockerNetworkConfig({
         rollback: true
       });
       // 3. Compose up --no-recreate
-      await dockerComposeUpPackage({
-        composeArgs: { dnpName: pkg.dnpName },
-        upAll: true,
-        dockerComposeUpOptions: { noRecreate: true }
-      }).catch((error) =>
-        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
-      );
+      if (pkg.dnpName !== params.dappmanagerDnpName)
+        await dockerComposeUpPackage({
+          composeArgs: { dnpName: pkg.dnpName },
+          upAll: true,
+          dockerComposeUpOptions: { noRecreate: true }
+        }).catch((error) =>
+          logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
+        );
     }
 
     // 4. remove the docker network
@@ -105,13 +106,14 @@ export async function ensureDockerNetworkConfig({
       networkName
     });
     // 3. compose up --no-recreate
-    await dockerComposeUpPackage({
-      composeArgs: { dnpName: pkg.dnpName },
-      upAll: true,
-      dockerComposeUpOptions: { noRecreate: true }
-    }).catch((error) =>
-      logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
-    );
+    if (pkg.dnpName !== params.dappmanagerDnpName)
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName: pkg.dnpName },
+        upAll: true,
+        dockerComposeUpOptions: { noRecreate: true }
+      }).catch((error) =>
+        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
+      );
 
     // 4. connect container to the network
     await connectPkgContainers({ pkg, network, dappmanagerIp, bindIp });
