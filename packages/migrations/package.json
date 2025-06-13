@@ -21,6 +21,7 @@
   "dependencies": {
     "@dappnode/db": "workspace:^0.1.0",
     "@dappnode/dockerapi": "workspace:^0.1.0",
+    "@dappnode/installer": "workspace:^0.1.0",
     "@dappnode/dockercompose": "workspace:^0.1.0",
     "@dappnode/ethicalmetrics": "workspace:^0.1.0",
     "@dappnode/eventbus": "workspace:^0.1.0",
