@@ -4,9 +4,8 @@ import Dockerode from "dockerode";
 import { isEmpty } from "lodash-es";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { params } from "@dappnode/params";
-import { getPrivateNetworkAliases } from "@dappnode/utils";
 import { disconnectConflictingContainerIfAny, docker, dockerComposeUp, findContainerByIP } from "@dappnode/dockerapi";
-import { getDockerComposePath, removeCidrSuffix } from "@dappnode/utils";
+import { getDockerComposePath, removeCidrSuffix, getPrivateNetworkAliases } from "@dappnode/utils";
 
 export async function connectPkgContainers({
   pkg,
@@ -20,30 +19,22 @@ export async function connectPkgContainers({
   bindIp: string;
 }): Promise<void> {
   for (const container of pkg.containers) {
-    const { containerName, dnpName } = container;
+    const { containerName } = container;
     const aliases = getPrivateNetworkAliases({
       serviceName: container.serviceName,
       dnpName: pkg.dnpName,
       isMainOrMonoservice: container.isMain || pkg.containers.length === 1
     });
 
-    if (dnpName === params.bindContainerName) {
-      // Special handling for bind and dappmanager containers
+    // Special handling for bind and dappmanager containers
+    const isBindContainer = containerName === params.bindContainerName;
+    const isDappmanagerContainer = containerName === params.dappmanagerContainerName;
+    if (isBindContainer || isDappmanagerContainer) {
       logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${bindIp}`);
       await connectPkgContainerWithIp({
         network,
         containerName,
-        containerIp: bindIp,
-        aliases
-      });
-      continue;
-    }
-    if (dnpName === params.dappmanagerContainerName) {
-      logs.info(`Connecting special container ${containerName} to network ${network.id} with IP ${dappmanagerIp}`);
-      await connectPkgContainerWithIp({
-        network,
-        containerName,
-        containerIp: dappmanagerIp,
+        containerIp: isBindContainer ? bindIp : dappmanagerIp,
         aliases
       });
       continue;
@@ -184,7 +175,6 @@ async function connectPkgContainerRetryOnIpUsed({
       ) {
         // IP is not right, reconnect container with proper IP
         logs.warn(`container ${containerName} already connected to network ${network.id} with wrong IP`);
-
         await network.disconnect({
           Container: containerName
         });

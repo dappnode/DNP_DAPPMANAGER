@@ -5,6 +5,7 @@ import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
 import { params } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
+import { InstalledPackageDataApiReturn } from "@dappnode/types";
 
 export async function ensureDockerNetworkConfigs(): Promise<void> {
   const networksConfigs = [
@@ -55,24 +56,13 @@ export async function ensureDockerNetworkConfig({
   // consider calling packagges get every time to ensure we have the latest packages
   const packages = await packagesGet();
 
-  // filter packages so first are bind and then dappmanager and then rest
-  packages.sort((a, b) => {
-    if (a.dnpName === params.bindContainerName) return -1; // bind should be first
-    if (b.dnpName === params.bindContainerName) return 1; // bind should be first
-    if (a.dnpName === params.dappmanagerContainerName) return 1; // dappmanager should be second
-    if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
-    return 0; // rest can be in any order
-  });
-
   // 1. create the new docker network
   const network = await createDockerNetwork({
     networkName,
     subnet
   });
 
-  // TODO: order to start with bind and dappmanager containers first
-  // this should be done first for bind and dappmanager, then for rest
-  for (const pkg of packages) {
+  for (const pkg of setDappmanagerAndBindFirst(packages)) {
     // 2. write the config in the compose file if needed
     writeDockerNetworkConfig({
       pkg,
@@ -91,4 +81,14 @@ export async function ensureDockerNetworkConfig({
     // 4. connect container to the network
     await connectPkgContainers({ pkg, network, dappmanagerIp, bindIp });
   }
+}
+
+function setDappmanagerAndBindFirst(packages: InstalledPackageDataApiReturn[]): InstalledPackageDataApiReturn[] {
+  return packages.sort((a, b) => {
+    if (a.dnpName === params.bindContainerName) return -1; // bind should be first
+    if (b.dnpName === params.bindContainerName) return 1; // bind should be first
+    if (a.dnpName === params.dappmanagerContainerName) return 1; // dappmanager should be second
+    if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
+    return 0; // rest can be in any order
+  });
 }
