@@ -1,13 +1,13 @@
 import { logs } from "@dappnode/logger";
 import { createDockerNetwork } from "./createDockerNetwork.js";
 import { packagesGet } from "@dappnode/installer";
-import { dockerComposeUpPackage } from "@dappnode/dockerapi";
+import { dockerComposeUpPackage, disconnectAllContainersFromNetwork, docker } from "@dappnode/dockerapi";
 import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
 import { params } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 
-export async function ensureDockerNetworkConfigs(): Promise<void> {
+export async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
   const networksConfigs = [
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
@@ -19,7 +19,8 @@ export async function ensureDockerNetworkConfigs(): Promise<void> {
       networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
       subnet: params.DOCKER_NETWORK_NEW_SUBNET,
       dappmanagerIp: params.DAPPMANAGER_NEW_IP,
-      bindIp: params.BIND_NEW_IP
+      bindIp: params.BIND_NEW_IP,
+      rollback // only apply rollback to dnprivate_network
     }
   ];
 
@@ -46,15 +47,47 @@ export async function ensureDockerNetworkConfig({
   networkName,
   subnet,
   dappmanagerIp,
-  bindIp
+  bindIp,
+  rollback = false
 }: {
   networkName: string;
   subnet: string;
   dappmanagerIp: string;
   bindIp: string;
+  rollback?: boolean; // if true it will remove the
 }): Promise<void> {
   // consider calling packagges get every time to ensure we have the latest packages
   const packages = await packagesGet();
+
+  if (rollback) {
+    const network = docker.getNetwork(networkName);
+    logs.info(`Rolling back docker network configuration for ${networkName}...`);
+    for (const pkg of packages) {
+      // 1. Disconnect containers from the network
+      logs.info(
+        `Rolling back docker network configuration for ${pkg.dnpName} compose file, disconnecting containers...`
+      );
+      await disconnectAllContainersFromNetwork(network);
+
+      // 2. Remove the config from the compose file if needed
+      writeDockerNetworkConfig({
+        pkg,
+        networkName,
+        rollback: true
+      });
+      // 3. Compose up --no-recreate
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName: pkg.dnpName },
+        upAll: true,
+        dockerComposeUpOptions: { noRecreate: true }
+      }).catch((error) =>
+        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
+      );
+    }
+
+    // 4. remove the docker network
+    await network.remove();
+  }
 
   // 1. create the new docker network
   const network = await createDockerNetwork({

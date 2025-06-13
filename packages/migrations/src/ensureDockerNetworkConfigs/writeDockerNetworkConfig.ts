@@ -5,12 +5,32 @@ import { getIsMonoService, getPrivateNetworkAliases } from "@dappnode/utils";
 
 export function writeDockerNetworkConfig({
   pkg,
-  networkName
+  networkName,
+  rollback = false
 }: {
   pkg: InstalledPackageDataApiReturn;
   networkName: string;
+  rollback?: boolean; // if true it will remove the network instead of adding it
 }): void {
   const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
+  if (rollback) {
+    logs.info(
+      `Rolling back docker compose network configuration for ${pkg.dnpName} compose file, removing network ${networkName}...`
+    );
+    // Remove network from all services
+    const composeServices = compose.services();
+    for (const [, serviceEditor] of Object.entries(composeServices)) {
+      serviceEditor.removeNetwork(networkName);
+    }
+    // Remove top-level network entry
+    if (compose.compose.networks && compose.compose.networks[networkName]) {
+      delete compose.compose.networks[networkName];
+    }
+    // Persist changes
+    compose.write();
+    return;
+  }
+
   const composeNetwork = compose.getComposeNetwork(networkName);
   if (!composeNetwork) {
     logs.info(`No network found in ${pkg.dnpName} compose file for ${networkName}, adding it...`);
