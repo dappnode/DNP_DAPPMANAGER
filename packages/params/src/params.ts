@@ -208,7 +208,7 @@ export const params = {
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["dappmanager.dappnode", "my.dappnode", "dappnode.local"],
-  DAPPMANAGER_NEW_ALIASES: ["dappmanager.private.dappnode", "my.private.dappnode", "dappnode.local"],
+  DAPPMANAGER_NEW_ALIASES: ["dappmanager.dappnode.private", "my.dappnode.private", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
