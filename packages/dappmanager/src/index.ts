@@ -3,7 +3,6 @@ import { eventBus } from "@dappnode/eventbus";
 import { initializeDb } from "./initializeDb.js";
 import {
   ensureIpv4Forward,
-  checkDockerNetwork,
   recreateDappnode,
   copyHostScripts,
   copyHostServices,
@@ -103,8 +102,6 @@ Promise.all([
   ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
   // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
-  // start check-docker-network service with timer
-  checkDockerNetwork().catch((e) => logs.error("Error starting service docker network checker", e));
   // start recreate-dappnode service with timer
   recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
 });
