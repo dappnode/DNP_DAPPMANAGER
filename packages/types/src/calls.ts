@@ -20,6 +20,7 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  external: boolean; // If the service is exposed to the internet
   auth?: {
     username: string;
     password: string;
@@ -40,6 +41,7 @@ export interface ExposableServiceManifestInfo {
   fromSubdomain?: string;
   port: number;
   exposeByDefault?: boolean;
+  external?: boolean;
 }
 
 export interface ExposableServiceMapping extends ExposableServiceInfo {
