@@ -90,6 +90,9 @@ export class Signer extends StakerComponent {
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
               aliases: [`signer.${network}.dncore.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`signer.${network}.dappnode.private`]
             }
           }
         }

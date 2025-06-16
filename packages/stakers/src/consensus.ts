@@ -147,6 +147,9 @@ export class Consensus extends StakerComponent {
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
             aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+            aliases: [`${beaconServiceName}.${network}.dappnode.private`]
           }
         },
         [validatorServiceName]: {
@@ -155,6 +158,9 @@ export class Consensus extends StakerComponent {
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
             aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+            aliases: [`${validatorServiceName}.${network}.dappnode.private`]
           }
         }
       }

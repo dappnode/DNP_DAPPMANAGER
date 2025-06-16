@@ -137,6 +137,9 @@ export class Execution extends StakerComponent {
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
               aliases: [`execution.${network}.dncore.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`execution.${network}.dappnode.private`]
             }
           }
         }
