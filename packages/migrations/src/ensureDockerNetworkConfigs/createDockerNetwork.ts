@@ -23,7 +23,7 @@ export async function createDockerNetwork({
 }: {
   networkName: string;
   subnet: string;
-}): Promise<Dockerode.Network> {
+}): Promise<void> {
   const networkOptions: Dockerode.NetworkCreateOptions = {
     Name: networkName,
     Driver: "bridge",
@@ -54,8 +54,6 @@ export async function createDockerNetwork({
       logs.warn(
         `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0].Subnet}, it should be ${subnet}.`
       );
-
-    return network;
   } catch (e) {
     if (e.statusCode === 404) {
       // docker network not found, create it
@@ -65,7 +63,7 @@ export async function createDockerNetwork({
         logs.error(`error removing overlapping networks: ${e}`)
       );
 
-      return await docker.createNetwork(networkOptions);
+      await docker.createNetwork(networkOptions);
     } else {
       throw e;
     }

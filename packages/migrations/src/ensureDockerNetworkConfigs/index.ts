@@ -94,7 +94,7 @@ export async function ensureDockerNetworkConfig({
   }
 
   // 1. create the new docker network
-  const network = await createDockerNetwork({
+  await createDockerNetwork({
     networkName,
     subnet
   });
@@ -116,7 +116,7 @@ export async function ensureDockerNetworkConfig({
       );
 
     // 4. connect container to the network
-    await connectPkgContainers({ pkg, network, dappmanagerIp, bindIp });
+    await connectPkgContainers({ pkg, networkName, dappmanagerIp, bindIp });
   }
 }
 
