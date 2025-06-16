@@ -1,7 +1,6 @@
 import Dockerode from "dockerode";
 import { docker } from "./docker.js";
 import { dockerContainerInspect } from "../index.js";
-import { logs } from "@dappnode/logger";
 
 /**
  * Disconnect all docker containers from a docker network
@@ -31,28 +30,6 @@ export async function dockerNetworkConnect(
     Container: containerName,
     EndpointConfig: endpointConfig
   });
-}
-
-/**
- * Connect a container to a network
- * @param networkName "dncore_network"
- * @param containerName "3613f73ba0e4" or "fullcontainername"
- * @param aliases `["network-alias"]`
- */
-export async function dockerNetworkConnectNotThrow(
-  networkName: string,
-  containerName: string,
-  endpointConfig?: Partial<Dockerode.NetworkInfo>
-): Promise<void> {
-  try {
-    const network = docker.getNetwork(networkName);
-    await network.connect({
-      Container: containerName,
-      EndpointConfig: endpointConfig
-    });
-  } catch (e) {
-    logs.debug(e);
-  }
 }
 
 /**

@@ -1,4 +1,3 @@
-import { dockerNetworkConnectNotThrow } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import Dockerode from "dockerode";
 import { isEmpty } from "lodash-es";
@@ -9,15 +8,16 @@ import { getDockerComposePath, removeCidrSuffix, getPrivateNetworkAliases } from
 
 export async function connectPkgContainers({
   pkg,
-  network,
+  networkName,
   dappmanagerIp,
   bindIp
 }: {
   pkg: InstalledPackageDataApiReturn;
-  network: Dockerode.Network;
+  networkName: string;
   dappmanagerIp: string;
   bindIp: string;
 }): Promise<void> {
+  const network = docker.getNetwork(networkName);
   for (const container of pkg.containers) {
     const { containerName } = container;
     const aliases = getPrivateNetworkAliases(
@@ -26,7 +26,7 @@ export async function connectPkgContainers({
         dnpName: pkg.dnpName,
         isMainOrMonoservice: container.isMain || pkg.containers.length === 1
       },
-      network.id
+      networkName
     );
 
     // Special handling for bind and dappmanager containers
@@ -46,8 +46,14 @@ export async function connectPkgContainers({
     const connected = await isContainerConnected(containerName, network);
     if (connected) continue;
 
-    logs.info(`Connecting container ${containerName} to network ${network.id}`);
-    await dockerNetworkConnectNotThrow(network.id, containerName, { Aliases: aliases });
+    await network
+      .connect({
+        Container: containerName,
+        EndpointConfig: { Aliases: aliases }
+      })
+      .catch((error) => {
+        logs.error(`Failed to connect container ${containerName} to network ${network.id}: ${error.message}`);
+      });
   }
 }
 
