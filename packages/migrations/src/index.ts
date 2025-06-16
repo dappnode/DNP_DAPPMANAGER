@@ -77,18 +77,15 @@ export async function executeMigrations(
     }
   ];
 
-  const migrationPromises = migrations.map(({ fn, migration, coreVersion }) =>
-    fn().catch((e) => new Error(`Migration ${migration} (${coreVersion}) failed: ${e.message}`))
-  );
-
-  // Run all migrations concurrently and wait for all to settle
-  const results = await Promise.allSettled(migrationPromises);
-
-  // Collect any errors
-  const migrationErrors = results
-    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
-    .map((result) => result.reason);
-
+  // Run migrations one after another to ensure defined order
+  const migrationErrors: Error[] = [];
+  for (const { fn, migration, coreVersion } of migrations) {
+    try {
+      await fn();
+    } catch (e) {
+      migrationErrors.push(new Error(`Migration ${migration} (${coreVersion}) failed: ${e}`));
+    }
+  }
   if (migrationErrors.length > 0) {
     throw new MigrationError(migrationErrors);
   }
