@@ -127,19 +127,29 @@ function setServiceNetworksWithAliases(
  * If the network dncore_network is not provided, it will be added
  */
 function setNetworks(networks: ComposeNetworks | undefined = {}): ComposeNetworks {
-  const dncoreNetwork = networks[params.DOCKER_PRIVATE_NETWORK_NAME];
   // Return network dncore_network with external: true if not provided
+  const dncoreNetwork = networks[params.DOCKER_PRIVATE_NETWORK_NAME];
   if (!dncoreNetwork)
-    return {
+    networks = {
       ...networks,
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         external: true
       }
     };
 
+  // Return the network dnprivate_network with the external: true added
+  const dnprivateNetwork = networks[params.DOCKER_PRIVATE_NETWORK_NEW_NAME];
+  if (!dnprivateNetwork)
+    networks = {
+      ...networks,
+      [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+        external: true
+      }
+    };
+
   // Return the network dncore_network with the external: true added
-  if (!dncoreNetwork.external)
-    return {
+  if (!dncoreNetwork?.external)
+    networks = {
       ...networks,
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         ...dncoreNetwork,
