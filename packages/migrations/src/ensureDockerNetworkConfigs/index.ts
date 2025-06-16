@@ -6,6 +6,7 @@ import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
 import { params } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
+import { httpsPortal } from "@dappnode/httpsportal";
 
 export async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
   const networksConfigs = [
@@ -25,11 +26,22 @@ export async function ensureDockerNetworkConfigs(rollback = false): Promise<void
   ];
 
   for (const config of networksConfigs) {
-    try {
-      logs.info(`Ensuring docker network config for ${config.networkName}`);
-      await ensureDockerNetworkConfig(config);
-    } catch (error) {
-      logs.error(`Failed to ensure docker network config for ${config.networkName}: ${error.message}`);
+    logs.info(`Ensuring docker network config for ${config.networkName}`);
+    await ensureDockerNetworkConfig(config);
+
+    // Create PWA mapping
+    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) {
+      logs.info(`Adding PWA mapping for ${params.dappmanagerDnpName}...`);
+      // Ensure the PWA mapping is added only for the new network
+      // This is needed for the new dappmanager to work with the PWA
+      // It will be a internal mapping so its not exposed to the internet
+      await httpsPortal.addMapping({
+        dnpName: params.dappmanagerDnpName,
+        external: false,
+        fromSubdomain: "pwa",
+        serviceName: params.dappmanagerDnpName,
+        port: 80
+      });
     }
   }
 }
