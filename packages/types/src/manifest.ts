@@ -168,6 +168,7 @@ interface ExposableServiceManifestInfo {
   fromSubdomain?: string;
   port: number;
   exposeByDefault?: boolean;
+  external?: boolean;
 }
 
 // Arch

@@ -36,7 +36,8 @@ export function parseExposableServiceManifest(
         fromSubdomain: info.fromSubdomain || defaultFromSubdomain,
         dnpName: dnp.dnpName,
         serviceName,
-        port: info.port
+        port: info.port,
+        external: info.external || true
       });
     }
   }

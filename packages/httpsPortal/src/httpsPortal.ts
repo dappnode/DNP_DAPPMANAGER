@@ -61,7 +61,8 @@ export class HttpsPortal {
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`,
-      auth: mapping.auth
+      auth: mapping.auth,
+      external: mapping.external
     });
 
     // Edit compose to persist the setting
@@ -90,7 +91,8 @@ export class HttpsPortal {
     // Call Http Portal API to remove the mapping
     await this.httpsPortalApiClient.remove({
       fromSubdomain: mapping.fromSubdomain,
-      toHost: externalNetworkAlias
+      toHost: externalNetworkAlias,
+      external: mapping.external
     });
 
     // If container still has mappings, don't disconnect from network
@@ -123,7 +125,7 @@ export class HttpsPortal {
     }
 
     const mappings: HttpsPortalMapping[] = [];
-    for (const { fromSubdomain, toHost, auth } of entries) {
+    for (const { fromSubdomain, toHost, auth, external } of entries) {
       const [alias, port] = toHost.split(":");
       const container = aliases.get(alias);
       if (container) {
@@ -132,7 +134,8 @@ export class HttpsPortal {
           dnpName: container.dnpName,
           serviceName: container.serviceName,
           port: parseInt(port) || 80,
-          auth
+          auth,
+          external
         });
       }
     }
@@ -213,7 +216,8 @@ export class HttpsPortal {
           fromSubdomain: exposable.fromSubdomain || prettyDnpName(pkg.dnpName), // get dnpName by default
           dnpName: pkg.dnpName,
           serviceName: exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
-          port: exposable.port
+          port: exposable.port,
+          external: exposable.external || true
         };
 
         if (currentMappings.length > 0 && currentMappings.includes(portalMapping)) continue;

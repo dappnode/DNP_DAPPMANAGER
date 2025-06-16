@@ -9,7 +9,8 @@ const exposable: ExposableServiceInfo[] = [
     serviceName: "geth.dnp.dappnode.eth",
     port: 8545,
     name: "Geth JSON RPC",
-    description: "JSON RPC endpoint for Geth mainnet"
+    description: "JSON RPC endpoint for Geth mainnet",
+    external: true
   }
 ];
 
