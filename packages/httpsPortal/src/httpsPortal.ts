@@ -43,7 +43,7 @@ export class HttpsPortal {
 
     logs.info(`Adding PWA mapping for ${dnpName}...`);
     await this.addMapping({
-      fromSubdomain: "pwa",
+      fromSubdomain,
       dnpName,
       serviceName: dnpName,
       port: 80,
