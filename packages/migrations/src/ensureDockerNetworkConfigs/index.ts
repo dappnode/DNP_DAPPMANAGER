@@ -30,24 +30,10 @@ export async function ensureDockerNetworkConfigs(rollback = false): Promise<void
     await ensureDockerNetworkConfig(config);
 
     // Create PWA mapping
-    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) {
-      const fromSubdomain = "pwa";
-      const dnpName = params.dappmanagerDnpName;
-      const mappings = await httpsPortal.getMappings();
-      if (mappings.some((mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName)) continue;
-
-      logs.info(`Adding PWA mapping for ${dnpName}...`);
-      // Ensure the PWA mapping is added only for the new network
-      // This is needed for the new dappmanager to work with the PWA
-      // It will be a internal mapping so its not exposed to the internet
-      await httpsPortal.addMapping({
-        dnpName,
-        external: false,
-        fromSubdomain,
-        serviceName: params.dappmanagerDnpName,
-        port: 80
-      });
-    }
+    // Ensure the PWA mapping is added only for the new network
+    // This is needed for the new dappmanager to work with the PWA
+    // It will be a internal mapping so its not exposed to the internet
+    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) await httpsPortal.addPwaMappingIfNotExists();
   }
 }
 

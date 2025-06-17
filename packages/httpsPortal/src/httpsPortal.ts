@@ -26,6 +26,32 @@ export class HttpsPortal {
   }
 
   /**
+   * Add a PWA internal mapping for dappmanager
+   */
+  async addPwaMappingIfNotExists(): Promise<void> {
+    const fromSubdomain = "pwa";
+    const dnpName = params.dappmanagerDnpName;
+
+    const hasMapping = (await this.getMappings()).some(
+      (mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName
+    );
+
+    if (hasMapping) {
+      logs.info(`PWA mapping for ${dnpName} already exists.`);
+      return;
+    }
+
+    logs.info(`Adding PWA mapping for ${dnpName}...`);
+    await this.addMapping({
+      fromSubdomain: "pwa",
+      dnpName,
+      serviceName: dnpName,
+      port: 80,
+      external: false // Internal mapping, not exposed to the internet
+    });
+  }
+
+  /**
    * Expose an internal container to the external internet through the https-portal
    */
   async addMapping(mapping: HttpsPortalMapping): Promise<void> {
