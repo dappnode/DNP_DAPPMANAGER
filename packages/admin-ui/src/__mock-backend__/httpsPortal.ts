@@ -16,12 +16,23 @@ const exposable: ExposableServiceInfo[] = [
 
 export const httpsPortal: Pick<
   Routes,
+  | "httpsPortalPwaMappingAdd"
   | "httpsPortalMappingAdd"
   | "httpsPortalMappingRemove"
   | "httpsPortalMappingsGet"
   | "httpsPortalExposableServicesGet"
   | "httpsPortalMappingsRecreate"
 > = {
+  httpsPortalPwaMappingAdd: async () => {
+    const pwaMapping: HttpsPortalMapping = {
+      fromSubdomain: "pwa",
+      dnpName: "pwa.dnp.dappnode.eth",
+      serviceName: "pwa",
+      port: 443,
+      external: false
+    };
+    mappings.set(pwaMapping.fromSubdomain, pwaMapping);
+  },
   httpsPortalMappingAdd: async ({ mapping }) => {
     mappings.set(mapping.fromSubdomain, mapping);
   },
