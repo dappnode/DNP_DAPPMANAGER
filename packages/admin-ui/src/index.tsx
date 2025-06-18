@@ -24,6 +24,19 @@ window.versionData = cleanObj({
   branch: import.meta.env.VITE_APP_BRANCH,
   commit: import.meta.env.VITE_APP_COMMIT
 });
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then(reg => {
+        console.log('Service Worker registered, scope:', reg.scope);
+      })
+      .catch(err => {
+        console.error('Service Worker registration failed:', err);
+      });
+  });
+}
 const root = createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
