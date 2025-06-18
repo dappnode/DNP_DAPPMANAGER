@@ -6,7 +6,8 @@ import {
   InstalledPackageData,
   Notification,
   NotificationPayload,
-  NotificationsConfig
+  NotificationsConfig,
+  NotifierSubscription
 } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
@@ -125,6 +126,34 @@ class Notifications {
     const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
     const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
     return { notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
+  }
+
+  /**
+   * Retrieves vapidKey from notifier
+   */
+  async getVapidKey(): Promise<string | null> {
+    return await this.api.getVapidKey();
+  }
+
+  /**
+   * Retrieves all subs from notifier
+   */
+  async fetchSubscriptions(): Promise<NotifierSubscription[] | null> {
+    return await this.api.fetchSubscriptions();
+  }
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  async deleteSubscription(endpoint: string): Promise<void> {
+    return await this.api.deleteSubscription(endpoint);
+  }
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  async postSubscription(subscription: PushSubscription): Promise<void> {
+    return await this.api.postSubscription(subscription);
   }
 }
 

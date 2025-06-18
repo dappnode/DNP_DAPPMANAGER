@@ -4,7 +4,8 @@ import {
   GatusEndpoint,
   InstalledPackageData,
   Notification,
-  NotificationsConfig
+  NotificationsConfig,
+  NotifierSubscription
 } from "@dappnode/types";
 
 /**
@@ -96,4 +97,32 @@ export async function notificationsPackageStatus(): Promise<{
   isNotifierRunning: boolean;
 }> {
   return await notifications.notificationsPackageStatus();
+}
+
+/**
+ * Get vapid key from notifier API
+ */
+export async function notificationsGetVapidKey(): Promise<string | null> {
+  return await notifications.getVapidKey();
+}
+
+/**
+ * Retrieves all subs from notifier
+ */
+export async function notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null> {
+  return await notifications.fetchSubscriptions();
+}
+
+/**
+ * Deletes a subscription from notifier by its endpoint
+ */
+export async function notificationsDeleteSubscription(endpoint: string): Promise<void> {
+  return await notifications.deleteSubscription(endpoint);
+}
+
+/**
+ * Posts a new subscription to notifier
+ */
+export async function notificationsPostSubscription(subscription: PushSubscription): Promise<void> {
+  return await notifications.postSubscription(subscription);
 }

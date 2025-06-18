@@ -31,6 +31,10 @@ export {
   notificationsSetAllSeen,
   notificationSetSeenByCorrelationID,
   notificationsPackageStatus,
+  notificationsGetVapidKey,
+  notificationsGetSubscriptions,
+  notificationsPostSubscription,
+  notificationsDeleteSubscription
 } from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
