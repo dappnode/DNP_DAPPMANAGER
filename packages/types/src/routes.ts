@@ -50,7 +50,8 @@ import {
   GatusEndpoint,
   Notification,
   NotificationsConfig,
-  NotificationsSettingsAllDnps
+  NotificationsSettingsAllDnps,
+  NotifierSubscription
 } from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
@@ -324,6 +325,25 @@ export interface Routes {
     servicesNotRunning: string[];
   }>;
 
+  /**
+   * Returns notifications package status
+   */
+  notificationsGetVapidKey: () => Promise<string | null>;
+
+  /**
+   * Returns all subs from notifier
+   */
+  notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null>;
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  notificationsDeleteSubscription(endpoint: string): Promise<void>;
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  notificationsPostSubscription(subscription: PushSubscription): Promise<void>;
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
@@ -759,6 +779,10 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   notificationsPackageStatus: {},
+  notificationsGetVapidKey: {},
+  notificationsGetSubscriptions: {},
+  notificationsDeleteSubscription: {},
+  notificationsPostSubscription: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalPwaMappingAdd: { log: true },

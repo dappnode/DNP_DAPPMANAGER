@@ -399,8 +399,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     isInstalled: false,
     isRunning: false,
     isNotifierRunning: false,
-    servicesNotRunning: [],
+    servicesNotRunning: []
   }),
+  notificationsGetVapidKey: async () => "B3N1b2JzY3JpcHRpb25LZXk6IHNvbWUtdmFwaWQta2V5",
+  notificationsGetSubscriptions: async () => [],
+  notificationsPostSubscription: async () => {},
+  notificationsDeleteSubscription: async () => {}
 };
 
 export const calls: Routes = {

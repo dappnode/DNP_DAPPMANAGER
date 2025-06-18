@@ -1,4 +1,4 @@
-import { Notification, NotificationPayload } from "@dappnode/types";
+import { Notification, NotificationPayload, NotifierSubscription } from "@dappnode/types";
 
 export class NotificationsApi {
   private readonly rootUrl: string;
@@ -32,7 +32,7 @@ export class NotificationsApi {
    */
   async getBannerNotifications(timestamp?: number): Promise<Notification[]> {
     const url = new URL(`/api/v1/notifications?isBanner=true&timestamp=${timestamp}`, `${this.rootUrl}:8080`);
- 
+
     const response = await fetch(url);
     return await response.json();
   }
@@ -83,5 +83,62 @@ export class NotificationsApi {
         "Content-Type": "application/json"
       }
     });
+  }
+
+  /**
+   * Get public vapidKey from notifier service
+   */
+  async getVapidKey(): Promise<string | null> {
+    const url = new URL("/api/v1/vapid/public-key", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error("Failed to fetch vapid public key");
+    }
+    return (await response.json()).publicKey;
+  }
+
+  /**
+   * Get all Push subscriptions from notifier service
+   */
+  async fetchSubscriptions(): Promise<NotifierSubscription[]> {
+    const url = new URL("/api/v1/subscriptions", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error("Failed to fetch subscriptions");
+    }
+    return await response.json();
+  }
+
+  /**
+   * Delete a Push subscription by its endpoint
+   */
+  async deleteSubscription(endpoint: string): Promise<void> {
+    const url = new URL(`/api/v1/subscriptions?endpoint=${endpoint}`, `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete subscription");
+    }
+  }
+
+  /**
+   * Post a new Push subscription to the notifier service
+   */
+  async postSubscription(subscription: PushSubscription): Promise<void> {
+    const url = new URL("/api/v1/subscriptions", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(subscription)
+    });
+    if (!response.ok) {
+      throw new Error("Failed positing sub to notifier");
+    }
   }
 }

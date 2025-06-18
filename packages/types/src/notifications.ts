@@ -110,3 +110,7 @@ export interface Alert {
   description: string;
   enabled: boolean;
 }
+
+export interface NotifierSubscription extends PushSubscription {
+  alias: string;
+}
