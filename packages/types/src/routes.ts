@@ -343,7 +343,8 @@ export interface Routes {
   /**
    * Posts a new subscription to notifier
    */
-  notificationsPostSubscription(subscription: PushSubscription): Promise<void>;
+  notificationsPostSubscription(subscription: NotifierSubscription): Promise<void>;
+
   /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support

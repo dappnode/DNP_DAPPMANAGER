@@ -1,10 +1,12 @@
 // src/hooks/usePushSubscription.ts
 import { api, useApi } from "api";
+import { UAParser } from "ua-parser-js";
 import { useState, useEffect, useCallback } from "react";
+import { NotifierSubscription } from "@dappnode/types";
 
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
-  subscriptionsList: PushSubscription[] | null;
+  subscriptionsList: NotifierSubscription[] | null;
   isSubInNotifier: boolean;
   permission: NotificationPermission | null;
   requestPermission: () => void;
@@ -14,7 +16,7 @@ interface UseHandleSubscriptionResult {
 export function useHandleSubscription(): UseHandleSubscriptionResult {
   const [vapidKey, setVapidKey] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
-  const [subscriptionsList, setSubscriptionsList] = useState<PushSubscription[] | null>(null);
+  const [subscriptionsList, setSubscriptionsList] = useState<NotifierSubscription[] | null>(null);
 
   const [isSubInNotifier, setIsSubInNotifier] = useState<boolean>(false);
 
@@ -135,15 +137,31 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       });
       console.log("New subscription:", newSub);
 
-      // const res = await fetch("http://notifier.notifications.dappnode:8081/api/v1/subscriptions", {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify(newSub)
-      // });
-      // console.log("Subscription response:", res);
+      // Build a human-readable alias from user agent
+      const parser = new UAParser();
+      const { device, browser, os } = parser.getResult();
+      const vendorModel = device.vendor && device.model ? `${device.vendor} ${device.model}` : "";
+      const typeLabel = device.type || "desktop";
+      const rawLabel = vendorModel || typeLabel;
+      const deviceLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
+      const browserName = browser.name || "";
+      const browserMajor = browser.version?.split(".")[0] || "";
+      const osName = os.name || "";
+      const osVersion = os.version || "";
+      const alias = `${deviceLabel} - ${browserName} ${browserMajor} on ${osName} ${osVersion}`;
 
-      // Posting new sub to notifier
-      await api.notificationsPostSubscription(newSub);
+      // Attach alias and send the subscription object to notifier
+      const newSubJson = newSub.toJSON();
+      if (!newSubJson.endpoint || !newSubJson.keys) {
+        throw new Error("Invalid subscription object");
+      }
+      const subscriptionWithAlias: NotifierSubscription = {
+        ...newSubJson,
+        alias
+      };
+
+      console.log("Subscription with alias:", subscriptionWithAlias);
+      await api.notificationsPostSubscription(subscriptionWithAlias);
 
       setSubscription(newSub);
     } catch (err) {

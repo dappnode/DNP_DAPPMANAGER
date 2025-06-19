@@ -111,6 +111,6 @@ export interface Alert {
   enabled: boolean;
 }
 
-export interface NotifierSubscription extends PushSubscription {
+export interface NotifierSubscription extends PushSubscriptionJSON {
   alias: string;
 }

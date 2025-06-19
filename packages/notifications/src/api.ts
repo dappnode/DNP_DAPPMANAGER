@@ -128,7 +128,7 @@ export class NotificationsApi {
   /**
    * Post a new Push subscription to the notifier service
    */
-  async postSubscription(subscription: PushSubscription): Promise<void> {
+  async postSubscription(subscription: NotifierSubscription): Promise<void> {
     const url = new URL("/api/v1/subscriptions", `${this.rootUrl}:8081`);
     const response = await fetch(url.toString(), {
       method: "POST",
