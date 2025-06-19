@@ -43,7 +43,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   }, [vapidKeyReq.data]);
 
   useEffect(() => {
-    if (subscriptionsReq.data) {
+    if (subscriptionsReq.data !== undefined) {
       setSubscriptionsList(subscriptionsReq.data);
     }
   }, [subscription, subscriptionsReq.data]);
@@ -77,7 +77,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
 
     if (subscriptionsList?.find((sub) => sub.endpoint === endpoint)) {
       await api.notificationsDeleteSubscription({ endpoint });
-      console.log("Subscription deleted from notifier");
+      subscriptionsReq.revalidate();
     }
     console.log("Subscription deletion process completed");
   };
