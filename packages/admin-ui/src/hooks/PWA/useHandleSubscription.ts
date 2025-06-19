@@ -12,6 +12,7 @@ interface UseHandleSubscriptionResult {
   requestPermission: () => void;
   subscribeBrowser: () => Promise<void>;
   deleteSubscription: (endpoint: string) => Promise<void>;
+  revalidateSubs: () => Promise<boolean>;
 }
 
 export function useHandleSubscription(): UseHandleSubscriptionResult {
@@ -25,6 +26,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
 
   const vapidKeyReq = useApi.notificationsGetVapidKey();
   const subscriptionsReq = useApi.notificationsGetSubscriptions();
+  const revalidateSubs = () => subscriptionsReq.revalidate();
 
   useEffect(() => {
     const getSub = async () => {
@@ -184,6 +186,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     deleteSubscription,
     requestPermission,
     subscriptionsList,
-    subscribeBrowser
+    subscribeBrowser,
+    revalidateSubs
   };
 }
