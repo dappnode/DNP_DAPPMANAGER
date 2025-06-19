@@ -22,6 +22,7 @@ export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export {
+  notificationsSendCustom,
   notificationsGetAllEndpoints,
   notificationsGetBanner,
   notificationsUpdateEndpoints,

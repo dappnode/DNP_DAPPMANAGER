@@ -4,9 +4,17 @@ import {
   GatusEndpoint,
   InstalledPackageData,
   Notification,
+  NotificationPayload,
   NotificationsConfig,
   NotifierSubscription
 } from "@dappnode/types";
+
+/**
+ * Sends custom notification to notifier service
+ */
+export async function notificationsSendCustom(notificationPayload: NotificationPayload): Promise<void> {
+  return await notifications.sendNotification(notificationPayload);
+}
 
 /**
  * Get all the notifications
