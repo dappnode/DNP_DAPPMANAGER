@@ -35,6 +35,7 @@ export {
   notificationsGetVapidKey,
   notificationsGetSubscriptions,
   notificationsPostSubscription,
+  notificationsUpdateSubAlias,
   notificationsDeleteSubscription
 } from "./notifications.js";
 export * from "./httpsPortal.js";

@@ -345,6 +345,11 @@ export interface Routes {
   notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null>;
 
   /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  notificationsUpdateSubAlias(kwargs: { endpoint: string, alias:string }): Promise<void>;
+
+  /**
    * Deletes a subscription from notifier by its endpoint
    */
   notificationsDeleteSubscription(kwargs: { endpoint: string }): Promise<void>;
@@ -792,6 +797,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsPackageStatus: {},
   notificationsGetVapidKey: {},
   notificationsGetSubscriptions: {},
+  notificationsUpdateSubAlias: {},
   notificationsDeleteSubscription: {},
   notificationsPostSubscription: {},
   getUserActionLogs: {},
