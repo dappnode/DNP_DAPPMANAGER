@@ -76,7 +76,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     }
 
     if (subscriptionsList?.find((sub) => sub.endpoint === endpoint)) {
-      await api.notificationsDeleteSubscription(endpoint);
+      await api.notificationsDeleteSubscription({ endpoint });
       console.log("Subscription deleted from notifier");
     }
     console.log("Subscription deletion process completed");
@@ -148,20 +148,22 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       };
 
       console.log("Subscription with alias:", subscriptionWithAlias);
-      await api.notificationsPostSubscription(subscriptionWithAlias);
+      await api.notificationsPostSubscription({ subscription: subscriptionWithAlias });
       subscriptionsReq.revalidate();
 
       await api.notificationsSendCustom({
-        title: `New device subscribed!`,
-        dnpName:'dappmanager.dnp.dappnode.eth',
-        body: `New device subscribed to push notifications system: ${alias}`,
-        category: Category.system,
-        priority: Priority.low,
-        status: Status.triggered,
-        isBanner: false,
-        isRemote: false,
-        correlationId: "dappmanager-push-subcription"
-      })
+        notificationPayload: {
+          title: `New device subscribed!`,
+          dnpName: "dappmanager.dnp.dappnode.eth",
+          body: `New device subscribed to push notifications system: ${alias}`,
+          category: Category.system,
+          priority: Priority.low,
+          status: Status.triggered,
+          isBanner: false,
+          isRemote: false,
+          correlationId: "dappmanager-push-subcription"
+        }
+      });
     } catch (err) {
       console.error("Subscribe error:", err);
     }

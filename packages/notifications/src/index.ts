@@ -24,12 +24,12 @@ class Notifications {
   /**
    * Send a new notification
    */
-  async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
+  async sendNotification(notificationPayload: NotificationPayload, subscriptionEndpoint?: string): Promise<void> {
     const { isNotifierRunning } = await this.notificationsPackageStatus();
 
     // Only send custom notifications if the notifier service is running
     if (isNotifierRunning) {
-      await this.api.sendNotification(notificationPayload);
+      await this.api.sendNotification(notificationPayload, subscriptionEndpoint);
     }
   }
 
