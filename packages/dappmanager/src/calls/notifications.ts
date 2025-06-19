@@ -123,6 +123,6 @@ export async function notificationsDeleteSubscription(endpoint: string): Promise
 /**
  * Posts a new subscription to notifier
  */
-export async function notificationsPostSubscription(subscription: PushSubscription): Promise<void> {
+export async function notificationsPostSubscription(subscription: NotifierSubscription): Promise<void> {
   return await notifications.postSubscription(subscription);
 }
