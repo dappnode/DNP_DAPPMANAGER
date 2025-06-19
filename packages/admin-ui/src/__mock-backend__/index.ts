@@ -405,6 +405,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsGetVapidKey: async () => "B3N1b2JzY3JpcHRpb25LZXk6IHNvbWUtdmFwaWQta2V5",
   notificationsGetSubscriptions: async () => [],
   notificationsPostSubscription: async () => {},
+  notificationsUpdateSubAlias: async () => {},
   notificationsDeleteSubscription: async () => {}
 };
 

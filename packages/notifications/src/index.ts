@@ -143,6 +143,13 @@ class Notifications {
   }
 
   /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  async updateSubscriptionAlias(endpoint: string, alias: string): Promise<void> {
+    return await this.api.updateSubscriptionAlias(endpoint, alias);
+  }
+
+  /**
    * Deletes a subscription from notifier by its endpoint
    */
   async deleteSubscription(endpoint: string): Promise<void> {

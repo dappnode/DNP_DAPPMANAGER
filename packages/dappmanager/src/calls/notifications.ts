@@ -128,6 +128,19 @@ export async function notificationsGetSubscriptions(): Promise<NotifierSubscript
 }
 
 /**
+ * Updates a subscription alias from notifier by its endpoint
+ */
+export async function notificationsUpdateSubAlias({
+  endpoint,
+  alias
+}: {
+  endpoint: string;
+  alias: string;
+}): Promise<void> {
+  return await notifications.updateSubscriptionAlias(endpoint, alias);
+}
+
+/**
  * Deletes a subscription from notifier by its endpoint
  */
 export async function notificationsDeleteSubscription({ endpoint }: { endpoint: string }): Promise<void> {

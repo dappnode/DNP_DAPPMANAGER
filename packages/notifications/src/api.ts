@@ -112,6 +112,21 @@ export class NotificationsApi {
     return await response.json();
   }
 
+  async updateSubscriptionAlias(endpoint: string, alias: string): Promise<void> {
+    const url = new URL(`/api/v1/subscriptions?endpoint=${encodeURIComponent(endpoint)}`, `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ alias })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update subscription alias");
+    }
+  }
+
   /**
    * Delete a Push subscription by its endpoint
    */
