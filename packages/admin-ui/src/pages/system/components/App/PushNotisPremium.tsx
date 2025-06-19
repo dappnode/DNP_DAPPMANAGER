@@ -12,7 +12,8 @@ export default function PushNotisPremium() {
     isSubInNotifier,
     deleteSubscription,
     requestPermission,
-    permission
+    permission,
+    subscribeBrowser
   } = useHandleSubscription();
 
   return (
@@ -35,19 +36,31 @@ export default function PushNotisPremium() {
           <h3>🌐 Browser Status</h3>
           <p>Permission: {permission}</p>
           <p>Subscribed: {sub && isSubInNotifier ? "Yes" : "No"}</p>
-          {sub ? (
+          {!sub && <p>Subscription not found</p>}
+          {!isSubInNotifier && sub && <p>Subscription not found in notifier</p>}
+          {permission === "default" ? (
+            <button onClick={requestPermission}>request Permission</button>
+          ) : permission === "denied" ? (
+            <p>Permission denied</p>
+          ) : (
+            <p>Permission granted</p>
+          )}
+          {sub && (
             <>
               <details style={{ marginTop: 10 }}>
-                <summary>Subscription JSON</summary>
+                <summary>Browser Subscription</summary>
                 <pre style={{ maxHeight: 200, overflow: "auto" }}>{JSON.stringify(sub.toJSON(), null, 2)}</pre>
               </details>
               <button onClick={() => deleteSubscription(sub.endpoint)}>Delete subscription</button>
             </>
-          ) : (
-            <button onClick={requestPermission}>Subscribe Device</button>
+          )}
+          {permission === "granted" && !isSubInNotifier && (
+            <button onClick={subscribeBrowser}>Subscribe browser</button>
           )}
         </Card>
-
+        <Card>
+          
+        </Card>
         <Card>
           <h3>📝 Notifier Subs</h3>
           {sub && isSubInNotifier ? <p>Subscription exists in notifier</p> : <p>Subscription not found in notifier</p>}

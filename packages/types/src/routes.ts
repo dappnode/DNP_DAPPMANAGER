@@ -49,6 +49,7 @@ import {
   CustomEndpoint,
   GatusEndpoint,
   Notification,
+  NotificationPayload,
   NotificationsConfig,
   NotificationsSettingsAllDnps,
   NotifierSubscription
@@ -263,6 +264,11 @@ export interface Routes {
    * Fetch extended info about a new DNP
    */
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
+
+  /**
+   * Sends custom notification to notifier service
+   */
+  notificationsSendCustom(notificationPayload: NotificationPayload): Promise<void>;
 
   /**
    * Get all the notifications
@@ -771,6 +777,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},
   notificationsGetUnseenCount: {},

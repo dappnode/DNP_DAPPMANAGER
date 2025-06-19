@@ -26,6 +26,7 @@ export interface NotificationPayload {
   errors?: string;
   callToAction?: CallToAction;
   correlationId: string;
+  subscriptionEndpoint?: string;
 }
 
 export interface CallToAction {

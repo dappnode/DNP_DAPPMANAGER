@@ -2,7 +2,7 @@
 import { api, useApi } from "api";
 import { UAParser } from "ua-parser-js";
 import { useState, useEffect, useCallback } from "react";
-import { NotifierSubscription } from "@dappnode/types";
+import { Category, NotifierSubscription, Priority, Status } from "@dappnode/types";
 
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
@@ -10,6 +10,7 @@ interface UseHandleSubscriptionResult {
   isSubInNotifier: boolean;
   permission: NotificationPermission | null;
   requestPermission: () => void;
+  subscribeBrowser: () => Promise<void>;
   deleteSubscription: (endpoint: string) => Promise<void>;
 }
 
@@ -60,40 +61,25 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     Notification.requestPermission().then((permission) => {
       setPermission(permission);
     });
-  };
-
-  useEffect(() => {
-    console.log("Notification permission changed:", permission);
-
     if (permission === "granted" && vapidKey) {
       subscribeBrowser();
     } else if (permission === "denied") {
       console.error("Notification permission denied");
     }
-  }, [vapidKey, permission, setIsSubInNotifier]);
+  };
 
   const deleteSubscription = async (endpoint: string) => {
-    console.log("0");
-
-    console.log("1");
-
-    console.log(subscription?.endpoint);
-    console.log(endpoint);
-    console.log(subscription?.endpoint === endpoint);
-
+    console.log("Deleting subscription for endpoint:", endpoint);
     if (subscription?.endpoint === endpoint) {
-      console.log("2");
       await subscription.unsubscribe(); // Unsubscribe from PushManager
-      console.log("3");
       setSubscription(null); // Clear local subscription state
     }
 
     if (subscriptionsList?.find((sub) => sub.endpoint === endpoint)) {
-      console.log("4");
       await api.notificationsDeleteSubscription(endpoint);
-      console.log("5");
+      console.log("Subscription deleted from notifier");
     }
-    console.log("6");
+    console.log("Subscription deletion process completed");
   };
 
   const subscribeBrowser = useCallback(async () => {
@@ -135,6 +121,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
         userVisibleOnly: true,
         applicationServerKey
       });
+      setSubscription(newSub);
       console.log("New subscription:", newSub);
 
       // Build a human-readable alias from user agent
@@ -162,8 +149,19 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
 
       console.log("Subscription with alias:", subscriptionWithAlias);
       await api.notificationsPostSubscription(subscriptionWithAlias);
+      subscriptionsReq.revalidate();
 
-      setSubscription(newSub);
+      await api.notificationsSendCustom({
+        title: `New device subscribed!`,
+        dnpName:'dappmanager.dnp.dappnode.eth',
+        body: `New device subscribed to push notifications system: ${alias}`,
+        category: Category.system,
+        priority: Priority.low,
+        status: Status.triggered,
+        isBanner: false,
+        isRemote: false,
+        correlationId: "dappmanager-push-subcription"
+      })
     } catch (err) {
       console.error("Subscribe error:", err);
     }
@@ -183,6 +181,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     isSubInNotifier,
     deleteSubscription,
     requestPermission,
-    subscriptionsList
+    subscriptionsList,
+    subscribeBrowser
   };
 }
