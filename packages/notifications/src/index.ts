@@ -152,7 +152,7 @@ class Notifications {
   /**
    * Posts a new subscription to notifier
    */
-  async postSubscription(subscription: PushSubscription): Promise<void> {
+  async postSubscription(subscription: NotifierSubscription): Promise<void> {
     return await this.api.postSubscription(subscription);
   }
 }
