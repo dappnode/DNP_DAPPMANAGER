@@ -3,6 +3,7 @@ import Card from "components/Card";
 import SubTitle from "components/SubTitle";
 import { usePwaInstall } from "hooks/PWA/usePwaInstall";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
+import { PushNotificationsSubs } from "./PushNotificationsSubs";
 
 export default function PushNotisPremium() {
   const { isPwa, canInstall, promptInstall } = usePwaInstall();
@@ -13,7 +14,8 @@ export default function PushNotisPremium() {
     deleteSubscription,
     requestPermission,
     permission,
-    subscribeBrowser
+    subscribeBrowser,
+    revalidateSubs
   } = useHandleSubscription();
 
   return (
@@ -37,7 +39,7 @@ export default function PushNotisPremium() {
           <p>Permission: {permission}</p>
           <p>Subscribed: {sub && isSubInNotifier ? "Yes" : "No"}</p>
           {!sub && <p>Subscription not found</p>}
-          {!isSubInNotifier && sub && <p>Subscription not found in notifier</p>}
+          {sub && isSubInNotifier ? <p>Subscription exists in notifier</p> : <p>Subscription not found in notifier</p>}
           {permission === "default" ? (
             <button onClick={requestPermission}>request Permission</button>
           ) : permission === "denied" ? (
@@ -58,28 +60,13 @@ export default function PushNotisPremium() {
             <button onClick={subscribeBrowser}>Subscribe browser</button>
           )}
         </Card>
-        <Card>
-          
-        </Card>
-        <Card>
-          <h3>📝 Notifier Subs</h3>
-          {sub && isSubInNotifier ? <p>Subscription exists in notifier</p> : <p>Subscription not found in notifier</p>}
 
-          {subscriptionsList && subscriptionsList.length > 0 ? (
-            <ul>
-              {subscriptionsList.map((sub, index) => (
-                <li key={index}>
-                  <details>
-                    <summary>Subscription {index + 1}</summary>
-                    <pre>{sub.endpoint}</pre>
-                  </details>{" "}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p>No subscriptions found in notifier</p>
-          )}
-        </Card>
+        <PushNotificationsSubs
+          subscriptionsList={subscriptionsList}
+          browserSubEndpoint={sub?.endpoint}
+          deleteSubscription={deleteSubscription}
+          revalidateSubs={revalidateSubs}
+        />
       </div>
     </>
   );
