@@ -12,8 +12,14 @@ import {
 /**
  * Sends custom notification to notifier service
  */
-export async function notificationsSendCustom(notificationPayload: NotificationPayload): Promise<void> {
-  return await notifications.sendNotification(notificationPayload);
+export async function notificationsSendCustom({
+  notificationPayload,
+  subscriptionEndpoint
+}: {
+  notificationPayload: NotificationPayload;
+  subscriptionEndpoint?: string;
+}): Promise<void> {
+  return await notifications.sendNotification(notificationPayload, subscriptionEndpoint);
 }
 
 /**
@@ -28,7 +34,7 @@ export async function notificationsGetAll(): Promise<Notification[]> {
  * Get all the notifications
  * @returns all the notifications
  */
-export async function notificationsGetBanner(timestamp: number): Promise<Notification[]> {
+export async function notificationsGetBanner({ timestamp }: { timestamp: number }): Promise<Notification[]> {
   const { isNotifierRunning } = await notifications.notificationsPackageStatus();
   return isNotifierRunning ? await notifications.getBannerNotifications(timestamp) : [];
 }
@@ -51,7 +57,7 @@ export async function notificationsSetAllSeen(): Promise<void> {
 /**
  * Set a notification as seen by providing its correlationId
  */
-export async function notificationSetSeenByCorrelationID(correlationId: string): Promise<void> {
+export async function notificationSetSeenByCorrelationID({ correlationId }: { correlationId: string }): Promise<void> {
   return await notifications.setNotificationSeenByCorrelationID(correlationId);
 }
 
@@ -124,13 +130,17 @@ export async function notificationsGetSubscriptions(): Promise<NotifierSubscript
 /**
  * Deletes a subscription from notifier by its endpoint
  */
-export async function notificationsDeleteSubscription(endpoint: string): Promise<void> {
+export async function notificationsDeleteSubscription({ endpoint }: { endpoint: string }): Promise<void> {
   return await notifications.deleteSubscription(endpoint);
 }
 
 /**
  * Posts a new subscription to notifier
  */
-export async function notificationsPostSubscription(subscription: NotifierSubscription): Promise<void> {
+export async function notificationsPostSubscription({
+  subscription
+}: {
+  subscription: NotifierSubscription;
+}): Promise<void> {
   return await notifications.postSubscription(subscription);
 }

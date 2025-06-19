@@ -268,7 +268,10 @@ export interface Routes {
   /**
    * Sends custom notification to notifier service
    */
-  notificationsSendCustom(notificationPayload: NotificationPayload): Promise<void>;
+  notificationsSendCustom(kwargs: {
+    notificationPayload: NotificationPayload;
+    subscriptionEndpoint?: string;
+  }): Promise<void>;
 
   /**
    * Get all the notifications
@@ -278,7 +281,7 @@ export interface Routes {
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
-  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
+  notificationsGetBanner(kwargs: { timestamp: number }): Promise<Notification[]>;
 
   /**
    * Get unseen notifications count
@@ -300,7 +303,7 @@ export interface Routes {
   /**
    * Set a notification as seen by providing its correlationId
    */
-  notificationSetSeenByCorrelationID(correlationId: string): Promise<void>;
+  notificationSetSeenByCorrelationID(kwargs: { correlationId: string }): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -344,12 +347,12 @@ export interface Routes {
   /**
    * Deletes a subscription from notifier by its endpoint
    */
-  notificationsDeleteSubscription(endpoint: string): Promise<void>;
+  notificationsDeleteSubscription(kwargs: { endpoint: string }): Promise<void>;
 
   /**
    * Posts a new subscription to notifier
    */
-  notificationsPostSubscription(subscription: NotifierSubscription): Promise<void>;
+  notificationsPostSubscription(kwargs: { subscription: NotifierSubscription }): Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different

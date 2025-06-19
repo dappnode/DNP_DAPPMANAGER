@@ -10,8 +10,11 @@ export class NotificationsApi {
   /**
    * Send a new notification
    */
-  async sendNotification(notificationPaylaod: NotificationPayload): Promise<void> {
-    await fetch(new URL("/api/v1/notifications", `${this.rootUrl}:8080`).toString(), {
+  async sendNotification(notificationPaylaod: NotificationPayload, subscriptionEndpoint?: string): Promise<void> {
+    // Build URL and append subscriptionEndpoint as query param if provided
+    const url = new URL("/api/v1/notifications", `${this.rootUrl}:8080`);
+    if (subscriptionEndpoint) url.searchParams.append("subscriptionEndpoint", encodeURIComponent(subscriptionEndpoint));
+    await fetch(url.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
