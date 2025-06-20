@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "components/Card";
 import SubTitle from "components/SubTitle";
-import { Requirements } from "./Requirements";
+import { PwaRequirements } from "./PwaRequirements";
 
 import PushNotisPremium from "./PushNotisPremium";
 
@@ -12,7 +12,7 @@ export default function App() {
       <Card spacing>
         <div>Download the Dappnode App for seamless access to the DappManager UI across all your devices.</div>
       </Card>
-      <Requirements />
+      <PwaRequirements />
 
       <PushNotisPremium />
     </>
