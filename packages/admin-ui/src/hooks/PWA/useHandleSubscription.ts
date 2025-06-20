@@ -134,10 +134,8 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       const rawLabel = vendorModel || typeLabel;
       const deviceLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
       const browserName = browser.name || "";
-      const browserMajor = browser.version?.split(".")[0] || "";
       const osName = os.name || "";
-      const osVersion = os.version || "";
-      const alias = `${deviceLabel} - ${browserName} ${browserMajor} on ${osName} ${osVersion}`;
+      const alias = `${deviceLabel} - ${browserName}  on ${osName}`;
 
       // Attach alias and send the subscription object to notifier
       const newSubJson = newSub.toJSON();
