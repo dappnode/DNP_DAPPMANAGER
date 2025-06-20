@@ -1,0 +1,47 @@
+.requirements-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  > h4 {
+    margin: 0;
+  }
+}
+
+.requirements-body {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+
+  .requirements-card {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  > * {
+    flex: 1 1 0;
+  }
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    gap: 0px; //Since card has margin-top
+    > * {
+      flex: initial; // to override the 1px cards height
+    }
+  }
+
+  .requirements-card.success {
+    color: var(--color-success);
+    border: 1px solid var(--success-green-color);
+    border-radius: 10px;
+  }
+
+  .requirements-card.error {
+    color: var(--color-success);
+    border: 1px solid var(--danger-color);
+    border-radius: 10px;
+  }
+}
