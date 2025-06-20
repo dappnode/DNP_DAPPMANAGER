@@ -103,23 +103,28 @@ export async function ensureDockerNetworkConfig({
   });
 
   for (const pkg of setDappmanagerAndBindFirst(packages)) {
-    // 2. write the config in the compose file if needed
-    writeDockerNetworkConfig({
-      pkg,
-      networkName
-    });
-    // 3. compose up --no-recreate
-    if (pkg.dnpName !== params.dappmanagerDnpName)
-      await dockerComposeUpPackage({
-        composeArgs: { dnpName: pkg.dnpName },
-        upAll: true,
-        dockerComposeUpOptions: { noRecreate: true }
-      }).catch((error) =>
-        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
-      );
+    try {
+      // 2. write the config in the compose file if needed
+      writeDockerNetworkConfig({
+        pkg,
+        networkName
+      });
+      // 3. compose up --no-recreate
+      if (pkg.dnpName !== params.dappmanagerDnpName)
+        await dockerComposeUpPackage({
+          composeArgs: { dnpName: pkg.dnpName },
+          upAll: true,
+          dockerComposeUpOptions: { noRecreate: true }
+        }).catch((error) =>
+          logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
+        );
 
-    // 4. connect container to the network
-    await connectPkgContainers({ pkg, networkName, dappmanagerIp, bindIp });
+      // 4. connect container to the network
+      await connectPkgContainers({ pkg, networkName, dappmanagerIp, bindIp });
+    } catch (error) {
+      logs.error(`Failed to ensure docker network config for package ${pkg.dnpName}: ${error.message}`);
+      continue;
+    }
   }
 }
 
