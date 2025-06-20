@@ -81,6 +81,9 @@ function SubscriptionCard({
               if (e.key === "Enter") {
                 handleUpdateAlias();
               }
+              if (e.key === "Escape") {
+                setEditAlias(false);
+              }
             }}
           />
         ) : (
