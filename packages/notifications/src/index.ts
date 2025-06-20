@@ -162,6 +162,13 @@ class Notifications {
   async postSubscription(subscription: NotifierSubscription): Promise<void> {
     return await this.api.postSubscription(subscription);
   }
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  async sendSubTestNotification(endpoint?: string): Promise<void> {
+    return await this.api.sendSubTestNotification(endpoint);
+  }
 }
 
 export const notifications = new Notifications();

@@ -157,3 +157,10 @@ export async function notificationsPostSubscription({
 }): Promise<void> {
   return await notifications.postSubscription(subscription);
 }
+
+/**
+ * Sends a test notification to all subscriptions / specific subscription
+ */
+export async function notificationsSendSubTest({ endpoint }: { endpoint?: string }): Promise<void> {
+  return await notifications.sendSubTestNotification(endpoint);
+}

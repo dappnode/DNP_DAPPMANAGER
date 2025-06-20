@@ -406,7 +406,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsGetSubscriptions: async () => [],
   notificationsPostSubscription: async () => {},
   notificationsUpdateSubAlias: async () => {},
-  notificationsDeleteSubscription: async () => {}
+  notificationsDeleteSubscription: async () => {},
+  notificationsSendSubTest: async () => {}
 };
 
 export const calls: Routes = {

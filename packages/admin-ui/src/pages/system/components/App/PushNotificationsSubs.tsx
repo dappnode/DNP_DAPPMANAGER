@@ -28,6 +28,13 @@ export function PushNotificationsSubs({
         or remove it from the list. <b>Learn more in docs...</b>
       </Card>
 
+      <Card style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        Send notification to all subscribed devices by clicking the "Send notifications"
+        <Button onClick={() => api.notificationsSendSubTest({})} variant="dappnode">
+          Send notifications
+        </Button>
+      </Card>
+
       {subscriptionsList && subscriptionsList.length > 0 ? (
         subscriptionsList.map((sub, index) => (
           <SubscriptionCard
@@ -111,7 +118,9 @@ function SubscriptionCard({
           </>
         ) : (
           <>
-            {" "}
+            <Button onClick={() => api.notificationsSendSubTest({ endpoint: sub.endpoint })} variant="outline-dappnode">
+              Send notification
+            </Button>{" "}
             <OverlayTrigger overlay={<Tooltip id="rename-sub">Rename subscription</Tooltip>} placement="top">
               <div className="icon-btns" onClick={() => setEditAlias(true)}>
                 <MdEdit />

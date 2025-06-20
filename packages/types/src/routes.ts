@@ -347,7 +347,7 @@ export interface Routes {
   /**
    * Updates a subscription alias from notifier by its endpoint
    */
-  notificationsUpdateSubAlias(kwargs: { endpoint: string, alias:string }): Promise<void>;
+  notificationsUpdateSubAlias(kwargs: { endpoint: string; alias: string }): Promise<void>;
 
   /**
    * Deletes a subscription from notifier by its endpoint
@@ -358,6 +358,11 @@ export interface Routes {
    * Posts a new subscription to notifier
    */
   notificationsPostSubscription(kwargs: { subscription: NotifierSubscription }): Promise<void>;
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  notificationsSendSubTest(kwargs: { endpoint?: string }): Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -800,6 +805,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsUpdateSubAlias: {},
   notificationsDeleteSubscription: {},
   notificationsPostSubscription: {},
+  notificationsSendSubTest: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalPwaMappingAdd: { log: true },

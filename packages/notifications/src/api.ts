@@ -159,4 +159,21 @@ export class NotificationsApi {
       throw new Error("Failed positing sub to notifier");
     }
   }
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  async sendSubTestNotification(endpoint?: string): Promise<void> {
+    const url = new URL("/api/v1/notifications/test", `${this.rootUrl}:8080`);
+    if (endpoint) {
+      url.searchParams.append("endpoint", endpoint);
+    }
+
+    await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
 }
