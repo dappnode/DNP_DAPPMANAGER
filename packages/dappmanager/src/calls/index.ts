@@ -36,7 +36,8 @@ export {
   notificationsGetSubscriptions,
   notificationsPostSubscription,
   notificationsUpdateSubAlias,
-  notificationsDeleteSubscription
+  notificationsDeleteSubscription,
+  notificationsSendSubTest
 } from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
