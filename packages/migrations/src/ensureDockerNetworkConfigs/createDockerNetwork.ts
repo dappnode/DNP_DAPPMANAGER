@@ -37,36 +37,29 @@ export async function createDockerNetwork({
     }
   };
 
-  try {
-    const network = docker.getNetwork(networkName);
-    // docker network inspect
-    // https://docs.docker.com/engine/api/v1.43/#tag/Network/operation/NetworkInspect
-    const networkInspect: Dockerode.NetworkInspectInfo = await network.inspect(); // throws 404 if network not found
-
+  // List existing networks and check if ours already exists
+  const allNetworks = await docker.listNetworks();
+  const existing = allNetworks.find((n) => n.Name === networkName);
+  if (existing) {
+    // Inspect and verify subnet
     logs.info(`docker network ${networkName} exists`);
-
-    const networkSubnets = networkInspect.IPAM?.Config?.map((config) => config.Subnet) ?? [];
-
-    // Check subnet is as expected
-    if (networkSubnets.some((subnet) => subnet === subnet))
-      logs.info(`docker network ${networkName} has correct subnet ${subnet}`);
+    const network = docker.getNetwork(networkName);
+    const info: Dockerode.NetworkInspectInfo = await network.inspect();
+    const networkSubnets = info.IPAM?.Config?.map((c) => c.Subnet) ?? [];
+    if (networkSubnets.includes(subnet)) logs.info(`docker network ${networkName} has correct subnet ${subnet}`);
     else
       logs.warn(
-        `docker network ${networkName} has incorrect subnet ${networkInspect.IPAM?.Config?.[0].Subnet}, it should be ${subnet}.`
+        `docker network ${networkName} has incorrect subnet ${info.IPAM?.Config?.[0].Subnet}, should be ${subnet}`
       );
-  } catch (e) {
-    if (e.statusCode === 404) {
-      // docker network not found, create it
-      logs.warn(`docker network ${networkName} not found, creating it...`);
-
-      await removeNetworksOverlappingSubnetIfNeeded(subnet).catch((e) =>
-        logs.error(`error removing overlapping networks: ${e}`)
-      );
-
-      await docker.createNetwork(networkOptions);
-    } else {
-      throw e;
+  } else {
+    // Create new network, removing any overlapping ones first
+    logs.warn(`docker network ${networkName} not found, creating it...`);
+    try {
+      await removeNetworksOverlappingSubnetIfNeeded(allNetworks, subnet);
+    } catch (err) {
+      logs.error(`error removing overlapping networks: ${err}`);
     }
+    await docker.createNetwork(networkOptions);
   }
 }
 
@@ -75,9 +68,10 @@ export async function createDockerNetwork({
  * The error thrown when trying to create a network with an overlapping subnet is:
  * Error: (HTTP code 403) unexpected - Pool overlaps with other one on this address space
  */
-async function removeNetworksOverlappingSubnetIfNeeded(networkSubnet: string): Promise<void> {
-  const networks = await docker.listNetworks();
-
+async function removeNetworksOverlappingSubnetIfNeeded(
+  networks: Dockerode.NetworkInspectInfo[],
+  networkSubnet: string
+): Promise<void> {
   const overlappingNetworks = networks.filter((network) => isNetworkOverlappingSubnet(network, networkSubnet));
 
   if (overlappingNetworks.length > 0) {
