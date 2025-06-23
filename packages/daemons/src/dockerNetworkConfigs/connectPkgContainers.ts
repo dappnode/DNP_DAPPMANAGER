@@ -106,7 +106,9 @@ export async function connectPkgContainerWithIp({
       await targetContainer.restart();
     }
 
+    // check if network is in the networks settings
     const hasContainerRightIp =
+      network.id in containerInfo.NetworkSettings.Networks &&
       removeCidrSuffix(containerInfo.NetworkSettings.Networks[network.id].IPAddress) === containerIp;
 
     if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
