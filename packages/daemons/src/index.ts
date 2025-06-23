@@ -12,12 +12,13 @@ import { startInternetConnectionDaemon } from "./internetConnection/index.js";
 import { startHostRebootDaemon } from "./hostReboot/index.js";
 import { startRepositoryHealthDaemon } from "./repositoryHealth/index.js";
 import { setMaxListeners } from "events"; // Import setMaxListeners
+import { startDockerNetworkConfigsDaemon } from "./dockerNetworkConfigs/index.js";
 
 // DAEMONS EXPORT
 
 export function startDaemons(dappnodeInstaller: DappnodeInstaller, signal: AbortSignal): void {
   // Increase the max listeners for AbortSignal. default is 10
-  setMaxListeners(12, signal);
+  setMaxListeners(13, signal);
 
   startAutoUpdatesDaemon(dappnodeInstaller, signal);
   startDiskUsageDaemon(signal);
@@ -31,6 +32,7 @@ export function startDaemons(dappnodeInstaller: DappnodeInstaller, signal: Abort
   startInternetConnectionDaemon(signal);
   startHostRebootDaemon(signal);
   startRepositoryHealthDaemon(signal);
+  startDockerNetworkConfigsDaemon(signal);
 }
 
 export { startAvahiDaemon } from "./avahi/index.js";

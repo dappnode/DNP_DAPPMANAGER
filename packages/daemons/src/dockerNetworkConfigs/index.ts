@@ -7,8 +7,9 @@ import { params } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { httpsPortal } from "@dappnode/httpsportal";
+import { runAtMostEvery } from "@dappnode/utils";
 
-export async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
+async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
   const networksConfigs = [
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
@@ -150,4 +151,8 @@ async function rollbackNetworkConfig({
   await network.remove();
 
   return;
+}
+
+export function startDockerNetworkConfigsDaemon(signal: AbortSignal): void {
+  runAtMostEvery(() => ensureDockerNetworkConfigs(), 1000 * 60, signal);
 }

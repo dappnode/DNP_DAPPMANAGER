@@ -1,7 +1,6 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
 import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { ensureDockerNetworkConfigs } from "./ensureDockerNetworkConfigs/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
@@ -69,11 +68,6 @@ export async function executeMigrations(
       fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
       migration: "create docker staker network and persist selected staker pkgs per network",
       coreVersion: "0.2.95"
-    },
-    {
-      fn: () => ensureDockerNetworkConfigs(),
-      migration: "ensure docker network configurations",
-      coreVersion: "0.2.104"
     }
   ];
 
