@@ -27,7 +27,9 @@ export async function ensureDockerNetworkConfigs(rollback = false): Promise<void
 
   for (const config of networksConfigs) {
     logs.info(`Ensuring docker network config for ${config.networkName}`);
-    await ensureDockerNetworkConfig(config);
+    await ensureDockerNetworkConfig(config).catch((error) =>
+      logs.error(`Failed to ensure docker network config: ${error.message}`)
+    );
 
     // Create PWA mapping
     // Ensure the PWA mapping is added only for the new network
@@ -63,36 +65,7 @@ export async function ensureDockerNetworkConfig({
   const packages = await packagesGet();
 
   if (rollback) {
-    const network = docker.getNetwork(networkName);
-    logs.info(`Rolling back docker network configuration for ${networkName}...`);
-
-    // 1. Disconnect containers from the network
-    logs.info(`Disconnecting all containers from network ${networkName}...`);
-    await disconnectAllContainersFromNetwork(network);
-
-    for (const pkg of packages) {
-      logs.info(`Rolling back docker network configuration for ${pkg.dnpName} compose file`);
-
-      // 2. Remove the config from the compose file if needed
-      writeDockerNetworkConfig({
-        pkg,
-        networkName,
-        rollback: true
-      });
-      // 3. Compose up --no-recreate
-      if (pkg.dnpName !== params.dappmanagerDnpName)
-        await dockerComposeUpPackage({
-          composeArgs: { dnpName: pkg.dnpName },
-          upAll: true,
-          dockerComposeUpOptions: { noRecreate: true }
-        }).catch((error) =>
-          logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
-        );
-    }
-
-    // 4. remove the docker network
-    await network.remove();
-
+    await rollbackNetworkConfig({ packages, networkName });
     return;
   }
 
@@ -123,6 +96,7 @@ export async function ensureDockerNetworkConfig({
       await connectPkgContainers({ pkg, networkName, dappmanagerIp, bindIp });
     } catch (error) {
       logs.error(`Failed to ensure docker network config for package ${pkg.dnpName}: ${error.message}`);
+      // TODO: consider setting array of failed packages that could not connect to the network and consider executing docker compose up with --force-recreate
       continue;
     }
   }
@@ -136,4 +110,44 @@ function setDappmanagerAndBindFirst(packages: InstalledPackageDataApiReturn[]): 
     if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
     return 0; // rest can be in any order
   });
+}
+
+async function rollbackNetworkConfig({
+  packages,
+  networkName
+}: {
+  packages: InstalledPackageDataApiReturn[];
+  networkName: string;
+}): Promise<void> {
+  const network = docker.getNetwork(networkName);
+  logs.info(`Rolling back docker network configuration for ${networkName}...`);
+
+  // 1. Disconnect containers from the network
+  logs.info(`Disconnecting all containers from network ${networkName}...`);
+  await disconnectAllContainersFromNetwork(network);
+
+  for (const pkg of packages) {
+    logs.info(`Rolling back docker network configuration for ${pkg.dnpName} compose file`);
+
+    // 2. Remove the config from the compose file if needed
+    writeDockerNetworkConfig({
+      pkg,
+      networkName,
+      rollback: true
+    });
+    // 3. Compose up --no-recreate
+    if (pkg.dnpName !== params.dappmanagerDnpName)
+      await dockerComposeUpPackage({
+        composeArgs: { dnpName: pkg.dnpName },
+        upAll: true,
+        dockerComposeUpOptions: { noRecreate: true }
+      }).catch((error) =>
+        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
+      );
+  }
+
+  // 4. remove the docker network
+  await network.remove();
+
+  return;
 }

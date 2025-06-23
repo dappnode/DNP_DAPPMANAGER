@@ -39,7 +39,9 @@ export async function connectPkgContainers({
         containerName,
         containerIp: isBindContainer ? bindIp : dappmanagerIp,
         aliases
-      });
+      }).catch((error) =>
+        logs.error(`Failed to connect special container ${containerName} to network ${network.id}: ${error.message}`)
+      );
       continue;
     }
 
@@ -103,7 +105,7 @@ export async function connectPkgContainerWithIp({
       logs.warn(`container ${containerName} is not running, restarting it`);
       await targetContainer.restart();
     }
-    // TODO: check this ip is good
+
     const hasContainerRightIp = removeCidrSuffix(containerInfo.NetworkSettings.IPAddress) === containerIp;
 
     if (hasContainerRightIp) logs.info(`container ${containerName} has right IP and is connected to docker network`);
@@ -175,8 +177,10 @@ async function connectPkgContainerRetryOnIpUsed({
       // The disconnected containers will be reconnected later (in the IP range migration)
       return;
     } catch (error) {
+      // There is a container already connected to the network with that IP
       if (error.statusCode === 403 && error.message.includes("Address already in use"))
         await disconnectConflictingContainerIfAny(network, ip);
+      // The container is already connected to the network with a different IP
       else if (
         error.statusCode === 403 &&
         // endpoint with name <containerName> already exists in
