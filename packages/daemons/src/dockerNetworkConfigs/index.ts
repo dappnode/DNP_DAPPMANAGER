@@ -49,7 +49,7 @@ async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
  * - All docker containers prefixed with "DAppnNodeCore-" || "DAppnodePackage-" are connected to it
  * - dappmanager and bind
  */
-export async function ensureDockerNetworkConfig({
+async function ensureDockerNetworkConfig({
   networkName,
   subnet,
   dappmanagerIp,

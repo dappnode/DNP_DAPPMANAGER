@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { subnetsOverlap } from "../../src/ensureDockerNetworkConfigs/createDockerNetwork.js";
+import { subnetsOverlap } from "../../src/dockerNetworkConfigs/createDockerNetwork.js";
 
 describe("Subnet Overlap Tests", () => {
   it("should detect overlapping subnets", () => {
