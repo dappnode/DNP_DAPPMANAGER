@@ -154,5 +154,5 @@ async function rollbackNetworkConfig({
 }
 
 export function startDockerNetworkConfigsDaemon(signal: AbortSignal): void {
-  runAtMostEvery(() => ensureDockerNetworkConfigs(), 1000 * 60, signal);
+  runAtMostEvery(() => ensureDockerNetworkConfigs(), 1000 * 60 * 60, signal); // every hour
 }
