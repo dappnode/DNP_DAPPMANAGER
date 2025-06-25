@@ -35,7 +35,7 @@ export function interceptGlobalEnvOnSet<T, U>(
       try {
         // Only attempt to update packages if the global env is not nullish
         if (globEnvValue !== null && globEnvValue !== undefined)
-          await updatePkgsWithGlobalEnvs(globEnvKey, globEnvValue as string);
+          await updatePkgsWithGlobalEnvs(globEnvKey, String(globEnvValue));
       } catch (err) {
         logs.error(`Error updating global env ${globEnvKey} to ${globEnvValue} in all dappnode packages: ${err}`);
       }
