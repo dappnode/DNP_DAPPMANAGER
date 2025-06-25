@@ -135,29 +135,50 @@ export class Consensus extends StakerComponent {
   }
 
   private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
+    // IMPORTANT! The nimbus gnosis package is a monoservice package and has no migrated to multiservice yet.
+    // until the migration is done we need to keep the service name as beacon-validator
+    const beaconValidatorServiceName = "beacon-validator"; // only used by Nimbus gnosis
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
     return {
       rootNetworks: this.getComposeRootNetworks(network),
-      serviceNetworks: {
-        [beaconServiceName]: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
-            aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
-          },
-          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
-          }
-        },
-        [validatorServiceName]: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
-            aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
-          },
-          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
-          }
-        }
-      }
+      serviceNetworks:
+        network === Network.Gnosis
+          ? {
+              [beaconValidatorServiceName]: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
+                },
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
+                }
+              }
+            }
+          : {
+              [beaconServiceName]: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
+                }
+              },
+              [validatorServiceName]: {
+                [params.DOCKER_STAKER_NETWORKS[network]]: {
+                  aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
+                },
+                [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+                  aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
+                }
+              }
+            }
     };
   }
 }
