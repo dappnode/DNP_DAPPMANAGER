@@ -9,7 +9,7 @@ import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { runAtMostEvery } from "@dappnode/utils";
 
-async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
+async function ensureDockerNetworkConfigs(rollback: boolean): Promise<void> {
   const networksConfigs = [
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
@@ -36,7 +36,10 @@ async function ensureDockerNetworkConfigs(rollback = false): Promise<void> {
     // Ensure the PWA mapping is added only for the new network
     // This is needed for the new dappmanager to work with the PWA
     // It will be a internal mapping so its not exposed to the internet
-    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) await httpsPortal.addPwaMappingIfNotExists();
+    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) {
+      if (rollback) await httpsPortal.removePwaMappingIfExists();
+      else await httpsPortal.addPwaMappingIfNotExists();
+    }
   }
 }
 
@@ -154,5 +157,5 @@ async function rollbackNetworkConfig({
 }
 
 export function startDockerNetworkConfigsDaemon(signal: AbortSignal): void {
-  runAtMostEvery(() => ensureDockerNetworkConfigs(), 1000 * 60 * 60, signal); // every hour
+  runAtMostEvery(() => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK), 1000 * 60 * 2, signal); // every hour
 }

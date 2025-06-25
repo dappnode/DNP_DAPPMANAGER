@@ -131,6 +131,7 @@ export class MevBoost extends StakerComponent {
 
   private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
     const mevBoostServiceName = "mev-boost";
+    const includeNew = !params.ROLLBACK_DOCKER_NETWORK;
 
     return {
       rootNetworks: this.getComposeRootNetworks(network),
@@ -142,9 +143,14 @@ export class MevBoost extends StakerComponent {
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
             aliases: [`${mevBoostServiceName}.${network}.dncore.dappnode`]
           },
-          [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-            aliases: [`${mevBoostServiceName}.${network}.dappnode.private`]
-          }
+          // only spread in the “new” private network when not rolling back
+          ...(includeNew
+            ? {
+                [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+                  aliases: [`${mevBoostServiceName}.${network}.dappnode.private`]
+                }
+              }
+            : {})
         }
       }
     };
