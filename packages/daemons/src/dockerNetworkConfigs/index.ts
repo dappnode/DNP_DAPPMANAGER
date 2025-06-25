@@ -124,6 +124,12 @@ async function rollbackNetworkConfig({
   networkName: string;
 }): Promise<void> {
   const network = docker.getNetwork(networkName);
+  // list networks if it not found return
+  const networks = await docker.listNetworks();
+  if (!networks.find((n) => n.Name === networkName)) {
+    logs.info(`Docker network ${networkName} not found, nothing to rollback.`);
+    return;
+  }
   logs.info(`Rolling back docker network configuration for ${networkName}...`);
 
   // 1. Disconnect containers from the network
@@ -157,5 +163,5 @@ async function rollbackNetworkConfig({
 }
 
 export function startDockerNetworkConfigsDaemon(signal: AbortSignal): void {
-  runAtMostEvery(() => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK), 1000 * 60 * 2, signal); // every hour
+  runAtMostEvery(() => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK), 1000 * 60 * 30, signal); // every 30 min
 }

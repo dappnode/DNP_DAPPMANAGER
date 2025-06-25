@@ -419,7 +419,7 @@ export const params = {
     }
   ],
 
-  ROLLBACK_DOCKER_NETWORK: true
+  ROLLBACK_DOCKER_NETWORK: false
 };
 
 if (devMode) {
