@@ -45,8 +45,14 @@ async function ensureDockerNetworkConfigs(
     // This is needed for the new dappmanager to work with the PWA
     // It will be a internal mapping so its not exposed to the internet
     if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) {
-      if (rollback) await httpsPortal.removePwaMappingIfExists();
-      else await httpsPortal.addPwaMappingIfNotExists();
+      if (rollback)
+        await httpsPortal
+          .removePwaMappingIfExists()
+          .catch((error) => logs.error(`Failed to remove PWA mapping: ${error.message}`));
+      else
+        await httpsPortal
+          .addPwaMappingIfNotExists()
+          .catch((error) => logs.error(`Failed to add PWA mapping: ${error.message}`));
     }
   }
 
