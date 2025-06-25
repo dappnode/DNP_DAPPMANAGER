@@ -88,7 +88,7 @@ export class MevBoost extends StakerComponent {
         userSettings
       });
 
-      this.DbHandlers[network].set(true);
+      await this.DbHandlers[network].set(true);
     }
   }
 
