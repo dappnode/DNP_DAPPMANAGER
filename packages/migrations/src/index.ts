@@ -3,9 +3,7 @@ import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 class MigrationError extends Error {
   errors: Error[];
@@ -27,12 +25,7 @@ interface Migration {
   coreVersion: string;
 }
 
-export async function executeMigrations(
-  execution: Execution,
-  consensus: Consensus,
-  signer: Signer,
-  mevBoost: MevBoost
-): Promise<void> {
+export async function executeMigrations(): Promise<void> {
   const migrations: Migration[] = [
     {
       fn: migrateUserActionLogs,
@@ -63,11 +56,6 @@ export async function executeMigrations(
       fn: determineIsDappnodeAws,
       migration: "determine if the dappnode is running in Dappnode AWS",
       coreVersion: "0.2.94"
-    },
-    {
-      fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
-      migration: "create docker staker network and persist selected staker pkgs per network",
-      coreVersion: "0.2.95"
     }
   ];
 

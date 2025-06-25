@@ -85,10 +85,9 @@ export const mevBoost = new MevBoost(dappnodeInstaller);
 export const signer = new Signer(dappnodeInstaller);
 
 // Execute migrations
-executeMigrations(execution, consensus, signer, mevBoost).catch((e) => logs.error("Error on executeMigrations", e));
-
+executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
 // Start daemons
-startDaemons(dappnodeInstaller, controller.signal);
+startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
 Promise.all([
   // Copy host scripts

@@ -8,8 +8,16 @@ import { connectPkgContainers } from "./connectPkgContainers.js";
 import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { runAtMostEvery } from "@dappnode/utils";
+import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
-async function ensureDockerNetworkConfigs(rollback: boolean): Promise<void> {
+async function ensureDockerNetworkConfigs(
+  rollback: boolean,
+  execution: Execution,
+  consensus: Consensus,
+  signer: Signer,
+  mevBoost: MevBoost
+): Promise<void> {
   const networksConfigs = [
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
@@ -41,6 +49,8 @@ async function ensureDockerNetworkConfigs(rollback: boolean): Promise<void> {
       else await httpsPortal.addPwaMappingIfNotExists();
     }
   }
+
+  await createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost);
 }
 
 /**
@@ -162,6 +172,16 @@ async function rollbackNetworkConfig({
   return;
 }
 
-export function startDockerNetworkConfigsDaemon(signal: AbortSignal): void {
-  runAtMostEvery(() => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK), 1000 * 60 * 30, signal); // every 30 min
+export function startDockerNetworkConfigsDaemon(
+  signal: AbortSignal,
+  execution: Execution,
+  consensus: Consensus,
+  signer: Signer,
+  mevBoost: MevBoost
+): void {
+  runAtMostEvery(
+    () => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK, execution, consensus, signer, mevBoost),
+    1000 * 60 * 30,
+    signal
+  ); // every 30 min
 }
