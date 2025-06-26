@@ -4,9 +4,22 @@ import SubTitle from "components/SubTitle";
 import { usePwaInstall } from "hooks/PWA/usePwaInstall";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import { PushNotificationsSubs } from "./PushNotificationsSubs";
+// import { pathName, subPaths } from "pages/system/data";
+// import Loading from "components/Loading";
+// import Button from "components/Button";
+// import QrCode from "components/QrCode";
+// import ErrorView from "components/ErrorView";
 
 export default function PushNotisPremium() {
-  const { isPwa, canInstall, promptInstall } = usePwaInstall();
+  const {
+    isPwa,
+    canInstall,
+    promptInstall,
+    // pwaMappingUrl,
+    // isOnPwaDomain,
+    // pwaMappingLoading,
+    // pwaMappingError
+  } = usePwaInstall();
   const {
     subscription: sub,
     subscriptionsList,
@@ -18,8 +31,39 @@ export default function PushNotisPremium() {
     revalidateSubs
   } = useHandleSubscription();
 
+  // const sanitizedPwaMappingUrl = pwaMappingUrl + "/" + pathName + "/" + subPaths.app;
+
   return (
     <>
+      {/* {pwaMappingLoading ? (
+        <Loading steps={["PWA Loading"]} />
+      ) : pwaMappingUrl ? (
+        <Card>
+          {!isOnPwaDomain ? (
+            <div style={{ display: "flex", flexDirection: "row", gap: "10px", alignItems: "center" }}>
+              <span>In order to install the PWA navigate to the PWA domain</span>
+              <Button
+                onClick={() => (window.location.href = sanitizedPwaMappingUrl)}
+                variant="dappnode"
+                disabled={Boolean(pwaMappingError) || pwaMappingLoading}
+              >
+                Navigate
+              </Button>
+            </div>
+          ) : canInstall ? (
+            <Button onClick={promptInstall} disabled={!canInstall}>
+              Install PWA
+            </Button>
+          ) : (
+            <div>PWA already installed / install manually</div>
+          )}
+          <br />
+          <QrCode width={"200px"} url={sanitizedPwaMappingUrl} />
+        </Card>
+      ) : (
+        pwaMappingError && <ErrorView error={pwaMappingError} />
+      )} */}
+
       <SubTitle>Push Notis Premium</SubTitle>
       <div>
         <Card>

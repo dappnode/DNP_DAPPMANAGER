@@ -1,4 +1,3 @@
-// hooks/usePwaInstall.ts
 import { useState, useEffect, useCallback } from "react";
 
 // 1) Extend the native Event with the prompt API
@@ -12,8 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export function usePwaInstall() {
-  const [deferredPrompt, setDeferredPrompt] =
-    useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isPwa, setIsPwa] = useState<boolean>(false);
 
   useEffect(() => {
@@ -34,14 +32,12 @@ export function usePwaInstall() {
     mediaQuery.addEventListener("change", updateIsPwa);
     updateIsPwa();
 
-    
     return () => {
       window.removeEventListener("beforeinstallprompt", beforeInstallHandler);
       mediaQuery.removeEventListener("change", updateIsPwa);
     };
   }, []);
 
-  
   const promptInstall = useCallback(async () => {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
@@ -57,6 +53,6 @@ export function usePwaInstall() {
   return {
     isPwa,
     canInstall: !!deferredPrompt,
-    promptInstall, 
+    promptInstall
   };
 }

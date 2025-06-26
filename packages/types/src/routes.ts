@@ -246,6 +246,15 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
+   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
+   */
+  getPwaRequirements: () => Promise<{
+    httpsDnpInstalled: boolean;
+    isHttpsRunning: boolean;
+    pwaMappingUrl: string | undefined;
+  }>;
+
+  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -785,6 +794,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
+  getPwaRequirements: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
