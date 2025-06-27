@@ -1,7 +1,4 @@
----
-title: Consolidate your validators in
 
----
 
 # Consolidate your validators in Gnosis
 
