@@ -1,12 +1,12 @@
 import React from "react";
-
 import Loading from "components/Loading";
 import Card from "components/Card";
 import Button from "components/Button";
 import { pathName, subPaths } from "pages/system/data";
 import { usePwaRequirements } from "hooks/PWA/usePwaRequirements";
-import "./pwaRequirementsCheck.scss";
+import { PwaInstallCards } from "./PwaInstallCards";
 import DiscordActions from "pages/community/components/DiscordActions";
+import "./pwaRequirementsCheck.scss";
 
 export function PwaRequirementsCheck() {
   const {
@@ -20,11 +20,12 @@ export function PwaRequirementsCheck() {
     restartingHttps
   } = usePwaRequirements();
   const pwaAppSubtabUrl = pwaMappingUrl + "/" + pathName + "/" + subPaths.app;
+  const allRequirementsMet = Boolean(pwaMappingUrl && httpsDnpInstalled && isHttpsRunning && isOnPwaDomain);
 
   return requirementsLoading ? (
     <Loading steps={["Checking App requirements"]} />
-  ) : Boolean(pwaMappingUrl && httpsDnpInstalled && isHttpsRunning && isOnPwaDomain) ? (
-    <div>ALL REQUIREMENTS MET AND ALREADY IN PWA DOMAIN</div>
+  ) : allRequirementsMet ? (
+    <PwaInstallCards pwaAppSubtabUrl={pwaAppSubtabUrl} />
   ) : installingHttps ? (
     <Loading steps={["Installing HTTPS package"]} />
   ) : !httpsDnpInstalled ? (
