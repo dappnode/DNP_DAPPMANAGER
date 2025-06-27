@@ -1,5 +1,28 @@
-.pwa-install-cards-container{
-    display: flex;
-    flex-direction: row;
+.pwa-vpn-requirement {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  @media (max-width: 40rem) {
+    flex-direction: column;
     gap: 10px;
+  }
+}
+
+.pwa-install-cards-container {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: stretch;
+
+  > * {
+    flex: 1 1 0;
+  }
+  @media (max-width: 40rem) {
+    flex-direction: column;
+    width: 100%;
+    > * {
+      flex: 1;
+    }
+  }
 }
