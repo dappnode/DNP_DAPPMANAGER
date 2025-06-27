@@ -16,6 +16,7 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
 
 // This process.env. vars will be substituted at build time
 // The VITE_APP_ prefix is mandatory for the substitution to work
@@ -25,24 +26,14 @@ window.versionData = cleanObj({
   commit: import.meta.env.VITE_APP_COMMIT
 });
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/sw.js')
-      .then(reg => {
-        console.log('Service Worker registered, scope:', reg.scope);
-      })
-      .catch(err => {
-        console.error('Service Worker registration failed:', err);
-      });
-  });
-}
 const root = createRoot(document.getElementById("root") as HTMLElement);
 
 root.render(
   <Provider store={store}>
-    <Router>
-      <App />
-    </Router>
+    <PwaInstallProvider>
+      <Router>
+        <App />
+      </Router>
+    </PwaInstallProvider>
   </Provider>
 );
