@@ -18,7 +18,7 @@ Configuration overhead
 
 Monitoring burden
 
-Risk of mistakes during upgrades or restarts
+Risk of mistakes during upgrades or restart
 
 #### 2. Optimize Costs
 
