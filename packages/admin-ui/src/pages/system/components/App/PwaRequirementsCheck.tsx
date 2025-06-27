@@ -6,6 +6,7 @@ import Button from "components/Button";
 import { pathName, subPaths } from "pages/system/data";
 import { usePwaRequirements } from "hooks/PWA/usePwaRequirements";
 import "./pwaRequirementsCheck.scss";
+import DiscordActions from "pages/community/components/DiscordActions";
 
 export function PwaRequirementsCheck() {
   const {
@@ -24,25 +25,26 @@ export function PwaRequirementsCheck() {
     <Loading steps={["Checking App requirements"]} />
   ) : Boolean(pwaMappingUrl && httpsDnpInstalled && isHttpsRunning && isOnPwaDomain) ? (
     <div>ALL REQUIREMENTS MET AND ALREADY IN PWA DOMAIN</div>
+  ) : installingHttps ? (
+    <Loading steps={["Installing HTTPS package"]} />
   ) : !httpsDnpInstalled ? (
-    installingHttps ? (
-      <Loading steps={["Installing https package"]} />
-    ) : (
-      <Card>
-        <div>
-          <p>Https package is not installed</p>
-          <p>To download the app, you must install the https package</p>
-          <Button variant="dappnode" onClick={() => installHttpsPkg()}>
-            Install
-          </Button>
-        </div>
-      </Card>
-    )
+    <Card>
+      <div>
+        <p>HTTPS package is not installed</p>
+        <p>To download the app, you must install the HTTPS package</p>
+        <Button variant="dappnode" onClick={() => installHttpsPkg()}>
+          Install
+        </Button>
+      </div>
+    </Card>
   ) : !isHttpsRunning ? (
     restartingHttps ? (
-      <Loading steps={["Restarting https package"]} />
+      <Loading steps={["Restarting HTTPS package"]} />
     ) : (
-      <div>HTTPS Package not running. Try restarting the package or contacting support</div>
+      <Card>
+        <p>HTTPS Package not running after restart.</p> <p>Try re-installing it or contacting support</p>{" "}
+        <DiscordActions />
+      </Card>
     )
   ) : !pwaMappingUrl ? (
     <div>PWA HTTPS mapping failed. Contact support</div>

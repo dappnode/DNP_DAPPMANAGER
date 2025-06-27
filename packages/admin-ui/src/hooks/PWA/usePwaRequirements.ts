@@ -1,7 +1,7 @@
 import { api, useApi } from "api";
 import { continueIfCalleDisconnected } from "api/utils";
 import { withToast } from "components/toast/Toast";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { httpsPortalDnpName } from "params";
 import { prettyDnpName } from "utils/format";
 
@@ -15,6 +15,7 @@ export function usePwaRequirements() {
   const [restartingHttps, setRestartingHttps] = useState<boolean>(false);
   const [requirementsLoading, setRequirementsLoading] = useState<boolean>(true);
   const [isOnPwaDomain, setIsOnPwaDomain] = useState<boolean>(false);
+  const hasRestartedRef = useRef(false);
 
   useEffect(() => {
     if (pwaRequirementsReq.data) {
@@ -36,8 +37,9 @@ export function usePwaRequirements() {
 
   useEffect(() => {
     const restartHttpsPkg = async () => {
-      if (httpsDnpInstalled && !isHttpsRunning) {
+      if (httpsDnpInstalled && !isHttpsRunning && !hasRestartedRef.current) {
         try {
+          hasRestartedRef.current = true; // Prevent multiple restarts
           setRestartingHttps(true);
           await api.packageRestart({
             dnpName: httpsPortalDnpName
@@ -45,8 +47,10 @@ export function usePwaRequirements() {
         } catch (error) {
           console.error(`Error while restarting ${prettyDnpName(httpsPortalDnpName)} package: ${error}`);
         } finally {
-          await pwaRequirementsReq.revalidate();
-          setRestartingHttps(false);
+          setTimeout(async () => {
+            await pwaRequirementsReq.revalidate();
+            setRestartingHttps(false);
+          }, 5000); // Wait 5 seconds before checking again, since it can take some time for the package to start
         }
       }
     };
@@ -86,8 +90,10 @@ export function usePwaRequirements() {
     } catch (error) {
       console.error(`Error while installing ${prettyDnpName(httpsPortalDnpName)} package: ${error}`);
     } finally {
-      setInstallingHttps(false);
-      await pwaRequirementsReq.revalidate();
+      setTimeout(async () => {
+        await pwaRequirementsReq.revalidate();
+        setInstallingHttps(false);
+      }, 5000); // Wait 5 seconds before checking again, since it can take some time for the package to start
     }
   }, [httpsDnpInstalled]);
 
