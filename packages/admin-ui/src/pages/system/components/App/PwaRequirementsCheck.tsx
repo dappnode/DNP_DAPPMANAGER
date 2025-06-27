@@ -48,7 +48,9 @@ export function PwaRequirementsCheck() {
       </Card>
     )
   ) : !pwaMappingUrl ? (
-    <div>PWA HTTPS mapping failed. Contact support</div>
+    <div>
+      PWA HTTPS mapping failed. Contact support. <DiscordActions />
+    </div>
   ) : (
     !isOnPwaDomain && (
       <Card>

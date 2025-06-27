@@ -15,16 +15,16 @@ export function PwaInstallCards({ pwaAppSubtabUrl }: { pwaAppSubtabUrl: string }
   return (
     <div>
       <Card>
-        <h3>Required: Configure VPN connection</h3>
-        <div>
-          <p>
+        <h5>Required: Configure VPN connection!</h5>
+        <div className="pwa-vpn-requirement">
+          <div>
             To install the DappManager as an App (PWA), you must first configure a VPN connection in the device you want
             to install it.
-          </p>
-          <p>
+            <br />
             Please follow the instructions in the VPN Configuration section to set up your VPN connection before
             proceeding with the PWA installation.
-          </p>
+          </div>
+
           <Button variant="dappnode" onClick={() => navigate(defaultVpnUrl)}>
             Configure VPN
           </Button>
@@ -32,22 +32,13 @@ export function PwaInstallCards({ pwaAppSubtabUrl }: { pwaAppSubtabUrl: string }
       </Card>
       <SubTitle>Download App</SubTitle>
       <div className="pwa-install-cards-container">
-        <Card>
-          <h3>Scan URL's app</h3>
-          <p>
-            Scan the QR code below after setting the VPN connection in your phone to download Dappnode's mobile app for
-            free
-          </p>
-          <QrCode width={"200px"} url={pwaAppSubtabUrl} />
-        </Card>
-
         {isPwa ? (
           <Card>
             <p>You are already using the Dappnode's app in this device!</p>
           </Card>
         ) : canInstall ? (
           <Card>
-            <h3>Download app</h3>
+            <h5>Download app in this device</h5>
             <p>Install Dappnode's app in this device. </p>
             <Button variant="dappnode" onClick={promptInstall} disabled={!canInstall}>
               Install PWA
@@ -55,13 +46,21 @@ export function PwaInstallCards({ pwaAppSubtabUrl }: { pwaAppSubtabUrl: string }
           </Card>
         ) : (
           <Card>
-            <h3>App already installed</h3>
+            <h5>App already installed</h5>
             <p>
               The Dappnode's app is already installed. To open it, locate the app on your device's home screen or app
               drawer and tap to launch it.
             </p>
           </Card>
         )}
+        <Card>
+          <h4>Download app on another mobile device</h4>
+          <p>
+            Scan the QR code below after setting the VPN connection in your phone to download Dappnode's mobile app for
+            free
+          </p>
+          <QrCode width={"200px"} url={pwaAppSubtabUrl} />
+        </Card>
       </div>
     </div>
   );
