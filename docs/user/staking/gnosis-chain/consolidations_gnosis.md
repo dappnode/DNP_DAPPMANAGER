@@ -65,7 +65,6 @@ Step 10. Review the consolidation process.
 ![consolidation_click](/img/consolidation_click.png)
 
 
-
 The consolidation process might take 2-3 days. It depends on the consolidation queue at the moment of consolidating.
 
 Now you are ready to consolidate your Gnosis validators. 
