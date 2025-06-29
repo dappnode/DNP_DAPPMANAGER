@@ -39,7 +39,7 @@ Less gas spent claiming rewards
 #### 4. Safe process
 Consolidation does not change your withdrawal address or risk your funds. It simply merges balances and validator responsibilities in a protocol-safe way.
 
-## How do I consolidate my Gnosis validators? 
+## How do I consolidate my Gnosis validators?
 Step 1: Go to https://consolidate.gnosischain.com/
 Step 2: Connect your wallet. Remember to use the same address with which you did the staking deposit of your validators. 
 ![wallet_keys](/img/continue.png)
