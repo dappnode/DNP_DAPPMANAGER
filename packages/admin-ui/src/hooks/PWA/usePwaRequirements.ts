@@ -23,11 +23,6 @@ export function usePwaRequirements() {
       setPwaMappingUrl(data.pwaMappingUrl || null);
       setHttpsDnpInstalled(data.httpsDnpInstalled);
       setIsHttpsRunning(data.isHttpsRunning);
-      console.log("📦 PWA requirements:", {
-        pwaMappingUrl: data.pwaMappingUrl,
-        httpsDnpInstalled: data.httpsDnpInstalled,
-        isHttpsRunning: data.isHttpsRunning
-      });
     }
   }, [pwaRequirementsReq.data]);
 
