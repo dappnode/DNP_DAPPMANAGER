@@ -10,8 +10,7 @@ export default function App() {
     <>
       <SubTitle>Dappnode App</SubTitle>
       <Card>
-        The Dappnode app allows you to connect to the Dappmanager in mobile or desktop and receive notifications about
-        your hardware and validators instantly.
+        The Dappnode app allows you to connect to the Dappmanager in mobile or desktop and receive notifications.
       </Card>
       <PwaRequirementsCheck />
       {/* <PushNotisPremium /> */}
