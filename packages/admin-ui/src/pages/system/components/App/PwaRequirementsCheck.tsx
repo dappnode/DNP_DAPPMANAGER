@@ -48,7 +48,7 @@ export function PwaRequirementsCheck() {
             <div>Https Package is not running after restarting.</div>
             <div>Try to reinstall the package or contact support. </div>
             <Button href={dappnodeDiscord} {...newTabProps} variant="dappnode">
-              Contant support
+              Contact support
             </Button>
           </RequirementCard>
         )
