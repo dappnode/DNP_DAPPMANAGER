@@ -16,6 +16,7 @@ import { logs } from "@dappnode/logger";
  * TODO: find a proper way to restart pkgs with global envs defined in the env_file (through manifest > globalEnvs = {all: true})
  */
 export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValue: string): Promise<void> {
+  // Must be
   const packages = await listPackageContainers();
 
   const pkgsWithGlobalEnv = packages.filter(
@@ -38,6 +39,7 @@ export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValu
         if (currentVal === globEnvValue) {
           logs.info(`Global env ${globalEnvKey} for ${pkg.dnpName} already set to ${globEnvValue}, skipping update`);
         } else {
+          logs.info(`Updating global env ${globalEnvKey} for ${pkg.dnpName} from ${currentVal} to ${globEnvValue}`);
           needsUpdate = true;
           environmentsByService.push({
             [pkg.serviceName]: { [globalEnvKey]: globEnvValue }

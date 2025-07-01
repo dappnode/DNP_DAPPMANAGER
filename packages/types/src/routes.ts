@@ -322,7 +322,7 @@ export interface Routes {
     isRunning: boolean;
     isNotifierRunning: boolean;
     servicesNotRunning: string[];
-  }> ;
+  }>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -340,6 +340,8 @@ export interface Routes {
    */
   getHostUptime: () => Promise<string>;
 
+  /** HTTPs Portal: add the PWA mapping */
+  httpsPortalPwaMappingAdd(): Promise<void>;
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
@@ -759,6 +761,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsPackageStatus: {},
   getUserActionLogs: {},
   getHostUptime: {},
+  httpsPortalPwaMappingAdd: { log: true },
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},

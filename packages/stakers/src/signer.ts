@@ -80,16 +80,21 @@ export class Signer extends StakerComponent {
   }
 
   private getUserSettings(network: Network): UserSettings {
+    const serviceName = "web3signer";
+
     return {
       networks: {
         rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
-          web3signer: {
+          [serviceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`signer.${network}.staker.dappnode`]
+              aliases: [`${serviceName}.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`signer.${network}.dncore.dappnode`]
+              aliases: [`${serviceName}.${network}.dncore.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`${serviceName}.${network}.dappnode.private`]
             }
           }
         }

@@ -15,7 +15,6 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test:int": "TEST=true mocha --config ./.mocharc.yaml --recursive ./test/int --timeout 180000",
-    "test": "mocha --config ./.mocharc.yaml --recursive ./test/unit --timeout 180000",
     "dev": "tsc -w"
   },
   "dependencies": {
@@ -24,6 +23,8 @@
     "@dappnode/dockercompose": "workspace:^0.1.0",
     "@dappnode/ethicalmetrics": "workspace:^0.1.0",
     "@dappnode/eventbus": "workspace:^0.1.0",
+    "@dappnode/httpsportal": "workspace:^0.1.0",
+    "@dappnode/installer": "workspace:^0.1.0",
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
     "@dappnode/stakers": "workspace:^0.1.0",

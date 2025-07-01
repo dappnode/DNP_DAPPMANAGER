@@ -86,6 +86,7 @@ export const params = {
     "http://localhost:3000",
     "http://localhost:3001",
     "http://my.dappnode",
+    "http://my.dappnode.private",
     "http://dappnode.local"
   ],
 
@@ -115,6 +116,8 @@ export const params = {
   // Docker network parameters
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
+  DOCKER_NETWORK_NEW_SUBNET: "10.20.0.0/24",
+  DOCKER_PRIVATE_NETWORK_NEW_NAME: "dnprivate_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
@@ -125,8 +128,10 @@ export const params = {
     [Network.Lukso]: "lukso_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
-  BIND_IP: "172.33.1.2", // "10.20.0.2"
-  DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
+  BIND_IP: "172.33.1.2",
+  BIND_NEW_IP: "10.20.0.2",
+  DAPPMANAGER_IP: "172.33.1.7",
+  DAPPMANAGER_NEW_IP: "10.20.0.7",
 
   // Docker compose parameters
   // Use of new compose file feature: network name
@@ -204,6 +209,7 @@ export const params = {
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["dappmanager.dappnode", "my.dappnode", "dappnode.local"],
+  DAPPMANAGER_NEW_ALIASES: ["dappmanager.dappnode.private", "my.dappnode.private", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",

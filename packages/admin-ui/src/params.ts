@@ -1,7 +1,7 @@
 import { urlJoin } from "utils/url";
 
 // JSON RPC API
-export const apiUrl = import.meta.env.VITE_APP_API_URL || "http://my.dappnode/";
+export const apiUrl = "/";
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
 

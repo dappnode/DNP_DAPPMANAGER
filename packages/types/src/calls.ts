@@ -505,6 +505,7 @@ export interface PackageContainer {
   created: number;
   image: string;
   ip?: string; // IP of the DNP in the dappnode network
+  privateIp?: string; // IP of the DNP in the private network
   state: ContainerState;
   running: boolean;
   exitCode: number | null;

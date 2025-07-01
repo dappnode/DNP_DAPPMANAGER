@@ -17,6 +17,9 @@ services:
       dncore_network:
         aliases:
           - "beacon-chain.prysm.dappnode"
+      dnprivate_network:
+        aliases:
+          - "beacon-chain.prysm.dappnode.private"
     logging:
       driver: json-file
       options:
@@ -38,6 +41,10 @@ services:
         aliases:
           - "validator.prysm.dappnode"
           - "prysm.dappnode"
+      dnprivate_network:
+        aliases:
+          - "validator.prysm.dappnode.private"
+          - "prysm.dappnode.private"
     logging:
       driver: json-file
       options:
@@ -48,4 +55,6 @@ volumes:
   validator-data: {}
 networks:
   dncore_network:
+    external: true
+  dnprivate_network:
     external: true
