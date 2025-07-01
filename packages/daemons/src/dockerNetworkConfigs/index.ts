@@ -1,7 +1,7 @@
 import { logs } from "@dappnode/logger";
 import { createDockerNetwork } from "./createDockerNetwork.js";
 import { packagesGet } from "@dappnode/installer";
-import { dockerComposeUpPackage, disconnectAllContainersFromNetwork, docker } from "@dappnode/dockerapi";
+import { dockerComposeUpPackage } from "@dappnode/dockerapi";
 import { writeDockerNetworkConfig } from "./writeDockerNetworkConfig.js";
 import { params } from "@dappnode/params";
 import { connectPkgContainers } from "./connectPkgContainers.js";
@@ -64,29 +64,20 @@ async function ensureDockerNetworkConfig({
   networkName,
   subnet,
   dappmanagerIp,
-  bindIp,
-  rollback = false
+  bindIp
 }: {
   networkName: string;
   subnet: string;
   dappmanagerIp: string;
   bindIp: string;
-  rollback?: boolean; // if true it will remove the
 }): Promise<void> {
-  // consider calling packagges get every time to ensure we have the latest packages
-  const packages = await packagesGet();
-
-  if (rollback) {
-    await rollbackNetworkConfig({ packages, networkName });
-    return;
-  }
-
   // 1. create the new docker network
   await createDockerNetwork({
     networkName,
     subnet
   });
 
+  const packages = await packagesGet();
   for (const pkg of setDappmanagerAndBindFirst(packages)) {
     try {
       // 2. write the config in the compose file if needed
@@ -122,52 +113,6 @@ function setDappmanagerAndBindFirst(packages: InstalledPackageDataApiReturn[]): 
     if (b.dnpName === params.dappmanagerContainerName) return -1; // dappmanager should be second
     return 0; // rest can be in any order
   });
-}
-
-async function rollbackNetworkConfig({
-  packages,
-  networkName
-}: {
-  packages: InstalledPackageDataApiReturn[];
-  networkName: string;
-}): Promise<void> {
-  const network = docker.getNetwork(networkName);
-  // list networks if it not found return
-  const networks = await docker.listNetworks();
-  if (!networks.find((n) => n.Name === networkName)) {
-    logs.info(`Docker network ${networkName} not found, nothing to rollback.`);
-    return;
-  }
-  logs.info(`Rolling back docker network configuration for ${networkName}...`);
-
-  // 1. Disconnect containers from the network
-  logs.info(`Disconnecting all containers from network ${networkName}...`);
-  await disconnectAllContainersFromNetwork(network);
-
-  for (const pkg of packages) {
-    logs.info(`Rolling back docker network configuration for ${pkg.dnpName} compose file`);
-
-    // 2. Remove the config from the compose file if needed
-    writeDockerNetworkConfig({
-      pkg,
-      networkName,
-      rollback: true
-    });
-    // 3. Compose up --no-recreate
-    if (pkg.dnpName !== params.dappmanagerDnpName)
-      await dockerComposeUpPackage({
-        composeArgs: { dnpName: pkg.dnpName },
-        upAll: true,
-        dockerComposeUpOptions: { noRecreate: true }
-      }).catch((error) =>
-        logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
-      );
-  }
-
-  // 4. remove the docker network
-  await network.remove();
-
-  return;
 }
 
 export function startDockerNetworkConfigsDaemon(
