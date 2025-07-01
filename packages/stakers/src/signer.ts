@@ -81,7 +81,6 @@ export class Signer extends StakerComponent {
 
   private getUserSettings(network: Network): UserSettings {
     const serviceName = "web3signer";
-    const includeNew = !params.ROLLBACK_DOCKER_NETWORK;
 
     return {
       networks: {
@@ -94,14 +93,9 @@ export class Signer extends StakerComponent {
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
               aliases: [`${serviceName}.${network}.dncore.dappnode`]
             },
-            // only add the “new” private network when not rolling back
-            ...(includeNew
-              ? {
-                  [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-                    aliases: [`${serviceName}.${network}.dappnode.private`]
-                  }
-                }
-              : {})
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`${serviceName}.${network}.dappnode.private`]
+            }
           }
         }
       }

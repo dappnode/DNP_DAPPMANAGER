@@ -12,7 +12,6 @@ import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAn
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 async function ensureDockerNetworkConfigs(
-  rollback: boolean,
   execution: Execution,
   consensus: Consensus,
   signer: Signer,
@@ -29,8 +28,7 @@ async function ensureDockerNetworkConfigs(
       networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
       subnet: params.DOCKER_NETWORK_NEW_SUBNET,
       dappmanagerIp: params.DAPPMANAGER_NEW_IP,
-      bindIp: params.BIND_NEW_IP,
-      rollback // only apply rollback to dnprivate_network
+      bindIp: params.BIND_NEW_IP
     }
   ];
 
@@ -44,16 +42,10 @@ async function ensureDockerNetworkConfigs(
     // Ensure the PWA mapping is added only for the new network
     // This is needed for the new dappmanager to work with the PWA
     // It will be a internal mapping so its not exposed to the internet
-    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME) {
-      if (rollback)
-        await httpsPortal
-          .removePwaMappingIfExists()
-          .catch((error) => logs.error(`Failed to remove PWA mapping: ${error.message}`));
-      else
-        await httpsPortal
-          .addPwaMappingIfNotExists()
-          .catch((error) => logs.error(`Failed to add PWA mapping: ${error.message}`));
-    }
+    if (config.networkName === params.DOCKER_PRIVATE_NETWORK_NEW_NAME)
+      await httpsPortal
+        .addPwaMappingIfNotExists()
+        .catch((error) => logs.error(`Failed to add PWA mapping: ${error.message}`));
   }
 
   await createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost);
@@ -185,9 +177,5 @@ export function startDockerNetworkConfigsDaemon(
   signer: Signer,
   mevBoost: MevBoost
 ): void {
-  runAtMostEvery(
-    () => ensureDockerNetworkConfigs(params.ROLLBACK_DOCKER_NETWORK, execution, consensus, signer, mevBoost),
-    1000 * 60 * 30,
-    signal
-  ); // every 30 min
+  runAtMostEvery(() => ensureDockerNetworkConfigs(execution, consensus, signer, mevBoost), 1000 * 60 * 30, signal); // every 30 min
 }

@@ -127,7 +127,6 @@ export class Execution extends StakerComponent {
   private async getUserSettings(network: Network, dnpName: string | null): Promise<UserSettings> {
     if (!dnpName) return {};
 
-    const includeNew = !params.ROLLBACK_DOCKER_NETWORK;
     const execService = await this.getExecutionServiceName(dnpName);
 
     return {
@@ -141,14 +140,9 @@ export class Execution extends StakerComponent {
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
               aliases: [`execution.${network}.dncore.dappnode`]
             },
-            // only include this block when not rolling back
-            ...(includeNew
-              ? {
-                  [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-                    aliases: [`execution.${network}.dappnode.private`]
-                  }
-                }
-              : {})
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`execution.${network}.dappnode.private`]
+            }
           }
         }
       }

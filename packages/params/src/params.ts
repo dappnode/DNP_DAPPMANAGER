@@ -417,9 +417,7 @@ export const params = {
       signatureProtocol: "ECDSA_256" as const,
       key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
     }
-  ],
-
-  ROLLBACK_DOCKER_NETWORK: false
+  ]
 };
 
 if (devMode) {

@@ -138,9 +138,6 @@ export class Consensus extends StakerComponent {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
-    // include the “new” private network only if we are NOT rolling back
-    const includeNew = !params.ROLLBACK_DOCKER_NETWORK;
-
     // helper to build each service’s networks
     const buildSvc = (svcName: string) => ({
       [params.DOCKER_STAKER_NETWORKS[network]]: {
@@ -149,14 +146,10 @@ export class Consensus extends StakerComponent {
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {
         aliases: [`${svcName}.${network}.dncore.dappnode`]
       },
-      // conditional spread: only adds this key if includeNew is true
-      ...(includeNew
-        ? {
-            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-              aliases: [`${svcName}.${network}.dappnode.private`]
-            }
-          }
-        : {})
+
+      [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+        aliases: [`${svcName}.${network}.dappnode.private`]
+      }
     });
 
     return {
