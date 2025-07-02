@@ -1,30 +1,12 @@
-.pwa-requirements-container {
+.pwa-vpn-info {
   display: flex;
   flex-direction: row;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
 
-  > * {
-    flex: 1 1 0;
-  }
   @media (max-width: 40rem) {
     flex-direction: column;
-    width: 100%;
-    > * {
-      flex: 1;
-    }
-  }
-  .pwa-requirement {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    text-align: center;
-
-    @media (max-width: 40rem) {
-      flex-direction: column;
-      gap: 10px;
-    }
+    gap: 10px;
   }
 }
 

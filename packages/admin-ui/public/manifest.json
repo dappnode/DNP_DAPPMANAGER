@@ -1,5 +1,5 @@
 {
-  "name": "Dappmanager",
+  "name": "Dappnode App",
   "short_name": "Dappnode App",
   "start_url": "/dashboard",
   "display": "standalone",
