@@ -7,7 +7,7 @@ import { prettyDnpName } from "utils/format";
 
 export function usePwaRequirements() {
   // Requirements
-  const pwaRequirementsReq = useApi.getPwaRequirements();
+  const pwaRequirementsReq = useApi.pwaRequirementsGet();
   const [pwaMappingUrl, setPwaMappingUrl] = useState<string | null>(null);
   const [httpsDnpInstalled, setHttpsDnpInstalled] = useState<boolean>(false);
   const [installingHttps, setInstallingHttps] = useState<boolean>(false);

@@ -408,7 +408,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   notificationsUpdateSubAlias: async () => {},
   notificationsDeleteSubscription: async () => {},
   notificationsSendSubTest: async () => {},
-  getPwaRequirements: async () => ({
+  pwaUrlGet: async () => "https://pwa.abcdef.dyndns.dappnode.io",
+  pwaRequirementsGet: async () => ({
     pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
     httpsDnpInstalled: true,
     isHttpsRunning: true
