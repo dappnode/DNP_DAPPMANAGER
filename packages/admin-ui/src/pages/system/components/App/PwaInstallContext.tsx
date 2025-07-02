@@ -1,7 +1,6 @@
 // src/contexts/PwaInstallContext.tsx
 import React, { createContext, useState, useEffect, useCallback, useContext, ReactNode } from "react";
 
-// extend the browser event…
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{
@@ -14,21 +13,27 @@ interface BeforeInstallPromptEvent extends Event {
 interface PwaInstallContextValue {
   isPwa: boolean;
   canInstall: boolean;
+  installLoading: boolean;
+  wasInstalled: boolean;
   promptInstall: () => Promise<void>;
 }
 
 const PwaInstallContext = createContext<PwaInstallContextValue>({
   isPwa: false,
   canInstall: false,
+  installLoading: false,
+  wasInstalled: false,
   promptInstall: async () => {}
 });
 
 export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isPwa, setIsPwa] = useState(false);
+  const [wasInstalled, setWasInstalled] = useState(false);
+  const [installLoading, setInstallLoading] = useState(false);
 
   useEffect(() => {
-    // 1) register your Service Worker
+    // 1) Register Service Worker
     if ("serviceWorker" in navigator) {
       window.addEventListener("load", () => {
         navigator.serviceWorker
@@ -54,9 +59,21 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
     mediaQuery.addEventListener("change", updateIsPwa);
     updateIsPwa();
 
+    // 4) capture the appinstalled event
+    const onAppInstalled = () => {
+      setInstallLoading(true);
+      setTimeout(() => {
+        console.log("PWA was installed 🎉");
+        setWasInstalled(true);
+        setInstallLoading(false);
+      }, 6000); // Delay to ensure the app is fully installed
+    };
+    window.addEventListener("appinstalled", onAppInstalled);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       mediaQuery.removeEventListener("change", updateIsPwa);
+      window.removeEventListener("appinstalled", onAppInstalled);
     };
   }, []);
 
@@ -69,7 +86,15 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
   }, [deferredPrompt]);
 
   return (
-    <PwaInstallContext.Provider value={{ isPwa, canInstall: deferredPrompt !== null, promptInstall }}>
+    <PwaInstallContext.Provider
+      value={{
+        isPwa,
+        canInstall: deferredPrompt !== null,
+        wasInstalled,
+        installLoading,
+        promptInstall
+      }}
+    >
       {children}
     </PwaInstallContext.Provider>
   );
