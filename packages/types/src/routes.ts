@@ -246,15 +246,6 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
-   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
-   */
-  getPwaRequirements: () => Promise<{
-    httpsDnpInstalled: boolean;
-    isHttpsRunning: boolean;
-    pwaMappingUrl: string | undefined;
-  }>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -630,6 +621,20 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the PWA mapping URL if it exists, otherwise returns undefined.
+   */
+  pwaUrlGet: () => Promise<string | undefined>;
+
+  /**
+   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
+   */
+  pwaRequirementsGet: () => Promise<{
+    httpsDnpInstalled: boolean;
+    isHttpsRunning: boolean;
+    pwaMappingUrl: string | undefined;
+  }>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -794,7 +799,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getPwaRequirements: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
@@ -858,6 +862,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  pwaUrlGet: {},
+  pwaRequirementsGet: {},
   rebootHost: { log: true },
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},

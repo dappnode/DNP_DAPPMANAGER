@@ -21,7 +21,7 @@ export { fetchRegistry } from "./fetchRegistry.js";
 export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
-export { getPwaRequirements } from "./getPwaRequirements.js";
+export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
 export {
   notificationsSendCustom,
   notificationsGetAllEndpoints,

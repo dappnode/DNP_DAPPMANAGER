@@ -6,7 +6,7 @@ import { params } from "@dappnode/params";
 /**
  * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
  */
-export async function getPwaRequirements(): Promise<{
+export async function pwaRequirementsGet(): Promise<{
   httpsDnpInstalled: boolean;
   isHttpsRunning: boolean;
   pwaMappingUrl: string | undefined;
@@ -16,13 +16,21 @@ export async function getPwaRequirements(): Promise<{
   const isHttpsRunning = httpsDnp && httpsDnp.containers.every((c) => c.state === "running");
 
   await httpsPortal.addPwaMappingIfNotExists();
-  const mappings = await httpsPortal.getMappings();
-
-  const pwaMapping = mappings.find((mapping) => mapping.fromSubdomain === "pwa");
-  const dyndnsDomain = domain.get();
+  const pwaMappingUrl = await pwaUrlGet();
   return {
-    pwaMappingUrl: pwaMapping && `https://pwa.${dyndnsDomain}`,
+    pwaMappingUrl,
     httpsDnpInstalled,
     isHttpsRunning: Boolean(isHttpsRunning)
   };
+}
+
+/**
+ * Returns the PWA mapping URL if it exists, otherwise returns undefined.
+ */
+export async function pwaUrlGet(): Promise<string | undefined> {
+  const mappings = await httpsPortal.getMappings();
+  const pwaMapping = mappings.find((mapping) => mapping.fromSubdomain === "pwa");
+  const dyndnsDomain = domain.get();
+
+  return pwaMapping ? `https://pwa.${dyndnsDomain}` : undefined;
 }
