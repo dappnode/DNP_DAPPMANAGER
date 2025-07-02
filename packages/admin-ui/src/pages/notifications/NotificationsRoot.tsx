@@ -11,6 +11,7 @@ import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
 import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
 import { notificationsDnpName } from "params";
+import { Subscriptions } from "./tabs/Devices";
 
 export const NotificationsRoot: React.FC = () => {
   const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
@@ -37,6 +38,11 @@ export const NotificationsRoot: React.FC = () => {
         name: "Settings",
         subPath: subPaths.settings,
         component: data.isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+      },
+      {
+        name: "Devices",
+        subPath: subPaths.devices,
+        component: data.isInstalled ? Subscriptions : () => <InstallNotificationsPkg />
       },
       {
         name: "Legacy",

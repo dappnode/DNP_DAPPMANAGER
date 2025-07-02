@@ -9,4 +9,5 @@ export const subPaths = {
   inbox: "inbox",
   settings: "settings",
   legacy: "legacy",
+  devices : "devices",
 };

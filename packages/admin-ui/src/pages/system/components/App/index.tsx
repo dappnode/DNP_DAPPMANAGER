@@ -1,9 +1,8 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
-
-// import PushNotisPremium from "./PushNotisPremium";
-import { PwaRequirementsCheck } from "./PwaRequirementsCheck";
 import Card from "components/Card";
+import { PwaInstallCards } from "./PwaInstallCards";
+import { PwaRequirementsWrapper } from "components/PwaRequirementsWrapper";
 
 export default function App() {
   return (
@@ -12,7 +11,12 @@ export default function App() {
       <Card>
         The Dappnode app allows you to connect to the Dappmanager in mobile or desktop and receive notifications.
       </Card>
-      <PwaRequirementsCheck />
+      <h5>App installation</h5>
+      <PwaRequirementsWrapper
+        successComponent={<PwaInstallCards />}
+        handleRedirectMessage="To install the app, you will be redirected to a different secure domain. Please, login with your current
+              Dappnode credentials."
+      />
       {/* <PushNotisPremium /> */}
     </>
   );

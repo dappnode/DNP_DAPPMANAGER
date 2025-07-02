@@ -11,9 +11,9 @@ import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
 
-export function PwaInstallCards({ pwaAppSubtabUrl }: { pwaAppSubtabUrl: string }) {
+export function PwaInstallCards() {
   const navigate = useNavigate();
-  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading } = usePwaInstall();
+  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, pwaAppSubtabUrl } = usePwaInstall();
   const { permission, requestPermission } = useHandleSubscription();
 
   return (
@@ -98,13 +98,15 @@ export function PwaInstallCards({ pwaAppSubtabUrl }: { pwaAppSubtabUrl: string }
             )}
           </Card>
         </div>
-        <div>
-          <h5>Install app on another mobile device</h5>
-          <Card className="pwa-install-card">
-            <p>Scan the QR code below to install Dappnode's mobile app.</p>
-            <QrCode width={"200px"} url={pwaAppSubtabUrl} />
-          </Card>
-        </div>
+        {pwaAppSubtabUrl && (
+          <div>
+            <h5>Install app on another mobile device</h5>
+            <Card className="pwa-install-card">
+              <p>Scan the QR code below to install Dappnode's mobile app.</p>
+              <QrCode width={"200px"} url={pwaAppSubtabUrl} />
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   );

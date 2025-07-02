@@ -2,14 +2,20 @@ import React from "react";
 import Loading from "components/Loading";
 import Card from "components/Card";
 import Button from "components/Button";
-import { pathName, subPaths } from "pages/system/data";
 import { usePwaRequirements } from "hooks/PWA/usePwaRequirements";
-import { PwaInstallCards } from "./PwaInstallCards";
 import { dappnodeDiscord } from "params";
 import newTabProps from "utils/newTabProps";
-import "./pwaRequirementsCheck.scss";
+import "./pwaRequirementsWrapper.scss";
 
-export function PwaRequirementsCheck() {
+interface PwaRequirementsWrapperProps {
+  successComponent: React.ReactNode;
+  handleRedirectMessage: string;
+}
+
+export function PwaRequirementsWrapper({
+  successComponent,
+  handleRedirectMessage,
+}: PwaRequirementsWrapperProps) {
   const {
     requirementsLoading,
     httpsDnpInstalled,
@@ -20,23 +26,28 @@ export function PwaRequirementsCheck() {
     installHttpsPkg,
     restartingHttps
   } = usePwaRequirements();
-  const pwaAppSubtabUrl = pwaMappingUrl + "/" + pathName + "/" + subPaths.app;
+
   const allRequirementsMet = Boolean(pwaMappingUrl && httpsDnpInstalled && isHttpsRunning && isOnPwaDomain);
 
-  return requirementsLoading ? (
-    <Loading steps={["Checking App requirements"]} />
-  ) : allRequirementsMet ? (
-    <PwaInstallCards pwaAppSubtabUrl={pwaAppSubtabUrl} />
-  ) : installingHttps ? (
-    <Loading steps={["Installing HTTPS package"]} />
-  ) : (
+  if (requirementsLoading) {
+    return <Loading steps={["Checking Requirements"]} />;
+  }
+
+  if (allRequirementsMet) {
+    return <>{successComponent}</>;
+  }
+
+  if (installingHttps) {
+    return <Loading steps={["Installing HTTPS package"]} />;
+  }
+
+  return (
     <>
-      <h5>App installation</h5>
       {!httpsDnpInstalled ? (
         <RequirementCard>
-          <div>Https package is not installed. </div>
-          <div>To install the App, you must first install the Https package.</div>
-          <Button variant="dappnode" onClick={() => installHttpsPkg()}>
+          <div>Https package is not installed.</div>
+          <div>To continue, you must first install the Https package.</div>
+          <Button variant="dappnode" onClick={installHttpsPkg}>
             Install Https
           </Button>
         </RequirementCard>
@@ -46,7 +57,7 @@ export function PwaRequirementsCheck() {
         ) : (
           <RequirementCard>
             <div>Https Package is not running after restarting.</div>
-            <div>Try to reinstall the package or contact support. </div>
+            <div>Try to reinstall the package or contact support.</div>
             <Button href={dappnodeDiscord} {...newTabProps} variant="dappnode">
               Contact support
             </Button>
@@ -54,7 +65,7 @@ export function PwaRequirementsCheck() {
         )
       ) : !pwaMappingUrl ? (
         <RequirementCard>
-          <div>PWA Https mapping failed. Please, contact support. </div>
+          <div>PWA Https mapping failed. Please, contact support.</div>
           <Button href={dappnodeDiscord} {...newTabProps} variant="dappnode">
             Contact support
           </Button>
@@ -62,11 +73,13 @@ export function PwaRequirementsCheck() {
       ) : (
         !isOnPwaDomain && (
           <RequirementCard>
-            <div>
-              To install the app, you will be redirected to a different secure domain. Please, login with your current
-              Dappnode credentials
-            </div>
-            <Button variant="dappnode" onClick={() => (window.location.href = pwaAppSubtabUrl)}>
+            <div>{handleRedirectMessage}</div>
+            <Button
+              variant="dappnode"
+              onClick={() => {
+                window.location.href = `${pwaMappingUrl}${window.location.pathname}`;
+              }}
+            >
               Continue
             </Button>
           </RequirementCard>
