@@ -16,7 +16,7 @@ import useDeviceInfo from "hooks/PWA/useDeviceInfo";
 export function PwaInstallCards() {
   const navigate = useNavigate();
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, pwaAppSubtabUrl } = usePwaInstall();
-  const { permission, requestPermission } = useHandleSubscription();
+  const { permission, requestPermission, isSubscribing } = useHandleSubscription();
   const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
@@ -95,7 +95,7 @@ export function PwaInstallCards() {
                   </Button>
                 </div>
               ) : (
-                permission === "granted" && (
+                permission === "granted" && isSubscribing ? <Loading steps={['Subscribing device']} />:(
                   <div>
                     <p>Your App is successfully configured!</p>
 
