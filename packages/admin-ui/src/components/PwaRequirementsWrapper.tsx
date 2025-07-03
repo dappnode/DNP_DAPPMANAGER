@@ -12,10 +12,7 @@ interface PwaRequirementsWrapperProps {
   handleRedirectMessage: string;
 }
 
-export function PwaRequirementsWrapper({
-  successComponent,
-  handleRedirectMessage,
-}: PwaRequirementsWrapperProps) {
+export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage }: PwaRequirementsWrapperProps) {
   const {
     requirementsLoading,
     httpsDnpInstalled,
@@ -74,12 +71,7 @@ export function PwaRequirementsWrapper({
         !isOnPwaDomain && (
           <RequirementCard>
             <div>{handleRedirectMessage}</div>
-            <Button
-              variant="dappnode"
-              onClick={() => {
-                window.location.href = `${pwaMappingUrl}${window.location.pathname}`;
-              }}
-            >
+            <Button variant="dappnode" href={`${pwaMappingUrl}${window.location.pathname}`} {...newTabProps}>
               Continue
             </Button>
           </RequirementCard>

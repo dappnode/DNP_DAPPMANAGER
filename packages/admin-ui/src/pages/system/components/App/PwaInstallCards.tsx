@@ -3,6 +3,7 @@ import Button from "components/Button";
 import Card from "components/Card";
 import QrCode from "components/QrCode";
 import { relativePath as defaultVpnUrl } from "pages/vpn";
+import { pathName as notisPathName, subPaths as notisSubpaths } from "pages/notifications";
 import { useNavigate } from "react-router-dom";
 import { usePwaInstall } from "./PwaInstallContext";
 import "./pwaInstallCards.scss";
@@ -10,11 +11,22 @@ import { AlertDismissible } from "components/AlertDismissible";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
+import useDeviceInfo from "hooks/PWA/useDeviceInfo";
 
 export function PwaInstallCards() {
   const navigate = useNavigate();
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, pwaAppSubtabUrl } = usePwaInstall();
   const { permission, requestPermission } = useHandleSubscription();
+  const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
+  const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
+
+  const showQrCode = (): Boolean => {
+    if (isPwa) {
+      return permission === "granted";
+    }
+    // If not a PWA and not on mobile, show QR code
+    return !isMobile;
+  };
 
   return (
     <div>
@@ -35,71 +47,93 @@ export function PwaInstallCards() {
           </Button>
         </div>
       </AlertDismissible>
-      <div className="pwa-install-cards-container">
-        <div>
+      {!deviceLoading && browser !== "Chrome" && (
+        <AlertDismissible variant="warning">
+          <div className="pwa-vpn-info">
+            <div>
+              <h5>Chrome is recommended for the best experience</h5>
+              <div>
+                {browser === "Unknown" ? "Your browser was not identified. " : `You are using ${browser}. `}
+                <br />
+                For the best experience and full functionality, we recommend using Chrome to install the app on your
+                device.
+              </div>
+            </div>
+            {/* TODO: Include link to docs on how install PWA manually. */}
+            <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+              Check Docs
+            </Button>
+          </div>
+        </AlertDismissible>
+      )}
+      <div className="pwa-install-section">
+        <div className="pwa-install-cards-container">
           <h5>Install app in this device</h5>
           <Card className="pwa-install-card">
             {isPwa ? (
               permission && permission === "default" ? (
-                <>
+                <div>
                   <p>
-                    To receive push notifications in your device, it's mandatory accept the notification permission in
-                    your browser.
-                    <br />
-                    <b>IMPORTANT:</b> Click the button below and click 'Allow' in the pop-up modal.
+                    To receive notifications in your device, it's mandatory granting the notification permission in your
+                    App.
+                  </p>
+                  <p>
+                    Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
                   </p>
 
-                  <Button
-                    variant="dappnode"
-                    onClick={requestPermission} //TODO: request browser permissions
-                  >
-                    Request permissions
+                  <Button variant="dappnode" onClick={requestPermission}>
+                    Grant permission
                   </Button>
-                </>
+                </div>
               ) : permission === "denied" ? (
-                <>
-                  <p>
-                    Permission denied. Please enable notifications in your browser settings to receive notifications.
-                  </p>
-                  <p>Link to docs -- how to reset browser permissions</p>
-                </>
+                <div>
+                  <p>Notifications permission denied.</p>
+                  <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
+                  {/* TODO: Include link to docs on how install PWA manually. */}
+                  <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+                    Check Docs
+                  </Button>
+                </div>
               ) : (
                 permission === "granted" && (
-                  <>
-                    <p>
-                      Check your device notification status in <i>notifications/devices</i>
-                    </p>
-                  </>
+                  <div>
+                    <p>Your App is successfully configured!</p>
+
+                    <p>You can now manage notifications for your devices in the Notifications tab.</p>
+                    <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
+                      Manage Devices
+                    </Button>
+                  </div>
                 )
               )
             ) : canInstall ? (
-              <>
+              <div>
                 <p>Click the button below, then click 'Install' in the pop-up modal.</p>
                 <Button variant="dappnode" onClick={promptInstall} disabled={!canInstall}>
                   Install App
                 </Button>
-              </>
+              </div>
             ) : installLoading ? (
               <Loading steps={["Installing Dappnode App"]} />
             ) : wasInstalled ? (
-              <>
-                <p>App has been installed succefully</p>
-                <p>Please, click the button below to open the app and finish its set up.</p>
+              <div>
+                <p>App has been installed successfully</p>
+                <p>Open the app and finish its setup.</p>
 
-                <Button href={pwaAppSubtabUrl} {...newTabProps}>
-                  Open App
+                <Button variant="dappnode" href={pwaAppSubtabUrl} {...newTabProps}>
+                  Finish Setup in App{" "}
                 </Button>
-              </>
+              </div>
             ) : (
-              <>
+              <div>
                 <p>App already installed or not available for this browser</p>
                 <p>If installed, open your app in your device home screen.</p>
-              </>
+              </div>
             )}
           </Card>
         </div>
-        {pwaAppSubtabUrl && (
-          <div>
+        {pwaAppSubtabUrl && showQrCode() && (
+          <div className="pwa-install-cards-container">
             <h5>Install app on another mobile device</h5>
             <Card className="pwa-install-card">
               <p>Scan the QR code below to install Dappnode's mobile app.</p>
