@@ -62,12 +62,12 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const requestPermission = () => {
     Notification.requestPermission().then((permission) => {
       setPermission(permission);
+      if (permission === "granted" && vapidKey) {
+        subscribeBrowser();
+      } else if (permission === "denied") {
+        console.error("Notification permission denied");
+      }
     });
-    if (permission === "granted" && vapidKey) {
-      subscribeBrowser();
-    } else if (permission === "denied") {
-      console.error("Notification permission denied");
-    }
   };
 
   const deleteSubscription = async (endpoint: string) => {
