@@ -61,6 +61,8 @@ export async function packageInstall(
         throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
       if (!release.isCore) await checkInstallRequirements({ manifest: release.manifest });
+      if (!release.signedSafe && release.dnpName === "premium.dnp.dappnode.eth")
+        throw Error(`Package ${release.dnpName} can only be installed as signed`);
     }
 
     // Gather all data necessary for the install
