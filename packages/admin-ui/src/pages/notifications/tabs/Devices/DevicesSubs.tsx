@@ -1,4 +1,3 @@
-import SubTitle from "components/SubTitle";
 import Card from "components/Card";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { MdBeenhere, MdClose, MdEdit } from "react-icons/md";
@@ -7,51 +6,114 @@ import { NotifierSubscription } from "@dappnode/types";
 import Button from "components/Button";
 import { api } from "api";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
+import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
+import newTabProps from "utils/newTabProps";
+import Loading from "components/Loading";
 import "./devicesSubs.scss";
 
 export function DevicesSubs() {
   const {
     subscription: browserSub,
     subscriptionsList,
-    // isSubInNotifier,
+    isSubscribing,
+    isSubInNotifier,
     deleteSubscription,
-    // requestPermission,
-    // permission,
-    // subscribeBrowser,
+    requestPermission,
+    permission,
+    subscribeBrowser,
     revalidateSubs
   } = useHandleSubscription();
+  const { isPwa, pwaAppSubtabUrl } = usePwaInstall();
+
   return (
-    <div>
-      <SubTitle>Subscribed Devices</SubTitle>
-      <Card>
-        This section displays all devices currently subscribed to push notifications. You can rename each subscription
-        or remove it from the list. <b>Learn more in docs...</b>
-      </Card>
+    <div className="devices-subs-container">
+      <div>
+        <h5>Current Device</h5>
+        <Card className="current-device-card">
+          {isPwa && permission ? (
+            permission === "denied" ? (
+              <div>
+                <p>
+                  To receive notifications in your device, it's mandatory granting the notification permission in your
+                  App.
+                </p>
+                <p>
+                  Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
+                </p>
 
-      {subscriptionsList && subscriptionsList.length > 0 ? (
-        <>
-          <Card
-            style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-          >
-            Send notification to all subscribed devices by clicking the "Send notifications"
-            <Button onClick={() => api.notificationsSendSubTest({})} variant="dappnode">
-              Send notifications
-            </Button>
-          </Card>
+                <Button variant="dappnode" onClick={requestPermission}>
+                  Grant permission
+                </Button>
+              </div>
+            ) : permission === "default" ? (
+              <div>
+                <p>
+                  To receive notifications in your device, it's mandatory granting the notification permission in your
+                  App.
+                </p>
+                <p>
+                  Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
+                </p>
 
-          {subscriptionsList.map((sub, index) => (
-            <SubscriptionCard
-              key={index}
-              sub={sub}
-              browserSubEndpoint={browserSub?.endpoint}
-              deleteSubscription={deleteSubscription}
-              revalidateSubs={revalidateSubs}
-            />
-          ))}
-        </>
-      ) : (
-        <Card>No subscriptions found</Card>
-      )}
+                <Button variant="dappnode" onClick={requestPermission}>
+                  Grant permission
+                </Button>
+              </div>
+            ) : isSubInNotifier ? (
+              <div>Your device is already subscribed to push notifications.</div>
+            ) : isSubscribing ? (
+              <Loading steps={["Subscribing device"]} />
+            ) : (
+              <div>
+                <p>Your device is not subscribed to push notifications.</p>
+                <Button variant="dappnode" onClick={subscribeBrowser}>
+                  Subscribe Device
+                </Button>
+              </div>
+            )
+          ) : (
+            <>
+              <p>To check your device status, please open the Dappnode App.</p>
+              <p>If you haven't installed the app yet, click the button below.</p>
+              <Button href={pwaAppSubtabUrl} {...newTabProps} variant="dappnode">
+                Install App
+              </Button>
+            </>
+          )}
+        </Card>
+      </div>
+      <div>
+        <h5>Subscribed Devices</h5>
+        <Card>
+          This section displays all devices currently subscribed to push notifications. You can rename each subscription
+          or remove it from the list. <b>Learn more in docs...</b>
+        </Card>
+
+        {subscriptionsList && subscriptionsList.length > 0 ? (
+          <>
+            <Card
+              style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+            >
+              Send notification to all subscribed devices by clicking the "Send notifications"
+              <Button onClick={() => api.notificationsSendSubTest({})} variant="dappnode">
+                Send notifications
+              </Button>
+            </Card>
+
+            {subscriptionsList.map((sub, index) => (
+              <SubscriptionCard
+                key={index}
+                sub={sub}
+                browserSubEndpoint={browserSub?.endpoint}
+                deleteSubscription={deleteSubscription}
+                revalidateSubs={revalidateSubs}
+              />
+            ))}
+          </>
+        ) : (
+          <Card>No subscriptions found</Card>
+        )}
+      </div>
     </div>
   );
 }

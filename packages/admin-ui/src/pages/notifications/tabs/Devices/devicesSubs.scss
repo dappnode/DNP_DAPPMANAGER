@@ -1,38 +1,57 @@
-.subscription-card {
+.devices-subs-container {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 20px;
 
-  @media (max-width: 40rem) {
+  .current-device-card {
+    display: flex;
     flex-direction: column;
     gap: 10px;
-  }
+    padding: 20px;
+    align-items: center;
+    text-align: center;
 
-  .alias-info {
-    font-size: 1.2rem;
-    input {
-      width: 30ch;
-      margin-right: 5px;
-      border-radius: 5px;
-    }
     @media (max-width: 40rem) {
-      width: 100%;
+      padding: 10px;
     }
   }
 
-  .btns-container {
+  .subscription-card {
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    justify-content: space-between;
+    align-items: center;
 
-    .icon-btns {
-      padding: 0px 10px;
-      font-size: 1.6rem;
-      opacity: 0.5;
-      cursor: pointer;
-      &:hover {
-        opacity: 0.8;
+    @media (max-width: 40rem) {
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .alias-info {
+      font-size: 1.2rem;
+      input {
+        width: 30ch;
+        margin-right: 5px;
+        border-radius: 5px;
+      }
+      @media (max-width: 40rem) {
+        width: 100%;
+      }
+    }
+
+    .btns-container {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+
+      .icon-btns {
+        padding: 0px 10px;
+        font-size: 1.6rem;
+        opacity: 0.5;
+        cursor: pointer;
+        &:hover {
+          opacity: 0.8;
+        }
       }
     }
   }

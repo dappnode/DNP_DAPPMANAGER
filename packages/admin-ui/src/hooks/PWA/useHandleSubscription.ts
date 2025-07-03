@@ -7,6 +7,7 @@ import { Category, NotifierSubscription, Priority, Status } from "@dappnode/type
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
   subscriptionsList: NotifierSubscription[] | null;
+  isSubscribing: boolean;
   isSubInNotifier: boolean;
   permission: NotificationPermission | null;
   requestPermission: () => void;
@@ -19,7 +20,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const [vapidKey, setVapidKey] = useState<string | null>(null);
   const [subscription, setSubscription] = useState<PushSubscription | null>(null);
   const [subscriptionsList, setSubscriptionsList] = useState<NotifierSubscription[] | null>(null);
-
+  const [isSubscribing, setIsSubscribing] = useState<boolean>(false);
   const [isSubInNotifier, setIsSubInNotifier] = useState<boolean>(false);
 
   const [permission, setPermission] = useState<NotificationPermission | null>(Notification.permission);
@@ -99,12 +100,10 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     }
 
     try {
+      setIsSubscribing(true);
+
       // Wait for SW to be active
       const registration = await navigator.serviceWorker.ready;
-      console.log("SW ready:", registration);
-
-      console.log("Current subscription:", subscription);
-      console.log("Is subscription in notifier:", isSubInNotifier);
 
       // Clean up any old subscription
       if (subscription && !isSubInNotifier) {
@@ -166,6 +165,8 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       });
     } catch (err) {
       console.error("Subscribe error:", err);
+    }finally{
+      setIsSubscribing(false);
     }
   }, [vapidKey]);
 
@@ -180,6 +181,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   return {
     permission,
     subscription,
+    isSubscribing,
     isSubInNotifier,
     deleteSubscription,
     requestPermission,
