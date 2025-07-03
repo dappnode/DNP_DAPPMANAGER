@@ -10,7 +10,7 @@ self.addEventListener("push", (event) => {
   const options = {
     body: data.body || "You have a new message.",
     icon: data.icon || "/favicon.svg",
-    badge: "/logo.svg", // mobile notifiation topbar
+    badge: "/dn-badge.svg", // mobile notifiation topbar
     data: {
       url: data.callToAction?.url || "/", // To be used on click
       correlationId: data.correlationId,
@@ -56,8 +56,8 @@ const CACHE_NAME = "dappmanager-test-offline-v1.00";
 const OFFLINE_URLS = [
   // Review the list of URLs to cache
   "/index.html",
-  "/favicon.svg",
-  "/logo.svg",
+  "/favicon.ico",
+  "/dn-badge.svg",
   "/icon-192x192.png",
   "/icon-256x256.png",
   "/icon-384x384.png",
