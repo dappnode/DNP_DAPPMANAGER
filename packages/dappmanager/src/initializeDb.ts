@@ -69,6 +69,7 @@ export async function initializeDb(): Promise<void> {
     });
 
     db.newFeatureStatus.set("enable-ethical-metrics", "pending");
+    db.newFeatureStatus.set("enable-notifications", "pending");
   }
 
   /**

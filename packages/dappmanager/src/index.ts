@@ -3,7 +3,6 @@ import { eventBus } from "@dappnode/eventbus";
 import { initializeDb } from "./initializeDb.js";
 import {
   ensureIpv4Forward,
-  checkDockerNetwork,
   recreateDappnode,
   copyHostScripts,
   copyHostServices,
@@ -51,7 +50,7 @@ export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersP
 
 export const publicRegistry = new DappNodeRegistry("public");
 
-// TODO: find a way to move the velow constants to the api itself
+// TODO: find a way to move the below constants to the api itself
 const vpnApiClient = getVpnApiClient(params);
 const adminPasswordDb = new AdminPasswordDb(params);
 const deviceCalls = new DeviceCalls({
@@ -86,10 +85,9 @@ export const mevBoost = new MevBoost(dappnodeInstaller);
 export const signer = new Signer(dappnodeInstaller);
 
 // Execute migrations
-executeMigrations(execution, consensus, signer, mevBoost).catch((e) => logs.error("Error on executeMigrations", e));
-
+executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
 // Start daemons
-startDaemons(dappnodeInstaller, controller.signal);
+startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
 Promise.all([
   // Copy host scripts
@@ -103,8 +101,6 @@ Promise.all([
   ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
   // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
-  // start check-docker-network service with timer
-  checkDockerNetwork().catch((e) => logs.error("Error starting service docker network checker", e));
   // start recreate-dappnode service with timer
   recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
 });

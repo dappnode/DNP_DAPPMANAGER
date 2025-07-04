@@ -183,10 +183,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
-  rebootHostIsRequiredGet: async () => ({
-    rebootRequired: true,
-    pkgs: "docker"
-  }),
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -385,8 +381,26 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerHostVersion: "20.10.7",
     dockerLatestVersion: "20.10.8"
   }),
-  getIsConnectedToInternet: async () => false,
-  getCoreVersion: async () => "0.2.92"
+  getCoreVersion: async () => "0.2.92",
+  notificationsGetAllEndpoints: async () => {
+    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
+  },
+  notificationsGetUnseenCount: async () => 2,
+  notificationsSetAllSeen: async () => {},
+  notificationSetSeenByCorrelationID: async () => {},
+  notificationsUpdateEndpoints: async () => {},
+  notificationsGetAll: async () => [],
+  notificationsGetBanner: async () => [],
+  notificationsApplyPreviousEndpoints: async () => {
+    return { endpoints: [], customEndpoints: [] };
+  },
+  notificationsPackageStatus: async () => ({
+    notificationsDnp: null,
+    isInstalled: false,
+    isRunning: false,
+    isNotifierRunning: false,
+    servicesNotRunning: [],
+  }),
 };
 
 export const calls: Routes = {

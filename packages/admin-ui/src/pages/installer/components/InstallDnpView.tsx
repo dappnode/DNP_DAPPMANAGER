@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { api } from "api";
+import { api, useApi } from "api";
 import { useDispatch } from "react-redux";
 import { Routes, Route, useNavigate, useLocation, useParams, NavLink } from "react-router-dom";
 import { isEmpty, throttle } from "lodash-es";
@@ -24,10 +24,11 @@ import { clearIsInstallingLog } from "services/isInstallingLogs/actions";
 import { continueIfCalleDisconnected } from "api/utils";
 import { enableAutoUpdatesForPackageWithConfirm } from "pages/system/components/AutoUpdates";
 import Warnings from "./Steps/Warnings";
-import { RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
+import { CustomEndpoint, GatusEndpoint, RequestedDnp, UserSettingsAllDnps } from "@dappnode/types";
 import { diff } from "semver";
 import Button from "components/Button";
 import { pathName as systemPathName, subPaths as systemSubPaths } from "pages/system/data";
+import { Notifications } from "./Steps/Notifications";
 
 interface InstallDnpViewProps {
   dnp: RequestedDnp;
@@ -51,9 +52,21 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [notificationsPkgInstalled, setNotificationsPkgInstalled] = useState(false);
+
   const dispatch = useDispatch();
 
-  const { dnpName, reqVersion, semVersion, settings, manifest, setupWizard, isInstalled, installedVersion } = dnp;
+  const {
+    dnpName,
+    reqVersion,
+    semVersion,
+    settings,
+    manifest,
+    setupWizard,
+    isInstalled,
+    installedVersion,
+    notificationsSettings
+  } = dnp;
   const updateType = installedVersion && diff(installedVersion, semVersion);
   const areUpdateWarnings =
     manifest.warnings?.onPatchUpdate || manifest.warnings?.onMinorUpdate || manifest.warnings?.onMajorUpdate;
@@ -65,6 +78,29 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const packagesToBeUninstalled = dnp.compatible.packagesToBeUninstalled;
   const isWizardEmpty = isSetupWizardEmpty(setupWizard);
   const oldEditorAvailable = Boolean(userSettings);
+
+  const [endpoints, setEndpoints] = React.useState<GatusEndpoint[]>(manifest.notifications?.endpoints || []);
+
+  const [customEndpoints, setCustomEndpoints] = React.useState<CustomEndpoint[]>(
+    manifest.notifications?.customEndpoints || []
+  );
+
+  const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
+
+  useEffect(() => {
+    // Check if notifications package is installed and running
+    if (notificationsPkgStatusRequest.data) {
+      const { isInstalled } = notificationsPkgStatusRequest.data;
+      setNotificationsPkgInstalled(isInstalled);
+    }
+  }, [notificationsPkgStatusRequest.data]);
+
+  useEffect(() => {
+    if (notificationsSettings && notificationsSettings[dnpName]) {
+      setEndpoints(notificationsSettings[dnpName].endpoints || []);
+      setCustomEndpoints(notificationsSettings[dnpName].customEndpoints || []);
+    }
+  }, [notificationsSettings]);
 
   useEffect(() => {
     setUserSettings(settings || {});
@@ -99,6 +135,12 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
               options: {
                 BYPASS_CORE_RESTRICTION: bypassCoreOpt,
                 BYPASS_SIGNED_RESTRICTION: bypassSignedOpt
+              },
+              notificationsSettings: {
+                [dnpName]: {
+                  endpoints: endpoints.length > 0 ? endpoints : undefined,
+                  customEndpoints: customEndpoints.length > 0 ? customEndpoints : undefined
+                }
               }
             }),
           dnpName
@@ -112,6 +154,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       // Re-direct user to package page if installation is successful
       if (componentIsMounted.current) {
         setShowSuccess(true);
+
         setTimeout(() => {
           if (componentIsMounted.current) {
             setShowSuccess(false);
@@ -179,7 +222,11 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const permissionsSubPath = "permissions";
   const warningsSubPath = "warnings";
   const disclaimerSubPath = "disclaimer";
+  const notificationsSubPath = "notifications";
   const installSubPath = "install";
+
+  // Only display notifications step if the notifications package is installed && there are endpoints in manifest
+  const showNotificationsStep = notificationsPkgInstalled && manifest.notifications;
 
   const availableRoutes: {
     name: string;
@@ -227,6 +274,21 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
       subPath: disclaimerSubPath,
       render: () => <Disclaimer disclaimers={disclaimers} onAccept={goNext} goBack={goBack} />,
       available: disclaimers.length > 0
+    },
+    {
+      name: "Notifications",
+      subPath: notificationsSubPath,
+      render: () => (
+        <Notifications
+          endpointsGatus={endpoints}
+          endpointsCustom={customEndpoints}
+          setEndpointsGatus={setEndpoints}
+          setEndpointsCustom={setCustomEndpoints}
+          goNext={goNext}
+          goBack={goBack}
+        />
+      ),
+      available: showNotificationsStep
     },
     // Placeholder for the final step in the horizontal stepper
     {

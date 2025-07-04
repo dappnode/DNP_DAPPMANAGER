@@ -86,6 +86,7 @@ export const params = {
     "http://localhost:3000",
     "http://localhost:3001",
     "http://my.dappnode",
+    "http://my.dappnode.private",
     "http://dappnode.local"
   ],
 
@@ -115,6 +116,8 @@ export const params = {
   // Docker network parameters
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",
+  DOCKER_NETWORK_NEW_SUBNET: "10.20.0.0/24",
+  DOCKER_PRIVATE_NETWORK_NEW_NAME: "dnprivate_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
   DOCKER_STAKER_NETWORKS: {
     [Network.Mainnet]: "mainnet_network",
@@ -125,8 +128,10 @@ export const params = {
     [Network.Lukso]: "lukso_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
-  BIND_IP: "172.33.1.2", // "10.20.0.2"
-  DAPPMANAGER_IP: "172.33.1.7", // "10.20.0.7";
+  BIND_IP: "172.33.1.2",
+  BIND_NEW_IP: "10.20.0.2",
+  DAPPMANAGER_IP: "172.33.1.7",
+  DAPPMANAGER_NEW_IP: "10.20.0.7",
 
   // Docker compose parameters
   // Use of new compose file feature: network name
@@ -154,7 +159,7 @@ export const params = {
   // IPFS parameters
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
-  IPFS_LOCAL: "http://ipfs.dappnode:5001",
+  IPFS_LOCAL: "http://ipfs.dappnode:8080",
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
@@ -204,6 +209,7 @@ export const params = {
 
   // DAPPMANAGER alias
   DAPPMANAGER_ALIASES: ["dappmanager.dappnode", "my.dappnode", "dappnode.local"],
+  DAPPMANAGER_NEW_ALIASES: ["dappmanager.dappnode.private", "my.dappnode.private", "dappnode.local"],
 
   // DAppNode specific names
   bindDnpName: "bind.dnp.dappnode.eth",
@@ -218,6 +224,7 @@ export const params = {
   wifiContainerName: "DAppNodeCore-wifi.dnp.dappnode.eth",
   ipfsDnpName: "ipfs.dnp.dappnode.eth",
   ipfsContainerName: "DAppNodeCore-ipfs.dnp.dappnode.eth",
+  notificationsDnpName: "notifications.dnp.dappnode.eth",
   vpnDataVolume: "dncore_vpndnpdappnodeeth_data",
   wireguardContainerName: "DAppNodeCore-wireguard.wireguard.dnp.dappnode.eth",
   restartContainerName: "DAppNodeTool-restart.dnp.dappnode.eth",
@@ -253,6 +260,7 @@ export const params = {
   // Wi-Fi ENVs
   WIFI_KEY_SSID: "SSID",
   WIFI_KEY_PASSWORD: "WPA_PASSPHRASE",
+  WIFI_DEFAULT_PASSWORD: "dappnode",
 
   // Global ENVs dappnode prefix
   GLOBAL_ENVS_PREFIX: "_DAPPNODE_GLOBAL_",
@@ -396,6 +404,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x67e5fEB0F1d184cC189614d8903ABcadD677c1E0"
+    },
+    {
+      name: "Dappnode Association - Pol (dnp)",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Dappnode Association - Pol (public)",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
     }
   ]
 };

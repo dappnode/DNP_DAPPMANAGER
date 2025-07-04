@@ -11,7 +11,7 @@ import { copyHostService } from "../hostServices/copyHostService.js";
  * Timers usually runs services which in the end runs scripts
  */
 type Timer = {
-  name: "check-docker-network.timer" | "recreate-dappnode.timer";
+  name: "recreate-dappnode.timer";
   dependantService: ServiceName;
 };
 

@@ -7,6 +7,7 @@ import { logs } from "@dappnode/logger";
 import { dockerComposeUpPackage, dockerComposeUp, copyFileToDockerContainer } from "@dappnode/dockerapi";
 import { packageToInstallHasPid } from "@dappnode/utils";
 import { httpsPortal } from "@dappnode/httpsportal";
+import { notifications } from "@dappnode/notifications";
 
 const externalNetworkName = params.DOCKER_EXTERNAL_NETWORK_NAME;
 
@@ -89,5 +90,14 @@ export async function runPackages(packagesData: InstallPackageData[], log: Log):
     // Expose default HTTPs ports if required and connected to public network
     await httpsPortal.connectToPublicNetwork(pkg, externalNetworkName);
     await httpsPortal.exposeByDefaultHttpsPorts(pkg, log);
+
+    // Reload gatus endpoints if any
+    try {
+      const { isInstalled } = await notifications.notificationsPackageStatus();
+      if (pkg.manifest.notifications?.endpoints && isInstalled) await notifications.updateEndpointsApi();
+    } catch (error) {
+      log(pkg.dnpName, `Could not update endpoints for ${pkg.dnpName}: ${error}`);
+      logs.error(`Error updating endpoints for ${pkg.dnpName}`, error);
+    }
   }
 }

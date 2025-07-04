@@ -138,25 +138,25 @@ export class Consensus extends StakerComponent {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
+    // helper to build each service’s networks
+    const buildSvc = (svcName: string) => ({
+      [params.DOCKER_STAKER_NETWORKS[network]]: {
+        aliases: [`${svcName}.${network}.staker.dappnode`]
+      },
+      [params.DOCKER_PRIVATE_NETWORK_NAME]: {
+        aliases: [`${svcName}.${network}.dncore.dappnode`]
+      },
+
+      [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+        aliases: [`${svcName}.${network}.dappnode.private`]
+      }
+    });
+
     return {
       rootNetworks: this.getComposeRootNetworks(network),
       serviceNetworks: {
-        [beaconServiceName]: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
-            aliases: [`${beaconServiceName}.${network}.staker.dappnode`]
-          },
-          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            aliases: [`${beaconServiceName}.${network}.dncore.dappnode`]
-          }
-        },
-        [validatorServiceName]: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
-            aliases: [`${validatorServiceName}.${network}.staker.dappnode`]
-          },
-          [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-            aliases: [`${validatorServiceName}.${network}.dncore.dappnode`]
-          }
-        }
+        [beaconServiceName]: buildSvc(beaconServiceName),
+        [validatorServiceName]: buildSvc(validatorServiceName)
       }
     };
   }

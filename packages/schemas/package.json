@@ -1,7 +1,7 @@
 {
   "name": "@dappnode/schemas",
   "type": "module",
-  "version": "0.1.23",
+  "version": "0.1.24",
   "description": "A shared TypeScript JSON schemas and its validation functions for the manifest and setup wizard dappnode files",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "@dappnode/types": "^0.1.40",
-    "ajv": "^8.12.0",
+    "ajv": "^8.17.1",
     "semver": "^7.5.0"
   }
 }

@@ -1,6 +1,3 @@
-export const relativePath = "rollups/optimism"; // default redirect to optimism
-export const rootPath = "rollups/*";
-export const title = "Rollups";
 export const disclaimer = `## Terms of Use - DAppNode
 
 Effective as of Oct 14, 2020

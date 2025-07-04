@@ -1,3 +1,4 @@
+import { NotificationsConfig } from "./notifications.js";
 import { SetupSchema, SetupTarget, SetupUiJson, SetupWizard } from "./setupWizard.js";
 
 export interface Manifest {
@@ -13,6 +14,7 @@ export interface Manifest {
   author?: string;
   license?: string;
   avatar?: string;
+  avatarUrl?: string;
   repository?: {
     type?: string;
     url?: string;
@@ -99,6 +101,9 @@ export interface Manifest {
 
   // setupWizard for compacted manifests in core packages
   setupWizard?: SetupWizard;
+
+  // notifications
+  notifications?: NotificationsConfig;
 }
 
 export interface UpstreamItem {
@@ -164,6 +169,7 @@ interface ExposableServiceManifestInfo {
   fromSubdomain?: string;
   port: number;
   exposeByDefault?: boolean;
+  external?: boolean;
 }
 
 // Arch

@@ -12,7 +12,6 @@ import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
-import { Notifications } from "./Notifications";
 import Hardware from "./Hardware";
 
 const SystemRoot: React.FC = () => {
@@ -47,12 +46,6 @@ const SystemRoot: React.FC = () => {
       subLink: subPaths.power,
       subPath: subPaths.power,
       component: PowerManagment
-    },
-    {
-      name: "Notifications",
-      subLink: subPaths.notifications,
-      subPath: subPaths.notifications,
-      component: Notifications
     },
     {
       name: "Network",

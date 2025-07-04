@@ -1,27 +1,35 @@
-import React, { useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import BaseDropdown from "./BaseDropdown";
-import { getNotifications } from "services/notifications/selectors";
-import { viewedNotifications, fetchNotifications } from "services/notifications/actions";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 // Icons
 import { FaRegBell } from "react-icons/fa";
+import { useApi } from "api";
 
 export default function Notifications() {
-  const notifications = useSelector(getNotifications);
-  const dispatch = useDispatch();
+  const unseenNotificationsReq = useApi.notificationsGetUnseenCount();
+  const [newNotifications, setNewNotifications] = useState(false);
+  const navigate = useNavigate();
+
   useEffect(() => {
-    dispatch(fetchNotifications());
-  }, [dispatch]);
+    const interval = setInterval(() => {
+      unseenNotificationsReq.revalidate();
+    }, 60 * 1000); // Updates the new norifications "blue dot" every minute
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [unseenNotificationsReq]);
+
+  useEffect(() => {
+    if (unseenNotificationsReq.data !== undefined) {
+      setNewNotifications(unseenNotificationsReq.data > 0);
+    }
+  }, [unseenNotificationsReq.data]);
 
   return (
-    <BaseDropdown
-      name="Notifications"
-      messages={notifications}
-      Icon={FaRegBell}
-      onClick={() => dispatch(viewedNotifications())}
-      moreVisible={true}
-      className={"notifications"}
-      placeholder="No notifications yet"
-    />
+    <div onClick={() => navigate("/notifications/inbox")} className="tn-dropdown tn-dropdown-toggle">
+      <FaRegBell size={"1.4em"} />
+      {newNotifications && <div className={`icon-bubble success`} />}
+    </div>
   );
 }

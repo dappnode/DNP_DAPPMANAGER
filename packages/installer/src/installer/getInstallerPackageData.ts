@@ -8,7 +8,9 @@ import {
   UserSettings,
   PackageRelease,
   InstallPackageData,
-  ContainersStatus
+  ContainersStatus,
+  NotificationsConfig,
+  NotificationsSettingsAllDnps
 } from "@dappnode/types";
 import { getBackupPath, getDockerComposePath, getImagePath, getManifestPath } from "@dappnode/utils";
 import { gt } from "semver";
@@ -17,6 +19,7 @@ import { logs } from "@dappnode/logger";
 interface GetInstallerPackageDataArg {
   releases: PackageRelease[];
   userSettings: UserSettingsAllDnps;
+  notificationsSettings: NotificationsSettingsAllDnps;
   currentVersions: { [dnpName: string]: string | undefined };
   reqName: string;
 }
@@ -24,6 +27,7 @@ interface GetInstallerPackageDataArg {
 export async function getInstallerPackagesData({
   releases,
   userSettings,
+  notificationsSettings,
   currentVersions,
   reqName
 }: GetInstallerPackageDataArg): Promise<InstallPackageData[]> {
@@ -37,6 +41,7 @@ export async function getInstallerPackagesData({
         getInstallerPackageData(
           release,
           userSettings[release.dnpName],
+          notificationsSettings?.[release.dnpName],
           currentVersions[release.dnpName],
           await getContainersStatus({
             dnpName: release.dnpName,
@@ -58,10 +63,11 @@ export async function getInstallerPackagesData({
 function getInstallerPackageData(
   release: PackageRelease,
   userSettings: UserSettings | undefined,
+  notificationsSettings: NotificationsConfig | undefined,
   currentVersion: string | undefined,
   containersStatus: ContainersStatus
 ): InstallPackageData {
-  const { dnpName, semVersion, isCore, imageFile } = release;
+  const { dnpName, semVersion, isCore, imageFile, manifest } = release;
 
   // Compute paths
   const composePath = getDockerComposePath(dnpName, isCore);
@@ -96,6 +102,13 @@ function getInstallerPackageData(
     imagePath,
     // Data to write
     compose: compose.output(),
+    manifest: release.manifest.notifications
+      ? {
+          ...release.manifest,
+          // Apply notitications user settings if any
+          notifications: notificationsSettings
+        }
+      : manifest,
     // User settings to be applied by the installer
     fileUploads: userSettings?.fileUploads,
     dockerTimeout,

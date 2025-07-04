@@ -32,7 +32,13 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
  */
 export async function packageInstall(
   dappnodeInstaller: DappnodeInstaller,
-  { name: reqName, version: reqVersion, userSettings = {}, options = {} }: Parameters<Routes["packageInstall"]>[0]
+  {
+    name: reqName,
+    version: reqVersion,
+    userSettings = {},
+    notificationsSettings = {},
+    options = {}
+  }: Parameters<Routes["packageInstall"]>[0]
 ): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
@@ -55,12 +61,15 @@ export async function packageInstall(
         throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
       if (!release.isCore) await checkInstallRequirements({ manifest: release.manifest });
+      if (!release.signedSafe && release.dnpName === "premium.dnp.dappnode.eth")
+        throw Error(`Package ${release.dnpName} can only be installed as signed`);
     }
 
     // Gather all data necessary for the install
     const packagesData = await getInstallerPackagesData({
       releases,
       userSettings,
+      notificationsSettings,
       currentVersions,
       reqName
     });
