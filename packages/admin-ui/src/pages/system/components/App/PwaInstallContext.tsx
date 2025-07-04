@@ -1,6 +1,4 @@
 // src/contexts/PwaInstallContext.tsx
-import { api } from "api";
-import { pathName, subPaths } from "pages/system/data";
 import React, { createContext, useState, useEffect, useCallback, useContext, ReactNode } from "react";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -18,7 +16,6 @@ interface PwaInstallContextValue {
   installLoading: boolean;
   wasInstalled: boolean;
   promptInstall: () => Promise<void>;
-  pwaAppSubtabUrl: string | undefined;
 }
 
 const PwaInstallContext = createContext<PwaInstallContextValue>({
@@ -26,8 +23,7 @@ const PwaInstallContext = createContext<PwaInstallContextValue>({
   canInstall: false,
   installLoading: false,
   wasInstalled: false,
-  promptInstall: async () => {},
-  pwaAppSubtabUrl: undefined
+  promptInstall: async () => {}
 });
 
 export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
@@ -81,20 +77,6 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  const [pwaAppSubtabUrl, setPwaAppSubtabUrl] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    async function fetchPwaUrl() {
-      const url = await api.pwaUrlGet();
-      if (url) {
-        setPwaAppSubtabUrl(`${url}/${pathName}/${subPaths.app}`);
-      } else {
-        setPwaAppSubtabUrl(undefined);
-      }
-    }
-    fetchPwaUrl();
-  }, []);
-
   const promptInstall = useCallback(async () => {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
@@ -110,8 +92,7 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
         canInstall: deferredPrompt !== null,
         wasInstalled,
         installLoading,
-        promptInstall,
-        pwaAppSubtabUrl
+        promptInstall
       }}
     >
       {children}

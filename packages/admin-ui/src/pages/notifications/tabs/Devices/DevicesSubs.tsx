@@ -7,7 +7,7 @@ import Button from "components/Button";
 import { api } from "api";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
-import newTabProps from "utils/newTabProps";
+import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import "./devicesSubs.scss";
 
@@ -23,7 +23,8 @@ export function DevicesSubs() {
     subscribeBrowser,
     revalidateSubs
   } = useHandleSubscription();
-  const { isPwa, pwaAppSubtabUrl } = usePwaInstall();
+  const { isPwa } = usePwaInstall();
+  const pwaSubtabUrl = usePwaSubtabUrl();
 
   return (
     <div className="devices-subs-container">
@@ -75,7 +76,7 @@ export function DevicesSubs() {
             <>
               <p>To check your device status, please open the Dappnode App.</p>
               <p>If you haven't installed the app yet, click the button below.</p>
-              <Button href={pwaAppSubtabUrl} {...newTabProps} variant="dappnode">
+              <Button href={pwaSubtabUrl} variant="dappnode">
                 Install App
               </Button>
             </>

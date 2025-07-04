@@ -12,10 +12,12 @@ import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
 import useDeviceInfo from "hooks/PWA/useDeviceInfo";
+import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 
 export function PwaInstallCards() {
   const navigate = useNavigate();
-  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, pwaAppSubtabUrl } = usePwaInstall();
+  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading } = usePwaInstall();
+  const pwaSubtabUrl = usePwaSubtabUrl();
   const { permission, requestPermission, isSubscribing } = useHandleSubscription();
   const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
@@ -120,7 +122,7 @@ export function PwaInstallCards() {
                 <p>App has been installed successfully</p>
                 <p>Open the app and finish its setup.</p>
 
-                <Button variant="dappnode" href={pwaAppSubtabUrl} {...newTabProps}>
+                <Button variant="dappnode" href={pwaSubtabUrl} {...newTabProps}>
                   Finish Setup in App{" "}
                 </Button>
               </div>
@@ -132,12 +134,12 @@ export function PwaInstallCards() {
             )}
           </Card>
         </div>
-        {pwaAppSubtabUrl && showQrCode() && (
+        {pwaSubtabUrl && showQrCode() && (
           <div className="pwa-install-cards-container">
             <h5>Install app on another mobile device</h5>
             <Card className="pwa-install-card">
               <p>Scan the QR code below to install Dappnode's mobile app.</p>
-              <QrCode width={"200px"} url={pwaAppSubtabUrl} />
+              <QrCode width={"200px"} url={pwaSubtabUrl} />
             </Card>
           </div>
         )}
