@@ -9,7 +9,7 @@ self.addEventListener("push", (event) => {
   const title = data.title || "New Notification";
   const options = {
     body: data.body || "You have a new message.",
-    icon: data.icon || "/favicon.svg",
+    icon: data.icon || "/favicon.ico",
     badge: "/dn-badge.svg", // mobile notifiation topbar
     data: {
       url: data.callToAction?.url || "/", // To be used on click
