@@ -10,6 +10,7 @@ import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import "./devicesSubs.scss";
+import newTabProps from "utils/newTabProps";
 
 export function DevicesSubs() {
   const {
@@ -34,16 +35,11 @@ export function DevicesSubs() {
           {isPwa && permission ? (
             permission === "denied" ? (
               <div>
-                <p>
-                  To receive notifications in your device, it's mandatory granting the notification permission in your
-                  App.
-                </p>
-                <p>
-                  Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
-                </p>
-
-                <Button variant="dappnode" onClick={requestPermission}>
-                  Grant permission
+                <p>Notifications permission denied.</p>
+                <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
+                {/* TODO: Include link to docs on how install PWA manually. */}
+                <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+                  Check Docs
                 </Button>
               </div>
             ) : permission === "default" ? (
