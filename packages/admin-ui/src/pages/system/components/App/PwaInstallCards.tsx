@@ -32,23 +32,25 @@ export function PwaInstallCards() {
 
   return (
     <div>
-      <AlertDismissible variant="info">
-        <div className="pwa-vpn-info">
-          <div>
-            <h5>Configure VPN connection</h5>
+      {!isPwa && (
+        <AlertDismissible variant="info">
+          <div className="pwa-vpn-info">
             <div>
-              To connect to the Dappnode App from outside the Dappnode-Wifi network, its mandatory to set a VPN
-              connection.
-              <br />
-              We highly encourage to set a VPN connection on your preferred device.
+              <h5>Configure VPN connection</h5>
+              <div>
+                To connect to the Dappnode App from outside the Dappnode-Wifi network, its mandatory to set a VPN
+                connection.
+                <br />
+                We highly encourage to set a VPN connection on your preferred device.
+              </div>
             </div>
-          </div>
 
-          <Button variant="dappnode" onClick={() => navigate("/" + defaultVpnUrl)}>
-            Configure VPN
-          </Button>
-        </div>
-      </AlertDismissible>
+            <Button variant="dappnode" onClick={() => navigate("/" + defaultVpnUrl)}>
+              Configure VPN
+            </Button>
+          </div>
+        </AlertDismissible>
+      )}
       {!deviceLoading && browser !== "Chrome" && (
         <AlertDismissible variant="warning">
           <div className="pwa-vpn-info">
@@ -96,17 +98,17 @@ export function PwaInstallCards() {
                     Check Docs
                   </Button>
                 </div>
+              ) : permission === "granted" && isSubscribing ? (
+                <Loading steps={["Subscribing device"]} />
               ) : (
-                permission === "granted" && isSubscribing ? <Loading steps={['Subscribing device']} />:(
-                  <div>
-                    <p>Your App is successfully configured!</p>
+                <div>
+                  <p>Your App is successfully configured!</p>
 
-                    <p>You can now manage notifications for your devices in the Notifications tab.</p>
-                    <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
-                      Manage Devices
-                    </Button>
-                  </div>
-                )
+                  <p>You can now manage notifications for your devices in the Notifications tab.</p>
+                  <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
+                    Manage Devices
+                  </Button>
+                </div>
               )
             ) : canInstall ? (
               <div>
