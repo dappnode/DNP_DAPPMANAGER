@@ -2,43 +2,36 @@ import { PackageContainer, PortToOpen, PortMapping } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { readManifestIfExists } from "@dappnode/utils";
-import { listPackages } from "@dappnode/dockerapi";
 
-export async function shouldAddPort(port: PortMapping, container: PackageContainer): Promise<boolean> {
-  const packages = await listPackages();
-  const dnp = packages.find((dnp) => dnp.dnpName === container.dnpName);
-  if (!dnp) return false;
-
-  const manifest = readManifestIfExists(dnp);
+export function shouldAddPort(port: PortMapping, container: PackageContainer): boolean {
+  const manifest = readManifestIfExists(container.dnpName);
   if (manifest && manifest.upnpDisable) {
     if (Array.isArray(manifest.upnpDisable)) {
       if (port.host && manifest.upnpDisable.includes(port.host)) {
-        logs.debug(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
+        logs.info(`UPnP disabled for port ${port.host} of ${manifest.name} package`);
         return false; // Skip this port if it's in the disable list
       }
     } else if (manifest.upnpDisable === true) {
       // It's a boolean true, skip all ports
-      logs.debug(`UPnP disabled for ${manifest.name} package`);
+      logs.info(`UPnP disabled for ${manifest.name} package`);
       return false;
     }
   }
   return true;
 }
 
-export async function getPortsToOpen(containers: PackageContainer[], _shouldAddPort?: boolean): Promise<PortToOpen[]> {
+export function getPortsToOpen(containers: PackageContainer[]): PortToOpen[] {
   // Aggreate ports with an object form to prevent duplicates
   const portsToOpen = new Map<string, PortToOpen>();
 
-  const addPortToOpen = async (port: PortMapping, container: PackageContainer): Promise<void> => {
-    if (_shouldAddPort || (await shouldAddPort(port, container))) {
-      if (port.host) {
-        portsToOpen.set(`${port.host}-${port.protocol}`, {
-          protocol: port.protocol,
-          portNumber: port.host,
-          serviceName: container.serviceName,
-          dnpName: container.dnpName
-        });
-      }
+  const addPortToOpen = (port: PortMapping, container: PackageContainer): void => {
+    if (shouldAddPort(port, container) && port.host) {
+      portsToOpen.set(`${port.host}-${port.protocol}`, {
+        protocol: port.protocol,
+        portNumber: port.host,
+        serviceName: container.serviceName,
+        dnpName: container.dnpName
+      });
     }
   };
 

@@ -1,9 +1,10 @@
 import "mocha";
 import { expect } from "chai";
-import { PackageContainer, PortProtocol } from "@dappnode/types";
-// imports for typings
+import { PackageContainer, PortProtocol, Manifest } from "@dappnode/types";
 import { mockContainer } from "../testUtils.js";
 import { getPortsToOpen } from "../../src/natRenewal/getPortsToOpen.js";
+import fs from "fs";
+import path from "path";
 import { ComposeEditor } from "@dappnode/dockercompose";
 
 describe("daemons > natRenewal > getPortsToOpen", () => {
@@ -71,7 +72,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     compose.writeTo(ComposeEditor.getComposePath(stoppedDnp, false));
 
     const containersListed = await listContainers();
-    const portsToOpen = await getPortsToOpen(containersListed, true);
+    const portsToOpen = getPortsToOpen(containersListed);
 
     expect(portsToOpen).to.deep.equal([
       // From "admin.dnp.dappnode.eth"
@@ -144,7 +145,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
     // }
 
     const containers = await listContainers();
-    const portsToOpen = await getPortsToOpen(containers, true);
+    const portsToOpen = getPortsToOpen(containers);
     expect(portsToOpen).to.deep.equal([
       // Should return only the admin's ports and ignore the other DNP's
       // From "admin.dnp.dappnode.eth"
@@ -155,5 +156,232 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
         serviceName: "mock-dnp.dnp.dappnode.eth"
       }
     ]);
+  });
+
+  describe("upnpDisable functionality", () => {
+    beforeEach(() => {
+      try {
+        if (fs.existsSync("./dnp_repo")) {
+          fs.rmSync("./dnp_repo", { recursive: true, force: true });
+        }
+      } catch (e) {
+      }
+    });
+
+    afterEach(() => {
+      try {
+        if (fs.existsSync("./dnp_repo")) {
+          fs.rmSync("./dnp_repo", { recursive: true, force: true });
+        }
+      } catch (e) {
+      }
+    });
+
+    function createTestManifest(dnpName: string, manifest: Manifest): void {
+      const dnpDir = path.join("./dnp_repo", dnpName);
+      if (!fs.existsSync(dnpDir)) {
+        fs.mkdirSync(dnpDir, { recursive: true });
+      }
+      const manifestPath = path.join(dnpDir, "dappnode_package.json");
+      
+      const dir = path.dirname(manifestPath);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      
+      fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+    }
+
+    it("Should exclude all ports when upnpDisable is true", () => {
+      const dnpName = "test-disable-all.dnp.dappnode.eth";
+      const manifest: Manifest = {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: true
+      };
+
+      createTestManifest(dnpName, manifest);
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          isCore: false,
+          dnpName,
+          ports: [
+            { container: 8545, host: 8545, protocol: PortProtocol.TCP },
+            { container: 30303, host: 30303, protocol: PortProtocol.UDP }
+          ],
+          running: true
+        }
+      ];
+
+      const portsToOpen = getPortsToOpen(containers);
+      expect(portsToOpen).to.deep.equal([]);
+    });
+
+    it("Should exclude specific ports when upnpDisable is an array", () => {
+      const dnpName = "test-disable-specific.dnp.dappnode.eth";
+      const manifest: Manifest = {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: [8545] // Only disable port 8545
+      };
+
+      createTestManifest(dnpName, manifest);
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          isCore: false,
+          dnpName,
+          ports: [
+            { container: 8545, host: 8545, protocol: PortProtocol.TCP }, // Should be excluded
+            { container: 30303, host: 30303, protocol: PortProtocol.UDP } // Should be included
+          ],
+          running: true
+        }
+      ];
+
+      const portsToOpen = getPortsToOpen(containers);
+      expect(portsToOpen).to.deep.equal([
+        {
+          dnpName,
+          protocol: "UDP",
+          portNumber: 30303,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        }
+      ]);
+    });
+
+    it("Should include all ports when upnpDisable is false", () => {
+      const dnpName = "test-upnp-enabled.dnp.dappnode.eth";
+      const manifest: Manifest = {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: false
+      };
+
+      createTestManifest(dnpName, manifest);
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          isCore: false,
+          dnpName,
+          ports: [
+            { container: 8545, host: 8545, protocol: PortProtocol.TCP },
+            { container: 30303, host: 30303, protocol: PortProtocol.UDP }
+          ],
+          running: true
+        }
+      ];
+
+      const portsToOpen = getPortsToOpen(containers);
+      expect(portsToOpen).to.deep.equal([
+        {
+          dnpName,
+          protocol: "TCP",
+          portNumber: 8545,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        },
+        {
+          dnpName,
+          protocol: "UDP",
+          portNumber: 30303,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        }
+      ]);
+    });
+
+    it("Should include all ports when upnpDisable is not defined", () => {
+      const dnpName = "test-no-upnp-setting.dnp.dappnode.eth";
+      const manifest: Manifest = {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT"
+        // upnpDisable not defined
+      };
+
+      createTestManifest(dnpName, manifest);
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          isCore: false,
+          dnpName,
+          ports: [
+            { container: 8545, host: 8545, protocol: PortProtocol.TCP },
+            { container: 30303, host: 30303, protocol: PortProtocol.UDP }
+          ],
+          running: true
+        }
+      ];
+
+      const portsToOpen = getPortsToOpen(containers);
+      expect(portsToOpen).to.deep.equal([
+        {
+          dnpName,
+          protocol: "TCP",
+          portNumber: 8545,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        },
+        {
+          dnpName,
+          protocol: "UDP",
+          portNumber: 30303,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        }
+      ]);
+    });
+
+    it("Should handle multiple ports in upnpDisable array", () => {
+      const dnpName = "test-multiple-disabled.dnp.dappnode.eth";
+      const manifest: Manifest = {
+        name: dnpName,
+        version: "1.0.0",
+        description: "Test package",
+        type: "service",
+        license: "MIT",
+        upnpDisable: [8545, 30303, 9000] // Disable multiple ports
+      };
+
+      createTestManifest(dnpName, manifest);
+
+      const containers: PackageContainer[] = [
+        {
+          ...mockContainer,
+          isCore: false,
+          dnpName,
+          ports: [
+            { container: 8545, host: 8545, protocol: PortProtocol.TCP }, // Should be excluded
+            { container: 30303, host: 30303, protocol: PortProtocol.UDP }, // Should be excluded
+            { container: 9000, host: 9000, protocol: PortProtocol.TCP }, // Should be excluded
+            { container: 3000, host: 3000, protocol: PortProtocol.TCP } // Should be included
+          ],
+          running: true
+        }
+      ];
+
+      const portsToOpen = getPortsToOpen(containers);
+      expect(portsToOpen).to.deep.equal([
+        {
+          dnpName,
+          protocol: "TCP",
+          portNumber: 3000,
+          serviceName: "mock-dnp.dnp.dappnode.eth"
+        }
+      ]);
+    });
   });
 });
