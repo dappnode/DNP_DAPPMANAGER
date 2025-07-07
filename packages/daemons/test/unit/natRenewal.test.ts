@@ -165,6 +165,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
           fs.rmSync("./dnp_repo", { recursive: true, force: true });
         }
       } catch (e) {
+          /* empty */
       }
     });
 
@@ -174,6 +175,7 @@ describe("daemons > natRenewal > getPortsToOpen", () => {
           fs.rmSync("./dnp_repo", { recursive: true, force: true });
         }
       } catch (e) {
+          /* empty */
       }
     });
 
