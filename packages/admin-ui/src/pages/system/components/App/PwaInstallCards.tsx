@@ -36,7 +36,7 @@ export function PwaInstallCards() {
         <AlertDismissible variant="info">
           <div className="pwa-vpn-info">
             <div>
-              <h5>Configure VPN connection</h5>
+              <h5>Configure VPN connection before installing the app</h5>
               <div>
                 To connect to the Dappnode App from outside the Dappnode-Wifi network, its mandatory to set a VPN
                 connection.
