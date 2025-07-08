@@ -7,7 +7,7 @@ export function Subscriptions() {
   return (
     <div className="subscriptions-container">
       <SubTitle>Device Subscriptions</SubTitle>
-      <p>Manage your device subscriptions for push notifications.</p>
+      <p>Manage your device subscriptions for push notifications. <b>TODO: Learn more in docs</b></p>
       <PwaRequirementsWrapper
         successComponent={<DevicesSubs />}
         handleRedirectMessage="To manage devices' subscriptions, you will be redirected to a different secure domain. Please, login with your current

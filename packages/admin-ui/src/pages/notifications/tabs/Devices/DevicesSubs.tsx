@@ -1,7 +1,7 @@
 import Card from "components/Card";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { MdBeenhere, MdClose, MdEdit } from "react-icons/md";
-import React, { useState } from "react";
+import { MdBeenhere, MdClose, MdEdit, MdOutgoingMail } from "react-icons/md";
+import React, { useEffect, useRef, useState } from "react";
 import { NotifierSubscription } from "@dappnode/types";
 import Button from "components/Button";
 import { api } from "api";
@@ -9,8 +9,8 @@ import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
-import "./devicesSubs.scss";
 import newTabProps from "utils/newTabProps";
+import "./devicesSubs.scss";
 
 export function DevicesSubs() {
   const {
@@ -81,22 +81,9 @@ export function DevicesSubs() {
       </div>
       <div>
         <h5>Subscribed Devices</h5>
-        <Card>
-          This section displays all devices currently subscribed to push notifications. You can rename each subscription
-          or remove it from the list. <b>Learn more in docs...</b>
-        </Card>
 
         {subscriptionsList && subscriptionsList.length > 0 ? (
           <>
-            <Card
-              style={{ display: "flex", flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
-            >
-              Send notification to all subscribed devices by clicking the "Send notifications"
-              <Button onClick={() => api.notificationsSendSubTest({})} variant="dappnode">
-                Send notifications
-              </Button>
-            </Card>
-
             {subscriptionsList.map((sub, index) => (
               <SubscriptionCard
                 key={index}
@@ -128,6 +115,13 @@ function SubscriptionCard({
 }) {
   const [editAlias, setEditAlias] = useState(false);
   const [newAlias, setNewAlias] = useState(sub.alias);
+  const aliasInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editAlias && aliasInputRef.current) {
+      aliasInputRef.current.focus();
+    }
+  }, [editAlias]);
 
   async function handleUpdateAlias(subEndpoint: string = sub.endpoint || "", alias: string = newAlias) {
     try {
@@ -144,6 +138,7 @@ function SubscriptionCard({
       <div className="alias-info">
         {editAlias ? (
           <input
+            ref={aliasInputRef}
             type="text"
             value={newAlias}
             onChange={(e) => setNewAlias(e.target.value)}
@@ -157,12 +152,14 @@ function SubscriptionCard({
             }}
           />
         ) : (
-          <span onClick={() => setEditAlias(true)}>{sub.alias}</span>
-        )}
-        {browserSubEndpoint && browserSubEndpoint === sub.endpoint && (
-          <OverlayTrigger overlay={<Tooltip id="current-device">Current Device</Tooltip>} placement="top">
-            <MdBeenhere className="current-tag" />
-          </OverlayTrigger>
+          <>
+            <span>{sub.alias}</span>
+            {browserSubEndpoint && browserSubEndpoint === sub.endpoint && (
+              <OverlayTrigger overlay={<Tooltip id="current-device">Current Device</Tooltip>} placement="top">
+                <MdBeenhere className="current-tag" />
+              </OverlayTrigger>
+            )}
+          </>
         )}
       </div>
       <div className="btns-container">
@@ -181,9 +178,11 @@ function SubscriptionCard({
           </>
         ) : (
           <>
-            <Button onClick={() => api.notificationsSendSubTest({ endpoint: sub.endpoint })} variant="outline-dappnode">
-              Send notification
-            </Button>{" "}
+            <OverlayTrigger overlay={<Tooltip id="rename-sub">Send test notification</Tooltip>} placement="top">
+              <div className="icon-btns" onClick={() => api.notificationsSendSubTest({ endpoint: sub.endpoint })}>
+                <MdOutgoingMail />
+              </div>
+            </OverlayTrigger>
             <OverlayTrigger overlay={<Tooltip id="rename-sub">Rename subscription</Tooltip>} placement="top">
               <div className="icon-btns" onClick={() => setEditAlias(true)}>
                 <MdEdit />

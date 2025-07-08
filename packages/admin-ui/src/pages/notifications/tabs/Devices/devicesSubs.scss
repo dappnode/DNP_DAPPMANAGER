@@ -25,6 +25,7 @@
     @media (max-width: 40rem) {
       flex-direction: column;
       gap: 10px;
+      align-items: flex-end;
     }
 
     .alias-info {
@@ -36,6 +37,13 @@
       }
       @media (max-width: 40rem) {
         width: 100%;
+        input {
+          width: 100%;
+        }
+      }
+
+      .current-tag{
+        margin-left: 5px;
       }
     }
 
