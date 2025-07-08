@@ -1,8 +1,8 @@
 // src/hooks/usePushSubscription.ts
 import { api, useApi } from "api";
-import { UAParser } from "ua-parser-js";
 import { useState, useEffect, useCallback } from "react";
 import { Category, NotifierSubscription, Priority, Status } from "@dappnode/types";
+import useDeviceInfo from "./useDeviceInfo";
 
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
@@ -28,6 +28,9 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const vapidKeyReq = useApi.notificationsGetVapidKey();
   const subscriptionsReq = useApi.notificationsGetSubscriptions();
   const revalidateSubs = () => subscriptionsReq.revalidate();
+
+  const { device, browser, os } = useDeviceInfo();
+  console.log("Device alias HOOK:", `${device} - ${browser} on ${os}`);
 
   useEffect(() => {
     const getSub = async () => {
@@ -125,17 +128,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       setSubscription(newSub);
       console.log("New subscription:", newSub);
 
-      // Build a human-readable alias from user agent
-      const parser = new UAParser();
-      const { device, browser, os } = parser.getResult();
-      const vendorModel = device.vendor && device.model ? `${device.vendor} ${device.model}` : "";
-      const typeLabel = device.type || "desktop";
-      const rawLabel = vendorModel || typeLabel;
-      const deviceLabel = rawLabel.charAt(0).toUpperCase() + rawLabel.slice(1);
-      const browserName = browser.name || "";
-      const osName = os.name || "";
-      const alias = `${deviceLabel} - ${browserName}  on ${osName}`;
-
+      const alias = `${device} - ${browser} ${browser === "Unknown" && "Browser"} on ${os} ${os === "Unknown" && "OS"}`;
       // Attach alias and send the subscription object to notifier
       const newSubJson = newSub.toJSON();
       if (!newSubJson.endpoint || !newSubJson.keys) {
@@ -165,7 +158,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       });
     } catch (err) {
       console.error("Subscribe error:", err);
-    }finally{
+    } finally {
       setIsSubscribing(false);
     }
   }, [vapidKey]);
