@@ -89,7 +89,7 @@ async function ensureDockerNetworkConfig({
       if (pkg.dnpName !== params.dappmanagerDnpName)
         await dockerComposeUpPackage({
           composeArgs: { dnpName: pkg.dnpName },
-          upAll: true,
+          upAll: false,
           dockerComposeUpOptions: { noRecreate: true }
         }).catch((error) =>
           logs.error(`Failed to run docker compose up --no-recreate for package ${pkg.dnpName}: ${error.message}`)
