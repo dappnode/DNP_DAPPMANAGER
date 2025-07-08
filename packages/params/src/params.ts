@@ -105,6 +105,9 @@ export const params = {
   HTTPS_PORTAL_MAIN_SERVICE: "https.dnp.dappnode.eth",
   HTTPS_PORTAL_LOCAL_PROXYING_ENVNAME: "LOCAL_PROXYING",
 
+  // Tailscale params
+  TAILSCALE_DNP_NAME: "tailscale.dnp.dappnode.eth",
+
   // Wireguard params
   WIREGUARD_DNP_NAME: "wireguard.dnp.dappnode.eth",
   WIREGUARD_ISCORE: true,
