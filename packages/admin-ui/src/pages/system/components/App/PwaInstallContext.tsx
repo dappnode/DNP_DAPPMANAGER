@@ -53,6 +53,7 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
     // 3) detect standalone mode (Chrome + iOS)
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
     const updateIsPwa = () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const navStandalone = (window.navigator as any)?.standalone === true;
       setIsPwa(mediaQuery.matches || navStandalone);
     };

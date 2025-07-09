@@ -22,7 +22,7 @@ export function PwaInstallCards() {
   const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
-  const showQrCode = (): Boolean => {
+  const showQrCode = (): boolean => {
     if (isPwa) {
       return permission === "granted";
     }
