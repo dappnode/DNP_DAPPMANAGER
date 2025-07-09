@@ -30,7 +30,6 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const revalidateSubs = () => subscriptionsReq.revalidate();
 
   const { device, browser, os } = useDeviceInfo();
-  console.log("Device alias HOOK:", `${device} - ${browser} on ${os}`);
 
   useEffect(() => {
     const getSub = async () => {
@@ -128,7 +127,9 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       setSubscription(newSub);
       console.log("New subscription:", newSub);
 
-      const alias = `${device} - ${browser} ${browser === "Unknown" && "Browser"} on ${os} ${os === "Unknown" && "OS"}`;
+      const alias = `${device} - ${browser} ${browser === "Unknown" ? "Browser" : ""}on ${os} ${
+        os === "Unknown" ? "OS" : ""
+      }`;
       // Attach alias and send the subscription object to notifier
       const newSubJson = newSub.toJSON();
       if (!newSubJson.endpoint || !newSubJson.keys) {
