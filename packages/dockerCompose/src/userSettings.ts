@@ -10,7 +10,14 @@ import {
   parseServiceNetworks
 } from "./index.js";
 import { parseEnvironment } from "@dappnode/utils";
-import { Compose, ComposeServiceNetworks, PortMapping, UserSettings, VolumeMapping } from "@dappnode/types";
+import {
+  Compose,
+  ComposeServiceNetwork,
+  ComposeServiceNetworks,
+  PortMapping,
+  UserSettings,
+  VolumeMapping
+} from "@dappnode/types";
 import { cleanCompose, isOmitable } from "./clean.js";
 import { stringifyVolumeMappings } from "./volumes.js";
 import { readContainerLabels, writeDefaultsToLabels } from "./labelsDb.js";
@@ -159,13 +166,36 @@ export function applyUserSettings(
       })
     );
 
-    // docker aliases must be unique
-    // merge base and user networks, then remove any empty/nullish props (e.g. empty ipv4_address)
-    const mergedNetworks = mergeWith(networks, userSetNetworks, (value1, value2) =>
-      mergeWith(value1, value2, (subvalue1, subvalue2) => union(subvalue1, subvalue2))
-    );
+    // Function to ensure types are correct and enforce Compose file compatibility
+    const normalizeNetwork = (network: ComposeServiceNetwork): ComposeServiceNetwork => {
+      return {
+        // Always keep the ipv4_address from the network (base network)
+        ipv4_address: network.ipv4_address || undefined, // Explicitly set undefined if IP is not present
+
+        // Ensure aliases is an array of strings (empty array is valid in Compose)
+        aliases: Array.isArray(network.aliases) ? network.aliases : []
+      };
+    };
+
+    // Merge base and user networks, ensuring proper type for ipv4_address and aliases
+    const mergedNetworks = mergeWith(networks, userSetNetworks, (value1, value2, key) => {
+      // If the key is 'ipv4_address', always keep the value from the base network (value1)
+      if (key === "ipv4_address") {
+        return value1; // Always keep the base network's ipv4_address
+      }
+
+      // For aliases, merge them by combining the user and base network aliases
+      if (key === "aliases") {
+        return union(value1, value2); // Merge aliases from both networks
+      }
+
+      // For other properties, just return value1 (base network config is preferred)
+      return value1;
+    });
+
+    // Normalize networks to ensure types are correct and compatible with Compose
     const nextNetworks = mapValues(mergedNetworks, (config) =>
-      omitBy(config, (v) => v == null || (Array.isArray(v) && v.length === 0))
+      omitBy(normalizeNetwork(config), (v) => v == null || (Array.isArray(v) && v.length === 0))
     );
 
     // ##### <DEPRECATED> Kept for legacy compatibility
