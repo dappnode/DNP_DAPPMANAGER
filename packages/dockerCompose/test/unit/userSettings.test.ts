@@ -653,7 +653,7 @@ describe("applyUserSettings - network merging logic", () => {
     expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
   });
 
-  it.only("should include user network and base network if both are defined in each", () => {
+  it("should include user network and base network if both are defined in each", () => {
     const serviceName = "test.dnp.dappnode.eth";
     const baseCompose = () => ({
       version: "3.5",
