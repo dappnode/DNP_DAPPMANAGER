@@ -652,4 +652,51 @@ describe("applyUserSettings - network merging logic", () => {
     const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
     expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
   });
+
+  it.only("should include user network and base network if both are defined in each", () => {
+    const serviceName = "test.dnp.dappnode.eth";
+    const baseCompose = () => ({
+      version: "3.5",
+      services: {
+        [serviceName]: {
+          image: "test:latest",
+          container_name: "DAppNodePackage-test",
+          networks: {
+            net1: {
+              ipv4_address: "10.0.0.6",
+              aliases: ["alias3", "alias4"]
+            }
+          }
+        }
+      },
+      networks: { net1: {} }
+    });
+
+    const userSettings = {
+      networks: {
+        rootNetworks: { net1: {}, net2: {} },
+        serviceNetworks: {
+          [serviceName]: {
+            net2: {
+              ipv4_address: "10.0.0.5",
+              aliases: ["alias1", "alias2"]
+            }
+          }
+        }
+      }
+    };
+
+    const compose = baseCompose();
+    const result = applyUserSettingsTest(compose, userSettings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({
+      net1: {
+        ipv4_address: "10.0.0.6",
+        aliases: ["alias3", "alias4"]
+      },
+      net2: {
+        ipv4_address: "10.0.0.5",
+        aliases: ["alias1", "alias2"]
+      }
+    });
+  });
 });

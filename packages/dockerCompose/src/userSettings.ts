@@ -189,25 +189,25 @@ export function applyUserSettings(
       const merged: ComposeServiceNetworksObj = {};
 
       // Iterate over the keys of the base networks
-      for (const key in base) {
-        merged[key] = { ...base[key] }; // Start with a shallow copy of the base network
+      for (const networkName in base) {
+        merged[networkName] = { ...base[networkName] }; // Start with a shallow copy of the base network
 
-        if (user[key]) {
+        if (user[networkName]) {
           // If the user has provided overrides for this network, merge them
-          for (const subKey in user[key]) {
+          for (const subKey in user[networkName]) {
             if (subKey === "ipv4_address") {
-              merged[key].ipv4_address = base[key].ipv4_address; // Always take base ipv4_address
+              merged[networkName].ipv4_address = base[networkName].ipv4_address; // Always take base ipv4_address
             } else if (subKey === "aliases") {
               // Merge and deduplicate aliases
-              const baseAliases = base[key].aliases || [];
-              const userAliases = user[key].aliases || [];
-              merged[key].aliases = Array.from(new Set([...baseAliases, ...userAliases]));
+              const baseAliases = base[networkName].aliases || [];
+              const userAliases = user[networkName].aliases || [];
+              merged[networkName].aliases = Array.from(new Set([...baseAliases, ...userAliases]));
             }
           }
         } else {
           // If user doesn't have settings for the network, just copy the base network
-          if (!merged[key].ipv4_address && base[key].ipv4_address) {
-            merged[key].ipv4_address = base[key].ipv4_address;
+          if (!merged[networkName].ipv4_address && base[networkName].ipv4_address) {
+            merged[networkName].ipv4_address = base[networkName].ipv4_address;
           }
         }
       }
