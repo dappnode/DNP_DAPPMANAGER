@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge";
+type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera";
 type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
 
 const useDeviceInfo = () => {
@@ -23,6 +23,8 @@ const useDeviceInfo = () => {
       browser = "Firefox";
     } else if (/Safari/i.test(userAgent) && !/Chrome/i.test(userAgent)) {
       browser = "Safari";
+    } else if (/OPR/i.test(userAgent) || /Opera/i.test(userAgent)) {
+      browser = "Opera";
     }
 
     let os: OS = "Unknown";
@@ -44,7 +46,14 @@ const useDeviceInfo = () => {
     setLoading(false);
   }, []);
 
-  return { isMobile, browser, os, loading, device: isMobile ? "Mobile" : "Desktop" };
+  return {
+    isMobile,
+    browser,
+    os,
+    loading,
+    device: isMobile ? "Mobile" : "Desktop",
+    isChromium: browser === "Chrome" || browser === "Edge" || browser === "Opera"
+  };
 };
 
 export default useDeviceInfo;

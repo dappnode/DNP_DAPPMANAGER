@@ -6,20 +6,21 @@ import { relativePath as defaultVpnUrl } from "pages/vpn";
 import { pathName as notisPathName, subPaths as notisSubpaths } from "pages/notifications";
 import { useNavigate } from "react-router-dom";
 import { usePwaInstall } from "./PwaInstallContext";
-import "./pwaInstallCards.scss";
 import { AlertDismissible } from "components/AlertDismissible";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
 import useDeviceInfo from "hooks/PWA/useDeviceInfo";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
+import { MdIosShare } from "react-icons/md";
+import "./pwaInstallCards.scss";
 
 export function PwaInstallCards() {
   const navigate = useNavigate();
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
   const { permission, requestPermission, isSubscribing, permissionLoading } = useHandleSubscription();
-  const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
+  const { isMobile, browser, loading: deviceLoading, isChromium } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
   const showQrCode = (): boolean => {
@@ -84,7 +85,7 @@ export function PwaInstallCards() {
                     App.
                   </p>
                   <p>
-                    Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
+                    Click the button below and then click <b>Allow</b> in the pop-up modal.
                   </p>
 
                   <Button variant="dappnode" onClick={requestPermission}>
@@ -114,7 +115,9 @@ export function PwaInstallCards() {
               )
             ) : canInstall ? (
               <div>
-                <p>Click the button below, then click 'Install' in the pop-up modal.</p>
+                <p>
+                  Click the button below, then click <b>Install</b> in the pop-up modal.
+                </p>
                 <Button variant="dappnode" onClick={promptInstall} disabled={!canInstall}>
                   Install App
                 </Button>
@@ -130,11 +133,37 @@ export function PwaInstallCards() {
                   Finish Setup in App{" "}
                 </Button>
               </div>
-            ) : (
+            ) : browser === "Safari" ? (
+              isMobile ? (
+                <div>
+                  <p>
+                    To install the App in Safari click the <MdIosShare /> icon at the bottom of the screen <br />
+                    and scroll down in the options and tap <b>Add to Home Screen</b>
+                  </p>
+
+                  <p>
+                    After that, open the App and navigate to <i>System &gt; App</i> to finish the App setup
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <p>
+                    To install the App in Safari click the <MdIosShare /> icon in the Safari toolbar and click{" "}
+                    <b>Add to Dock</b>
+                  </p>
+
+                  <p>
+                    After that, open the App and navigate to <i>System &gt; App</i> to finish the setup
+                  </p>
+                </div>
+              )
+            ) : isChromium ? (
               <div>
-                <p>App already installed or not available for this browser</p>
-                <p>If installed, open your app in your device home screen.</p>
+                <p>App already installed</p>
+                <p>Open your app in your device home screen to continue.</p>
               </div>
+            ) : (
+              <div>App not available for this browser.</div>
             )}
           </Card>
         </div>
