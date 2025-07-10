@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /* public/sw.js */
 
 // Push: display incoming push messages
@@ -52,7 +53,7 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-const CACHE_NAME = "dappmanager-pwa-v1";
+const CACHE_NAME = "dappmanager-pwa-v0";
 const OFFLINE_URLS = [
   // Review the list of URLs to cache
   "/index.html",
@@ -62,8 +63,10 @@ const OFFLINE_URLS = [
   "/icon-256x256.png",
   "/icon-384x384.png",
   "/icon-512x512.png",
+  "/vpnoff.png",
 
-  "/offline.html"
+  "/offline.html",
+  "/vpnoff.html"
 ];
 
 // Install: cache essential assets
@@ -89,22 +92,30 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
-self.addEventListener("fetch", (event) => {  if (event.request.method !== "GET" || event.request.mode !== "navigate") {
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET" || event.request.mode !== "navigate") {
     return;
   }
 
-  event.respondWith((async () => {
-    try {
-      const networkResponse = await fetch(event.request);
+  event.respondWith(
+    (async () => {
+      try {
+        const networkResponse = await fetch(event.request);
 
-      // If we get any !ok serve the offline => maybe add a cache html for 403 (VPN)
-      if (!networkResponse.ok) {
+        // If PWA domain returns 403, return VPN offline page
+        if (networkResponse.status === 403) {
+          return caches.match("/vpnoff.html");
+        }
+
+        // If we get any !ok serve the offline => maybe add a cache html for 403 (VPN)
+        if (!networkResponse.ok) {
+          return caches.match("/offline.html");
+        }
+
+        return networkResponse;
+      } catch (err) {
         return caches.match("/offline.html");
       }
-
-      return networkResponse;
-    } catch (err) {
-      return caches.match("/offline.html");
-    }
-  })());
+    })()
+  );
 });
