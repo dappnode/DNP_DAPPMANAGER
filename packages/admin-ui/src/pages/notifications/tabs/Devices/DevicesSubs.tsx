@@ -21,6 +21,7 @@ export function DevicesSubs() {
     deleteSubscription,
     requestPermission,
     permission,
+    permissionLoading,
     subscribeBrowser,
     revalidateSubs
   } = useHandleSubscription();
@@ -33,7 +34,9 @@ export function DevicesSubs() {
         <h5>Current Device</h5>
         <Card className="current-device-card">
           {isPwa && permission ? (
-            permission === "denied" ? (
+            permissionLoading ? (
+              <Loading steps={["Waiting for permissions approval"]} />
+            ) : permission === "denied" ? (
               <div>
                 <p>Notifications permission denied.</p>
                 <p>Grant notification permission for this App in your browser settings to receive notifications.</p>

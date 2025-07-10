@@ -18,7 +18,7 @@ export function PwaInstallCards() {
   const navigate = useNavigate();
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
-  const { permission, requestPermission, isSubscribing } = useHandleSubscription();
+  const { permission, requestPermission, isSubscribing, permissionLoading } = useHandleSubscription();
   const { isMobile, browser, loading: deviceLoading } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
@@ -75,7 +75,9 @@ export function PwaInstallCards() {
           <h5>Install app in this device</h5>
           <Card className="pwa-install-card">
             {isPwa ? (
-              permission && permission === "default" ? (
+              permission && permissionLoading ? (
+                <Loading steps={["Waiting for permissions approval"]} />
+              ) : permission === "default" ? (
                 <div>
                   <p>
                     To receive notifications in your device, it's mandatory granting the notification permission in your

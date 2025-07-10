@@ -10,6 +10,7 @@ interface UseHandleSubscriptionResult {
   isSubscribing: boolean;
   isSubInNotifier: boolean;
   permission: NotificationPermission | null;
+  permissionLoading: boolean;
   requestPermission: () => void;
   subscribeBrowser: () => Promise<void>;
   deleteSubscription: (endpoint: string) => Promise<void>;
@@ -22,6 +23,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const [subscriptionsList, setSubscriptionsList] = useState<NotifierSubscription[] | null>(null);
   const [isSubscribing, setIsSubscribing] = useState<boolean>(false);
   const [isSubInNotifier, setIsSubInNotifier] = useState<boolean>(false);
+  const [permissionLoading, setPermissionLoading] = useState<boolean>(false);
 
   const [permission, setPermission] = useState<NotificationPermission | null>(Notification.permission);
 
@@ -63,6 +65,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   }, [subscription, subscriptionsList]);
 
   const requestPermission = () => {
+    setPermissionLoading(true);
     Notification.requestPermission().then((permission) => {
       setPermission(permission);
       if (permission === "granted" && vapidKey) {
@@ -70,6 +73,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       } else if (permission === "denied") {
         console.error("Notification permission denied");
       }
+      setPermissionLoading(false);
     });
   };
 
@@ -174,6 +178,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
 
   return {
     permission,
+    permissionLoading,
     subscription,
     isSubscribing,
     isSubInNotifier,
