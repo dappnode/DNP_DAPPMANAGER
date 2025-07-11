@@ -166,7 +166,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     } finally {
       setIsSubscribing(false);
     }
-  }, [vapidKey]);
+  }, [vapidKey, device, browser, os]);
 
   function urlBase64ToUint8Array(base64String: string) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
