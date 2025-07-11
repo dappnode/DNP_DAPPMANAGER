@@ -21,7 +21,9 @@ export { fetchRegistry } from "./fetchRegistry.js";
 export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
+export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
 export {
+  notificationsSendCustom,
   notificationsGetAllEndpoints,
   notificationsGetBanner,
   notificationsUpdateEndpoints,
@@ -31,6 +33,12 @@ export {
   notificationsSetAllSeen,
   notificationSetSeenByCorrelationID,
   notificationsPackageStatus,
+  notificationsGetVapidKey,
+  notificationsGetSubscriptions,
+  notificationsPostSubscription,
+  notificationsUpdateSubAlias,
+  notificationsDeleteSubscription,
+  notificationsSendSubTest
 } from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";

@@ -26,6 +26,7 @@ export interface NotificationPayload {
   errors?: string;
   callToAction?: CallToAction;
   correlationId: string;
+  subscriptionEndpoint?: string;
 }
 
 export interface CallToAction {
@@ -109,4 +110,8 @@ export interface Alert {
   "send-on-resolved": boolean;
   description: string;
   enabled: boolean;
+}
+
+export interface NotifierSubscription extends PushSubscriptionJSON {
+  alias: string;
 }

@@ -382,6 +382,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerLatestVersion: "20.10.8"
   }),
   getCoreVersion: async () => "0.2.92",
+  notificationsSendCustom: async () => {},
   notificationsGetAllEndpoints: async () => {
     return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
   },
@@ -399,8 +400,20 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     isInstalled: false,
     isRunning: false,
     isNotifierRunning: false,
-    servicesNotRunning: [],
+    servicesNotRunning: []
   }),
+  notificationsGetVapidKey: async () => "B3N1b2JzY3JpcHRpb25LZXk6IHNvbWUtdmFwaWQta2V5",
+  notificationsGetSubscriptions: async () => [],
+  notificationsPostSubscription: async () => {},
+  notificationsUpdateSubAlias: async () => {},
+  notificationsDeleteSubscription: async () => {},
+  notificationsSendSubTest: async () => {},
+  pwaUrlGet: async () => "https://pwa.abcdef.dyndns.dappnode.io",
+  pwaRequirementsGet: async () => ({
+    pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
+    httpsDnpInstalled: true,
+    isHttpsRunning: true
+  })
 };
 
 export const calls: Routes = {

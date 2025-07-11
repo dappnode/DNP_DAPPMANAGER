@@ -24,7 +24,7 @@ export default function NotificationsView() {
     return Math.floor(now.getTime() / 1000); // Convert to seconds
   }, []);
 
-  const notificationsCall = useApi.notificationsGetBanner(oneMonthAgoTimestamp);
+  const notificationsCall = useApi.notificationsGetBanner({ timestamp: oneMonthAgoTimestamp });
 
   useEffect(() => {
     if (notificationsCall.data) {
@@ -96,7 +96,7 @@ export function CollapsableBannerNotification({
   const [hasClosed, setHasClosed] = useState(false);
 
   const handleClose = () => {
-    api.notificationSetSeenByCorrelationID(notification.correlationId);
+    api.notificationSetSeenByCorrelationID({ correlationId: notification.correlationId });
     setHasClosed(true);
     onClose();
   };
