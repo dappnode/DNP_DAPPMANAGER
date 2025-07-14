@@ -88,13 +88,13 @@ export class Signer extends StakerComponent {
         serviceNetworks: {
           [serviceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`${serviceName}.${network}.staker.dappnode`]
+              aliases: [`${serviceName}.${network}.staker.dappnode`, `signer.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`${serviceName}.${network}.dncore.dappnode`]
+              aliases: [`${serviceName}.${network}.dncore.dappnode`, `signer.${network}.dncore.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
-              aliases: [`${serviceName}.${network}.dappnode.private`]
+              aliases: [`${serviceName}.${network}.dappnode.private`, `signer.${network}.dappnode.private`]
             }
           }
         }
