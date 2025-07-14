@@ -1,0 +1,54 @@
+.pwa-permissions-modal-bg {
+  z-index: var(--z-index-welcome-dialog);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  -ms-align-items: center;
+  align-items: center;
+
+  .pwa-permissions-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    box-shadow: 0 20px 75px rgba(0, 0, 0, 0.13);
+    gap: 10px;
+
+    .modal-close-btn {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      background: transparent;
+      border: none;
+      font-size: 1.5rem;
+      color: #666;
+      cursor: pointer;
+
+      &:hover {
+        color: black;
+      }
+    }
+  }
+}
+
+#dark {
+  .pwa-permissions-modal-bg {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .pwa-permissions-modal {
+    background: var(--color-dark-card);
+    color: var(--color-dark-maintext);
+    .modal-close-btn {
+      &:hover {
+        color: var(--color-dark-maintext);
+      }
+    }
+  }
+}
