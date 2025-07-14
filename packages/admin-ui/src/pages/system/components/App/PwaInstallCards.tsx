@@ -17,7 +17,7 @@ import "./pwaInstallCards.scss";
 
 export function PwaInstallCards() {
   const navigate = useNavigate();
-  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading } = usePwaInstall();
+  const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
   const { permission, requestPermission, isSubscribing, permissionLoading } = useHandleSubscription();
   const { isMobile, browser, loading: deviceLoading, isChromium } = useDeviceInfo();
@@ -52,6 +52,7 @@ export function PwaInstallCards() {
           </div>
         </AlertDismissible>
       )}
+
       {!deviceLoading && browser !== "Chrome" && (
         <AlertDismissible variant="warning">
           <div className="pwa-vpn-info">
@@ -71,6 +72,19 @@ export function PwaInstallCards() {
           </div>
         </AlertDismissible>
       )}
+
+      {isFullscreenOn && (
+        <AlertDismissible variant="warning">
+          <div className="pwa-vpn-info">
+            <div>
+              <h5>Exit fullscreen mode</h5>
+              To use and install the Dappnode App properly, please exit fullscreen mode. Some features may not work as
+              expected while in fullscreen.
+            </div>
+          </div>
+        </AlertDismissible>
+      )}
+
       <div className="pwa-install-section">
         <div className="pwa-install-cards-container">
           <h5>Install app in this device</h5>

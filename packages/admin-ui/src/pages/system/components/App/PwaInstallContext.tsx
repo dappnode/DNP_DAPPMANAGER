@@ -15,6 +15,7 @@ interface PwaInstallContextValue {
   canInstall: boolean;
   installLoading: boolean;
   wasInstalled: boolean;
+  isFullscreenOn: boolean;
   promptInstall: () => Promise<void>;
 }
 
@@ -23,12 +24,14 @@ const PwaInstallContext = createContext<PwaInstallContextValue>({
   canInstall: false,
   installLoading: false,
   wasInstalled: false,
+  isFullscreenOn: false,
   promptInstall: async () => {}
 });
 
 export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isPwa, setIsPwa] = useState(false);
+  const [isFullscreenOn, setIsFullscreenOn] = useState(false);
   const [wasInstalled, setWasInstalled] = useState(false);
   const [installLoading, setInstallLoading] = useState(false);
 
@@ -57,6 +60,14 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
     mediaQuery.addEventListener("change", updateIsPwa);
     updateIsPwa();
 
+    // Detect fullscreen display-mode
+    const fullscreenQuery = window.matchMedia("(display-mode: fullscreen)");
+    const updateFullscreen = () => {
+      setIsFullscreenOn(fullscreenQuery.matches);
+    };
+    fullscreenQuery.addEventListener("change", updateFullscreen);
+    updateFullscreen();
+
     // 4) capture the appinstalled event
     const onAppInstalled = () => {
       setInstallLoading(true);
@@ -71,6 +82,7 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstall);
       mediaQuery.removeEventListener("change", updateIsPwa);
+      fullscreenQuery.removeEventListener("change", updateFullscreen);
       window.removeEventListener("appinstalled", onAppInstalled);
     };
   }, []);
@@ -90,6 +102,7 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
         canInstall: deferredPrompt !== null,
         wasInstalled,
         installLoading,
+        isFullscreenOn,
         promptInstall
       }}
     >
