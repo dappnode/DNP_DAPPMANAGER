@@ -10,7 +10,6 @@ import { Accordion } from "react-bootstrap";
 import { MdClose } from "react-icons/md";
 import "./notificationsMain.scss";
 import "./pwaPermissions.scss";
-import Card from "./Card";
 
 export function PwaPermissionsModal() {
   const navigate = useNavigate();
@@ -30,7 +29,7 @@ export function PwaPermissionsModal() {
   return (
     showModal && (
       <div className="pwa-permissions-modal-bg">
-        <Card className="pwa-permissions-modal">
+        <div className="pwa-permissions-modal">
           {!permissionLoading && (
             <button className="modal-close-btn" onClick={() => setShowModal(false)}>
               <MdClose />
@@ -78,7 +77,7 @@ export function PwaPermissionsModal() {
               </Button>
             </>
           )}
-        </Card>{" "}
+        </div>{" "}
       </div>
     )
   );
