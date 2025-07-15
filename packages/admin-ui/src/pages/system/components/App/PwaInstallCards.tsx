@@ -19,7 +19,7 @@ export function PwaInstallCards() {
   const navigate = useNavigate();
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
-  const { permission, requestPermission, isSubscribing, permissionLoading } = useHandleSubscription();
+  const { permission } = useHandleSubscription();
   const { isMobile, browser, loading: deviceLoading, isCompatible } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
@@ -90,43 +90,14 @@ export function PwaInstallCards() {
           <h5>Install app in this device</h5>
           <Card className="pwa-install-card">
             {isPwa ? (
-              permission && permissionLoading ? (
-                <Loading steps={["Waiting for permissions approval"]} />
-              ) : permission === "default" ? (
-                <div>
-                  <p>
-                    To receive notifications in your device, it's mandatory granting the notification permission in your
-                    App.
-                  </p>
-                  <p>
-                    Click the button below and then click <b>Allow</b> in the pop-up modal.
-                  </p>
+              <div>
+                <p>Your App is successfully installed!</p>
 
-                  <Button variant="dappnode" onClick={requestPermission}>
-                    Grant permission
-                  </Button>
-                </div>
-              ) : permission === "denied" ? (
-                <div>
-                  <p>Notifications permission denied.</p>
-                  <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
-                  {/* TODO: Include link to docs on how install PWA manually. */}
-                  <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
-                    Check Docs
-                  </Button>
-                </div>
-              ) : permission === "granted" && isSubscribing ? (
-                <Loading steps={["Subscribing device"]} />
-              ) : (
-                <div>
-                  <p>Your App is successfully configured!</p>
-
-                  <p>You can now manage notifications for your devices in the Notifications tab.</p>
-                  <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
-                    Manage Devices
-                  </Button>
-                </div>
-              )
+                <p>You can now manage notifications for your devices in the Notifications tab.</p>
+                <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
+                  Manage Devices
+                </Button>
+              </div>
             ) : canInstall ? (
               <div>
                 <p>
