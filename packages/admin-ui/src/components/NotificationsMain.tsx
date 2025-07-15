@@ -8,6 +8,7 @@ import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
 import { Accordion } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
+import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
 
 /**
  * Displays banner notifications among all tabs
@@ -123,7 +124,10 @@ export function CollapsableBannerNotification({
             <div className="banner-body">
               <RenderMarkdown source={notification.body} />
               {notification.callToAction && (
-                <NavLink to={notification.callToAction.url} {...(isExternalUrl ? externalUrlProps : {})}>
+                <NavLink
+                  to={resolveDappnodeUrl(notification.callToAction.url, window.location)}
+                  {...(isExternalUrl ? externalUrlProps : {})}
+                >
                   <Button variant={priorityBtnVariants[notification.priority]}>
                     <div className="btn-text">{notification.callToAction.title}</div>
                   </Button>
