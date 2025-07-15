@@ -8,6 +8,7 @@ import { Accordion } from "react-bootstrap";
 import { MdClose } from "react-icons/md";
 import "./notificationsMain.scss";
 import "./pwaPermissions.scss";
+import { docsUrl } from "params";
 
 export function PwaPermissionsModal() {
   const { isPwa } = usePwaInstall();
@@ -50,7 +51,7 @@ export function PwaPermissionsModal() {
                 To receive notifications from the app, you'll need to re-enable notification permissions in your browser
                 settings. Follow our step-by-step guide to fix it.
               </p>
-              <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+              <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
                 <div className="btn-text">Check Docs</div>
               </Button>
             </>
@@ -106,7 +107,7 @@ export function PwaPermissionsAlert() {
                 To receive notifications from the app, you'll need to re-enable notification permissions in your browser
                 settings. Follow our step-by-step guide to fix it.
               </p>
-              <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+              <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
                 <div className="btn-text">Check Docs</div>
               </Button>
             </div>

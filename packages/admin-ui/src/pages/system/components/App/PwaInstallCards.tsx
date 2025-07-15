@@ -65,10 +65,6 @@ export function PwaInstallCards() {
                 device.
               </div>
             </div>
-            {/* TODO: Include link to docs on how install PWA manually. */}
-            <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
-              Check Docs
-            </Button>
           </div>
         </AlertDismissible>
       )}

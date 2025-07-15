@@ -11,6 +11,7 @@ import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import newTabProps from "utils/newTabProps";
 import "./devicesSubs.scss";
+import { docsUrl } from "params";
 
 export function DevicesSubs() {
   const {
@@ -40,8 +41,7 @@ export function DevicesSubs() {
               <div>
                 <p>Notifications permission denied.</p>
                 <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
-                {/* TODO: Include link to docs on how install PWA manually. */}
-                <Button variant="warning" href="https://docs.dappnode.io/" {...newTabProps}>
+                <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
                   Check Docs
                 </Button>
               </div>
