@@ -1,7 +1,7 @@
 // src/hooks/usePushSubscription.ts
 import { api, useApi } from "api";
 import { useState, useEffect, useCallback } from "react";
-import { Category, NotifierSubscription, Priority, Status } from "@dappnode/types";
+import { NotifierSubscription } from "@dappnode/types";
 import useDeviceInfo from "./useDeviceInfo";
 
 interface UseHandleSubscriptionResult {
@@ -147,20 +147,6 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       console.log("Subscription with alias:", subscriptionWithAlias);
       await api.notificationsPostSubscription({ subscription: subscriptionWithAlias });
       subscriptionsReq.revalidate();
-
-      await api.notificationsSendCustom({
-        notificationPayload: {
-          title: `New device subscribed!`,
-          dnpName: "dappmanager.dnp.dappnode.eth",
-          body: `New device subscribed to push notifications system: ${alias}`,
-          category: Category.system,
-          priority: Priority.low,
-          status: Status.triggered,
-          isBanner: false,
-          isRemote: false,
-          correlationId: "dappmanager-push-subcription"
-        }
-      });
     } catch (err) {
       console.error("Subscribe error:", err);
     } finally {
