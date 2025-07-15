@@ -20,7 +20,7 @@ export function PwaInstallCards() {
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
   const { permission, requestPermission, isSubscribing, permissionLoading } = useHandleSubscription();
-  const { isMobile, browser, loading: deviceLoading, isChromium } = useDeviceInfo();
+  const { isMobile, browser, loading: deviceLoading, isCompatible } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
   const showQrCode = (): boolean => {
@@ -171,7 +171,7 @@ export function PwaInstallCards() {
                   </p>
                 </div>
               )
-            ) : isChromium ? (
+            ) : isCompatible ? (
               <div>
                 <p>App already installed</p>
                 <p>Open your app in your device home screen to continue.</p>

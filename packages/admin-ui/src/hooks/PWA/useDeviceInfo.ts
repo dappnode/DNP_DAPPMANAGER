@@ -71,7 +71,7 @@ const useDeviceInfo = () => {
     os,
     loading,
     device: isMobile ? "Mobile" : "Desktop",
-    isChromium: ["Chrome", "Edge", "Opera", "Brave"].includes(browser)
+    isCompatible: ["Chrome", "Edge", "Brave"].includes(browser)
   };
 };
 

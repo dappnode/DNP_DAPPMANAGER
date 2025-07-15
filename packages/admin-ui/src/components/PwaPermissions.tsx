@@ -4,19 +4,14 @@ import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import Button from "./Button";
 import Loading from "./Loading";
 import newTabProps from "utils/newTabProps";
-import { useNavigate } from "react-router-dom";
-import { pathName as notisPathName, subPaths as notisSubpaths } from "pages/notifications";
 import { Accordion } from "react-bootstrap";
 import { MdClose } from "react-icons/md";
 import "./notificationsMain.scss";
 import "./pwaPermissions.scss";
 
 export function PwaPermissionsModal() {
-  const navigate = useNavigate();
-
   const { isPwa } = usePwaInstall();
   const { permission, isSubscribing, requestPermission, permissionLoading } = useHandleSubscription();
-  const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
   const [showModal, setShowModal] = useState(false);
 
@@ -66,15 +61,6 @@ export function PwaPermissionsModal() {
               <h4>Your App is successfully configured!</h4>
 
               <p>You can now manage notifications for your devices in the Notifications tab.</p>
-              <Button
-                variant="dappnode"
-                onClick={() => {
-                  setShowModal(false);
-                  navigate(devicesTabUrl);
-                }}
-              >
-                Manage Devices
-              </Button>
             </>
           )}
         </div>{" "}

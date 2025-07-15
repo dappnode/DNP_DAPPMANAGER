@@ -39,7 +39,24 @@ self.addEventListener("notificationclick", (event) => {
   console.log("[SW] Notification click");
   event.notification.close();
 
-  const targetUrl = event.notification.data?.url || "/";
+  const originalUrl = event.notification.data?.url || "/";
+  let targetUrl;
+  const swOrigin = self.location.origin;
+
+  // Code to redirect to the PWA domain if the original URL is from "my.dappnode"
+  if (originalUrl.includes("my.dappnode")) {
+    try {
+      const parsedUrl = new URL(originalUrl);
+      parsedUrl.hostname = new URL(swOrigin).hostname;
+      parsedUrl.protocol = new URL(swOrigin).protocol;
+      targetUrl = parsedUrl.toString();
+    } catch (e) {
+      console.error("Failed to parse or modify URL:", e);
+      targetUrl = "/";
+    }
+  } else {
+    targetUrl = originalUrl;
+  }
 
   event.waitUntil(
     clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
