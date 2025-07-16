@@ -62,6 +62,14 @@ export function PwaPermissionsModal() {
               <h4>Your App is successfully configured!</h4>
 
               <p>You can now manage notifications for your devices in the Notifications tab.</p>
+              <Button
+                variant="dappnode"
+                onClick={() => {
+                  setShowModal(false);
+                }}
+              >
+                Finish
+              </Button>
             </>
           )}
         </div>{" "}

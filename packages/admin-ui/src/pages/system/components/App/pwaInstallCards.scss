@@ -1,45 +1,68 @@
-.pwa-vpn-info {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-
-  @media (max-width: 40rem) {
-    flex-direction: column;
-    gap: 10px;
-  }
-}
-
-.pwa-install-section {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  align-items: stretch;
-
-  @media (max-width: 40rem) {
-    flex-direction: column;
-
-    h5 {
-      margin-bottom: 0px;
-    }
-  }
-
-  .pwa-install-cards-container {
-    flex: 1 1 0;
+.pwa-install-root {
+  .fullscreen-card {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    > div {
-      height: 100%;
-    }
-  }
-
-  .pwa-install-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 20px;
+    padding: 10px;
+    h5 {
+      margin-bottom: 20px;
+    }
+  }
+
+  .alert-dismissible {
+    padding-right: 35px !important;
+  }
+
+  .pwa-vpn-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+      gap: 10px;
+      ul {
+        margin: 0;
+        padding-left: 15px;
+      }
+    }
+  }
+
+  .pwa-install-section {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: stretch;
+
+    @media (max-width: 40rem) {
+      flex-direction: column;
+
+      h5 {
+        margin-bottom: 0px;
+      }
+    }
+
+    .pwa-install-cards-container {
+      flex: 1 1 0;
+      display: flex;
+      flex-direction: column;
+      > div {
+        height: 100%;
+      }
+    }
+
+    .pwa-install-card {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+    }
   }
 }

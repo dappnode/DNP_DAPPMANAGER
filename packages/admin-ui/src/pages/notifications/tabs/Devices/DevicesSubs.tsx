@@ -10,8 +10,8 @@ import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import newTabProps from "utils/newTabProps";
-import "./devicesSubs.scss";
 import { docsUrl } from "params";
+import "./devicesSubs.scss";
 
 export function DevicesSubs() {
   const {
@@ -26,7 +26,7 @@ export function DevicesSubs() {
     subscribeBrowser,
     revalidateSubs
   } = useHandleSubscription();
-  const { isPwa } = usePwaInstall();
+  const { isPwa, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
 
   return (
@@ -34,50 +34,60 @@ export function DevicesSubs() {
       <div>
         <h5>Current Device</h5>
         <Card className="current-device-card">
-          {isPwa && permission ? (
-            permissionLoading ? (
-              <Loading steps={["Waiting for permissions approval"]} />
-            ) : permission === "denied" ? (
-              <div>
-                <p>Notifications permission denied.</p>
-                <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
-                <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
-                  Check Docs
-                </Button>
-              </div>
-            ) : permission === "default" ? (
-              <div>
-                <p>
-                  To receive notifications in your device, it's mandatory granting the notification permission in your
-                  App.
-                </p>
-                <p>
-                  Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
-                </p>
-
-                <Button variant="dappnode" onClick={requestPermission}>
-                  Grant permission
-                </Button>
-              </div>
-            ) : isSubInNotifier ? (
-              <div>Your device is already subscribed to push notifications.</div>
-            ) : isSubscribing ? (
-              <Loading steps={["Subscribing device"]} />
-            ) : (
-              <div>
-                <p>Your device is not subscribed to push notifications.</p>
-                <Button variant="dappnode" onClick={subscribeBrowser}>
-                  Subscribe Device
-                </Button>
-              </div>
-            )
+          {isFullscreenOn ? (
+            <div className="fullscreen-card">
+              <h5>Exit fullscreen mode</h5>
+              <p>To manage your current device, please exit fullscreen mode.</p>
+              Some features may not work as expected while in fullscreen.
+            </div>
           ) : (
             <>
-              <p>To check your device status, please open the Dappnode App.</p>
-              <p>If you haven't installed the app yet, click the button below.</p>
-              <Button href={pwaSubtabUrl} variant="dappnode">
-                Install App
-              </Button>
+              {isPwa && permission ? (
+                permissionLoading ? (
+                  <Loading steps={["Waiting for permissions approval"]} />
+                ) : permission === "denied" ? (
+                  <div>
+                    <p>Notifications permission denied.</p>
+                    <p>Grant notification permission for this App in your browser settings to receive notifications.</p>
+                    <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
+                      Check Docs
+                    </Button>
+                  </div>
+                ) : permission === "default" ? (
+                  <div>
+                    <p>
+                      To receive notifications in your device, it's mandatory granting the notification permission in
+                      your App.
+                    </p>
+                    <p>
+                      Click the button below and then <b>click 'Allow' in the pop-up modal</b>.
+                    </p>
+
+                    <Button variant="dappnode" onClick={requestPermission}>
+                      Grant permission
+                    </Button>
+                  </div>
+                ) : isSubInNotifier ? (
+                  <div>Your device is already subscribed to push notifications.</div>
+                ) : isSubscribing ? (
+                  <Loading steps={["Subscribing device"]} />
+                ) : (
+                  <div>
+                    <p>Your device is not subscribed to push notifications.</p>
+                    <Button variant="dappnode" onClick={subscribeBrowser}>
+                      Subscribe Device
+                    </Button>
+                  </div>
+                )
+              ) : (
+                <>
+                  <p>To check your device status, please open the Dappnode App.</p>
+                  <p>If you haven't installed the app yet, click the button below.</p>
+                  <Button href={pwaSubtabUrl} variant="dappnode">
+                    Install App
+                  </Button>
+                </>
+              )}
             </>
           )}
         </Card>
