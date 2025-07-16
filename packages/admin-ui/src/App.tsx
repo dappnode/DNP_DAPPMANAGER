@@ -17,6 +17,7 @@ import { NoConnection } from "start-pages/NoConnection";
 // Types
 import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
+import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -79,6 +80,7 @@ function MainApp({ username }: { username: string }) {
           <ErrorBoundary>
             <NotificationsMain />
           </ErrorBoundary>
+          <PwaPermissionsAlert />
           <Routes>
             {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
@@ -101,6 +103,7 @@ function MainApp({ username }: { username: string }) {
         {/* Place here non-page components */}
         <Welcome />
         <Smooth />
+        <PwaPermissionsModal />
         <ToastContainer />
       </div>
     </AppContext.Provider>

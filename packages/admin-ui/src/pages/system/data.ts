@@ -21,7 +21,8 @@ export const subPaths = {
   power: "power",
   profile: "profile",
   advanced: "advanced",
-  hardware: "hardware"
+  hardware: "hardware",
+  app: "app"
 };
 
 // Computed paths

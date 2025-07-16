@@ -6,7 +6,8 @@ import {
   InstalledPackageData,
   Notification,
   NotificationPayload,
-  NotificationsConfig
+  NotificationsConfig,
+  NotifierSubscription
 } from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
@@ -23,12 +24,12 @@ class Notifications {
   /**
    * Send a new notification
    */
-  async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
+  async sendNotification(notificationPayload: NotificationPayload, subscriptionEndpoint?: string): Promise<void> {
     const { isNotifierRunning } = await this.notificationsPackageStatus();
 
     // Only send custom notifications if the notifier service is running
     if (isNotifierRunning) {
-      await this.api.sendNotification(notificationPayload);
+      await this.api.sendNotification(notificationPayload, subscriptionEndpoint);
     }
   }
 
@@ -125,6 +126,48 @@ class Notifications {
     const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
     const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
     return { notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
+  }
+
+  /**
+   * Retrieves vapidKey from notifier
+   */
+  async getVapidKey(): Promise<string | null> {
+    return await this.api.getVapidKey();
+  }
+
+  /**
+   * Retrieves all subs from notifier
+   */
+  async fetchSubscriptions(): Promise<NotifierSubscription[] | null> {
+    return await this.api.fetchSubscriptions();
+  }
+
+  /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  async updateSubscriptionAlias(endpoint: string, alias: string): Promise<void> {
+    return await this.api.updateSubscriptionAlias(endpoint, alias);
+  }
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  async deleteSubscription(endpoint: string): Promise<void> {
+    return await this.api.deleteSubscription(endpoint);
+  }
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  async postSubscription(subscription: NotifierSubscription): Promise<void> {
+    return await this.api.postSubscription(subscription);
+  }
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  async sendSubTestNotification(endpoint?: string): Promise<void> {
+    return await this.api.sendSubTestNotification(endpoint);
   }
 }
 

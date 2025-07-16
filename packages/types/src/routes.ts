@@ -49,8 +49,10 @@ import {
   CustomEndpoint,
   GatusEndpoint,
   Notification,
+  NotificationPayload,
   NotificationsConfig,
-  NotificationsSettingsAllDnps
+  NotificationsSettingsAllDnps,
+  NotifierSubscription
 } from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
@@ -264,6 +266,14 @@ export interface Routes {
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
 
   /**
+   * Sends custom notification to notifier service
+   */
+  notificationsSendCustom(kwargs: {
+    notificationPayload: NotificationPayload;
+    subscriptionEndpoint?: string;
+  }): Promise<void>;
+
+  /**
    * Get all the notifications
    */
   notificationsGetAll(): Promise<Notification[]>;
@@ -271,7 +281,7 @@ export interface Routes {
   /**
    * Get banner notifications that should be displayed within the given timestamp range
    */
-  notificationsGetBanner(timestamp: number): Promise<Notification[]>;
+  notificationsGetBanner(kwargs: { timestamp: number }): Promise<Notification[]>;
 
   /**
    * Get unseen notifications count
@@ -293,7 +303,7 @@ export interface Routes {
   /**
    * Set a notification as seen by providing its correlationId
    */
-  notificationSetSeenByCorrelationID(correlationId: string): Promise<void>;
+  notificationSetSeenByCorrelationID(kwargs: { correlationId: string }): Promise<void>;
 
   /**
    * Gatus update endpoint
@@ -323,6 +333,36 @@ export interface Routes {
     isNotifierRunning: boolean;
     servicesNotRunning: string[];
   }>;
+
+  /**
+   * Returns notifications package status
+   */
+  notificationsGetVapidKey: () => Promise<string | null>;
+
+  /**
+   * Returns all subs from notifier
+   */
+  notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null>;
+
+  /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  notificationsUpdateSubAlias(kwargs: { endpoint: string; alias: string }): Promise<void>;
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  notificationsDeleteSubscription(kwargs: { endpoint: string }): Promise<void>;
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  notificationsPostSubscription(kwargs: { subscription: NotifierSubscription }): Promise<void>;
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  notificationsSendSubTest(kwargs: { endpoint?: string }): Promise<void>;
 
   /**
    * Returns the user action logs. This logs are stored in a different
@@ -581,6 +621,20 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the PWA mapping URL if it exists, otherwise returns undefined.
+   */
+  pwaUrlGet: () => Promise<string | undefined>;
+
+  /**
+   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
+   */
+  pwaRequirementsGet: () => Promise<{
+    httpsDnpInstalled: boolean;
+    isHttpsRunning: boolean;
+    pwaMappingUrl: string | undefined;
+  }>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
@@ -750,6 +804,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},
   notificationsGetUnseenCount: {},
@@ -759,6 +814,12 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   notificationsUpdateEndpoints: {},
   notificationsApplyPreviousEndpoints: {},
   notificationsPackageStatus: {},
+  notificationsGetVapidKey: {},
+  notificationsGetSubscriptions: {},
+  notificationsUpdateSubAlias: {},
+  notificationsDeleteSubscription: {},
+  notificationsPostSubscription: {},
+  notificationsSendSubTest: {},
   getUserActionLogs: {},
   getHostUptime: {},
   httpsPortalPwaMappingAdd: { log: true },
@@ -801,6 +862,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  pwaUrlGet: {},
+  pwaRequirementsGet: {},
   rebootHost: { log: true },
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},

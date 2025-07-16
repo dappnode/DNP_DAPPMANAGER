@@ -3,6 +3,10 @@ networks:
   dncore_network:
     name: dncore_network
     external: true
+  dnprivate_network:
+    external: true
+  dnpublic_network:
+    external: true
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
@@ -32,5 +36,14 @@ services:
           - dappmanager.dappnode
           - my.dappnode
           - dappnode.local
+      dnprivate_network:
+        aliases:
+          - dappmanager.dnp.dappnode.eth.dappmanager.dappnode.private
+          - dappmanager.dappnode.private
+          - my.dappnode.private
+          - dappnode.local
+      dnpublic_network:
+        aliases:
+          - dappmanager.external
     logging:
       driver: journald
