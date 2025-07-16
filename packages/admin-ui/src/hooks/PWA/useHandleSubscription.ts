@@ -34,21 +34,26 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const { device, browser, os } = useDeviceInfo();
 
   useEffect(() => {
-    try {
+    if ("Notification" in window) {
       setPermission(Notification.permission);
-    } catch (error) {
-      console.warn("Notification API not supported on this device:", error);
-      setPermission(null);
+    } else {
+      console.warn("Notification not supported");
     }
   }, []);
 
   useEffect(() => {
     const getSub = async () => {
-      const registration = await navigator.serviceWorker?.ready;
-      if (registration) {
-        const sub = await registration.pushManager.getSubscription();
-        setSubscription(sub);
+      if (!("serviceWorker" in navigator)) {
+        console.warn("Service Worker not supported");
+        return;
       }
+      if (!("PushManager" in window)) {
+        console.warn("Push Manager not supported");
+        return;
+      }
+      const registration = await navigator.serviceWorker.ready;
+      const sub = await registration.pushManager.getSubscription();
+      setSubscription(sub);
     };
 
     getSub();
