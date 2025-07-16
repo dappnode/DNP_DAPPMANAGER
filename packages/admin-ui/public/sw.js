@@ -70,7 +70,7 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
-const CACHE_NAME = "dappmanager-pwa-v0001";
+const CACHE_NAME = "dappmanager-pwa-v0";
 const OFFLINE_URLS = [
   // Review the list of URLs to cache
   "/index.html",
