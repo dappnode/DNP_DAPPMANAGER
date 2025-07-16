@@ -3,6 +3,7 @@ import { api, useApi } from "api";
 import { useState, useEffect, useCallback } from "react";
 import { NotifierSubscription } from "@dappnode/types";
 import useDeviceInfo from "./useDeviceInfo";
+import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
@@ -25,19 +26,35 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const [isSubInNotifier, setIsSubInNotifier] = useState<boolean>(false);
   const [permissionLoading, setPermissionLoading] = useState<boolean>(false);
 
-  const [permission, setPermission] = useState<NotificationPermission | null>(Notification.permission);
+  const [permission, setPermission] = useState<NotificationPermission | null>(null);
 
   const vapidKeyReq = useApi.notificationsGetVapidKey();
   const subscriptionsReq = useApi.notificationsGetSubscriptions();
   const revalidateSubs = () => subscriptionsReq.revalidate();
 
   const { device, browser, os } = useDeviceInfo();
+  const { isPwa } = usePwaInstall();
+
+  useEffect(() => {
+    if (isPwa) {
+      try {
+        setPermission(Notification.permission);
+      } catch (error) {
+        console.error("Error accessing Notification permission:", error);
+        setPermission(null);
+      }
+    } else {
+      setPermission(null);
+    }
+  }, [isPwa]);
 
   useEffect(() => {
     const getSub = async () => {
-      const registartion = await navigator.serviceWorker.ready;
-      const sub = await registartion.pushManager.getSubscription();
-      setSubscription(sub);
+      const registration = await navigator.serviceWorker?.ready;
+      if (registration) {
+        const sub = await registration.pushManager.getSubscription();
+        setSubscription(sub);
+      }
     };
 
     getSub();
