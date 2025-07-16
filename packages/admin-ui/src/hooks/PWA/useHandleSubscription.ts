@@ -3,7 +3,6 @@ import { api, useApi } from "api";
 import { useState, useEffect, useCallback } from "react";
 import { NotifierSubscription } from "@dappnode/types";
 import useDeviceInfo from "./useDeviceInfo";
-import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 
 interface UseHandleSubscriptionResult {
   subscription: PushSubscription | null;
@@ -33,20 +32,15 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const revalidateSubs = () => subscriptionsReq.revalidate();
 
   const { device, browser, os } = useDeviceInfo();
-  const { isPwa } = usePwaInstall();
 
   useEffect(() => {
-    if (isPwa) {
-      try {
-        setPermission(Notification.permission);
-      } catch (error) {
-        console.error("Error accessing Notification permission:", error);
-        setPermission(null);
-      }
-    } else {
+    try {
+      setPermission(Notification.permission);
+    } catch (error) {
+      console.warn("Notification API not supported on this device:", error);
       setPermission(null);
     }
-  }, [isPwa]);
+  }, []);
 
   useEffect(() => {
     const getSub = async () => {
