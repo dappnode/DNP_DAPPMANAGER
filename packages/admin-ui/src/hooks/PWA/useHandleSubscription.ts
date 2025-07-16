@@ -25,7 +25,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const [isSubInNotifier, setIsSubInNotifier] = useState<boolean>(false);
   const [permissionLoading, setPermissionLoading] = useState<boolean>(false);
 
-  const [permission, setPermission] = useState<NotificationPermission | null>(Notification.permission);
+  const [permission, setPermission] = useState<NotificationPermission | null>(null);
 
   const vapidKeyReq = useApi.notificationsGetVapidKey();
   const subscriptionsReq = useApi.notificationsGetSubscriptions();
@@ -34,9 +34,25 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
   const { device, browser, os } = useDeviceInfo();
 
   useEffect(() => {
+    if ("Notification" in window) {
+      setPermission(Notification.permission);
+    } else {
+      console.warn("Notification not supported");
+    }
+  }, []);
+
+  useEffect(() => {
     const getSub = async () => {
-      const registartion = await navigator.serviceWorker.ready;
-      const sub = await registartion.pushManager.getSubscription();
+      if (!("serviceWorker" in navigator)) {
+        console.warn("Service Worker not supported");
+        return;
+      }
+      if (!("PushManager" in window)) {
+        console.warn("Push Manager not supported");
+        return;
+      }
+      const registration = await navigator.serviceWorker.ready;
+      const sub = await registration.pushManager.getSubscription();
       setSubscription(sub);
     };
 
