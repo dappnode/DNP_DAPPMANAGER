@@ -13,6 +13,7 @@ import Loading from "components/Loading";
 import useDeviceInfo from "hooks/PWA/useDeviceInfo";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import { MdIosShare } from "react-icons/md";
+import { docsUrl } from "params";
 import "./pwaInstallCards.scss";
 
 export function PwaInstallCards() {
@@ -63,8 +64,24 @@ export function PwaInstallCards() {
                 <br />
                 For the best experience and full functionality, we recommend using Chrome to install the app on your
                 device.
+                {(browser === "Safari" || (browser === "Brave" && !isMobile)) && (
+                  <>
+                    {" "}
+                    <br />
+                    If you want to use the app in {browser}, please follow the instructions in our documentation.
+                  </>
+                )}
               </div>
             </div>
+            {(browser === "Safari" || (browser === "Brave" && !isMobile)) && (
+              <Button
+                variant="warning"
+                href={`${docsUrl.pwaHowToInstall}#${browser === "Safari" ? "safari" : "brave"}`}
+                {...newTabProps}
+              >
+                Check Docs
+              </Button>
+            )}
           </div>
         </AlertDismissible>
       )}
