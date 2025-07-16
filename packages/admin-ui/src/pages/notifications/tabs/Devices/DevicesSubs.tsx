@@ -10,8 +10,8 @@ import { usePwaInstall } from "pages/system/components/App/PwaInstallContext";
 import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import newTabProps from "utils/newTabProps";
-import "./devicesSubs.scss";
 import { docsUrl } from "params";
+import "./devicesSubs.scss";
 
 export function DevicesSubs() {
   const {

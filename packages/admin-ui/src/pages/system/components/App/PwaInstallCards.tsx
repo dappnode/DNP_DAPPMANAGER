@@ -4,7 +4,7 @@ import Card from "components/Card";
 import QrCode from "components/QrCode";
 import { relativePath as defaultVpnUrl } from "pages/vpn";
 import { pathName as notisPathName, subPaths as notisSubpaths } from "pages/notifications";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { usePwaInstall } from "./PwaInstallContext";
 import { AlertDismissible } from "components/AlertDismissible";
 import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
@@ -33,7 +33,7 @@ export function PwaInstallCards() {
   };
 
   return (
-    <div>
+    <div className="pwa-install-root">
       {isFullscreenOn ? (
         <Card>
           <div className="fullscreen-card">
@@ -48,12 +48,25 @@ export function PwaInstallCards() {
             <AlertDismissible variant="info">
               <div className="pwa-vpn-info">
                 <div>
-                  <h5>Configure VPN connection before installing the app</h5>
+                  <h5>Set up your VPN before installing the app</h5>
                   <div>
-                    To connect to the Dappnode App from outside the Dappnode-Wifi network, its mandatory to set a VPN
-                    connection.
+                    To access the Dappnode App from outside the Dappnode Wi-Fi network, a VPN connection is required.
                     <br />
-                    We highly encourage to set a VPN connection on your preferred device.
+                    <ul>
+                      <li>
+                        <b>Tailscale:</b> Requires updated configuration. Follow the steps in{" "}
+                        <Link to={docsUrl.tailscaleVpn} {...newTabProps}>
+                          our Tailscale documentation
+                        </Link>
+                        .
+                      </li>
+                      <li>
+                        <b>WireGuard:</b> No configuration changes needed.
+                      </li>
+                      <li>
+                        <b>OpenVPN:</b> Currently not supported.
+                      </li>
+                    </ul>
                   </div>
                 </div>
 
