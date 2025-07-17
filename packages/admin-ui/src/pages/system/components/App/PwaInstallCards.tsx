@@ -37,9 +37,9 @@ export function PwaInstallCards() {
       {isFullscreenOn ? (
         <Card>
           <div className="fullscreen-card">
-            <h5>Exit fullscreen mode</h5>
-            <p>To use and install the Dappnode App properly, please exit fullscreen mode.</p>
-            Some features may not work as expected while in fullscreen.
+            <h5>Exit full screen mode</h5>
+            <p>To use and install the Dappnode App properly, please exit full screen mode.</p>
+            Some features may not work as expected while in full screen.
           </div>
         </Card>
       ) : (

@@ -36,9 +36,9 @@ export function DevicesSubs() {
         <Card className="current-device-card">
           {isFullscreenOn ? (
             <div className="fullscreen-card">
-              <h5>Exit fullscreen mode</h5>
-              <p>To manage your current device, please exit fullscreen mode.</p>
-              Some features may not work as expected while in fullscreen.
+              <h5>Exit full screen mode</h5>
+              <p>To manage your current device, please exit full screen mode.</p>
+              Some features may not work as expected while in full screen.
             </div>
           ) : (
             <>
@@ -161,6 +161,7 @@ function SubscriptionCard({
               }
               if (e.key === "Escape") {
                 setEditAlias(false);
+                setNewAlias(sub.alias);
               }
             }}
           />
@@ -178,7 +179,13 @@ function SubscriptionCard({
       <div className="btns-container">
         {editAlias ? (
           <>
-            <Button onClick={() => setEditAlias(false)} variant="outline-danger">
+            <Button
+              onClick={() => {
+                setEditAlias(false);
+                setNewAlias(sub.alias);
+              }}
+              variant="outline-danger"
+            >
               Cancel
             </Button>
             <Button
