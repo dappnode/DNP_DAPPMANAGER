@@ -29,8 +29,6 @@ export function DevicesSubs() {
   const { isPwa, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
 
-  console.log("subscriptionsList", subscriptionsList);
-
   return (
     <div className="devices-subs-container">
       <div>
