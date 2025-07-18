@@ -21,7 +21,7 @@ export function PwaInstallCards() {
   const { isPwa, canInstall, promptInstall, wasInstalled, installLoading, isFullscreenOn } = usePwaInstall();
   const pwaSubtabUrl = usePwaSubtabUrl();
   const { permission } = useHandleSubscription();
-  const { isMobile, browser, loading: deviceLoading, isCompatible } = useDeviceInfo();
+  const { isMobile, browser, loading: deviceLoading, isCompatible, os } = useDeviceInfo();
   const devicesTabUrl = `/${notisPathName}/${notisSubpaths.devices}`;
 
   const showQrCode = (): boolean => {
@@ -77,7 +77,7 @@ export function PwaInstallCards() {
             </AlertDismissible>
           )}
 
-          {!deviceLoading && browser !== "Chrome" && (
+          {!deviceLoading && os !== "iOS" && browser !== "Chrome" && (
             <AlertDismissible variant="warning">
               <div className="pwa-vpn-info">
                 <div>
@@ -116,7 +116,6 @@ export function PwaInstallCards() {
                 {isPwa ? (
                   <div>
                     <p>Your App is successfully installed!</p>
-
                     <p>You can now manage notifications for your devices in the Notifications tab.</p>
                     <Button variant="dappnode" onClick={() => navigate(devicesTabUrl)}>
                       Manage Devices
@@ -137,35 +136,34 @@ export function PwaInstallCards() {
                   <div>
                     <p>App has been installed successfully</p>
                     <p>Open the app and finish its setup.</p>
-
                     <Button variant="dappnode" href={pwaSubtabUrl} {...newTabProps}>
                       Finish Setup in App{" "}
                     </Button>
                   </div>
-                ) : browser === "Safari" ? (
-                  isMobile ? (
-                    <div>
-                      <p>
-                        To install the App in Safari click the <MdIosShare /> icon at the bottom of the screen <br />
-                        and scroll down in the options and tap <b>Add to Home Screen</b>
-                      </p>
-
-                      <p>
-                        After that, open the App and navigate to <i>System &gt; App</i> to finish the App setup
-                      </p>
-                    </div>
-                  ) : (
-                    <div>
-                      <p>
-                        To install the App in Safari click the <MdIosShare /> icon in the Safari toolbar and click{" "}
-                        <b>Add to Dock</b>
-                      </p>
-
-                      <p>
-                        After that, open the App and navigate to <i>System &gt; App</i> to finish the setup
-                      </p>
-                    </div>
-                  )
+                ) : os === "iOS" ? (
+                  <div>
+                    <p>To install the App:</p>
+                    <ol>
+                      <li>
+                        Tap the <MdIosShare /> icon in the browser toolbar
+                      </li>
+                      <li>
+                        Tap <b>Add to Home Screen</b>
+                      </li>
+                    </ol>
+                  </div>
+                ) : os === "macOS" && browser === "Safari" ? (
+                  <div>
+                    <p>To install the App in Safari:</p>
+                    <ol>
+                      <li>
+                        Click the <MdIosShare /> icon in the browser toolbar
+                      </li>
+                      <li>
+                        Click the <b>Add to Dock</b>
+                      </li>
+                    </ol>
+                  </div>
                 ) : isCompatible ? (
                   <div>
                     <p>App already installed</p>
