@@ -18,7 +18,18 @@ const useDeviceInfo = () => {
   useEffect(() => {
     const userAgent = navigator.userAgent;
 
-    const detectBrowser = async () => {
+    const detectBrowser = async (): Promise<Browser> => {
+      const braveNavigator = navigator as BraveNavigator;
+      if (braveNavigator.brave && typeof braveNavigator.brave.isBrave === "function") {
+        try {
+          if (await braveNavigator.brave.isBrave()) {
+            return "Brave";
+          }
+        } catch {
+          // fallback to UA
+        }
+      }
+
       let browser: Browser = "Unknown";
 
       if (/Edg\//i.test(userAgent)) {
@@ -30,17 +41,7 @@ const useDeviceInfo = () => {
       } else if (/Safari/i.test(userAgent) && !/Chrome/i.test(userAgent)) {
         browser = "Safari";
       } else if (/Chrome|Chromium|CriOS/i.test(userAgent)) {
-        const braveNavigator = navigator as BraveNavigator;
-        if (braveNavigator.brave && typeof braveNavigator.brave.isBrave === "function") {
-          try {
-            const isBrave = await braveNavigator.brave.isBrave();
-            browser = isBrave ? "Brave" : "Chrome";
-          } catch {
-            browser = "Chrome";
-          }
-        } else {
-          browser = "Chrome";
-        }
+        browser = "Chrome";
       }
 
       return browser;
