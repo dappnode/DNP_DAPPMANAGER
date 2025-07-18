@@ -64,11 +64,18 @@ const useDeviceInfo = () => {
     detectBrowser().then((browser) => {
       setBrowser(browser);
       setOS(detectOS());
-      const isMobile = (os === "iOS" || os === "Android") && true;
-      setIsMobile(isMobile);
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    // Set device type based on OS
+    if (os === "iOS" || os === "Android") {
+      setIsMobile(true);
+    } else {
+      setIsMobile(false);
+    }
+  }, [os]);
 
   return {
     isMobile,
