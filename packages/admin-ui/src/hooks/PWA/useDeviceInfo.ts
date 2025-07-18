@@ -3,12 +3,6 @@ import { useEffect, useState } from "react";
 type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera" | "Brave";
 type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
 
-interface BraveNavigator extends Navigator {
-  brave?: {
-    isBrave: () => Promise<boolean>;
-  };
-}
-
 const useDeviceInfo = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [browser, setBrowser] = useState<Browser>("Unknown");
@@ -19,14 +13,13 @@ const useDeviceInfo = () => {
     const userAgent = navigator.userAgent;
 
     const detectBrowser = async (): Promise<Browser> => {
-      const braveNavigator = navigator as BraveNavigator;
-      if (braveNavigator.brave && typeof braveNavigator.brave.isBrave === "function") {
+      if ("brave" in navigator) {
         try {
-          if (await braveNavigator.brave.isBrave()) {
+          if (await (navigator.brave as { isBrave: () => Promise<boolean> }).isBrave()) {
             return "Brave";
           }
         } catch {
-          // fallback to UA
+          console.error("Error detecting Brave browser");
         }
       }
 

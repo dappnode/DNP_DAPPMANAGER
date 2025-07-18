@@ -141,17 +141,24 @@ export function PwaInstallCards() {
                     </Button>
                   </div>
                 ) : os === "iOS" ? (
-                  <div>
-                    <p>To install the App:</p>
-                    <ol>
-                      <li>
-                        Tap the <MdIosShare /> icon in the browser toolbar
-                      </li>
-                      <li>
-                        Tap <b>Add to Home Screen</b>
-                      </li>
-                    </ol>
-                  </div>
+                  browser === "Brave" ? (
+                    <div>
+                      <p>App installation is not compatible with the Brave browser on iOS.</p>
+                      <p>Switch to Chrome or Safari.</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <p>To install the App:</p>
+                      <ol>
+                        <li>
+                          Tap the <MdIosShare /> icon in the browser toolbar
+                        </li>
+                        <li>
+                          Tap <b>Add to Home Screen</b>
+                        </li>
+                      </ol>
+                    </div>
+                  )
                 ) : os === "macOS" && browser === "Safari" ? (
                   <div>
                     <p>To install the App in Safari:</p>
