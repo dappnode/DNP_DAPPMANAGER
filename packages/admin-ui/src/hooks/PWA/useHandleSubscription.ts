@@ -174,7 +174,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     } finally {
       setIsSubscribing(false);
     }
-  }, [vapidKey, device, browser, os]);
+  }, [vapidKey, device, browser, os, isSubInNotifier]);
 
   function urlBase64ToUint8Array(base64String: string) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
