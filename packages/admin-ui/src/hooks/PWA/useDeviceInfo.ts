@@ -18,8 +18,6 @@ const useDeviceInfo = () => {
   useEffect(() => {
     const userAgent = navigator.userAgent;
 
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(userAgent);
-
     const detectBrowser = async () => {
       let browser: Browser = "Unknown";
 
@@ -64,9 +62,10 @@ const useDeviceInfo = () => {
     };
 
     detectBrowser().then((browser) => {
-      setIsMobile(isMobile);
       setBrowser(browser);
       setOS(detectOS());
+      const isMobile = (os === "iOS" || os === "Android") && true;
+      setIsMobile(isMobile);
       setLoading(false);
     });
   }, []);
