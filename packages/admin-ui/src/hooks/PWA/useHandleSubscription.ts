@@ -127,6 +127,12 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       // Wait for SW to be active
       const registration = await navigator.serviceWorker.ready;
 
+      // Return if device already subscribed
+      if (subscription && isSubInNotifier) {
+        console.log("Device already subscribed");
+        return;
+      }
+
       // Clean up any old subscription
       if (subscription && !isSubInNotifier) {
         console.log("Deleting old subscription");
@@ -147,8 +153,8 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       setSubscription(newSub);
       console.log("New subscription:", newSub);
 
-      const alias = `${device} - ${browser} ${browser === "Unknown" ? "Browser" : ""}on ${os} ${
-        os === "Unknown" ? "OS" : ""
+      const alias = `${device} - ${browser} ${browser === "Unknown" ? "Browser" : ""}on ${os}${
+        os === "Unknown" ? " OS" : ""
       }`;
       // Attach alias and send the subscription object to notifier
       const newSubJson = newSub.toJSON();
