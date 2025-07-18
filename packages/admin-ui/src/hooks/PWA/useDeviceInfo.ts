@@ -50,7 +50,13 @@ const useDeviceInfo = () => {
 
     const detectOS = (): OS => {
       if (/Windows NT/i.test(userAgent)) return "Windows";
-      if (/Mac OS X/i.test(userAgent) && !/Mobile/i.test(userAgent)) return "macOS";
+      if (/Mac OS X/i.test(userAgent)) {
+        if (navigator.maxTouchPoints > 1) {
+          return "iOS"; // iPads && iPhones have touch support
+        } else {
+          return "macOS";
+        }
+      }
       if (/iPhone|iPad|iPod/i.test(userAgent)) return "iOS";
       if (/Android/i.test(userAgent)) return "Android";
       if (/Linux/i.test(userAgent)) return "Linux";
