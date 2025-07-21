@@ -151,5 +151,10 @@ export default function PwaInstallCards({
     );
   }
 
-  return <h5>App already installed.</h5>;
+  return (
+    <div>
+      <p>App already installed.</p>
+      <p>To manage notifications for your devices open the App.</p>
+    </div>
+  );
 }
