@@ -153,7 +153,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       setSubscription(newSub);
       console.log("New subscription:", newSub);
 
-      const alias = `${device} - ${browser} ${browser === "Unknown" ? "Browser" : ""}on ${os}${
+      const alias = `${device} - ${os !== "iOS" ? browser : ""} ${browser === "Unknown" ? "Browser" : ""}on ${os}${
         os === "Unknown" ? " OS" : ""
       }`;
       // Attach alias and send the subscription object to notifier
