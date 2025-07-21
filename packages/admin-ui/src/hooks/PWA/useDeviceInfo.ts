@@ -1,7 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera" | "Brave";
-type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
+export type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera" | "Brave";
+export type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
+
+const compatibilityMap: Record<OS, Browser[]> = {
+  Windows: ["Chrome", "Edge", "Brave"],
+  Linux: ["Chrome", "Brave"],
+  Android: ["Chrome", "Edge", "Brave"],
+  macOS: ["Chrome", "Edge", "Brave", "Safari"],
+  iOS: ["Chrome", "Safari"],
+  Unknown: []
+};
 
 const useDeviceInfo = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -64,12 +73,11 @@ const useDeviceInfo = () => {
 
   useEffect(() => {
     // Set device type based on OS
-    if (os === "iOS" || os === "Android") {
-      setIsMobile(true);
-    } else {
-      setIsMobile(false);
-    }
+    setIsMobile(os === "iOS" || os === "Android");
   }, [os]);
+
+  const supportedBrowsers = useMemo<Browser[]>(() => compatibilityMap[os], [os]);
+  const isCompatible = useMemo<boolean>(() => supportedBrowsers.includes(browser), [supportedBrowsers, browser]);
 
   return {
     isMobile,
@@ -77,7 +85,8 @@ const useDeviceInfo = () => {
     os,
     loading,
     device: isMobile ? "Mobile" : "Desktop",
-    isCompatible: ["Chrome", "Edge", "Brave"].includes(browser)
+    isCompatible,
+    supportedBrowsers
   };
 };
 
