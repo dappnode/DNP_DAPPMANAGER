@@ -75,7 +75,7 @@ export const PwaInstallProvider = ({ children }: { children: ReactNode }) => {
         console.log("PWA was installed 🎉");
         setWasInstalled(true);
         setInstallLoading(false);
-      }, 6000); // Delay to ensure the app is fully installed
+      }, 8000); // Delay to ensure the app is fully installed
     };
     window.addEventListener("appinstalled", onAppInstalled);
 

@@ -1,13 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera" | "Brave";
-type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
+export type Browser = "Unknown" | "Chrome" | "Firefox" | "Safari" | "Edge" | "Opera" | "Brave";
+export type OS = "Unknown" | "Windows" | "macOS" | "iOS" | "Android" | "Linux";
 
-interface BraveNavigator extends Navigator {
-  brave?: {
-    isBrave: () => Promise<boolean>;
-  };
-}
+const compatibilityMap: Record<OS, Browser[]> = {
+  Windows: ["Chrome", "Edge", "Brave"],
+  Linux: ["Chrome", "Brave"],
+  Android: ["Chrome", "Edge", "Brave"],
+  macOS: ["Chrome", "Edge", "Brave", "Safari"],
+  iOS: ["Chrome", "Safari"],
+  Unknown: []
+};
 
 const useDeviceInfo = () => {
   const [isMobile, setIsMobile] = useState(false);
@@ -18,9 +21,17 @@ const useDeviceInfo = () => {
   useEffect(() => {
     const userAgent = navigator.userAgent;
 
-    const isMobile = /Mobi|Android|iPhone|iPad|iPod|Windows Phone/i.test(userAgent);
+    const detectBrowser = async (): Promise<Browser> => {
+      if ("brave" in navigator) {
+        try {
+          if (await (navigator.brave as { isBrave: () => Promise<boolean> }).isBrave()) {
+            return "Brave";
+          }
+        } catch {
+          console.error("Error detecting Brave browser");
+        }
+      }
 
-    const detectBrowser = async () => {
       let browser: Browser = "Unknown";
 
       if (/Edg\//i.test(userAgent)) {
@@ -32,17 +43,7 @@ const useDeviceInfo = () => {
       } else if (/Safari/i.test(userAgent) && !/Chrome/i.test(userAgent)) {
         browser = "Safari";
       } else if (/Chrome|Chromium|CriOS/i.test(userAgent)) {
-        const braveNavigator = navigator as BraveNavigator;
-        if (braveNavigator.brave && typeof braveNavigator.brave.isBrave === "function") {
-          try {
-            const isBrave = await braveNavigator.brave.isBrave();
-            browser = isBrave ? "Brave" : "Chrome";
-          } catch {
-            browser = "Chrome";
-          }
-        } else {
-          browser = "Chrome";
-        }
+        browser = "Chrome";
       }
 
       return browser;
@@ -50,7 +51,13 @@ const useDeviceInfo = () => {
 
     const detectOS = (): OS => {
       if (/Windows NT/i.test(userAgent)) return "Windows";
-      if (/Mac OS X/i.test(userAgent) && !/Mobile/i.test(userAgent)) return "macOS";
+      if (/Mac OS X/i.test(userAgent)) {
+        if (navigator.maxTouchPoints > 1) {
+          return "iOS"; // iPads && iPhones have touch support
+        } else {
+          return "macOS";
+        }
+      }
       if (/iPhone|iPad|iPod/i.test(userAgent)) return "iOS";
       if (/Android/i.test(userAgent)) return "Android";
       if (/Linux/i.test(userAgent)) return "Linux";
@@ -58,12 +65,19 @@ const useDeviceInfo = () => {
     };
 
     detectBrowser().then((browser) => {
-      setIsMobile(isMobile);
       setBrowser(browser);
       setOS(detectOS());
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    // Set device type based on OS
+    setIsMobile(os === "iOS" || os === "Android");
+  }, [os]);
+
+  const supportedBrowsers = useMemo<Browser[]>(() => compatibilityMap[os], [os]);
+  const isCompatible = useMemo<boolean>(() => supportedBrowsers.includes(browser), [supportedBrowsers, browser]);
 
   return {
     isMobile,
@@ -71,7 +85,8 @@ const useDeviceInfo = () => {
     os,
     loading,
     device: isMobile ? "Mobile" : "Desktop",
-    isCompatible: ["Chrome", "Edge", "Brave"].includes(browser)
+    isCompatible,
+    supportedBrowsers
   };
 };
 

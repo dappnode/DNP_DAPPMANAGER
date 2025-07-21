@@ -1,7 +1,7 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
 import Card from "components/Card";
-import { PwaInstallCards } from "./PwaInstallCards";
+import { PwaInstallScreen } from "./PwaInstallScreen";
 import { PwaRequirementsWrapper } from "components/PwaRequirementsWrapper";
 import LinkDocs from "components/LinkDocs";
 import { docsUrl } from "params";
@@ -15,7 +15,7 @@ export default function App() {
         <LinkDocs href={docsUrl.pwaHowToInstall}>Check installation guide.</LinkDocs>
       </Card>
       <PwaRequirementsWrapper
-        successComponent={<PwaInstallCards />}
+        successComponent={<PwaInstallScreen />}
         handleRedirectMessage="To install the app, you will be redirected to a different secure domain. Please, login with your current
               Dappnode credentials."
       />
