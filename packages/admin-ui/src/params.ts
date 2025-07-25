@@ -105,6 +105,7 @@ export const docsUrl = {
   pwaOverview: `${docsBaseUrl}/docs/user/dappnode-app/overview`,
   pwaHowToInstall: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install`,
   pwaResetPermissions: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install#reset-notifications-permissions`,
+  premiumOverview: `${docsBaseUrl}/docs/user/premium/overview`,
 };
 
 export const forumUrl = {
@@ -146,6 +147,7 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Premium
+export const premiumLanding = 'https://dappnode.io/premium';
 export const stripeDashboard = "https://dashboard.stripe.com/login";
 export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
 

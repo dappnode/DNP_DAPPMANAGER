@@ -2,7 +2,7 @@ import React from "react";
 import Loading from "components/Loading";
 import Card from "components/Card";
 import Button from "components/Button";
-import { dappnodeDiscord } from "params";
+import { dappnodeDiscord, premiumLanding } from "params";
 import newTabProps from "utils/newTabProps";
 import "./premiumWrapper.scss";
 
@@ -21,11 +21,22 @@ export function PremiumWrapper({ isLoading, isInstalled, isRunning, successCompo
   if (!isInstalled) {
     return (
       <RequirementCard>
-        <div>Premium package is not installed.</div>
-        <div>To continue, you must first install it.</div>
-        <Button variant="dappnode" onClick={() => console.log("Install Premium Pkg")}>
-          Install Premium
-        </Button>
+        <div>The Premium package must be installed to continue.</div>
+        <div>
+          Premium unlocks powerful features, including advanced push notifications, priority support, and automatic
+          beacon node backups.
+        </div>
+        <div>
+          To explore all features and pricing, click <i>Learn More</i> to visit the Dappnode Premium landing page.
+        </div>
+        <div className="premium-buttons">
+          <Button variant="outline-dappnode" href={premiumLanding} {...newTabProps}>
+            Learn More
+          </Button>
+          <Button variant="dappnode" onClick={() => console.log("Install Premium Pkg")}>
+            Install Premium
+          </Button>
+        </div>
       </RequirementCard>
     );
   }

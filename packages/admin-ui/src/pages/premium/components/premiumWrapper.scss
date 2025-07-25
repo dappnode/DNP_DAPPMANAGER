@@ -1,13 +1,21 @@
 .premium-requirements-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 20px;
+
+  a.btn,
+  button {
+    margin-top: 10px;
+  }
+
+  .premium-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    padding: 10px 0;
-  
-    a.btn, button {
-      margin-top: 10px;
-    }
   }
-  
+}
