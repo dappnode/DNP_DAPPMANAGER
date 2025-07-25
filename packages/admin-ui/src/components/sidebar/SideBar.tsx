@@ -36,7 +36,7 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
         {sidenavItems
           .filter((item) => item.show === true)
           .map((item) => (
-            <NavLink className={`sidenav-item selectable`} to={item.href}>
+            <NavLink className={`sidenav-item selectable ${item.name === "Premium" && "premium-item"}`} to={item.href}>
               <item.icon />
               {screenWidth > 640 && <span className="name svg-text">{item.name}</span>}
             </NavLink>
