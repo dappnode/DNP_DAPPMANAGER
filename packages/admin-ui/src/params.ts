@@ -145,4 +145,8 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 
+// Premium
+export const stripeDashboard = "https://dashboard.stripe.com/login";
+export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
+
 // Support, where to send issues
