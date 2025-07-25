@@ -12,6 +12,7 @@ import { MdSettings } from "react-icons/md";
 import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
+import { ActivatePremium } from "./ActivatePremium";
 
 const PremiumRoot: React.FC = () => {
   const routes: {
@@ -23,7 +24,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Activate",
       subPath: subPaths.activate,
-      component: () => <div>Activate</div>
+      component: () => <ActivatePremium isActivated={isActivated} />
     },
     {
       name: "Advanced notifications",
@@ -38,7 +39,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Beacon node backup",
       subPath: subPaths.beaconNodeBackup,
-      component: () => <div>Advfanced notifications</div>
+      component: () => <div>Beacon node backup</div>
     }
   ];
 
@@ -48,8 +49,8 @@ const PremiumRoot: React.FC = () => {
     <div className="premium-root">
       <div className="premium-header">
         <Title title={title} />
-        <div className={`premium-status ${isActivated ? "activated" : "unactivated"}`}>
-          {isActivated ? "Activated" : "Unactivated"}
+        <div className={`premium-status ${isActivated ? "activated" : "deactivated"}`}>
+          {isActivated ? "Activated" : "Deactivated"}
         </div>
         {isActivated && (
           <Button href={stripeDashboard} {...newTabProps} variant="outline-secondary">
