@@ -15,6 +15,8 @@ import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
 
 const PremiumRoot: React.FC = () => {
+  const { isActivated, isInstalled, isLoading, isRunning, prefilledLicense } = usePremium();
+
   const routes: {
     name: string;
     subPath: string;
@@ -24,7 +26,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Activate",
       subPath: subPaths.activate,
-      component: () => <ActivatePremium isActivated={isActivated} />
+      component: () => <ActivatePremium isActivated={isActivated} prefilledLicense={prefilledLicense} />
     },
     {
       name: "Advanced notifications",
@@ -42,8 +44,6 @@ const PremiumRoot: React.FC = () => {
       component: () => <div>Beacon node backup</div>
     }
   ];
-
-  const { isActivated, isInstalled, isLoading, isRunning } = usePremium();
 
   return (
     <div className="premium-root">
