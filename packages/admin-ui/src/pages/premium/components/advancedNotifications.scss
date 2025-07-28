@@ -1,0 +1,15 @@
+.premium-notifications-cont {
+  display: flex;
+  flex-direction: row;
+  padding: 30px;
+
+  align-items: center;
+  justify-content: space-between;
+  
+  .premium-notifications-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: flex-end;
+  }
+}

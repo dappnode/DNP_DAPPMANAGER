@@ -1,0 +1,14 @@
+.premium-support-cont {
+  display: flex;
+  flex-direction: row;
+  padding: 30px;
+
+  align-items: center;
+  justify-content: space-between;
+  .premium-support-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: flex-end;
+  }
+}
