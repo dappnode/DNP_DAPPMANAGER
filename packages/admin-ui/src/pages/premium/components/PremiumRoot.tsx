@@ -5,14 +5,11 @@ import { title, subPaths } from "../data";
 import Title from "components/Title";
 import { usePremium } from "hooks/usePremium";
 import "./premiumRoot.scss";
-import Button from "components/Button";
-import newTabProps from "utils/newTabProps";
-import { stripeDashboard } from "params";
-import { MdSettings } from "react-icons/md";
 import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
+import { BeaconNodeBackup } from "./BeaconNodeBackup";
 
 const PremiumRoot: React.FC = () => {
   const { isActivated, isInstalled, isLoading, isRunning, prefilledLicense } = usePremium();
@@ -31,12 +28,12 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Advanced notifications",
       subPath: subPaths.advancedNotifications,
-      component: () => <AdvancedNotifications />
+      component: () => <AdvancedNotifications isActivated={isActivated}/>
     },
     {
       name: "Premium support",
       subPath: subPaths.premiumSupport,
-      component: () => <PremiumSupport />
+      component: () => <PremiumSupport isActivated={isActivated}/>
     },
     {
       name: "Beacon node backup",
@@ -52,11 +49,6 @@ const PremiumRoot: React.FC = () => {
         <div className={`premium-status ${isActivated ? "activated" : "deactivated"}`}>
           {isActivated ? "Activated" : "Deactivated"}
         </div>
-        {isActivated && (
-          <Button href={stripeDashboard} {...newTabProps} variant="outline-secondary">
-            <MdSettings /> <span>Subscription Settings </span>
-          </Button>
-        )}
       </div>
 
       <div className="horizontal-navbar">
