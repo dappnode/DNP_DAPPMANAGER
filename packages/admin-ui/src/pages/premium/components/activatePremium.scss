@@ -10,6 +10,19 @@
 
     .card {
       max-height: fit-content;
+      flex: 1;
+      &.left-card {
+        flex: 0.6;
+      }
+      &.right-card {
+        flex: 0.4;
+      }
+      &.max-h {
+        max-height: 100%;
+        .premium-card {
+          height: 100%;
+        }
+      }
     }
 
     .premium-card {
@@ -26,6 +39,14 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+    }
+
+    .premium-stripe-portal {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      height: 100%;
+      justify-content: space-between;
     }
 
     .premium-info {
@@ -98,6 +119,13 @@
           align-items: center;
           justify-content: center;
           gap: 10px;
+
+          .premium-trial-tag {
+            text-align: center;
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: deepskyblue;
+          }
         }
       }
     }
@@ -106,15 +134,20 @@
 
 // Dark colors fix
 #dark {
-  .premium-root {
-    .premium-feature {
-      background-color: var(--color-dark-background-main);
-      .premium-feature-icon {
-        background-color: var(--color-dark-card);
+  #main {
+    .premium-root {
+      .premium-feature {
+        background-color: var(--color-dark-background-main);
+        .premium-feature-icon {
+          background-color: var(--color-dark-card);
+        }
       }
-    }
-    .premium-features-pricing {
-      border: 1px solid var(--color-dark-border);
+      .premium-features-pricing {
+        border: 1px solid var(--color-dark-border);
+      }
+      .premium-trial-tag {
+        color: deepskyblue;
+      }
     }
   }
 }

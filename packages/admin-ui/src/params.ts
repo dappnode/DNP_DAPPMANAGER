@@ -147,7 +147,7 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Premium
-export const premiumLanding = 'https://dappnode.io/premium';
+export const premiumLanding = 'https://dappnode.com/pages/dappnode-premium';
 export const stripeDashboard = "https://dashboard.stripe.com/login";
 export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
 

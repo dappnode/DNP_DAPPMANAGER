@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { docsUrl, premiumLanding, stripeDashboard } from "params";
+import { premiumLanding, stripeDashboard } from "params";
 import newTabProps from "utils/newTabProps";
 import Button from "components/Button";
 import Input from "components/Input";
 import { Card } from "react-bootstrap";
 import "./activatePremium.scss";
-
 interface ActivatePremiumProps {
   isActivated: boolean;
   prefilledLicense: string | null;
@@ -24,6 +23,24 @@ export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremi
     setActivationCode(newValue);
   };
 
+  return (
+    <div className="premium-activate-cont">
+      {isActivated ? (
+        <>
+          <StripePortalCard />
+          <DeactivateCard activationCode={activationCode} />
+        </>
+      ) : (
+        <>
+          <InfoCard />
+          <ActivateCard activationCode={activationCode} onCodeChange={handleCodeChange} />
+        </>
+      )}
+    </div>
+  );
+}
+
+const InfoCard: React.FC = () => {
   const features: { title: string; description: string; icon: JSX.Element }[] = [
     {
       title: "Advanced Notifications",
@@ -45,8 +62,8 @@ export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremi
     }
   ];
 
-  const InfoCard = () => (
-    <Card>
+  return (
+    <Card className="left-card">
       <div className="premium-info premium-card">
         <h5>What is included in Dappnode Premium?</h5>
         <div className="premium-features-col">
@@ -55,23 +72,17 @@ export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremi
               <div className="premium-feature-icon">{feature.icon}</div>
               <div className="premium-feature-text">
                 <div>
-                  <strong>{feature.title}:</strong>
+                  <strong>{feature.title}</strong>
                 </div>
                 <div> {feature.description}</div>
               </div>
             </div>
           ))}
-          {isActivated ? (
-            <div className="premium-features-cta">
-              <Button variant="outline-dappnode" href={docsUrl.premiumOverview} {...newTabProps}>
-                Read Docs
-              </Button>
-            </div>
-          ) : (
+          {
             <>
               <div className="premium-features-pricing">
                 <div>
-                  <b>$12.99 / month</b>
+                  <b>12.99 € / month</b>
                   <div>
                     <i> Billed monthly</i>
                   </div>
@@ -79,7 +90,7 @@ export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremi
 
                 <div>or</div>
                 <div>
-                  <b>$9.99 / month</b>
+                  <b>9.99 € / month</b>
                   <div>
                     <i> Billed annually</i>
                   </div>
@@ -92,43 +103,36 @@ export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremi
                 <Button variant="dappnode" href={stripeDashboard} {...newTabProps}>
                   Get Premium
                 </Button>
+                <div className="premium-trial-tag">
+                  15 day <br />
+                  free trial!
+                </div>
               </div>
             </>
-          )}
+          }
         </div>
       </div>
     </Card>
   );
-
-  return (
-    <div className="premium-activate-cont">
-      <InfoCard />
-      {isActivated ? (
-        <DeactivateCard activationCode={activationCode} />
-      ) : (
-        <ActivateCard activationCode={activationCode} onCodeChange={handleCodeChange} />
-      )}
-    </div>
-  );
-}
+};
 
 const ActivateCard: React.FC<{
   activationCode: string;
   onCodeChange: (value: string) => void;
 }> = ({ activationCode, onCodeChange }) => {
   return (
-    <Card>
+    <Card className="right-card">
       <div className="premium-card">
         <h5>Activate Premium subscription</h5>
         <div className="premium-activate">
-          <div>Activate the subscription with the same email in which you received the activation code.</div>
+          <div>Activate the subscription with the activation code sent to your email.</div>
           <div>
             <b>Activation code:</b>
             <Input
               type="text"
               onValueChange={onCodeChange}
               value={activationCode}
-              placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-V3"
+              placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX"
             />
           </div>
           <Button variant="dappnode" onClick={() => console.log("Activate premium")}>
@@ -146,21 +150,32 @@ const DeactivateCard: React.FC<{
   return (
     <Card>
       <div className="premium-card">
-        <h5>Deactivate Premium subscription</h5>
+        <h5>Deactivate Premium license</h5>
         <div className="premium-activate">
-          <div>Before using your license key on a different Dappnode, you have to deactivate it on this device.</div>
+          <div>Your activation code can only be used on one Dappnode at a time.</div>
+          <div>Before using your license on a different Dappnode, you have to deactivate it on this device.</div>
           <div>
-            <b>Activation code:</b>
-            <Input
-              type="text"
-              onValueChange={() => {}}
-              value={activationCode}
-              lock={true}
-              placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-V3"
-            />
+            <b>Activation code:</b> {activationCode}
           </div>
           <Button variant="dappnode" onClick={() => console.log("Deactivate premium")}>
             Deactivate
+          </Button>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+const StripePortalCard: React.FC = () => {
+  return (
+    <Card className="max-h">
+      <div className="premium-card">
+        <div className="premium-stripe-portal">
+          <h5>Manage Premium subscription</h5>
+          <div>To update, cancel, or renew your Dappnode premium subscription, visit the Stripe Customer Portal.</div>
+          <div>Log in using the email you used to subscribe.</div>
+          <Button href={stripeDashboard} {...newTabProps} variant="dappnode">
+            Visit Stripe Portal
           </Button>
         </div>
       </div>
