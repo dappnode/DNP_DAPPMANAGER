@@ -134,6 +134,12 @@ export interface Routes {
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
+  /**
+   * Returns the consensus client for a given network
+   * @param network Network to get the consensus client for
+   */
+  consensusClientsGetByNetworks: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
 
@@ -819,6 +825,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
+  consensusClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },

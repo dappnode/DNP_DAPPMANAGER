@@ -7,6 +7,7 @@ export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";
 export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
+export { consensusClientsGetByNetworks } from "./consensusClientGet.js";
 export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
