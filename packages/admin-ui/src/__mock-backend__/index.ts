@@ -413,7 +413,15 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
     httpsDnpInstalled: true,
     isHttpsRunning: true
-  })
+  }),
+  consensusClientsGetByNetworks: async () => {
+    return {
+      mainnet: "prysm.dnp.dappnode.eth",
+      gnosis: "prysm-gnosis.dnp.dappnode.eth",
+    };
+  }
+  
+  
 };
 
 export const calls: Routes = {

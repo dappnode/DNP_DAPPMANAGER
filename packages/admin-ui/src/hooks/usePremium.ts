@@ -20,7 +20,7 @@ export const usePremium = (): {
   const isLoading = false;
   const isInstalled = true;
   const isRunning = true;
-  const isActivated = false;
+  const isActivated = true;
 
   return {
     isLoading,

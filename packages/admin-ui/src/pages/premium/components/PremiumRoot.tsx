@@ -38,7 +38,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Beacon node backup",
       subPath: subPaths.beaconNodeBackup,
-      component: () => <div>Beacon node backup</div>
+      component: () => <BeaconNodeBackup isActivated={isActivated}/>
     }
   ];
 
