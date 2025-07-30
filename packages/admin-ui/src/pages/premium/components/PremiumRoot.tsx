@@ -21,7 +21,8 @@ const PremiumRoot: React.FC = () => {
     licenseKey,
     setLicenseKey,
     handleActivate,
-    deactivateLicenseKey
+    isActivationLoading,
+    handleDectivate
   } = usePremium();
 
   const routes: {
@@ -39,7 +40,8 @@ const PremiumRoot: React.FC = () => {
           licenseKey={licenseKey}
           setLicenseKey={setLicenseKey}
           handleActivate={handleActivate}
-          deactivateLicenseKey={deactivateLicenseKey}
+          handleDectivate={handleDectivate}
+          isActivationLoading={isActivationLoading}
         />
       )
     },
@@ -64,9 +66,11 @@ const PremiumRoot: React.FC = () => {
     <div className="premium-root">
       <div className="premium-header">
         <Title title={title} />
-        <div className={`premium-status ${isActivated ? "activated" : "deactivated"}`}>
-          {isActivated ? "Activated" : "Deactivated"}
-        </div>
+        {!isActivationLoading && (
+          <div className={`premium-status ${isActivated ? "activated" : "deactivated"}`}>
+            {isActivated ? "Activated" : "Deactivated"}
+          </div>
+        )}
       </div>
 
       <div className="horizontal-navbar">
