@@ -70,6 +70,14 @@ export { poweroffHost } from "./poweroffHost.js";
 export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
+export {
+  premiumPkgStatus,
+  premiumSetLicenseKey,
+  premiumGetLicenseKey,
+  premiumActivateLicense,
+  premiumDeactivateLicense,
+  premiumIsLicenseActive
+} from "./premium.js";
 export { rebootHost } from "./rebootHost.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";

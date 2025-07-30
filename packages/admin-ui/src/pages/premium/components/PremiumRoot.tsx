@@ -9,10 +9,20 @@ import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
-import { BeaconNodeBackup } from "./BeaconNodeBackup";
 
 const PremiumRoot: React.FC = () => {
-  const { isActivated, isInstalled, isLoading, isRunning, prefilledLicense } = usePremium();
+  const {
+    isActivated,
+    isInstalled,
+    isInstalling,
+    installPremiumPkg,
+    isLoading,
+    isRunning,
+    licenseKey,
+    setLicenseKey,
+    handleActivate,
+    deactivateLicenseKey
+  } = usePremium();
 
   const routes: {
     name: string;
@@ -23,17 +33,25 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Activate",
       subPath: subPaths.activate,
-      component: () => <ActivatePremium isActivated={isActivated} prefilledLicense={prefilledLicense} />
+      component: () => (
+        <ActivatePremium
+          isActivated={isActivated}
+          licenseKey={licenseKey}
+          setLicenseKey={setLicenseKey}
+          handleActivate={handleActivate}
+          deactivateLicenseKey={deactivateLicenseKey}
+        />
+      )
     },
     {
       name: "Advanced notifications",
       subPath: subPaths.advancedNotifications,
-      component: () => <AdvancedNotifications isActivated={isActivated}/>
+      component: () => <AdvancedNotifications isActivated={isActivated} />
     },
     {
       name: "Premium support",
       subPath: subPaths.premiumSupport,
-      component: () => <PremiumSupport isActivated={isActivated}/>
+      component: () => <PremiumSupport isActivated={isActivated} />
     },
     {
       name: "Beacon node backup",
@@ -64,6 +82,8 @@ const PremiumRoot: React.FC = () => {
       <div className="section-spacing">
         <PremiumWrapper
           isInstalled={isInstalled}
+          isInstalling={isInstalling}
+          installPremiumPkg={installPremiumPkg}
           isLoading={isLoading}
           isRunning={isRunning}
           successComponent={

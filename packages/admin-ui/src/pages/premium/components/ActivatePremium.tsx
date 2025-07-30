@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { premiumLanding, stripeDashboard } from "params";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { premiumLanding, stripePortal } from "params";
 import newTabProps from "utils/newTabProps";
 import Button from "components/Button";
 import Input from "components/Input";
@@ -7,38 +7,29 @@ import { Card } from "react-bootstrap";
 import "./activatePremium.scss";
 interface ActivatePremiumProps {
   isActivated: boolean;
-  prefilledLicense: string | null;
+  licenseKey: string;
+  setLicenseKey: Dispatch<SetStateAction<string>>;
+  handleActivate: () => Promise<void>;
+  deactivateLicenseKey: () => Promise<void>;
 }
 
-export function ActivatePremium({ isActivated, prefilledLicense }: ActivatePremiumProps) {
-  const [activationCode, setActivationCode] = useState<string>("");
-
-  useEffect(() => {
-    if (prefilledLicense) {
-      setActivationCode(prefilledLicense);
-    }
-  }, [prefilledLicense]);
-
-  const handleCodeChange = (newValue: string) => {
-    setActivationCode(newValue);
-  };
-
+export const ActivatePremium = ({ isActivated, licenseKey, setLicenseKey, handleActivate, deactivateLicenseKey }: ActivatePremiumProps) => {
   return (
     <div className="premium-activate-cont">
       {isActivated ? (
         <>
           <StripePortalCard />
-          <DeactivateCard activationCode={activationCode} />
+          <DeactivateCard activationCode={licenseKey} deactivateLicenseKey={deactivateLicenseKey} />
         </>
       ) : (
         <>
           <InfoCard />
-          <ActivateCard activationCode={activationCode} onCodeChange={handleCodeChange} />
+          <ActivateCard activationCode={licenseKey} setLicenseKey={setLicenseKey} handleActivate={handleActivate} />
         </>
       )}
     </div>
   );
-}
+};
 
 const InfoCard: React.FC = () => {
   const features: { title: string; description: string; icon: JSX.Element }[] = [
@@ -100,7 +91,7 @@ const InfoCard: React.FC = () => {
                 <Button variant="outline-dappnode" href={premiumLanding} {...newTabProps}>
                   Visit Web
                 </Button>
-                <Button variant="dappnode" href={stripeDashboard} {...newTabProps}>
+                <Button variant="dappnode" href={stripePortal} {...newTabProps}>
                   Get Premium
                 </Button>
                 <div className="premium-trial-tag">
@@ -118,8 +109,19 @@ const InfoCard: React.FC = () => {
 
 const ActivateCard: React.FC<{
   activationCode: string;
-  onCodeChange: (value: string) => void;
-}> = ({ activationCode, onCodeChange }) => {
+  setLicenseKey: Dispatch<SetStateAction<string>>;
+  handleActivate: () => Promise<void>;
+}> = ({ activationCode, setLicenseKey, handleActivate }) => {
+  const [localLicenseKey, setLocalLicenseKey] = useState(activationCode);
+
+  const handleInputChange = (newValue: string) => {
+    setLocalLicenseKey(newValue);
+  };
+
+  const handleBlur = () => {
+    setLicenseKey(localLicenseKey);
+  };
+
   return (
     <Card className="right-card">
       <div className="premium-card">
@@ -130,12 +132,13 @@ const ActivateCard: React.FC<{
             <b>Activation code:</b>
             <Input
               type="text"
-              onValueChange={onCodeChange}
-              value={activationCode}
+              onValueChange={handleInputChange}
+              value={localLicenseKey}
+              onBlur={handleBlur}
               placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX"
             />
           </div>
-          <Button variant="dappnode" onClick={() => console.log("Activate premium")}>
+          <Button variant="dappnode" onClick={handleActivate}>
             Activate
           </Button>
         </div>
@@ -146,7 +149,8 @@ const ActivateCard: React.FC<{
 
 const DeactivateCard: React.FC<{
   activationCode: string;
-}> = ({ activationCode }) => {
+  deactivateLicenseKey: () => Promise<void>;
+}> = ({ activationCode, deactivateLicenseKey }) => {
   return (
     <Card>
       <div className="premium-card">
@@ -157,7 +161,7 @@ const DeactivateCard: React.FC<{
           <div>
             <b>Activation code:</b> {activationCode}
           </div>
-          <Button variant="dappnode" onClick={() => console.log("Deactivate premium")}>
+          <Button variant="dappnode" onClick={deactivateLicenseKey}>
             Deactivate
           </Button>
         </div>
@@ -174,7 +178,7 @@ const StripePortalCard: React.FC = () => {
           <h5>Manage Premium subscription</h5>
           <div>To update, cancel, or renew your Dappnode premium subscription, visit the Stripe Customer Portal.</div>
           <div>Log in using the email you used to subscribe.</div>
-          <Button href={stripeDashboard} {...newTabProps} variant="dappnode">
+          <Button href={stripePortal} {...newTabProps} variant="dappnode">
             Visit Stripe Portal
           </Button>
         </div>
