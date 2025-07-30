@@ -53,6 +53,7 @@ export const coreDnpName = "core.dnp.dappnode.eth";
 export const bindDnpName = "bind.dnp.dappnode.eth";
 export const vpnDnpName = "vpn.dnp.dappnode.eth";
 export const notificationsDnpName = "notifications.dnp.dappnode.eth";
+export const premiumDnpName = "premium.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
@@ -148,7 +149,7 @@ export const MAIN_ADMIN_NAME = "dappnode_admin";
 
 // Premium
 export const premiumLanding = 'https://dappnode.com/pages/dappnode-premium';
-export const stripeDashboard = "https://dashboard.stripe.com/login";
+export const stripePortal = "https://billing.stripe.com/p/login/8x29ASeSmeOu18Yao2dby00";
 export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
 
 // Support, where to send issues

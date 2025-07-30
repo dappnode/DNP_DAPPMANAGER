@@ -9,13 +9,32 @@ import "./premiumWrapper.scss";
 interface PremiumWrapperProps {
   isLoading: boolean;
   isInstalled: boolean;
+  isInstalling: boolean;
+  installPremiumPkg: () => Promise<void>;
   isRunning: boolean;
   successComponent: React.ReactNode;
 }
 
-export function PremiumWrapper({ isLoading, isInstalled, isRunning, successComponent }: PremiumWrapperProps) {
+export function PremiumWrapper({
+  isLoading,
+  isInstalled,
+  isInstalling,
+  installPremiumPkg,
+  isRunning,
+  successComponent
+}: PremiumWrapperProps) {
   if (isLoading) {
     return <Loading steps={["Checking Requirements"]} />;
+  }
+
+  if (isInstalling) {
+    return (
+      <Card>
+        <div className="premium-installing">
+          <Loading steps={["Installing Premium Package"]} />
+        </div>
+      </Card>
+    );
   }
 
   if (!isInstalled) {
@@ -33,7 +52,7 @@ export function PremiumWrapper({ isLoading, isInstalled, isRunning, successCompo
           <Button variant="outline-dappnode" href={premiumLanding} {...newTabProps}>
             Learn More
           </Button>
-          <Button variant="dappnode" onClick={() => console.log("Install Premium Pkg")}>
+          <Button variant="dappnode" onClick={() => installPremiumPkg()}>
             Install Premium
           </Button>
         </div>
@@ -44,8 +63,8 @@ export function PremiumWrapper({ isLoading, isInstalled, isRunning, successCompo
   if (!isRunning) {
     return (
       <RequirementCard>
-        <div>Premium Package is not running after restarting.</div>
-        <div>Try to reinstall the package or contact support.</div>
+        <div>Premium Package is installed but not running.</div>
+        <div>Please try restarting the package, reinstalling it, or contacting support for further help.</div>
         <Button href={dappnodeDiscord} {...newTabProps} variant="dappnode">
           Contact support
         </Button>

@@ -413,7 +413,19 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
     httpsDnpInstalled: true,
     isHttpsRunning: true
-  })
+  }),
+  premiumPkgStatus: async () => ({
+    premiumDnpInstalled: true,
+    premiumDnpRunning: true
+  }),
+  premiumSetLicenseKey: async () => {},
+  premiumGetLicenseKey: async () => ({
+    key: "ABCDEF-123456-ABCDEF-123456-ABCDEF-V1",
+    hash: "1234567890abcdef1234567890abcdef1234567890"
+  }),
+  premiumActivateLicense: async () => {},
+  premiumDeactivateLicense: async () => {},
+  premiumIsLicenseActive: async () => false
 };
 
 export const calls: Routes = {

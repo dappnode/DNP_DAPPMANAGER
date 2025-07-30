@@ -621,6 +621,43 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the Premium package status
+   */
+  premiumPkgStatus: () => Promise<{
+    premiumDnpInstalled: boolean;
+    premiumDnpRunning: boolean;
+  }>;
+
+  /**
+   * Sets current license key
+   * @param licenseKey License key to set
+   */
+  premiumSetLicenseKey: (licenseKey: string) => Promise<void>;
+
+  /**
+   * Returns your current license key and hash
+   */
+  premiumGetLicenseKey: () => Promise<{
+    key: string;
+    hash: string;
+  }>;
+
+  /**
+   * Activates premium license key
+   */
+  premiumActivateLicense: () => Promise<void>;
+
+  /**
+   * Deactivates premium license key
+   */
+  premiumDeactivateLicense: () => Promise<void>;
+
+  /**
+   * Checks if the premium license is active
+   */
+  premiumIsLicenseActive: () => Promise<boolean>;
+
+  /**
    * Returns the PWA mapping URL if it exists, otherwise returns undefined.
    */
   pwaUrlGet: () => Promise<string | undefined>;
@@ -862,6 +899,12 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  premiumPkgStatus: {},
+  premiumSetLicenseKey: { log: true },
+  premiumGetLicenseKey: { log: true },
+  premiumActivateLicense: { log: true },
+  premiumDeactivateLicense: { log: true },
+  premiumIsLicenseActive: { log: true },
   pwaUrlGet: {},
   pwaRequirementsGet: {},
   rebootHost: { log: true },
