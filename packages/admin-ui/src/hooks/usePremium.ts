@@ -15,7 +15,8 @@ export const usePremium = (): {
   setLicenseKey: Dispatch<SetStateAction<string>>;
   isActivated: boolean;
   handleActivate: () => Promise<void>;
-  deactivateLicenseKey: () => Promise<void>;
+  handleDectivate: () => Promise<void>;
+  isActivationLoading: boolean;
   hashedLicense: string;
 } => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -24,6 +25,7 @@ export const usePremium = (): {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [licenseKey, setLicenseKey] = useState<string>("");
   const [isActivated, setIsActivated] = useState<boolean>(false);
+  const [isActivationLoading, setIsActivationLoading] = useState<boolean>(true);
   const [hashedLicense, setHashedLicense] = useState<string>("");
 
   const premiumPkgReq = useApi.premiumPkgStatus();
@@ -42,10 +44,14 @@ export const usePremium = (): {
   }, [premiumPkgReq.data]);
 
   useEffect(() => {
-    if (premiumActiveReq.data) {
+    if (premiumActiveReq.data !== undefined) {
       setIsActivated(premiumActiveReq.data);
     }
   }, [premiumActiveReq.data]);
+
+  useEffect(() => {
+    setIsActivationLoading(premiumActiveReq.isValidating);
+  }, [premiumActiveReq.isValidating]);
 
   useEffect(() => {
     if (!licenseKeyReq.data) return;
@@ -121,9 +127,18 @@ export const usePremium = (): {
     try {
       await putLicenseKey(licenseKey);
       await activateLicenseKey();
-      await premiumActiveReq.revalidate();
+      premiumActiveReq.revalidate();
     } catch (error) {
       console.error(`Error while activating license key: ${error}`);
+    }
+  };
+
+  const handleDectivate = async (): Promise<void> => {
+    try {
+      await deactivateLicenseKey();
+      premiumActiveReq.revalidate();
+    } catch (error) {
+      console.error(`Error while deactivating license key: ${error}`);
     }
   };
 
@@ -137,7 +152,8 @@ export const usePremium = (): {
     licenseKey,
     setLicenseKey,
     handleActivate,
-    deactivateLicenseKey,
+    handleDectivate,
+    isActivationLoading,
     hashedLicense
   };
 };

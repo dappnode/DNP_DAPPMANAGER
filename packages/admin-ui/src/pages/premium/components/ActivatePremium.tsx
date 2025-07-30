@@ -5,26 +5,39 @@ import Button from "components/Button";
 import Input from "components/Input";
 import { Card } from "react-bootstrap";
 import "./activatePremium.scss";
+import Loading from "components/Loading";
 interface ActivatePremiumProps {
   isActivated: boolean;
   licenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
   handleActivate: () => Promise<void>;
-  deactivateLicenseKey: () => Promise<void>;
+  handleDectivate: () => Promise<void>;
+  isActivationLoading: boolean;
 }
 
-export const ActivatePremium = ({ isActivated, licenseKey, setLicenseKey, handleActivate, deactivateLicenseKey }: ActivatePremiumProps) => {
+export const ActivatePremium = ({
+  isActivated,
+  licenseKey,
+  setLicenseKey,
+  handleActivate,
+  handleDectivate,
+  isActivationLoading
+}: ActivatePremiumProps) => {
+  if (isActivationLoading) {
+    return <Loading steps={["Loading Activation"]} />;
+  }
+
   return (
     <div className="premium-activate-cont">
       {isActivated ? (
         <>
           <StripePortalCard />
-          <DeactivateCard activationCode={licenseKey} deactivateLicenseKey={deactivateLicenseKey} />
+          <DeactivateCard licenseKey={licenseKey} handleDectivate={handleDectivate} />
         </>
       ) : (
         <>
           <InfoCard />
-          <ActivateCard activationCode={licenseKey} setLicenseKey={setLicenseKey} handleActivate={handleActivate} />
+          <ActivateCard licenseKey={licenseKey} setLicenseKey={setLicenseKey} handleActivate={handleActivate} />
         </>
       )}
     </div>
@@ -108,11 +121,11 @@ const InfoCard: React.FC = () => {
 };
 
 const ActivateCard: React.FC<{
-  activationCode: string;
+  licenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
   handleActivate: () => Promise<void>;
-}> = ({ activationCode, setLicenseKey, handleActivate }) => {
-  const [localLicenseKey, setLocalLicenseKey] = useState(activationCode);
+}> = ({ licenseKey, setLicenseKey, handleActivate }) => {
+  const [localLicenseKey, setLocalLicenseKey] = useState(licenseKey);
 
   const handleInputChange = (newValue: string) => {
     setLocalLicenseKey(newValue);
@@ -138,7 +151,11 @@ const ActivateCard: React.FC<{
               placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX"
             />
           </div>
-          <Button variant="dappnode" onClick={handleActivate}>
+          <Button
+            variant="dappnode"
+            onClick={handleActivate}
+            disabled={!localLicenseKey}
+          >
             Activate
           </Button>
         </div>
@@ -148,9 +165,9 @@ const ActivateCard: React.FC<{
 };
 
 const DeactivateCard: React.FC<{
-  activationCode: string;
-  deactivateLicenseKey: () => Promise<void>;
-}> = ({ activationCode, deactivateLicenseKey }) => {
+  licenseKey: string;
+  handleDectivate: () => Promise<void>;
+}> = ({ licenseKey, handleDectivate }) => {
   return (
     <Card>
       <div className="premium-card">
@@ -159,9 +176,9 @@ const DeactivateCard: React.FC<{
           <div>Your activation code can only be used on one Dappnode at a time.</div>
           <div>Before using your license on a different Dappnode, you have to deactivate it on this device.</div>
           <div>
-            <b>Activation code:</b> {activationCode}
+            <b>Activation code:</b> {licenseKey}
           </div>
-          <Button variant="dappnode" onClick={deactivateLicenseKey}>
+          <Button variant="dappnode" onClick={handleDectivate}>
             Deactivate
           </Button>
         </div>
