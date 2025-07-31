@@ -15,8 +15,9 @@ export const useBeaconNodeBackup = (
   backupStatusLoading: boolean;
   backupActive: boolean;
   backupActivable: boolean;
-  timeUntilActivable?: string;
-  timeUntilDeactivation?: string;
+  secondsUntilActivable?: number;
+  secondsUntilDeactivation?: number;
+  formatCountdown: (totalSeconds?: number) => string | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
   const backupEnvName = "BACKUP_BEACON_NODES";
@@ -27,8 +28,8 @@ export const useBeaconNodeBackup = (
   const [backupStatusLoading, setBackupStatusLoading] = useState(true);
   const [backupActive, setBackupActive] = useState<boolean>(false);
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
-  const [timeUntilActivable, setTimeUntilActivable] = useState<string | undefined>(undefined);
-  const [timeUntilDeactivation, setTimeUntilDeactivation] = useState<string | undefined>(undefined);
+  const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
+  const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
 
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({
     networks: availableNetworks
@@ -53,11 +54,41 @@ export const useBeaconNodeBackup = (
   useEffect(() => {
     if (backupStatusReq.data) {
       setBackupActive(backupStatusReq.data.isActive);
-      setTimeUntilActivable(backupStatusReq.data.timeUntilActivable);
+      setSecondsUntilActivable(backupStatusReq.data.secondsUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
-      setTimeUntilDeactivation(backupStatusReq.data.timeUntilDeactivation);
+      setSecondsUntilDeactivation(backupStatusReq.data.secondsUntilDeactivation);
     }
   }, [backupStatusReq.data]);
+
+  // useEffect to update the seconds until activable and deactivation without revalidating the request
+  // revalidating if the seconds reach < 1
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsUntilActivable((prev) => {
+        if (typeof prev === "number") {
+          if (prev <= 1) {
+            backupStatusReq.revalidate();
+            return undefined;
+          }
+          return prev - 1;
+        }
+        return prev;
+      });
+
+      setSecondsUntilDeactivation((prev) => {
+        if (typeof prev === "number") {
+          if (prev <= 1) {
+            backupStatusReq.revalidate();
+            return undefined;
+          }
+          return prev - 1;
+        }
+        return prev;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const setBackupEnv = async (type: "activate" | "deactivate") => {
     if (!hashedLicense) {
@@ -116,7 +147,9 @@ export const useBeaconNodeBackup = (
   const deactivateBackup = () => {
     confirm({
       title: `Deactivating Beacon Node Backup`,
-      text: `Deactivating the Beacon Node backup is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${timeUntilDeactivation}.`,
+      text: `Deactivating the Beacon Node backup is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
+        secondsUntilDeactivation
+      )}.`,
       label: "Deactivate",
       variant: "danger",
       onClick: () =>
@@ -128,6 +161,15 @@ export const useBeaconNodeBackup = (
     });
   };
 
+  const formatCountdown = (totalSeconds?: number): string | undefined => {
+    if (totalSeconds === undefined) return undefined;
+    const d = Math.floor(totalSeconds / 86400);
+    const h = Math.floor((totalSeconds % 86400) / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = totalSeconds % 60;
+    return `${d} days ${h} hours ${m} mins ${s} secs`;
+  };
+
   return {
     consensusLoading,
     currentConsensus,
@@ -136,7 +178,8 @@ export const useBeaconNodeBackup = (
     backupStatusLoading,
     backupActive,
     backupActivable,
-    timeUntilActivable,
-    timeUntilDeactivation
+    secondsUntilActivable,
+    secondsUntilDeactivation,
+    formatCountdown
   };
 };

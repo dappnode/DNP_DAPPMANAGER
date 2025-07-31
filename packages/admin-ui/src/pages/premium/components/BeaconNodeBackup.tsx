@@ -26,8 +26,9 @@ export function BeaconNodeBackup({
     backupActive,
     activateBackup,
     deactivateBackup,
-    timeUntilActivable,
-    timeUntilDeactivation
+    secondsUntilActivable,
+    secondsUntilDeactivation,
+    formatCountdown
   } = useBeaconNodeBackup(hashedLicense);
 
   if (consensusLoading || backupStatusLoading) {
@@ -47,12 +48,12 @@ export function BeaconNodeBackup({
             <div>
               Once the backup is activated, it will be used regardless of whether you deactivate it later. The backup is
               renewed monthly.
-              {!backupActive && timeUntilActivable && (
+              {!backupActive && secondsUntilActivable && (
                 <div>
                   <br />
                   <div>Time remaining until backup available:</div>
-                  <div>
-                    <b>{timeUntilActivable}</b>
+                  <div className="premium-beacon-backup-countdown">
+                    <b>{formatCountdown(secondsUntilActivable)}</b>
                   </div>
                 </div>
               )}
@@ -88,11 +89,11 @@ export function BeaconNodeBackup({
         <Card className="premium-backup-active-card">
           <div className="premium-backup-active-col">
             <h5>Backup active</h5>
-            {timeUntilDeactivation && (
+            {secondsUntilDeactivation && (
               <div>
                 <div>Backup time remaining:</div>
-                <div>
-                  <b>{timeUntilDeactivation}</b>
+                <div className="premium-beacon-backup-countdown">
+                  <b>{formatCountdown(secondsUntilDeactivation)}</b>
                 </div>
               </div>
             )}

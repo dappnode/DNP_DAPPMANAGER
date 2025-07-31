@@ -682,16 +682,16 @@ export interface Routes {
    *
    * - Determines if the backup is activable.
    * - Determines if the backup is currently active.
-   * - Returns time remaining until activation becomes possible (if not activable).
-   * - Returns time remaining until deactivation (if currently active).
+   * - Returns time remaining until activation becomes possible in seconds (if not activable).
+   * - Returns time remaining until deactivation in seconds (if currently active).
    *
    * @param hashedLicense The hashed license string used to identify the key.
    */
   premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
     isActivable: boolean;
     isActive: boolean;
-    timeUntilActivable?: string;
-    timeUntilDeactivation?: string;
+    secondsUntilActivable?: number;
+    secondsUntilDeactivation?: number;
   }>;
 
   /**

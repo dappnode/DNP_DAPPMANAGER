@@ -437,7 +437,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   premiumBeaconBackupStatus: async () => ({
     isActivable: false,
     isActive: true,
-    timeUntilDeactivation: "30d 12h 5m"
+    secondsUntilDeactivation: 259200
   })
 };
 

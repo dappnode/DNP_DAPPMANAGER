@@ -132,8 +132,8 @@ export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> =
  *
  * - Determines if the backup is activable.
  * - Determines if the backup is currently active.
- * - Returns time remaining until activation becomes possible (if not activable).
- * - Returns time remaining until deactivation (if currently active).
+ * - Returns time remaining until activation becomes possible in seconds (if not activable).
+ * - Returns time remaining until deactivation in seconds (if currently active).
  *
  * @param hashedLicense The hashed license string used to identify the key.
  */
@@ -141,9 +141,9 @@ export const premiumBeaconBackupStatus = async (
   hashedLicense: string
 ): Promise<{
   isActivable: boolean;
-  timeUntilActivable?: string;
+  secondsUntilActivable?: number;
   isActive: boolean;
-  timeUntilDeactivation?: string;
+  secondsUntilDeactivation?: number;
 }> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/${hashedLicense}`);
 
@@ -167,28 +167,20 @@ export const premiumBeaconBackupStatus = async (
 
   const result: {
     isActivable: boolean;
-    timeUntilActivable?: string;
+    secondsUntilActivable?: number;
     isActive: boolean;
-    timeUntilDeactivation?: string;
+    secondsUntilDeactivation?: number;
   } = {
     isActivable,
     isActive
   };
 
   if (!isActivable) {
-    const timeUntilActivableMs = gracePeriodEnd.getTime() - now.getTime();
-    const days = Math.floor(timeUntilActivableMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeUntilActivableMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeUntilActivableMs % (1000 * 60 * 60)) / (1000 * 60));
-    result.timeUntilActivable = `${days}d ${hours}h ${minutes}m`;
+    result.secondsUntilActivable = Math.floor((gracePeriodEnd.getTime() - now.getTime()) / 1000);
   }
 
   if (isActive) {
-    const timeUntilDeactivationMs = validUntil.getTime() - now.getTime();
-    const days = Math.floor(timeUntilDeactivationMs / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((timeUntilDeactivationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((timeUntilDeactivationMs % (1000 * 60 * 60)) / (1000 * 60));
-    result.timeUntilDeactivation = `${days}d ${hours}h ${minutes}m`;
+    result.secondsUntilDeactivation = Math.floor((validUntil.getTime() - now.getTime()) / 1000);
   }
 
   return result;
