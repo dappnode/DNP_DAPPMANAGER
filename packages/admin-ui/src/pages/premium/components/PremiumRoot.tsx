@@ -9,6 +9,7 @@ import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
+import { BeaconNodeBackup } from "./BeaconNodeBackup";
 
 const PremiumRoot: React.FC = () => {
   const {
@@ -22,7 +23,8 @@ const PremiumRoot: React.FC = () => {
     setLicenseKey,
     handleActivate,
     isActivationLoading,
-    handleDectivate
+    handleDectivate,
+    hashedLicense
   } = usePremium();
 
   const routes: {
@@ -58,7 +60,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Beacon node backup",
       subPath: subPaths.beaconNodeBackup,
-      component: () => <div>Beacon node backup</div>
+      component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense}  />
     }
   ];
 
