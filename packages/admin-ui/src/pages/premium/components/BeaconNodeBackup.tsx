@@ -1,117 +1,119 @@
 import { Network } from "@dappnode/types";
-import { api, useApi } from "api";
 import Button from "components/Button";
-import React, { useEffect, useState } from "react";
-import { Card } from "react-bootstrap";
+import React from "react";
+import { Alert, Card } from "react-bootstrap";
 import Loading from "components/Loading";
 import { relativePath } from "../data";
 import { useNavigate } from "react-router-dom";
-import { withToast } from "components/toast/Toast";
 import { prettyDnpName } from "utils/format";
+import { useBeaconNodeBackup } from "hooks/useBeaconNodeBackup";
+import { capitalize } from "utils/strings";
 import "./beaconNodeBackup.scss";
 
-export function BeaconNodeBackup({ isActivated }: { isActivated: boolean }) {
-  const availableNetworks: Network[] = [Network.Mainnet];
-  const [consensusLoading, setConsensusLoading] = useState(true);
-  const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, string | null | undefined>>>({});
-
+export function BeaconNodeBackup({
+  isActivated: isPremium,
+  hashedLicense
+}: {
+  isActivated: boolean;
+  hashedLicense: string;
+}) {
   const navigate = useNavigate();
-
-  const currentConsensusReq = useApi.consensusClientsGetByNetworks({
-    networks: availableNetworks
-  });
-
-  useEffect(() => {
-    setConsensusLoading(currentConsensusReq.isValidating);
-  }, [currentConsensusReq.isValidating]);
-
-  useEffect(() => {
-    if (currentConsensusReq.data) {
-      setCurrentConsensus(currentConsensusReq.data);
-    }
-  }, [currentConsensusReq.data]);
-
-  async function setBackupEnv() {
-    const envs = {
-      ["BACKUP_BEACON_NODES"]: "my-license-key"
-    };
-
-    const entries = Object.entries(currentConsensus) as [Network, string | null | undefined][];
-
-    for (const [, dnpName] of entries) {
-      if (!dnpName) continue; // Skip if dnpName is null or undefined
-
-      await withToast(
-        () =>
-          api.packageSetEnvironment({
-            dnpName,
-            environmentByService: { ["beacon-chain"]: envs }
-          }),
-        {
-          message: `Updating ${prettyDnpName(dnpName)} ENVs...`,
-          onSuccess: `Updated ${prettyDnpName(dnpName)} ENVs`
-        }
-      );
-    }
-  }
+  const {
+    consensusLoading,
+    currentConsensus,
+    backupStatusLoading,
+    backupActive,
+    backupActivable,
+    activateBackup,
+    deactivateBackup,
+    timeUntilActivable,
+    timeUntilDeactivation
+  } = useBeaconNodeBackup(hashedLicense);
 
   return (
     <div className="premium-beacon-backup-cont">
-      <Card>
-        <p>
-          The beacon node backup ensures that all your imported Ethereum validators in Dappnode stay up when you have
-          problems attesting. It backs you for 7 days to let you diagnose the issue, fix your setup and be back to
-          normal without missing attestations.
-        </p>
-      </Card>
-
-      {/* <div>
+      <Card className="premium-activate-backup-card">
         <div>
-          The maximum number of Ethereum validators to use the beacon node backup is 10. If you exceed this number we
-          invite you to consolidate your validators to use the service.
-        </div>
-        <Button>Check Docs</Button>
-      </div> */}
-
-      {isActivated ? (
-        consensusLoading ? (
-          <Loading steps={[`Loading consensus data`]} />
-        ) : (
-          <>
-            {" "}
+          <p>
+            The beacon node backup ensures that all your imported Ethereum validators in Dappnode stay up when you have
+            problems attesting. It backs you for 7 days to let you diagnose the issue, fix your setup and be back to
+            normal without missing attestations.
+          </p>
+          {isPremium ? (
             <div>
               Once the backup is activated, it will be used regardless of whether you deactivate it later. The backup is
               renewed monthly.
             </div>
-            <Button onClick={() => setBackupEnv()}> Inject ENV</Button>
+          ) : (
+            <div>Activate Premium to enable the beacon node backup.</div>
+          )}
+        </div>
+        {isPremium ? (
+          <Button
+            variant="dappnode"
+            onClick={() => console.log("Activate Beacon Node Backup")}
+            disabled={consensusLoading}
+          >
+            Activate Backup
+          </Button>
+        ) : (
+          <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
+            Activate Premium
+          </Button>
+        )}
+      </Card>
+
+      <Alert variant="warning">
+        <div className="premium-beacon-backup-alert">
+          <div>
+            The maximum number of Ethereum validators to use the beacon node backup is 10. If you exceed this number we
+            invite you to consolidate your validators to use the service.
+          </div>
+          <Button variant="warning">Check Docs</Button>
+        </div>
+      </Alert>
+      {isPremium &&
+        (consensusLoading ? (
+          <Loading steps={[`Loading consensus data`]} />
+        ) : (
+          <>
             <div>
+              <h5>Beacon Backup Nodes Available</h5>
               {Object.entries(currentConsensus).map(([network, client]) => (
                 <NetworkSection key={network} network={network as Network} client={client} />
               ))}
             </div>
+            <Button onClick={activateBackup}> Activate Backup</Button>
+            <Button onClick={deactivateBackup}>Deactivate Backup</Button>
           </>
-        )
-      ) : (
-        <>
-          <div>Activate Premium to enable the beacon node bakcup.</div>
-          <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
-            Activate Premium
-          </Button>
-        </>
-      )}
+        ))}
+
+      <div>
+        <div>Backup Status Loading? {backupStatusLoading ? "true" : "false"}</div>
+        <div>Backup activable? {backupActivable ? "true" : "false"}</div>
+        <div>timeUntilActivable? {timeUntilActivable}</div>
+        <div>Backup active? {backupActive ? "true" : "false"}</div>
+        <div>timeUntilDeactivation? {timeUntilDeactivation}</div>
+      </div>
     </div>
   );
 }
 
 const NetworkSection: React.FC<{ network: Network; client: string | null }> = ({ network, client }) => {
   return (
-    <div>
-      <h5>{network}</h5>
-      {client ? (
-        <div>Your current consensus: {prettyDnpName(client)}</div>
-      ) : (
-        <div>No consensus client set for this network</div>
-      )}
-    </div>
+    <>
+      <Card>
+        {client ? (
+          <div>
+            <h5>{capitalize(network)}</h5>
+            <div>
+              Selected consensus client: <b>{prettyDnpName(client)}</b>
+            </div>
+          </div>
+        ) : (
+          <div>No consensus client set for this network</div>
+        )}
+      </Card>
+    </>
   );
 };

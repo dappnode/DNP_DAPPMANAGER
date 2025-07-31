@@ -1,5 +1,28 @@
-.premium-beacon-backup-cont{
+.premium-beacon-backup-cont {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  .card {
+    padding: 30px;
+  }
+
+  .premium-activate-backup-card {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
+    flex-direction: row;
+    gap: 40px;
+    align-items: center;
+
+    button {
+      min-width: fit-content;
+    }
+  }
+
+  .premium-beacon-backup-alert {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
 }

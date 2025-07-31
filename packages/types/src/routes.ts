@@ -138,7 +138,9 @@ export interface Routes {
    * Returns the consensus client for a given network
    * @param network Network to get the consensus client for
    */
-  consensusClientsGetByNetworks: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+  consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
@@ -664,6 +666,35 @@ export interface Routes {
   premiumIsLicenseActive: () => Promise<boolean>;
 
   /**
+   * Activates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupActivate: (id: string) => Promise<void>;
+
+  /**
+   * Deactivates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupDeactivate: (id: string) => Promise<void>;
+
+  /**
+   * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
+   *
+   * - Determines if the backup is activable.
+   * - Determines if the backup is currently active.
+   * - Returns time remaining until activation becomes possible (if not activable).
+   * - Returns time remaining until deactivation (if currently active).
+   *
+   * @param hashedLicense The hashed license string used to identify the key.
+   */
+  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
+    isActivable: boolean;
+    isActive: boolean;
+    timeUntilActivable?: string;
+    timeUntilDeactivation?: string;
+  }>;
+
+  /**
    * Returns the PWA mapping URL if it exists, otherwise returns undefined.
    */
   pwaUrlGet: () => Promise<string | undefined>;
@@ -912,6 +943,9 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   premiumActivateLicense: { log: true },
   premiumDeactivateLicense: { log: true },
   premiumIsLicenseActive: { log: true },
+  premiumBeaconBackupActivate: { log: true },
+  premiumBeaconBackupDeactivate: { log: true },
+  premiumBeaconBackupStatus: { log: true },
   pwaUrlGet: {},
   pwaRequirementsGet: {},
   rebootHost: { log: true },

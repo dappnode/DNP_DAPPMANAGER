@@ -429,9 +429,16 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   consensusClientsGetByNetworks: async () => {
     return {
       mainnet: "prysm.dnp.dappnode.eth",
-      gnosis: "prysm-gnosis.dnp.dappnode.eth",
+      gnosis: "prysm-gnosis.dnp.dappnode.eth"
     };
-  }
+  },
+  premiumBeaconBackupActivate: async () => {},
+  premiumBeaconBackupDeactivate: async () => {},
+  premiumBeaconBackupStatus: async () => ({
+    isActivable: false,
+    isActive: true,
+    timeUntilDeactivation: "30d 12h 5m"
+  })
 };
 
 export const calls: Routes = {

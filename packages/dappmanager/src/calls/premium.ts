@@ -41,7 +41,7 @@ export const premiumSetLicenseKey = async (licenseKey: string): Promise<void> =>
 /**
  * Returns your current license key and hash
  */
-export const premiumGetLicenseKey = async (): Promise<{ key: string, hash:string }> => {
+export const premiumGetLicenseKey = async (): Promise<{ key: string; hash: string }> => {
   const response = await fetch(`${baseUrl}:8080/api/license`);
 
   if (!response.ok) {
@@ -89,4 +89,107 @@ export const premiumIsLicenseActive = async (): Promise<boolean> => {
 
   const data = await response.json();
   return data.valid;
+};
+
+/**
+ * Activates the beacon node backup
+ * @param id the hashed license
+ */
+export const premiumBeaconBackupActivate = async (id: string): Promise<void> => {
+  const response = await fetch(`${baseUrl}:8080/api/keys/activate`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ id })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to activate beacon backup: ${response.statusText}`);
+  }
+};
+
+/**
+ * Deactivates the beacon node backup
+ * @param id the hashed license
+ */
+export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> => {
+  const response = await fetch(`${baseUrl}:8080/api/keys/deactivate`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ id })
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to deactivate beacon backup: ${response.statusText}`);
+  }
+};
+
+/**
+ * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
+ *
+ * - Determines if the backup is activable.
+ * - Determines if the backup is currently active.
+ * - Returns time remaining until activation becomes possible (if not activable).
+ * - Returns time remaining until deactivation (if currently active).
+ *
+ * @param hashedLicense The hashed license string used to identify the key.
+ */
+export const premiumBeaconBackupStatus = async (
+  hashedLicense: string
+): Promise<{
+  isActivable: boolean;
+  timeUntilActivable?: string;
+  isActive: boolean;
+  timeUntilDeactivation?: string;
+}> => {
+  const response = await fetch(`${baseUrl}:8080/api/keys/${hashedLicense}`);
+
+  if (!response.ok) {
+    throw new Error(`Failed to check beacon backup activable: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  const validUntilString = data.ValidUntil;
+  const validUntil = new Date(validUntilString);
+  const now = new Date();
+
+  const isZeroTime = validUntilString === "0001-01-01T00:00:00Z";
+
+  // Activation grace period (30 days after ValidUntil)
+  const gracePeriodEnd = new Date(validUntil.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const hasPassedGracePeriod = now > gracePeriodEnd;
+
+  const isActivable = isZeroTime || hasPassedGracePeriod;
+  const isActive = validUntil > now;
+
+  const result: {
+    isActivable: boolean;
+    timeUntilActivable?: string;
+    isActive: boolean;
+    timeUntilDeactivation?: string;
+  } = {
+    isActivable,
+    isActive
+  };
+
+  if (!isActivable) {
+    const timeUntilActivableMs = gracePeriodEnd.getTime() - now.getTime();
+    const days = Math.floor(timeUntilActivableMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeUntilActivableMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeUntilActivableMs % (1000 * 60 * 60)) / (1000 * 60));
+    result.timeUntilActivable = `${days}d ${hours}h ${minutes}m`;
+  }
+
+  if (isActive) {
+    const timeUntilDeactivationMs = validUntil.getTime() - now.getTime();
+    const days = Math.floor(timeUntilDeactivationMs / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeUntilDeactivationMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeUntilDeactivationMs % (1000 * 60 * 60)) / (1000 * 60));
+    result.timeUntilDeactivation = `${days}d ${hours}h ${minutes}m`;
+  }
+
+  return result;
 };

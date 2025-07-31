@@ -23,7 +23,8 @@ const PremiumRoot: React.FC = () => {
     setLicenseKey,
     handleActivate,
     isActivationLoading,
-    handleDectivate
+    handleDectivate,
+    hashedLicense
   } = usePremium();
 
   const routes: {
@@ -59,7 +60,7 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Beacon node backup",
       subPath: subPaths.beaconNodeBackup,
-      component: () => <BeaconNodeBackup isActivated={isActivated}/>
+      component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense}  />
     }
   ];
 

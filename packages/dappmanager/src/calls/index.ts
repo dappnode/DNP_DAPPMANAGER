@@ -77,7 +77,10 @@ export {
   premiumGetLicenseKey,
   premiumActivateLicense,
   premiumDeactivateLicense,
-  premiumIsLicenseActive
+  premiumIsLicenseActive,
+  premiumBeaconBackupActivate,
+  premiumBeaconBackupDeactivate,
+  premiumBeaconBackupStatus
 } from "./premium.js";
 export { rebootHost } from "./rebootHost.js";
 export * from "./releaseTrustedKey.js";
