@@ -17,7 +17,7 @@ export const useBeaconNodeBackup = (
   timeUntilActivable?: string;
   timeUntilDeactivation?: string;
 } => {
-  const availableNetworks: Network[] = [Network.Mainnet];
+  const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
   const backupEnvName = "BACKUP_BEACON_NODES";
   const beaconChainServiceName = "beacon-chain";
 
