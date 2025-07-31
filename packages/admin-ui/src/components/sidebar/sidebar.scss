@@ -73,6 +73,9 @@
     svg {
       opacity: 0.7;
     }
+    &.active {
+      color: #ff397f;
+    }
   }
   &.premium-item:hover {
     color: #ff397f;
