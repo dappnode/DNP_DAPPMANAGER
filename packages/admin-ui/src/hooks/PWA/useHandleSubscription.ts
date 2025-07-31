@@ -136,7 +136,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
       // Clean up any old subscription
       if (subscription && !isSubInNotifier) {
         console.log("Deleting old subscription");
-        deleteSubscription(subscription.endpoint);
+        await deleteSubscription(subscription.endpoint);
       }
 
       // Convert + validate VAPID key
@@ -174,7 +174,7 @@ export function useHandleSubscription(): UseHandleSubscriptionResult {
     } finally {
       setIsSubscribing(false);
     }
-  }, [vapidKey, device, browser, os, isSubInNotifier]);
+  }, [vapidKey, device, browser, os, isSubInNotifier, subscription]);
 
   function urlBase64ToUint8Array(base64String: string) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
