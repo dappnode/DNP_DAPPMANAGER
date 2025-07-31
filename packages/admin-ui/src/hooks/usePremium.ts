@@ -4,6 +4,7 @@ import { withToast } from "components/toast/Toast";
 import { premiumDnpName } from "params";
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { prettyDnpName } from "utils/format";
+import { confirm } from "components/ConfirmDialog";
 
 export const usePremium = (): {
   isLoading: boolean;
@@ -135,8 +136,16 @@ export const usePremium = (): {
 
   const handleDectivate = async (): Promise<void> => {
     try {
-      await deactivateLicenseKey();
-      premiumActiveReq.revalidate();
+      confirm({
+        title: `Deactivate Premium license`,
+        text: `Are you sure you want to deactivate the premium license on this Dappnode?`,
+        label: "Deactivate",
+        variant: "danger",
+        onClick: async () => {
+          await deactivateLicenseKey();
+          premiumActiveReq.revalidate();
+        }
+      });
     } catch (error) {
       console.error(`Error while deactivating license key: ${error}`);
     }
