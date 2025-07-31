@@ -2,9 +2,18 @@
   display: flex;
   flex-direction: row;
   padding: 30px;
+  @media (max-width: 40rem) {
+    padding: 15px;
+  }
 
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 60rem) {
+    flex-direction: column;
+    gap: 20px;
+  }
+
   .premium-support-actions {
     display: flex;
     flex-direction: row;

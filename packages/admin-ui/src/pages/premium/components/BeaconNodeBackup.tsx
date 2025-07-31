@@ -121,16 +121,16 @@ const NetworkSection: React.FC<{ network: Network; client: string | null }> = ({
   return (
     <>
       <Card>
-        {client ? (
-          <div>
-            <h5>{capitalize(network)}</h5>
+        <div>
+          <h5>{capitalize(network)}</h5>
+          {client ? (
             <div>
               Selected consensus client: <b>{prettyDnpName(client)}</b>
             </div>
-          </div>
-        ) : (
-          <div>No consensus client set for this network</div>
-        )}
+          ) : (
+            <div>No consensus client set for {network} network</div>
+          )}
+        </div>
       </Card>
     </>
   );

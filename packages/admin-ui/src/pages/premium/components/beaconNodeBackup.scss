@@ -5,9 +5,12 @@
 
   .card {
     padding: 30px;
+    @media (max-width: 40rem) {
+      padding: 15px;
+    }
   }
 
-  .alert{
+  .alert {
     margin: 0px;
   }
 
@@ -20,6 +23,11 @@
     button {
       min-width: fit-content;
     }
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+      gap: 20px;
+    }
   }
 
   .premium-beacon-backup-alert {
@@ -28,6 +36,11 @@
     align-items: center;
     justify-content: space-between;
     gap: 40px;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+      gap: 20px;
+    }
   }
 
   .premium-backup-active-card {

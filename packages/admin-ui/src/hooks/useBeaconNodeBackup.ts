@@ -52,8 +52,6 @@ export const useBeaconNodeBackup = (
 
   useEffect(() => {
     if (backupStatusReq.data) {
-      console.log("Backup Status Data:", backupStatusReq.data);
-
       setBackupActive(backupStatusReq.data.isActive);
       setTimeUntilActivable(backupStatusReq.data.timeUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
