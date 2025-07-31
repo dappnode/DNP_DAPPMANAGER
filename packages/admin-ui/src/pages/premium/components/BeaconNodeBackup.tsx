@@ -22,13 +22,17 @@ export function BeaconNodeBackup({
     consensusLoading,
     currentConsensus,
     backupStatusLoading,
-    backupActive,
     backupActivable,
+    backupActive,
     activateBackup,
     deactivateBackup,
     timeUntilActivable,
     timeUntilDeactivation
   } = useBeaconNodeBackup(hashedLicense);
+
+  if (consensusLoading || backupStatusLoading) {
+    return <Loading steps={["Loading beacon node backup data"]} />;
+  }
 
   return (
     <div className="premium-beacon-backup-cont">
@@ -43,19 +47,26 @@ export function BeaconNodeBackup({
             <div>
               Once the backup is activated, it will be used regardless of whether you deactivate it later. The backup is
               renewed monthly.
+              {!backupActive && timeUntilActivable && (
+                <div>
+                  <br />
+                  <div>Time remaining until backup available:</div>
+                  <div>
+                    <b>{timeUntilActivable}</b>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <div>Activate Premium to enable the beacon node backup.</div>
           )}
         </div>
         {isPremium ? (
-          <Button
-            variant="dappnode"
-            onClick={() => console.log("Activate Beacon Node Backup")}
-            disabled={consensusLoading}
-          >
-            Activate Backup
-          </Button>
+          backupActivable && (
+            <Button variant="dappnode" onClick={activateBackup} disabled={consensusLoading || backupStatusLoading}>
+              Activate Backup
+            </Button>
+          )
         ) : (
           <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
             Activate Premium
@@ -72,29 +83,36 @@ export function BeaconNodeBackup({
           <Button variant="warning">Check Docs</Button>
         </div>
       </Alert>
-      {isPremium &&
-        (consensusLoading ? (
-          <Loading steps={[`Loading consensus data`]} />
-        ) : (
-          <>
-            <div>
-              <h5>Beacon Backup Nodes Available</h5>
-              {Object.entries(currentConsensus).map(([network, client]) => (
-                <NetworkSection key={network} network={network as Network} client={client} />
-              ))}
-            </div>
-            <Button onClick={activateBackup}> Activate Backup</Button>
-            <Button onClick={deactivateBackup}>Deactivate Backup</Button>
-          </>
-        ))}
 
-      <div>
-        <div>Backup Status Loading? {backupStatusLoading ? "true" : "false"}</div>
-        <div>Backup activable? {backupActivable ? "true" : "false"}</div>
-        <div>timeUntilActivable? {timeUntilActivable}</div>
-        <div>Backup active? {backupActive ? "true" : "false"}</div>
-        <div>timeUntilDeactivation? {timeUntilDeactivation}</div>
-      </div>
+      {backupActive && (
+        <Card className="premium-backup-active-card">
+          <div className="premium-backup-active-col">
+            <h5>Backup active</h5>
+            {timeUntilDeactivation && (
+              <div>
+                <div>Backup time remaining:</div>
+                <div>
+                  <b>{timeUntilDeactivation}</b>
+                </div>
+              </div>
+            )}
+          </div>
+          <Button variant="danger" onClick={deactivateBackup} disabled={consensusLoading || backupStatusLoading}>
+            Stop Backup
+          </Button>
+        </Card>
+      )}
+
+      {isPremium && (
+        <>
+          <div>
+            <h5>Beacon Backup Nodes Available</h5>
+            {Object.entries(currentConsensus).map(([network, client]) => (
+              <NetworkSection key={network} network={network as Network} client={client} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

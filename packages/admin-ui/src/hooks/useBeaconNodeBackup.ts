@@ -33,15 +33,15 @@ export const useBeaconNodeBackup = (
     networks: availableNetworks
   });
 
-  const BackupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
+  const backupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
 
   useEffect(() => {
     setConsensusLoading(currentConsensusReq.isValidating);
   }, [currentConsensusReq.isValidating]);
 
   useEffect(() => {
-    setBackupStatusLoading(BackupStatusReq.isValidating);
-  }, [BackupStatusReq.isValidating]);
+    setBackupStatusLoading(backupStatusReq.isValidating);
+  }, [backupStatusReq.isValidating]);
 
   useEffect(() => {
     if (currentConsensusReq.data) {
@@ -50,15 +50,15 @@ export const useBeaconNodeBackup = (
   }, [currentConsensusReq.data]);
 
   useEffect(() => {
-    if (BackupStatusReq.data) {
-      console.log("Backup Status Data:", BackupStatusReq.data);
+    if (backupStatusReq.data) {
+      console.log("Backup Status Data:", backupStatusReq.data);
 
-      setBackupActive(BackupStatusReq.data.isActive);
-      setTimeUntilActivable(BackupStatusReq.data.timeUntilActivable);
-      setBackupActivable(BackupStatusReq.data.isActivable);
-      setTimeUntilDeactivation(BackupStatusReq.data.timeUntilDeactivation);
+      setBackupActive(backupStatusReq.data.isActive);
+      setTimeUntilActivable(backupStatusReq.data.timeUntilActivable);
+      setBackupActivable(backupStatusReq.data.isActivable);
+      setTimeUntilDeactivation(backupStatusReq.data.timeUntilDeactivation);
     }
-  }, [BackupStatusReq.data]);
+  }, [backupStatusReq.data]);
 
   const setBackupEnv = async (type: "activate" | "deactivate") => {
     if (!hashedLicense) {
@@ -94,7 +94,7 @@ export const useBeaconNodeBackup = (
     }
     await api.premiumBeaconBackupActivate(hashedLicense);
     await setBackupEnv("activate");
-    BackupStatusReq.revalidate();
+    backupStatusReq.revalidate();
   };
 
   const deactivate = async () => {
@@ -103,7 +103,7 @@ export const useBeaconNodeBackup = (
     }
     await api.premiumBeaconBackupDeactivate(hashedLicense);
     await setBackupEnv("deactivate");
-    BackupStatusReq.revalidate();
+    backupStatusReq.revalidate();
   };
 
   const activateBackup = async () => {
