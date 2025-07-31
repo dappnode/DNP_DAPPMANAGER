@@ -105,8 +105,8 @@ function getInstallerPackageData(
     manifest: release.manifest.notifications
       ? {
           ...release.manifest,
-          // Apply notitications user settings if any
-          notifications: notificationsSettings
+          // Apply notitications user settings if any otherwise use the default manifest notifications
+          notifications: notificationsSettings ?? release.manifest.notifications
         }
       : manifest,
     // User settings to be applied by the installer
