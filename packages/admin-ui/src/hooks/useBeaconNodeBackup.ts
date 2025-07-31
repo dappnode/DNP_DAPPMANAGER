@@ -3,14 +3,15 @@ import { api, useApi } from "api";
 import { withToast } from "components/toast/Toast";
 import { useEffect, useState } from "react";
 import { prettyDnpName } from "utils/format";
+import { confirm } from "components/ConfirmDialog";
 
 export const useBeaconNodeBackup = (
   hashedLicense: string
 ): {
   consensusLoading: boolean;
   currentConsensus: Partial<Record<Network, string | null | undefined>>;
-  activateBackup: () => Promise<void>;
-  deactivateBackup: () => Promise<void>;
+  activateBackup: () => void;
+  deactivateBackup: () => void;
   backupStatusLoading: boolean;
   backupActive: boolean;
   backupActivable: boolean;
@@ -106,19 +107,26 @@ export const useBeaconNodeBackup = (
     backupStatusReq.revalidate();
   };
 
-  const activateBackup = async () => {
-    await withToast(() => activate(), {
+  const activateBackup = () => {
+    withToast(() => activate(), {
       message: `Activating Beacon Node Backup...`,
       onSuccess: `Beacon Node Backup activated`,
       onError: `Error while activating Beacon Node Backup`
     });
   };
 
-  const deactivateBackup = async () => {
-    await withToast(() => deactivate(), {
-      message: `Deactivating Beacon Node Backup...`,
-      onSuccess: `Beacon Node Backup deactivated`,
-      onError: `Error while deactivating Beacon Node Backup`
+  const deactivateBackup = () => {
+    confirm({
+      title: `Deactivating Beacon Node Backup`,
+      text: `Deactivating the Beacon Node backup is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${timeUntilDeactivation}.`,
+      label: "Deactivate",
+      variant: "danger",
+      onClick: () =>
+        withToast(() => deactivate(), {
+          message: `Deactivating Beacon Node Backup...`,
+          onSuccess: `Beacon Node Backup deactivated`,
+          onError: `Error while deactivating Beacon Node Backup`
+        })
     });
   };
 
