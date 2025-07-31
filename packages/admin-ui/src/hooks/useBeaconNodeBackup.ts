@@ -19,7 +19,7 @@ export const useBeaconNodeBackup = (
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
   const backupEnvName = "BACKUP_BEACON_NODES";
-  const beaconChainServiceName = "beacon-chain";
+  const beaconChainServiceName = "validator";
 
   const [consensusLoading, setConsensusLoading] = useState(true);
   const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, string | null | undefined>>>({});
