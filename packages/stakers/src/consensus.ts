@@ -124,14 +124,58 @@ export class Consensus extends StakerComponent {
     if (!newConsensusDnpName) return {};
 
     const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
+    let environment = isPkgInstalled ? {} : getDefaultConsensusUserSettings({ network }).environment;
+
+    // Only for Mainnet and Hoodi, try to get backup beacon node
+    if (network === Network.Mainnet || network === Network.Hoodi) {
+      const backupUrl = await this.getBackupIfActive(network);
+      if (backupUrl) {
+        environment = {
+          ...environment,
+          validator: {
+            ...(environment?.validator || {}),
+            BACKUP_BEACON_NODES: backupUrl
+          }
+        };
+      }
+    }
 
     const userSettings = {
-      // If the package is not installed, we use the default environment
-      environment: isPkgInstalled ? {} : getDefaultConsensusUserSettings({ network }).environment,
+      environment,
       networks: this.getStakerNetworkSettings(network)
     };
 
     return userSettings;
+  }
+
+  /**
+   * Returns backup beacon node URL if premium license is active and valid, otherwise null
+   */
+  private async getBackupIfActive(network: Network.Hoodi | Network.Mainnet): Promise<string | null> {
+    try {
+      const licenseRes = await fetch("http://premium.dappnode:8080/api/license");
+      if (!licenseRes.ok) return null;
+      const license = (await licenseRes.json()) as { hash?: string };
+      const hash = typeof license.hash === "string" ? license.hash : null;
+      if (!hash) return null;
+
+      const keyRes = await fetch(`http://premium.dappnode:8080/api/keys/${hash}`);
+      if (!keyRes.ok) return null;
+      const keyData = (await keyRes.json()) as { ValidUntil?: string };
+      if (!keyData.ValidUntil) return null;
+      const validUntil = new Date(keyData.ValidUntil);
+      if (isNaN(validUntil.getTime())) return null;
+      if (validUntil.getTime() <= Date.now()) return null;
+
+      if (network === Network.Mainnet) {
+        return `https://${hash}:@mainnet.beacon.dappnode.io`;
+      } else if (network === Network.Hoodi) {
+        return `https://${hash}:@hoodi.beacon.dappnode.io`;
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
