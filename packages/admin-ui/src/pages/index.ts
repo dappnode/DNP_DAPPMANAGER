@@ -10,6 +10,7 @@ import * as community from "./community";
 import * as stakers from "./stakers";
 import * as repository from "./repository";
 import * as notifications from "./notifications";
+import * as premium from "./premium";
 
 export const pages = {
   dashboard,
@@ -23,7 +24,8 @@ export const pages = {
   community,
   system,
   repository,
-  notifications
+  notifications,
+  premium
 };
 
 export const defaultPage = dashboard;

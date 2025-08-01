@@ -113,6 +113,9 @@ export const params = {
   WIREGUARD_API_URL: "http://api.wireguard.dappnode",
   WIREGUARD_DEVICES_ENVNAME: "PEERS",
 
+  // Premium params
+  PREMIUM_DNP_NAME: "premium.dnp.dappnode.eth",
+
   // Docker network parameters
   DOCKER_NETWORK_SUBNET: "172.33.0.0/16", // "10.20.0.0/24";
   DOCKER_PRIVATE_NETWORK_NAME: "dncore_network",

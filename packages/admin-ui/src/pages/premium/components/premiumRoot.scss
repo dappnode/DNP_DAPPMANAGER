@@ -1,0 +1,109 @@
+.premium-root {
+  .premium-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 0.5rem;
+    margin-bottom: var(--default-spacing);
+
+    .premium-status {
+      font-size: 0.8rem;
+      font-weight: bold;
+      padding: 0px 10px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-transform: uppercase;
+      background-color: #e9ecef;
+      transition: background-color 0.5s ease-in-out;
+
+      animation: pulse 5s infinite ease-in-out;
+
+      &.activated {
+        color: green;
+        animation: pulseActivated 5s infinite ease-in-out;
+      }
+
+      &.deactivated {
+        color: orange;
+        animation: pulseDeactivated 5s infinite ease-in-out;
+      }
+
+      &::before {
+        content: "•";
+        margin-right: 0.3rem;
+        margin-bottom: 3px;
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+@keyframes pulseActivated {
+  0% {
+    background-color: #e9ecef;
+  }
+  50% {
+    background-color: rgba(0, 128, 0, 0.3);
+  }
+  100% {
+    background-color: #e9ecef;
+  }
+}
+
+@keyframes pulseDeactivated {
+  0% {
+    background-color: #e9ecef;
+  }
+  50% {
+    background-color: rgba(255, 166, 0, 0.3);
+  }
+  100% {
+    background-color: #e9ecef;
+  }
+}
+
+#dark {
+  #main {
+    .premium-status {
+      background-color: var(--color-dark-card-hover);
+      animation: pulseDark 5s infinite ease-in-out;
+
+      &.activated {
+        color: #00ff00;
+        animation: pulseActivatedDark 5s infinite ease-in-out;
+      }
+
+      &.deactivated {
+        color: #ff9800;
+        animation: pulseDeactivatedDark 5s infinite ease-in-out;
+      }
+    }
+  }
+}
+
+@keyframes pulseActivatedDark {
+  0% {
+    background-color: var(--color-dark-card-hover);
+  }
+  50% {
+    background-color: #00ff004d;
+  }
+  100% {
+    background-color: var(--color-dark-card-hover);
+  }
+}
+
+@keyframes pulseDeactivatedDark {
+  0% {
+    background-color: var(--color-dark-card-hover);
+  }
+  50% {
+    background-color: #ff990049;
+  }
+  100% {
+    background-color: var(--color-dark-card-hover);
+  }
+}

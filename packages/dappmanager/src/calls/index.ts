@@ -7,6 +7,7 @@ export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";
 export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
+export { consensusClientsGetByNetworks } from "./consensusClientGet.js";
 export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
@@ -70,6 +71,17 @@ export { poweroffHost } from "./poweroffHost.js";
 export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
+export {
+  premiumPkgStatus,
+  premiumSetLicenseKey,
+  premiumGetLicenseKey,
+  premiumActivateLicense,
+  premiumDeactivateLicense,
+  premiumIsLicenseActive,
+  premiumBeaconBackupActivate,
+  premiumBeaconBackupDeactivate,
+  premiumBeaconBackupStatus
+} from "./premium.js";
 export { rebootHost } from "./rebootHost.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";

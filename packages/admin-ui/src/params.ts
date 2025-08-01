@@ -53,6 +53,7 @@ export const coreDnpName = "core.dnp.dappnode.eth";
 export const bindDnpName = "bind.dnp.dappnode.eth";
 export const vpnDnpName = "vpn.dnp.dappnode.eth";
 export const notificationsDnpName = "notifications.dnp.dappnode.eth";
+export const premiumDnpName = "premium.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
@@ -105,6 +106,7 @@ export const docsUrl = {
   pwaOverview: `${docsBaseUrl}/docs/user/dappnode-app/overview`,
   pwaHowToInstall: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install`,
   pwaResetPermissions: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install#reset-notifications-permissions`,
+  premiumOverview: `${docsBaseUrl}/docs/user/premium/overview`,
 };
 
 export const forumUrl = {
@@ -144,5 +146,10 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";
+
+// Premium
+export const premiumLanding = 'https://dappnode.com/pages/dappnode-premium';
+export const stripePortal = "https://billing.stripe.com/p/login/8x29ASeSmeOu18Yao2dby00";
+export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
 
 // Support, where to send issues
