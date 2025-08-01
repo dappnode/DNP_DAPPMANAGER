@@ -81,7 +81,6 @@ export function BeaconNodeBackup({
             The maximum number of Ethereum validators to use the beacon node backup is 10. If you exceed this number we
             invite you to consolidate your validators to use the service.
           </div>
-          <Button variant="warning">Check Docs</Button>
         </div>
       </Alert>
 
