@@ -48,7 +48,7 @@ export function BeaconNodeBackup({
             <div>
               Once the backup is activated, it will be used regardless of whether you deactivate it later. The backup is
               renewed monthly.
-              {!backupActive && secondsUntilActivable && (
+              {!backupActive && secondsUntilActivable !== undefined && (
                 <div>
                   <br />
                   <div>Time remaining until backup available:</div>
@@ -88,7 +88,7 @@ export function BeaconNodeBackup({
         <Card className="premium-backup-active-card">
           <div className="premium-backup-active-col">
             <h5>Backup active</h5>
-            {secondsUntilDeactivation && (
+            {secondsUntilDeactivation !== undefined && (
               <div>
                 <div>Backup time remaining:</div>
                 <div className="premium-beacon-backup-countdown">

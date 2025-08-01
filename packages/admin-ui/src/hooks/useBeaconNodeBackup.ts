@@ -66,7 +66,7 @@ export const useBeaconNodeBackup = (
     const interval = setInterval(() => {
       setSecondsUntilActivable((prev) => {
         if (typeof prev === "number") {
-          if (prev <= 1) {
+          if (prev <= 0) {
             backupStatusReq.revalidate();
             return undefined;
           }
@@ -77,7 +77,7 @@ export const useBeaconNodeBackup = (
 
       setSecondsUntilDeactivation((prev) => {
         if (typeof prev === "number") {
-          if (prev <= 1) {
+          if (prev <= 0) {
             backupStatusReq.revalidate();
             return undefined;
           }
