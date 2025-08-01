@@ -138,25 +138,25 @@ export const useBeaconNodeBackup = (
 
   const activateBackup = () => {
     withToast(() => activate(), {
-      message: `Activating Beacon Node Backup...`,
-      onSuccess: `Beacon Node Backup activated`,
-      onError: `Error while activating Beacon Node Backup`
+      message: `Activating Backup node...`,
+      onSuccess: `Backup node activated`,
+      onError: `Error while activating Backup node`
     });
   };
 
   const deactivateBackup = () => {
     confirm({
-      title: `Deactivating Beacon Node Backup`,
-      text: `Deactivating the Beacon Node backup is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
+      title: `Deactivating Backup node`,
+      text: `Deactivating the Backup node is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
         secondsUntilDeactivation
       )}.`,
       label: "Deactivate",
       variant: "danger",
       onClick: () =>
         withToast(() => deactivate(), {
-          message: `Deactivating Beacon Node Backup...`,
-          onSuccess: `Beacon Node Backup deactivated`,
-          onError: `Error while deactivating Beacon Node Backup`
+          message: `Deactivating Backup node...`,
+          onSuccess: `Backup node deactivated`,
+          onError: `Error while deactivating Backup node`
         })
     });
   };

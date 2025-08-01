@@ -42,8 +42,8 @@ export function PremiumWrapper({
       <RequirementCard>
         <div>The Premium package must be installed to continue.</div>
         <div>
-          Premium unlocks powerful features, including advanced push notifications, priority support, and automatic
-          beacon node backups.
+          Premium unlocks powerful features, including advanced push notifications, priority support, and a backup node
+          for validators.
         </div>
         <div>
           To explore all features and pricing, click <i>Learn More</i> to visit the Dappnode Premium landing page.

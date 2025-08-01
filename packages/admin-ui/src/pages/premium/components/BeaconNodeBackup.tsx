@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { prettyDnpName } from "utils/format";
 import { useBeaconNodeBackup } from "hooks/useBeaconNodeBackup";
 import { capitalize } from "utils/strings";
+import newTabProps from "utils/newTabProps";
+import { docsUrl } from "params";
 import "./beaconNodeBackup.scss";
 
 export function BeaconNodeBackup({
@@ -32,7 +34,7 @@ export function BeaconNodeBackup({
   } = useBeaconNodeBackup(hashedLicense);
 
   if (consensusLoading || backupStatusLoading) {
-    return <Loading steps={["Loading beacon node backup data"]} />;
+    return <Loading steps={["Loading backup node data"]} />;
   }
 
   return (
@@ -40,9 +42,9 @@ export function BeaconNodeBackup({
       <Card className="premium-activate-backup-card">
         <div>
           <p>
-            The beacon node backup ensures that all your imported Ethereum validators in Dappnode stay up when you have
-            problems attesting. It backs you for 7 days to let you diagnose the issue, fix your setup and be back to
-            normal without missing attestations.
+            The backup node for validators ensures that all your imported Ethereum validators in Dappnode stay up when
+            you have problems attesting. It backs you for 7 days to let you diagnose the issue, fix your setup and be
+            back to normal without missing attestations.
           </p>
           {isPremium ? (
             <div>
@@ -59,7 +61,7 @@ export function BeaconNodeBackup({
               )}
             </div>
           ) : (
-            <div>Activate Premium to enable the beacon node backup.</div>
+            <div>Activate Premium to enable the backup node for validators.</div>
           )}
         </div>
         {isPremium ? (
@@ -78,9 +80,12 @@ export function BeaconNodeBackup({
       <Alert variant="warning">
         <div className="premium-beacon-backup-alert">
           <div>
-            The maximum number of Ethereum validators to use the beacon node backup is 10. If you exceed this number we
-            invite you to consolidate your validators to use the service.
+            The maximum number of Ethereum validators to use the backup node is 10. If you exceed this number we invite
+            you to consolidate your validators to use the service.
           </div>
+          <Button variant="warning" href={docsUrl.premiumBackupNode} {...newTabProps}>
+            Check Docs
+          </Button>
         </div>
       </Alert>
 

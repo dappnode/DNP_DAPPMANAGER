@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction, useState } from "react";
-import { premiumLanding, stripePortal } from "params";
+import { buyPremiumUrl, premiumLanding, stripePortal } from "params";
 import newTabProps from "utils/newTabProps";
 import Button from "components/Button";
 import Input from "components/Input";
@@ -59,7 +59,7 @@ const InfoCard: React.FC = () => {
       icon: <span>💬</span>
     },
     {
-      title: "Beacon Node Backup",
+      title: "Backup node for validators",
       description:
         "Use our backup to keep your validators attesting for 7 days in case you find issues in your staking setup.",
       icon: <span>📀</span>
@@ -104,7 +104,7 @@ const InfoCard: React.FC = () => {
                 <Button variant="outline-dappnode" href={premiumLanding} {...newTabProps}>
                   Visit Web
                 </Button>
-                <Button variant="dappnode" href={stripePortal} {...newTabProps}>
+                <Button variant="dappnode" href={buyPremiumUrl} {...newTabProps}>
                   Get Premium
                 </Button>
                 <div className="premium-trial-tag">

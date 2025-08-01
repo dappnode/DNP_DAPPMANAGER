@@ -58,7 +58,7 @@ const PremiumRoot: React.FC = () => {
       component: () => <PremiumSupport isActivated={isActivated} />
     },
     {
-      name: "Beacon node backup",
+      name: "Backup node for validators",
       subPath: subPaths.beaconNodeBackup,
       component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense}  />
     }
