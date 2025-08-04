@@ -13,6 +13,7 @@ interface ActivatePremiumProps {
   handleActivate: () => Promise<void>;
   handleDectivate: () => Promise<void>;
   isActivationLoading: boolean;
+  activateTimeout: number;
 }
 
 export const ActivatePremium = ({
@@ -21,7 +22,8 @@ export const ActivatePremium = ({
   setLicenseKey,
   handleActivate,
   handleDectivate,
-  isActivationLoading
+  isActivationLoading,
+  activateTimeout
 }: ActivatePremiumProps) => {
   if (isActivationLoading) {
     return <Loading steps={["Loading Activation"]} />;
@@ -32,12 +34,17 @@ export const ActivatePremium = ({
       {isActivated ? (
         <>
           <StripePortalCard />
-          <DeactivateCard licenseKey={licenseKey} handleDectivate={handleDectivate} />
+          <DeactivateCard licenseKey={licenseKey} handleDectivate={handleDectivate} activateTimeout={activateTimeout} />
         </>
       ) : (
         <>
           <InfoCard />
-          <ActivateCard licenseKey={licenseKey} setLicenseKey={setLicenseKey} handleActivate={handleActivate} />
+          <ActivateCard
+            licenseKey={licenseKey}
+            setLicenseKey={setLicenseKey}
+            handleActivate={handleActivate}
+            activateTimeout={activateTimeout}
+          />
         </>
       )}
     </div>
@@ -124,8 +131,10 @@ const ActivateCard: React.FC<{
   licenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
   handleActivate: () => Promise<void>;
-}> = ({ licenseKey, setLicenseKey, handleActivate }) => {
+  activateTimeout: number;
+}> = ({ licenseKey, setLicenseKey, handleActivate, activateTimeout }) => {
   const [localLicenseKey, setLocalLicenseKey] = useState(licenseKey);
+  const timeOutOn = activateTimeout > 0;
 
   const handleInputChange = (newValue: string) => {
     setLocalLicenseKey(newValue);
@@ -151,12 +160,8 @@ const ActivateCard: React.FC<{
               placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX"
             />
           </div>
-          <Button
-            variant="dappnode"
-            onClick={handleActivate}
-            disabled={!localLicenseKey}
-          >
-            Activate
+          <Button variant="dappnode" onClick={handleActivate} disabled={!localLicenseKey || timeOutOn}>
+            {timeOutOn ? <b>{activateTimeout}</b> : "Activate"}
           </Button>
         </div>
       </div>
@@ -167,7 +172,9 @@ const ActivateCard: React.FC<{
 const DeactivateCard: React.FC<{
   licenseKey: string;
   handleDectivate: () => Promise<void>;
-}> = ({ licenseKey, handleDectivate }) => {
+  activateTimeout: number;
+}> = ({ licenseKey, handleDectivate, activateTimeout }) => {
+  const timeOutOn = activateTimeout > 0;
   return (
     <Card>
       <div className="premium-card">
@@ -178,8 +185,8 @@ const DeactivateCard: React.FC<{
           <div>
             <b>Activation code:</b> {licenseKey}
           </div>
-          <Button variant="danger" onClick={handleDectivate}>
-            Deactivate
+          <Button variant="danger" onClick={handleDectivate} disabled={timeOutOn}>
+            {timeOutOn ? <b>{activateTimeout}</b> : "Deactivate"}
           </Button>
         </div>
       </div>
