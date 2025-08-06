@@ -1,20 +1,17 @@
 import Title from "components/Title";
 import React from "react";
-import { NavLink, Routes, Route } from "react-router-dom";
 import { title } from "../data";
 import StakerNetwork from "./StakerNetwork";
 import { Network } from "@dappnode/types";
 import Optimism from "pages/rollups/components/Optimism";
+import { RouteType } from "types";
+import { SectionNavigator } from "components/SectionNavigator";
 
 const StakersRoot: React.FC = () => {
-  const stakersItems: {
-    subPath: string;
-    title: string;
-    component: () => React.JSX.Element;
-  }[] = [
+  const availableRoutes: RouteType[] = [
     {
       subPath: "ethereum",
-      title: "Ethereum",
+      name: "Ethereum",
       component: () =>
         StakerNetwork({
           network: Network.Mainnet,
@@ -24,7 +21,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "gnosis",
-      title: "Gnosis Chain",
+      name: "Gnosis Chain",
       component: () =>
         StakerNetwork({
           network: Network.Gnosis,
@@ -34,7 +31,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "holesky",
-      title: "Holesky",
+      name: "Holesky",
       component: () =>
         StakerNetwork({
           network: Network.Holesky,
@@ -44,7 +41,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "hoodi",
-      title: "Hoodi",
+      name: "Hoodi",
       component: () =>
         StakerNetwork({
           network: Network.Hoodi,
@@ -54,7 +51,7 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "prater",
-      title: "Prater",
+      name: "Prater",
       component: () =>
         StakerNetwork({
           network: Network.Prater,
@@ -64,48 +61,32 @@ const StakersRoot: React.FC = () => {
     },
     {
       subPath: "lukso",
-      title: "LUKSO",
+      name: "LUKSO",
       component: () =>
         StakerNetwork({
           network: Network.Lukso,
           description:
             "The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
         })
-    },{
+    },
+    {
       subPath: "optimism",
-      title: "Optimism",
+      name: "Optimism",
       component: () =>
         Optimism({
-          description: "Optimism is a Layer 2 scaling solution for Ethereum. Rather than operating as an independent EVM chain, Optimism executes transactions off-chain and posts compressed data to Ethereum"
+          description:
+            "Optimism is a Layer 2 scaling solution for Ethereum. Rather than operating as an independent EVM chain, Optimism executes transactions off-chain and posts compressed data to Ethereum"
         })
     }
   ];
 
   // Remove the "Prater" tab from the stakersItems array
-  const filteredStakersItems = stakersItems.filter((item) => item.subPath !== "prater");
+  const filteredStakersRoutes = availableRoutes.filter((item) => item.subPath !== "prater");
 
   return (
     <>
       <Title title={title} />
-
-      <div className="horizontal-navbar">
-        {/* Render the staker tabs, excluding "Prater" which is hidden due to deprecation */}
-        {filteredStakersItems.map((route) => (
-          <button key={route.subPath} className="item-container">
-            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-              {route.title}
-            </NavLink>
-          </button>
-        ))}
-      </div>
-
-      <div className="section-spacing">
-        <Routes>
-          {stakersItems.map((route) => (
-            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
-          ))}
-        </Routes>
-      </div>
+      <SectionNavigator routes={filteredStakersRoutes} />
     </>
   );
 };

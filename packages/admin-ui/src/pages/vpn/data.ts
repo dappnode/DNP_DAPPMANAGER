@@ -7,9 +7,9 @@ export const wireguardSubtitle = "Wireguard";
 
 // Subpaths
 export const subPaths = {
-  openVpn: "openvpn/*",
-  wireguard: "wireguard/*",
-  tailscale: "tailscale/*"
+  openVpn: "openvpn",
+  wireguard: "wireguard",
+  tailscale: "tailscale"
 };
 
 // Additional data
