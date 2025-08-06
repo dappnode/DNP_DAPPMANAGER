@@ -24,7 +24,8 @@ const PremiumRoot: React.FC = () => {
     handleActivate,
     isActivationLoading,
     handleDectivate,
-    hashedLicense
+    hashedLicense,
+    activateTimeout
   } = usePremium();
 
   const routes: {
@@ -44,6 +45,7 @@ const PremiumRoot: React.FC = () => {
           handleActivate={handleActivate}
           handleDectivate={handleDectivate}
           isActivationLoading={isActivationLoading}
+          activateTimeout={activateTimeout}
         />
       )
     },

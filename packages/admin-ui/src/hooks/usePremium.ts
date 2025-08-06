@@ -19,6 +19,7 @@ export const usePremium = (): {
   handleDectivate: () => Promise<void>;
   isActivationLoading: boolean;
   hashedLicense: string;
+  activateTimeout: number;
 } => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
@@ -28,6 +29,10 @@ export const usePremium = (): {
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [isActivationLoading, setIsActivationLoading] = useState<boolean>(true);
   const [hashedLicense, setHashedLicense] = useState<string>("");
+  
+  // Timeout used to prevent the user from activating/deactivating the license key multiple times in a short
+  const [activateTimeout, setActivateTimeout] = useState<number>(-1);
+  const timeoutDuration = 12; // seconds
 
   const premiumPkgReq = useApi.premiumPkgStatus();
   const premiumActiveReq = useApi.premiumIsLicenseActive();
@@ -69,6 +74,16 @@ export const usePremium = (): {
 
     if (licenseKeyReq.data.hash) setHashedLicense(licenseKeyReq.data.hash);
   }, [licenseKeyReq.data]);
+
+  useEffect(() => {
+    if (activateTimeout <= 0) return;
+  
+    const timer = setTimeout(() => {
+      setActivateTimeout(prev => prev - 1);
+    }, 1000);
+  
+    return () => clearTimeout(timer);
+  }, [activateTimeout]);
 
   const installPremiumPkg = useCallback(async (): Promise<void> => {
     try {
@@ -129,6 +144,7 @@ export const usePremium = (): {
       await putLicenseKey(licenseKey);
       await activateLicenseKey();
       premiumActiveReq.revalidate();
+      setActivateTimeout(timeoutDuration);
     } catch (error) {
       console.error(`Error while activating license key: ${error}`);
     }
@@ -144,6 +160,7 @@ export const usePremium = (): {
         onClick: async () => {
           await deactivateLicenseKey();
           premiumActiveReq.revalidate();
+          setActivateTimeout(timeoutDuration);
         }
       });
     } catch (error) {
@@ -163,6 +180,7 @@ export const usePremium = (): {
     handleActivate,
     handleDectivate,
     isActivationLoading,
-    hashedLicense
+    hashedLicense,
+    activateTimeout
   };
 };
