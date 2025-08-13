@@ -20,6 +20,7 @@ export class MevBoost extends StakerComponent {
     [Network.Gnosis]: db.mevBoostGnosis,
     [Network.Prater]: db.mevBoostPrater,
     [Network.Holesky]: db.mevBoostHolesky,
+    [Network.Sepolia]: db.mevBoostSepolia,
     [Network.Hoodi]: db.mevBoostHoodi,
     [Network.Lukso]: db.mevBoostLukso
   };
@@ -42,7 +43,8 @@ export class MevBoost extends StakerComponent {
       dnpName: MevBoostHoodi.Mevboost,
       minVersion: "0.1.0"
     },
-    [Network.Lukso]: null
+    [Network.Lukso]: null,
+    [Network.Sepolia]: null
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {

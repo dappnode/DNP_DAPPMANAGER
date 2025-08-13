@@ -139,6 +139,10 @@ export enum ExecutionClientSepolia {
   Geth = "sepolia-geth.dnp.dappnode.eth"
 }
 
+export enum SignerSepolia {
+  Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
+}
+
 export type StakerItem = StakerItemOk | StakerItemError;
 
 interface StakerItemBasic {
