@@ -134,7 +134,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   ].includes(network) && !!currentStakerConfigReq.data?.mevBoost;
 
   // Get dynamic setup instructions
-  const setupInstructions = getStakerSetupInstructions(network, showRemoteSigner, showMevBoost);
+  const setupInstructions = getStakerSetupInstructions(showRemoteSigner, showMevBoost);
 
   return (
     <>
@@ -270,7 +270,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
  * Helper Functions
  * ======================= */
 
-function getStakerSetupInstructions(network: Network, showRemoteSigner: boolean, showMevBoost: boolean) {
+function getStakerSetupInstructions(showRemoteSigner: boolean, showMevBoost: boolean) {
   let instructions = `
     Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will need to: <br />
     (1) Choose an Execution Layer client <br />
