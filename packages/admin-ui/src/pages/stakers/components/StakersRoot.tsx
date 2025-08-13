@@ -49,7 +49,17 @@ const StakersRoot: React.FC = () => {
         StakerNetwork({
           network: Network.Hoodi,
           description:
-            "Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates."
+            "Hoodi is the latest public Ethereum testnet introduced to support the Pectra upgrade, addressing challenges faced on Holesky and Sepolia. This network focuses on testing Ethereum Improvement Proposals (EIPs), staking mechanisms, and wallet interactions in a post-merge environment, ensuring a smooth transition for future mainnet updates. It is the preferred choice for users looking to test staking configurations before deploying validators and using real ETH on the mainnet."
+        })
+    },
+    {
+      subPath: "sepolia",
+      title: "Sepolia",
+      component: () =>
+        StakerNetwork({
+          network: Network.Sepolia,
+          description:
+            "Sepolia is a public Ethereum testnet designed for developers who want to test their applications in a pre-production environment. Different from the Holesky/Hoodi testnets, Sepolia is run by a small set of centrally permissioned validators, making it more stable and reliable for testing purposes. While its not a network for testing staking, it is still a valuable resource for developers looking to test their applications before deploying them on the Ethereum mainnet."
         })
     },
     {

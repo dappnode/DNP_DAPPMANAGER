@@ -123,6 +123,7 @@ export const params = {
     [Network.Mainnet]: "mainnet_network",
     [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
+    [Network.Sepolia]: "sepolia_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network"
