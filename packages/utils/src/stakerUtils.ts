@@ -58,3 +58,4 @@ const getDefaultCheckpointSync = (network: Network): string =>
               : network === "sepolia"
                 ? "https://checkpoint-sync-sepolia.dappnode.io"
                 : "";
+                
