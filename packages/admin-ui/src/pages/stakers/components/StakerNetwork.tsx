@@ -117,7 +117,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   }
 
   // Determine which columns to show and construct the instructions dynamically
-const showRemoteSigner = [
+const showRemoteSigner: boolean = [
   Network.Mainnet,
   Network.Prater,
   Network.Gnosis,
@@ -126,13 +126,12 @@ const showRemoteSigner = [
   Network.Hoodi
 ].includes(network);
 
-const showMevBoost = [
+const showMevBoost: boolean = [
   Network.Prater,
   Network.Mainnet,
   Network.Holesky,
   Network.Hoodi
-].includes(network) && currentStakerConfigReq.data?.mevBoost;
-
+].includes(network) && !!currentStakerConfigReq.data?.mevBoost;
 
   // Get dynamic setup instructions
   const setupInstructions = getStakerSetupInstructions(network, showRemoteSigner, showMevBoost);
