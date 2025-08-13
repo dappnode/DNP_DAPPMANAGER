@@ -59,6 +59,7 @@ async function ensureNimbusConnection(dnpName: string): Promise<void> {
     "nimbus-gnosis.dnp.dappnode.eth": Network.Gnosis,
     "nimbus-holesky.dnp.dappnode.eth": Network.Holesky,
     "nimbus-hoodi.dnp.dappnode.eth": Network.Hoodi, // Remove all networks unless nimbus-gnosis? (still monoserivce) 
+    "nimbus-sepolia.dnp.dappnode.eth": Network.Sepolia,
   };
 
   const network = nimbusNetwork[dnpName];
