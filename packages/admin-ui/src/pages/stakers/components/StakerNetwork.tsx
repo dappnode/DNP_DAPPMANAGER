@@ -194,7 +194,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   />
                 ))}
               </Col>
-
+              {[Network.Mainnet, Network.Prater, Network.Gnosis, Network.Lukso, Network.Holesky, Network.Hoodi].includes(network) &&(
               <Col>
                 <SubTitle>Remote signer</SubTitle>
                 <RemoteSigner
@@ -202,7 +202,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   setNewWeb3signer={setNewWeb3signer}
                   isSelected={Boolean(newWeb3signer)}
                 />
-              </Col>
+              </Col>)}
               {["prater", "mainnet", "holesky", "hoodi"].includes(network) && currentStakerConfigReq.data.mevBoost && (
                 <Col>
                   <SubTitle>Mev Boost</SubTitle>
