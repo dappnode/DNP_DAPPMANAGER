@@ -84,9 +84,9 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   const ActivateCard = () => (
     <Card className="premium-backup-action-card card">
-      <MdOutlineBackup />
+      <MdOutlineBackup className="blue-text" />
 
-      <h5>Ready to activate</h5>
+      <h5 className="blue-text">Ready to activate</h5>
       <div>Your backup service is ready to use.</div>
 
       <Button variant="dappnode" onClick={activateBackup} disabled={consensusLoading || backupStatusLoading}>
@@ -97,13 +97,13 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   const DeactiveCard = () => (
     <Card className="premium-backup-action-card card">
-      <MdOutlineCheckCircleOutline />
+      <MdOutlineCheckCircleOutline className="green-text" />
 
-      <h5>Backup Active</h5>
+      <h5 className="green-text">Backup Active</h5>
       <div>Your validators are protected by backup coverage</div>
-      <div>
-        <div>Auto-deactivation in:</div>
-        <div>
+      <div className="premium-backup-countdown">
+        <div className="premium-backup-countdown-text">Auto-deactivation in:</div>
+        <div className="premium-backup-countdown-time">
           <b>{formatCountdown(secondsUntilDeactivation)}</b>
         </div>
       </div>
@@ -115,13 +115,14 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   const CooldownCard = () => (
     <Card className="premium-backup-action-card card">
-      <MdOutlineAccessTime />
-      <h5>Cooldown Period</h5>
+      <MdOutlineAccessTime className="orange-text" />
+      <h5 className="orange-text">Cooldown Period</h5>
       <div>Backup cannot be reactivated during cooldown</div>
 
-      <div>
-        <div>Available again in:</div>
-        <div>
+      <div className="premium-backup-countdown">
+        <div className="premium-backup-countdown-text">Available again in:</div>
+        <div className="premium-backup-countdown-time">
+          {" "}
           <b>{formatCountdown(secondsUntilActivable)}</b>
         </div>
       </div>
@@ -136,6 +137,18 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     return <Loading steps={["Loading backup node data"]} />;
   }
 
+  if (!isPremium) {
+    return (
+      <div className="premium-backup-node">
+        <DescriptionCard />
+        <div className="premium-backup-info-cards">
+          <NetworkCard />
+          <ValidatorsCard />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="premium-backup-node">
       {!backupActive && backupActivable && <DescriptionCard />}
@@ -144,9 +157,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         <NetworkCard />
         <ValidatorsCard />
       </div>
-      <ActivateCard />
-      <DeactiveCard />
-      <CooldownCard />
+      {backupActive ? <DeactiveCard /> : backupActivable ? <ActivateCard /> : <CooldownCard />}
     </div>
   );
 }

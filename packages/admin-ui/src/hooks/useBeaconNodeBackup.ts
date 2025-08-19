@@ -167,7 +167,7 @@ export const useBeaconNodeBackup = (
     const h = Math.floor((totalSeconds % 86400) / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
     const s = totalSeconds % 60;
-    return `${d} days ${h} hours ${m} mins ${s} secs`;
+    return `${d}d ${h}h ${m}m ${s}s`;
   };
 
   return {
