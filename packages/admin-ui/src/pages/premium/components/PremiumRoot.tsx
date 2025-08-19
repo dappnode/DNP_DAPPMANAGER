@@ -10,6 +10,7 @@ import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
 import { BeaconNodeBackup } from "./BeaconNodeBackup";
+import { BackupNode } from "./BackupNode";
 
 const PremiumRoot: React.FC = () => {
   const {
@@ -62,7 +63,12 @@ const PremiumRoot: React.FC = () => {
     {
       name: "Backup node for validators",
       subPath: subPaths.beaconNodeBackup,
-      component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense}  />
+      component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense} />
+    },
+    {
+      name: "Backup node for validators",
+      subPath: subPaths.backupNode,
+      component: () => <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
     }
   ];
 

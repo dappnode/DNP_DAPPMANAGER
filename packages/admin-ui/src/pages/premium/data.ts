@@ -7,5 +7,6 @@ export const subPaths = {
   activate: "activate",
   advancedNotifications: "advanced-notifications",
   premiumSupport: "premium-support",
-  beaconNodeBackup: "beacon-node-backup"
+  beaconNodeBackup: "beacon-node-backup",
+  backupNode: "backup-node"
 };
