@@ -27,7 +27,6 @@ async function ensureDockerNetworkConfigs(
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
       subnet: params.DOCKER_NETWORK_NEW_SUBNET,
-      dappmanagerIp: params.DAPPMANAGER_NEW_IP,
       bindIp: params.BIND_NEW_IP
     }
   ];
@@ -68,7 +67,7 @@ async function ensureDockerNetworkConfig({
 }: {
   networkName: string;
   subnet: string;
-  dappmanagerIp: string;
+  dappmanagerIp?: string;
   bindIp: string;
 }): Promise<void> {
   // 1. create the new docker network
