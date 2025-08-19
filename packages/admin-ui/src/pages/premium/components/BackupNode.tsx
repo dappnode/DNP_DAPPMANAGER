@@ -10,6 +10,7 @@ import { MdOutlineBackup, MdOutlineCheckCircleOutline, MdOutlineAccessTime } fro
 import "./backupNode.scss";
 
 import React from "react";
+import { SiEthereum } from "react-icons/si";
 
 export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActivated: boolean; hashedLicense: string }) {
   const {
@@ -52,18 +53,22 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   const NetworkCard = () => (
     <Card className="premium-backup-network-card card">
-      <h5>Supported active Networks</h5>
-      {Object.entries(currentConsensus).map(
-        ([network, client]) =>
-          client && (
-            <div>
-              <p>
-                <b>{capitalize(network)}</b>
-              </p>
-              <p>{prettyDnpName(client)}</p>
-            </div>
-          )
-      )}
+      <h5>Supported Active Networks</h5>
+
+      <div className="premium-backup-network-list">
+        {Object.entries(currentConsensus).map(
+          ([network, client]) =>
+            client && (
+              <div className="premium-backup-network-item" key={network}>
+                <div>
+                  {(network === "mainnet" || network === "hoodi") && <SiEthereum />}
+                  <b>{capitalize(network)}</b>
+                </div>
+                <div className="premium-backup-cc-tag">{prettyDnpName(client)}</div>
+              </div>
+            )
+        )}
+      </div>
     </Card>
   );
 
@@ -135,7 +140,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     <div className="premium-backup-node">
       {!backupActive && backupActivable && <DescriptionCard />}
 
-      <div>
+      <div className="premium-backup-info-cards">
         <NetworkCard />
         <ValidatorsCard />
       </div>

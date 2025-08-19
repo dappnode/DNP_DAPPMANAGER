@@ -6,26 +6,100 @@
   .card {
     margin: 0px;
     padding: 20px;
-  }
-
-  .description-row {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-
-    .description-row-text {
-      flex: 1;
-      ul {
-        margin: 0;
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-      }
+    @media (max-width: 60rem) {
+      padding: 10px;
     }
 
-    button {
-      max-height: fit-content;
+    h5 {
+      font-weight: bold;
+    }
+  }
+
+  .premium-backup-node-desc {
+    .description-row {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+      @media (max-width: 60rem) {
+        flex-direction: column;
+      }
+
+      .description-row-text {
+        flex: 1;
+        ul {
+          margin: 0;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          @media (max-width: 60rem) {
+            grid-template-columns: repeat(1, 1fr);
+            gap: 10px;
+          }
+        }
+      }
+
+      button {
+        max-height: fit-content;
+      }
+    }
+  }
+
+  .premium-backup-info-cards {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+    }
+
+    .card {
+      flex: 1;
+    }
+
+    .premium-backup-network-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .premium-backup-network-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .premium-backup-network-item {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 10px;
+
+          background-color: var(--color-light-background-main);
+          border-radius: 10px;
+
+          svg {
+            margin-right: 5px;
+          }
+
+          .premium-backup-cc-tag {
+            font-style: italic;
+            color: var(--color-text-secondary);
+          }
+        }
+      }
+    }
+  }
+}
+
+#dark {
+  .premium-backup-node {
+    .premium-backup-info-cards {
+      .premium-backup-network-card {
+        .premium-backup-network-item {
+          background-color: var(--color-dark-background-main);
+        }
+      }
     }
   }
 }
