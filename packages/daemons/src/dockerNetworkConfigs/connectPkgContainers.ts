@@ -163,12 +163,10 @@ async function connectPkgContainerRetryOnIpUsed({
   if (maxAttempts > 100) maxAttempts = 100;
   if (maxAttempts < 1) maxAttempts = 1;
   let attemptCount = 0;
-  const networkOptions = {
+  const networkOptions: Dockerode.NetworkConnectOptions = {
     Container: containerName,
     EndpointConfig: {
-      IPAMConfig: {
-        IPv4Address: ip
-      },
+      IPAddress: ip,
       Aliases: aliases
     }
   };
