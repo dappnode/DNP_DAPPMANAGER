@@ -131,7 +131,6 @@ export const params = {
   BIND_IP: "172.33.1.2",
   BIND_NEW_IP: "10.20.0.2",
   DAPPMANAGER_IP: "172.33.1.7",
-  DAPPMANAGER_NEW_IP: "10.20.0.7",
 
   // Docker compose parameters
   // Use of new compose file feature: network name
