@@ -148,7 +148,7 @@ export const useBeaconNodeBackup = (
     confirm({
       title: `Deactivating Backup node`,
       text: `Deactivating the Backup node is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
-        secondsUntilDeactivation
+        secondsUntilActivable
       )}.`,
       label: "Deactivate",
       variant: "danger",
