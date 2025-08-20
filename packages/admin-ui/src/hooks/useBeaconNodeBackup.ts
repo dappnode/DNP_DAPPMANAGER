@@ -20,6 +20,7 @@ export const useBeaconNodeBackup = (
   formatCountdown: (totalSeconds?: number) => string | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
+  const activeValidatorLimit = 10; // Max validators for backup
   const backupEnvName = "BACKUP_BEACON_NODES";
   const beaconChainServiceName = "validator";
 
@@ -30,6 +31,24 @@ export const useBeaconNodeBackup = (
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
   const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
   const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
+  const [activeValidators, setActiveValidators] = useState<number>(0);
+
+  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
+    networks: availableNetworks
+  });
+
+  useEffect(() => {
+    type ActiveByNetwork = Partial<Record<Network, string[] | null>>;
+    function totalActiveCount(map: ActiveByNetwork): number {
+      return Object.values(map).reduce((sum, v) => sum + (Array.isArray(v) ? v.length : 0), 0);
+    }
+    if (validatorsFilterActiveReq.data === undefined) return;
+
+    console.log("Active validators data:", validatorsFilterActiveReq.data);
+    const count = totalActiveCount(validatorsFilterActiveReq.data as ActiveByNetwork);
+    console.log("Active validators count:", count);
+    setActiveValidators(count);
+  }, [validatorsFilterActiveReq.data]);
 
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({
     networks: availableNetworks
