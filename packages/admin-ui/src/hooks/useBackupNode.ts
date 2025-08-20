@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { prettyDnpName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
 
-export const useBeaconNodeBackup = (
+export const useBackupNode = (
   hashedLicense: string
 ): {
   consensusLoading: boolean;
