@@ -1,4 +1,5 @@
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useBeaconNodeBackup } from "hooks/useBeaconNodeBackup";
 import { Card } from "react-bootstrap";
 import Loading from "components/Loading";
@@ -6,11 +7,11 @@ import Button from "components/Button";
 import { relativePath } from "../data";
 import { capitalize } from "utils/strings";
 import { prettyDnpName } from "utils/format";
-import { MdOutlineBackup, MdOutlineCheckCircleOutline, MdOutlineAccessTime } from "react-icons/md";
-import "./backupNode.scss";
-
-import React from "react";
+import { MdOutlineBackup, MdOutlineCheckCircleOutline, MdOutlineAccessTime, MdGroup } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
+import newTabProps from "utils/newTabProps";
+import { docsUrl } from "params";
+import "./backupNode.scss";
 
 export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActivated: boolean; hashedLicense: string }) {
   const {
@@ -23,7 +24,9 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     deactivateBackup,
     secondsUntilActivable,
     secondsUntilDeactivation,
-    formatCountdown
+    formatCountdown,
+    activeValidators,
+    activeValidatorLimit
   } = useBeaconNodeBackup(hashedLicense);
   const navigate = useNavigate();
 
@@ -72,15 +75,41 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     </Card>
   );
 
-  const ValidatorsCard = () => (
-    <Card className="premium-backup-validators-card card">
-      <h5>Validators Coverage</h5>
-      <p>TODO: get validators data.</p>
-      <p>
-        <b>Note:</b> Up to 10 validators supported among all available networks.
-      </p>
-    </Card>
-  );
+  const ValidatorsCard = () => {
+    const validatorsPercentage = (activeValidators / activeValidatorLimit) * 100;
+    const valLimitExceeded = activeValidators > activeValidatorLimit;
+    return (
+      <Card className="premium-backup-validators-card card">
+        <h5>Validators Coverage</h5>
+
+        <div className="premium-backup-validators-count">
+          <div>
+            <MdGroup /> <span className={`${valLimitExceeded && "color-danger"}`}> {activeValidators}</span> /{" "}
+            {activeValidatorLimit} validators
+          </div>
+          <div className="premium-backup-validators-limit-bar">
+            <div
+              className={`premium-backup-validators-curr-bar ${valLimitExceeded && "color-danger"}`}
+              style={{ width: `${validatorsPercentage}%` }}
+            ></div>
+          </div>
+
+          <div className="premium-backup-validators-limit-desc">
+            Up to {activeValidatorLimit} validators supported among all available networks.
+          </div>
+          {valLimitExceeded && (
+            <div className="premium-backup-validators-limit-warning">
+              You are exceeding the supported number of active validators to enable the backup. We invite you to
+              consolidate your validators to use this service.{" "}
+              <Link to={docsUrl.premiumBackupValidatorsLimit} {...newTabProps}>
+                Learn more
+              </Link>
+            </div>
+          )}
+        </div>
+      </Card>
+    );
+  };
 
   const ActivateCard = () => (
     <Card className="premium-backup-action-card card">

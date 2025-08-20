@@ -18,6 +18,8 @@ export const useBeaconNodeBackup = (
   secondsUntilActivable?: number;
   secondsUntilDeactivation?: number;
   formatCountdown: (totalSeconds?: number) => string | undefined;
+  activeValidators: number;
+  activeValidatorLimit: number;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
   const activeValidatorLimit = 10; // Max validators for backup
@@ -43,10 +45,7 @@ export const useBeaconNodeBackup = (
       return Object.values(map).reduce((sum, v) => sum + (Array.isArray(v) ? v.length : 0), 0);
     }
     if (validatorsFilterActiveReq.data === undefined) return;
-
-    console.log("Active validators data:", validatorsFilterActiveReq.data);
     const count = totalActiveCount(validatorsFilterActiveReq.data as ActiveByNetwork);
-    console.log("Active validators count:", count);
     setActiveValidators(count);
   }, [validatorsFilterActiveReq.data]);
 
@@ -199,6 +198,8 @@ export const useBeaconNodeBackup = (
     backupActivable,
     secondsUntilActivable,
     secondsUntilDeactivation,
-    formatCountdown
+    formatCountdown,
+    activeValidators,
+    activeValidatorLimit
   };
 };
