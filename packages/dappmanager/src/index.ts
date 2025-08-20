@@ -86,6 +86,11 @@ export const signer = new Signer(dappnodeInstaller);
 
 // Execute migrations
 executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
+
+process.on("unhandledRejection", (reason, promise) => {
+  logs.error("Unhandled Rejection:", String(reason));
+});
+
 // Start daemons
 startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
