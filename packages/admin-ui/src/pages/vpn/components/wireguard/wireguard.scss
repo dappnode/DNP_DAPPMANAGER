@@ -96,3 +96,14 @@
     text-decoration: underline;
   }
 }
+
+// Dark mode fix
+#dark {
+  #main {
+    .wireguard-device-settings {
+      .credentials-config {
+        background-color: var(--color-dark-background-main);
+      }
+    }
+  }
+}
