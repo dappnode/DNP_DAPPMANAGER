@@ -107,3 +107,10 @@
     display: none;
   }
 }
+
+// Remove bootstrap row's negative margin to fix mobile overflow-x
+.staker-network {
+  &.row {
+    margin: 0;
+  }
+}
