@@ -11,6 +11,8 @@ services:
     image: "dappmanager.dnp.dappnode.eth:0.2.71"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
     restart: always
+    ports:
+      - 9229:9229
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
       - "dappmanagerdnpdappnodeeth_data:/usr/src/app/dnp_repo/"
