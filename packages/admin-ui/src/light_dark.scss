@@ -1,6 +1,10 @@
 /*
   LIGHT
 */
+html,
+body {
+  background-color: var(--color-light-background-main);
+}
 #light.body {
   background-color: var(--color-light-background-main);
 }
@@ -32,6 +36,10 @@
 /*
   DARK
 */
+html.dark,
+body.dark {
+  background-color: var(--color-dark-background-main);
+}
 #dark.body {
   background-color: var(--color-dark-background-main);
 }

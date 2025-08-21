@@ -71,6 +71,17 @@ function MainApp({ username }: { username: string }) {
     toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light"))
   };
 
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.classList.remove("light", "dark");
+    body.classList.remove("light", "dark");
+
+    html.classList.add(theme);
+    body.classList.add(theme);
+  }, [theme]);
+
   return (
     <AppContext.Provider value={appContext}>
       <div className="body" id={theme}>
