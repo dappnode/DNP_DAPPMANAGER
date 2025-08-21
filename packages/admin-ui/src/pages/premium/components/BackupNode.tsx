@@ -26,9 +26,11 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     secondsUntilDeactivation,
     formatCountdown,
     activeValidators,
-    activeValidatorLimit
+    validatorLimit
   } = useBackupNode(hashedLicense);
   const navigate = useNavigate();
+
+  const valLimitExceeded = validatorLimit ? activeValidators > validatorLimit : false;
 
   const DescriptionCard = () => (
     <Card className="premium-backup-node-desc card">
@@ -76,8 +78,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
   );
 
   const ValidatorsCard = () => {
-    const validatorsPercentage = (activeValidators / activeValidatorLimit) * 100;
-    const valLimitExceeded = activeValidators > activeValidatorLimit;
+    const validatorsPercentage = validatorLimit ? (activeValidators / validatorLimit) * 100 : 100;
     return (
       <Card className="premium-backup-validators-card card">
         <h5>Validators Coverage</h5>
@@ -85,7 +86,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         <div className="premium-backup-validators-count">
           <div>
             <MdGroup /> <span className={`${valLimitExceeded && "color-danger"}`}> {activeValidators}</span> /{" "}
-            {activeValidatorLimit} validators
+            {validatorLimit} validators
           </div>
           <div className="premium-backup-validators-limit-bar">
             <div
@@ -95,7 +96,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           </div>
 
           <div className="premium-backup-validators-limit-desc">
-            Up to {activeValidatorLimit} validators supported among all available networks.
+            Up to {validatorLimit} validators supported among all available networks.
           </div>
           {valLimitExceeded && (
             <div className="premium-backup-validators-limit-warning">
@@ -116,11 +117,16 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
       <MdOutlineBackup className="blue-text" />
 
       <h5 className="blue-text">Ready to activate</h5>
-      <div>Your backup service is ready to use.</div>
+      <div>Your 7-day backup service is ready to cover your validators</div>
 
-      <Button variant="dappnode" onClick={activateBackup} disabled={consensusLoading || backupStatusLoading}>
+      <Button
+        variant="dappnode"
+        onClick={activateBackup}
+        disabled={consensusLoading || backupStatusLoading || valLimitExceeded}
+      >
         Activate Backup
       </Button>
+      {valLimitExceeded && <div className="color-danger">Validator limit exceeded</div>}
     </Card>
   );
 

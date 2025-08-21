@@ -140,6 +140,7 @@ export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> =
 export const premiumBeaconBackupStatus = async (
   hashedLicense: string
 ): Promise<{
+  validatorLimit: number;
   isActivable: boolean;
   secondsUntilActivable?: number;
   isActive: boolean;
@@ -152,6 +153,7 @@ export const premiumBeaconBackupStatus = async (
   }
 
   const data = await response.json();
+  const validatorLimit = data.ValidatorLimit;
   const validUntilString = data.ValidUntil;
   const validUntil = new Date(validUntilString);
   const now = new Date();
@@ -166,11 +168,13 @@ export const premiumBeaconBackupStatus = async (
   const isActive = validUntil > now;
 
   const result: {
+    validatorLimit: number;
     isActivable: boolean;
     secondsUntilActivable?: number;
     isActive: boolean;
     secondsUntilDeactivation?: number;
   } = {
+    validatorLimit,
     isActivable,
     isActive
   };

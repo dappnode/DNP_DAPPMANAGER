@@ -695,6 +695,7 @@ export interface Routes {
    * @param hashedLicense The hashed license string used to identify the key.
    */
   premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
+    validatorLimit: number; // The maximum number of validators that can be backed up
     isActivable: boolean;
     isActive: boolean;
     secondsUntilActivable?: number;

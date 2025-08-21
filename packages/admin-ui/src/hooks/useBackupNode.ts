@@ -19,10 +19,9 @@ export const useBackupNode = (
   secondsUntilDeactivation?: number;
   formatCountdown: (totalSeconds?: number) => string | undefined;
   activeValidators: number;
-  activeValidatorLimit: number;
+  validatorLimit: number | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
-  const activeValidatorLimit = 10; // Max validators for backup
   const backupEnvName = "BACKUP_BEACON_NODES";
   const beaconChainServiceName = "validator";
 
@@ -33,6 +32,7 @@ export const useBackupNode = (
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
   const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
   const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
+  const [validatorLimit, setValidatorLimit] = useState<number | undefined>(undefined);
   const [activeValidators, setActiveValidators] = useState<number>(0);
 
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
@@ -71,6 +71,7 @@ export const useBackupNode = (
 
   useEffect(() => {
     if (backupStatusReq.data) {
+      setValidatorLimit(backupStatusReq.data.validatorLimit);
       setBackupActive(backupStatusReq.data.isActive);
       setSecondsUntilActivable(backupStatusReq.data.secondsUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
@@ -200,6 +201,6 @@ export const useBackupNode = (
     secondsUntilDeactivation,
     formatCountdown,
     activeValidators,
-    activeValidatorLimit
+    validatorLimit
   };
 };

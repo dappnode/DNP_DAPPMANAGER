@@ -150,6 +150,7 @@
     flex-direction: column;
     align-items: center;
     gap: 15px;
+    text-align: center;
 
     svg {
       font-size: 100px;
@@ -200,10 +201,10 @@
           color: var(--warning-color);
         }
       }
+      .color-danger {
+        color: red;
+      }
       .premium-backup-validators-card {
-        .color-danger {
-          color: red;
-        }
         .premium-backup-validators-limit-bar {
           background-color: var(--color-dark-background-main);
 
