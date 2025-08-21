@@ -50,8 +50,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           <ul>
             <li>Provides 7-day backup coverage to diagnose and fix issues</li>
             <li>Covers up to 10 validators among all available networks</li>
-            <li>Once activated, backup is used regardless of later deactivation</li>
-            <li>Service renews monthly</li>
+            <li>The backup service can be used once a month per user</li>
           </ul>
         </div>
         {!isPremium && (
@@ -70,7 +69,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         <OverlayTrigger
           overlay={
             <Tooltip id="active-networks">
-              Your current active networks and their corresponding clients that are available for the backup service
+              The supported networks that have staking clients selected in order to use the backup node service
             </Tooltip>
           }
           placement="top"
@@ -105,7 +104,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           <OverlayTrigger
             overlay={
               <Tooltip id="validators-coverage">
-                The amount of active validators among all available networks that can be covered by the backup service
+                The number of active validators across all networks supported by the backup service
               </Tooltip>
             }
             placement="top"
