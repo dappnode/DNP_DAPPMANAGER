@@ -28,6 +28,20 @@ import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 const controller = new AbortController();
 
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+// Graceful shutdown
+process.on("SIGINT", () => {
+  controller.abort();
+  server.close();
+  process.exit(0);
+});
+
 // Initialize DB must be the first step so the db has the required values
 initializeDb()
   .then(() => logs.info("Initialized Database"))
@@ -127,10 +141,3 @@ if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
 
 postRestartPatch().catch((e) => logs.error("Error on postRestartPatch", e));
-
-// Graceful shutdown
-process.on("SIGINT", () => {
-  controller.abort();
-  server.close();
-  process.exit(0);
-});
