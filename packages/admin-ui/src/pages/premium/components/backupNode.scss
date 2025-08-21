@@ -15,6 +15,12 @@
     }
   }
 
+  .tooltip-icon {
+    margin-bottom: 2px;
+    font-size: 0.95rem;
+    color: var(--light-text-color);
+  }
+
   .premium-backup-node-desc {
     .description-row {
       display: flex;

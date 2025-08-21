@@ -4,10 +4,17 @@ import { useBackupNode } from "hooks/useBackupNode";
 import { Card } from "react-bootstrap";
 import Loading from "components/Loading";
 import Button from "components/Button";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { relativePath } from "../data";
 import { capitalize } from "utils/strings";
 import { prettyDnpName } from "utils/format";
-import { MdOutlineBackup, MdOutlineCheckCircleOutline, MdOutlineAccessTime, MdGroup } from "react-icons/md";
+import {
+  MdOutlineBackup,
+  MdOutlineCheckCircleOutline,
+  MdOutlineAccessTime,
+  MdGroup,
+  MdInfoOutline
+} from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
@@ -58,7 +65,19 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   const NetworkCard = () => (
     <Card className="premium-backup-network-card card">
-      <h5>Supported Active Networks</h5>
+      <h5>
+        Supported Active Networks{" "}
+        <OverlayTrigger
+          overlay={
+            <Tooltip id="active-networks">
+              Your current active networks and their corresponding clients that are available for the backup service
+            </Tooltip>
+          }
+          placement="top"
+        >
+          <MdInfoOutline className="tooltip-icon" />
+        </OverlayTrigger>
+      </h5>
 
       <div className="premium-backup-network-list">
         {Object.entries(currentConsensus).map(
@@ -81,7 +100,19 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     const validatorsPercentage = validatorLimit ? (activeValidators / validatorLimit) * 100 : 100;
     return (
       <Card className="premium-backup-validators-card card">
-        <h5>Validators Coverage</h5>
+        <h5>
+          Validators Coverage{" "}
+          <OverlayTrigger
+            overlay={
+              <Tooltip id="validators-coverage">
+                The amount of active validators among all available networks that can be covered by the backup service
+              </Tooltip>
+            }
+            placement="top"
+          >
+            <MdInfoOutline className="tooltip-icon" />
+          </OverlayTrigger>
+        </h5>
 
         <div className="premium-backup-validators-count">
           <div>
