@@ -130,6 +130,31 @@ export const mevBoostHoodi = interceptGlobalEnvOnSet(
   Object.keys({ MEVBOOST_HOODI })[0]
 );
 
+// Sepolia
+
+const CONSENSUS_CLIENT_SEPOLIA = "consensus-client-sepolia";
+const EXECUTION_CLIENT_SEPOLIA = "execution-client-sepolia";
+const MEVBOOST_SEPOLIA = "mevboost-sepolia";
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusClientSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_CLIENT_SEPOLIA, null),
+  Object.keys({ CONSENSUS_CLIENT_SEPOLIA })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionClientSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_CLIENT_SEPOLIA, null),
+  Object.keys({ EXECUTION_CLIENT_SEPOLIA })[0]
+);
+
+export const mevBoostSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_SEPOLIA, false),
+  Object.keys({ MEVBOOST_SEPOLIA })[0]
+);
+
 // LUKSO
 
 const CONSENSUS_CLIENT_LUKSO = "consensus-client-lukso";

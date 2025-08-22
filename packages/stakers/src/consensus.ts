@@ -2,6 +2,7 @@ import {
   ConsensusClientGnosis,
   ConsensusClientHolesky,
   ConsensusClientHoodi,
+  ConsensusClientSepolia,
   ConsensusClientLukso,
   ConsensusClientMainnet,
   ConsensusClientPrater,
@@ -29,6 +30,7 @@ export class Consensus extends StakerComponent {
     [Network.Gnosis]: db.consensusClientGnosis,
     [Network.Prater]: db.consensusClientPrater,
     [Network.Holesky]: db.consensusClientHolesky,
+    [Network.Sepolia]: db.consensusClientSepolia,
     [Network.Hoodi]: db.consensusClientHoodi,
     [Network.Lukso]: db.consensusClientLukso
   };
@@ -66,6 +68,9 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientHoodi.Teku, minVersion: "0.1.0" },
       { dnpName: ConsensusClientHoodi.Nimbus, minVersion: "0.1.0" },
       { dnpName: ConsensusClientHoodi.Lodestar, minVersion: "0.1.0" }
+    ],
+    [Network.Sepolia]: [
+      { dnpName: ConsensusClientSepolia.Prysm, minVersion: "0.1.2" },
     ],
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },

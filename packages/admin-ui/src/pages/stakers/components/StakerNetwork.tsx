@@ -129,12 +129,12 @@ export default function StakerNetwork({ network, description }: { network: Netwo
       {network === "holesky" && (
         <AlertDismissible variant="warning">
           <p>
-            The holesky network is about to be deprecated, please migrate to <b>Hoodi</b>.
+            The holesky network is deprecated, please migrate to <b>Hoodi</b>.
           </p>
         </AlertDismissible>
       )}
 
-      {(network === "holesky" || network === "mainnet") && (
+      {(network === "hoodi" || network === "mainnet") && (
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
