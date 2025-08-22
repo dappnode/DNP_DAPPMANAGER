@@ -353,14 +353,21 @@ export class DappnodeRepository extends ApmRepository {
             reject(Error(streamId + ": " + err));
           };
 
+        const iterator = readable[Symbol.asyncIterator]();
         try {
-          for await (const chunk of readable) onData(chunk);
+          for await (const chunk of { [Symbol.asyncIterator]: () => iterator }) onData(chunk);
 
           const writable = fs.createWriteStream(_path);
           await util.promisify(stream.pipeline)(stream.Readable.from(asyncIterableArray), writable);
           onFinish();
         } catch (e) {
           onError("Error writing to fs")(e as Error);
+        } finally {
+          // Manually close the iterator, otherwise only the first error might be handled
+          // making the app crashing in subsequent iterations
+          if (typeof iterator.return === "function") {
+            await iterator.return();
+          }
         }
       }
 
