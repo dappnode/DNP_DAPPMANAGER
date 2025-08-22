@@ -51,3 +51,10 @@ export interface AppContextIface {
   theme: Theme;
   toggleTheme: () => void;
 }
+
+export interface RouteType {
+  name: string;
+  subPath: string;
+  component: React.ComponentType;
+  hideSection?: boolean; // Used to hide sections in the navbar
+}

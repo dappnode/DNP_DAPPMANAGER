@@ -1,17 +1,18 @@
 import React from "react";
-import { Routes, Route, NavLink } from "react-router-dom";
 import { title } from "../data";
 // Components
 import AutoDiagnose from "./AutoDiagnose";
 import Report from "./Report";
 import Activity from "./Activity";
 import Title from "components/Title";
+import Ports from "./Ports";
+import { SectionNavigator } from "components/SectionNavigator";
+import { RouteType } from "types";
 // Styles
 import "./support.scss";
-import Ports from "./Ports";
 
 const SupportRoot: React.FC = () => {
-  const routes = [
+  const availableRoutes: RouteType[] = [
     {
       name: "Auto Diagnose",
       subPath: "auto-diagnose",
@@ -37,24 +38,7 @@ const SupportRoot: React.FC = () => {
   return (
     <>
       <Title title={title} />
-
-      <div className="horizontal-navbar">
-        {routes.map((route) => (
-          <button key={route.subPath} className="item-container">
-            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-              {route.name}
-            </NavLink>
-          </button>
-        ))}
-      </div>
-
-      <div className="packages-content">
-        <Routes>
-          {routes.map((route) => (
-            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
-          ))}
-        </Routes>
-      </div>
+      <SectionNavigator routes={availableRoutes} />
     </>
   );
 };
