@@ -96,8 +96,16 @@
           .premium-backup-cc-tag {
             font-style: italic;
             color: var(--color-text-secondary);
+
+            &.color-danger {
+              color: var(--danger-color);
+            }
           }
         }
+      }
+      .premium-backup-network-warning {
+        color: var(--light-text-color);
+        font-size: 0.8rem;
       }
     }
   }
