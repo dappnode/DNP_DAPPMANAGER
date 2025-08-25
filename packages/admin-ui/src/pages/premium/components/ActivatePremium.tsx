@@ -185,7 +185,7 @@ const DeactivateCard: React.FC<{
           <div>
             <b>Activation code:</b> {licenseKey}
           </div>
-          <Button variant="danger" onClick={handleDectivate} disabled={timeOutOn}>
+          <Button variant="dappnode" onClick={handleDectivate} disabled={timeOutOn}>
             {timeOutOn ? <b>{activateTimeout}</b> : "Deactivate"}
           </Button>
         </div>

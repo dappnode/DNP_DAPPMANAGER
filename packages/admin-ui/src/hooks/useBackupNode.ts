@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { prettyDnpName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
 
-export const useBeaconNodeBackup = (
+export const useBackupNode = (
   hashedLicense: string
 ): {
   consensusLoading: boolean;
@@ -18,6 +18,8 @@ export const useBeaconNodeBackup = (
   secondsUntilActivable?: number;
   secondsUntilDeactivation?: number;
   formatCountdown: (totalSeconds?: number) => string | undefined;
+  activeValidators: number;
+  validatorLimit: number | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
   const backupEnvName = "BACKUP_BEACON_NODES";
@@ -30,6 +32,22 @@ export const useBeaconNodeBackup = (
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
   const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
   const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
+  const [validatorLimit, setValidatorLimit] = useState<number | undefined>(undefined);
+  const [activeValidators, setActiveValidators] = useState<number>(0);
+
+  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
+    networks: availableNetworks
+  });
+
+  useEffect(() => {
+    type ActiveByNetwork = Partial<Record<Network, string[] | null>>;
+    function totalActiveCount(map: ActiveByNetwork): number {
+      return Object.values(map).reduce((sum, v) => sum + (Array.isArray(v) ? v.length : 0), 0);
+    }
+    if (validatorsFilterActiveReq.data === undefined) return;
+    const count = totalActiveCount(validatorsFilterActiveReq.data as ActiveByNetwork);
+    setActiveValidators(count);
+  }, [validatorsFilterActiveReq.data]);
 
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({
     networks: availableNetworks
@@ -53,6 +71,7 @@ export const useBeaconNodeBackup = (
 
   useEffect(() => {
     if (backupStatusReq.data) {
+      setValidatorLimit(backupStatusReq.data.validatorLimit);
       setBackupActive(backupStatusReq.data.isActive);
       setSecondsUntilActivable(backupStatusReq.data.secondsUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
@@ -148,7 +167,7 @@ export const useBeaconNodeBackup = (
     confirm({
       title: `Deactivating Backup node`,
       text: `Deactivating the Backup node is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
-        secondsUntilDeactivation
+        secondsUntilActivable
       )}.`,
       label: "Deactivate",
       variant: "danger",
@@ -167,7 +186,7 @@ export const useBeaconNodeBackup = (
     const h = Math.floor((totalSeconds % 86400) / 3600);
     const m = Math.floor((totalSeconds % 3600) / 60);
     const s = totalSeconds % 60;
-    return `${d} days ${h} hours ${m} mins ${s} secs`;
+    return `${d}d ${h}h ${m}m ${s}s`;
   };
 
   return {
@@ -180,6 +199,8 @@ export const useBeaconNodeBackup = (
     backupActivable,
     secondsUntilActivable,
     secondsUntilDeactivation,
-    formatCountdown
+    formatCountdown,
+    activeValidators,
+    validatorLimit
   };
 };

@@ -435,9 +435,19 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   premiumBeaconBackupActivate: async () => {},
   premiumBeaconBackupDeactivate: async () => {},
   premiumBeaconBackupStatus: async () => ({
+    validatorLimit: 10,
     isActivable: false,
     isActive: true,
     secondsUntilDeactivation: 259200
+  }),
+  keystoresGetByNetwork: async () => ({
+    mainnet: { solo: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: null
+  }),
+  validatorsFilterActiveByNetwork: async () => ({
+    mainnet: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"],
+    hoodi: [],
+    gnosis: null
   })
 };
 

@@ -417,6 +417,13 @@ export interface Routes {
   ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
+   * Returns the keystores imported for the given networks.
+   */
+  keystoresGetByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, Record<string, string[]> | null>>>;
+
+  /**
    * Local proxying allows to access the admin UI through dappnode.local.
    * When disabling this feature:
    * - Remove NGINX logic in HTTPs Portal to route .local domains
@@ -688,6 +695,7 @@ export interface Routes {
    * @param hashedLicense The hashed license string used to identify the key.
    */
   premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
+    validatorLimit: number; // The maximum number of validators that can be backed up
     isActivable: boolean;
     isActive: boolean;
     secondsUntilActivable?: number;
@@ -802,6 +810,12 @@ export interface Routes {
   natRenewalIsEnabled: () => Promise<boolean>;
 
   /**
+   * Returns the active validators by network
+   * @param networks Array of networks to retrieve its active validators
+   */
+  validatorsFilterActiveByNetwork(kwargs: { networks: Network[] }): Promise<Partial<Record<Network, string[] | null>>>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -906,6 +920,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},
@@ -970,6 +985,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
+  validatorsFilterActiveByNetwork: { log: true },
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

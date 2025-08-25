@@ -4,12 +4,12 @@ import { Routes, Route, NavLink } from "react-router-dom";
 import { title, subPaths } from "../data";
 import Title from "components/Title";
 import { usePremium } from "hooks/usePremium";
-import "./premiumRoot.scss";
 import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
-import { BeaconNodeBackup } from "./BeaconNodeBackup";
+import { BackupNode } from "./BackupNode";
+import "./premiumRoot.scss";
 
 const PremiumRoot: React.FC = () => {
   const {
@@ -61,8 +61,8 @@ const PremiumRoot: React.FC = () => {
     },
     {
       name: "Backup node for validators",
-      subPath: subPaths.beaconNodeBackup,
-      component: () => <BeaconNodeBackup isActivated={isActivated} hashedLicense={hashedLicense}  />
+      subPath: subPaths.backupNode,
+      component: () => <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
     }
   ];
 

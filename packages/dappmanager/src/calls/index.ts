@@ -23,6 +23,8 @@ export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
 export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
+export { keystoresGetByNetwork } from "./keystoresGet.js";
+export { validatorsFilterActiveByNetwork } from "./validatorsFilterActive.js";
 export {
   notificationsSendCustom,
   notificationsGetAllEndpoints,
