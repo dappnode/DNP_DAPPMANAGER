@@ -18,12 +18,16 @@ import {
 import { SiEthereum } from "react-icons/si";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
+import { relativePath as stakersPath } from "pages/stakers/data";
+
 import "./backupNode.scss";
 
 export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActivated: boolean; hashedLicense: string }) {
   const {
     consensusLoading,
     currentConsensus,
+    allPrysmOrTekuActive,
+    anyPrysmOrTekuActive,
     backupStatusLoading,
     backupActivable,
     backupActive,
@@ -38,6 +42,9 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
   const navigate = useNavigate();
 
   const valLimitExceeded = validatorLimit ? activeValidators > validatorLimit : false;
+
+  // Check if atleast on client is selected
+  const noClientsSelected = !Object.values(currentConsensus).some((client) => client !== null && client !== undefined);
 
   const DescriptionCard = () => (
     <Card className="premium-backup-node-desc card">
@@ -79,17 +86,36 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
       </h5>
 
       <div className="premium-backup-network-list">
-        {Object.entries(currentConsensus).map(
-          ([network, client]) =>
+        {Object.entries(currentConsensus).map(([network, client]) => {
+          const isPrysmOrTeku = client?.includes("prysm") || client?.includes("teku");
+          return (
             client && (
-              <div className="premium-backup-network-item" key={network}>
-                <div>
-                  {(network === "mainnet" || network === "hoodi") && <SiEthereum />}
-                  <b>{capitalize(network)}</b>
+              <div>
+                <div className="premium-backup-network-item" key={network}>
+                  <div>
+                    {(network === "mainnet" || network === "hoodi") && <SiEthereum />}
+                    <b>{capitalize(network)}</b>
+                  </div>
+                  <div className={`premium-backup-cc-tag ${isPrysmOrTeku && "color-danger"}`}>
+                    {prettyDnpName(client)}
+                  </div>
                 </div>
-                <div className="premium-backup-cc-tag">{prettyDnpName(client)}</div>
               </div>
             )
+          );
+        })}
+        {noClientsSelected && (
+          <div className="premium-backup-network-item">
+            <div>
+              No staking clients selected. Set up your node in the <Link to={`/${stakersPath}`}> Stakers tab</Link>.
+            </div>
+          </div>
+        )}
+        {anyPrysmOrTekuActive && (
+          <div className="premium-backup-network-warning">
+            Prysm and Teku not supported. To enable the backup, switch to a different client in the{" "}
+            <Link to={`/${stakersPath}`}> Stakers tab</Link>.
+          </div>
         )}
       </div>
     </Card>
@@ -152,11 +178,15 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
       <Button
         variant="dappnode"
         onClick={activateBackup}
-        disabled={consensusLoading || backupStatusLoading || valLimitExceeded}
+        disabled={
+          consensusLoading || backupStatusLoading || allPrysmOrTekuActive || valLimitExceeded || noClientsSelected
+        }
       >
         Activate Backup
       </Button>
       {valLimitExceeded && <div className="color-danger">Validator limit exceeded</div>}
+      {allPrysmOrTekuActive && <div className="color-danger">Clients are not supported</div>}
+      {noClientsSelected && <div className="color-danger">No staking clients selected</div>}
     </Card>
   );
 

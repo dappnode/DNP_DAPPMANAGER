@@ -10,6 +10,8 @@ export const useBackupNode = (
 ): {
   consensusLoading: boolean;
   currentConsensus: Partial<Record<Network, string | null | undefined>>;
+  anyPrysmOrTekuActive: boolean;
+  allPrysmOrTekuActive: boolean;
   activateBackup: () => void;
   deactivateBackup: () => void;
   backupStatusLoading: boolean;
@@ -27,6 +29,11 @@ export const useBackupNode = (
 
   const [consensusLoading, setConsensusLoading] = useState(true);
   const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, string | null | undefined>>>({});
+
+  // Prysm and Teku are not supported by now. Used to disable btn and display warning
+  const [anyPrysmOrTekuActive, setAnyPrysmOrTekuActive] = useState(false);
+  const [allPrysmOrTekuActive, setAllPrysmOrTekuActive] = useState(false);
+
   const [backupStatusLoading, setBackupStatusLoading] = useState(true);
   const [backupActive, setBackupActive] = useState<boolean>(false);
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
@@ -66,6 +73,18 @@ export const useBackupNode = (
   useEffect(() => {
     if (currentConsensusReq.data) {
       setCurrentConsensus(currentConsensusReq.data);
+      setAnyPrysmOrTekuActive(
+        Object.values(currentConsensusReq.data).some((client) => {
+          const ccName = client && client.toLowerCase();
+          return ccName?.includes("prysm") || ccName?.includes("teku");
+        })
+      );
+      setAllPrysmOrTekuActive(
+        Object.values(currentConsensusReq.data).every((client) => {
+          const ccName = client && client.toLowerCase();
+          return ccName?.includes("prysm") || ccName?.includes("teku");
+        })
+      );
     }
   }, [currentConsensusReq.data]);
 
@@ -192,6 +211,8 @@ export const useBackupNode = (
   return {
     consensusLoading,
     currentConsensus,
+    anyPrysmOrTekuActive,
+    allPrysmOrTekuActive,
     activateBackup,
     deactivateBackup,
     backupStatusLoading,
