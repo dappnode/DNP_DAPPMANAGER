@@ -38,7 +38,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     formatCountdown,
     activeValidatorsCounts,
     validatorLimit
-  } = useBackupNode(hashedLicense);
+  } = useBackupNode({ hashedLicense, isPremiumActivated: isPremium });
   const navigate = useNavigate();
 
   // Check if atleast on client is selected
@@ -57,7 +57,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           </p>
           <ul>
             <li>Provides 7-day backup coverage to diagnose and fix issues</li>
-            <li>Covers up to 10 validators among all available networks</li>
+            <li>By default, it covers up to 10 validators per available network</li>
             <li>The backup service can be used once a month per user</li>
           </ul>
         </div>

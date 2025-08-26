@@ -5,9 +5,13 @@ import { useEffect, useState } from "react";
 import { prettyDnpName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
 
-export const useBackupNode = (
-  hashedLicense: string
-): {
+export const useBackupNode = ({
+  hashedLicense,
+  isPremiumActivated
+}: {
+  hashedLicense: string;
+  isPremiumActivated: boolean;
+}): {
   consensusLoading: boolean;
   currentConsensus: Partial<Record<Network, string | null | undefined>>;
   anyPrysmOrTekuActive: boolean;
@@ -77,8 +81,12 @@ export const useBackupNode = (
   }, [currentConsensusReq.isValidating]);
 
   useEffect(() => {
-    setBackupStatusLoading(backupStatusReq.isValidating);
-  }, [backupStatusReq.isValidating]);
+    if (isPremiumActivated) {
+      setBackupStatusLoading(backupStatusReq.isValidating);
+    } else {
+      setBackupStatusLoading(false);
+    }
+  }, [isPremiumActivated, backupStatusReq.isValidating]);
 
   useEffect(() => {
     if (currentConsensusReq.data) {
@@ -99,14 +107,14 @@ export const useBackupNode = (
   }, [currentConsensusReq.data]);
 
   useEffect(() => {
-    if (backupStatusReq.data) {
+    if (isPremiumActivated && backupStatusReq.data) {
       setValidatorLimit(backupStatusReq.data.validatorLimit);
       setBackupActive(backupStatusReq.data.isActive);
       setSecondsUntilActivable(backupStatusReq.data.secondsUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
       setSecondsUntilDeactivation(backupStatusReq.data.secondsUntilDeactivation);
     }
-  }, [backupStatusReq.data]);
+  }, [backupStatusReq.data, isPremiumActivated]);
 
   // useEffect to update the seconds until activable and deactivation without revalidating the request
   // revalidating if the seconds reach < 1
