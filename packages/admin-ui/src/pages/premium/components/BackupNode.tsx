@@ -36,15 +36,16 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     secondsUntilActivable,
     secondsUntilDeactivation,
     formatCountdown,
-    activeValidators,
+    activeValidatorsCounts,
     validatorLimit
   } = useBackupNode(hashedLicense);
   const navigate = useNavigate();
 
-  const valLimitExceeded = validatorLimit ? activeValidators > validatorLimit : false;
-
   // Check if atleast on client is selected
   const noClientsSelected = !Object.values(currentConsensus).some((client) => client !== null && client !== undefined);
+
+  // Check if validator limit exceeded in any network
+  const valLimitExceeded = Object.values(activeValidatorsCounts).some((data) => data?.limitExceeded);
 
   const DescriptionCard = () => (
     <Card className="premium-backup-node-desc card">
@@ -122,15 +123,14 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
   );
 
   const ValidatorsCard = () => {
-    const validatorsPercentage = validatorLimit ? (activeValidators / validatorLimit) * 100 : 100;
     return (
       <Card className="premium-backup-validators-card card">
         <h5>
-          Validators Coverage{" "}
+          Validators Coverage by Network{" "}
           <OverlayTrigger
             overlay={
               <Tooltip id="validators-coverage">
-                The number of active validators across all networks supported by the backup service
+                The number of active validators per network supported by the backup service
               </Tooltip>
             }
             placement="top"
@@ -140,27 +140,43 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         </h5>
 
         <div className="premium-backup-validators-count">
-          <div>
-            <MdGroup /> <span className={`${valLimitExceeded && "color-danger"}`}> {activeValidators}</span> /{" "}
-            {validatorLimit} validators
-          </div>
-          <div className="premium-backup-validators-limit-bar">
-            <div
-              className={`premium-backup-validators-curr-bar ${valLimitExceeded && "color-danger"}`}
-              style={{ width: `${validatorsPercentage}%` }}
-            ></div>
-          </div>
+          {Object.entries(activeValidatorsCounts).map(([network, data]) => {
+            if (!data) return null;
 
-          <div className="premium-backup-validators-limit-desc">
-            Up to {validatorLimit} validators supported among all available networks.
-          </div>
-          {valLimitExceeded && (
+            const count = data.count ?? 0;
+            const exceeded = data.limitExceeded;
+            const pct = validatorLimit ? Math.min((count / validatorLimit) * 100, 100) : 100;
+
+            return (
+              <div key={String(network)} className="premium-backup-validators-item">
+                <div className="premium-backup-validators-count-row">
+                  <strong className={exceeded ? "color-danger" : undefined}>{capitalize(network)}</strong>
+                  <div>
+                    <MdGroup /> <span className={exceeded ? "color-danger" : undefined}>{data.count ?? "0"}</span> /{" "}
+                    {validatorLimit ?? "—"} validators
+                  </div>
+                </div>
+
+                <div className="premium-backup-validators-limit-bar">
+                  <div
+                    className={`premium-backup-validators-curr-bar ${exceeded && "color-danger"}`}
+                    style={{ width: `${pct}%` }}
+                  />
+                </div>
+              </div>
+            );
+          })}
+          {valLimitExceeded ? (
             <div className="premium-backup-validators-limit-warning">
-              You are exceeding the supported number of active validators to enable the backup. We invite you to
+              You are exceeding the supported number of active validators in at least one network. We invite you to
               consolidate your validators to use this service.{" "}
               <Link to={docsUrl.premiumBackupValidatorsLimit} {...newTabProps}>
                 Learn more
               </Link>
+            </div>
+          ) : (
+            <div className="premium-backup-validators-limit-desc">
+              Up to {validatorLimit ?? "—"} validators supported per network.
             </div>
           )}
         </div>

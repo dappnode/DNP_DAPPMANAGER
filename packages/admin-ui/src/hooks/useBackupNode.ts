@@ -20,7 +20,7 @@ export const useBackupNode = (
   secondsUntilActivable?: number;
   secondsUntilDeactivation?: number;
   formatCountdown: (totalSeconds?: number) => string | undefined;
-  activeValidators: number;
+  activeValidatorsCounts: Partial<Record<Network, { count: number | null; limitExceeded: boolean }>>;
   validatorLimit: number | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
@@ -40,21 +40,31 @@ export const useBackupNode = (
   const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
   const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
   const [validatorLimit, setValidatorLimit] = useState<number | undefined>(undefined);
-  const [activeValidators, setActiveValidators] = useState<number>(0);
+  const [activeValidatorsCounts, setActiveValidatorsCounts] = useState<
+    Partial<Record<Network, { count: number | null; limitExceeded: boolean }>>
+  >({});
 
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
     networks: availableNetworks
   });
 
   useEffect(() => {
-    type ActiveByNetwork = Partial<Record<Network, string[] | null>>;
-    function totalActiveCount(map: ActiveByNetwork): number {
-      return Object.values(map).reduce((sum, v) => sum + (Array.isArray(v) ? v.length : 0), 0);
+    const data = validatorsFilterActiveReq.data;
+    if (data === undefined) return;
+
+    const counts: Partial<Record<Network, { count: number | null; limitExceeded: boolean }>> = {};
+
+    for (const [network, arr] of Object.entries(data) as [Network, string[] | null][]) {
+      const count = Array.isArray(arr) ? arr.length : null;
+
+      counts[network] = {
+        count,
+        limitExceeded: count !== null && validatorLimit !== undefined ? count > validatorLimit : false
+      };
     }
-    if (validatorsFilterActiveReq.data === undefined) return;
-    const count = totalActiveCount(validatorsFilterActiveReq.data as ActiveByNetwork);
-    setActiveValidators(count);
-  }, [validatorsFilterActiveReq.data]);
+
+    setActiveValidatorsCounts(counts);
+  }, [validatorsFilterActiveReq.data, validatorLimit]);
 
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({
     networks: availableNetworks
@@ -221,7 +231,7 @@ export const useBackupNode = (
     secondsUntilActivable,
     secondsUntilDeactivation,
     formatCountdown,
-    activeValidators,
+    activeValidatorsCounts,
     validatorLimit
   };
 };

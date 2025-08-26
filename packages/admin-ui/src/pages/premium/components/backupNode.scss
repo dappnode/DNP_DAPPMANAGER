@@ -118,7 +118,7 @@
     .premium-backup-validators-count {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 15px;
 
       svg {
         font-size: 1.3rem;
@@ -129,31 +129,41 @@
         font-weight: bold;
       }
 
-      .premium-backup-validators-limit-bar {
-        width: 100%;
-        height: 5px;
-        background-color: #e9ecef;
-        border-radius: 3px;
-        overflow: hidden;
+      .premium-backup-validators-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
 
-        .premium-backup-validators-curr-bar {
-          width: 0; /* This is dynamically set */
-          height: 100%;
+        .premium-backup-validators-count-row {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .premium-backup-validators-limit-bar {
+          width: 100%;
+          height: 5px;
+          background-color: #e9ecef;
           border-radius: 3px;
-          background-color: #000;
+          overflow: hidden;
 
-          &.color-danger {
-            background-color: var(--danger-color);
+          .premium-backup-validators-curr-bar {
+            width: 0; /* This is dynamically set */
+            height: 100%;
+            border-radius: 3px;
+            background-color: #000;
+
+            &.color-danger {
+              background-color: var(--danger-color);
+            }
           }
         }
       }
 
-      .premium-backup-validators-limit-desc {
-        color: var(--light-text-color);
-        font-size: 0.8rem;
-      }
-
+      .premium-backup-validators-limit-desc,
       .premium-backup-validators-limit-warning {
+        color: var(--light-text-color);
         font-size: 0.8rem;
       }
     }
