@@ -62,9 +62,6 @@ export const premiumActivateLicense = async (): Promise<void> => {
   if (!response.ok) {
     let message: string;
 
-    console.log("Activate Response", response);
-    console.log(response.status);
-
     switch (response.status) {
       case 403:
         message = "License does not exist or unauthorized";
