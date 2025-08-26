@@ -23,6 +23,7 @@ const PremiumRoot: React.FC = () => {
     setLicenseKey,
     handleActivate,
     isActivationLoading,
+    licenseActivationError,
     handleDectivate,
     hashedLicense,
     activateTimeout
@@ -45,6 +46,7 @@ const PremiumRoot: React.FC = () => {
           handleActivate={handleActivate}
           handleDectivate={handleDectivate}
           isActivationLoading={isActivationLoading}
+          licenseActivationError={licenseActivationError}
           activateTimeout={activateTimeout}
         />
       )

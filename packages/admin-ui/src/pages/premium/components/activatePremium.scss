@@ -39,6 +39,11 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+
+      .premium-activate-error {
+        color: var(--danger-color);
+        font-size: 0.8rem;
+      }
     }
 
     .premium-stripe-portal {
@@ -147,6 +152,11 @@
       }
       .premium-trial-tag {
         color: deepskyblue;
+      }
+      .premium-activate {
+        .premium-activate-error {
+          color: var(--danger-color);
+        }
       }
     }
   }

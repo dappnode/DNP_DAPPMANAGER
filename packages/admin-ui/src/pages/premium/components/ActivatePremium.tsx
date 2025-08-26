@@ -4,8 +4,9 @@ import newTabProps from "utils/newTabProps";
 import Button from "components/Button";
 import Input from "components/Input";
 import { Card } from "react-bootstrap";
-import "./activatePremium.scss";
 import Loading from "components/Loading";
+import "./activatePremium.scss";
+
 interface ActivatePremiumProps {
   isActivated: boolean;
   licenseKey: string;
@@ -13,6 +14,7 @@ interface ActivatePremiumProps {
   handleActivate: () => Promise<void>;
   handleDectivate: () => Promise<void>;
   isActivationLoading: boolean;
+  licenseActivationError: string | null;
   activateTimeout: number;
 }
 
@@ -23,6 +25,7 @@ export const ActivatePremium = ({
   handleActivate,
   handleDectivate,
   isActivationLoading,
+  licenseActivationError,
   activateTimeout
 }: ActivatePremiumProps) => {
   if (isActivationLoading) {
@@ -43,6 +46,7 @@ export const ActivatePremium = ({
             licenseKey={licenseKey}
             setLicenseKey={setLicenseKey}
             handleActivate={handleActivate}
+            licenseActivationError={licenseActivationError}
             activateTimeout={activateTimeout}
           />
         </>
@@ -131,8 +135,9 @@ const ActivateCard: React.FC<{
   licenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
   handleActivate: () => Promise<void>;
+  licenseActivationError: string | null;
   activateTimeout: number;
-}> = ({ licenseKey, setLicenseKey, handleActivate, activateTimeout }) => {
+}> = ({ licenseKey, setLicenseKey, handleActivate, licenseActivationError, activateTimeout }) => {
   const [localLicenseKey, setLocalLicenseKey] = useState(licenseKey);
   const timeOutOn = activateTimeout > 0;
 
@@ -159,6 +164,7 @@ const ActivateCard: React.FC<{
               onBlur={handleBlur}
               placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX"
             />
+            {licenseActivationError && <div className="premium-activate-error">{licenseActivationError}</div>}
           </div>
           <Button variant="dappnode" onClick={handleActivate} disabled={!localLicenseKey || timeOutOn}>
             {timeOutOn ? <b>{activateTimeout}</b> : "Activate"}

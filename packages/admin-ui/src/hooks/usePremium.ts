@@ -20,6 +20,7 @@ export const usePremium = (): {
   isActivationLoading: boolean;
   hashedLicense: string;
   activateTimeout: number;
+  licenseActivationError: string | null;
 } => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
@@ -28,8 +29,9 @@ export const usePremium = (): {
   const [licenseKey, setLicenseKey] = useState<string>("");
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [isActivationLoading, setIsActivationLoading] = useState<boolean>(true);
+  const [licenseActivationError, setLicenseActivationError] = useState<string | null>(null);
   const [hashedLicense, setHashedLicense] = useState<string>("");
-  
+
   // Timeout used to prevent the user from activating/deactivating the license key multiple times in a short
   const [activateTimeout, setActivateTimeout] = useState<number>(-1);
   const timeoutDuration = 12; // seconds
@@ -77,11 +79,11 @@ export const usePremium = (): {
 
   useEffect(() => {
     if (activateTimeout <= 0) return;
-  
+
     const timer = setTimeout(() => {
-      setActivateTimeout(prev => prev - 1);
+      setActivateTimeout((prev) => prev - 1);
     }, 1000);
-  
+
     return () => clearTimeout(timer);
   }, [activateTimeout]);
 
@@ -140,13 +142,17 @@ export const usePremium = (): {
   };
 
   const handleActivate = async (): Promise<void> => {
+    setLicenseActivationError(null);
     try {
       await putLicenseKey(licenseKey);
       await activateLicenseKey();
       premiumActiveReq.revalidate();
       setActivateTimeout(timeoutDuration);
     } catch (error) {
-      console.error(`Error while activating license key: ${error}`);
+      const msg = error instanceof Error ? error.message : "Internal server error";
+
+      console.error("Error while activating license key:", error);
+      setLicenseActivationError(msg);
     }
   };
 
@@ -181,6 +187,7 @@ export const usePremium = (): {
     handleDectivate,
     isActivationLoading,
     hashedLicense,
-    activateTimeout
+    activateTimeout,
+    licenseActivationError
   };
 };

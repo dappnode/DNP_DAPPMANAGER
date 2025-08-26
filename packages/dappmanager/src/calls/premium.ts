@@ -60,7 +60,24 @@ export const premiumActivateLicense = async (): Promise<void> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to activate premium: ${response.statusText}`);
+    let message: string;
+
+    console.log("Activate Response", response);
+    console.log(response.status);
+
+    switch (response.status) {
+      case 403:
+        message = "License does not exist or unauthorized";
+        break;
+      case 429:
+        message = "Too many requests";
+        break;
+      default:
+        message = "Internal server error";
+        break;
+    }
+
+    throw new Error(message);
   }
 };
 
