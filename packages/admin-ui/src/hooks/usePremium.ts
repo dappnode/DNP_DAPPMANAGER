@@ -115,14 +115,7 @@ export const usePremium = (): {
   }, [isInstalled]);
 
   const putLicenseKey = (licenseKey: string): Promise<void> => {
-    return withToast(
-      continueIfCalleDisconnected(() => api.premiumSetLicenseKey(licenseKey), premiumDnpName),
-      {
-        message: "Setting license key...",
-        onSuccess: "License key set successfully",
-        onError: "Error while setting license key"
-      }
-    );
+    return continueIfCalleDisconnected(() => api.premiumSetLicenseKey(licenseKey), premiumDnpName)();
   };
 
   const activateLicenseKey = (): Promise<void> => {
