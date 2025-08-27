@@ -64,7 +64,7 @@ export const premiumActivateLicense = async (): Promise<void> => {
 
     switch (response.status) {
       case 403:
-        message = "License does not exist or unauthorized";
+        message = "License does not exist";
         break;
       case 429:
         message = "Too many requests";
