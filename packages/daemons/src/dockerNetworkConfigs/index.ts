@@ -17,18 +17,21 @@ async function ensureDockerNetworkConfigs(
   signer: Signer,
   mevBoost: MevBoost
 ): Promise<void> {
+  /**
+   * Set first dnprivate_network and second dncore_network since its more likely to
+   * happen the IP collision while in the dncore_network is very unlikely to happen.
+   */
   const networksConfigs = [
+    {
+      networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
+      subnet: params.DOCKER_NETWORK_NEW_SUBNET,
+      bindIp: params.BIND_NEW_IP
+    },
     {
       networkName: params.DOCKER_PRIVATE_NETWORK_NAME,
       subnet: params.DOCKER_NETWORK_SUBNET,
       dappmanagerIp: params.DAPPMANAGER_IP,
       bindIp: params.BIND_IP
-    },
-    {
-      networkName: params.DOCKER_PRIVATE_NETWORK_NEW_NAME,
-      subnet: params.DOCKER_NETWORK_NEW_SUBNET,
-      dappmanagerIp: params.DAPPMANAGER_NEW_IP,
-      bindIp: params.BIND_NEW_IP
     }
   ];
 
@@ -68,7 +71,7 @@ async function ensureDockerNetworkConfig({
 }: {
   networkName: string;
   subnet: string;
-  dappmanagerIp: string;
+  dappmanagerIp?: string;
   bindIp: string;
 }): Promise<void> {
   // 1. create the new docker network

@@ -14,7 +14,6 @@ import Button from "components/Button";
 import { disclaimer } from "../data";
 import Loading from "components/Loading";
 import { Alert } from "react-bootstrap";
-import "./stakers.scss";
 import { AppContext } from "App";
 import { Network } from "@dappnode/types";
 import { useStakerConfig } from "./useStakerConfig";
@@ -22,6 +21,7 @@ import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
 import Card from "components/Card";
+import "./stakers.scss";
 
 export default function StakerNetwork({ network, description }: { network: Network; description: string }) {
   // Context
