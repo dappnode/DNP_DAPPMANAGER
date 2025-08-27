@@ -163,7 +163,7 @@ export const premiumBeaconBackupStatus = async (
   const response = await fetch(`${baseUrl}:8080/api/keys/${hashedLicense}`);
 
   if (!response.ok) {
-    throw new Error(`Failed to check beacon backup activable: ${response.statusText}`);
+    throw new Error(`Failed to check backup node status: ${response.statusText}`);
   }
 
   const data = await response.json();

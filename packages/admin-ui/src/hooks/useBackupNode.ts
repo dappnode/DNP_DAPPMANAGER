@@ -19,6 +19,7 @@ export const useBackupNode = ({
   activateBackup: () => void;
   deactivateBackup: () => void;
   backupStatusLoading: boolean;
+  backupStatusError: string | null;
   backupActive: boolean;
   backupActivable: boolean;
   secondsUntilActivable?: number;
@@ -39,6 +40,7 @@ export const useBackupNode = ({
   const [allPrysmOrTekuActive, setAllPrysmOrTekuActive] = useState(false);
 
   const [backupStatusLoading, setBackupStatusLoading] = useState(true);
+  const [backupStatusError, setBackupStatusError] = useState<string | null>(null);
   const [backupActive, setBackupActive] = useState<boolean>(false);
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
   const [secondsUntilActivable, setSecondsUntilActivable] = useState<number | undefined>(undefined);
@@ -115,6 +117,18 @@ export const useBackupNode = ({
       setSecondsUntilDeactivation(backupStatusReq.data.secondsUntilDeactivation);
     }
   }, [backupStatusReq.data, isPremiumActivated]);
+
+  useEffect(() => {
+    if (backupStatusReq.error) {
+      console.log("Backup status error", backupStatusReq.error);
+      const errorMessage =
+        backupStatusReq.error instanceof Error ? backupStatusReq.error.message : "Unknown error occurred";
+      setBackupStatusError(errorMessage);
+      console.log("Backup status error message", errorMessage);
+    } else {
+      setBackupStatusError(null);
+    }
+  }, [backupStatusReq.error]);
 
   // useEffect to update the seconds until activable and deactivation without revalidating the request
   // revalidating if the seconds reach < 1
@@ -234,6 +248,7 @@ export const useBackupNode = ({
     activateBackup,
     deactivateBackup,
     backupStatusLoading,
+    backupStatusError,
     backupActive,
     backupActivable,
     secondsUntilActivable,

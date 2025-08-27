@@ -13,7 +13,8 @@ import {
   MdOutlineCheckCircleOutline,
   MdOutlineAccessTime,
   MdGroup,
-  MdInfoOutline
+  MdInfoOutline,
+  MdErrorOutline
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import newTabProps from "utils/newTabProps";
@@ -29,6 +30,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
     allPrysmOrTekuActive,
     anyPrysmOrTekuActive,
     backupStatusLoading,
+    backupStatusError,
     backupActivable,
     backupActive,
     activateBackup,
@@ -256,6 +258,22 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           <NetworkCard />
           <ValidatorsCard />
         </div>
+      </div>
+    );
+  }
+
+  if (backupStatusError) {
+    return (
+      <div className="premium-backup-node">
+        <DescriptionCard />
+        <div className="premium-backup-info-cards">
+          <NetworkCard />
+          <ValidatorsCard />
+        </div>
+        <Card className="premium-backup-error-card card">
+          <MdErrorOutline />
+          <div>{backupStatusError}</div>
+        </Card>
       </div>
     );
   }

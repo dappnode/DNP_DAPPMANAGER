@@ -208,6 +208,21 @@
       color: rgb(238, 163, 2);
     }
   }
+
+  .premium-backup-error-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    color: var(--danger-color);
+    font-size: 1.2rem;
+    gap: 15px;
+
+    svg {
+      font-size: 100px;
+      color: var(--danger-color);
+    }
+  }
 }
 
 #dark {
@@ -238,6 +253,9 @@
             }
           }
         }
+      }
+      .premium-backup-error-card {
+        color: red;
       }
     }
   }
