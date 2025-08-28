@@ -445,8 +445,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     hoodi: null
   }),
   validatorsFilterActiveByNetwork: async () => ({
-    mainnet: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"],
-    hoodi: [],
+    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: { validators: [] },
     gnosis: null
   })
 };

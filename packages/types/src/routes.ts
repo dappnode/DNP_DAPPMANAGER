@@ -813,7 +813,9 @@ export interface Routes {
    * Returns the active validators by network
    * @param networks Array of networks to retrieve its active validators
    */
-  validatorsFilterActiveByNetwork(kwargs: { networks: Network[] }): Promise<Partial<Record<Network, string[] | null>>>;
+  validatorsFilterActiveByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
 
   /**
    * Removes a docker volume by name

@@ -55,8 +55,8 @@ export async function validatorsFilterActiveByNetwork({
   networks
 }: {
   networks: Network[];
-}): Promise<Partial<Record<Network, string[] | null>>> {
-  const result: Partial<Record<Network, string[] | null>> = {};
+}): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>> {
+  const result: Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>> = {};
 
   const keystoresByNetwork = await keystoresGetByNetwork({ networks });
 
@@ -80,10 +80,10 @@ export async function validatorsFilterActiveByNetwork({
       const activeSet = new Set(activeSets.flat());
       const activeInInputOrder = pubkeys.filter((pk) => activeSet.has(pk));
 
-      result[network] = activeInInputOrder; // could be []
+      result[network] = { validators: activeInInputOrder }; // could be []
     } catch (err) {
-      // If the beacon request fails for this network returns "null"
-      result[network] = null;
+      // If the beacon request fails for this network returns all the imported keystores
+      result[network] = { validators: pubkeys, beaconError: err as Error };
     }
   }
 
