@@ -134,7 +134,6 @@ export const useBackupNode = ({
       const errorMessage =
         backupStatusReq.error instanceof Error ? backupStatusReq.error.message : "Unknown error occurred";
       setBackupStatusError(errorMessage);
-      console.log("Backup status error message", errorMessage);
     } else {
       setBackupStatusError(null);
     }
