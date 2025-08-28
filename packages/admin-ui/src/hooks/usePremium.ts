@@ -69,9 +69,7 @@ export const usePremium = (): {
     } else {
       const searchParams = new URLSearchParams(window.location.search);
       const license = searchParams.get("license");
-      if (license && /^[A-F0-9]{6}-[A-F0-9]{6}-[A-F0-9]{6}-[A-F0-9]{6}-[A-F0-9]{6}-V\d+$/i.test(license)) {
-        setLicenseKey(license);
-      }
+      license && setLicenseKey(license);
     }
 
     if (licenseKeyReq.data.hash) setHashedLicense(licenseKeyReq.data.hash);
