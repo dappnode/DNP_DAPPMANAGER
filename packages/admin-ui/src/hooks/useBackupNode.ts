@@ -119,14 +119,14 @@ export const useBackupNode = ({
   }, [currentConsensusReq.data]);
 
   useEffect(() => {
-    if (isPremiumActivated && backupStatusReq.data) {
+    if (backupStatusReq.data) {
       setValidatorLimit(backupStatusReq.data.validatorLimit);
       setBackupActive(backupStatusReq.data.isActive);
       setSecondsUntilActivable(backupStatusReq.data.secondsUntilActivable);
       setBackupActivable(backupStatusReq.data.isActivable);
       setSecondsUntilDeactivation(backupStatusReq.data.secondsUntilDeactivation);
     }
-  }, [backupStatusReq.data, isPremiumActivated]);
+  }, [backupStatusReq.data]);
 
   useEffect(() => {
     if (backupStatusReq.error) {

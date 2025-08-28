@@ -138,6 +138,7 @@ export const usePremium = (): {
       await putLicenseKey(licenseKey);
       await activateLicenseKey();
       premiumActiveReq.revalidate();
+      licenseKeyReq.revalidate();
       setActivateTimeout(timeoutDuration);
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Internal server error";
