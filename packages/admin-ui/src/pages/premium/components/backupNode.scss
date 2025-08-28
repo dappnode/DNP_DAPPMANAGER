@@ -125,8 +125,13 @@
         margin: 0 2px 2px 0;
       }
 
-      .color-danger {
+      .color-danger,
+      .color-warning {
         font-weight: bold;
+      }
+
+      .color-warning {
+        color: darkorange;
       }
 
       .premium-backup-validators-item {
@@ -139,6 +144,12 @@
           flex-direction: row;
           justify-content: space-between;
           align-items: center;
+
+          .tooltip-beacon-api-error {
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+            color: darkorange;
+          }
         }
 
         .premium-backup-validators-limit-bar {
@@ -243,6 +254,10 @@
       .color-danger {
         color: red;
       }
+      .color-warning {
+        color: orange;
+      }
+
       .premium-backup-validators-card {
         .premium-backup-validators-limit-bar {
           background-color: var(--color-dark-background-main);
@@ -252,6 +267,9 @@
               background-color: red;
             }
           }
+        }
+        .tooltip-beacon-api-error {
+          color: orange;
         }
       }
       .premium-backup-error-card {

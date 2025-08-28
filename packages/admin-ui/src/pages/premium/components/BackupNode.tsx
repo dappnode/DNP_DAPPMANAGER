@@ -14,6 +14,7 @@ import {
   MdOutlineAccessTime,
   MdGroup,
   MdInfoOutline,
+  MdWarningAmber,
   MdErrorOutline
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
@@ -148,14 +149,33 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
             const count = data.count ?? 0;
             const exceeded = data.limitExceeded;
             const pct = validatorLimit ? Math.min((count / validatorLimit) * 100, 100) : 100;
+            const beaconApiError = data.beaconApiError;
 
             return (
               <div key={String(network)} className="premium-backup-validators-item">
                 <div className="premium-backup-validators-count-row">
-                  <strong className={exceeded ? "color-danger" : undefined}>{capitalize(network)}</strong>
                   <div>
-                    <MdGroup /> <span className={exceeded ? "color-danger" : undefined}>{data.count ?? "0"}</span> /{" "}
-                    {validatorLimit ?? "—"} validators
+                    <strong className={exceeded ? "color-danger" : undefined}>{capitalize(network) + " "} </strong>
+                  </div>
+                  <div>
+                    <MdGroup />{" "}
+                    <span className={exceeded ? "color-danger" : beaconApiError ? "color-warning" : undefined}>
+                      {data.count ?? "0"}
+                    </span>{" "}
+                    {beaconApiError && (
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="beacon-api-error">
+                            Error fetching validators status on {capitalize(network)} network. All keystores imported in
+                            your Web3Signer are being considered as active validators.
+                          </Tooltip>
+                        }
+                        placement="top"
+                      >
+                        <MdWarningAmber className="tooltip-beacon-api-error" />
+                      </OverlayTrigger>
+                    )}
+                    / {validatorLimit ?? "—"} validators
                   </div>
                 </div>
 

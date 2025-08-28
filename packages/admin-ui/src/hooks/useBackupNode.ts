@@ -25,7 +25,9 @@ export const useBackupNode = ({
   secondsUntilActivable?: number;
   secondsUntilDeactivation?: number;
   formatCountdown: (totalSeconds?: number) => string | undefined;
-  activeValidatorsCounts: Partial<Record<Network, { count: number | null; limitExceeded: boolean }>>;
+  activeValidatorsCounts: Partial<
+    Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>
+  >;
   validatorLimit: number | undefined;
 } => {
   const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
@@ -47,7 +49,7 @@ export const useBackupNode = ({
   const [secondsUntilDeactivation, setSecondsUntilDeactivation] = useState<number | undefined>(undefined);
   const [validatorLimit, setValidatorLimit] = useState<number | undefined>(undefined);
   const [activeValidatorsCounts, setActiveValidatorsCounts] = useState<
-    Partial<Record<Network, { count: number | null; limitExceeded: boolean }>>
+    Partial<Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>>
   >({});
 
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
@@ -58,13 +60,21 @@ export const useBackupNode = ({
     const data = validatorsFilterActiveReq.data;
     if (data === undefined) return;
 
-    const counts: Partial<Record<Network, { count: number | null; limitExceeded: boolean }>> = {};
+    const counts: Partial<Record<
+      Network,
+      { count: number | null; limitExceeded: boolean; beaconApiError: boolean }
+    >> = {};
 
-    for (const [network, arr] of Object.entries(data) as [Network, string[] | null][]) {
-      const count = Array.isArray(arr) ? arr.length : null;
+    for (const [network, res] of Object.entries(data) as [
+      Network,
+      { validators: string[]; beaconError: Error } | null
+    ][]) {
+      const count = Array.isArray(res?.validators) ? res?.validators.length : null;
+      const beaconApiError = res?.beaconError !== undefined;
 
       counts[network] = {
         count,
+        beaconApiError,
         limitExceeded: count !== null && validatorLimit !== undefined ? count > validatorLimit : false
       };
     }
