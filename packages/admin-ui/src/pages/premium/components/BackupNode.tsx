@@ -62,6 +62,10 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
             <li>Provides 7-day backup coverage to diagnose and fix issues</li>
             <li>By default, it covers up to 10 validators per available network</li>
             <li>The backup service can be used once a month per user</li>
+            <li>
+              After activating the backup, you'll need to wait 2 epochs (≈13 minutes) for your validators to start
+              attesting
+            </li>
           </ul>
         </div>
         {!isPremium && (

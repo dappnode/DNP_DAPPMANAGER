@@ -37,7 +37,7 @@
         ul {
           margin: 0;
           display: grid;
-          grid-template-columns: repeat(2, 1fr);
+          grid-template-columns: auto auto;
           padding: 0px;
           @media (max-width: 60rem) {
             grid-template-columns: repeat(1, 1fr);
