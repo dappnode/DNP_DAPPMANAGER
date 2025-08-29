@@ -134,6 +134,14 @@ export interface Routes {
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
 
+  /**
+   * Returns the consensus client for a given network
+   * @param network Network to get the consensus client for
+   */
+  consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
 
@@ -409,6 +417,13 @@ export interface Routes {
   ipfsClientTargetGet(): Promise<IpfsRepository>;
 
   /**
+   * Returns the keystores imported for the given networks.
+   */
+  keystoresGetByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, Record<string, string[]> | null>>>;
+
+  /**
    * Local proxying allows to access the admin UI through dappnode.local.
    * When disabling this feature:
    * - Remove NGINX logic in HTTPs Portal to route .local domains
@@ -621,6 +636,73 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the Premium package status
+   */
+  premiumPkgStatus: () => Promise<{
+    premiumDnpInstalled: boolean;
+    premiumDnpRunning: boolean;
+  }>;
+
+  /**
+   * Sets current license key
+   * @param licenseKey License key to set
+   */
+  premiumSetLicenseKey: (licenseKey: string) => Promise<void>;
+
+  /**
+   * Returns your current license key and hash
+   */
+  premiumGetLicenseKey: () => Promise<{
+    key: string;
+    hash: string;
+  }>;
+
+  /**
+   * Activates premium license key
+   */
+  premiumActivateLicense: () => Promise<void>;
+
+  /**
+   * Deactivates premium license key
+   */
+  premiumDeactivateLicense: () => Promise<void>;
+
+  /**
+   * Checks if the premium license is active
+   */
+  premiumIsLicenseActive: () => Promise<boolean>;
+
+  /**
+   * Activates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupActivate: (id: string) => Promise<void>;
+
+  /**
+   * Deactivates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupDeactivate: (id: string) => Promise<void>;
+
+  /**
+   * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
+   *
+   * - Determines if the backup is activable.
+   * - Determines if the backup is currently active.
+   * - Returns time remaining until activation becomes possible in seconds (if not activable).
+   * - Returns time remaining until deactivation in seconds (if currently active).
+   *
+   * @param hashedLicense The hashed license string used to identify the key.
+   */
+  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
+    validatorLimit: number; // The maximum number of validators that can be backed up
+    isActivable: boolean;
+    isActive: boolean;
+    secondsUntilActivable?: number;
+    secondsUntilDeactivation?: number;
+  }>;
+
+  /**
    * Returns the PWA mapping URL if it exists, otherwise returns undefined.
    */
   pwaUrlGet: () => Promise<string | undefined>;
@@ -728,6 +810,14 @@ export interface Routes {
   natRenewalIsEnabled: () => Promise<boolean>;
 
   /**
+   * Returns the active validators by network
+   * @param networks Array of networks to retrieve its active validators
+   */
+  validatorsFilterActiveByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -782,6 +872,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
+  consensusClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -831,6 +922,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},
@@ -862,6 +954,15 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  premiumPkgStatus: {},
+  premiumSetLicenseKey: { log: true },
+  premiumGetLicenseKey: { log: true },
+  premiumActivateLicense: { log: true },
+  premiumDeactivateLicense: { log: true },
+  premiumIsLicenseActive: { log: true },
+  premiumBeaconBackupActivate: { log: true },
+  premiumBeaconBackupDeactivate: { log: true },
+  premiumBeaconBackupStatus: { log: true },
   pwaUrlGet: {},
   pwaRequirementsGet: {},
   rebootHost: { log: true },
@@ -886,6 +987,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
+  validatorsFilterActiveByNetwork: { log: true },
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

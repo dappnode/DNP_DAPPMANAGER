@@ -413,6 +413,41 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
     httpsDnpInstalled: true,
     isHttpsRunning: true
+  }),
+  premiumPkgStatus: async () => ({
+    premiumDnpInstalled: true,
+    premiumDnpRunning: true
+  }),
+  premiumSetLicenseKey: async () => {},
+  premiumGetLicenseKey: async () => ({
+    key: "ABCDEF-123456-ABCDEF-123456-ABCDEF-V1",
+    hash: "1234567890abcdef1234567890abcdef1234567890"
+  }),
+  premiumActivateLicense: async () => {},
+  premiumDeactivateLicense: async () => {},
+  premiumIsLicenseActive: async () => false,
+  consensusClientsGetByNetworks: async () => {
+    return {
+      mainnet: "prysm.dnp.dappnode.eth",
+      gnosis: "prysm-gnosis.dnp.dappnode.eth"
+    };
+  },
+  premiumBeaconBackupActivate: async () => {},
+  premiumBeaconBackupDeactivate: async () => {},
+  premiumBeaconBackupStatus: async () => ({
+    validatorLimit: 10,
+    isActivable: false,
+    isActive: true,
+    secondsUntilDeactivation: 259200
+  }),
+  keystoresGetByNetwork: async () => ({
+    mainnet: { solo: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: null
+  }),
+  validatorsFilterActiveByNetwork: async () => ({
+    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: { validators: [] },
+    gnosis: null
   })
 };
 
