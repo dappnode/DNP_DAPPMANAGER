@@ -33,6 +33,15 @@ export default function NotificationsView() {
     }
   }, [notificationsCall.data]);
 
+  //Revalidate every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      notificationsCall.revalidate();
+    }, 60 * 1000); // Re-fecthes banner notifications every minute
+
+    return () => clearInterval(interval);
+  }, []);
+
   /**
    * filters notifications:
    * 1. Filters out notifications that have errors
