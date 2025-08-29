@@ -22,13 +22,11 @@ export const usePremium = (): {
   activateTimeout: number;
   licenseActivationError: string | null;
 } => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isInstalled, setIsInstalled] = useState<boolean>(false);
   const [isInstalling, setIsInstalling] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [licenseKey, setLicenseKey] = useState<string>("");
   const [isActivated, setIsActivated] = useState<boolean>(false);
-  const [isActivationLoading, setIsActivationLoading] = useState<boolean>(true);
   const [licenseActivationError, setLicenseActivationError] = useState<string | null>(null);
   const [hashedLicense, setHashedLicense] = useState<string>("");
 
@@ -40,9 +38,8 @@ export const usePremium = (): {
   const premiumActiveReq = useApi.premiumIsLicenseActive();
   const licenseKeyReq = useApi.premiumGetLicenseKey();
 
-  useEffect(() => {
-    setIsLoading(premiumPkgReq.isValidating);
-  }, [premiumPkgReq.isValidating]);
+  const isLoading = premiumPkgReq.isValidating;
+  const isActivationLoading = premiumActiveReq.isValidating;
 
   useEffect(() => {
     if (premiumPkgReq.data) {
@@ -56,10 +53,6 @@ export const usePremium = (): {
       setIsActivated(premiumActiveReq.data);
     }
   }, [premiumActiveReq.data]);
-
-  useEffect(() => {
-    setIsActivationLoading(premiumActiveReq.isValidating);
-  }, [premiumActiveReq.isValidating]);
 
   useEffect(() => {
     if (!licenseKeyReq.data) return;

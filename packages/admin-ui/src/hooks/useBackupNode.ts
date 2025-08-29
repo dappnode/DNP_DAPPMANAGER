@@ -1,9 +1,13 @@
 import { Network } from "@dappnode/types";
 import { api, useApi } from "api";
 import { withToast } from "components/toast/Toast";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { prettyDnpName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
+
+const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
+const backupEnvName = "BACKUP_BEACON_NODES";
+const beaconChainServiceName = "validator";
 
 export const useBackupNode = ({
   hashedLicense,
@@ -11,37 +15,12 @@ export const useBackupNode = ({
 }: {
   hashedLicense: string;
   isPremiumActivated: boolean;
-}): {
-  consensusLoading: boolean;
-  currentConsensus: Partial<Record<Network, string | null | undefined>>;
-  anyPrysmOrTekuActive: boolean;
-  allPrysmOrTekuActive: boolean;
-  activateBackup: () => void;
-  deactivateBackup: () => void;
-  backupStatusLoading: boolean;
-  backupStatusError: string | null;
-  backupActive: boolean;
-  backupActivable: boolean;
-  secondsUntilActivable?: number;
-  secondsUntilDeactivation?: number;
-  formatCountdown: (totalSeconds?: number) => string | undefined;
-  activeValidatorsCounts: Partial<
-    Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>
-  >;
-  validatorLimit: number | undefined;
-} => {
-  const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
-  const backupEnvName = "BACKUP_BEACON_NODES";
-  const beaconChainServiceName = "validator";
-
-  const [consensusLoading, setConsensusLoading] = useState(true);
+}) => {
   const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, string | null | undefined>>>({});
 
-  // Prysm and Teku are not supported by now. Used to disable btn and display warning
   const [anyPrysmOrTekuActive, setAnyPrysmOrTekuActive] = useState(false);
   const [allPrysmOrTekuActive, setAllPrysmOrTekuActive] = useState(false);
 
-  const [backupStatusLoading, setBackupStatusLoading] = useState(true);
   const [backupStatusError, setBackupStatusError] = useState<string | null>(null);
   const [backupActive, setBackupActive] = useState<boolean>(false);
   const [backupActivable, setBackupActivable] = useState<boolean>(false);
@@ -52,9 +31,14 @@ export const useBackupNode = ({
     Partial<Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>>
   >({});
 
-  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({
-    networks: availableNetworks
-  });
+  const networksParam = useMemo(() => ({ networks: availableNetworks }), []);
+
+  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork(networksParam);
+  const currentConsensusReq = useApi.consensusClientsGetByNetworks(networksParam);
+  const backupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
+
+  const consensusLoading = currentConsensusReq.isValidating;
+  const backupStatusLoading = isPremiumActivated ? backupStatusReq.isValidating : false;
 
   useEffect(() => {
     const data = validatorsFilterActiveReq.data;
@@ -82,38 +66,25 @@ export const useBackupNode = ({
     setActiveValidatorsCounts(counts);
   }, [validatorsFilterActiveReq.data, validatorLimit]);
 
-  const currentConsensusReq = useApi.consensusClientsGetByNetworks({
-    networks: availableNetworks
-  });
-
-  const backupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
-
-  useEffect(() => {
-    setConsensusLoading(currentConsensusReq.isValidating);
-  }, [currentConsensusReq.isValidating]);
-
-  useEffect(() => {
-    if (isPremiumActivated) {
-      setBackupStatusLoading(backupStatusReq.isValidating);
-    } else {
-      setBackupStatusLoading(false);
-    }
-  }, [isPremiumActivated, backupStatusReq.isValidating]);
-
   useEffect(() => {
     if (currentConsensusReq.data) {
       setCurrentConsensus(currentConsensusReq.data);
+
+      const clients = Object.values(currentConsensusReq.data).filter(Boolean) as string[];
+
       setAnyPrysmOrTekuActive(
-        Object.values(currentConsensusReq.data).some((client) => {
-          const ccName = client && client.toLowerCase();
-          return ccName?.includes("prysm") || ccName?.includes("teku");
+        clients.some((client) => {
+          const ccName = client.toLowerCase();
+          return ccName.includes("prysm") || ccName.includes("teku");
         })
       );
+
       setAllPrysmOrTekuActive(
-        Object.values(currentConsensusReq.data).every((client) => {
-          const ccName = client && client.toLowerCase();
-          return ccName?.includes("prysm") || ccName?.includes("teku");
-        })
+        clients.length > 0 &&
+          clients.every((client) => {
+            const ccName = client.toLowerCase();
+            return ccName.includes("prysm") || ccName.includes("teku");
+          })
       );
     }
   }, [currentConsensusReq.data]);
@@ -139,8 +110,7 @@ export const useBackupNode = ({
     }
   }, [backupStatusReq.error]);
 
-  // useEffect to update the seconds until activable and deactivation without revalidating the request
-  // revalidating if the seconds reach < 1
+  // countdown interval not depending on backupStatusReq
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsUntilActivable((prev) => {
@@ -168,7 +138,6 @@ export const useBackupNode = ({
 
     return () => clearInterval(interval);
   }, []);
-
   const setBackupEnv = async (type: "activate" | "deactivate") => {
     if (!hashedLicense) {
       throw new Error("Hashed license is required to set backup environment");
@@ -177,7 +146,7 @@ export const useBackupNode = ({
     const entries = Object.entries(currentConsensus) as [Network, string | null | undefined][];
 
     for (const [network, dnpName] of entries) {
-      if (!dnpName) continue; // Skip if dnpName is null or undefined
+      if (!dnpName) continue;
       const envValue = type === "activate" ? `https://${hashedLicense}:@${network}.beacon.dappnode.io` : "";
       const env = {
         [backupEnvName]: envValue
@@ -198,18 +167,14 @@ export const useBackupNode = ({
   };
 
   const activate = async () => {
-    if (!hashedLicense) {
-      throw new Error("Hashed license is required to activate beacon backup");
-    }
+    if (!hashedLicense) throw new Error("Hashed license is required to activate beacon backup");
     await api.premiumBeaconBackupActivate(hashedLicense);
     await setBackupEnv("activate");
     backupStatusReq.revalidate();
   };
 
   const deactivate = async () => {
-    if (!hashedLicense) {
-      throw new Error("Hashed license is required to activate beacon backup");
-    }
+    if (!hashedLicense) throw new Error("Hashed license is required to activate beacon backup");
     await api.premiumBeaconBackupDeactivate(hashedLicense);
     await setBackupEnv("deactivate");
     backupStatusReq.revalidate();

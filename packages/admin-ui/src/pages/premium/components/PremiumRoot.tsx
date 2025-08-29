@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Routes, Route, NavLink } from "react-router-dom";
 // Components
 import { title, subPaths } from "../data";
@@ -12,6 +12,8 @@ import { BackupNode } from "./BackupNode";
 import "./premiumRoot.scss";
 
 const PremiumRoot: React.FC = () => {
+  const premium = usePremium();
+
   const {
     isActivated,
     isInstalled,
@@ -27,46 +29,54 @@ const PremiumRoot: React.FC = () => {
     handleDectivate,
     hashedLicense,
     activateTimeout
-  } = usePremium();
+  } = premium;
 
-  const routes: {
-    name: string;
-    subPath: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: React.ComponentType<any>;
-  }[] = [
-    {
-      name: "Activate",
-      subPath: subPaths.activate,
-      component: () => (
-        <ActivatePremium
-          isActivated={isActivated}
-          licenseKey={licenseKey}
-          setLicenseKey={setLicenseKey}
-          handleActivate={handleActivate}
-          handleDectivate={handleDectivate}
-          isActivationLoading={isActivationLoading}
-          licenseActivationError={licenseActivationError}
-          activateTimeout={activateTimeout}
-        />
-      )
-    },
-    {
-      name: "Advanced notifications",
-      subPath: subPaths.advancedNotifications,
-      component: () => <AdvancedNotifications isActivated={isActivated} />
-    },
-    {
-      name: "Premium support",
-      subPath: subPaths.premiumSupport,
-      component: () => <PremiumSupport isActivated={isActivated} />
-    },
-    {
-      name: "Backup node for validators",
-      subPath: subPaths.backupNode,
-      component: () => <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
-    }
-  ];
+  const routes = useMemo(
+    () => [
+      {
+        name: "Activate",
+        subPath: subPaths.activate,
+        element: (
+          <ActivatePremium
+            isActivated={isActivated}
+            licenseKey={licenseKey}
+            setLicenseKey={setLicenseKey}
+            handleActivate={handleActivate}
+            handleDectivate={handleDectivate}
+            isActivationLoading={isActivationLoading}
+            licenseActivationError={licenseActivationError}
+            activateTimeout={activateTimeout}
+          />
+        )
+      },
+      {
+        name: "Advanced notifications",
+        subPath: subPaths.advancedNotifications,
+        element: <AdvancedNotifications isActivated={isActivated} />
+      },
+      {
+        name: "Premium support",
+        subPath: subPaths.premiumSupport,
+        element: <PremiumSupport isActivated={isActivated} />
+      },
+      {
+        name: "Backup node for validators",
+        subPath: subPaths.backupNode,
+        element: <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
+      }
+    ],
+    [
+      isActivated,
+      licenseKey,
+      setLicenseKey,
+      handleActivate,
+      handleDectivate,
+      isActivationLoading,
+      licenseActivationError,
+      activateTimeout,
+      hashedLicense
+    ]
+  );
 
   return (
     <div className="premium-root">
@@ -88,7 +98,6 @@ const PremiumRoot: React.FC = () => {
           </button>
         ))}
       </div>
-
       <div className="section-spacing">
         <PremiumWrapper
           isInstalled={isInstalled}
@@ -98,8 +107,8 @@ const PremiumRoot: React.FC = () => {
           isRunning={isRunning}
           successComponent={
             <Routes>
-              {routes.map((route) => (
-                <Route key={route.subPath} path={route.subPath} element={<route.component />} />
+              {routes.map((r) => (
+                <Route key={r.subPath} path={r.subPath} element={r.element} />
               ))}
             </Routes>
           }
