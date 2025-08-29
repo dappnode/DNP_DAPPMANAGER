@@ -22,6 +22,7 @@ const PremiumRoot: React.FC = () => {
     isLoading,
     isRunning,
     licenseKey,
+    prefilledLicenseKey,
     setLicenseKey,
     handleActivate,
     isActivationLoading,
@@ -40,6 +41,7 @@ const PremiumRoot: React.FC = () => {
           <ActivatePremium
             isActivated={isActivated}
             licenseKey={licenseKey}
+            prefilledLicenseKey={prefilledLicenseKey}
             setLicenseKey={setLicenseKey}
             handleActivate={handleActivate}
             handleDectivate={handleDectivate}

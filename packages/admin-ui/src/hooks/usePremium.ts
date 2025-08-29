@@ -13,9 +13,10 @@ export const usePremium = (): {
   installPremiumPkg: () => Promise<void>;
   isRunning: boolean;
   licenseKey: string;
+  prefilledLicenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
   isActivated: boolean;
-  handleActivate: () => Promise<void>;
+  handleActivate: (license: string) => Promise<void>;
   handleDectivate: () => Promise<void>;
   isActivationLoading: boolean;
   hashedLicense: string;
@@ -26,6 +27,7 @@ export const usePremium = (): {
   const [isInstalling, setIsInstalling] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [licenseKey, setLicenseKey] = useState<string>("");
+  const [prefilledLicenseKey, setPrefilledLicenseKey] = useState<string>("");
   const [isActivated, setIsActivated] = useState<boolean>(false);
   const [licenseActivationError, setLicenseActivationError] = useState<string | null>(null);
   const [hashedLicense, setHashedLicense] = useState<string>("");
@@ -40,6 +42,12 @@ export const usePremium = (): {
 
   const isLoading = premiumPkgReq.isValidating;
   const isActivationLoading = premiumActiveReq.isValidating;
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const prefilledLicense = searchParams.get("license");
+    prefilledLicense && setPrefilledLicenseKey(prefilledLicense);
+  }, []);
 
   useEffect(() => {
     if (premiumPkgReq.data) {
@@ -57,13 +65,7 @@ export const usePremium = (): {
   useEffect(() => {
     if (!licenseKeyReq.data) return;
 
-    if (licenseKeyReq.data.key) {
-      setLicenseKey(licenseKeyReq.data.key);
-    } else {
-      const searchParams = new URLSearchParams(window.location.search);
-      const license = searchParams.get("license");
-      license && setLicenseKey(license);
-    }
+    if (licenseKeyReq.data.key) setLicenseKey(licenseKeyReq.data.key);
 
     if (licenseKeyReq.data.hash) setHashedLicense(licenseKeyReq.data.hash);
   }, [licenseKeyReq.data]);
@@ -125,10 +127,10 @@ export const usePremium = (): {
     });
   };
 
-  const handleActivate = async (): Promise<void> => {
+  const handleActivate = async (license: string): Promise<void> => {
     setLicenseActivationError(null);
     try {
-      await putLicenseKey(licenseKey);
+      await putLicenseKey(license);
       await activateLicenseKey();
       premiumActiveReq.revalidate();
       licenseKeyReq.revalidate();
@@ -167,6 +169,7 @@ export const usePremium = (): {
     isRunning,
     isActivated,
     licenseKey,
+    prefilledLicenseKey,
     setLicenseKey,
     handleActivate,
     handleDectivate,

@@ -67,7 +67,7 @@ export const premiumActivateLicense = async (): Promise<void> => {
         message = "License does not exist";
         break;
       case 429:
-        message = "Too many requests";
+        message = "Too many requests. Wait until tomorrow to try again.";
         break;
       default:
         message = "Internal server error";

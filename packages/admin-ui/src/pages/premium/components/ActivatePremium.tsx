@@ -10,8 +10,9 @@ import "./activatePremium.scss";
 interface ActivatePremiumProps {
   isActivated: boolean;
   licenseKey: string;
+  prefilledLicenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
-  handleActivate: () => Promise<void>;
+  handleActivate: (license: string) => Promise<void>;
   handleDectivate: () => Promise<void>;
   isActivationLoading: boolean;
   licenseActivationError: string | null;
@@ -21,6 +22,7 @@ interface ActivatePremiumProps {
 export const ActivatePremium = ({
   isActivated,
   licenseKey,
+  prefilledLicenseKey,
   setLicenseKey,
   handleActivate,
   handleDectivate,
@@ -44,6 +46,7 @@ export const ActivatePremium = ({
           <InfoCard />
           <ActivateCard
             licenseKey={licenseKey}
+            prefilledLicenseKey={prefilledLicenseKey}
             setLicenseKey={setLicenseKey}
             handleActivate={handleActivate}
             licenseActivationError={licenseActivationError}
@@ -133,12 +136,13 @@ const InfoCard: React.FC = () => {
 
 const ActivateCard: React.FC<{
   licenseKey: string;
+  prefilledLicenseKey: string;
   setLicenseKey: Dispatch<SetStateAction<string>>;
-  handleActivate: () => Promise<void>;
+  handleActivate: (license: string) => Promise<void>;
   licenseActivationError: string | null;
   activateTimeout: number;
-}> = ({ licenseKey, setLicenseKey, handleActivate, licenseActivationError, activateTimeout }) => {
-  const [localLicenseKey, setLocalLicenseKey] = useState(licenseKey);
+}> = ({ licenseKey, prefilledLicenseKey, setLicenseKey, handleActivate, licenseActivationError, activateTimeout }) => {
+  const [localLicenseKey, setLocalLicenseKey] = useState(prefilledLicenseKey ? prefilledLicenseKey : licenseKey);
   const timeOutOn = activateTimeout > 0;
 
   const handleInputChange = (newValue: string) => {
@@ -166,7 +170,11 @@ const ActivateCard: React.FC<{
             />
             {licenseActivationError && <div className="premium-activate-error">{licenseActivationError}</div>}
           </div>
-          <Button variant="dappnode" onClick={handleActivate} disabled={!localLicenseKey || timeOutOn}>
+          <Button
+            variant="dappnode"
+            onClick={() => handleActivate(localLicenseKey)}
+            disabled={!localLicenseKey || timeOutOn}
+          >
             {timeOutOn ? <b>{activateTimeout}</b> : "Activate"}
           </Button>
         </div>
