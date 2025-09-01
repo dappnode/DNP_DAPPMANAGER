@@ -33,10 +33,9 @@ export async function keystoresGetByNetwork({
         }
 
         const data = await response.json();
-        console.log("Validators:", data);
         result[network] = data ? data : undefined;
       } catch (error) {
-        console.error("Error fetching validators:", error);
+        console.error("Error fetching keystores:", error);
       }
     }
   }
