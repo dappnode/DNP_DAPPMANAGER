@@ -16,22 +16,22 @@ const SupportRoot: React.FC = () => {
     {
       name: "Auto Diagnose",
       subPath: "auto-diagnose",
-      component: AutoDiagnose
+      element: <AutoDiagnose />
     },
     {
       name: "Report",
       subPath: "report",
-      component: Report
+      element: <Report />
     },
     {
       name: "Ports",
       subPath: "ports",
-      component: Ports
+      element: <Ports />
     },
     {
       name: "Activity",
       subPath: "activity",
-      component: Activity
+      element: <Activity />
     }
   ];
 

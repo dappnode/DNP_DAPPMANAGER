@@ -29,8 +29,8 @@ export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNav
       {/* Route render   */}
       <div className="section-spacing">
         <Routes>
-          {routes.map((route) => (
-            <Route key={route.subPath + "/*"} path={route.subPath + "/*"} element={<route.component />} />
+          {routes.map((r) => (
+            <Route key={r.subPath} path={r.subPath} element={r.element} />
           ))}
         </Routes>
       </div>

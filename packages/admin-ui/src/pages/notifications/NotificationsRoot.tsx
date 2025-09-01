@@ -29,22 +29,22 @@ export const NotificationsRoot: React.FC = () => {
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: data.isInstalled ? Inbox : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <Inbox /> : <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: data.isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <NotificationsSettings /> : <InstallNotificationsPkg />
       },
       {
         name: "Devices",
         subPath: subPaths.devices,
-        component: data.isInstalled ? Subscriptions : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <Subscriptions /> : <InstallNotificationsPkg />
       },
       {
         name: "Legacy",
         subPath: subPaths.legacy,
-        component: LegacyNotifications
+        element: <LegacyNotifications />
       }
     ];
 

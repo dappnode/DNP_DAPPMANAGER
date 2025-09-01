@@ -11,12 +11,12 @@ export const Repository: React.FC = () => {
     {
       name: "Ethereum",
       subPath: subPaths.eth,
-      component: Eth
+      element: <Eth />
     },
     {
       name: "IPFS",
       subPath: subPaths.ipfs,
-      component: Ipfs
+      element: <Ipfs />
     }
   ];
 

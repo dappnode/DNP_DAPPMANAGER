@@ -55,6 +55,6 @@ export interface AppContextIface {
 export interface RouteType {
   name: string;
   subPath: string;
-  component: React.ComponentType;
+  element: React.JSX.Element;
   hideSection?: boolean; // Used to hide sections in the navbar
 }

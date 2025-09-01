@@ -21,57 +21,57 @@ const SystemRoot: React.FC = () => {
     {
       name: "Info",
       subPath: subPaths.info,
-      component: SystemInfo
+      element: <SystemInfo />
     },
     {
       name: "Auto updates",
       subPath: subPaths.autoUpdates,
-      component: AutoUpdates
+      element: <AutoUpdates />
     },
     {
       name: "App",
       subPath: subPaths.app,
-      component: App
+      element: <App />
     },
     {
       name: "Profile",
       subPath: subPaths.profile,
-      component: Profile
+      element: <Profile />
     },
     {
       name: "Power",
       subPath: subPaths.power,
-      component: PowerManagment
+      element: <PowerManagment />
     },
     {
       name: "Network",
       subPath: subPaths.network,
-      component: Network
+      element: <Network />
     },
     {
       name: "Update",
       subPath: subPaths.update,
-      component: SystemUpdate
+      element: <SystemUpdate />
     },
     {
       name: "Peers",
       subPath: subPaths.peers + "/*",
-      component: Peers
+      element: <Peers />
     },
     {
       name: "Security",
       subPath: subPaths.security,
-      component: Security
+      element: <Security />
     },
     {
       name: "Hardware",
       subPath: subPaths.hardware,
-      component: Hardware
+      element: <Hardware />
     },
     {
       name: "Advanced",
       subPath: subPaths.advanced,
-      component: Advanced
+      element: <Advanced />
     }
   ];
 

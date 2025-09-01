@@ -19,19 +19,19 @@ export function VpnHome() {
       {
         name: "Tailscale",
         subPath: subPaths.tailscale,
-        component: TailscaleVpn,
+        element: <TailscaleVpn />,
         installed: dnpsSet.has(tailscaleDnpName)
       },
       {
         name: "OpenVPN",
         subPath: subPaths.openVpn,
-        component: OpenVpnDevicesRoot,
+        element: <OpenVpnDevicesRoot />,
         installed: dnpsSet.has(vpnDnpName)
       },
       {
         name: "Wireguard",
         subPath: subPaths.wireguard,
-        component: WireguardDevicesRoot,
+        element: <WireguardDevicesRoot />,
         installed: dnpsSet.has(wireguardDnpName)
       }
     ];

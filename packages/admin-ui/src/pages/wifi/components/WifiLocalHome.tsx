@@ -15,12 +15,12 @@ export const WifiLocalHome: React.FC = () => {
     {
       name: "Wi-Fi",
       subPath: subPaths.wifi,
-      component: WifiHome
+      element: <WifiHome />
     },
     {
       name: "Local Network",
       subPath: subPaths.local,
-      component: LocalProxying
+      element: <LocalProxying />
     }
   ];
 
