@@ -4,11 +4,11 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
 import { api, useApi } from "api";
 import { Notification, Priority } from "@dappnode/types";
-import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
 import { Accordion } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
 import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
+import "./notificationsMain.scss";
 
 /**
  * Displays banner notifications among all tabs
