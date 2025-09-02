@@ -1,16 +1,9 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
-import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
 import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
-import { params } from "@dappnode/params";
-import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
-import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 class MigrationError extends Error {
   errors: Error[];
@@ -32,18 +25,8 @@ interface Migration {
   coreVersion: string;
 }
 
-export async function executeMigrations(
-  execution: Execution,
-  consensus: Consensus,
-  signer: Signer,
-  mevBoost: MevBoost
-): Promise<void> {
+export async function executeMigrations(): Promise<void> {
   const migrations: Migration[] = [
-    {
-      fn: removeLegacyDockerAssets,
-      migration: "bundle legacy ops to prevent spamming the docker API",
-      coreVersion: "0.2.30"
-    },
     {
       fn: migrateUserActionLogs,
       migration: "migrate winston .log JSON file to a lowdb",
@@ -65,58 +48,26 @@ export async function executeMigrations(
       coreVersion: "0.2.85"
     },
     {
-      fn: () =>
-        migrateDockerNetworkIpRange({
-          dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
-          dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
-          dappmanagerContainer: {
-            name: params.dappmanagerContainerName,
-            ip: params.DAPPMANAGER_IP
-          },
-          bindContainer: { name: params.bindContainerName, ip: params.BIND_IP }
-        }),
-      migration: "ensure docker network configuration",
-      coreVersion: "0.2.85"
-    },
-    {
       fn: removeDnsAndAddAlias,
       migration: "add docker alias to running containers",
       coreVersion: "0.2.80"
     },
     {
-      fn: addDappnodePeerToLocalIpfsNode,
-      migration: "add Dappnode peer to local IPFS node",
-      coreVersion: "0.2.88"
-    },
-    {
-      fn: changeEthicalMetricsDbFormat,
-      migration: "change ethical metrics db format",
-      coreVersion: "0.2.92"
-    },
-    {
       fn: determineIsDappnodeAws,
       migration: "determine if the dappnode is running in Dappnode AWS",
       coreVersion: "0.2.94"
-    },
-    {
-      fn: () => createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost),
-      migration: "create docker staker network and persist selected staker pkgs per network",
-      coreVersion: "0.2.95"
     }
   ];
 
-  const migrationPromises = migrations.map(({ fn, migration, coreVersion }) =>
-    fn().catch((e) => new Error(`Migration ${migration} (${coreVersion}) failed: ${e.message}`))
-  );
-
-  // Run all migrations concurrently and wait for all to settle
-  const results = await Promise.allSettled(migrationPromises);
-
-  // Collect any errors
-  const migrationErrors = results
-    .filter((result): result is PromiseRejectedResult => result.status === "rejected")
-    .map((result) => result.reason);
-
+  // Run migrations one after another to ensure defined order
+  const migrationErrors: Error[] = [];
+  for (const { fn, migration, coreVersion } of migrations) {
+    try {
+      await fn();
+    } catch (e) {
+      migrationErrors.push(new Error(`Migration ${migration} (${coreVersion}) failed: ${e}`));
+    }
+  }
   if (migrationErrors.length > 0) {
     throw new MigrationError(migrationErrors);
   }

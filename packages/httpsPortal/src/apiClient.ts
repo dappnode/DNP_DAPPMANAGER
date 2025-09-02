@@ -7,6 +7,12 @@ const ajv = new Ajv({ allErrors: true });
 
 export interface HttpPortalEntry {
   /**
+   * Whether the entry is external or internal
+   * If `true`, the entry is external and will be accessible from the public internet.
+   * If `false`, the entry is internal and will only be accessible within private ip range.
+   */
+  external: boolean;
+  /**
    * The public subdomain
    * `"validator-prysm"`, `"customsubdomain"`
    * Note that there is a max length for domains, and must not use special characters
@@ -61,11 +67,12 @@ export class HttpsPortalApiClient {
    * GET /add?from=<chosen-subodomain>&to=<internal-resource>
    * Empty reply
    */
-  async add({ fromSubdomain, toHost, auth }: HttpPortalEntry): Promise<void> {
+  async add({ fromSubdomain, toHost, auth, external = true }: HttpPortalEntry): Promise<void> {
     const search = querystring.encode({
       from: fromSubdomain,
       to: toHost,
-      auth: auth && (await this.getHtpasswdEntry(auth))
+      auth: auth && (await this.getHtpasswdEntry(auth)),
+      external
     });
     await this.get(urlJoin(this.baseUrl, `/add?${search}`));
   }
@@ -92,7 +99,7 @@ export class HttpsPortalApiClient {
    * [{"from":"validator-prysm-pyrmont.1ba499fcc3aff025.dyndns.dappnode.io","to":"validator-prysm-pyrmont"}]
    */
   async list(): Promise<HttpPortalEntry[]> {
-    const entries = await this.get<{ from: string; to: string; auth?: string }[]>(
+    const entries = await this.get<{ from: string; to: string; auth?: string; external: boolean }[]>(
       urlJoin(this.baseUrl, `/?format=json`)
     );
 
@@ -103,6 +110,7 @@ export class HttpsPortalApiClient {
     return entries.map((entry) => ({
       fromSubdomain: entry.from,
       toHost: entry.to,
+      external: entry.external,
       auth: entry.auth
         ? {
             username: entry.auth.split(":")[0],

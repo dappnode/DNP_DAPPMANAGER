@@ -1,6 +1,14 @@
 import { NotificationsApi } from "./api.js";
 import { NotificationsManifest } from "./manifest.js";
-import { CustomEndpoint, GatusEndpoint, Notification, NotificationPayload, NotificationsConfig } from "@dappnode/types";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  InstalledPackageData,
+  Notification,
+  NotificationPayload,
+  NotificationsConfig,
+  NotifierSubscription
+} from "@dappnode/types";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 
@@ -16,8 +24,13 @@ class Notifications {
   /**
    * Send a new notification
    */
-  async sendNotification(notificationPayload: NotificationPayload): Promise<void> {
-    await this.api.sendNotification(notificationPayload);
+  async sendNotification(notificationPayload: NotificationPayload, subscriptionEndpoint?: string): Promise<void> {
+    const { isNotifierRunning } = await this.notificationsPackageStatus();
+
+    // Only send custom notifications if the notifier service is running
+    if (isNotifierRunning) {
+      await this.api.sendNotification(notificationPayload, subscriptionEndpoint);
+    }
   }
 
   /**
@@ -99,9 +112,62 @@ class Notifications {
   /**
    * Determine if notifications package is installed
    */
-  async isNotificationsPackageInstalled(): Promise<boolean> {
-    if (await listPackageNoThrow({ dnpName: params.notificationsDnpName })) return true;
-    return false;
+  async notificationsPackageStatus(): Promise<{
+    notificationsDnp: InstalledPackageData | null;
+    isInstalled: boolean;
+    isRunning: boolean;
+    isNotifierRunning: boolean;
+    servicesNotRunning: string[];
+  }> {
+    const notificationsDnp = await listPackageNoThrow({ dnpName: params.notificationsDnpName });
+    const isInstalled = Boolean(notificationsDnp);
+    const servicesNotRunning =
+      notificationsDnp?.containers.filter((c) => c.state !== "running").map((c) => c.serviceName) || [];
+    const isRunning = isInstalled && servicesNotRunning.length === 0; // Considering running if all services are running
+    const isNotifierRunning = isInstalled && !servicesNotRunning.includes("notifier");
+    return { notificationsDnp, isInstalled, isRunning, servicesNotRunning, isNotifierRunning };
+  }
+
+  /**
+   * Retrieves vapidKey from notifier
+   */
+  async getVapidKey(): Promise<string | null> {
+    return await this.api.getVapidKey();
+  }
+
+  /**
+   * Retrieves all subs from notifier
+   */
+  async fetchSubscriptions(): Promise<NotifierSubscription[] | null> {
+    return await this.api.fetchSubscriptions();
+  }
+
+  /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  async updateSubscriptionAlias(endpoint: string, alias: string): Promise<void> {
+    return await this.api.updateSubscriptionAlias(endpoint, alias);
+  }
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  async deleteSubscription(endpoint: string): Promise<void> {
+    return await this.api.deleteSubscription(endpoint);
+  }
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  async postSubscription(subscription: NotifierSubscription): Promise<void> {
+    return await this.api.postSubscription(subscription);
+  }
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  async sendSubTestNotification(endpoint?: string): Promise<void> {
+    return await this.api.sendSubTestNotification(endpoint);
   }
 }
 

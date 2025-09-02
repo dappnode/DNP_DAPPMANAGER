@@ -3,7 +3,6 @@ import { eventBus } from "@dappnode/eventbus";
 import { initializeDb } from "./initializeDb.js";
 import {
   ensureIpv4Forward,
-  checkDockerNetwork,
   recreateDappnode,
   copyHostScripts,
   copyHostServices,
@@ -28,6 +27,20 @@ import { DappNodeRegistry } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
 const controller = new AbortController();
+
+process.on("unhandledRejection", (reason) => {
+  console.error("Unhandled Rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("Uncaught Exception:", err);
+});
+
+// Graceful shutdown
+process.on("SIGINT", () => {
+  controller.abort();
+  server.close();
+  process.exit(0);
+});
 
 // Initialize DB must be the first step so the db has the required values
 initializeDb()
@@ -86,10 +99,9 @@ export const mevBoost = new MevBoost(dappnodeInstaller);
 export const signer = new Signer(dappnodeInstaller);
 
 // Execute migrations
-executeMigrations(execution, consensus, signer, mevBoost).catch((e) => logs.error("Error on executeMigrations", e));
-
+executeMigrations().catch((e) => logs.error("Error on executeMigrations", e));
 // Start daemons
-startDaemons(dappnodeInstaller, controller.signal);
+startDaemons(dappnodeInstaller, execution, consensus, signer, mevBoost, controller.signal);
 
 Promise.all([
   // Copy host scripts
@@ -103,8 +115,6 @@ Promise.all([
   ensureIpv4Forward().catch((e) => logs.error("Error ensuring ipv4 forward", e));
   // avahiDaemon uses a host script that must be copied before been initialized
   startAvahiDaemon().catch((e) => logs.error("Error starting avahi daemon", e));
-  // start check-docker-network service with timer
-  checkDockerNetwork().catch((e) => logs.error("Error starting service docker network checker", e));
   // start recreate-dappnode service with timer
   recreateDappnode().catch((e) => logs.error("Error starting service recreate dappnode", e));
 });
@@ -131,10 +141,3 @@ if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
 
 postRestartPatch().catch((e) => logs.error("Error on postRestartPatch", e));
-
-// Graceful shutdown
-process.on("SIGINT", () => {
-  controller.abort();
-  server.close();
-  process.exit(0);
-});

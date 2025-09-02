@@ -3,20 +3,22 @@ import { useNavigate } from "react-router-dom";
 // Components
 import Button from "components/Button";
 // Modules
-import { relativePath as installedRelativePath, getInstallerPath } from "pages/installer";
+import { getInstallerPath } from "pages/installer";
 // Utils
 import { prettyDnpName } from "utils/format";
+import Card from "components/Card";
+import SubTitle from "components/SubTitle";
+import './noDnpInstalled.scss';
 
-export const NoDnpInstalled = ({ id }: { id: string }) => {
+export const NoDnpInstalled = ({ id, customCopy }: { id: string; customCopy?: string }) => {
   const navigate = useNavigate();
   return (
-    <div className="centered-container">
-      <h4>{id} is not installed</h4>
-      <p>Go back to packages or click below to install it</p>
-      <Button onClick={() => navigate("/" + installedRelativePath)} style={{ textTransform: "capitalize" }}>
-        Packages
+    <Card className="install-pkg-card">
+      <SubTitle>Install {prettyDnpName(id)} package</SubTitle>
+      {customCopy ? <p>{customCopy}</p> : <p>{prettyDnpName(id)} package not installed, click below to install it</p>}
+      <Button variant="dappnode" onClick={() => navigate(getInstallerPath(id) + "/" + id)}>
+        Install
       </Button>
-      <Button onClick={() => navigate(getInstallerPath(id) + "/" + id)}>Install {prettyDnpName(id)}</Button>
-    </div>
+    </Card>
   );
 };

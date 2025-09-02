@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { api, useApi } from "api";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 // Own module
 import { maxIdLength } from "../../data";
 import coerceDeviceName from "../../helpers/coerceDeviceName";
@@ -11,20 +11,22 @@ import Input from "components/Input";
 import Card from "components/Card";
 import Button from "components/Button";
 import { renderResponse } from "components/SwrRender";
-import Alert from "react-bootstrap/esm/Alert";
 // Icons
 import { MdDelete } from "react-icons/md";
 import { MAIN_ADMIN_NAME } from "params";
 // Params
 import { wireguardDnpName } from "params";
-import { getInstallerPath } from "pages/installer";
+import { VpnDocsGuide } from "../VpnDocsGuide";
+import Loading from "components/Loading";
+import { prettyDnpName } from "utils/format";
+import ErrorView from "components/ErrorView";
+import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
 
 export function WireguardDevicesHome() {
-  const navigate = useNavigate();
   const [input, setInput] = useState("");
   const devicesReq = useApi.wireguardDevicesGet();
-  const dnpsRequest = useApi.packagesGet();
-
+  const dnpRequest = useApi.packageGet({ dnpName: wireguardDnpName });
+  const dnp = dnpRequest.data;
   // Actions
 
   function addDevice(id: string) {
@@ -52,23 +54,25 @@ export function WireguardDevicesHome() {
   if (input.length > maxIdLength) errors.push(`Device name must be shorter than {maxIdLength} characters`);
 
   // If the wireguard package is not installed, invite the user to install it
-  if (dnpsRequest.data) {
-    const wireguardDnp = dnpsRequest.data.find((dnp) => dnp.dnpName === wireguardDnpName);
-    if (!wireguardDnp) {
-      return (
-        <Alert variant="secondary">
-          You must{" "}
-          <a href="#" onClick={() => navigate(`${getInstallerPath(wireguardDnpName)}/${wireguardDnpName}`)}>
-            install the Wireguard package
-          </a>{" "}
-          to use this feature
-        </Alert>
-      );
-    }
+  if (!dnp) {
+    return (
+      <>
+        {dnpRequest.isValidating ? (
+          <Loading steps={[`Loading ${prettyDnpName(wireguardDnpName)}`]} />
+        ) : dnpRequest.error ? (
+          dnpRequest.error.message.includes("No DNP was found") ? (
+            <NoDnpInstalled id={wireguardDnpName} />
+          ) : (
+            <ErrorView error={dnpRequest.error} />
+          )
+        ) : null}
+      </>
+    );
   }
 
   return (
     <>
+      <VpnDocsGuide variant="wireguard" />
       <Input
         placeholder="Device's unique name"
         value={input}

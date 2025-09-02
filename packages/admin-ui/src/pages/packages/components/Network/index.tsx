@@ -17,9 +17,18 @@ export function Network({ containers }: { containers: PackageContainer[] }) {
       <Card spacing className="network-editor">
         <ServiceSelector serviceName={serviceName} setServiceName={setServiceName} containers={containers} />
         {container && (
-          <div>
-            <strong>Container IP: </strong>
-            {container.ip || "Not available"}
+          <div className="container-ips">
+            <strong>Container IPs </strong>
+            <ul>
+              {!container.ip && !container.privateIp ? (
+                <li>Container IPs not available</li>
+              ) : (
+                <>
+                  {container.ip && <li>Public IP: {container.ip}</li>}
+                  {container.privateIp && <li>Private IP: {container.privateIp}</li>}
+                </>
+              )}
+            </ul>
           </div>
         )}
       </Card>

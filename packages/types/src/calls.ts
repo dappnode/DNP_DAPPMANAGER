@@ -20,6 +20,7 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  external: boolean; // If the service is exposed to the internet
   auth?: {
     username: string;
     password: string;
@@ -40,6 +41,7 @@ export interface ExposableServiceManifestInfo {
   fromSubdomain?: string;
   port: number;
   exposeByDefault?: boolean;
+  external?: boolean;
 }
 
 export interface ExposableServiceMapping extends ExposableServiceInfo {
@@ -503,6 +505,7 @@ export interface PackageContainer {
   created: number;
   image: string;
   ip?: string; // IP of the DNP in the dappnode network
+  privateIp?: string; // IP of the DNP in the private network
   state: ContainerState;
   running: boolean;
   exitCode: number | null;

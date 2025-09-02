@@ -26,7 +26,8 @@ describe("modules / https-portal / exposable", () => {
         description: "",
         dnpName: "mock-dnp.dnp.dappnode.eth",
         serviceName: "mock-dnp.dnp.dappnode.eth",
-        port: 1111
+        port: 1111,
+        external: true
       },
       {
         fromSubdomain: "serv-mock-dnp",
@@ -34,7 +35,8 @@ describe("modules / https-portal / exposable", () => {
         description: "desc3",
         dnpName: "mock-dnp.dnp.dappnode.eth",
         serviceName: "serv3",
-        port: 3333
+        port: 3333,
+        external: true
       }
     ];
 

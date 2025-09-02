@@ -93,8 +93,8 @@ export async function runPackages(packagesData: InstallPackageData[], log: Log):
 
     // Reload gatus endpoints if any
     try {
-      if (pkg.manifest.notifications?.endpoints && (await notifications.isNotificationsPackageInstalled()))
-        await notifications.updateEndpointsApi();
+      const { isInstalled } = await notifications.notificationsPackageStatus();
+      if (pkg.manifest.notifications?.endpoints && isInstalled) await notifications.updateEndpointsApi();
     } catch (error) {
       log(pkg.dnpName, `Could not update endpoints for ${pkg.dnpName}: ${error}`);
       logs.error(`Error updating endpoints for ${pkg.dnpName}`, error);

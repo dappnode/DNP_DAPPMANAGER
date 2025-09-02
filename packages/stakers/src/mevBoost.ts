@@ -1,4 +1,12 @@
-import { MevBoostHolesky, MevBoostHoodi, MevBoostMainnet, MevBoostPrater, Network, StakerItem, UserSettings } from "@dappnode/types";
+import {
+  MevBoostHolesky,
+  MevBoostHoodi,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network,
+  StakerItem,
+  UserSettings
+} from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -80,7 +88,7 @@ export class MevBoost extends StakerComponent {
         userSettings
       });
 
-      this.DbHandlers[network].set(true);
+      await this.DbHandlers[network].set(true);
     }
   }
 
@@ -133,6 +141,9 @@ export class MevBoost extends StakerComponent {
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
             aliases: [`${mevBoostServiceName}.${network}.dncore.dappnode`]
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+            aliases: [`${mevBoostServiceName}.${network}.dappnode.private`]
           }
         }
       }

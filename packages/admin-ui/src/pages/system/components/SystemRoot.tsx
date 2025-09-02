@@ -4,6 +4,7 @@ import { Routes, Route, NavLink } from "react-router-dom";
 // Components
 import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
+import App from "./App";
 import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
@@ -34,6 +35,12 @@ const SystemRoot: React.FC = () => {
       subLink: subPaths.autoUpdates,
       subPath: subPaths.autoUpdates,
       component: AutoUpdates
+    },
+    {
+      name: "App",
+      subLink: subPaths.app,
+      subPath: subPaths.app,
+      component: App
     },
     {
       name: "Profile",

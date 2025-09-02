@@ -2,9 +2,18 @@ import { HttpsPortalMapping, ExposableServiceMapping } from "@dappnode/types";
 import { httpsPortal, getExposableServices } from "@dappnode/httpsportal";
 
 /**
+ * HTTPs Portal: add the PWA mapping
+ */
+export async function httpsPortalPwaMappingAdd(): Promise<void> {
+  await httpsPortal.addPwaMappingIfNotExists();
+}
+
+/**
  * HTTPs Portal: map a subdomain
  */
 export async function httpsPortalMappingAdd({ mapping }: { mapping: HttpsPortalMapping }): Promise<void> {
+  if (mapping.fromSubdomain === "pwa")
+    throw Error("Cannot add mapping with 'pwa' as fromSubdomain, It is reserved for the PWA service.");
   await httpsPortal.addMapping(mapping);
 }
 

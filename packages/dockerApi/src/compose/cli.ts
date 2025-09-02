@@ -30,6 +30,7 @@ async function execDockerCompose(
 
 export interface DockerComposeUpOptions {
   noStart?: boolean;
+  noRecreate?: boolean;
   detach?: boolean;
   forceRecreate?: boolean;
   timeout?: number;
@@ -45,6 +46,7 @@ export function dockerComposeUp(dcPath: string, options: DockerComposeUpOptions 
     "up",
     {
       noStart: options.noStart,
+      noRecreate: options.noRecreate,
       detach: options.detach ?? true,
       forceRecreate: options.forceRecreate,
       timeout: options.timeout,

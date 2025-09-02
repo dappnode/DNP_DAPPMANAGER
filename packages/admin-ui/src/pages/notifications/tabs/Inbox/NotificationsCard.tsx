@@ -10,6 +10,7 @@ import Button from "components/Button";
 import { NavLink } from "react-router-dom";
 import { api } from "api";
 import { dappmanagerAliases, externalUrlProps } from "params";
+import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -38,13 +39,13 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
 
   useEffect(() => {
     if (!notification.seen && notification.isBanner && notification.status === "resolved") {
-      api.notificationSetSeenByCorrelationID(notification.correlationId);
+      api.notificationSetSeenByCorrelationID({ correlationId: notification.correlationId });
     }
   }, []);
 
   const isExternalUrl =
     notification.callToAction && !dappmanagerAliases.some((alias) => notification.callToAction!.url.includes(alias));
-    
+
   return (
     <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
       <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)} className="notification-card">
@@ -83,8 +84,13 @@ export function NotificationCard({ notification, openByDefault = false }: Notifi
           <div className="notification-body">
             <RenderMarkdown source={prettifiedBody(notification.body)} />
             {notification.callToAction && (
-              <NavLink to={notification.callToAction.url} {...isExternalUrl ? externalUrlProps : {}}>
-                <Button variant="dappnode"><div>{notification.callToAction.title}</div></Button>
+              <NavLink
+                to={resolveDappnodeUrl(notification.callToAction.url, window.location)}
+                {...(isExternalUrl ? externalUrlProps : {})}
+              >
+                <Button variant="dappnode">
+                  <div>{notification.callToAction.title}</div>
+                </Button>
               </NavLink>
             )}
           </div>

@@ -52,6 +52,8 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const [showAdvancedEditor, setShowAdvancedEditor] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
+  const [notificationsPkgInstalled, setNotificationsPkgInstalled] = useState(false);
+
   const dispatch = useDispatch();
 
   const {
@@ -82,6 +84,16 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const [customEndpoints, setCustomEndpoints] = React.useState<CustomEndpoint[]>(
     manifest.notifications?.customEndpoints || []
   );
+
+  const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
+
+  useEffect(() => {
+    // Check if notifications package is installed and running
+    if (notificationsPkgStatusRequest.data) {
+      const { isInstalled } = notificationsPkgStatusRequest.data;
+      setNotificationsPkgInstalled(isInstalled);
+    }
+  }, [notificationsPkgStatusRequest.data]);
 
   useEffect(() => {
     if (notificationsSettings && notificationsSettings[dnpName]) {
@@ -203,8 +215,6 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
     }
   ].filter((option) => option.available);
 
-  const isNotificationsPkgInstalled = useApi.notificationsIsInstalled();
-
   const disableInstallation =
     !isEmpty(progressLogs) || requiresCoreUpdate || requiresDockerUpdate || packagesToBeUninstalled.length > 0;
 
@@ -216,7 +226,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   const installSubPath = "install";
 
   // Only display notifications step if the notifications package is installed && there are endpoints in manifest
-  const showNotificationsStep = isNotificationsPkgInstalled.data && manifest.notifications;
+  const showNotificationsStep = notificationsPkgInstalled && manifest.notifications;
 
   const availableRoutes: {
     name: string;

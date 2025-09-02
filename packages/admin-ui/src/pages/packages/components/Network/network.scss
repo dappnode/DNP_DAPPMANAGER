@@ -4,6 +4,13 @@
     padding: 0.7em !important;
   }
 
+  .container-ips {
+    > ul {
+      margin-top: 5px;
+      margin-bottom: 0px;
+    }
+  }
+
   table {
     width: 100%;
 

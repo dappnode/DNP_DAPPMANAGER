@@ -159,6 +159,7 @@ export class StakerComponent {
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
       upAll: true
+      // dockerComposeUpOptions: { noRecreate: true }
     });
   }
 

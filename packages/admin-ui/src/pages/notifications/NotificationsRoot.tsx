@@ -3,18 +3,27 @@ import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
 import { subPaths, title } from "./data";
-import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
 import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
+import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
+import { notificationsDnpName } from "params";
+import { Subscriptions } from "./tabs/Devices";
 
 export const NotificationsRoot: React.FC = () => {
-  const isNotificationsPkgInstalledRequest = useApi.notificationsIsInstalled();
+  const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
 
-  return renderResponse(isNotificationsPkgInstalledRequest, ["Loading notifications"], (isInstalled) => {
+  const InstallNotificationsPkg = () => (
+    <NoDnpInstalled
+      customCopy="To receive notifications on your Dappnode, you must install the Notifications Dappnode Package."
+      id={notificationsDnpName}
+    />
+  );
+
+  return renderResponse(notificationsPkgStatusRequest, ["Loading notifications"], (data) => {
     const availableRoutes: {
       name: string;
       subPath: string;
@@ -23,12 +32,17 @@ export const NotificationsRoot: React.FC = () => {
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: isInstalled ? Inbox : () => <InstallNotificationsPkg />
+        component: data.isInstalled ? Inbox : () => <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        component: data.isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+      },
+      {
+        name: "Devices",
+        subPath: subPaths.devices,
+        component: data.isInstalled ? Subscriptions : () => <InstallNotificationsPkg />
       },
       {
         name: "Legacy",

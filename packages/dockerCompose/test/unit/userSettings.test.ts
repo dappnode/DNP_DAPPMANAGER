@@ -295,15 +295,54 @@ describe("parseUserSettings", () => {
 });
 
 describe("applyUserSettings", () => {
-  /**
-   * Same function as applyUserSettings but without adding labels
-   * To avoid having to add the labels to the test result data
-   */
+  /** Same function as applyUserSettings but without adding labels */
   const applyUserSettingsTest: typeof applyUserSettings = (...args) => {
     const nextCompose = applyUserSettings(...args);
     for (const serviceName in nextCompose.services) delete nextCompose.services[serviceName].labels;
     return nextCompose;
   };
+
+  it("Should not include service networks that have no user settings", () => {
+    const serviceName = "nosettings.dnp.dappnode.eth";
+    const compose: Compose = {
+      version: "3.5",
+      networks: { net1: {} },
+      services: { [serviceName]: { ...mockComposeService, networks: { net1: {} } } }
+    };
+    const userSettings: UserSettings = {
+      networks: {
+        rootNetworks: { net1: {} },
+        serviceNetworks: { [serviceName]: {} }
+      }
+    };
+    const result = applyUserSettingsTest(compose, userSettings, { dnpName: serviceName });
+    // no networks should be carried over since user didn't set any
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+    // rootNetworks still appears at top level
+    expect(result.networks).to.deep.equal(userSettings.networks!.rootNetworks);
+  });
+
+  it("Should apply user-set ipv4_address and remove empty arrays for service networks", () => {
+    const serviceName = "myservice.dnp.dappnode.eth";
+    const compose: Compose = {
+      version: "3.5",
+      networks: { net1: {} },
+      services: { [serviceName]: { ...mockComposeService, networks: { net1: {} } } }
+    };
+    const userSettings: UserSettings = {
+      networks: {
+        rootNetworks: { net1: {} },
+        serviceNetworks: { [serviceName]: { net1: { ipv4_address: "10.0.0.5" } } }
+      }
+    };
+    const result = applyUserSettingsTest(compose, userSettings, { dnpName: serviceName });
+    // service networks should include the string ipv4_address from userSettings
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+    // ensure no empty array was kept
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+    // top-level networks should equal the rootNetworks from userSettings
+    expect(result.networks).to.deep.equal(userSettings.networks!.rootNetworks);
+  });
 
   it("Should apply some user settings", () => {
     const bitcoinVolumeName = "bitcoin_data";
@@ -543,5 +582,121 @@ describe("applyUserSettings", () => {
       expectedComposeAfterUpdate,
       "Wrong composeAfterUpdate"
     );
+  });
+});
+
+describe("applyUserSettings - network merging logic", () => {
+  const serviceName = "test.dnp.dappnode.eth";
+  const baseCompose = (baseIp?: string, baseAliases?: string[]) => ({
+    version: "3.5",
+    services: {
+      [serviceName]: {
+        image: "test:latest",
+        container_name: "DAppNodePackage-test",
+        networks: {
+          net1: {
+            ...(baseIp !== undefined ? { ipv4_address: baseIp } : {}),
+            ...(baseAliases !== undefined ? { aliases: baseAliases } : {})
+          }
+        }
+      }
+    },
+    networks: { net1: {} }
+  });
+
+  const userSettings = (userIp?: string, userAliases?: string[]): UserSettings => ({
+    networks: {
+      rootNetworks: { net1: {} },
+      serviceNetworks: {
+        [serviceName]: {
+          net1: {
+            ...(userIp !== undefined ? { ipv4_address: userIp } : {}),
+            ...(userAliases !== undefined ? { aliases: userAliases } : {})
+          }
+        }
+      }
+    }
+  });
+
+  const applyUserSettingsTest: typeof applyUserSettings = (...args) => {
+    const nextCompose = applyUserSettings(...args);
+    for (const sName in nextCompose.services) delete nextCompose.services[sName].labels;
+    return nextCompose;
+  };
+
+  it("should merge aliases from both base and user networks, always resulting in an array", () => {
+    const compose = baseCompose(undefined, ["base1", "base2"]);
+    const settings = userSettings(undefined, ["user1", "base2"]);
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: { aliases: ["base1", "base2", "user1"] } });
+  });
+
+  it("should always use the ip from the base network, not from user network", () => {
+    // base has ip, user has different ip
+    const compose = baseCompose("10.0.0.1");
+    const settings = userSettings("10.0.0.2");
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: { ipv4_address: "10.0.0.1" } });
+  });
+
+  it("should not have ip if base network does not define it, even if user network does", () => {
+    const compose = baseCompose();
+    const settings = userSettings("10.0.0.2");
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+  });
+
+  it("should not have ip if neither base nor user network define it", () => {
+    const compose = baseCompose();
+    const settings = userSettings();
+    const result = applyUserSettingsTest(compose, settings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({ net1: {} });
+  });
+
+  it("should include user network and base network if both are defined in each", () => {
+    const serviceName = "test.dnp.dappnode.eth";
+    const baseCompose = () => ({
+      version: "3.5",
+      services: {
+        [serviceName]: {
+          image: "test:latest",
+          container_name: "DAppNodePackage-test",
+          networks: {
+            net1: {
+              ipv4_address: "10.0.0.6",
+              aliases: ["alias3", "alias4"]
+            }
+          }
+        }
+      },
+      networks: { net1: {} }
+    });
+
+    const userSettings = {
+      networks: {
+        rootNetworks: { net1: {}, net2: {} },
+        serviceNetworks: {
+          [serviceName]: {
+            net2: {
+              ipv4_address: "10.0.0.5",
+              aliases: ["alias1", "alias2"]
+            }
+          }
+        }
+      }
+    };
+
+    const compose = baseCompose();
+    const result = applyUserSettingsTest(compose, userSettings, { dnpName: serviceName });
+    expect(result.services[serviceName].networks).to.deep.equal({
+      net1: {
+        ipv4_address: "10.0.0.6",
+        aliases: ["alias3", "alias4"]
+      },
+      net2: {
+        ipv4_address: "10.0.0.5",
+        aliases: ["alias1", "alias2"]
+      }
+    });
   });
 });

@@ -72,7 +72,8 @@ export function HttpsMappings({ dnpName, serviceName }: { dnpName: string; servi
       dnpName,
       serviceName,
       port: parseInt(port),
-      auth: user && password ? { username: user, password } : undefined
+      auth: user && password ? { username: user, password } : undefined,
+      external: true
     };
 
     try {
