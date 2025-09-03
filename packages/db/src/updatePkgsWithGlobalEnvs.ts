@@ -37,10 +37,10 @@ export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValu
       if (globalEnvKey in serviceEnvs) {
         const currentVal = serviceEnvs[globalEnvKey];
         if (currentVal === globEnvValue) {
-          logs.info(`Global env ${globalEnvKey} for ${pkg.dnpName} already set to ${globEnvValue}, skipping update`);
+          logs.debug(`Global env ${globalEnvKey} for ${pkg.dnpName} already set to ${globEnvValue}, skipping update`);
         } else if (!currentVal && (!globEnvValue || globEnvValue === "false")) {
           // empty strings are determined as false values within packages. Dappmanager 0.2.103 and below sets glob envs bool false values as empty strings
-          logs.info(`Global env ${globalEnvKey} for ${pkg.dnpName} already nullish, skipping update`);
+          logs.debug(`Global env ${globalEnvKey} for ${pkg.dnpName} already nullish, skipping update`);
         } else {
           logs.info(`Updating global env ${globalEnvKey} for ${pkg.dnpName} from ${currentVal} to ${globEnvValue}`);
           needsUpdate = true;
