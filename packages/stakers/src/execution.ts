@@ -10,7 +10,7 @@ import {
   UserSettings
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
-import { DappnodeInstaller, ethereumClient } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { listPackage } from "@dappnode/dockerapi";
@@ -115,12 +115,6 @@ export class Execution extends StakerComponent {
     if (newExecutionDnpName !== prevExecClientDnpName) {
       // persist on db
       await this.DbHandlers[network].set(newExecutionDnpName);
-      // update fullnode alias
-      await ethereumClient.updateFullnodeAlias({
-        network,
-        newExecClientDnpName: newExecutionDnpName,
-        prevExecClientDnpName: prevExecClientDnpName || ""
-      });
     }
   }
 

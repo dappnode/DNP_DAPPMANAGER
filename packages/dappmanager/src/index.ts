@@ -8,7 +8,7 @@ import {
   copyHostServices,
   copyHostTimers
 } from "@dappnode/hostscriptsservices";
-import { DappnodeInstaller, getEthersProvider, getEthUrl, getIpfsUrl, postRestartPatch } from "@dappnode/installer";
+import { DappnodeInstaller, getIpfsUrl, postRestartPatch } from "@dappnode/installer";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -25,6 +25,7 @@ import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
 import { DappNodeRegistry } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { ethers } from "ethers";
 
 const controller = new AbortController();
 
@@ -47,11 +48,6 @@ initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch((e) => logs.error("Error inititializing Database", e));
 
-await getEthUrl().catch((e) => {
-  logs.error(`Error getting ethUrl, using default ${params.ETH_MAINNET_RPC_URL_REMOTE}`, e);
-  return params.ETH_MAINNET_RPC_URL_REMOTE;
-});
-
 let ipfsUrl = params.IPFS_LOCAL;
 try {
   ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
@@ -60,7 +56,10 @@ try {
 }
 
 // Required db to be initialized
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, await getEthersProvider());
+export const dappnodeInstaller = new DappnodeInstaller(
+  ipfsUrl,
+  new ethers.JsonRpcProvider(params.ETH_MAINNET_RPC_URL_REMOTE) // TODO: review
+);
 
 export const publicRegistry = new DappNodeRegistry("public");
 

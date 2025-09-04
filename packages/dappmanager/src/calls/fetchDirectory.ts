@@ -4,9 +4,9 @@ import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
 import { fileToGatewayUrl, getIsInstalled, getIsUpdated } from "@dappnode/utils";
 import { throttle } from "lodash-es";
-import { getEthersProvider } from "@dappnode/installer";
 import { DappNodeDirectory } from "@dappnode/toolkit";
 import { dappnodeInstaller } from "../index.js";
+import { ethers } from "ethers";
 
 const loadThrottle = 500; // 0.5 seconds
 
@@ -14,7 +14,7 @@ const loadThrottle = 500; // 0.5 seconds
  * Fetches all package names in the custom dappnode directory.
  */
 export async function fetchDirectory(): Promise<DirectoryItem[]> {
-  const directory = new DappNodeDirectory(await getEthersProvider());
+  const directory = new DappNodeDirectory(new ethers.JsonRpcProvider()); // TODO: review
 
   const installedDnpList = await listPackages();
 

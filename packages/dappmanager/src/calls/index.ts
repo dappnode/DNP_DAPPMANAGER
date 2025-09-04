@@ -12,8 +12,6 @@ export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
 export { dappnodeWebNameSet } from "./dappnodeWebNameSet.js";
-export { ethClientTargetSet } from "./ethClientTargetSet.js";
-export { ethClientFallbackSet } from "./ethClientFallbackSet.js";
 export { disableEthicalMetrics, enableEthicalMetrics, getEthicalMetricsConfig } from "./ethicalMetrics.js";
 export { fetchCoreUpdateData } from "./fetchCoreUpdateData.js";
 export { fetchDirectory } from "./fetchDirectory.js";

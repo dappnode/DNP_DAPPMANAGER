@@ -26,7 +26,6 @@ import { computeGlobalEnvsFromDb } from "@dappnode/db";
 import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
-import { getEthersProvider } from "./ethClient/index.js";
 import { omit } from "lodash-es";
 import { ethers } from "ethers";
 
@@ -52,7 +51,7 @@ export class DappnodeInstaller extends DappnodeRepository {
 
   private async updateProviders(): Promise<void> {
     const newIpfsUrl = getIpfsUrl();
-    super.changeEthProvider(await getEthersProvider());
+    // super.changeEthProvider();
     super.changeIpfsGatewayUrl(newIpfsUrl);
   }
 

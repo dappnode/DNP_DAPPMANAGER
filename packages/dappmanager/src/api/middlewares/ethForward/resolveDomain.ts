@@ -1,5 +1,4 @@
 import { ethers } from "ethers";
-import { getEthersProvider, getEthUrl } from "@dappnode/installer";
 import resolverAbi from "./abi/resolverAbi.json" with { type: "json" };
 import ensAbi from "./abi/ens.json" with { type: "json" };
 import { Network, Content, NotFoundError, EnsResolverError } from "./types.js";
@@ -28,7 +27,7 @@ interface InterfacesAvailable {
 async function getEthersProviderByNetwork(network: Network): Promise<string> {
   switch (network) {
     case "mainnet":
-      return await getEthUrl();
+      return "" // TODO add remote eth url
     case "ropsten":
       return ropstenJsonRpc;
     default:
@@ -52,7 +51,7 @@ export function ResolveDomainWithCache(): (domain: string) => Promise<Content> {
   return async function (domain: string): Promise<Content> {
     const network = parseNetworkFromDomain(domain);
     const providerUrl = await _getEthersProviderByNetwork(network);
-    const provider = await getEthersProvider(providerUrl);
+    const provider = new ethers.JsonRpcProvider(providerUrl); // TODO: review
     return _resolveDomain(domain, provider);
   };
 }

@@ -1,12 +1,11 @@
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
-import { DappnodeInstaller, getEthUrl } from "@dappnode/installer";
+import { DappnodeInstaller } from "@dappnode/installer";
 import { listPackages } from "@dappnode/dockerapi";
 import { runAtMostEvery } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import { checkNewPackagesVersion } from "./updateMyPackages.js";
 import { checkSystemPackagesVersion } from "./updateSystemPackages.js";
-import { EthProviderError } from "@dappnode/types";
 import { clearPendingUpdates } from "./clearPendingUpdates.js";
 import { clearCompletedCoreUpdatesIfAny } from "./clearCompletedCoreUpdatesIfAny.js";
 import { clearRegistry } from "./clearRegistry.js";
@@ -18,15 +17,6 @@ import { clearRegistry } from "./clearRegistry.js";
  */
 async function checkAutoUpdates(dappnodeInstaller: DappnodeInstaller): Promise<void> {
   try {
-    // Make sure the eth client provider is available before checking each package
-    // Do it once and return for expected errors to reduce cluttering
-    try {
-      await getEthUrl();
-    } catch (e) {
-      if (e instanceof EthProviderError) return;
-      logs.warn("Error getting eth provider", e);
-    }
-
     try {
       await checkNewPackagesVersion(dappnodeInstaller);
     } catch (e) {
