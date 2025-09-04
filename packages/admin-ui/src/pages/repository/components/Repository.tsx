@@ -1,5 +1,4 @@
 import React from "react";
-import Eth from "./Eth";
 import Ipfs from "./Ipfs";
 import { NavLink, Route, Routes } from "react-router-dom";
 import { subPaths, title } from "../data";
@@ -12,11 +11,6 @@ export const Repository: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     component: React.ComponentType<any>;
   }[] = [
-    {
-      name: "Ethereum",
-      subPath: subPaths.eth,
-      component: Eth
-    },
     {
       name: "IPFS",
       subPath: subPaths.ipfs,

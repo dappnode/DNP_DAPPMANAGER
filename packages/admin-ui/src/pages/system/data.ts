@@ -26,7 +26,6 @@ export const subPaths = {
 };
 
 // Computed paths
-export const activateFallbackPath = `${subPaths.repository}/eth`;
 export const systemProfilePath = `${pathName}/${subPaths.profile}`;
 
 // DAppNode data
