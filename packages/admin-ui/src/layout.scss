@@ -158,10 +158,6 @@ body,
   padding-top: var(--topbar-height) !important;
   margin-left: var(--sidenav-width);
   padding: var(--container-padding);
-
-  > div {
-    margin-bottom: var(--default-spacing);
-  }
 }
 
 /********************
@@ -190,7 +186,7 @@ body,
     margin-left: var(--sidenav-collapsed-width);
   }
 
-  .card-body{
+  .card-body {
     padding: 0.7rem;
   }
 }

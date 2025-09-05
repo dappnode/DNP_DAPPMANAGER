@@ -1,6 +1,6 @@
 import React from "react";
 import { title, subPaths } from "../data";
-import { Routes, Route, NavLink } from "react-router-dom";
+import { RouteType } from "types";
 // Components
 import Title from "components/Title";
 import AutoUpdates from "./AutoUpdates";
@@ -14,108 +14,71 @@ import Profile from "./Profile";
 import { Network } from "./Network";
 import { Advanced } from "./Advanced";
 import Hardware from "./Hardware";
+import { SectionNavigator } from "components/SectionNavigator";
 
 const SystemRoot: React.FC = () => {
-  const availableRoutes: {
-    name: string;
-    subLink: string;
-    subPath: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    component: React.ComponentType<any>;
-    hideFromMenu?: boolean;
-  }[] = [
+  const availableRoutes: RouteType[] = [
     {
       name: "Info",
-      subLink: subPaths.info,
       subPath: subPaths.info,
-      component: SystemInfo
+      element: <SystemInfo />
     },
     {
       name: "Auto updates",
-      subLink: subPaths.autoUpdates,
       subPath: subPaths.autoUpdates,
-      component: AutoUpdates
+      element: <AutoUpdates />
     },
     {
       name: "App",
-      subLink: subPaths.app,
       subPath: subPaths.app,
-      component: App
+      element: <App />
     },
     {
       name: "Profile",
-      subLink: subPaths.profile,
       subPath: subPaths.profile,
-      component: Profile
+      element: <Profile />
     },
     {
       name: "Power",
-      subLink: subPaths.power,
       subPath: subPaths.power,
-      component: PowerManagment
+      element: <PowerManagment />
     },
     {
       name: "Network",
-      subLink: subPaths.network,
       subPath: subPaths.network,
-      component: Network
+      element: <Network />
     },
     {
       name: "Update",
-      subLink: subPaths.update,
       subPath: subPaths.update,
-      component: SystemUpdate
+      element: <SystemUpdate />
     },
-
     {
       name: "Peers",
-      subLink: subPaths.peers,
       subPath: subPaths.peers + "/*",
-      component: Peers
+      element: <Peers />
     },
     {
       name: "Security",
-      subLink: subPaths.security,
       subPath: subPaths.security,
-      component: Security
+      element: <Security />
     },
     {
       name: "Hardware",
-      subLink: subPaths.hardware,
       subPath: subPaths.hardware,
-      component: Hardware
+      element: <Hardware />
     },
     {
       name: "Advanced",
-      subLink: subPaths.advanced,
       subPath: subPaths.advanced,
-      component: Advanced
+      element: <Advanced />
     }
   ];
 
   return (
     <>
       <Title title={title} />
-
-      <div className="horizontal-navbar">
-        {availableRoutes
-          .filter((route) => !route.hideFromMenu)
-          .map((route) => (
-            <button key={route.subPath} className="item-container">
-              <NavLink to={route.subLink} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                {route.name}
-              </NavLink>
-            </button>
-          ))}
-      </div>
-
-      <div className="section-spacing">
-        <Routes>
-          {availableRoutes.map((route) => (
-            <Route key={route.subPath} path={route.subPath} element={<route.component />} />
-          ))}
-        </Routes>
-      </div>
+      <SectionNavigator routes={availableRoutes} />
     </>
   );
 };
