@@ -29,15 +29,6 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
         continue;
       }
 
-      // MUST exist an APM repo with the package dnpName
-      // Check here instead of the if statement to be inside the try / catch
-      try {
-        await dappnodeInstaller.getRepoContract(dnpName);
-      } catch (e) {
-        logs.warn(`Error checking ${dnpName} version`, e);
-        continue;
-      }
-
       const { version: newVersion } = await dappnodeInstaller.getVersionAndIpfsHash({
         dnpNameOrHash: dnpName
       });
