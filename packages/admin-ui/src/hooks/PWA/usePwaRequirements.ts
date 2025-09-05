@@ -23,6 +23,7 @@ export function usePwaRequirements() {
   const [externalPointToDappmanager, setExternalPointToDappmanager] = useState<boolean>(false);
   const [pwaCheckLogs, setPwaCheckLogs] = useState<string>("");
   const hasRestartedRef = useRef(false);
+  const isPrivateDomain = window.location.hostname === "my.dappnode.private";
 
   useEffect(() => {
     if (pwaRequirementsReq.data) {
@@ -124,6 +125,14 @@ export function usePwaRequirements() {
     return joinedLogs;
   };
 
+  const failedChecksCount = [
+    !privateIp,
+    !pwaDnsResolves,
+    !containersInExternalNetwork?.dappmanager,
+    !containersInExternalNetwork?.httpsDnp,
+    !externalPointToDappmanager
+  ].filter(Boolean).length;
+
   return {
     requirementsLoading,
     httpsDnpInstalled,
@@ -133,10 +142,8 @@ export function usePwaRequirements() {
     installHttpsPkg,
     pwaMappingUrl,
     isOnPwaDomain,
-    privateIp,
-    pwaDnsResolves,
-    containersInExternalNetwork,
-    externalPointToDappmanager,
-    pwaCheckLogs
+    failedChecksCount,
+    pwaCheckLogs,
+    isPrivateDomain
   };
 }

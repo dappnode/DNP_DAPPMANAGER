@@ -94,8 +94,8 @@ export async function checkContainersOnPublicNetwork(): Promise<{ dappmanager: b
   const dappmanagerConnected = connectedSet.has(params.dappmanagerContainerName);
   const httpsConnected = connectedSet.has(params.httpsContainerName);
 
-  if (!dappmanagerConnected) console.error('PWA Check - dappmanager not in "dnpublic_network"');
-  if (!httpsConnected) console.error('PWA Check - https not in "dnpublic_network"');
+  if (!dappmanagerConnected) console.error(`PWA Check - dappmanager not in "${publicNetwork}"`);
+  if (!httpsConnected) console.error(`PWA Check - https not in "${publicNetwork}"`);
 
   return { dappmanager: dappmanagerConnected, httpsDnp: httpsConnected };
 }
