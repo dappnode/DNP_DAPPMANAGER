@@ -82,7 +82,7 @@ async function checkIpfsHealth(): Promise<void> {
 }
 
 async function checkEthHealth(): Promise<void> {
-  const ethUrl = ""; // TODO: add remote eth url
+  const ethUrl = params.ETH_MAINNET_RPC_URL_REMOTE;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
