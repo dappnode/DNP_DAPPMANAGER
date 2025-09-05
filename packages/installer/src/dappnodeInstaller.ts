@@ -45,7 +45,7 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethersProvider: ethers.JsonRpcProvider) {
+  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider) {
     super(ipfsUrl, ethersProvider);
   }
 

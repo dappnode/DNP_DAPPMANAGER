@@ -4,8 +4,7 @@ import { ethers } from "ethers";
 import { mapValues } from "lodash-es";
 import { shell } from "@dappnode/utils";
 import { yamlDump } from "@dappnode/utils";
-import { getContainerName, getImageTag } from "@dappnode/utils";
-import { Manifest, Compose, SetupWizard, ComposeService } from "@dappnode/types";
+import { Manifest, Compose, SetupWizard, ComposeService, getContainerName, getImageTag } from "@dappnode/types";
 import { testDir, manifestFileName, composeFileName, ipfs } from "../../testUtils.js";
 import { ipfsAddAll } from "../../testUtils.js";
 import { saveNewImageToDisk } from "./mockImage.js";
@@ -60,7 +59,7 @@ export async function uploadDirectoryRelease({
   if (setupWizard) writeJson("setup-wizard.json", setupWizard);
   if (disclaimer) writeAsset("disclaimer.md", disclaimer);
 
-  const addResults = await ipfsAddAll(releaseDir);
+  const addResults = (await ipfsAddAll(releaseDir)) as Array<{ cid: { toString: () => string } }>;
   // The last result is the root /test_files, the second is the dir /test_files/something/
   const rootHash = addResults[addResults.length - 2].cid.toString();
 

@@ -27,7 +27,7 @@ interface InterfacesAvailable {
 async function getEthersProviderByNetwork(network: Network): Promise<string> {
   switch (network) {
     case "mainnet":
-      return "" // TODO add remote eth url
+      return "http://execution.mainnet.dncore.dappnode:8545"; 
     case "ropsten":
       return ropstenJsonRpc;
     default:
