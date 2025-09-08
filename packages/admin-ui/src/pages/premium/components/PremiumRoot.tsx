@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import { Routes, Route, NavLink } from "react-router-dom";
 // Components
 import { title, subPaths } from "../data";
 import Title from "components/Title";
@@ -10,6 +9,7 @@ import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
 import { BackupNode } from "./BackupNode";
 import "./premiumRoot.scss";
+import { SectionNavigator } from "components/SectionNavigator";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();
@@ -91,31 +91,14 @@ const PremiumRoot: React.FC = () => {
         )}
       </div>
 
-      <div className="horizontal-navbar">
-        {routes.map((route) => (
-          <button key={route.subPath} className="item-container">
-            <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-              {route.name}
-            </NavLink>
-          </button>
-        ))}
-      </div>
-      <div className="section-spacing">
-        <PremiumWrapper
-          isInstalled={isInstalled}
-          isInstalling={isInstalling}
-          installPremiumPkg={installPremiumPkg}
-          isLoading={isLoading}
-          isRunning={isRunning}
-          successComponent={
-            <Routes>
-              {routes.map((r) => (
-                <Route key={r.subPath} path={r.subPath} element={r.element} />
-              ))}
-            </Routes>
-          }
-        />
-      </div>
+      <PremiumWrapper
+        isInstalled={isInstalled}
+        isInstalling={isInstalling}
+        installPremiumPkg={installPremiumPkg}
+        isLoading={isLoading}
+        isRunning={isRunning}
+        successComponent={<SectionNavigator routes={routes} />}
+      />
     </div>
   );
 };

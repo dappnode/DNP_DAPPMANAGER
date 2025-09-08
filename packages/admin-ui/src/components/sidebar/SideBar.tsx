@@ -35,12 +35,21 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       <div className="nav">
         {sidenavItems
           .filter((item) => item.show === true)
-          .map((item) => (
-            <NavLink className={`sidenav-item selectable ${item.name === "Premium" && "premium-item"}`} to={item.href}>
-              <item.icon />
-              {screenWidth > 640 && <span className="name svg-text">{item.name}</span>}
-            </NavLink>
-          ))}
+          .map((item) => {
+            const basePath = item.href.split("/")[0];
+            const baseLocationPath = location.pathname.substring(1).split("/")[0];
+            const isActive = baseLocationPath === basePath;
+            return (
+              <NavLink
+                className={`sidenav-item selectable ${isActive && "active"} ${item.name === "Premium" &&
+                  "premium-item"}`}
+                to={item.href}
+              >
+                <item.icon />
+                {screenWidth > 640 && <span className="name svg-text">{item.name}</span>}
+              </NavLink>
+            );
+          })}
       </div>
 
       {/* spacer keeps the funded-by section at the bottom (if possible) */}
