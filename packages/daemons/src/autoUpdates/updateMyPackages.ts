@@ -117,4 +117,4 @@ async function autoUpdatePackageMaybe({
     flagErrorUpdate(dnpName, e.message);
     throw e;
   }
-};
+}
