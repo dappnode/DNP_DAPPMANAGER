@@ -11,6 +11,8 @@ import { isUpdateDelayCompleted } from "./isUpdateDelayCompleted.js";
 import { flagCompletedUpdate } from "./flagCompletedUpdate.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
+const contractAddressMap: Record<string, string> = {};
+
 /**
  * For all installed non-core DAppNode packages, check their latest version
  * If there is an update available (of any kind)
@@ -31,15 +33,24 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
 
       // MUST exist an APM repo with the package dnpName
       // Check here instead of the if statement to be inside the try / catch
-      try {
-        await dappnodeInstaller.getRepoContract(dnpName);
-      } catch (e) {
-        logs.warn(`Error checking ${dnpName} version`, e);
-        continue;
+      let contractAddress = contractAddressMap[dnpName];
+      if (!contractAddress) {
+        try {
+          const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
+          if (typeof repoContract.target === "string") {
+            logs.info(`Caching contract address for ${dnpName}: ${repoContract.target}`);
+            contractAddress = repoContract.target;
+            contractAddressMap[dnpName] = contractAddress;
+          }
+        } catch (e) {
+          logs.warn(`Error checking ${dnpName} version`, e);
+          continue;
+        }
       }
 
       const { version: newVersion } = await dappnodeInstaller.getVersionAndIpfsHash({
-        dnpNameOrHash: dnpName
+        dnpNameOrHash: dnpName,
+        contractAddress
       });
 
       // This version is not an update
