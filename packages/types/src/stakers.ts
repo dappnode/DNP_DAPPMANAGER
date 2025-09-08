@@ -12,6 +12,11 @@ export enum Network {
   Hoodi = "hoodi"
 }
 
+export const networksByType = {
+  mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso],
+  testnets: [Network.Hoodi, Network.Prater, Network.Holesky]
+};
+
 // MAINNET
 export enum ConsensusClientMainnet {
   Lodestar = "lodestar.dnp.dappnode.eth",
