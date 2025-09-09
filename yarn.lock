@@ -2385,15 +2385,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-ts@npm:^0.38.1":
-  version: 0.38.1
-  resolution: "@graphprotocol/graph-ts@npm:0.38.1"
-  dependencies:
-    assemblyscript: "npm:0.27.31"
-  checksum: 10c0/59bb49f0e24e673e9c68fffeb81e60ad8f5c1dc93133b3a1a2d9ee2480338d662638a6f93c30b6dc06abad20cb20d8c1cba1ed7638c58d95cfe6a5e9b6500e26
-  languageName: node
-  linkType: hard
-
 "@graphql-tools/batch-execute@npm:8.5.1":
   version: 8.5.1
   resolution: "@graphql-tools/batch-execute@npm:8.5.1"
@@ -5661,19 +5652,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"assemblyscript@npm:0.27.31":
-  version: 0.27.31
-  resolution: "assemblyscript@npm:0.27.31"
-  dependencies:
-    binaryen: "npm:116.0.0-nightly.20240114"
-    long: "npm:^5.2.1"
-  bin:
-    asc: bin/asc.js
-    asinit: bin/asinit.js
-  checksum: 10c0/56b17b57c589625f7683508a2c457e01677e5c2943d08f29b0d6a56e021c2a8ac37e71541771c2659f7b05a672c816a15e0d23fe37e002a700f74efda08440cf
-  languageName: node
-  linkType: hard
-
 "assert-plus@npm:1.0.0, assert-plus@npm:^1.0.0":
   version: 1.0.0
   resolution: "assert-plus@npm:1.0.0"
@@ -5902,16 +5880,6 @@ __metadata:
   version: 2.2.0
   resolution: "binary-extensions@npm:2.2.0"
   checksum: 10c0/d73d8b897238a2d3ffa5f59c0241870043aa7471335e89ea5e1ff48edb7c2d0bb471517a3e4c5c3f4c043615caa2717b5f80a5e61e07503d51dc85cb848e665d
-  languageName: node
-  linkType: hard
-
-"binaryen@npm:116.0.0-nightly.20240114":
-  version: 116.0.0-nightly.20240114
-  resolution: "binaryen@npm:116.0.0-nightly.20240114"
-  bin:
-    wasm-opt: bin/wasm-opt
-    wasm2js: bin/wasm2js
-  checksum: 10c0/95e14b87c27fef94fb4008dcd63fa61ea66f69bcb179f7f73f56dfb39aed58afec6957ef18acacfce15e4874a0da402b0fc3d47ee392a9b906a97e7634bbbad3
   languageName: node
   linkType: hard
 
@@ -11775,13 +11743,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"long@npm:^5.2.1":
-  version: 5.3.2
-  resolution: "long@npm:5.3.2"
-  checksum: 10c0/7130fe1cbce2dca06734b35b70d380ca3f70271c7f8852c922a7c62c86c4e35f0c39290565eca7133c625908d40e126ac57c02b1b1a4636b9457d77e1e60b981
-  languageName: node
-  linkType: hard
-
 "loose-envify@npm:^1.0.0, loose-envify@npm:^1.1.0, loose-envify@npm:^1.4.0":
   version: 1.4.0
   resolution: "loose-envify@npm:1.4.0"
@@ -15495,7 +15456,6 @@ __metadata:
   resolution: "root@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.22.0"
-    "@graphprotocol/graph-ts": "npm:^0.38.1"
     "@types/chai": "npm:^4.3.11"
     "@types/mocha": "npm:^10.0.6"
     "@types/node": "npm:^22.13.9"
