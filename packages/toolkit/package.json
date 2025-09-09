@@ -10,14 +10,7 @@
     "dev": "tsc -w",
     "build": "tsc -p tsconfig.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "test": "mocha --config .mocharc.yml test/**/*.test.ts",
-    "truffle:compile:v0.4": "truffle compile --config ./truffle/truffle-config-v0.4.cjs",
-    "truffle:compile:v0.5": "truffle compile --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:develop:v0.5": "truffle develop --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:test:v0.4": "truffle test --config ./truffle/truffle-config-v0.4.cjs",
-    "truffle:test:v0.5": "truffle test --config ./truffle/truffle-config-v0.5.cjs",
-    "truffle:migrate:v0.4": "truffle migrate --config ./truffle/truffle-config-v0.4.cjs --reset --network development",
-    "truffle:migrate:v0.5": "truffle migrate --config ./truffle/truffle-config-v0.5.cjs --reset --network development"
+    "test": "mocha --config .mocharc.yml test/**/*.test.ts"
   },
   "author": "DAppNode Association <admin@dappnode.io> (https://github.com/dappnode)",
   "contributors": [
