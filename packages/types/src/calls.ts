@@ -2,6 +2,7 @@ import { ContainerState } from "./pkg.js";
 import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.js";
 import { Manifest, Dependencies, ChainDriver, PackageBackup, ManifestUpdateAlert } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
+import { NotificationsSettingsAllDnps } from "./notifications.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -19,6 +20,7 @@ export interface HttpsPortalMapping {
   dnpName: string;
   serviceName: string;
   port: number;
+  external: boolean; // If the service is exposed to the internet
   auth?: {
     username: string;
     password: string;
@@ -39,6 +41,7 @@ export interface ExposableServiceManifestInfo {
   fromSubdomain?: string;
   port: number;
   exposeByDefault?: boolean;
+  external?: boolean;
 }
 
 export interface ExposableServiceMapping extends ExposableServiceInfo {
@@ -75,6 +78,8 @@ export interface LoginStatusReturn {
 
 export interface WifiReport {
   info: string;
+  isDefaultPassphrase: boolean;
+  isRunning: boolean;
   report?: {
     lastLog: string;
     exitCode: number | null;
@@ -276,6 +281,7 @@ export interface RequestedDnp {
   // Setup
   setupWizard?: SetupWizardAllDnps;
   settings: UserSettingsAllDnps; // MUST include the previous user settings
+  notificationsSettings?: NotificationsSettingsAllDnps;
   // Additional data
   imageSize: number;
   isUpdated: boolean;
@@ -499,6 +505,7 @@ export interface PackageContainer {
   created: number;
   image: string;
   ip?: string; // IP of the DNP in the dappnode network
+  privateIp?: string; // IP of the DNP in the private network
   state: ContainerState;
   running: boolean;
   exitCode: number | null;
@@ -1081,7 +1088,8 @@ export type NewFeatureId =
   | "repository-fallback"
   | "system-auto-updates"
   | "enable-ethical-metrics"
-  | "change-host-password";
+  | "change-host-password"
+  | "enable-notifications";
 
 /**
  * =======

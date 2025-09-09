@@ -27,7 +27,6 @@
     "semver": "7.3.8"
   },
   "devDependencies": {
-    "@types/node": "^20.14.10",
     "@types/semver": "7.3.13"
   }
 }

@@ -14,10 +14,12 @@ import {
   PackageRelease,
   CompatibleDnps,
   InstalledPackageData,
-  ReleaseSignatureStatusCode
+  ReleaseSignatureStatusCode,
+  NotificationsSettingsAllDnps
 } from "@dappnode/types";
 import { Manifest, SetupWizardField } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
+import { notifications } from "@dappnode/notifications";
 
 export async function fetchDnpRequest({ id, version }: { id: string; version?: string }): Promise<RequestedDnp> {
   const mainRelease = await dappnodeInstaller.getRelease(id, version);
@@ -25,6 +27,7 @@ export async function fetchDnpRequest({ id, version }: { id: string; version?: s
   const settings: UserSettingsAllDnps = {};
   const specialPermissions: SpecialPermissionAllDnps = {};
   const setupWizard: SetupWizardAllDnps = {};
+  const notificationsSettings: NotificationsSettingsAllDnps = {};
   const signedSafe: RequestedDnp["signedSafe"] = {};
 
   const dnpList = await listPackages();
@@ -37,6 +40,9 @@ export async function fetchDnpRequest({ id, version }: { id: string; version?: s
     const defaultUserSet = new ComposeEditor(compose).getUserSettings();
     const prevUserSet = ComposeFileEditor.getUserSettingsIfExist(dnpName, isCore);
     settings[dnpName] = deepmerge(defaultUserSet, prevUserSet);
+
+    if (release.notifications)
+      notificationsSettings[dnpName] = notifications.applyPreviousEndpoints(dnpName, isCore, release.notifications);
 
     specialPermissions[dnpName] = parseSpecialPermissions(compose, isCore);
 
@@ -101,6 +107,7 @@ export async function fetchDnpRequest({ id, version }: { id: string; version?: s
     manifest: omit(mainRelease.manifest, ["setupWizard"]),
     specialPermissions, // Decoupled metadata
     // Settings must include the previous user settings
+    notificationsSettings,
     settings,
     compatible: {
       // Compute version metadata

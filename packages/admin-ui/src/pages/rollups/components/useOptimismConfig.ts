@@ -169,7 +169,7 @@ function validateUrl(str: string): string | null {
   try {
     new URL(str);
     return null;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+     
   } catch (_) {
     return "Invalid URL";
   }

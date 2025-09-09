@@ -18,6 +18,12 @@ services:
           - "dappmanager.dappnode"
           - "my.dappnode"
           - "dappnode.local"
+      dnprivate_network:
+        aliases:
+          - "dappmanager.dnp.dappnode.eth.dappmanager.dappnode.private"
+          - "dappmanager.dappnode.private"
+          - "my.dappnode.private"
+          - "dappnode.local"
     restart: always
     volumes:
       - "/run/dbus/system_bus_socket:/run/dbus/system_bus_socket"
@@ -31,3 +37,5 @@ networks:
   dncore_network:
     external: true
     name: "dncore_network"
+  dnprivate_network:
+    external: true

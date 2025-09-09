@@ -472,6 +472,11 @@
             "type": "boolean",
             "description": "Whether this HTTPS port should be exposed by default on installation",
             "examples": [true, false]
+          },
+          "external": {
+            "type": "boolean",
+            "description": "Whether this exposable service is external (not part of core)",
+            "default": true
           }
         }
       }

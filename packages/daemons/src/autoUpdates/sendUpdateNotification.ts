@@ -1,13 +1,13 @@
 import { valid, lte } from "semver";
 import { params } from "@dappnode/params";
 import * as db from "@dappnode/db";
-import { eventBus } from "@dappnode/eventbus";
 import { DappnodeInstaller } from "@dappnode/installer";
-import { prettyDnpName } from "@dappnode/utils";
-import { CoreUpdateDataAvailable, upstreamVersionToString } from "@dappnode/types";
+import { prettyDnpName, urlJoin } from "@dappnode/utils";
+import { CoreUpdateDataAvailable, Category, Priority, upstreamVersionToString, Status } from "@dappnode/types";
 import { formatPackageUpdateNotification, formatSystemUpdateNotification } from "./formatNotificationBody.js";
 import { isCoreUpdateEnabled } from "./isCoreUpdateEnabled.js";
-import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
+import { notifications } from "@dappnode/notifications";
+import { logs } from "@dappnode/logger";
 
 export async function sendUpdatePackageNotificationMaybe({
   dappnodeInstaller,
@@ -20,6 +20,13 @@ export async function sendUpdatePackageNotificationMaybe({
   currentVersion: string;
   newVersion: string;
 }): Promise<void> {
+  // Check if auto-update notifications are enabled
+  const dappmanagerCustomEndpoint = notifications
+    .getEndpointsIfExists(params.dappmanagerDnpName, true)
+    ?.customEndpoints?.find((customEndpoint) => customEndpoint.correlationId === "dappmanager-update-pkg");
+
+  if (!dappmanagerCustomEndpoint || !dappmanagerCustomEndpoint.enabled) return;
+
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version
@@ -31,19 +38,31 @@ export async function sendUpdatePackageNotificationMaybe({
     upstream: release.manifest.upstream
   });
 
-  // Emit notification about new version available
-  eventBus.notification.emit({
-    id: `update-available-${dnpName}-${newVersion}`,
-    type: "info",
-    title: `Update available for ${prettyDnpName(dnpName)}`,
-    body: formatPackageUpdateNotification({
-      dnpName: dnpName,
-      newVersion,
-      upstreamVersion,
-      currentVersion,
-      autoUpdatesEnabled: isDnpUpdateEnabled(dnpName)
+  const adminUiInstallPackageUrl = "http://my.dappnode/installer/dnp";
+
+  // Send notification about new version available
+  await notifications
+    .sendNotification({
+      title: `Update available for ${prettyDnpName(dnpName)}`,
+      dnpName,
+      body: formatPackageUpdateNotification({
+        dnpName,
+        currentVersion,
+        newVersion,
+        upstreamVersion
+      }),
+      category: Category.system,
+      priority: Priority.low,
+      status: Status.triggered,
+      callToAction: {
+        title: "Update",
+        url: urlJoin(adminUiInstallPackageUrl, dnpName)
+      },
+      isBanner: false,
+      isRemote: false,
+      correlationId: "dappmanager-update-pkg"
     })
-  });
+    .catch((e) => logs.error("Error sending package update notification", e));
 
   // Register version to prevent sending notification again
   db.packageLatestKnownVersion.set(dnpName, { newVersion, upstreamVersion });
@@ -54,20 +73,33 @@ export async function sendUpdateSystemNotificationMaybe(data: CoreUpdateDataAvai
   const newVersion = data.coreVersion;
   const dnpName = params.coreDnpName;
 
+  const adminUiUpdateCoreUrl = "http://my.dappnode/system/update";
+
   // If version has already been emitted, skip
   const lastEmittedVersion = db.notificationLastEmitVersion.get(dnpName);
   if (lastEmittedVersion && valid(lastEmittedVersion) && lte(newVersion, lastEmittedVersion)) return; // Already emitted update available for this version
 
-  // Emit notification about new version available
-  eventBus.notification.emit({
-    id: `update-available-${dnpName}-${newVersion}`,
-    type: "info",
-    title: "System update available",
-    body: formatSystemUpdateNotification({
-      packages: data.packages,
-      autoUpdatesEnabled: isCoreUpdateEnabled()
+  // Send notification about new version available
+  await notifications
+    .sendNotification({
+      title: `System update available`,
+      dnpName,
+      body: formatSystemUpdateNotification({
+        packages: data.packages,
+        autoUpdatesEnabled: isCoreUpdateEnabled()
+      }),
+      category: Category.system,
+      priority: Priority.high,
+      status: Status.triggered,
+      callToAction: {
+        title: "Update",
+        url: adminUiUpdateCoreUrl
+      },
+      isBanner: true,
+      isRemote: false,
+      correlationId: "dappmanager-update-systemPkg"
     })
-  });
+    .catch((e) => logs.error("Error sending system update notification", e));
 
   data.packages;
 

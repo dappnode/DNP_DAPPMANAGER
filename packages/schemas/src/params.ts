@@ -8,15 +8,17 @@ export const dockerParams = {
   CONTAINER_NAME_PREFIX: "DAppNodePackage-",
   CONTAINER_CORE_NAME_PREFIX: "DAppNodeCore-",
   CONTAINER_TOOL_NAME_PREFIX: "DAppNodeTool-",
-  DOCKER_WHITELIST_NETWORKS: ["dncore_network", "dnpublic_network"],
+  DOCKER_WHITELIST_NETWORKS: ["dncore_network", "dnprivate_network", "dnpublic_network"],
   DOCKER_WHITELIST_BIND_VOLUMES: [
+    "portainer.dnp.dappnode.eth",
     "dappmanager.dnp.dappnode.eth",
     "wifi.dnp.dappnode.eth",
     "vpn.dnp.dappnode.eth",
     "wireguard.dnp.dappnode.eth",
     "core.dnp.dappnode.eth",
     "dappnode-exporter.dnp.dappnode.eth",
-    "dms.dnp.dappnode.eth"
+    "dms.dnp.dappnode.eth",
+    "tailscale.dnp.dappnode.eth"
   ],
   DOCKER_CORE_ALIASES: [
     "dappmanager.dappnode",

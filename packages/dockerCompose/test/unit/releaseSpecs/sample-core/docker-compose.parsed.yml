@@ -13,6 +13,9 @@ services:
       dncore_network:
         aliases:
           - "s1.sample-core.dappnode"
+      dnprivate_network:
+        aliases:
+          - "s1.sample-core.dappnode.private"
     restart: always
     volumes:
       - "data:/data"
@@ -29,6 +32,9 @@ services:
       dncore_network:
         aliases:
           - "s2.sample-core.dappnode"
+      dnprivate_network:
+        aliases:
+          - "s2.sample-core.dappnode.private"
     restart: always
     volumes:
       - "data:/data"
@@ -37,4 +43,6 @@ volumes:
 networks:
   local: {}
   dncore_network:
+    external: true
+  dnprivate_network:
     external: true

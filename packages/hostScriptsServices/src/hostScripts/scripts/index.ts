@@ -8,3 +8,4 @@ export * from "./mountpoints.js";
 export * from "./rebootRequired.js";
 export * from "./updateUpgrade.js";
 export * from "./dockerUpgradeCheck.js";
+export * from "./ensureIpv4Forward.js";

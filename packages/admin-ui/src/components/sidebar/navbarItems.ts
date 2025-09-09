@@ -13,11 +13,12 @@ import {
   MdDevices,
   MdDashboard,
   MdWifi,
-  MdPeople
+  MdPeople,
+  MdStar
 } from "react-icons/md";
+import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
 import { BiGitRepoForked } from "react-icons/bi";
-import { GiRolledCloth } from "react-icons/gi";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
 import { relativePath as devicesRelativePath } from "pages/vpn";
@@ -29,8 +30,9 @@ import { relativePath as supportRelativePath } from "pages/support";
 import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
-import { relativePath as rollupsRelativePath } from "pages/rollups";
 import { relativePath as repositoryRelativePath } from "pages/repository";
+import { relativePath as notificationsRelativePath } from "pages/notifications";
+import { relativePath as premiumRelativePath } from "pages/premium";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -99,12 +101,6 @@ export const sidenavItems: {
     show: true
   },
   {
-    name: "Rollups",
-    href: rollupsRelativePath,
-    icon: GiRolledCloth,
-    show: true
-  },
-  {
     name: "Repository",
     href: repositoryRelativePath,
     icon: BiGitRepoForked,
@@ -114,6 +110,12 @@ export const sidenavItems: {
     name: "System",
     href: systemRelativePath,
     icon: MdSettings,
+    show: true
+  },
+  {
+    name: "Notifications",
+    href: notificationsRelativePath,
+    icon: FaRegBell,
     show: true
   },
   {
@@ -132,6 +134,12 @@ export const sidenavItems: {
     name: "Support",
     href: supportRelativePath,
     icon: MdHelp,
+    show: true
+  },
+  {
+    name: "Premium",
+    href: premiumRelativePath,
+    icon: MdStar,
     show: true
   }
 ];

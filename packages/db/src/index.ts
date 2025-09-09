@@ -18,7 +18,7 @@ export * from "./ui.js";
 export * from "./upnp.js";
 export * from "./vpn.js";
 export * from "./stakerConfig.js";
-// Aditional low levels methods
+// Additional low levels methods
 import { dbCache, dbMain } from "./dbFactory.js";
 // Additional envs methods
 export { computeGlobalEnvsFromDb, writeGlobalEnvsToEnvFile } from "./globalEnvs.js";

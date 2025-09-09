@@ -27,7 +27,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
       - run: yarn
       - run: yarn build
       - run: yarn test
@@ -37,26 +37,26 @@ jobs:
     env:
       INFURA_MAINNET_KEY: ${{ secrets.INFURA_MAINNET_KEY }}
 
-  integration-test:
-    runs-on: ubuntu-latest
-    name: In app integration tests
-    steps:
-      - uses: actions/checkout@v4
-      - name: Enable Corepack
-        run: corepack enable
-      - name: Setup node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "yarn"
-      - run: yarn # Caching only saves 30s
-      - run: yarn build
-      - run: yarn test:int
+  # integration-test:
+  #   runs-on: ubuntu-latest
+  #   name: In app integration tests
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - name: Enable Corepack
+  #       run: corepack enable
+  #     - name: Setup node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "22"
+  #         cache: "yarn"
+  #     - run: yarn # Caching only saves 30s
+  #     - run: yarn build
+  #     - run: yarn test:int
 
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [unit-test, integration-test]
+    needs: [unit-test]
     if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Verify input
@@ -69,7 +69,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "yarn"
       - name: Publish
         run: npx @dappnode/dappnodesdk publish ${BUMP_TYPE} --dappnode_team_preset

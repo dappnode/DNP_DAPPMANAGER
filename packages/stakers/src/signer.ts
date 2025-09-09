@@ -2,6 +2,7 @@ import {
   Network,
   SignerGnosis,
   SignerHolesky,
+  SignerHoodi,
   SignerLukso,
   SignerMainnet,
   SignerPrater,
@@ -31,6 +32,10 @@ export class Signer extends StakerComponent {
     },
     [Network.Holesky]: {
       dnpName: SignerHolesky.Web3signer,
+      minVersion: "0.1.0"
+    },
+    [Network.Hoodi]: {
+      dnpName: SignerHoodi.Web3signer,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: {
@@ -67,6 +72,7 @@ export class Signer extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAliases: [`signer.${network}.dncore.dappnode`],
       compatibleClients: [Signer.CompatibleSigners[network]],
       userSettings: this.getUserSettings(network),
       prevClient: Signer.CompatibleSigners[network].dnpName
@@ -74,16 +80,21 @@ export class Signer extends StakerComponent {
   }
 
   private getUserSettings(network: Network): UserSettings {
+    const serviceName = "web3signer";
+
     return {
       networks: {
         rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
-          web3signer: {
+          [serviceName]: {
             [params.DOCKER_STAKER_NETWORKS[network]]: {
-              aliases: [`signer.${network}.staker.dappnode`]
+              aliases: [`${serviceName}.${network}.staker.dappnode`, `signer.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {
-              aliases: [`signer.${network}.dncore.dappnode`]
+              aliases: [`${serviceName}.${network}.dncore.dappnode`, `signer.${network}.dncore.dappnode`]
+            },
+            [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+              aliases: [`${serviceName}.${network}.dappnode.private`, `signer.${network}.dappnode.private`]
             }
           }
         }

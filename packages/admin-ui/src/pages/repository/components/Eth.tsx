@@ -14,9 +14,9 @@ import SubTitle from "components/SubTitle";
 import { getEthClientPrettyStatus, EthMultiClientsAndFallback } from "components/EthMultiClient";
 import Alert from "react-bootstrap/esm/Alert";
 import Button from "components/Button";
-import Card from "components/Card";
 import { prettyDnpName } from "utils/format";
 import { isEqual } from "lodash-es";
+import Card from "components/Card";
 
 export default function Eth() {
   const ethRemoteRpc = useSelector(getEthRemoteRpc);
@@ -81,8 +81,10 @@ export default function Eth() {
     }
   }
   return (
-    <Card className="dappnode-identity">
+    <div className="dappnode-identity">
       <SubTitle>Ethereum</SubTitle>
+      <Card>
+
       <div>
         <p>Dappnode uses smart contracts to access a decentralized repository of DApps.</p>
         <p>
@@ -98,6 +100,7 @@ export default function Eth() {
           <strong>Status:</strong> {getEthClientPrettyStatus(ethClientStatus, ethClientFallback)}
         </div>
       )}
+      </Card>
 
       {renderEthMultiClientWarning()}
 
@@ -121,6 +124,6 @@ export default function Eth() {
           Change
         </Button>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -1,0 +1,6 @@
+customEndpoints:
+  - name: "Package updates notifications"
+    isBanner: false
+    correlationId: "dappmanager-update-pkg"
+    description: "This endpoint notifies users about available package updates."
+    enabled: true

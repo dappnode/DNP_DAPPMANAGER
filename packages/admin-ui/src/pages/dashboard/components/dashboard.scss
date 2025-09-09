@@ -28,8 +28,10 @@
   }
 
   .package-updates {
-    // Give the single card a max width that matches the other cards
-    grid-column: 1 / 4;
+    @media screen and (min-width: 65rem) {
+      // Give the single card a max width that matches the other cards
+      grid-column: 1 / 4;
+    }
   }
 }
 
@@ -90,11 +92,51 @@
 .package-update-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
+  height: 100%;
 
-  // Make buttons smaller so the list is not that big
-  button {
-    padding: 3px 12px;
-    font-size: 94%;
+  .package-update-accordion {
+    min-width: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    cursor: pointer;
   }
+
+  .package-update-details {
+    margin: 0;
+    width: 100%;
+  }
+
+  .package-update-actions {
+    align-self: stretch;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  @media screen and (max-width: 80rem) {
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    gap: 10px;
+
+    .package-update-details {
+      padding-left: 1rem;
+      > li {
+        font-size: 0.7rem;
+      }
+    }
+    .package-update-actions {
+      flex-direction: row;
+      justify-content: flex-end;
+      align-items: flex-start;
+    }
+  }
+}
+
+// Make buttons smaller so the list is not that big
+button {
+  padding: 3px 12px;
+  font-size: 94%;
 }

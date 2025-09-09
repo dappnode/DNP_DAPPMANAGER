@@ -30,7 +30,6 @@ import {
   PortToOpen,
   UpnpTablePortStatus,
   ApiTablePortStatus,
-  RebootRequiredScript,
   HostStatCpu,
   HostStatMemory,
   HostStatDisk,
@@ -41,10 +40,20 @@ import {
   CurrentWifiCredentials,
   WifiReport,
   WireguardDeviceCredentials,
-  DockerUpgradeRequirements
+  DockerUpgradeRequirements,
+  InstalledPackageData
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
+import {
+  CustomEndpoint,
+  GatusEndpoint,
+  Notification,
+  NotificationPayload,
+  NotificationsConfig,
+  NotificationsSettingsAllDnps,
+  NotifierSubscription
+} from "./notifications.js";
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
@@ -120,10 +129,18 @@ export interface Routes {
   }) => Promise<void>;
 
   /** Gets the staker configuration for a given network */
-  stakerConfigGet: <T extends Network>(network: T) => Promise<StakerConfigGet>;
+  stakerConfigGet: (kwargs: { network: Network }) => Promise<StakerConfigGet>;
 
   /** Sets the staker configuration for a given network */
   stakerConfigSet: (kwargs: { stakerConfig: StakerConfigSet }) => Promise<void>;
+
+  /**
+   * Returns the consensus client for a given network
+   * @param network Network to get the consensus client for
+   */
+  consensusClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
@@ -237,11 +254,6 @@ export interface Routes {
   getEthicalMetricsConfig: () => Promise<EthicalMetricsConfig | null>;
 
   /**
-   * Returns true if dappnode connected to internet
-   */
-  getIsConnectedToInternet: () => Promise<boolean>;
-
-  /**
    * Return formated core update data
    */
   fetchCoreUpdateData: (kwarg: { version?: string }) => Promise<CoreUpdateData>;
@@ -262,6 +274,105 @@ export interface Routes {
   fetchDnpRequest: (kwargs: { id: string; version?: string }) => Promise<RequestedDnp>;
 
   /**
+   * Sends custom notification to notifier service
+   */
+  notificationsSendCustom(kwargs: {
+    notificationPayload: NotificationPayload;
+    subscriptionEndpoint?: string;
+  }): Promise<void>;
+
+  /**
+   * Get all the notifications
+   */
+  notificationsGetAll(): Promise<Notification[]>;
+
+  /**
+   * Get banner notifications that should be displayed within the given timestamp range
+   */
+  notificationsGetBanner(kwargs: { timestamp: number }): Promise<Notification[]>;
+
+  /**
+   * Get unseen notifications count
+   */
+  notificationsGetUnseenCount(): Promise<number>;
+
+  /**
+   * Gatus get endpoints
+   */
+  notificationsGetAllEndpoints(): Promise<{
+    [dnpName: string]: { endpoints: GatusEndpoint[]; customEndpoints: CustomEndpoint[]; isCore: boolean };
+  }>;
+
+  /**
+   * Set all non-banner notifications as seen
+   */
+  notificationsSetAllSeen(): Promise<void>;
+
+  /**
+   * Set a notification as seen by providing its correlationId
+   */
+  notificationSetSeenByCorrelationID(kwargs: { correlationId: string }): Promise<void>;
+
+  /**
+   * Gatus update endpoint
+   */
+  notificationsUpdateEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    notificationsConfig: NotificationsConfig;
+  }) => Promise<void>;
+
+  /**
+   * Applies the previous endpoints configuration to the new ones if their names match
+   */
+  notificationsApplyPreviousEndpoints: (kwargs: {
+    dnpName: string;
+    isCore: boolean;
+    newNotificationsConfig: NotificationsConfig;
+  }) => Promise<NotificationsConfig>;
+
+  /**
+   * Returns notifications package status
+   */
+  notificationsPackageStatus: () => Promise<{
+    notificationsDnp: InstalledPackageData | null;
+    isInstalled: boolean;
+    isRunning: boolean;
+    isNotifierRunning: boolean;
+    servicesNotRunning: string[];
+  }>;
+
+  /**
+   * Returns notifications package status
+   */
+  notificationsGetVapidKey: () => Promise<string | null>;
+
+  /**
+   * Returns all subs from notifier
+   */
+  notificationsGetSubscriptions(): Promise<NotifierSubscription[] | null>;
+
+  /**
+   * Updates a subscription alias from notifier by its endpoint
+   */
+  notificationsUpdateSubAlias(kwargs: { endpoint: string; alias: string }): Promise<void>;
+
+  /**
+   * Deletes a subscription from notifier by its endpoint
+   */
+  notificationsDeleteSubscription(kwargs: { endpoint: string }): Promise<void>;
+
+  /**
+   * Posts a new subscription to notifier
+   */
+  notificationsPostSubscription(kwargs: { subscription: NotifierSubscription }): Promise<void>;
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  notificationsSendSubTest(kwargs: { endpoint?: string }): Promise<void>;
+
+  /**
    * Returns the user action logs. This logs are stored in a different
    * file and format, and are meant to ease user support
    * The list is ordered from newest to oldest. Newest log has index = 0
@@ -277,6 +388,8 @@ export interface Routes {
    */
   getHostUptime: () => Promise<string>;
 
+  /** HTTPs Portal: add the PWA mapping */
+  httpsPortalPwaMappingAdd(): Promise<void>;
   /** HTTPs Portal: map a subdomain */
   httpsPortalMappingAdd(kwargs: { mapping: HttpsPortalMapping }): Promise<void>;
   /** HTTPs Portal: remove an existing mapping */
@@ -302,6 +415,13 @@ export interface Routes {
    * Gets the Ipfs client target
    */
   ipfsClientTargetGet(): Promise<IpfsRepository>;
+
+  /**
+   * Returns the keystores imported for the given networks.
+   */
+  keystoresGetByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, Record<string, string[]> | null>>>;
 
   /**
    * Local proxying allows to access the admin UI through dappnode.local.
@@ -389,6 +509,7 @@ export interface Routes {
     name: string;
     version?: string;
     userSettings?: UserSettingsAllDnps;
+    notificationsSettings?: NotificationsSettingsAllDnps;
     options?: {
       /**
        * Forwarded option to dappGet
@@ -515,14 +636,90 @@ export interface Routes {
   portsApiStatusGet: (kwargs: { portsToOpen: PortToOpen[] }) => Promise<ApiTablePortStatus[]>;
 
   /**
+   * Returns the Premium package status
+   */
+  premiumPkgStatus: () => Promise<{
+    premiumDnpInstalled: boolean;
+    premiumDnpRunning: boolean;
+  }>;
+
+  /**
+   * Sets current license key
+   * @param licenseKey License key to set
+   */
+  premiumSetLicenseKey: (licenseKey: string) => Promise<void>;
+
+  /**
+   * Returns your current license key and hash
+   */
+  premiumGetLicenseKey: () => Promise<{
+    key: string;
+    hash: string;
+  }>;
+
+  /**
+   * Activates premium license key
+   */
+  premiumActivateLicense: () => Promise<void>;
+
+  /**
+   * Deactivates premium license key
+   */
+  premiumDeactivateLicense: () => Promise<void>;
+
+  /**
+   * Checks if the premium license is active
+   */
+  premiumIsLicenseActive: () => Promise<boolean>;
+
+  /**
+   * Activates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupActivate: (id: string) => Promise<void>;
+
+  /**
+   * Deactivates the beacon node backup
+   * @param id the hashed license
+   */
+  premiumBeaconBackupDeactivate: (id: string) => Promise<void>;
+
+  /**
+   * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
+   *
+   * - Determines if the backup is activable.
+   * - Determines if the backup is currently active.
+   * - Returns time remaining until activation becomes possible in seconds (if not activable).
+   * - Returns time remaining until deactivation in seconds (if currently active).
+   *
+   * @param hashedLicense The hashed license string used to identify the key.
+   */
+  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
+    validatorLimit: number; // The maximum number of validators that can be backed up
+    isActivable: boolean;
+    isActive: boolean;
+    secondsUntilActivable?: number;
+    secondsUntilDeactivation?: number;
+  }>;
+
+  /**
+   * Returns the PWA mapping URL if it exists, otherwise returns undefined.
+   */
+  pwaUrlGet: () => Promise<string | undefined>;
+
+  /**
+   * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
+   */
+  pwaRequirementsGet: () => Promise<{
+    httpsDnpInstalled: boolean;
+    isHttpsRunning: boolean;
+    pwaMappingUrl: string | undefined;
+  }>;
+
+  /**
    * Reboots the host machine via the DBus socket
    */
   rebootHost: () => Promise<void>;
-
-  /**
-   *  Returns true if a reboot is required
-   */
-  rebootHostIsRequiredGet: () => Promise<RebootRequiredScript>;
 
   /** Add a release key to trusted keys db */
   releaseTrustedKeyAdd(newTrustedKey: TrustedReleaseKey): Promise<void>;
@@ -613,6 +810,14 @@ export interface Routes {
   natRenewalIsEnabled: () => Promise<boolean>;
 
   /**
+   * Returns the active validators by network
+   * @param networks Array of networks to retrieve its active validators
+   */
+  validatorsFilterActiveByNetwork(kwargs: {
+    networks: Network[];
+  }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -667,6 +872,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   copyFileToDockerContainer: { log: true },
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
+  consensusClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },
@@ -684,14 +890,30 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },
-  getIsConnectedToInternet: {},
   disableEthicalMetrics: { log: true },
   fetchCoreUpdateData: {},
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  notificationsSendCustom: {},
+  notificationsGetAll: {},
+  notificationsGetBanner: {},
+  notificationsGetUnseenCount: {},
+  notificationsGetAllEndpoints: {},
+  notificationsSetAllSeen: {},
+  notificationSetSeenByCorrelationID: {},
+  notificationsUpdateEndpoints: {},
+  notificationsApplyPreviousEndpoints: {},
+  notificationsPackageStatus: {},
+  notificationsGetVapidKey: {},
+  notificationsGetSubscriptions: {},
+  notificationsUpdateSubAlias: {},
+  notificationsDeleteSubscription: {},
+  notificationsPostSubscription: {},
+  notificationsSendSubTest: {},
   getUserActionLogs: {},
   getHostUptime: {},
+  httpsPortalPwaMappingAdd: { log: true },
   httpsPortalMappingAdd: { log: true },
   httpsPortalMappingRemove: { log: true },
   httpsPortalMappingsGet: {},
@@ -700,6 +922,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   ipfsTest: {},
   ipfsClientTargetSet: {},
   ipfsClientTargetGet: {},
+  keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},
   lvmhardDisksGet: {},
@@ -731,8 +954,18 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   portsToOpenGet: {},
   portsUpnpStatusGet: {},
   portsApiStatusGet: {},
+  premiumPkgStatus: {},
+  premiumSetLicenseKey: { log: true },
+  premiumGetLicenseKey: { log: true },
+  premiumActivateLicense: { log: true },
+  premiumDeactivateLicense: { log: true },
+  premiumIsLicenseActive: { log: true },
+  premiumBeaconBackupActivate: { log: true },
+  premiumBeaconBackupDeactivate: { log: true },
+  premiumBeaconBackupStatus: { log: true },
+  pwaUrlGet: {},
+  pwaRequirementsGet: {},
   rebootHost: { log: true },
-  rebootHostIsRequiredGet: {},
   releaseTrustedKeyAdd: { log: true },
   releaseTrustedKeyList: {},
   releaseTrustedKeyRemove: { log: true },
@@ -754,6 +987,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   updateUpgrade: { log: true },
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
+  validatorsFilterActiveByNetwork: { log: true },
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

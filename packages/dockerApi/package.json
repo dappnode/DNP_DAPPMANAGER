@@ -34,7 +34,6 @@
     "@types/dockerode": "^3.3.23",
     "@types/memoizee": "0.4.4",
     "@types/mocha": "^10",
-    "@types/node": "^20.14.10",
     "@types/tar-stream": "2.1.0",
     "mocha": "^10.7.0",
     "rewiremock": "^3.13.7"

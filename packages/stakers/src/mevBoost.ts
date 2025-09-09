@@ -1,4 +1,12 @@
-import { MevBoostHolesky, MevBoostMainnet, MevBoostPrater, Network, StakerItem, UserSettings } from "@dappnode/types";
+import {
+  MevBoostHolesky,
+  MevBoostHoodi,
+  MevBoostMainnet,
+  MevBoostPrater,
+  Network,
+  StakerItem,
+  UserSettings
+} from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
@@ -12,6 +20,7 @@ export class MevBoost extends StakerComponent {
     [Network.Gnosis]: db.mevBoostGnosis,
     [Network.Prater]: db.mevBoostPrater,
     [Network.Holesky]: db.mevBoostHolesky,
+    [Network.Hoodi]: db.mevBoostHoodi,
     [Network.Lukso]: db.mevBoostLukso
   };
 
@@ -27,6 +36,10 @@ export class MevBoost extends StakerComponent {
     },
     [Network.Holesky]: {
       dnpName: MevBoostHolesky.Mevboost,
+      minVersion: "0.1.0"
+    },
+    [Network.Hoodi]: {
+      dnpName: MevBoostHoodi.Mevboost,
       minVersion: "0.1.0"
     },
     [Network.Lukso]: null
@@ -75,7 +88,7 @@ export class MevBoost extends StakerComponent {
         userSettings
       });
 
-      this.DbHandlers[network].set(true);
+      await this.DbHandlers[network].set(true);
     }
   }
 
@@ -84,6 +97,7 @@ export class MevBoost extends StakerComponent {
     await super.setNew({
       newStakerDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      fullnodeAliases: [`mev-boost.${network}.dncore.dappnode`],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       userSettings: newMevBoostDnpName ? this.getUserSettings(network, newRelays) : {},
       prevClient: compatibleMevBoost ? compatibleMevBoost.dnpName : null
@@ -127,6 +141,9 @@ export class MevBoost extends StakerComponent {
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {
             aliases: [`${mevBoostServiceName}.${network}.dncore.dappnode`]
+          },
+          [params.DOCKER_PRIVATE_NETWORK_NEW_NAME]: {
+            aliases: [`${mevBoostServiceName}.${network}.dappnode.private`]
           }
         }
       }

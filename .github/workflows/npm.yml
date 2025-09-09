@@ -18,6 +18,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Enable Corepack
+        run: corepack enable
+
       - name: Validate package name
         run: |
           if [[ ${{ github.event.inputs.packageName }} != "schemas" && ${{ github.event.inputs.packageName }} != "types" && ${{ github.event.inputs.packageName }} != "toolkit" ]]; then
@@ -41,10 +44,13 @@ jobs:
       - name: Install dependencies and build
         run: yarn && yarn build
 
+      - name: Configure Yarn for Authentication
+        run: yarn config set npmAuthToken "${{ secrets.NPM_TOKEN }}"
+
       - name: Build and Publish
         run: |
           cd packages/${{ github.event.inputs.packageName }}
-          yarn publish --new-version ${{ github.event.inputs.version }} --access public --non-interactive --no-git-tag-version
+          yarn npm publish --tag ${{ github.event.inputs.version }} --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

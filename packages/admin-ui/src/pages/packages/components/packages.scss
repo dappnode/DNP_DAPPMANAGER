@@ -25,7 +25,7 @@
 
   @media screen and (max-width: 40rem) {
     grid-template-columns:
-      1.65rem
+      1.5rem
       min-content
       minmax(5rem, auto)
       minmax(calc(var(--icon-size) / 2), min-content);
@@ -35,8 +35,8 @@
     }
 
     .state-badge {
-      height: 1.65rem;
-      border-radius: 1.65rem;
+      height: 1rem;
+      border-radius: 1rem;
       .content {
         display: none;
       }
@@ -160,42 +160,5 @@
   }
   > *:not(:last-child) {
     margin-bottom: var(--default-spacing);
-  }
-}
-
-.horizontal-navbar {
-  display: block;
-  text-align: center;
-  margin-bottom: 0.5rem !important;
-  .item-container {
-    background-color: transparent;
-    border: none;
-    margin-bottom: 1rem;
-    padding-bottom: 0.3rem;
-    padding-left: 0;
-    font-size: 1.2rem;
-    &:not(:last-child) {
-      padding-right: 1rem;
-      margin-right: 1rem;
-      border-right: var(--border-style);
-    }
-    &:hover {
-      color: inherit;
-    }
-
-    // Remove the border (outline) on click
-    &:focus {
-      outline: none;
-    }
-  }
-  .item {
-    color: #7b7d7f;
-    border: none;
-    padding-bottom: 0.3rem;
-    cursor: pointer;
-    &.active {
-      color: #212529;
-      border-bottom: 5px solid var(--dappnode-strong-main-color);
-    }
   }
 }

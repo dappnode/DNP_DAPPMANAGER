@@ -43,10 +43,10 @@ export const ContainerList = ({ dnp }: { dnp: InstalledPackageData }) => {
   return (
     <div className="info-container-list">
       <div className="list-grid containers">
-        <header className="center">Status</header>
-        <header></header>
-        <header className="center">Pause</header>
-        <header className="center">Restart</header>
+        <header className="title-label">Status</header>
+        <header className="title-label"></header>
+        <header className="title-label">Pause</header>
+        <header className="title-label">Restart</header>
 
         {/* DNP entry */}
         <React.Fragment>

@@ -12,24 +12,13 @@ if (!Array.isArray(sidenavItems)) throw Error("sidenavItems must be an array");
 if (!Array.isArray(fundedBy)) throw Error("fundedBy must be an array");
 
 export default function SideBar({ screenWidth }: { screenWidth: number }) {
-  const { theme, rollupsModuleStatus, stakersModuleStatus } = React.useContext(AppContext);
+  const { theme } = React.useContext(AppContext);
 
-  const stakersItem = sidenavItems.find((item) => item.name === "Stakers");
-  if (stakersItem) {
-    if (stakersModuleStatus === "enabled") stakersItem.show = true;
-    else stakersItem.show = false;
-  }
-  const rollupsItem = sidenavItems.find((item) => item.name === "Rollups");
-  if (rollupsItem) {
-    if (rollupsModuleStatus === "enabled") rollupsItem.show = true;
-    else rollupsItem.show = false;
-  }
   const [coreVersion, setCoreVersion] = useState("");
   useEffect(() => {
     async function getCoreVersion(): Promise<void> {
       setCoreVersion(await api.getCoreVersion());
     }
-
     getCoreVersion();
   }, []);
 
@@ -46,12 +35,21 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
       <div className="nav">
         {sidenavItems
           .filter((item) => item.show === true)
-          .map((item) => (
-            <NavLink className={`sidenav-item selectable`} to={item.href}>
-              <item.icon />
-              {screenWidth > 640 && <span className="name svg-text">{item.name}</span>}
-            </NavLink>
-          ))}
+          .map((item) => {
+            const basePath = item.href.split("/")[0];
+            const baseLocationPath = location.pathname.substring(1).split("/")[0];
+            const isActive = baseLocationPath === basePath;
+            return (
+              <NavLink
+                className={`sidenav-item selectable ${isActive && "active"} ${item.name === "Premium" &&
+                  "premium-item"}`}
+                to={item.href}
+              >
+                <item.icon />
+                {screenWidth > 640 && <span className="name svg-text">{item.name}</span>}
+              </NavLink>
+            );
+          })}
       </div>
 
       {/* spacer keeps the funded-by section at the bottom (if possible) */}

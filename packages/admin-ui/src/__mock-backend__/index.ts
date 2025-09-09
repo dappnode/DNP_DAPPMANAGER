@@ -183,10 +183,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   newFeatureStatusSet: async () => {},
   poweroffHost: async () => {},
   rebootHost: async () => {},
-  rebootHostIsRequiredGet: async () => ({
-    rebootRequired: true,
-    pkgs: "docker"
-  }),
   setStaticIp: async () => {},
 
   systemInfoGet: async () => ({
@@ -385,8 +381,74 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     dockerHostVersion: "20.10.7",
     dockerLatestVersion: "20.10.8"
   }),
-  getIsConnectedToInternet: async () => false,
-  getCoreVersion: async () => "0.2.92"
+  getCoreVersion: async () => "0.2.92",
+  notificationsSendCustom: async () => {},
+  notificationsGetAllEndpoints: async () => {
+    return { "geth.dnp.dappnode.eth": { endpoints: [], customEndpoints: [], isCore: false } };
+  },
+  notificationsGetUnseenCount: async () => 2,
+  notificationsSetAllSeen: async () => {},
+  notificationSetSeenByCorrelationID: async () => {},
+  notificationsUpdateEndpoints: async () => {},
+  notificationsGetAll: async () => [],
+  notificationsGetBanner: async () => [],
+  notificationsApplyPreviousEndpoints: async () => {
+    return { endpoints: [], customEndpoints: [] };
+  },
+  notificationsPackageStatus: async () => ({
+    notificationsDnp: null,
+    isInstalled: false,
+    isRunning: false,
+    isNotifierRunning: false,
+    servicesNotRunning: []
+  }),
+  notificationsGetVapidKey: async () => "B3N1b2JzY3JpcHRpb25LZXk6IHNvbWUtdmFwaWQta2V5",
+  notificationsGetSubscriptions: async () => [],
+  notificationsPostSubscription: async () => {},
+  notificationsUpdateSubAlias: async () => {},
+  notificationsDeleteSubscription: async () => {},
+  notificationsSendSubTest: async () => {},
+  pwaUrlGet: async () => "https://pwa.abcdef.dyndns.dappnode.io",
+  pwaRequirementsGet: async () => ({
+    pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
+    httpsDnpInstalled: true,
+    isHttpsRunning: true
+  }),
+  premiumPkgStatus: async () => ({
+    premiumDnpInstalled: true,
+    premiumDnpRunning: true
+  }),
+  premiumSetLicenseKey: async () => {},
+  premiumGetLicenseKey: async () => ({
+    key: "ABCDEF-123456-ABCDEF-123456-ABCDEF-V1",
+    hash: "1234567890abcdef1234567890abcdef1234567890"
+  }),
+  premiumActivateLicense: async () => {},
+  premiumDeactivateLicense: async () => {},
+  premiumIsLicenseActive: async () => false,
+  consensusClientsGetByNetworks: async () => {
+    return {
+      mainnet: "prysm.dnp.dappnode.eth",
+      gnosis: "prysm-gnosis.dnp.dappnode.eth"
+    };
+  },
+  premiumBeaconBackupActivate: async () => {},
+  premiumBeaconBackupDeactivate: async () => {},
+  premiumBeaconBackupStatus: async () => ({
+    validatorLimit: 10,
+    isActivable: false,
+    isActive: true,
+    secondsUntilDeactivation: 259200
+  }),
+  keystoresGetByNetwork: async () => ({
+    mainnet: { solo: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: null
+  }),
+  validatorsFilterActiveByNetwork: async () => ({
+    mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
+    hoodi: { validators: [] },
+    gnosis: null
+  })
 };
 
 export const calls: Routes = {

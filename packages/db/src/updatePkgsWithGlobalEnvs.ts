@@ -16,6 +16,7 @@ import { logs } from "@dappnode/logger";
  * TODO: find a proper way to restart pkgs with global envs defined in the env_file (through manifest > globalEnvs = {all: true})
  */
 export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValue: string): Promise<void> {
+  // Must be
   const packages = await listPackageContainers();
 
   const pkgsWithGlobalEnv = packages.filter(
@@ -30,15 +31,28 @@ export async function updatePkgsWithGlobalEnvs(globalEnvKey: string, globEnvValu
     const compose = new ComposeFileEditor(pkg.dnpName, pkg.isCore);
     const services = Object.values(compose.services());
     const environmentsByService: { [serviceName: string]: PackageEnvs }[] = [];
+    let needsUpdate = false;
     for (const service of services) {
       const serviceEnvs = service.getEnvs();
       if (globalEnvKey in serviceEnvs) {
-        environmentsByService.push({
-          [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
-        });
+        const currentVal = serviceEnvs[globalEnvKey];
+        if (currentVal === globEnvValue) {
+          logs.debug(`Global env ${globalEnvKey} for ${pkg.dnpName} already set to ${globEnvValue}, skipping update`);
+        } else if (!currentVal && (!globEnvValue || globEnvValue === "false")) {
+          // empty strings are determined as false values within packages. Dappmanager 0.2.103 and below sets glob envs bool false values as empty strings
+          logs.debug(`Global env ${globalEnvKey} for ${pkg.dnpName} already nullish, skipping update`);
+        } else {
+          logs.info(`Updating global env ${globalEnvKey} for ${pkg.dnpName} from ${currentVal} to ${globEnvValue}`);
+          needsUpdate = true;
+          environmentsByService.push({
+            [pkg.serviceName]: { [globalEnvKey]: globEnvValue }
+          });
+        }
       }
     }
-    if (environmentsByService.length === 0) continue;
+    if (!needsUpdate) {
+      continue;
+    }
     const environmentByService: {
       [serviceName: string]: PackageEnvs;
     } = environmentsByService.reduce((acc, curr) => ({ ...acc, ...curr }), {});

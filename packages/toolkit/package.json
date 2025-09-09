@@ -26,7 +26,6 @@
   "license": "ISC",
   "devDependencies": {
     "@types/mocha": "^10",
-    "@types/node": "^20.14.10",
     "@types/semver": "^7.3.13",
     "mocha": "^10.7.0",
     "rimraf": "^5.0.0",
@@ -36,15 +35,15 @@
   },
   "dependencies": {
     "@dappnode/types": "workspace:^0.1.0",
-    "@ipld/car": "^5.3.2",
+    "@ipld/car": "^5.4.0",
     "esm": "^3.2.25",
     "ethers": "^6.10.0",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
-    "ipfs-unixfs-exporter": "^13.5.0",
+    "ipfs-unixfs-exporter": "^13.6.2",
     "is-ipfs": "^8.0.1",
-    "kubo-rpc-client": "^4.1.1",
-    "multiformats": "^13.2.2",
+    "kubo-rpc-client": "^5.1.0",
+    "multiformats": "^13.3.2",
     "semver": "^7.5.0",
     "yaml": "^2.4.5"
   },

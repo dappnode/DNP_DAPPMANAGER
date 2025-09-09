@@ -27,8 +27,13 @@
 
 .user-log {
   padding: 0 !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15) !important;
+
   > div {
     padding: var(--default-spacing);
+    @media (max-width: 40rem) {
+      padding: 0.7rem;
+    }
   }
   > .show {
     padding-top: 0;
@@ -45,7 +50,18 @@
     font-size: 90%;
     opacity: 0.6;
   }
+
   .log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media (max-width: 40rem) {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
+  }
+
+  .log-title {
     margin-bottom: 10px;
   }
   .reply {
@@ -59,9 +75,9 @@
      Using user-logs > x, to win the bootstrap css in specificity
   */
 
-   /* Polish bootstrap style */
+  /* Polish bootstrap style */
 
   .badge {
     margin-right: 0.5rem;
-    }
   }
+}

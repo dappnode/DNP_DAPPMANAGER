@@ -10,12 +10,14 @@ import {
   rollbackPackages,
   writeAndValidateFiles,
   postInstallClean,
-  afterInstall
+  afterInstall,
+  checkInstallRequirements
 } from "../installer/index.js";
 import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
 import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
+import { sendCoreInstalledResolvedNotification } from "../installer/sendCoreInstallResolvedNotification.js";
 
 /**
  * Installs a DAppNode Package.
@@ -31,7 +33,13 @@ import { DappnodeInstaller } from "../dappnodeInstaller.js";
  */
 export async function packageInstall(
   dappnodeInstaller: DappnodeInstaller,
-  { name: reqName, version: reqVersion, userSettings = {}, options = {} }: Parameters<Routes["packageInstall"]>[0]
+  {
+    name: reqName,
+    version: reqVersion,
+    userSettings = {},
+    notificationsSettings = {},
+    options = {}
+  }: Parameters<Routes["packageInstall"]>[0]
 ): Promise<void> {
   // 1. Parse the id into a request
   const req: PackageRequest = {
@@ -53,12 +61,16 @@ export async function packageInstall(
       if (!release.signedSafe && !options.BYPASS_SIGNED_RESTRICTION) {
         throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
+      if (!release.isCore) await checkInstallRequirements({ manifest: release.manifest });
+      if (!release.signedSafe && release.dnpName === "premium.dnp.dappnode.eth")
+        throw Error(`Package ${release.dnpName} can only be installed as signed`);
     }
 
     // Gather all data necessary for the install
     const packagesData = await getInstallerPackagesData({
       releases,
       userSettings,
+      notificationsSettings,
       currentVersions,
       reqName
     });
@@ -87,6 +99,7 @@ export async function packageInstall(
 
       await postInstallClean(packagesData, log);
       afterInstall(dnpNames);
+      await sendCoreInstalledResolvedNotification(packagesData);
       logUiClear({ id });
     } catch (e) {
       afterInstall(dnpNames);

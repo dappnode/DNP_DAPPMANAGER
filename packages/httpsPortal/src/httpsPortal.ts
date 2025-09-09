@@ -26,6 +26,58 @@ export class HttpsPortal {
   }
 
   /**
+   * Remove a PWA internal mapping for dappmanager
+   */
+  async removePwaMappingIfExists(): Promise<void> {
+    const fromSubdomain = "pwa";
+    const dnpName = params.dappmanagerDnpName;
+
+    const hasMapping = (await this.getMappings()).some(
+      (mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName
+    );
+
+    if (!hasMapping) {
+      logs.info(`PWA mapping for ${dnpName} does not exist.`);
+      return;
+    }
+
+    logs.info(`Removing PWA mapping for ${dnpName}...`);
+    await this.removeMapping({
+      fromSubdomain,
+      dnpName,
+      serviceName: dnpName,
+      port: 80,
+      external: false // Internal mapping, not exposed to the internet
+    });
+  }
+
+  /**
+   * Add a PWA internal mapping for dappmanager
+   */
+  async addPwaMappingIfNotExists(): Promise<void> {
+    const fromSubdomain = "pwa";
+    const dnpName = params.dappmanagerDnpName;
+
+    const hasMapping = (await this.getMappings()).some(
+      (mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName
+    );
+
+    if (hasMapping) {
+      logs.info(`PWA mapping for ${dnpName} already exists.`);
+      return;
+    }
+
+    logs.info(`Adding PWA mapping for ${dnpName}...`);
+    await this.addMapping({
+      fromSubdomain,
+      dnpName,
+      serviceName: dnpName,
+      port: 80,
+      external: false // Internal mapping, not exposed to the internet
+    });
+  }
+
+  /**
    * Expose an internal container to the external internet through the https-portal
    */
   async addMapping(mapping: HttpsPortalMapping): Promise<void> {
@@ -61,7 +113,8 @@ export class HttpsPortal {
     await this.httpsPortalApiClient.add({
       fromSubdomain: mapping.fromSubdomain,
       toHost: `${externalNetworkAlias}:${mapping.port}`,
-      auth: mapping.auth
+      auth: mapping.auth,
+      external: mapping.external
     });
 
     // Edit compose to persist the setting
@@ -90,7 +143,8 @@ export class HttpsPortal {
     // Call Http Portal API to remove the mapping
     await this.httpsPortalApiClient.remove({
       fromSubdomain: mapping.fromSubdomain,
-      toHost: externalNetworkAlias
+      toHost: externalNetworkAlias,
+      external: mapping.external
     });
 
     // If container still has mappings, don't disconnect from network
@@ -123,7 +177,7 @@ export class HttpsPortal {
     }
 
     const mappings: HttpsPortalMapping[] = [];
-    for (const { fromSubdomain, toHost, auth } of entries) {
+    for (const { fromSubdomain, toHost, auth, external } of entries) {
       const [alias, port] = toHost.split(":");
       const container = aliases.get(alias);
       if (container) {
@@ -132,7 +186,8 @@ export class HttpsPortal {
           dnpName: container.dnpName,
           serviceName: container.serviceName,
           port: parseInt(port) || 80,
-          auth
+          auth,
+          external
         });
       }
     }
@@ -213,7 +268,8 @@ export class HttpsPortal {
           fromSubdomain: exposable.fromSubdomain || prettyDnpName(pkg.dnpName), // get dnpName by default
           dnpName: pkg.dnpName,
           serviceName: exposable.serviceName || Object.keys(pkg.compose.services)[0], // get first service name by default (docs: https://docs.dappnode.io/es/developers/manifest-reference/#servicename)
-          port: exposable.port
+          port: exposable.port,
+          external: exposable.external || true
         };
 
         if (currentMappings.length > 0 && currentMappings.includes(portalMapping)) continue;

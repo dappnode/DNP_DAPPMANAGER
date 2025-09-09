@@ -86,7 +86,7 @@ describe("Util: logs", () => {
     });
   });
 
-  it("should should limit the size of the string object properties", () => {
+  it("should limit the size of the string object properties", () => {
     const obj = {
       longProp: "1".repeat(2 * maxLength),
       shortProp: "1"

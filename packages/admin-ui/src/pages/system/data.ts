@@ -20,9 +20,9 @@ export const subPaths = {
   peers: "add-ipfs-peer",
   power: "power",
   profile: "profile",
-  notifications: "notifications",
   advanced: "advanced",
-  hardware: "hardware"
+  hardware: "hardware",
+  app: "app"
 };
 
 // Computed paths

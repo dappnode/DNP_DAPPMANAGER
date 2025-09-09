@@ -1068,7 +1068,7 @@ contract ACL is IACL, AragonApp, ACLHelpers {
     }
 
     /**
-    * @dev Revokes permission if allowed. This requires `msg.sender` to be the the permission manager
+    * @dev Revokes permission if allowed. This requires `msg.sender` to be the permission manager
     * @notice Revokes `_entity` the ability to perform actions of role `_role` on `_app`
     * @param _entity Address of the whitelisted entity to revoke access from
     * @param _app Address of the app in which the role will be revoked
@@ -1271,7 +1271,7 @@ contract ACL is IACL, AragonApp, ACLHelpers {
             return (r1 && !r2) || (!r1 && r2);
         }
 
-        return r2; // both or and and depend on result of r2 after checks
+        return r2; // both or and depend on result of r2 after checks
     }
 
     function compare(uint256 _a, Op _op, uint256 _b) internal pure returns (bool) {

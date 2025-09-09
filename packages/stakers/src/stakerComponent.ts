@@ -5,7 +5,6 @@ import { logs } from "@dappnode/logger";
 import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
-import { isMatch } from "lodash-es";
 import { params } from "@dappnode/params";
 
 export class StakerComponent {
@@ -56,12 +55,14 @@ export class StakerComponent {
   protected async setNew({
     newStakerDnpName,
     dockerNetworkName,
+    fullnodeAliases,
     compatibleClients,
     userSettings,
     prevClient
   }: {
     newStakerDnpName: string | null | undefined;
     dockerNetworkName: string;
+    fullnodeAliases: string[];
     compatibleClients:
       | {
           dnpName: string;
@@ -83,7 +84,8 @@ export class StakerComponent {
     if (currentPkg) {
       if (prevClient && compatibleClients)
         this.ensureCompatibilityRequirements(prevClient, compatibleClients, currentPkg.version);
-      if (prevClient !== newStakerDnpName) await this.unsetStakerPkgConfig(currentPkg, dockerNetworkName);
+      if (prevClient !== newStakerDnpName)
+        await this.unsetStakerPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
     }
 
     if (!newStakerDnpName) return;
@@ -145,28 +147,19 @@ export class StakerComponent {
     dnpName: string;
     userSettings: UserSettings;
   }): Promise<void> {
-    let forceRecreate = false;
-
     if (userSettings) {
       const composeEditor = new ComposeFileEditor(dnpName, false);
 
-      const previousSettings = composeEditor.getUserSettings();
-
       composeEditor.applyUserSettings(userSettings, { dnpName });
-      const newSettings = composeEditor.getUserSettings();
-
-      if (!isMatch(previousSettings, newSettings)) {
-        composeEditor.write();
-        forceRecreate = true;
-        logs.info(`Settings for ${dnpName} have changed. Forcing recreation of containers.`);
-      }
+      // it must be called write after applying user settings otherwise the new settings will be lost and therefore the compose up will not have effect
+      composeEditor.write();
     }
 
     // start all containers
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
-      upAll: true,
-      dockerComposeUpOptions: { forceRecreate }
+      upAll: true
+      // dockerComposeUpOptions: { noRecreate: true }
     });
   }
 
@@ -176,8 +169,17 @@ export class StakerComponent {
    * - stops the staker pkg
    * - removes the staker network from the docker-compose file
    */
-  private async unsetStakerPkgConfig(pkg: InstalledPackageData, dockerNetworkName: string): Promise<void> {
+  private async unsetStakerPkgConfig({
+    pkg,
+    dockerNetworkName,
+    fullnodeAliases
+  }: {
+    pkg: InstalledPackageData;
+    dockerNetworkName: string;
+    fullnodeAliases: string[];
+  }): Promise<void> {
     this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
+    this.removeFullnodeAliasFromDncoreNetwork(pkg.dnpName, fullnodeAliases);
 
     // This recreates the package containers so that they include the recently added configuration
     // The flag --no-start is added so that the containers remain stopped after recreation
@@ -186,6 +188,26 @@ export class StakerComponent {
       upAll: false,
       dockerComposeUpOptions: { forceRecreate: true, noStart: true }
     });
+  }
+
+  private removeFullnodeAliasFromDncoreNetwork(dnpName: string, fullnodeAliases: string[]): void {
+    const composeEditor = new ComposeFileEditor(dnpName, false);
+    const services = composeEditor.compose.services;
+
+    for (const [, service] of Object.entries(services)) {
+      const serviceNetworks = service.networks;
+
+      if (!serviceNetworks || Array.isArray(serviceNetworks)) continue;
+
+      for (const [networkName, networkSettings] of Object.entries(serviceNetworks)) {
+        if (networkName === params.DOCKER_PRIVATE_NETWORK_NAME) {
+          const aliases = networkSettings.aliases;
+          if (aliases) networkSettings.aliases = aliases.filter((alias) => !fullnodeAliases.includes(alias));
+        }
+      }
+    }
+
+    composeEditor.write();
   }
 
   private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {

@@ -1,13 +1,31 @@
 .network-editor {
+  // Reduce padding on mobile so the card content is legible
+  @media (max-width: 40rem) {
+    padding: 0.7em !important;
+  }
+
+  .container-ips {
+    > ul {
+      margin-top: 5px;
+      margin-bottom: 0px;
+    }
+  }
+
   table {
     width: 100%;
 
     tr:not(:last-child) td,
     thead td {
       padding-bottom: var(--default-spacing);
+      @media (max-width: 40rem) {
+        padding-bottom: 0.2rem;
+      }
     }
     td:not(:last-child) {
       padding-right: var(--default-spacing);
+      @media (max-width: 40rem) {
+        padding-right: 0.2rem;
+      }
     }
   }
 
@@ -15,8 +33,16 @@
     color: var(--danger-color);
   }
 
-  .button-row {
+  // Reduce padding on mobile so the input content is legible
+  .port-mapping-input {
+    @media (max-width: 40rem) {
+      padding: 0;
+      text-align: center;
+    }
+  }
+  .port-mapping-actions {
     display: flex;
+    gap: var(--default-spacing);
     justify-content: space-between;
   }
 

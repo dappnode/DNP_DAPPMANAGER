@@ -17,7 +17,7 @@ export default function generateErrorMessage({
   totalCases: number;
   errors: DappGetErrors;
 }): string {
-  const errorMsgs = [];
+  const errorMsgs: string[] = [];
   // Timeout message
   if (hasTimedOut) errorMsgs.push(`Resolver timed out (${timeoutMs} ms).`);
   // Blame message

@@ -15,16 +15,13 @@ import { Login } from "./start-pages/Login";
 import { Register } from "./start-pages/Register";
 import { NoConnection } from "start-pages/NoConnection";
 // Types
-import { AppContextIface, Theme, UiModuleStatus } from "types";
+import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
+import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
-  stakersModuleStatus: "enabled",
-  rollupsModuleStatus: "disabled",
-  toggleTheme: () => {},
-  toggleStakersModuleStatus: () => {},
-  toggleRollupsModuleStatus: () => {}
+  toggleTheme: () => {}
 });
 
 const useLocalStorage = <T extends string>(
@@ -56,14 +53,6 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
-  const [stakersModuleStatus, setStakersModuleStatus] = useLocalStorage<UiModuleStatus>(
-    "stakersModuleStatus",
-    "enabled"
-  );
-  const [rollupsModuleStatus, setRollupsModuleStatus] = useLocalStorage<UiModuleStatus>(
-    "rollupsModuleStatus",
-    "disabled"
-  );
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
@@ -79,14 +68,19 @@ function MainApp({ username }: { username: string }) {
 
   const appContext: AppContextIface = {
     theme,
-    stakersModuleStatus,
-    rollupsModuleStatus,
-    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light")),
-    toggleStakersModuleStatus: () =>
-      setStakersModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled")),
-    toggleRollupsModuleStatus: () =>
-      setRollupsModuleStatus((curr: UiModuleStatus) => (curr === "enabled" ? "disabled" : "enabled"))
+    toggleTheme: () => setTheme((curr: Theme) => (curr === "light" ? "dark" : "light"))
   };
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+
+    html.classList.remove("light", "dark");
+    body.classList.remove("light", "dark");
+
+    html.classList.add(theme);
+    body.classList.add(theme);
+  }, [theme]);
 
   return (
     <AppContext.Provider value={appContext}>
@@ -97,6 +91,7 @@ function MainApp({ username }: { username: string }) {
           <ErrorBoundary>
             <NotificationsMain />
           </ErrorBoundary>
+          <PwaPermissionsAlert />
           <Routes>
             {/** Provide the app context only to the dashboard (where the modules switch is handled) */}
             {Object.values(pages).map(({ RootComponent, rootPath }) => (
@@ -119,6 +114,7 @@ function MainApp({ username }: { username: string }) {
         {/* Place here non-page components */}
         <Welcome />
         <Smooth />
+        <PwaPermissionsModal />
         <ToastContainer />
       </div>
     </AppContext.Provider>

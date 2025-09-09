@@ -20,16 +20,18 @@ export async function packageInstall({
   name: reqName,
   version: reqVersion,
   userSettings = {},
+  notificationsSettings = {},
   options = {}
 }: Parameters<Routes["packageInstall"]>[0]): Promise<void> {
   await pkgInstall(dappnodeInstaller, {
     name: reqName,
     version: reqVersion,
     userSettings,
+    notificationsSettings,
     options
   });
 
-  ensureNimbusConnection(reqName);
+  await ensureNimbusConnection(reqName);
 }
 
 /**
@@ -41,9 +43,10 @@ export async function packageInstall({
  *
  * TODO: Remove this once all Nimbus packages are multiservice
  */
-function ensureNimbusConnection(dnpName: string): void {
+async function ensureNimbusConnection(dnpName: string): Promise<void> {
   if (!dnpName.includes("nimbus")) {
     logs.debug("Not a Nimbus package, skipping network reconnection");
+    return;
   }
 
   logs.info("Ensuring Nimbus services are connected to the staker network");
@@ -54,7 +57,8 @@ function ensureNimbusConnection(dnpName: string): void {
     "nimbus.dnp.dappnode.eth": Network.Mainnet,
     "nimbus-prater.dnp.dappnode.eth": Network.Prater,
     "nimbus-gnosis.dnp.dappnode.eth": Network.Gnosis,
-    "nimbus-holesky.dnp.dappnode.eth": Network.Holesky
+    "nimbus-holesky.dnp.dappnode.eth": Network.Holesky,
+    "nimbus-hoodi.dnp.dappnode.eth": Network.Hoodi, // Remove all networks unless nimbus-gnosis? (still monoserivce) 
   };
 
   const network = nimbusNetwork[dnpName];
@@ -65,5 +69,5 @@ function ensureNimbusConnection(dnpName: string): void {
   }
 
   // Not awaited
-  consensus.persistSelectedConsensusIfInstalled(network);
+  await consensus.persistSelectedConsensusIfInstalled(network);
 }

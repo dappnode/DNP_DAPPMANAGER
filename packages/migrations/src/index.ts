@@ -1,155 +1,74 @@
 import { migrateUserActionLogs } from "./migrateUserActionLogs.js";
-import { removeLegacyDockerAssets } from "./removeLegacyDockerAssets.js";
-import { addAliasToRunningContainers } from "./addAliasToRunningContainers.js";
+import { removeDnsAndAddAlias } from "./removeDnsAndAddAlias.js";
 import { pruneUserActionLogs } from "./pruneUserActionLogs.js";
-import { removeDnsFromComposeFiles } from "./removeDnsFromComposeFiles.js";
-import { migrateDockerNetworkIpRange } from "./migrateDockerNetworkIpRange/index.js";
 import { recreateContainersIfLegacyDns } from "./recreateContainersIfLegacyDns.js";
 import { ensureCoreComposesHardcodedIpsRange } from "./ensureCoreComposesHardcodedIpsRange.js";
-import { addDappnodePeerToLocalIpfsNode } from "./addDappnodePeerToLocalIpfsNode.js";
-import { params } from "@dappnode/params";
-import { changeEthicalMetricsDbFormat } from "./changeEthicalMetricsDbFormat.js";
-import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
 import { determineIsDappnodeAws } from "./determineIsDappnodeAws.js";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
 
-export class MigrationError extends Error {
-  migration: string;
-  coreVersion: string;
-  constructor(migration: string, coreVersion: string) {
-    super();
-    this.migration = migration;
-    this.coreVersion = coreVersion;
-    super.message = `Migration ${migration} ${coreVersion} failed: ${super.message}`;
+class MigrationError extends Error {
+  errors: Error[];
+
+  constructor(errors: Error[]) {
+    super("One or more migrations failed");
+    this.name = "MigrationError";
+    this.errors = errors; // Retain the original error details
+  }
+
+  toString(): string {
+    return `${this.name}: ${this.message}\n` + this.errors.map((err) => err.message).join("\n");
   }
 }
 
-/**
- * Executes migrations required for the current DAppNode core version.
- */
-export async function executeMigrations(
-  execution: Execution,
-  consensus: Consensus,
-  signer: Signer,
-  mevBoost: MevBoost
-): Promise<void> {
-  const migrationErrors: MigrationError[] = [];
+interface Migration {
+  fn: () => Promise<void>;
+  migration: string;
+  coreVersion: string;
+}
 
-  await removeLegacyDockerAssets().catch((e) =>
-    migrationErrors.push({
-      migration: "bundle legacy ops to prevent spamming the docker API",
-      coreVersion: "0.2.30",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await migrateUserActionLogs().catch((e) =>
-    migrationErrors.push({
+export async function executeMigrations(): Promise<void> {
+  const migrations: Migration[] = [
+    {
+      fn: migrateUserActionLogs,
       migration: "migrate winston .log JSON file to a lowdb",
-      coreVersion: "0.2.30",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await pruneUserActionLogs().catch((e) =>
-    migrationErrors.push({
-      migration: "prune user action logs if the size is greater than 4 MB",
-      coreVersion: "0.2.59",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await removeDnsFromComposeFiles().catch((e) =>
-    migrationErrors.push({
-      migration: "remove bind DNS from docker compose files",
-      coreVersion: "0.2.82",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await ensureCoreComposesHardcodedIpsRange().catch((e) =>
-    migrationErrors.push({
-      migration: "ensure core composes files has correct hardcoded IPs in range",
-      coreVersion: "0.2.85",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await recreateContainersIfLegacyDns().catch((e) =>
-    migrationErrors.push({
-      migration: "remove legacy dns from running containers",
-      coreVersion: "0.2.85",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await migrateDockerNetworkIpRange({
-    dockerNetworkName: params.DOCKER_PRIVATE_NETWORK_NAME,
-    dockerNetworkSubnet: params.DOCKER_NETWORK_SUBNET,
-    dappmanagerContainer: {
-      name: params.dappmanagerContainerName,
-      ip: params.DAPPMANAGER_IP
+      coreVersion: "0.2.30"
     },
-    bindContainer: { name: params.bindContainerName, ip: params.BIND_IP }
-  }).catch((e) =>
-    migrationErrors.push({
-      migration: "ensure docker network configuration",
-      coreVersion: "0.2.85",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await addAliasToRunningContainers().catch((e) =>
-    migrationErrors.push({
+    {
+      fn: pruneUserActionLogs,
+      migration: "prune user action logs if the size is greater than 4 MB",
+      coreVersion: "0.2.59"
+    },
+    {
+      fn: ensureCoreComposesHardcodedIpsRange,
+      migration: "ensure core composes files has correct hardcoded IPs in range",
+      coreVersion: "0.2.85"
+    },
+    {
+      fn: recreateContainersIfLegacyDns,
+      migration: "remove legacy dns from running containers",
+      coreVersion: "0.2.85"
+    },
+    {
+      fn: removeDnsAndAddAlias,
       migration: "add docker alias to running containers",
-      coreVersion: "0.2.80",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await addDappnodePeerToLocalIpfsNode().catch((e) =>
-    migrationErrors.push({
-      migration: "add Dappnode peer to local IPFS node",
-      coreVersion: "0.2.88",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await changeEthicalMetricsDbFormat().catch((e) =>
-    migrationErrors.push({
-      migration: "change ethical metrics db format",
-      coreVersion: "0.2.92",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  await determineIsDappnodeAws().catch((e) =>
-    migrationErrors.push({
+      coreVersion: "0.2.80"
+    },
+    {
+      fn: determineIsDappnodeAws,
       migration: "determine if the dappnode is running in Dappnode AWS",
-      coreVersion: "0.2.94",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
+      coreVersion: "0.2.94"
+    }
+  ];
 
-  await createStakerNetworkAndConnectStakerPkgs(execution, consensus, signer, mevBoost).catch((e) =>
-    migrationErrors.push({
-      migration: "create docker staker network and persist selected staker pkgs per network",
-      coreVersion: "0.2.95",
-      name: "MIGRATION_ERROR",
-      message: e
-    })
-  );
-
-  if (migrationErrors.length > 0) throw migrationErrors;
+  // Run migrations one after another to ensure defined order
+  const migrationErrors: Error[] = [];
+  for (const { fn, migration, coreVersion } of migrations) {
+    try {
+      await fn();
+    } catch (e) {
+      migrationErrors.push(new Error(`Migration ${migration} (${coreVersion}) failed: ${e}`));
+    }
+  }
+  if (migrationErrors.length > 0) {
+    throw new MigrationError(migrationErrors);
+  }
 }

@@ -7,6 +7,7 @@ export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";
 export { cleanDb } from "./cleanDb.js";
 export { stakerConfigSet, stakerConfigGet } from "./stakerConfig.js";
+export { consensusClientsGetByNetworks } from "./consensusClientGet.js";
 export { copyFileToDockerContainer } from "./copyFileToDockerContainer.js";
 export { diagnose } from "./diagnose.js";
 export { dockerUpgradeCheck, dockerUpgrade } from "./dockerUpgrade.js";
@@ -21,7 +22,27 @@ export { fetchRegistry } from "./fetchRegistry.js";
 export { getCoreVersion } from "./getCoreVersion.js";
 export { getUserActionLogs } from "./getUserActionLogs.js";
 export { getHostUptime } from "./getHostUptime.js";
-export { getIsConnectedToInternet } from "./getIsConnectedToInternet.js";
+export { pwaUrlGet, pwaRequirementsGet } from "./pwaRequirementsGet.js";
+export { keystoresGetByNetwork } from "./keystoresGet.js";
+export { validatorsFilterActiveByNetwork } from "./validatorsFilterActive.js";
+export {
+  notificationsSendCustom,
+  notificationsGetAllEndpoints,
+  notificationsGetBanner,
+  notificationsUpdateEndpoints,
+  notificationsGetAll,
+  notificationsApplyPreviousEndpoints,
+  notificationsGetUnseenCount,
+  notificationsSetAllSeen,
+  notificationSetSeenByCorrelationID,
+  notificationsPackageStatus,
+  notificationsGetVapidKey,
+  notificationsGetSubscriptions,
+  notificationsPostSubscription,
+  notificationsUpdateSubAlias,
+  notificationsDeleteSubscription,
+  notificationsSendSubTest
+} from "./notifications.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
@@ -52,8 +73,18 @@ export { poweroffHost } from "./poweroffHost.js";
 export { portsApiStatusGet } from "./portsStatusGet.js";
 export { portsUpnpStatusGet } from "./portsStatusGet.js";
 export { portsToOpenGet } from "./portsToOpenGet.js";
+export {
+  premiumPkgStatus,
+  premiumSetLicenseKey,
+  premiumGetLicenseKey,
+  premiumActivateLicense,
+  premiumDeactivateLicense,
+  premiumIsLicenseActive,
+  premiumBeaconBackupActivate,
+  premiumBeaconBackupDeactivate,
+  premiumBeaconBackupStatus
+} from "./premium.js";
 export { rebootHost } from "./rebootHost.js";
-export { rebootHostIsRequiredGet } from "./rebootHostIsRequiredGet.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
 export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";

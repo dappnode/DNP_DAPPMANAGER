@@ -38,12 +38,8 @@
   .name {
     display: flex;
   }
-  .name .arrow {
-    margin-right: 0.5rem;
-    font-weight: 800;
-    color: var(--border-color);
-    opacity: 1;
-    cursor: auto;
+  .bullet {
+    padding-left: 15px;
   }
 
   .last-update {

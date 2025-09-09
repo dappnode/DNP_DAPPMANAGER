@@ -1,11 +1,18 @@
 import { expect } from "chai";
-import { validateComposeSchema, validateManifestSchema, validateSetupWizardSchema } from "../../src/index.js";
+import {
+  validateComposeSchema,
+  validateManifestSchema,
+  validateSetupWizardSchema,
+  validateNotificationsSchema
+} from "../../src/index.js";
 import fs from "fs";
 import path from "path";
 import { cleanTestDir, testDir } from "../testUtils.js";
-import { Manifest, SetupWizard } from "@dappnode/types";
+import { Manifest, SetupWizard, NotificationsConfig, GatusEndpoint, CustomEndpoint } from "@dappnode/types";
+import { Priority } from "../../../types/src/notifications.js";
 
-describe("schemaValidation", () => {
+describe.only("schemaValidation", function () {
+  this.timeout(10000);
   describe("manifest", () => {
     before(() => {
       cleanTestDir();
@@ -431,6 +438,362 @@ volumes:
       };
 
       expect(() => validateManifestSchema(manifest)).to.not.throw();
+    });
+  });
+
+  describe("notifications", () => {
+    it("should validate a valid notifications configuration", () => {
+      const validNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "example-correlation-id",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Custom alert description",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            metric: {
+              min: 0,
+              max: 1000,
+              unit: "ms"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for missing required fields", () => {
+      const invalidNotifications: Partial<NotificationsConfig> = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST"
+            // Missing required fields like conditions, interval, group, alerts, and definition
+          } as GatusEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications as NotificationsConfig)).to.throw(
+        "Invalid notifications configuration"
+      );
+    });
+
+    it("should throw an error for invalid URL format", () => {
+      const invalidNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "example-correlation-id",
+            enabled: true,
+            url: "invalid-url",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for invalid interval format", () => {
+      const invalidNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "example-correlation-id",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "invalid-interval",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for missing alert fields", () => {
+      const invalidNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms"],
+            interval: "1m",
+            group: "example-group",
+            isBanner: false,
+            alerts: [
+              {
+                type: "response-time",
+                "failure-threshold": 3,
+                // Missing success-threshold and other required fields
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            }
+          } as GatusEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should validate a valid notifications configuration with customEndpoints", () => {
+      const validNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
+            description: "A custom endpoint for testing", // Added required description
+            isBanner: false,
+            metric: {
+              treshold: 90,
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for missing required fields in customEndpoints", () => {
+      const invalidNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            // Missing required description field
+            group: "custom-group"
+          } as unknown as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should throw an error for invalid metric in customEndpoints", () => {
+      const invalidNotifications: NotificationsConfig = {
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            description: "A custom endpoint for testing",
+            metric: {
+              treshold: "fd" as unknown as number, // Invalid treshold value
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          } as CustomEndpoint
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
+    });
+
+    it("should validate a configuration with both endpoints and customEndpoints", () => {
+      const validNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "example-correlation-id",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Response time exceeded",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            metric: {
+              min: 0,
+              max: 1000,
+              unit: "ms"
+            }
+          }
+        ],
+        customEndpoints: [
+          {
+            enabled: true,
+            name: "custom-endpoint",
+            correlationId: "custom-correlation-id",
+            description: "A custom endpoint for testing", // Added required description
+            isBanner: false,
+            metric: {
+              treshold: 90,
+              min: 0,
+              max: 100,
+              unit: "%"
+            }
+          }
+        ]
+      };
+
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should validate a notifications configuration with valid requirements and pkgsInstalled version ranges", () => {
+      const validNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "abc-example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Custom alert description",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            requirements: {
+              pkgsInstalled: {
+                "geth.dnp.dappnode.eth": ">=0.4.3",
+                "other.dnp.dappnode.eth": "^1.2.3"
+              },
+              pkgsNotInstalled: ["foo.dnp.dappnode.eth"]
+            }
+          }
+        ]
+      };
+      expect(() => validateNotificationsSchema(validNotifications)).to.not.throw();
+    });
+
+    it("should throw an error for requirements with invalid pkgsInstalled version range", () => {
+      const invalidNotifications: NotificationsConfig = {
+        endpoints: [
+          {
+            name: "example-endpoint",
+            correlationId: "abc-example-endpoint",
+            enabled: true,
+            url: "http://example.com",
+            method: "POST",
+            conditions: ["response-time < 500ms", "status == 200"],
+            interval: "1m",
+            group: "example-group",
+            priority: Priority.low,
+            isBanner: false,
+            alerts: [
+              {
+                type: "custom",
+                "failure-threshold": 3,
+                "success-threshold": 2,
+                "send-on-resolved": true,
+                description: "Custom alert description",
+                enabled: true
+              }
+            ],
+            definition: {
+              title: "Example Endpoint",
+              description: "An example endpoint for testing"
+            },
+            requirements: {
+              pkgsInstalled: {
+                "geth.dnp.dappnode.eth": "invalid-version"
+              },
+              pkgsNotInstalled: ["foo.dnp.dappnode.eth"]
+            }
+          }
+        ]
+      };
+      expect(() => validateNotificationsSchema(invalidNotifications)).to.throw("Invalid notifications configuration");
     });
   });
 });

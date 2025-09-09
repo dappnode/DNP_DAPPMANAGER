@@ -9,18 +9,30 @@ const exposable: ExposableServiceInfo[] = [
     serviceName: "geth.dnp.dappnode.eth",
     port: 8545,
     name: "Geth JSON RPC",
-    description: "JSON RPC endpoint for Geth mainnet"
+    description: "JSON RPC endpoint for Geth mainnet",
+    external: true
   }
 ];
 
 export const httpsPortal: Pick<
   Routes,
+  | "httpsPortalPwaMappingAdd"
   | "httpsPortalMappingAdd"
   | "httpsPortalMappingRemove"
   | "httpsPortalMappingsGet"
   | "httpsPortalExposableServicesGet"
   | "httpsPortalMappingsRecreate"
 > = {
+  httpsPortalPwaMappingAdd: async () => {
+    const pwaMapping: HttpsPortalMapping = {
+      fromSubdomain: "pwa",
+      dnpName: "pwa.dnp.dappnode.eth",
+      serviceName: "pwa",
+      port: 443,
+      external: false
+    };
+    mappings.set(pwaMapping.fromSubdomain, pwaMapping);
+  },
   httpsPortalMappingAdd: async ({ mapping }) => {
     mappings.set(mapping.fromSubdomain, mapping);
   },

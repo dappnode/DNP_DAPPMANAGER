@@ -1,7 +1,7 @@
 import { urlJoin } from "utils/url";
 
 // JSON RPC API
-export const apiUrl = import.meta.env.VITE_APP_API_URL || "http://my.dappnode/";
+export const apiUrl = "/";
 export const apiUrls = {
   ping: urlJoin(apiUrl, "ping"),
 
@@ -46,11 +46,14 @@ export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";
 export const zkevmDnpName = "zkevm-tokens-withdrawal.dnp.dappnode.eth";
 export const wireguardDnpName = "wireguard.dnp.dappnode.eth";
+export const tailscaleDnpName = "tailscale.dnp.dappnode.eth";
 export const wifiDnpName = "wifi.dnp.dappnode.eth";
 export const ipfsDnpName = "ipfs.dnp.dappnode.eth";
 export const coreDnpName = "core.dnp.dappnode.eth";
 export const bindDnpName = "bind.dnp.dappnode.eth";
 export const vpnDnpName = "vpn.dnp.dappnode.eth";
+export const notificationsDnpName = "notifications.dnp.dappnode.eth";
+export const premiumDnpName = "premium.dnp.dappnode.eth";
 export const dappmanagerDnpName = "dappmanager.dnp.dappnode.eth";
 export const mandatoryCoreDnps = [
   dappmanagerDnpName,
@@ -91,17 +94,34 @@ export const docsUrl = {
   connectWifi: `${docsBaseUrl}/docs/user/access-your-dappnode/wifi`,
   connectLocalProxy: `${docsBaseUrl}/docs/user/access-your-dappnode/local`,
   connectVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/overview`,
+  tailscaleVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/tailscale`,
+  wireguardVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/wireguard`,
+  openVpn: `${docsBaseUrl}/docs/user/access-your-dappnode/vpn/openvpn`,
   httpsExplanation: `${docsBaseUrl}`, // TODO: Add link to HTTPS page in docs when it's ready
   ipfsPeersExplanation: `${docsBaseUrl}`, // TODO: Add link to IPFS page in docs when it's ready
   stakers: `${docsBaseUrl}/docs/user/staking/overview`,
   rollups: `${docsBaseUrl}/docs/user/rollups/overview`,
-  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`
+  ethicalMetricsOverview: `${docsBaseUrl}/docs/user/ethical-metrics/overview`,
+  notificationsOverview: `${docsBaseUrl}/docs/user/notifications/overview`,
+  pwaOverview: `${docsBaseUrl}/docs/user/dappnode-app/overview`,
+  pwaHowToInstall: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install`,
+  pwaResetPermissions: `${docsBaseUrl}/docs/user/dappnode-app/how-to-install#reset-notifications-permissions`,
+  premiumOverview: `${docsBaseUrl}/docs/user/dappnode-premium/overview`,
+  premiumBackupNode: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#backup-node-for-validators`,
+  premiumBackupValidatorsLimit: `${docsBaseUrl}/docs/user/dappnode-premium/premium-services#validators-limit`
 };
 
 export const forumUrl = {
   telegramHowTo: "https://forum.dappnode.io/t/set-up-your-dappnode-telegram-bot/816/4",
   ipfsRemoteHowTo: "https://forum.dappnode.io/t/how-to-use-dappnode-ipfs-remote/1295",
   expandFileSystemHowTo: "https://forum.dappnode.io/t/how-to-expand-your-dappnode-filesystem-space/1296"
+};
+
+export const dappmanagerAliases = ["dappmanager.dappnode", "my.dappnode", "dappnode.local"];
+
+export const externalUrlProps = {
+  target: "_blank",
+  rel: "noopener noreferrer"
 };
 
 export const troubleShootMountpointsGuideUrl = "https://docs.dappnode.io/developers/package-dev/wizard#target";
@@ -128,5 +148,11 @@ export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-check
 
 // VPN
 export const MAIN_ADMIN_NAME = "dappnode_admin";
+
+// Premium
+export const premiumLanding = "https://dappnode.com/pages/dappnode-premium";
+export const stripePortal = "https://billing.stripe.com/p/login/8x29ASeSmeOu18Yao2dby00";
+export const premiumSupportCalUrl = "https://cal.com/dappnode-support/30-1-o-1";
+export const buyPremiumUrl = "https://buy.stripe.com/28EeVc8tY21I18YdAedby04";
 
 // Support, where to send issues

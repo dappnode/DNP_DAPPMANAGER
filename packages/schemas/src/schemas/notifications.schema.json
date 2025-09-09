@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dappnode/DAppNode/raw/schema/notifications.schema.json",
+  "type": "object",
+  "title": "Notifications Configuration Schema",
+  "required": [],
+  "properties": {
+    "endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "name",
+          "correlationId",
+          "enabled",
+          "url",
+          "method",
+          "conditions",
+          "interval",
+          "group",
+          "alerts",
+          "definition",
+          "priority",
+          "isBanner"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "correlationId": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
+          "enabled": { "type": "boolean" },
+          "url": { "type": "string", "pattern": "^(https?|ftp):\\/\\/\\S+[\\s\\S]*$" },
+          "method": { "type": "string", "enum": ["GET", "POST", "PUT", "DELETE"] },
+          "conditions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "interval": { "type": "string", "pattern": "^[0-9]+[smhd]$" },
+          "group": { "type": "string", "pattern": "^[a-zA-Z0-9_-]+$" },
+          "priority": { "type": "string", "enum": ["low", "medium", "high", "critical"] },
+          "isBanner": { "type": "boolean" },
+          "alerts": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "type",
+                "failure-threshold",
+                "success-threshold",
+                "send-on-resolved",
+                "description",
+                "enabled"
+              ],
+              "properties": {
+                "type": { "type": "string", "enum": ["custom"] },
+                "failure-threshold": { "type": "integer", "minimum": 1 },
+                "success-threshold": { "type": "integer", "minimum": 1 },
+                "send-on-resolved": { "type": "boolean" },
+                "description": { "type": "string" },
+                "enabled": { "type": "boolean" }
+              }
+            }
+          },
+          "definition": {
+            "type": "object",
+            "required": ["title", "description"],
+            "properties": {
+              "title": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          },
+          "metric": {
+            "type": "object",
+            "required": ["min", "max"],
+            "properties": {
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "unit": { "type": "string" }
+            }
+          },
+          "callToAction": {
+            "type": "object",
+            "required": ["title", "url"],
+            "properties": {
+              "title": { "type": "string" },
+              "url": { "type": "string" }
+            }
+          },
+          "requirements": {
+            "type": "object",
+            "properties": {
+              "pkgsInstalled": {
+                "type": "object",
+                "patternProperties": {
+                  "^[a-zA-Z0-9._-]+\\.(dnp|public)\\.dappnode\\.eth$": {
+                    "type": "string",
+                    "pattern": "^(\\^|~|>|>=|<|<=)?\\d+\\.\\d+\\.\\d+$"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "pkgsNotInstalled": {
+                "type": "array",
+                "items": { "type": "string", "pattern": "^[a-zA-Z0-9._-]+\\.(dnp|public)\\.dappnode\\.eth$" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "customEndpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["enabled", "name", "description", "isBanner", "correlationId"],
+        "properties": {
+          "correlationId": { "type": "string", "pattern": "^[a-zA-Z]{3,}-[a-zA-Z0-9-]+$" },
+          "enabled": { "type": "boolean" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "isBanner": { "type": "boolean" },
+          "metric": {
+            "type": "object",
+            "required": ["treshold", "min", "max"],
+            "properties": {
+              "treshold": { "type": "number" },
+              "min": { "type": "number" },
+              "max": { "type": "number" },
+              "unit": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
