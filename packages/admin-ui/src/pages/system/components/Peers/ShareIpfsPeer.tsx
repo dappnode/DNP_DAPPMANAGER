@@ -77,7 +77,7 @@ export default function ShareIpfsPeer({ matchUrl }: { matchUrl: string }) {
   const peerMultiAddressEncoded = origin && peerId ? encodeURIComponent(`${origin}/tcp/4001/ipfs/${peerId}`) : "";
 
   // http://my.dappnode/system/add-ipfs-peer/%2Fip4%2F1.9.207.246%2Ftcp%2F4001%2Fipfs%2FQmQnwHU6nj1v47mZQWeej4rBtYYTPrMJft88vKp9BAV38L
-  const addMyPeerUrl = `http://my.dappnode/${matchUrl}/${peerMultiAddressEncoded}`;
+  const addMyPeerUrl = `http://my.dappnode/${matchUrl}?add-peer=${peerMultiAddressEncoded}`;
 
   return (
     <Card spacing>

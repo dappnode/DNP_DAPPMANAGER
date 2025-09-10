@@ -54,9 +54,15 @@ const SystemRoot: React.FC = () => {
       element: <SystemUpdate />
     },
     {
-      name: "Peers",
-      subPath: subPaths.peers + "/*",
+      name: "IPFS",
+      subPath: subPaths.ipfs,
       element: <Peers />
+    },
+    {
+      name: "Peers (legacy)",
+      subPath: `${subPaths.peers}/*`, // legacy /system/add-ipfs-peer/* for backwards compatibility with old links
+      element: <Peers />,
+      hideSection: true
     },
     {
       name: "Security",

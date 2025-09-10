@@ -5,6 +5,8 @@ import Card from "components/Card";
 import Input from "components/Input";
 import Button from "components/Button";
 import Ok from "components/Ok";
+import { useLocation } from "react-router-dom";
+import { subPaths } from "pages/system/data";
 
 /**
  * peer = "/dns4/1bc3641738cbe2b1.dyndns.dappnode.io/tcp/4001/ipfs/QmWAcZZCvqVnJ6J9946qxEMaAbkUj6FiiVWakizVKfnfDL"
@@ -35,7 +37,32 @@ import Ok from "components/Ok";
  * - /dnsaddr/
  */
 
-export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
+export default function AddIpfsPeer() {
+  const location = useLocation();
+
+  const peerFromQuery =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("add-peer") || undefined
+      : undefined;
+
+  let peerFromLegacyPath: string | undefined;
+  if (location?.pathname) {
+    const splitter = `/${subPaths.peers}/`;
+    const idx = location.pathname.indexOf(splitter);
+    if (idx !== -1) {
+      const raw = location.pathname.slice(idx + splitter.length);
+      if (raw) {
+        try {
+          peerFromLegacyPath = decodeURIComponent(raw);
+        } catch {
+          peerFromLegacyPath = raw;
+        }
+      }
+    }
+  }
+
+  const peerFromUrl = (peerFromQuery ?? peerFromLegacyPath) || undefined;
+
   const [peerInput, setPeerInput] = useState("");
   const [addStat, setAddStat] = useState<{
     msg?: string;
