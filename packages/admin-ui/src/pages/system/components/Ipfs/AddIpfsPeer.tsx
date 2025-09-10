@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as ipfs from "utils/ipfs";
 // Components
-import Card from "components/Card";
 import Input from "components/Input";
 import Button from "components/Button";
 import Ok from "components/Ok";
@@ -96,32 +95,29 @@ export default function AddIpfsPeer() {
   }, [peerFromUrl, addIpfsPeer]);
 
   return (
-    <>
-      <Card spacing>
-        <div>Add an IPFS peer to your own boostrap list and immediately connect to it.</div>
+    <div>
+      <h5 className="card-title">Add IPFS peer</h5>
+      <div>Add an IPFS peer to your own boostrap list and immediately connect to it.</div>
 
-        <Input
-          placeholder="Peer address /ip4/85.200.85.20/tcp/4001/ipfs/QmWas..."
-          value={peerInput}
-          // Ensure id contains only alphanumeric characters
-          onValueChange={(value) => {
-            setAddStat({});
-            setPeerInput(value);
-          }}
-          onEnterPress={() => {
-            if (!addStat.loading) addIpfsPeer(peerInput);
-          }}
-          append={
-            <Button variant="dappnode" onClick={() => addIpfsPeer(peerInput)} disabled={addStat.loading || !peerInput}>
-              Add peer
-            </Button>
-          }
-        />
+      <Input
+        placeholder="Peer address /ip4/85.200.85.20/tcp/4001/ipfs/QmWas..."
+        value={peerInput}
+        // Ensure id contains only alphanumeric characters
+        onValueChange={(value) => {
+          setAddStat({});
+          setPeerInput(value);
+        }}
+        onEnterPress={() => {
+          if (!addStat.loading) addIpfsPeer(peerInput);
+        }}
+        append={
+          <Button variant="dappnode" onClick={() => addIpfsPeer(peerInput)} disabled={addStat.loading || !peerInput}>
+            Add peer
+          </Button>
+        }
+      />
 
-        {addStat.msg && (
-          <Ok msg={addStat.msg} ok={addStat.ok} loading={addStat.loading} style={{ marginTop: "1rem" }} />
-        )}
-      </Card>
-    </>
+      {addStat.msg && <Ok msg={addStat.msg} ok={addStat.ok} loading={addStat.loading} style={{ marginTop: "1rem" }} />}
+    </div>
   );
 }

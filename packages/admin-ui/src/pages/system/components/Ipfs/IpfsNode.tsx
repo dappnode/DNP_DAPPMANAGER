@@ -7,8 +7,9 @@ import Button from "components/Button";
 import LinkDocs from "components/LinkDocs";
 import { forumUrl } from "params";
 import Card from "components/Card";
+import SubTitle from "components/SubTitle";
 
-export default function Ipfs() {
+export default function IpfsNode() {
   const ipfsRepository = useApi.ipfsClientTargetGet();
   const [ipfsClientTarget, setIpfsClientTarget] = useState<IpfsClientTarget | null>(null);
   const [ipfsGatewayTarget, setIpfsGatewayTarget] = useState<string | null>(null);
@@ -38,6 +39,8 @@ export default function Ipfs() {
 
   return (
     <div className="dappnode-identity">
+      <SubTitle>IPFS Node</SubTitle>
+
       <Card>
         <div>
           Dappnode uses IPFS to distribute Dappnode packages in a decentralized way. Choose to connect to a remote IPFS

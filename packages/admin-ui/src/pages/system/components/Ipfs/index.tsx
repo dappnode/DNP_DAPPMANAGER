@@ -1,25 +1,14 @@
 import React from "react";
-import SubTitle from "components/SubTitle";
-import AddIpfsPeer from "./AddIpfsPeer";
-import ShareIpfsPeer from "./ShareIpfsPeer";
-import { docsUrl } from "params";
-import LinkDocs from "components/LinkDocs";
-import { pathName, subPaths } from "pages/system/data";
-import Ipfs from "./Ipfs";
+import IpfsNode from "./IpfsNode";
+import Peers from "./Peers";
 
-const Peers: React.FC = () => {
+const Ipfs: React.FC = () => {
   return (
     <>
-      <Ipfs />
-      <p>
-        Learn more about IPFS peers at: <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
-      </p>
-      <SubTitle>Share IPFS peer</SubTitle>
-      <ShareIpfsPeer matchUrl={`${pathName}/${subPaths.ipfs}`} />
-      <SubTitle>Add IPFS peer</SubTitle>
-      <AddIpfsPeer />
+      <IpfsNode />
+      <Peers />
     </>
   );
 };
 
-export default Peers;
+export default Ipfs;
