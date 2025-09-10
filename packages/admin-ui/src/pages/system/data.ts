@@ -16,8 +16,8 @@ export const subPaths = {
   staticIp: "static-ip",
   network: "network",
   update: "update",
-  // Must be "add-ipfs-peer" for backwards compatibility with the previous IFPS peer links
-  peers: "add-ipfs-peer",
+  ipfs: "ipfs",
+  peers: "add-ipfs-peer", // Mantain it for backwards compatibility with the previous IFPS peer links
   power: "power",
   profile: "profile",
   advanced: "advanced",

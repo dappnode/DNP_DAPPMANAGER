@@ -1,0 +1,14 @@
+.peers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  .divider {
+    border-top: 1px solid #ccc;
+    margin: 0;
+  }
+
+  .input-group {
+    margin-top: 5px;
+  }
+}
