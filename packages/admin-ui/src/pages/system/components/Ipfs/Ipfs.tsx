@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useApi, api } from "api";
 import { IpfsClientTarget } from "@dappnode/types";
 import { withToast } from "components/toast/Toast";
-import SubTitle from "components/SubTitle";
 import { IpfsClient } from "components/IpfsClient";
 import Button from "components/Button";
 import LinkDocs from "components/LinkDocs";
@@ -39,7 +38,6 @@ export default function Ipfs() {
 
   return (
     <div className="dappnode-identity">
-      <SubTitle>IPFS</SubTitle>
       <Card>
         <div>
           Dappnode uses IPFS to distribute Dappnode packages in a decentralized way. Choose to connect to a remote IPFS

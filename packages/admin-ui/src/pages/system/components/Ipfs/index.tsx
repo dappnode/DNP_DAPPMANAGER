@@ -5,10 +5,12 @@ import ShareIpfsPeer from "./ShareIpfsPeer";
 import { docsUrl } from "params";
 import LinkDocs from "components/LinkDocs";
 import { pathName, subPaths } from "pages/system/data";
+import Ipfs from "./Ipfs";
 
 const Peers: React.FC = () => {
   return (
     <>
+      <Ipfs />
       <p>
         Learn more about IPFS peers at: <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
       </p>

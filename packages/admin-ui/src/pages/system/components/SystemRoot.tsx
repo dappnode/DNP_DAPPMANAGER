@@ -8,7 +8,7 @@ import App from "./App";
 import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
-import Peers from "./Peers";
+import Peers from "./Ipfs";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
