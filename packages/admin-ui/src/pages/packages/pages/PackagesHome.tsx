@@ -10,7 +10,7 @@ export function PackagesHome() {
   return (
     <>
       <Title title={title} />
-      <PackagesNavigator />;
+      <PackagesNavigator />
     </>
   );
 }
