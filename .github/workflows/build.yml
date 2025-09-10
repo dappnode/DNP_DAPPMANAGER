@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npx @dappnode/dappnodesdk github-action build
+      - name: Build
+        if: github.actor != 'dependabot[bot]'
+        run: npx @dappnode/dappnodesdk github-action build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
