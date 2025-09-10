@@ -1,7 +1,5 @@
 import { getShortUniqueDnp } from "./getShortUniqueDnp.js";
 
-// TODO: unit testing
-
 /**
  * This function return fullNetworkAlias or shortNetworkAlias:
  * - shortDnpName is dnpName.split(0)["."]. i.e dnpName = "dappmanager.dnp.dappnode.eth" => shortDnpName = "dappmanager"
@@ -20,6 +18,7 @@ import { getShortUniqueDnp } from "./getShortUniqueDnp.js";
  * @param dnpName dappnode dnp name
  * @param serviceName container service name
  * @param isMainOrMonoservice IF true returns the full network alias, otherwise the short network alias
+ * @param isPrivate if true, it will return the private network alias otherwise the dncore network alias
  * @param isExternal is the container external
  * @param short if true, it will return the short version of the dnpName otherwise the full network alias
  * @returns the root private network alias. It
@@ -28,14 +27,16 @@ export function buildNetworkAlias({
   dnpName,
   serviceName,
   isMainOrMonoservice,
+  isPrivate = false,
   isExternal = false
 }: {
   dnpName: string;
   serviceName: string;
   isMainOrMonoservice: boolean;
+  isPrivate?: boolean;
   isExternal?: boolean;
 }): string {
-  const endDomain = isExternal ? "dappnode.external" : "dappnode";
+  const endDomain = isExternal ? "dappnode.external" : isPrivate ? "dappnode.private" : "dappnode";
 
   return isMainOrMonoservice
     ? `${getShortUniqueDnp(dnpName)}.${endDomain}`

@@ -1,4 +1,4 @@
-import { Notification, NotificationPayload } from "@dappnode/types";
+import { Notification, NotificationPayload, NotifierSubscription } from "@dappnode/types";
 
 export class NotificationsApi {
   private readonly rootUrl: string;
@@ -10,8 +10,11 @@ export class NotificationsApi {
   /**
    * Send a new notification
    */
-  async sendNotification(notificationPaylaod: NotificationPayload): Promise<void> {
-    await fetch(new URL("/api/v1/notifications", `${this.rootUrl}:8080`).toString(), {
+  async sendNotification(notificationPaylaod: NotificationPayload, subscriptionEndpoint?: string): Promise<void> {
+    // Build URL and append subscriptionEndpoint as query param if provided
+    const url = new URL("/api/v1/notifications", `${this.rootUrl}:8080`);
+    if (subscriptionEndpoint) url.searchParams.append("subscriptionEndpoint", encodeURIComponent(subscriptionEndpoint));
+    await fetch(url.toString(), {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -32,7 +35,7 @@ export class NotificationsApi {
    */
   async getBannerNotifications(timestamp?: number): Promise<Notification[]> {
     const url = new URL(`/api/v1/notifications?isBanner=true&timestamp=${timestamp}`, `${this.rootUrl}:8080`);
- 
+
     const response = await fetch(url);
     return await response.json();
   }
@@ -79,6 +82,95 @@ export class NotificationsApi {
 
     await fetch(url.toString(), {
       method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
+
+  /**
+   * Get public vapidKey from notifier service
+   */
+  async getVapidKey(): Promise<string | null> {
+    const url = new URL("/api/v1/vapid/public-key", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error("Failed to fetch vapid public key");
+    }
+    return (await response.json()).publicKey;
+  }
+
+  /**
+   * Get all Push subscriptions from notifier service
+   */
+  async fetchSubscriptions(): Promise<NotifierSubscription[]> {
+    const url = new URL("/api/v1/subscriptions", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString());
+    if (!response.ok) {
+      throw new Error("Failed to fetch subscriptions");
+    }
+    return await response.json();
+  }
+
+  async updateSubscriptionAlias(endpoint: string, alias: string): Promise<void> {
+    const url = new URL(`/api/v1/subscriptions?endpoint=${encodeURIComponent(endpoint)}`, `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ alias })
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update subscription alias");
+    }
+  }
+
+  /**
+   * Delete a Push subscription by its endpoint
+   */
+  async deleteSubscription(endpoint: string): Promise<void> {
+    const url = new URL(`/api/v1/subscriptions?endpoint=${encodeURIComponent(endpoint)}`, `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error("Failed to delete subscription");
+    }
+  }
+
+  /**
+   * Post a new Push subscription to the notifier service
+   */
+  async postSubscription(subscription: NotifierSubscription): Promise<void> {
+    const url = new URL("/api/v1/subscriptions", `${this.rootUrl}:8081`);
+    const response = await fetch(url.toString(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(subscription)
+    });
+    if (!response.ok) {
+      throw new Error("Failed positing sub to notifier");
+    }
+  }
+
+  /**
+   * Sends a test notification to all subscriptions / specific subscription
+   */
+  async sendSubTestNotification(endpoint?: string): Promise<void> {
+    const url = new URL("/api/v1/notifications/test", `${this.rootUrl}:8080`);
+    if (endpoint) {
+      url.searchParams.append("endpoint", endpoint);
+    }
+
+    await fetch(url.toString(), {
+      method: "POST",
       headers: {
         "Content-Type": "application/json"
       }

@@ -1,63 +1,57 @@
 import React from "react";
-import { Routes, Route, NavLink } from "react-router-dom";
 import { useApi } from "api";
 // Own module
 import { subPaths, title } from "./data";
-import { InstallNotificationsPkg } from "./tabs/InstallNotifications/InstallNotifications";
 // Components
 import Title from "components/Title";
 import { renderResponse } from "components/SwrRender";
 import { Inbox } from "./tabs/Inbox/Inbox";
 import { NotificationsSettings } from "./tabs/Settings/Settings";
 import { LegacyNotifications } from "./tabs/Legacy";
+import { NoDnpInstalled } from "pages/packages/components/NoDnpInstalled";
+import { notificationsDnpName } from "params";
+import { Subscriptions } from "./tabs/Devices";
+import { RouteType } from "types";
+import { SectionNavigator } from "components/SectionNavigator";
 
 export const NotificationsRoot: React.FC = () => {
-  const isNotificationsPkgInstalledRequest = useApi.notificationsIsInstalled();
+  const notificationsPkgStatusRequest = useApi.notificationsPackageStatus();
 
-  return renderResponse(isNotificationsPkgInstalledRequest, ["Loading notifications"], (isInstalled) => {
-    const availableRoutes: {
-      name: string;
-      subPath: string;
-      component: React.ComponentType;
-    }[] = [
+  const InstallNotificationsPkg = () => (
+    <NoDnpInstalled
+      customCopy="To receive notifications on your Dappnode, you must install the Notifications Dappnode Package."
+      id={notificationsDnpName}
+    />
+  );
+
+  return renderResponse(notificationsPkgStatusRequest, ["Loading notifications"], (data) => {
+    const availableRoutes: RouteType[] = [
       {
         name: "Inbox",
         subPath: subPaths.inbox,
-        component: isInstalled ? Inbox : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <Inbox /> : <InstallNotificationsPkg />
       },
       {
         name: "Settings",
         subPath: subPaths.settings,
-        component: isInstalled ? NotificationsSettings : () => <InstallNotificationsPkg />
+        element: data.isInstalled ? <NotificationsSettings /> : <InstallNotificationsPkg />
+      },
+      {
+        name: "Devices",
+        subPath: subPaths.devices,
+        element: data.isInstalled ? <Subscriptions /> : <InstallNotificationsPkg />
       },
       {
         name: "Legacy",
         subPath: subPaths.legacy,
-        component: LegacyNotifications
+        element: <LegacyNotifications />
       }
     ];
 
     return (
       <>
         <Title title={title} />
-
-        <div className="horizontal-navbar">
-          {availableRoutes.map((route) => (
-            <button key={route.subPath} className="item-container">
-              <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                {route.name}
-              </NavLink>
-            </button>
-          ))}
-        </div>
-
-        <div className="section-spacing">
-          <Routes>
-            {availableRoutes.map((route) => (
-              <Route key={route.subPath} path={route.subPath} element={<route.component />} />
-            ))}
-          </Routes>
-        </div>
+        <SectionNavigator routes={availableRoutes} />
       </>
     );
   });

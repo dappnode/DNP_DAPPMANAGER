@@ -4,10 +4,11 @@ import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
 import { api, useApi } from "api";
 import { Notification, Priority } from "@dappnode/types";
-import "./notificationsMain.scss";
 import { MdClose } from "react-icons/md";
 import { Accordion } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
+import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
+import "./notificationsMain.scss";
 
 /**
  * Displays banner notifications among all tabs
@@ -24,13 +25,22 @@ export default function NotificationsView() {
     return Math.floor(now.getTime() / 1000); // Convert to seconds
   }, []);
 
-  const notificationsCall = useApi.notificationsGetBanner(oneMonthAgoTimestamp);
+  const notificationsCall = useApi.notificationsGetBanner({ timestamp: oneMonthAgoTimestamp });
 
   useEffect(() => {
     if (notificationsCall.data) {
       setNotifications(filterNotifications(notificationsCall.data));
     }
   }, [notificationsCall.data]);
+
+  //Revalidate every minute
+  useEffect(() => {
+    const interval = setInterval(() => {
+      notificationsCall.revalidate();
+    }, 60 * 1000); // Re-fecthes banner notifications every minute
+
+    return () => clearInterval(interval);
+  }, []);
 
   /**
    * filters notifications:
@@ -96,7 +106,7 @@ export function CollapsableBannerNotification({
   const [hasClosed, setHasClosed] = useState(false);
 
   const handleClose = () => {
-    api.notificationSetSeenByCorrelationID(notification.correlationId);
+    api.notificationSetSeenByCorrelationID({ correlationId: notification.correlationId });
     setHasClosed(true);
     onClose();
   };
@@ -123,7 +133,10 @@ export function CollapsableBannerNotification({
             <div className="banner-body">
               <RenderMarkdown source={notification.body} />
               {notification.callToAction && (
-                <NavLink to={notification.callToAction.url} {...(isExternalUrl ? externalUrlProps : {})}>
+                <NavLink
+                  to={resolveDappnodeUrl(notification.callToAction.url, window.location)}
+                  {...(isExternalUrl ? externalUrlProps : {})}
+                >
                   <Button variant={priorityBtnVariants[notification.priority]}>
                     <div className="btn-text">{notification.callToAction.title}</div>
                   </Button>

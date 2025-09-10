@@ -13,7 +13,7 @@ export default function Notifications() {
   useEffect(() => {
     const interval = setInterval(() => {
       unseenNotificationsReq.revalidate();
-    }, 60 * 1000); // Updates the new norifications "blue dot" every minute
+    }, 60 * 1000); // Updates the new notifications "blue dot" every minute
 
     return () => {
       clearInterval(interval);
@@ -21,7 +21,7 @@ export default function Notifications() {
   }, [unseenNotificationsReq]);
 
   useEffect(() => {
-    if (unseenNotificationsReq.data !== undefined && unseenNotificationsReq.data !== null) {
+    if (unseenNotificationsReq.data !== undefined) {
       setNewNotifications(unseenNotificationsReq.data > 0);
     }
   }, [unseenNotificationsReq.data]);

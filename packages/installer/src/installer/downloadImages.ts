@@ -93,7 +93,7 @@ export async function getImage(
     return; // Image OK
   } catch (e) {
     // Continue, bad image
-    logs.error(`Image at ${path} is invalid: ${e}`);
+    logs.debug(`Image at ${path} is invalid: ${e}`);
   }
 
   const { hash, size } = imageFile;

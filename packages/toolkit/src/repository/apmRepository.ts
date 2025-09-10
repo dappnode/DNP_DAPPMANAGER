@@ -47,14 +47,17 @@ export class ApmRepository {
    * If the version is not specified, it returns the latest version.
    * @param dnpNameOrHash - The name of the DNP or the IPFS hash.
    * @param version - The version of the DNP (optional).
+   * @param contractAddress - The address of the repository contract (optional).
    * @returns - A promise that resolves to the raw APM version.
    */
   public async getVersionAndIpfsHash({
     dnpNameOrHash,
-    version = "*"
+    version = "*",
+    contractAddress
   }: {
     dnpNameOrHash: string;
     version?: string;
+    contractAddress?: string;
   }): Promise<ApmVersionRawAndOrigin> {
     // Correct version
     if (version === "latest") version = "*";
@@ -63,7 +66,12 @@ export class ApmRepository {
     // - name = eth domain & ver = semverVersion
     // - name = eth domain & ver = semverRange, [DO-NOT-CACHE] as the version is dynamic
     if (isEnsDomain(dnpNameOrHash) && (this.isSemver(version) || this.isSemverRange(version))) {
-      const repoContract = await this.getRepoContract(dnpNameOrHash);
+      let repoContract;
+      if (contractAddress) {
+        repoContract = new ethers.Contract(contractAddress, repositoryAbi, this.ethProvider);
+      } else {
+        repoContract = await this.getRepoContract(dnpNameOrHash);
+      }
       const res =
         version && valid(version)
           ? await repoContract.getBySemanticVersion(this.toApmVersionArray(version))

@@ -1,0 +1,9 @@
+.install-pkg-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  > .section-subtitle {
+    margin-top: 0px;
+  }
+}

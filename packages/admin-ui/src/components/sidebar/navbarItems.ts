@@ -13,7 +13,8 @@ import {
   MdDevices,
   MdDashboard,
   MdWifi,
-  MdPeople
+  MdPeople,
+  MdStar
 } from "react-icons/md";
 import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
@@ -31,6 +32,7 @@ import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
 import { relativePath as repositoryRelativePath } from "pages/repository";
 import { relativePath as notificationsRelativePath } from "pages/notifications";
+import { relativePath as premiumRelativePath } from "pages/premium";
 
 export const fundedBy: { logo: string; text: string; link: string }[] = [
   {
@@ -132,6 +134,12 @@ export const sidenavItems: {
     name: "Support",
     href: supportRelativePath,
     icon: MdHelp,
+    show: true
+  },
+  {
+    name: "Premium",
+    href: premiumRelativePath,
+    icon: MdStar,
     show: true
   }
 ];

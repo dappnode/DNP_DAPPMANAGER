@@ -17,6 +17,7 @@ import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
 import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
+import { sendCoreInstalledResolvedNotification } from "../installer/sendCoreInstallResolvedNotification.js";
 
 /**
  * Installs a DAppNode Package.
@@ -61,6 +62,8 @@ export async function packageInstall(
         throw Error(`Package ${release.dnpName} is from untrusted origin and is not signed`);
       }
       if (!release.isCore) await checkInstallRequirements({ manifest: release.manifest });
+      if (!release.signedSafe && release.dnpName === "premium.dnp.dappnode.eth")
+        throw Error(`Package ${release.dnpName} can only be installed as signed`);
     }
 
     // Gather all data necessary for the install
@@ -96,6 +99,7 @@ export async function packageInstall(
 
       await postInstallClean(packagesData, log);
       afterInstall(dnpNames);
+      await sendCoreInstalledResolvedNotification(packagesData);
       logUiClear({ id });
     } catch (e) {
       afterInstall(dnpNames);

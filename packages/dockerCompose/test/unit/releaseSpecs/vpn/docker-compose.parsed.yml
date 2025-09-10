@@ -10,6 +10,10 @@ services:
         aliases:
           - "vpn.dnp.dappnode.eth.vpn.dappnode"
           - "vpn.dappnode"
+      dnprivate_network:
+        aliases:
+          - "vpn.dnp.dappnode.eth.vpn.dappnode.private"
+          - "vpn.dappnode.private"
     ports:
       - "1194:1194/udp"
       - "8092:8092"
@@ -29,3 +33,5 @@ networks:
   dncore_network:
     external: true
     name: dncore_network
+  dnprivate_network:
+    external: true
