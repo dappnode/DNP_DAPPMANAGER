@@ -8,7 +8,7 @@ import App from "./App";
 import Security from "./Security";
 import PowerManagment from "./PowerManagment";
 import SystemUpdate from "./SystemUpdate";
-import Peers from "./Peers";
+import Ipfs from "./Ipfs";
 import SystemInfo from "./SystemInfo";
 import Profile from "./Profile";
 import { Network } from "./Network";
@@ -54,9 +54,15 @@ const SystemRoot: React.FC = () => {
       element: <SystemUpdate />
     },
     {
-      name: "Peers",
-      subPath: subPaths.peers + "/*",
-      element: <Peers />
+      name: "IPFS",
+      subPath: subPaths.ipfs,
+      element: <Ipfs />
+    },
+    {
+      name: "Peers (legacy)",
+      subPath: `${subPaths.peers}/*`, // legacy /system/add-ipfs-peer/* for backwards compatibility with old links
+      element: <Ipfs />,
+      hideSection: true
     },
     {
       name: "Security",

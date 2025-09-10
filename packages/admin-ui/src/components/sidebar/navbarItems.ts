@@ -18,7 +18,6 @@ import {
 } from "react-icons/md";
 import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
-import { BiGitRepoForked } from "react-icons/bi";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
 import { relativePath as devicesRelativePath } from "pages/vpn";
@@ -30,7 +29,6 @@ import { relativePath as supportRelativePath } from "pages/support";
 import { relativePath as wifiRelativePath } from "pages/wifi";
 import { relativePath as communityRelativePath } from "pages/community";
 import { relativePath as stakersRelativePath } from "pages/stakers";
-import { relativePath as repositoryRelativePath } from "pages/repository";
 import { relativePath as notificationsRelativePath } from "pages/notifications";
 import { relativePath as premiumRelativePath } from "pages/premium";
 
@@ -98,12 +96,6 @@ export const sidenavItems: {
     name: "Stakers",
     href: stakersRelativePath,
     icon: SiEthereum,
-    show: true
-  },
-  {
-    name: "Repository",
-    href: repositoryRelativePath,
-    icon: BiGitRepoForked,
     show: true
   },
   {

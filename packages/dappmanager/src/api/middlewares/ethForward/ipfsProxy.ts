@@ -6,7 +6,6 @@ import { urlJoin } from "@dappnode/utils";
 import { logs } from "@dappnode/logger";
 import * as views from "./views/index.js";
 import { NodeNotAvailable, ProxyError, EnsResolverError, NotFoundError, Content } from "./types.js";
-import { EthProviderError } from "@dappnode/types";
 
 export enum ProxyType {
   ETHFORWARD = "ETHFORWARD",
@@ -106,7 +105,6 @@ function errorToResponseHtml(e: Error, domain?: string): string {
   if (e instanceof EnsResolverError || e instanceof NotFoundError) return views.notFound(e);
 
   // Node not available views
-  if (e instanceof EthProviderError) return views.noEth(e);
   if (e instanceof NodeNotAvailable)
     if (e.location === "swarm") return views.noSwarm(e);
     else if (e.location === "ipfs") return views.noIpfs(e);

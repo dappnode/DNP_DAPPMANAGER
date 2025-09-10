@@ -7,7 +7,6 @@ export * from "./calls.js";
 export * from "./rollups.js";
 export * from "./globalEnvs.js";
 export * from "./releaseFiles.js";
-export * from "./errors.js";
 export * from "./routes.js";
 export * from "./subscriptions.js";
 export * from "./notifications.js";

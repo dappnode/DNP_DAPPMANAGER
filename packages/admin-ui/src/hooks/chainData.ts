@@ -1,8 +1,6 @@
 import { useApi } from "api";
 import { ChainData } from "@dappnode/types";
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { getRepositorySourceChainItem } from "services/dappnodeStatus/selectors";
 
 /**
  * Fetches chainData from api.chainDataGet() and repository status from redux
@@ -12,7 +10,6 @@ import { getRepositorySourceChainItem } from "services/dappnodeStatus/selectors"
  * - Dashboard chains
  */
 export function useChainData(): ChainData[] {
-  const repositorySourceChainItem = useSelector(getRepositorySourceChainItem);
   const chainDataRes = useApi.chainDataGet();
 
   useEffect(() => {
@@ -26,5 +23,5 @@ export function useChainData(): ChainData[] {
     return [];
   }
 
-  return repositorySourceChainItem ? [repositorySourceChainItem, ...chainDataRes.data] : chainDataRes.data;
+  return chainDataRes.data;
 }

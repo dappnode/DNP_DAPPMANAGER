@@ -2,7 +2,6 @@ export * from "./autoUpdateSettings.js";
 export * from "./coreUpdate.js";
 export * from "./counterViews.js";
 export * from "./dyndns.js";
-export * from "./ethClient.js";
 export * from "./ethicalMetrics.js";
 export * from "./ipfsClient.js";
 export * from "./fileTransferPath.js";

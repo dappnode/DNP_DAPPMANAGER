@@ -3,7 +3,7 @@ import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
 import { Category, Priority, Status } from "@dappnode/types";
 import * as db from "@dappnode/db";
-import { getEthUrl, getIpfsUrl } from "@dappnode/installer";
+import { getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
 
@@ -82,8 +82,7 @@ async function checkIpfsHealth(): Promise<void> {
 }
 
 async function checkEthHealth(): Promise<void> {
-  const ethClientTarget = db.ethClientRemote.get();
-  const ethUrl = await getEthUrl();
+  const ethUrl = params.ETH_MAINNET_RPC_URL_REMOTE;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
@@ -109,7 +108,7 @@ async function checkEthHealth(): Promise<void> {
     const data = await res.json();
     if (!data.result) throw new Error(`Invalid response: ${JSON.stringify(data)}`);
 
-    logs.info(`Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is healthy`);
+    logs.info(`Ethereum endpoint ${ethUrl} is healthy`);
 
     // reset failure count on success
     ethFailureCount = 0;
@@ -130,7 +129,7 @@ Syncing and access to Ethereum chain data should now resume normally.`,
     }
   } catch (error) {
     clearTimeout(timeout);
-    logs.error(`Ethereum endpoint (${ethClientTarget}) at ${ethUrl} is unhealthy: ${error}`);
+    logs.error(`Ethereum endpoint ${ethUrl} is unhealthy: ${error}`);
 
     // increment failure count and send notification after threshold
     ethFailureCount += 1;
@@ -138,15 +137,12 @@ Syncing and access to Ethereum chain data should now resume normally.`,
       await notifications.sendNotification({
         title: "Ethereum Repository Unreachable",
         dnpName: params.dappmanagerDnpName,
-        body: `Your Dappnode is currently unable to connect to the Ethereum endpoint (${ethClientTarget}) at ${ethUrl}`,
+        body: `Your Dappnode is currently unable to connect to the Ethereum endpoint ${ethUrl}`,
         category: Category.system,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title:
-            ethClientTarget && ethClientTarget === "off"
-              ? "Change to Remote"
-              : "Make sure your Ethereum RPC is reachable",
+          title: "Make sure your Ethereum RPC is reachable",
           url: "http://my.dappnode/repository/eth"
         },
         isBanner: true,
