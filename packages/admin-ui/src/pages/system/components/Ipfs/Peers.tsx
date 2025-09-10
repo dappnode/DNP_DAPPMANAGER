@@ -18,7 +18,7 @@ const Peers: React.FC = () => {
           <div className="divider" />
           <AddIpfsPeer />
           <div>
-            Learn more about IPFS peers at: <LinkDocs href={docsUrl.ipfsPeersExplanation}>What is IPFS</LinkDocs>
+            Learn more about IPFS peers at: <LinkDocs href={docsUrl.ipfs}>What is IPFS</LinkDocs>
           </div>
         </div>
       </Card>
