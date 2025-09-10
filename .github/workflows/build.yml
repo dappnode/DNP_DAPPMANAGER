@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Print Actor
+        run: echo "The actor is ${{ github.actor }}"
       - name: Build
         if: github.actor != 'dependabot[bot]'
         run: npx @dappnode/dappnodesdk github-action build
