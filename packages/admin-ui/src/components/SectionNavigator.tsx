@@ -30,7 +30,11 @@ export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNav
       <div className="section-spacing">
         <Routes>
           {routes.map((r) => (
-            <Route key={r.subPath} path={r.subPath} element={r.element} />
+            <React.Fragment key={r.subPath}>
+              <Route path={r.subPath} element={r.element} />
+              {/* catch sub-nested child routes */}
+              <Route path={`${r.subPath}/*`} element={r.element} />
+            </React.Fragment>
           ))}
         </Routes>
       </div>
