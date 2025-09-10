@@ -7,6 +7,8 @@ import { dappnodeDiscord } from "params";
 import newTabProps from "utils/newTabProps";
 import ClipboardJS from "clipboard";
 import { GoCopy } from "react-icons/go";
+import { confirm } from "components/ConfirmDialog";
+
 import "./pwaRequirementsWrapper.scss";
 
 interface PwaRequirementsWrapperProps {
@@ -32,6 +34,18 @@ export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage
   const [continueClicked, setContinueClicked] = useState(false); // State to track if pwa domain redirect btn was clicked
 
   useEffect(() => {
+    if (continueClicked) {
+      confirm({
+        title: `Having problems accessing the App?`,
+        text: `If you are having problems accessing the App after clicking "Continue", you can navigate to private secure domain to perform additional diagnostics.`,
+        label: "Navigate",
+        variant: "dappnode",
+        onClick: () => (window.location.href = `http://my.dappnode.private${window.location.pathname}`)
+      });
+    }
+  }, [continueClicked]);
+
+  useEffect(() => {
     const clipboard = new ClipboardJS(".copy-pwa-logs");
     return () => clipboard.destroy();
   }, [pwaCheckLogs]);
@@ -48,6 +62,10 @@ export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage
 
   if (installingHttps) {
     return <Loading steps={["Installing HTTPS package"]} />;
+  }
+
+  if (isPrivateDomain) {
+    return <DiagnoseCard failedChecksCount={failedChecksCount} pwaCheckLogs={pwaCheckLogs} />;
   }
 
   return (
@@ -93,8 +111,7 @@ export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage
                 Continue
               </Button>
             </RequirementCard>
-            {!isPrivateDomain && continueClicked && <RedirectDiagnoseCard />}
-            {isPrivateDomain && <DiagnoseCard failedChecksCount={failedChecksCount} pwaCheckLogs={pwaCheckLogs} />}
+            {continueClicked && <RedirectDiagnoseCard />}
           </>
         )
       )}
@@ -124,7 +141,7 @@ function DiagnoseCard({ failedChecksCount, pwaCheckLogs }: { failedChecksCount: 
               <div className="diagnose-step">
                 <span className="diagnose-description">1. Copy logs to share with support</span>
                 <Button className="copy-pwa-logs" data-clipboard-text={pwaCheckLogs}>
-                  <GoCopy /> Copy Diagnsotic logs
+                  <GoCopy /> Copy Diagnostic logs
                 </Button>
               </div>
               <div className="splitter"></div>
