@@ -75,22 +75,18 @@ export default async function aggregate({
   if (req.ver === "latest") req.ver = "*";
 
   // Determine the latest version first
-  const availableVersions = await dappGetFetcher.versions(dappnodeInstaller, req.name, "*").then(sanitizeVersions);
+  const availableVersions = await dappGetFetcher.versions(dappnodeInstaller, req.name, req.ver).then(sanitizeVersions);
+  if (availableVersions.length === 0) throw new ErrorDappGetNoVersions({ dnpName: req.name, req });
 
-  if (!availableVersions.length) {
-    throw new ErrorDappGetNoVersions({ dnpName: req.name, req });
-  }
+  const latestVersion = availableVersions.sort((a, b) => (valid(a) && valid(b) ? (lt(a, b) ? 1 : -1) : 0))[0];
 
-const latestVersion = availableVersions.sort((a, b) => (valid(a) && valid(b) ? (lt(a, b) ? 1 : -1) : 0))[0];
-
-await aggregateDependencies({
-  dappnodeInstaller,
-  name: req.name,
-  versionRange: latestVersion, // Only the latest version
-  dnps,
-  dappGetFetcher
-});
-
+  await aggregateDependencies({
+    dappnodeInstaller,
+    name: req.name,
+    versionRange: latestVersion, // Only the latest version
+    dnps,
+    dappGetFetcher
+  });
 
   const relevantInstalledDnps = getRelevantInstalledDnps({
     // requestedDnps = ["A", "B", "C"]
