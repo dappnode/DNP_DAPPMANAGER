@@ -1,10 +1,4 @@
-import {
-  ConsensusClientMainnet,
-  ExecutionClientMainnet,
-  IpfsClientTarget,
-  PortProtocol,
-  Routes
-} from "@dappnode/types";
+import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -67,8 +61,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   cleanDb: async () => {},
   copyFileToDockerContainer: async () => {},
   diagnose: async () => [],
-  ethClientFallbackSet: async () => {},
-  ethClientTargetSet: async () => {},
   getHostUptime: async () => "1 week, 1 day, 5 hours, 10 minutes",
   ipfsTest: async () => {},
   ipPublicGet: async () => ({
@@ -207,20 +199,6 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     internalIp: "192.168.0.1",
     publicIp: "85.84.83.82",
     identityAddress: "0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B",
-    ethClientTarget: "nethermind",
-    eth2ClientTarget: {
-      execClient: ExecutionClientMainnet.Geth,
-      consClient: ConsensusClientMainnet.Prysm
-    },
-    ethClientFallback: "off",
-    ethClientStatus: {
-      ok: false,
-      code: "STATE_CALL_ERROR",
-      error: {
-        message: "Some Error",
-        stack: "Some Error\nline 56 file.ts"
-      }
-    },
     ethRemoteRpc: "http://remoteNode.dappnode:8545",
     fullnodeDomainTarget: "geth.dnp.dappnode.eth",
     newFeatureIds: [

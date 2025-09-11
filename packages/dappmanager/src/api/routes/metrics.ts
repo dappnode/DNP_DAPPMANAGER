@@ -45,40 +45,6 @@ register.registerMetric(
   })
 );
 
-// Ethereum node local or remote
-register.registerMetric(
-  new client.Gauge({
-    name: "dappmanager_eth_client_target_local",
-    help: "eth client target local",
-    labelNames: ["ethClientTargetLocal"],
-    collect() {
-      const ethClientRemote = db.ethClientRemote.get();
-      if (ethClientRemote === "on") {
-        this.set({ ethClientTargetLocal: "local" }, 0);
-      } else {
-        this.set({ ethClientTargetLocal: "local" }, 1);
-      }
-    }
-  })
-);
-
-// Ethereum fallback enabled
-register.registerMetric(
-  new client.Gauge({
-    name: "dappmanager_eth_fallback_enabled",
-    help: "eth fallback enabled",
-    labelNames: ["ethFallbackEnabled"],
-    collect() {
-      const ethClientFallback = db.ethClientFallback.get();
-      if (ethClientFallback === "on") {
-        this.set({ ethFallbackEnabled: "enabled" }, 1);
-      } else {
-        this.set({ ethFallbackEnabled: "enabled" }, 0);
-      }
-    }
-  })
-);
-
 // Staker config
 register.registerMetric(
   new client.Gauge({

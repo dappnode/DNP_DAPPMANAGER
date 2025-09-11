@@ -8,8 +8,6 @@ import Start from "./Start";
 import Finished from "./Finished";
 import SystemAutoUpdates from "./features/SystemAutoUpdates";
 import ChangeHostPassword from "./features/ChangeHostPassword";
-import Repository from "./features/Repository";
-import RepositoryFallback from "./features/RepositoryFallback";
 import EnableEthicalMetrics from "./features/EnableEthicalMetrics";
 // Utils
 import { isEqual } from "lodash-es";
@@ -40,10 +38,6 @@ function getRouteIdComponent(routeId: NewFeatureId): React.FC<RouteProps> | unde
       return (props: RouteProps) => <SystemAutoUpdates {...props} />;
     case "change-host-password":
       return (props: RouteProps) => <ChangeHostPassword {...props} />;
-    case "repository":
-      return (props: RouteProps) => <Repository {...props} />;
-    case "repository-fallback":
-      return (props: RouteProps) => <RepositoryFallback {...props} />;
     case "enable-ethical-metrics":
       return (props: RouteProps) => <EnableEthicalMetrics {...props} />;
     case "enable-notifications":

@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
 import * as ipfs from "utils/ipfs";
 // Components
-import Card from "components/Card";
 import Input from "components/Input";
 import Button from "components/Button";
 import Ok from "components/Ok";
+import { useLocation } from "react-router-dom";
+import { subPaths } from "pages/system/data";
 
 /**
  * peer = "/dns4/1bc3641738cbe2b1.dyndns.dappnode.io/tcp/4001/ipfs/QmWAcZZCvqVnJ6J9946qxEMaAbkUj6FiiVWakizVKfnfDL"
@@ -35,7 +36,32 @@ import Ok from "components/Ok";
  * - /dnsaddr/
  */
 
-export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
+export default function AddIpfsPeer() {
+  const location = useLocation();
+
+  const peerFromQuery =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("add-peer") || undefined
+      : undefined;
+
+  let peerFromLegacyPath: string | undefined;
+  if (location?.pathname) {
+    const splitter = `/${subPaths.peers}/`;
+    const idx = location.pathname.indexOf(splitter);
+    if (idx !== -1) {
+      const raw = location.pathname.slice(idx + splitter.length);
+      if (raw) {
+        try {
+          peerFromLegacyPath = decodeURIComponent(raw);
+        } catch {
+          peerFromLegacyPath = raw;
+        }
+      }
+    }
+  }
+
+  const peerFromUrl = (peerFromQuery ?? peerFromLegacyPath) || undefined;
+
   const [peerInput, setPeerInput] = useState("");
   const [addStat, setAddStat] = useState<{
     msg?: string;
@@ -69,32 +95,29 @@ export default function AddIpfsPeer({ peerFromUrl }: { peerFromUrl?: string }) {
   }, [peerFromUrl, addIpfsPeer]);
 
   return (
-    <>
-      <Card spacing>
-        <div>Add an IPFS peer to your own boostrap list and immediately connect to it.</div>
+    <div>
+      <h5 className="card-title">Add IPFS peer</h5>
+      <div>Add an IPFS peer to your own boostrap list and immediately connect to it.</div>
 
-        <Input
-          placeholder="Peer address /ip4/85.200.85.20/tcp/4001/ipfs/QmWas..."
-          value={peerInput}
-          // Ensure id contains only alphanumeric characters
-          onValueChange={(value) => {
-            setAddStat({});
-            setPeerInput(value);
-          }}
-          onEnterPress={() => {
-            if (!addStat.loading) addIpfsPeer(peerInput);
-          }}
-          append={
-            <Button variant="dappnode" onClick={() => addIpfsPeer(peerInput)} disabled={addStat.loading || !peerInput}>
-              Add peer
-            </Button>
-          }
-        />
+      <Input
+        placeholder="Peer address /ip4/85.200.85.20/tcp/4001/ipfs/QmWas..."
+        value={peerInput}
+        // Ensure id contains only alphanumeric characters
+        onValueChange={(value) => {
+          setAddStat({});
+          setPeerInput(value);
+        }}
+        onEnterPress={() => {
+          if (!addStat.loading) addIpfsPeer(peerInput);
+        }}
+        append={
+          <Button variant="dappnode" onClick={() => addIpfsPeer(peerInput)} disabled={addStat.loading || !peerInput}>
+            Add peer
+          </Button>
+        }
+      />
 
-        {addStat.msg && (
-          <Ok msg={addStat.msg} ok={addStat.ok} loading={addStat.loading} style={{ marginTop: "1rem" }} />
-        )}
-      </Card>
-    </>
+      {addStat.msg && <Ok msg={addStat.msg} ok={addStat.ok} loading={addStat.loading} style={{ marginTop: "1rem" }} />}
+    </div>
   );
 }

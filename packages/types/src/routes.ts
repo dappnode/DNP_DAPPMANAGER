@@ -4,8 +4,6 @@ import {
   VpnDeviceCredentials,
   VpnDevice,
   HostDiagnoseItem,
-  EthClientFallback,
-  Eth2ClientTarget,
   EthicalMetricsConfig,
   CoreUpdateData,
   DirectoryItem,
@@ -211,24 +209,6 @@ export interface Routes {
    * Checks requirements to update docker
    */
   dockerUpgradeCheck: () => Promise<DockerUpgradeRequirements>;
-
-  /**
-   * Sets if a fallback should be used
-   */
-  ethClientFallbackSet: (kwargs: { fallback: EthClientFallback }) => Promise<void>;
-
-  /**
-   * Changes the ethereum client used to fetch package data
-   */
-  ethClientTargetSet: (kwargs: {
-    target: Eth2ClientTarget;
-    ethRemoteRpc: string;
-    sync?: boolean;
-    deletePrevExecClient?: boolean;
-    deletePrevExecClientVolumes?: boolean;
-    deletePrevConsClient?: boolean;
-    deletePrevConsClientVolumes?: boolean;
-  }) => Promise<void>;
 
   /**
    * Enables ethical metrics notifications
@@ -885,8 +865,6 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   diagnose: {},
   dockerUpgrade: { log: true },
   dockerUpgradeCheck: { log: true },
-  ethClientFallbackSet: {},
-  ethClientTargetSet: { log: true },
   enableEthicalMetrics: { log: true },
   getCoreVersion: {},
   getEthicalMetricsConfig: { log: true },

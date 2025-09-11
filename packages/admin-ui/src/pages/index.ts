@@ -8,7 +8,6 @@ import * as system from "./system";
 import * as wifi from "./wifi";
 import * as community from "./community";
 import * as stakers from "./stakers";
-import * as repository from "./repository";
 import * as notifications from "./notifications";
 import * as premium from "./premium";
 
@@ -23,7 +22,6 @@ export const pages = {
   support,
   community,
   system,
-  repository,
   notifications,
   premium
 };

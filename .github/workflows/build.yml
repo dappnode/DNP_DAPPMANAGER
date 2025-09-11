@@ -1,15 +1,16 @@
 name: Build test
 on:
-  push:
   pull_request:
 
 jobs:
   build:
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Print Actor
+        run: echo "The actor is ${{ github.actor }}"
       - name: Build
-        if: github.actor != 'dependabot[bot]'
         run: npx @dappnode/dappnodesdk github-action build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
