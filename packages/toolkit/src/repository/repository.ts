@@ -40,6 +40,7 @@ const source = "ipfs" as const;
  */
 export class DappnodeRepository extends ApmRepository {
   protected gatewayUrl: string;
+  protected localIpfsUrl = "http://ipfs.dappnode:5001";
 
   /**
    * Constructs an instance of DappnodeRepository
@@ -60,22 +61,27 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Pins a hash to the IPFS node. Do not throw errors.
-   * @param hash
+   * Pin content to local IPFS node
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private async pinAddNoThrow(hash: any): Promise<void> {
-    try {
-      await fetch(`${this.gatewayUrl}/api/v0/pin/add?arg=${hash}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-    } catch (e) {
-      // Do not spam the terminal
-      // console.error(`Error pinning ${hash}`, e);
-    }
+  public async pinAddLocal(hash: string): Promise<void> {
+    await fetch(`${this.localIpfsUrl}/api/v0/pin/add?arg=${hash}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
+
+  /**
+   * Unpin content from local IPFS node
+   */
+  public async pinRmLocal(hash: string): Promise<void> {
+    await fetch(`${this.localIpfsUrl}/api/v0/pin/rm?arg=${hash}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
   }
 
   /**
@@ -140,9 +146,6 @@ export class DappnodeRepository extends ApmRepository {
       version
     });
     if (!isIPFS.cid(this.sanitizeIpfsPath(contentUri))) throw Error(`Invalid IPFS hash ${contentUri}`);
-
-    // pin hash asynchronously
-    this.pinAddNoThrow(this.sanitizeIpfsPath(contentUri));
 
     const ipfsEntries = await this.list(contentUri);
 
