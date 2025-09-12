@@ -11,7 +11,8 @@ import { isUpdateDelayCompleted } from "./isUpdateDelayCompleted.js";
 import { flagCompletedUpdate } from "./flagCompletedUpdate.js";
 import { isDnpUpdateEnabled } from "./isDnpUpdateEnabled.js";
 
-const contractAddressMap: Record<string, string> = {};
+const contractAddressMap = new Map<string, string>();
+const contentUriMap = new Map<string, string>();
 
 /**
  * For all installed non-core DAppNode packages, check their latest version
@@ -27,48 +28,70 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
       // Ignore:
       // - core DNPs that must be updatable only from the "core.dnp.dappnode.eth" package
       // - non-valid versions (semver.lte will throw)
-      if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) {
+      if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) continue;
+
+      await updateContractAddressMap(dappnodeInstaller, dnpName);
+      const contractAddress = contractAddressMap.get(dnpName);
+      if (!contractAddress) {
+        logs.warn(`No contract address found for ${dnpName}, skipping version check`);
         continue;
       }
 
-      // MUST exist an APM repo with the package dnpName
-      // Check here instead of the if statement to be inside the try / catch
-      let contractAddress = contractAddressMap[dnpName];
-      if (!contractAddress) {
-        try {
-          const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
-          if (typeof repoContract.target === "string") {
-            logs.info(`Caching contract address for ${dnpName}: ${repoContract.target}`);
-            contractAddress = repoContract.target;
-            contractAddressMap[dnpName] = contractAddress;
-          }
-        } catch (e) {
-          logs.warn(`Error checking ${dnpName} version`, e);
-          continue;
-        }
-      }
-
-      const { version: newVersion } = await dappnodeInstaller.getVersionAndIpfsHash({
+      const { version: newVersion, contentUri: newContentUri } = await dappnodeInstaller.getVersionAndIpfsHash({
         dnpNameOrHash: dnpName,
         contractAddress
       });
 
+      if (!contentUriMap.get(dnpName)) contentUriMap.set(dnpName, newContentUri);
+      await pinAndUnpinContentNotThrow(dappnodeInstaller, dnpName, newContentUri);
+
       // This version is not an update
-      if (lte(newVersion, currentVersion)) {
-        continue;
-      }
+      if (lte(newVersion, currentVersion)) continue;
 
       const updateData = { dnpName, currentVersion, newVersion };
-
       // Will try to resolve the IPFS release content, so await it to ensure it resolves
       await sendUpdatePackageNotificationMaybe({
         dappnodeInstaller,
         ...updateData
       });
-
       await autoUpdatePackageMaybe({ dappnodeInstaller, ...updateData });
     } catch (e) {
       logs.error(`Error checking ${dnpName} version`, e);
+    }
+  }
+}
+
+/**
+ * pinAndUnpinContent compares with the old version and content for pin and unpin content
+ */
+async function pinAndUnpinContentNotThrow(
+  dappnodeInstaller: DappnodeInstaller,
+  dnpName: string,
+  newContentUri: string
+): Promise<void> {
+  // Compare with the old version and content for pin and unpin content
+  const oldContentUri = contentUriMap.get(dnpName);
+  if (oldContentUri && newContentUri !== oldContentUri) {
+    logs.info(`Unpinning old content and pinning new content for ${dnpName}`);
+    try {
+      await dappnodeInstaller.pinRmLocal(oldContentUri);
+      await dappnodeInstaller.pinAddLocal(newContentUri);
+    } catch (e) {
+      logs.error(`Error updating content for ${dnpName}`, e);
+    }
+  }
+}
+
+/**
+ * updateContractAddressMap
+ */
+async function updateContractAddressMap(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<void> {
+  // MUST exist an APM repo with the package dnpName
+  if (!contractAddressMap.get(dnpName)) {
+    const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
+    if (typeof repoContract.target === "string") {
+      logs.info(`Caching contract info for ${dnpName}`);
+      contractAddressMap.set(dnpName, repoContract.target);
     }
   }
 }
