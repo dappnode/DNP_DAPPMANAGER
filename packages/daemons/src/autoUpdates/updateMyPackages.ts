@@ -71,15 +71,14 @@ async function pinAndUnpinContentNotThrow(
 ): Promise<void> {
   const oldContentUri = contentUriMap.get(dnpName);
   if (oldContentUri && newContentUri !== oldContentUri) {
-    logs.info(`Unpinning old content and pinning new content for ${dnpName}`);
-    try {
-      logs.info(`Pinning new content ${newContentUri} for ${dnpName}`);
-      await dappnodeInstaller.pinAddLocal(newContentUri);
-      logs.info(`Unpinning old content ${oldContentUri} for ${dnpName}`);
-      await dappnodeInstaller.pinRmLocal(oldContentUri);
-    } catch (e) {
-      logs.error(`Error updating content for ${dnpName}`, e);
-    }
+    logs.info(`Pinning new content ${newContentUri} for ${dnpName}`);
+    await dappnodeInstaller
+      .pinAddLocal(newContentUri)
+      .catch((e) => logs.info(`Could not pin new content for ${dnpName}`, e));
+    logs.info(`Unpinning old content ${oldContentUri} for ${dnpName}`);
+    await dappnodeInstaller
+      .pinRmLocal(oldContentUri)
+      .catch((e) => logs.info(`Could not unpin old content for ${dnpName}`, e));
   }
 }
 
