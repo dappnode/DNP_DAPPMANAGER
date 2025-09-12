@@ -30,7 +30,7 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
       // - non-valid versions (semver.lte will throw)
       if (!dnpName || !valid(currentVersion) || params.corePackagesNotAutoupdatable.includes(dnpName)) continue;
 
-      await updateContractAddressMap(dappnodeInstaller, dnpName);
+      await updateContractAddress(dappnodeInstaller, dnpName);
       const contractAddress = contractAddressMap.get(dnpName);
       if (!contractAddress) {
         logs.warn(`No contract address found for ${dnpName}, skipping version check`);
@@ -69,13 +69,14 @@ async function pinAndUnpinContentNotThrow(
   dnpName: string,
   newContentUri: string
 ): Promise<void> {
-  // Compare with the old version and content for pin and unpin content
   const oldContentUri = contentUriMap.get(dnpName);
   if (oldContentUri && newContentUri !== oldContentUri) {
     logs.info(`Unpinning old content and pinning new content for ${dnpName}`);
     try {
-      await dappnodeInstaller.pinRmLocal(oldContentUri);
+      logs.info(`Pinning new content ${newContentUri} for ${dnpName}`);
       await dappnodeInstaller.pinAddLocal(newContentUri);
+      logs.info(`Unpinning old content ${oldContentUri} for ${dnpName}`);
+      await dappnodeInstaller.pinRmLocal(oldContentUri);
     } catch (e) {
       logs.error(`Error updating content for ${dnpName}`, e);
     }
@@ -83,9 +84,9 @@ async function pinAndUnpinContentNotThrow(
 }
 
 /**
- * updateContractAddressMap
+ * updateContractAddress
  */
-async function updateContractAddressMap(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<void> {
+async function updateContractAddress(dappnodeInstaller: DappnodeInstaller, dnpName: string): Promise<void> {
   // MUST exist an APM repo with the package dnpName
   if (!contractAddressMap.get(dnpName)) {
     const repoContract = await dappnodeInstaller.getRepoContract(dnpName);
