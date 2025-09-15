@@ -118,7 +118,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
 
   return (
     <>
-      {network === "prater" && (
+      {network === Network.Prater && (
         <AlertDismissible variant="warning">
           <p>
             The prater network is deprecated, please migrate to <b>Hoodi</b>.
@@ -126,7 +126,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
         </AlertDismissible>
       )}
 
-      {network === "holesky" && (
+      {network === Network.Holesky && (
         <AlertDismissible variant="warning">
           <p>
             The holesky network is deprecated, please migrate to <b>Hoodi</b>.
@@ -134,7 +134,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
         </AlertDismissible>
       )}
 
-      {(network === "hoodi" || network === "mainnet") && (
+      {(network === Network.Hoodi || network === Network.Mainnet) && (
         <AlertDismissible variant="info">
           <p>
             <BsInfoCircleFill className="smooth-alert-icon" />
@@ -159,11 +159,15 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 to: <br />
                 (1) Choose an Execution Layer client <br />
                 (2) Choose a Consensus Layer client (+ validator) <br />
-                (3) Install the web3signer, which will hold the validator keys and sign <br />
-                {network !== "gnosis" && network !== "lukso" && (
+                {network !== Network.Sepolia && (
                   <>
-                    (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
-                    profit from MEV
+                    (3) Install the web3signer, which will hold the validator keys and sign <br />
+                    {network !== Network.Gnosis && network !== Network.Lukso && (
+                      <>
+                        (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
+                        profit from MEV
+                      </>
+                    )}
                   </>
                 )}
               </p>
@@ -195,28 +199,31 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                 ))}
               </Col>
 
-              <Col>
-                <SubTitle>Remote signer</SubTitle>
-                <RemoteSigner
-                  signer={currentStakerConfigReq.data.web3Signer}
-                  setNewWeb3signer={setNewWeb3signer}
-                  isSelected={Boolean(newWeb3signer)}
-                />
-              </Col>
-              {["prater", "mainnet", "holesky", "hoodi"].includes(network) && currentStakerConfigReq.data.mevBoost && (
+              {network !== Network.Sepolia && (
                 <Col>
-                  <SubTitle>Mev Boost</SubTitle>
-                  <MevBoost
-                    network={network}
-                    mevBoost={currentStakerConfigReq.data.mevBoost}
-                    newMevBoost={newMevBoost}
-                    setNewMevBoost={setNewMevBoost}
-                    newRelays={newRelays}
-                    setNewRelays={setNewRelays}
-                    isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                  <SubTitle>Remote signer</SubTitle>
+                  <RemoteSigner
+                    signer={currentStakerConfigReq.data.web3Signer}
+                    setNewWeb3signer={setNewWeb3signer}
+                    isSelected={Boolean(newWeb3signer)}
                   />
                 </Col>
               )}
+              {[Network.Prater, Network.Mainnet, Network.Holesky, Network.Hoodi].includes(network) &&
+                currentStakerConfigReq.data.mevBoost && (
+                  <Col>
+                    <SubTitle>Mev Boost</SubTitle>
+                    <MevBoost
+                      network={network}
+                      mevBoost={currentStakerConfigReq.data.mevBoost}
+                      newMevBoost={newMevBoost}
+                      setNewMevBoost={setNewMevBoost}
+                      newRelays={newRelays}
+                      setNewRelays={setNewRelays}
+                      isSelected={currentStakerConfigReq.data.mevBoost.dnpName === newMevBoost?.dnpName}
+                    />
+                  </Col>
+                )}
             </Row>
             <hr />
             <div>
