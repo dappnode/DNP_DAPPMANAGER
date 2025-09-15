@@ -249,7 +249,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           imageFile: {
             hash: "QM..",
             source: "ipfs",
-            size: 123
+            size: 123,
+            imageName: "op-geth.dnp.dappnode.eth"
           },
           warnings: {},
           signedSafe: true,
@@ -277,7 +278,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
           imageFile: {
             hash: "QM..",
             source: "ipfs",
-            size: 123
+            size: 123,
+            imageName: "op-erigon.dnp.dappnode.eth"
           },
           warnings: {},
           signedSafe: true,
@@ -306,7 +308,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         imageFile: {
           hash: "QM..",
           source: "ipfs",
-          size: 123
+          size: 123,
+          imageName: "op-node.dnp.dappnode.eth"
         },
         warnings: {},
         signedSafe: true,
@@ -334,7 +337,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         imageFile: {
           hash: "QM..",
           source: "ipfs",
-          size: 123
+          size: 123,
+          imageName: "op-l2geth.dnp.dappnode.eth"
         },
         warnings: {},
         signedSafe: true,

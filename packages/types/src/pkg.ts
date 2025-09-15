@@ -179,14 +179,13 @@ export interface TrustedReleaseKey {
   key: string;
 }
 
-type DistributedFileSource = "ipfs" | "swarm";
-
-interface DistributedFile {
+export type DistributedFileSource = "github" | "ipfs" | "swarm";
+export interface DistributedFile {
   hash: string;
   source: DistributedFileSource;
   size: number;
+  imageName: string; // "geth.tar.xz"
 }
-
 /**
  * APM version
  */
