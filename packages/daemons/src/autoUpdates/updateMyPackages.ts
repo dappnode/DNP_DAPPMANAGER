@@ -42,11 +42,18 @@ export async function checkNewPackagesVersion(dappnodeInstaller: DappnodeInstall
         contractAddress
       });
 
-      if (!contentUriMap.get(dnpName)) contentUriMap.set(dnpName, newContentUri);
-      await pinAndUnpinContentNotThrow(dappnodeInstaller, dnpName, newContentUri);
-
       // This version is not an update
       if (lte(newVersion, currentVersion)) continue;
+
+      if (!contentUriMap.get(dnpName)) {
+        const { contentUri: oldContentUri } = await dappnodeInstaller.getVersionAndIpfsHash({
+          dnpNameOrHash: dnpName,
+          version: currentVersion,
+          contractAddress
+        });
+        contentUriMap.set(dnpName, oldContentUri);
+      }
+      await pinAndUnpinContentNotThrow(dappnodeInstaller, dnpName, newContentUri);
 
       const updateData = { dnpName, currentVersion, newVersion };
       // Will try to resolve the IPFS release content, so await it to ensure it resolves
