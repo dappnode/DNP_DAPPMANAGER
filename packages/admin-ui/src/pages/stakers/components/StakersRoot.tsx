@@ -95,12 +95,14 @@ const StakersRoot: React.FC = () => {
   return (
     <>
       <Title title={title} />
-      <SwitchText
-        leftLabel="Mainnets"
-        rightLabel="Testnets"
-        checked={testnetsSelected}
-        onChange={handleNetworkFilter}
-      />
+      <div style={{ marginBottom: "10px" }}>
+        <SwitchText
+          leftLabel="Mainnets"
+          rightLabel="Testnets"
+          checked={testnetsSelected}
+          onChange={handleNetworkFilter}
+        />
+      </div>
       <SectionNavigator routes={filteredRoutes} />
     </>
   );
