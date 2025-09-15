@@ -14,7 +14,7 @@ export enum Network {
 
 export const networksByType = {
   mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso],
-  testnets: [Network.Hoodi, Network.Prater, Network.Holesky]
+  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia]
 };
 
 // MAINNET
@@ -137,7 +137,7 @@ export enum SignerLukso {
 // SEPOLIA
 export enum ConsensusClientSepolia {
   /*"prysm-sepolia.dnp.dappnode.eth",*/
-  Prysm = "prysm-sepolia.dnp.dappnode.eth",
+  Prysm = "prysm-sepolia.dnp.dappnode.eth"
 }
 
 export enum ExecutionClientSepolia {

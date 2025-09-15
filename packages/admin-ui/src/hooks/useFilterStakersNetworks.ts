@@ -17,7 +17,7 @@ const mainSet = new Set(networksByType.mainnets);
  * Filters on render based on URL.
  * Navigates to a matching route when toggled.
  */
-export function useFilterStakersNetwroks(availableRoutes: RouteType[]) {
+export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
   const location = useLocation();
   const navigate = useNavigate();
 

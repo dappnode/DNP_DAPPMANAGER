@@ -7,7 +7,7 @@ import { Network } from "@dappnode/types";
 import { SectionNavigator } from "components/SectionNavigator";
 import SwitchText from "components/SwitchText";
 import { RouteType } from "types";
-import { useFilterStakersNetwroks } from "hooks/useFilterStakersNetworks";
+import { useFilterStakersNetworks } from "hooks/useFilterStakersNetworks";
 
 const availableRoutes: RouteType[] = [
   {
@@ -90,7 +90,7 @@ const availableRoutes: RouteType[] = [
 ];
 
 const StakersRoot: React.FC = () => {
-  const { testnetsSelected, filteredRoutes, handleNetworkFilter } = useFilterStakersNetwroks(availableRoutes);
+  const { testnetsSelected, filteredRoutes, handleNetworkFilter } = useFilterStakersNetworks(availableRoutes);
 
   return (
     <>
