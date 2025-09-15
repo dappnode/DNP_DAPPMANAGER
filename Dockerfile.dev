@@ -30,7 +30,10 @@ COPY package.json yarn.lock .yarnrc.yml tsconfig.json ./
 COPY packages packages
 
 # link instructions must be executed in runtime due to the way the volumes are mounted
-ENTRYPOINT ["/bin/sh", "-c", "ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
+ENTRYPOINT ["/bin/sh", "-lc", "\
+  ln -sf /app/packages/admin-ui/build/ /app/packages/dappmanager/dist && \
   ln -sf /usr/src/app/dnp_repo/ /app/packages/dappmanager && \
   ln -sf /usr/src/app/DNCORE/ /app/packages/dappmanager && \
-  yarn && yarn build && yarn run dev"]
+  yarn && yarn build && \
+  yarn workspace @dappnode/dappmanager run dev:debug \
+"]
