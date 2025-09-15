@@ -97,8 +97,8 @@ const StakersRoot: React.FC = () => {
       <Title title={title} />
       <div style={{ marginBottom: "10px" }}>
         <SwitchText
-          leftLabel="Mainnets"
-          rightLabel="Testnets"
+          leftLabel="Mainnet"
+          rightLabel="Testnet"
           checked={testnetsSelected}
           onChange={handleNetworkFilter}
         />
