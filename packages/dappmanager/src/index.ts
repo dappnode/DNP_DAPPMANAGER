@@ -23,9 +23,8 @@ import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
-import { DappNodeDirectory, DappNodeRegistry } from "@dappnode/toolkit";
+import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
-import { ethers, FetchRequest } from "ethers";
 
 const controller = new AbortController();
 
@@ -60,44 +59,11 @@ const versionData = getVersionData();
 if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
 
-// Create unique provider with custom header
-const fetchRequest = new FetchRequest(params.ETH_MAINNET_RPC_URL_REMOTE);
-fetchRequest.setHeader(
-  "x-dappmanager-version",
-  `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
-);
-const provider1 = new ethers.JsonRpcProvider("http://execution.mainnet.dncore.dappnode:8545", "mainnet", {
-  staticNetwork: true
-});
-provider1._perform = async function (req) {
-  const isSyncing = await this.send("eth_syncing", []).catch((e) => {
-    console.error("Error checking eth_syncing", e);
-    throw e;
-  });
-  console.log({ isSyncing });
-  if (!isSyncing) {
-    const result = await ethers.JsonRpcProvider.prototype._perform.call(this, req);
-    // You can also check block number freshness here
-    return result;
-  } else {
-    throw new Error("Node is syncing");
+const providers = new MultiUrlJsonRpcProvider(
+  ["http://execution.mainnet.dncore.dappnode:8545", params.ETH_MAINNET_RPC_URL_REMOTE],
+  {
+    ["x-dappmanager-version"]: `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
   }
-};
-export const providers = new ethers.FallbackProvider(
-  [
-    {
-      provider: provider1,
-      priority: 1,
-      stallTimeout: 1000
-    },
-    {
-      provider: new ethers.JsonRpcProvider(fetchRequest, "mainnet", { staticNetwork: true, batchStallTime: 20 }),
-      priority: 2,
-      stallTimeout: 2000
-    }
-  ],
-  "mainnet",
-  { quorum: 1 }
 );
 
 // Required db to be initialized
