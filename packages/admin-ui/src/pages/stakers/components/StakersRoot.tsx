@@ -22,7 +22,7 @@ const availableRoutes: RouteType[] = [
   },
   {
     subPath: "gnosis",
-    name: "Gnosis Chain",
+    name: "Gnosis",
     element: (
       <StakerNetwork
         network={Network.Gnosis}
@@ -72,7 +72,7 @@ const availableRoutes: RouteType[] = [
   },
   {
     subPath: "lukso",
-    name: "LUKSO",
+    name: "Lukso",
     element: (
       <StakerNetwork
         network={Network.Lukso}
