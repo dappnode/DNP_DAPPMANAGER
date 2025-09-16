@@ -23,6 +23,16 @@ export const useStakerConfig = <T extends Network>(
   }>({ isAllowed: false });
 
   useEffect(() => {
+    // reset new states when network changes
+    setReqStatus({});
+    setNewExecClient(null);
+    setNewConsClient(null);
+    setNewMevBoost(null);
+    setNewRelays([]);
+    setNewWeb3signer(null);
+    setCurrentStakerConfig(undefined);
+    setChanges({ isAllowed: false });
+
     if (currentStakerConfigReq.data) {
       const { executionClients, consensusClients, mevBoost, web3Signer } = currentStakerConfigReq.data;
 
