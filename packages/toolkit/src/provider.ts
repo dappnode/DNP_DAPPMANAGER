@@ -38,9 +38,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
 
   /**
    * Core hook: route every JSON-RPC call through the first eligible healthy endpoint.
-   * If an endpoint is unhealthy and was checked < 1 min ago, skip it.
    * Otherwise, probe it with `eth_syncing`. If syncing === false, mark healthy and use it.
-   * If syncing is true/object OR the probe errors, mark unhealthy (update timestamp) and try the next.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   override async send(method: string, params: Array<any>): Promise<any> {
