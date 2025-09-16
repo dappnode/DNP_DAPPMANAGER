@@ -40,7 +40,7 @@ export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
   const filteredRoutes = React.useMemo(
     () =>
       availableRoutes.filter((r) => {
-        if (r.subPath === "prater") return false; // hide prater
+        if ([Network.Prater, Network.Holesky].includes(r.element.props.network)) return false; // hide prater && holesky
         if (r.subPath === "optimism") return !testnetsSelected; // only in mainnets view
         if (!isStakerRoute(r)) return false;
         const net = netOf(r);
@@ -52,7 +52,7 @@ export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
   // toggle -> navigate to first route of the target group if needed
   const handleNetworkFilter = (toTestnets: boolean) => {
     const target = availableRoutes.find((r) => {
-      if (r.subPath === "prater") return false;
+      if ([Network.Prater, Network.Holesky].includes(r.element.props.network)) return false;
       if (r.subPath === "optimism") return !toTestnets; // optimism counts only for mainnets
       if (!isStakerRoute(r)) return false;
       const net = netOf(r);
