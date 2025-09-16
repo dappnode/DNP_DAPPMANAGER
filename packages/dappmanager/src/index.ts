@@ -63,7 +63,7 @@ const providers = new MultiUrlJsonRpcProvider(
   [
     {
       url: "http://execution.mainnet.dncore.dappnode:8545",
-      beaconchainUrl: "http://beacon-chain.mainnet.dncore.dappnode:8545",
+      beaconchainUrl: "http://beacon-chain.mainnet.dncore.dappnode:3500",
       type: "local"
     },
     { url: params.ETH_MAINNET_RPC_URL_REMOTE, type: "remote" }
