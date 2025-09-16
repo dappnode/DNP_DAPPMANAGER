@@ -82,6 +82,8 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
   ): Promise<any> {
     try {
       const result = await ep.provider.send(method, params);
+      console.log(`result from ${ep.url} for method ${method}`);
+      console.log(result);
       return result;
     } catch (err) {
       errors.push({ url: ep.url, error: err });
