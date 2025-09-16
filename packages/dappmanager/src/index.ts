@@ -66,18 +66,36 @@ fetchRequest.setHeader(
   "x-dappmanager-version",
   `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
 );
-export const providers = new ethers.FallbackProvider([
-  {
-    provider: new ethers.JsonRpcProvider("http://execution.mainnet.dncore.dappnode:8545", "mainnet", {
-      staticNetwork: true
-    }),
-    priority: 1
-  },
-  {
-    provider: new ethers.JsonRpcProvider(fetchRequest, "mainnet", { staticNetwork: true, batchStallTime: 20 }),
-    priority: 2
+const provider1 = new ethers.JsonRpcProvider("http://execution.mainnet.dncore.dappnode:8545", "mainnet", {
+  staticNetwork: true
+});
+provider1._perform = async function (req) {
+  const isSyncing = await this.send("eth_syncing", []);
+  console.log({ isSyncing });
+  if (!isSyncing) {
+    const result = await ethers.JsonRpcProvider.prototype._perform.call(this, req);
+    // You can also check block number freshness here
+    return result;
+  } else {
+    throw new Error("Node is syncing");
   }
-]);
+};
+export const providers = new ethers.FallbackProvider(
+  [
+    {
+      provider: provider1,
+      priority: 1,
+      stallTimeout: 1000
+    },
+    {
+      provider: new ethers.JsonRpcProvider(fetchRequest, "mainnet", { staticNetwork: true, batchStallTime: 20 }),
+      priority: 2,
+      stallTimeout: 2000
+    }
+  ],
+  "mainnet",
+  { quorum: 1 }
+);
 
 // Required db to be initialized
 export const directory = new DappNodeDirectory(providers);
