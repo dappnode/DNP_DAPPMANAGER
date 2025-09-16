@@ -5,30 +5,34 @@ type EndpointState = {
   provider: JsonRpcProvider;
   healthy: boolean; // last known health
   lastHealthyCheck: number; // epoch ms of last health probe (or failure)
+  beaconchainUrl?: string;
 };
+
+// Removed: MultiProviderUrls. Each endpoint can have its own beaconchainUrl.
 
 const ONE_MINUTE_MS = 60_000;
 
 export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
   private endpoints: EndpointState[];
 
-  constructor(urls: string[], customHeaders: Record<string, string> = {}) {
-    if (!urls || urls.length === 0) {
-      throw new Error("MultiUrlJsonRpcProvider: at least one RPC URL is required");
+  constructor(endpoints: Array<{ url: string; beaconchainUrl?: string }>, customHeaders: Record<string, string> = {}) {
+    if (!endpoints || endpoints.length === 0) {
+      throw new Error("MultiUrlJsonRpcProvider: at least one endpoint is required");
     }
-    // Initialize the base JsonRpcProvider with the first URL (won’t actually be used for routing).
-    super(urls[0], "mainnet", { staticNetwork: true });
+    // Initialize the base JsonRpcProvider with the first endpoint
+    super(endpoints[0].url, "mainnet", { staticNetwork: true });
 
-    this.endpoints = urls.map((url) => {
-      const fetchRequest = new FetchRequest(url);
+    this.endpoints = endpoints.map((ep) => {
+      const fetchRequest = new FetchRequest(ep.url);
       Object.entries(customHeaders).forEach(([header, value]) => {
         fetchRequest.setHeader(header, value);
       });
       return {
-        url,
-        provider: new JsonRpcProvider(url, "mainnet", { staticNetwork: true }),
-        healthy: false, // pessimistic default until checked
-        lastHealthyCheck: 0
+        url: ep.url,
+        provider: new JsonRpcProvider(ep.url, "mainnet", { staticNetwork: true }),
+        healthy: false,
+        lastHealthyCheck: 0,
+        beaconchainUrl: ep.beaconchainUrl
       };
     });
   }
@@ -56,7 +60,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
           return result;
         } catch (err) {
           console.warn(`Request to ${ep.url} failed: ${stringifyError(err)}`);
-          // Mark unhealthy and record a timestamp, then fall through to try others.
           ep.healthy = false;
           ep.lastHealthyCheck = now;
           errors.push({ url: ep.url, error: err });
@@ -70,17 +73,26 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
         continue;
       }
 
-      // Probe health with eth_syncing.
-      const healthyNow = await this.probeHealth(ep).catch((err) => {
-        ep.healthy = false;
-        ep.lastHealthyCheck = now;
-        errors.push({ url: ep.url, error: err });
-        return false;
-      });
+      // Probe health: use beaconchain health if present
+      let healthyNow = false;
+      if (ep.beaconchainUrl) {
+        healthyNow = await this.probeBeaconchainHealth(ep.beaconchainUrl).catch((err) => {
+          ep.healthy = false;
+          ep.lastHealthyCheck = now;
+          errors.push({ url: ep.url, error: err });
+          return false;
+        });
+      } else {
+        healthyNow = await this.probeHealth(ep).catch((err) => {
+          ep.healthy = false;
+          ep.lastHealthyCheck = now;
+          errors.push({ url: ep.url, error: err });
+          return false;
+        });
+      }
 
       if (!healthyNow) {
         console.log(`Endpoint ${ep.url} is unhealthy after probe.`);
-        // Unhealthy; try next endpoint.
         continue;
       }
 
@@ -91,7 +103,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
         return result;
       } catch (err) {
         console.warn(`Request to ${ep.url} failed after probe: ${stringifyError(err)}`);
-        // Call failed; downgrade this endpoint and try the next.
         ep.healthy = false;
         ep.lastHealthyCheck = Date.now();
         errors.push({ url: ep.url, error: err });
@@ -106,6 +117,20 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
     );
     console.log(err.message);
     throw err;
+  }
+  /**
+   * Probe beaconchain health using /eth/v1/node/syncing endpoint
+   */
+  private async probeBeaconchainHealth(url: string): Promise<boolean> {
+    try {
+      const response = await fetch(`${url}/eth/v1/node/syncing`);
+      if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+      const data = await response.json();
+      if (!data || !data.data || data.data.is_syncing) return false;
+      return true;
+    } catch (err) {
+      return false;
+    }
   }
 
   /**

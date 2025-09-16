@@ -60,7 +60,13 @@ if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
 
 const providers = new MultiUrlJsonRpcProvider(
-  ["http://execution.mainnet.dncore.dappnode:8545", params.ETH_MAINNET_RPC_URL_REMOTE],
+  [
+    {
+      url: "http://execution.mainnet.dncore.dappnode:8545",
+      beaconchainUrl: "http://beacon-chain.mainnet.dncore.dappnode:8545"
+    },
+    { url: params.ETH_MAINNET_RPC_URL_REMOTE }
+  ],
   {
     ["x-dappmanager-version"]: `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
   }
