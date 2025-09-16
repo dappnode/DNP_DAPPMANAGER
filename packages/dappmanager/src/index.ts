@@ -70,7 +70,10 @@ const provider1 = new ethers.JsonRpcProvider("http://execution.mainnet.dncore.da
   staticNetwork: true
 });
 provider1._perform = async function (req) {
-  const isSyncing = await this.send("eth_syncing", []);
+  const isSyncing = await this.send("eth_syncing", []).catch((e) => {
+    console.error("Error checking eth_syncing", e);
+    throw e;
+  });
   console.log({ isSyncing });
   if (!isSyncing) {
     const result = await ethers.JsonRpcProvider.prototype._perform.call(this, req);
