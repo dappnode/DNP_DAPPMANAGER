@@ -30,7 +30,7 @@
     "@dappnode/types": "workspace:^0.1.0",
     "@ipld/car": "^5.4.0",
     "esm": "^3.2.25",
-    "ethers": "^6.10.0",
+    "ethers": "^6.15.0",
     "graphql": "^16.6.0",
     "graphql-request": "^6.0.0",
     "ipfs-unixfs-exporter": "^13.6.2",

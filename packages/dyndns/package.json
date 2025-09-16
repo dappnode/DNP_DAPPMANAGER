@@ -21,7 +21,7 @@
     "@dappnode/db": "workspace:^0.1.0",
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
-    "ethers": "^6.10.0",
+    "ethers": "^6.15.0",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
