@@ -3,15 +3,9 @@ import { JsonRpcProvider, FetchRequest } from "ethers";
 type EndpointState = {
   url: string;
   provider: JsonRpcProvider;
-  healthy: boolean; // last known health
-  lastHealthyCheck: number; // epoch ms of last health probe (or failure)
   beaconchainUrl?: string;
   type: "local" | "remote";
 };
-
-// Removed: MultiProviderUrls. Each endpoint can have its own beaconchainUrl.
-
-const ONE_MINUTE_MS = 60_000;
 
 export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
   private endpoints: EndpointState[];
@@ -53,26 +47,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
     const errors: Array<{ url: string; error: unknown }> = [];
 
     for (const ep of this.endpoints) {
-      console.log(`Trying endpoint ${ep.url} (healthy: ${ep.healthy}) for method ${method}`);
-      const now = Date.now();
-
-      // Fast path: if we believe it's healthy, try the call immediately.
-      if (ep.healthy) {
-        console.log(`Endpoint ${ep.url} is healthy, trying request...`);
-        try {
-          return await this.sendRequest(ep, now, errors, method, params);
-        } catch (err) {
-          console.warn(`Request to ${ep.url} failed: ${stringifyError(err)}`);
-          continue;
-        }
-      }
-
-      // Not healthy (or unknown). If checked < 1 minute ago, skip probing and move on.
-      if (now - ep.lastHealthyCheck < ONE_MINUTE_MS) {
-        console.log(`Skipping recently checked unhealthy endpoint ${ep.url}`);
-        continue;
-      }
-
       // Probe local full node health
       if (ep.type === "local") {
         // Probe beaconchain health if applicable
@@ -83,9 +57,8 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
 
       // Healthy after probe — attempt the actual request.
       try {
-        return await this.sendRequest(ep, now, errors, method, params);
+        return await this.sendRequest(ep, errors, method, params);
       } catch (err) {
-        console.warn(`Request to ${ep.url} failed after probe: ${stringifyError(err)}`);
         continue;
       }
     }
@@ -95,7 +68,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
       `MultiUrlJsonRpcProvider: all RPC endpoints failed for method "${method}".` +
         (errors.length ? ` Last errors: ${errors.map((e) => `\n- ${e.url}: ${stringifyError(e.error)}`).join("")}` : "")
     );
-    console.log(err.message);
     throw err;
   }
 
@@ -104,7 +76,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
    */
   private async sendRequest(
     ep: EndpointState,
-    now: number,
     errors: Array<{ url: string; error: unknown }>,
     method: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -115,8 +86,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
       const result = await ep.provider.send(method, params);
       return result;
     } catch (err) {
-      ep.healthy = false;
-      ep.lastHealthyCheck = now;
       errors.push({ url: ep.url, error: err });
       throw err;
     }
@@ -134,8 +103,6 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
       if (!data || !data.data || data.data.is_syncing) return false;
       return true;
     } catch (err) {
-      ep.healthy = false;
-      ep.lastHealthyCheck = Date.now();
       errors.push({ url: ep.beaconchainUrl, error: err });
       return false;
     }
@@ -153,26 +120,11 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
     try {
       const res = await ep.provider.send("eth_syncing", []);
       const isHealthy = res === false;
-      ep.healthy = isHealthy;
-      ep.lastHealthyCheck = Date.now();
       return isHealthy;
     } catch (err) {
-      ep.healthy = false;
-      ep.lastHealthyCheck = Date.now();
       errors.push({ url: ep.url, error: err });
       return false;
     }
-  }
-
-  /**
-   * Optional: expose current endpoint states (read-only copies).
-   */
-  public getEndpointStates(): Array<Pick<EndpointState, "url" | "healthy" | "lastHealthyCheck">> {
-    return this.endpoints.map(({ url, healthy, lastHealthyCheck }) => ({
-      url,
-      healthy,
-      lastHealthyCheck
-    }));
   }
 }
 
