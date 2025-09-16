@@ -1,5 +1,5 @@
 import { params } from "@dappnode/params";
-import { DappnodeRepository } from "@dappnode/toolkit";
+import { DappnodeRepository, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
   DistributedFile,
@@ -27,7 +27,6 @@ import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
 import { omit } from "lodash-es";
-import { ethers } from "ethers";
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
@@ -45,8 +44,8 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider) {
-    super(ipfsUrl, ethersProvider);
+  constructor(ipfsUrl: string, provider: MultiUrlJsonRpcProvider) {
+    super(ipfsUrl, provider);
   }
 
   private async updateProviders(): Promise<void> {
