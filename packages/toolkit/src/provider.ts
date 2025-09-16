@@ -70,7 +70,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
   }
 
   /**
-   *
+   * Send the actual JSON-RPC request to the given endpoint.
    */
   private async sendRequest(
     ep: EndpointState,
