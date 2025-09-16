@@ -5,18 +5,19 @@ import * as isIPFS from "is-ipfs";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { repositoryAbi } from "./params.js";
 import { MultiUrlJsonRpcProvider } from "../provider.js";
+import { JsonRpcApiProvider } from "ethers";
 
 /**
  * ApmRepository is a class to interact with the DAppNode APM Repository Contract.
  */
 export class ApmRepository {
-  private provider: MultiUrlJsonRpcProvider;
+  private provider: JsonRpcApiProvider;
 
   /**
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(provider: MultiUrlJsonRpcProvider) {
+  constructor(provider: JsonRpcApiProvider) {
     this.provider = provider;
   }
 

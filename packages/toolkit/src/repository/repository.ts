@@ -28,7 +28,7 @@ import { ApmRepository } from "./apmRepository.js";
 import { getReleaseSignatureStatus, serializeIpfsDirectory } from "./releaseSignature.js";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { dappnodeRegistry } from "./params.js";
-import { MultiUrlJsonRpcProvider } from "../provider.js";
+import { JsonRpcApiProvider } from "ethers";
 
 const source = "ipfs" as const;
 
@@ -47,7 +47,7 @@ export class DappnodeRepository extends ApmRepository {
    * @param ipfsUrl - The URL of the IPFS network node.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ipfsUrl: string, provider: MultiUrlJsonRpcProvider) {
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
     super(provider);
     this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
   }
