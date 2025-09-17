@@ -32,7 +32,7 @@
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",
     "deepmerge": "2.2.1",
-    "ethers": "^6.10.0",
+    "ethers": "^6.15.0",
     "is-ipfs": "8.0.1",
     "lodash-es": "4.17.21",
     "semver": "7.3.8",

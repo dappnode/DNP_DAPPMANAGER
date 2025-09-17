@@ -23,9 +23,8 @@ import { getLimiter, getViewsCounterMiddleware, getEthForwardMiddleware } from "
 import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
-import { DappNodeDirectory, DappNodeRegistry } from "@dappnode/toolkit";
+import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
 import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
-import { ethers, FetchRequest } from "ethers";
 
 const controller = new AbortController();
 
@@ -60,24 +59,19 @@ const versionData = getVersionData();
 if (versionData.ok) logs.info("Version info", versionData.data);
 else logs.error(`Error getting version data: ${versionData.message}`);
 
-// Create unique provider with custom header
-const fetchRequest = new FetchRequest(params.ETH_MAINNET_RPC_URL_REMOTE);
-fetchRequest.setHeader(
-  "x-dappmanager-version",
-  `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
-);
-export const providers = new ethers.FallbackProvider([
+const providers = new MultiUrlJsonRpcProvider(
+  [
+    {
+      url: "http://execution.mainnet.dncore.dappnode:8545",
+      beaconchainUrl: "http://beacon-chain.mainnet.dncore.dappnode:3500",
+      type: "local"
+    },
+    { url: params.ETH_MAINNET_RPC_URL_REMOTE, type: "remote" }
+  ],
   {
-    provider: new ethers.JsonRpcProvider("http://execution.mainnet.dncore.dappnode:8545", "mainnet", {
-      staticNetwork: true
-    }),
-    priority: 1
-  },
-  {
-    provider: new ethers.JsonRpcProvider(fetchRequest, "mainnet", { staticNetwork: true, batchStallTime: 20 }),
-    priority: 2
+    ["x-dappmanager-version"]: `${versionData.data.version}-${db.versionData.get().commit?.slice(0, 8)}`
   }
-]);
+);
 
 // Required db to be initialized
 export const directory = new DappNodeDirectory(providers);
