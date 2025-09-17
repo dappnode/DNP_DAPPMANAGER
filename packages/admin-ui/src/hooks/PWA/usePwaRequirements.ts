@@ -2,12 +2,12 @@ import { api, useApi } from "api";
 import { continueIfCalleDisconnected } from "api/utils";
 import { withToast } from "components/toast/Toast";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { httpsPortalDnpName } from "params";
+import { dnpCorePrefix, httpsPortalDnpName, dappmanagerDnpName } from "params";
 import { prettyDnpName } from "utils/format";
 
 export function usePwaRequirements() {
   // Requirements
-  const pwaRequirementsReq = useApi.pwaRequirementsGet();
+  const pwaRequirementsReq = useApi.pwaRequirementsGet({ host: window.location.hostname });
   const [pwaMappingUrl, setPwaMappingUrl] = useState<string | null>(null);
   const [httpsDnpInstalled, setHttpsDnpInstalled] = useState<boolean>(false);
   const [installingHttps, setInstallingHttps] = useState<boolean>(false);
@@ -15,14 +15,33 @@ export function usePwaRequirements() {
   const [restartingHttps, setRestartingHttps] = useState<boolean>(false);
   const [requirementsLoading, setRequirementsLoading] = useState<boolean>(true);
   const [isOnPwaDomain, setIsOnPwaDomain] = useState<boolean>(false);
+  const [privateIp, setPrivateIp] = useState<boolean | undefined>(undefined);
+  const [pwaDnsResolves, setPwaDnsResolves] = useState<boolean | undefined>(undefined);
+  const [containersInExternalNetwork, setContainersInExternalNetwork] = useState<
+    { dappmanager: boolean; httpsDnp: boolean } | undefined
+  >(undefined);
+  const [externalPointToDappmanager, setExternalPointToDappmanager] = useState<boolean>(false);
+  const [pwaCheckLogs, setPwaCheckLogs] = useState<string>("");
   const hasRestartedRef = useRef(false);
+  const isPrivateDomain = window.location.hostname === "my.dappnode.private";
 
   useEffect(() => {
     if (pwaRequirementsReq.data) {
       const data = pwaRequirementsReq.data;
+      console.log("Fetched PWA requirements:", data);
+
       setPwaMappingUrl(data.pwaMappingUrl || null);
       setHttpsDnpInstalled(data.httpsDnpInstalled);
       setIsHttpsRunning(data.isHttpsRunning);
+      setPrivateIp(data.privateIp);
+      setPwaDnsResolves(data.pwaDnsResolves);
+      setContainersInExternalNetwork(data.containersInExternalNetwork);
+      setExternalPointToDappmanager(data.externalPointToDappmanager);
+
+      async function getLogs() {
+        setPwaCheckLogs(await getPwaChecksLogs());
+      }
+      getLogs();
     }
   }, [pwaRequirementsReq.data]);
 
@@ -92,6 +111,28 @@ export function usePwaRequirements() {
     }
   }, [httpsDnpInstalled]);
 
+  const getPwaChecksLogs = async (): Promise<string> => {
+    const rawLogs = await api.packageLog({
+      containerName: `${dnpCorePrefix}${dappmanagerDnpName}`,
+      options: { timestamps: false, tail: 1000 }
+    });
+
+    // Normalize endings and split per line
+    const lines = rawLogs.replace(/\r\n/g, "\n").split("\n");
+    const filteredLogs = lines.filter((line) => line.includes("PWA Check") && line.trim() !== "");
+    const joinedLogs = filteredLogs.join("\n");
+
+    return joinedLogs;
+  };
+
+  const failedChecksCount = [
+    !privateIp,
+    !pwaDnsResolves,
+    !containersInExternalNetwork?.dappmanager,
+    !containersInExternalNetwork?.httpsDnp,
+    !externalPointToDappmanager
+  ].filter(Boolean).length;
+
   return {
     requirementsLoading,
     httpsDnpInstalled,
@@ -100,6 +141,9 @@ export function usePwaRequirements() {
     installingHttps,
     installHttpsPkg,
     pwaMappingUrl,
-    isOnPwaDomain
+    isOnPwaDomain,
+    failedChecksCount,
+    pwaCheckLogs,
+    isPrivateDomain
   };
 }

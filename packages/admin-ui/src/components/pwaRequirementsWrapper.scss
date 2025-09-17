@@ -1,13 +1,71 @@
 .pwa-requirements-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 0;
+
+  a.btn,
+  button {
+    margin-top: 10px;
+  }
+
+  .private-domain-description {
+    font-size: 0.9em;
+    color: gray;
+  }
+
+  .diagnose-card {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    text-align: center;
     gap: 10px;
-    padding: 10px 0;
-  
-    a.btn, button {
-      margin-top: 10px;
+
+    .diagnose-warning {
+      font-weight: bold;
+      font-size: 1.2rem;
+
+      .warning-color {
+        color: var(--danger-color);
+      }
+    }
+
+    .diagnose-actions-container {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      padding-top: 20px;
+
+      @media (max-width: 65rem) {
+        flex-direction: column;
+      }
+
+      > .diagnose-step {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .splitter {
+        width: 1px;
+        background-color: #ccc;
+        margin: 0 10px;
+
+        @media (max-width: 65rem) {
+          height: 1px;
+          width: 100%;
+          margin: 30px 0;
+        }
+      }
+    }
+
+    .diagnose-description {
+      color: gray;
     }
   }
-  
+}

@@ -390,7 +390,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   pwaRequirementsGet: async () => ({
     pwaMappingUrl: "https://pwa.abcdef.dyndns.dappnode.io",
     httpsDnpInstalled: true,
-    isHttpsRunning: true
+    isHttpsRunning: true,
+    externalPointToDappmanager: true
   }),
   premiumPkgStatus: async () => ({
     premiumDnpInstalled: true,

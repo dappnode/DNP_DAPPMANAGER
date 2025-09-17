@@ -690,10 +690,14 @@ export interface Routes {
   /**
    * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
    */
-  pwaRequirementsGet: () => Promise<{
+  pwaRequirementsGet: (kwargs: { host: string }) => Promise<{
     httpsDnpInstalled: boolean;
     isHttpsRunning: boolean;
     pwaMappingUrl: string | undefined;
+    privateIp?: boolean | undefined;
+    pwaDnsResolves?: boolean | undefined;
+    containersInExternalNetwork?: { dappmanager: boolean; httpsDnp: boolean } | undefined;
+    externalPointToDappmanager: boolean;
   }>;
 
   /**
