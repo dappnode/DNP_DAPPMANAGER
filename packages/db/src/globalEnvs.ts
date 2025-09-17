@@ -16,10 +16,13 @@ import {
   mevBoostMainnet,
   mevBoostPrater,
   mevBoostHolesky,
+  mevBoostSepolia,
   consensusClientHolesky,
   executionClientHolesky,
   consensusClientHoodi,
   executionClientHoodi,
+  consensusClientSepolia,
+  executionClientSepolia,
   mevBoostHoodi
 } from "./stakerConfig.js";
 import { serverName } from "./system.js";
@@ -66,6 +69,9 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_LUKSO`]: consensusClientLukso.get(),
     [`${prefix}EXECUTION_CLIENT_LUKSO`]: executionClientLukso.get(),
     [`${prefix}MEVBOOST_LUKSO`]: mevBoostLukso.get() ? "true" : "false",
+    [`${prefix}CONSENSUS_CLIENT_SEPOLIA`]: consensusClientSepolia.get(),
+    [`${prefix}EXECUTION_CLIENT_SEPOLIA`]: executionClientSepolia.get(),
+    [`${prefix}MEVBOOST_SEPOLIA`]: mevBoostSepolia.get() ? "true" : "false",
     [`${prefix}OP_ENABLE_HISTORICAL_RPC`]: opEnableHistoricalRpc.get() ? "true" : "false",
     [`${prefix}OP_EXECUTION_CLIENT`]: opExecutionClient.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

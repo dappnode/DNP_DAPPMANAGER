@@ -904,6 +904,100 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
+      
+      case "sepolia":
+        return {
+          executionClients: [
+            {
+              status: "ok",
+              dnpName: "sepolia-geth.dnp.dappnode.eth",
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                manifest: {
+                  name: "geth.dnp.dappnode.eth",
+                  description: "Geth execution client",
+                  shortDescription: "Geth execution client",
+                  version: "0.1.0"
+                }
+              }
+            }
+          ],
+          consensusClients: [
+            {
+              status: "ok",
+              dnpName: "prysm-sepolia.dnp.dappnode.eth",
+              isInstalled: true,
+              isRunning: true,
+              isUpdated: true,
+              isSelected: true,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+
+                manifest: {
+                  name: "prysm.dnp.dappnode.eth",
+                  description: "Prysm consensus client",
+                  shortDescription: "Prysm consensus client",
+                  version: "0.1.0"
+                }
+              }
+            }
+          ],
+          web3Signer: {
+            status: "ok",
+            dnpName: "web3signer-sepolia.dnp.dappnode.eth",
+            isInstalled: true,
+            isRunning: true,
+            isUpdated: true,
+            isSelected: true,
+            avatarUrl: "",
+            data: {
+              dnpName: "package",
+              reqVersion: "0.1.0",
+              semVersion: "0.1.0",
+              imageFile: {
+                hash: "QM..",
+                source: "ipfs",
+                size: 123
+              },
+              warnings: {},
+              signedSafe: true,
+              manifest: {
+                name: "web3signer.dnp.dappnode.eth",
+                description: "Web3Signer",
+                shortDescription: "Web3Signer",
+                version: "0.1.0"
+              },
+              links: {
+                ui: "http://web3signer-prater.dappnode:9000"
+              }
+            }
+          }
+        };
+
       case "hoodi":
         return {
           executionClients: [

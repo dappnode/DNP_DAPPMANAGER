@@ -8,8 +8,14 @@ export enum Network {
   Gnosis = "gnosis",
   Lukso = "lukso",
   Holesky = "holesky",
+  Sepolia = "sepolia",
   Hoodi = "hoodi"
 }
+
+export const networksByType = {
+  mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso],
+  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia]
+};
 
 // MAINNET
 export enum ConsensusClientMainnet {
@@ -126,6 +132,20 @@ export enum ExecutionClientLukso {
 }
 export enum SignerLukso {
   Web3signer = "web3signer-lukso.dnp.dappnode.eth"
+}
+
+// SEPOLIA
+export enum ConsensusClientSepolia {
+  /*"prysm-sepolia.dnp.dappnode.eth",*/
+  Prysm = "prysm-sepolia.dnp.dappnode.eth"
+}
+
+export enum ExecutionClientSepolia {
+  Geth = "sepolia-geth.dnp.dappnode.eth"
+}
+
+export enum SignerSepolia {
+  Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
 }
 
 export type StakerItem = StakerItemOk | StakerItemError;
