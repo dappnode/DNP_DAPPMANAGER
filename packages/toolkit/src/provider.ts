@@ -27,7 +27,7 @@ export class MultiUrlJsonRpcProvider extends JsonRpcProvider {
       });
       return {
         url: ep.url,
-        provider: new JsonRpcProvider(ep.url, "mainnet", { staticNetwork: true }),
+        provider: new JsonRpcProvider(fetchRequest, "mainnet", { staticNetwork: true }),
         beaconchainUrl: ep.beaconchainUrl,
         type: ep.type
       };
