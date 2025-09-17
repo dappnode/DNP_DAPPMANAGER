@@ -56,6 +56,6 @@ const getDefaultCheckpointSync = (network: Network): string =>
             : network === "lukso"
               ? "https://checkpoints.mainnet.lukso.network"
               : network === "sepolia"
-                ? "https://checkpoint-sync-sepolia.dappnode.io"
+                ? "https://checkpoint-sync.sepolia.ethpandaops.io"
                 : "";
                 
