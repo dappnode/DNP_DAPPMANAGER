@@ -1,10 +1,10 @@
 .horizontal-navbar {
   display: flex;
-  margin-bottom: 0.5rem !important;
+  border-bottom: 1px solid var(--color-light-border);
+  margin-bottom: 1rem;
   .item-container {
     background-color: transparent;
     border: none;
-    margin-bottom: 1rem;
     padding-bottom: 0.3rem;
     padding-left: 0;
     font-size: 1.2rem;
@@ -35,5 +35,13 @@
 
   @media (max-width: 40rem) {
     overflow-x: scroll;
+  }
+}
+
+#dark {
+  #main {
+    .horizontal-navbar {
+      border-bottom: var(--border-style-dark);
+    }
   }
 }
