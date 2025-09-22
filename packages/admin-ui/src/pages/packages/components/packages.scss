@@ -171,3 +171,13 @@
     font-size: 1.5rem;
   }
 }
+
+#dark {
+  #main {
+    .pkgs-back-btn {
+      span {
+        color: var(--dappnode-links-color);
+      }
+    }
+  }
+}
