@@ -185,6 +185,13 @@ const getDefaultRelays = (network: Network): RelayIface[] => {
             "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay.ultrasound.money"
         },
         {
+          operator: "Ultra Sound (filtered)",
+          ofacCompliant: true,
+          docs: "https://relay.ultrasound.money/",
+          url:
+            "https://0xa1559ace749633b997cb3fdacffb890aeebdb0f5a3b6aaa7eeeaf1a38af0a8fe88b9e4b1f61f236d2e64d95733327a62@relay-filtered.ultrasound.money"
+        },
+        {
           operator: "Flashbots",
           ofacCompliant: true,
           docs: "https://boost.flashbots.net/",
