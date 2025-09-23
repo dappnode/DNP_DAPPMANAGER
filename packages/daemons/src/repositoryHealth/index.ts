@@ -70,7 +70,7 @@ async function checkIpfsHealth(): Promise<void> {
         status: Status.triggered,
         callToAction: {
           title: `Switch to ${ipfsClientTarget && ipfsClientTarget === "local" ? "Remote" : "Local"} IPFS`,
-          url: "http://my.dappnode/repository/ipfs"
+          url: "http://my.dappnode/system/ipfs"
         },
         isBanner: true,
         isRemote: false,
@@ -142,8 +142,8 @@ Syncing and access to Ethereum chain data should now resume normally.`,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: "Make sure your Ethereum RPC is reachable",
-          url: "http://my.dappnode/repository/eth"
+          title: "Check docs",
+          url: "https://docs.dappnode.io/docs/user/repository/ethereum"
         },
         isBanner: true,
         isRemote: false,
