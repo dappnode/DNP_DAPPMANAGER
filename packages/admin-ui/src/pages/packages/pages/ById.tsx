@@ -1,7 +1,7 @@
 import React from "react";
-import { Routes, Route, NavLink, useParams } from "react-router-dom";
+import { Routes, Route, NavLink, useParams, Link } from "react-router-dom";
 import { useApi } from "api";
-import { isEmpty } from "lodash-es";
+import { capitalize, isEmpty } from "lodash-es";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";
@@ -10,7 +10,7 @@ import { FileManager } from "../components/FileManager";
 import { Backup } from "../components/Backup";
 import { NoDnpInstalled } from "../components/NoDnpInstalled";
 import { Network } from "../components/Network";
-import { title } from "../data";
+import { basePath, mySubPath, systemSubPath } from "../data";
 // Components
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
@@ -18,6 +18,8 @@ import Title from "components/Title";
 // Utils
 import { prettyDnpName } from "utils/format";
 import { AlertPackageUpdateAvailable } from "../components/AlertPackageUpdateAvailable";
+import { MdKeyboardArrowLeft } from "react-icons/md";
+import "../components/packages.scss";
 
 export const PackageById: React.FC = () => {
   const params = useParams();
@@ -29,16 +31,19 @@ export const PackageById: React.FC = () => {
   if (!dnp) {
     return (
       <>
-        <Title title={title} subtitle={id} />
         {dnpRequest.isValidating ? (
           <Loading steps={[`Loading ${prettyDnpName(id)}`]} />
-        ) : dnpRequest.error ? (
-          dnpRequest.error.message.includes("package not found") ? (
-            <NoDnpInstalled id={id} />
-          ) : (
-            <ErrorView error={dnpRequest.error} />
-          )
-        ) : null}
+        ) : (
+          <>
+            <Title title={id} />
+            {dnpRequest.error &&
+              (dnpRequest.error.message.includes("package not found") ? (
+                <NoDnpInstalled id={id} />
+              ) : (
+                <ErrorView error={dnpRequest.error} />
+              ))}
+          </>
+        )}
       </>
     );
   }
@@ -52,7 +57,8 @@ export const PackageById: React.FC = () => {
     gettingStartedShow,
     backup = [],
     containers,
-    updateAvailable
+    updateAvailable,
+    isCore
   } = dnp;
 
   /**
@@ -105,9 +111,13 @@ export const PackageById: React.FC = () => {
   ].filter((route) => route.available);
 
   return (
-    <>
-      <Title title={title} subtitle={prettyDnpName(dnpName)} />
+    <div>
+      <Link to={isCore ? `/${basePath}/${systemSubPath}` : `/${basePath}/${mySubPath}`} className="pkgs-back-btn">
+        <MdKeyboardArrowLeft />
+        <span>{capitalize(isCore ? `${systemSubPath}` : `${mySubPath}`)} packages</span>
+      </Link>
 
+      <Title title={prettyDnpName(dnpName)} />
       <div className="horizontal-navbar">
         {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
@@ -129,6 +139,6 @@ export const PackageById: React.FC = () => {
           ))}
         </Routes>
       </div>
-    </>
+    </div>
   );
 };
