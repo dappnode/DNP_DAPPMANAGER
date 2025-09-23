@@ -9,7 +9,7 @@ export const usePwaSubtabUrl = (): string | undefined => {
     async function fetchPwaUrl() {
       const url = await api.pwaUrlGet();
       if (url) {
-        setPwaSubtabUrl(`${url}/${pathName}/${subPaths.app}`);
+        setPwaSubtabUrl(`https://${url}/${pathName}/${subPaths.app}`);
       } else {
         setPwaSubtabUrl(undefined);
       }
