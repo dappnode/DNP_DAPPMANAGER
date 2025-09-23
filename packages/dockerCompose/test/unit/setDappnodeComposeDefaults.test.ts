@@ -179,7 +179,6 @@ describe("setDappnodeComposeDefaults", () => {
           ],
           environment: [
             "LOG_LEVEL=info",
-            "ETH_MAINNET_RPC_URL_OVERRIDE=",
             "ETH_MAINNET_RPC_URL_REMOTE=",
             "IPFS_HOST=",
             "DISABLE_UPNP="
@@ -232,7 +231,6 @@ describe("setDappnodeComposeDefaults", () => {
           container_name: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
           environment: {
             LOG_LEVEL: "info",
-            ETH_MAINNET_RPC_URL_OVERRIDE: "",
             ETH_MAINNET_RPC_URL_REMOTE: "",
             IPFS_HOST: "",
             DISABLE_UPNP: ""
