@@ -10,7 +10,7 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
@@ -53,11 +53,17 @@ export class MevBoost extends StakerComponent {
 
   async getAllMevBoost(network: Network): Promise<StakerItem[]> {
     const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
-    return await super.getAll({
-      dnpNames: mevBoostDnpName ? [mevBoostDnpName] : [],
-      currentClient: this.DbHandlers[network].get(),
-      relays: await this.getMevBoostCurrentRelays(mevBoostDnpName)
-    });
+    return await Promise.all(
+      (mevBoostDnpName ? [mevBoostDnpName] : []).map(async (dnpName) =>
+        super.getStakerPkg({
+          dnpName,
+          dnpList: await listPackages(),
+          userSettings: this.getUserSettings(network, null),
+          currentClient: this.DbHandlers[network].get(),
+          relays: await this.getMevBoostCurrentRelays(dnpName)
+        })
+      )
+    );
   }
 
   async getMevBoostCurrentRelays(mevBoostDnpName?: string): Promise<string[]> {
