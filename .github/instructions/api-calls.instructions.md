@@ -7,7 +7,7 @@ applyTo: "packages/types/src/routes.ts,packages/dappmanager/src/calls/**/*.ts,pa
 - **Definition:** A frontend-backend API call is any function that fetches or sends data between the frontend (`admin-ui`) and backend (`dappmanager`), e.g., REST, GraphQL, or RPC endpoints.
 
 ### 1. Define API Call Logic
-- Create a new file under `packages/dappmanager/src/calls/` with a descriptive, camelCase name (e.g., `getUser.ts`).
+- Create a new file under `packages/dappmanager/src/calls/` with a descriptive, camelCase name (e.g., `chainDataGet.ts`).
 - If logic becomes complex or reusable, import code from shared modules instead of implementing all logic in `dappmanager`.
 
 **Example:**
