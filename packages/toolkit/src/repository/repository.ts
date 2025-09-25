@@ -39,25 +39,28 @@ const source = "ipfs" as const;
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected gatewayUrl: string;
+  protected gatewayUrls: string[];
   protected localIpfsUrl = "http://ipfs.dappnode:5001";
 
   /**
    * Constructs an instance of DappnodeRepository
-   * @param ipfsUrl - The URL of the IPFS network node.
-   * @param ethUrl - The URL of the Ethereum node to connect to.
+   * @param ipfsUrls - Array of IPFS gateway URLs, tried in order with fallback.
+   * @param provider - The Ethereum provider to connect to.
    */
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+  constructor(ipfsUrls: string | string[], provider: JsonRpcApiProvider) {
     super(provider);
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+    // Support both single URL (backward compatibility) and array of URLs
+    const urls = Array.isArray(ipfsUrls) ? ipfsUrls : [ipfsUrls];
+    this.gatewayUrls = urls.map(url => url.replace(/\/?$/, "")); // Remove trailing slash
   }
 
   /**
    * Changes the IPFS provider and target.
-   * @param ipfsUrl - The new URL of the IPFS network node.
+   * @param ipfsUrls - Array of IPFS gateway URLs or single URL string.
    */
-  public changeIpfsGatewayUrl(ipfsUrl: string): void {
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+  public changeIpfsGatewayUrl(ipfsUrls: string | string[]): void {
+    const urls = Array.isArray(ipfsUrls) ? ipfsUrls : [ipfsUrls];
+    this.gatewayUrls = urls.map(url => url.replace(/\/?$/, ""));
   }
 
   /**
@@ -373,6 +376,7 @@ export class DappnodeRepository extends ApmRepository {
 
   /**
    * Lists the contents of a directory pointed by the given hash.
+   * Tries multiple gateways in order until successful.
    * ipfs.dag.get => reutrns `Tsize`!
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
@@ -383,66 +387,124 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    const errors: string[] = [];
+
+    for (const gatewayUrl of this.gatewayUrls) {
+      try {
+        const url = `${gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+        const res = await fetch(url, {
+          headers: { Accept: "application/vnd.ipld.dag-json" }
+        });
+        
+        if (!res.ok) {
+          errors.push(`Gateway ${gatewayUrl}: ${res.status} ${res.statusText}`);
+          continue;
+        }
+
+        const dagJson = (await res.json()) as {
+          Links?: Array<{
+            Name: string;
+            Hash: { "/": string };
+            Tsize: number;
+          }>;
+        };
+
+        if (!dagJson.Links) {
+          errors.push(`Gateway ${gatewayUrl}: Invalid IPFS directory CID ${cidStr}`);
+          continue;
+        }
+
+        // Success! Return the directory listing
+        return dagJson.Links.map((link) => ({
+          type: "file",
+          cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
+          name: link.Name,
+          path: `${link.Hash["/"]}/${link.Name}`,
+          size: link.Tsize
+        }));
+
+      } catch (error) {
+        errors.push(`Gateway ${gatewayUrl}: ${error.message}`);
+      }
     }
 
-    const dagJson = (await res.json()) as {
-      Links?: Array<{
-        Name: string;
-        Hash: { "/": string };
-        Tsize: number;
-      }>;
-    };
+    // If we get here, all gateways failed
+    throw new Error(`Failed to list directory from all gateways. Errors: ${errors.join("; ")}`);
+  }
 
-    if (!dagJson.Links) {
-      throw new Error(`Invalid IPFS directory CID ${cidStr}`);
+  /**
+   * Checks if content exists on an IPFS gateway using HEAD request.
+   * 
+   * @param gatewayUrl - The IPFS gateway URL to check.
+   * @param hash - The content identifier (CID) to check.
+   * @returns True if content exists, false otherwise.
+   */
+  private async checkContentExistsOnGateway(gatewayUrl: string, hash: string): Promise<boolean> {
+    try {
+      const url = `${gatewayUrl}/ipfs/${hash}`;
+      const res = await fetch(url, { method: "HEAD" });
+      return res.ok;
+    } catch (error) {
+      return false;
     }
-
-    return dagJson.Links.map((link) => ({
-      type: "file",
-      cid: CID.parse(this.sanitizeIpfsPath(link.Hash["/"])),
-      name: link.Name,
-      path: `${link.Hash["/"]}/${link.Name}`,
-      size: link.Tsize
-    }));
   }
 
   /**
    * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
+   * Tries multiple gateways in order until content is found or all gateways fail.
    * The content is returned as a CAR reader and the root CID.
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
    * @returns The content as a CAR reader and the root CID.
-   * @throws Error when the root CID does not match the provided hash (content is untrusted).
+   * @throws Error when content is not found on any gateway or root CID does not match.
    */
   private async getAndVerifyContentFromGateway(hash: string): Promise<{
     carReader: CarReader;
     root: CID;
   }> {
-    // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
-    });
-    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
+    const errors: string[] = [];
 
-    // 2. Parse into a CarReader
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const carReader = await CarReader.fromBytes(bytes);
+    for (const gatewayUrl of this.gatewayUrls) {
+      try {
+        // First check if content exists on this gateway
+        const contentExists = await this.checkContentExistsOnGateway(gatewayUrl, hash);
+        if (!contentExists) {
+          errors.push(`Gateway ${gatewayUrl}: Content not found`);
+          continue;
+        }
 
-    // 3. Verify the root CID
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
-      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+        // 1. Download the CAR
+        const url = `${gatewayUrl}/ipfs/${hash}?format=car`;
+        const res = await fetch(url, {
+          headers: { Accept: "application/vnd.ipld.car" }
+        });
+        if (!res.ok) {
+          errors.push(`Gateway ${gatewayUrl}: ${res.status} ${res.statusText}`);
+          continue;
+        }
+
+        // 2. Parse into a CarReader
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const carReader = await CarReader.fromBytes(bytes);
+
+        // 3. Verify the root CID
+        const roots = await carReader.getRoots();
+        const root = roots[0];
+        if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+          errors.push(`Gateway ${gatewayUrl}: UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+          continue;
+        }
+
+        // Success! Return the verified content
+        return { carReader, root };
+
+      } catch (error) {
+        errors.push(`Gateway ${gatewayUrl}: ${error.message}`);
+      }
     }
 
-    return { carReader, root };
+    // If we get here, all gateways failed
+    throw new Error(`Failed to fetch content from all gateways. Errors: ${errors.join("; ")}`);
   }
 
   /**
