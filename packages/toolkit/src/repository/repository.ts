@@ -433,23 +433,6 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Checks if content exists on an IPFS gateway using HEAD request.
-   * 
-   * @param gatewayUrl - The IPFS gateway URL to check.
-   * @param hash - The content identifier (CID) to check.
-   * @returns True if content exists, false otherwise.
-   */
-  private async checkContentExistsOnGateway(gatewayUrl: string, hash: string): Promise<boolean> {
-    try {
-      const url = `${gatewayUrl}/ipfs/${hash}`;
-      const res = await fetch(url, { method: "HEAD" });
-      return res.ok;
-    } catch (error) {
-      return false;
-    }
-  }
-
-  /**
    * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
    * Tries multiple gateways in order until content is found or all gateways fail.
    * The content is returned as a CAR reader and the root CID.
@@ -466,28 +449,22 @@ export class DappnodeRepository extends ApmRepository {
 
     for (const gatewayUrl of this.gatewayUrls) {
       try {
-        // First check if content exists on this gateway
-        const contentExists = await this.checkContentExistsOnGateway(gatewayUrl, hash);
-        if (!contentExists) {
-          errors.push(`Gateway ${gatewayUrl}: Content not found`);
-          continue;
-        }
-
-        // 1. Download the CAR
+        // Download the CAR directly - no need for HEAD check since we validate content anyway
         const url = `${gatewayUrl}/ipfs/${hash}?format=car`;
         const res = await fetch(url, {
           headers: { Accept: "application/vnd.ipld.car" }
         });
+        
         if (!res.ok) {
           errors.push(`Gateway ${gatewayUrl}: ${res.status} ${res.statusText}`);
           continue;
         }
 
-        // 2. Parse into a CarReader
+        // Parse into a CarReader
         const bytes = new Uint8Array(await res.arrayBuffer());
         const carReader = await CarReader.fromBytes(bytes);
 
-        // 3. Verify the root CID
+        // Verify the root CID
         const roots = await carReader.getRoots();
         const root = roots[0];
         if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
