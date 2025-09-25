@@ -47,6 +47,7 @@ export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
 export { ipfsClientTargetGet } from "./ipfsClientTargetGet.js";
 export { ipPublicGet } from "./ipPublicGet.js";
 export * from "./localProxy.js";
+export { mathSumGet } from "./mathSumGet.js";
 export * from "./manageLvm.js";
 export { mountpointsGet } from "./mountpointsGet.js";
 export { newFeatureStatusSet } from "./newFeatureStatusSet.js";

@@ -834,6 +834,9 @@ export interface Routes {
 
   /** Get URLs to a single Wireguard credentials */
   wireguardDevicesGet(): Promise<string[]>;
+
+  /** Returns the sum of 3 + 5 */
+  mathSumGet(): Promise<number>;
 }
 
 interface RouteData {
@@ -978,7 +981,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   wireguardDeviceAdd: { log: true },
   wireguardDeviceRemove: { log: true },
   wireguardDeviceGet: {},
-  wireguardDevicesGet: {}
+  wireguardDevicesGet: {},
+  mathSumGet: {}
 };
 
 // DO NOT REMOVE
