@@ -427,7 +427,8 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
     hoodi: { validators: [] },
     gnosis: null
-  })
+  }),
+  mathSumGet: async () => 8
 };
 
 export const calls: Routes = {

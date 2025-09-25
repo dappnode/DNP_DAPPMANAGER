@@ -4,6 +4,7 @@ import { title } from "../data";
 import { ChainCards } from "./ChainCard";
 import { HostStats } from "./HostStats";
 import { PackageUpdates } from "./PackageUpdates";
+import { MathSum } from "./MathSum";
 // Components
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
@@ -26,6 +27,9 @@ export default function Dashboard() {
 
           <SubTitle>Machine stats</SubTitle>
           <HostStats />
+
+          <SubTitle>Math Sum</SubTitle>
+          <MathSum />
         </div>
       </div>
     </>
