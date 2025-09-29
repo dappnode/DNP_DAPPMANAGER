@@ -53,31 +53,41 @@ export default async function aggregateDependencies({
       // Already checked, skip. Otherwise lock request to prevent duplicate fetches
       if (hasVersion(dnps, name, version)) return;
       else setVersion(dnps, name, version, {});
-      // 2. Get dependencies of this specific version
-      //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-      const dependencies = await dappGetFetcher
-        .dependencies(dappnodeInstaller, name, version)
-        .then(sanitizeDependencies)
-        .catch((e: Error) => {
-          e.message += `Error fetching ${name}@${version}`;
-          throw e;
-        });
+      
+      try {
+        // 2. Get dependencies of this specific version
+        //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
+        const dependencies = await dappGetFetcher
+          .dependencies(dappnodeInstaller, name, version)
+          .then(sanitizeDependencies);
 
-      // 3. Store dependencies
-      setVersion(dnps, name, version, dependencies);
-      // 4. Fetch sub-dependencies recursively
-      await Promise.all(
-        Object.keys(dependencies).map(async (dependencyName) => {
-          await aggregateDependencies({
-            dappnodeInstaller,
-            name: dependencyName,
-            versionRange: dependencies[dependencyName],
-            dnps,
-            recursiveCount,
-            dappGetFetcher
-          });
-        })
-      );
+        // 3. Store dependencies
+        setVersion(dnps, name, version, dependencies);
+        // 4. Fetch sub-dependencies recursively
+        await Promise.all(
+          Object.keys(dependencies).map(async (dependencyName) => {
+            await aggregateDependencies({
+              dappnodeInstaller,
+              name: dependencyName,
+              versionRange: dependencies[dependencyName],
+              dnps,
+              recursiveCount,
+              dappGetFetcher
+            });
+          })
+        );
+      } catch (e: unknown) {
+        // Skip versions whose dependencies can't be fetched instead of failing the entire aggregation
+        // Remove the version from dnps as it's not usable
+        if (dnps[name] && dnps[name].versions && dnps[name].versions[version] !== undefined) {
+          delete dnps[name].versions[version];
+          // If no versions remain for this package, remove the package entirely
+          if (Object.keys(dnps[name].versions).length === 0) {
+            delete dnps[name];
+          }
+        }
+        // Continue with other versions by not re-throwing the error
+      }
     })
   );
 }
