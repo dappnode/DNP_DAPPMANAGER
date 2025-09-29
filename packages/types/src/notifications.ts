@@ -50,6 +50,7 @@ export enum Category {
   system = "system",
   ethereum = "ethereum",
   holesky = "holesky",
+  sepolia = "sepolia",
   lukso = "lukso",
   gnosis = "gnosis",
   hoodi = "hoodi",

@@ -126,6 +126,7 @@ export const params = {
     [Network.Mainnet]: "mainnet_network",
     [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
+    [Network.Sepolia]: "sepolia_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
     [Network.Lukso]: "lukso_network"
@@ -165,7 +166,6 @@ export const params = {
   IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
 
   // Web3 parameters
-  ETH_MAINNET_RPC_URL_OVERRIDE: process.env.ETH_MAINNET_RPC_OVERRIDE,
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
   ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.io",
 
@@ -219,6 +219,7 @@ export const params = {
   coreDnpName: "core.dnp.dappnode.eth",
   dappmanagerDnpName: "dappmanager.dnp.dappnode.eth",
   dappmanagerContainerName: "DAppNodeCore-dappmanager.dnp.dappnode.eth",
+  httpsContainerName: "DAppNodeCore-https.dnp.dappnode.eth",
   restartDnpName: "restart.dnp.dappnode.eth",
   vpnDnpName: "vpn.dnp.dappnode.eth",
   vpnContainerName: "DAppNodeCore-vpn.dnp.dappnode.eth",
@@ -418,6 +419,18 @@ export const params = {
       dnpNameSuffix: ".public.dappnode.eth",
       signatureProtocol: "ECDSA_256" as const,
       key: "0x18eE60706Ed150f6E21D020C1Cede55E4267f409"
+    },
+    {
+      name: "Chainnodes",
+      dnpNameSuffix: ".dnp.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x174ebad9bcd1B431e32c488064d30737427b982A"
+    },
+    {
+      name: "Chainnodes",
+      dnpNameSuffix: ".public.dappnode.eth",
+      signatureProtocol: "ECDSA_256" as const,
+      key: "0x174ebad9bcd1B431e32c488064d30737427b982A"
     }
   ]
 };

@@ -162,3 +162,22 @@
     margin-bottom: var(--default-spacing);
   }
 }
+
+.pkgs-back-btn {
+  font-size: 1rem;
+  margin-left: -5px; // Align svg with the page padding
+  display: inline-flex;
+  svg {
+    font-size: 1.5rem;
+  }
+}
+
+#dark {
+  #main {
+    .pkgs-back-btn {
+      span {
+        color: var(--dappnode-links-color);
+      }
+    }
+  }
+}

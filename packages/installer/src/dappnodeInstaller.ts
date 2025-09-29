@@ -27,7 +27,7 @@ import { fileToGatewayUrl, getIsCore } from "@dappnode/utils";
 import { sanitizeDependencies } from "./dappGet/utils/sanitizeDependencies.js";
 import { parseTimeoutSeconds } from "./utils.js";
 import { omit } from "lodash-es";
-import { ethers } from "ethers";
+import { JsonRpcApiProvider } from "ethers";
 
 /**
  * Returns the ipfsUrl to initialize the ipfs instance
@@ -45,8 +45,8 @@ export function getIpfsUrl(): string {
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, ethersProvider: ethers.AbstractProvider) {
-    super(ipfsUrl, ethersProvider);
+  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
+    super(ipfsUrl, provider);
   }
 
   private async updateProviders(): Promise<void> {

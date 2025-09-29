@@ -4,27 +4,29 @@ import { ApmRepoVersionReturn, ApmVersionRawAndOrigin, ApmVersionState } from ".
 import * as isIPFS from "is-ipfs";
 import { isEnsDomain } from "../isEnsDomain.js";
 import { repositoryAbi } from "./params.js";
+import { MultiUrlJsonRpcProvider } from "../provider.js";
+import { JsonRpcApiProvider } from "ethers";
 
 /**
  * ApmRepository is a class to interact with the DAppNode APM Repository Contract.
  */
 export class ApmRepository {
-  private ethProvider: ethers.AbstractProvider;
+  private provider: JsonRpcApiProvider;
 
   /**
    * Class constructor
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  constructor(ethersProvider: ethers.AbstractProvider) {
-    this.ethProvider = ethersProvider;
+  constructor(provider: JsonRpcApiProvider) {
+    this.provider = provider;
   }
 
   /**
    * Changes the Ethereum node to connect to.
    * @param ethUrl - The URL of the Ethereum node to connect to.
    */
-  public changeEthProvider(ethersProvider: ethers.AbstractProvider): void {
-    this.ethProvider = ethersProvider;
+  public changeEthProvider(ethersProvider: MultiUrlJsonRpcProvider): void {
+    this.provider = ethersProvider;
   }
 
   /**
@@ -35,11 +37,11 @@ export class ApmRepository {
    * @returns - A promise that resolves to the Repo instance.
    */
   public async getRepoContract(dnpName: string): Promise<ethers.Contract> {
-    const contractAddress = await this.ethProvider.resolveName(this.ensureValidDnpName(dnpName));
+    const contractAddress = await this.provider.resolveName(this.ensureValidDnpName(dnpName));
 
     // This error should include "NOREPO" in order to handle it properly in SDK publish code
     if (!contractAddress) throw new Error(`Could not resolve name ${dnpName}: NOREPO`);
-    return new ethers.Contract(contractAddress, repositoryAbi, this.ethProvider);
+    return new ethers.Contract(contractAddress, repositoryAbi, this.provider);
   }
 
   /**
@@ -68,7 +70,7 @@ export class ApmRepository {
     if (isEnsDomain(dnpNameOrHash) && (this.isSemver(version) || this.isSemverRange(version))) {
       let repoContract;
       if (contractAddress) {
-        repoContract = new ethers.Contract(contractAddress, repositoryAbi, this.ethProvider);
+        repoContract = new ethers.Contract(contractAddress, repositoryAbi, this.provider);
       } else {
         repoContract = await this.getRepoContract(dnpNameOrHash);
       }
@@ -125,7 +127,7 @@ export class ApmRepository {
    * @param dnpName "bitcoin.dnp.dappnode.eth"
    */
   public async fetchApmVersionsState(dnpName: string, lastVersionId = 0): Promise<ApmVersionState[]> {
-    const repo = new ethers.Contract(dnpName, repositoryAbi, this.ethProvider);
+    const repo = new ethers.Contract(dnpName, repositoryAbi, this.provider);
 
     const versionCount: number = await repo.getVersionsCount().then(parseFloat);
 

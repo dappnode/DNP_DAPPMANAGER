@@ -41,6 +41,10 @@ export const wifiEnvSSID = "SSID";
 // Local proxying
 export const adminUiLocalDomain = "http://dappnode.local";
 
+// Packages prefixes
+export const dnpPrefix = "DAppNodePackage-";
+export const dnpCorePrefix = "DAppNodeCore-";
+
 // DNP names
 export const ethicalMetricsDnpName = "ethical-metrics.dnp.dappnode.eth";
 export const httpsPortalDnpName = "https.dnp.dappnode.eth";

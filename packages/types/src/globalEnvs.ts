@@ -28,7 +28,10 @@ export const GLOBAL_ENVS = {
   MEVBOOST_HOLESKY: "_DAPPNODE_GLOBAL_MEVBOOST_HOLESKY", // "mevboost-holesky.dnp.dappnode.eth"
   CONSENSUS_CLIENT_HOODI: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_HOODI", // "prysm-hoodi.dnp.dappnode.eth"
   EXECUTION_CLIENT_HOODI: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_HOODI", // "hoodi-geth.dnp.dappnode.eth"
-  MEVBOOST_HOODI: "_DAPPNODE_GLOBAL_MEVBOOST_HOODI" // "mevboost-hoodi.dnp.dappnode.eth"
+  MEVBOOST_HOODI: "_DAPPNODE_GLOBAL_MEVBOOST_HOODI", // "mevboost-hoodi.dnp.dappnode.eth"
+  CONSENSUS_CLIENT_SEPOLIA: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_SEPOLIA", // "prysm-sepolia.dnp.dappnode.eth"
+  EXECUTION_CLIENT_SEPOLIA: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_SEPOLIA", // "sepolia-geth.dnp.dappnode.eth",
+  MEVBOOST_SEPOLIA: "_DAPPNODE_GLOBAL_MEVBOOST_SEPOLIA", // "mevboost-sepolia.dnp.dappnode.eth"
 };
 
 /**

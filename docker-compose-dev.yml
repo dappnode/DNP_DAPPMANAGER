@@ -26,7 +26,6 @@ services:
       - "./:/app"
     environment:
       - LOG_LEVEL=info
-      - ETH_MAINNET_RPC_URL_OVERRIDE=
       - ETH_MAINNET_RPC_URL_REMOTE=
       - IPFS_HOST=
       - DISABLE_UPNP=
