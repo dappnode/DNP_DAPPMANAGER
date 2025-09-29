@@ -53,19 +53,31 @@ export default async function aggregateDependencies({
       // Already checked, skip. Otherwise lock request to prevent duplicate fetches
       if (hasVersion(dnps, name, version)) return;
       else setVersion(dnps, name, version, {});
-      // 2. Get dependencies of this specific version
-      //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-      const dependencies = await dappGetFetcher
-        .dependencies(dappnodeInstaller, name, version)
-        .then(sanitizeDependencies)
-        .catch((e: Error) => {
-          e.message += `Error fetching ${name}@${version}`;
-          throw e;
-        });
 
-      // 3. Store dependencies
+      let dependencies;
+      try {
+        dependencies = await dappGetFetcher
+          .dependencies(dappnodeInstaller, name, version)
+          .then(sanitizeDependencies);
+      } catch (e) {
+        // Log the error and skip this version
+        // Prefer using the DappNode logger if possible, otherwise fallback to console
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn(`Skipping ${name}@${version}: could not fetch dependencies: ${e.message}`);
+        }
+        // Remove placeholder from dnps if present
+        if (dnps[name] && dnps[name].versions) {
+          delete dnps[name].versions[version];
+          // If no versions left, delete dnps[name] as well (optional, cleaner)
+          if (Object.keys(dnps[name].versions).length === 0) {
+            delete dnps[name];
+          }
+        }
+        return;
+      }
+
       setVersion(dnps, name, version, dependencies);
-      // 4. Fetch sub-dependencies recursively
+
       await Promise.all(
         Object.keys(dependencies).map(async (dependencyName) => {
           await aggregateDependencies({
