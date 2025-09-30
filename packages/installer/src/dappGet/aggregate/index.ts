@@ -81,6 +81,11 @@ export default async function aggregate({
     dappGetFetcher // #### Injected dependency
   });
 
+  // If no dnps were aggregated, throw an error
+  if (Object.keys(dnps).length === 0) {
+    throw new Error('Could not get any complete dependencies for the requested package' );
+  }
+
   const relevantInstalledDnps = getRelevantInstalledDnps({
     // requestedDnps = ["A", "B", "C"]
     requestedDnps: Object.keys(dnps),

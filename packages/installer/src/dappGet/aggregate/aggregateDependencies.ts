@@ -55,15 +55,17 @@ export default async function aggregateDependencies({
       else setVersion(dnps, name, version, {});
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-      const dependencies = await dappGetFetcher
-        .dependencies(dappnodeInstaller, name, version)
-        .then(sanitizeDependencies)
-        .catch((e: Error) => {
-          e.message += `Error fetching ${name}@${version}`;
-          throw e;
-        });
+      let dependencies;
+      try {
+        dependencies = await dappGetFetcher
+          .dependencies(dappnodeInstaller, name, version)
+          .then(sanitizeDependencies);
+      } catch (e) {
+        // Skip this dnp/version if dependencies cannot be fetched
+        return;
+      }
 
-      // 3. Store dependencies
+      // 3. Store the dependency if it was fetched correctly
       setVersion(dnps, name, version, dependencies);
       // 4. Fetch sub-dependencies recursively
       await Promise.all(
