@@ -108,4 +108,227 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       }
     });
   });
+
+  it("should aggregate only fully resolvable DNPs and skip all with unresolvable dependencies (deep tree)", async () => {
+    // This test covers:
+    // - A fully resolvable DNP tree
+    // - A DNP with a direct dependency that fails to fetch
+    // - A DNP with a sub-dependency that fails to fetch
+    // - A DNP with a deep sub-dependency that fails to fetch
+    // - A DNP with a circular dependency (should not crash)
+    const mockDnps: MockDnps = {
+      // Fully resolvable
+      "good.dnp.dappnode.eth": {
+        "1.0.0": { "dep1.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "dep1.dnp.dappnode.eth": {
+        "1.0.0": { "dep2.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "dep2.dnp.dappnode.eth": {
+        "1.0.0": {}
+      },
+      // Direct dependency fails
+      "fail-direct.dnp.dappnode.eth": {
+        "1.0.0": { "missing.dnp.dappnode.eth": "^1.0.0" }
+      },
+      // Sub-dependency fails
+      "fail-sub.dnp.dappnode.eth": {
+        "1.0.0": { "dep-ok.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "dep-ok.dnp.dappnode.eth": {
+        "1.0.0": { "missing.dnp.dappnode.eth": "^1.0.0" }
+      },
+      // Deep sub-dependency fails
+      "fail-deep.dnp.dappnode.eth": {
+        "1.0.0": { "dep-deep1.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "dep-deep1.dnp.dappnode.eth": {
+        "1.0.0": { "dep-deep2.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "dep-deep2.dnp.dappnode.eth": {
+        "1.0.0": { "missing.dnp.dappnode.eth": "^1.0.0" }
+      },
+      // Circular dependency (should not crash, but is resolvable)
+      "circularA.dnp.dappnode.eth": {
+        "1.0.0": { "circularB.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "circularB.dnp.dappnode.eth": {
+        "1.0.0": { "circularA.dnp.dappnode.eth": "^1.0.0" }
+      },
+      // The missing package (will throw)
+      "missing.dnp.dappnode.eth": {
+        // No versions, will always throw
+      }
+    };
+    // Patch the fetcher to throw for missing.dnp.dappnode.eth
+    class DappGetFetcherThrows extends DappGetFetcherMock {
+      async dependencies(installer: any, name: string, version: string) {
+        if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
+        return super.dependencies(installer, name, version);
+      }
+    }
+    const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
+    const dnps: Record<string, any> = {};
+    // Aggregate all roots
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "good.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "fail-direct.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "fail-sub.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "fail-deep.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "circularA.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    // Only fully resolvable and circular should remain
+    expect(dnps).to.deep.equal({
+      "good.dnp.dappnode.eth": {
+        versions: {
+          "1.0.0": { "dep1.dnp.dappnode.eth": "^1.0.0" }
+        }
+      },
+      "dep1.dnp.dappnode.eth": {
+        versions: {
+          "1.0.0": { "dep2.dnp.dappnode.eth": "^1.0.0" }
+        }
+      },
+      "dep2.dnp.dappnode.eth": {
+        versions: {
+          "1.0.0": {}
+        }
+      },
+      "circularA.dnp.dappnode.eth": {
+        versions: {
+          "1.0.0": { "circularB.dnp.dappnode.eth": "^1.0.0" }
+        }
+      },
+      "circularB.dnp.dappnode.eth": {
+        versions: {
+          "1.0.0": { "circularA.dnp.dappnode.eth": "^1.0.0" }
+        }
+      }
+    });
+  });
+
+  it("should clean up after each aggregation step (intermediate state)", async () => {
+    const mockDnps: MockDnps = {
+      "root.dnp.dappnode.eth": { "1.0.0": { "fail.dnp.dappnode.eth": "^1.0.0" } },
+      "fail.dnp.dappnode.eth": { "1.0.0": { "missing.dnp.dappnode.eth": "^1.0.0" } },
+      "missing.dnp.dappnode.eth": {}
+    };
+    class DappGetFetcherThrows extends DappGetFetcherMock {
+      async dependencies(installer: any, name: string, version: string) {
+        if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
+        return super.dependencies(installer, name, version);
+      }
+    }
+    const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
+    const dnps: Record<string, any> = {};
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "root.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    // After first aggregation, everything should be cleaned up (nothing resolvable)
+    expect(dnps).to.deep.equal({});
+  });
+
+  it("should handle complex circular graphs", async () => {
+    const mockDnps: MockDnps = {
+      "A.dnp.dappnode.eth": { "1.0.0": { "B.dnp.dappnode.eth": "^1.0.0" } },
+      "B.dnp.dappnode.eth": { "1.0.0": { "C.dnp.dappnode.eth": "^1.0.0" } },
+      "C.dnp.dappnode.eth": { "1.0.0": { "A.dnp.dappnode.eth": "^1.0.0", "D.dnp.dappnode.eth": "^1.0.0" } },
+      "D.dnp.dappnode.eth": { "1.0.0": { "A.dnp.dappnode.eth": "^1.0.0" } }
+    };
+    const dappGetFetcher = new DappGetFetcherMock(mockDnps);
+    const dnps: Record<string, any> = {};
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "A.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    expect(dnps).to.deep.equal({
+      "A.dnp.dappnode.eth": { versions: { "1.0.0": { "B.dnp.dappnode.eth": "^1.0.0" } } },
+      "B.dnp.dappnode.eth": { versions: { "1.0.0": { "C.dnp.dappnode.eth": "^1.0.0" } } },
+      "C.dnp.dappnode.eth": { versions: { "1.0.0": { "A.dnp.dappnode.eth": "^1.0.0", "D.dnp.dappnode.eth": "^1.0.0" } } },
+      "D.dnp.dappnode.eth": { versions: { "1.0.0": { "A.dnp.dappnode.eth": "^1.0.0" } } }
+    });
+  });
+
+  it("should not mutate the input mockDnps object", async () => {
+    const mockDnps: MockDnps = {
+      "immutable.dnp.dappnode.eth": { "1.0.0": {} }
+    };
+    const original = JSON.stringify(mockDnps);
+    const dappGetFetcher = new DappGetFetcherMock(mockDnps);
+    const dnps: Record<string, any> = {};
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "immutable.dnp.dappnode.eth",
+      versionRange: "1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    expect(JSON.stringify(mockDnps)).to.equal(original);
+  });
+
+  it("should keep only resolvable versions if a DNP has both valid and invalid versions", async () => {
+    const mockDnps: MockDnps = {
+      "multi.dnp.dappnode.eth": {
+        "1.0.0": { "ok.dnp.dappnode.eth": "^1.0.0" },
+        "2.0.0": { "fail.dnp.dappnode.eth": "^1.0.0" }
+      },
+      "ok.dnp.dappnode.eth": { "1.0.0": {} },
+      "fail.dnp.dappnode.eth": { "1.0.0": { "missing.dnp.dappnode.eth": "^1.0.0" } },
+      "missing.dnp.dappnode.eth": {}
+    };
+    class DappGetFetcherThrows extends DappGetFetcherMock {
+      async dependencies(installer: any, name: string, version: string) {
+        if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
+        return super.dependencies(installer, name, version);
+      }
+    }
+    const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
+    const dnps: Record<string, any> = {};
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: "multi.dnp.dappnode.eth",
+      versionRange: ">=1.0.0",
+      dnps,
+      dappGetFetcher
+    });
+    expect(dnps).to.deep.equal({
+      "multi.dnp.dappnode.eth": { versions: { "1.0.0": { "ok.dnp.dappnode.eth": "^1.0.0" } } },
+      "ok.dnp.dappnode.eth": { versions: { "1.0.0": {} } }
+    });
+  });
 });

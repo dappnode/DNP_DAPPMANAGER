@@ -5,6 +5,36 @@ import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
+// Simpler cleanup: remove DNPs with no versions, then remove versions with missing dependencies, repeat until stable
+function cleanupDnps(dnps: DappGetDnps) {
+  let changed = true;
+  let safety = 0;
+  const MAX_ITER = 1000;
+  while (changed) {
+    if (++safety > MAX_ITER) {
+      throw new Error("cleanupDnps: Exceeded max iterations, possible infinite loop");
+    }
+    changed = false;
+    // Remove DNPs with no versions
+    for (const dnpName of Object.keys(dnps)) {
+      if (Object.keys(dnps[dnpName].versions).length === 0) {
+        delete dnps[dnpName];
+        changed = true;
+      }
+    }
+    // Remove versions with missing dependencies
+    for (const dnpName of Object.keys(dnps)) {
+      for (const version of Object.keys(dnps[dnpName].versions)) {
+        const deps = dnps[dnpName].versions[version];
+        if (Object.keys(deps).some(dep => !dnps[dep])) {
+          delete dnps[dnpName].versions[version];
+          changed = true;
+        }
+      }
+    }
+  }
+}
+
 /**
  * The goal of this function is to recursively aggregate all dependencies
  * of a given request. The structure of the data is:
@@ -61,25 +91,40 @@ export default async function aggregateDependencies({
           .dependencies(dappnodeInstaller, name, version)
           .then(sanitizeDependencies);
       } catch (e) {
-        // Skip this dnp/version if dependencies cannot be fetched
+        // Remove this version if dependencies cannot be fetched
+        if (dnps[name] && dnps[name].versions) {
+          delete dnps[name].versions[version];
+        }
         return;
       }
 
       // 3. Store the dependency if it was fetched correctly
       setVersion(dnps, name, version, dependencies);
       // 4. Fetch sub-dependencies recursively
+      let subDepFailed = false;
       await Promise.all(
         Object.keys(dependencies).map(async (dependencyName) => {
-          await aggregateDependencies({
-            dappnodeInstaller,
-            name: dependencyName,
-            versionRange: dependencies[dependencyName],
-            dnps,
-            recursiveCount,
-            dappGetFetcher
-          });
+          try {
+            await aggregateDependencies({
+              dappnodeInstaller,
+              name: dependencyName,
+              versionRange: dependencies[dependencyName],
+              dnps,
+              recursiveCount,
+              dappGetFetcher
+            });
+          } catch (e) {
+            subDepFailed = true;
+          }
         })
       );
+      // If any sub-dependency failed, remove this version
+      if (subDepFailed && dnps[name] && dnps[name].versions) {
+        delete dnps[name].versions[version];
+      }
     })
   );
+
+  // Use the simpler cleanup
+  cleanupDnps(dnps);
 }
