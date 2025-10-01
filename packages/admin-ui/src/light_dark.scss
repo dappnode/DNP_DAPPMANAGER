@@ -197,7 +197,9 @@ body.dark {
       }
     }
     .sidenav-item {
-      &.selectable:hover,
+      &.selectable:hover {
+        background-color: var(--color-dark-background-main);
+      }
       &.selectable.active {
         background-color: var(--color-dark-card);
       }

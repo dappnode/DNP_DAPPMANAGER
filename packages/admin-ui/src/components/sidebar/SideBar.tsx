@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
-import { sidenavItems, fundedBy } from "./navbarItems";
+import { sidenavItems, fundedBy, premiumLabel } from "./navbarItems";
 import logoWide from "img/dappnode-logo-wide-min.png";
 import logoWideDark from "img/dappnode-logo-wide-min-dark.png";
 import logomin from "img/dappnode-logo-only.png";
@@ -41,7 +41,7 @@ export default function SideBar({ screenWidth }: { screenWidth: number }) {
             const isActive = baseLocationPath === basePath;
             return (
               <NavLink
-                className={`sidenav-item selectable ${isActive && "active"} ${item.name === "Premium" &&
+                className={`sidenav-item selectable ${isActive && "active"} ${item.name === premiumLabel &&
                   "premium-item"}`}
                 to={item.href}
               >
