@@ -84,7 +84,7 @@ export default async function aggregate({
 
   // If no resolvable packages or dependencies were found, throw an error
   if (Object.keys(dnps).length === 0) {
-      throw new Error('A dependency of the requested package could not be resolved');
+      throw new Error(`A dependency of the requested package "${req.name}" (version range: "${req.ver}") could not be resolved`);
   }
 
   // Clean up the dnps graph only once after all aggregation is done
