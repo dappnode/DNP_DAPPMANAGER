@@ -82,9 +82,9 @@ export default async function aggregate({
     dappGetFetcher // #### Injected dependency
   });
 
-  // If no dnps were aggregated, throw an error
+  // If no resolvable packages or dependencies were found, throw an error
   if (Object.keys(dnps).length === 0) {
-    throw new Error('Could not get any complete dependencies for the requested package' );
+      throw new Error('A dependency of the requested package could not be resolved');
   }
 
   // Clean up the dnps graph only once after all aggregation is done
