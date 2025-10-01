@@ -86,7 +86,7 @@ export default async function aggregateDependencies({
               recursiveCount,
               dappGetFetcher
             });
-          } catch (e: Error) {
+          } catch (e) {
             subDepFailed = true;
           }
         })
