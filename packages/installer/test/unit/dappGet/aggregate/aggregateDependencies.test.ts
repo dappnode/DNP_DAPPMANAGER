@@ -2,6 +2,7 @@ import "mocha";
 import { expect } from "chai";
 import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
 import aggregateDependencies from "../../../../src/dappGet/aggregate/aggregateDependencies.js";
+import { cleanupDnps } from "../../../../src/dappGet/aggregate/cleanupDnp.js";
 import { dappnodeInstaller } from "../../../testUtils.js";
 
 /**
@@ -95,7 +96,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
-
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     expect(dnps).to.deep.equal({
       "dnpA.dnp.dappnode.eth": {
         versions: { "0.1.0": { "dnpB.dnp.dappnode.eth": "^0.1.0" } }
@@ -205,6 +207,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     // Only fully resolvable and circular should remain
     expect(dnps).to.deep.equal({
       "good.dnp.dappnode.eth": {
@@ -256,6 +260,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     // After first aggregation, everything should be cleaned up (nothing resolvable)
     expect(dnps).to.deep.equal({});
   });
@@ -276,6 +282,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     expect(dnps).to.deep.equal({
       "A.dnp.dappnode.eth": { versions: { "1.0.0": { "B.dnp.dappnode.eth": "^1.0.0" } } },
       "B.dnp.dappnode.eth": { versions: { "1.0.0": { "C.dnp.dappnode.eth": "^1.0.0" } } },
@@ -298,6 +306,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     expect(JSON.stringify(mockDnps)).to.equal(original);
   });
 
@@ -326,6 +336,8 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       dnps,
       dappGetFetcher
     });
+    // Clean up after all aggregation steps
+    cleanupDnps(dnps);
     expect(dnps).to.deep.equal({
       "multi.dnp.dappnode.eth": { versions: { "1.0.0": { "ok.dnp.dappnode.eth": "^1.0.0" } } },
       "ok.dnp.dappnode.eth": { versions: { "1.0.0": {} } }

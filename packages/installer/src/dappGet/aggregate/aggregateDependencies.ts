@@ -5,35 +5,6 @@ import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
 
-// Simpler cleanup: remove DNPs with no versions, then remove versions with missing dependencies, repeat until stable
-function cleanupDnps(dnps: DappGetDnps) {
-  let changed = true;
-  let safety = 0;
-  const MAX_ITER = 1000;
-  while (changed) {
-    if (++safety > MAX_ITER) {
-      throw new Error("cleanupDnps: Exceeded max iterations, possible infinite loop");
-    }
-    changed = false;
-    // Remove DNPs with no versions
-    for (const dnpName of Object.keys(dnps)) {
-      if (Object.keys(dnps[dnpName].versions).length === 0) {
-        delete dnps[dnpName];
-        changed = true;
-      }
-    }
-    // Remove versions with missing dependencies
-    for (const dnpName of Object.keys(dnps)) {
-      for (const version of Object.keys(dnps[dnpName].versions)) {
-        const deps = dnps[dnpName].versions[version];
-        if (Object.keys(deps).some(dep => !dnps[dep])) {
-          delete dnps[dnpName].versions[version];
-          changed = true;
-        }
-      }
-    }
-  }
-}
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -93,6 +64,7 @@ export default async function aggregateDependencies({
       } catch (e) {
         // Remove this version if dependencies cannot be fetched
         if (dnps[name] && dnps[name].versions) {
+          console.log (`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e.message}`);
           delete dnps[name].versions[version];
         }
         return;
@@ -124,7 +96,6 @@ export default async function aggregateDependencies({
       }
     })
   );
+    // cleanupDnps(dnps);
 
-  // Use the simpler cleanup
-  cleanupDnps(dnps);
 }
