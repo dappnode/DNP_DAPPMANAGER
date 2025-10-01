@@ -96,6 +96,4 @@ export default async function aggregateDependencies({
       }
     })
   );
-    // cleanupDnps(dnps);
-
 }
