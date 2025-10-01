@@ -4,6 +4,7 @@ import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
 import aggregateDependencies from "../../../../src/dappGet/aggregate/aggregateDependencies.js";
 import { cleanupDnps } from "../../../../src/dappGet/aggregate/cleanupDnp.js";
 import { dappnodeInstaller } from "../../../testUtils.js";
+import type { DappnodeInstaller as DappnodeInstallerType } from "../../../../src/dappnodeInstaller.js";
 
 /**
  * Purpose of the test. Make sure it is able recursively fetch a DNP's dependencies
@@ -164,7 +165,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
     };
     // Patch the fetcher to throw for missing.dnp.dappnode.eth
     class DappGetFetcherThrows extends DappGetFetcherMock {
-      async dependencies(installer: any, name: string, version: string) {
+      async dependencies(installer: DappnodeInstallerType, name: string, version: string) {
         if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
         return super.dependencies(installer, name, version);
       }
@@ -246,7 +247,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       "missing.dnp.dappnode.eth": {}
     };
     class DappGetFetcherThrows extends DappGetFetcherMock {
-      async dependencies(installer: any, name: string, version: string) {
+      async dependencies(installer: DappnodeInstallerType, name: string, version: string) {
         if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
         return super.dependencies(installer, name, version);
       }
@@ -322,7 +323,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       "missing.dnp.dappnode.eth": {}
     };
     class DappGetFetcherThrows extends DappGetFetcherMock {
-      async dependencies(installer: any, name: string, version: string) {
+      async dependencies(installer: DappnodeInstallerType, name: string, version: string) {
         if (name === "missing.dnp.dappnode.eth") throw new Error("fetch failed");
         return super.dependencies(installer, name, version);
       }
