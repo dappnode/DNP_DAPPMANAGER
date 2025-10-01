@@ -65,7 +65,7 @@ export default async function aggregateDependencies({
       } catch (e) {
         // Remove this version if dependencies cannot be fetched
         if (dnps[name] && dnps[name].versions) {
-          logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e.message}`);
+          logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e?.message}`);
           delete dnps[name].versions[version];
         }
         return;
