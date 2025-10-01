@@ -5,6 +5,7 @@ import aggregateDependencies from "../../../../src/dappGet/aggregate/aggregateDe
 import { cleanupDnps } from "../../../../src/dappGet/aggregate/cleanupDnp.js";
 import { dappnodeInstaller } from "../../../testUtils.js";
 import type { DappnodeInstaller as DappnodeInstallerType } from "../../../../src/dappnodeInstaller.js";
+import type { DappGetDnps } from "../../../../src/dappGet/types.js";
 
 /**
  * Purpose of the test. Make sure it is able recursively fetch a DNP's dependencies
@@ -48,7 +49,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
 
     const dnpName = "kovan.dnp.dappnode.eth";
     const versionRange = "0.1.0";
-    const dnps = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: dnpName,
@@ -89,7 +90,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
 
     const dnpName = "dnpA.dnp.dappnode.eth";
     const versionRange = "0.1.0";
-    const dnps = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: dnpName,
@@ -171,7 +172,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       }
     }
     const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
-    const dnps: Record<string, any> = {};
+    const dnps: DappGetDnps = {};
     // Aggregate all roots
     await aggregateDependencies({
       dappnodeInstaller,
@@ -253,7 +254,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       }
     }
     const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
-    const dnps: Record<string, any> = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: "root.dnp.dappnode.eth",
@@ -275,7 +276,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       "D.dnp.dappnode.eth": { "1.0.0": { "A.dnp.dappnode.eth": "^1.0.0" } }
     };
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
-    const dnps: Record<string, any> = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: "A.dnp.dappnode.eth",
@@ -299,7 +300,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
     };
     const original = JSON.stringify(mockDnps);
     const dappGetFetcher = new DappGetFetcherMock(mockDnps);
-    const dnps: Record<string, any> = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: "immutable.dnp.dappnode.eth",
@@ -329,7 +330,7 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
       }
     }
     const dappGetFetcher = new DappGetFetcherThrows(mockDnps);
-    const dnps: Record<string, any> = {};
+    const dnps: DappGetDnps = {};
     await aggregateDependencies({
       dappnodeInstaller,
       name: "multi.dnp.dappnode.eth",
