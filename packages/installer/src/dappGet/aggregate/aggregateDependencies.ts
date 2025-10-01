@@ -4,6 +4,7 @@ import { sanitizeDependencies } from "../utils/sanitizeDependencies.js";
 import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { logs } from "@dappnode/logger";
 
 
 /**
@@ -64,7 +65,7 @@ export default async function aggregateDependencies({
       } catch (e) {
         // Remove this version if dependencies cannot be fetched
         if (dnps[name] && dnps[name].versions) {
-          console.log (`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e.message}`);
+          logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e.message}`);
           delete dnps[name].versions[version];
         }
         return;
@@ -92,6 +93,7 @@ export default async function aggregateDependencies({
       );
       // If any sub-dependency failed, remove this version
       if (subDepFailed && dnps[name] && dnps[name].versions) {
+        logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to sub-dependency failure`);
         delete dnps[name].versions[version];
       }
     })
