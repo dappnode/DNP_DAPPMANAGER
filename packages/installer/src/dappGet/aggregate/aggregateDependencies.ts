@@ -29,6 +29,7 @@ export default async function aggregateDependencies({
   name,
   versionRange,
   dnps,
+  shouldThrow = false,
   recursiveCount,
   dappGetFetcher
 }: {
@@ -36,6 +37,7 @@ export default async function aggregateDependencies({
   name: string;
   versionRange: string;
   dnps: DappGetDnps;
+  shouldThrow?: boolean;
   recursiveCount?: number;
   dappGetFetcher: DappGetFetcher;
 }): Promise<void> {
@@ -61,6 +63,7 @@ export default async function aggregateDependencies({
       try {
         dependencies = await dappGetFetcher.dependencies(dappnodeInstaller, name, version).then(sanitizeDependencies);
       } catch (e) {
+        if (shouldThrow) throw e;
         // Remove this version if dependencies cannot be fetched
         if (dnps[name] && dnps[name].versions) {
           logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e?.message}`);
@@ -80,6 +83,7 @@ export default async function aggregateDependencies({
               name: dependencyName,
               versionRange: dependencies[dependencyName],
               dnps,
+              shouldThrow: true,
               recursiveCount,
               dappGetFetcher
             });
