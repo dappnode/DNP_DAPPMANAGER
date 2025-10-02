@@ -4,7 +4,7 @@ import { useHandleSubscription } from "hooks/PWA/useHandleSubscription";
 import Button from "./Button";
 import Loading from "./Loading";
 import newTabProps from "utils/newTabProps";
-import { Accordion } from "react-bootstrap";
+import { Accordion, useAccordionButton } from "react-bootstrap";
 import { MdClose } from "react-icons/md";
 import "./notificationsMain.scss";
 import "./pwaPermissions.scss";
@@ -82,46 +82,44 @@ export function PwaPermissionsAlert() {
   const { isPwa } = usePwaInstall();
   const { permission } = useHandleSubscription();
 
-  const [isOpen, setIsOpen] = useState(false);
   const [hasClosed, setHasClosed] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const showAlert = isPwa && permission === "denied";
+  if (!showAlert || hasClosed) return null;
 
-  if (!showAlert) return null;
+  const toggle = useAccordionButton("0", () => setOpen((v) => !v));
 
   return (
-    !hasClosed && (
-      <Accordion defaultActiveKey={isOpen ? "0" : "1"} className="banner-notifications-col">
-        <Accordion.Toggle
-          as={"div"}
-          eventKey="0"
-          onClick={() => setIsOpen(!isOpen)}
-          className={`banner-card high-priority`}
-        >
+    <Accordion activeKey={open ? "0" : undefined} className="banner-notifications-col">
+      <Accordion.Item eventKey="0">
+        <div role="button" tabIndex={0} onClick={toggle} className="banner-card high-priority">
           <div className="banner-header">
             <h5>App Notifications blocked</h5>
             <button
               className="close-btn"
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setHasClosed(true);
               }}
             >
               <MdClose />
             </button>
           </div>
+
           <Accordion.Collapse eventKey="0">
             <div className="banner-body">
-              <p>
+              <div>
                 To receive notifications from the app, you'll need to re-enable notification permissions in your browser
                 settings. Follow our step-by-step guide to fix it.
-              </p>
+              </div>
               <Button variant="warning" href={docsUrl.pwaResetPermissions} {...newTabProps}>
                 <div className="btn-text">Check Docs</div>
               </Button>
             </div>
           </Accordion.Collapse>
-        </Accordion.Toggle>
-      </Accordion>
-    )
+        </div>
+      </Accordion.Item>
+    </Accordion>
   );
 }
