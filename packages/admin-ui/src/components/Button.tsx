@@ -41,8 +41,7 @@ const Button: React.FC<ButtonBootstrapProps & ButtonProps & React.HTMLAttributes
     <ButtonBootstap
       variant={variant}
       disabled={disabled}
-      block={fullwidth}
-      className={joinCssClass({ pill }, className)}
+      className={joinCssClass(className, fullwidth ? "w-100" : undefined)}
       {...props}
     >
       {Icon ? (
