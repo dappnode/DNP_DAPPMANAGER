@@ -154,7 +154,8 @@ export default function StakerNetwork({ network, description }: { network: Netwo
         {currentStakerConfigReq.data ? (
           <div>
             <CustomAccordion defaultOpen={false}>
-              <CustomAccordionItem header={<b>Network Description</b>}>
+              <CustomAccordionItem header={<>Network Description</>}>
+                <p className="network-description">{description}</p>
                 <p>
                   Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will
                   need to: <br />
@@ -172,7 +173,6 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                     </>
                   )}
                 </p>
-                <p className="network-description">{description}</p>
               </CustomAccordionItem>
             </CustomAccordion>
 
