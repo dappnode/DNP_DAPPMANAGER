@@ -137,11 +137,13 @@ export enum SignerLukso {
 // SEPOLIA
 export enum ConsensusClientSepolia {
   /*"prysm-sepolia.dnp.dappnode.eth",*/
-  Prysm = "prysm-sepolia.dnp.dappnode.eth"
+  Prysm = "prysm-sepolia.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-sepolia.dnp.dappnode.eth"
 }
 
 export enum ExecutionClientSepolia {
-  Geth = "sepolia-geth.dnp.dappnode.eth"
+  Geth = "sepolia-geth.dnp.dappnode.eth",
+  Reth = "sepolia-reth.dnp.dappnode.eth"
 }
 
 export enum SignerSepolia {

@@ -71,6 +71,7 @@ export class Execution extends StakerComponent {
     ],
     [Network.Sepolia]: [
       { dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" },
+      { dnpName: ExecutionClientSepolia.Reth, minVersion: "0.1.0" }
     ],
     [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
   };
