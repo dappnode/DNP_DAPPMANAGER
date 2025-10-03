@@ -1,9 +1,10 @@
 import { eventBus } from "@dappnode/eventbus";
-import { DirectoryItem, DirectoryItemOk } from "@dappnode/types";
+import { DirectoryItem, DirectoryItemOk, PackageRelease } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { listPackages } from "@dappnode/dockerapi";
 import { fileToGatewayUrl, getIsInstalled, getIsUpdated } from "@dappnode/utils";
 import { throttle } from "lodash-es";
+import { dappstoreCache, getOrSet } from "@dappnode/cache";
 import { dappnodeInstaller, directory } from "../index.js";
 
 const loadThrottle = 500; // 0.5 seconds
@@ -37,8 +38,12 @@ export async function fetchDirectory(): Promise<DirectoryItem[]> {
       const whitelisted = true;
       const directoryItemBasic = { index, name, whitelisted, isFeatured };
       try {
-        // Now resolve the last version of the package
-        const release = await dappnodeInstaller.getRelease(name);
+        // Now resolve the last version of the package using cache
+        const release = await getOrSet(
+          dappstoreCache,
+          `release:${name}`,
+          async () => await dappnodeInstaller.getRelease(name)
+        ) as PackageRelease;
         const { manifest, avatarFile } = release;
 
         pushDirectoryItem({

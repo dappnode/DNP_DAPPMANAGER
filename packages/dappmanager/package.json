@@ -18,6 +18,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/cache": "workspace:^0.1.0",
     "@dappnode/chains": "workspace:^0.1.0",
     "@dappnode/common": "workspace:^0.1.0",
     "@dappnode/daemons": "workspace:^0.1.0",
