@@ -63,7 +63,7 @@ export function CustomAccordionItem({
             ...(isOpen ? {} : { borderBottom: "none" })
           }}
         >
-          <b>{header}</b> {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          <>{header}</> {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
         </Card.Header>
         <Accordion.Body>
           <Card.Body>{children}</Card.Body>
