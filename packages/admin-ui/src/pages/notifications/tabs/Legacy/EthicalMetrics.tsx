@@ -6,8 +6,7 @@ import Input from "components/Input";
 import Ok from "components/Ok";
 import { withToast } from "components/toast/Toast";
 import React, { useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
-import Form from "react-bootstrap/esm/Form";
+import { Form, Accordion, useAccordionButton } from "react-bootstrap";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import { ReqStatus } from "types";
@@ -38,19 +37,8 @@ export default function EthicalMetrics() {
     const emailRegex = /\S+@\S+\.\S+/;
     const tgChannelIdRegex = /^-100\d{10}(?:_\d{1,3})?$/;
 
-    // Email validation
-    if (emailRegex.test(mail) || mail === "") {
-      setMailError(false);
-    } else {
-      setMailError(true);
-    }
-
-    // Telegram channel ID validation
-    if (tgChannelIdRegex.test(tgChannelId) || tgChannelId === "") {
-      setTgChannelIdError(false);
-    } else {
-      setTgChannelIdError(true);
-    }
+    setMailError(!(emailRegex.test(mail) || mail === ""));
+    setTgChannelIdError(!(tgChannelIdRegex.test(tgChannelId) || tgChannelId === ""));
   }, [mail, tgChannelId]);
 
   useEffect(() => {
@@ -82,8 +70,8 @@ export default function EthicalMetrics() {
             mailValue && tgChannelIdValue
               ? "telegram channel and email"
               : mailValue
-                ? "email"
-                : tgChannelId && "telegram channel"
+              ? "email"
+              : tgChannelId && "telegram channel"
           }`,
           onSuccess: `Enabled ethical metrics`
         }
@@ -126,6 +114,8 @@ export default function EthicalMetrics() {
     setEthicalLoading(false);
   }
 
+  const toggleTgAccordion = useAccordionButton("0", () => setTgAccordionOpen((v) => !v));
+
   return (
     <Card spacing>
       <div>
@@ -148,7 +138,6 @@ export default function EthicalMetrics() {
         <Form.Group>
           <Form.Label>Ethical metrics status</Form.Label>
           <br />
-          {/** TODO: show instance and register status */}
           <div style={{ display: "inline-block" }}>
             <SwitchBig
               disabled={
@@ -213,63 +202,76 @@ export default function EthicalMetrics() {
               )
             }
           />
-          <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
-            <div className="accordion-notifications-wrapper">
-              <Accordion.Toggle
-                eventKey="0"
-                onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-                className="accordion-notifications"
-              >
-                <div className="header">
-                  <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
-                  How can I get a Telegram channel ID? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
-                </div>
-              </Accordion.Toggle>
-              <Accordion.Collapse eventKey="0">
-                <div>
-                  <ol>
-                    <li>
-                      Open{" "}
-                      <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
-                        Telegram web
-                      </a>
-                      .
-                      <ul>
-                        <li>
-                          Ensure the URL ends with <span className={theme === "dark" ? "dark" : "light"}>/a/</span>. If
-                          not, manually add <span className={theme === "dark" ? "dark" : "light"}>/a/</span> after{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>https://web.telegram.org</span>.{" "}
-                        </li>
-                      </ul>
-                    </li>
-                    <li>Create a private channel.</li>
-                    <li>
-                      Add <span className={theme === "dark" ? "dark" : "light"}>@ethicalMetricsAlerts_bot</span> as an
-                      administrator in the channel.
-                    </li>
-                    <li>
-                      Go to your channel and copy the 13-digit ID from the URL.
-                      <ul>
-                        <li>
-                          The channel ID always starts with{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>-100</span>. Ensure to include the{" "}
-                          <span className={theme === "dark" ? "dark" : "light"}>-</span> when coping it.
-                        </li>
-                      </ul>
-                    </li>
 
-                    <li>
-                      Paste the ID into the Telegram Channel ID field and enable Ethical Metrics to receive
-                      notifications.
-                    </li>
-                  </ol>
+          <Accordion activeKey={tgAccordionOpen ? "0" : undefined}>
+            <Accordion.Item eventKey="0">
+              <div className="accordion-notifications-wrapper">
+                <div
+                  role="button"
+                  tabIndex={0}
+                  className="accordion-notifications"
+                  onClick={toggleTgAccordion}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      toggleTgAccordion(e);
+                    }
+                  }}
+                >
+                  <div className="header">
+                    <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
+                    How can I get a Telegram channel ID? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+                  </div>
                 </div>
-              </Accordion.Collapse>
-            </div>
+
+                <Accordion.Body>
+                  <div>
+                    <ol>
+                      <li>
+                        Open{" "}
+                        <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
+                          Telegram web
+                        </a>
+                        .
+                        <ul>
+                          <li>
+                            Ensure the URL ends with <span className={theme === "dark" ? "dark" : "light"}>/a/</span>.
+                            If not, manually add <span className={theme === "dark" ? "dark" : "light"}>/a/</span> after{" "}
+                            <span className={theme === "dark" ? "dark" : "light"}>https://web.telegram.org</span>.{" "}
+                          </li>
+                        </ul>
+                      </li>
+                      <li>Create a private channel.</li>
+                      <li>
+                        Add <span className={theme === "dark" ? "dark" : "light"}>@ethicalMetricsAlerts_bot</span> as an
+                        administrator in the channel.
+                      </li>
+                      <li>
+                        Go to your channel and copy the 13-digit ID from the URL.
+                        <ul>
+                          <li>
+                            The channel ID always starts with{" "}
+                            <span className={theme === "dark" ? "dark" : "light"}>-100</span>. Ensure to include the{" "}
+                            <span className={theme === "dark" ? "dark" : "light"}>-</span> when coping it.
+                          </li>
+                        </ul>
+                      </li>
+
+                      <li>
+                        Paste the ID into the Telegram Channel ID field and enable Ethical Metrics to receive
+                        notifications.
+                      </li>
+                    </ol>
+                  </div>
+                </Accordion.Body>
+              </div>
+            </Accordion.Item>
           </Accordion>
+
           {tgChannelIdError && (
             <span style={{ fontSize: "12px", color: "red" }}>Telegram channel ID format is incorrect</span>
           )}
+
           <br />
           <Form.Label>Ethical metrics notifications by email</Form.Label>
           <Input
