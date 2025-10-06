@@ -1,6 +1,8 @@
 import "mocha";
 import { expect } from "chai";
 import { DappGetFetcherMock, MockDnps } from "../testHelpers.js";
+import { Dependencies } from "@dappnode/types";
+import { DappnodeInstaller } from "../../../../src/dappnodeInstaller.js";
 import aggregateDependencies from "../../../../src/dappGet/aggregate/aggregateDependencies.js";
 import { dappnodeInstaller } from "../../../testUtils.js";
 
@@ -107,5 +109,104 @@ describe("dappGet/aggregate/aggregateDependencies", () => {
         versions: { "0.1.0": { "dnpA.dnp.dappnode.eth": "^0.1.0" } }
       }
     });
+  });
+
+  it("should skip versions whose dependencies can't be fetched", async () => {
+    // Create a mock fetcher that fails for specific versions
+    class DappGetFetcherWithFailures extends DappGetFetcherMock {
+      async dependencies(dappnodeInstaller: DappnodeInstaller, name: string, version: string): Promise<Dependencies> {
+        // Simulate failure for specific version
+        if (name === "kovan.dnp.dappnode.eth" && version === "0.1.1") {
+          throw new Error(`Failed to fetch dependencies for ${name}@${version}`);
+        }
+        return super.dependencies(dappnodeInstaller, name, version);
+      }
+    }
+
+    const mockDnps: MockDnps = {
+      "kovan.dnp.dappnode.eth": {
+        "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" },
+        "0.1.1": { "dependency.dnp.dappnode.eth": "^0.1.1" }, // This will fail
+        "0.1.2": { "dependency.dnp.dappnode.eth": "^0.1.1" }
+      },
+      "dependency.dnp.dappnode.eth": {
+        "0.1.1": {},
+        "0.1.2": {}
+      }
+    };
+
+    const dappGetFetcher = new DappGetFetcherWithFailures(mockDnps);
+
+    const dnpName = "kovan.dnp.dappnode.eth";
+    const versionRange = "^0.1.0"; // This will match multiple versions
+    const dnps = {};
+    
+    // This should not throw an error despite version 0.1.1 failing
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: dnpName,
+      versionRange,
+      dnps,
+      dappGetFetcher
+    });
+
+    // Should only contain versions 0.1.0 and 0.1.2 (0.1.1 should be skipped due to fetch failure)
+    expect(dnps).to.deep.equal({
+      "kovan.dnp.dappnode.eth": {
+        versions: {
+          "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" },
+          "0.1.2": { "dependency.dnp.dappnode.eth": "^0.1.1" }
+        }
+      },
+      "dependency.dnp.dappnode.eth": {
+        versions: {
+          "0.1.1": {},
+          "0.1.2": {}
+        }
+      }
+    });
+  });
+
+  it("should handle case where all versions fail to fetch dependencies", async () => {
+    // Create a mock fetcher that fails for all versions of a specific package
+    class DappGetFetcherWithAllFailures extends DappGetFetcherMock {
+      async dependencies(dappnodeInstaller: DappnodeInstaller, name: string, version: string): Promise<Dependencies> {
+        // Simulate failure for all versions of this specific package
+        if (name === "broken.dnp.dappnode.eth") {
+          throw new Error(`Failed to fetch dependencies for ${name}@${version}`);
+        }
+        return super.dependencies(dappnodeInstaller, name, version);
+      }
+    }
+
+    const mockDnps: MockDnps = {
+      "broken.dnp.dappnode.eth": {
+        "0.1.0": { "dependency.dnp.dappnode.eth": "^0.1.1" }, // This will fail
+        "0.1.1": { "dependency.dnp.dappnode.eth": "^0.1.1" }, // This will fail
+        "0.1.2": { "dependency.dnp.dappnode.eth": "^0.1.1" }  // This will fail
+      },
+      "dependency.dnp.dappnode.eth": {
+        "0.1.1": {},
+        "0.1.2": {}
+      }
+    };
+
+    const dappGetFetcher = new DappGetFetcherWithAllFailures(mockDnps);
+
+    const dnpName = "broken.dnp.dappnode.eth";
+    const versionRange = "^0.1.0"; // This will match multiple versions but all will fail
+    const dnps = {};
+    
+    // This should not throw an error despite all versions failing
+    await aggregateDependencies({
+      dappnodeInstaller,
+      name: dnpName,
+      versionRange,
+      dnps,
+      dappGetFetcher
+    });
+
+    // Should be empty since all versions failed to fetch dependencies
+    expect(dnps).to.deep.equal({});
   });
 });
