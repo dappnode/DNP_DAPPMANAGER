@@ -319,3 +319,12 @@ p.no-p-style:last-child {
     padding: 0px;
   }
 }
+
+/* Remove bootsrap's default table background */
+.table {
+  background-color: transparent !important;
+  th,
+  td {
+    background-color: transparent !important;
+  }
+}
