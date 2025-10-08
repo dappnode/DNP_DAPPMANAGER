@@ -152,7 +152,7 @@ export const params = {
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Install method parameters
-  ALWAYS_DAPPGETBASIC: false,
+  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
   // Watchers
   TEMPERATURE_DAEMON_INTERVAL: 5 * MINUTE,
   AUTO_UPDATE_DAEMON_INTERVAL: 30 * MINUTE,
