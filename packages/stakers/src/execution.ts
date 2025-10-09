@@ -47,7 +47,9 @@ export class Execution extends StakerComponent {
     ],
     [Network.Gnosis]: [
       { dnpName: ExecutionClientGnosis.Nethermind, minVersion: "1.0.18" },
-      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" }
+      { dnpName: ExecutionClientGnosis.Erigon, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Geth, minVersion: "0.1.0" },
+      { dnpName: ExecutionClientGnosis.Reth, minVersion: "0.1.0" }
     ],
     [Network.Prater]: [
       { dnpName: ExecutionClientPrater.Geth, minVersion: "0.4.26" },
@@ -69,9 +71,7 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHoodi.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHoodi.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Sepolia]: [
-      { dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" },
-    ],
+    [Network.Sepolia]: [{ dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" }],
     [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
   };
 

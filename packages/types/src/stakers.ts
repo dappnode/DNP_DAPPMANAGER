@@ -113,7 +113,9 @@ export enum ConsensusClientGnosis {
 }
 export enum ExecutionClientGnosis {
   Nethermind = "nethermind-xdai.dnp.dappnode.eth",
-  Erigon = "gnosis-erigon.dnp.dappnode.eth"
+  Erigon = "gnosis-erigon.dnp.dappnode.eth",
+  Geth = "gnosis-geth.dnp.dappnode.eth",
+  Reth = "gnosis-reth.dnp.dappnode.eth"
 }
 export enum SignerGnosis {
   Web3signer = "web3signer-gnosis.dnp.dappnode.eth"
