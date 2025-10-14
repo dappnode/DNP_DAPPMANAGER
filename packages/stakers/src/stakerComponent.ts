@@ -2,7 +2,7 @@ import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappn
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import { InstalledPackageData, StakerItem, UserSettings, Network, ExecutionClientGnosis } from "@dappnode/types";
+import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
@@ -28,41 +28,19 @@ export class StakerComponent {
     return await Promise.all(
       dnpNames.map(async (dnpName) => {
         try {
-          if (dnpName === ExecutionClientGnosis.Geth || dnpName === ExecutionClientGnosis.Reth) {
-            const isInstalled = getIsInstalled({ dnpName }, dnpList);
-            if (isInstalled) {
-              return {
-                status: "ok",
-                dnpName,
-                avatarUrl: "https://www.svgrepo.com/show/485751/lab.svg",
-                isInstalled: isInstalled,
-                isUpdated: true,
-                isRunning: getIsRunning({ dnpName }, dnpList),
-                relays, // only for mevBoost
-                isSelected: dnpName === currentClient || currentClient === true
-              };
-            } else {
-              return {
-                status: "error",
-                dnpName,
-                error: `${dnpName} package not installed`
-              };
-            }
-          } else {
-            await this.dappnodeInstaller.getRepoContract(dnpName);
-            const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
-            return {
-              status: "ok",
-              dnpName,
-              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-              isInstalled: getIsInstalled(pkgData, dnpList),
-              isUpdated: getIsUpdated(pkgData, dnpList),
-              isRunning: getIsRunning(pkgData, dnpList),
-              data: pkgData,
-              relays, // only for mevBoost
-              isSelected: dnpName === currentClient || currentClient === true
-            };
-          }
+          await this.dappnodeInstaller.getRepoContract(dnpName);
+          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+          return {
+            status: "ok",
+            dnpName,
+            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+            isInstalled: getIsInstalled(pkgData, dnpList),
+            isUpdated: getIsUpdated(pkgData, dnpList),
+            isRunning: getIsRunning(pkgData, dnpList),
+            data: pkgData,
+            relays, // only for mevBoost
+            isSelected: dnpName === currentClient || currentClient === true
+          };
         } catch (error) {
           return {
             status: "error",
