@@ -2,7 +2,7 @@ import { dockerComposeUpPackage, listPackageNoThrow, listPackages } from "@dappn
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 import { DappnodeInstaller, packageGetData, packageInstall } from "@dappnode/installer";
 import { logs } from "@dappnode/logger";
-import { InstalledPackageData, StakerItem, UserSettings, Network } from "@dappnode/types";
+import { InstalledPackageData, StakerItem, UserSettings, Network, PackageItemData } from "@dappnode/types";
 import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@dappnode/utils";
 import { lt } from "semver";
 import { params } from "@dappnode/params";
@@ -28,19 +28,35 @@ export class StakerComponent {
     return await Promise.all(
       dnpNames.map(async (dnpName) => {
         try {
-          await this.dappnodeInstaller.getRepoContract(dnpName);
-          const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
-          return {
-            status: "ok",
-            dnpName,
-            avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
-            isInstalled: getIsInstalled(pkgData, dnpList),
-            isUpdated: getIsUpdated(pkgData, dnpList),
-            isRunning: getIsRunning(pkgData, dnpList),
-            data: pkgData,
-            relays, // only for mevBoost
-            isSelected: dnpName === currentClient || currentClient === true
-          };
+          // await this.dappnodeInstaller.getRepoContract(dnpName);
+          const pkg = dnpList.find((p) => p.dnpName === dnpName);
+
+          if (!pkg) {
+            const pkgData = await packageGetData(this.dappnodeInstaller, dnpName);
+            return {
+              status: "ok",
+              dnpName,
+              avatarUrl: fileToGatewayUrl(pkgData.avatarFile),
+              isInstalled: getIsInstalled(pkgData, dnpList),
+              isUpdated: getIsUpdated(pkgData, dnpList),
+              isRunning: getIsRunning(pkgData, dnpList),
+              data: pkgData,
+              relays, // only for mevBoost
+              isSelected: dnpName === currentClient || currentClient === true
+            };
+          } else {
+            return {
+              status: "ok",
+              dnpName,
+              avatarUrl: pkg.avatarUrl,
+              isInstalled: true,
+              isUpdated: getIsUpdated({ dnpName: pkg.dnpName, reqVersion: pkg.version }, dnpList),
+              isRunning: getIsRunning(pkg, dnpList),
+              data: pkg as unknown as PackageItemData,
+              relays, // only for mevBoost
+              isSelected: dnpName === currentClient || currentClient === true
+            };
+          }
         } catch (error) {
           return {
             status: "error",
