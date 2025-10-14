@@ -71,7 +71,10 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientHoodi.Nethermind, minVersion: "0.1.0" },
       { dnpName: ExecutionClientHoodi.Besu, minVersion: "0.1.0" }
     ],
-    [Network.Sepolia]: [{ dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" }],
+    [Network.Sepolia]: [
+      { dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" },
+      { dnpName: ExecutionClientSepolia.Reth, minVersion: "0.1.0" }
+    ],
     [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
   };
 

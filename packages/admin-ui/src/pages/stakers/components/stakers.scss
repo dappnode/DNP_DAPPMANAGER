@@ -54,9 +54,6 @@
     color: var(--eth-multi-client-description-color);
   } */
 
-  > *:not(:last-child) {
-    margin-bottom: 1rem;
-  }
   // Button feel
   &:hover:not(.isSelected) {
     cursor: pointer;
