@@ -54,8 +54,8 @@ export default function VolumesGrid() {
         const onDelete = isOrphan
           ? () => dispatch(volumeRemove(name))
           : owner
-            ? () => dispatch(packageVolumeRemove(owner, name))
-            : () => {};
+          ? () => dispatch(packageVolumeRemove(owner, name))
+          : () => {};
         const isDeletable = Boolean(isOrphan || owner);
 
         return (
@@ -75,7 +75,7 @@ export default function VolumesGrid() {
                 <span className="volName">{namePretty}</span>
               </span>
               {isOrphan && (
-                <Badge pill variant="danger">
+                <Badge pill bg="danger">
                   Orphan
                 </Badge>
               )}

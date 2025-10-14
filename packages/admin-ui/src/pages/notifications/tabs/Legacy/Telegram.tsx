@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { api, useApi } from "api";
 import { ReqStatus } from "types";
-import Form from "react-bootstrap/esm/Form";
+import { Form, Accordion, useAccordionButton } from "react-bootstrap";
 import Button from "components/Button";
 import Card from "components/Card";
 import Switch from "components/Switch";
@@ -11,7 +11,6 @@ import { withToast } from "components/toast/Toast";
 import { InputSecret } from "components/InputSecret";
 import { forumUrl } from "params";
 import Input from "components/Input";
-import { Accordion } from "react-bootstrap";
 import { BsInfoCircleFill } from "react-icons/bs";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 
@@ -93,6 +92,8 @@ export function TelegramNotifications() {
     }
   }
 
+  const toggleTgAccordion = useAccordionButton("0", () => setTgAccordionOpen((v) => !v));
+
   return (
     <Card spacing>
       <div>
@@ -127,7 +128,7 @@ export function TelegramNotifications() {
               (telegramStatus.data === false && (userIdError || tokenError)) ||
               ((!userId || !token) && telegramStatus.data === false)
             }
-          ></Switch>
+          />
         </Form.Group>
       ) : telegramStatus.error ? (
         <Ok msg={"Error getting status"} style={{ margin: "auto" }} />
@@ -174,43 +175,55 @@ export function TelegramNotifications() {
             </Button>
           }
         />
-        <Accordion defaultActiveKey={tgAccordionOpen ? "0" : ""}>
-          <div className="accordion-notifications-wrapper">
-            <Accordion.Toggle
-              eventKey="0"
-              onClick={() => setTgAccordionOpen(!tgAccordionOpen)}
-              className="accordion-notifications"
-            >
-              <div className="header">
-                <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
-                How can I get my telegram user Id? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}{" "}
+
+        <Accordion activeKey={tgAccordionOpen ? "0" : undefined}>
+          <Accordion.Item eventKey="0">
+            <div className="accordion-notifications-wrapper">
+              <div
+                role="button"
+                tabIndex={0}
+                className="accordion-notifications"
+                onClick={toggleTgAccordion}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleTgAccordion(e);
+                  }
+                }}
+              >
+                <div className="header">
+                  <BsInfoCircleFill className="links-icon" style={{ fontSize: "14px" }} />
+                  How can I get my telegram user Id? {tgAccordionOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                </div>
               </div>
-            </Accordion.Toggle>
-            <Accordion.Collapse eventKey="0">
-              <div>
-                <ol>
-                  <li>
-                    Open{" "}
-                    <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
-                      Telegram web
-                    </a>
-                    .
-                  </li>
-                  <li>
-                    Search for the bot <span>@raw_data_bot</span>.
-                  </li>
-                  <li>
-                    Write the command <span>/start</span> and copy the user ID returned.
-                  </li>
-                  <li>
-                    Paste the user ID into the user ID field and enable Telegram to secure your dappnode telegram bot
-                    and ensure only you are the only one allowed to write authenticated commands to it.
-                  </li>
-                </ol>
-              </div>
-            </Accordion.Collapse>
-          </div>
+
+              <Accordion.Body>
+                <div>
+                  <ol>
+                    <li>
+                      Open{" "}
+                      <a href="https://web.telegram.org/a/" target="_blank" rel="noopener noreferrer">
+                        Telegram web
+                      </a>
+                      .
+                    </li>
+                    <li>
+                      Search for the bot <span>@raw_data_bot</span>.
+                    </li>
+                    <li>
+                      Write the command <span>/start</span> and copy the user ID returned.
+                    </li>
+                    <li>
+                      Paste the user ID into the user ID field and enable Telegram to secure your dappnode telegram bot
+                      and ensure only you are the only one allowed to write authenticated commands to it.
+                    </li>
+                  </ol>
+                </div>
+              </Accordion.Body>
+            </div>
+          </Accordion.Item>
         </Accordion>
+
         {userIdError && <span style={{ fontSize: "12px", color: "red" }}>Telegram user ID format is incorrect</span>}
       </Form.Group>
 

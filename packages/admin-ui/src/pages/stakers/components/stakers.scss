@@ -112,5 +112,14 @@
 .staker-network {
   &.row {
     margin: 0;
+    //Remove padding left and padding right for 1st and last child for desktop view
+    @media screen and (min-width: 40rem) {
+      > :first-child {
+        padding-left: 0;
+      }
+      > :last-child {
+        padding-right: 0;
+      }
+    }
   }
 }
