@@ -18,6 +18,7 @@ import { Routes } from "@dappnode/types";
 import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
 import { sendCoreInstalledResolvedNotification } from "../installer/sendCoreInstallResolvedNotification.js";
+import { params } from "@dappnode/params";
 
 /**
  * Installs a DAppNode Package.
@@ -51,6 +52,7 @@ export async function packageInstall(
 
   try {
     log(id, "Resolving dependencies...");
+    if (params.ALWAYS_DAPPGETBASIC) options.BYPASS_RESOLVER = true;
     const { state, currentVersions, releases } = await dappnodeInstaller.getReleasesResolved(req, options);
     logs.info("Resolved request", req, state);
 
