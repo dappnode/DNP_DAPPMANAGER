@@ -130,7 +130,7 @@ p.no-p-style:last-child {
   // Smaller icons for mobile
   @media (max-width: 40rem) {
     --icon-size: 1.25rem;
-  } 
+  }
   --grid-spacing: 1rem;
   display: grid;
   /* Specify a custom grid-template-columns:  */
@@ -309,4 +309,13 @@ p.no-p-style:last-child {
 /* DAppStore cards */
 .dnp-card {
   cursor: pointer;
+}
+
+/* Bootstrap Accordion styles overwrite */
+.accordion-item {
+  border: none;
+  background-color: transparent;
+  .accordion-body {
+    padding: 0px;
+  }
 }
