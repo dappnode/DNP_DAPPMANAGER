@@ -113,7 +113,9 @@ export enum ConsensusClientGnosis {
 }
 export enum ExecutionClientGnosis {
   Nethermind = "nethermind-xdai.dnp.dappnode.eth",
-  Erigon = "gnosis-erigon.dnp.dappnode.eth"
+  Erigon = "gnosis-erigon.dnp.dappnode.eth",
+  Geth = "gnosis-geth.dnp.dappnode.eth",
+  Reth = "gnosis-reth.dnp.dappnode.eth"
 }
 export enum SignerGnosis {
   Web3signer = "web3signer-gnosis.dnp.dappnode.eth"
@@ -137,11 +139,13 @@ export enum SignerLukso {
 // SEPOLIA
 export enum ConsensusClientSepolia {
   /*"prysm-sepolia.dnp.dappnode.eth",*/
-  Prysm = "prysm-sepolia.dnp.dappnode.eth"
+  Prysm = "prysm-sepolia.dnp.dappnode.eth",
+  Lighthouse = "lighthouse-sepolia.dnp.dappnode.eth"
 }
 
 export enum ExecutionClientSepolia {
-  Geth = "sepolia-geth.dnp.dappnode.eth"
+  Geth = "sepolia-geth.dnp.dappnode.eth",
+  Reth = "sepolia-reth.dnp.dappnode.eth"
 }
 
 export enum SignerSepolia {

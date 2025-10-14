@@ -71,6 +71,7 @@ export class Consensus extends StakerComponent {
     ],
     [Network.Sepolia]: [
       { dnpName: ConsensusClientSepolia.Prysm, minVersion: "0.1.2" },
+      { dnpName: ConsensusClientSepolia.Lighthouse, minVersion: "0.1.0" }
     ],
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
