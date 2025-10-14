@@ -55,6 +55,8 @@ export const fundedBy: { logo: string; text: string; link: string }[] = [
   }
 ];
 
+export const premiumLabel = "PREMIUM";
+
 export const sidenavItems: {
   name: string;
   href: string;
@@ -63,13 +65,13 @@ export const sidenavItems: {
   show: boolean;
 }[] = [
   {
-    name: "Dashboard",
+    name: "DASHBOARD",
     href: dashboardRelativePath,
     icon: MdDashboard,
     show: true
   },
   {
-    name: "Wi-Fi",
+    name: "WI-FI",
     href: wifiRelativePath,
     icon: MdWifi,
     show: true
@@ -81,55 +83,55 @@ export const sidenavItems: {
     show: true
   },
   {
-    name: "DAppStore",
+    name: "DAPPSTORE",
     href: installerRelativePath,
     icon: MdCreateNewFolder,
     show: true
   },
   {
-    name: "Packages",
+    name: "PACKAGES",
     href: packagesRelativePath,
     icon: MdFolder,
     show: true
   },
   {
-    name: "Stakers",
+    name: "STAKERS",
     href: stakersRelativePath,
     icon: SiEthereum,
     show: true
   },
   {
-    name: "System",
+    name: "SYSTEM",
     href: systemRelativePath,
     icon: MdSettings,
     show: true
   },
   {
-    name: "Notifications",
+    name: "NOTIFICATIONS",
     href: notificationsRelativePath,
     icon: FaRegBell,
     show: true
   },
   {
-    name: "Community",
+    name: "COMMUNITY",
     href: communityRelativePath,
     icon: MdPeople,
     show: true
   },
   {
-    name: "Sdk",
+    name: "SDK",
     href: sdkRelativePath,
     icon: MdBuild,
     show: true
   },
   {
-    name: "Support",
+    name: "SUPPORT",
     href: supportRelativePath,
     icon: MdHelp,
     show: true
   },
   {
-    name: "Premium",
+    name: premiumLabel,
     href: premiumRelativePath,
     icon: MdStar,
     show: true

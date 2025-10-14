@@ -36,7 +36,7 @@
   text-decoration: none;
   transition: all 0.5s;
   /* Try to standarize this size */
-  font-size: 0.94rem;
+  font-size: 0.8rem;
 
   /* Subheader before the list of routes, with text: Admin UI */
   .subheader {
@@ -52,19 +52,24 @@
   }
   &.selectable:hover,
   &.selectable.active {
-    border-left: 5px solid var(--dappnode-strong-main-color);
     color: black;
     font-weight: 800;
     text-decoration: none;
-    background-color: #e6eceb80;
   }
+  &.selectable:hover {
+    background-color: var(--color-light-background-main);
+  }
+  &.selectable.active {
+    background-color: var(--color-light-border);
+  }
+
   &.selectable:hover svg,
   &.selectable.active svg {
     opacity: 0.7;
   }
 
   &.selectable svg {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   &.premium-item {
