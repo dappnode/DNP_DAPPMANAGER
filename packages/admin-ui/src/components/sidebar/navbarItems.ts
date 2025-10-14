@@ -20,6 +20,7 @@ import { FaRegBell } from "react-icons/fa";
 import { SiEthereum } from "react-icons/si";
 // URLs
 import { relativePath as dashboardRelativePath } from "pages/dashboard";
+import { relativePath as dashboardv2RelativePath } from "pages/dashboard_v2";
 import { relativePath as devicesRelativePath } from "pages/vpn";
 import { relativePath as installerRelativePath } from "pages/installer";
 import { relativePath as packagesRelativePath } from "pages/packages";
@@ -67,6 +68,12 @@ export const sidenavItems: {
   {
     name: "DASHBOARD",
     href: dashboardRelativePath,
+    icon: MdDashboard,
+    show: true
+  },
+  {
+    name: "DASHBOARD v2",
+    href: dashboardv2RelativePath,
     icon: MdDashboard,
     show: true
   },
