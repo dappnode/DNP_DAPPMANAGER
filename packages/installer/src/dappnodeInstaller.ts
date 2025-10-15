@@ -30,29 +30,43 @@ import { omit } from "lodash-es";
 import { JsonRpcApiProvider } from "ethers";
 
 /**
- * Returns the ipfsUrl to initialize the ipfs instance
+ * Returns the ipfsUrls array to initialize the IPFS instance
+ * Local IPFS comes first as default, then remote as fallback
  */
-export function getIpfsUrl(): string {
-  // Fort testing
-  if (params.IPFS_HOST) return params.IPFS_HOST;
+export function getIpfsUrls(): string[] {
+  // For testing
+  if (params.IPFS_HOST) return [params.IPFS_HOST];
 
   const ipfsClientTarget = db.ipfsClientTarget.get();
   if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
+  
   // local
-  if (ipfsClientTarget === IpfsClientTarget.local) return params.IPFS_LOCAL;
+  if (ipfsClientTarget === IpfsClientTarget.local) {
+    return [params.IPFS_LOCAL, params.IPFS_REMOTE]; // Local first, remote fallback
+  }
   // remote
-  return db.ipfsGateway.get();
+  const remoteGateway = db.ipfsGateway.get();
+  return [remoteGateway, params.IPFS_LOCAL]; // Remote first, local fallback
+}
+
+/**
+ * Returns the ipfsUrl to initialize the ipfs instance
+ * @deprecated Use getIpfsUrls() instead for multiple gateway support
+ */
+export function getIpfsUrl(): string {
+  const urls = getIpfsUrls();
+  return urls[0]; // Return first URL for backward compatibility
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
-  constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
-    super(ipfsUrl, provider);
+  constructor(ipfsUrls: string | string[], provider: JsonRpcApiProvider) {
+    super(ipfsUrls, provider);
   }
 
   private async updateProviders(): Promise<void> {
-    const newIpfsUrl = getIpfsUrl();
+    const newIpfsUrls = getIpfsUrls();
     // super.changeEthProvider();
-    super.changeIpfsGatewayUrl(newIpfsUrl);
+    super.changeIpfsGatewayUrl(newIpfsUrls);
   }
 
   /**
