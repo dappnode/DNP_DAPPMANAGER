@@ -1,0 +1,75 @@
+.dashboard-container {
+  .dashboard-header {
+    .section-title {
+      padding: 0;
+    }
+    hr {
+      margin: 0;
+    }
+  }
+
+  .system-health {
+    .system-health-card {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 4rem;
+      padding-left: 2rem;
+      padding-right: 2rem;
+
+      .loading-view {
+        margin: 1rem 0px;
+        img {
+          width: 50px;
+          height: 50px;
+          margin: 0px;
+        }
+      }
+
+      .stats-block {
+        flex: 1;
+        .stats-block-header {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+
+          .title {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+          }
+
+          svg {
+            opacity: 0.5;
+          }
+        }
+
+        // Overwrite bootstrap progress bar styles
+        .progress {
+          height: 10px;
+          background-color: var(--color-light-border); // Non-filled part bg color
+          .progress-bar {
+            &.bg-info {
+              background-color: var(--dappnode-strong-main-color);
+            }
+          }
+        }
+      }
+      .uptime {
+        .uptime-header {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          svg {
+            opacity: 0.5;
+          }
+        }
+        .uptime-label {
+          font-weight: 600;
+          color: var(--dappnode-strong-main-color);
+        }
+      }
+    }
+  }
+}
