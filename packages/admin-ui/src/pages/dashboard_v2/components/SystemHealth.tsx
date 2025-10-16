@@ -9,6 +9,7 @@ import { CpuTempIcon } from "./icons/CpuTempIcon";
 import { UptimeIcon } from "./icons/UptimeIcon";
 import Loading from "components/Loading";
 import { ProgressBar } from "react-bootstrap";
+import "./systemHealth.scss";
 
 export default function SystemHealth() {
   const {
@@ -32,29 +33,30 @@ export default function SystemHealth() {
           <Loading />
         ) : (
           <>
-            {" "}
-            <StatBlock title="CPU Usage" icon={<CpuIcon />} data={`${cpuUsage}%`}>
-              <CustomProgressBar value={cpuUsage} />
-            </StatBlock>
-            <StatBlock title="CPU Temp" icon={<CpuTempIcon />} data={`${cpuTemp}°C`}>
-              <CustomProgressBar
-                value={cpuTemp}
-                max={115} // cpu temperature above 100/110 triggers automatic shutdowns in intel NUCs
-                danger={95}
-                warning={85}
-              />
-            </StatBlock>
-            <StatBlock title="Memory" icon={<MemoryIcon />} data={`${memoryUsed}/${memoryTotal}`}>
-              <CustomProgressBar value={memoryPercentage} />
-            </StatBlock>
-            <StatBlock title="Disk" icon={<DiskIcon />} data={`${diskUsed}/${diskTotal}`}>
-              <CustomProgressBar value={diskPercentage} />
-            </StatBlock>
+            <div className="stats-grid">
+              {" "}
+              <StatBlock title="CPU Usage" icon={<CpuIcon />} data={`${cpuUsage}%`}>
+                <CustomProgressBar value={cpuUsage} />
+              </StatBlock>
+              <StatBlock title="CPU Temp" icon={<CpuTempIcon />} data={`${cpuTemp}°C`}>
+                <CustomProgressBar
+                  value={cpuTemp}
+                  max={115} // cpu temperature above 100/110 triggers automatic shutdowns in intel NUCs
+                  danger={95}
+                  warning={85}
+                />
+              </StatBlock>
+              <StatBlock title="Memory" icon={<MemoryIcon />} data={`${memoryUsed} /${memoryTotal}`}>
+                <CustomProgressBar value={memoryPercentage} />
+              </StatBlock>
+              <StatBlock title="Disk" icon={<DiskIcon />} data={`${diskUsed} /${diskTotal}`}>
+                <CustomProgressBar value={diskPercentage} />
+              </StatBlock>
+            </div>
+            <hr />
             <div className="uptime">
-              <div className="uptime-header">
-                <UptimeIcon />
-                <div>Uptime</div>
-              </div>
+              <UptimeIcon />
+              <div>Uptime</div>
               <div className="uptime-label">{uptime}</div>
             </div>
           </>
