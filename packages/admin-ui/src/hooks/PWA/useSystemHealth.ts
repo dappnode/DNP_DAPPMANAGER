@@ -41,7 +41,7 @@ export function useSystemHealth() {
   return {
     cpuUsage: cpuStats.data ? Math.floor(cpuStats.data.usedPercentage) : 0,
     cpuTemp: cpuStats.data ? Math.floor(cpuStats.data.temperatureAverage) : 0,
-    memoryUsed: memoryStats.data ? humanFileSize(memoryStats.data.used, false) : null,
+    memoryUsed: memoryStats.data ? humanFileSize(memoryStats.data.used, false, 0) : null,
     memoryTotal: memoryStats.data ? humanFileSize(memoryStats.data.total) : null,
     memoryPercentage: memoryStats.data ? Math.floor(memoryStats.data.usedPercentage) : 0,
     diskUsed: diskStats.data ? humanFileSize(diskStats.data.used, false) : null,
@@ -55,7 +55,8 @@ export function useSystemHealth() {
 // Formats uptime string from "up 1 week, 2 days, 3 hours, 4 minutes" to "up 1w 2d 3h 4m"
 function formatUptime(uptime: string): string {
   if (!uptime) return "";
-  return uptime
+  const clean = uptime.replace(/^up\s*/, "");
+  return clean
     .split(",")
     .map((part) => {
       const trimmed = part.trim();
