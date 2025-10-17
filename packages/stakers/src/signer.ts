@@ -13,7 +13,7 @@ import {
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { params } from "@dappnode/params";
-import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { listPackageNoThrow, listPackages } from "@dappnode/dockerapi";
 
 export class Signer extends StakerComponent {
   protected static readonly ServiceAliasesMap: Record<string, string[]> = {};
@@ -54,10 +54,16 @@ export class Signer extends StakerComponent {
   }
 
   async getAllSigners(network: Network): Promise<StakerItem[]> {
-    return await super.getAll({
-      dnpNames: [Signer.CompatibleSigners[network].dnpName],
-      currentClient: Signer.CompatibleSigners[network].dnpName
-    });
+    return await Promise.all(
+      [Signer.CompatibleSigners[network].dnpName].map(async (dnpName) =>
+        super.getStakerPkg({
+          dnpName,
+          dnpList: await listPackages(),
+          userSettings: this.getUserSettings(network),
+          currentClient: Signer.CompatibleSigners[network].dnpName
+        })
+      )
+    );
   }
 
   async persistSignerIfInstalledAndRunning(network: Network): Promise<void> {
