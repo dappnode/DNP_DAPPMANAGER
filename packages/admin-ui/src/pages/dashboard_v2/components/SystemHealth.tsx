@@ -33,6 +33,14 @@ export default function SystemHealth() {
           <Loading />
         ) : (
           <>
+            <div className="uptime">
+              <div className="uptime-header">
+                <UptimeIcon />
+                <div>Your Dappnode has been running for:</div>
+              </div>
+              <div className="uptime-label">{uptime}</div>
+            </div>
+            <hr />
             <div className="stats-grid">
               {" "}
               <StatBlock title="CPU Usage" icon={<CpuIcon />} data={`${cpuUsage}%`}>
@@ -52,12 +60,6 @@ export default function SystemHealth() {
               <StatBlock title="Disk" icon={<DiskIcon />} data={`${diskUsed} /${diskTotal}`}>
                 <CustomProgressBar value={diskPercentage} />
               </StatBlock>
-            </div>
-            <hr />
-            <div className="uptime">
-              <UptimeIcon />
-              <div>Uptime</div>
-              <div className="uptime-label">{uptime}</div>
             </div>
           </>
         )}
@@ -86,7 +88,7 @@ function StatBlock({
         </div>
         {data ? <span>{data}</span> : null}
       </div>
-      <div className="stats-block-bar">{children}</div>
+      <div className="stats-block-child">{children}</div>
     </div>
   );
 }
