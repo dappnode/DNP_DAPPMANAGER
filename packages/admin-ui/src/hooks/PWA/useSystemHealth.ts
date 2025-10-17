@@ -56,15 +56,5 @@ export function useSystemHealth() {
 function formatUptime(uptime: string): string {
   if (!uptime) return "";
   const clean = uptime.replace(/^up\s*/, "");
-  return clean
-    .split(",")
-    .map((part) => {
-      const trimmed = part.trim();
-      return trimmed
-        .replace(/(\d+)\s*weeks?/, "$1w")
-        .replace(/(\d+)\s*days?/, "$1d")
-        .replace(/(\d+)\s*hours?/, "$1h")
-        .replace(/(\d+)\s*minutes?/, "$1m");
-    })
-    .join(" ");
+  return clean;
 }
