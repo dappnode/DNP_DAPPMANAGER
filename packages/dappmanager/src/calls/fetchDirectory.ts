@@ -113,7 +113,8 @@ const stakerMainnetCard: DirectoryItemOk = {
   avatarUrl: fileToGatewayUrl({
     hash: "QmQBRqfs5D1Fubd6SwBmfruMfisEWN5dGN7azPhCsTY13y",
     source: "ipfs",
-    size: 0
+    size: 0,
+    imageName: "ethereum-logo.png"
   }), // Ethereum image logo
   isInstalled: false,
   isUpdated: false,
@@ -135,7 +136,8 @@ const stakerGnosisCard: DirectoryItemOk = {
   avatarUrl: fileToGatewayUrl({
     hash: "QmcHzRr3BDJM4rb4MXBmPR5qKehWPqpwxrFQQeNcV3mvmS",
     source: "ipfs",
-    size: 0
+    size: 0,
+    imageName: "gnosis-logo.png"
   }), // Gnosis image logo
   isInstalled: false,
   isUpdated: false,
@@ -157,7 +159,8 @@ const stakeHouseCard: DirectoryItemOk = {
   avatarUrl: fileToGatewayUrl({
     hash: "QmPZ7KYwjXEXDjEj5A2iXbQ2oj9bMWKgBNJBRgUxGNCjmw",
     source: "ipfs",
-    size: 0
+    size: 0,
+    imageName: "stakehouse-logo.png"
   }), // Stakehouse image logo
   isInstalled: false,
   isUpdated: false,
