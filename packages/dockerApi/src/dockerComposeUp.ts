@@ -48,6 +48,35 @@ export async function dockerComposeUpPackage({
     (serviceName) => containersStatus && containersStatus[serviceName]?.targetStatus !== "stopped"
   );
 
+  // Wait for any containers in 'removing' state before attempting docker compose up
+  // This prevents race conditions when calling docker compose up two times in a row
+  if (containersStatus) {
+    const { dockerContainerInspect } = await import("./api/container.js");
+    const serviceNamesToCheck = upAll ? serviceNames : servicesToStart;
+    for (const serviceName of serviceNamesToCheck) {
+      const containerStatus = containersStatus[serviceName];
+      if (!containerStatus) continue;
+      let waitMs = 0;
+      const maxWaitMs = 10000; // 10 seconds
+      const pollIntervalMs = 200; // 0.2 seconds
+      while (waitMs < maxWaitMs) {
+        try {
+          const compose = ComposeFileEditor.readFrom(composePath);
+          const containerName = compose.services[serviceName]?.container_name;
+          if (!containerName) break;
+          const inspect = await dockerContainerInspect(containerName);
+          if (inspect?.State?.Status !== "removing") break;
+        } catch (err) {
+          // Not found, safe to continue
+          logs.info(`Container for service ${serviceName} not found during removing check: ${err}`);
+          break;
+        }
+        await new Promise((res) => setTimeout(res, pollIntervalMs)); // wait before re-checking
+        waitMs += pollIntervalMs; // increment waited time
+      }
+    }
+  }
+
   try {
     if (upAll || serviceNames.length === servicesToStart.length || dnpName === params.coreDnpName) {
       // Run docker-compose up on all services for:
