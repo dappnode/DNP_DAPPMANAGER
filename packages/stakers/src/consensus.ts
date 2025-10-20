@@ -45,8 +45,7 @@ export class Consensus extends StakerComponent {
     [Network.Gnosis]: [
       { dnpName: ConsensusClientGnosis.Lighthouse, minVersion: "0.1.5" },
       { dnpName: ConsensusClientGnosis.Teku, minVersion: "0.1.5" },
-      { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" },
-      { dnpName: ConsensusClientGnosis.Nimbus, minVersion: "0.1.0" }
+      { dnpName: ConsensusClientGnosis.Lodestar, minVersion: "0.1.0" }
     ],
     [Network.Prater]: [
       { dnpName: ConsensusClientPrater.Prysm, minVersion: "1.0.15" },
