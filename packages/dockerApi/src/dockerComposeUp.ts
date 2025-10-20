@@ -54,7 +54,7 @@ export async function dockerComposeUpPackage({
     if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout) dockerComposeUpOptions.timeout = timeout;
 
     // Check for any service in 'removing' state before proceeding
-    let dnpData: InstalledPackageData | null = await listPackageNoThrow({ dnpName });
+    const dnpData: InstalledPackageData | null = await listPackageNoThrow({ dnpName });
     if (dnpData && dnpData.containers) {
       const removingContainers = dnpData.containers.filter(c => c.state === "removing");
       if (removingContainers.length > 0) {
