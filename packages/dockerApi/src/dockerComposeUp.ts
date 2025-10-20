@@ -8,6 +8,9 @@ import { logs } from "@dappnode/logger";
 import { ContainersStatus, InstalledPackageData, PackageContainer } from "@dappnode/types";
 import { getDockerComposePathSmart } from "@dappnode/utils";
 
+// In-process lock map to prevent concurrent compose up calls per composePath
+const composeUpLocks = new Map<string, Promise<void>>();
+
 interface ComposeUpArgs {
   dnpName: string;
   composePath?: string;
@@ -17,6 +20,7 @@ interface ComposeUpArgs {
  * docker-compose up but it also
  * - Uses a custom timeout defined by the package developer
  * - Prevents starting stoped containers if any
+ * - Prevents concurrent calls for the same composePath
  */
 export async function dockerComposeUpPackage({
   composeArgs,
@@ -35,79 +39,76 @@ export async function dockerComposeUpPackage({
     throw Error(`No docker-compose found for ${dnpName} at ${composePath}`);
   }
 
-  // TODO: restartDappmanagerPatch should be placed here. Its not placed in this module
-  // because it adds a lot of complexity to create a new module for it.
-
-  // Add timeout option if not previously specified
-  const timeout = containersStatus ? getDockerTimeoutMax(Object.values(containersStatus)) : undefined;
-  if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout) dockerComposeUpOptions.timeout = timeout;
-
-  // Check the current status of package's container if any
-  const serviceNames: string[] = readComposeServiceNames(composePath);
-  const servicesToStart = serviceNames.filter(
-    (serviceName) => containersStatus && containersStatus[serviceName]?.targetStatus !== "stopped"
-  );
-
-  // Wait for any containers in 'removing' state before attempting docker compose up
-  // This prevents race conditions when calling docker compose up two times in a row
-  if (containersStatus) {
-    const { dockerContainerInspect } = await import("./api/container.js");
-    const serviceNamesToCheck = upAll ? serviceNames : servicesToStart;
-    for (const serviceName of serviceNamesToCheck) {
-      const containerStatus = containersStatus[serviceName];
-      if (!containerStatus) continue;
-      let waitMs = 0;
-      const maxWaitMs = 10000; // 10 seconds
-      const pollIntervalMs = 200; // 0.2 seconds
-      while (waitMs < maxWaitMs) {
-        try {
-          const compose = ComposeFileEditor.readFrom(composePath);
-          const containerName = compose.services[serviceName]?.container_name;
-          if (!containerName) break;
-          const inspect = await dockerContainerInspect(containerName);
-          if (inspect?.State?.Status !== "removing") break;
-        } catch (err) {
-          // Not found, safe to continue
-          logs.info(`Container for service ${serviceName} not found during removing check: ${err}`);
-          break;
-        }
-        await new Promise((res) => setTimeout(res, pollIntervalMs)); // wait before re-checking
-        waitMs += pollIntervalMs; // increment waited time
-      }
-    }
+  // In-process lock: prevent concurrent up for the same composePath
+  if (composeUpLocks.has(composePath)) {
+    logs.warn(`dockerComposeUpPackage: composePath ${composePath} is already being processed. Skipping concurrent call.`);
+    throw new Error(`dockerComposeUpPackage: composePath ${composePath} is already being processed.`);
   }
 
-  try {
-    if (upAll || serviceNames.length === servicesToStart.length || dnpName === params.coreDnpName) {
-      // Run docker-compose up on all services for:
-      // - packages with all services running
-      // - core package, it must be executed always. No matter the previous status
-      await dockerComposeUp(composePath, dockerComposeUpOptions);
-    } else {
-      // If some services are not running, first create the containers
-      // then start only those that are running
-      await dockerComposeUp(composePath, {
-        ...dockerComposeUpOptions,
-        noStart: true
-      });
-      if (servicesToStart.length > 0) {
-        await dockerComposeUp(composePath, {
-          ...dockerComposeUpOptions,
-          serviceNames: servicesToStart
-        });
+  const upPromise = (async () => {
+    // TODO: restartDappmanagerPatch should be placed here. Its not placed in this module
+    // because it adds a lot of complexity to create a new module for it.
+
+    // Add timeout option if not previously specified
+    const timeout = containersStatus ? getDockerTimeoutMax(Object.values(containersStatus)) : undefined;
+    if (timeout && dockerComposeUpOptions && !dockerComposeUpOptions.timeout) dockerComposeUpOptions.timeout = timeout;
+
+    // Check for any service in 'removing' state before proceeding
+    let dnpData: InstalledPackageData | null = await listPackageNoThrow({ dnpName });
+    if (dnpData && dnpData.containers) {
+      const removingContainers = dnpData.containers.filter(c => c.state === "removing");
+      if (removingContainers.length > 0) {
+        const serviceNames = removingContainers.map(c => c.serviceName).join(", ");
+        logs.warn(`dockerComposeUpPackage: Cannot proceed, services in 'removing' state: ${serviceNames}`);
+        throw new Error(`dockerComposeUpPackage: Cannot proceed, services in 'removing' state: ${serviceNames}`);
       }
     }
-  } catch (e) {
-    if (e.message.includes("Renaming a container with the same name as its current name")) {
-      // Catch error: Error response from daemon: Renaming a container with the same name as its current name
-      // Ref: https://github.com/docker/compose/issues/6704
-      logs.info("Catch error renaming container with the same name");
-      // Do compose down and compose up
-      await dockerComposeDown(composePath);
-      await dockerComposeUp(composePath, dockerComposeUpOptions);
-    } else {
-      throw e;
+
+    // Check the current status of package's container if any
+    const serviceNames: string[] = readComposeServiceNames(composePath);
+    const servicesToStart = serviceNames.filter(
+      (serviceName) => containersStatus && containersStatus[serviceName]?.targetStatus !== "stopped"
+    );
+    
+    try {
+      if (upAll || serviceNames.length === servicesToStart.length || dnpName === params.coreDnpName) {
+        // Run docker-compose up on all services for:
+        // - packages with all services running
+        // - core package, it must be executed always. No matter the previous status
+        await dockerComposeUp(composePath, dockerComposeUpOptions);
+      } else {
+        // If some services are not running, first create the containers
+        // then start only those that are running
+        await dockerComposeUp(composePath, {
+          ...dockerComposeUpOptions,
+          noStart: true
+        });
+        if (servicesToStart.length > 0) {
+          await dockerComposeUp(composePath, {
+            ...dockerComposeUpOptions,
+            serviceNames: servicesToStart
+          });
+        }
+      }
+    } catch (e) {
+      if (e.message.includes("Renaming a container with the same name as its current name")) {
+        // Catch error: Error response from daemon: Renaming a container with the same name as its current name
+        // Ref: https://github.com/docker/compose/issues/6704
+        logs.info("Catch error renaming container with the same name");
+        // Do compose down and compose up
+        await dockerComposeDown(composePath);
+        await dockerComposeUp(composePath, dockerComposeUpOptions);
+      } else {
+        throw e;
+      }
     }
+  })();
+
+  composeUpLocks.set(composePath, upPromise);
+  try {
+    await upPromise;
+  } finally {
+    composeUpLocks.delete(composePath);
   }
 }
 
