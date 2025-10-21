@@ -8,6 +8,7 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { relativePath } from "../data";
 import { capitalize } from "utils/strings";
 import { prettyDnpName } from "utils/format";
+import { Network } from "@dappnode/types";
 import {
   MdOutlineBackup,
   MdOutlineCheckCircleOutline,
@@ -21,6 +22,7 @@ import { SiEthereum } from "react-icons/si";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
 import { relativePath as stakersPath } from "pages/stakers/data";
+import { GnosisLogo } from "img/logos/gnosisLogo";
 
 import "./backupNode.scss";
 
@@ -49,6 +51,18 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
 
   // Check if validator limit exceeded in any network
   const valLimitExceeded = Object.values(activeValidatorsCounts).some((data) => data?.limitExceeded);
+
+  const getIconForNetwork = (network: Network) => {
+    switch (network) {
+      case Network.Mainnet:
+      case Network.Hoodi:
+        return <SiEthereum />;
+      case Network.Gnosis:
+        return <GnosisLogo />;
+      default:
+        return null;
+    }
+  };
 
   const DescriptionCard = () => (
     <Card className="premium-backup-node-desc card">
@@ -102,8 +116,8 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
             client && (
               <div>
                 <div className="premium-backup-network-item" key={network}>
-                  <div>
-                    {(network === "mainnet" || network === "hoodi") && <SiEthereum />}
+                  <div className="premium-backup-network-name">
+                    {getIconForNetwork(network as Network)}
                     <b>{capitalize(network)}</b>
                   </div>
                   <div className={`premium-backup-cc-tag ${isPrysmOrTeku && "color-danger"}`}>
