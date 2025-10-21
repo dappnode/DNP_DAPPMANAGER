@@ -170,7 +170,9 @@ function SubscriptionCard({
             <span>{sub.alias}</span>
             {browserSubEndpoint && browserSubEndpoint === sub.endpoint && (
               <OverlayTrigger overlay={<Tooltip id="current-device">Current Device</Tooltip>} placement="top">
-                <MdBeenhere className="current-tag" />
+                <span>
+                  <MdBeenhere className="current-tag" />
+                </span>
               </OverlayTrigger>
             )}
           </>

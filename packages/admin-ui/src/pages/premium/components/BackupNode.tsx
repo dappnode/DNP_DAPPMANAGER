@@ -89,7 +89,9 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           }
           placement="top"
         >
-          <MdInfoOutline className="tooltip-icon" />
+          <span>
+            <MdInfoOutline className="tooltip-icon" />
+          </span>
         </OverlayTrigger>
       </h5>
 
@@ -140,9 +142,10 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
                 The number of active validators per network supported by the backup service
               </Tooltip>
             }
-            placement="top"
           >
-            <MdInfoOutline className="tooltip-icon" />
+            <span>
+              <MdInfoOutline className="tooltip-icon" />
+            </span>
           </OverlayTrigger>
         </h5>
 
@@ -176,7 +179,9 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
                         }
                         placement="top"
                       >
-                        <MdWarningAmber className="tooltip-beacon-api-error" />
+                        <span>
+                          <MdWarningAmber className="tooltip-beacon-api-error" />
+                        </span>
                       </OverlayTrigger>
                     )}
                     / {validatorLimit ?? "—"} validators
