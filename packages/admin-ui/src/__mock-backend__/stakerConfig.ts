@@ -904,7 +904,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           },
           feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
         };
-      
+
       case "sepolia":
         return {
           executionClients: [
@@ -1401,34 +1401,6 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
                   name: "teku.dnp.dappnode.eth",
                   description: "Teku consensus client",
                   shortDescription: "Teku consensus client",
-                  version: "0.1.0"
-                }
-              }
-            },
-            {
-              status: "ok",
-              dnpName: "nimbus-gnosis.dnp.dappnode.eth",
-              isInstalled: true,
-              isRunning: true,
-              isUpdated: true,
-              isSelected: false,
-              avatarUrl: "",
-              data: {
-                dnpName: "package",
-                reqVersion: "0.1.0",
-                semVersion: "0.1.0",
-                imageFile: {
-                  hash: "QM..",
-                  source: "ipfs",
-                  size: 123
-                },
-                warnings: {},
-                signedSafe: true,
-
-                manifest: {
-                  name: "nimbus.dnp.dappnode.eth",
-                  description: "Nimbus consensus client",
-                  shortDescription: "Nimbus consensus client",
                   version: "0.1.0"
                 }
               }
