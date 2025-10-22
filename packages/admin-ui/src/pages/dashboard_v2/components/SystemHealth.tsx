@@ -1,6 +1,6 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
-import { useSystemHealth } from "hooks/PWA/useSystemHealth";
+import { useSystemHealth } from "hooks/useSystemHealth";
 import Card from "components/Card";
 import { CpuIcon } from "./icons/CpuIcon";
 import { MemoryIcon } from "./icons/MemoryIcon";

@@ -1,0 +1,18 @@
+.chain-stats {
+  width: 100%;
+  .chain-cards-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    .card {
+      flex: 1;
+    }
+  }
+}
+
+#dark {
+  #main {
+    .chain-stats {
+    }
+  }
+}
