@@ -7,12 +7,56 @@
     .card {
       flex: 1;
     }
-  }
-}
+    .chain-stats-card {
+      .chain-card-header {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
 
-#dark {
-  #main {
-    .chain-stats {
+        .chain-card-icon {
+          svg {
+            padding: 3px;
+            border-radius: 5px;
+
+            &.health-icon {
+              color: blue;
+              background-color: rgba(173, 216, 230, 0.452);
+            }
+            &.bolt-icon {
+              color: purple;
+              background-color: rgba(128, 0, 128, 0.445);
+            }
+            &.rewards-icon {
+              color: green;
+              background-color: rgba(0, 128, 0, 0.377);
+            }
+          }
+        }
+      }
+
+      .status-card-container {
+        display: flex;
+        flex-direction: column;
+
+        .status-client-row {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          .status-client-name,
+          .status-client-sync {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+          }
+        }
+      }
+    }
+  }
+
+  #dark {
+    #main {
+      .chain-stats {
+      }
     }
   }
 }
