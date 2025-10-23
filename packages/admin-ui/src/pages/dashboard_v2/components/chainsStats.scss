@@ -4,8 +4,14 @@
     display: flex;
     flex-direction: row;
     gap: 10px;
+
+    @media (max-width: 65rem) {
+      flex-direction: column;
+    }
+
     .card {
       flex: 1;
+      margin-top: 0px;
     }
     .chain-stats-card {
       display: flex;
@@ -23,6 +29,16 @@
           font-size: 20px;
           color: black;
           margin-top: -5px;
+        }
+        .client-status {
+          text-transform: capitalize;
+          font-size: 14px;
+          display: flex;
+          justify-content: center;
+          background-color: rgb(203, 241, 203);
+          color: green;
+          padding: 2px;
+          border-radius: 5px;
         }
       }
 
@@ -56,12 +72,16 @@
       .validators-card-container {
         display: flex;
         flex-direction: column;
+        padding: 0.5rem 0;
 
         .status-client-row,
         .validators-row {
           display: flex;
           flex-direction: row;
           justify-content: space-between;
+        }
+        hr {
+          margin: 0.5rem 0;
         }
       }
     }
