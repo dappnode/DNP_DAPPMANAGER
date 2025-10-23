@@ -85,7 +85,7 @@ Nobody, DAppNode Association, DAppNodeDAO or anyone, will be held responsible fo
             return (
               <button key={r.subPath} className="item-container" onClick={guard}>
                 <NavLink to={r.link} className="item no-a-style" style={{ whiteSpace: "nowrap" }} onClick={guard}>
-                  {r.name}
+                  {r.name.toUpperCase()}
                 </NavLink>
               </button>
             );
