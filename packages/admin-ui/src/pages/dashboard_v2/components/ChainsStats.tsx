@@ -4,7 +4,7 @@ import { NetworkStatus, NodeStatus, useChainStats } from "hooks/useChainsStats";
 import Card from "components/Card";
 
 import Loading from "components/Loading";
-import { ProgressBar } from "react-bootstrap";
+// import { ProgressBar } from "react-bootstrap";
 import "./chainsStats.scss";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
@@ -61,14 +61,14 @@ const StatusCard = ({ network, data }: { network: string; data: NodeStatus }) =>
         <div className="status-client-row">
           {execution && (
             <>
-              <div className="status-client-name">
-                <span>EXECUTION</span>
+              <div className="chain-stat-col">
+                <div>EXECUTION</div>
                 <span>
                   {execution.name} {execution.version}
                 </span>
               </div>
-              <div className="status-client-sync">
-                <span>#{execution.blockNumber}</span>
+              <div className="chain-stat-col">
+                <div>#{execution.blockNumber}</div>
                 <span>{execution.status}</span>
               </div>
             </>
@@ -78,14 +78,14 @@ const StatusCard = ({ network, data }: { network: string; data: NodeStatus }) =>
         <div className="status-client-row">
           {consensus && (
             <>
-              <div className="status-client-name">
-                <span>CONSENSUS</span>
+              <div className="chain-stat-col">
+                <div>CONSENSUS</div>
                 <span>
                   {consensus.name} {consensus.version}
                 </span>
               </div>
-              <div className="status-client-sync">
-                <span>#{consensus.blockNumber}</span>
+              <div className="chain-stat-col">
+                <div>#{consensus.blockNumber}</div>
                 <span>{consensus.status}</span>
               </div>
             </>
@@ -104,26 +104,26 @@ const ValidatorsCard = ({ network, data }: { network: string; data: NetworkStatu
     <ChainCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
       <div className="validators-card-container">
         <div className="validators-row">
-          <div className="validators-cell">
+          <div className="chain-stat-col">
             <div>TOTAL</div>
             <span>{data?.total ?? "-"}</span>
           </div>
-          <div className="validators-cell">
+          <div className="chain-stat-col">
             <div>BALANCE</div>
             <span>{data?.balance ?? "-"}</span>
           </div>
-          <div className="validators-cell">
+          <div className="chain-stat-col">
             <div>EFFECTIVITY</div>
             <span>{data?.efectivity ?? "-"}%</span>
           </div>
         </div>
         <hr />
         <div className="validators-row">
-          <div className="validators-cell">
+          <div className="chain-stat-col">
             <div>ATTESTING</div>
             <span>{data?.attesting ?? "-"}</span>
           </div>
-          <div className="validators-cell">
+          <div className="chain-stat-col">
             <div>PROPOSALS</div>
             <span>{data?.proposals ?? "-"}</span>
           </div>

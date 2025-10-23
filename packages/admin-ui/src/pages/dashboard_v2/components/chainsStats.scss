@@ -11,6 +11,21 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+
+      .chain-stat-col {
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+        color: var(--light-text-color);
+
+        > span {
+          font-weight: bold;
+          font-size: 20px;
+          color: black;
+          margin-top: -5px;
+        }
+      }
+
       .chain-card-header {
         display: flex;
         flex-direction: row;
@@ -47,22 +62,6 @@
           display: flex;
           flex-direction: row;
           justify-content: space-between;
-          .status-client-name,
-          .status-client-sync {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-          }
-
-          .validators-cell {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            > span {
-              font-weight: bold;
-              font-size: 20px;
-            }
-          }
         }
       }
     }
