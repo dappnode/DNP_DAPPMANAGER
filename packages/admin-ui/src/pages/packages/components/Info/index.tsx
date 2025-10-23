@@ -64,12 +64,10 @@ export function Info({
     <>
       {gettingStarted && gettingStartedShowLocal && (
         <>
-          <SubTitle className={`getting-started-header ${loading ? "loading" : ""}`}>
-            <div>Getting started</div>
-            <div>
-              <MdClose onClick={hideGettingStarted} />
-            </div>
-          </SubTitle>
+          <SubTitle className={`getting-started-header ${loading ? "loading" : ""}`}>Getting started</SubTitle>
+          <div>
+            <MdClose onClick={hideGettingStarted} />
+          </div>
           <Card className="getting-started-content">
             <RenderMarkdown source={gettingStarted} />
             <div className="subtle-header" onClick={hideGettingStarted}>

@@ -20,6 +20,7 @@ import { FaQrcode } from "react-icons/fa";
 import { WireguardDeviceCredentials } from "@dappnode/types";
 // Utils
 import { urlJoin } from "utils/url";
+import SubTitle from "components/SubTitle";
 
 function WireguardDeviceDetailsLoaded({ id, device }: { id: string; device: WireguardDeviceCredentials }) {
   const [showQr, setShowQr] = useState(false);
@@ -104,7 +105,7 @@ export const WireguardDeviceDetails: React.FC = () => {
 
   return (
     <>
-      <Title title={title} subtitle={id} />
+      <SubTitle>{id}</SubTitle>
 
       {device.data ? (
         <WireguardDeviceDetailsLoaded id={id} device={device.data} />
