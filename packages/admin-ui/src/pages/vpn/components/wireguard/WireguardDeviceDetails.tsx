@@ -3,7 +3,7 @@ import { NavLink, useParams } from "react-router-dom";
 import { useApi } from "api";
 import ClipboardJS from "clipboard";
 // Own module
-import { rootPath, subPaths, title } from "../../data";
+import { rootPath, subPaths } from "../../data";
 // Components
 import Form from "react-bootstrap/esm/Form";
 import Card from "components/Card";
@@ -11,7 +11,6 @@ import Button from "components/Button";
 import QrCode from "components/QrCode";
 import Loading from "components/Loading";
 import ErrorView from "components/ErrorView";
-import Title from "components/Title";
 import { apiRoutes } from "api";
 // Icons
 import { FiDownload } from "react-icons/fi";
