@@ -2,7 +2,7 @@
   // widths
   --sidenav-width: 12.5rem;
   --sidenav-collapsed-width: 3rem;
-  --topbar-height: 3.5rem;
+  --topbar-height: 3rem;
   // Borders and padding
   --container-padding: 1.5rem;
   // mobile view fixes (only for mobile, not for tablets)
@@ -91,7 +91,7 @@ body,
   }
 
   .sidebar-logo {
-    padding-top: 1rem;
+    padding-top: var(--container-padding);
     padding-bottom: 0.5rem;
     width: calc(0.7 * var(--sidenav-width));
   }
@@ -162,9 +162,12 @@ body,
   Overflow on the y axis is expected and will be scrollable
 */
 #main {
-  padding-top: var(--topbar-height) !important;
   margin-left: var(--sidenav-width);
   padding: var(--container-padding);
+
+  @media (max-width: 40rem) {
+    padding-top: var(--topbar-height) !important;
+  }
 }
 
 /********************
