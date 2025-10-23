@@ -1,6 +1,6 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
-import { useChainStats } from "hooks/useChainsStats";
+import { NetworkStatus, NodeStatus, useChainStats } from "hooks/useChainsStats";
 import Card from "components/Card";
 
 import Loading from "components/Loading";
@@ -12,6 +12,7 @@ import { RewardsIcon } from "./icons/RewardsIcon";
 import Button from "components/Button";
 import { useNavigate } from "react-router";
 import { basePath } from "pages/stakers";
+import newTabProps from "utils/newTabProps";
 
 export default function ChainStats() {
   const { isLoading, chainStats } = useChainStats();
@@ -25,12 +26,11 @@ export default function ChainStats() {
             <div key={network}>
               <SubTitle>{network.toUpperCase()}</SubTitle>
               <div className="chain-cards-container">
-                <StatusCard network={network} />
-                <ChainCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
-                  <ProgressBar now={parseFloat(data)} label={data} />
-                </ChainCard>
+                <StatusCard network={network} data={data.nodeStatus} />
+                <ValidatorsCard network={network} data={data.validators} />
+
                 <ChainCard title="REWARDS" icon={<RewardsIcon />}>
-                  <ProgressBar now={parseFloat(data)} label={data} />
+                  <div>Rewards card</div>
                 </ChainCard>
               </div>
             </div>
@@ -51,35 +51,86 @@ const ChainCard = ({ title, icon, children }: { title: string; icon: React.React
   </Card>
 );
 
-const StatusCard = ({ network }: { network: string }) => {
+const StatusCard = ({ network, data }: { network: string; data: NodeStatus }) => {
   const navigate = useNavigate();
+  const execution = data.execution;
+  const consensus = data.consensus;
   return (
     <ChainCard title="NODE STATUS" icon={<HealthIcon />}>
       <div className="status-card-container">
         <div className="status-client-row">
-          <div className="status-client-name">
-            <span>EXECUTION</span>
-            <span>Geth</span>
-          </div>
-          <div className="status-client-sync">
-            <span>#123456</span>
-            <span>Synced</span>
-          </div>
+          {execution && (
+            <>
+              <div className="status-client-name">
+                <span>EXECUTION</span>
+                <span>
+                  {execution.name} {execution.version}
+                </span>
+              </div>
+              <div className="status-client-sync">
+                <span>#{execution.blockNumber}</span>
+                <span>{execution.status}</span>
+              </div>
+            </>
+          )}
         </div>
         <hr />
         <div className="status-client-row">
-          <div className="status-client-name">
-            <span>CONSENSUS</span>
-            <span>Lodestar</span>
-          </div>
-          <div className="status-client-sync">
-            <span>#123456</span>
-            <span>Synced</span>
-          </div>
+          {consensus && (
+            <>
+              <div className="status-client-name">
+                <span>CONSENSUS</span>
+                <span>
+                  {consensus.name} {consensus.version}
+                </span>
+              </div>
+              <div className="status-client-sync">
+                <span>#{consensus.blockNumber}</span>
+                <span>{consensus.status}</span>
+              </div>
+            </>
+          )}
         </div>
       </div>
       <Button onClick={() => navigate("/" + basePath + `/${network}`)} fullwidth>
         <span>View Setup</span>
+      </Button>
+    </ChainCard>
+  );
+};
+
+const ValidatorsCard = ({ network, data }: { network: string; data: NetworkStatus["validators"] }) => {
+  return (
+    <ChainCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
+      <div className="validators-card-container">
+        <div className="validators-row">
+          <div className="validators-cell">
+            <div>TOTAL</div>
+            <span>{data?.total ?? "-"}</span>
+          </div>
+          <div className="validators-cell">
+            <div>BALANCE</div>
+            <span>{data?.balance ?? "-"}</span>
+          </div>
+          <div className="validators-cell">
+            <div>EFFECTIVITY</div>
+            <span>{data?.efectivity ?? "-"}%</span>
+          </div>
+        </div>
+        <hr />
+        <div className="validators-row">
+          <div className="validators-cell">
+            <div>ATTESTING</div>
+            <span>{data?.attesting ?? "-"}</span>
+          </div>
+          <div className="validators-cell">
+            <div>PROPOSALS</div>
+            <span>{data?.proposals ?? "-"}</span>
+          </div>
+        </div>
+      </div>
+      <Button href={`http://web3signer-${network}.dappnode:9000`} fullwidth {...newTabProps}>
+        <span>View Validators</span>
       </Button>
     </ChainCard>
   );
