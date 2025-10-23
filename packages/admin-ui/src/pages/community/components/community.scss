@@ -1,4 +1,10 @@
-.community-actions {
-  display: flex;
-  justify-content: space-around;
+.community-container {
+  .section-subtitle {
+    margin: 0;
+  }
+
+  .community-actions {
+    display: flex;
+    justify-content: space-around;
+  }
 }

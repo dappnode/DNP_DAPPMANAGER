@@ -13,12 +13,11 @@ export default function CommunityHome() {
     <>
       <Title title={title} />
 
-      <div>
+      <div className="community-container">
         {communityTypes.map((communityItem: CommunityItem) => (
           <Card className="text-center">
-            <SubTitle key={communityItem.title}>
-              {communityItem.title} <communityItem.icon />
-            </SubTitle>
+            <communityItem.icon />
+            <SubTitle key={communityItem.title}>{communityItem.title}</SubTitle>
             <p>{communityItem.text}</p>
             <div className="community-actions">
               {communityItem.actions.map((CommunityItemAction) => (
