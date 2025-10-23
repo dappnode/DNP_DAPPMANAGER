@@ -8,7 +8,7 @@ import { docsUrl } from "params";
 
 export default function App() {
   return (
-    <>
+    <div className="section-spacing">
       <SubTitle>Dappnode App</SubTitle>
       <Card>
         The Dappnode app allows you to connect to the Dappmanager in mobile or desktop and receive notifications.{" "}
@@ -19,6 +19,6 @@ export default function App() {
         handleRedirectMessage="To install the app, you will be redirected to a different secure domain. Please, login with your current
               Dappnode credentials."
       />
-    </>
+    </div>
   );
 }

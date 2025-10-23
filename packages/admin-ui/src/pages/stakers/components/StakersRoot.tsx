@@ -95,7 +95,7 @@ const StakersRoot: React.FC = () => {
   return (
     <>
       <Title title={title} />
-      <div style={{ marginBottom: "10px" }}>
+      <div>
         <SwitchText
           leftLabel="Mainnet"
           rightLabel="Testnet"

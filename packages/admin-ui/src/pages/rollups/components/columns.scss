@@ -3,10 +3,6 @@
   --eth-multi-client-description-color: var(--light-text-color);
 }
 
-.card {
-  margin-top: 15px;
-}
-
 .staker-buttons {
   display: flex;
   justify-content: space-between;
@@ -22,7 +18,6 @@
 }
 
 .optimism-dark {
-
   .optimism-node,
   .execution-client,
   .legacy-geth {
@@ -69,7 +64,7 @@
     color: var(--eth-multi-client-description-color);
   } */
 
-  >*:not(:last-child) {
+  > *:not(:last-child) {
     margin-bottom: 1rem;
   }
 
@@ -96,10 +91,7 @@
     }
   }
 
-  transition: color 0.15s,
-  background-color 0.15s,
-  border-color 0.15s,
-  box-shadow 0.15s;
+  transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 
   .avatar {
     --avatar-size: 6rem;

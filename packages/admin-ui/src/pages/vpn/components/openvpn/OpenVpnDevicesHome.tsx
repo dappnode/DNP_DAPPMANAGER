@@ -96,7 +96,7 @@ export default function OpenVpnDevicesHome() {
   }
 
   return (
-    <>
+    <div className="section-spacing">
       <VpnDocsGuide variant="openvpn" />
       <Input
         placeholder="Device's unique name"
@@ -143,6 +143,6 @@ export default function OpenVpnDevicesHome() {
             ))}
         </Card>
       ))}
-    </>
+    </div>
   );
 }

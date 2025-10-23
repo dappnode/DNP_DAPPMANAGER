@@ -71,7 +71,7 @@ export function WireguardDevicesHome() {
   }
 
   return (
-    <>
+    <div className="section-spacing">
       <VpnDocsGuide variant="wireguard" />
       <Input
         placeholder="Device's unique name"
@@ -114,6 +114,6 @@ export function WireguardDevicesHome() {
             ))}
         </Card>
       ))}
-    </>
+    </div>
   );
 }

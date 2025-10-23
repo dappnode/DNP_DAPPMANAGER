@@ -170,9 +170,6 @@
   .section-subtitle:first-child:nth-last-child(2) {
     display: none;
   }
-  > *:not(:last-child) {
-    margin-bottom: var(--default-spacing);
-  }
 }
 
 .pkgs-back-btn {

@@ -13,7 +13,7 @@ export default function CommunityHome() {
     <>
       <Title title={title} />
 
-      <div className="community-container">
+      <div className="section-spacing">
         {communityTypes.map((communityItem: CommunityItem) => (
           <Card className="text-center">
             <communityItem.icon />
