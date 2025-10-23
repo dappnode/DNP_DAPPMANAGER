@@ -13,6 +13,7 @@ import Button from "components/Button";
 import { useNavigate } from "react-router";
 import { basePath } from "pages/stakers";
 import newTabProps from "utils/newTabProps";
+import { Network } from "@dappnode/types";
 
 export default function ChainStats() {
   const { isLoading, chainStats } = useChainStats();
@@ -69,7 +70,7 @@ const StatusCard = ({ network, data }: { network: string; data: NodeStatus }) =>
               </div>
               <div className="chain-stat-col">
                 <div>#{execution.blockNumber}</div>
-                <span>{execution.status}</span>
+                <div className="client-status">{execution.status}</div>
               </div>
             </>
           )}
@@ -86,13 +87,17 @@ const StatusCard = ({ network, data }: { network: string; data: NodeStatus }) =>
               </div>
               <div className="chain-stat-col">
                 <div>#{consensus.blockNumber}</div>
-                <span>{consensus.status}</span>
+                <div className="client-status">{consensus.status}</div>
               </div>
             </>
           )}
         </div>
       </div>
-      <Button onClick={() => navigate("/" + basePath + `/${network}`)} fullwidth>
+      <Button
+        onClick={() => navigate("/" + basePath + `/${network === Network.Mainnet ? "ethereum" : network}`)}
+        fullwidth
+        variant="outline-dappnode"
+      >
         <span>View Setup</span>
       </Button>
     </ChainCard>
@@ -129,7 +134,12 @@ const ValidatorsCard = ({ network, data }: { network: string; data: NetworkStatu
           </div>
         </div>
       </div>
-      <Button href={`http://web3signer-${network}.dappnode:9000`} fullwidth {...newTabProps}>
+      <Button
+        href={`http://brain.web3signer-${network}.dappnode:9000`}
+        fullwidth
+        {...newTabProps}
+        variant="outline-dappnode"
+      >
         <span>View Validators</span>
       </Button>
     </ChainCard>
