@@ -185,6 +185,10 @@
       .premium-backup-validators-limit-warning {
         color: var(--light-text-color);
         font-size: 0.8rem;
+
+        hr {
+          margin: 0.25rem 0;
+        }
       }
     }
   }

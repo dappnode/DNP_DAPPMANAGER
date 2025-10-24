@@ -20,7 +20,7 @@ import {
 } from "react-icons/md";
 import { SiEthereum } from "react-icons/si";
 import newTabProps from "utils/newTabProps";
-import { docsUrl } from "params";
+import { dappnodeDiscord, docsUrl } from "params";
 import { relativePath as stakersPath } from "pages/stakers/data";
 import { GnosisLogo } from "img/logos/gnosisLogo";
 
@@ -222,6 +222,12 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
           ) : (
             <div className="premium-backup-validators-limit-desc">
               Up to {validatorLimit ?? "—"} validators supported per network.
+              <hr />
+              <b>Need more validators?</b> Open a support ticket on{" "}
+              <a href={dappnodeDiscord} {...newTabProps}>
+                Dappnode's Discord
+              </a>{" "}
+              to request a higher limit.
             </div>
           )}
         </div>
