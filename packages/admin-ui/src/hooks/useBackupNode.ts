@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { prettyDnpName } from "utils/format";
 import { confirm } from "components/ConfirmDialog";
 
-const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi];
+const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi, Network.Gnosis];
 const backupEnvName = "BACKUP_BEACON_NODES";
 const beaconChainServiceName = "validator";
 
