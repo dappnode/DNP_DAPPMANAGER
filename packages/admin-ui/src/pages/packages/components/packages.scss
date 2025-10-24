@@ -166,10 +166,6 @@
 
 .packages-content {
   flex: auto;
-  .section-subtitle:only-child,
-  .section-subtitle:first-child:nth-last-child(2) {
-    display: none;
-  }
 }
 
 .pkgs-back-btn {

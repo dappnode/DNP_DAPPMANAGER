@@ -61,11 +61,11 @@ export function Info({
   if (!dnp) return null;
 
   return (
-    <>
+    <div className="section-spacing">
       {gettingStarted && gettingStartedShowLocal && (
-        <>
-          <SubTitle className={`getting-started-header ${loading ? "loading" : ""}`}>Getting started</SubTitle>
-          <div>
+        <div>
+          <div className="getting-started-header">
+            <SubTitle className={`getting-started-header ${loading ? "loading" : ""}`}>Getting started</SubTitle>
             <MdClose onClick={hideGettingStarted} />
           </div>
           <Card className="getting-started-content">
@@ -74,7 +74,7 @@ export function Info({
               Dismiss
             </div>
           </Card>
-        </>
+        </div>
       )}
 
       <Card spacing divider>
@@ -123,6 +123,6 @@ export function Info({
 
         <RemovePackage dnp={dnp} />
       </Card>
-    </>
+    </div>
   );
 }
