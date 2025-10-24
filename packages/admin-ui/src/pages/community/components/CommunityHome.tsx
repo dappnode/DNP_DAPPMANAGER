@@ -10,7 +10,7 @@ import "./community.scss";
 
 export default function CommunityHome() {
   return (
-    <>
+    <div className="community-home-container">
       <Title title={title} />
 
       <div className="section-spacing">
@@ -27,6 +27,6 @@ export default function CommunityHome() {
           </Card>
         ))}
       </div>
-    </>
+    </div>
   );
 }

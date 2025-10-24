@@ -1,4 +1,9 @@
-.community-actions {
-  display: flex;
-  justify-content: space-around;
+.community-home-container {
+  svg {
+    font-size: 24px;
+  }
+  .community-actions {
+    display: flex;
+    justify-content: space-around;
+  }
 }
