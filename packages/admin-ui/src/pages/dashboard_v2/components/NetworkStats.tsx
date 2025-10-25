@@ -75,25 +75,13 @@ const StatusCard = ({
   data: NodeStatus | undefined;
   clientsLoading: boolean;
 }) => {
-  if (clientsLoading) {
-    <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
-      <div>data could not be fetched</div>
-    </NetworkCard>;
-  }
-
-  if (!data) {
-    <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
-      <div>data could not be fetched</div>
-    </NetworkCard>;
-  }
-
   const navigate = useNavigate();
   const execution = data && data.ec;
   const consensus = data && data.cc;
   return (
     <NetworkCard title="NODE STATUS" icon={<HealthIcon />}>
       {clientsLoading ? (
-        <Loading />
+        <Loading small />
       ) : data ? (
         <div className="status-card-container">
           <div className="status-client-row">

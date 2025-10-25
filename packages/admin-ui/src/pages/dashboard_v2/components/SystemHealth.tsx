@@ -30,7 +30,7 @@ export default function SystemHealth() {
       <SubTitle>SYSTEM HEALTH</SubTitle>
       <Card className="system-health-card">
         {isLoading ? (
-          <Loading />
+          <Loading small />
         ) : (
           <>
             <div className="uptime">
