@@ -49,9 +49,9 @@ export const StatusCard = ({
         <Loading small />
       ) : data ? (
         <div className="status-card-container">
-          <div className="status-client-row">
-            {execution && (
-              <>
+          {execution && (
+            <div>
+              <div className="status-client-row">
                 <div className="network-stat-col">
                   <div>EXECUTION</div>
                   <span>{capitalize(execution.name ?? "-")}</span>
@@ -68,10 +68,10 @@ export const StatusCard = ({
                     </div>
                   </div>
                 </div>
-                {!execution.isSynced && <ProgressBar animated now={execution.progress} />}
-              </>
-            )}
-          </div>
+              </div>
+              {!execution.isSynced && <ProgressBar animated now={execution.progress} />}
+            </div>
+          )}
           <hr />
           {consensus && (
             <div>
