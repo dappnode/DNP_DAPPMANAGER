@@ -1,6 +1,6 @@
-.chain-stats {
+.network-stats {
   width: 100%;
-  .chain-cards-container {
+  .network-cards-container {
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -13,12 +13,12 @@
       flex: 1;
       margin-top: 0px;
     }
-    .chain-stats-card {
+    .network-stats-card {
       display: flex;
       flex-direction: column;
       justify-content: space-between;
 
-      .chain-stat-col {
+      .network-stat-col {
         display: flex;
         flex-direction: column;
         font-size: 14px;
@@ -35,19 +35,26 @@
           font-size: 14px;
           display: flex;
           justify-content: center;
-          background-color: rgb(203, 241, 203);
-          color: green;
+
           padding: 2px;
           border-radius: 5px;
+          &.synced {
+            background-color: rgb(203, 241, 203);
+            color: green;
+          }
+          &.syncing {
+            background-color: rgb(255, 229, 204);
+            color: orange;
+          }
         }
       }
 
-      .chain-card-header {
+      .network-card-header {
         display: flex;
         flex-direction: row;
         gap: 5px;
 
-        .chain-card-icon {
+        .network-card-icon {
           svg {
             padding: 3px;
             border-radius: 5px;
@@ -80,8 +87,28 @@
           flex-direction: row;
           justify-content: space-between;
         }
+        .status-client-row {
+          > div {
+            flex: 1;
+          }
+        }
+
+        .status-client-details {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+
         hr {
           margin: 0.5rem 0;
+        }
+
+        .progress {
+          margin-top: 5px;
+          height: 10px;
+          .progress-bar {
+            background-color: orange;
+          }
         }
       }
     }
@@ -89,7 +116,7 @@
 
   #dark {
     #main {
-      .chain-stats {
+      .network-stats {
       }
     }
   }

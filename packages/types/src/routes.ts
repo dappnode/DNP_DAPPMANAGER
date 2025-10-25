@@ -39,7 +39,8 @@ import {
   WifiReport,
   WireguardDeviceCredentials,
   DockerUpgradeRequirements,
-  InstalledPackageData
+  InstalledPackageData,
+  NodeStatusByNetwork
 } from "./calls.js";
 import { PackageEnvs } from "./compose.js";
 import { PackageBackup } from "./manifest.js";
@@ -262,6 +263,7 @@ export interface Routes {
     subscriptionEndpoint?: string;
   }): Promise<void>;
 
+  nodeStatusGetByNetwork(kwargs: { networks: Network[] }): Promise<NodeStatusByNetwork>;
   /**
    * Get all the notifications
    */
@@ -872,6 +874,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   fetchDirectory: {},
   fetchRegistry: {},
   fetchDnpRequest: {},
+  nodeStatusGetByNetwork: {},
   notificationsSendCustom: {},
   notificationsGetAll: {},
   notificationsGetBanner: {},

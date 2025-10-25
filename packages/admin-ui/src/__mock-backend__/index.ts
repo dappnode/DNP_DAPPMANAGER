@@ -56,6 +56,40 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       progress: 0.83027522935
     }
   ],
+  nodeStatusGetByNetwork: async () => ({
+    mainnet: {
+      ec: {
+        name: "Nethermind",
+        isSynced: true,
+        currentBlock: 23648945,
+        progress: 100,
+        peers: 50
+      },
+      cc: {
+        name: "Nimbus",
+        isSynced: true,
+        currentBlock: 12875373,
+        progress: 100,
+        peers: 40
+      }
+    },
+    hoodi: {
+      ec: {
+        name: "besu",
+        isSynced: true,
+        currentBlock: 1480848,
+        progress: 100,
+        peers: 30
+      },
+      cc: {
+        name: "Prysm",
+        isSynced: false,
+        currentBlock: 1592925,
+        progress: 100,
+        peers: 20
+      }
+    }
+  }),
   changeIpfsTimeout: async () => {},
   cleanCache: async () => {},
   cleanDb: async () => {},

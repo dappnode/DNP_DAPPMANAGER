@@ -5,8 +5,8 @@ import { ChainCards } from "./ChainCard";
 import SubTitle from "components/SubTitle";
 import Title from "components/Title";
 import SystemHealth from "./SystemHealth";
+import NetworkStats from "./NetworkStats";
 import "./dashboard.scss";
-import ChainsStats from "./ChainsStats";
 
 export default function Dashboard() {
   return (
@@ -18,7 +18,7 @@ export default function Dashboard() {
 
       <SystemHealth />
 
-      <ChainsStats />
+      <NetworkStats />
 
       <div className="dashboard-layout">
         <div className="dashboard-left">
