@@ -41,6 +41,7 @@ export {
   notificationsDeleteSubscription,
   notificationsSendSubTest
 } from "./notifications.js";
+export { nodeStatusGetByNetwork } from "./nodeStatusGet.js";
 export * from "./httpsPortal.js";
 export { ipfsTest } from "./ipfsTest.js";
 export { ipfsClientTargetSet } from "./ipfsClientTargetSet.js";
