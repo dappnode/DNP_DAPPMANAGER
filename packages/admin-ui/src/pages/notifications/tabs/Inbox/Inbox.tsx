@@ -108,19 +108,19 @@ export function Inbox() {
       </div>
 
       {newNotifications.length > 0 && (
-        <>
+        <div className="section-spacing">
           <SubTitle>New Notifications</SubTitle>
           {newNotifications.map((notification) => (
             <NotificationCard key={notification.id} notification={notification} openByDefault />
           ))}
-        </>
+        </div>
       )}
 
       <SubTitle>History</SubTitle>
       {!seenNotifications || seenNotifications.length === 0 ? (
         <Card>No notifications</Card>
       ) : (
-        <>
+        <div className="section-spacing">
           {paginatedSeenNotifications.map((notification) => (
             <NotificationCard key={notification.timestamp} notification={notification} />
           ))}
@@ -157,7 +157,7 @@ export function Inbox() {
               )}
             </div>
           )}
-        </>
+        </div>
       )}
     </>
   );

@@ -59,7 +59,7 @@ export const PackagesNavigator: React.FC = () => {
             {routesForNavbar.map((r) => (
               <button key={r.subPath} className="item-container">
                 <NavLink to={r.link} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                  {r.name}
+                  {r.name.toUpperCase()}
                 </NavLink>
               </button>
             ))}

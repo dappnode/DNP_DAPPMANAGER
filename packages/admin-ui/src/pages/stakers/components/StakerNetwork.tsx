@@ -119,7 +119,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   }
 
   return (
-    <>
+    <div className="staker-network-container">
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
           <p>
@@ -276,6 +276,6 @@ export default function StakerNetwork({ network, description }: { network: Netwo
           <ErrorView error={"No data"} hideIcon red />
         )}
       </div>
-    </>
+    </div>
   );
 }

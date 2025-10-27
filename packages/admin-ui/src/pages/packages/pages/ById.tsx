@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route, NavLink, useParams, Link } from "react-router-dom";
 import { useApi } from "api";
-import { capitalize, isEmpty } from "lodash-es";
+import { isEmpty } from "lodash-es";
 // This module
 import { Info } from "../components/Info";
 import { Logs } from "../components/Logs";
@@ -114,7 +114,7 @@ export const PackageById: React.FC = () => {
     <div>
       <Link to={isCore ? `/${basePath}/${systemSubPath}` : `/${basePath}/${mySubPath}`} className="pkgs-back-btn">
         <MdKeyboardArrowLeft />
-        <span>{capitalize(isCore ? `${systemSubPath}` : `${mySubPath}`)} packages</span>
+        <span>{(isCore ? `${systemSubPath}` : `${mySubPath}`).toUpperCase()} PACKAGES</span>
       </Link>
 
       <Title title={prettyDnpName(dnpName)} />
@@ -122,7 +122,7 @@ export const PackageById: React.FC = () => {
         {availableRoutes.map((route) => (
           <button key={route.subPath} className="item-container">
             <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-              {route.name}
+              {route.name.toUpperCase()}
             </NavLink>
           </button>
         ))}

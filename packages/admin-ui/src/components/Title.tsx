@@ -2,20 +2,11 @@ import React from "react";
 
 interface TitleProps {
   title: string;
-  subtitle?: string;
-  children?: React.ReactNode;
+  children?: string;
 }
 
-const Title: React.FC<TitleProps> = ({ title, subtitle, children }) => {
-  if (children) return <div className="section-title">{children}</div>;
-  if (subtitle)
-    return (
-      <div className="section-title">
-        <span className="pre-title">{title} </span>
-        {subtitle}
-      </div>
-    );
-  return <div className="section-title">{title}</div>;
+const Title: React.FC<TitleProps> = ({ title, children }) => {
+  return <div className="section-title">{children ? children.toUpperCase() : title.toLocaleUpperCase()}</div>;
 };
 
 export default Title;

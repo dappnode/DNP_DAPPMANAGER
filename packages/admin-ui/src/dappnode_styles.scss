@@ -41,9 +41,7 @@ p.no-p-style:last-child {
 }
 
 .section-title {
-  border-bottom: var(--border-style);
-  padding-bottom: 0.5rem;
-  font-size: 2rem;
+  font-size: 1.7rem;
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -56,12 +54,12 @@ p.no-p-style:last-child {
 }
 
 .section-subtitle {
-  margin: 1rem 0 0.5rem;
-  font-size: 1.5rem;
+  margin: 0.5rem 0 !important;
+  font-size: 1.25rem;
   font-weight: 400;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
 .section-card-subtitle {

@@ -19,7 +19,7 @@ export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNav
             .map((route) => (
               <button key={route.subPath + "/*"} className="item-container">
                 <NavLink to={route.subPath} className="item no-a-style" style={{ whiteSpace: "nowrap" }}>
-                  {route.name}
+                  {route.name.toUpperCase()}
                 </NavLink>
               </button>
             ))}
@@ -27,7 +27,7 @@ export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNav
       )}
 
       {/* Route render   */}
-      <div className="section-spacing">
+      <div>
         <Routes>
           {routes.map((r) => (
             <React.Fragment key={r.subPath}>

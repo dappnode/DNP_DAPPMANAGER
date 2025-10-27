@@ -30,9 +30,9 @@ export function TailscaleVpn() {
 
   const { userSettings, setupWizard } = dnp;
   return (
-    <>
+    <div className="section-spacing">
       <VpnDocsGuide variant="tailscale" />
       <Config dnpName={dnp.dnpName} {...{ userSettings, setupWizard }} />
-    </>
+    </div>
   );
 }

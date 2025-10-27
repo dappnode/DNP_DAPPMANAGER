@@ -40,42 +40,43 @@ export default function IpfsNode() {
   return (
     <div className="dappnode-identity">
       <SubTitle>IPFS Node</SubTitle>
-
-      <Card>
-        <div>
-          Dappnode uses IPFS to distribute Dappnode packages in a decentralized way. Choose to connect to a remote IPFS
-          gateway or use your own local IPFS node.
-        </div>
-        <div>
-          More information at: <LinkDocs href={forumUrl.ipfsRemoteHowTo}>How to use Dappnode IPFS remote</LinkDocs>
-        </div>
-      </Card>
-      {ipfsRepository.data ? (
-        <>
-          <IpfsClient
-            clientTarget={ipfsClientTarget}
-            onClientTargetChange={setIpfsClientTarget}
-            gatewayTarget={ipfsGatewayTarget}
-            onGatewayTargetChange={setIpfsGatewayTarget}
-          />
-
-          <br />
-
-          <div style={{ textAlign: "end" }}>
-            <Button
-              variant="dappnode"
-              onClick={changeIpfsClient}
-              disabled={
-                !ipfsClientTarget ||
-                (ipfsRepository.data.ipfsClientTarget === ipfsClientTarget &&
-                  ipfsRepository.data.ipfsGateway === ipfsGatewayTarget)
-              }
-            >
-              Change
-            </Button>
+      <div className="section-spacing">
+        <Card>
+          <div>
+            Dappnode uses IPFS to distribute Dappnode packages in a decentralized way. Choose to connect to a remote
+            IPFS gateway or use your own local IPFS node.
           </div>
-        </>
-      ) : null}
+          <div>
+            More information at: <LinkDocs href={forumUrl.ipfsRemoteHowTo}>How to use Dappnode IPFS remote</LinkDocs>
+          </div>
+        </Card>
+        {ipfsRepository.data ? (
+          <>
+            <IpfsClient
+              clientTarget={ipfsClientTarget}
+              onClientTargetChange={setIpfsClientTarget}
+              gatewayTarget={ipfsGatewayTarget}
+              onGatewayTargetChange={setIpfsGatewayTarget}
+            />
+
+            <br />
+
+            <div style={{ textAlign: "end" }}>
+              <Button
+                variant="dappnode"
+                onClick={changeIpfsClient}
+                disabled={
+                  !ipfsClientTarget ||
+                  (ipfsRepository.data.ipfsClientTarget === ipfsClientTarget &&
+                    ipfsRepository.data.ipfsGateway === ipfsGatewayTarget)
+                }
+              >
+                Change
+              </Button>
+            </div>
+          </>
+        ) : null}
+      </div>
     </div>
   );
 }
