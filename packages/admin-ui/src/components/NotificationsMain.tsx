@@ -8,6 +8,7 @@ import { MdClose } from "react-icons/md";
 import { Accordion, useAccordionButton } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
 import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import "./notificationsMain.scss";
 
 /**
@@ -94,7 +95,6 @@ const priorityBtnVariants: Record<Priority, ButtonVariant> = {
   [Priority.high]: "warning",
   [Priority.critical]: "danger"
 };
-
 export function CollapsableBannerNotification({
   notification,
   onClose
@@ -103,6 +103,7 @@ export function CollapsableBannerNotification({
   onClose: () => void;
 }) {
   const [hasClosed, setHasClosed] = useState(false);
+  const [isOpen, setIsOpen] = useState(notification.priority === Priority.critical);
 
   const handleClose = () => {
     api.notificationSetSeenByCorrelationID({ correlationId: notification.correlationId });
@@ -118,7 +119,7 @@ export function CollapsableBannerNotification({
     className?: string;
     children: React.ReactNode;
   }> = ({ eventKey, className, children }) => {
-    const onClick = useAccordionButton(eventKey);
+    const onClick = useAccordionButton(eventKey, () => setIsOpen((prev) => !prev));
     return (
       <div
         role="button"
@@ -143,11 +144,14 @@ export function CollapsableBannerNotification({
   const defaultKey = notification.priority === Priority.critical ? "0" : undefined;
 
   return (
-    <Accordion defaultActiveKey={defaultKey}>
+    <Accordion activeKey={isOpen ? "0" : undefined} defaultActiveKey={defaultKey}>
       <Accordion.Item eventKey="0">
         <BannerToggle eventKey="0" className={`banner-card ${notification.priority}-priority`}>
           <div className="banner-header">
-            <h5>{notification.title}</h5>
+            <h5 className="banner-title">
+              {notification.title}
+              {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+            </h5>
             <button
               className="close-btn"
               onClick={(e) => {
@@ -177,3 +181,4 @@ export function CollapsableBannerNotification({
     </Accordion>
   );
 }
+// ...existing code...
