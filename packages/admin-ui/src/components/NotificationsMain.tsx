@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
 import { api, useApi } from "api";
 import { Notification, Priority } from "@dappnode/types";
 import { MdClose } from "react-icons/md";
-import { Accordion, useAccordionButton } from "react-bootstrap";
+import { Accordion, AccordionContext, useAccordionButton } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
 import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
@@ -103,7 +103,6 @@ export function CollapsableBannerNotification({
   onClose: () => void;
 }) {
   const [hasClosed, setHasClosed] = useState(false);
-  const [isOpen, setIsOpen] = useState(notification.priority === Priority.critical);
 
   const handleClose = () => {
     api.notificationSetSeenByCorrelationID({ correlationId: notification.correlationId });
@@ -114,12 +113,17 @@ export function CollapsableBannerNotification({
   const isExternalUrl =
     notification.callToAction && !dappmanagerAliases.some((alias) => notification.callToAction!.url.includes(alias));
 
+  // open by default if critical
+  const defaultKey = notification.priority === Priority.critical ? "0" : undefined;
   const BannerToggle: React.FC<{
     eventKey: string;
     className?: string;
     children: React.ReactNode;
-  }> = ({ eventKey, className, children }) => {
-    const onClick = useAccordionButton(eventKey, () => setIsOpen((prev) => !prev));
+    title: string;
+  }> = ({ eventKey, className, children, title }) => {
+    const onClick = useAccordionButton(eventKey);
+    const { activeEventKey } = useContext(AccordionContext) as { activeEventKey?: string | string[] };
+    const isOpen = activeEventKey === eventKey || (Array.isArray(activeEventKey) && activeEventKey.includes(eventKey));
     return (
       <div
         role="button"
@@ -133,6 +137,21 @@ export function CollapsableBannerNotification({
           }
         }}
       >
+        <div className="banner-header">
+          <h5 className="banner-title">
+            {title}
+            {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </h5>
+          <button
+            className="close-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClose();
+            }}
+          >
+            <MdClose />
+          </button>
+        </div>
         {children}
       </div>
     );
@@ -140,29 +159,14 @@ export function CollapsableBannerNotification({
 
   if (hasClosed) return null;
 
-  // open by default if critical
-  const defaultKey = notification.priority === Priority.critical ? "0" : undefined;
-
   return (
-    <Accordion activeKey={isOpen ? "0" : undefined} defaultActiveKey={defaultKey}>
+    <Accordion defaultActiveKey={defaultKey}>
       <Accordion.Item eventKey="0">
-        <BannerToggle eventKey="0" className={`banner-card ${notification.priority}-priority`}>
-          <div className="banner-header">
-            <h5 className="banner-title">
-              {notification.title}
-              {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
-            </h5>
-            <button
-              className="close-btn"
-              onClick={(e) => {
-                e.stopPropagation(); // don't toggle when closing
-                handleClose();
-              }}
-            >
-              <MdClose />
-            </button>
-          </div>
-
+        <BannerToggle
+          eventKey="0"
+          className={`banner-card ${notification.priority}-priority`}
+          title={notification.title}
+        >
           <Accordion.Body className="banner-body">
             <RenderMarkdown source={notification.body} />
             {notification.callToAction && (
@@ -181,4 +185,3 @@ export function CollapsableBannerNotification({
     </Accordion>
   );
 }
-// ...existing code...
