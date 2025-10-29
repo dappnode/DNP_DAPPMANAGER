@@ -122,7 +122,7 @@ export function CollapsableBannerNotification({
     title: string;
   }> = ({ eventKey, className, children, title }) => {
     const onClick = useAccordionButton(eventKey);
-    const { activeEventKey } = useContext(AccordionContext) as { activeEventKey?: string | string[] };
+    const { activeEventKey } = useContext(AccordionContext);
     const isOpen = activeEventKey === eventKey || (Array.isArray(activeEventKey) && activeEventKey.includes(eventKey));
     return (
       <div
