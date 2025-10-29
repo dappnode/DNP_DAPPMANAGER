@@ -1,0 +1,14 @@
+.installer-ai-banner {
+  margin-bottom: var(--default-spacing);
+  cursor: pointer;
+
+  &.group:hover h2 {
+    color: var(--dappnode-strong-main-color);
+  }
+  .ai-banner-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+  }
+}
