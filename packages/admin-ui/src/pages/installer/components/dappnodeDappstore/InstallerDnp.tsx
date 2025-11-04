@@ -97,13 +97,11 @@ export const InstallerDnp: React.FC = () => {
     setSelectedCategories((x) => ({ ...x, [category]: !x[category] }));
   }
 
-  const directoryFiltered = [
-    ...filterDirectory({
-      directory,
-      query,
-      selectedCategories
-    })
-  ];
+  const directoryFiltered = filterDirectory({
+    directory,
+    query,
+    selectedCategories
+  });
 
   /**
    * 1. If the query is a valid IPFS hash, open it
