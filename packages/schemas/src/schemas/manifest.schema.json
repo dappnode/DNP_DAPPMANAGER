@@ -522,7 +522,8 @@
           "Storage",
           "Lido",
           "DVT",
-          "LSD"
+          "LSD",
+          "AI"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",
