@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Script to synchronize master branch with develop branch
 # This is useful when master has unnecessary merge commits but the same content as develop
 
@@ -8,6 +8,17 @@ echo "🔍 Checking current status..."
 
 # Fetch latest changes
 git fetch origin
+
+# Verify branches exist
+if ! git rev-parse --verify master >/dev/null 2>&1; then
+    echo "❌ Error: master branch does not exist"
+    exit 1
+fi
+
+if ! git rev-parse --verify develop >/dev/null 2>&1; then
+    echo "❌ Error: develop branch does not exist"
+    exit 1
+fi
 
 # Check if master and develop have the same tree
 MASTER_TREE=$(git rev-parse master^{tree})
@@ -26,11 +37,15 @@ if [ "$MASTER_TREE" = "$DEVELOP_TREE" ]; then
         # Show what commits are different
         echo ""
         echo "📊 Commits in master but not in develop:"
-        git log --oneline master ^develop || echo "  (none)"
+        if ! git log --oneline master ^develop 2>/dev/null | head -20; then
+            echo "  (none)"
+        fi
         
         echo ""
         echo "📊 Commits in develop but not in master:"
-        git log --oneline develop ^master || echo "  (none)"
+        if ! git log --oneline develop ^master 2>/dev/null | head -20; then
+            echo "  (none)"
+        fi
         
         echo ""
         echo "To sync master with develop, run:"
