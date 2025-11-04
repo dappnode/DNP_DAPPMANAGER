@@ -523,7 +523,8 @@
           "Lido",
           "DVT",
           "LSD",
-          "AI"
+          "AI",
+          "MCP"
         ],
         "enumDescriptions": {
           "Blockchain": "Blockchain nodes, i.e. Bitcoin, Monero",
