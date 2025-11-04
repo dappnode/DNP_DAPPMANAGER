@@ -9,6 +9,28 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+
+    img {
+      height: 75px;
+      width: 75px;
+    }
+
+    h2 {
+      margin: 0;
+    }
+
+    .description {
+      line-height: normal;
+
+      @media (max-width: 25rem) {
+        display: none;
+      }
+    }
+  }
+
+  // Adding margin-top in mobile view since category filter is hidden
+  @media (max-width: 40rem) {
+    margin-top: var(--default-spacing);
   }
 }
