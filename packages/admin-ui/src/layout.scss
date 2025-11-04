@@ -29,8 +29,19 @@
 /* 
   TEXT STYLES 
 */
+
+// Titles and navigators
+.section-title,
+.section-subtitle,
+.sidenav-item,
+.horizontal-navbar,
+.pkgs-back-btn {
+  font-family: "Montserrat", sans-serif;
+}
+
+// Body text style
 body {
-  font-family: overpass, sans-serif !important;
+  font-family: "Inter", sans-serif;
 }
 
 /* Reset margins and underlying sizes. 
