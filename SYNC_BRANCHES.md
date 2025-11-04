@@ -11,6 +11,18 @@ git checkout master
 git reset --hard develop
 ```
 
+**Note**: After running the reset locally, the remote master branch will need to be updated. Since this is a force push operation (because we're rewriting history), it should be done carefully. Coordinate with your team before pushing:
+
+```bash
+# Verify the state before pushing
+git log --oneline master -5
+git log --oneline develop -5
+
+# Push the synchronized master (requires force push)
+# This needs to be done by someone with appropriate permissions
+# git push --force-with-lease origin master
+```
+
 ## Verification
 After the reset:
 - Both master and develop point to the same commit: `a7ba56c6`
