@@ -21,7 +21,6 @@ import { getDnpDirectory, getDirectoryRequestStatus } from "services/dnpDirector
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
-import { DirectoryItem } from "@dappnode/types";
 import { InstallerAIBanner } from "../aiDappstore/InstallerAiBanner";
 
 export const InstallerDnp: React.FC = () => {
@@ -98,50 +97,9 @@ export const InstallerDnp: React.FC = () => {
     setSelectedCategories((x) => ({ ...x, [category]: !x[category] }));
   }
 
-  const aiDnps: DirectoryItem[] = [
-    {
-      name: "telegram-mcp.dnp.dappnode.eth",
-      categories: ["AI"],
-      status: "ok",
-      isFeatured: false,
-      description: "AI-powered DAppNode package",
-      avatarUrl:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/1200px-Telegram_2019_Logo.svg.png",
-      index: 0,
-      whitelisted: true,
-      isInstalled: false,
-      isUpdated: false
-    },
-    {
-      name: "drive-mcp.dnp.dappnode.eth",
-      categories: ["AI"],
-      status: "ok",
-      isFeatured: false,
-      description: "AI-powered DAppNode package",
-      avatarUrl:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Drive_icon_%282020%29.svg/250px-Google_Drive_icon_%282020%29.svg.png",
-      index: 0,
-      whitelisted: true,
-      isInstalled: false,
-      isUpdated: false
-    },
-    {
-      name: "n8n.dnp.dappnode.eth",
-      categories: ["AI"],
-      status: "ok",
-      isFeatured: false,
-      description: "AI-powered DAppNode package",
-      avatarUrl: "https://cdn.prod.website-files.com/63b8205d66300ce7eb612a32/678599ece5abb8fe4631597f_logo_n8n2x.png",
-      index: 0,
-      whitelisted: true,
-      isInstalled: false,
-      isUpdated: false
-    }
-  ];
-
   const directoryFiltered = [
     ...filterDirectory({
-      directory: [...directory, ...aiDnps],
+      directory,
       query,
       selectedCategories
     })
@@ -163,7 +121,6 @@ export const InstallerDnp: React.FC = () => {
       if (dnp.status === "ok") for (const category of dnp.categories) obj[category] = false;
       return obj;
     }, {}),
-    AI: false,
     ...selectedCategories
   };
 
