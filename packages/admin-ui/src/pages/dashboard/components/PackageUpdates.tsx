@@ -77,7 +77,7 @@ function UpdateCard({ update }: { update: UpdatesInterface }) {
             }}
           >
             <div>
-              <strong>{prettyDnpName(update.dnpName)}</strong> v{update.newVersion}{" "}
+              <span className="dnp-name">{prettyDnpName(update.dnpName)}</span> v{update.newVersion}{" "}
               {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
             </div>
           </div>

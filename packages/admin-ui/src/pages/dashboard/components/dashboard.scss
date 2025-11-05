@@ -28,6 +28,9 @@
   }
 
   .package-updates {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
     @media screen and (min-width: 65rem) {
       // Give the single card a max width that matches the other cards
       grid-column: 1 / 4;
@@ -51,7 +54,7 @@
 .chain-card .name,
 .stats-card .id {
   text-transform: capitalize;
-  font-weight: 800;
+  font-weight: 600;
 
   display: flex;
   .text {
@@ -94,6 +97,10 @@
   justify-content: space-between;
   align-items: stretch;
   height: 100%;
+
+  .dnp-name {
+    font-weight: 600;
+  }
 
   .package-update-accordion {
     min-width: max-content;

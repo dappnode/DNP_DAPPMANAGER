@@ -6,7 +6,7 @@ interface TitleProps {
 }
 
 const Title: React.FC<TitleProps> = ({ title, children }) => {
-  return <div className="section-title">{children ? children.toUpperCase() : title.toLocaleUpperCase()}</div>;
+  return <div className="section-title">{children ? children : title}</div>;
 };
 
 export default Title;
