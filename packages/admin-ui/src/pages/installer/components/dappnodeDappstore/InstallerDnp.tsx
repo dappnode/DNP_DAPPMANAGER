@@ -93,8 +93,19 @@ export const InstallerDnp: React.FC = () => {
     }
   }
 
+  // Toggle category: sets only one category to true at a time
   function onCategoryChange(category: string) {
-    setSelectedCategories((x) => ({ ...x, [category]: !x[category] }));
+    setSelectedCategories((x) => {
+      const newCategories = { ...x, [category]: !x[category] };
+
+      // If the category has been set to true, set all others to false
+      if (newCategories[category]) {
+        Object.keys(newCategories).forEach((key) => {
+          if (key !== category) newCategories[key] = false;
+        });
+      }
+      return newCategories;
+    });
   }
 
   const directoryFiltered = filterDirectory({
@@ -148,12 +159,7 @@ export const InstallerDnp: React.FC = () => {
           <NoPackageFound query={query} />
         ) : (
           <>
-            {!selectedCategories.AI && (
-              <InstallerAIBanner
-                selectedCategories={selectedCategories}
-                setSelectedCategories={setSelectedCategories}
-              />
-            )}
+            {!selectedCategories.AI && <InstallerAIBanner onCategoryChange={onCategoryChange} />}
             <div className="dnps-container">
               {/* <DnpStore directory={dnpsFeatured} openDnp={openDnp} featured /> */}
               <DnpStore directory={dnpsNormal} openDnp={openDnp} />
