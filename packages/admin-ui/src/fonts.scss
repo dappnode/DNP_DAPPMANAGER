@@ -1,0 +1,44 @@
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat";
+  src: url("/fonts/montserrat/Montserrat-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter/Inter-Italic-VariableFont_opsz,wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+.section-title,
+.section-subtitle,
+.sidenav-item,
+.horizontal-navbar,
+.pkgs-back-btn {
+  font-family: "Montserrat", sans-serif;
+}
+
+// Body text style
+body {
+  font-family: "Inter", sans-serif;
+}
