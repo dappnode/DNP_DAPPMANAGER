@@ -85,7 +85,7 @@
 .dnp-cards.featured {
   /* Must be auto-fill so when there's one card on big screens, it appears normal */
   grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
-  
+
   > .card {
     margin-top: 0;
   }
@@ -147,6 +147,7 @@
 /* Type filter */
 
 .type-filter {
+  margin-top: 10px;
   // Hide categories in mobile view
   @media (max-width: 40rem) {
     display: none;

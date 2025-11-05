@@ -21,6 +21,7 @@ import { getDnpDirectory, getDirectoryRequestStatus } from "services/dnpDirector
 import { fetchDnpDirectory } from "services/dnpDirectory/actions";
 import { confirmPromise } from "components/ConfirmDialog";
 import { stakehouseLsdUrl } from "params";
+import { InstallerAIBanner } from "../aiDappstore/InstallerAiBanner";
 
 export const InstallerDnp: React.FC = () => {
   const navigate = useNavigate();
@@ -122,7 +123,7 @@ export const InstallerDnp: React.FC = () => {
   };
 
   const dnpsNoError = directoryFiltered.filter((dnp) => dnp.status !== "error");
-  const dnpsFeatured = dnpsNoError.filter((dnp) => dnp.isFeatured);
+  // const dnpsFeatured = dnpsNoError.filter((dnp) => dnp.isFeatured);
   const dnpsNormal = dnpsNoError.filter((dnp) => !dnp.isFeatured);
   const dnpsError = directoryFiltered.filter((dnp) => dnp.status === "error");
 
@@ -146,17 +147,25 @@ export const InstallerDnp: React.FC = () => {
         !directoryFiltered.length ? (
           <NoPackageFound query={query} />
         ) : (
-          <div className="dnps-container">
-            <DnpStore directory={dnpsFeatured} openDnp={openDnp} featured />
-            <DnpStore directory={dnpsNormal} openDnp={openDnp} />
-            {dnpsError.length ? (
-              showErrorDnps ? (
-                <DnpStore directory={dnpsError} openDnp={openDnp} />
-              ) : (
-                <Button onClick={() => setShowErrorDnps(true)}>Show packages still propagating</Button>
-              )
-            ) : null}
-          </div>
+          <>
+            {!selectedCategories.AI && (
+              <InstallerAIBanner
+                selectedCategories={selectedCategories}
+                setSelectedCategories={setSelectedCategories}
+              />
+            )}
+            <div className="dnps-container">
+              {/* <DnpStore directory={dnpsFeatured} openDnp={openDnp} featured /> */}
+              <DnpStore directory={dnpsNormal} openDnp={openDnp} />
+              {dnpsError.length ? (
+                showErrorDnps ? (
+                  <DnpStore directory={dnpsError} openDnp={openDnp} />
+                ) : (
+                  <Button onClick={() => setShowErrorDnps(true)}>Show packages still propagating</Button>
+                )
+              ) : null}
+            </div>
+          </>
         )
       ) : requestStatus.error ? (
         <ErrorView error={requestStatus.error} />
