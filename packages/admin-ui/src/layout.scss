@@ -26,24 +26,6 @@
   --z-index-topbar: 1000;
 }
 
-/* 
-  TEXT STYLES 
-*/
-
-// Titles and navigators
-.section-title,
-.section-subtitle,
-.sidenav-item,
-.horizontal-navbar,
-.pkgs-back-btn {
-  font-family: "Montserrat", sans-serif;
-}
-
-// Body text style
-body {
-  font-family: "Inter", sans-serif;
-}
-
 /* Reset margins and underlying sizes. 
    The height 100% is necessary so child elements have a reference to be full width
 */
