@@ -16,6 +16,7 @@ import "./dappnode_styles.scss";
 import "./dappnode_colors.scss";
 import "./light_dark.scss";
 import "./layout.scss";
+import "./fonts.scss";
 import { PwaInstallProvider } from "pages/system/components/App/PwaInstallContext";
 
 // This process.env. vars will be substituted at build time
