@@ -10,6 +10,7 @@ import { ActivatePremium } from "./ActivatePremium";
 import { BackupNode } from "./BackupNode";
 import "./premiumRoot.scss";
 import { SectionNavigator } from "components/SectionNavigator";
+import { BackupNode2 } from "./BackupNode2";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();
@@ -65,6 +66,11 @@ const PremiumRoot: React.FC = () => {
         name: "Backup node for validators",
         subPath: subPaths.backupNode,
         element: <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
+      },
+      {
+        name: "Backup node for validators 2",
+        subPath: subPaths.backupNode2,
+        element: <BackupNode2 isActivated={isActivated} hashedLicense={hashedLicense} />
       }
     ],
     [
@@ -79,7 +85,6 @@ const PremiumRoot: React.FC = () => {
       hashedLicense
     ]
   );
-
   return (
     <div className="premium-root">
       <div className="premium-header">
