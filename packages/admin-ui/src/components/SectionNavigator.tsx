@@ -6,14 +6,15 @@ import "./sectionNavigator.scss";
 interface SectionNavbarProps {
   routes: RouteType[];
   hideNavbar?: boolean;
+  variant?: "sm";
 }
 
-export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNavbar = false }) => {
+export const SectionNavigator: React.FC<SectionNavbarProps> = ({ routes, hideNavbar = false, variant }) => {
   return (
     <div>
       {/* Navbar   */}
       {!hideNavbar && (
-        <div className="horizontal-navbar">
+        <div className={`horizontal-navbar ${variant && variant}`}>
           {routes
             .filter((route) => !route.hideSection)
             .map((route) => (
