@@ -21,6 +21,7 @@ import Alert from "react-bootstrap/esm/Alert";
 import { LocalProxyingStatus } from "@dappnode/types";
 import { useNavigate } from "react-router-dom";
 import LinkDocs from "components/LinkDocs";
+import { AlertDismissible } from "components/AlertDismissible";
 
 export function LocalProxying() {
   const navigate = useNavigate();
@@ -38,7 +39,7 @@ export function LocalProxying() {
         await new Promise<void>((resolve) => {
           confirm({
             title: `Stopping Local Network Proxy`,
-            text: `Warning, if you are connected to your DAppNode through Local Network Proxy you may lose access to your DAppNode. Make sure to have an alternative way to connect to it, like WiFi or a VPN connection.`,
+            text: `Warning, if you are connected to your Dappnode through Local Network Proxy you may lose access to your Dappnode. Make sure to have an alternative way to connect to it, like WiFi or a VPN connection.`,
             label: "Pause",
             onClick: resolve
           });
@@ -73,37 +74,48 @@ export function LocalProxying() {
   return (
     <>
       {localProxyingStatus.data ? (
-        <Card spacing>
-          <p>
-            If you are connected to the same router as your DAppNode you can use this page at{" "}
-            <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>. Learn more about the Local Network Proxy at:{" "}
-            <LinkDocs href={docsUrl.connectLocalProxy}>How to connect to DAppNode Local Network Proxy</LinkDocs>
-          </p>
-          {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
-            <p>
-              Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not
-              require Local Network Proxy.
-            </p>
+        <>
+          {window.location.origin !== adminUiLocalDomain && (
+            <AlertDismissible variant="warning">
+              <p>
+                Note that connecting via local proxy is less reliable than using a VPN or Wi-fi hotspot. The local proxy
+                only provides access to the Dappmanager UI and does not grant access to other domains served through
+                your Dappnode, such as client interfaces or other package UIs.
+              </p>
+            </AlertDismissible>
           )}
-          <hr />
+          <Card spacing>
+            <p>
+              If you are connected to the same router as your Dappnode you can use this page at{" "}
+              <a href={adminUiLocalDomain}>{adminUiLocalDomain}</a>. Learn more about the Local Network Proxy at:{" "}
+              <LinkDocs href={docsUrl.connectLocalProxy}>How to connect to Dappnode Local Network Proxy</LinkDocs>
+            </p>
+            {dappnodeIdentity.internalIp === dappnodeIdentity.ip && (
+              <p>
+                Local and public IPs are equal. This may be due to dappnode is running on a remote machine and does not
+                require Local Network Proxy.
+              </p>
+            )}
+            <hr />
 
-          <div className="wifi-local-status-actions-row">
-            <div className="wifi-local-status-container">
-              <StateBadge {...parseAvahiPublishCmdState(localProxyingStatus.data)} />
-              <MdWifi className="wifi-local-status-icon" />
-              <span className="wifi-local-status-name">Local Network Proxy</span>
-            </div>
+            <div className="wifi-local-status-actions-row">
+              <div className="wifi-local-status-container">
+                <StateBadge {...parseAvahiPublishCmdState(localProxyingStatus.data)} />
+                <MdWifi className="wifi-local-status-icon" />
+                <span className="wifi-local-status-name">Local Network Proxy</span>
+              </div>
 
-            <div className="wifi-local-actions">
-              <Switch
-                checked={localProxyingStatus.data === "running"}
-                onToggle={localProxyingEnableDisable}
-                disabled={reqStatus.loading}
-                label={localProxyingStatus.data === "running" ? "On" : "Off"}
-              ></Switch>
+              <div className="wifi-local-actions">
+                <Switch
+                  checked={localProxyingStatus.data === "running"}
+                  onToggle={localProxyingEnableDisable}
+                  disabled={reqStatus.loading}
+                  label={localProxyingStatus.data === "running" ? "On" : "Off"}
+                ></Switch>
+              </div>
             </div>
-          </div>
-        </Card>
+          </Card>
+        </>
       ) : localProxyingStatus.isValidating ? (
         <Loading steps={["Loading Local Network Proxy..."]} />
       ) : localProxyingStatus.error ? (
