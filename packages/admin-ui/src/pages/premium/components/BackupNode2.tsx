@@ -9,8 +9,9 @@ import { RouteType } from "types";
 import SubTitle from "components/SubTitle";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Card } from "react-bootstrap";
+import { MdOutlineBackup } from "react-icons/md";
 
-const availableNetworks = [Network.Mainnet, Network.Hoodi];
+const availableNetworks = [Network.Mainnet, Network.Gnosis, Network.Hoodi];
 
 type BackupData = {
   activable: boolean;
@@ -60,7 +61,7 @@ export function BackupNode2({
   }, []);
 
   const routes: RouteType[] = availableNetworks.map((network) => ({
-    name: `${network} Backup`,
+    name: `${network}`,
     subPath: `${network}`,
     element: <NetworkBackup networkData={fakeBackupData[network]} />
   }));
@@ -105,7 +106,7 @@ export function BackupNode2({
   return (
     <div>
       {<DescriptionCard />}
-      <SectionNavigator routes={routes} />
+      <SectionNavigator routes={routes} variant="sm" />
     </div>
   );
 }
@@ -146,6 +147,8 @@ const NetworkBackup = ({ networkData }: { networkData: BackupData | undefined })
             </Card>
           </div>
 
+          <ActivateCard />
+
           <CustomAccordion defaultOpen={false}>
             <CustomAccordionItem header={<b>Activation history</b>}>
               <div>
@@ -162,3 +165,32 @@ const NetworkBackup = ({ networkData }: { networkData: BackupData | undefined })
     </div>
   );
 };
+
+const ActivateCard = () => (
+  <Card
+    style={{
+      padding: "15px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: "10px"
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center"
+      }}
+    >
+      <MdOutlineBackup className="blue-text" style={{ fontSize: "36px" }} />
+      <h5 className="blue-text">Ready to activate</h5>
+    </div>
+
+    <div>Your backup service is ready to cover your validators for 5 days 4 hours 3 minutes</div>
+
+    <Button variant="dappnode" onClick={() => {}}>
+      Activate Backup
+    </Button>
+  </Card>
+);
