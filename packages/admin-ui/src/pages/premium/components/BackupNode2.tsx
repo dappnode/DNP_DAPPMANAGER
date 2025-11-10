@@ -3,44 +3,11 @@ import { useNavigate } from "react-router-dom";
 import Button from "components/Button";
 import { basePath, relativePath, subPaths } from "../data";
 
-import { Network } from "@dappnode/types";
 import { SectionNavigator } from "components/SectionNavigator";
 import { RouteType } from "types";
-import SubTitle from "components/SubTitle";
-import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Card } from "react-bootstrap";
-import { MdOutlineBackup } from "react-icons/md";
-
-const availableNetworks = [Network.Mainnet, Network.Gnosis, Network.Hoodi];
-
-type BackupData = {
-  activable: boolean;
-  activeValidators: number;
-  maxValidators: number;
-  nextAvailableDate: string | null;
-  consensusClient: string;
-  // activationsHistory: Array<{
-  //   activation_date: string;
-  //   end_date: string;
-  // }>;
-  activationsHistory: string[];
-};
-
-const fakeBackupData: Partial<Record<Network, BackupData>> = {
-  [Network.Mainnet]: {
-    activable: true,
-    activeValidators: 5,
-    maxValidators: 10,
-    nextAvailableDate: null,
-    consensusClient: "lighthouse.dnp.dappnode.eth",
-    activationsHistory: [
-      // { activation_date: "2025-10-10T12:00:00Z", end_date: "2025-10-15T12:00:00Z" },
-      // { activation_date: "2025-10-20T08:00:00Z", end_date: "2025-10-25T08:00:00Z" }
-      "November 1, 2023 - 12:00 - 5 hours 23 minutes",
-      "December 15, 2023 - 09:30 - 3 hours 45 minutes"
-    ]
-  }
-};
+import { NetworkBackup } from "./NetworkBackup";
+import { availableNetworks, useBackupNode2 } from "hooks/useBackupNodev2";
 
 export function BackupNode2({
   isActivated: isPremium,
@@ -49,6 +16,8 @@ export function BackupNode2({
   isActivated: boolean;
   hashedLicense: string;
 }) {
+  const { fakeBackupData } = useBackupNode2({ hashedLicense, isPremiumActivated: isPremium });
+
   const navigate = useNavigate();
 
   // if no backup subroute selected, redirect automatically to first network
@@ -63,7 +32,7 @@ export function BackupNode2({
   const routes: RouteType[] = availableNetworks.map((network) => ({
     name: `${network}`,
     subPath: `${network}`,
-    element: <NetworkBackup networkData={fakeBackupData[network]} />
+    element: <NetworkBackup network={network} networkData={fakeBackupData[network]} />
   }));
 
   const DescriptionCard = () => (
@@ -110,87 +79,3 @@ export function BackupNode2({
     </div>
   );
 }
-
-const NetworkBackup = ({ networkData }: { networkData: BackupData | undefined }) => {
-  const backupData = networkData;
-  return (
-    <div>
-      {/*Get the network name from networkData key*/}
-      {backupData ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "15px" }}>
-            <Card style={{ flex: 1, padding: "15px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center"
-                }}
-              >
-                <SubTitle>Consensus Client Data</SubTitle>
-                <div>{backupData.consensusClient}</div>
-              </div>
-            </Card>
-            <Card style={{ flex: 1, padding: "15px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center"
-                }}
-              >
-                <SubTitle>Validators coverage Data</SubTitle>
-                <div>
-                  {backupData.activeValidators}/{backupData.maxValidators} validators
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          <ActivateCard />
-
-          <CustomAccordion defaultOpen={false}>
-            <CustomAccordionItem header={<b>Activation history</b>}>
-              <div>
-                {backupData.activationsHistory.map((activation, index) => (
-                  <div key={index}>- {activation}</div>
-                ))}
-              </div>
-            </CustomAccordionItem>
-          </CustomAccordion>
-        </div>
-      ) : (
-        <p>No backup data available</p>
-      )}
-    </div>
-  );
-};
-
-const ActivateCard = () => (
-  <Card
-    style={{
-      padding: "15px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "10px"
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center"
-      }}
-    >
-      <MdOutlineBackup className="blue-text" style={{ fontSize: "36px" }} />
-      <h5 className="blue-text">Ready to activate</h5>
-    </div>
-
-    <div>Your backup service is ready to cover your validators for 5 days 4 hours 3 minutes</div>
-
-    <Button variant="dappnode" onClick={() => {}}>
-      Activate Backup
-    </Button>
-  </Card>
-);
