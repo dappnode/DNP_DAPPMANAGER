@@ -3,6 +3,26 @@
   flex-direction: column;
   gap: 15px;
 
+  .card {
+    padding: 15px;
+
+    .section-subtitle {
+      margin: 0;
+    }
+  }
+
+  .blue-text {
+    color: var(--dappnode-strong-main-color);
+  }
+
+  .green-text {
+    color: var(--success-green-color);
+  }
+
+  .orange-text {
+    color: rgb(238, 163, 2);
+  }
+
   .info-cards-row {
     display: flex;
     flex-direction: row;
@@ -10,7 +30,6 @@
 
     .card {
       flex: 1;
-      padding: 15px;
       justify-content: space-between;
       gap: 5px;
 
@@ -18,9 +37,6 @@
         display: flex;
         align-items: center;
         gap: 5px;
-        .section-subtitle {
-          margin: 0;
-        }
 
         .tooltip-icon {
           font-size: 0.95rem;
@@ -94,17 +110,56 @@
       }
     }
   }
+
+  .action-backup-card {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    align-items: center;
+
+    .section-subtitle {
+      font-weight: bold;
+    }
+
+    .action-backup-col {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+
+      .action-icon {
+        font-size: 3rem;
+      }
+
+      .countdown-text {
+        color: var(--light-text-color);
+      }
+      .countdown-time {
+        font-size: 1.5rem;
+        font-weight: bold;
+      }
+    }
+  }
 }
 
 #dark {
   #main {
     .network-backup-container {
+      .blue-text {
+        color: var(--dappnode-strong-main-color);
+      }
+
+      .color-danger {
+        color: red;
+      }
+      .color-warning {
+        color: orange;
+      }
+
       .consensus-card {
         .cc-item {
           background-color: var(--color-dark-background-main);
-          &.color-danger {
-            color: red;
-          }
         }
       }
 
