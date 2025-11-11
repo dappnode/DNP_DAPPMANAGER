@@ -19,11 +19,10 @@
         align-items: center;
         gap: 5px;
         .section-subtitle {
-          margin-bottom: 0;
+          margin: 0;
         }
 
         .tooltip-icon {
-          margin-bottom: 2px;
           font-size: 0.95rem;
           color: var(--light-text-color);
         }
@@ -49,6 +48,51 @@
         font-size: 0.8rem;
       }
     }
+
+    .validators-card {
+      .validators-item {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .validators-item-row {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+
+          .tooltip-beacon-api-error {
+            margin-bottom: 3px;
+            font-size: 0.95rem;
+            color: darkorange;
+          }
+        }
+
+        .validators-limit-bar {
+          width: 100%;
+          height: 5px;
+          background-color: #e9ecef;
+          border-radius: 3px;
+          overflow: hidden;
+
+          .validators-curr-bar {
+            width: 0; /* This is dynamically set */
+            height: 100%;
+            border-radius: 3px;
+            background-color: #000;
+
+            &.color-danger {
+              background-color: var(--danger-color);
+            }
+          }
+        }
+      }
+      .validators-limit-desc,
+      .validators-limit-warning {
+        color: var(--light-text-color);
+        font-size: 0.8rem;
+      }
+    }
   }
 }
 
@@ -61,6 +105,21 @@
           &.color-danger {
             color: red;
           }
+        }
+      }
+
+      .validators-card {
+        .premium-backup-validators-limit-bar {
+          background-color: var(--color-dark-background-main);
+
+          .validators-curr-bar {
+            &.color-danger {
+              background-color: red;
+            }
+          }
+        }
+        .tooltip-beacon-api-error {
+          color: orange;
         }
       }
     }

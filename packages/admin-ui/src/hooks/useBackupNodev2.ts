@@ -3,7 +3,7 @@ import { useApi } from "api";
 
 import { useEffect, useMemo, useState } from "react";
 
-export const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi, Network.Gnosis];
+export const availableNetworks: Network[] = [Network.Mainnet, Network.Hoodi, Network.Gnosis, Network.Holesky];
 
 export type ConsensusInfo = {
   noConsensusSelected: boolean;
@@ -15,6 +15,7 @@ export type BackupData = {
   activable: boolean;
   activeValidators: number;
   maxValidators: number;
+  beaconApiError: boolean;
   nextAvailableDate: string | null;
   consensusInfo: ConsensusInfo | undefined;
   // activationsHistory: Array<{
@@ -98,6 +99,7 @@ export const useBackupNode2 = ({
         activable: true,
         activeValidators: 5,
         maxValidators: 10,
+        beaconApiError: false,
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Mainnet],
         activationsHistory: [
@@ -111,6 +113,7 @@ export const useBackupNode2 = ({
         activable: true,
         activeValidators: 9,
         maxValidators: 10,
+        beaconApiError: true,
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Hoodi],
         activationsHistory: [
@@ -120,10 +123,23 @@ export const useBackupNode2 = ({
       },
       [Network.Gnosis]: {
         activable: true,
-        activeValidators: 0,
+        activeValidators: 234,
         maxValidators: 100,
+        beaconApiError: false,
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Gnosis],
+        activationsHistory: [
+          "November 1, 2023 - 12:00 - 5 hours 23 minutes",
+          "December 15, 2023 - 09:30 - 3 hours 45 minutes"
+        ]
+      },
+      [Network.Holesky]: {
+        activable: true,
+        activeValidators: 35,
+        maxValidators: 15,
+        beaconApiError: false,
+        nextAvailableDate: null,
+        consensusInfo: currentConsensus[Network.Holesky],
         activationsHistory: [
           "November 1, 2023 - 12:00 - 5 hours 23 minutes",
           "December 15, 2023 - 09:30 - 3 hours 45 minutes"
