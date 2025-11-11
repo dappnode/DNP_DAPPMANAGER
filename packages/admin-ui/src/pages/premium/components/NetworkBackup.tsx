@@ -4,7 +4,14 @@ import Button from "components/Button";
 import SubTitle from "components/SubTitle";
 import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
-import { MdGroup, MdInfoOutline, MdOutlineBackup, MdWarningAmber } from "react-icons/md";
+import {
+  MdGroup,
+  MdInfoOutline,
+  MdOutlineAccessTime,
+  MdOutlineBackup,
+  MdOutlineCheckCircleOutline,
+  MdWarningAmber
+} from "react-icons/md";
 import { BackupData, ConsensusInfo } from "hooks/useBackupNodev2";
 
 import "./networkBackup.scss";
@@ -35,7 +42,8 @@ export const NetworkBackup = ({ network, networkData }: { network: Network; netw
             />
           </div>
 
-          <ActivateCard />
+          {/* <ActivateCard timeLeft={backupData.timeLeft} /> */}
+          <CooldownCard timeLeft={backupData.timeLeft} />
 
           <CustomAccordion defaultOpen={false}>
             <CustomAccordionItem header={<b>Activation history</b>}>
@@ -57,7 +65,6 @@ export const NetworkBackup = ({ network, networkData }: { network: Network; netw
 const ConsensusCard = ({ network, consensusData }: { network: Network; consensusData: ConsensusInfo | undefined }) => {
   const currentConsensus = consensusData;
   const stakersPath = `/${stakersBasePath}/${network === "mainnet" ? "ethereum" : network}`;
-  console.log("ConsensusCard currentConsensus", currentConsensus);
 
   return (
     <Card className="consensus-card">
@@ -190,31 +197,58 @@ const ValidatorsCard = ({
   );
 };
 
-const ActivateCard = () => (
-  <Card
-    style={{
-      padding: "15px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "10px"
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center"
-      }}
-    >
-      <MdOutlineBackup className="blue-text" style={{ fontSize: "36px" }} />
-      <h5 className="blue-text">Ready to activate</h5>
+const ActivateCard = ({ timeLeft }: { timeLeft: string }) => (
+  <Card className="action-backup-card">
+    <div className="action-backup-col">
+      <MdOutlineBackup className="blue-text action-icon" />
+      <SubTitle className="blue-text">Ready to activate </SubTitle>
     </div>
 
-    <div>Your backup service is ready to cover your validators for 5 days 4 hours 3 minutes</div>
-
+    <div>Your backup service is ready to cover your validators for: </div>
+    <div className="action-backup-col">
+      <div className="countdown-text">Available time remaining:</div>
+      <div className="countdown-time">{timeLeft}</div>
+    </div>
     <Button variant="dappnode" onClick={() => {}}>
       Activate Backup
+    </Button>
+  </Card>
+);
+
+const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
+  <Card className="action-backup-card">
+    <div className="action-backup-col">
+      <MdOutlineCheckCircleOutline className="green-text action-icon" />
+
+      <SubTitle className="green-text">Backup Active </SubTitle>
+    </div>
+
+    <div>Your validators are protected by backup coverage</div>
+    <div className="action-backup-col">
+      <div className="countdown-text">Auto-deactivation in:</div>
+      <div className="countdown-time">{timeLeft}</div>
+    </div>
+    <Button variant="danger" onClick={() => {}}>
+      Stop Backup
+    </Button>
+  </Card>
+);
+
+const CooldownCard = ({ timeLeft }: { timeLeft: string }) => (
+  <Card className="action-backup-card">
+    <div className="action-backup-col">
+      <MdOutlineAccessTime className="orange-text action-icon" />
+      <SubTitle className="orange-text">Cooldown Period</SubTitle>
+    </div>
+    <div>Backup cannot be reactivated during cooldown</div>
+
+    <div className="action-backup-col">
+      <div className="countdown-text">Available again in:</div>
+      <div className="countdown-time">{timeLeft}</div>
+    </div>
+
+    <Button variant="dappnode" disabled={true}>
+      Backup unavailable
     </Button>
   </Card>
 );

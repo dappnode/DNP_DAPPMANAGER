@@ -13,6 +13,7 @@ export type ConsensusInfo = {
 
 export type BackupData = {
   activable: boolean;
+  timeLeft: string;
   activeValidators: number;
   maxValidators: number;
   beaconApiError: boolean;
@@ -97,6 +98,7 @@ export const useBackupNode2 = ({
     () => ({
       [Network.Mainnet]: {
         activable: true,
+        timeLeft: "5d 23h 12m 44s",
         activeValidators: 5,
         maxValidators: 10,
         beaconApiError: false,
@@ -111,6 +113,7 @@ export const useBackupNode2 = ({
       },
       [Network.Hoodi]: {
         activable: true,
+        timeLeft: "2d 10h 5m 30s",
         activeValidators: 9,
         maxValidators: 10,
         beaconApiError: true,
@@ -123,6 +126,7 @@ export const useBackupNode2 = ({
       },
       [Network.Gnosis]: {
         activable: true,
+        timeLeft: "5d 23h 12m 44s",
         activeValidators: 234,
         maxValidators: 100,
         beaconApiError: false,
@@ -135,6 +139,7 @@ export const useBackupNode2 = ({
       },
       [Network.Holesky]: {
         activable: true,
+        timeLeft: "0",
         activeValidators: 35,
         maxValidators: 15,
         beaconApiError: false,
