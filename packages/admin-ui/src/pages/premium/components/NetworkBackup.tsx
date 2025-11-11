@@ -86,25 +86,26 @@ const ConsensusCard = ({ network, consensusData }: { network: Network; consensus
 
       {currentConsensus && (
         <>
-          {currentConsensus.name && (
-            <div className={`cc-item ${currentConsensus.isPrysmOrTeku && "color-danger"}`}>
-              {prettyDnpName(currentConsensus.name)}
-            </div>
-          )}
+          <div className={`cc-item ${currentConsensus.isPrysmOrTeku && "color-danger"}`}>
+            {currentConsensus.name ? prettyDnpName(currentConsensus.name) : "-"}
+          </div>
 
-          {currentConsensus.noConsensusSelected && (
-            <div>
-              <div className="cc-warning">
-                No staking clients selected. Set up your node in the <Link to={stakersPath}> Stakers tab</Link>.
-              </div>
-            </div>
-          )}
-          {currentConsensus.isPrysmOrTeku && (
+          <div>
             <div className="cc-warning">
-              Prysm and Teku not supported. To enable the backup, switch to a different client in the{" "}
-              <Link to={stakersPath}> Stakers tab</Link>.
+              {currentConsensus.noConsensusSelected ? (
+                <div>
+                  No staking clients selected. Set up your node in the <Link to={stakersPath}> Stakers tab</Link>.
+                </div>
+              ) : currentConsensus.isPrysmOrTeku ? (
+                <div>
+                  Prysm and Teku not supported. To enable the backup, switch to a different client in the{" "}
+                  <Link to={stakersPath}> Stakers tab</Link>.
+                </div>
+              ) : (
+                <div> Compatible client selected </div>
+              )}
             </div>
-          )}
+          </div>
         </>
       )}
     </Card>
@@ -180,10 +181,10 @@ const ValidatorsCard = ({
       </div>
       {limitExceeded ? (
         <div className="validators-limit-warning">
-          You are exceeding the supported number of active validators in {capitalize(network)}.{" "}
+          You are exceeding the supported number of validators in {capitalize(network)}.{" "}
           {network !== "gnosis" && (
             <>
-              We invite you to consolidate your validators to use this service.{" "}
+              We invite you to consolidate them to use this service.{" "}
               <Link to={docsUrl.premiumBackupValidatorsLimit} {...newTabProps}>
                 Learn more
               </Link>
