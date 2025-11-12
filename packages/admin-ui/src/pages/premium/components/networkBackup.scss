@@ -153,21 +153,30 @@
     table {
       width: 100%;
       border-collapse: collapse;
+      margin-top: 5px;
     }
 
     th {
       text-align: left;
       padding: 6px 8px;
+      border-radius: 5px;
       border-bottom: 1px solid #ddd;
       cursor: pointer;
     }
 
+    th:hover,
     tr:nth-child(even) {
       background-color: var(--color-light-background-main);
     }
 
     td {
       padding: 6px 8px;
+    }
+
+    .sort-arrow {
+      display: inline-block;
+      width: 5px;
+      margin-left: 5px;
     }
   }
 }
@@ -208,6 +217,7 @@
       }
 
       .activation-history-card {
+        th:hover,
         tr:nth-child(even) {
           background-color: var(--color-dark-background-main);
         }
