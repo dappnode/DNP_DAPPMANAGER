@@ -2,7 +2,6 @@ import React from "react";
 import Button from "components/Button";
 
 import SubTitle from "components/SubTitle";
-import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
 import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   MdGroup,
@@ -25,11 +24,9 @@ import newTabProps from "utils/newTabProps";
 
 export const NetworkBackup = ({ network, networkData }: { network: Network; networkData: BackupData | undefined }) => {
   const backupData = networkData;
-  console.log("NetworkBackup backupData", backupData);
 
   return (
     <div>
-      {/*Get the network name from networkData key*/}
       {backupData ? (
         <div className="network-backup-container">
           <div className="info-cards-row">
@@ -45,15 +42,7 @@ export const NetworkBackup = ({ network, networkData }: { network: Network; netw
           {/* <ActivateCard timeLeft={backupData.timeLeft} /> */}
           <CooldownCard timeLeft={backupData.timeLeft} />
 
-          <CustomAccordion defaultOpen={false}>
-            <CustomAccordionItem header={<b>Activation history</b>}>
-              <div>
-                {backupData.activationsHistory.map((activation, index) => (
-                  <div key={index}>- {activation}</div>
-                ))}
-              </div>
-            </CustomAccordionItem>
-          </CustomAccordion>
+          <ActivationHistoryCard activationsHistory={backupData.activationsHistory} />
         </div>
       ) : (
         <p>No backup data available</p>
@@ -253,3 +242,55 @@ const CooldownCard = ({ timeLeft }: { timeLeft: string }) => (
     </Button>
   </Card>
 );
+
+const ActivationHistoryCard = ({
+  activationsHistory
+}: {
+  activationsHistory: { activation_date: Date; end_date: Date }[];
+}) => {
+  return (
+    <Card className="activation-history-card">
+      <SubTitle>Activation history</SubTitle>
+      <ActivationHistoryTable activationsHistory={activationsHistory} />
+    </Card>
+  );
+};
+
+const ActivationHistoryTable = ({
+  activationsHistory
+}: {
+  activationsHistory: { activation_date: Date; end_date: Date }[];
+}) => {
+  if (!activationsHistory?.length) return <div>No activations found.</div>;
+
+  return (
+    <div style={{ overflowX: "auto", marginTop: 12 }}>
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>#</th>
+            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>Start date</th>
+            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>End date</th>
+            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>Time spent</th>
+          </tr>
+        </thead>
+        <tbody>
+          {activationsHistory.map((activation, idx) => (
+            <tr key={idx}>
+              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>{idx + 1}</td>
+              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
+                {activation.activation_date.toLocaleString()}
+              </td>
+              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
+                {activation.end_date.toLocaleString()}
+              </td>
+              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
+                {(activation.end_date.getTime() - activation.activation_date.getTime()) / (1000 * 60 * 60)} hours
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
