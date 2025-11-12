@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "components/Button";
 
 import SubTitle from "components/SubTitle";
@@ -139,7 +139,7 @@ const ValidatorsCard = ({
 
           <div>
             <MdGroup />{" "}
-            <span className={limitExceeded ? "color-danger" : beaconApiError ? "color-warning" : undefined}>
+            <span className={limitExceeded ? "color-danger" : beaconApiError ? "orange-text" : undefined}>
               {activeValidators ?? "0"}
             </span>{" "}
             {beaconApiError && (
@@ -261,32 +261,69 @@ const ActivationHistoryTable = ({
 }: {
   activationsHistory: { activation_date: Date; end_date: Date }[];
 }) => {
+  const [sortBy, setSortBy] = useState<"number" | "start" | "end" | "duration">("number");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
   if (!activationsHistory?.length) return <div>No activations found.</div>;
 
+  const getDuration = (a: { activation_date: Date; end_date: Date }) =>
+    a.end_date.getTime() - a.activation_date.getTime();
+
+  const sorted = [...activationsHistory].sort((a, b) => {
+    let cmp = 0;
+    if (sortBy === "number") {
+      cmp = activationsHistory.indexOf(a) - activationsHistory.indexOf(b);
+    } else if (sortBy === "start") {
+      cmp = a.activation_date.getTime() - b.activation_date.getTime();
+    } else if (sortBy === "end") {
+      cmp = a.end_date.getTime() - b.end_date.getTime();
+    } else if (sortBy === "duration") {
+      cmp = getDuration(a) - getDuration(b);
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  const handleSort = (column: typeof sortBy) => {
+    if (sortBy === column) {
+      setSortDir(sortDir === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(column);
+      setSortDir("desc");
+    }
+  };
+
+  const sortArrow = (column: typeof sortBy) => (sortBy === column ? (sortDir === "asc" ? " ▲" : " ▼") : "");
+
   return (
-    <div style={{ overflowX: "auto", marginTop: 12 }}>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+    <div>
+      <table>
         <thead>
           <tr>
-            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>#</th>
-            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>Start date</th>
-            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>End date</th>
-            <th style={{ textAlign: "left", padding: "6px 8px", borderBottom: "1px solid #ddd" }}>Time spent</th>
+            <th onClick={() => handleSort("number")}>
+              #<span className="blue-text">{sortArrow("number")}</span>
+            </th>
+
+            <th onClick={() => handleSort("start")}>
+              Start date
+              <span className="blue-text">{sortArrow("start")}</span>
+            </th>
+            <th onClick={() => handleSort("end")}>
+              End date
+              <span className="blue-text">{sortArrow("end")}</span>
+            </th>
+            <th onClick={() => handleSort("duration")}>
+              Time spent
+              <span className="blue-text"> {sortArrow("duration")}</span>
+            </th>
           </tr>
         </thead>
         <tbody>
-          {activationsHistory.map((activation, idx) => (
+          {sorted.map((activation, idx) => (
             <tr key={idx}>
-              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>{idx + 1}</td>
-              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
-                {activation.activation_date.toLocaleString()}
-              </td>
-              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
-                {activation.end_date.toLocaleString()}
-              </td>
-              <td style={{ padding: "6px 8px", borderBottom: "1px solid #eee" }}>
-                {(activation.end_date.getTime() - activation.activation_date.getTime()) / (1000 * 60 * 60)} hours
-              </td>
+              <td>{activationsHistory.indexOf(activation) + 1}</td>
+              <td>{activation.activation_date.toLocaleString()}</td>
+              <td>{activation.end_date.toLocaleString()}</td>
+              <td>{getDuration(activation) / (1000 * 60 * 60)} hours</td>
             </tr>
           ))}
         </tbody>

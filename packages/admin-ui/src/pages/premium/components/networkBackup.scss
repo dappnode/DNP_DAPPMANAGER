@@ -159,11 +159,15 @@
       text-align: left;
       padding: 6px 8px;
       border-bottom: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    tr:nth-child(even) {
+      background-color: var(--color-light-background-main);
     }
 
     td {
       padding: 6px 8px;
-      border-bottom: 1px solid #eee;
     }
   }
 }
@@ -178,7 +182,7 @@
       .color-danger {
         color: red;
       }
-      .color-warning {
+      .orange-text {
         color: orange;
       }
 
@@ -200,6 +204,12 @@
         }
         .tooltip-beacon-api-error {
           color: orange;
+        }
+      }
+
+      .activation-history-card {
+        tr:nth-child(even) {
+          background-color: var(--color-dark-background-main);
         }
       }
     }
