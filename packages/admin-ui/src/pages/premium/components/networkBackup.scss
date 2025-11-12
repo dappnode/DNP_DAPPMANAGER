@@ -111,9 +111,9 @@
       }
     }
 
-    // @media (max-width: 55rem) {
-    //   flex-direction: column;
-    // }
+    @media (max-width: 55rem) {
+      flex-direction: column;
+    }
   }
 
   .action-backup-card {
