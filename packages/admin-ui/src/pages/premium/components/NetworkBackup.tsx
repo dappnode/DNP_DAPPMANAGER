@@ -292,29 +292,27 @@ const ActivationHistoryTable = ({
     }
   };
 
-  const sortArrow = (column: typeof sortBy) => (sortBy === column ? (sortDir === "asc" ? " ▲" : " ▼") : "");
+  const SortArrow = ({ column }: { column: typeof sortBy }) => {
+    const sortIcon = sortBy === column && (sortDir === "asc" ? "▲" : "▼");
+    return <span className="blue-text sort-arrow">{sortIcon}</span>;
+  };
+
+  const TableHeader = ({ column, label }: { column: typeof sortBy; label: string }) => (
+    <th onClick={() => handleSort(column)}>
+      {label}
+      <SortArrow column={column} />
+    </th>
+  );
 
   return (
     <div>
       <table>
         <thead>
           <tr>
-            <th onClick={() => handleSort("number")}>
-              #<span className="blue-text">{sortArrow("number")}</span>
-            </th>
-
-            <th onClick={() => handleSort("start")}>
-              Start date
-              <span className="blue-text">{sortArrow("start")}</span>
-            </th>
-            <th onClick={() => handleSort("end")}>
-              End date
-              <span className="blue-text">{sortArrow("end")}</span>
-            </th>
-            <th onClick={() => handleSort("duration")}>
-              Time spent
-              <span className="blue-text"> {sortArrow("duration")}</span>
-            </th>
+            <TableHeader column="number" label="#" />
+            <TableHeader column="start" label="Start date" />
+            <TableHeader column="end" label="End date" />
+            <TableHeader column="duration" label="Time spent" />
           </tr>
         </thead>
         <tbody>
