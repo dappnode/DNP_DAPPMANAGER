@@ -146,6 +146,26 @@
       }
     }
   }
+
+  .activation-history-card {
+    overflow-x: auto;
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      text-align: left;
+      padding: 6px 8px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #eee;
+    }
+  }
 }
 
 #dark {
@@ -169,7 +189,7 @@
       }
 
       .validators-card {
-        .premium-backup-validators-limit-bar {
+        .validators-limit-bar {
           background-color: var(--color-dark-background-main);
 
           .validators-curr-bar {

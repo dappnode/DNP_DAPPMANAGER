@@ -23,7 +23,7 @@ export type BackupData = {
   //   activation_date: string;
   //   end_date: string;
   // }>;
-  activationsHistory: string[];
+  activationsHistory: { activation_date: Date; end_date: Date }[];
 };
 
 export const useBackupNode2 = ({
@@ -105,10 +105,9 @@ export const useBackupNode2 = ({
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Mainnet],
         activationsHistory: [
-          // { activation_date: "2025-10-10T12:00:00Z", end_date: "2025-10-15T12:00:00Z" },
-          // { activation_date: "2025-10-20T08:00:00Z", end_date: "2025-10-25T08:00:00Z" }
-          "November 1, 2023 - 12:00 - 5 hours 23 minutes",
-          "December 15, 2023 - 09:30 - 3 hours 45 minutes"
+          { activation_date: new Date("2025-01-10T09:00:00Z"), end_date: new Date("2025-01-15T09:00:00Z") },
+          { activation_date: new Date("2025-03-05T14:30:00Z"), end_date: new Date("2025-03-10T14:30:00Z") },
+          { activation_date: new Date("2025-06-20T08:00:00Z"), end_date: new Date("2025-06-25T08:00:00Z") }
         ]
       },
       [Network.Hoodi]: {
@@ -120,8 +119,8 @@ export const useBackupNode2 = ({
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Hoodi],
         activationsHistory: [
-          "November 1, 2023 - 12:00 - 5 hours 23 minutes",
-          "December 15, 2023 - 09:30 - 3 hours 45 minutes"
+          { activation_date: new Date("2024-11-12T10:15:00Z"), end_date: new Date("2024-11-12T16:45:00Z") },
+          { activation_date: new Date("2025-02-01T07:00:00Z"), end_date: new Date("2025-02-01T12:00:00Z") }
         ]
       },
       [Network.Gnosis]: {
@@ -133,8 +132,9 @@ export const useBackupNode2 = ({
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Gnosis],
         activationsHistory: [
-          "November 1, 2023 - 12:00 - 5 hours 23 minutes",
-          "December 15, 2023 - 09:30 - 3 hours 45 minutes"
+          { activation_date: new Date("2024-09-20T18:00:00Z"), end_date: new Date("2024-09-21T18:00:00Z") },
+          { activation_date: new Date("2024-12-10T11:00:00Z"), end_date: new Date("2024-12-15T11:00:00Z") },
+          { activation_date: new Date("2025-04-01T09:00:00Z"), end_date: new Date("2025-04-06T09:00:00Z") }
         ]
       },
       [Network.Holesky]: {
@@ -146,8 +146,8 @@ export const useBackupNode2 = ({
         nextAvailableDate: null,
         consensusInfo: currentConsensus[Network.Holesky],
         activationsHistory: [
-          "November 1, 2023 - 12:00 - 5 hours 23 minutes",
-          "December 15, 2023 - 09:30 - 3 hours 45 minutes"
+          { activation_date: new Date("2025-05-10T13:00:00Z"), end_date: new Date("2025-05-10T18:00:00Z") },
+          { activation_date: new Date("2025-07-22T06:00:00Z"), end_date: new Date("2025-07-22T12:00:00Z") }
         ]
       }
     }),
