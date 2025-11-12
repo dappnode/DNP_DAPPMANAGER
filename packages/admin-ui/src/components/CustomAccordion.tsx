@@ -50,7 +50,7 @@ export function CustomAccordionItem({
       <Card>
         <Card.Header
           as="div"
-          className="custom-accordion-header"
+          className={`custom-accordion-header ${!isOpen ? "closed" : ""}`}
           role="button"
           tabIndex={0}
           onClick={toggle}
