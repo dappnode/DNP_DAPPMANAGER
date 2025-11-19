@@ -12,7 +12,7 @@ import { PackageContainer, HttpsPortalMapping, InstallPackageData, InstalledPack
 import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { prettyDnpName } from "@dappnode/utils";
-import { Log, logs } from "@dappnode/logger";
+import { Log, logs, logUserAction } from "@dappnode/logger";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable/index.js";
 
@@ -210,19 +210,31 @@ export class HttpsPortal {
         break;
       }
     }
-    if (!hasApiMapping) return false;
+    if (!hasApiMapping) {
+      logs.warn(`No API mapping found for ${dnpName} ${serviceName}`);
+      return false;
+    }
 
     // condition 2:
     // - compose external network
     const compose = new ComposeFileEditor(dnpName, isCore);
     const externalNetwork = compose.getComposeNetwork(externalNetworkName);
-    if (!externalNetwork) return false;
+    if (!externalNetwork) {
+      logs.warn(`No external network ${externalNetworkName} found in compose for ${dnpName}`);
+      return false;
+    }
     // - compose service network
     const composeServiceNetworks = compose.services()[serviceName].getNetworks();
-    if (!(externalNetworkName in composeServiceNetworks)) return false;
+    if (!(externalNetworkName in composeServiceNetworks)) {
+      logs.warn(`No network ${externalNetworkName} found in compose service ${serviceName} for ${dnpName}`);
+      return false;
+    }
     // - aliases
     const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
-    if (!aliases.includes(mappingAlias)) return false;
+    if (!aliases.includes(mappingAlias)) {
+      logs.warn(`No alias ${mappingAlias} found in compose service ${serviceName} for ${dnpName}`);
+      return false;
+    }
 
     return true;
   }
