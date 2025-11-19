@@ -5,8 +5,8 @@ import { params } from "@dappnode/params";
 // import { wrapHandler } from "../api/utils.js";
 import dns from "dns/promises";
 import net from "net";
-
 import { NetworkInspectInfo } from "dockerode";
+import { logs } from "@dappnode/logger";
 
 /**
  * Returns the HTTPS package status and PWA mapping url if it exists, otherwise adds the mapping.
@@ -68,10 +68,10 @@ async function isPwaResolvable(pwaMappingUrl: string): Promise<boolean | undefin
     if (result.length > 0) {
       return true;
     }
-    console.error("PWA Check - Pwa not Resolvable");
+    logs.error("PWA Check - Pwa not Resolvable");
     return false;
   } catch (err) {
-    console.error("PWA Check - DNS resolution failed:", err);
+    logs.error("PWA Check - DNS resolution failed:", err);
     return undefined;
   }
 }
@@ -94,8 +94,8 @@ export async function checkContainersOnPublicNetwork(): Promise<{ dappmanager: b
   const dappmanagerConnected = connectedSet.has(params.dappmanagerContainerName);
   const httpsConnected = connectedSet.has(params.httpsContainerName);
 
-  if (!dappmanagerConnected) console.error(`PWA Check - dappmanager not in "${publicNetwork}"`);
-  if (!httpsConnected) console.error(`PWA Check - https not in "${publicNetwork}"`);
+  if (!dappmanagerConnected) logs.error(`PWA Check - dappmanager not in "${publicNetwork}"`);
+  if (!httpsConnected) logs.error(`PWA Check - https not in "${publicNetwork}"`);
 
   return { dappmanager: dappmanagerConnected, httpsDnp: httpsConnected };
 }
@@ -113,7 +113,7 @@ export async function isPrivateIp(domain: string): Promise<boolean> {
 
     return (ipInt & maskInt) === (baseInt & maskInt);
   } catch (err) {
-    console.error(`PWA Check - Error while checking ${domain} private IP`, err);
+    logs.error(`PWA Check - Error while checking ${domain} private IP`, err);
     return false;
   }
 }
@@ -173,14 +173,14 @@ async function doesExternalPointToDappmanager(): Promise<boolean> {
     }
     if (!!resolvedIp && !!dappmanagerIp && resolvedIp === dappmanagerIp) return true;
     else {
-      console.error(
+      logs.error(
         `PWA Check - dappmanager.external (${resolvedIp}) does not point to dappmanager container IP (${dappmanagerIp})`
       );
 
       return false;
     }
   } catch (err) {
-    console.error("PWA Check - Error comparing dappmanager.external and dappmanager IP:", err);
+    logs.error("PWA Check - Error comparing dappmanager.external and dappmanager IP:", err);
     return false;
   }
 }
