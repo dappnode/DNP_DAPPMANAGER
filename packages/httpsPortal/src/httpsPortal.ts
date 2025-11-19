@@ -58,11 +58,7 @@ export class HttpsPortal {
     const fromSubdomain = "pwa";
     const dnpName = params.dappmanagerDnpName;
 
-    const hasMapping = (await this.getMappings()).some(
-      (mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName
-    );
-
-    if (hasMapping) {
+    if (!(await this.hasMapping(dnpName, dnpName, true))) {
       logs.info(`PWA mapping for ${dnpName} already exists.`);
       return;
     }
@@ -195,18 +191,40 @@ export class HttpsPortal {
   }
 
   /**
-   * Returns true if the container has assigned a mapping to the https-portal
+   * Returns true if the container fullfills both conditions:
+   * - assigned a mapping to the https-portal API
+   * - written external network config (+alias) in its compose file
    */
-  async hasMapping(dnpName: string, serviceName: string): Promise<boolean> {
+  async hasMapping(dnpName: string, serviceName: string, isCore: boolean): Promise<boolean> {
     if (!(await this.isRunningHttps())) return false;
+
+    // condition 1: has mapping in https-portal API
+    let hasApiMapping = false;
     const entries = await this.httpsPortalApiClient.list();
     const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
     for (const { toHost } of entries) {
       // toHost format: someDomain:80
       const alias = toHost.split(":")[0];
-      if (alias === mappingAlias) return true;
+      if (alias === mappingAlias) {
+        hasApiMapping = true;
+        break;
+      }
     }
-    return false;
+    if (!hasApiMapping) return false;
+
+    // condition 2:
+    // - compose external network
+    const compose = new ComposeFileEditor(dnpName, isCore);
+    const externalNetwork = compose.getComposeNetwork(externalNetworkName);
+    if (!externalNetwork) return false;
+    // - compose service network
+    const composeServiceNetworks = compose.services()[serviceName].getNetworks();
+    if (!(externalNetworkName in composeServiceNetworks)) return false;
+    // - aliases
+    const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
+    if (!aliases.includes(mappingAlias)) return false;
+
+    return true;
   }
 
   /**
@@ -233,7 +251,10 @@ export class HttpsPortal {
     if (containers.length === 0) return;
 
     for (const container of containers) {
-      if (pkg.dnpName === params.HTTPS_PORTAL_DNPNAME || (await this.hasMapping(pkg.dnpName, container.serviceName))) {
+      if (
+        pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
+        (await this.hasMapping(pkg.dnpName, container.serviceName, pkg.isCore))
+      ) {
         const alias = getExternalNetworkAlias({
           serviceName: container.serviceName,
           dnpName: pkg.dnpName
