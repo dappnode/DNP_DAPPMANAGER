@@ -12,7 +12,7 @@ import { PackageContainer, HttpsPortalMapping, InstallPackageData, InstalledPack
 import { HttpsPortalApiClient } from "./apiClient.js";
 import { ComposeEditor, ComposeFileEditor } from "@dappnode/dockercompose";
 import { prettyDnpName } from "@dappnode/utils";
-import { Log, logs, logUserAction } from "@dappnode/logger";
+import { Log, logs } from "@dappnode/logger";
 export { HttpsPortalApiClient };
 export { getExposableServices } from "./exposable/index.js";
 
