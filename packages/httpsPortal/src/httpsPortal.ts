@@ -58,7 +58,7 @@ export class HttpsPortal {
     const fromSubdomain = "pwa";
     const dnpName = params.dappmanagerDnpName;
 
-    if (!(await this.hasMapping(dnpName, dnpName, true))) {
+    if (await this.hasMapping(dnpName, dnpName, true)) {
       logs.info(`PWA mapping for ${dnpName} already exists.`);
       return;
     }
