@@ -38,6 +38,13 @@ export class ComposeServiceEditor {
     this.serviceName = serviceName;
   }
 
+  /**
+   * Returns the networks object for this service, always as an object
+   */
+  getNetworks(): ComposeServiceNetworksObj {
+    return parseServiceNetworks(this.get().networks || {});
+  }
+
   private getGlobalEnvsFilePath(isCore: boolean): string {
     return isCore ? params.GLOBAL_ENVS_PATH_FOR_CORE : params.GLOBAL_ENVS_PATH_FOR_DNP;
   }
