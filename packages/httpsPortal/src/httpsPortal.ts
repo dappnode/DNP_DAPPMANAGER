@@ -58,11 +58,6 @@ export class HttpsPortal {
     const fromSubdomain = "pwa";
     const dnpName = params.dappmanagerDnpName;
 
-    if (await this.hasMapping(dnpName, dnpName, true)) {
-      logs.info(`PWA mapping for ${dnpName} already exists.`);
-      return;
-    }
-
     logs.info(`Adding PWA mapping for ${dnpName}...`);
     await this.addMapping({
       fromSubdomain,
@@ -78,24 +73,15 @@ export class HttpsPortal {
    */
   async addMapping(mapping: HttpsPortalMapping): Promise<void> {
     if (!(await this.isRunningHttps())) return;
+
     const containers = await listPackageContainers();
     const container = await this.getContainerForMapping(mapping, containers);
 
     const externalNetworkAlias = getExternalNetworkAlias(container);
     const aliases = [externalNetworkAlias];
 
-    // Ensure network exists
-    const networks = await dockerListNetworks();
-    if (!networks.find((network) => network.Name === externalNetworkName)) {
-      await dockerCreateNetwork(externalNetworkName);
-    }
-
-    // Ensure the HTTPs portal container is connected to `externalNetworkName`
-    const httpsPortalContainer = containers.find((c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME);
-    if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
-    if (!this.isConnected(httpsPortalContainer)) {
-      await dockerNetworkConnect(externalNetworkName, httpsPortalContainer.containerName);
-    }
+    // Ensure external network configuration: dnpublic_network exists + https-portal connected + compose edited
+    await this.ensureExternalNetworkConfig(containers);
 
     // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
@@ -105,24 +91,21 @@ export class HttpsPortal {
       });
     }
 
-    // Call Http Portal API to add the mapping
-    await this.httpsPortalApiClient.add({
-      fromSubdomain: mapping.fromSubdomain,
-      toHost: `${externalNetworkAlias}:${mapping.port}`,
-      auth: mapping.auth,
-      external: mapping.external
-    });
+    if (!(await this.hasApiMapping(mapping.dnpName, mapping.serviceName))) {
+      logs.info(`Adding HTTPS portal mapping for ${mapping.dnpName}:${mapping.port}...`);
+      // Call Http Portal API to add the mapping
+      await this.httpsPortalApiClient.add({
+        fromSubdomain: mapping.fromSubdomain,
+        toHost: `${externalNetworkAlias}:${mapping.port}`,
+        auth: mapping.auth,
+        external: mapping.external
+      });
+    }
 
-    // Edit compose to persist the setting
-    this.addNetworkAliasCompose(container, externalNetworkName, aliases);
-
-    // Check whether DNP_HTTPS compose has external network persisted
-    const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true);
-    const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath));
-
-    if (editor.getComposeNetwork(externalNetworkName) === null) {
-      const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
-      this.addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias]);
+    if (!(await this.hasComposeNetworkAlias(mapping.dnpName, mapping.serviceName, container.isCore))) {
+      logs.info(`Persisting HTTPS portal mapping for ${mapping.dnpName}:${mapping.port} in compose...`);
+      // Edit compose to persist the setting
+      this.addNetworkAliasCompose(container, externalNetworkName, aliases);
     }
   }
 
@@ -191,55 +174,6 @@ export class HttpsPortal {
   }
 
   /**
-   * Returns true if the container fullfills both conditions:
-   * - assigned a mapping to the https-portal API
-   * - written external network config (+alias) in its compose file
-   */
-  async hasMapping(dnpName: string, serviceName: string, isCore: boolean): Promise<boolean> {
-    if (!(await this.isRunningHttps())) return false;
-
-    // condition 1: has mapping in https-portal API
-    let hasApiMapping = false;
-    const entries = await this.httpsPortalApiClient.list();
-    const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
-    for (const { toHost } of entries) {
-      // toHost format: someDomain:80
-      const alias = toHost.split(":")[0];
-      if (alias === mappingAlias) {
-        hasApiMapping = true;
-        break;
-      }
-    }
-    if (!hasApiMapping) {
-      logs.warn(`No API mapping found for ${dnpName} ${serviceName}`);
-      return false;
-    }
-
-    // condition 2:
-    // - compose external network
-    const compose = new ComposeFileEditor(dnpName, isCore);
-    const externalNetwork = compose.getComposeNetwork(externalNetworkName);
-    if (!externalNetwork) {
-      logs.warn(`No external network ${externalNetworkName} found in compose for ${dnpName}`);
-      return false;
-    }
-    // - compose service network
-    const composeServiceNetworks = compose.services()[serviceName].getNetworks();
-    if (!(externalNetworkName in composeServiceNetworks)) {
-      logs.warn(`No network ${externalNetworkName} found in compose service ${serviceName} for ${dnpName}`);
-      return false;
-    }
-    // - aliases
-    const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
-    if (!aliases.includes(mappingAlias)) {
-      logs.warn(`No alias ${mappingAlias} found in compose service ${serviceName} for ${dnpName}`);
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
    * Connect to dnpublic_network with an alias if:
    * - is HTTPS package
    * - any package with https portal mappings
@@ -265,7 +199,7 @@ export class HttpsPortal {
     for (const container of containers) {
       if (
         pkg.dnpName === params.HTTPS_PORTAL_DNPNAME ||
-        (await this.hasMapping(pkg.dnpName, container.serviceName, pkg.isCore))
+        (await this.hasApiMapping(pkg.dnpName, container.serviceName))
       ) {
         const alias = getExternalNetworkAlias({
           serviceName: container.serviceName,
@@ -342,6 +276,78 @@ export class HttpsPortal {
           // Bypass error to continue deleting mappings
           .catch((e) => logs.error(`Error removing https mapping of ${pkg.dnpName}`, e));
     }
+  }
+
+  // INTERNAL METHODS
+
+  /**
+   * Ensure external network configuration
+   * - dnpublic_network exists
+   * - https-portal container connected to dnpublic_network
+   * - https-portal compose file has external network + alias config
+   */
+  private async ensureExternalNetworkConfig(containers: PackageContainer[]): Promise<void> {
+    // Ensure network exists
+    const networks = await dockerListNetworks();
+    if (!networks.find((network) => network.Name === externalNetworkName)) {
+      await dockerCreateNetwork(externalNetworkName);
+    }
+
+    // Ensure the HTTPs portal container is connected to `externalNetworkName`
+    const httpsPortalContainer = containers.find((c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME);
+    if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
+    if (!this.isConnected(httpsPortalContainer)) {
+      await dockerNetworkConnect(externalNetworkName, httpsPortalContainer.containerName);
+    }
+
+    const httpsComposePath = ComposeEditor.getComposePath(params.HTTPS_PORTAL_DNPNAME, true);
+    const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath));
+
+    if (editor.getComposeNetwork(externalNetworkName) === null) {
+      const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
+      this.addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias]);
+    }
+  }
+
+  /**
+   * Returns weather a container has assigned or not a mapping to the https-portal API
+   */
+  private async hasApiMapping(dnpName: string, serviceName: string): Promise<boolean> {
+    const entries = await this.httpsPortalApiClient.list();
+    const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
+    for (const { toHost } of entries) {
+      // toHost format: someDomain:80
+      const alias = toHost.split(":")[0];
+      if (alias === mappingAlias) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Returns weather a compose file has written external network config (+alias) for a container:
+   * - compose external network
+   * - compose service network
+   * - aliases
+   */
+  private async hasComposeNetworkAlias(dnpName: string, serviceName: string, isCore: boolean): Promise<boolean> {
+    const compose = new ComposeFileEditor(dnpName, isCore);
+    const externalNetwork = compose.getComposeNetwork(externalNetworkName);
+    if (!externalNetwork) {
+      return false;
+    }
+    const composeServiceNetworks = compose.services()[serviceName].getNetworks();
+    if (!(externalNetworkName in composeServiceNetworks)) {
+      return false;
+    }
+    const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
+    const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
+    if (!aliases.includes(mappingAlias)) {
+      return false;
+    }
+
+    return true;
   }
 
   private async getContainerForMapping(
