@@ -26,32 +26,6 @@ export class HttpsPortal {
   }
 
   /**
-   * Remove a PWA internal mapping for dappmanager
-   */
-  async removePwaMappingIfExists(): Promise<void> {
-    const fromSubdomain = "pwa";
-    const dnpName = params.dappmanagerDnpName;
-
-    const hasMapping = (await this.getMappings()).some(
-      (mapping) => mapping.fromSubdomain === fromSubdomain && mapping.dnpName === dnpName
-    );
-
-    if (!hasMapping) {
-      logs.info(`PWA mapping for ${dnpName} does not exist.`);
-      return;
-    }
-
-    logs.info(`Removing PWA mapping for ${dnpName}...`);
-    await this.removeMapping({
-      fromSubdomain,
-      dnpName,
-      serviceName: dnpName,
-      port: 80,
-      external: false // Internal mapping, not exposed to the internet
-    });
-  }
-
-  /**
    * Add a PWA internal mapping for dappmanager
    */
   async addPwaMappingIfNotExists(): Promise<void> {
