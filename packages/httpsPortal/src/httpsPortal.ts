@@ -60,6 +60,7 @@ export class HttpsPortal {
     // Container joins external network with a designated alias (immediate)
     // Check first is it's already connected, or dockerNetworkConnect throws
     if (!this.isConnected(container)) {
+      logs.info(`Connecting ${mapping.dnpName}:${mapping.serviceName} to ${externalNetworkName} network...`);
       await dockerNetworkConnect(externalNetworkName, container.containerName, {
         Aliases: aliases
       });
@@ -271,6 +272,7 @@ export class HttpsPortal {
     const httpsPortalContainer = containers.find((c) => c.dnpName === params.HTTPS_PORTAL_DNPNAME);
     if (!httpsPortalContainer) throw Error(`HTTPs portal container not found`);
     if (!this.isConnected(httpsPortalContainer)) {
+      logs.warn(`Connecting HTTPS portal to ${externalNetworkName} network...`);
       await dockerNetworkConnect(externalNetworkName, httpsPortalContainer.containerName);
     }
 
@@ -278,6 +280,7 @@ export class HttpsPortal {
     const editor = new ComposeEditor(ComposeEditor.readFrom(httpsComposePath));
 
     if (editor.getComposeNetwork(externalNetworkName) === null) {
+      logs.warn(`Adding ${externalNetworkName} network to HTTPS portal compose...`);
       const httpsExternalAlias = getExternalNetworkAlias(httpsPortalContainer);
       this.addNetworkAliasCompose(httpsPortalContainer, externalNetworkName, [httpsExternalAlias]);
     }
@@ -293,9 +296,11 @@ export class HttpsPortal {
       // toHost format: someDomain:80
       const alias = toHost.split(":")[0];
       if (alias === mappingAlias) {
+        logs.info(`Found API mapping for ${dnpName} ${serviceName}`);
         return true;
       }
     }
+    logs.info(`No API mapping found for ${dnpName} ${serviceName}`);
     return false;
   }
 
@@ -309,18 +314,22 @@ export class HttpsPortal {
     const compose = new ComposeFileEditor(dnpName, isCore);
     const externalNetwork = compose.getComposeNetwork(externalNetworkName);
     if (!externalNetwork) {
+      logs.info(`No external network ${externalNetworkName} found in compose for ${dnpName}`);
       return false;
     }
     const composeServiceNetworks = compose.services()[serviceName].getNetworks();
     if (!(externalNetworkName in composeServiceNetworks)) {
+      logs.info(`No external network ${externalNetworkName} found in service ${serviceName} for ${dnpName}`);
       return false;
     }
     const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
     const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
     if (!aliases.includes(mappingAlias)) {
+      logs.info(`No alias ${mappingAlias} found in service ${serviceName} for ${dnpName}`);
       return false;
     }
 
+    logs.info(`External network alias found in service ${serviceName} for ${dnpName}`);
     return true;
   }
 
