@@ -322,7 +322,7 @@ export class HttpsPortal {
       logs.info(`No external network ${externalNetworkName} found in service ${serviceName} for ${dnpName}`);
       return false;
     }
-    const aliases = composeServiceNetworks[externalNetworkName].aliases || [];
+    const aliases = composeServiceNetworks[externalNetworkName]?.aliases || [];
     const mappingAlias = getExternalNetworkAlias({ serviceName, dnpName });
     if (!aliases.includes(mappingAlias)) {
       logs.info(`No alias ${mappingAlias} found in service ${serviceName} for ${dnpName}`);
