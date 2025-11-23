@@ -424,25 +424,31 @@ export class DappnodeRepository extends ApmRepository {
     carReader: CarReader;
     root: CID;
   }> {
-    // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
-    });
-    if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
+    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car&dag-scope=all&car-order=dfs&car-dups=n`;
+    let lastError: unknown;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        const res = await fetch(url, {
+          headers: { Accept: "application/vnd.ipld.car; version=1; order=dfs; dups=n" }
+        });
+        if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
 
-    // 2. Parse into a CarReader
-    const bytes = new Uint8Array(await res.arrayBuffer());
-    const carReader = await CarReader.fromBytes(bytes);
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const carReader = await CarReader.fromBytes(bytes);
 
-    // 3. Verify the root CID
-    const roots = await carReader.getRoots();
-    const root = roots[0];
-    if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
-      throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+        const expected = CID.parse(hash.replace(/^\/ipfs\//, ""));
+        const rootBlock = await carReader.get(expected);
+        if (!rootBlock) throw new Error(`CAR missing requested root block ${expected}`);
+        const root = expected // use the CID I asked for as the root for exporter
+
+        return { carReader, root };
+      } catch (e) {
+        lastError = e;
+        // Wait a bit before retrying
+        if (attempt < 2) await new Promise(r => setTimeout(r, 500));
+      }
     }
-
-    return { carReader, root };
+    throw lastError instanceof Error ? lastError : new Error(String(lastError));
   }
 
   /**
