@@ -89,8 +89,17 @@
           background-color: var(--color-light-background-main);
           border-radius: 10px;
 
-          svg {
-            margin-right: 5px;
+          .premium-backup-network-name {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            .gnosis-logo {
+              width: 1em;
+              height: 1em;
+            }
+            svg {
+              margin-right: 5px;
+            }
           }
 
           .premium-backup-cc-tag {
@@ -176,6 +185,10 @@
       .premium-backup-validators-limit-warning {
         color: var(--light-text-color);
         font-size: 0.8rem;
+
+        hr {
+          margin: 0.25rem 0;
+        }
       }
     }
   }
