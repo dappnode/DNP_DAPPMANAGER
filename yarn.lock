@@ -978,6 +978,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dappnode/cache@workspace:^0.1.0, @dappnode/cache@workspace:packages/cache":
+  version: 0.0.0-use.local
+  resolution: "@dappnode/cache@workspace:packages/cache"
+  dependencies:
+    "@types/mocha": "npm:^10"
+    lru-cache: "npm:^11.0.0"
+    mocha: "npm:^10.7.0"
+  languageName: unknown
+  linkType: soft
+
 "@dappnode/chains@workspace:^0.1.0, @dappnode/chains@workspace:packages/chains":
   version: 0.0.0-use.local
   resolution: "@dappnode/chains@workspace:packages/chains"
@@ -1011,6 +1021,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/daemons@workspace:packages/daemons"
   dependencies:
+    "@dappnode/cache": "workspace:^0.1.0"
     "@dappnode/db": "workspace:^0.1.0"
     "@dappnode/dockerapi": "workspace:^0.1.0"
     "@dappnode/dockercompose": "workspace:^0.1.0"
@@ -1047,6 +1058,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/dappmanager@workspace:packages/dappmanager"
   dependencies:
+    "@dappnode/cache": "workspace:^0.1.0"
     "@dappnode/chains": "workspace:^0.1.0"
     "@dappnode/common": "workspace:^0.1.0"
     "@dappnode/daemons": "workspace:^0.1.0"
@@ -12104,6 +12116,13 @@ __metadata:
   version: 10.4.3
   resolution: "lru-cache@npm:10.4.3"
   checksum: 10c0/ebd04fbca961e6c1d6c0af3799adcc966a1babe798f685bb84e6599266599cd95d94630b10262f5424539bc4640107e8a33aa28585374abf561d30d16f4b39fb
+  languageName: node
+  linkType: hard
+
+"lru-cache@npm:^11.0.0":
+  version: 11.2.2
+  resolution: "lru-cache@npm:11.2.2"
+  checksum: 10c0/72d7831bbebc85e2bdefe01047ee5584db69d641c48d7a509e86f66f6ee111b30af7ec3bd68a967d47b69a4b1fa8bbf3872630bd06a63b6735e6f0a5f1c8e83d
   languageName: node
   linkType: hard
 
