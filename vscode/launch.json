@@ -1,0 +1,32 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Attach: dappmanager (Docker 9229)",
+      "type": "node",
+      "request": "attach",
+      "address": "localhost",
+      "port": 9229,
+      "restart": true,
+      "sourceMaps": true,
+
+      // Map the whole repo to /app (covers all packages)
+      "localRoot": "${workspaceFolder}",
+      "remoteRoot": "/app",
+
+      // Only look at JS emitted by your server package to avoid noise
+      "outFiles": ["${workspaceFolder}/packages/*/dist/**/*.js"],
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"],
+
+      // 👇 Critical: rewrite any stale absolute prefixes to your local repo
+      "sourceMapPathOverrides": {
+        "/root/DNP_DAPPMANAGER/*": "${workspaceFolder}/*",
+        "/usr/src/app/*": "${workspaceFolder}/*",
+        "/app/*": "${workspaceFolder}/*"
+      },
+
+      // Uncomment to see mapping decisions if it still won’t bind:
+      "trace": true
+    }
+  ]
+}
