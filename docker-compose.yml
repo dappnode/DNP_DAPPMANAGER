@@ -6,7 +6,7 @@ networks:
 volumes:
   dappmanagerdnpdappnodeeth_data: {}
 services:
-  dappmanager.dnp.dappnode.eth:
+  dappmanager:
     build: .
     image: "dappmanager.dnp.dappnode.eth:0.2.71"
     container_name: DAppNodeCore-dappmanager.dnp.dappnode.eth
@@ -27,6 +27,7 @@ services:
       dncore_network:
         aliases:
           - dappmanager.dappnode
+          - dappmanager.dappmanager.dappnode
           - my.dappnode
           - dappnode.local
     logging:
