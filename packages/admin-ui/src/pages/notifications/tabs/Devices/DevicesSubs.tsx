@@ -12,6 +12,7 @@ import Loading from "components/Loading";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
 import "./devicesSubs.scss";
+import SubTitle from "components/SubTitle";
 
 export function DevicesSubs() {
   const {
@@ -32,7 +33,7 @@ export function DevicesSubs() {
   return (
     <div className="devices-subs-container">
       <div>
-        <h5>Current Device</h5>
+        <SubTitle>Current Device</SubTitle>
         <Card className="current-device-card">
           {isFullscreenOn ? (
             <div className="fullscreen-card">
@@ -93,7 +94,7 @@ export function DevicesSubs() {
         </Card>
       </div>
       <div>
-        <h5>Subscribed Devices</h5>
+        <SubTitle>Subscribed Devices</SubTitle>
 
         {subscriptionsList && subscriptionsList.length > 0 ? (
           <>
@@ -170,7 +171,9 @@ function SubscriptionCard({
             <span>{sub.alias}</span>
             {browserSubEndpoint && browserSubEndpoint === sub.endpoint && (
               <OverlayTrigger overlay={<Tooltip id="current-device">Current Device</Tooltip>} placement="top">
-                <MdBeenhere className="current-tag" />
+                <span>
+                  <MdBeenhere className="current-tag" />
+                </span>
               </OverlayTrigger>
             )}
           </>

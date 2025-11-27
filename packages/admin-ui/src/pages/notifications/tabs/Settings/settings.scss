@@ -33,6 +33,7 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
+    margin-top: var(--default-spacing);
   }
 
   .notifications-pkg-name {
@@ -43,7 +44,6 @@
   .endpoint-list-card {
     border-radius: 10px;
     background-color: #e9ecef;
-    margin: 10px 0;
     padding: 15px;
     display: flex;
     flex-direction: column;

@@ -60,15 +60,8 @@ export default function ConsensusClient({
               >
                 UPDATE
               </Button>
-              <br />
-              <br />
             </>
           )}
-          <>
-            {consensusClient.data && (
-              <div className="description">{consensusClient.data?.manifest?.shortDescription}</div>
-            )}
-          </>
         </>
       ) : null}
 

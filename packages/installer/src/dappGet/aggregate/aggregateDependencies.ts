@@ -4,6 +4,8 @@ import { sanitizeDependencies } from "../utils/sanitizeDependencies.js";
 import { DappGetDnps } from "../types.js";
 import { DappGetFetcher } from "../fetch/index.js";
 import { DappnodeInstaller } from "../../dappnodeInstaller.js";
+import { logs } from "@dappnode/logger";
+
 
 /**
  * The goal of this function is to recursively aggregate all dependencies
@@ -55,29 +57,45 @@ export default async function aggregateDependencies({
       else setVersion(dnps, name, version, {});
       // 2. Get dependencies of this specific version
       //    dependencies = { dnp-name-1: "semverRange", dnp-name-2: "/ipfs/Qmf53..."}
-      const dependencies = await dappGetFetcher
-        .dependencies(dappnodeInstaller, name, version)
-        .then(sanitizeDependencies)
-        .catch((e: Error) => {
-          e.message += `Error fetching ${name}@${version}`;
-          throw e;
-        });
+      let dependencies;
+      try {
+        dependencies = await dappGetFetcher
+          .dependencies(dappnodeInstaller, name, version)
+          .then(sanitizeDependencies);
+      } catch (e) {
+        // Remove this version if dependencies cannot be fetched
+        if (dnps[name] && dnps[name].versions) {
+          logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to fetch error: ${e?.message}`);
+          delete dnps[name].versions[version];
+        }
+        return;
+      }
 
-      // 3. Store dependencies
+      // 3. Store the dependency if it was fetched correctly
       setVersion(dnps, name, version, dependencies);
       // 4. Fetch sub-dependencies recursively
+      let subDepFailed = false;
       await Promise.all(
         Object.keys(dependencies).map(async (dependencyName) => {
-          await aggregateDependencies({
-            dappnodeInstaller,
-            name: dependencyName,
-            versionRange: dependencies[dependencyName],
-            dnps,
-            recursiveCount,
-            dappGetFetcher
-          });
+          try {
+            await aggregateDependencies({
+              dappnodeInstaller,
+              name: dependencyName,
+              versionRange: dependencies[dependencyName],
+              dnps,
+              recursiveCount,
+              dappGetFetcher
+            });
+          } catch (e) {
+            subDepFailed = true;
+          }
         })
       );
+      // If any sub-dependency failed, remove this version
+      if (subDepFailed && dnps[name] && dnps[name].versions) {
+        logs.debug(`[aggregateDependencies] Removing version ${name}@${version} due to sub-dependency failure`);
+        delete dnps[name].versions[version];
+      }
     })
   );
 }

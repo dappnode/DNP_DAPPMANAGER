@@ -10,15 +10,14 @@ import "./community.scss";
 
 export default function CommunityHome() {
   return (
-    <>
+    <div className="community-home-container">
       <Title title={title} />
 
-      <div>
+      <div className="section-spacing">
         {communityTypes.map((communityItem: CommunityItem) => (
           <Card className="text-center">
-            <SubTitle key={communityItem.title}>
-              {communityItem.title} <communityItem.icon />
-            </SubTitle>
+            <communityItem.icon />
+            <SubTitle key={communityItem.title}>{communityItem.title}</SubTitle>
             <p>{communityItem.text}</p>
             <div className="community-actions">
               {communityItem.actions.map((CommunityItemAction) => (
@@ -28,6 +27,6 @@ export default function CommunityHome() {
           </Card>
         ))}
       </div>
-    </>
+    </div>
   );
 }

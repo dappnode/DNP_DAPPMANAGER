@@ -171,6 +171,14 @@
 .badge-danger {
   background-color: var(--danger-color);
 }
+.badge-secondary,
+.badge-info {
+  background-color: var(--dappnode-gray-main-color);
+}
+.badge-warning {
+  background-color: var(--warning-color);
+  color: #433c1d;
+}
 .badge-success {
   background-color: var(--success-color);
 }

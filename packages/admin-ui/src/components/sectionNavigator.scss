@@ -2,12 +2,13 @@
   display: flex;
   border-bottom: 1px solid var(--color-light-border);
   margin-bottom: 1rem;
+  padding: 0.5rem 0;
   .item-container {
     background-color: transparent;
     border: none;
     padding-bottom: 0.3rem;
     padding-left: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
     &:not(:last-child) {
       padding-right: 1rem;
       margin-right: 1rem;

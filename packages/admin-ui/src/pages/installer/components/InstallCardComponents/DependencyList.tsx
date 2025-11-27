@@ -21,18 +21,6 @@ const SpanCenter = styled.span`
   }
 `;
 
-// const Badge = ({ text }) => (
-//   <span
-//     className={`badge badge-warning`}
-//     style={{
-//       textTransform: "capitalize",
-//       marginLeft: "6px"
-//     }}
-//   >
-//     {text}
-//   </span>
-// );
-
 interface DependencyListProps {
   deps: DependencyListItem[];
 }
@@ -53,9 +41,7 @@ const DependencyList: React.FC<DependencyListProps> = ({ deps }) => {
               <span>{prettyDnpName(name)}</span>
               <SpanCenter>
                 {from ? `Update from ${from} to ${to}` : `Installs ${to}`}
-                {updateType === "downgrade" || updateType === "major" ? (
-                  <Badge variant="danger">{updateType}</Badge>
-                ) : null}
+                {updateType === "downgrade" || updateType === "major" ? <Badge bg="danger">{updateType}</Badge> : null}
               </SpanCenter>
             </InfoContainer>
             {warningOnInstall && (

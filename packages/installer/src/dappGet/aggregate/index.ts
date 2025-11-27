@@ -3,6 +3,7 @@ import { params } from "@dappnode/params";
 // Internal
 import { safeSemver } from "../utils/safeSemver.js";
 import aggregateDependencies from "./aggregateDependencies.js";
+import { cleanupDnps } from "./cleanupDnp.js";
 import getRelevantInstalledDnps from "./getRelevantInstalledDnps.js";
 import { DappGetDnps } from "../types.js";
 import { logs } from "@dappnode/logger";
@@ -80,6 +81,17 @@ export default async function aggregate({
     dnps,
     dappGetFetcher // #### Injected dependency
   });
+
+  // Clean up the dnps graph only once after all aggregation is done
+  // IMPORTANT: This must be done right after all dependencies are aggregated
+  cleanupDnps(dnps);
+
+  // If no resolvable packages or dependencies were found, throw an error
+  if (Object.keys(dnps).length === 0) {
+    throw new Error(
+      `A dependency of the requested package "${req.name}" (version range: "${req.ver}") could not be resolved`
+    );
+  }
 
   const relevantInstalledDnps = getRelevantInstalledDnps({
     // requestedDnps = ["A", "B", "C"]

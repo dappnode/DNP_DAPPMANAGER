@@ -20,7 +20,9 @@ import { useStakerConfig } from "./useStakerConfig";
 import { AlertDismissible } from "components/AlertDismissible";
 import { docsSmooth } from "params";
 import { BsInfoCircleFill } from "react-icons/bs";
-import Card from "components/Card";
+import { CustomAccordion, CustomAccordionItem } from "components/CustomAccordion";
+import { Link } from "react-router-dom";
+
 import "./stakers.scss";
 
 export default function StakerNetwork({ network, description }: { network: Network; description: string }) {
@@ -117,7 +119,7 @@ export default function StakerNetwork({ network, description }: { network: Netwo
   }
 
   return (
-    <>
+    <div className="staker-network-container">
       {network === Network.Prater && (
         <AlertDismissible variant="warning">
           <p>
@@ -150,29 +152,45 @@ export default function StakerNetwork({ network, description }: { network: Netwo
         </AlertDismissible>
       )}
 
+      {network === Network.Sepolia && (
+        <AlertDismissible variant="info">
+          <p>
+            <BsInfoCircleFill className="smooth-alert-icon" />
+            <b>Sepolia network is not intended for staking</b>, as it only supports whitelisted validators. Running a
+            Sepolia node is still useful for L2s, infrastructure testing, and other use cases. To test staking, run a{" "}
+            <b>
+              <Link to="/stakers/hoodi">Hoodi node</Link>
+            </b>{" "}
+            instead.
+          </p>
+        </AlertDismissible>
+      )}
+
       <div className={theme === "light" ? "stakers-light" : "stakers-dark"}>
         {currentStakerConfigReq.data ? (
           <div>
-            <Card>
-              <p>
-                Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will need
-                to: <br />
-                (1) Choose an Execution Layer client <br />
-                (2) Choose a Consensus Layer client (+ validator) <br />
-                {network !== Network.Sepolia && (
-                  <>
-                    (3) Install the web3signer, which will hold the validator keys and sign <br />
-                    {network !== Network.Gnosis && network !== Network.Lukso && (
-                      <>
-                        (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
-                        profit from MEV
-                      </>
-                    )}
-                  </>
-                )}
-              </p>
-              <p className="network-description">{description}</p>
-            </Card>
+            <CustomAccordion defaultOpen={false}>
+              <CustomAccordionItem header={<>Network Description</>}>
+                <p className="network-description">{description}</p>
+                <p>
+                  Set up your Proof-of-Stake validator configuration for Ethereum and Ethereum-based chains. You will
+                  need to: <br />
+                  (1) Choose an Execution Layer client <br />
+                  (2) Choose a Consensus Layer client (+ validator) <br />
+                  {network !== Network.Sepolia && (
+                    <>
+                      (3) Install the web3signer, which will hold the validator keys and sign <br />
+                      {network !== Network.Gnosis && network !== Network.Lukso && (
+                        <>
+                          (4) Optional; delegate block-building capacities through the MEV Boost network and potentially
+                          profit from MEV
+                        </>
+                      )}
+                    </>
+                  )}
+                </p>
+              </CustomAccordionItem>
+            </CustomAccordion>
 
             <Row className="staker-network">
               <Col>
@@ -258,6 +276,6 @@ export default function StakerNetwork({ network, description }: { network: Netwo
           <ErrorView error={"No data"} hideIcon red />
         )}
       </div>
-    </>
+    </div>
   );
 }

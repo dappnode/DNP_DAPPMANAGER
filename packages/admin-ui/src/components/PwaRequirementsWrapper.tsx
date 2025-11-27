@@ -99,7 +99,7 @@ export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage
         </RequirementCard>
       ) : (
         !isOnPwaDomain && (
-          <>
+          <div className="section-spacing">
             <RequirementCard>
               <div>{handleRedirectMessage}</div>
               <Button
@@ -112,7 +112,7 @@ export function PwaRequirementsWrapper({ successComponent, handleRedirectMessage
               </Button>
             </RequirementCard>
             {continueClicked && <RedirectDiagnoseCard />}
-          </>
+          </div>
         )
       )}
     </>

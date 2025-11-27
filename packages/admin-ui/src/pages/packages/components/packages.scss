@@ -132,8 +132,20 @@
   }
 }
 
-.file-manager .subtle-header {
-  margin-bottom: 0.5rem;
+.file-manager {
+  .subtle-header {
+    margin-bottom: 0.5rem;
+  }
+  .input-group {
+    border-radius: var(--bs-border-radius);
+    overflow: hidden;
+    .custom-file-label {
+      margin-bottom: 0px;
+      padding-right: 10px;
+      display: flex;
+      align-items: center;
+    }
+  }
 }
 
 // Internal packages navigation
@@ -154,13 +166,6 @@
 
 .packages-content {
   flex: auto;
-  .section-subtitle:only-child,
-  .section-subtitle:first-child:nth-last-child(2) {
-    display: none;
-  }
-  > *:not(:last-child) {
-    margin-bottom: var(--default-spacing);
-  }
 }
 
 .pkgs-back-btn {

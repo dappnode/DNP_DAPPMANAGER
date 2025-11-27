@@ -8,7 +8,7 @@ import ErrorView from "components/ErrorView";
 import Ok from "components/Ok";
 import CardList from "components/CardList";
 import { prettyDnpName } from "utils/format";
-import { Accordion } from "react-bootstrap";
+import { Accordion, useAccordionButton } from "react-bootstrap";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 interface UpdatesInterface extends UpdateAvailable {
   dnpName: string;
@@ -37,9 +37,7 @@ export function PackageUpdates() {
     <div className="dashboard-cards">
       <div className="package-updates">
         {updatesAvailable.length === 0 ? (
-          <div className="card card-body" >
-            All packages are up to date
-          </div>
+          <div className="card card-body">All packages are up to date</div>
         ) : (
           <>
             {updatesAvailable.map((update) => (
@@ -58,30 +56,47 @@ export function PackageUpdates() {
 
 function UpdateCard({ update }: { update: UpdatesInterface }) {
   const [isOpen, setIsOpen] = useState(false);
-
   const navigate = useNavigate();
+
+  const toggle = useAccordionButton("0", () => setIsOpen((v) => !v));
 
   return (
     <div className="package-update-item">
-      <Accordion defaultActiveKey={isOpen ? "0" : "1"} className="package-update-accordion">
-        <Accordion.Toggle as={"div"} eventKey="0" onClick={() => setIsOpen(!isOpen)}>
-          <div>
-            <strong>{prettyDnpName(update.dnpName)}</strong> v{update.newVersion}
-            {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+      <Accordion activeKey={isOpen ? "0" : undefined} className="package-update-accordion">
+        <Accordion.Item eventKey="0">
+          {/* Clickable header (replaces Accordion.Toggle) */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={toggle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                toggle(e);
+              }
+            }}
+          >
+            <div>
+              <span className="dnp-name">{prettyDnpName(update.dnpName)}</span> v{update.newVersion}{" "}
+              {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+            </div>
           </div>
-          <Accordion.Collapse eventKey="0">
+
+          {/* Collapsible content (replaces Accordion.Collapse) */}
+          <Accordion.Body>
             <div>
               {Array.isArray(update.upstreamVersion) && update.upstreamVersion.length > 0 && (
                 <ul className="package-update-details">
-                  {update.upstreamVersion.map((upstreamVersion) => (
-                    <li>{upstreamVersion}</li>
-                  ))}{" "}
+                  {update.upstreamVersion.map((upstreamVersion, i) => (
+                    <li key={`${upstreamVersion}-${i}`}>{upstreamVersion}</li>
+                  ))}
                 </ul>
               )}
             </div>
-          </Accordion.Collapse>
-        </Accordion.Toggle>{" "}
+          </Accordion.Body>
+        </Accordion.Item>
       </Accordion>
+
       <div className="package-update-actions">
         <Button onClick={() => navigate(`${getInstallerPath(update.dnpName)}/${update.dnpName}`)} variant="dappnode">
           Update

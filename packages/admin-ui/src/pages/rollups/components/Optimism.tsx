@@ -106,7 +106,7 @@ export default function Optimism({ description }: { description: string }) {
   }
 
   return (
-    <div className={theme === "light" ? "optimism-light" : "optimism-dark"}>
+    <div className={`optimism-container section-spacing ${theme === "light" ? "optimism-light" : "optimism-dark"}`}>
       <OpCommunity />
       {currentOptimismConfigReq.data ? (
         <>

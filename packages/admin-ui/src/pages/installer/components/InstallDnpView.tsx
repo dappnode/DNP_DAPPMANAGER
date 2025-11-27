@@ -338,7 +338,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
   }
 
   return (
-    <>
+    <div className="section-spacing">
       {progressLogs ? (
         <Card noscroll>
           <ProgressLogsView progressLogs={progressLogs} />
@@ -416,7 +416,7 @@ const InstallDnpView: React.FC<InstallDnpViewProps> = ({ dnp, progressLogs }) =>
             <Route key={route.subPath} path={route.subPath} element={<>{route.render && route.render()}</>} />
           ))}
       </Routes>
-    </>
+    </div>
   );
 };
 

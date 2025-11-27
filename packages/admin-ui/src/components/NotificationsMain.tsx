@@ -1,13 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import RenderMarkdown from "components/RenderMarkdown";
 import Button, { ButtonVariant } from "components/Button";
 import { api, useApi } from "api";
 import { Notification, Priority } from "@dappnode/types";
 import { MdClose } from "react-icons/md";
-import { Accordion } from "react-bootstrap";
+import { Accordion, AccordionContext, useAccordionButton } from "react-bootstrap";
 import { dappmanagerAliases, externalUrlProps } from "params";
 import { resolveDappnodeUrl } from "utils/resolveDappnodeUrl";
+import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import "./notificationsMain.scss";
 
 /**
@@ -94,7 +95,6 @@ const priorityBtnVariants: Record<Priority, ButtonVariant> = {
   [Priority.high]: "warning",
   [Priority.critical]: "danger"
 };
-
 export function CollapsableBannerNotification({
   notification,
   onClose
@@ -102,7 +102,6 @@ export function CollapsableBannerNotification({
   notification: Notification;
   onClose: () => void;
 }) {
-  const [isOpen, setIsOpen] = useState(notification.priority === Priority.critical);
   const [hasClosed, setHasClosed] = useState(false);
 
   const handleClose = () => {
@@ -114,38 +113,75 @@ export function CollapsableBannerNotification({
   const isExternalUrl =
     notification.callToAction && !dappmanagerAliases.some((alias) => notification.callToAction!.url.includes(alias));
 
+  // open by default if critical
+  const defaultKey = notification.priority === Priority.critical ? "0" : undefined;
+  const BannerToggle: React.FC<{
+    eventKey: string;
+    className?: string;
+    children: React.ReactNode;
+    title: string;
+  }> = ({ eventKey, className, children, title }) => {
+    const onClick = useAccordionButton(eventKey);
+    const { activeEventKey } = useContext(AccordionContext);
+    const isOpen = activeEventKey === eventKey || (Array.isArray(activeEventKey) && activeEventKey.includes(eventKey));
+    return (
+      <div
+        role="button"
+        onClick={onClick}
+        className={className}
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onClick(e);
+          }
+        }}
+      >
+        <div className="banner-header">
+          <h5 className="banner-title">
+            {title}
+            {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </h5>
+          <button
+            className="close-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleClose();
+            }}
+          >
+            <MdClose />
+          </button>
+        </div>
+        {children}
+      </div>
+    );
+  };
+
+  if (hasClosed) return null;
+
   return (
-    !hasClosed && (
-      <Accordion defaultActiveKey={isOpen ? "0" : "1"}>
-        <Accordion.Toggle
-          as={"div"}
+    <Accordion defaultActiveKey={defaultKey}>
+      <Accordion.Item eventKey="0">
+        <BannerToggle
           eventKey="0"
-          onClick={() => setIsOpen(!isOpen)}
           className={`banner-card ${notification.priority}-priority`}
+          title={notification.title}
         >
-          <div className="banner-header">
-            <h5>{notification.title}</h5>
-            <button className="close-btn" onClick={handleClose}>
-              <MdClose />
-            </button>
-          </div>
-          <Accordion.Collapse eventKey="0">
-            <div className="banner-body">
-              <RenderMarkdown source={notification.body} />
-              {notification.callToAction && (
-                <NavLink
-                  to={resolveDappnodeUrl(notification.callToAction.url, window.location)}
-                  {...(isExternalUrl ? externalUrlProps : {})}
-                >
-                  <Button variant={priorityBtnVariants[notification.priority]}>
-                    <div className="btn-text">{notification.callToAction.title}</div>
-                  </Button>
-                </NavLink>
-              )}
-            </div>
-          </Accordion.Collapse>
-        </Accordion.Toggle>
-      </Accordion>
-    )
+          <Accordion.Body className="banner-body">
+            <RenderMarkdown source={notification.body} />
+            {notification.callToAction && (
+              <NavLink
+                to={resolveDappnodeUrl(notification.callToAction.url, window.location)}
+                {...(isExternalUrl ? externalUrlProps : {})}
+              >
+                <Button variant={priorityBtnVariants[notification.priority]}>
+                  <div className="btn-text">{notification.callToAction.title}</div>
+                </Button>
+              </NavLink>
+            )}
+          </Accordion.Body>
+        </BannerToggle>
+      </Accordion.Item>
+    </Accordion>
   );
 }
