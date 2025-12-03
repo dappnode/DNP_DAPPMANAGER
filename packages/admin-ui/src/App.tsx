@@ -18,6 +18,7 @@ import { NoConnection } from "start-pages/NoConnection";
 import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
+import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -89,6 +90,7 @@ function MainApp({ username }: { username: string }) {
         <TopBar username={username} appContext={appContext} />
         <div id="main">
           <ErrorBoundary>
+            <LocalProxyBanner />
             <NotificationsMain />
           </ErrorBoundary>
           <PwaPermissionsAlert />
