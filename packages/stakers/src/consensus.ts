@@ -32,7 +32,9 @@ export class Consensus extends StakerComponent {
     [Network.Holesky]: db.consensusClientHolesky,
     [Network.Sepolia]: db.consensusClientSepolia,
     [Network.Hoodi]: db.consensusClientHoodi,
-    [Network.Lukso]: db.consensusClientLukso
+    [Network.Lukso]: db.consensusClientLukso,
+    [Network.StarknetMainnet]: { get: () => null, set: async () => {} },
+    [Network.StarknetSepolia]: { get: () => null, set: async () => {} }
   };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -75,7 +77,9 @@ export class Consensus extends StakerComponent {
     [Network.Lukso]: [
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
       { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" }
-    ]
+    ],
+    [Network.StarknetMainnet]: [],
+    [Network.StarknetSepolia]: []
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
