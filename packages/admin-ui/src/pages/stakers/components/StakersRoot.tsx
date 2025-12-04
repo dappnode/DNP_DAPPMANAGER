@@ -2,6 +2,7 @@ import React from "react";
 import Title from "components/Title";
 import { title } from "../data";
 import StakerNetwork from "./StakerNetwork";
+import Starknet from "pages/rollups/components/Starknet";
 import Optimism from "pages/rollups/components/Optimism";
 import { Network } from "@dappnode/types";
 import { SectionNavigator } from "components/SectionNavigator";
@@ -77,6 +78,26 @@ const availableRoutes: RouteType[] = [
       <StakerNetwork
         network={Network.Lukso}
         description="The LUKSO Blockchain is a next-gen, Ethereum-based platform designed specifically for the fashion, gaming, design, and social media industries, focusing on creating a new digital lifestyle space. It introduces standards for digital certificates of authenticity and ownership, enabling the development of unique digital identities, assets, and experiences through blockchain technology."
+      />
+    )
+  },
+  {
+    subPath: "starknet",
+    name: "Starknet",
+    element: (
+      <Starknet
+        network={Network.StarknetMainnet}
+        description="Starknet is a permissionless decentralized Layer 2 validity rollup (also known as a 'ZK-Rollup') that operates as a scaling solution for Ethereum. It leverages STARK cryptographic proofs to enable secure, high-throughput transactions while inheriting Ethereum's security guarantees. Starknet supports general-purpose computation through its Cairo programming language, making it suitable for complex decentralized applications."
+      />
+    )
+  },
+  {
+    subPath: "starknet-sepolia",
+    name: "Starknet Sepolia",
+    element: (
+      <Starknet
+        network={Network.StarknetSepolia}
+        description="Starknet Sepolia is the public testnet for Starknet, providing developers with a pre-production environment to test their applications. It mirrors the mainnet architecture and allows developers to experiment with Starknet's features, deploy smart contracts written in Cairo, and test integrations before deploying to the Starknet mainnet."
       />
     )
   },

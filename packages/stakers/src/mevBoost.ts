@@ -22,7 +22,9 @@ export class MevBoost extends StakerComponent {
     [Network.Holesky]: db.mevBoostHolesky,
     [Network.Sepolia]: db.mevBoostSepolia,
     [Network.Hoodi]: db.mevBoostHoodi,
-    [Network.Lukso]: db.mevBoostLukso
+    [Network.Lukso]: db.mevBoostLukso,
+    [Network.StarknetMainnet]: { get: () => false, set: async () => {} },
+    [Network.StarknetSepolia]: { get: () => false, set: async () => {} }
   };
 
   protected static readonly CompatibleMevBoost: Record<Network, { dnpName: string; minVersion: string } | null> = {
@@ -44,7 +46,9 @@ export class MevBoost extends StakerComponent {
       minVersion: "0.1.0"
     },
     [Network.Lukso]: null,
-    [Network.Sepolia]: null
+    [Network.Sepolia]: null,
+    [Network.StarknetMainnet]: null,
+    [Network.StarknetSepolia]: null
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {

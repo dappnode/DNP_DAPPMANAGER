@@ -1,7 +1,7 @@
 import { Routes, Network } from "@dappnode/types";
 
 export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> = {
-  stakerConfigSet: async () => {},
+  stakerConfigSet: async () => { },
   stakerConfigGet: async ({ network }: { network: Network }) => {
     switch (network) {
       case "mainnet":
@@ -1673,6 +1673,180 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
             }
           },
           feeRecipient: "0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
+        };
+      case "starknet":
+        return {
+          executionClients: [
+            {
+              status: "ok",
+              dnpName: "juno.dnp.dappnode.eth",
+              isInstalled: false,
+              isRunning: false,
+              isUpdated: false,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                manifest: {
+                  name: "juno.dnp.dappnode.eth",
+                  description: "Juno - Starknet full node client",
+                  shortDescription: "Juno Starknet client",
+                  version: "0.1.0"
+                }
+              }
+            },
+            {
+              status: "ok",
+              dnpName: "pathfinder.dnp.dappnode.eth",
+              isInstalled: false,
+              isRunning: false,
+              isUpdated: false,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                manifest: {
+                  name: "pathfinder.dnp.dappnode.eth",
+                  description: "Pathfinder - Starknet full node client",
+                  shortDescription: "Pathfinder Starknet client",
+                  version: "0.1.0"
+                }
+              }
+            }
+          ],
+          consensusClients: [],
+          web3Signer: {
+            status: "ok",
+            dnpName: "starknetstaking.dnp.dappnode.eth",
+            isInstalled: false,
+            isRunning: false,
+            isUpdated: false,
+            isSelected: false,
+            avatarUrl: "",
+            data: {
+              dnpName: "package",
+              reqVersion: "0.1.0",
+              semVersion: "0.1.0",
+              imageFile: {
+                hash: "QM..",
+                source: "ipfs",
+                size: 123
+              },
+              warnings: {},
+              signedSafe: true,
+              manifest: {
+                name: "starknetstaking.dnp.dappnode.eth",
+                description: "Starknet Staking Application",
+                shortDescription: "Starknet Staking",
+                version: "0.1.0"
+              }
+            }
+          }
+        };
+      case "starknet-sepolia":
+        return {
+          executionClients: [
+            {
+              status: "ok",
+              dnpName: "juno-sepolia.dnp.dappnode.eth",
+              isInstalled: false,
+              isRunning: false,
+              isUpdated: false,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                manifest: {
+                  name: "juno-sepolia.dnp.dappnode.eth",
+                  description: "Juno - Starknet Sepolia full node client",
+                  shortDescription: "Juno Starknet Sepolia",
+                  version: "0.1.0"
+                }
+              }
+            },
+            {
+              status: "ok",
+              dnpName: "pathfinder-sepolia.dnp.dappnode.eth",
+              isInstalled: false,
+              isRunning: false,
+              isUpdated: false,
+              isSelected: false,
+              avatarUrl: "",
+              data: {
+                dnpName: "package",
+                reqVersion: "0.1.0",
+                semVersion: "0.1.0",
+                imageFile: {
+                  hash: "QM..",
+                  source: "ipfs",
+                  size: 123
+                },
+                warnings: {},
+                signedSafe: true,
+                manifest: {
+                  name: "pathfinder-sepolia.dnp.dappnode.eth",
+                  description: "Pathfinder - Starknet Sepolia full node client",
+                  shortDescription: "Pathfinder Starknet Sepolia",
+                  version: "0.1.0"
+                }
+              }
+            }
+          ],
+          consensusClients: [],
+          web3Signer: {
+            status: "ok",
+            dnpName: "starknetstaking.dnp.dappnode.eth",
+            isInstalled: false,
+            isRunning: false,
+            isUpdated: false,
+            isSelected: false,
+            avatarUrl: "",
+            data: {
+              dnpName: "package",
+              reqVersion: "0.1.0",
+              semVersion: "0.1.0",
+              imageFile: {
+                hash: "QM..",
+                source: "ipfs",
+                size: 123
+              },
+              warnings: {},
+              signedSafe: true,
+              manifest: {
+                name: "starknetstaking.dnp.dappnode.eth",
+                description: "Starknet Staking Application",
+                shortDescription: "Starknet Staking",
+                version: "0.1.0"
+              }
+            }
+          }
         };
       default:
         throw Error(`Unknown network ${network}`);

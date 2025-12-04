@@ -3,11 +3,11 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Network, networksByType } from "@dappnode/types";
 import { RouteType } from "types";
 import StakerNetwork from "pages/stakers/components/StakerNetwork";
+import Starknet from "pages/rollups/components/Starknet";
 
-const isStakerRoute = (r: RouteType) => React.isValidElement(r.element) && r.element.type === StakerNetwork;
-
-const netOf = (r: RouteType): Network | undefined =>
-  isStakerRoute(r) ? (r.element as React.ReactElement).props?.network : undefined;
+const isStakerRoute = (r: RouteType) =>
+  React.isValidElement(r.element) && (r.element.type === StakerNetwork || r.element.type === Starknet); const netOf = (r: RouteType): Network | undefined =>
+    isStakerRoute(r) ? (r.element as React.ReactElement).props?.network : undefined;
 
 const testSet = new Set(networksByType.testnets);
 const mainSet = new Set(networksByType.mainnets);
@@ -33,8 +33,8 @@ export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
     currentRoute?.subPath === "optimism"
       ? false // Optimism is mainnet (exception)
       : currentRoute && isStakerRoute(currentRoute)
-      ? testSet.has(netOf(currentRoute) as Network)
-      : false;
+        ? testSet.has(netOf(currentRoute) as Network)
+        : false;
 
   // filter routes for current selection
   const filteredRoutes = React.useMemo(
