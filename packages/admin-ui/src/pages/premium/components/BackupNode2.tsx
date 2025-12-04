@@ -8,6 +8,7 @@ import { RouteType } from "types";
 import { Card } from "react-bootstrap";
 import { NetworkBackup } from "./NetworkBackup";
 import { availableNetworks, useBackupNode2 } from "hooks/useBackupNodev2";
+import { Network } from "@dappnode/types";
 
 export function BackupNode2({
   isActivated: isPremium,
@@ -26,12 +27,12 @@ export function BackupNode2({
       window.location.pathname === `/${basePath}/${subPaths.backupNode2}` ||
       window.location.pathname === `/${basePath}/${subPaths.backupNode2}/`
     )
-      navigate(`${availableNetworks[0]}`);
+      navigate(`ethereum`);
   }, []);
 
   const routes: RouteType[] = availableNetworks.map((network) => ({
-    name: `${network}`,
-    subPath: `${network}`,
+    name: network === Network.Mainnet ? "Ethereum" : `${network}`,
+    subPath: network === Network.Mainnet ? "ethereum" : `${network}`,
     element: <NetworkBackup network={network} networkData={fakeBackupData[network]} />
   }));
 
@@ -44,13 +45,14 @@ export function BackupNode2({
             problems attesting.
           </p>
           <ul>
-            <li>Provides 7-day backup coverage to diagnose and fix issues</li>
-            <li>By default, it covers up to 10 validators per available network</li>
-            <li>The backup service can be used once a month per user</li>
+            <li>Available in Ethereum, Gnosis and Hoodi.</li>
+            <li>Provides 168h of backup coverage per month in each network.</li>
             <li>
-              After activating the backup, you'll need to wait 2 epochs (≈13 minutes) for your validators to start
-              attesting
+              You can activate and deactivate the backup at any moment. You will only spend time when the backup is
+              active in the selected network.
             </li>
+            <li>After activating the backup, you will need to wait 2 epochs (13 min) to start attesting.</li>
+            <li>Each network has its own validator limit. Check Active validators below.</li>
           </ul>
         </div>
         {!isPremium && (

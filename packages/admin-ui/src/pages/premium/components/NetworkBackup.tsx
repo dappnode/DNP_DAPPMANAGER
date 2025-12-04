@@ -39,8 +39,8 @@ export const NetworkBackup = ({ network, networkData }: { network: Network; netw
             />
           </div>
 
-          {/* <ActivateCard timeLeft={backupData.timeLeft} /> */}
-          <CooldownCard timeLeft={backupData.timeLeft} />
+          <ActivateCard timeLeft={backupData.timeLeft} />
+          {/* <CooldownCard timeLeft={backupData.timeLeft} /> */}
 
           <ActivationHistoryCard activationsHistory={backupData.activationsHistory} />
         </div>
@@ -75,15 +75,18 @@ const ConsensusCard = ({ network, consensusData }: { network: Network; consensus
 
       {currentConsensus && (
         <>
-          <div className={`cc-item ${currentConsensus.isPrysmOrTeku && "color-danger"}`}>
-            {currentConsensus.name ? prettyDnpName(currentConsensus.name) : "-"}
+          <div
+            className={`cc-item ${(currentConsensus.isPrysmOrTeku || currentConsensus.noConsensusSelected) &&
+              "color-danger"}`}
+          >
+            {currentConsensus.name ? prettyDnpName(currentConsensus.name) : "No staking clients selected"}
           </div>
 
           <div>
             <div className="cc-warning">
               {currentConsensus.noConsensusSelected ? (
                 <div>
-                  No staking clients selected. Set up your node in the <Link to={stakersPath}> Stakers tab</Link>.
+                  Set up your staking clients in the <Link to={stakersPath}> Stakers tab</Link>.
                 </div>
               ) : currentConsensus.isPrysmOrTeku ? (
                 <div>
@@ -146,7 +149,7 @@ const ValidatorsCard = ({
               <OverlayTrigger
                 overlay={
                   <Tooltip id="beacon-api-error">
-                    Error fetching {capitalize(network)} validators status. All keystores imported in your
+                    Error fetching {capitalize(network)} validators status. All keystores imported in your{" "}
                     {capitalize(network)} Web3Signer are being considered as active validators.
                   </Tooltip>
                 }
@@ -170,18 +173,16 @@ const ValidatorsCard = ({
       </div>
       {limitExceeded ? (
         <div className="validators-limit-warning">
-          You are exceeding the supported number of validators in {capitalize(network)}.{" "}
-          {network !== "gnosis" && (
-            <>
-              We invite you to consolidate them to use this service.{" "}
-              <Link to={docsUrl.premiumBackupValidatorsLimit} {...newTabProps}>
-                Learn more
-              </Link>
-            </>
-          )}
+          You are exceeding the supported number of validators in {capitalize(network)}. Want to back up all your
+          validators?{" "}
+          <Link to={docsUrl.premiumBackupValidatorsLimit} {...newTabProps}>
+            Read docs
+          </Link>
         </div>
       ) : (
-        <div className="validators-limit-desc">Up to {maxValidators ?? "—"} validators supported per network.</div>
+        <div className="validators-limit-desc">
+          Up to {maxValidators ?? "—"} validators supported in {capitalize(network)}.
+        </div>
       )}
     </Card>
   );
