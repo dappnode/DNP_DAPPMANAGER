@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
+import { BeaconBackupNetworkStatus, IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -413,12 +413,18 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   },
   premiumBeaconBackupActivate: async () => {},
   premiumBeaconBackupDeactivate: async () => {},
-  premiumBeaconBackupStatus: async () => ({
-    validatorLimit: 10,
-    isActivable: false,
-    isActive: true,
-    secondsUntilDeactivation: 259200
-  }),
+  premiumBeaconBackupStatus: async (): Promise<Record<string, BeaconBackupNetworkStatus>> => {
+    return {
+      mainnet: {
+        validatorLimit: 100,
+        isActivable: true,
+        secondsUntilActivable: 0,
+        isActive: false,
+        activeTimeLeft: "0s"
+        // secondsUntilDeactivation is optional and can be omitted or set to undefined
+      }
+    };
+  },
   keystoresGetByNetwork: async () => ({
     mainnet: { solo: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
     hoodi: null

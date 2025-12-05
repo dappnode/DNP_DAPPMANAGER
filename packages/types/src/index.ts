@@ -10,6 +10,7 @@ export * from "./releaseFiles.js";
 export * from "./routes.js";
 export * from "./subscriptions.js";
 export * from "./notifications.js";
+export * from "./beaconBackup.js";
 
 // utils
 export * from "./utils/index.js";
