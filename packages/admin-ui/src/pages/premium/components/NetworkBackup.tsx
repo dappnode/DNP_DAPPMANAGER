@@ -6,7 +6,7 @@ import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   MdGroup,
   MdInfoOutline,
-  MdOutlineAccessTime,
+  // MdOutlineAccessTime,
   MdOutlineBackup,
   MdOutlineCheckCircleOutline,
   MdWarningAmber
@@ -21,25 +21,55 @@ import { basePath as stakersBasePath } from "pages/stakers/data";
 import { capitalize } from "utils/strings";
 import { docsUrl } from "params";
 import newTabProps from "utils/newTabProps";
+import Loading from "components/Loading";
 
-export const NetworkBackup = ({ network, networkData }: { network: Network; networkData: BackupData | undefined }) => {
+export const NetworkBackup = ({
+  network,
+  networkData,
+  isLoading
+}: {
+  network: Network;
+  networkData: BackupData | undefined;
+  isLoading: boolean;
+}) => {
   const backupData = networkData;
+  const valLimitExceeded = (backupData && backupData?.activeValidators > backupData?.maxValidators) || false;
+  const noConsensusSelected = (backupData && backupData.consensusInfo?.noConsensusSelected) || false;
+  const consensusPrysmOrTeku = (backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku) || false;
+  console.log("!noConsensusSelected", noConsensusSelected);
+  console.log("prysmteku", backupData!.consensusInfo?.isPrysmOrTeku);
+
+  console.log("consensusPrysmOrTeku", consensusPrysmOrTeku);
+  console.log(backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku);
 
   return (
     <div>
-      {backupData ? (
+      {isLoading ? (
+        <Loading steps={["Loading network backup data..."]} />
+      ) : backupData ? (
         <div className="network-backup-container">
           <div className="info-cards-row">
-            <ConsensusCard network={network} consensusData={backupData.consensusInfo} />
+            <ConsensusCard
+              network={network}
+              consensusData={backupData.consensusInfo}
+              noConsensusSelected={noConsensusSelected}
+              consensusPrysmOrTeku={consensusPrysmOrTeku}
+            />
             <ValidatorsCard
               network={network}
               activeValidators={backupData.activeValidators}
               maxValidators={backupData.maxValidators}
+              valLimitExceeded={valLimitExceeded}
               beaconApiError={backupData.beaconApiError}
             />
           </div>
 
-          <ActivateCard timeLeft={backupData.timeLeft} />
+          <ActivateCard
+            timeLeft={backupData.timeLeft}
+            valLimitExceeded={valLimitExceeded}
+            noConsensusSelected={noConsensusSelected}
+            consensusPrysmOrTeku={consensusPrysmOrTeku}
+          />
           {/* <CooldownCard timeLeft={backupData.timeLeft} /> */}
 
           <ActivationHistoryCard activationsHistory={backupData.activationsHistory} />
@@ -51,7 +81,17 @@ export const NetworkBackup = ({ network, networkData }: { network: Network; netw
   );
 };
 
-const ConsensusCard = ({ network, consensusData }: { network: Network; consensusData: ConsensusInfo | undefined }) => {
+const ConsensusCard = ({
+  network,
+  consensusData,
+  noConsensusSelected,
+  consensusPrysmOrTeku
+}: {
+  network: Network;
+  consensusData: ConsensusInfo | undefined;
+  noConsensusSelected: boolean;
+  consensusPrysmOrTeku: boolean;
+}) => {
   const currentConsensus = consensusData;
   const stakersPath = `/${stakersBasePath}/${network === "mainnet" ? "ethereum" : network}`;
 
@@ -75,20 +115,17 @@ const ConsensusCard = ({ network, consensusData }: { network: Network; consensus
 
       {currentConsensus && (
         <>
-          <div
-            className={`cc-item ${(currentConsensus.isPrysmOrTeku || currentConsensus.noConsensusSelected) &&
-              "color-danger"}`}
-          >
+          <div className={`cc-item ${(noConsensusSelected || consensusPrysmOrTeku) && "color-danger"}`}>
             {currentConsensus.name ? prettyDnpName(currentConsensus.name) : "No staking clients selected"}
           </div>
 
           <div>
             <div className="cc-warning">
-              {currentConsensus.noConsensusSelected ? (
+              {noConsensusSelected ? (
                 <div>
                   Set up your staking clients in the <Link to={stakersPath}> Stakers tab</Link>.
                 </div>
-              ) : currentConsensus.isPrysmOrTeku ? (
+              ) : consensusPrysmOrTeku ? (
                 <div>
                   Prysm and Teku not supported. To enable the backup, switch to a different client in the{" "}
                   <Link to={stakersPath}> Stakers tab</Link>.
@@ -108,14 +145,15 @@ const ValidatorsCard = ({
   network,
   activeValidators,
   maxValidators,
+  valLimitExceeded,
   beaconApiError
 }: {
   network: Network;
   activeValidators: number;
   maxValidators: number;
+  valLimitExceeded: boolean;
   beaconApiError: boolean;
 }) => {
-  const limitExceeded = activeValidators > maxValidators;
   const barPercentage = maxValidators ? Math.min((activeValidators / maxValidators) * 100, 100) : 100;
 
   return (
@@ -138,11 +176,11 @@ const ValidatorsCard = ({
 
       <div className="validators-item">
         <div className="validators-item-row">
-          <i className={limitExceeded ? "color-danger" : ""}>Your active validators</i>
+          <i className={valLimitExceeded ? "color-danger" : ""}>Your active validators</i>
 
           <div>
             <MdGroup />{" "}
-            <span className={limitExceeded ? "color-danger" : beaconApiError ? "orange-text" : undefined}>
+            <span className={valLimitExceeded ? "color-danger" : beaconApiError ? "orange-text" : undefined}>
               {activeValidators ?? "0"}
             </span>{" "}
             {beaconApiError && (
@@ -166,12 +204,12 @@ const ValidatorsCard = ({
 
         <div className="validators-limit-bar">
           <div
-            className={`validators-curr-bar ${limitExceeded && "color-danger"}`}
+            className={`validators-curr-bar ${valLimitExceeded && "color-danger"}`}
             style={{ width: `${barPercentage}%` }}
           />
         </div>
       </div>
-      {limitExceeded ? (
+      {valLimitExceeded ? (
         <div className="validators-limit-warning">
           You are exceeding the supported number of validators in {capitalize(network)}. Want to back up all your
           validators?{" "}
@@ -188,21 +226,32 @@ const ValidatorsCard = ({
   );
 };
 
-const ActivateCard = ({ timeLeft }: { timeLeft: string }) => (
+const ActivateCard = ({
+  timeLeft,
+  valLimitExceeded,
+  noConsensusSelected,
+  consensusPrysmOrTeku
+}: {
+  timeLeft: string;
+  valLimitExceeded: boolean;
+  noConsensusSelected: boolean;
+  consensusPrysmOrTeku: boolean;
+}) => (
   <Card className="action-backup-card">
     <div className="action-backup-col">
       <MdOutlineBackup className="blue-text action-icon" />
-      <SubTitle className="blue-text">Ready to activate </SubTitle>
+      <SubTitle className="blue-text">Ready to activate</SubTitle>
     </div>
-
-    <div>Your backup service is ready to cover your validators for: </div>
     <div className="action-backup-col">
-      <div className="countdown-text">Available time remaining:</div>
+      <div className="countdown-text">Available time remaining</div>
       <div className="countdown-time">{timeLeft}</div>
     </div>
     <Button variant="dappnode" onClick={() => {}}>
       Activate Backup
     </Button>
+    {valLimitExceeded && <div className="color-danger">Validator limit exceeded</div>}
+    {consensusPrysmOrTeku && <div className="color-danger">Clients are not supported</div>}
+    {noConsensusSelected && <div className="color-danger">No staking clients selected</div>}
   </Card>
 );
 
@@ -216,7 +265,7 @@ const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
 
     <div>Your validators are protected by backup coverage</div>
     <div className="action-backup-col">
-      <div className="countdown-text">Auto-deactivation in:</div>
+      <div className="countdown-text">Auto-deactivation in</div>
       <div className="countdown-time">{timeLeft}</div>
     </div>
     <Button variant="danger" onClick={() => {}}>
@@ -225,24 +274,24 @@ const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
   </Card>
 );
 
-const CooldownCard = ({ timeLeft }: { timeLeft: string }) => (
-  <Card className="action-backup-card">
-    <div className="action-backup-col">
-      <MdOutlineAccessTime className="orange-text action-icon" />
-      <SubTitle className="orange-text">Cooldown Period</SubTitle>
-    </div>
-    <div>Backup cannot be reactivated during cooldown</div>
+// const CooldownCard = ({ timeLeft }: { timeLeft: string }) => (
+//   <Card className="action-backup-card">
+//     <div className="action-backup-col">
+//       <MdOutlineAccessTime className="orange-text action-icon" />
+//       <SubTitle className="orange-text">Cooldown Period</SubTitle>
+//     </div>
+//     <div>Backup cannot be reactivated during cooldown</div>
 
-    <div className="action-backup-col">
-      <div className="countdown-text">Available again in:</div>
-      <div className="countdown-time">{timeLeft}</div>
-    </div>
+//     <div className="action-backup-col">
+//       <div className="countdown-text">Available again in</div>
+//       <div className="countdown-time">{timeLeft}</div>
+//     </div>
 
-    <Button variant="dappnode" disabled={true}>
-      Backup unavailable
-    </Button>
-  </Card>
-);
+//     <Button variant="dappnode" disabled={true}>
+//       Backup unavailable
+//     </Button>
+//   </Card>
+// );
 
 const ActivationHistoryCard = ({
   activationsHistory
