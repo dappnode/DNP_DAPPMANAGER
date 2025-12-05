@@ -1,279 +1,29 @@
 .premium-backup-node {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-
-  .card {
-    margin: 0px;
-    padding: 20px;
-    @media (max-width: 60rem) {
-      padding: 10px;
-    }
-
-    h5 {
-      font-weight: bold;
-    }
-  }
-
-  .tooltip-icon {
-    margin-bottom: 2px;
-    font-size: 0.95rem;
-    color: var(--light-text-color);
-  }
-
-  .premium-backup-node-desc {
-    .description-row {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      gap: 20px;
-      @media (max-width: 60rem) {
-        flex-direction: column;
-      }
-
-      .description-row-text {
-        flex: 1;
-        ul {
-          margin: 0;
-          display: grid;
-          grid-template-columns: auto auto;
-          padding: 0px;
-          @media (max-width: 60rem) {
-            grid-template-columns: repeat(1, 1fr);
-            gap: 10px;
-          }
-        }
-
-        li {
-          margin-left: 20px;
-        }
-      }
-
-      button {
-        max-height: fit-content;
-      }
-    }
-  }
-
-  .premium-backup-info-cards {
-    display: flex;
-    flex-direction: row;
+  .backup-description-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
-
-    @media (max-width: 60rem) {
-      flex-direction: column;
-    }
-
-    .card {
-      flex: 1;
-    }
-
-    .premium-backup-network-card {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-
-      .premium-backup-network-list {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-
-        .premium-backup-network-item {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          padding: 10px 10px;
-
-          background-color: var(--color-light-background-main);
-          border-radius: 10px;
-
-          svg {
-            margin-right: 5px;
-          }
-
-          .premium-backup-cc-tag {
-            font-style: italic;
-            color: var(--color-text-secondary);
-
-            &.color-danger {
-              color: var(--danger-color);
-            }
-          }
-        }
-      }
-      .premium-backup-network-warning {
-        color: var(--light-text-color);
-        font-size: 0.8rem;
-      }
-    }
+    width: 100%;
   }
 
-  .premium-backup-validators-card {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  .backup-description-card {
+    padding: 15px;
+    height: 100%;
 
-    .premium-backup-validators-count {
+    > div {
       display: flex;
       flex-direction: column;
-      gap: 15px;
-
-      svg {
-        font-size: 1.3rem;
-        margin: 0 2px 2px 0;
-      }
-
-      .color-danger,
-      .color-warning {
+      justify-content: space-evenly;
+      align-items: center;
+      text-align: center;
+      height: 100%;
+      .backup-card-title {
+        font-size: 18px;
         font-weight: bold;
       }
-
-      .color-warning {
-        color: darkorange;
-      }
-
-      .premium-backup-validators-item {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-
-        .premium-backup-validators-count-row {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          align-items: center;
-
-          .tooltip-beacon-api-error {
-            margin-bottom: 3px;
-            font-size: 0.95rem;
-            color: darkorange;
-          }
-        }
-
-        .premium-backup-validators-limit-bar {
-          width: 100%;
-          height: 5px;
-          background-color: #e9ecef;
-          border-radius: 3px;
-          overflow: hidden;
-
-          .premium-backup-validators-curr-bar {
-            width: 0; /* This is dynamically set */
-            height: 100%;
-            border-radius: 3px;
-            background-color: #000;
-
-            &.color-danger {
-              background-color: var(--danger-color);
-            }
-          }
-        }
-      }
-
-      .premium-backup-validators-limit-desc,
-      .premium-backup-validators-limit-warning {
+      .backup-card-body {
         color: var(--light-text-color);
-        font-size: 0.8rem;
-      }
-    }
-  }
-
-  .premium-backup-action-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    text-align: center;
-
-    svg {
-      font-size: 100px;
-    }
-
-    .premium-backup-countdown {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 5px;
-
-      .premium-backup-countdown-text {
-        color: var(--light-text-color);
-      }
-
-      .premium-backup-countdown-time {
-        font-size: 1.5rem;
-        font-weight: bold;
-      }
-    }
-
-    .blue-text {
-      color: var(--dappnode-strong-main-color);
-    }
-
-    .green-text {
-      color: var(--success-green-color);
-    }
-
-    .orange-text {
-      color: rgb(238, 163, 2);
-    }
-  }
-
-  .premium-backup-error-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    color: var(--danger-color);
-    font-size: 1.2rem;
-    gap: 15px;
-
-    svg {
-      font-size: 100px;
-      color: var(--danger-color);
-    }
-  }
-}
-
-#dark {
-  #main {
-    .premium-backup-node {
-      .premium-backup-info-cards {
-        .premium-backup-network-card {
-          .premium-backup-network-item {
-            background-color: var(--color-dark-background-main);
-          }
-        }
-      }
-      .premium-backup-action-card {
-        .orange-text {
-          color: var(--warning-color);
-        }
-      }
-      .color-danger {
-        color: red;
-      }
-      .color-warning {
-        color: orange;
-      }
-
-      .premium-backup-validators-card {
-        .premium-backup-validators-limit-bar {
-          background-color: var(--color-dark-background-main);
-
-          .premium-backup-validators-curr-bar {
-            &.color-danger {
-              background-color: red;
-            }
-          }
-        }
-        .tooltip-beacon-api-error {
-          color: orange;
-        }
-      }
-      .premium-backup-error-card {
-        color: red;
+        font-style: italic;
       }
     }
   }

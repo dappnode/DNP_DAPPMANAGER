@@ -9,6 +9,7 @@ import { Card } from "react-bootstrap";
 import { NetworkBackup } from "./NetworkBackup";
 import { availableNetworks, useBackupNode2 } from "hooks/useBackupNodev2";
 import { Network } from "@dappnode/types";
+import "./backupNode.scss";
 
 export function BackupNode2({
   isActivated: isPremium,
@@ -17,7 +18,10 @@ export function BackupNode2({
   isActivated: boolean;
   hashedLicense: string;
 }) {
-  const { fakeBackupData } = useBackupNode2({ hashedLicense, isPremiumActivated: isPremium });
+  const { backupData, consensusLoading, backupStatusLoading } = useBackupNode2({
+    hashedLicense,
+    isPremiumActivated: isPremium
+  });
 
   const navigate = useNavigate();
 
@@ -33,51 +37,56 @@ export function BackupNode2({
   const routes: RouteType[] = availableNetworks.map((network) => ({
     name: network === Network.Mainnet ? "Ethereum" : `${network}`,
     subPath: network === Network.Mainnet ? "ethereum" : `${network}`,
-    element: <NetworkBackup network={network} networkData={fakeBackupData[network]} />
+    element: (
+      <NetworkBackup
+        network={network}
+        networkData={backupData[network]}
+        isLoading={consensusLoading || backupStatusLoading}
+      />
+    )
   }));
 
-  const DescriptionCard = () => (
-    <Card style={{ padding: "15px" }}>
-      <div className="description-row">
-        <div className="description-row-text">
-          <p>
-            The backup node for validators ensures that your imported validators in Dappnode stay up when you have
-            problems attesting.
-          </p>
-          <ul>
-            <li>Available in Ethereum, Gnosis and Hoodi.</li>
-            <li>Provides 168h of backup coverage per month in each network.</li>
-            <li>
-              You can activate and deactivate the backup at any moment. You will only spend time when the backup is
-              active in the selected network.
-            </li>
-            <li>After activating the backup, you will need to wait 2 epochs (13 min) to start attesting.</li>
-            <li>Each network has its own validator limit. Check Active validators below.</li>
-          </ul>
+  const DescriptionCardsGrid = () => (
+    <>
+      <div>
+        <div className="backup-description-grid ">
+          <DescriptionCard title="🛡️ Secure Validator Duties" body="Keep all your validators up when having problems" />
+          <DescriptionCard title="🕒 168 hours of coverage" body="In each network, every 30 days " />
+          <DescriptionCard title="🕹️ Enable or disable anytime" body="Backup time only spent in the selected network" />
+          <DescriptionCard title="⏳ Wait 2 epochs" body="≈13 minutes to start attesting once activated" />
         </div>
-        {!isPremium && (
-          <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
-            Activate Premium
-          </Button>
-        )}
       </div>
-    </Card>
+    </>
   );
 
   if (!isPremium) {
     return (
       <div className="premium-backup-node">
-        <DescriptionCard />
-        <div className="premium-backup-info-cards">
-          <p>Premium not active</p>
-        </div>
+        <DescriptionCardsGrid />
+        <Card>
+          <div className="premium-backup-not-premium-card">
+            <div>Activate Premium to enable the backup node for validators.</div>
+            <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
+              Activate Premium
+            </Button>
+          </div>
+        </Card>
       </div>
     );
   }
   return (
-    <div>
-      {<DescriptionCard />}
+    <div className="premium-backup-node">
+      <DescriptionCardsGrid />
       <SectionNavigator routes={routes} variant="sm" />
     </div>
   );
 }
+
+const DescriptionCard = ({ title, body }: { title: string; body: string }) => (
+  <Card className="backup-description-card">
+    <div>
+      <div className="backup-card-title">{title}</div>
+      <span className="backup-card-body">{body}</span>
+    </div>
+  </Card>
+);
