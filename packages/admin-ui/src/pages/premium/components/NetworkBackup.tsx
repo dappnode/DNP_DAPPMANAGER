@@ -246,7 +246,11 @@ const ActivateCard = ({
       <div className="countdown-text">Available time remaining</div>
       <div className="countdown-time">{timeLeft}</div>
     </div>
-    <Button variant="dappnode" onClick={() => {}}>
+    <Button
+      variant="dappnode"
+      onClick={() => {}}
+      disabled={valLimitExceeded || consensusPrysmOrTeku || noConsensusSelected}
+    >
       Activate Backup
     </Button>
     {valLimitExceeded && <div className="color-danger">Validator limit exceeded</div>}
