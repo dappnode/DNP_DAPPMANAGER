@@ -14,8 +14,8 @@ export async function sendPackageInstalledResolvedNotification(packagesData: Ins
   const regularPackages = packagesData.filter((p) => !params.corePackagesNotAutoupdatable.includes(p.dnpName));
 
   for (const pkg of regularPackages) {
-    const title = `${prettyDnpName(pkg.dnpName)} updated successfully`;
-    const body = `${prettyDnpName(pkg.dnpName)} has been updated to version ${pkg.semVersion}`;
+    const title = `${prettyDnpName(pkg.dnpName)} installed successfully`;
+    const body = `${prettyDnpName(pkg.dnpName)} version ${pkg.semVersion} has been installed successfully`;
 
     await notifications
       .sendNotification({
