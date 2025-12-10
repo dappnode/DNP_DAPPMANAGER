@@ -75,15 +75,14 @@ export function LocalProxying() {
     <>
       {localProxyingStatus.data ? (
         <>
-          {window.location.origin !== adminUiLocalDomain && (
-            <AlertDismissible variant="warning">
-              <p>
-                Note that connecting via local proxy is less reliable than using a VPN or Wi-fi hotspot. The local proxy
-                only provides access to the Dappmanager UI and does not grant access to other domains served through
-                your Dappnode, such as client interfaces or other package UIs.
-              </p>
-            </AlertDismissible>
-          )}
+          <AlertDismissible variant="warning">
+            <p>
+              Note that connecting via local proxy is less reliable than using a VPN or Wi-fi hotspot, and should be
+              used <b>only as a fallback</b> method. It only provides access to the Dappmanager UI and does not grant
+              access to other domains served through your Dappnode, such as client interfaces or other package UIs.
+            </p>
+          </AlertDismissible>
+
           <Card spacing>
             <p>
               If you are connected to the same router as your Dappnode you can use this page at{" "}
