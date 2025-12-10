@@ -12,8 +12,7 @@ import StarknetSigner from "./columns/StarknetSigner";
 import { Network } from "@dappnode/types";
 import { useStarknetConfig } from "./useStarknetConfig";
 import "./columns.scss";
-import { Alert, Button, Form } from "react-bootstrap";
-import Input from "components/Input";
+import { Alert, Button } from "react-bootstrap";
 import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "../data";
 import { withToast } from "components/toast/Toast";
@@ -28,25 +27,32 @@ export default function Starknet({
   const { theme } = React.useContext(AppContext);
 
   const currentStakerConfigReq = useApi.stakerConfigGet({ network });
-
   // hooks
   const {
     reqStatus,
     setReqStatus,
-    ethRpcUrlError,
     newFullNode,
     setNewFullNode,
-    customL1RpcUrl,
-    setCustomL1RpcUrl,
     newSigner,
     setNewSigner,
     changes
   } = useStarknetConfig(network, currentStakerConfigReq);
 
-  const isMainnet = network === Network.StarknetMainnet;
-  const networkName = isMainnet ? "Starknet" : "Starknet Sepolia";
-  const l1NetworkName = isMainnet ? "Ethereum Mainnet" : "Ethereum Sepolia";
 
+
+
+  const networkName = network === Network.StarknetMainnet ? "Starknet" : "Starknet Sepolia";
+  // print nall useStakerConfig states for debugging
+  React.useEffect(() => {
+    console.log("Starknet useStakerConfig states:", {
+      reqStatus,
+      newFullNode,
+      newSigner,
+      changes
+    });
+  }
+  , [reqStatus, newFullNode, newSigner, changes]);
+  
   /**
    * Set new Starknet config
    */
@@ -117,32 +123,13 @@ export default function Starknet({
       {currentStakerConfigReq.data ? (
         <>
           <Card>
+            <p>{description}</p>
+            
             <p>
               Set up your Starknet node configuration: <br />
               (1) <b>Choose</b> a <b>Full Node Client</b> (Juno or Pathfinder) <br />
-              (2) <b>Input</b> the <b>{l1NetworkName} RPC URL</b> (Not necessary if you are already running an {l1NetworkName}{" "}
-              node on this Dappnode)
-              <br />
-              (3) [Optional] <b>Select Staking Application</b> to participate in Starknet staking
+              (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking
             </p>
-            <br />
-
-            <p>{description}</p>
-
-            <>
-              <Input
-                value={customL1RpcUrl || ""}
-                onValueChange={(value: string) => setCustomL1RpcUrl(value)}
-                isInvalid={Boolean(ethRpcUrlError)}
-                prepend={`${l1NetworkName} RPC URL`}
-                placeholder={`${l1NetworkName} RPC URL for Starknet node`}
-              />
-              {customL1RpcUrl && ethRpcUrlError && (
-                <Form.Text className="text-danger" as="span">
-                  {ethRpcUrlError}
-                </Form.Text>
-              )}
-            </>
           </Card>
 
           <Row className="staker-network">
@@ -157,16 +144,15 @@ export default function Starknet({
                 />
               ))}
             </Col>
-
             {currentStakerConfigReq.data.web3Signer && (
-              <Col>
+                <Col>
                 <SubTitle>Staking Application</SubTitle>
                 <StarknetSigner
                   signer={currentStakerConfigReq.data.web3Signer}
                   setNewSigner={setNewSigner}
-                  isSelected={Boolean(newSigner)}
+                  isSelected={newSigner?.dnpName === currentStakerConfigReq.data.web3Signer.dnpName}
                 />
-              </Col>
+                </Col>
             )}
           </Row>
 

@@ -9,11 +9,8 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
 ) => {
     // Request status
     const [reqStatus, setReqStatus] = useState<ReqStatus>({});
-    // Error
-    const [ethRpcUrlError, setEthRpcUrlError] = useState<string | null>(null);
     // New config
     const [newFullNode, setNewFullNode] = useState<StakerItemOk | null>(null);
-    const [customL1RpcUrl, setCustomL1RpcUrl] = useState<string | null>(null);
     const [newSigner, setNewSigner] = useState<StakerItemOk | null>(null);
     const [currentStakerConfig, setCurrentStakerConfig] = useState<StakerConfigSet>();
     // Changes
@@ -28,19 +25,22 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
         setReqStatus({});
         setNewFullNode(null);
         setNewSigner(null);
-        setCustomL1RpcUrl(null);
         setCurrentStakerConfig(undefined);
         setChanges({ isAllowed: false });
 
         if (currentStakerConfigReq.data) {
+            console.log("useStarknetConfig - currentStakerConfigReq.data:", currentStakerConfigReq.data);
             const { executionClients, web3Signer } = currentStakerConfigReq.data;
 
             const executionClient = executionClients.find((ec) => ec.status === "ok" && isOkSelectedInstalledAndRunning(ec));
 
             if (executionClient && executionClient.status === "ok") setNewFullNode(executionClient);
 
-            const currentWeb3signer = web3Signer.status === "ok" && isOkSelectedInstalledAndRunning(web3Signer) ? web3Signer : null;
-            if (currentWeb3signer && web3Signer.status === "ok") setNewSigner(web3Signer);
+            // Initialize signer if it's selected (regardless of installation status)
+            // This allows users to select the signer for installation
+            if (web3Signer.status === "ok" && web3Signer.isSelected) {
+                setNewSigner(web3Signer);
+            }
 
             setCurrentStakerConfig({
                 network,
@@ -48,7 +48,7 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
                 consensusDnpName: null, // Starknet doesn't use consensus clients
                 mevBoostDnpName: null, // Starknet doesn't use MEV Boost
                 relays: [],
-                web3signerDnpName: currentWeb3signer?.dnpName || null
+                web3signerDnpName: web3Signer.status === "ok" && web3Signer.isSelected ? web3Signer.dnpName : null
             });
         }
     }, [currentStakerConfigReq.data, network]);
@@ -65,33 +65,16 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
                         mevBoostDnpName: null,
                         relays: [],
                         web3signerDnpName: newSigner?.dnpName || null
-                    },
-                    ethRpcUrlError
+                    }
                 })
             );
-    }, [network, currentStakerConfig, newSigner, newFullNode, ethRpcUrlError, customL1RpcUrl]);
-
-    useEffect(() => {
-        // If the URL is null, Starknet will use the corresponding RPC to L1 (mainnet or sepolia)
-        const l1Network = network === Network.StarknetMainnet ? "Ethereum mainnet" : "Ethereum Sepolia";
-        if (customL1RpcUrl) {
-            setEthRpcUrlError(validateUrl(customL1RpcUrl));
-        } else {
-            setEthRpcUrlError(
-                `You need to set an ${l1Network} full node in the Stakers menu (execution + consensus clients) or set a custom RPC URL`
-            );
-        }
-    }, [customL1RpcUrl, network]);
+    }, [network, currentStakerConfig, newSigner, newFullNode]);
 
     return {
         reqStatus,
         setReqStatus,
-        ethRpcUrlError,
-        setEthRpcUrlError,
         newFullNode,
         setNewFullNode,
-        customL1RpcUrl,
-        setCustomL1RpcUrl,
         newSigner,
         setNewSigner,
         changes
@@ -109,25 +92,15 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
  */
 function getChanges({
     currentStakerConfig,
-    newStakerConfig,
-    ethRpcUrlError
+    newStakerConfig
 }: {
     currentStakerConfig: StakerConfigSet;
     newStakerConfig: StakerConfigSet;
-    ethRpcUrlError: string | null;
 }): {
     isAllowed: boolean;
     reason?: string;
     severity?: "warning" | "secondary" | "danger";
 } {
-    // Not allowed if ethRpcUrlError
-    if (ethRpcUrlError)
-        return {
-            isAllowed: false,
-            reason: "Invalid Ethereum RPC url",
-            severity: "danger"
-        };
-
     const { executionDnpName, web3signerDnpName } = currentStakerConfig;
 
     // Not allowed if no changes
@@ -158,15 +131,6 @@ function getChanges({
         };
 
     return { isAllowed: true };
-}
-
-function validateUrl(str: string): string | null {
-    try {
-        new URL(str);
-        return null;
-    } catch (_) {
-        return "Invalid URL";
-    }
 }
 
 function isOkSelectedInstalledAndRunning(item: StakerItemOk): boolean {

@@ -168,7 +168,7 @@ export enum StarknetClientSepolia {
   Pathfinder = "pathfinder-sepolia.dnp.dappnode.eth"
 }
 export enum SignerStarknetSepolia {
-  Web3signer = "starknetstaking.dnp.dappnode.eth"
+  Web3signer = "starknetstaking-sepolia.dnp.dappnode.eth"
 }
 
 export type StakerItem = StakerItemOk | StakerItemError;

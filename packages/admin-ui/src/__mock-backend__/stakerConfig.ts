@@ -1822,7 +1822,7 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
           consensusClients: [],
           web3Signer: {
             status: "ok",
-            dnpName: "starknetstaking.dnp.dappnode.eth",
+            dnpName: "starknetstaking-sepolia.dnp.dappnode.eth",
             isInstalled: false,
             isRunning: false,
             isUpdated: false,
@@ -1840,9 +1840,9 @@ export const stakerConfig: Pick<Routes, "stakerConfigGet" | "stakerConfigSet"> =
               warnings: {},
               signedSafe: true,
               manifest: {
-                name: "starknetstaking.dnp.dappnode.eth",
-                description: "Starknet Staking Application",
-                shortDescription: "Starknet Staking",
+                name: "starknetstaking-sepolia.dnp.dappnode.eth",
+                description: "Starknet Sepolia Staking Application",
+                shortDescription: "Starknet Sepolia Staking",
                 version: "0.1.0"
               }
             }
