@@ -34,54 +34,16 @@ export default function Starknet({
   
   // Check if user has an Ethereum node running
   const hasEthereumNode = React.useMemo(() => {
-    console.log("Starknet - Checking Ethereum L1 node:", {
-      network,
-      ethereumNetwork,
-      hasData: !!ethereumStakerConfigReq.data
-    });
-    
-    if (!ethereumStakerConfigReq.data) {
-      console.log("Starknet - No Ethereum staker config data available");
-      return false;
-    }
-    
+    if (!ethereumStakerConfigReq.data) return false;
     const { executionClients, consensusClients } = ethereumStakerConfigReq.data;
-    
-    console.log("Starknet - Ethereum execution clients:", 
-      executionClients.map(c => ({
-        dnpName: c.dnpName,
-        status: c.status,
-        isInstalled: c.status === "ok" ? c.isInstalled : undefined,
-        isRunning: c.status === "ok" ? c.isRunning : undefined,
-        isSelected: c.status === "ok" ? c.isSelected : undefined
-      }))
-    );
-    
-    console.log("Starknet - Ethereum consensus clients:", 
-      consensusClients.map(c => ({
-        dnpName: c.dnpName,
-        status: c.status,
-        isInstalled: c.status === "ok" ? c.isInstalled : undefined,
-        isRunning: c.status === "ok" ? c.isRunning : undefined,
-        isSelected: c.status === "ok" ? c.isSelected : undefined
-      }))
-    );
-    
     const hasRunningExecution = executionClients.some(
       (client) => client.status === "ok" && client.isInstalled && client.isRunning && client.isSelected
     );
     const hasRunningConsensus = consensusClients.some(
       (client) => client.status === "ok" && client.isInstalled && client.isSelected
     );
-    
-    console.log("Starknet - Ethereum node check result:", {
-      hasRunningExecution,
-      hasRunningConsensus,
-      hasEthereumNode: hasRunningExecution && hasRunningConsensus
-    });
-    
     return hasRunningExecution && hasRunningConsensus;
-  }, [ethereumStakerConfigReq.data, network, ethereumNetwork]);
+  }, [ethereumStakerConfigReq.data]);
   
   // hooks
   const {
@@ -94,21 +56,8 @@ export default function Starknet({
     changes
   } = useStarknetConfig(network, currentStakerConfigReq);
 
-
-
-
   const networkName = network === Network.StarknetMainnet ? "Starknet" : "Starknet Sepolia";
-  // print nall useStakerConfig states for debugging
-  React.useEffect(() => {
-    console.log("Starknet useStakerConfig states:", {
-      reqStatus,
-      newFullNode,
-      newSigner,
-      changes
-    });
-  }
-  , [reqStatus, newFullNode, newSigner, changes]);
-  
+
   /**
    * Set new Starknet config
    */
