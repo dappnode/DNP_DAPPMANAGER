@@ -14,9 +14,8 @@ import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { listPackage } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
-import { gt } from "semver";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 
 // TODO: move ethereumClient logic here
 
@@ -28,14 +27,14 @@ export class Execution extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.executionClientMainnet,
-    [Network.Gnosis]: db.executionClientGnosis,
-    [Network.Prater]: db.executionClientPrater,
-    [Network.Holesky]: db.executionClientHolesky,
-    [Network.Sepolia]: db.executionClientSepolia,
-    [Network.Hoodi]: db.executionClientHoodi,
-    [Network.Lukso]: db.executionClientLukso
-  };
+      [Network.Mainnet]: db.executionClientMainnet,
+      [Network.Gnosis]: db.executionClientGnosis,
+      [Network.Prater]: db.executionClientPrater,
+      [Network.Holesky]: db.executionClientHolesky,
+      [Network.Sepolia]: db.executionClientSepolia,
+      [Network.Hoodi]: db.executionClientHoodi,
+      [Network.Lukso]: db.executionClientLukso
+    };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -152,43 +151,29 @@ export class Execution extends StakerComponent {
   }
 
   /**
-   * Returns the service name of the execution client
-   *
-   * TODO: find a better way to get the service name of the execution client or force execution clients to have same service name "execution", similar as consensus clients with beacon-chain and validator services
+   * Returns the service name of the execution client by reading the compose file
    */
   private async getExecutionServiceName(dnpName: string): Promise<string> {
-    // TODO: geth mainnet is the only execution with service name === dnpName. See https://github.com/dappnode/DAppNodePackage-geth/blob/7e8e5aa860a8861986f675170bfa92215760d32e/docker-compose.yml#L3
-    if (dnpName === ExecutionClientMainnet.Geth) {
-      logs.info(`Execution mainnet ${dnpName} has service name ${dnpName}`);
-      const version = await this.getExecutionVersion(dnpName);
-      if (gt(version, "0.1.43")) {
-        logs.info(`Version ${version} is greater than 0.1.43. Using service name "geth"`);
-        return "geth";
+    try {
+      const isInstalled = await this.isPackageInstalled(dnpName);
+      // Get compose from installed package or from the release
+      const compose = isInstalled
+        ? new ComposeFileEditor(dnpName, false).output()
+        : (await this.dappnodeInstaller.getRelease(dnpName)).compose;
+
+      const serviceNames = Object.keys(compose.services);
+
+      if (serviceNames.length === 0) {
+        throw new Error(`No services found in compose for ${dnpName}`);
       }
-      logs.info(`Version ${version} is less than 0.1.44. Using service name ${dnpName}`);
-      return ExecutionClientMainnet.Geth;
-    }
 
-    if (dnpName.includes("geth")) return "geth";
-    if (dnpName.includes("nethermind")) return "nethermind";
-    if (dnpName.includes("erigon")) return "erigon";
-    if (dnpName.includes("besu")) return "besu";
-    if (dnpName.includes("reth")) return "reth";
-
-    return dnpName;
-  }
-
-  private async getExecutionVersion(dnpName: string): Promise<string> {
-    const isInstalled = await this.isPackageInstalled(dnpName);
-
-    if (isInstalled) {
-      const version = (await listPackage({ dnpName })).version;
-      logs.info(`Execution ${dnpName} is installed. Using version ${version}`);
-      return version;
-    } else {
-      const version = (await this.dappnodeInstaller.getVersionAndIpfsHash({ dnpNameOrHash: dnpName })).version;
-      logs.info(`Execution ${dnpName} is not installed. Using version ${version} from APM`);
-      return version;
+      // Return the first service name (execution clients typically have one service)
+      const serviceName = serviceNames[0];
+      logs.info(`Execution client ${dnpName} has service name: ${serviceName}`);
+      return serviceName;
+    } catch (error) {
+      logs.error(`Error getting service name for ${dnpName}, falling back to package name`, error);
+      return dnpName;
     }
   }
 }
