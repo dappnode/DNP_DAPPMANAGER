@@ -33,14 +33,10 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
             const { executionClients, web3Signer } = currentStakerConfigReq.data;
 
             const executionClient = executionClients.find((ec) => ec.status === "ok" && isOkSelectedInstalledAndRunning(ec));
+            const signer = web3Signer.status === "ok" && isOkSelectedInstalledAndRunning(web3Signer);
 
             if (executionClient && executionClient.status === "ok") setNewFullNode(executionClient);
-
-            // Initialize signer if it's selected (regardless of installation status)
-            // This allows users to select the signer for installation
-            if (web3Signer.status === "ok" && web3Signer.isSelected) {
-                setNewSigner(web3Signer);
-            }
+            if (signer && web3Signer.status === "ok") setNewSigner(web3Signer);
 
             setCurrentStakerConfig({
                 network,

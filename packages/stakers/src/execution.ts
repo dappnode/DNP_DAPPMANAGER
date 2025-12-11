@@ -30,16 +30,16 @@ export class Execution extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.executionClientMainnet,
-    [Network.Gnosis]: db.executionClientGnosis,
-    [Network.Prater]: db.executionClientPrater,
-    [Network.Holesky]: db.executionClientHolesky,
-    [Network.Sepolia]: db.executionClientSepolia,
-    [Network.Hoodi]: db.executionClientHoodi,
-    [Network.Lukso]: db.executionClientLukso,
-    [Network.StarknetMainnet]: db.starknetClientMainnet,
-    [Network.StarknetSepolia]: db.starknetClientSepolia
-  };
+      [Network.Mainnet]: db.executionClientMainnet,
+      [Network.Gnosis]: db.executionClientGnosis,
+      [Network.Prater]: db.executionClientPrater,
+      [Network.Holesky]: db.executionClientHolesky,
+      [Network.Sepolia]: db.executionClientSepolia,
+      [Network.Hoodi]: db.executionClientHoodi,
+      [Network.Lukso]: db.executionClientLukso,
+      [Network.StarknetMainnet]: db.starknetClientMainnet,
+      [Network.StarknetSepolia]: db.starknetClientSepolia
+    };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -186,6 +186,8 @@ export class Execution extends StakerComponent {
     if (dnpName.includes("erigon")) return "erigon";
     if (dnpName.includes("besu")) return "besu";
     if (dnpName.includes("reth")) return "reth";
+    if (dnpName.includes("juno")) return "juno";
+    if (dnpName.includes("pathfinder")) return "pathfinder";
 
     return dnpName;
   }

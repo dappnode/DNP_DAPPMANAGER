@@ -128,7 +128,7 @@ export default function Starknet({
             <p>
               Set up your Starknet node configuration: <br />
               (1) <b>Choose</b> a <b>Full Node Client</b> (Juno or Pathfinder) <br />
-              (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking
+              (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking and configure it following the <a href="https://docs.dappnode.io/docs/user/staking/starknet/solo/" target="_blank">docs</a>
             </p>
           </Card>
 
