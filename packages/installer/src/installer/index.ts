@@ -8,3 +8,4 @@ export * from "./runPackages.js";
 export * from "./restartPatch.js";
 export * from "./writeAndValidateFiles.js";
 export * from "./checkInstallRequirements.js";
+export * from "./sendPackageInstallResolvedNotification.js";
