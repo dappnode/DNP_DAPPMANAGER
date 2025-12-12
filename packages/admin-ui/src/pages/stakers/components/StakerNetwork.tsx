@@ -204,20 +204,24 @@ export default function StakerNetwork({ network, description }: { network: Netwo
                   />
                 ))}
               </Col>
+              
+              {/* Only shows consensus clients if data is available */}
+              {currentStakerConfigReq.data.consensusClients.length > 0 && (
+                <Col>
+                  <SubTitle>Consensus Clients</SubTitle>
+                  {currentStakerConfigReq.data.consensusClients.map((consensusClient, i) => (
+                    <ConsensusClient
+                      key={i}
+                      consensusClient={consensusClient}
+                      setNewConsClient={setNewConsClient}
+                      isSelected={consensusClient.dnpName === newConsClient?.dnpName}
+                    />
+                  ))}
+                </Col>
+              )}
 
-              <Col>
-                <SubTitle>Consensus Clients</SubTitle>
-                {currentStakerConfigReq.data.consensusClients.map((consensusClient, i) => (
-                  <ConsensusClient
-                    key={i}
-                    consensusClient={consensusClient}
-                    setNewConsClient={setNewConsClient}
-                    isSelected={consensusClient.dnpName === newConsClient?.dnpName}
-                  />
-                ))}
-              </Col>
-
-              {network !== Network.Sepolia && (
+              {/* Only shows signer if data is available */}
+              {network !== Network.Sepolia && currentStakerConfigReq.data.web3Signer && (
                 <Col>
                   <SubTitle>Remote signer</SubTitle>
                   <RemoteSigner

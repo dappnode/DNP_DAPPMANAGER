@@ -6,6 +6,8 @@ import {
   ExecutionClientLukso,
   ExecutionClientMainnet,
   ExecutionClientPrater,
+  StarknetClientMainnet,
+  StarknetClientSepolia,
   Network,
   StakerItem,
   UserSettings
@@ -28,14 +30,16 @@ export class Execution extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.executionClientMainnet,
-    [Network.Gnosis]: db.executionClientGnosis,
-    [Network.Prater]: db.executionClientPrater,
-    [Network.Holesky]: db.executionClientHolesky,
-    [Network.Sepolia]: db.executionClientSepolia,
-    [Network.Hoodi]: db.executionClientHoodi,
-    [Network.Lukso]: db.executionClientLukso
-  };
+      [Network.Mainnet]: db.executionClientMainnet,
+      [Network.Gnosis]: db.executionClientGnosis,
+      [Network.Prater]: db.executionClientPrater,
+      [Network.Holesky]: db.executionClientHolesky,
+      [Network.Sepolia]: db.executionClientSepolia,
+      [Network.Hoodi]: db.executionClientHoodi,
+      [Network.Lukso]: db.executionClientLukso,
+      [Network.StarknetMainnet]: db.starknetClientMainnet,
+      [Network.StarknetSepolia]: db.starknetClientSepolia
+    };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -75,7 +79,15 @@ export class Execution extends StakerComponent {
       { dnpName: ExecutionClientSepolia.Geth, minVersion: "0.1.3" },
       { dnpName: ExecutionClientSepolia.Reth, minVersion: "0.1.0" }
     ],
-    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }]
+    [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }],
+    [Network.StarknetMainnet]: [
+      { dnpName: StarknetClientMainnet.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetClientMainnet.Pathfinder, minVersion: "0.1.0" }
+    ],
+    [Network.StarknetSepolia]: [
+      { dnpName: StarknetClientSepolia.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetClientSepolia.Pathfinder, minVersion: "0.1.0" }
+    ]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -174,6 +186,8 @@ export class Execution extends StakerComponent {
     if (dnpName.includes("erigon")) return "erigon";
     if (dnpName.includes("besu")) return "besu";
     if (dnpName.includes("reth")) return "reth";
+    if (dnpName.includes("juno")) return "juno";
+    if (dnpName.includes("pathfinder")) return "pathfinder";
 
     return dnpName;
   }

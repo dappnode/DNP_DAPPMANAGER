@@ -32,6 +32,8 @@ export const GLOBAL_ENVS = {
   CONSENSUS_CLIENT_SEPOLIA: "_DAPPNODE_GLOBAL_CONSENSUS_CLIENT_SEPOLIA", // "prysm-sepolia.dnp.dappnode.eth"
   EXECUTION_CLIENT_SEPOLIA: "_DAPPNODE_GLOBAL_EXECUTION_CLIENT_SEPOLIA", // "sepolia-geth.dnp.dappnode.eth",
   MEVBOOST_SEPOLIA: "_DAPPNODE_GLOBAL_MEVBOOST_SEPOLIA", // "mevboost-sepolia.dnp.dappnode.eth"
+  STARKNET_CLIENT_MAINNET: "_DAPPNODE_GLOBAL_STARKNET_CLIENT_MAINNET", // "juno.dnp.dappnode.eth"
+  STARKNET_CLIENT_SEPOLIA: "_DAPPNODE_GLOBAL_STARKNET_CLIENT_SEPOLIA", // "juno-sepolia.dnp.dappnode.eth"
 };
 
 /**
