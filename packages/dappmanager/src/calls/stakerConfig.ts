@@ -1,4 +1,5 @@
 import { StakerConfigGet, StakerConfigSet, Network } from "@dappnode/types";
+import { stakerConfigCache, getOrSet } from "@dappnode/cache";
 import { execution, consensus, mevBoost, signer } from "../index.js";
 
 /**
@@ -17,6 +18,9 @@ export async function stakerConfigSet({ stakerConfig }: { stakerConfig: StakerCo
   // The web3signer deppends on the global envs EXECUTION_CLIENT and CONSENSUS_CLIENT
   // so it is convenient to set it at the end once the db is updated
   await signer.setNewSigner(network, web3signerDnpName);
+
+  // Invalidate cache after config changes
+  stakerConfigCache.delete(`stakerConfig:${network}`);
 }
 
 /**
@@ -24,17 +28,23 @@ export async function stakerConfigSet({ stakerConfig }: { stakerConfig: StakerCo
  * remote signer, mev boost, graffiti, fee recipient address and checkpoint sync url
  */
 export async function stakerConfigGet({ network }: { network: Network }): Promise<StakerConfigGet> {
-  return await Promise.all([
-    await execution.getAllExecutions(network),
-    await consensus.getAllConsensus(network),
-    await mevBoost.getAllMevBoost(network),
-    await signer.getAllSigners(network)
-  ]).then(([executionClients, consensusClients, mevBoost, web3signer]) => {
-    return {
-      executionClients,
-      consensusClients,
-      mevBoost: mevBoost[0],
-      web3Signer: web3signer[0]
-    };
-  });
+  return await getOrSet(
+    stakerConfigCache,
+    `stakerConfig:${network}`,
+    async () => {
+      return await Promise.all([
+        await execution.getAllExecutions(network),
+        await consensus.getAllConsensus(network),
+        await mevBoost.getAllMevBoost(network),
+        await signer.getAllSigners(network)
+      ]).then(([executionClients, consensusClients, mevBoost, web3signer]) => {
+        return {
+          executionClients,
+          consensusClients,
+          mevBoost: mevBoost[0],
+          web3Signer: web3signer[0]
+        };
+      });
+    }
+  ) as Promise<StakerConfigGet>;
 }
