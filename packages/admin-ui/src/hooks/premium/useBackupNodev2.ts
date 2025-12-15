@@ -93,24 +93,12 @@ export function useBackupNode2({
       const backupStatus = backupStatusData?.[network];
       const activeValidatorsInfo = activeValidatorsCounts[network];
       const consensus = currentConsensus[network];
-
-      const defaultActivationsHistory: Partial<Record<Network, { activation_date: Date; end_date: Date }[]>> = {
-        [Network.Mainnet]: [
-          { activation_date: new Date("2025-01-10T09:00:00Z"), end_date: new Date("2025-01-15T09:00:00Z") },
-          { activation_date: new Date("2025-03-05T14:30:00Z"), end_date: new Date("2025-03-10T14:30:00Z") },
-          { activation_date: new Date("2025-06-20T08:00:00Z"), end_date: new Date("2025-06-25T08:00:00Z") }
-        ],
-        [Network.Hoodi]: [
-          { activation_date: new Date("2024-11-12T10:15:00Z"), end_date: new Date("2024-11-12T16:45:00Z") },
-          { activation_date: new Date("2025-02-01T07:00:00Z"), end_date: new Date("2025-02-01T12:00:00Z") }
-        ],
-        [Network.Gnosis]: [
-          { activation_date: new Date("2024-09-20T18:00:00Z"), end_date: new Date("2024-09-21T18:00:00Z") },
-          { activation_date: new Date("2024-12-10T11:00:00Z"), end_date: new Date("2024-12-15T11:00:00Z") },
-          { activation_date: new Date("2025-04-01T09:00:00Z"), end_date: new Date("2025-04-06T09:00:00Z") }
-        ],
-        [Network.Holesky]: []
-      };
+      const formattedActivationsHistory = backupStatus?.activationHistory
+        ? backupStatus.activationHistory.map(({ activation_date, end_date }) => ({
+            activation_date: new Date(activation_date),
+            end_date: new Date(end_date)
+          }))
+        : [];
 
       acc[network] = {
         isActive: backupStatus?.isActive ?? false,
@@ -122,7 +110,7 @@ export function useBackupNode2({
         beaconApiError: activeValidatorsInfo?.beaconApiError ?? false,
         nextAvailableDate: null,
         consensusInfo: consensus,
-        activationsHistory: defaultActivationsHistory[network] ?? []
+        activationsHistory: formattedActivationsHistory
       };
 
       return acc;
