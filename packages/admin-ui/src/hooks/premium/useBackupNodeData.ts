@@ -23,7 +23,7 @@ export type BackupData = {
   activationsHistory: { activation_date: Date; end_date: Date }[];
 };
 
-export function useBackupNode2({
+export function useBackupNodeData({
   hashedLicense,
   isPremiumActivated
 }: {
