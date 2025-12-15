@@ -657,13 +657,13 @@ export interface Routes {
    * Activates the beacon node backup
    * @param id the hashed license
    */
-  premiumBeaconBackupActivate: (id: string) => Promise<void>;
+  premiumBeaconBackupActivate: ({ key, network }: { key: string; network: Network }) => Promise<void>;
 
   /**
    * Deactivates the beacon node backup
    * @param id the hashed license
    */
-  premiumBeaconBackupDeactivate: (id: string) => Promise<void>;
+  premiumBeaconBackupDeactivate: ({ key, network }: { key: string; network: Network }) => Promise<void>;
 
   /**
    * Checks the activation and validity status of the beacon node backup associated with the given hashed license.

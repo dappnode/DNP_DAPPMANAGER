@@ -420,7 +420,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
         isActivable: true,
         secondsUntilActivable: 0,
         isActive: false,
-        activeTimeLeft: "0s"
+        timeLeft: 2450
         // secondsUntilDeactivation is optional and can be omitted or set to undefined
       }
     };

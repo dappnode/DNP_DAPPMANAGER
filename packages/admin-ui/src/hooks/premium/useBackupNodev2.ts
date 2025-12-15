@@ -1,6 +1,5 @@
 import { Network } from "@dappnode/types";
 import { useApi } from "api";
-
 import { useEffect, useMemo, useState } from "react";
 
 export const availableNetworks: Network[] = [Network.Mainnet, Network.Gnosis, Network.Hoodi];
@@ -12,42 +11,37 @@ export type ConsensusInfo = {
 };
 
 export type BackupData = {
+  isActive: boolean;
   activable: boolean;
-  timeLeft: string;
+  timeLeft: number;
   activeValidators: number;
   maxValidators: number;
   beaconApiError: boolean;
+  timeUntilAvailable: number;
   nextAvailableDate: string | null;
   consensusInfo: ConsensusInfo | undefined;
-  // activationsHistory: Array<{
-  //   activation_date: string;
-  //   end_date: string;
-  // }>;
   activationsHistory: { activation_date: Date; end_date: Date }[];
 };
 
-export const useBackupNode2 = ({
+export function useBackupNode2({
   hashedLicense,
   isPremiumActivated
 }: {
   hashedLicense: string;
   isPremiumActivated: boolean;
-}) => {
+}) {
   const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, ConsensusInfo>>>({});
-
   const [activeValidatorsCounts, setActiveValidatorsCounts] = useState<
     Partial<Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>>
   >({});
 
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: availableNetworks });
   const currentConsensusReq = useApi.consensusClientsGetByNetworks({ networks: availableNetworks });
-  const backupStatusReq = useApi.premiumBeaconBackupStatus("05f116fdb971e44f1c59fddc8a29954");
+  const backupStatusReq = useApi.premiumBeaconBackupStatus(hashedLicense);
 
   const consensusLoading = currentConsensusReq.isValidating;
   const backupStatusLoading = isPremiumActivated ? backupStatusReq.isValidating : false;
-
   const backupStatusData = backupStatusReq.data;
-  console.log("backupStatusReq data:", backupStatusData);
 
   useEffect(() => {
     const data = validatorsFilterActiveReq.data;
@@ -81,18 +75,15 @@ export const useBackupNode2 = ({
   useEffect(() => {
     if (currentConsensusReq.data) {
       const data = currentConsensusReq.data;
-
       const consensusInfo: Partial<Record<Network, ConsensusInfo>> = {};
       for (const [network, clientName] of Object.entries(data) as [Network, string | null | undefined][]) {
         consensusInfo[network] = {
           name: clientName,
-          // Check if the selected client is Prysm or Teku
           isPrysmOrTeku:
             clientName?.toLowerCase().includes("prysm") || clientName?.toLowerCase().includes("teku") || false,
           noConsensusSelected: !clientName ? true : false
         };
       }
-
       setCurrentConsensus(consensusInfo);
     }
   }, [currentConsensusReq.data]);
@@ -103,7 +94,6 @@ export const useBackupNode2 = ({
       const activeValidatorsInfo = activeValidatorsCounts[network];
       const consensus = currentConsensus[network];
 
-      // Default activation history per network (used as fallback)
       const defaultActivationsHistory: Partial<Record<Network, { activation_date: Date; end_date: Date }[]>> = {
         [Network.Mainnet]: [
           { activation_date: new Date("2025-01-10T09:00:00Z"), end_date: new Date("2025-01-15T09:00:00Z") },
@@ -123,8 +113,10 @@ export const useBackupNode2 = ({
       };
 
       acc[network] = {
+        isActive: backupStatus?.isActive ?? false,
         activable: backupStatus?.isActivable ?? false,
-        timeLeft: backupStatus?.activeTimeLeft ?? "0d 0h 0m 0s",
+        timeLeft: backupStatus?.timeLeft ?? 60,
+        timeUntilAvailable: backupStatus?.isActivable ? 0 : 60,
         activeValidators: activeValidatorsInfo?.count ?? 0,
         maxValidators: backupStatus?.validatorLimit ?? 0,
         beaconApiError: activeValidatorsInfo?.beaconApiError ?? false,
@@ -140,8 +132,7 @@ export const useBackupNode2 = ({
   return {
     backupData,
     consensusLoading,
-    currentConsensus,
     backupStatusLoading,
-    activeValidatorsCounts
+    revalidateBackup: backupStatusReq.revalidate
   };
-};
+}

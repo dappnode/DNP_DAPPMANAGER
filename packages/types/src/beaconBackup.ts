@@ -3,10 +3,9 @@ export type BeaconBackupNetworkStatus = {
   isActivable: boolean;
   secondsUntilActivable?: number;
   isActive: boolean;
-  secondsUntilDeactivation?: number;
   activationHistory?: Array<{
     activation_date: string;
     end_date: string;
   }>;
-  activeTimeLeft: string;
+  timeLeft: number;
 };

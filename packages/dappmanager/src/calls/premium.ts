@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { BeaconBackupNetworkStatus, Network } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
-const baseUrlTest = "https://08135712ea1e.ngrok-free.app";
+const baseUrlTest = "https://0fb336699cb1.ngrok-free.app";
 
 /**
  * Returns the Premium package status
@@ -109,37 +109,53 @@ export const premiumIsLicenseActive = async (): Promise<boolean> => {
 
 /**
  * Activates the beacon node backup
- * @param id the hashed license
+ * @param key the hashed license
+ * @param network the network that the backup will be activated on
  */
-export const premiumBeaconBackupActivate = async (id: string): Promise<void> => {
-  const response = await fetch(`${baseUrlTest}:8083/api/keys/activate`, {
+export const premiumBeaconBackupActivate = async ({
+  key,
+  network
+}: {
+  key: string;
+  network: Network;
+}): Promise<void> => {
+  const response = await fetch(`${baseUrlTest}/keys/activate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ key, network })
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to activate beacon backup: ${response.statusText}`);
+    const error = await response.text();
+    throw new Error(`Failed to activate beacon backup: ${error}`);
   }
 };
 
 /**
  * Deactivates the beacon node backup
- * @param id the hashed license
+ * @param key the hashed license
+ * @param network the network that the backup will be deactivated on
  */
-export const premiumBeaconBackupDeactivate = async (id: string): Promise<void> => {
-  const response = await fetch(`${baseUrlTest}:8083/api/keys/deactivate`, {
-    method: "DELETE",
+export const premiumBeaconBackupDeactivate = async ({
+  key,
+  network
+}: {
+  key: string;
+  network: Network;
+}): Promise<void> => {
+  const response = await fetch(`${baseUrlTest}/keys/deactivate`, {
+    method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ id })
+    body: JSON.stringify({ key, network })
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to deactivate beacon backup: ${response.statusText}`);
+    const error = await response.text();
+    throw new Error(`Failed to deactivate beacon backup: ${error}`);
   }
 };
 
@@ -172,7 +188,7 @@ export const premiumBeaconBackupStatus = async (
 
     const typedStatus = status as {
       validator_limit: number;
-      time_left: string;
+      time_left: number;
       isActivable: boolean;
       active: boolean;
       activation_history: Array<{
@@ -182,10 +198,10 @@ export const premiumBeaconBackupStatus = async (
     };
     result[network as Network] = {
       validatorLimit: typedStatus.validator_limit,
-      isActivable: typedStatus.active === false && typedStatus.time_left !== "0s",
+      isActivable: typedStatus.active === false && typedStatus.time_left > 0,
       isActive: typedStatus.active,
       activationHistory: typedStatus.activation_history,
-      activeTimeLeft: typedStatus.time_left
+      timeLeft: typedStatus.time_left || 60
     };
   });
 
