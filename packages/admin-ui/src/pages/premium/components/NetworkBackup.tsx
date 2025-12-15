@@ -6,12 +6,12 @@ import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import {
   MdGroup,
   MdInfoOutline,
-  // MdOutlineAccessTime,
+  MdOutlineAccessTime,
   MdOutlineBackup,
   MdOutlineCheckCircleOutline,
   MdWarningAmber
 } from "react-icons/md";
-import { BackupData, ConsensusInfo } from "hooks/useBackupNodev2";
+import { BackupData, ConsensusInfo } from "hooks/premium/useBackupNodev2";
 
 import "./networkBackup.scss";
 import { prettyDnpName } from "utils/format";
@@ -22,24 +22,38 @@ import { capitalize } from "utils/strings";
 import { docsUrl } from "params";
 import newTabProps from "utils/newTabProps";
 import Loading from "components/Loading";
+import { useBackupNodeActions } from "hooks/premium/useBackupNodeActions";
 
 export const NetworkBackup = ({
   network,
   networkData,
-  isLoading
+  isLoading,
+  hashedLicense,
+  revalidateBackupCall
 }: {
   network: Network;
   networkData: BackupData | undefined;
   isLoading: boolean;
+  revalidateBackupCall: () => Promise<boolean>;
+  hashedLicense: string;
 }) => {
   const backupData = networkData;
+
+  const { formatCountdown, timeLeft, timeUntilAvailable, activateBackup, deactivateBackup } = useBackupNodeActions({
+    network,
+    hashedLicense,
+    isActive: backupData?.isActive || false,
+    isActivable: backupData?.activable || false,
+    currentConsensus: backupData?.consensusInfo?.name || undefined,
+    timeLeftInitial: backupData?.timeLeft ?? 0,
+    timeUntilAvailableInitial: backupData?.timeUntilAvailable ?? 0,
+    revalidate: revalidateBackupCall
+  });
+
   const valLimitExceeded = (backupData && backupData?.activeValidators > backupData?.maxValidators) || false;
   const noConsensusSelected = (backupData && backupData.consensusInfo?.noConsensusSelected) || false;
   const consensusPrysmOrTeku = (backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku) || false;
-  console.log("!noConsensusSelected", noConsensusSelected);
-  console.log("prysmteku", backupData!.consensusInfo?.isPrysmOrTeku);
 
-  console.log("consensusPrysmOrTeku", consensusPrysmOrTeku);
   console.log(backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku);
 
   return (
@@ -64,14 +78,20 @@ export const NetworkBackup = ({
             />
           </div>
 
-          <ActivateCard
-            timeLeft={backupData.timeLeft}
-            valLimitExceeded={valLimitExceeded}
-            noConsensusSelected={noConsensusSelected}
-            consensusPrysmOrTeku={consensusPrysmOrTeku}
-          />
-          {/* <CooldownCard timeLeft={backupData.timeLeft} /> */}
-
+          {/* Backup action cards */
+          backupData.isActive ? (
+            <DeactivateCard timeLeft={formatCountdown(timeLeft)} />
+          ) : backupData.activable ? (
+            <ActivateCard
+              timeLeft={formatCountdown(backupData.timeLeft)}
+              valLimitExceeded={valLimitExceeded}
+              noConsensusSelected={noConsensusSelected}
+              consensusPrysmOrTeku={consensusPrysmOrTeku}
+              activateBackup={activateBackup}
+            />
+          ) : (
+            <CooldownCard timeLeft={formatCountdown(timeUntilAvailable)} deactivateBackup={deactivateBackup} />
+          )}
           <ActivationHistoryCard activationsHistory={backupData.activationsHistory} />
         </div>
       ) : (
@@ -230,12 +250,14 @@ const ActivateCard = ({
   timeLeft,
   valLimitExceeded,
   noConsensusSelected,
-  consensusPrysmOrTeku
+  consensusPrysmOrTeku,
+  activateBackup
 }: {
   timeLeft: string;
   valLimitExceeded: boolean;
   noConsensusSelected: boolean;
   consensusPrysmOrTeku: boolean;
+  activateBackup: () => void;
 }) => (
   <Card className="action-backup-card">
     <div className="action-backup-col">
@@ -248,7 +270,11 @@ const ActivateCard = ({
     </div>
     <Button
       variant="dappnode"
-      onClick={() => {}}
+      onClick={() => {
+        console.log("Activating backup..1");
+
+        activateBackup;
+      }}
       disabled={valLimitExceeded || consensusPrysmOrTeku || noConsensusSelected}
     >
       Activate Backup
@@ -278,24 +304,24 @@ const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
   </Card>
 );
 
-// const CooldownCard = ({ timeLeft }: { timeLeft: string }) => (
-//   <Card className="action-backup-card">
-//     <div className="action-backup-col">
-//       <MdOutlineAccessTime className="orange-text action-icon" />
-//       <SubTitle className="orange-text">Cooldown Period</SubTitle>
-//     </div>
-//     <div>Backup cannot be reactivated during cooldown</div>
+const CooldownCard = ({ timeLeft, deactivateBackup }: { timeLeft: string; deactivateBackup: () => void }) => (
+  <Card className="action-backup-card">
+    <div className="action-backup-col">
+      <MdOutlineAccessTime className="orange-text action-icon" />
+      <SubTitle className="orange-text">Cooldown Period</SubTitle>
+    </div>
+    <div>Backup cannot be reactivated during cooldown</div>
 
-//     <div className="action-backup-col">
-//       <div className="countdown-text">Available again in</div>
-//       <div className="countdown-time">{timeLeft}</div>
-//     </div>
+    <div className="action-backup-col">
+      <div className="countdown-text">Available again in</div>
+      <div className="countdown-time">{timeLeft}</div>
+    </div>
 
-//     <Button variant="dappnode" disabled={true}>
-//       Backup unavailable
-//     </Button>
-//   </Card>
-// );
+    <Button variant="dappnode" disabled={true} onClick={deactivateBackup}>
+      Backup unavailable
+    </Button>
+  </Card>
+);
 
 const ActivationHistoryCard = ({
   activationsHistory
