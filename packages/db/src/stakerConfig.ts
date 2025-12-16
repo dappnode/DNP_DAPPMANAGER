@@ -183,12 +183,18 @@ export const mevBoostLukso = interceptGlobalEnvOnSet(
 // Starknet Mainnet
 
 const STARKNET_CLIENT_MAINNET = "starknet-client";
+const MEVBOOST_STARKNET_MAINNET = "mevboost-starknet-mainnet";
+const MEVBOOST_STARKNET_SEPOLIA = "mevboost-starknet-sepolia";
 
 export const starknetClientMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(STARKNET_CLIENT_MAINNET, null),
   Object.keys({ STARKNET_CLIENT_MAINNET })[0]
 );
 
+export const mevBoostStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_STARKNET_MAINNET, false),
+  Object.keys({ MEVBOOST_STARKNET_MAINNET })[0]
+);
 // Starknet Sepolia
 
 const STARKNET_CLIENT_SEPOLIA = "starknet-client-sepolia";
@@ -196,4 +202,9 @@ const STARKNET_CLIENT_SEPOLIA = "starknet-client-sepolia";
 export const starknetClientSepolia = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(STARKNET_CLIENT_SEPOLIA, null),
   Object.keys({ STARKNET_CLIENT_SEPOLIA })[0]
+);
+
+export const mevBoostStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_STARKNET_SEPOLIA, false),
+  Object.keys({ MEVBOOST_STARKNET_SEPOLIA })[0]
 );

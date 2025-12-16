@@ -23,8 +23,8 @@ export class MevBoost extends StakerComponent {
     [Network.Sepolia]: db.mevBoostSepolia,
     [Network.Hoodi]: db.mevBoostHoodi,
     [Network.Lukso]: db.mevBoostLukso,
-    [Network.StarknetMainnet]: { get: () => false, set: async () => {} },
-    [Network.StarknetSepolia]: { get: () => false, set: async () => {} }
+    [Network.StarknetMainnet]: db.mevBoostStarknetMainnet,
+    [Network.StarknetSepolia]: db.mevBoostStarknetSepolia
   };
 
   protected static readonly CompatibleMevBoost: Record<Network, { dnpName: string; minVersion: string } | null> = {
@@ -120,14 +120,14 @@ export class MevBoost extends StakerComponent {
       // If the package is not installed, we use the default environment
       environment: newRelays
         ? {
-            [mevBoostServiceName]: {
-              ["RELAYS"]:
-                newRelays
-                  .join(",")
-                  .trim()
-                  .replace(/(^,)|(,$)/g, "") || ""
-            }
+          [mevBoostServiceName]: {
+            ["RELAYS"]:
+              newRelays
+                .join(",")
+                .trim()
+                .replace(/(^,)|(,$)/g, "") || ""
           }
+        }
         : {},
       networks: this.getStakerNetworkSettings(network)
     };

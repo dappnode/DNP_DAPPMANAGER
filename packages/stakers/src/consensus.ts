@@ -26,16 +26,16 @@ export class Consensus extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-    [Network.Mainnet]: db.consensusClientMainnet,
-    [Network.Gnosis]: db.consensusClientGnosis,
-    [Network.Prater]: db.consensusClientPrater,
-    [Network.Holesky]: db.consensusClientHolesky,
-    [Network.Sepolia]: db.consensusClientSepolia,
-    [Network.Hoodi]: db.consensusClientHoodi,
-    [Network.Lukso]: db.consensusClientLukso,
-    [Network.StarknetMainnet]: { get: () => null, set: async () => {} },
-    [Network.StarknetSepolia]: { get: () => null, set: async () => {} }
-  };
+      [Network.Mainnet]: db.consensusClientMainnet,
+      [Network.Gnosis]: db.consensusClientGnosis,
+      [Network.Prater]: db.consensusClientPrater,
+      [Network.Holesky]: db.consensusClientHolesky,
+      [Network.Sepolia]: db.consensusClientSepolia,
+      [Network.Hoodi]: db.consensusClientHoodi,
+      [Network.Lukso]: db.consensusClientLukso,
+      [Network.StarknetMainnet]: db.starknetClientMainnet,
+      [Network.StarknetSepolia]: db.starknetClientSepolia
+    };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
       { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
