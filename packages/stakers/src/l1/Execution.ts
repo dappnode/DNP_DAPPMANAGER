@@ -7,22 +7,22 @@ import {
   ExecutionClientMainnet,
   ExecutionClientPrater,
   Network,
+  L1Network,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { StakerComponent } from "./StakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { listPackage } from "@dappnode/dockerapi";
 import { logs } from "@dappnode/logger";
 import { gt } from "semver";
-
-// TODO: move ethereumClient logic here
+import { CompatibleClient } from "../core/BlockchainComponent.js";
 
 export class Execution extends StakerComponent {
   readonly DbHandlers: Record<
-    Network,
+    L1Network,
     {
       get: () => string | null | undefined;
       set: (globEnvValue: string | null | undefined) => Promise<void>;
@@ -37,7 +37,7 @@ export class Execution extends StakerComponent {
     [Network.Lukso]: db.executionClientLukso
   };
 
-  protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
+  protected static readonly CompatibleExecutions: Record<L1Network, CompatibleClient[]> = {
     [Network.Mainnet]: [
       { dnpName: ExecutionClientMainnet.Reth, minVersion: "0.1.0" },
       { dnpName: ExecutionClientMainnet.Geth, minVersion: "0.1.37" },
@@ -82,14 +82,14 @@ export class Execution extends StakerComponent {
     super(dappnodeInstaller);
   }
 
-  async getAllExecutions(network: Network): Promise<StakerItem[]> {
+  async getAllExecutions(network: L1Network): Promise<StakerItem[]> {
     return await super.getAll({
       dnpNames: Execution.CompatibleExecutions[network].map((client) => client.dnpName),
       currentClient: this.DbHandlers[network].get()
     });
   }
 
-  async persistSelectedExecutionIfInstalled(network: Network): Promise<void> {
+  async persistSelectedExecutionIfInstalled(network: L1Network): Promise<void> {
     const currentExecutionDnpName = this.DbHandlers[network].get();
     if (currentExecutionDnpName) {
       const isInstalled = await this.isPackageInstalled(currentExecutionDnpName);
@@ -108,12 +108,12 @@ export class Execution extends StakerComponent {
     }
   }
 
-  async setNewExecution(network: Network, newExecutionDnpName: string | null) {
+  async setNewExecution(network: L1Network, newExecutionDnpName: string | null) {
     const prevExecClientDnpName = this.DbHandlers[network].get();
 
     await super.setNew({
-      newStakerDnpName: newExecutionDnpName,
-      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      newClientDnpName: newExecutionDnpName,
+      dockerNetworkName: params.DOCKER_BLOCKCHAIN_NETWORKS[network],
       fullnodeAliases: [`execution.${network}.dncore.dappnode`],
       compatibleClients: Execution.CompatibleExecutions[network],
       userSettings: await this.getUserSettings(network, newExecutionDnpName),
@@ -126,7 +126,7 @@ export class Execution extends StakerComponent {
     }
   }
 
-  private async getUserSettings(network: Network, dnpName: string | null): Promise<UserSettings> {
+  private async getUserSettings(network: L1Network, dnpName: string | null): Promise<UserSettings> {
     if (!dnpName) return {};
 
     const execService = await this.getExecutionServiceName(dnpName);
@@ -136,7 +136,7 @@ export class Execution extends StakerComponent {
         rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
           [execService]: {
-            [params.DOCKER_STAKER_NETWORKS[network]]: {
+            [params.DOCKER_BLOCKCHAIN_NETWORKS[network]]: {
               aliases: [`execution.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {

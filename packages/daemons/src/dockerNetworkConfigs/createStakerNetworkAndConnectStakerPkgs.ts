@@ -2,10 +2,12 @@ import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
 import { Execution, Consensus, Signer, MevBoost } from "@dappnode/stakers";
-import { Network } from "@dappnode/types";
+import { L1_NETWORKS } from "@dappnode/types";
 
 /**
  * Creates the staker network and connects the staker packages to it
+ * Note: Only L1 networks are handled here. L2 networks have their own setup.
+ * TODO: should L2 networks be handled here as well?
  */
 export async function createStakerNetworkAndConnectStakerPkgs(
   execution: Execution,
@@ -13,8 +15,8 @@ export async function createStakerNetworkAndConnectStakerPkgs(
   signer: Signer,
   mevBoost: MevBoost
 ): Promise<void> {
-  for (const network of Object.values(Network)) {
-    await createDockerStakerNetwork(params.DOCKER_STAKER_NETWORKS[network]);
+  for (const network of L1_NETWORKS) {
+    await createDockerStakerNetwork(params.DOCKER_BLOCKCHAIN_NETWORKS[network]);
     const results = await Promise.allSettled([
       execution.persistSelectedExecutionIfInstalled(network),
       consensus.persistSelectedConsensusIfInstalled(network),

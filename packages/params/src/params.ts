@@ -122,14 +122,23 @@ export const params = {
   DOCKER_NETWORK_NEW_SUBNET: "10.20.0.0/24",
   DOCKER_PRIVATE_NETWORK_NEW_NAME: "dnprivate_network",
   DOCKER_EXTERNAL_NETWORK_NAME: "dnpublic_network",
-  DOCKER_STAKER_NETWORKS: {
+  // Blockchain-specific Docker networks (formerly DOCKER_STAKER_NETWORKS)
+  // Used by both L1 stakers and L2 nodes
+  DOCKER_BLOCKCHAIN_NETWORKS: {
+    // L1 Networks
     [Network.Mainnet]: "mainnet_network",
     [Network.Holesky]: "holesky_network",
     [Network.Hoodi]: "hoodi_network",
     [Network.Sepolia]: "sepolia_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
-    [Network.Lukso]: "lukso_network"
+    [Network.Lukso]: "lukso_network",
+    // L2 Networks
+    [Network.Starknet]: "starknet_network"
+  },
+  /** @deprecated Use DOCKER_BLOCKCHAIN_NETWORKS instead */
+  get DOCKER_STAKER_NETWORKS() {
+    return this.DOCKER_BLOCKCHAIN_NETWORKS;
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2",

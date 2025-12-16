@@ -7,10 +7,10 @@ import {
   consensusClientPrater,
   consensusClientSepolia
 } from "@dappnode/db";
-import { Network } from "@dappnode/types";
+import { Network, L1Network, isL1Network } from "@dappnode/types";
 
-// Mapping of each network to its corresponding consensus client getter
-const consensusClientMap: { [key in Network]: () => string | null | undefined } = {
+// Mapping of each L1 network to its corresponding consensus client getter
+const consensusClientMap: { [key in L1Network]: () => string | null | undefined } = {
   mainnet: () => consensusClientMainnet.get(),
   gnosis: () => consensusClientGnosis.get(),
   hoodi: () => consensusClientHoodi.get(),
@@ -28,8 +28,11 @@ export async function consensusClientsGetByNetworks({
   const result: Partial<Record<Network, string | null | undefined>> = {};
 
   for (const network of networks) {
-    const getter = consensusClientMap[network];
-    result[network] = getter ? getter() : undefined;
+    if (isL1Network(network)) {
+      const getter = consensusClientMap[network];
+      result[network] = getter ? getter() : undefined;
+    }
+    // L2 networks don't have separate consensus clients, skip them
   }
 
   return result;

@@ -4,18 +4,20 @@ import {
   MevBoostMainnet,
   MevBoostPrater,
   Network,
+  L1Network,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { StakerComponent } from "./StakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
+import { CompatibleClient } from "../core/BlockchainComponent.js";
 
 export class MevBoost extends StakerComponent {
-  readonly DbHandlers: Record<Network, { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }> = {
+  readonly DbHandlers: Record<L1Network, { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }> = {
     [Network.Mainnet]: db.mevBoostMainnet,
     [Network.Gnosis]: db.mevBoostGnosis,
     [Network.Prater]: db.mevBoostPrater,
@@ -25,7 +27,7 @@ export class MevBoost extends StakerComponent {
     [Network.Lukso]: db.mevBoostLukso
   };
 
-  protected static readonly CompatibleMevBoost: Record<Network, { dnpName: string; minVersion: string } | null> = {
+  protected static readonly CompatibleMevBoost: Record<L1Network, CompatibleClient | null> = {
     [Network.Mainnet]: {
       dnpName: MevBoostMainnet.Mevboost,
       minVersion: "0.1.0"
@@ -51,7 +53,7 @@ export class MevBoost extends StakerComponent {
     super(dappnodeInstaller);
   }
 
-  async getAllMevBoost(network: Network): Promise<StakerItem[]> {
+  async getAllMevBoost(network: L1Network): Promise<StakerItem[]> {
     const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
     return await super.getAll({
       dnpNames: mevBoostDnpName ? [mevBoostDnpName] : [],
@@ -70,7 +72,7 @@ export class MevBoost extends StakerComponent {
     return relays;
   }
 
-  async persistMevBoostIfInstalledAndRunning(network: Network): Promise<void> {
+  async persistMevBoostIfInstalledAndRunning(network: L1Network): Promise<void> {
     const mevBoostDnpName = MevBoost.CompatibleMevBoost[network]?.dnpName;
 
     if (mevBoostDnpName) {
@@ -94,11 +96,11 @@ export class MevBoost extends StakerComponent {
     }
   }
 
-  async setNewMevBoost(network: Network, newMevBoostDnpName: string | null, newRelays: string[]) {
+  async setNewMevBoost(network: L1Network, newMevBoostDnpName: string | null, newRelays: string[]) {
     const compatibleMevBoost = MevBoost.CompatibleMevBoost[network];
     await super.setNew({
-      newStakerDnpName: newMevBoostDnpName,
-      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      newClientDnpName: newMevBoostDnpName,
+      dockerNetworkName: params.DOCKER_BLOCKCHAIN_NETWORKS[network],
       fullnodeAliases: [`mev-boost.${network}.dncore.dappnode`],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,
       userSettings: newMevBoostDnpName ? this.getUserSettings(network, newRelays) : {},
@@ -109,7 +111,7 @@ export class MevBoost extends StakerComponent {
       await this.DbHandlers[network].set(newMevBoostDnpName ? true : false);
   }
 
-  private getUserSettings(network: Network, newRelays: string[] | null): UserSettings {
+  private getUserSettings(network: L1Network, newRelays: string[] | null): UserSettings {
     const mevBoostServiceName = "mev-boost";
 
     const userSettings: UserSettings = {
@@ -131,14 +133,14 @@ export class MevBoost extends StakerComponent {
     return userSettings;
   }
 
-  private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
+  private getStakerNetworkSettings(network: L1Network): UserSettings["networks"] {
     const mevBoostServiceName = "mev-boost";
 
     return {
       rootNetworks: this.getComposeRootNetworks(network),
       serviceNetworks: {
         [mevBoostServiceName]: {
-          [params.DOCKER_STAKER_NETWORKS[network]]: {
+          [params.DOCKER_BLOCKCHAIN_NETWORKS[network]]: {
             aliases: [`${mevBoostServiceName}.${network}.staker.dappnode`]
           },
           [params.DOCKER_PRIVATE_NETWORK_NAME]: {

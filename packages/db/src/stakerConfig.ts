@@ -179,3 +179,22 @@ export const mevBoostLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
   Object.keys({ MEVBOOST_LUKSO })[0]
 );
+
+// Starknet (L2)
+
+const STARKNET_NODE = "starknet-node";
+const STARKNET_SIGNER = "starknet-signer";
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const starknetNode = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(STARKNET_NODE, null),
+  Object.keys({ STARKNET_NODE })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const starknetSigner = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(STARKNET_SIGNER, null),
+  Object.keys({ STARKNET_SIGNER })[0]
+);
