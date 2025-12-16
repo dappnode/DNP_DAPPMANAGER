@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { BeaconBackupNetworkStatus, Network } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
-const baseUrlTest = "https://0fb336699cb1.ngrok-free.app";
+const baseUrlTest = "https://d25074d9fd86.ngrok-free.app";
 
 /**
  * Returns the Premium package status
@@ -173,7 +173,6 @@ export const premiumBeaconBackupDeactivate = async ({
 export const premiumBeaconBackupStatus = async (
   hashedLicense: string
 ): Promise<Record<Network, BeaconBackupNetworkStatus>> => {
-  console.log("Fetching beacon backup status for hashedLicense:", `${baseUrlTest}/keys/details?id=${hashedLicense}`);
   const response = await fetch(`${baseUrlTest}/keys/details?id=${hashedLicense}`);
 
   if (!response.ok) {
@@ -184,63 +183,26 @@ export const premiumBeaconBackupStatus = async (
   const result: Record<Network, BeaconBackupNetworkStatus> = {} as Record<Network, BeaconBackupNetworkStatus>;
 
   Object.entries(data.networks).forEach(([network, status]) => {
-    console.log("Beacon backup status data for", network, ":", status);
-
     const typedStatus = status as {
       validator_limit: number;
-      time_left: number;
+      available_activation_seconds: number;
       isActivable: boolean;
       active: boolean;
       activation_history: Array<{
         activation_date: string;
         end_date: string;
       }>;
+      time_to_be_available: number;
     };
     result[network as Network] = {
       validatorLimit: typedStatus.validator_limit,
-      isActivable: typedStatus.active === false && typedStatus.time_left > 0,
+      isActivable: typedStatus.active === false && typedStatus.available_activation_seconds > 0,
       isActive: typedStatus.active,
       activationHistory: typedStatus.activation_history,
-      timeLeft: typedStatus.time_left || 60
+      timeLeft: typedStatus.available_activation_seconds || 0,
+      timeUntilAvailable: typedStatus.time_to_be_available || 0
     };
   });
-
-  // const validatorLimit = data.ValidatorLimit;
-  // const validUntilString = data.ValidUntil;
-  // const validUntil = new Date(validUntilString);
-  // const now = new Date();
-
-  // const isZeroTime = validUntilString === "0001-01-01T00:00:00Z";
-
-  // // Activation grace period (30 days after ValidUntil)
-  // const gracePeriodEnd = new Date(validUntil.getTime() + 30 * 24 * 60 * 60 * 1000);
-  // const hasPassedGracePeriod = now > gracePeriodEnd;
-
-  // const isActivable = isZeroTime || hasPassedGracePeriod;
-  // const isActive = validUntil > now;
-
-  // const result: {
-  //   validatorLimit: number;
-  //   isActivable: boolean;
-  //   secondsUntilActivable?: number;
-  //   isActive: boolean;
-  //   secondsUntilDeactivation?: number;
-  // } = {
-  //   validatorLimit,
-  //   isActivable,
-  //   isActive
-  // };
-
-  // if (!isActivable) {
-  //   result.secondsUntilActivable = Math.floor((gracePeriodEnd.getTime() - now.getTime()) / 1000);
-  // }
-
-  // if (isActive) {
-  //   result.secondsUntilDeactivation = Math.floor((validUntil.getTime() - now.getTime()) / 1000);
-  // }
-
-  // return result;
-  console.log("Beacon backup status result:", result);
 
   return result;
 };
