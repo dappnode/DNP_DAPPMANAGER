@@ -1,7 +1,7 @@
 import { Network } from "@dappnode/types";
 import { api } from "api";
 import { withToast } from "components/toast/Toast";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { confirm } from "components/ConfirmDialog";
 import { prettyDnpName } from "utils/format";
 
@@ -30,57 +30,42 @@ export function useBackupNodeActions({
   const [timeLeft, setTimeLeft] = useState<number>(timeLeftInitial);
   const [timeUntilAvailable, setTimeUntilAvailable] = useState<number>(timeUntilAvailableInitial);
 
+  // Prevent multiple revalidates
+  const hasRevalidatedTimeLeft = useRef(false);
+  const hasRevalidatedTimeUntil = useRef(false);
+
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (isActive) {
-        setTimeLeft((prev) => {
-          if (prev <= 0) {
-            revalidate();
-            return -1;
-          }
-          return prev - 1;
-        });
-      }
-
-      if (!isActivable && !isActive) {
-        setTimeUntilAvailable((prev) => {
-          if (prev <= -1) {
-            revalidate();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+    setTimeLeft(timeLeftInitial);
+    setTimeUntilAvailable(timeUntilAvailableInitial);
+    hasRevalidatedTimeLeft.current = false;
+    hasRevalidatedTimeUntil.current = false;
+  }, [timeLeftInitial, timeUntilAvailableInitial]);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (isActive) {
         setTimeLeft((prev) => {
-          if (prev <= 0) {
+          if (prev > 0) return prev - 1;
+          if (!hasRevalidatedTimeLeft.current) {
+            hasRevalidatedTimeLeft.current = true;
             revalidate();
-            return -1;
           }
-          return prev - 1;
+          return 0;
         });
-      }
-
-      if (isActivable) {
+      } else if (!isActivable) {
         setTimeUntilAvailable((prev) => {
-          if (prev <= -1) {
+          if (prev > 0) return prev - 1;
+          if (!hasRevalidatedTimeUntil.current) {
+            hasRevalidatedTimeUntil.current = true;
             revalidate();
-            return 0;
           }
-          return prev - 1;
+          return 0;
         });
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isActive, isActivable, revalidate]);
 
   const formatCountdown = (totalSeconds?: number): string => {
     if (totalSeconds === undefined) return "0d 0h 0m 0s";
@@ -130,7 +115,6 @@ export function useBackupNodeActions({
   };
 
   const activateBackup = () => {
-    console.log("Activating backup..2");
     withToast(() => activate(), {
       message: `Activating Backup node...`,
       onSuccess: `Backup node activated`,
@@ -141,9 +125,7 @@ export function useBackupNodeActions({
   const deactivateBackup = () => {
     confirm({
       title: `Deactivating Backup node`,
-      text: `Deactivating the Backup node is not reversible until it is renewed. Once deactivated, it cannot be reactivated until ${formatCountdown(
-        timeUntilAvailable
-      )}.`,
+      text: `Once deactivated, you'll have ${formatCountdown(timeLeft)} until its fully renewed again.`,
       label: "Deactivate",
       variant: "danger",
       onClick: () =>

@@ -11,7 +11,7 @@ import {
   MdOutlineCheckCircleOutline,
   MdWarningAmber
 } from "react-icons/md";
-import { BackupData, ConsensusInfo } from "hooks/premium/useBackupNodev2";
+import { BackupData, ConsensusInfo } from "hooks/premium/useBackupNodeData";
 
 import "./networkBackup.scss";
 import { prettyDnpName } from "utils/format";
@@ -54,8 +54,6 @@ export const NetworkBackup = ({
   const noConsensusSelected = (backupData && backupData.consensusInfo?.noConsensusSelected) || false;
   const consensusPrysmOrTeku = (backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku) || false;
 
-  console.log(backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku);
-
   return (
     <div>
       {isLoading ? (
@@ -80,7 +78,7 @@ export const NetworkBackup = ({
 
           {/* Backup action cards */
           backupData.isActive ? (
-            <DeactivateCard timeLeft={formatCountdown(timeLeft)} />
+            <DeactivateCard timeLeft={formatCountdown(timeLeft)} deactivateBackup={deactivateBackup} />
           ) : backupData.activable ? (
             <ActivateCard
               timeLeft={formatCountdown(backupData.timeLeft)}
@@ -270,11 +268,7 @@ const ActivateCard = ({
     </div>
     <Button
       variant="dappnode"
-      onClick={() => {
-        console.log("Activating backup..1");
-
-        activateBackup;
-      }}
+      onClick={activateBackup}
       disabled={valLimitExceeded || consensusPrysmOrTeku || noConsensusSelected}
     >
       Activate Backup
@@ -285,7 +279,7 @@ const ActivateCard = ({
   </Card>
 );
 
-const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
+const DeactivateCard = ({ timeLeft, deactivateBackup }: { timeLeft: string; deactivateBackup: () => void }) => (
   <Card className="action-backup-card">
     <div className="action-backup-col">
       <MdOutlineCheckCircleOutline className="green-text action-icon" />
@@ -298,7 +292,7 @@ const DeactivateCard = ({ timeLeft }: { timeLeft: string }) => (
       <div className="countdown-text">Auto-deactivation in</div>
       <div className="countdown-time">{timeLeft}</div>
     </div>
-    <Button variant="danger" onClick={() => {}}>
+    <Button variant="danger" onClick={deactivateBackup}>
       Stop Backup
     </Button>
   </Card>
@@ -344,7 +338,7 @@ const ActivationHistoryTable = ({
   const [sortBy, setSortBy] = useState<"number" | "start" | "end" | "duration">("number");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
-  if (!activationsHistory?.length) return <div>No activations found.</div>;
+  if (!activationsHistory?.length) return <div className="no-history-label">No activations found.</div>;
 
   const getDuration = (a: { activation_date: Date; end_date: Date }) =>
     a.end_date.getTime() - a.activation_date.getTime();
@@ -401,7 +395,7 @@ const ActivationHistoryTable = ({
               <td>{activationsHistory.indexOf(activation) + 1}</td>
               <td>{activation.activation_date.toLocaleString()}</td>
               <td>{activation.end_date.toLocaleString()}</td>
-              <td>{getDuration(activation) / (1000 * 60 * 60)} hours</td>
+              <td>{(getDuration(activation) / (1000 * 60 * 60)).toFixed(2)} hours</td>
             </tr>
           ))}
         </tbody>

@@ -103,8 +103,8 @@ export function useBackupNodeData({
       acc[network] = {
         isActive: backupStatus?.isActive ?? false,
         activable: backupStatus?.isActivable ?? false,
-        timeLeft: backupStatus?.timeLeft ?? 60,
-        timeUntilAvailable: backupStatus?.isActivable ? 0 : 60,
+        timeLeft: backupStatus?.timeLeft ?? 0,
+        timeUntilAvailable: backupStatus?.timeUntilAvailable ?? 0,
         activeValidators: activeValidatorsInfo?.count ?? 0,
         maxValidators: backupStatus?.validatorLimit ?? 0,
         beaconApiError: activeValidatorsInfo?.beaconApiError ?? false,
