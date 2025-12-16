@@ -76,7 +76,7 @@
     "prom-client": "^14.1.0",
     "semver": "^7.3.8",
     "socket.io": "^4.5.1",
-    "systeminformation": "^5.21.24"
+    "systeminformation": "^5.27.14"
   },
   "devDependencies": {
     "@types/mocha": "^10",
