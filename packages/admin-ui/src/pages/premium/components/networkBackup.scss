@@ -150,6 +150,12 @@
   .activation-history-card {
     overflow-x: auto;
 
+    .no-history-label {
+      margin-top: 5px 0;
+      font-size: 0.8rem;
+      color: var(--light-text-color);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;

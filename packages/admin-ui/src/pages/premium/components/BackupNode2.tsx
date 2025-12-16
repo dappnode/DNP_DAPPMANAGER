@@ -7,7 +7,7 @@ import { SectionNavigator } from "components/SectionNavigator";
 import { RouteType } from "types";
 import { Card } from "react-bootstrap";
 import { NetworkBackup } from "./NetworkBackup";
-import { availableNetworks, useBackupNode2 } from "hooks/premium/useBackupNodev2";
+import { availableNetworks, useBackupNodeData } from "hooks/premium/useBackupNodeData";
 import { Network } from "@dappnode/types";
 import "./backupNode.scss";
 
@@ -18,7 +18,7 @@ export function BackupNode2({
   isActivated: boolean;
   hashedLicense: string;
 }) {
-  const { backupData, consensusLoading, backupStatusLoading, revalidateBackup } = useBackupNode2({
+  const { backupData, consensusLoading, backupStatusLoading, revalidateBackup } = useBackupNodeData({
     hashedLicense,
     isPremiumActivated: isPremium
   });
