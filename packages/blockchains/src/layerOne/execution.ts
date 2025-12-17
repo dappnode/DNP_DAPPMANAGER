@@ -10,7 +10,7 @@ import {
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { Blockchain } from "../blockchain.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
@@ -20,7 +20,7 @@ import { gt } from "semver";
 
 // TODO: move ethereumClient logic here
 
-export class Execution extends StakerComponent {
+export class Execution extends Blockchain {
   readonly DbHandlers: Record<
     Network,
     {
@@ -102,7 +102,7 @@ export class Execution extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentExecutionDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
+      await this.setBlockchainPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
 
       await this.DbHandlers[network].set(currentExecutionDnpName);
     }
@@ -112,7 +112,7 @@ export class Execution extends StakerComponent {
     const prevExecClientDnpName = this.DbHandlers[network].get();
 
     await super.setNew({
-      newStakerDnpName: newExecutionDnpName,
+      newBlockchainDnpName: newExecutionDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       fullnodeAliases: [`execution.${network}.dncore.dappnode`],
       compatibleClients: Execution.CompatibleExecutions[network],
@@ -152,43 +152,100 @@ export class Execution extends StakerComponent {
   }
 
   /**
-   * Returns the service name of the execution client
+   * This function returns the execution service name for a given dnpName.
+   * Useful for setting the execution service network aliases.
    *
-   * TODO: find a better way to get the service name of the execution client or force execution clients to have same service name "execution", similar as consensus clients with beacon-chain and validator services
+   * @description The execution service name should be same accross all execution packages
+   * but currently it is not. So we need to find the service name for each package.
+   *
+   * Logic: find the service with an image that contains the execution dnpName
+   * - e.g. for mainnet: "reth.dnp.dappnode.eth:2.0.0" -> service name: "reth"
+   *
+   * NOTE: Reth is the only package that has a different service name for the execution from the
+   * service image name. Reth starts with "reth" but the service image name is "reth.dnp.dappnode.eth:version"
+   *
+   * @param dnpName
+   * @returns execution service name
    */
   private async getExecutionServiceName(dnpName: string): Promise<string> {
-    // TODO: geth mainnet is the only execution with service name === dnpName. See https://github.com/dappnode/DAppNodePackage-geth/blob/7e8e5aa860a8861986f675170bfa92215760d32e/docker-compose.yml#L3
-    if (dnpName === ExecutionClientMainnet.Geth) {
-      logs.info(`Execution mainnet ${dnpName} has service name ${dnpName}`);
-      const version = await this.getExecutionVersion(dnpName);
-      if (gt(version, "0.1.43")) {
-        logs.info(`Version ${version} is greater than 0.1.43. Using service name "geth"`);
-        return "geth";
-      }
-      logs.info(`Version ${version} is less than 0.1.44. Using service name ${dnpName}`);
-      return ExecutionClientMainnet.Geth;
-    }
-
-    if (dnpName.includes("geth")) return "geth";
-    if (dnpName.includes("nethermind")) return "nethermind";
-    if (dnpName.includes("erigon")) return "erigon";
-    if (dnpName.includes("besu")) return "besu";
-    if (dnpName.includes("reth")) return "reth";
-
-    return dnpName;
-  }
-
-  private async getExecutionVersion(dnpName: string): Promise<string> {
     const isInstalled = await this.isPackageInstalled(dnpName);
 
     if (isInstalled) {
-      const version = (await listPackage({ dnpName })).version;
-      logs.info(`Execution ${dnpName} is installed. Using version ${version}`);
-      return version;
-    } else {
-      const version = (await this.dappnodeInstaller.getVersionAndIpfsHash({ dnpNameOrHash: dnpName })).version;
-      logs.info(`Execution ${dnpName} is not installed. Using version ${version} from APM`);
-      return version;
+      const pkg = await listPackage({ dnpName });
+      const execService = pkg.containers.find((container) => container.serviceName.includes("reth"))
+        ? "reth"
+        : pkg.containers[0].serviceName;
+
+      if (!execService) {
+        logs.error(`Could not find execution service name for ${dnpName}, using dnpName instead`);
+        return dnpName.split(".")[0];
+      }
+      // Some clients are versioned such as geth-v1-26-0-2 but service name is geth
+      // Version is introduced by -v and can contain numbers and dashes
+      return execService.replace(/-v[\d-]+$/, "");
     }
+
+    // If is a reth package, the service name is "reth" instead of the first part of the dnpName
+    // this is because the container version is different from the service name in reth packages
+    if (dnpName.includes("reth")) return "reth";
+
+    // If not installed: the service name is the first part of the dnpName
+    return dnpName.split(".")[0];
+  }
+
+  /**
+   * This function checks if the current execution package has a newer version that needs to be installed
+   * because the execution service has been changed to a newer versioned service
+   * (i.e., geth -> geth-v1-26-0-2)
+   *
+   * We need the installed version to be greater than the new versioned service release and the service
+   * image version to be different from the first part of the dnpName
+   */
+  async executionNeedsToBeReinstalled(network: Network): Promise<boolean> {
+    const currentExecutionDnpName = this.DbHandlers[network].get();
+    if (!currentExecutionDnpName) return false;
+    const isInstalled = await this.isPackageInstalled(currentExecutionDnpName);
+
+    if (!isInstalled) return false;
+
+    const newVersionedReleases = this.getNewVersionedServiceRelease(network, currentExecutionDnpName);
+
+    if (!newVersionedReleases) return false;
+
+    const pkg = await listPackage({ dnpName: currentExecutionDnpName });
+
+    if (gt(pkg.version, newVersionedReleases.version)) return false;
+
+    const allServicesContainsNewVersionedService = pkg.containers.every(
+      (container) =>
+        container.serviceName === newVersionedReleases.service ||
+        container.serviceName.startsWith(newVersionedReleases.service)
+    );
+
+    if (allServicesContainsNewVersionedService) return false;
+
+    return true;
+  }
+
+  private getNewVersionedServiceRelease(
+    network: Network,
+    dnpName: string
+  ): { service: string; version: string } | null {
+    const newVersionedServiceReleases: Record<Network, Record<string, { service: string; version: string }>> = {
+      [Network.Mainnet]: {
+        [ExecutionClientMainnet.Geth]: {
+          service: "geth",
+          version: "0.1.51"
+        }
+      },
+      [Network.Gnosis]: {},
+      [Network.Prater]: {},
+      [Network.Holesky]: {},
+      [Network.Hoodi]: {},
+      [Network.Sepolia]: {},
+      [Network.Lukso]: {}
+    };
+
+    return newVersionedServiceReleases[network][dnpName] || null;
   }
 }

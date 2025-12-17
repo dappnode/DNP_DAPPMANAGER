@@ -7,7 +7,7 @@ import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@d
 import { lt } from "semver";
 import { params } from "@dappnode/params";
 
-export class StakerComponent {
+export class Blockchain {
   protected dappnodeInstaller: DappnodeInstaller;
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -53,14 +53,14 @@ export class StakerComponent {
   }
 
   protected async setNew({
-    newStakerDnpName,
+    newBlockchainDnpName,
     dockerNetworkName,
     fullnodeAliases,
     compatibleClients,
     userSettings,
     prevClient
   }: {
-    newStakerDnpName: string | null | undefined;
+    newBlockchainDnpName: string | null | undefined;
     dockerNetworkName: string;
     fullnodeAliases: string[];
     compatibleClients:
@@ -72,7 +72,7 @@ export class StakerComponent {
     userSettings: UserSettings;
     prevClient?: string | null;
   }): Promise<void> {
-    if (!prevClient && !newStakerDnpName) {
+    if (!prevClient && !newBlockchainDnpName) {
       logs.info("no client selected, skipping");
       return;
     }
@@ -84,15 +84,15 @@ export class StakerComponent {
     if (currentPkg) {
       if (prevClient && compatibleClients)
         this.ensureCompatibilityRequirements(prevClient, compatibleClients, currentPkg.version);
-      if (prevClient !== newStakerDnpName)
-        await this.unsetStakerPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
+      if (prevClient !== newBlockchainDnpName)
+        await this.unsetBlockchainPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
     }
 
-    if (!newStakerDnpName) return;
-    // set staker config
-    await this.setStakerPkgConfig({
-      dnpName: newStakerDnpName,
-      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
+    if (!newBlockchainDnpName) return;
+    // set blockchain config
+    await this.setBlockchainPkgConfig({
+      dnpName: newBlockchainDnpName,
+      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newBlockchainDnpName })),
       userSettings
     });
   }
@@ -115,13 +115,13 @@ export class StakerComponent {
   }
 
   /**
-   * Set the staker pkg:
-   * - ensures the staker pkg is installed
-   * - connects the staker pkg to the staker network
+   * Set the blockchain pkg:
+   * - ensures the blockchain pkg is installed
+   * - connects the blockchain pkg to the staker network
    * - adds the staker network to the docker-compose file
-   * - starts the staker pkg
+   * - starts the blockchain pkg
    */
-  protected async setStakerPkgConfig({
+  protected async setBlockchainPkgConfig({
     dnpName,
     isInstalled,
     userSettings
@@ -131,7 +131,7 @@ export class StakerComponent {
     userSettings: UserSettings;
   }): Promise<void> {
     if (isInstalled) {
-      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
+      await this.setInstalledBlockchainPkgConfig({ dnpName, userSettings });
     } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
@@ -140,7 +140,7 @@ export class StakerComponent {
     }
   }
 
-  private async setInstalledStakerPkgConfig({
+  private async setInstalledBlockchainPkgConfig({
     dnpName,
     userSettings
   }: {
@@ -164,12 +164,12 @@ export class StakerComponent {
   }
 
   /**
-   * Unset staker pkg:
-   * - disconnects the staker pkg from the staker network
-   * - stops the staker pkg
+   * Unset blockchain pkg:
+   * - disconnects the blockchain pkg from the staker network
+   * - stops the blockchain pkg
    * - removes the staker network from the docker-compose file
    */
-  private async unsetStakerPkgConfig({
+  private async unsetBlockchainPkgConfig({
     pkg,
     dockerNetworkName,
     fullnodeAliases
@@ -178,7 +178,7 @@ export class StakerComponent {
     dockerNetworkName: string;
     fullnodeAliases: string[];
   }): Promise<void> {
-    this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
+    this.removeBlockchainNetworkFromCompose(pkg.dnpName, dockerNetworkName);
     this.removeFullnodeAliasFromDncoreNetwork(pkg.dnpName, fullnodeAliases);
 
     // This recreates the package containers so that they include the recently added configuration
@@ -210,7 +210,7 @@ export class StakerComponent {
     composeEditor.write();
   }
 
-  private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
+  private removeBlockchainNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
     const composeEditor = new ComposeFileEditor(dnpName, false);
     const services = composeEditor.compose.services;
 
@@ -245,12 +245,12 @@ export class StakerComponent {
     const compatibleClient = compatibleClients.find((c) => c.dnpName === dnpName);
 
     // ensure valid dnpName
-    if (!compatibleClient) throw Error("The selected staker is not compatible with the current network");
+    if (!compatibleClient) throw Error("The selected blockchain client is not compatible with the current network");
 
     // ensure valid version
     if (compatibleClient?.minVersion && lt(pkgVersion, compatibleClient.minVersion)) {
       throw Error(
-        `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
+        `The selected blockchain client version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
   }

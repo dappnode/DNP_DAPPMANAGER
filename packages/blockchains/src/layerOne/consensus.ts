@@ -10,7 +10,7 @@ import {
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { Blockchain } from "../blockchain.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
@@ -18,7 +18,7 @@ import { getDefaultConsensusUserSettings } from "@dappnode/utils";
 
 // TODO: move ethereumClient logic here
 
-export class Consensus extends StakerComponent {
+export class Consensus extends Blockchain {
   readonly DbHandlers: Record<
     Network,
     {
@@ -102,7 +102,7 @@ export class Consensus extends StakerComponent {
 
       const userSettings = await this.getUserSettings(network, currentConsensusDnpName);
 
-      await this.setStakerPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
+      await this.setBlockchainPkgConfig({ dnpName: currentConsensusDnpName, isInstalled, userSettings });
 
       await this.DbHandlers[network].set(currentConsensusDnpName);
     }
@@ -114,7 +114,7 @@ export class Consensus extends StakerComponent {
     const userSettings = await this.getUserSettings(network, newConsensusDnpName);
 
     await super.setNew({
-      newStakerDnpName: newConsensusDnpName,
+      newBlockchainDnpName: newConsensusDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       fullnodeAliases: [`beacon-chain.${network}.dncore.dappnode`, `validator.${network}.dncore.dappnode`],
       compatibleClients: Consensus.CompatibleConsensus[network],
@@ -187,7 +187,7 @@ export class Consensus extends StakerComponent {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
-    // helper to build each service’s networks
+    // helper to build each service's networks
     const buildSvc = (svcName: string) => ({
       [params.DOCKER_STAKER_NETWORKS[network]]: {
         aliases: [`${svcName}.${network}.staker.dappnode`]

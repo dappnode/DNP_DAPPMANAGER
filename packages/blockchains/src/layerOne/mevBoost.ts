@@ -7,14 +7,14 @@ import {
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { Blockchain } from "../blockchain.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { ComposeFileEditor } from "@dappnode/dockercompose";
 
-export class MevBoost extends StakerComponent {
+export class MevBoost extends Blockchain {
   readonly DbHandlers: Record<Network, { get: () => boolean; set: (globEnvValue: boolean) => Promise<void> }> = {
     [Network.Mainnet]: db.mevBoostMainnet,
     [Network.Gnosis]: db.mevBoostGnosis,
@@ -84,7 +84,7 @@ export class MevBoost extends StakerComponent {
 
       const userSettings = this.getUserSettings(network, null);
 
-      await this.setStakerPkgConfig({
+      await this.setBlockchainPkgConfig({
         dnpName: mevBoostDnpName,
         isInstalled: true,
         userSettings
@@ -97,7 +97,7 @@ export class MevBoost extends StakerComponent {
   async setNewMevBoost(network: Network, newMevBoostDnpName: string | null, newRelays: string[]) {
     const compatibleMevBoost = MevBoost.CompatibleMevBoost[network];
     await super.setNew({
-      newStakerDnpName: newMevBoostDnpName,
+      newBlockchainDnpName: newMevBoostDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       fullnodeAliases: [`mev-boost.${network}.dncore.dappnode`],
       compatibleClients: compatibleMevBoost ? [compatibleMevBoost] : null,

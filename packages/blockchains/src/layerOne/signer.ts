@@ -10,12 +10,12 @@ import {
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { Blockchain } from "../blockchain.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 
-export class Signer extends StakerComponent {
+export class Signer extends Blockchain {
   protected static readonly ServiceAliasesMap: Record<string, string[]> = {};
 
   protected static readonly CompatibleSigners: Record<Network, { dnpName: string; minVersion: string }> = {
@@ -69,13 +69,13 @@ export class Signer extends StakerComponent {
       const dnpName = Signer.CompatibleSigners[network].dnpName;
       const userSettings = this.getUserSettings(network);
 
-      await this.setStakerPkgConfig({ dnpName, isInstalled: true, userSettings });
+      await this.setBlockchainPkgConfig({ dnpName, isInstalled: true, userSettings });
     }
   }
 
   async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
     await super.setNew({
-      newStakerDnpName: newWeb3signerDnpName,
+      newBlockchainDnpName: newWeb3signerDnpName,
       dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
       fullnodeAliases: [`signer.${network}.dncore.dappnode`],
       compatibleClients: [Signer.CompatibleSigners[network]],

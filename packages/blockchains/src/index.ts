@@ -1,4 +1,2 @@
-export { Consensus } from "./consensus.js";
-export { Execution } from "./execution.js";
-export { MevBoost } from "./mevBoost.js";
-export { Signer } from "./signer.js";
+export { Blockchain } from "./blockchain.js";
+export { Consensus, Execution, MevBoost, Signer } from "./layerOne/index.js";
