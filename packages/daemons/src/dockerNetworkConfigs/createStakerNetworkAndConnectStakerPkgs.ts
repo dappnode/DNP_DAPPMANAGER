@@ -1,7 +1,7 @@
 import { docker } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
 import { logs } from "@dappnode/logger";
-import { Execution, Consensus, Signer, MevBoost } from "@dappnode/stakers";
+import { Execution, Consensus, Signer, MevBoost } from "@dappnode/blockchains";
 import { Network } from "@dappnode/types";
 
 /**

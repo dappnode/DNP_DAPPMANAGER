@@ -18,6 +18,7 @@
     "dev": "tsc -w"
   },
   "dependencies": {
+    "@dappnode/blockchains": "workspace:^0.1.0",
     "@dappnode/db": "workspace:^0.1.0",
     "@dappnode/dockerapi": "workspace:^0.1.0",
     "@dappnode/dockercompose": "workspace:^0.1.0",
@@ -30,7 +31,6 @@
     "@dappnode/logger": "workspace:^0.1.0",
     "@dappnode/notifications": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
-    "@dappnode/stakers": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/upnpc": "workspace:^0.1.0",
     "@dappnode/utils": "workspace:^0.1.0",

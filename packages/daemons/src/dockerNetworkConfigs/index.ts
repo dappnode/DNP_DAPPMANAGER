@@ -9,7 +9,7 @@ import { InstalledPackageDataApiReturn } from "@dappnode/types";
 import { httpsPortal } from "@dappnode/httpsportal";
 import { runAtMostEvery } from "@dappnode/utils";
 import { createStakerNetworkAndConnectStakerPkgs } from "./createStakerNetworkAndConnectStakerPkgs.js";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/blockchains";
 
 async function ensureDockerNetworkConfigs(
   execution: Execution,

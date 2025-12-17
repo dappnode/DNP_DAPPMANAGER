@@ -12,7 +12,7 @@ import { startHostRebootDaemon } from "./hostReboot/index.js";
 import { startRepositoryHealthDaemon } from "./repositoryHealth/index.js";
 import { setMaxListeners } from "events"; // Import setMaxListeners
 import { startDockerNetworkConfigsDaemon } from "./dockerNetworkConfigs/index.js";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/blockchains";
 
 // DAEMONS EXPORT
 

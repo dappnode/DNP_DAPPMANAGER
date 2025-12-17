@@ -18,6 +18,7 @@
   },
   "license": "GPL-3.0",
   "dependencies": {
+    "@dappnode/blockchains": "workspace:^0.1.0",
     "@dappnode/chains": "workspace:^0.1.0",
     "@dappnode/common": "workspace:^0.1.0",
     "@dappnode/daemons": "workspace:^0.1.0",
@@ -35,7 +36,6 @@
     "@dappnode/notifications": "workspace:^0.1.0",
     "@dappnode/optimism": "workspace:^0.1.0",
     "@dappnode/params": "workspace:^0.1.0",
-    "@dappnode/stakers": "workspace:^0.1.0",
     "@dappnode/toolkit": "workspace:^0.1.0",
     "@dappnode/types": "workspace:^0.1.0",
     "@dappnode/upnpc": "workspace:^0.1.0",

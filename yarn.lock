@@ -978,6 +978,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@dappnode/blockchains@workspace:^0.1.0, @dappnode/blockchains@workspace:packages/blockchains":
+  version: 0.0.0-use.local
+  resolution: "@dappnode/blockchains@workspace:packages/blockchains"
+  dependencies:
+    "@dappnode/db": "workspace:^0.1.0"
+    "@dappnode/dockerapi": "workspace:^0.1.0"
+    "@dappnode/installer": "workspace:^0.1.0"
+    "@dappnode/logger": "workspace:^0.1.0"
+    "@dappnode/types": "workspace:^0.1.0"
+    "@dappnode/utils": "workspace:^0.1.0"
+    "@types/semver": "npm:7.3.13"
+    lodash-es: "npm:^4.17.21"
+    semver: "npm:7.3.8"
+  languageName: unknown
+  linkType: soft
+
 "@dappnode/chains@workspace:^0.1.0, @dappnode/chains@workspace:packages/chains":
   version: 0.0.0-use.local
   resolution: "@dappnode/chains@workspace:packages/chains"
@@ -1011,6 +1027,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/daemons@workspace:packages/daemons"
   dependencies:
+    "@dappnode/blockchains": "workspace:^0.1.0"
     "@dappnode/db": "workspace:^0.1.0"
     "@dappnode/dockerapi": "workspace:^0.1.0"
     "@dappnode/dockercompose": "workspace:^0.1.0"
@@ -1023,7 +1040,6 @@ __metadata:
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/notifications": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
-    "@dappnode/stakers": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/upnpc": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
@@ -1047,6 +1063,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/dappmanager@workspace:packages/dappmanager"
   dependencies:
+    "@dappnode/blockchains": "workspace:^0.1.0"
     "@dappnode/chains": "workspace:^0.1.0"
     "@dappnode/common": "workspace:^0.1.0"
     "@dappnode/daemons": "workspace:^0.1.0"
@@ -1064,7 +1081,6 @@ __metadata:
     "@dappnode/notifications": "workspace:^0.1.0"
     "@dappnode/optimism": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
-    "@dappnode/stakers": "workspace:^0.1.0"
     "@dappnode/toolkit": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/upnpc": "workspace:^0.1.0"
@@ -1291,6 +1307,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@dappnode/migrations@workspace:packages/migrations"
   dependencies:
+    "@dappnode/blockchains": "workspace:^0.1.0"
     "@dappnode/db": "workspace:^0.1.0"
     "@dappnode/dockerapi": "workspace:^0.1.0"
     "@dappnode/dockercompose": "workspace:^0.1.0"
@@ -1300,7 +1317,6 @@ __metadata:
     "@dappnode/installer": "workspace:^0.1.0"
     "@dappnode/logger": "workspace:^0.1.0"
     "@dappnode/params": "workspace:^0.1.0"
-    "@dappnode/stakers": "workspace:^0.1.0"
     "@dappnode/types": "workspace:^0.1.0"
     "@dappnode/utils": "workspace:^0.1.0"
     "@types/dockerode": "npm:^3.3.23"
@@ -1357,22 +1373,6 @@ __metadata:
     ajv: "npm:^8.17.1"
     mocha: "npm:^10.7.0"
     semver: "npm:^7.5.0"
-  languageName: unknown
-  linkType: soft
-
-"@dappnode/stakers@workspace:^0.1.0, @dappnode/stakers@workspace:packages/stakers":
-  version: 0.0.0-use.local
-  resolution: "@dappnode/stakers@workspace:packages/stakers"
-  dependencies:
-    "@dappnode/db": "workspace:^0.1.0"
-    "@dappnode/dockerapi": "workspace:^0.1.0"
-    "@dappnode/installer": "workspace:^0.1.0"
-    "@dappnode/logger": "workspace:^0.1.0"
-    "@dappnode/types": "workspace:^0.1.0"
-    "@dappnode/utils": "workspace:^0.1.0"
-    "@types/semver": "npm:7.3.13"
-    lodash-es: "npm:^4.17.21"
-    semver: "npm:7.3.8"
   languageName: unknown
   linkType: soft
 

@@ -1,7 +1,7 @@
 import { Network, Routes } from "@dappnode/types";
 import { packageInstall as pkgInstall } from "@dappnode/installer";
 import { dappnodeInstaller } from "../index.js";
-import { Consensus } from "@dappnode/stakers";
+import { Consensus } from "@dappnode/blockchains";
 import { logs } from "@dappnode/logger";
 
 /**

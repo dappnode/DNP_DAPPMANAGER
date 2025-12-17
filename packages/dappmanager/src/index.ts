@@ -24,7 +24,7 @@ import { AdminPasswordDb } from "./api/auth/adminPasswordDb.js";
 import { DeviceCalls } from "./calls/device/index.js";
 import { startHttpApi } from "./api/startHttpApi.js";
 import { DappNodeDirectory, DappNodeRegistry, MultiUrlJsonRpcProvider } from "@dappnode/toolkit";
-import { Consensus, Execution, MevBoost, Signer } from "@dappnode/stakers";
+import { Consensus, Execution, MevBoost, Signer } from "@dappnode/blockchains";
 
 const controller = new AbortController();
 
