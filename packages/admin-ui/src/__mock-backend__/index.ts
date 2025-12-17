@@ -418,7 +418,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       mainnet: {
         validatorLimit: 100,
         isActivable: true,
-        secondsUntilActivable: 0,
+        timeUntilAvailable: 0,
         isActive: false,
         timeLeft: 2450
         // secondsUntilDeactivation is optional and can be omitted or set to undefined
