@@ -15,50 +15,55 @@
       padding: 10px;
     }
   }
-
-  .subscription-card {
+  .subscriptions-list {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 10px;
 
-    @media (max-width: 40rem) {
-      flex-direction: column;
-      gap: 10px;
-      align-items: flex-end;
-    }
+    .subscription-card {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
 
-    .alias-info {
-      font-size: 1.2rem;
-      input {
-        width: 30ch;
-        margin-right: 5px;
-        border-radius: 5px;
-      }
       @media (max-width: 40rem) {
-        width: 100%;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-end;
+      }
+
+      .alias-info {
+        font-size: 1.2rem;
         input {
+          width: 30ch;
+          margin-right: 5px;
+          border-radius: 5px;
+        }
+        @media (max-width: 40rem) {
           width: 100%;
+          input {
+            width: 100%;
+          }
+        }
+
+        .current-tag {
+          margin-left: 5px;
         }
       }
 
-      .current-tag{
-        margin-left: 5px;
-      }
-    }
+      .btns-container {
+        display: flex;
+        flex-direction: row;
+        gap: 10px;
 
-    .btns-container {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-
-      .icon-btns {
-        padding: 0px 10px;
-        font-size: 1.6rem;
-        opacity: 0.5;
-        cursor: pointer;
-        &:hover {
-          opacity: 0.8;
+        .icon-btns {
+          padding: 0px 10px;
+          font-size: 1.6rem;
+          opacity: 0.5;
+          cursor: pointer;
+          &:hover {
+            opacity: 0.8;
+          }
         }
       }
     }
