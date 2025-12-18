@@ -17,7 +17,6 @@ import { logs, getLogUi, logUiClear } from "@dappnode/logger";
 import { Routes } from "@dappnode/types";
 import { PackageRequest } from "@dappnode/types";
 import { DappnodeInstaller } from "../dappnodeInstaller.js";
-import { sendCoreInstalledResolvedNotification } from "../installer/sendCoreInstallResolvedNotification.js";
 import { params } from "@dappnode/params";
 
 /**
@@ -101,7 +100,6 @@ export async function packageInstall(
 
       await postInstallClean(packagesData, log);
       afterInstall(dnpNames);
-      await sendCoreInstalledResolvedNotification(packagesData);
       logUiClear({ id });
     } catch (e) {
       afterInstall(dnpNames);
