@@ -11,8 +11,8 @@ import { usePwaSubtabUrl } from "hooks/PWA/usePwaSubtabUrl";
 import Loading from "components/Loading";
 import newTabProps from "utils/newTabProps";
 import { docsUrl } from "params";
-import "./devicesSubs.scss";
 import SubTitle from "components/SubTitle";
+import "./devicesSubs.scss";
 
 export function DevicesSubs() {
   const {
@@ -97,7 +97,7 @@ export function DevicesSubs() {
         <SubTitle>Subscribed Devices</SubTitle>
 
         {subscriptionsList && subscriptionsList.length > 0 ? (
-          <>
+          <div className="subscriptions-list">
             {subscriptionsList.map((sub, index) => (
               <SubscriptionCard
                 key={index}
@@ -107,7 +107,7 @@ export function DevicesSubs() {
                 revalidateSubs={revalidateSubs}
               />
             ))}
-          </>
+          </div>
         ) : (
           <Card>No subscriptions found</Card>
         )}

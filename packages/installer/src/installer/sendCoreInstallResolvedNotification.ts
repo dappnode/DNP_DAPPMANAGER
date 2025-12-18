@@ -1,4 +1,4 @@
-import { Category, InstallPackageData, Priority, Status } from "@dappnode/types";
+import { Category, InstallPackageDataPaths, Priority, Status } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { notifications } from "@dappnode/notifications";
 import { params } from "@dappnode/params";
@@ -7,7 +7,7 @@ import { params } from "@dappnode/params";
  * Send resolved notification for core packages once installed
  * @param packagesData
  */
-export async function sendCoreInstalledResolvedNotification(packagesData: InstallPackageData[]): Promise<void> {
+export async function sendCoreInstalledResolvedNotification(packagesData: InstallPackageDataPaths[]): Promise<void> {
   if (packagesData.some((p) => p.dnpName === params.coreDnpName)) {
     const title = "System update completed successfully";
     const body = formatNotificationBody({ packages: packagesData });
@@ -28,7 +28,7 @@ export async function sendCoreInstalledResolvedNotification(packagesData: Instal
   }
 }
 
-function formatNotificationBody({ packages }: { packages: InstallPackageData[] }): string {
+function formatNotificationBody({ packages }: { packages: InstallPackageDataPaths[] }): string {
   return [
     "The installation of the following packages has been completed successfully:",
     packages.map((p) => ` - ${p.dnpName}: ${p.semVersion}`).join("\n")
