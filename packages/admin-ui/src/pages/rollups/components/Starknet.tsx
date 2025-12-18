@@ -8,7 +8,6 @@ import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import SubTitle from "components/SubTitle";
 import StarknetFullNode from "./columns/StarknetFullNode";
-import StarknetSigner from "./columns/StarknetSigner";
 import { Network } from "@dappnode/types";
 import { useStarknetConfig } from "./useStarknetConfig";
 import "./columns.scss";
@@ -51,8 +50,8 @@ export default function Starknet({
     setReqStatus,
     newFullNode,
     setNewFullNode,
-    newSigner,
-    setNewSigner,
+    newStakingApp,
+    setNewStakingApp,
     changes
   } = useStarknetConfig(network, currentStakerConfigReq);
 
@@ -96,9 +95,9 @@ export default function Starknet({
               stakerConfig: {
                 network,
                 executionDnpName: newFullNode?.dnpName || null,
-                consensusDnpName: null, // Starknet doesn't use consensus clients
+                consensusDnpName: newStakingApp?.dnpName || null,
                 mevBoostDnpName: null, // Starknet doesn't use MEV Boost
-                web3signerDnpName: newSigner?.dnpName || null,
+                web3signerDnpName: null, // Starknet doesn't use Web3Signer
                 relays: []
               }
             }),
@@ -169,16 +168,17 @@ export default function Starknet({
                 />
               ))}
             </Col>
-            {currentStakerConfigReq.data.web3Signer && (
-                <Col>
-                <SubTitle>Staking Application</SubTitle>
-                <StarknetSigner
-                  signer={currentStakerConfigReq.data.web3Signer}
-                  setNewSigner={setNewSigner}
-                  isSelected={newSigner?.dnpName === currentStakerConfigReq.data.web3Signer.dnpName}
+            <Col>
+              <SubTitle>Staking Application</SubTitle>
+              {currentStakerConfigReq.data.consensusClients.map((stakingApp, i) => (
+                <StarknetFullNode
+                  key={i}
+                  fullNode={stakingApp}
+                  setNewFullNode={setNewStakingApp}
+                  isSelected={stakingApp.dnpName === newStakingApp?.dnpName}
                 />
-                </Col>
-            )}
+              ))}
+            </Col>
           </Row>
 
           <hr />

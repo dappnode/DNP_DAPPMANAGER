@@ -153,22 +153,24 @@ export enum SignerSepolia {
   Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
 }
 
+// For starknet, we treat juno/pathfinder as an execution client, but its basically a fullnode on its own.
+// "Starknetstaking" (validator sofware) is treated as consensus client.
 // STARKNET MAINNET
-export enum StarknetClientMainnet {
+export enum StarknetExecutionMainnet {
   Juno = "juno.dnp.dappnode.eth",
   Pathfinder = "pathfinder.dnp.dappnode.eth"
 }
-export enum SignerStarknetMainnet {
-  Web3signer = "starknetstaking.dnp.dappnode.eth"
+export enum StarknetConsensusMainnet {
+  StarknetStaking = "starknetstaking.dnp.dappnode.eth"
 }
 
 // STARKNET SEPOLIA
-export enum StarknetClientSepolia {
+export enum StarknetExecutionSepolia {
   Juno = "juno-sepolia.dnp.dappnode.eth",
   Pathfinder = "pathfinder-sepolia.dnp.dappnode.eth"
 }
-export enum SignerStarknetSepolia {
-  Web3signer = "starknetstaking-sepolia.dnp.dappnode.eth"
+export enum StarknetConsensusSepolia {
+  StarknetStaking = "starknetstaking-sepolia.dnp.dappnode.eth"
 }
 
 export type StakerItem = StakerItemOk | StakerItemError;

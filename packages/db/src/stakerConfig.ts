@@ -181,30 +181,60 @@ export const mevBoostLukso = interceptGlobalEnvOnSet(
 );
 
 // Starknet Mainnet
+const CONSENSUS_STAKER_MAINNET = "consensus-staker-mainnet";
+const EXECUTION_STAKER_MAINNET = "execution-staker-mainnet";
+const MEVBOOST_STAKER_MAINNET = "mevboost-staker-mainnet";
 
-const STARKNET_CLIENT_MAINNET = "starknet-client";
-const MEVBOOST_STARKNET_MAINNET = "mevboost-starknet-mainnet";
-const MEVBOOST_STARKNET_SEPOLIA = "mevboost-starknet-sepolia";
+/**
+ * Whenever a user switches the EC and/or CC from the stakers UI then
+ * consensusClientMainnet, executionClientMainnet will change as well
+ */
 
-export const starknetClientMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(STARKNET_CLIENT_MAINNET, null),
-  Object.keys({ STARKNET_CLIENT_MAINNET })[0]
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_MAINNET, null),
+  Object.keys({ CONSENSUS_STAKER_MAINNET })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_MAINNET, null),
+  Object.keys({ EXECUTION_STAKER_MAINNET })[0]
 );
 
 export const mevBoostStarknetMainnet = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_STARKNET_MAINNET, false),
-  Object.keys({ MEVBOOST_STARKNET_MAINNET })[0]
+  dbMain.staticKey<boolean>(MEVBOOST_STAKER_MAINNET, false),
+  Object.keys({ MEVBOOST_STAKER_MAINNET })[0]
 );
+
 // Starknet Sepolia
 
-const STARKNET_CLIENT_SEPOLIA = "starknet-client-sepolia";
+const CONSENSUS_STAKER_SEPOLIA = "consensus-staker-sepolia";
+const EXECUTION_STAKER_SEPOLIA = "execution-staker-sepolia";
+const MEVBOOST_STAKER_SEPOLIA = "mevboost-staker-sepolia";
 
-export const starknetClientSepolia = interceptGlobalEnvOnSet(
-  dbMain.staticKey<string | undefined | null>(STARKNET_CLIENT_SEPOLIA, null),
-  Object.keys({ STARKNET_CLIENT_SEPOLIA })[0]
+/**
+ * Whenever a user switches the EC and/or CC from the stakers UI then
+ * consensusClientSepolia, executionClientSepolia will change as well
+ */
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_SEPOLIA, null),
+  Object.keys({ CONSENSUS_STAKER_SEPOLIA })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_SEPOLIA, null),
+  Object.keys({ EXECUTION_STAKER_SEPOLIA })[0]
 );
 
 export const mevBoostStarknetSepolia = interceptGlobalEnvOnSet(
-  dbMain.staticKey<boolean>(MEVBOOST_STARKNET_SEPOLIA, false),
-  Object.keys({ MEVBOOST_STARKNET_SEPOLIA })[0]
+  dbMain.staticKey<boolean>(MEVBOOST_STAKER_SEPOLIA, false),
+  Object.keys({ MEVBOOST_STAKER_SEPOLIA })[0]
 );

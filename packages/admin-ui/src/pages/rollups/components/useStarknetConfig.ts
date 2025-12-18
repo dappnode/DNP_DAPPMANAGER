@@ -11,7 +11,7 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
     const [reqStatus, setReqStatus] = useState<ReqStatus>({});
     // New config
     const [newFullNode, setNewFullNode] = useState<StakerItemOk | null>(null);
-    const [newSigner, setNewSigner] = useState<StakerItemOk | null>(null);
+    const [newStakingApp, setNewStakingApp] = useState<StakerItemOk | null>(null);
     const [currentStakerConfig, setCurrentStakerConfig] = useState<StakerConfigSet>();
     // Changes
     const [changes, setChanges] = useState<{
@@ -24,27 +24,29 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
         // reset new states when network changes
         setReqStatus({});
         setNewFullNode(null);
-        setNewSigner(null);
+        setNewStakingApp(null);
         setCurrentStakerConfig(undefined);
         setChanges({ isAllowed: false });
 
         if (currentStakerConfigReq.data) {
             console.log("useStarknetConfig - currentStakerConfigReq.data:", currentStakerConfigReq.data);
-            const { executionClients, web3Signer } = currentStakerConfigReq.data;
+            const { executionClients, consensusClients } = currentStakerConfigReq.data;
 
             const executionClient = executionClients.find((ec) => ec.status === "ok" && isOkSelectedInstalledAndRunning(ec));
-            const signer = web3Signer.status === "ok" && isOkSelectedInstalledAndRunning(web3Signer);
+            const stakingApp = consensusClients && Array.isArray(consensusClients)
+              ? consensusClients.find((cc) => cc.status === "ok" && isOkSelectedInstalledAndRunning(cc))
+              : null;
 
             if (executionClient && executionClient.status === "ok") setNewFullNode(executionClient);
-            if (signer && web3Signer.status === "ok") setNewSigner(web3Signer);
+            if (stakingApp && stakingApp.status === "ok") setNewStakingApp(stakingApp);
 
             setCurrentStakerConfig({
                 network,
                 executionDnpName: executionClient?.dnpName || null,
-                consensusDnpName: null, // Starknet doesn't use consensus clients
+                consensusDnpName: stakingApp?.dnpName || null,
                 mevBoostDnpName: null, // Starknet doesn't use MEV Boost
                 relays: [],
-                web3signerDnpName: web3Signer.status === "ok" && web3Signer.isSelected ? web3Signer.dnpName : null
+                web3signerDnpName: null // Starknet doesn't use Web3Signer
             });
         }
     }, [currentStakerConfigReq.data, network]);
@@ -57,22 +59,22 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
                     newStakerConfig: {
                         network,
                         executionDnpName: newFullNode?.dnpName || null,
-                        consensusDnpName: null,
+                        consensusDnpName: newStakingApp?.dnpName || null,
                         mevBoostDnpName: null,
                         relays: [],
-                        web3signerDnpName: newSigner?.dnpName || null
+                        web3signerDnpName: null
                     }
                 })
             );
-    }, [network, currentStakerConfig, newSigner, newFullNode]);
+    }, [network, currentStakerConfig, newStakingApp, newFullNode]);
 
     return {
         reqStatus,
         setReqStatus,
         newFullNode,
         setNewFullNode,
-        newSigner,
-        setNewSigner,
+        newStakingApp,
+        setNewStakingApp,
         changes
     };
 };

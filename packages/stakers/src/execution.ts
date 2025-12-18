@@ -6,8 +6,8 @@ import {
   ExecutionClientLukso,
   ExecutionClientMainnet,
   ExecutionClientPrater,
-  StarknetClientMainnet,
-  StarknetClientSepolia,
+  StarknetExecutionMainnet,
+  StarknetExecutionSepolia,
   Network,
   StakerItem,
   UserSettings
@@ -37,8 +37,8 @@ export class Execution extends StakerComponent {
       [Network.Sepolia]: db.executionClientSepolia,
       [Network.Hoodi]: db.executionClientHoodi,
       [Network.Lukso]: db.executionClientLukso,
-      [Network.StarknetMainnet]: db.starknetClientMainnet,
-      [Network.StarknetSepolia]: db.starknetClientSepolia
+      [Network.StarknetMainnet]: db.executionStarknetMainnet,
+      [Network.StarknetSepolia]: db.executionStarknetSepolia
     };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {
@@ -81,12 +81,12 @@ export class Execution extends StakerComponent {
     ],
     [Network.Lukso]: [{ dnpName: ExecutionClientLukso.Geth, minVersion: "0.1.0" }],
     [Network.StarknetMainnet]: [
-      { dnpName: StarknetClientMainnet.Juno, minVersion: "0.1.0" },
-      { dnpName: StarknetClientMainnet.Pathfinder, minVersion: "0.1.0" }
+      { dnpName: StarknetExecutionMainnet.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetExecutionMainnet.Pathfinder, minVersion: "0.1.0" }
     ],
     [Network.StarknetSepolia]: [
-      { dnpName: StarknetClientSepolia.Juno, minVersion: "0.1.0" },
-      { dnpName: StarknetClientSepolia.Pathfinder, minVersion: "0.1.0" }
+      { dnpName: StarknetExecutionSepolia.Juno, minVersion: "0.1.0" },
+      { dnpName: StarknetExecutionSepolia.Pathfinder, minVersion: "0.1.0" }
     ]
   };
 
