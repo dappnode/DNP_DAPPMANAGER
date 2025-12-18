@@ -6,9 +6,11 @@ import {
   ConsensusClientLukso,
   ConsensusClientMainnet,
   ConsensusClientPrater,
+  StarknetConsensusMainnet,
+  StarknetConsensusSepolia,
   Network,
   StakerItem,
-  UserSettings
+  UserSettings,
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -33,8 +35,8 @@ export class Consensus extends StakerComponent {
       [Network.Sepolia]: db.consensusClientSepolia,
       [Network.Hoodi]: db.consensusClientHoodi,
       [Network.Lukso]: db.consensusClientLukso,
-      [Network.StarknetMainnet]: db.starknetClientMainnet,
-      [Network.StarknetSepolia]: db.starknetClientSepolia
+      [Network.StarknetMainnet]: db.consensusStakerMainnet,
+      [Network.StarknetSepolia]: db.consensusStakerSepolia
     };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
@@ -78,8 +80,13 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
       { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" }
     ],
-    [Network.StarknetMainnet]: [],
-    [Network.StarknetSepolia]: []
+    [Network.StarknetMainnet]: [
+      { dnpName: StarknetConsensusSepolia.StarknetStaking, minVersion: "0.1.0" },
+    ],
+    [Network.StarknetSepolia]: [
+      { dnpName: StarknetConsensusSepolia.StarknetStaking, minVersion: "0.1.0" },
+      { dnpName: StarknetConsensusSepolia.StarknetStaking, minVersion: "0.1.0" }
+    ]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {

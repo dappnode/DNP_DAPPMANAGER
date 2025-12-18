@@ -63,7 +63,7 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}EXECUTION_CLIENT_PRATER`]: executionClientPrater.get(),
     [`${prefix}MEVBOOST_PRATER`]: mevBoostPrater.get() ? "true" : "false",
     [`${prefix}CONSENSUS_CLIENT_HOLESKY`]: consensusClientHolesky.get(),
-    [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),
+    [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),vfdf
     [`${prefix}MEVBOOST_HOLESKY`]: mevBoostHolesky.get() ? "true" : "false",
     [`${prefix}CONSENSUS_CLIENT_HOODI`]: consensusClientHoodi.get(),
     [`${prefix}EXECUTION_CLIENT_HOODI`]: executionClientHoodi.get(),
