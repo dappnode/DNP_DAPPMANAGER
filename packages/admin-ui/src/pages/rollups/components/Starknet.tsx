@@ -50,6 +50,8 @@ export default function Starknet({
     setReqStatus,
     newFullNode,
     setNewFullNode,
+    newStakingApp,
+    setNewStakingApp,
     changes
   } = useStarknetConfig(network, currentStakerConfigReq);
 
@@ -93,7 +95,7 @@ export default function Starknet({
               stakerConfig: {
                 network,
                 executionDnpName: newFullNode?.dnpName || null,
-                consensusDnpName: newFullNode?.dnpName || null,
+                consensusDnpName: newStakingApp?.dnpName || null,
                 mevBoostDnpName: null, // Starknet doesn't use MEV Boost
                 web3signerDnpName: null, // Starknet doesn't use Web3Signer
                 relays: []
@@ -167,13 +169,13 @@ export default function Starknet({
               ))}
             </Col>
             <Col>
-            <SubTitle>Staking Application</SubTitle>
-            {currentStakerConfigReq.data.consensusClients.map((fullNode, i) => (
+              <SubTitle>Staking Application</SubTitle>
+              {currentStakerConfigReq.data.consensusClients.map((stakingApp, i) => (
                 <StarknetFullNode
                   key={i}
-                  fullNode={fullNode}
-                  setNewFullNode={setNewFullNode}
-                  isSelected={fullNode.dnpName === newFullNode?.dnpName}
+                  fullNode={stakingApp}
+                  setNewFullNode={setNewStakingApp}
+                  isSelected={stakingApp.dnpName === newStakingApp?.dnpName}
                 />
               ))}
             </Col>
