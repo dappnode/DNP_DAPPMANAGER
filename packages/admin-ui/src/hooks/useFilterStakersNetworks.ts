@@ -3,17 +3,17 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Network, networksByType } from "@dappnode/types";
 import { RouteType } from "types";
 import StakerNetwork from "pages/stakers/components/StakerNetwork";
-import Starknet from "pages/rollups/components/Starknet";
 
-const isStakerRoute = (r: RouteType) =>
-  React.isValidElement(r.element) && (r.element.type === StakerNetwork || r.element.type === Starknet); const netOf = (r: RouteType): Network | undefined =>
-    isStakerRoute(r) ? (r.element as React.ReactElement).props?.network : undefined;
+const isStakerRoute = (r: RouteType) => React.isValidElement(r.element) && r.element.type === StakerNetwork;
+
+const netOf = (r: RouteType): Network | undefined =>
+  isStakerRoute(r) ? (r.element as React.ReactElement).props?.network : undefined;
 
 const testSet = new Set(networksByType.testnets);
 const mainSet = new Set(networksByType.mainnets);
 
 /**
- * Treats "optimism" as MAINNET (exception).
+ * Treats "optimism" and "starknet" as MAINNET (exception) and "starknet-sepolia" as TESTNET (exception).
  * Filters on render based on URL.
  * Navigates to a matching route when toggled.
  */
@@ -30,18 +30,21 @@ export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
   const currentRoute = availableRoutes.find((r) => r.subPath === subPath);
 
   const testnetsSelected =
-    currentRoute?.subPath === "optimism"
-      ? false // Optimism is mainnet (exception)
+    currentRoute?.subPath === "optimism" || currentRoute?.subPath === "starknet"
+      ? false // Optimism and Starknet mainnet are mainnet (exception)
+      : currentRoute?.subPath === "starknet-sepolia"
+      ? true // Starknet Sepolia is testnet (exception)
       : currentRoute && isStakerRoute(currentRoute)
-        ? testSet.has(netOf(currentRoute) as Network)
-        : false;
+      ? testSet.has(netOf(currentRoute) as Network)
+      : false;
 
   // filter routes for current selection
   const filteredRoutes = React.useMemo(
     () =>
       availableRoutes.filter((r) => {
         if ([Network.Prater, Network.Holesky].includes(r.element.props.network)) return false; // hide prater && holesky
-        if (r.subPath === "optimism") return !testnetsSelected; // only in mainnets view
+        if (r.subPath === "optimism" || r.subPath === "starknet") return !testnetsSelected; // only in mainnets view
+        if (r.subPath === "starknet-sepolia") return testnetsSelected; // only in testnets view
         if (!isStakerRoute(r)) return false;
         const net = netOf(r);
         return testnetsSelected ? testSet.has(net as Network) : mainSet.has(net as Network);
@@ -53,7 +56,8 @@ export function useFilterStakersNetworks(availableRoutes: RouteType[]) {
   const handleNetworkFilter = (toTestnets: boolean) => {
     const target = availableRoutes.find((r) => {
       if ([Network.Prater, Network.Holesky].includes(r.element.props.network)) return false;
-      if (r.subPath === "optimism") return !toTestnets; // optimism counts only for mainnets
+      if (r.subPath === "optimism" || r.subPath === "starknet") return !toTestnets; // optimism and starknet mainnet count only for mainnets
+      if (r.subPath === "starknet-sepolia") return toTestnets; // starknet sepolia counts only for testnets
       if (!isStakerRoute(r)) return false;
       const net = netOf(r);
       return toTestnets ? testSet.has(net as Network) : mainSet.has(net as Network);
