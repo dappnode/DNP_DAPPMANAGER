@@ -24,8 +24,8 @@ import {
   consensusClientSepolia,
   executionClientSepolia,
   mevBoostHoodi,
-  starknetClientMainnet,
-  starknetClientSepolia
+  executionStakerMainnet,
+  executionStakerSepolia,
 } from "./stakerConfig.js";
 import { serverName } from "./system.js";
 import { upnpAvailable } from "./upnp.js";
@@ -63,7 +63,7 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}EXECUTION_CLIENT_PRATER`]: executionClientPrater.get(),
     [`${prefix}MEVBOOST_PRATER`]: mevBoostPrater.get() ? "true" : "false",
     [`${prefix}CONSENSUS_CLIENT_HOLESKY`]: consensusClientHolesky.get(),
-    [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),vfdf
+    [`${prefix}EXECUTION_CLIENT_HOLESKY`]: executionClientHolesky.get(),
     [`${prefix}MEVBOOST_HOLESKY`]: mevBoostHolesky.get() ? "true" : "false",
     [`${prefix}CONSENSUS_CLIENT_HOODI`]: consensusClientHoodi.get(),
     [`${prefix}EXECUTION_CLIENT_HOODI`]: executionClientHoodi.get(),
@@ -74,8 +74,8 @@ export function computeGlobalEnvsFromDb<B extends boolean>(
     [`${prefix}CONSENSUS_CLIENT_SEPOLIA`]: consensusClientSepolia.get(),
     [`${prefix}EXECUTION_CLIENT_SEPOLIA`]: executionClientSepolia.get(),
     [`${prefix}MEVBOOST_SEPOLIA`]: mevBoostSepolia.get() ? "true" : "false",
-    [`${prefix}STARKNET_CLIENT_MAINNET`]: starknetClientMainnet.get(),
-    [`${prefix}STARKNET_CLIENT_SEPOLIA`]: starknetClientSepolia.get(),
+    [`${prefix}STARKNET_EXECUTION_MAINNET`]: executionStakerMainnet.get(),
+    [`${prefix}STARKNET_EXECUTION_SEPOLIA`]: executionStakerSepolia.get(),
     [`${prefix}OP_ENABLE_HISTORICAL_RPC`]: opEnableHistoricalRpc.get() ? "true" : "false",
     [`${prefix}OP_EXECUTION_CLIENT`]: opExecutionClient.get()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
