@@ -1,5 +1,6 @@
 import {
   Network,
+  L1Network,
   SignerGnosis,
   SignerHolesky,
   SignerHoodi,
@@ -10,15 +11,16 @@ import {
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { StakerComponent } from "./StakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { CompatibleClient } from "../core/BlockchainComponent.js";
 
 export class Signer extends StakerComponent {
   protected static readonly ServiceAliasesMap: Record<string, string[]> = {};
 
-  protected static readonly CompatibleSigners: Record<Network, { dnpName: string; minVersion: string }> = {
+  protected static readonly CompatibleSigners: Record<L1Network, CompatibleClient> = {
     [Network.Mainnet]: {
       dnpName: SignerMainnet.Web3signer,
       minVersion: "0.1.4"
@@ -44,7 +46,7 @@ export class Signer extends StakerComponent {
       minVersion: "0.1.0"
     },
     [Network.Sepolia]: {
-      dnpName: SignerSepolia.Web3signer, 
+      dnpName: SignerSepolia.Web3signer,
       minVersion: "0.1.0"
     }
   };
@@ -53,14 +55,14 @@ export class Signer extends StakerComponent {
     super(dappnodeInstaller);
   }
 
-  async getAllSigners(network: Network): Promise<StakerItem[]> {
+  async getAllSigners(network: L1Network): Promise<StakerItem[]> {
     return await super.getAll({
       dnpNames: [Signer.CompatibleSigners[network].dnpName],
       currentClient: Signer.CompatibleSigners[network].dnpName
     });
   }
 
-  async persistSignerIfInstalledAndRunning(network: Network): Promise<void> {
+  async persistSignerIfInstalledAndRunning(network: L1Network): Promise<void> {
     const signerDnpName = Signer.CompatibleSigners[network].dnpName;
     const signerDnp = await listPackageNoThrow({ dnpName: signerDnpName });
     const isRunning = signerDnp?.containers.some((container) => container.running);
@@ -73,10 +75,10 @@ export class Signer extends StakerComponent {
     }
   }
 
-  async setNewSigner(network: Network, newWeb3signerDnpName: string | null) {
+  async setNewSigner(network: L1Network, newWeb3signerDnpName: string | null) {
     await super.setNew({
-      newStakerDnpName: newWeb3signerDnpName,
-      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      newClientDnpName: newWeb3signerDnpName,
+      dockerNetworkName: params.DOCKER_BLOCKCHAIN_NETWORKS[network],
       fullnodeAliases: [`signer.${network}.dncore.dappnode`],
       compatibleClients: [Signer.CompatibleSigners[network]],
       userSettings: this.getUserSettings(network),
@@ -84,7 +86,7 @@ export class Signer extends StakerComponent {
     });
   }
 
-  private getUserSettings(network: Network): UserSettings {
+  private getUserSettings(network: L1Network): UserSettings {
     const serviceName = "web3signer";
 
     return {
@@ -92,7 +94,7 @@ export class Signer extends StakerComponent {
         rootNetworks: this.getComposeRootNetworks(network),
         serviceNetworks: {
           [serviceName]: {
-            [params.DOCKER_STAKER_NETWORKS[network]]: {
+            [params.DOCKER_BLOCKCHAIN_NETWORKS[network]]: {
               aliases: [`${serviceName}.${network}.staker.dappnode`, `signer.${network}.staker.dappnode`]
             },
             [params.DOCKER_PRIVATE_NETWORK_NAME]: {

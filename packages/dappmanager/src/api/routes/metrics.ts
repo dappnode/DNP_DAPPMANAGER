@@ -3,7 +3,7 @@ import { wrapHandler } from "../utils.js";
 import * as db from "@dappnode/db";
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { isEmpty } from "lodash-es";
-import { Network } from "@dappnode/types";
+import { L1_NETWORKS } from "@dappnode/types";
 import { getHostInfoMemoized } from "@dappnode/hostscriptsservices";
 import si from "systeminformation";
 import { mevBoost, execution, consensus } from "../../index.js";
@@ -69,7 +69,7 @@ register.registerMetric(
         return 0;
       }
 
-      for (const network of ["mainnet", "prater", "gnosis", "lukso", "holesky", "hoodi", "sepolia"] as Network[]) {
+      for (const network of L1_NETWORKS) {
         const isMevBoostSelected = mevBoost.DbHandlers[network].get();
         const executionClient = execution.DbHandlers[network].get();
         const consensusClient = consensus.DbHandlers[network].get();

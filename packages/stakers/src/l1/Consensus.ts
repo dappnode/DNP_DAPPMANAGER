@@ -7,20 +7,20 @@ import {
   ConsensusClientMainnet,
   ConsensusClientPrater,
   Network,
+  L1Network,
   StakerItem,
   UserSettings
 } from "@dappnode/types";
-import { StakerComponent } from "./stakerComponent.js";
+import { StakerComponent } from "./StakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getDefaultConsensusUserSettings } from "@dappnode/utils";
-
-// TODO: move ethereumClient logic here
+import { CompatibleClient } from "../core/BlockchainComponent.js";
 
 export class Consensus extends StakerComponent {
   readonly DbHandlers: Record<
-    Network,
+    L1Network,
     {
       get: () => string | null | undefined;
       set: (globEnvValue: string | null | undefined) => Promise<void>;
@@ -34,7 +34,8 @@ export class Consensus extends StakerComponent {
     [Network.Hoodi]: db.consensusClientHoodi,
     [Network.Lukso]: db.consensusClientLukso
   };
-  protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
+
+  protected static readonly CompatibleConsensus: Record<L1Network, CompatibleClient[]> = {
     [Network.Mainnet]: [
       { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
       { dnpName: ConsensusClientMainnet.Lighthouse, minVersion: "1.0.3" },
@@ -82,14 +83,14 @@ export class Consensus extends StakerComponent {
     super(dappnodeInstaller);
   }
 
-  async getAllConsensus(network: Network): Promise<StakerItem[]> {
+  async getAllConsensus(network: L1Network): Promise<StakerItem[]> {
     return await super.getAll({
       dnpNames: Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
       currentClient: this.DbHandlers[network].get()
     });
   }
 
-  async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
+  async persistSelectedConsensusIfInstalled(network: L1Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
     if (currentConsensusDnpName) {
       const isInstalled = await this.isPackageInstalled(currentConsensusDnpName);
@@ -108,14 +109,14 @@ export class Consensus extends StakerComponent {
     }
   }
 
-  async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
+  async setNewConsensus(network: L1Network, newConsensusDnpName: string | null) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
 
     const userSettings = await this.getUserSettings(network, newConsensusDnpName);
 
     await super.setNew({
-      newStakerDnpName: newConsensusDnpName,
-      dockerNetworkName: params.DOCKER_STAKER_NETWORKS[network],
+      newClientDnpName: newConsensusDnpName,
+      dockerNetworkName: params.DOCKER_BLOCKCHAIN_NETWORKS[network],
       fullnodeAliases: [`beacon-chain.${network}.dncore.dappnode`, `validator.${network}.dncore.dappnode`],
       compatibleClients: Consensus.CompatibleConsensus[network],
       userSettings,
@@ -125,7 +126,7 @@ export class Consensus extends StakerComponent {
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private async getUserSettings(network: Network, newConsensusDnpName: string | null): Promise<UserSettings> {
+  private async getUserSettings(network: L1Network, newConsensusDnpName: string | null): Promise<UserSettings> {
     if (!newConsensusDnpName) return {};
 
     const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
@@ -183,13 +184,13 @@ export class Consensus extends StakerComponent {
     }
   }
 
-  private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
+  private getStakerNetworkSettings(network: L1Network): UserSettings["networks"] {
     const validatorServiceName = "validator";
     const beaconServiceName = "beacon-chain";
 
-    // helper to build each service’s networks
+    // helper to build each service's networks
     const buildSvc = (svcName: string) => ({
-      [params.DOCKER_STAKER_NETWORKS[network]]: {
+      [params.DOCKER_BLOCKCHAIN_NETWORKS[network]]: {
         aliases: [`${svcName}.${network}.staker.dappnode`]
       },
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {

@@ -7,13 +7,38 @@ import { getIsInstalled, getIsUpdated, getIsRunning, fileToGatewayUrl } from "@d
 import { lt } from "semver";
 import { params } from "@dappnode/params";
 
-export class StakerComponent {
+/**
+ * Compatible client definition used for version validation
+ */
+export interface CompatibleClient {
+  dnpName: string;
+  minVersion: string;
+}
+
+/**
+ * BlockchainComponent is the base class for all blockchain-related package management.
+ * It provides generic infrastructure for:
+ * - Installing and configuring packages
+ * - Managing Docker network connections
+ * - Package lifecycle (start, stop, recreate)
+ * - Version compatibility checks
+ *
+ * This class is network-agnostic and can be extended for:
+ * - L1 staking components (Consensus, Execution, MevBoost, Signer)
+ * - L2 components (Starknet, etc.)
+ * - Any other blockchain packages that need network connectivity
+ */
+export class BlockchainComponent {
   protected dappnodeInstaller: DappnodeInstaller;
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
+  /**
+   * Get all available packages for a list of DNP names
+   * Returns status information for each package (installed, running, etc.)
+   */
   protected async getAll({
     dnpNames,
     currentClient,
@@ -52,27 +77,28 @@ export class StakerComponent {
     );
   }
 
+  /**
+   * Set a new blockchain package, handling the transition from previous to new client
+   * - Validates compatibility requirements
+   * - Disconnects previous client from network
+   * - Configures and starts new client
+   */
   protected async setNew({
-    newStakerDnpName,
+    newClientDnpName,
     dockerNetworkName,
     fullnodeAliases,
     compatibleClients,
     userSettings,
     prevClient
   }: {
-    newStakerDnpName: string | null | undefined;
+    newClientDnpName: string | null | undefined;
     dockerNetworkName: string;
     fullnodeAliases: string[];
-    compatibleClients:
-      | {
-          dnpName: string;
-          minVersion: string;
-        }[]
-      | null;
+    compatibleClients: CompatibleClient[] | null;
     userSettings: UserSettings;
     prevClient?: string | null;
   }): Promise<void> {
-    if (!prevClient && !newStakerDnpName) {
+    if (!prevClient && !newClientDnpName) {
       logs.info("no client selected, skipping");
       return;
     }
@@ -84,28 +110,41 @@ export class StakerComponent {
     if (currentPkg) {
       if (prevClient && compatibleClients)
         this.ensureCompatibilityRequirements(prevClient, compatibleClients, currentPkg.version);
-      if (prevClient !== newStakerDnpName)
-        await this.unsetStakerPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
+      if (prevClient !== newClientDnpName)
+        await this.unsetPkgConfig({ pkg: currentPkg, dockerNetworkName, fullnodeAliases });
     }
 
-    if (!newStakerDnpName) return;
-    // set staker config
-    await this.setStakerPkgConfig({
-      dnpName: newStakerDnpName,
-      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newStakerDnpName })),
+    if (!newClientDnpName) return;
+    // set package config
+    await this.setPkgConfig({
+      dnpName: newClientDnpName,
+      isInstalled: Boolean(await listPackageNoThrow({ dnpName: newClientDnpName })),
       userSettings
     });
   }
 
+  /**
+   * Check if a package is installed
+   */
   protected async isPackageInstalled(dnpName: string): Promise<boolean> {
     const dnp = await listPackageNoThrow({ dnpName });
-
     return Boolean(dnp);
   }
 
+  /**
+   * Get the Docker network name for a given network
+   */
+  protected getDockerNetworkName(network: Network): string {
+    return params.DOCKER_BLOCKCHAIN_NETWORKS[network];
+  }
+
+  /**
+   * Build the root networks configuration for docker-compose
+   * Includes the blockchain-specific network and the private DAppNode network
+   */
   protected getComposeRootNetworks(network: Network): NonNullable<UserSettings["networks"]>["rootNetworks"] {
     return {
-      [params.DOCKER_STAKER_NETWORKS[network]]: {
+      [this.getDockerNetworkName(network)]: {
         external: true
       },
       [params.DOCKER_PRIVATE_NETWORK_NAME]: {
@@ -115,13 +154,11 @@ export class StakerComponent {
   }
 
   /**
-   * Set the staker pkg:
-   * - ensures the staker pkg is installed
-   * - connects the staker pkg to the staker network
-   * - adds the staker network to the docker-compose file
-   * - starts the staker pkg
+   * Configure and start a blockchain package
+   * - If already installed: applies user settings and starts containers
+   * - If not installed: installs the package with user settings
    */
-  protected async setStakerPkgConfig({
+  protected async setPkgConfig({
     dnpName,
     isInstalled,
     userSettings
@@ -131,7 +168,7 @@ export class StakerComponent {
     userSettings: UserSettings;
   }): Promise<void> {
     if (isInstalled) {
-      await this.setInstalledStakerPkgConfig({ dnpName, userSettings });
+      await this.setInstalledPkgConfig({ dnpName, userSettings });
     } else {
       await packageInstall(this.dappnodeInstaller, {
         name: dnpName,
@@ -140,7 +177,10 @@ export class StakerComponent {
     }
   }
 
-  private async setInstalledStakerPkgConfig({
+  /**
+   * Apply settings to an already installed package and start it
+   */
+  private async setInstalledPkgConfig({
     dnpName,
     userSettings
   }: {
@@ -159,17 +199,16 @@ export class StakerComponent {
     await dockerComposeUpPackage({
       composeArgs: { dnpName },
       upAll: true
-      // dockerComposeUpOptions: { noRecreate: true }
     });
   }
 
   /**
-   * Unset staker pkg:
-   * - disconnects the staker pkg from the staker network
-   * - stops the staker pkg
-   * - removes the staker network from the docker-compose file
+   * Disconnect and stop a blockchain package
+   * - Removes package from Docker network
+   * - Removes network aliases
+   * - Recreates containers in stopped state
    */
-  private async unsetStakerPkgConfig({
+  protected async unsetPkgConfig({
     pkg,
     dockerNetworkName,
     fullnodeAliases
@@ -178,8 +217,8 @@ export class StakerComponent {
     dockerNetworkName: string;
     fullnodeAliases: string[];
   }): Promise<void> {
-    this.removeStakerNetworkFromCompose(pkg.dnpName, dockerNetworkName);
-    this.removeFullnodeAliasFromDncoreNetwork(pkg.dnpName, fullnodeAliases);
+    this.removeNetworkFromCompose(pkg.dnpName, dockerNetworkName);
+    this.removeAliasesFromPrivateNetwork(pkg.dnpName, fullnodeAliases);
 
     // This recreates the package containers so that they include the recently added configuration
     // The flag --no-start is added so that the containers remain stopped after recreation
@@ -190,7 +229,10 @@ export class StakerComponent {
     });
   }
 
-  private removeFullnodeAliasFromDncoreNetwork(dnpName: string, fullnodeAliases: string[]): void {
+  /**
+   * Remove specific aliases from the private DAppNode network in docker-compose
+   */
+  private removeAliasesFromPrivateNetwork(dnpName: string, aliasesToRemove: string[]): void {
     const composeEditor = new ComposeFileEditor(dnpName, false);
     const services = composeEditor.compose.services;
 
@@ -202,7 +244,7 @@ export class StakerComponent {
       for (const [networkName, networkSettings] of Object.entries(serviceNetworks)) {
         if (networkName === params.DOCKER_PRIVATE_NETWORK_NAME) {
           const aliases = networkSettings.aliases;
-          if (aliases) networkSettings.aliases = aliases.filter((alias) => !fullnodeAliases.includes(alias));
+          if (aliases) networkSettings.aliases = aliases.filter((alias) => !aliasesToRemove.includes(alias));
         }
       }
     }
@@ -210,7 +252,10 @@ export class StakerComponent {
     composeEditor.write();
   }
 
-  private removeStakerNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
+  /**
+   * Remove a network from the docker-compose file (both root level and service level)
+   */
+  private removeNetworkFromCompose(dnpName: string, dockerNetworkName: string): void {
     const composeEditor = new ComposeFileEditor(dnpName, false);
     const services = composeEditor.compose.services;
 
@@ -232,12 +277,13 @@ export class StakerComponent {
     composeEditor.write();
   }
 
-  private ensureCompatibilityRequirements(
+  /**
+   * Validate that a package meets compatibility requirements
+   * Throws if the package version is below the minimum required
+   */
+  protected ensureCompatibilityRequirements(
     dnpName: string,
-    compatibleClients: {
-      dnpName: string;
-      minVersion: string;
-    }[],
+    compatibleClients: CompatibleClient[],
     pkgVersion: string
   ): void {
     if (!dnpName) return;
@@ -245,12 +291,12 @@ export class StakerComponent {
     const compatibleClient = compatibleClients.find((c) => c.dnpName === dnpName);
 
     // ensure valid dnpName
-    if (!compatibleClient) throw Error("The selected staker is not compatible with the current network");
+    if (!compatibleClient) throw Error("The selected client is not compatible with the current network");
 
     // ensure valid version
     if (compatibleClient?.minVersion && lt(pkgVersion, compatibleClient.minVersion)) {
       throw Error(
-        `The selected staker version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
+        `The selected client version from ${dnpName} is not compatible with the current network. Required version: ${compatibleClient.minVersion}. Got: ${pkgVersion}`
       );
     }
   }

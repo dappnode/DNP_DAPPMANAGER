@@ -1,4 +1,4 @@
-import { Network, Routes } from "@dappnode/types";
+import { Network, L1Network, Routes } from "@dappnode/types";
 import { packageInstall as pkgInstall } from "@dappnode/installer";
 import { dappnodeInstaller } from "../index.js";
 import { Consensus } from "@dappnode/stakers";
@@ -53,7 +53,7 @@ async function ensureNimbusConnection(dnpName: string): Promise<void> {
 
   const consensus: Consensus = new Consensus(dappnodeInstaller);
 
-  const nimbusNetwork: Record<string, Network> = {
+  const nimbusNetwork: Record<string, L1Network> = {
     "nimbus.dnp.dappnode.eth": Network.Mainnet,
     "nimbus-prater.dnp.dappnode.eth": Network.Prater,
     "nimbus-gnosis.dnp.dappnode.eth": Network.Gnosis,

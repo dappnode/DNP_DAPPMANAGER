@@ -9,12 +9,45 @@ export enum Network {
   Lukso = "lukso",
   Holesky = "holesky",
   Sepolia = "sepolia",
-  Hoodi = "hoodi"
+  Hoodi = "hoodi",
+  // L2 Networks
+  Starknet = "starknet"
+}
+
+/** L1 Networks - PoS blockchains with separate execution/consensus clients */
+export type L1Network = Exclude<Network, Network.Starknet>;
+
+/** L2 Networks - Layer 2 blockchains */
+export type L2Network = Network.Starknet;
+
+/** List of all L1 networks */
+export const L1_NETWORKS: L1Network[] = [
+  Network.Mainnet,
+  Network.Prater,
+  Network.Gnosis,
+  Network.Lukso,
+  Network.Holesky,
+  Network.Sepolia,
+  Network.Hoodi
+];
+
+/** List of all L2 networks */
+export const L2_NETWORKS: L2Network[] = [Network.Starknet];
+
+/** Check if a network is an L1 network */
+export function isL1Network(network: Network): network is L1Network {
+  return L1_NETWORKS.includes(network as L1Network);
+}
+
+/** Check if a network is an L2 network */
+export function isL2Network(network: Network): network is L2Network {
+  return L2_NETWORKS.includes(network as L2Network);
 }
 
 export const networksByType = {
   mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso],
-  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia]
+  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia],
+  l2: [Network.Starknet]
 };
 
 // MAINNET
@@ -149,6 +182,15 @@ export enum ExecutionClientSepolia {
 
 export enum SignerSepolia {
   Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
+}
+
+// STARKNET (L2)
+export enum StarknetNode {
+  Juno = "juno.dnp.dappnode.eth"
+}
+
+export enum StarknetSigner {
+  StarknetStaking = "starknetstaking.dnp.dappnode.eth"
 }
 
 export type StakerItem = StakerItemOk | StakerItemError;
