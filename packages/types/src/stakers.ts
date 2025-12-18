@@ -225,4 +225,8 @@ export interface StakerConfigSet {
   mevBoostDnpName: string | null;
   relays: string[];
   web3signerDnpName: string | null;
+  /** Starknet-specific: Operational address for signing attestations (Hot wallet) */
+  starknetSignerOperationalAddress?: string;
+  /** Starknet-specific: Internal signing private key */
+  starknetSignerPrivateKey?: string;
 }

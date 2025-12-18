@@ -10,7 +10,7 @@ import {
   StarknetConsensusSepolia,
   Network,
   StakerItem,
-  UserSettings,
+  UserSettings
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -28,16 +28,16 @@ export class Consensus extends StakerComponent {
       set: (globEnvValue: string | null | undefined) => Promise<void>;
     }
   > = {
-      [Network.Mainnet]: db.consensusClientMainnet,
-      [Network.Gnosis]: db.consensusClientGnosis,
-      [Network.Prater]: db.consensusClientPrater,
-      [Network.Holesky]: db.consensusClientHolesky,
-      [Network.Sepolia]: db.consensusClientSepolia,
-      [Network.Hoodi]: db.consensusClientHoodi,
-      [Network.Lukso]: db.consensusClientLukso,
-      [Network.StarknetMainnet]: db.consensusStarknetMainnet,
-      [Network.StarknetSepolia]: db.consensusStarknetSepolia
-    };
+    [Network.Mainnet]: db.consensusClientMainnet,
+    [Network.Gnosis]: db.consensusClientGnosis,
+    [Network.Prater]: db.consensusClientPrater,
+    [Network.Holesky]: db.consensusClientHolesky,
+    [Network.Sepolia]: db.consensusClientSepolia,
+    [Network.Hoodi]: db.consensusClientHoodi,
+    [Network.Lukso]: db.consensusClientLukso,
+    [Network.StarknetMainnet]: db.consensusStarknetMainnet,
+    [Network.StarknetSepolia]: db.consensusStarknetSepolia
+  };
   protected static readonly CompatibleConsensus: Record<Network, { dnpName: string; minVersion: string }[]> = {
     [Network.Mainnet]: [
       { dnpName: ConsensusClientMainnet.Prysm, minVersion: "3.0.4" },
@@ -80,12 +80,8 @@ export class Consensus extends StakerComponent {
       { dnpName: ConsensusClientLukso.Prysm, minVersion: "0.1.0" },
       { dnpName: ConsensusClientLukso.Teku, minVersion: "0.1.0" }
     ],
-    [Network.StarknetMainnet]: [
-      { dnpName: StarknetConsensusMainnet.StarknetStaking, minVersion: "0.1.0" },
-    ],
-    [Network.StarknetSepolia]: [
-      { dnpName: StarknetConsensusSepolia.StarknetStaking, minVersion: "0.1.0" },
-    ]
+    [Network.StarknetMainnet]: [{ dnpName: StarknetConsensusMainnet.StarknetStaking, minVersion: "0.1.0" }],
+    [Network.StarknetSepolia]: [{ dnpName: StarknetConsensusSepolia.StarknetStaking, minVersion: "0.1.0" }]
   };
 
   constructor(dappnodeInstaller: DappnodeInstaller) {
@@ -118,10 +114,17 @@ export class Consensus extends StakerComponent {
     }
   }
 
-  async setNewConsensus(network: Network, newConsensusDnpName: string | null) {
+  async setNewConsensus(
+    network: Network,
+    newConsensusDnpName: string | null,
+    starknetEnvs?: {
+      starknetSignerOperationalAddress?: string;
+      starknetSignerPrivateKey?: string;
+    }
+  ) {
     const prevConsClientDnpName = this.DbHandlers[network].get();
 
-    const userSettings = await this.getUserSettings(network, newConsensusDnpName);
+    const userSettings = await this.getUserSettings(network, newConsensusDnpName, starknetEnvs);
 
     await super.setNew({
       newStakerDnpName: newConsensusDnpName,
@@ -135,7 +138,14 @@ export class Consensus extends StakerComponent {
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
   }
 
-  private async getUserSettings(network: Network, newConsensusDnpName: string | null): Promise<UserSettings> {
+  private async getUserSettings(
+    network: Network,
+    newConsensusDnpName: string | null,
+    starknetEnvs?: {
+      starknetSignerOperationalAddress?: string;
+      starknetSignerPrivateKey?: string;
+    }
+  ): Promise<UserSettings> {
     if (!newConsensusDnpName) return {};
 
     const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
@@ -153,6 +163,23 @@ export class Consensus extends StakerComponent {
           }
         };
       }
+    }
+
+    // For Starknet networks, apply staking-specific environment variables
+    if (
+      (network === Network.StarknetMainnet || network === Network.StarknetSepolia) &&
+      starknetEnvs?.starknetSignerOperationalAddress &&
+      starknetEnvs?.starknetSignerPrivateKey
+    ) {
+      const starknetStakingServiceName = "starknetstaking";
+      environment = {
+        ...environment,
+        [starknetStakingServiceName]: {
+          ...(environment?.[starknetStakingServiceName] || {}),
+          SIGNER_OPERATIONAL_ADDRESS: starknetEnvs.starknetSignerOperationalAddress,
+          SIGNER_PRIVATE_KEY: starknetEnvs.starknetSignerPrivateKey
+        }
+      };
     }
 
     const userSettings = {
