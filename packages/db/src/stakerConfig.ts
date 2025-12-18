@@ -192,19 +192,19 @@ const MEVBOOST_STAKER_MAINNET = "mevboost-staker-mainnet";
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const consensusStakerMainnet = interceptGlobalEnvOnSet(
+export const consensusStarknetMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_MAINNET, null),
   Object.keys({ CONSENSUS_STAKER_MAINNET })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const executionStakerMainnet = interceptGlobalEnvOnSet(
+export const executionStarknetMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_MAINNET, null),
   Object.keys({ EXECUTION_STAKER_MAINNET })[0]
 );
 
-export const mevBoostStakerMainnet = interceptGlobalEnvOnSet(
+export const mevBoostStarknetMainnet = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_STAKER_MAINNET, false),
   Object.keys({ MEVBOOST_STAKER_MAINNET })[0]
 );
@@ -222,19 +222,19 @@ const MEVBOOST_STAKER_SEPOLIA = "mevboost-staker-sepolia";
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const consensusStakerSepolia = interceptGlobalEnvOnSet(
+export const consensusStarknetSepolia = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_SEPOLIA, null),
   Object.keys({ CONSENSUS_STAKER_SEPOLIA })[0]
 );
 
 // Null means not set
 // Undefined means its set but the user has not selected any value
-export const executionStakerSepolia = interceptGlobalEnvOnSet(
+export const executionStarknetSepolia = interceptGlobalEnvOnSet(
   dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_SEPOLIA, null),
   Object.keys({ EXECUTION_STAKER_SEPOLIA })[0]
 );
 
-export const mevBoostStakerSepolia = interceptGlobalEnvOnSet(
+export const mevBoostStarknetSepolia = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_STAKER_SEPOLIA, false),
   Object.keys({ MEVBOOST_STAKER_SEPOLIA })[0]
 );

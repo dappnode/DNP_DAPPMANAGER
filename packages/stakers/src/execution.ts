@@ -37,8 +37,8 @@ export class Execution extends StakerComponent {
       [Network.Sepolia]: db.executionClientSepolia,
       [Network.Hoodi]: db.executionClientHoodi,
       [Network.Lukso]: db.executionClientLukso,
-      [Network.StarknetMainnet]: db.executionStakerMainnet,
-      [Network.StarknetSepolia]: db.executionStakerSepolia
+      [Network.StarknetMainnet]: db.executionStarknetMainnet,
+      [Network.StarknetSepolia]: db.executionStarknetSepolia
     };
 
   protected static readonly CompatibleExecutions: Record<Network, { dnpName: string; minVersion: string }[]> = {

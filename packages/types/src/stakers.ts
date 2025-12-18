@@ -161,7 +161,7 @@ export enum StarknetExecutionMainnet {
   Pathfinder = "pathfinder.dnp.dappnode.eth"
 }
 export enum StarknetConsensusMainnet {
-  Web3signer = "starknetstaking.dnp.dappnode.eth"
+  StarknetStaking = "starknetstaking.dnp.dappnode.eth"
 }
 
 // STARKNET SEPOLIA
