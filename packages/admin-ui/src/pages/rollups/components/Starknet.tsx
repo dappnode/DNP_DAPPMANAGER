@@ -166,6 +166,8 @@ export default function Starknet({
                 />
               ))}
             </Col>
+            <Col>
+            <SubTitle>Staking Application</SubTitle>
             {currentStakerConfigReq.data.consensusClients.map((fullNode, i) => (
                 <StarknetFullNode
                   key={i}
@@ -174,6 +176,7 @@ export default function Starknet({
                   isSelected={fullNode.dnpName === newFullNode?.dnpName}
                 />
               ))}
+            </Col>
           </Row>
 
           <hr />
