@@ -103,7 +103,7 @@ export default function StarknetFullNode({
             <Input
               value={starknetEnvs.signerOperationalAddress}
               onValueChange={(value) => onStarknetEnvsChange({ ...starknetEnvs, signerOperationalAddress: value })}
-              placeholder="0x..."
+              placeholder={fullNode.starknetSignerOperationalAddress || "0x..."}
               isInvalid={starknetEnvs.signerOperationalAddress !== "" && !isAddressValid}
             />
             {starknetEnvs.signerOperationalAddress !== "" && !isAddressValid && (
@@ -121,7 +121,11 @@ export default function StarknetFullNode({
               type="password"
               value={starknetEnvs.signerPrivateKey}
               onValueChange={(value) => onStarknetEnvsChange({ ...starknetEnvs, signerPrivateKey: value })}
-              placeholder="Enter private key"
+              placeholder={
+                fullNode.starknetSignerPrivateKey
+                  ? "*".repeat(fullNode.starknetSignerPrivateKey.length)
+                  : "Enter private key"
+              }
             />
           </Form.Group>
         </div>
