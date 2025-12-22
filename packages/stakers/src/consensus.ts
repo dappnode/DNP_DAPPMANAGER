@@ -14,6 +14,8 @@ import {
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
+import { listPackageNoThrow } from "@dappnode/dockerapi";
+import { ComposeFileEditor } from "@dappnode/dockercompose";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getDefaultConsensusUserSettings } from "@dappnode/utils";
@@ -89,11 +91,44 @@ export class Consensus extends StakerComponent {
   }
 
   async getAllConsensus(network: Network): Promise<StakerItem[]> {
+
+    // For Starknet networks, include staking-specific envs
+    if (network === Network.StarknetMainnet || network === Network.StarknetSepolia) {
+      const starknetstakingDnpName = Consensus.CompatibleConsensus[network]?.[0]?.dnpName;
+      return await super.getAll({
+        dnpNames: Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
+        currentClient: this.DbHandlers[network].get(),
+        starknetSignerOperationalAddress: await this.getStarknetOperationalAddresses(starknetstakingDnpName),
+        starknetSignerPrivateKey: await this.getStarknetSignerPrivateKey(starknetstakingDnpName)
+      });
+    }
     return await super.getAll({
       dnpNames: Consensus.CompatibleConsensus[network].map((client) => client.dnpName),
       currentClient: this.DbHandlers[network].get()
     });
   }
+
+  // Done in the same way as mevBoost relays, useful to print current starknet signer envs in UI
+  async getStarknetOperationalAddresses(starknetDnpName?: string): Promise<string> {
+      let address = "";
+      if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return address;
+      const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
+      if (pkgEnv) {
+        address = pkgEnv["staking"]["SIGNER_OPERATIONAL_ADDRESS"]
+      }
+      return address;
+    }
+  
+  // Done in the same way as mevBoost relays, useful to print current starknet signer envs in UI
+  async getStarknetSignerPrivateKey(starknetDnpName?: string): Promise<string> {
+      let key = "";
+      if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return key;
+      const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
+      if (pkgEnv) {
+        key = pkgEnv["staking"]["SIGNER_PRIVATE_KEY"]
+      }
+      return key;
+    }
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();

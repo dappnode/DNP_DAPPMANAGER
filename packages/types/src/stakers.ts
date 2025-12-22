@@ -178,6 +178,8 @@ export type StakerItem = StakerItemOk | StakerItemError;
 interface StakerItemBasic {
   dnpName: string;
   relays?: string[];
+  starknetSignerOperationalAddress?: string;
+  starknetSignerPrivateKey?: string;
 }
 
 export type StakerItemError = {
