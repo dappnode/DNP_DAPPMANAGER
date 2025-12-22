@@ -171,7 +171,7 @@ export class Consensus extends StakerComponent {
       starknetEnvs?.starknetSignerOperationalAddress &&
       starknetEnvs?.starknetSignerPrivateKey
     ) {
-      const starknetStakingServiceName = "starknetstaking";
+      const starknetStakingServiceName = "staking";
       environment = {
         ...environment,
         [starknetStakingServiceName]: {
