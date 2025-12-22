@@ -40,7 +40,6 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
     setChanges({ isAllowed: false });
 
     if (currentStakerConfigReq.data) {
-      console.log("useStarknetConfig - currentStakerConfigReq.data:", currentStakerConfigReq.data);
       const { executionClients, consensusClients } = currentStakerConfigReq.data;
 
       const executionClient = executionClients.find((ec) => ec.status === "ok" && isOkSelectedInstalledAndRunning(ec));
