@@ -16,21 +16,21 @@ import { confirm } from "components/ConfirmDialog";
 import { disclaimer } from "../data";
 import { withToast } from "components/toast/Toast";
 
-export default function Starknet({ 
-  network, 
-  description 
-}: { 
+export default function Starknet({
+  network,
+  description
+}: {
   network: Network.StarknetMainnet | Network.StarknetSepolia;
   description: string;
 }) {
   const { theme } = React.useContext(AppContext);
 
   const currentStakerConfigReq = useApi.stakerConfigGet({ network });
-  
+
   // Check for Ethereum L1 node (mainnet or sepolia depending on Starknet network)
   const ethereumNetwork = network === Network.StarknetMainnet ? Network.Mainnet : Network.Sepolia;
   const ethereumStakerConfigReq = useApi.stakerConfigGet({ network: ethereumNetwork });
-  
+
   // Check if user has an Ethereum node running
   const hasEthereumNode = React.useMemo(() => {
     if (!ethereumStakerConfigReq.data) return false;
@@ -43,7 +43,7 @@ export default function Starknet({
     );
     return hasRunningExecution && hasRunningConsensus;
   }, [ethereumStakerConfigReq.data]);
-  
+
   // hooks
   const {
     reqStatus,
@@ -52,6 +52,8 @@ export default function Starknet({
     setNewFullNode,
     newStakingApp,
     setNewStakingApp,
+    starknetEnvs,
+    setStarknetEnvs,
     changes
   } = useStarknetConfig(network, currentStakerConfigReq);
 
@@ -98,7 +100,12 @@ export default function Starknet({
                 consensusDnpName: newStakingApp?.dnpName || null,
                 mevBoostDnpName: null, // Starknet doesn't use MEV Boost
                 web3signerDnpName: null, // Starknet doesn't use Web3Signer
-                relays: []
+                relays: [],
+                // Include Starknet staking envs only when staking app is selected
+                ...(newStakingApp && {
+                  starknetSignerOperationalAddress: starknetEnvs.signerOperationalAddress,
+                  starknetSignerPrivateKey: starknetEnvs.signerPrivateKey
+                })
               }
             }),
           {
@@ -128,28 +135,33 @@ export default function Starknet({
         <>
           <Card>
             <p>{description}</p>
-            
+
             <p>
               Set up your Starknet node configuration: <br />
               (1) <b>Choose</b> a <b>Full Node Client</b> (Juno or Pathfinder) <br />
-              (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking and configure it following the <a href="https://docs.dappnode.io/docs/user/staking/starknet/solo/" target="_blank">docs</a>
+              (2) [Optional] <b>Select Staking Application</b> to participate in Starknet staking and configure it
+              following the{" "}
+              <a href="https://docs.dappnode.io/docs/user/staking/starknet/solo/" target="_blank">
+                docs
+              </a>
             </p>
-            
+
             {!hasEthereumNode && (
               <Alert variant="warning" className="mt-3">
                 <Alert.Heading>⚠️ Ethereum L1 Node Required</Alert.Heading>
                 <p>
-                  Starknet nodes require a connection to an Ethereum L1 node to function properly.
-                  You have two options:
+                  Starknet nodes require a connection to an Ethereum L1 node to function properly. You have two options:
                 </p>
                 <ol className="mb-2">
                   <li>
-                    <b>Run a local node:</b> Go to the <b>Stakers</b> menu and set up an Ethereum {network === Network.StarknetMainnet ? "Mainnet" : "Sepolia"} node 
-                    (both execution and consensus clients) on your DAppNode.
+                    <b>Run a local node:</b> Go to the <b>Stakers</b> menu and set up an Ethereum{" "}
+                    {network === Network.StarknetMainnet ? "Mainnet" : "Sepolia"} node (both execution and consensus
+                    clients) on your DAppNode.
                   </li>
                   <li>
-                    <b>Use an external RPC service:</b> Configure your Starknet node to use an external Ethereum RPC provider 
-                    (such as Infura, Alchemy, or other RPC services) if you don't want to run a local Ethereum node.
+                    <b>Use an external RPC service:</b> Configure your Starknet node to use an external Ethereum RPC
+                    provider (such as Infura, Alchemy, or other RPC services) if you don't want to run a local Ethereum
+                    node.
                   </li>
                 </ol>
               </Alert>
@@ -176,6 +188,9 @@ export default function Starknet({
                   fullNode={stakingApp}
                   setNewFullNode={setNewStakingApp}
                   isSelected={stakingApp.dnpName === newStakingApp?.dnpName}
+                  isStakingApp={true}
+                  starknetEnvs={starknetEnvs}
+                  onStarknetEnvsChange={setStarknetEnvs}
                 />
               ))}
             </Col>
