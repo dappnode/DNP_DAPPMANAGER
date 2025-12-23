@@ -14,15 +14,19 @@ export class StakerComponent {
     this.dappnodeInstaller = dappnodeInstaller;
   }
 
-  protected async getAll({
-    dnpNames,
-    currentClient,
-    relays
-  }: {
-    dnpNames: string[];
-    currentClient?: boolean | string | null;
-    relays?: string[];
-  }): Promise<StakerItem[]> {
+protected async getAll({
+  dnpNames,
+  currentClient,
+  relays,
+  starknetSignerOperationalAddress,
+  starknetSignerPrivateKey
+}: {
+  dnpNames: string[];
+  currentClient?: boolean | string | null;
+  relays?: string[];
+  starknetSignerOperationalAddress?: string;
+  starknetSignerPrivateKey?: string;
+}): Promise<StakerItem[]> {
     const dnpList = await listPackages();
 
     return await Promise.all(
@@ -39,6 +43,8 @@ export class StakerComponent {
             isRunning: getIsRunning(pkgData, dnpList),
             data: pkgData,
             relays, // only for mevBoost
+            starknetSignerOperationalAddress, // only for starknet staking
+            starknetSignerPrivateKey, // only for starknet staking
             isSelected: dnpName === currentClient || currentClient === true
           };
         } catch (error) {
