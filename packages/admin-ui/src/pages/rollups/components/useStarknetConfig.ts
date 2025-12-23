@@ -23,6 +23,11 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
     signerOperationalAddress: "",
     signerPrivateKey: ""
   });
+  // Original starknet envs for change detection
+  const [originalStarknetEnvs, setOriginalStarknetEnvs] = useState<StarknetEnvs>({
+    signerOperationalAddress: "",
+    signerPrivateKey: ""
+  });
   // Changes
   const [changes, setChanges] = useState<{
     isAllowed: boolean;
@@ -37,6 +42,7 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
     setNewStakingApp(null);
     setCurrentStakerConfig(undefined);
     setStarknetEnvs({ signerOperationalAddress: "", signerPrivateKey: "" });
+    setOriginalStarknetEnvs({ signerOperationalAddress: "", signerPrivateKey: "" });
     setChanges({ isAllowed: false });
 
     if (currentStakerConfigReq.data) {
@@ -49,7 +55,16 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
           : null;
 
       if (executionClient && executionClient.status === "ok") setNewFullNode(executionClient);
-      if (stakingApp && stakingApp.status === "ok") setNewStakingApp(stakingApp);
+      if (stakingApp && stakingApp.status === "ok") {
+        setNewStakingApp(stakingApp);
+        // Pre-populate starknet envs with existing values
+        const existingEnvs = {
+          signerOperationalAddress: stakingApp.starknetSignerOperationalAddress || "",
+          signerPrivateKey: stakingApp.starknetSignerPrivateKey || ""
+        };
+        setStarknetEnvs(existingEnvs);
+        setOriginalStarknetEnvs(existingEnvs);
+      }
 
       setCurrentStakerConfig({
         network,
@@ -76,10 +91,11 @@ export const useStarknetConfig = <T extends Network.StarknetMainnet | Network.St
             web3signerDnpName: null
           },
           starknetEnvs,
+          originalStarknetEnvs,
           hasStakingApp: !!newStakingApp
         })
       );
-  }, [network, currentStakerConfig, newStakingApp, newFullNode, starknetEnvs]);
+  }, [network, currentStakerConfig, newStakingApp, newFullNode, starknetEnvs, originalStarknetEnvs]);
 
   return {
     reqStatus,
@@ -106,16 +122,19 @@ const addressPattern = /^0x[0-9a-fA-F]{1,64}$/;
  * - Any change in:
  *   - Execution client
  *   - Signer
+ *   - Starknet environment variables
  */
 function getChanges({
   currentStakerConfig,
   newStakerConfig,
   starknetEnvs,
+  originalStarknetEnvs,
   hasStakingApp
 }: {
   currentStakerConfig: StakerConfigSet;
   newStakerConfig: StakerConfigSet;
   starknetEnvs: StarknetEnvs;
+  originalStarknetEnvs: StarknetEnvs;
   hasStakingApp: boolean;
 }): {
   isAllowed: boolean;
@@ -124,16 +143,18 @@ function getChanges({
 } {
   const { executionDnpName, web3signerDnpName, consensusDnpName } = currentStakerConfig;
 
-  // Not allowed if no changes and no staking app being newly configured
+  // Check for client configuration changes
   const hasClientChanges =
     executionDnpName !== newStakerConfig.executionDnpName ||
     web3signerDnpName !== newStakerConfig.web3signerDnpName ||
     consensusDnpName !== newStakerConfig.consensusDnpName;
 
-  // Check if staking app envs are provided when staking app is selected
-  const hasStakingEnvs = starknetEnvs.signerOperationalAddress && starknetEnvs.signerPrivateKey;
+  // Check if starknet env values have changed from original
+  const hasEnvChanges =
+    starknetEnvs.signerOperationalAddress !== originalStarknetEnvs.signerOperationalAddress ||
+    starknetEnvs.signerPrivateKey !== originalStarknetEnvs.signerPrivateKey;
 
-  if (!hasClientChanges && !hasStakingEnvs)
+  if (!hasClientChanges && !hasEnvChanges)
     return {
       isAllowed: false,
       reason: "No changes detected",
