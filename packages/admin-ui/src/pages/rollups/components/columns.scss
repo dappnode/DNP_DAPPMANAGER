@@ -17,7 +17,8 @@
   }
 }
 
-.optimism-dark {
+.optimism-dark,
+.starknet-dark {
   .optimism-node,
   .starknet-node,
   .execution-client,
@@ -40,6 +41,19 @@
       cursor: pointer;
       background-color: rgb(85, 85, 85);
     }
+
+    // Starknet staking env form styling for dark mode
+    .starknet-staking-envs {
+      text-align: left;
+
+      .form-label {
+        color: var(--color-dark-maintext);
+      }
+
+      .text-muted {
+        color: rgba(255, 255, 255, 0.6) !important;
+      }
+    }
   }
 }
 
@@ -47,6 +61,11 @@
 .starknet-container {
   .card {
     margin-top: 10px;
+  }
+
+  // Starknet staking env form styling (light mode)
+  .starknet-staking-envs {
+    text-align: left;
   }
 
   .zkevm-rollup,
@@ -72,7 +91,7 @@
     color: var(--eth-multi-client-description-color);
   } */
 
-    >*:not(:last-child) {
+    > *:not(:last-child) {
       margin-bottom: 1rem;
     }
 
@@ -99,10 +118,7 @@
       }
     }
 
-    transition: color 0.15s,
-    background-color 0.15s,
-    border-color 0.15s,
-    box-shadow 0.15s;
+    transition: color 0.15s, background-color 0.15s, border-color 0.15s, box-shadow 0.15s;
 
     .avatar {
       --avatar-size: 6rem;
