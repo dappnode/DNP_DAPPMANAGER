@@ -10,7 +10,7 @@ import { ethers } from "ethers";
 describe.skip("Dappnode Repository", function () {
   const ipfsUrls = [
     //"https://api.ipfs.dappnode.io",
-    "https://gateway.ipfs.dappnode.io"
+    "https://ipfs-gateway.dappnode.net"
   ];
 
   const prysmDnpName = "prysm.dnp.dappnode.eth";

@@ -384,7 +384,7 @@ describe("modules / docker / parseContainerInfo", function () {
         running: true,
         exitCode: null,
         dependencies: {},
-        avatarUrl: "https://gateway.ipfs.dappnode.io/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
+        avatarUrl: "https://ipfs-gateway.dappnode.net/ipfs/QmQnHxr4YAVdtqzHnsDYvmXizxptSYyaj3YwTjoiLshVwF",
         origin: "/ipfs/QmeBfnwgsNcEmbmxENBWtgkv5YZsAhiaDsoYd7nMTV1wKV",
         chain: "ethereum",
         canBeFullnode: false,
@@ -765,7 +765,7 @@ describe("modules / docker / parseContainerInfo", function () {
         canBeFullnode: false
       },
       {
-        avatarUrl: "https://gateway.ipfs.dappnode.io/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
+        avatarUrl: "https://ipfs-gateway.dappnode.net/ipfs/QmaZZVsVqaWwVLe36HhvKj3QEPt7hM1GL8kemNvsZd5F5x",
         canBeFullnode: false,
         containerId: "ba4765113dd6016da8b35dfe367493186f3bfd34d88eca03ccf894f7045710fa",
         containerName: "DAppNodePackage-grafana.dms.dnp.dappnode.eth",

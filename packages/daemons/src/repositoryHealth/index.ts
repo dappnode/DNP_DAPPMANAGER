@@ -25,7 +25,7 @@ async function checkIpfsHealth(): Promise<void> {
 
   try {
     // check health by fetching CID of empty directory QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn. Most of ipfs nodes should have it.
-    // checked against: https://ipfs.io https://gateway-dev.ipfs.dappnode.io https://gateway.ipfs.dappnode.io
+    // checked against: https://ipfs.io https://gateway-dev.ipfs.dappnode.io https://ipfs-gateway.dappnode.net
     const res = await fetch(`${ipfsUrl}/ipfs/QmUNLLsPACCz1vLxQVkXqqLX5R1X345qqfHbsf67hvA3Nn`, {
       method: "GET",
       headers: { "Content-Type": "application/json" },
