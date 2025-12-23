@@ -91,7 +91,6 @@ export class Consensus extends StakerComponent {
   }
 
   async getAllConsensus(network: Network): Promise<StakerItem[]> {
-
     // For Starknet networks, include staking-specific envs
     if (network === Network.StarknetMainnet || network === Network.StarknetSepolia) {
       const starknetstakingDnpName = Consensus.CompatibleConsensus[network]?.[0]?.dnpName;
@@ -110,25 +109,25 @@ export class Consensus extends StakerComponent {
 
   // Done in the same way as mevBoost relays, useful to print current starknet signer envs in UI
   async getStarknetOperationalAddresses(starknetDnpName?: string): Promise<string> {
-      let address = "";
-      if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return address;
-      const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
-      if (pkgEnv) {
-        address = pkgEnv["staking"]["SIGNER_OPERATIONAL_ADDRESS"]
-      }
-      return address;
+    let address = "";
+    if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return address;
+    const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
+    if (pkgEnv) {
+      address = pkgEnv["staking"]["SIGNER_OPERATIONAL_ADDRESS"];
     }
-  
+    return address;
+  }
+
   // Done in the same way as mevBoost relays, useful to print current starknet signer envs in UI
   async getStarknetSignerPrivateKey(starknetDnpName?: string): Promise<string> {
-      let key = "";
-      if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return key;
-      const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
-      if (pkgEnv) {
-        key = pkgEnv["staking"]["SIGNER_PRIVATE_KEY"]
-      }
-      return key;
+    let key = "";
+    if (!starknetDnpName || !(await listPackageNoThrow({ dnpName: starknetDnpName }))) return key;
+    const pkgEnv = new ComposeFileEditor(starknetDnpName, false).getUserSettings().environment;
+    if (pkgEnv) {
+      key = pkgEnv["staking"]["SIGNER_PRIVATE_KEY"];
     }
+    return key;
+  }
 
   async persistSelectedConsensusIfInstalled(network: Network): Promise<void> {
     const currentConsensusDnpName = this.DbHandlers[network].get();
@@ -256,10 +255,7 @@ export class Consensus extends StakerComponent {
   }
 
   private getStakerNetworkSettings(network: Network): UserSettings["networks"] {
-    const validatorServiceName = "validator";
-    const beaconServiceName = "beacon-chain";
-
-    // helper to build each service’s networks
+    // helper to build each service's networks
     const buildSvc = (svcName: string) => ({
       [params.DOCKER_STAKER_NETWORKS[network]]: {
         aliases: [`${svcName}.${network}.staker.dappnode`]
@@ -272,6 +268,20 @@ export class Consensus extends StakerComponent {
         aliases: [`${svcName}.${network}.dappnode.private`]
       }
     });
+
+    // For Starknet networks, use "staking" as the service name
+    if (network === Network.StarknetMainnet || network === Network.StarknetSepolia) {
+      const stakingServiceName = "staking";
+      return {
+        rootNetworks: this.getComposeRootNetworks(network),
+        serviceNetworks: {
+          [stakingServiceName]: buildSvc(stakingServiceName)
+        }
+      };
+    }
+
+    const validatorServiceName = "validator";
+    const beaconServiceName = "beacon-chain";
 
     return {
       rootNetworks: this.getComposeRootNetworks(network),
