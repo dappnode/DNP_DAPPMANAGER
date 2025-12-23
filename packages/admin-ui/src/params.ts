@@ -147,7 +147,7 @@ export const dappnodeVolumeGroup = "rootvg";
 export const dappnodeLogicalVolume = "root";
 
 // IPFS
-export const IPFS_DAPPNODE_GATEWAY = "https://gateway.ipfs.dappnode.io";
+export const IPFS_DAPPNODE_GATEWAY = "https://ipfs-gateway.dappnode.net";
 export const IPFS_GATEWAY_CHECKER = "https://ipfs.github.io/public-gateway-checker/";
 
 // VPN
