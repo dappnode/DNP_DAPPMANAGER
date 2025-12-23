@@ -17,7 +17,9 @@ const consensusClientMap: { [key in Network]: () => string | null | undefined } 
   prater: () => consensusClientPrater.get(),
   holesky: () => consensusClientHolesky.get(),
   lukso: () => consensusClientLukso.get(),
-  sepolia: () => consensusClientSepolia.get()
+  sepolia: () => consensusClientSepolia.get(),
+  starknet: () => null,
+  "starknet-sepolia": () => null
 };
 
 export async function consensusClientsGetByNetworks({

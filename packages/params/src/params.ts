@@ -129,7 +129,9 @@ export const params = {
     [Network.Sepolia]: "sepolia_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
-    [Network.Lukso]: "lukso_network"
+    [Network.Lukso]: "lukso_network",
+    [Network.StarknetMainnet]: "starknet_network",
+    [Network.StarknetSepolia]: "starknet_sepolia_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2",

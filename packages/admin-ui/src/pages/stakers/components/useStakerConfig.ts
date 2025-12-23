@@ -143,9 +143,13 @@ function getChanges({
     };
 
   // Not allowed if execution and !consensus or !execution and consensus
+  // Exception: Starknet networks use full nodes (execution client only, no consensus client needed)
+  const isStarknetNetwork = newStakerConfig.network === Network.StarknetMainnet || newStakerConfig.network === Network.StarknetSepolia;
+
   if (
-    (newStakerConfig.executionDnpName && !newStakerConfig.consensusDnpName) ||
-    (!newStakerConfig.executionDnpName && newStakerConfig.consensusDnpName)
+    !isStarknetNetwork &&
+    ((newStakerConfig.executionDnpName && !newStakerConfig.consensusDnpName) ||
+      (!newStakerConfig.executionDnpName && newStakerConfig.consensusDnpName))
   )
     return {
       isAllowed: false,
@@ -162,10 +166,17 @@ function getChanges({
     };
 
   // Not allowed if changes AND (EC or CC are deselected) AND (signer or mev boost)
-  if (!isExecAndConsSelected && (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName))
+  // Exception: Starknet networks only need execution client
+  const hasRequiredClients = isStarknetNetwork
+    ? Boolean(newStakerConfig.executionDnpName)
+    : isExecAndConsSelected;
+
+  if (!hasRequiredClients && (newStakerConfig.web3signerDnpName || newStakerConfig.mevBoostDnpName))
     return {
       isAllowed: false,
-      reason: "To enable web3signer and/or MEV boost, execution and consensus clients must be selected",
+      reason: isStarknetNetwork
+        ? "To enable web3signer and/or MEV boost, execution client must be selected"
+        : "To enable web3signer and/or MEV boost, execution and consensus clients must be selected",
       severity: "warning"
     };
 
