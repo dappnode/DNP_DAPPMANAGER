@@ -46,6 +46,15 @@ export class Signer extends StakerComponent {
     [Network.Sepolia]: {
       dnpName: SignerSepolia.Web3signer, 
       minVersion: "0.1.0"
+    },
+    // TODO: dont exist but need to be added
+    [Network.StarknetMainnet]: {
+      dnpName: "web3signer-starknet.dnp.dappnode.eth",
+      minVersion: "0.1.0"
+    },
+    [Network.StarknetSepolia]: {
+      dnpName: "web3signer-starknet-sepolia.dnp.dappnode.eth",
+      minVersion: "0.1.0"
     }
   };
 

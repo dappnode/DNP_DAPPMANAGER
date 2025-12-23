@@ -224,7 +224,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsClientTargetSet: async () => {},
   ipfsClientTargetGet: async () => ({
     ipfsClientTarget: IpfsClientTarget.remote,
-    ipfsGateway: "https://gateway.ipfs.dappnode.io"
+    ipfsGateway: "https://ipfs-gateway.dappnode.net"
   }),
   enableEthicalMetrics: async () => {},
   getEthicalMetricsConfig: async () => ({

@@ -9,12 +9,14 @@ export enum Network {
   Lukso = "lukso",
   Holesky = "holesky",
   Sepolia = "sepolia",
-  Hoodi = "hoodi"
+  Hoodi = "hoodi",
+  StarknetMainnet = "starknet",
+  StarknetSepolia = "starknet-sepolia"
 }
 
 export const networksByType = {
-  mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso],
-  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia]
+  mainnets: [Network.Mainnet, Network.Gnosis, Network.Lukso, Network.StarknetMainnet],
+  testnets: [Network.Hoodi, Network.Prater, Network.Holesky, Network.Sepolia, Network.StarknetSepolia]
 };
 
 // MAINNET
@@ -151,11 +153,33 @@ export enum SignerSepolia {
   Web3signer = "web3signer-sepolia.dnp.dappnode.eth"
 }
 
+// For starknet, we treat juno/pathfinder as an execution client, but its basically a fullnode on its own.
+// "Starknetstaking" (validator sofware) is treated as consensus client.
+// STARKNET MAINNET
+export enum StarknetExecutionMainnet {
+  Juno = "juno.dnp.dappnode.eth",
+  Pathfinder = "pathfinder.dnp.dappnode.eth"
+}
+export enum StarknetConsensusMainnet {
+  StarknetStaking = "starknetstaking.dnp.dappnode.eth"
+}
+
+// STARKNET SEPOLIA
+export enum StarknetExecutionSepolia {
+  Juno = "juno-sepolia.dnp.dappnode.eth",
+  Pathfinder = "pathfinder-sepolia.dnp.dappnode.eth"
+}
+export enum StarknetConsensusSepolia {
+  StarknetStaking = "starknetstaking-sepolia.dnp.dappnode.eth"
+}
+
 export type StakerItem = StakerItemOk | StakerItemError;
 
 interface StakerItemBasic {
   dnpName: string;
   relays?: string[];
+  starknetSignerOperationalAddress?: string;
+  starknetSignerPrivateKey?: string;
 }
 
 export type StakerItemError = {
@@ -203,4 +227,8 @@ export interface StakerConfigSet {
   mevBoostDnpName: string | null;
   relays: string[];
   web3signerDnpName: string | null;
+  /** Starknet-specific: Operational address for signing attestations (Hot wallet) */
+  starknetSignerOperationalAddress?: string;
+  /** Starknet-specific: Internal signing private key */
+  starknetSignerPrivateKey?: string;
 }

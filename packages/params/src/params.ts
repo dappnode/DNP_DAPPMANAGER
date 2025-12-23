@@ -129,7 +129,9 @@ export const params = {
     [Network.Sepolia]: "sepolia_network",
     [Network.Prater]: "prater_network",
     [Network.Gnosis]: "gnosis_network",
-    [Network.Lukso]: "lukso_network"
+    [Network.Lukso]: "lukso_network",
+    [Network.StarknetMainnet]: "starknet_network",
+    [Network.StarknetSepolia]: "starknet_sepolia_network"
   },
   DOCKER_LEGACY_DNS: "172.33.1.2",
   BIND_IP: "172.33.1.2",
@@ -165,11 +167,11 @@ export const params = {
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
   IPFS_LOCAL: "http://ipfs.dappnode:8080",
-  IPFS_REMOTE: "https://gateway.ipfs.dappnode.io",
+  IPFS_REMOTE: "https://ipfs-gateway.dappnode.net",
 
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
-  ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.io",
+  ETH_MAINNET_CHECKPOINTSYNC_URL_REMOTE: "https://checkpoint-sync.dappnode.net",
 
   // Prysm legacy specs for: prater, gnosis and mainnet
   prysmLegacySpecs: [

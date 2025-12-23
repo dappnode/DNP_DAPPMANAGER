@@ -179,3 +179,62 @@ export const mevBoostLukso = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_LUKSO, false),
   Object.keys({ MEVBOOST_LUKSO })[0]
 );
+
+// Starknet Mainnet
+const CONSENSUS_STAKER_MAINNET = "consensus-staker-mainnet";
+const EXECUTION_STAKER_MAINNET = "execution-staker-mainnet";
+const MEVBOOST_STAKER_MAINNET = "mevboost-staker-mainnet";
+
+/**
+ * Whenever a user switches the EC and/or CC from the stakers UI then
+ * consensusClientMainnet, executionClientMainnet will change as well
+ */
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_MAINNET, null),
+  Object.keys({ CONSENSUS_STAKER_MAINNET })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_MAINNET, null),
+  Object.keys({ EXECUTION_STAKER_MAINNET })[0]
+);
+
+export const mevBoostStarknetMainnet = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_STAKER_MAINNET, false),
+  Object.keys({ MEVBOOST_STAKER_MAINNET })[0]
+);
+
+// Starknet Sepolia
+
+const CONSENSUS_STAKER_SEPOLIA = "consensus-staker-sepolia";
+const EXECUTION_STAKER_SEPOLIA = "execution-staker-sepolia";
+const MEVBOOST_STAKER_SEPOLIA = "mevboost-staker-sepolia";
+
+/**
+ * Whenever a user switches the EC and/or CC from the stakers UI then
+ * consensusClientSepolia, executionClientSepolia will change as well
+ */
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const consensusStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(CONSENSUS_STAKER_SEPOLIA, null),
+  Object.keys({ CONSENSUS_STAKER_SEPOLIA })[0]
+);
+
+// Null means not set
+// Undefined means its set but the user has not selected any value
+export const executionStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<string | undefined | null>(EXECUTION_STAKER_SEPOLIA, null),
+  Object.keys({ EXECUTION_STAKER_SEPOLIA })[0]
+);
+
+export const mevBoostStarknetSepolia = interceptGlobalEnvOnSet(
+  dbMain.staticKey<boolean>(MEVBOOST_STAKER_SEPOLIA, false),
+  Object.keys({ MEVBOOST_STAKER_SEPOLIA })[0]
+);
