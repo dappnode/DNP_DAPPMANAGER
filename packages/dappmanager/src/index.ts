@@ -8,7 +8,7 @@ import {
   copyHostServices,
   copyHostTimers
 } from "@dappnode/hostscriptsservices";
-import { DappnodeInstaller, getIpfsUrl, postRestartPatch } from "@dappnode/installer";
+import { DappnodeInstaller, getIpfsUrls, postRestartPatch } from "@dappnode/installer";
 import * as calls from "./calls/index.js";
 import { routesLogger, subscriptionsLogger, logs } from "@dappnode/logger";
 import * as routes from "./api/routes/index.js";
@@ -47,11 +47,11 @@ initializeDb()
   .then(() => logs.info("Initialized Database"))
   .catch((e) => logs.error("Error inititializing Database", e));
 
-let ipfsUrl = params.IPFS_LOCAL;
+let ipfsUrls = [params.IPFS_LOCAL];
 try {
-  ipfsUrl = getIpfsUrl(); // Attempt to update with value from getIpfsUrl
+  ipfsUrls = getIpfsUrls(); // Attempt to update with value from getIpfsUrls
 } catch (e) {
-  logs.error(`Error getting ipfsUrl: ${e.message}. Using default: ${ipfsUrl}`);
+  logs.error(`Error getting ipfsUrls: ${e.message}. Using default: ${ipfsUrls}`);
 }
 
 // Read and print version data
@@ -75,7 +75,7 @@ const providers = new MultiUrlJsonRpcProvider(
 
 // Required db to be initialized
 export const directory = new DappNodeDirectory(providers);
-export const dappnodeInstaller = new DappnodeInstaller(ipfsUrl, providers);
+export const dappnodeInstaller = new DappnodeInstaller(ipfsUrls, providers);
 
 export const publicRegistry = new DappNodeRegistry("public");
 
