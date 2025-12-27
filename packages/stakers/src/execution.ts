@@ -117,6 +117,11 @@ export class Execution extends StakerComponent {
       await this.setStakerPkgConfig({ dnpName: currentExecutionDnpName, isInstalled, userSettings });
 
       await this.DbHandlers[network].set(currentExecutionDnpName);
+
+      if (network === Network.Mainnet)
+        db.ethExecClientInstallStatus.set(currentExecutionDnpName, {
+          status: "INSTALLED"
+        });
     }
   }
 
@@ -135,6 +140,18 @@ export class Execution extends StakerComponent {
     if (newExecutionDnpName !== prevExecClientDnpName) {
       // persist on db
       await this.DbHandlers[network].set(newExecutionDnpName);
+    }
+
+    // update client status
+    if (network === Network.Mainnet) {
+      if (newExecutionDnpName)
+        db.ethExecClientInstallStatus.set(newExecutionDnpName, {
+          status: "INSTALLED"
+        });
+      else if (prevExecClientDnpName)
+        db.ethExecClientInstallStatus.set(prevExecClientDnpName, {
+          status: "UNINSTALLED"
+        });
     }
   }
 
