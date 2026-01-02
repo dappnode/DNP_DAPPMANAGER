@@ -195,38 +195,22 @@
             "mode": "fixed"
           },
           "decimals": 0,
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "light-red",
-                  "index": 0,
-                  "text": "OFF"
-                },
-                "1": {
-                  "color": "light-green",
-                  "index": 1,
-                  "text": "ON"
-                }
-              },
-              "type": "value"
-            }
-          ],
-          "max": 1,
+          "mappings": [],
+          "max": 10,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "red"
               },
               {
-                "color": "red",
-                "value": 80
+                "color": "green",
+                "value": 1
               }
             ]
           },
-          "unit": "bool_on_off"
+          "unit": "short"
         },
         "overrides": []
       },
@@ -256,13 +240,13 @@
             "uid": "PBFA97CFB590B2093"
           },
           "exemplar": true,
-          "expr": "dappmanager_ipfs_client_target_local{instance=\"dappmanager.dappnode:80\",ipfsClientTargetLocal=\"local\"}",
+          "expr": "dappmanager_ipfs_gateway_count{instance=\"dappmanager.dappnode:80\",gatewayCount=\"count\"}",
           "interval": "",
-          "legendFormat": "Ipfs Client Local (on / off)",
+          "legendFormat": "IPFS Gateways Configured",
           "refId": "A"
         }
       ],
-      "title": "Ipfs Client Local",
+      "title": "IPFS Gateways",
       "type": "gauge"
     },
     {

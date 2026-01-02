@@ -2,7 +2,6 @@ import { logs } from "@dappnode/logger";
 import { runAtMostEvery } from "@dappnode/utils";
 import { notifications } from "@dappnode/notifications";
 import { Category, Priority, Status } from "@dappnode/types";
-import * as db from "@dappnode/db";
 import { getIpfsUrl } from "@dappnode/installer";
 import { params } from "@dappnode/params";
 import { eventBus } from "@dappnode/eventbus";
@@ -15,7 +14,6 @@ let ethFailureCount = 0;
 let ethNotificationSent = false;
 
 async function checkIpfsHealth(): Promise<void> {
-  const ipfsClientTarget = db.ipfsClientTarget.get();
   const ipfsUrl = getIpfsUrl();
 
   const controller = new AbortController();
@@ -36,7 +34,7 @@ async function checkIpfsHealth(): Promise<void> {
 
     if (!res.ok) throw new Error(`Status ${res.status}`);
 
-    logs.info(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is healthy`);
+    logs.info(`IPFS endpoint at ${ipfsUrl} is healthy`);
 
     // reset failure count on success
     ipfsFailureCount = 0;
@@ -56,7 +54,7 @@ async function checkIpfsHealth(): Promise<void> {
     }
   } catch (error) {
     clearTimeout(timeout);
-    logs.error(`IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is unhealthy: ${error}`);
+    logs.error(`IPFS endpoint at ${ipfsUrl} is unhealthy: ${error}`);
 
     // increment failure count and send notification after threshold
     ipfsFailureCount += 1;
@@ -64,12 +62,12 @@ async function checkIpfsHealth(): Promise<void> {
       await notifications.sendNotification({
         title: "Your Dappnode IPFS endpoint is not resolving content correctly.",
         dnpName: params.dappmanagerDnpName,
-        body: `Dappnode IPFS endpoint (${ipfsClientTarget}) at ${ipfsUrl} is currently unreachable or not resolving content correctly. This may affect access to decentralized content or applications relying on IPFS.`,
+        body: `Dappnode IPFS endpoint at ${ipfsUrl} is currently unreachable or not resolving content correctly. This may affect access to decentralized content or applications relying on IPFS.`,
         category: Category.system,
         priority: Priority.high,
         status: Status.triggered,
         callToAction: {
-          title: `Switch to ${ipfsClientTarget && ipfsClientTarget === "local" ? "Remote" : "Local"} IPFS`,
+          title: "Configure IPFS Gateways",
           url: "http://my.dappnode/system/ipfs"
         },
         isBanner: true,

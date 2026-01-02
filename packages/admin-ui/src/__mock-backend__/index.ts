@@ -1,4 +1,4 @@
-import { IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
+import { PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -221,10 +221,13 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     { lv_name: "swap_1", vg_name: "rootvg", lv_size: "976.00m" }
   ],
   lvmDiskSpaceExtend: async () => "Successfully extended LVM disk space",
-  ipfsClientTargetSet: async () => {},
-  ipfsClientTargetGet: async () => ({
-    ipfsClientTarget: IpfsClientTarget.remote,
-    ipfsGateway: "https://ipfs-gateway.dappnode.net"
+  ipfsGatewayUrlsSet: async () => {},
+  ipfsGatewayUrlsGet: async () => ({
+    ipfsGatewayUrls: [
+      "https://ipfs-gateway.dappnode.net",
+      "https://gateway.pinata.cloud",
+      "https://cloudflare-ipfs.com"
+    ]
   }),
   enableEthicalMetrics: async () => {},
   getEthicalMetricsConfig: async () => ({

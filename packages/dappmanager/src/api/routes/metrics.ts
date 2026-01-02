@@ -28,19 +28,15 @@ export const metrics = wrapHandler(async (_, res) => {
 // Create a Registry which registers the metrics
 const register = new client.Registry();
 
-// IPFS node local or remote
+// IPFS gateway URLs configured count
 register.registerMetric(
   new client.Gauge({
-    name: "dappmanager_ipfs_client_target_local",
-    help: "Ipfs client target local",
-    labelNames: ["ipfsClientTargetLocal"],
+    name: "dappmanager_ipfs_gateway_count",
+    help: "Number of IPFS gateways configured",
+    labelNames: ["gatewayCount"],
     collect() {
-      const ipfsClientTarget = db.ipfsClientTarget.get();
-      if (ipfsClientTarget === "local") {
-        this.set({ ipfsClientTargetLocal: "local" }, 1);
-      } else {
-        this.set({ ipfsClientTargetLocal: "local" }, 0);
-      }
+      const ipfsGatewayUrls = db.ipfsGatewayUrls.get();
+      this.set({ gatewayCount: "count" }, ipfsGatewayUrls.length);
     }
   })
 );

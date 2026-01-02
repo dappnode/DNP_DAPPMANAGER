@@ -1,11 +1,12 @@
 import { dbMain } from "./dbFactory.js";
-import { IpfsClientTarget } from "@dappnode/types";
 import { params } from "@dappnode/params";
 
 // User chosen properties
-const IPFS_CLIENT_TARGET = "ipfs-client-target";
-const IPFS_GATEWAY = "ipfs-gateway";
+const IPFS_GATEWAY_URLS = "ipfs-gateway-urls";
+// Legacy key for migration
+const IPFS_GATEWAY_LEGACY = "ipfs-gateway";
 
-export const ipfsClientTarget = dbMain.staticKey<IpfsClientTarget>(IPFS_CLIENT_TARGET, IpfsClientTarget.local);
+export const ipfsGatewayUrls = dbMain.staticKey<string[]>(IPFS_GATEWAY_URLS, params.IPFS_REMOTE_URLS);
 
-export const ipfsGateway = dbMain.staticKey<string>(IPFS_GATEWAY, params.IPFS_REMOTE);
+// Legacy accessor for migration purposes only
+export const ipfsGatewayLegacy = dbMain.staticKey<string>(IPFS_GATEWAY_LEGACY, params.IPFS_REMOTE_URLS[0]);

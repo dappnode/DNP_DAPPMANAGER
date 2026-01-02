@@ -154,7 +154,7 @@ export const params = {
   AUTO_UPDATE_INCLUDE_IPFS_VERSIONS: false,
 
   // Install method parameters
-  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === 'true',
+  ALWAYS_DAPPGETBASIC: process.env.ALWAYS_DAPPGETBASIC === "true",
   // Watchers
   TEMPERATURE_DAEMON_INTERVAL: 5 * MINUTE,
   AUTO_UPDATE_DAEMON_INTERVAL: 30 * MINUTE,
@@ -167,7 +167,15 @@ export const params = {
   IPFS_HOST: process.env.IPFS_HOST || process.env.IPFS_REDIRECT,
   IPFS_TIMEOUT: 0.5 * MINUTE,
   IPFS_LOCAL: "http://ipfs.dappnode:8080",
+  IPFS_LOCAL_API: "http://ipfs.dappnode:5001",
   IPFS_REMOTE: "https://ipfs-gateway.dappnode.net",
+  /** Default list of IPFS gateway URLs to use for resilient content fetching */
+  IPFS_REMOTE_URLS: [
+    "https://ipfs-gateway.dappnode.net",
+    "https://gateway.pinata.cloud",
+    "https://cloudflare-ipfs.com",
+    "https://dweb.link"
+  ],
 
   // Web3 parameters
   ETH_MAINNET_RPC_URL_REMOTE: process.env.ETH_MAINNET_RPC_URL_REMOTE || "https://web3.dappnode.net",
