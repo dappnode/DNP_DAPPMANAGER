@@ -929,13 +929,7 @@ export interface DistributedFile {
 }
 
 export interface IpfsRepository {
-  ipfsClientTarget: IpfsClientTarget;
-  ipfsGateway: string;
-}
-
-export enum IpfsClientTarget {
-  local = "local",
-  remote = "remote"
+  ipfsGatewayUrls: string[];
 }
 
 /**

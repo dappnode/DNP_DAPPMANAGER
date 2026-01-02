@@ -3,7 +3,6 @@ import { DappnodeRepository } from "@dappnode/toolkit";
 import * as db from "@dappnode/db";
 import {
   DistributedFile,
-  IpfsClientTarget,
   PackageRelease,
   ManifestWithImage,
   Compose,
@@ -30,18 +29,24 @@ import { omit } from "lodash-es";
 import { JsonRpcApiProvider } from "ethers";
 
 /**
+ * Returns the IPFS gateway URLs to initialize the ipfs instance.
+ * These URLs are used for resilient fetching - local node is tried first, then gateways are raced.
+ */
+export function getIpfsGatewayUrls(): string[] {
+  // For testing
+  if (params.IPFS_HOST) return [params.IPFS_HOST];
+
+  // Return configured gateway URLs from db
+  return db.ipfsGatewayUrls.get();
+}
+
+/**
+ * @deprecated Use getIpfsGatewayUrls() instead
  * Returns the ipfsUrl to initialize the ipfs instance
  */
 export function getIpfsUrl(): string {
-  // Fort testing
-  if (params.IPFS_HOST) return params.IPFS_HOST;
-
-  const ipfsClientTarget = db.ipfsClientTarget.get();
-  if (!ipfsClientTarget) throw Error("Ipfs client target is not set");
-  // local
-  if (ipfsClientTarget === IpfsClientTarget.local) return params.IPFS_LOCAL;
-  // remote
-  return db.ipfsGateway.get();
+  const urls = getIpfsGatewayUrls();
+  return urls[0];
 }
 
 export class DappnodeInstaller extends DappnodeRepository {
@@ -50,9 +55,9 @@ export class DappnodeInstaller extends DappnodeRepository {
   }
 
   private async updateProviders(): Promise<void> {
-    const newIpfsUrl = getIpfsUrl();
+    const newIpfsUrls = getIpfsGatewayUrls();
     // super.changeEthProvider();
-    super.changeIpfsGatewayUrl(newIpfsUrl);
+    super.changeIpfsGatewayUrls(newIpfsUrls);
   }
 
   /**

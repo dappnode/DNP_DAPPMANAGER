@@ -387,14 +387,14 @@ export interface Routes {
   ipfsTest(): Promise<void>;
 
   /**
-   * Sets the ipfs client target: local | remote
+   * Sets the IPFS gateway URLs for package fetching
    */
-  ipfsClientTargetSet(kwargs: { ipfsRepository: IpfsRepository }): Promise<void>;
+  ipfsGatewayUrlsSet(kwargs: { ipfsGatewayUrls: string[] }): Promise<void>;
 
   /**
-   * Gets the Ipfs client target
+   * Gets the IPFS gateway URLs for package fetching
    */
-  ipfsClientTargetGet(): Promise<IpfsRepository>;
+  ipfsGatewayUrlsGet(): Promise<IpfsRepository>;
 
   /**
    * Returns the keystores imported for the given networks.
@@ -902,8 +902,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   httpsPortalMappingsRecreate: {},
   httpsPortalExposableServicesGet: {},
   ipfsTest: {},
-  ipfsClientTargetSet: {},
-  ipfsClientTargetGet: {},
+  ipfsGatewayUrlsSet: {},
+  ipfsGatewayUrlsGet: {},
   keystoresGetByNetwork: { log: true },
   localProxyingEnableDisable: { log: true },
   localProxyingStatusGet: {},

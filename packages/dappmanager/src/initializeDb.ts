@@ -6,7 +6,7 @@ import { getInternalIp, getServerName, getStaticIp, ping } from "./utils/index.j
 import { getExternalUpnpIp, isUpnpAvailable } from "@dappnode/upnpc";
 import { writeGlobalEnvsToEnvFile } from "@dappnode/db";
 import { params } from "@dappnode/params";
-import { IdentityInterface, IpfsClientTarget } from "@dappnode/types";
+import { IdentityInterface } from "@dappnode/types";
 import { logs } from "@dappnode/logger";
 import { localProxyingEnableDisable } from "./calls/index.js";
 import { pause, shell, getPublicIpFromUrls } from "@dappnode/utils";
@@ -35,24 +35,30 @@ function returnNullIfError(fn: () => Promise<string>, silent?: boolean): () => P
  */
 export async function initializeDb(): Promise<void> {
   /**
-   * ipfsClientTarget
+   * Migrate from single ipfsGateway (string) to ipfsGatewayUrls (string[])
+   * This handles the transition from the old single-gateway format to multi-gateway support
    */
   try {
-    const ipfsClientTarget = db.ipfsClientTarget.get();
-    if (!ipfsClientTarget) {
-      logs.info("ipfsClientTarget not found, setting to local");
-      db.ipfsClientTarget.set(IpfsClientTarget.local);
+    const legacyGateway = db.ipfsGatewayLegacy.get();
+    const currentUrls = db.ipfsGatewayUrls.get();
+
+    // Check if we need to migrate: legacy value exists and is different from defaults
+    if (legacyGateway && legacyGateway !== params.IPFS_REMOTE_URLS[0]) {
+      // Migrate deprecated endpoint
+      const migratedGateway =
+        legacyGateway === "http://ipfs.dappnode.io:8081" ? params.IPFS_REMOTE_URLS[0] : legacyGateway;
+
+      // If currentUrls is still the default, prepend the migrated legacy gateway
+      if (JSON.stringify(currentUrls) === JSON.stringify(params.IPFS_REMOTE_URLS)) {
+        // Use legacy gateway as primary, keep defaults as fallbacks
+        const newUrls = [migratedGateway, ...params.IPFS_REMOTE_URLS.filter((url) => url !== migratedGateway)];
+        db.ipfsGatewayUrls.set(newUrls);
+        logs.info(`Migrated IPFS gateway from ${legacyGateway} to multi-gateway format`);
+      }
     }
   } catch (e) {
-    logs.error("Error getting ipfsClientTarget", e);
-    db.ipfsClientTarget.set(IpfsClientTarget.local);
+    logs.warn("Error migrating IPFS gateway settings", e);
   }
-
-  /**
-   * Migrate ipfs remote gateway endpoint from http://ipfs.dappnode.io:8081 to https://ipfs.gateway.dappnode.io
-   * The endpoint http://ipfs.dappnode.io:8081 is being deprecated
-   */
-  if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081") db.ipfsGateway.set(params.IPFS_REMOTE);
 
   /**
    *

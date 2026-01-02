@@ -32,39 +32,61 @@ import { JsonRpcApiProvider } from "ethers";
 
 const source = "ipfs" as const;
 
+/** Timeout for local IPFS node requests in milliseconds */
+const LOCAL_IPFS_TIMEOUT_MS = 30_000;
+
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
- * To fetch IPFS content it uses dag endpoint for CAR content validation
+ * To fetch IPFS content it uses dag endpoint for CAR content validation.
+ *
+ * Implements a resilient IPFS fetching strategy:
+ * 1. Try local IPFS node first (via API port 5001)
+ * 2. If local fails, race all configured gateway URLs simultaneously
+ * 3. First successful response wins, others are aborted
  *
  * @extends ApmRepository
  */
 export class DappnodeRepository extends ApmRepository {
-  protected gatewayUrl: string;
-  protected localIpfsUrl = "http://ipfs.dappnode:5001";
+  /** Array of IPFS gateway URLs to use for fetching content */
+  protected gatewayUrls: string[];
+  /** Local IPFS node API URL (port 5001) for RPC operations */
+  protected localIpfsApiUrl = "http://ipfs.dappnode:5001";
+  /** Local IPFS node gateway URL (port 8080) for CAR retrieval */
+  protected localIpfsGatewayUrl = "http://ipfs.dappnode:8080";
 
   /**
    * Constructs an instance of DappnodeRepository
-   * @param ipfsUrl - The URL of the IPFS network node.
-   * @param ethUrl - The URL of the Ethereum node to connect to.
+   * @param ipfsUrl - The primary URL of the IPFS network node (for backward compatibility).
+   * @param provider - The Ethereum JSON-RPC provider.
    */
   constructor(ipfsUrl: string, provider: JsonRpcApiProvider) {
     super(provider);
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, ""); // e.g. "https://gateway.pinata.cloud"
+    // Initialize with single URL for backward compatibility
+    this.gatewayUrls = [ipfsUrl.replace(/\/?$/, "")];
   }
 
   /**
-   * Changes the IPFS provider and target.
+   * Changes the IPFS gateway URLs for multi-gateway resilient fetching.
+   * @param ipfsUrls - Array of IPFS gateway URLs.
+   */
+  public changeIpfsGatewayUrls(ipfsUrls: string[]): void {
+    this.gatewayUrls = ipfsUrls.map((url) => url.replace(/\/?$/, ""));
+  }
+
+  /**
+   * @deprecated Use changeIpfsGatewayUrls instead for multi-gateway support
+   * Changes the IPFS provider and target (backward compatibility).
    * @param ipfsUrl - The new URL of the IPFS network node.
    */
   public changeIpfsGatewayUrl(ipfsUrl: string): void {
-    this.gatewayUrl = ipfsUrl.replace(/\/?$/, "");
+    this.gatewayUrls = [ipfsUrl.replace(/\/?$/, "")];
   }
 
   /**
    * Pin content to local IPFS node
    */
   public async pinAddLocal(hash: string): Promise<void> {
-    await fetch(`${this.localIpfsUrl}/api/v0/pin/add?arg=${hash}`, {
+    await fetch(`${this.localIpfsApiUrl}/api/v0/pin/add?arg=${hash}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -76,7 +98,7 @@ export class DappnodeRepository extends ApmRepository {
    * Unpin content from local IPFS node
    */
   public async pinRmLocal(hash: string): Promise<void> {
-    await fetch(`${this.localIpfsUrl}/api/v0/pin/rm?arg=${hash}`, {
+    await fetch(`${this.localIpfsApiUrl}/api/v0/pin/rm?arg=${hash}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -250,6 +272,8 @@ export class DappnodeRepository extends ApmRepository {
    * Downloads the content pointed by the given hash, parses it to UTF8 and returns it as a string.
    * This function is intended for small files.
    *
+   * Uses resilient fetching: tries local IPFS first, then races all gateway URLs.
+   *
    * @param hash - The content identifier (CID) of the file to download.
    * @param maxLength - The maximum length of the file in bytes. If the downloaded file exceeds this length, an error is thrown.
    * @returns The downloaded file content as a UTF8 string.
@@ -259,7 +283,7 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async writeFileToMemory(hash: string, maxLength?: number): Promise<string> {
     const chunks: Uint8Array[] = [];
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const { carReader, root } = await this.getAndVerifyContentResilient(hash);
     const content = await this.unpackCarReader(carReader, root);
     for await (const chunk of content) chunks.push(chunk);
 
@@ -285,6 +309,8 @@ export class DappnodeRepository extends ApmRepository {
    * Downloads the content pointed by the given hash and writes it directly to the filesystem.
    * This function is intended for large files, such as Docker images.
    *
+   * Uses resilient fetching: tries local IPFS first, then races all gateway URLs.
+   *
    * IMPORTANT: This function is not supported in the browser.
    *
    * @param args - The arguments object.
@@ -309,7 +335,7 @@ export class DappnodeRepository extends ApmRepository {
     fileSize?: number;
     progress?: (n: number) => void;
   }): Promise<void> {
-    const { carReader, root } = await this.getAndVerifyContentFromGateway(hash);
+    const { carReader, root } = await this.getAndVerifyContentResilient(hash);
     const readable = await this.unpackCarReader(carReader, root);
 
     return new Promise((resolve, reject) => {
@@ -373,7 +399,9 @@ export class DappnodeRepository extends ApmRepository {
 
   /**
    * Lists the contents of a directory pointed by the given hash.
-   * ipfs.dag.get => reutrns `Tsize`!
+   * ipfs.dag.get => returns `Tsize`!
+   *
+   * Uses resilient fetching: tries local IPFS first, then races all gateway URLs.
    *
    * TODO: research why the size is different, i.e for the hash QmWcJrobqhHF7GWpqEbxdv2cWCCXbACmq85Hh7aJ1eu8rn Tsize is 64461521 and size is 64446140
    *
@@ -383,21 +411,9 @@ export class DappnodeRepository extends ApmRepository {
    */
   public async list(hash: string): Promise<IPFSEntry[]> {
     const cidStr = this.sanitizeIpfsPath(hash.toString());
-    const url = `${this.gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
-    const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
-    });
-    if (!res.ok) {
-      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
-    }
 
-    const dagJson = (await res.json()) as {
-      Links?: Array<{
-        Name: string;
-        Hash: { "/": string };
-        Tsize: number;
-      }>;
-    };
+    // Resilient fetching: try local first, then race gateways
+    const dagJson = await this.fetchDagJsonResilient(cidStr);
 
     if (!dagJson.Links) {
       throw new Error(`Invalid IPFS directory CID ${cidStr}`);
@@ -413,29 +429,232 @@ export class DappnodeRepository extends ApmRepository {
   }
 
   /**
-   * Gets the content from an IPFS gateway using the given hash and verifies its integrity.
-   * The content is returned as a CAR reader and the root CID.
+   * Fetches DAG-JSON from IPFS using resilient strategy.
+   * Tries local IPFS first, then races all gateway URLs.
+   */
+  private async fetchDagJsonResilient(cidStr: string): Promise<{
+    Links?: Array<{
+      Name: string;
+      Hash: { "/": string };
+      Tsize: number;
+    }>;
+  }> {
+    const errors: Array<{ source: string; error: unknown }> = [];
+
+    // 1. Try local IPFS gateway first (with timeout)
+    const localAbortController = new AbortController();
+    const localTimeout = setTimeout(() => localAbortController.abort(), LOCAL_IPFS_TIMEOUT_MS);
+    try {
+      const localResult = await this.fetchDagJsonFromUrl(this.localIpfsGatewayUrl, cidStr, localAbortController.signal);
+      clearTimeout(localTimeout);
+      console.log(`IPFS resolved ${cidStr} via local node (${this.localIpfsGatewayUrl})`);
+      return localResult;
+    } catch (err) {
+      clearTimeout(localTimeout);
+      const errorMsg = (err as Error).name === "AbortError" ? "Timeout after 30s" : (err as Error).message;
+      errors.push({ source: "local", error: errorMsg });
+    }
+
+    // 2. Race all remote gateways simultaneously
+    if (this.gatewayUrls.length === 0) {
+      throw new Error(`No IPFS gateways configured. Errors: ${this.formatErrors(errors)}`);
+    }
+
+    const raceResult = await this.raceGatewaysForDagJson(cidStr, errors);
+    if (raceResult) return raceResult;
+
+    throw new Error(`All IPFS sources failed for ${cidStr}. Errors: ${this.formatErrors(errors)}`);
+  }
+
+  /**
+   * Fetches DAG-JSON from a specific gateway URL.
+   */
+  private async fetchDagJsonFromUrl(
+    gatewayUrl: string,
+    cidStr: string,
+    signal?: AbortSignal
+  ): Promise<{
+    Links?: Array<{
+      Name: string;
+      Hash: { "/": string };
+      Tsize: number;
+    }>;
+  }> {
+    const url = `${gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+    const res = await fetch(url, {
+      headers: { Accept: "application/vnd.ipld.dag-json" },
+      signal
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
+    }
+    return (await res.json()) as {
+      Links?: Array<{
+        Name: string;
+        Hash: { "/": string };
+        Tsize: number;
+      }>;
+    };
+  }
+
+  /**
+   * Races all configured gateway URLs for DAG-JSON content.
+   * Returns the first successful result, aborts others.
+   */
+  private async raceGatewaysForDagJson(
+    cidStr: string,
+    errors: Array<{ source: string; error: unknown }>
+  ): Promise<{
+    Links?: Array<{
+      Name: string;
+      Hash: { "/": string };
+      Tsize: number;
+    }>;
+  } | null> {
+    const abortControllers = this.gatewayUrls.map(() => new AbortController());
+
+    const promises = this.gatewayUrls.map(async (gatewayUrl, index) => {
+      try {
+        const url = `${gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
+        const res = await fetch(url, {
+          headers: { Accept: "application/vnd.ipld.dag-json" },
+          signal: abortControllers[index].signal
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        }
+        const data = await res.json();
+        // Success! Abort all other requests
+        abortControllers.forEach((ctrl, i) => {
+          if (i !== index) ctrl.abort();
+        });
+        console.log(`IPFS resolved ${cidStr} via gateway (${gatewayUrl})`);
+        return { success: true as const, data, gatewayUrl };
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          errors.push({ source: gatewayUrl, error: err });
+        }
+        return { success: false as const, gatewayUrl };
+      }
+    });
+
+    const results = await Promise.all(promises);
+    const successResult = results.find((r) => r.success);
+    return successResult?.success ? successResult.data : null;
+  }
+
+  /**
+   * Resilient content fetching: tries local IPFS first, then races all gateway URLs.
+   * Gets the content as a verified CAR reader.
    *
    * @param hash - The content identifier (CID) of the content to get and verify.
    * @returns The content as a CAR reader and the root CID.
-   * @throws Error when the root CID does not match the provided hash (content is untrusted).
+   * @throws Error when all sources fail or content is untrusted.
    */
-  private async getAndVerifyContentFromGateway(hash: string): Promise<{
+  private async getAndVerifyContentResilient(hash: string): Promise<{
     carReader: CarReader;
     root: CID;
   }> {
-    // 1. Download the CAR
-    const url = `${this.gatewayUrl}/ipfs/${hash}?format=car`;
+    const errors: Array<{ source: string; error: unknown }> = [];
+
+    // 1. Try local IPFS gateway first (with timeout)
+    const localAbortController = new AbortController();
+    const localTimeout = setTimeout(() => localAbortController.abort(), LOCAL_IPFS_TIMEOUT_MS);
+    try {
+      const localResult = await this.getAndVerifyContentFromUrl(
+        this.localIpfsGatewayUrl,
+        hash,
+        localAbortController.signal
+      );
+      clearTimeout(localTimeout);
+      console.log(`IPFS resolved ${hash} via local node (${this.localIpfsGatewayUrl})`);
+      return localResult;
+    } catch (err) {
+      clearTimeout(localTimeout);
+      const errorMsg = (err as Error).name === "AbortError" ? "Timeout after 30s" : (err as Error).message;
+      errors.push({ source: "local", error: errorMsg });
+    }
+
+    // 2. Race all remote gateways simultaneously
+    if (this.gatewayUrls.length === 0) {
+      throw new Error(`No IPFS gateways configured. Errors: ${this.formatErrors(errors)}`);
+    }
+
+    const raceResult = await this.raceGatewaysForCar(hash, errors);
+    if (raceResult) return raceResult;
+
+    throw new Error(`All IPFS sources failed for ${hash}. Errors: ${this.formatErrors(errors)}`);
+  }
+
+  /**
+   * Races all configured gateway URLs for CAR content.
+   * Returns the first successful verified result, aborts others.
+   */
+  private async raceGatewaysForCar(
+    hash: string,
+    errors: Array<{ source: string; error: unknown }>
+  ): Promise<{ carReader: CarReader; root: CID } | null> {
+    const abortControllers = this.gatewayUrls.map(() => new AbortController());
+
+    const promises = this.gatewayUrls.map(async (gatewayUrl, index) => {
+      try {
+        const url = `${gatewayUrl}/ipfs/${hash}?format=car`;
+        const res = await fetch(url, {
+          headers: { Accept: "application/vnd.ipld.car" },
+          signal: abortControllers[index].signal
+        });
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        }
+
+        const bytes = new Uint8Array(await res.arrayBuffer());
+        const carReader = await CarReader.fromBytes(bytes);
+
+        // Verify the root CID
+        const roots = await carReader.getRoots();
+        const root = roots[0];
+        if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
+          throw new Error(`UNTRUSTED CONTENT: expected root ${hash}, got ${roots}`);
+        }
+
+        // Success! Abort all other requests
+        abortControllers.forEach((ctrl, i) => {
+          if (i !== index) ctrl.abort();
+        });
+
+        console.log(`IPFS resolved ${hash} via gateway (${gatewayUrl})`);
+        return { success: true as const, data: { carReader, root }, gatewayUrl };
+      } catch (err) {
+        if ((err as Error).name !== "AbortError") {
+          errors.push({ source: gatewayUrl, error: err });
+        }
+        return { success: false as const, gatewayUrl };
+      }
+    });
+
+    const results = await Promise.all(promises);
+    const successResult = results.find((r) => r.success);
+    return successResult?.success ? successResult.data : null;
+  }
+
+  /**
+   * Gets and verifies content from a specific gateway URL.
+   */
+  private async getAndVerifyContentFromUrl(
+    gatewayUrl: string,
+    hash: string,
+    signal?: AbortSignal
+  ): Promise<{ carReader: CarReader; root: CID }> {
+    const url = `${gatewayUrl}/ipfs/${hash}?format=car`;
     const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
+      headers: { Accept: "application/vnd.ipld.car" },
+      signal
     });
     if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
 
-    // 2. Parse into a CarReader
     const bytes = new Uint8Array(await res.arrayBuffer());
     const carReader = await CarReader.fromBytes(bytes);
 
-    // 3. Verify the root CID
     const roots = await carReader.getRoots();
     const root = roots[0];
     if (roots.length !== 1 || root.toString() !== CID.parse(hash).toString()) {
@@ -443,6 +662,13 @@ export class DappnodeRepository extends ApmRepository {
     }
 
     return { carReader, root };
+  }
+
+  /**
+   * Formats error array for logging.
+   */
+  private formatErrors(errors: Array<{ source: string; error: unknown }>): string {
+    return errors.map((e) => `${e.source}: ${e.error instanceof Error ? e.error.message : String(e.error)}`).join("; ");
   }
 
   /**
