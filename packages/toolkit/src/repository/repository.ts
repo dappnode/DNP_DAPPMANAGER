@@ -32,6 +32,9 @@ import { JsonRpcApiProvider } from "ethers";
 
 const source = "ipfs" as const;
 
+/** Timeout for local IPFS node requests in milliseconds */
+const LOCAL_IPFS_TIMEOUT_MS = 30_000;
+
 /**
  * The DappnodeRepository class extends ApmRepository class to provide methods to interact with the IPFS network.
  * To fetch IPFS content it uses dag endpoint for CAR content validation.
@@ -438,12 +441,18 @@ export class DappnodeRepository extends ApmRepository {
   }> {
     const errors: Array<{ source: string; error: unknown }> = [];
 
-    // 1. Try local IPFS gateway first
+    // 1. Try local IPFS gateway first (with timeout)
+    const localAbortController = new AbortController();
+    const localTimeout = setTimeout(() => localAbortController.abort(), LOCAL_IPFS_TIMEOUT_MS);
     try {
-      const localResult = await this.fetchDagJsonFromUrl(this.localIpfsGatewayUrl, cidStr);
+      const localResult = await this.fetchDagJsonFromUrl(this.localIpfsGatewayUrl, cidStr, localAbortController.signal);
+      clearTimeout(localTimeout);
+      console.log(`IPFS resolved ${cidStr} via local node (${this.localIpfsGatewayUrl})`);
       return localResult;
     } catch (err) {
-      errors.push({ source: "local", error: err });
+      clearTimeout(localTimeout);
+      const errorMsg = (err as Error).name === "AbortError" ? "Timeout after 30s" : (err as Error).message;
+      errors.push({ source: "local", error: errorMsg });
     }
 
     // 2. Race all remote gateways simultaneously
@@ -462,7 +471,8 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async fetchDagJsonFromUrl(
     gatewayUrl: string,
-    cidStr: string
+    cidStr: string,
+    signal?: AbortSignal
   ): Promise<{
     Links?: Array<{
       Name: string;
@@ -472,7 +482,8 @@ export class DappnodeRepository extends ApmRepository {
   }> {
     const url = `${gatewayUrl}/ipfs/${cidStr}?format=dag-json`;
     const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.dag-json" }
+      headers: { Accept: "application/vnd.ipld.dag-json" },
+      signal
     });
     if (!res.ok) {
       throw new Error(`Failed to list directory ${cidStr}: ${res.status} ${res.statusText}`);
@@ -517,6 +528,7 @@ export class DappnodeRepository extends ApmRepository {
         abortControllers.forEach((ctrl, i) => {
           if (i !== index) ctrl.abort();
         });
+        console.log(`IPFS resolved ${cidStr} via gateway (${gatewayUrl})`);
         return { success: true as const, data, gatewayUrl };
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
@@ -545,12 +557,22 @@ export class DappnodeRepository extends ApmRepository {
   }> {
     const errors: Array<{ source: string; error: unknown }> = [];
 
-    // 1. Try local IPFS gateway first
+    // 1. Try local IPFS gateway first (with timeout)
+    const localAbortController = new AbortController();
+    const localTimeout = setTimeout(() => localAbortController.abort(), LOCAL_IPFS_TIMEOUT_MS);
     try {
-      const localResult = await this.getAndVerifyContentFromUrl(this.localIpfsGatewayUrl, hash);
+      const localResult = await this.getAndVerifyContentFromUrl(
+        this.localIpfsGatewayUrl,
+        hash,
+        localAbortController.signal
+      );
+      clearTimeout(localTimeout);
+      console.log(`IPFS resolved ${hash} via local node (${this.localIpfsGatewayUrl})`);
       return localResult;
     } catch (err) {
-      errors.push({ source: "local", error: err });
+      clearTimeout(localTimeout);
+      const errorMsg = (err as Error).name === "AbortError" ? "Timeout after 30s" : (err as Error).message;
+      errors.push({ source: "local", error: errorMsg });
     }
 
     // 2. Race all remote gateways simultaneously
@@ -600,6 +622,7 @@ export class DappnodeRepository extends ApmRepository {
           if (i !== index) ctrl.abort();
         });
 
+        console.log(`IPFS resolved ${hash} via gateway (${gatewayUrl})`);
         return { success: true as const, data: { carReader, root }, gatewayUrl };
       } catch (err) {
         if ((err as Error).name !== "AbortError") {
@@ -619,11 +642,13 @@ export class DappnodeRepository extends ApmRepository {
    */
   private async getAndVerifyContentFromUrl(
     gatewayUrl: string,
-    hash: string
+    hash: string,
+    signal?: AbortSignal
   ): Promise<{ carReader: CarReader; root: CID }> {
     const url = `${gatewayUrl}/ipfs/${hash}?format=car`;
     const res = await fetch(url, {
-      headers: { Accept: "application/vnd.ipld.car" }
+      headers: { Accept: "application/vnd.ipld.car" },
+      signal
     });
     if (!res.ok) throw new Error(`Gateway error: ${res.status} ${res.statusText}`);
 

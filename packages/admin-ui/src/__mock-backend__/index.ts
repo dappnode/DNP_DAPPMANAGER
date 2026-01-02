@@ -225,6 +225,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
   ipfsGatewayUrlsGet: async () => ({
     ipfsGatewayUrls: [
       "https://ipfs-gateway.dappnode.net",
+      "https://ipfs-gateway-dev.dappnode.net",
       "https://gateway.pinata.cloud",
       "https://cloudflare-ipfs.com"
     ]

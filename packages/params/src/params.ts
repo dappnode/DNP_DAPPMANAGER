@@ -172,6 +172,7 @@ export const params = {
   /** Default list of IPFS gateway URLs to use for resilient content fetching */
   IPFS_REMOTE_URLS: [
     "https://ipfs-gateway.dappnode.net",
+    "https://ipfs-gateway-dev.dappnode.net",
     "https://gateway.pinata.cloud",
     "https://cloudflare-ipfs.com",
     "https://dweb.link"

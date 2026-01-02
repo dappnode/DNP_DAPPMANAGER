@@ -29,7 +29,7 @@ export function IpfsClient({
 
       <label style={{ fontWeight: 500, marginBottom: "0.5rem", display: "block" }}>Gateway URLs</label>
       <Input
-        placeholder="https://ipfs-gateway.dappnode.net, https://gateway.pinata.cloud, https://cloudflare-ipfs.com"
+        placeholder="https://ipfs-gateway.dappnode.net, https://ipfs-gateway-dev.dappnode.net, https://gateway.pinata.cloud, https://cloudflare-ipfs.com"
         value={gatewayUrls || ""}
         onValueChange={onGatewayUrlsChange}
       />
