@@ -93,6 +93,7 @@ export { statsDiskGet } from "./statsDiskGet.js";
 export { systemInfoGet } from "./systemInfoGet.js";
 export { telegramConfigGet, telegramConfigSet, telegramStatusGet, telegramStatusSet } from "./telegram.js";
 export { updateUpgrade } from "./updateUpgrade.js";
+export { uiActivityUpdate, uiActivityGet } from "./uiActivityUpdate.js";
 export { natRenewalIsEnabled, natRenewalEnable } from "./natRenewal.js";
 export { volumeRemove } from "./volumeRemove.js";
 export { volumesGet } from "./volumesGet.js";

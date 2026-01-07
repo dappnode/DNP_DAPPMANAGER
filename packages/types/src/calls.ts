@@ -1045,6 +1045,21 @@ export interface IdentityInterface {
 }
 
 /**
+ * ===========
+ * UI ACTIVITY
+ * ===========
+ */
+
+export interface UiActivityData {
+  /** Whether the user is currently active in the UI */
+  isActive: boolean;
+  /** Timestamp of last user activity in seconds (Unix epoch) */
+  lastActivityTimestamp: number;
+  /** Timestamp when the session started in seconds (Unix epoch) */
+  sessionStartTimestamp: number;
+}
+
+/**
  * =====
  * UTILS
  * =====

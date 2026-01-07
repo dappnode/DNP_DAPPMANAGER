@@ -427,6 +427,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     mainnet: { validators: ["0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"] },
     hoodi: { validators: [] },
     gnosis: null
+  }),
+  uiActivityUpdate: async () => {},
+  uiActivityGet: async () => ({
+    isActive: true,
+    lastActivityTimestamp: Math.floor(Date.now() / 1000),
+    sessionStartTimestamp: Math.floor(Date.now() / 1000) - 3600
   })
 };
 

@@ -206,6 +206,61 @@ register.registerMetric(
   })
 );
 
+// UI activity staleness threshold (if no heartbeat received in this time, consider user inactive)
+// Should be > heartbeat interval (30s) to account for network delays
+const UI_ACTIVITY_STALE_THRESHOLD_SECONDS = 90; // 1.5 minutes
+
+// Helper to check if UI activity is stale
+function isUiActivityStale(lastActivityTimestamp: number): boolean {
+  const now = Math.floor(Date.now() / 1000);
+  return now - lastActivityTimestamp > UI_ACTIVITY_STALE_THRESHOLD_SECONDS;
+}
+
+// UI user active metric
+register.registerMetric(
+  new client.Gauge({
+    name: "ui_user_active",
+    help: "Whether a user is currently active in the UI (1 = active, 0 = inactive)",
+    collect() {
+      const uiActivityData = db.uiActivity.get();
+      // Consider inactive if no heartbeat received recently (handles browser close)
+      const isActive = uiActivityData.isActive && !isUiActivityStale(uiActivityData.lastActivityTimestamp);
+      this.set(isActive ? 1 : 0);
+    }
+  })
+);
+
+// UI last activity timestamp metric
+register.registerMetric(
+  new client.Gauge({
+    name: "ui_last_activity_timestamp_seconds",
+    help: "Unix timestamp of the last user activity in the UI (seconds)",
+    collect() {
+      const uiActivityData = db.uiActivity.get();
+      this.set(uiActivityData.lastActivityTimestamp);
+    }
+  })
+);
+
+// UI session uptime metric
+register.registerMetric(
+  new client.Gauge({
+    name: "ui_session_uptime_seconds",
+    help: "Duration of the current UI session in seconds (0 if no active session)",
+    collect() {
+      const uiActivityData = db.uiActivity.get();
+      // Only report uptime if session is active and not stale
+      const isActive = uiActivityData.isActive && !isUiActivityStale(uiActivityData.lastActivityTimestamp);
+      if (uiActivityData.sessionStartTimestamp > 0 && isActive) {
+        const now = Math.floor(Date.now() / 1000);
+        this.set(now - uiActivityData.sessionStartTimestamp);
+      } else {
+        this.set(0);
+      }
+    }
+  })
+);
+
 // Add a default label which is added to all metrics
 register.setDefaultLabels({
   app: "dappmanager-custom-metrics"

@@ -14,6 +14,7 @@ export * from "./stakerConfig.js";
 export * from "./system.js";
 export * from "./systemFlags.js";
 export * from "./ui.js";
+export * from "./uiActivity.js";
 export * from "./upnp.js";
 export * from "./vpn.js";
 export * from "./stakerConfig.js";
