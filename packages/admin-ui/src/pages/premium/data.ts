@@ -8,6 +8,5 @@ export const subPaths = {
   activate: "activate",
   advancedNotifications: "advanced-notifications",
   premiumSupport: "premium-support",
-  backupNode: "backup-node",
-  backupNode2: "backup-node-2"
+  backupNode: "backup-node"
 };

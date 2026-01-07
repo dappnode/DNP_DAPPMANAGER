@@ -2,15 +2,15 @@ import React, { useMemo } from "react";
 // Components
 import { title, subPaths } from "../data";
 import Title from "components/Title";
-import { usePremium } from "hooks/usePremium";
+import { usePremium } from "hooks/premium/usePremium";
 import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
-import { BackupNode } from "./BackupNode";
+// import { BackupNode } from "./BackupNode";
 import "./premiumRoot.scss";
 import { SectionNavigator } from "components/SectionNavigator";
-import { BackupNode2 } from "./BackupNode2";
+import { BackupNode } from "./BackupNode";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();
@@ -65,12 +65,7 @@ const PremiumRoot: React.FC = () => {
       {
         name: "Backup node for validators",
         subPath: subPaths.backupNode,
-        element: <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
-      },
-      {
-        name: "Backup node for validators 2",
-        subPath: subPaths.backupNode2,
-        element: <BackupNode2 isActivated={isActivated} hashedLicense={hashedLicense} />
+        element: <BackupNode isActivated={isActivated} hashedLicense={"05f116fdb971e44f1c59fddc8a299540"} />
       }
     ],
     [

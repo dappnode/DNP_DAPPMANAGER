@@ -3,7 +3,7 @@ import { params } from "@dappnode/params";
 import { BeaconBackupNetworkStatus, Network } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
-const baseUrlTest = "https://d25074d9fd86.ngrok-free.app";
+const baseUrlTest = "https://d39d9dea5999.ngrok-free.app";
 
 /**
  * Returns the Premium package status
