@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "components/Button";
-import { basePath, relativePath, subPaths } from "../data";
+import { basePath, relativePath, subPaths } from "../../data";
 
 import { SectionNavigator } from "components/SectionNavigator";
 import { RouteType } from "types";

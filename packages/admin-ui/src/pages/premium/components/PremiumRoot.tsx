@@ -10,7 +10,7 @@ import { ActivatePremium } from "./ActivatePremium";
 // import { BackupNode } from "./BackupNode";
 import "./premiumRoot.scss";
 import { SectionNavigator } from "components/SectionNavigator";
-import { BackupNode } from "./BackupNode";
+import { BackupNode } from "./backupNode/BackupNode";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();
