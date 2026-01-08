@@ -1,13 +1,12 @@
 import React from "react";
-
 import { BackupData } from "hooks/premium/useBackupNodeData";
-
 import { Network } from "@dappnode/types";
 import Loading from "components/Loading";
 import { useBackupNodeActions } from "hooks/premium/useBackupNodeActions";
 import { ConsensusCard, ValidatorsCard } from "./BackupInfoCards";
 import { ActivateCard, CooldownCard, DeactivateCard } from "./BackupActionCards";
 import { ActivationHistoryCard } from "./BackupHistoryCard";
+
 import "./networkBackup.scss";
 
 export const NetworkBackup = ({

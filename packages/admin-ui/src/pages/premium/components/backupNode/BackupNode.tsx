@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "components/Button";
 import { basePath, relativePath, subPaths } from "../../data";
-
 import { SectionNavigator } from "components/SectionNavigator";
 import { RouteType } from "types";
 import { Card } from "react-bootstrap";
 import { NetworkBackup } from "./NetworkBackup";
 import { availableNetworks, useBackupNodeData } from "hooks/premium/useBackupNodeData";
 import { Network } from "@dappnode/types";
+
 import "./backupNode.scss";
 
 export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActivated: boolean; hashedLicense: string }) {

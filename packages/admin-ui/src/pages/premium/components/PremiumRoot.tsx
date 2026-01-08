@@ -7,10 +7,9 @@ import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
-// import { BackupNode } from "./BackupNode";
-import "./premiumRoot.scss";
 import { SectionNavigator } from "components/SectionNavigator";
 import { BackupNode } from "./backupNode/BackupNode";
+import "./premiumRoot.scss";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();

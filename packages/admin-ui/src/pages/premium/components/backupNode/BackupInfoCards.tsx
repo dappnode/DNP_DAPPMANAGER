@@ -1,11 +1,8 @@
 import React from "react";
-
 import SubTitle from "components/SubTitle";
 import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { MdGroup, MdInfoOutline, MdWarningAmber } from "react-icons/md";
 import { ConsensusInfo } from "hooks/premium/useBackupNodeData";
-
-import "./networkBackup.scss";
 import { prettyDnpName } from "utils/format";
 import { Link } from "react-router-dom";
 import { Network } from "@dappnode/types";

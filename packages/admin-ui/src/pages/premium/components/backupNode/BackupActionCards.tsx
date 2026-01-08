@@ -2,8 +2,6 @@ import React from "react";
 import Button from "components/Button";
 import { Card } from "react-bootstrap";
 
-import "./networkBackup.scss";
-
 export const ActivateCard = ({
   timeLeft,
   valLimitExceeded,
