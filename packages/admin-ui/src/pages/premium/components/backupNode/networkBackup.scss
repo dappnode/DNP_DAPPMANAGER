@@ -118,7 +118,8 @@
 
   .action-backup-card {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 20px;
     padding: 20px;
     align-items: center;
@@ -132,17 +133,20 @@
       flex-direction: column;
       gap: 5px;
       align-items: center;
+      font-size: 0.8rem;
 
-      .action-icon {
-        font-size: 3rem;
+      h5 {
+        margin: 0;
       }
 
-      .countdown-text {
-        color: var(--light-text-color);
-      }
+      .backup-status,
       .countdown-time {
         font-size: 1.5rem;
         font-weight: bold;
+      }
+
+      .error-text {
+        font-size: 0.8rem;
       }
     }
   }
