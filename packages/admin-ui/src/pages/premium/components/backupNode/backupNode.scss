@@ -1,9 +1,30 @@
 .premium-backup-node {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
   .backup-description-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 15px;
     width: 100%;
+  }
+
+  .premium-backup-not-premium-card {
+    display: flex;
+    flex-direction: row;
+    padding: 30px;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 60rem) {
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    @media (max-width: 40rem) {
+      padding: 15px;
+    }
   }
 
   .backup-description-card {

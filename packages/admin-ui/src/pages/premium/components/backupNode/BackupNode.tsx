@@ -61,7 +61,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         <DescriptionCardsGrid />
         <Card>
           <div className="premium-backup-not-premium-card">
-            <div>Activate Premium to enable the backup node for validators.</div>
+            <div>Activate Premium to enable the backup node for validators in ethereum, gnosis or hoodi networks.</div>
             <Button variant="dappnode" onClick={() => navigate("/" + relativePath)}>
               Activate Premium
             </Button>
