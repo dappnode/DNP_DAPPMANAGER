@@ -64,7 +64,7 @@ const PremiumRoot: React.FC = () => {
       {
         name: "Backup node for validators",
         subPath: subPaths.backupNode,
-        element: <BackupNode isActivated={isActivated} hashedLicense={"05f116fdb971e44f1c59fddc8a299540"} />
+        element: <BackupNode isActivated={isActivated} hashedLicense={hashedLicense} />
       }
     ],
     [
