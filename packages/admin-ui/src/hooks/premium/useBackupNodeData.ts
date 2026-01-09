@@ -42,6 +42,7 @@ export function useBackupNodeData({
   const consensusLoading = currentConsensusReq.isValidating;
   const backupStatusLoading = isPremiumActivated ? backupStatusReq.isValidating : false;
   const backupStatusData = backupStatusReq.data;
+  const backupStatusError = backupStatusReq.error;
 
   useEffect(() => {
     const data = validatorsFilterActiveReq.data;
@@ -121,6 +122,7 @@ export function useBackupNodeData({
     backupData,
     consensusLoading,
     backupStatusLoading,
+    backupStatusError,
     revalidateBackup: backupStatusReq.revalidate
   };
 }

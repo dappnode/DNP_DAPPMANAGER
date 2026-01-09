@@ -74,3 +74,12 @@ export const CooldownCard = ({ timeLeft, deactivateBackup }: { timeLeft: string;
     </div>
   </Card>
 );
+
+export const ErrorCard = ({ backupStatusError }: { backupStatusError: Error | undefined }) => (
+  <Card className="action-backup-card error-card">
+    <div className="action-backup-col">
+      <h5 className="backup-status color-danger">Error while getting Backup Node data</h5>
+      <div>{backupStatusError?.message}</div>
+    </div>
+  </Card>
+);

@@ -12,7 +12,7 @@ import { Network } from "@dappnode/types";
 import "./backupNode.scss";
 
 export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActivated: boolean; hashedLicense: string }) {
-  const { backupData, consensusLoading, backupStatusLoading, revalidateBackup } = useBackupNodeData({
+  const { backupData, consensusLoading, backupStatusLoading, backupStatusError, revalidateBackup } = useBackupNodeData({
     hashedLicense,
     isPremiumActivated: isPremium
   });
@@ -37,6 +37,7 @@ export function BackupNode({ isActivated: isPremium, hashedLicense }: { isActiva
         hashedLicense={hashedLicense}
         networkData={backupData[network]}
         isLoading={consensusLoading || backupStatusLoading}
+        backupStatusError={backupStatusError}
         revalidateBackupCall={revalidateBackup}
       />
     )

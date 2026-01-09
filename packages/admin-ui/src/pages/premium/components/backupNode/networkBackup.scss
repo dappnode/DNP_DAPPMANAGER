@@ -124,6 +124,10 @@
     padding: 20px;
     align-items: center;
 
+    &.error-card {
+      justify-content: center;
+    }
+
     .section-subtitle {
       font-weight: bold;
     }

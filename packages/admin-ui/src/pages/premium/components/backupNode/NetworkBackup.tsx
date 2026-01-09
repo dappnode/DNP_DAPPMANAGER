@@ -4,7 +4,7 @@ import { Network } from "@dappnode/types";
 import Loading from "components/Loading";
 import { useBackupNodeActions } from "hooks/premium/useBackupNodeActions";
 import { ConsensusCard, ValidatorsCard } from "./BackupInfoCards";
-import { ActivateCard, CooldownCard, DeactivateCard } from "./BackupActionCards";
+import { ActivateCard, CooldownCard, DeactivateCard, ErrorCard } from "./BackupActionCards";
 import { ActivationHistoryCard } from "./BackupHistoryCard";
 
 import "./networkBackup.scss";
@@ -14,13 +14,15 @@ export const NetworkBackup = ({
   networkData,
   isLoading,
   hashedLicense,
+  backupStatusError,
   revalidateBackupCall
 }: {
   network: Network;
   networkData: BackupData | undefined;
   isLoading: boolean;
-  revalidateBackupCall: () => Promise<boolean>;
   hashedLicense: string;
+  backupStatusError: Error | undefined;
+  revalidateBackupCall: () => Promise<boolean>;
 }) => {
   const backupData = networkData;
 
@@ -62,7 +64,9 @@ export const NetworkBackup = ({
           </div>
 
           {/* Backup action cards */
-          backupData.isActive ? (
+          backupStatusError ? (
+            <ErrorCard backupStatusError={backupStatusError} />
+          ) : backupData.isActive ? (
             <DeactivateCard timeLeft={formatCountdown(timeLeft)} deactivateBackup={deactivateBackup} />
           ) : backupData.activable ? (
             <ActivateCard
