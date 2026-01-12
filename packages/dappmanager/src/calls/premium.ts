@@ -3,7 +3,6 @@ import { params } from "@dappnode/params";
 import { BeaconBackupNetworkStatus, Network } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
-const baseUrlTest = "https://d39d9dea5999.ngrok-free.app";
 
 /**
  * Returns the Premium package status
@@ -119,7 +118,7 @@ export const premiumBeaconBackupActivate = async ({
   key: string;
   network: Network;
 }): Promise<void> => {
-  const response = await fetch(`${baseUrlTest}/keys/activate`, {
+  const response = await fetch(`${baseUrl}:8080/api/keys/activate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -145,7 +144,7 @@ export const premiumBeaconBackupDeactivate = async ({
   key: string;
   network: Network;
 }): Promise<void> => {
-  const response = await fetch(`${baseUrlTest}/keys/deactivate`, {
+  const response = await fetch(`${baseUrl}:8080/api/keys/deactivate`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -173,7 +172,7 @@ export const premiumBeaconBackupDeactivate = async ({
 export const premiumBeaconBackupStatus = async (
   hashedLicense: string
 ): Promise<Record<Network, BeaconBackupNetworkStatus>> => {
-  const response = await fetch(`${baseUrlTest}/keys/details?id=${hashedLicense}`);
+  const response = await fetch(`${baseUrl}:8080/api/keys/details?id=${hashedLicense}`);
 
   if (!response.ok) {
     throw new Error(`Failed to check backup node status: ${response.statusText}`);
