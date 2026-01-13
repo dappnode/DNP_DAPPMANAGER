@@ -170,6 +170,29 @@ export class Consensus extends StakerComponent {
     });
     // persist on db
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
+
+    // If changing consensus clients and in a network where premium backup exists,
+    // always try to clear BACKUP_BEACON_NODES from the previous client
+    // Do this after everything else and only log error in console as this is not critical
+    if (
+      prevConsClientDnpName &&
+      prevConsClientDnpName !== newConsensusDnpName &&
+      (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi)
+    ) {
+      try {
+        const isPrevInstalled = await this.isPackageInstalled(prevConsClientDnpName);
+        if (isPrevInstalled) {
+          const composeEditor = new ComposeFileEditor(prevConsClientDnpName, false);
+          const validatorService = composeEditor.services()["validator"];
+          if (validatorService) {
+            validatorService.mergeEnvs({ BACKUP_BEACON_NODES: "" });
+            composeEditor.write();
+          }
+        }
+      } catch (e) {
+        console.error(`Failed to clear BACKUP_BEACON_NODES on previous client ${prevConsClientDnpName}:`, e);
+      }
+    }
   }
 
   private async getUserSettings(
@@ -188,13 +211,16 @@ export class Consensus extends StakerComponent {
     // Only for Mainnet, Gnosis and Hoodi, try to get backup beacon node
     if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
       const backupUrl = await this.getBackupIfActive(network);
-      environment = {
-        ...environment,
-        validator: {
-          ...(environment?.validator || {}),
-          BACKUP_BEACON_NODES: backupUrl ? backupUrl : "" // Empty string to clear previous env if backup is not active
-        }
-      };
+      if (backupUrl) {
+        console.log("BACKUP ACTIVE, Setting BACKUP_BEACON_NODES for", newConsensusDnpName, "to", backupUrl);
+        environment = {
+          ...environment,
+          validator: {
+            ...(environment?.validator || {}),
+            BACKUP_BEACON_NODES: backupUrl
+          }
+        };
+      }
     }
 
     // For Starknet networks, apply staking-specific environment variables
