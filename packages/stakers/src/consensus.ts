@@ -185,18 +185,16 @@ export class Consensus extends StakerComponent {
     const isPkgInstalled = await this.isPackageInstalled(newConsensusDnpName);
     let environment = isPkgInstalled ? {} : getDefaultConsensusUserSettings({ network }).environment;
 
-    // Only for Mainnet and Hoodi, try to get backup beacon node
-    if (network === Network.Mainnet || network === Network.Hoodi) {
+    // Only for Mainnet, Gnosis and Hoodi, try to get backup beacon node
+    if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
       const backupUrl = await this.getBackupIfActive(network);
-      if (backupUrl) {
-        environment = {
-          ...environment,
-          validator: {
-            ...(environment?.validator || {}),
-            BACKUP_BEACON_NODES: backupUrl
-          }
-        };
-      }
+      environment = {
+        ...environment,
+        validator: {
+          ...(environment?.validator || {}),
+          BACKUP_BEACON_NODES: backupUrl ? backupUrl : "" // Empty string to clear previous env if backup is not active
+        }
+      };
     }
 
     // For Starknet networks, apply staking-specific environment variables
@@ -227,7 +225,7 @@ export class Consensus extends StakerComponent {
   /**
    * Returns backup beacon node URL if premium license is active and valid, otherwise null
    */
-  private async getBackupIfActive(network: Network.Hoodi | Network.Mainnet): Promise<string | null> {
+  private async getBackupIfActive(network: Network.Hoodi | Network.Mainnet | Network.Gnosis): Promise<string | null> {
     try {
       const licenseRes = await fetch("http://premium.dappnode:8080/api/license");
       if (!licenseRes.ok) return null;
@@ -235,21 +233,37 @@ export class Consensus extends StakerComponent {
       const hash = typeof license.hash === "string" ? license.hash : null;
       if (!hash) return null;
 
-      const keyRes = await fetch(`http://premium.dappnode:8080/api/keys/${hash}`);
-      if (!keyRes.ok) return null;
-      const keyData = (await keyRes.json()) as { ValidUntil?: string };
-      if (!keyData.ValidUntil) return null;
-      const validUntil = new Date(keyData.ValidUntil);
-      if (isNaN(validUntil.getTime())) return null;
-      if (validUntil.getTime() <= Date.now()) return null;
+      const detailsUrl = `http://premium.dappnode:8080/api/keys/details?id=${encodeURIComponent(hash)}`;
+      const detailsRes = await fetch(detailsUrl);
 
-      if (network === Network.Mainnet) {
-        return `https://${hash}:@mainnet.beacon.dappnode.io`;
-      } else if (network === Network.Hoodi) {
-        return `https://${hash}:@hoodi.beacon.dappnode.io`;
-      }
-      return null;
+      if (!detailsRes.ok) return null;
+
+      const details = (await detailsRes.json()) as {
+        id?: string;
+        networks?: Record<
+          string,
+          {
+            activation_history?: Array<{ activation_date: string; end_date: string }>;
+            available_activation_seconds?: number;
+            time_to_be_available?: number;
+            active?: boolean;
+            validator_limit?: number;
+          }
+        >;
+      };
+      if (!details.networks) return null;
+
+      const netStatus = details.networks[network];
+      if (!netStatus) return null;
+
+      const isActive = netStatus.active === true;
+      if (!isActive) return null;
+
+      const url = `https://${hash}:@${network}.beacon.dappnode.io`;
+
+      return url;
     } catch (e) {
+      console.error(`Error while getting backup status in ${network}:`, e);
       return null;
     }
   }
