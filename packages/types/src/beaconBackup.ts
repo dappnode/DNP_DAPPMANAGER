@@ -1,3 +1,5 @@
+import { Network } from "./stakers.js";
+
 export type BeaconBackupNetworkStatus = {
   validatorLimit: number;
   isActivable: boolean;
@@ -8,4 +10,12 @@ export type BeaconBackupNetworkStatus = {
   }>;
   timeLeft: number;
   timeUntilAvailable: number;
+};
+
+/**
+ * Parameters for beacon backup activation/deactivation
+ */
+export type BeaconBackupActivationParams = {
+  key: string;
+  network: Network;
 };

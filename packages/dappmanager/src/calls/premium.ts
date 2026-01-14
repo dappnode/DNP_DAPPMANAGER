@@ -1,6 +1,6 @@
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { BeaconBackupNetworkStatus, Network } from "@dappnode/types";
+import { BeaconBackupNetworkStatus, Network, BeaconBackupActivationParams } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
 
@@ -111,13 +111,7 @@ export const premiumIsLicenseActive = async (): Promise<boolean> => {
  * @param key the hashed license
  * @param network the network that the backup will be activated on
  */
-export const premiumBeaconBackupActivate = async ({
-  key,
-  network
-}: {
-  key: string;
-  network: Network;
-}): Promise<void> => {
+export const premiumBeaconBackupActivate = async ({ key, network }: BeaconBackupActivationParams): Promise<void> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/activate`, {
     method: "POST",
     headers: {
@@ -137,13 +131,7 @@ export const premiumBeaconBackupActivate = async ({
  * @param key the hashed license
  * @param network the network that the backup will be deactivated on
  */
-export const premiumBeaconBackupDeactivate = async ({
-  key,
-  network
-}: {
-  key: string;
-  network: Network;
-}): Promise<void> => {
+export const premiumBeaconBackupDeactivate = async ({ key, network }: BeaconBackupActivationParams): Promise<void> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/deactivate`, {
     method: "POST",
     headers: {
@@ -171,7 +159,7 @@ export const premiumBeaconBackupDeactivate = async ({
 
 export const premiumBeaconBackupStatus = async (
   hashedLicense: string
-): Promise<Record<Network, BeaconBackupNetworkStatus>> => {
+): Promise<Partial<Record<Network, BeaconBackupNetworkStatus>>> => {
   const response = await fetch(`${baseUrl}:8080/api/keys/details?id=${hashedLicense}`);
 
   if (!response.ok) {
@@ -179,7 +167,7 @@ export const premiumBeaconBackupStatus = async (
   }
   const data = await response.json();
 
-  const result: Record<Network, BeaconBackupNetworkStatus> = {} as Record<Network, BeaconBackupNetworkStatus>;
+  const result: Partial<Record<Network, BeaconBackupNetworkStatus>> = {};
 
   Object.entries(data.networks).forEach(([network, status]) => {
     const typedStatus = status as {
