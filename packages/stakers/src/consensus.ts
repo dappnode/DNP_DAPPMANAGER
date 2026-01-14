@@ -19,6 +19,7 @@ import { ComposeFileEditor } from "@dappnode/dockercompose";
 import * as db from "@dappnode/db";
 import { params } from "@dappnode/params";
 import { getDefaultConsensusUserSettings } from "@dappnode/utils";
+import { logs } from "@dappnode/logger";
 
 // TODO: move ethereumClient logic here
 
@@ -171,27 +172,41 @@ export class Consensus extends StakerComponent {
     // persist on db
     if (newConsensusDnpName !== prevConsClientDnpName) await this.DbHandlers[network].set(newConsensusDnpName);
 
-    // If changing consensus clients and in a network where premium backup exists,
-    // always try to clear BACKUP_BEACON_NODES from the previous client
-    // Do this after everything else and only log error in console as this is not critical
+    // Clear backup beacon nodes from the previous client if switching clients
+    await this.clearBackupBeaconNodesFromPrevClient(network, prevConsClientDnpName, newConsensusDnpName);
+  }
+
+  /**
+   * If changing consensus clients and in a network where premium backup exists,
+   * clears BACKUP_BEACON_NODES from the previous client.
+   * This is done after everything else and only logs errors as this is not critical.
+   */
+  private async clearBackupBeaconNodesFromPrevClient(
+    network: Network,
+    prevConsClientDnpName: string | null | undefined,
+    newConsensusDnpName: string | null
+  ): Promise<void> {
     if (
-      prevConsClientDnpName &&
-      prevConsClientDnpName !== newConsensusDnpName &&
-      (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi)
+      !prevConsClientDnpName ||
+      prevConsClientDnpName === newConsensusDnpName ||
+      (network !== Network.Mainnet && network !== Network.Gnosis && network !== Network.Hoodi)
     ) {
-      try {
-        const isPrevInstalled = await this.isPackageInstalled(prevConsClientDnpName);
-        if (isPrevInstalled) {
-          const composeEditor = new ComposeFileEditor(prevConsClientDnpName, false);
-          const validatorService = composeEditor.services()["validator"];
-          if (validatorService) {
-            validatorService.mergeEnvs({ BACKUP_BEACON_NODES: "" });
-            composeEditor.write();
-          }
+      return;
+    }
+
+    try {
+      const isPrevInstalled = await this.isPackageInstalled(prevConsClientDnpName);
+      if (isPrevInstalled) {
+        const composeEditor = new ComposeFileEditor(prevConsClientDnpName, false);
+        const validatorService = composeEditor.services()["validator"]; // WARNING: assumes service is named "validator"
+        if (validatorService) {
+          validatorService.mergeEnvs({ BACKUP_BEACON_NODES: "" });
+          composeEditor.write();
+          logs.info(`Cleared BACKUP_BEACON_NODES from previous client ${prevConsClientDnpName}`);
         }
-      } catch (e) {
-        console.error(`Failed to clear BACKUP_BEACON_NODES on previous client ${prevConsClientDnpName}:`, e);
       }
+    } catch (e) {
+      logs.error(`Failed to clear BACKUP_BEACON_NODES on previous client ${prevConsClientDnpName}`, e);
     }
   }
 
@@ -210,9 +225,9 @@ export class Consensus extends StakerComponent {
 
     // Only for Mainnet, Gnosis and Hoodi, try to get backup beacon node
     if (network === Network.Mainnet || network === Network.Gnosis || network === Network.Hoodi) {
-      const backupUrl = await this.getBackupIfActive(network);
+      const backupUrl = await this.getBackupIfActiveNoThrow(network);
       if (backupUrl) {
-        console.log("BACKUP ACTIVE, Setting BACKUP_BEACON_NODES for", newConsensusDnpName, "to", backupUrl);
+        logs.info(`BACKUP ACTIVE, Setting BACKUP_BEACON_NODES for ${newConsensusDnpName} to ${backupUrl}`);
         environment = {
           ...environment,
           validator: {
@@ -251,7 +266,7 @@ export class Consensus extends StakerComponent {
   /**
    * Returns backup beacon node URL if premium license is active and valid, otherwise null
    */
-  private async getBackupIfActive(network: Network.Hoodi | Network.Mainnet | Network.Gnosis): Promise<string | null> {
+  private async getBackupIfActiveNoThrow(network: Network.Hoodi | Network.Mainnet | Network.Gnosis): Promise<string | null> {
     try {
       const licenseRes = await fetch("http://premium.dappnode:8080/api/license");
       if (!licenseRes.ok) return null;
@@ -289,7 +304,7 @@ export class Consensus extends StakerComponent {
 
       return url;
     } catch (e) {
-      console.error(`Error while getting backup status in ${network}:`, e);
+      logs.error(`Error while getting backup status in ${network}`, e);
       return null;
     }
   }
