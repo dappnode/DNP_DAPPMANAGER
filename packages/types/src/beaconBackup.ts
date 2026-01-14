@@ -20,7 +20,7 @@ export type BeaconBackupActivationParams = {
   network: Network;
 };
 
-export type ConsensusInfo = {
+export type BackupConsensusInfo = {
   noConsensusSelected: boolean;
   isPrysmOrTeku: boolean;
   name: string | null | undefined;
@@ -32,6 +32,6 @@ export type ConsensusInfo = {
 export type ParsedNetworkBackupData = BeaconBackupNetworkStatus & {
   activeValidators: number;
   beaconApiError: boolean;
-  consensusInfo?: ConsensusInfo;
+  consensusInfo?: BackupConsensusInfo;
   activationHistoryParsed: { activation_date: Date; end_date: Date }[];
 };

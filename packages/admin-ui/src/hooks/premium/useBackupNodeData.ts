@@ -1,4 +1,4 @@
-import { ConsensusInfo, Network, ParsedNetworkBackupData } from "@dappnode/types";
+import { BackupConsensusInfo, Network, ParsedNetworkBackupData } from "@dappnode/types";
 import { useApi } from "api";
 import { useEffect, useMemo, useState } from "react";
 
@@ -11,7 +11,7 @@ export function useBackupNodeData({
   hashedLicense: string;
   isPremiumActivated: boolean;
 }) {
-  const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, ConsensusInfo>>>({});
+  const [currentConsensus, setCurrentConsensus] = useState<Partial<Record<Network, BackupConsensusInfo>>>({});
   const [activeValidatorsCounts, setActiveValidatorsCounts] = useState<
     Partial<Record<Network, { count: number | null; limitExceeded: boolean; beaconApiError: boolean }>>
   >({});
@@ -57,7 +57,7 @@ export function useBackupNodeData({
   useEffect(() => {
     if (currentConsensusReq.data) {
       const data = currentConsensusReq.data;
-      const consensusInfo: Partial<Record<Network, ConsensusInfo>> = {};
+      const consensusInfo: Partial<Record<Network, BackupConsensusInfo>> = {};
       for (const [network, clientName] of Object.entries(data) as [Network, string | null | undefined][]) {
         consensusInfo[network] = {
           name: clientName,
