@@ -1,6 +1,5 @@
 import React from "react";
-import { BackupData } from "hooks/premium/useBackupNodeData";
-import { Network } from "@dappnode/types";
+import { Network, ParsedNetworkBackupData } from "@dappnode/types";
 import Loading from "components/Loading";
 import { useBackupNodeActions } from "hooks/premium/useBackupNodeActions";
 import { ConsensusCard, ValidatorsCard } from "./BackupInfoCards";
@@ -18,7 +17,7 @@ export const NetworkBackup = ({
   revalidateBackupCall
 }: {
   network: Network;
-  networkData: BackupData | undefined;
+  networkData: ParsedNetworkBackupData | undefined;
   isLoading: boolean;
   hashedLicense: string;
   backupStatusError: Error | undefined;
@@ -30,14 +29,14 @@ export const NetworkBackup = ({
     network,
     hashedLicense,
     isActive: backupData?.isActive || false,
-    isActivable: backupData?.activable || false,
+    isActivable: backupData?.isActivable || false,
     currentConsensus: backupData?.consensusInfo?.name || undefined,
     timeLeftInitial: backupData?.timeLeft ?? 0,
     timeUntilAvailableInitial: backupData?.timeUntilAvailable ?? 0,
     revalidate: revalidateBackupCall
   });
 
-  const valLimitExceeded = (backupData && backupData?.activeValidators > backupData?.maxValidators) || false;
+  const valLimitExceeded = (backupData && backupData?.activeValidators > backupData?.validatorLimit) || false;
   const noConsensusSelected = (backupData && backupData.consensusInfo?.noConsensusSelected) || false;
   const consensusPrysmOrTeku = (backupData && !noConsensusSelected && backupData.consensusInfo?.isPrysmOrTeku) || false;
 
@@ -57,7 +56,7 @@ export const NetworkBackup = ({
             <ValidatorsCard
               network={network}
               activeValidators={backupData.activeValidators}
-              maxValidators={backupData.maxValidators}
+              maxValidators={backupData.validatorLimit}
               valLimitExceeded={valLimitExceeded}
               beaconApiError={backupData.beaconApiError}
             />
@@ -68,7 +67,7 @@ export const NetworkBackup = ({
             <ErrorCard backupStatusError={backupStatusError} />
           ) : backupData.isActive ? (
             <DeactivateCard timeLeft={formatCountdown(timeLeft)} deactivateBackup={deactivateBackup} />
-          ) : backupData.activable ? (
+          ) : backupData.isActivable ? (
             <ActivateCard
               timeLeft={formatCountdown(backupData.timeLeft)}
               valLimitExceeded={valLimitExceeded}
@@ -79,7 +78,10 @@ export const NetworkBackup = ({
           ) : (
             <CooldownCard timeLeft={formatCountdown(timeUntilAvailable)} deactivateBackup={deactivateBackup} />
           )}
-          <ActivationHistoryCard activationsHistory={backupData.activationsHistory} isActive={backupData.isActive} />
+          <ActivationHistoryCard
+            activationsHistory={backupData.activationHistoryParsed}
+            isActive={backupData.isActive}
+          />
         </div>
       ) : (
         <p>No backup data available</p>

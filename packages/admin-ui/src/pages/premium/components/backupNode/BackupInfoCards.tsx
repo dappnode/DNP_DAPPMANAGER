@@ -2,10 +2,9 @@ import React from "react";
 import SubTitle from "components/SubTitle";
 import { Card, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { MdGroup, MdInfoOutline, MdWarningAmber } from "react-icons/md";
-import { ConsensusInfo } from "hooks/premium/useBackupNodeData";
 import { prettyDnpName } from "utils/format";
 import { Link } from "react-router-dom";
-import { Network } from "@dappnode/types";
+import { BackupConsensusInfo, Network } from "@dappnode/types";
 import { basePath as stakersBasePath } from "pages/stakers/data";
 import { capitalize } from "utils/strings";
 import { docsUrl } from "params";
@@ -18,7 +17,7 @@ export const ConsensusCard = ({
   consensusPrysmOrTeku
 }: {
   network: Network;
-  consensusData: ConsensusInfo | undefined;
+  consensusData: BackupConsensusInfo | undefined;
   noConsensusSelected: boolean;
   consensusPrysmOrTeku: boolean;
 }) => {

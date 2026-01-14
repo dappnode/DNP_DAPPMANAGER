@@ -19,3 +19,19 @@ export type BeaconBackupActivationParams = {
   key: string;
   network: Network;
 };
+
+export type BackupConsensusInfo = {
+  noConsensusSelected: boolean;
+  isPrysmOrTeku: boolean;
+  name: string | null | undefined;
+};
+
+/**
+ * Type used in the admin UI to show parsed backup data for a network
+ */
+export type ParsedNetworkBackupData = BeaconBackupNetworkStatus & {
+  activeValidators: number;
+  beaconApiError: boolean;
+  consensusInfo?: BackupConsensusInfo;
+  activationHistoryParsed: { activation_date: Date; end_date: Date }[];
+};
