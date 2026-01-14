@@ -55,6 +55,7 @@ import {
 import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
+import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
 
 export interface Routes {
   /**
@@ -656,13 +657,13 @@ export interface Routes {
    * Activates the beacon node backup
    * @param id the hashed license
    */
-  premiumBeaconBackupActivate: (id: string) => Promise<void>;
+  premiumBeaconBackupActivate: ({ key, network }: BeaconBackupActivationParams) => Promise<void>;
 
   /**
    * Deactivates the beacon node backup
    * @param id the hashed license
    */
-  premiumBeaconBackupDeactivate: (id: string) => Promise<void>;
+  premiumBeaconBackupDeactivate: ({ key, network }: BeaconBackupActivationParams) => Promise<void>;
 
   /**
    * Checks the activation and validity status of the beacon node backup associated with the given hashed license.
@@ -674,13 +675,7 @@ export interface Routes {
    *
    * @param hashedLicense The hashed license string used to identify the key.
    */
-  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<{
-    validatorLimit: number; // The maximum number of validators that can be backed up
-    isActivable: boolean;
-    isActive: boolean;
-    secondsUntilActivable?: number;
-    secondsUntilDeactivation?: number;
-  }>;
+  premiumBeaconBackupStatus: (hashedLicense: string) => Promise<Partial<Record<Network, BeaconBackupNetworkStatus>>>;
 
   /**
    * Returns the PWA mapping URL if it exists, otherwise returns undefined.
