@@ -1,6 +1,6 @@
 import { listPackageNoThrow } from "@dappnode/dockerapi";
 import { params } from "@dappnode/params";
-import { BeaconBackupNetworkStatus, Network, BeaconBackupActivationParams } from "@dappnode/types";
+import { BeaconBackupNetworkStatus, Network, BeaconBackupActivationParams, NetworkDetailsRes } from "@dappnode/types";
 
 const baseUrl = "http://premium.dappnode";
 
@@ -170,17 +170,7 @@ export const premiumBeaconBackupStatus = async (
   const result: Partial<Record<Network, BeaconBackupNetworkStatus>> = {};
 
   Object.entries(data.networks).forEach(([network, status]) => {
-    const typedStatus = status as {
-      validator_limit: number;
-      available_activation_seconds: number;
-      isActivable: boolean;
-      active: boolean;
-      activation_history: Array<{
-        activation_date: string;
-        end_date: string;
-      }>;
-      time_to_be_available: number;
-    };
+    const typedStatus = status as NetworkDetailsRes;
     result[network as Network] = {
       validatorLimit: typedStatus.validator_limit,
       isActivable: typedStatus.active === false && typedStatus.available_activation_seconds > 0,
