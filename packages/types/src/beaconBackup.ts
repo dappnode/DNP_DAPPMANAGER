@@ -1,5 +1,21 @@
 import { Network } from "./stakers.js";
 
+export type DetailsResponse = {
+  id?: string;
+  networks?: Record<string, NetworkDetailsRes>;
+};
+
+export type NetworkDetailsRes = {
+  activation_history: Array<{
+    activation_date: string;
+    end_date: string;
+  }>;
+  available_activation_seconds: number;
+  time_to_be_available: number;
+  active: boolean;
+  validator_limit: number;
+};
+
 export type BeaconBackupNetworkStatus = {
   validatorLimit: number;
   isActivable: boolean;
