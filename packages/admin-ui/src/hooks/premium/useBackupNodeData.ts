@@ -1,27 +1,8 @@
-import { Network } from "@dappnode/types";
+import { ConsensusInfo, Network, ParsedNetworkBackupData } from "@dappnode/types";
 import { useApi } from "api";
 import { useEffect, useMemo, useState } from "react";
 
 export const availableNetworks: Network[] = [Network.Mainnet, Network.Gnosis, Network.Hoodi];
-
-export type ConsensusInfo = {
-  noConsensusSelected: boolean;
-  isPrysmOrTeku: boolean;
-  name: string | null | undefined;
-};
-
-export type BackupData = {
-  isActive: boolean;
-  activable: boolean;
-  timeLeft: number;
-  activeValidators: number;
-  maxValidators: number;
-  beaconApiError: boolean;
-  timeUntilAvailable: number;
-  nextAvailableDate: string | null;
-  consensusInfo: ConsensusInfo | undefined;
-  activationsHistory: { activation_date: Date; end_date: Date }[];
-};
 
 export function useBackupNodeData({
   hashedLicense,
@@ -89,8 +70,8 @@ export function useBackupNodeData({
     }
   }, [currentConsensusReq.data]);
 
-  const backupData: Partial<Record<Network, BackupData>> = useMemo(() => {
-    return availableNetworks.reduce<Partial<Record<Network, BackupData>>>((acc, network) => {
+  const backupData: Partial<Record<Network, ParsedNetworkBackupData>> = useMemo(() => {
+    return availableNetworks.reduce<Partial<Record<Network, ParsedNetworkBackupData>>>((acc, network) => {
       const backupStatus = backupStatusData?.[network];
       const activeValidatorsInfo = activeValidatorsCounts[network];
       const consensus = currentConsensus[network];
@@ -102,16 +83,16 @@ export function useBackupNodeData({
         : [];
 
       acc[network] = {
+        validatorLimit: backupStatus?.validatorLimit ?? 0,
+        isActivable: backupStatus?.isActivable ?? false,
         isActive: backupStatus?.isActive ?? false,
-        activable: backupStatus?.isActivable ?? false,
+        activationHistory: backupStatus?.activationHistory ?? [],
         timeLeft: backupStatus?.timeLeft ?? 0,
         timeUntilAvailable: backupStatus?.timeUntilAvailable ?? 0,
         activeValidators: activeValidatorsInfo?.count ?? 0,
-        maxValidators: backupStatus?.validatorLimit ?? 0,
         beaconApiError: activeValidatorsInfo?.beaconApiError ?? false,
-        nextAvailableDate: null,
         consensusInfo: consensus,
-        activationsHistory: formattedActivationsHistory
+        activationHistoryParsed: formattedActivationsHistory
       };
 
       return acc;
