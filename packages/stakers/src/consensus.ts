@@ -10,7 +10,8 @@ import {
   StarknetConsensusSepolia,
   Network,
   StakerItem,
-  UserSettings
+  UserSettings,
+  DetailsResponse
 } from "@dappnode/types";
 import { StakerComponent } from "./stakerComponent.js";
 import { DappnodeInstaller } from "@dappnode/installer";
@@ -266,7 +267,9 @@ export class Consensus extends StakerComponent {
   /**
    * Returns backup beacon node URL if premium license is active and valid, otherwise null
    */
-  private async getBackupIfActiveNoThrow(network: Network.Hoodi | Network.Mainnet | Network.Gnosis): Promise<string | null> {
+  private async getBackupIfActiveNoThrow(
+    network: Network.Hoodi | Network.Mainnet | Network.Gnosis
+  ): Promise<string | null> {
     try {
       const licenseRes = await fetch("http://premium.dappnode:8080/api/license");
       if (!licenseRes.ok) return null;
@@ -279,30 +282,9 @@ export class Consensus extends StakerComponent {
 
       if (!detailsRes.ok) return null;
 
-      const details = (await detailsRes.json()) as {
-        id?: string;
-        networks?: Record<
-          string,
-          {
-            activation_history?: Array<{ activation_date: string; end_date: string }>;
-            available_activation_seconds?: number;
-            time_to_be_available?: number;
-            active?: boolean;
-            validator_limit?: number;
-          }
-        >;
-      };
-      if (!details.networks) return null;
+      const details: DetailsResponse = await detailsRes.json();
 
-      const netStatus = details.networks[network];
-      if (!netStatus) return null;
-
-      const isActive = netStatus.active === true;
-      if (!isActive) return null;
-
-      const url = `https://${hash}:@${network}.beacon.dappnode.io`;
-
-      return url;
+      return details.networks?.[network]?.active === true ? `https://${hash}:@${network}.beacon.dappnode.io` : null;
     } catch (e) {
       logs.error(`Error while getting backup status in ${network}`, e);
       return null;
