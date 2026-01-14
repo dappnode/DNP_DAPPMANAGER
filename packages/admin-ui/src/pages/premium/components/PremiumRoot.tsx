@@ -2,14 +2,14 @@ import React, { useMemo } from "react";
 // Components
 import { title, subPaths } from "../data";
 import Title from "components/Title";
-import { usePremium } from "hooks/usePremium";
+import { usePremium } from "hooks/premium/usePremium";
 import { AdvancedNotifications } from "./AdvancedNotifications";
 import { PremiumSupport } from "./PremiumSupport";
 import { PremiumWrapper } from "./PremiumWrapper";
 import { ActivatePremium } from "./ActivatePremium";
-import { BackupNode } from "./BackupNode";
-import "./premiumRoot.scss";
 import { SectionNavigator } from "components/SectionNavigator";
+import { BackupNode } from "./backupNode/BackupNode";
+import "./premiumRoot.scss";
 
 const PremiumRoot: React.FC = () => {
   const premium = usePremium();
@@ -79,7 +79,6 @@ const PremiumRoot: React.FC = () => {
       hashedLicense
     ]
   );
-
   return (
     <div className="premium-root">
       <div className="premium-header">
