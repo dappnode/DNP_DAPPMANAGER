@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Accordion, Card, useAccordionButton } from "react-bootstrap";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import "./customAccordion.scss";
 
 interface CustomAccordionProps {
   defaultOpen?: boolean;
@@ -20,7 +21,7 @@ export function CustomAccordion({ defaultOpen = true, children }: CustomAccordio
   const toggle = useAccordionButton("0", () => setIsOpen((v) => !v));
 
   return (
-    <Accordion activeKey={isOpen ? "0" : undefined}>
+    <Accordion activeKey={isOpen ? "0" : undefined} className="custom-accordion">
       {React.Children.map(children, (child) =>
         React.isValidElement(child)
           ? React.cloneElement(
@@ -49,6 +50,7 @@ export function CustomAccordionItem({
       <Card>
         <Card.Header
           as="div"
+          className={`custom-accordion-header ${!isOpen ? "closed" : ""}`}
           role="button"
           tabIndex={0}
           onClick={toggle}
@@ -58,12 +60,10 @@ export function CustomAccordionItem({
               toggle && toggle(e);
             }
           }}
-          style={{
-            cursor: "pointer",
-            ...(isOpen ? {} : { borderBottom: "none" })
-          }}
         >
-          <>{header}</> {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          <>
+            {header} {isOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+          </>
         </Card.Header>
         <Accordion.Body>
           <Card.Body>{children}</Card.Body>
