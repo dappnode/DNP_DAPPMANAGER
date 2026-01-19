@@ -21,11 +21,10 @@
       .network-stat-col {
         display: flex;
         flex-direction: column;
-        font-size: 14px;
+        font-size: 12px;
         color: var(--light-text-color);
 
         > span {
-          font-weight: bold;
           font-size: 20px;
           color: black;
           margin-top: -5px;
@@ -54,22 +53,27 @@
         flex-direction: row;
         gap: 5px;
 
+        .network-card-title {
+          color: var(--light-text-color);
+          margin-top: 1px;
+        }
+
         .network-card-icon {
           svg {
             padding: 3px;
             border-radius: 5px;
 
             &.health-icon {
-              color: blue;
-              background-color: rgba(173, 216, 230, 0.452);
+              color: #0084ff;
+              background-color: #b6e5fa;
             }
             &.bolt-icon {
-              color: purple;
-              background-color: rgba(128, 0, 128, 0.445);
+              color: #6c3299;
+              background-color: #e5c4ff;
             }
             &.rewards-icon {
-              color: green;
-              background-color: rgba(0, 128, 0, 0.377);
+              color: #017701;
+              background-color: #bce9bc;
             }
           }
         }
