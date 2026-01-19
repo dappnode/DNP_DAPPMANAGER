@@ -1039,7 +1039,7 @@ __metadata:
     rewiremock: "npm:^3.13.7"
     semver: "npm:^7.3.8"
     sinon: "npm:^5.0.10"
-    systeminformation: "npm:^5.21.24"
+    systeminformation: "npm:^5.27.14"
   languageName: unknown
   linkType: soft
 
@@ -1113,7 +1113,7 @@ __metadata:
     sinon: "npm:^5.0.10"
     socket.io: "npm:^4.5.1"
     socket.io-client: "npm:^4.5.1"
-    systeminformation: "npm:^5.21.24"
+    systeminformation: "npm:^5.27.14"
   languageName: unknown
   linkType: soft
 
@@ -16889,12 +16889,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systeminformation@npm:*, systeminformation@npm:^5.21.24":
+"systeminformation@npm:*":
   version: 5.21.24
   resolution: "systeminformation@npm:5.21.24"
   bin:
     systeminformation: lib/cli.js
   checksum: 10c0/395ea78d7d3028d42a55cd33b8b8fe73df246b84110f84b2ca801dd487af91bb35d1ae70ddfb738d37f6d7dbd56a7cca5a0b46575b21c6a34ab11a551115125c
+  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
+  languageName: node
+  linkType: hard
+
+"systeminformation@npm:^5.27.14":
+  version: 5.27.14
+  resolution: "systeminformation@npm:5.27.14"
+  bin:
+    systeminformation: lib/cli.js
+  checksum: 10c0/dd2887c19d46ae378cd916a25a6e8e323a86e5c20f456c724b6b954e8f0b78c0bd536e6a988482b1b70ce712c07c4146a471a712a650eefae13312c6ca06aebf
   conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
