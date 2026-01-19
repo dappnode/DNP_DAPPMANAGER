@@ -1,7 +1,7 @@
 import { Network, NetworkStats, NodeStatus } from "@dappnode/types";
 import { useApi } from "api";
 
-const supportedNetworks: Network[] = [Network.Mainnet, Network.Gnosis, Network.Sepolia];
+const supportedNetworks: Network[] = [Network.Mainnet, Network.Gnosis, Network.Sepolia, Network.Hoodi];
 
 export function useNetworkStats() {
   const isLoading = false;

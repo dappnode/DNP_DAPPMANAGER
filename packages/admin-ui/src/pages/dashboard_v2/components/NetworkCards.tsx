@@ -25,7 +25,7 @@ const NetworkCard = ({
   <Card className="network-stats-card">
     <div className="network-card-header">
       <div className="network-card-icon">{icon}</div>
-      <h5>{title}</h5>
+      <div className="network-card-title">{title}</div>
     </div>
     {children}
   </Card>
@@ -145,7 +145,11 @@ export const ValidatorsCard = ({ network, data }: { network: string; data: Netwo
         </div>
       </div>
       <Button
-        href={`http://brain.web3signer-${network}.dappnode:9000`}
+        href={
+          network === Network.Mainnet
+            ? "http://brain.web3signer.dappnode"
+            : `http://brain.web3signer-${network}.dappnode`
+        }
         fullwidth
         {...newTabProps}
         variant="outline-dappnode"
