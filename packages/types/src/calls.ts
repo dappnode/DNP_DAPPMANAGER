@@ -3,7 +3,6 @@ import { ComposeNetworks, ComposeServiceNetworks, PackageEnvs } from "./compose.
 import { Manifest, Dependencies, ChainDriver, PackageBackup, ManifestUpdateAlert } from "./manifest.js";
 import { SetupWizard } from "./setupWizard.js";
 import { NotificationsSettingsAllDnps } from "./notifications.js";
-import { Network } from "./stakers.js";
 
 /**
  * Take into account the following tags to document the new types inside this file
@@ -614,38 +613,6 @@ export interface ChainData {
   progress?: number; // 0.83027522935
   peers?: number; // 10
 }
-
-export type ClientData = {
-  name: string;
-  isSynced: boolean;
-  currentBlock: number;
-  progress: number;
-  peers: number;
-} | null;
-
-export type NodeStatus = { ec: ClientData; cc: ClientData };
-
-export type NetworkStatus = {
-  nodeStatus: NodeStatus | undefined;
-  validators?: {
-    total: number;
-    balance: number;
-    efectivity: number;
-    attesting: number;
-    proposals: number;
-  };
-  rewards?: {
-    APR: number;
-    ethPrice: number;
-    "7days": number;
-    "30days": number;
-    "365days": number;
-  };
-};
-
-export type NetworkStats = Record<Network, NetworkStatus>;
-
-export type NodeStatusByNetwork = Partial<Record<Network, NodeStatus>>;
 
 /**
  * UI Welcome flow status. Persists the info of which page the UI should show

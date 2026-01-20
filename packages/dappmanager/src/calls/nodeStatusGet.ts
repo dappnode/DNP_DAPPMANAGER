@@ -1,9 +1,9 @@
-import { Network, NodeStatusByNetwork } from "@dappnode/types";
+import { DashboardSupportedNetwork, NodeStatusByNetwork } from "@dappnode/types";
 
-const ecBaseUrl = (network: Network) => `http://execution.${network}.dncore.dappnode:8545`;
-const ccBaseUrl = (network: Network) => `http://beacon-chain.${network}.dncore.dappnode:3500`;
+const ecBaseUrl = (network: DashboardSupportedNetwork) => `http://execution.${network}.dncore.dappnode:8545`;
+const ccBaseUrl = (network: DashboardSupportedNetwork) => `http://beacon-chain.${network}.dncore.dappnode:3500`;
 
-const getEcName = async (network: Network) => {
+const getEcName = async (network: DashboardSupportedNetwork) => {
   try {
     const versionResponse = await fetch(ecBaseUrl(network), {
       method: "POST",
@@ -31,7 +31,7 @@ const getEcName = async (network: Network) => {
   }
 };
 
-const getEcSyncStatus = async (network: Network) => {
+const getEcSyncStatus = async (network: DashboardSupportedNetwork) => {
   try {
     const syncResponse = await fetch(`${ecBaseUrl(network)}`, {
       method: "POST",
@@ -96,7 +96,7 @@ const getEcSyncStatus = async (network: Network) => {
   }
 };
 
-const getEcPeers = async (network: Network) => {
+const getEcPeers = async (network: DashboardSupportedNetwork) => {
   try {
     const peersResponse = await fetch(ecBaseUrl(network), {
       method: "POST",
@@ -120,7 +120,7 @@ const getEcPeers = async (network: Network) => {
     return null;
   }
 };
-const getCcName = async (network: Network) => {
+const getCcName = async (network: DashboardSupportedNetwork) => {
   try {
     const versionResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/version`, {
       method: "GET",
@@ -144,7 +144,7 @@ const getCcName = async (network: Network) => {
 
 // get also peers for the consensus clients
 
-const getCcPeers = async (network: Network) => {
+const getCcPeers = async (network: DashboardSupportedNetwork) => {
   try {
     const peersResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/peer_count`);
     if (!peersResponse.ok) {
@@ -158,7 +158,7 @@ const getCcPeers = async (network: Network) => {
   }
 };
 
-const getCcSyncStatus = async (network: Network) => {
+const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
   try {
     // Standard endpoint for consensus client sync status (REST API, not JSON-RPC)
     const syncResponse = await fetch(`${ccBaseUrl(network)}/eth/v1/node/syncing`);
@@ -189,7 +189,7 @@ const getCcSyncStatus = async (network: Network) => {
     return null;
   }
 };
-const getEcData = async (network: Network) => {
+const getEcData = async (network: DashboardSupportedNetwork) => {
   const ecName = await getEcName(network);
   const ecSync = await getEcSyncStatus(network);
   const ecPeers = await getEcPeers(network);
@@ -207,7 +207,7 @@ const getEcData = async (network: Network) => {
   };
 };
 
-const getCcData = async (network: Network) => {
+const getCcData = async (network: DashboardSupportedNetwork) => {
   const ccVersion = await getCcName(network);
   const ccSync = await getCcSyncStatus(network);
   const ccPeers = await getCcPeers(network);
@@ -225,7 +225,7 @@ const getCcData = async (network: Network) => {
   };
 };
 
-export async function nodeStatusGetByNetwork({ networks }: { networks: Network[] }) {
+export async function nodeStatusGetByNetwork({ networks }: { networks: DashboardSupportedNetwork[] }) {
   const resultsByNetwork: NodeStatusByNetwork = {};
 
   for (const network of networks) {
