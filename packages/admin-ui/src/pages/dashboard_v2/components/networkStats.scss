@@ -1,5 +1,17 @@
 .network-stats {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+
+  .network-header {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+  }
+
   .network-cards-container {
     display: flex;
     flex-direction: row;

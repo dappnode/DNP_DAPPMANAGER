@@ -1,5 +1,8 @@
 import { DashboardSupportedNetwork, Network, NetworkStats, NodeStatus } from "@dappnode/types";
 import { useApi } from "api";
+import EthLogo from "img/logos/eth-logo.svg?react";
+import GnosisLogo from "img/logos/gnosis-logo.svg?react";
+import LuksoLogo from "img/logos/lukso-logo.svg?react";
 
 const supportedNetworks: DashboardSupportedNetwork[] = [
   Network.Mainnet,
@@ -10,12 +13,15 @@ const supportedNetworks: DashboardSupportedNetwork[] = [
 ];
 
 // Define which networks have validators and rewards data
-const networkFeatures: Record<DashboardSupportedNetwork, { hasValidators: boolean; hasRewardsData: boolean }> = {
-  [Network.Mainnet]: { hasValidators: true, hasRewardsData: true },
-  [Network.Gnosis]: { hasValidators: true, hasRewardsData: false },
-  [Network.Lukso]: { hasValidators: true, hasRewardsData: false },
-  [Network.Hoodi]: { hasValidators: true, hasRewardsData: true },
-  [Network.Sepolia]: { hasValidators: false, hasRewardsData: false }
+const networkFeatures: Record<
+  DashboardSupportedNetwork,
+  { hasValidators: boolean; hasRewardsData: boolean; logo: React.FC<React.SVGProps<SVGSVGElement>> }
+> = {
+  [Network.Mainnet]: { hasValidators: true, hasRewardsData: true, logo: EthLogo },
+  [Network.Gnosis]: { hasValidators: true, hasRewardsData: false, logo: GnosisLogo },
+  [Network.Lukso]: { hasValidators: true, hasRewardsData: false, logo: LuksoLogo },
+  [Network.Hoodi]: { hasValidators: true, hasRewardsData: true, logo: EthLogo },
+  [Network.Sepolia]: { hasValidators: false, hasRewardsData: false, logo: EthLogo }
 };
 
 export function useNetworkStats() {
@@ -69,5 +75,10 @@ export function useNetworkStats() {
     }
   }
 
-  return { isLoading, networkStats, clientsLoading };
+  // Provide a function to get the logo for a network
+  function getNetworkLogo(network: DashboardSupportedNetwork) {
+    return networkFeatures[network]?.logo || EthLogo;
+  }
+
+  return { isLoading, networkStats, clientsLoading, getNetworkLogo };
 }
