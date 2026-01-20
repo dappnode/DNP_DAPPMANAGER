@@ -19,6 +19,8 @@ import { AppContextIface, Theme } from "types";
 import Smooth from "components/Smooth";
 import { PwaPermissionsAlert, PwaPermissionsModal } from "components/PwaPermissions";
 import { LocalProxyBanner } from "pages/wifi/components/localProxying/LocalProxyBanner";
+// Hooks
+import { useUiActivityTracker } from "hooks/useUiActivityTracker";
 
 export const AppContext = React.createContext<AppContextIface>({
   theme: "light",
@@ -54,6 +56,9 @@ function MainApp({ username }: { username: string }) {
 
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
   const [theme, setTheme] = useLocalStorage<Theme>("theme", "light");
+
+  // Track UI activity for Prometheus metrics
+  useUiActivityTracker();
 
   useEffect(() => {
     const handleResize = () => setScreenWidth(window.innerWidth);
