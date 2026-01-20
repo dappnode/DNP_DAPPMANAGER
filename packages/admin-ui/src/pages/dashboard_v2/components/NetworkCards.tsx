@@ -114,7 +114,19 @@ export const StatusCard = ({
   );
 };
 
-export const ValidatorsCard = ({ network, data }: { network: string; data: NetworkStatus["validators"] }) => {
+export const ValidatorsCard = ({
+  network,
+  data,
+  hasRewardsData,
+  efectivity,
+  proposals
+}: {
+  network: string;
+  data: NetworkStatus["validators"];
+  hasRewardsData: boolean;
+  efectivity: number | undefined;
+  proposals: number | undefined;
+}) => {
   return (
     <NetworkCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
       <div className="validators-card-container">
@@ -124,24 +136,29 @@ export const ValidatorsCard = ({ network, data }: { network: string; data: Netwo
             <span>{data?.total ?? "-"}</span>
           </div>
           <div className="network-stat-col">
-            <div>BALANCE</div>
-            <span>{data?.balance ?? "-"}</span>
+            <div>ATTESTING</div>
+            <span>{data?.attesting ?? "-"}</span>
           </div>
-          <div className="network-stat-col">
-            <div>EFFECTIVITY</div>
-            <span>{data?.efectivity ?? "-"}%</span>
-          </div>
+          {hasRewardsData && (
+            <div className="network-stat-col">
+              <div>EFFECTIVITY</div>
+              <span>{efectivity ?? "-"}%</span>
+            </div>
+          )}
         </div>
         <hr />
         <div className="validators-row">
           <div className="network-stat-col">
-            <div>ATTESTING</div>
-            <span>{data?.attesting ?? "-"}</span>
+            <div>BALANCE</div>
+            <span>{data?.balance ?? "-"}</span>
           </div>
-          <div className="network-stat-col">
-            <div>PROPOSALS</div>
-            <span>{data?.proposals ?? "-"}</span>
-          </div>
+
+          {hasRewardsData && (
+            <div className="network-stat-col">
+              <div>PROPOSALS</div>
+              <span>{proposals ?? "-"}</span>
+            </div>
+          )}
         </div>
       </div>
       <Button

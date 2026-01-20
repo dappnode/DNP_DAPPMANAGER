@@ -20,8 +20,18 @@ export default function NetworkStats() {
                   <SubTitle>{network.toUpperCase()}</SubTitle>
                   <div className="network-cards-container">
                     <StatusCard network={network} data={data.nodeStatus} clientsLoading={clientsLoading} />
-                    <ValidatorsCard network={network} data={data.validators} />
-                    <RewardsCard />
+
+                    {data.hasValidators && (
+                      <ValidatorsCard
+                        network={network}
+                        data={data.validators}
+                        hasRewardsData={data.hasRewardsData || false}
+                        efectivity={data.rewards?.efectivity}
+                        proposals={data.rewards?.proposals}
+                      />
+                    )}
+
+                    {data.hasRewardsData && <RewardsCard />}
                   </div>
                 </div>
               )
