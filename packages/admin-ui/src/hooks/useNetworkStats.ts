@@ -12,11 +12,14 @@ const supportedNetworks: DashboardSupportedNetwork[] = [
   Network.Sepolia
 ];
 
-// Define which networks have validators and rewards data
-const networkFeatures: Record<
-  DashboardSupportedNetwork,
-  { hasValidators: boolean; hasRewardsData: boolean; logo: React.FC<React.SVGProps<SVGSVGElement>> }
-> = {
+// Define network's logos and which ones have validators and rewards data
+type NetworkFeatures = {
+  hasValidators: boolean;
+  hasRewardsData: boolean;
+  logo: React.FC<React.SVGProps<SVGSVGElement>>;
+};
+
+const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
   [Network.Mainnet]: { hasValidators: true, hasRewardsData: true, logo: EthLogo },
   [Network.Gnosis]: { hasValidators: true, hasRewardsData: false, logo: GnosisLogo },
   [Network.Lukso]: { hasValidators: true, hasRewardsData: false, logo: LuksoLogo },

@@ -16,11 +16,11 @@ export default function NetworkStats() {
         <>
           {Object.entries(networkStats).map(([network, data]) => {
             if (!data) return null;
-            const Logo = getNetworkLogo(network as DashboardSupportedNetwork);
+            const NetworkLogo = getNetworkLogo(network as DashboardSupportedNetwork);
             return (
               <div key={network}>
                 <div className="network-header">
-                  <Logo width={24} height={24} />
+                  <NetworkLogo width={24} height={24} />
                   <SubTitle>{(network === Network.Mainnet ? "ethereum" : network).toUpperCase()}</SubTitle>
                 </div>
 
