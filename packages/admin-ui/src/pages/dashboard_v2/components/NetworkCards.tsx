@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { basePath } from "pages/stakers";
 import newTabProps from "utils/newTabProps";
 import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { MdWarningAmber } from "react-icons/md";
@@ -174,7 +175,11 @@ export const ValidatorsCard = ({
             <div className="validators-row">
               <div className="network-stat-col">
                 <div>BALANCE</div>
-                <span>{data?.balance ?? "-"}</span>
+                <span>
+                  {typeof data?.balance === "number" || typeof data?.balance === "string"
+                    ? gweiToToken(data.balance, network as Network)
+                    : "-"}
+                </span>
               </div>
 
               {hasRewardsData && (
