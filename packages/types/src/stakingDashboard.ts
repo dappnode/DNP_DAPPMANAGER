@@ -23,6 +23,7 @@ export type NetworkStatus = {
     total: number;
     balance: number;
     attesting: number;
+    beaconError?: Error;
   };
   rewards?: {
     APR: number;
