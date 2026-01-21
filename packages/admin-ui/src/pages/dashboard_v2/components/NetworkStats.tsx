@@ -1,17 +1,16 @@
 import React from "react";
 import SubTitle from "components/SubTitle";
 import { useNetworkStats } from "hooks/useNetworkStats";
-import Loading from "components/Loading";
-import { RewardsCard, StatusCard, ValidatorsCard } from "./NetworkCards";
+import { NoNodesCard, RewardsCard, StatusCard, ValidatorsCard } from "./NetworkCards";
 import { DashboardSupportedNetwork, Network } from "@dappnode/types";
 import "./networkStats.scss";
 
 export default function NetworkStats() {
-  const { isLoading, networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
+  const { networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
   return (
     <div className="network-stats">
-      {isLoading ? (
-        <Loading />
+      {Object.entries(networkStats).length !== 0 ? (
+        <NoNodesCard />
       ) : (
         <>
           {Object.entries(networkStats).map(([network, data]) => {

@@ -14,6 +14,8 @@ import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { MdWarningAmber } from "react-icons/md";
+import { NavLink } from "react-router-dom";
+import { relativePath as stakersPath } from "pages/stakers/data";
 
 const NetworkCard = ({
   title,
@@ -217,5 +219,19 @@ export const RewardsCard = () => {
         🚧 COMING SOON 🚧
       </div>
     </NetworkCard>
+  );
+};
+
+export const NoNodesCard = () => {
+  return (
+    <Card>
+      <div className="no-nodes-card" style={{ textAlign: "center" }}>
+        <h5>No nodes configured yet!</h5>
+        <div>You haven't set up a node on any network.</div>
+        <div>
+          Set up your nodes from the <NavLink to={`/${stakersPath}`}>Stakers tab</NavLink>.
+        </div>
+      </div>
+    </Card>
   );
 };
