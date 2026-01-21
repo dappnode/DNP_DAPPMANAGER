@@ -133,10 +133,42 @@
       }
     }
   }
+}
+#dark {
+  #main {
+    .network-stats {
+      .network-cards-container {
+        .client-status {
+          &.synced {
+            background-color: green;
+            color: rgb(203, 241, 203);
+          }
+          &.syncing {
+            background-color: orange;
+            color: rgb(255, 229, 204);
+          }
+        }
 
-  #dark {
-    #main {
-      .network-stats {
+        .network-card-icon {
+          svg {
+            &.health-icon {
+              color: #9fddfa;
+              background-color: #0084ff;
+            }
+            &.bolt-icon {
+              color: #d4a1fd;
+              background-color: #6c3299;
+            }
+            &.rewards-icon {
+              color: #81b181;
+              background-color: #017701;
+            }
+          }
+        }
+
+        .progress {
+          background-color: #696969;
+        }
       }
     }
   }
