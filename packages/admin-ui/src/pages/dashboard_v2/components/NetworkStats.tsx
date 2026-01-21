@@ -3,13 +3,16 @@ import SubTitle from "components/SubTitle";
 import { useNetworkStats } from "hooks/useNetworkStats";
 import { NoNodesCard, RewardsCard, StatusCard, ValidatorsCard } from "./NetworkCards";
 import { DashboardSupportedNetwork, Network } from "@dappnode/types";
+import Loading from "components/Loading";
 import "./networkStats.scss";
 
 export default function NetworkStats() {
   const { networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
   return (
     <div className="network-stats">
-      {Object.entries(networkStats).length !== 0 ? (
+      {clientsLoading ? (
+        <Loading />
+      ) : Object.entries(networkStats).length === 0 ? (
         <NoNodesCard />
       ) : (
         <>
