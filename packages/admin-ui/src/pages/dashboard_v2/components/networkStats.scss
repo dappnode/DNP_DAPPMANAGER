@@ -10,6 +10,12 @@
     flex-direction: row;
     gap: 5px;
     align-items: center;
+
+    svg {
+      &.eth-logo {
+        color: gray;
+      }
+    }
   }
 
   .network-cards-container {
