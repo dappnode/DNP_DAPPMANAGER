@@ -122,7 +122,7 @@ async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[]
 
   if (indices.length === 0) return [];
 
-  // 3) Liveness expects body: ["1","2",...]
+  // Query liveness endpoint with indices to get attesting validators
   const livenessUrl = new URL(`/eth/v1/validator/liveness/${livenessEpoch}`, base);
 
   const res = await fetch(livenessUrl.toString(), {
@@ -144,7 +144,7 @@ async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[]
 
   const live = new Set((json.data ?? []).filter((x) => x.is_live).map((x) => x.index));
 
-  // Return pubkeys that are live (lowercased)
+  // Return pubkeys that are attesting
   const result = indices
     .filter((idx) => live.has(idx))
     .map((idx) => indexToPubkey.get(idx))
