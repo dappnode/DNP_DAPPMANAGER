@@ -4,71 +4,18 @@ import { keystoresGetByNetwork } from "./keystoresGet.js";
 type KeystoresByProtocol = Record<string, string[]>;
 
 const ACTIVE_STATUSES = new Set(["active_ongoing", "active_exiting", "active_slashed"]);
-
 /**
  * Query the beacon API for a batch of pubkeys and return the attesting ones (liveness endpoint).
+ * Uses (current epoch -1) and converts pubkeys -> indices since liveness endpoint requires indices.
  */
-async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[], epoch?: string): Promise<string[]> {
-  // If epoch is not provided, use "head" (current epoch)
-  const epochParam = epoch || "head";
-  const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
-  const url = new URL(`/eth/v1/validator/liveness/${epochParam}`, base);
-  const params = new URLSearchParams();
-  for (const pk of pubkeys) params.append("pubkeys", pk);
-  url.search = params.toString();
 
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    throw new Error(`Beacon API ${network} liveness responded ${res.status} ${res.statusText}`);
-  }
-
-  type LivenessEntry = {
-    pubkey: string;
-    is_live: boolean;
-  };
-
-  const json: { data: LivenessEntry[] } = await res.json();
-  return (json.data ?? []).filter((v) => v.is_live).map((v) => v.pubkey.toLowerCase());
-}
-
-/**
- * Query the beacon API for a batch of pubkeys and return their balances.
- */
-async function fetchBalancesForBatch(network: Network, pubkeys: string[]): Promise<Record<string, string>> {
-  const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
-  const url = new URL(`/eth/v1/beacon/states/head/validators`, base);
-  const params = new URLSearchParams();
-  for (const pk of pubkeys) params.append("id", pk);
-  url.search = params.toString();
-
-  const res = await fetch(url.toString());
-  if (!res.ok) {
-    throw new Error(`Beacon API ${network} responded ${res.status} ${res.statusText}`);
-  }
-
-  type ValidatorEntry = {
-    validator: { pubkey: string };
-    balance: string;
-    status: string;
-    index?: string;
-  };
-
-  const json: { data: ValidatorEntry[] } = await res.json();
-  const out: Record<string, string> = {};
-  for (const v of json.data ?? []) {
-    out[v.validator.pubkey.toLowerCase()] = v.balance;
-  }
-  return out;
-}
 /**
  * For each network, return the attesting validators (using liveness endpoint).
  */
 export async function validatorsFilterAttestingByNetwork({
-  networks,
-  epoch
+  networks
 }: {
   networks: Network[];
-  epoch?: string;
 }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>> {
   const result: Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>> = {};
   const keystoresByNetwork = await keystoresGetByNetwork({ networks });
@@ -82,7 +29,7 @@ export async function validatorsFilterAttestingByNetwork({
     }
     try {
       const batches = chunk(pubkeys, BATCH_SIZE);
-      const attestingSets = await Promise.all(batches.map((b) => fetchAttestingPubkeysForBatch(network, b, epoch)));
+      const attestingSets = await Promise.all(batches.map((b) => fetchAttestingPubkeysForBatch(network, b)));
       const attestingSet = new Set(attestingSets.flat());
       const attestingInInputOrder = pubkeys.filter((pk) => attestingSet.has(pk));
       result[network] = { validators: attestingInInputOrder };
@@ -123,6 +70,117 @@ export async function validatorsBalancesByNetwork({
     }
   }
   return result;
+}
+
+async function fetchAttestingPubkeysForBatch(network: Network, pubkeys: string[]): Promise<string[]> {
+  const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
+  const normPubkeys = pubkeys.map((p) => p.toLowerCase());
+
+  // Get current epoch from head. Use last completed epoch = currentEpoch - 1
+  const headHeaderUrl = new URL(`/eth/v1/beacon/headers/head`, base);
+  console.log(`[fetchAttestingPubkeysForBatch] headHeaderUrl:`, headHeaderUrl.toString());
+
+  const headRes = await fetch(headHeaderUrl.toString(), { headers: { Accept: "application/json" } });
+  if (!headRes.ok) {
+    throw new Error(`Beacon API ${network} headers/head responded ${headRes.status} ${headRes.statusText}`);
+  }
+
+  const headJson: { data?: { header?: { message?: { slot?: string } } } } = await headRes.json();
+
+  const slotStr = headJson?.data?.header?.message?.slot;
+  if (!slotStr) throw new Error(`Beacon API ${network} headers/head missing data.header.message.slot`);
+  fetchAttestingPubkeysForBatch;
+  const currentEpoch = Math.floor(Number(slotStr) / 32);
+  const livenessEpoch = currentEpoch - 1; // "last epoch" and widely supported
+
+  // Query validators endpoint to convert pubkeys -> indices
+  const validatorsUrl = new URL(`/eth/v1/beacon/states/head/validators`, base);
+  const params = new URLSearchParams();
+  for (const pk of normPubkeys) params.append("id", pk);
+  validatorsUrl.search = params.toString();
+
+  const vRes = await fetch(validatorsUrl.toString(), { headers: { Accept: "application/json" } });
+  if (!vRes.ok) {
+    throw new Error(`Beacon API ${network} validators responded ${vRes.status} ${vRes.statusText}`);
+  }
+
+  type ValidatorEntry = { index: string; validator: { pubkey: string } };
+  const vJson: { data?: ValidatorEntry[] } = await vRes.json();
+
+  const pubkeyToIndex = new Map<string, string>();
+  const indexToPubkey = new Map<string, string>();
+  for (const row of vJson.data ?? []) {
+    const pk = row.validator?.pubkey?.toLowerCase();
+    const idx = row.index;
+    if (pk && idx) {
+      pubkeyToIndex.set(pk, idx);
+      indexToPubkey.set(idx, pk);
+    }
+  }
+
+  const indices = normPubkeys.map((pk) => pubkeyToIndex.get(pk)).filter((x): x is string => !!x);
+
+  if (indices.length === 0) return [];
+
+  // 3) Liveness expects body: ["1","2",...]
+  const livenessUrl = new URL(`/eth/v1/validator/liveness/${livenessEpoch}`, base);
+
+  const res = await fetch(livenessUrl.toString(), {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify(indices)
+  });
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+
+    throw new Error(
+      `Beacon API ${network} liveness responded ${res.status} ${res.statusText}${text ? `: ${text}` : ""}`
+    );
+  }
+
+  type LivenessEntry = { index: string; is_live: boolean };
+  const json: { data?: LivenessEntry[] } = await res.json();
+
+  const live = new Set((json.data ?? []).filter((x) => x.is_live).map((x) => x.index));
+
+  // Return pubkeys that are live (lowercased)
+  const result = indices
+    .filter((idx) => live.has(idx))
+    .map((idx) => indexToPubkey.get(idx))
+    .filter((pk): pk is string => !!pk);
+
+  return result;
+}
+
+/**
+ * Query the beacon API for a batch of pubkeys and return their balances.
+ */
+async function fetchBalancesForBatch(network: Network, pubkeys: string[]): Promise<Record<string, string>> {
+  const base = `http://beacon-chain.${network}.dncore.dappnode:3500`;
+  const url = new URL(`/eth/v1/beacon/states/head/validators`, base);
+  const params = new URLSearchParams();
+  for (const pk of pubkeys) params.append("id", pk);
+  url.search = params.toString();
+
+  const res = await fetch(url.toString());
+  if (!res.ok) {
+    throw new Error(`Beacon API ${network} responded ${res.status} ${res.statusText}`);
+  }
+
+  type ValidatorEntry = {
+    validator: { pubkey: string };
+    balance: string;
+    status: string;
+    index?: string;
+  };
+
+  const json: { data: ValidatorEntry[] } = await res.json();
+  const out: Record<string, string> = {};
+  for (const v of json.data ?? []) {
+    out[v.validator.pubkey.toLowerCase()] = v.balance;
+  }
+  return out;
 }
 
 /**

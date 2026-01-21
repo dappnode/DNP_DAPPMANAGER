@@ -805,7 +805,6 @@ export interface Routes {
    */
   validatorsFilterAttestingByNetwork: (kwargs: {
     networks: Network[];
-    epoch?: string;
   }) => Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
 
   /**
