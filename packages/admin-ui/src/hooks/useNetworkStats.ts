@@ -28,6 +28,7 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
 };
 
 export function useNetworkStats() {
+  const isLoading = false;
   const nodesStatusReq = useApi.nodeStatusGetByNetwork({ networks: supportedNetworks });
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: supportedNetworks });
   const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
@@ -117,5 +118,5 @@ export function useNetworkStats() {
     return networkFeatures[network]?.logo || EthLogo;
   }
 
-  return { networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
+  return { isLoading, networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
 }
