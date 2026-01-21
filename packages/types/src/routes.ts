@@ -799,6 +799,23 @@ export interface Routes {
   }): Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
 
   /**
+   * Returns the attesting validators for each network (using beacon liveness endpoint)
+   * @param networks List of networks
+   * @param epoch (optional) Beacon epoch to check liveness for (default: head)
+   */
+  validatorsFilterAttestingByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, { validators: string[]; beaconError?: Error } | null>>>;
+
+  /**
+   * Returns the balances for all validators for each network (as a map pubkey -> balance)
+   * @param networks List of networks
+   */
+  validatorsBalancesByNetwork: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, { balances: Record<string, string>; beaconError?: Error } | null>>>;
+
+  /**
    * Removes a docker volume by name
    * @param name Full volume name: "bitcoindnpdappnodeeth_bitcoin_data"
    */
@@ -968,6 +985,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   natRenewalEnable: {},
   natRenewalIsEnabled: {},
   validatorsFilterActiveByNetwork: { log: true },
+  validatorsFilterAttestingByNetwork: { log: true },
+  validatorsBalancesByNetwork: { log: true },
   volumeRemove: { log: true },
   volumesGet: {},
   ipPublicGet: {},

@@ -167,7 +167,6 @@ const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
     }
     const syncData = await syncResponse.json();
     const syncing = syncData.data;
-    console.log(`CC syncData for ${network}:`, syncData);
 
     const isSynced = syncing.is_syncing === false;
     const currentBlock = parseInt(syncing.head_slot, 10);
@@ -180,8 +179,6 @@ const getCcSyncStatus = async (network: DashboardSupportedNetwork) => {
       // Calculate progress based on slots
       progress = 100;
     }
-
-    console.log(`CC Sync Data for ${network}:`, { isSynced, currentBlock, progress });
 
     return { isSynced, currentBlock, progress };
   } catch (e) {

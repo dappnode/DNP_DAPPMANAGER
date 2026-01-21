@@ -30,25 +30,60 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
 export function useNetworkStats() {
   const isLoading = false;
   const nodesStatusReq = useApi.nodeStatusGetByNetwork({ networks: supportedNetworks });
+  const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: supportedNetworks });
+  const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
+  const validatorsBalancesReq = useApi.validatorsBalancesByNetwork({ networks: supportedNetworks });
 
   const clientsLoading = nodesStatusReq.isValidating;
   const nodesStatusByNetwork = nodesStatusReq.data;
+  const validatorsActiveByNetwork = validatorsFilterActiveReq.data;
+  const validatorsAttestingByNetwork = validatorsFilterAttestingReq.data;
+  const validatorsBalancesByNetwork = validatorsBalancesReq.data;
+
+  const validatorsLoading =
+    validatorsFilterActiveReq.isValidating ||
+    validatorsFilterAttestingReq.isValidating ||
+    validatorsBalancesReq.isValidating;
 
   const networkStats: NetworkStats = {};
 
   for (const network of supportedNetworks) {
-    const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
     const features = networkFeatures[network];
+    const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
+    const validatorsActive = validatorsActiveByNetwork?.[network];
+    const validatorsAttesting = validatorsAttestingByNetwork?.[network];
+    const balancesObj = validatorsBalancesByNetwork?.[network]?.balances;
 
-    const validatorsData = features.hasValidators
-      ? {
-          validators: {
-            total: 5,
-            balance: 160,
-            attesting: 5
+    console.log("balances", balancesObj);
+
+    let total = 0;
+    let attesting = 0;
+    let balance = 0;
+    let beaconError = undefined;
+
+    if (features.hasValidators && validatorsActive) {
+      total = validatorsActive.validators.length;
+      beaconError = validatorsActive.beaconError;
+    }
+    if (features.hasValidators && validatorsAttesting) {
+      attesting = validatorsAttesting.validators.length;
+    }
+    if (features.hasValidators && balancesObj && validatorsActive) {
+      // Sum balances for active validators
+      balance = validatorsActive.validators.reduce((acc, pk) => acc + (parseFloat(balancesObj[pk]) || 0), 0);
+    }
+
+    const validatorsData =
+      features.hasValidators && validatorsActive
+        ? {
+            validators: {
+              total,
+              balance,
+              attesting,
+              beaconError
+            }
           }
-        }
-      : {};
+        : undefined;
 
     const rewardsData = features.hasRewardsData
       ? {
@@ -83,5 +118,5 @@ export function useNetworkStats() {
     return networkFeatures[network]?.logo || EthLogo;
   }
 
-  return { isLoading, networkStats, clientsLoading, getNetworkLogo };
+  return { isLoading, networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
 }

@@ -7,7 +7,7 @@ import { DashboardSupportedNetwork, Network } from "@dappnode/types";
 import "./networkStats.scss";
 
 export default function NetworkStats() {
-  const { isLoading, networkStats, clientsLoading, getNetworkLogo } = useNetworkStats();
+  const { isLoading, networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
   return (
     <div className="network-stats">
       {isLoading ? (
@@ -30,6 +30,7 @@ export default function NetworkStats() {
                   {data.hasValidators && (
                     <ValidatorsCard
                       network={network}
+                      validatorsLoading={validatorsLoading}
                       data={data.validators}
                       hasRewardsData={data.hasRewardsData || false}
                       efectivity={data.rewards?.efectivity}

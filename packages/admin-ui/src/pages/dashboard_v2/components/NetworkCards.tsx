@@ -10,8 +10,10 @@ import { useNavigate } from "react-router";
 import { basePath } from "pages/stakers";
 import newTabProps from "utils/newTabProps";
 import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import { gweiToToken } from "utils/gweiToToken";
 import { capitalize } from "utils/strings";
-import { ProgressBar } from "react-bootstrap";
+import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
+import { MdWarningAmber } from "react-icons/md";
 
 const NetworkCard = ({
   title,
@@ -116,12 +118,14 @@ export const StatusCard = ({
 
 export const ValidatorsCard = ({
   network,
+  validatorsLoading,
   data,
   hasRewardsData,
   efectivity,
   proposals
 }: {
   network: string;
+  validatorsLoading: boolean;
   data: NetworkStatus["validators"];
   hasRewardsData: boolean;
   efectivity: number | undefined;
@@ -129,50 +133,77 @@ export const ValidatorsCard = ({
 }) => {
   return (
     <NetworkCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
-      <div className="validators-card-container">
-        <div className="validators-row">
-          <div className="network-stat-col">
-            <div>TOTAL</div>
-            <span>{data?.total ?? "-"}</span>
-          </div>
-          <div className="network-stat-col">
-            <div>ATTESTING</div>
-            <span>{data?.attesting ?? "-"}</span>
-          </div>
-          {hasRewardsData && (
-            <div className="network-stat-col">
-              <div>EFFECTIVITY</div>
-              <span>{efectivity ?? "-"}%</span>
+      {validatorsLoading ? (
+        <Loading small />
+      ) : (
+        <>
+          <div className="validators-card-container">
+            <div className="validators-row">
+              <div className="network-stat-col">
+                <div>
+                  TOTAL{" "}
+                  {data?.beaconError && (
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip id="beacon-api-error">
+                          Error fetching {capitalize(network)} validators status. All keystores imported in your{" "}
+                          {capitalize(network)} Web3Signer are being considered as active validators.
+                        </Tooltip>
+                      }
+                      placement="top"
+                    >
+                      <span>
+                        <MdWarningAmber className="tooltip-beacon-api-error" />{" "}
+                      </span>
+                    </OverlayTrigger>
+                  )}
+                </div>
+                <span>{data?.total ?? "0"}</span>
+              </div>
+              <div className="network-stat-col">
+                <div>ATTESTING</div>
+                <span>{data?.attesting ?? "-"}</span>
+              </div>
+              {hasRewardsData && (
+                <div className="network-stat-col">
+                  <div>EFFECTIVITY</div>
+                  <span>{efectivity ?? "-"}%</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <hr />
-        <div className="validators-row">
-          <div className="network-stat-col">
-            <div>BALANCE</div>
-            <span>{data?.balance ?? "-"}</span>
-          </div>
+            <hr />
+            <div className="validators-row">
+              <div className="network-stat-col">
+                <div>BALANCE</div>
+                <span>
+                  {typeof data?.balance === "number" || typeof data?.balance === "string"
+                    ? gweiToToken(data.balance, network as Network)
+                    : "-"}
+                </span>
+              </div>
 
-          {hasRewardsData && (
-            <div className="network-stat-col">
-              <div>PROPOSALS</div>
-              <span>{proposals ?? "-"}</span>
+              {hasRewardsData && (
+                <div className="network-stat-col">
+                  <div>PROPOSALS</div>
+                  <span>{proposals ?? "-"}</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
-      <Button
-        href={
-          network === Network.Mainnet
-            ? "http://brain.web3signer.dappnode"
-            : `http://brain.web3signer-${network}.dappnode`
-        }
-        fullwidth
-        {...newTabProps}
-        variant="outline-dappnode"
-      >
-        <span>View Validators</span>
-      </Button>
+          </div>
+          <Button
+            href={
+              network === Network.Mainnet
+                ? "http://brain.web3signer.dappnode"
+                : `http://brain.web3signer-${network}.dappnode`
+            }
+            fullwidth
+            {...newTabProps}
+            variant="outline-dappnode"
+          >
+            <span>View Validators</span>
+          </Button>
+        </>
+      )}
     </NetworkCard>
   );
 };
