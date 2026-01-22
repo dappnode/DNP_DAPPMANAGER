@@ -56,7 +56,7 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
-import { NodeStatusByNetwork } from "./stakingDashboard.js";
+import { NodeStatusByNetwork, SignerStatus } from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -761,6 +761,11 @@ export interface Routes {
   updateUpgrade: () => Promise<string>;
 
   /**
+   * Returns the signer status of the provided networks
+   */
+  signerByNetworkGet: (kwargs: { networks: Network[] }) => Promise<Partial<Record<Network, SignerStatus>>>;
+
+  /**
    * Return the current SSH port from sshd
    */
   sshPortGet: () => Promise<number>;
@@ -968,6 +973,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   releaseTrustedKeyRemove: { log: true },
   setShouldShownSmooth: {},
   getShouldShowSmooth: {},
+  signerByNetworkGet: {},
   setStaticIp: { log: true },
   statsCpuGet: {},
   statsDiskGet: {},

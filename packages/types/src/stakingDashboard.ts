@@ -24,6 +24,7 @@ export type NetworkStatus = {
     balance: number;
     attesting: number;
     beaconError?: Error;
+    signerStatus: SignerStatus;
   };
   rewards?: {
     APR: number;
@@ -36,6 +37,11 @@ export type NetworkStatus = {
   };
   hasValidators: boolean; // Whether this network has validators
   hasRewardsData: boolean; // Whether this network can retrieve rewards data from Beaconcha.in API
+};
+
+export type SignerStatus = {
+  isInstalled: boolean;
+  brainRunning: boolean;
 };
 
 export type NetworkStats = Partial<Record<DashboardSupportedNetwork, NetworkStatus>>;

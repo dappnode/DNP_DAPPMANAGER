@@ -32,17 +32,20 @@ export function useNetworkStats() {
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: supportedNetworks });
   const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
   const validatorsBalancesReq = useApi.validatorsBalancesByNetwork({ networks: supportedNetworks });
+  const signersStatusReq = useApi.signerByNetworkGet({ networks: supportedNetworks });
 
   const clientsLoading = nodesStatusReq.isValidating;
   const nodesStatusByNetwork = nodesStatusReq.data;
   const validatorsActiveByNetwork = validatorsFilterActiveReq.data;
   const validatorsAttestingByNetwork = validatorsFilterAttestingReq.data;
   const validatorsBalancesByNetwork = validatorsBalancesReq.data;
+  const signersStatusByNetwork = signersStatusReq.data;
 
   const validatorsLoading =
     validatorsFilterActiveReq.isValidating ||
     validatorsFilterAttestingReq.isValidating ||
-    validatorsBalancesReq.isValidating;
+    validatorsBalancesReq.isValidating ||
+    signersStatusReq.isValidating;
 
   const networkStats: NetworkStats = {};
 
@@ -52,8 +55,7 @@ export function useNetworkStats() {
     const validatorsActive = validatorsActiveByNetwork?.[network];
     const validatorsAttesting = validatorsAttestingByNetwork?.[network];
     const balancesObj = validatorsBalancesByNetwork?.[network]?.balances;
-
-    console.log("balances", balancesObj);
+    const signerStatus = signersStatusByNetwork?.[network] ?? { isInstalled: false, brainRunning: false };
 
     let total = 0;
     let attesting = 0;
@@ -72,17 +74,17 @@ export function useNetworkStats() {
       balance = validatorsActive.validators.reduce((acc, pk) => acc + (parseFloat(balancesObj[pk]) || 0), 0);
     }
 
-    const validatorsData =
-      features.hasValidators && validatorsActive
-        ? {
-            validators: {
-              total,
-              balance,
-              attesting,
-              beaconError
-            }
+    const validatorsData = features.hasValidators
+      ? {
+          validators: {
+            total,
+            balance,
+            attesting,
+            beaconError,
+            signerStatus
           }
-        : undefined;
+        }
+      : undefined;
 
     const rewardsData = features.hasRewardsData
       ? {
@@ -110,6 +112,8 @@ export function useNetworkStats() {
     } else {
       delete networkStats[network];
     }
+
+    console.log(`Network stats for ${network}:`, networkStats[network]);
   }
 
   // Provide a function to get the logo for a network

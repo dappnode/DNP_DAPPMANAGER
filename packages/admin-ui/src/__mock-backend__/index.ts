@@ -483,6 +483,21 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     },
     hoodi: { balances: {} },
     gnosis: null
+  }),
+
+  signerByNetworkGet: async () => ({
+    mainnet: {
+      isInstalled: true,
+      brainRunning: true
+    },
+    hoodi: {
+      isInstalled: true,
+      brainRunning: false
+    },
+    gnosis: {
+      isInstalled: false,
+      brainRunning: false
+    }
   })
 };
 
