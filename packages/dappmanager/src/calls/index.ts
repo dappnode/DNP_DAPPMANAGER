@@ -2,6 +2,7 @@ export { autoUpdateDataGet } from "./autoUpdateDataGet.js";
 export { autoUpdateSettingsEdit } from "./autoUpdateSettingsEdit.js";
 export { backupGet } from "./backupGet.js";
 export { backupRestore } from "./backupRestore.js";
+export { beaconchaSharingConsentGet, beaconchaSharingConsentSet } from "./beaconchaSharingConsent.js";
 export { chainDataGet } from "./chainDataGet.js";
 export { changeIpfsTimeout } from "./changeIpfsTimeout.js";
 export { cleanCache } from "./cleanCache.js";

@@ -47,3 +47,5 @@ export type SignerStatus = {
 export type NetworkStats = Partial<Record<DashboardSupportedNetwork, NetworkStatus>>;
 
 export type NodeStatusByNetwork = Partial<Record<DashboardSupportedNetwork, NodeStatus>>;
+
+export type BeaconchaSharingConsent = Partial<Record<DashboardSupportedNetwork, boolean>>;

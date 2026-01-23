@@ -1,4 +1,10 @@
-import { BeaconBackupNetworkStatus, IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
+import {
+  BeaconBackupNetworkStatus,
+  DashboardSupportedNetwork,
+  IpfsClientTarget,
+  PortProtocol,
+  Routes
+} from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
@@ -498,7 +504,14 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       isInstalled: false,
       brainRunning: false
     }
-  })
+  }),
+
+  beaconchaSharingConsentGet: async () => ({
+    mainnet: true,
+    hoodi: false
+  }),
+
+  beaconchaSharingConsentSet: async () => {}
 };
 
 export const calls: Routes = {

@@ -56,7 +56,12 @@ import { TrustedReleaseKey } from "./pkg.js";
 import { OptimismConfigSet, OptimismConfigGet } from "./rollups.js";
 import { Network, StakerConfigGet, StakerConfigSet } from "./stakers.js";
 import { BeaconBackupActivationParams, BeaconBackupNetworkStatus } from "./beaconBackup.js";
-import { NodeStatusByNetwork, SignerStatus } from "./stakingDashboard.js";
+import {
+  BeaconchaSharingConsent,
+  DashboardSupportedNetwork,
+  NodeStatusByNetwork,
+  SignerStatus
+} from "./stakingDashboard.js";
 
 export interface Routes {
   /**
@@ -82,6 +87,18 @@ export interface Routes {
    * @returns fileId = "64020f6e8d2d02aa2324dab9cd68a8ccb186e192232814f79f35d4c2fbf2d1cc"
    */
   backupRestore: (kwargs: { dnpName: string; backup: PackageBackup[]; fileId: string }) => Promise<void>;
+
+  /**
+   * Returns the consent to share validators data for all supported networks
+   */
+  beaconchaSharingConsentGet(): Promise<BeaconchaSharingConsent>;
+
+  /**
+   * Sets the consent to share validators data for a given network
+   * @param network The network for which to set the consent
+   * @param consent The consent value
+   */
+  beaconchaSharingConsentSet(kwargs: { network: DashboardSupportedNetwork; consent: boolean }): Promise<void>;
 
   /**
    * Returns chain data for all installed packages declared as chains
@@ -868,6 +885,8 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   autoUpdateSettingsEdit: {},
   backupGet: {},
   backupRestore: {},
+  beaconchaSharingConsentGet: {},
+  beaconchaSharingConsentSet: { log: true },
   chainDataGet: {},
   changeIpfsTimeout: {},
   cleanCache: {},

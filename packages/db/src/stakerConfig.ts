@@ -1,5 +1,6 @@
 import { dbMain } from "./dbFactory.js";
 import { interceptGlobalEnvOnSet } from "./intercepGlobalEnvOnSet.js";
+import { BeaconchaSharingConsent, Network } from "@dappnode/types";
 
 // Mainnet
 
@@ -238,3 +239,18 @@ export const mevBoostStarknetSepolia = interceptGlobalEnvOnSet(
   dbMain.staticKey<boolean>(MEVBOOST_STAKER_SEPOLIA, false),
   Object.keys({ MEVBOOST_STAKER_SEPOLIA })[0]
 );
+
+/**
+ * BEACONCHA.IN SHARING CONSENT
+ *
+ * User consent to share validators data to use beaconcha.in API
+ * In order to retrieve rewards data for the validators (displayed in the staking dashboard),
+ * we need to use beaconcha.in API. We ask for user consent to share the validators public keys
+ */
+
+const BEACONCHA_SHARING_CONSENT = "beaconcha-sharing-consent";
+
+export const beaconchaSharingConsent = dbMain.staticKey<BeaconchaSharingConsent>(BEACONCHA_SHARING_CONSENT, {
+  [Network.Mainnet]: false,
+  [Network.Hoodi]: false
+});
