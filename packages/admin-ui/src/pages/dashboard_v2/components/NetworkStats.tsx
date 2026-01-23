@@ -7,7 +7,14 @@ import Loading from "components/Loading";
 import "./networkStats.scss";
 
 export default function NetworkStats() {
-  const { networkStats, clientsLoading, getNetworkLogo, validatorsLoading } = useNetworkStats();
+  const {
+    networkStats,
+    clientsLoading,
+    getNetworkLogo,
+    validatorsLoading,
+    rewardsLoading,
+    beaconchaConsentSet
+  } = useNetworkStats();
   return (
     <div className="network-stats">
       {clientsLoading ? (
@@ -40,7 +47,14 @@ export default function NetworkStats() {
                     />
                   )}
 
-                  {data.hasRewardsData && <RewardsCard />}
+                  {data.hasRewardsData && (
+                    <RewardsCard
+                      network={network}
+                      data={data.rewards}
+                      loading={rewardsLoading}
+                      beaconchaConsentSet={beaconchaConsentSet}
+                    />
+                  )}
                 </div>
               </div>
             );
