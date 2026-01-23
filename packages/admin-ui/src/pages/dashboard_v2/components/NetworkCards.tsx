@@ -7,7 +7,7 @@ import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
 import Button from "components/Button";
 import { useNavigate } from "react-router";
-import { basePath } from "pages/stakers";
+import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
 import newTabProps from "utils/newTabProps";
 import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
 import { gweiToToken } from "utils/gweiToToken";
@@ -15,7 +15,6 @@ import { capitalize } from "utils/strings";
 import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { MdWarningAmber } from "react-icons/md";
 import { NavLink } from "react-router-dom";
-import { relativePath as stakersPath } from "pages/stakers/data";
 
 const NetworkCard = ({
   title,
@@ -108,7 +107,7 @@ export const StatusCard = ({
       )}
 
       <Button
-        onClick={() => navigate("/" + basePath + `/${network === Network.Mainnet ? "ethereum" : network}`)}
+        onClick={() => navigate("/" + stakersBasePath + `/${network === Network.Mainnet ? "ethereum" : network}`)}
         fullwidth
         variant="outline-dappnode"
       >
@@ -133,10 +132,36 @@ export const ValidatorsCard = ({
   efectivity: number | undefined;
   proposals: number | undefined;
 }) => {
+  const signerInstalled = data?.signerStatus.isInstalled;
+  const brainRunning = data?.signerStatus.brainRunning;
+  const navigate = useNavigate();
+
   return (
     <NetworkCard title="YOUR VALIDATORS" icon={<BoltIcon />}>
       {validatorsLoading ? (
         <Loading small />
+      ) : !signerInstalled || !brainRunning ? (
+        <div className="signer-error-card">
+          <div />
+          <div>
+            <div className="error-message">
+              <MdWarningAmber className="warning-icon" />{" "}
+              <div>
+                {!signerInstalled
+                  ? "Web3Signer is not installed on this network."
+                  : "Web3Signer is not running properly on this network."}
+              </div>
+            </div>
+            <div className="action-text">Select Web3Signer in the stakers tab and apply changes.</div>
+          </div>
+          <Button
+            onClick={() => navigate("/" + stakersBasePath + `/${network === Network.Mainnet ? "ethereum" : network}`)}
+            fullwidth
+            variant="outline-dappnode"
+          >
+            <span>Set Web3Signer</span>
+          </Button>
+        </div>
       ) : (
         <>
           <div className="validators-card-container">
@@ -202,7 +227,7 @@ export const ValidatorsCard = ({
             {...newTabProps}
             variant="outline-dappnode"
           >
-            <span>View Validators</span>
+            <span>{data?.total < 1 ? "Import Validators" : "View Validators"}</span>
           </Button>
         </>
       )}

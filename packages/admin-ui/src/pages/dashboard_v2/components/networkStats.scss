@@ -135,6 +135,33 @@
           color: darkorange;
         }
       }
+
+      .signer-error-card {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 25px;
+
+        .error-message {
+          display: flex;
+          gap: 5px;
+          padding: 10px;
+          background-color: var(--color-light-background-main);
+          border-radius: 10px;
+          font-style: italic;
+          align-items: center;
+
+          .warning-icon {
+            color: darkorange;
+          }
+        }
+
+        .action-text {
+          margin-top: 5px;
+          color: var(--light-text-color);
+        }
+      }
     }
 
     @media (max-width: 65rem) {
@@ -158,6 +185,7 @@
     }
   }
 }
+
 #dark {
   #main {
     .network-stats {
@@ -192,6 +220,12 @@
 
         .progress {
           background-color: #696969;
+        }
+
+        .signer-error-card {
+          .error-message {
+            background-color: var(--color-dark-background-main);
+          }
         }
       }
     }
