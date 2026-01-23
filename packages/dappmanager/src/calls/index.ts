@@ -90,6 +90,7 @@ export {
 export { rebootHost } from "./rebootHost.js";
 export * from "./releaseTrustedKey.js";
 export { setStaticIp } from "./setStaticIp.js";
+export { signerByNetworkGet } from "./signerByNetworkGet.js";
 export { getShouldShowSmooth, setShouldShownSmooth } from "./smooth.js";
 export { statsCpuGet } from "./statsCpuGet.js";
 export { sshPortGet, sshPortSet, sshStatusGet, sshStatusSet } from "./sshManager.js";
