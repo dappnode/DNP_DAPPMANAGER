@@ -1,10 +1,4 @@
-import {
-  BeaconBackupNetworkStatus,
-  DashboardSupportedNetwork,
-  IpfsClientTarget,
-  PortProtocol,
-  Routes
-} from "@dappnode/types";
+import { BeaconBackupNetworkStatus, IpfsClientTarget, PortProtocol, Routes } from "@dappnode/types";
 import { autoUpdate } from "./autoUpdate";
 import { devices } from "./devices";
 import { fetchPkgsData } from "./fetchPkgsData";
