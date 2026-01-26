@@ -131,14 +131,12 @@ export function useNetworkStats() {
 
     // Remove network where no node data is available
     if (nodeStatusData && (nodeStatusData.ec || nodeStatusData.cc)) {
-      // Add DNP names stored in the db from staker config
-      const nodeStatusWithDnps: NodeStatus = {
-        ec: nodeStatusData.ec ? { ...nodeStatusData.ec, dnp: executionClientDnp || nodeStatusData.ec.dnp } : null,
-        cc: nodeStatusData.cc ? { ...nodeStatusData.cc, dnp: consensusClientDnp || nodeStatusData.cc.dnp } : null
-      };
-
       networkStats[network] = {
-        nodeStatus: nodeStatusWithDnps,
+        nodeStatus: nodeStatusData,
+        clientsDnps: {
+          ecDnp: executionClientDnp || null,
+          ccDnp: consensusClientDnp || null
+        },
         ...validatorsData,
         ...rewardsData,
         hasValidators: features.hasValidators,

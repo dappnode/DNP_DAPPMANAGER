@@ -38,11 +38,16 @@ const NetworkCard = ({
 export const StatusCard = ({
   network,
   data,
-  clientsLoading
+  clientsLoading,
+  clientsDnps
 }: {
   network: string;
   data: NodeStatus | undefined;
   clientsLoading: boolean;
+  clientsDnps?: {
+    ecDnp: string | null;
+    ccDnp: string | null;
+  };
 }) => {
   const navigate = useNavigate();
   const execution = data && data.ec;
@@ -59,9 +64,13 @@ export const StatusCard = ({
                 <div className="network-stat-col">
                   <div>EXECUTION</div>
                   <span>
-                    <Link to={`/${packagesRelativePath}/${execution.dnp}/info`}>
-                      {capitalize(execution.name ?? "-")}
-                    </Link>
+                    {clientsDnps?.ecDnp ? (
+                      <Link to={`/${packagesRelativePath}/${clientsDnps.ecDnp}/info`}>
+                        {capitalize(execution.name ?? "-")}
+                      </Link>
+                    ) : (
+                      capitalize(execution.name ?? "-")
+                    )}
                   </span>
                 </div>
                 <div className="status-client-details">
@@ -88,9 +97,13 @@ export const StatusCard = ({
                   <div className="network-stat-col">
                     <div>CONSENSUS</div>
                     <span>
-                      <Link to={`/${packagesRelativePath}/${consensus.dnp}/info`}>
-                        {capitalize(consensus.name ?? "-")}
-                      </Link>
+                      {clientsDnps?.ccDnp ? (
+                        <Link to={`/${packagesRelativePath}/${clientsDnps.ccDnp}/info`}>
+                          {capitalize(consensus.name ?? "-")}
+                        </Link>
+                      ) : (
+                        capitalize(consensus.name ?? "-")
+                      )}
                     </span>
                   </div>
                   <div className="status-client-details">

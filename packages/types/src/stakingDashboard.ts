@@ -9,7 +9,6 @@ export type DashboardSupportedNetwork =
 
 export type ClientData = {
   name: string;
-  dnp: string;
   isSynced: boolean;
   currentBlock: number;
   progress: number;
@@ -20,6 +19,10 @@ export type NodeStatus = { ec: ClientData; cc: ClientData };
 
 export type NetworkStatus = {
   nodeStatus: NodeStatus | undefined;
+  clientsDnps?: {
+    ecDnp: string | null;
+    ccDnp: string | null;
+  };
   validators?: {
     total: number;
     balance: number;
