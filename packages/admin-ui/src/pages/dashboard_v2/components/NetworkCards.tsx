@@ -255,11 +255,6 @@ export const RewardsCard = ({
 }) => {
   const [beaconchaConsent, setBeaconchaConsent] = useState<boolean>(!!data?.beaconchaConsent);
 
-  // Sync local state with prop changes
-  React.useEffect(() => {
-    setBeaconchaConsent(!!data?.beaconchaConsent);
-  }, [data?.beaconchaConsent]);
-
   const handleSetBeaconchaConsent = async (checked: boolean) => {
     await beaconchaConsentSet({ network: network as DashboardSupportedNetwork, consent: checked });
     setBeaconchaConsent(checked);
