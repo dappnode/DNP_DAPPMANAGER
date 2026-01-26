@@ -1,21 +1,20 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
+import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
+import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import newTabProps from "utils/newTabProps";
+import { gweiToToken } from "utils/gweiToToken";
+import { capitalize } from "utils/strings";
 import Card from "components/Card";
 import Loading from "components/Loading";
-// import { ProgressBar } from "react-bootstrap";
+import Button from "components/Button";
+import Switch from "components/Switch";
+import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
-import Button from "components/Button";
-import { useNavigate } from "react-router";
-import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
-import newTabProps from "utils/newTabProps";
-import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
-import { gweiToToken } from "utils/gweiToToken";
-import { capitalize } from "utils/strings";
-import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { MdWarningAmber } from "react-icons/md";
-import { NavLink } from "react-router-dom";
-import Switch from "components/Switch";
 
 const NetworkCard = ({
   title,
