@@ -9,6 +9,7 @@ export type DashboardSupportedNetwork =
 
 export type ClientData = {
   name: string;
+  dnp: string;
   isSynced: boolean;
   currentBlock: number;
   progress: number;

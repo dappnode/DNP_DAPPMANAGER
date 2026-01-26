@@ -60,6 +60,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     mainnet: {
       ec: {
         name: "Nethermind",
+        dnp: "nethermind.dnp.dappnode.eth",
         isSynced: true,
         currentBlock: 23648945,
         progress: 100,
@@ -67,6 +68,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       },
       cc: {
         name: "Nimbus",
+        dnp: "nimbus.dnp.dappnode.eth",
         isSynced: true,
         currentBlock: 12875373,
         progress: 100,
@@ -76,6 +78,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     hoodi: {
       ec: {
         name: "besu",
+        dnp: "besu-hoodi.dnp.dappnode.eth",
         isSynced: true,
         currentBlock: 1480848,
         progress: 100,
@@ -83,6 +86,7 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
       },
       cc: {
         name: "Prysm",
+        dnp: "prysm-hoodi.dnp.dappnode.eth",
         isSynced: false,
         currentBlock: 1592925,
         progress: 100,
@@ -443,6 +447,12 @@ export const otherCalls: Omit<Routes, keyof typeof namedSpacedCalls> = {
     return {
       mainnet: "prysm.dnp.dappnode.eth",
       gnosis: "prysm-gnosis.dnp.dappnode.eth"
+    };
+  },
+  executionClientsGetByNetworks: async () => {
+    return {
+      mainnet: "geth.dnp.dappnode.eth",
+      gnosis: "nethermind-xdai.dnp.dappnode.eth"
     };
   },
   premiumBeaconBackupActivate: async () => {},

@@ -159,6 +159,14 @@ export interface Routes {
     networks: Network[];
   }) => Promise<Partial<Record<Network, string | null | undefined>>>;
 
+  /**
+   * Returns the execution client for a given network
+   * @param network Network to get the execution client for
+   */
+  executionClientsGetByNetworks: (kwargs: {
+    networks: Network[];
+  }) => Promise<Partial<Record<Network, string | null | undefined>>>;
+
   /** Set the dappnodeWebNameSet */
   dappnodeWebNameSet: (kwargs: { dappnodeWebName: string }) => Promise<void>;
 
@@ -895,6 +903,7 @@ export const routesData: { [P in keyof Routes]: RouteData } = {
   stakerConfigGet: {},
   stakerConfigSet: { log: true },
   consensusClientsGetByNetworks: {},
+  executionClientsGetByNetworks: {},
   dappnodeWebNameSet: { log: true },
   deviceAdd: { log: true },
   deviceAdminToggle: { log: true },

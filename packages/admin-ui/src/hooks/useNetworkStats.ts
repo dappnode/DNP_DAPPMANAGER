@@ -29,6 +29,8 @@ const networkFeatures: Record<DashboardSupportedNetwork, NetworkFeatures> = {
 
 export function useNetworkStats() {
   const nodesStatusReq = useApi.nodeStatusGetByNetwork({ networks: supportedNetworks });
+  const consensusClientsReq = useApi.consensusClientsGetByNetworks({ networks: supportedNetworks });
+  const executionClientsReq = useApi.executionClientsGetByNetworks({ networks: supportedNetworks });
   const validatorsFilterActiveReq = useApi.validatorsFilterActiveByNetwork({ networks: supportedNetworks });
   const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
   const validatorsBalancesReq = useApi.validatorsBalancesByNetwork({ networks: supportedNetworks });
@@ -36,13 +38,16 @@ export function useNetworkStats() {
   const beaconchaSharingConsentReq = useApi.beaconchaSharingConsentGet();
 
   const nodesStatusByNetwork = nodesStatusReq.data;
+  const consensusClientsByNetwork = consensusClientsReq.data;
+  const executionClientsByNetwork = executionClientsReq.data;
   const validatorsActiveByNetwork = validatorsFilterActiveReq.data;
   const validatorsAttestingByNetwork = validatorsFilterAttestingReq.data;
   const validatorsBalancesByNetwork = validatorsBalancesReq.data;
   const signersStatusByNetwork = signersStatusReq.data;
   const beaconchaSharingConsent = beaconchaSharingConsentReq.data;
 
-  const clientsLoading = nodesStatusReq.isValidating;
+  const clientsLoading =
+    nodesStatusReq.isValidating || consensusClientsReq.isValidating || executionClientsReq.isValidating;
 
   const validatorsLoading =
     validatorsFilterActiveReq.isValidating ||
@@ -73,6 +78,8 @@ export function useNetworkStats() {
   for (const network of supportedNetworks) {
     const features = networkFeatures[network];
     const nodeStatusData: NodeStatus | undefined = nodesStatusByNetwork?.[network];
+    const consensusClientDnp = consensusClientsByNetwork?.[network];
+    const executionClientDnp = executionClientsByNetwork?.[network];
     const validatorsActive = validatorsActiveByNetwork?.[network];
     const validatorsAttesting = validatorsAttestingByNetwork?.[network];
     const balancesObj = validatorsBalancesByNetwork?.[network]?.balances;
@@ -124,8 +131,14 @@ export function useNetworkStats() {
 
     // Remove network where no node data is available
     if (nodeStatusData && (nodeStatusData.ec || nodeStatusData.cc)) {
+      // Add DNP names stored in the db from staker config
+      const nodeStatusWithDnps: NodeStatus = {
+        ec: nodeStatusData.ec ? { ...nodeStatusData.ec, dnp: executionClientDnp || nodeStatusData.ec.dnp } : null,
+        cc: nodeStatusData.cc ? { ...nodeStatusData.cc, dnp: consensusClientDnp || nodeStatusData.cc.dnp } : null
+      };
+
       networkStats[network] = {
-        nodeStatus: nodeStatusData,
+        nodeStatus: nodeStatusWithDnps,
         ...validatorsData,
         ...rewardsData,
         hasValidators: features.hasValidators,

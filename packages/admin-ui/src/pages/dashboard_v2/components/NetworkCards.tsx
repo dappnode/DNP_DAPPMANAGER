@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
-import { NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
+import { relativePath as packagesRelativePath } from "pages/packages";
 import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
 import newTabProps from "utils/newTabProps";
 import { gweiToToken } from "utils/gweiToToken";
@@ -57,7 +58,11 @@ export const StatusCard = ({
               <div className="status-client-row">
                 <div className="network-stat-col">
                   <div>EXECUTION</div>
-                  <span>{capitalize(execution.name ?? "-")}</span>
+                  <span>
+                    <Link to={`/${packagesRelativePath}/${execution.dnp}/info`}>
+                      {capitalize(execution.name ?? "-")}
+                    </Link>
+                  </span>
                 </div>
                 <div className="status-client-details">
                   <div className="network-stat-col">
@@ -82,7 +87,11 @@ export const StatusCard = ({
                 <>
                   <div className="network-stat-col">
                     <div>CONSENSUS</div>
-                    <span>{capitalize(consensus.name ?? "-")}</span>
+                    <span>
+                      <Link to={`/${packagesRelativePath}/${consensus.dnp}/info`}>
+                        {capitalize(consensus.name ?? "-")}
+                      </Link>
+                    </span>
                   </div>
                   <div className="status-client-details">
                     <div className="network-stat-col">
@@ -282,7 +291,7 @@ export const NoNodesCard = () => {
         <h5>No nodes configured yet!</h5>
         <div>You haven't set up a node on any network.</div>
         <div>
-          Set up your nodes from the <NavLink to={`/${stakersPath}`}>Stakers tab</NavLink>.
+          Set up your nodes from the <Link to={`/${stakersPath}`}>Stakers tab</Link>.
         </div>
       </div>
     </Card>
