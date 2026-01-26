@@ -34,6 +34,7 @@ export type NetworkStatus = {
     "365days": number;
     efectivity: number; // Even though this is validator data, it is retrieved from Beaconcha.in API along with rewards data
     proposals: number; // Even though this is validator data, it is retrieved from Beaconcha.in API along with rewards data
+    beaconchaConsent: boolean; // Whether the user has given consent to share validators data with Beaconcha.in
   };
   hasValidators: boolean; // Whether this network has validators
   hasRewardsData: boolean; // Whether this network can retrieve rewards data from Beaconcha.in API
@@ -47,3 +48,5 @@ export type SignerStatus = {
 export type NetworkStats = Partial<Record<DashboardSupportedNetwork, NetworkStatus>>;
 
 export type NodeStatusByNetwork = Partial<Record<DashboardSupportedNetwork, NodeStatus>>;
+
+export type BeaconchaSharingConsent = Partial<Record<DashboardSupportedNetwork, boolean>>;

@@ -1,5 +1,5 @@
 import { DashboardSupportedNetwork, Network, NetworkStats, NodeStatus } from "@dappnode/types";
-import { useApi } from "api";
+import { useApi, api } from "api";
 import EthLogo from "img/logos/eth-logo.svg?react";
 import GnosisLogo from "img/logos/gnosis-logo.svg?react";
 import LuksoLogo from "img/logos/lukso-logo.svg?react";
@@ -33,19 +33,40 @@ export function useNetworkStats() {
   const validatorsFilterAttestingReq = useApi.validatorsFilterAttestingByNetwork({ networks: supportedNetworks });
   const validatorsBalancesReq = useApi.validatorsBalancesByNetwork({ networks: supportedNetworks });
   const signersStatusReq = useApi.signerByNetworkGet({ networks: supportedNetworks });
+  const beaconchaSharingConsentReq = useApi.beaconchaSharingConsentGet();
 
-  const clientsLoading = nodesStatusReq.isValidating;
   const nodesStatusByNetwork = nodesStatusReq.data;
   const validatorsActiveByNetwork = validatorsFilterActiveReq.data;
   const validatorsAttestingByNetwork = validatorsFilterAttestingReq.data;
   const validatorsBalancesByNetwork = validatorsBalancesReq.data;
   const signersStatusByNetwork = signersStatusReq.data;
+  const beaconchaSharingConsent = beaconchaSharingConsentReq.data;
+
+  const clientsLoading = nodesStatusReq.isValidating;
 
   const validatorsLoading =
     validatorsFilterActiveReq.isValidating ||
     validatorsFilterAttestingReq.isValidating ||
     validatorsBalancesReq.isValidating ||
     signersStatusReq.isValidating;
+
+  const rewardsLoading = beaconchaSharingConsentReq.isValidating;
+
+  const beaconchaConsentSet = async ({
+    network,
+    consent
+  }: {
+    network: DashboardSupportedNetwork;
+    consent: boolean;
+  }) => {
+    try {
+      await api.beaconchaSharingConsentSet({ network, consent });
+      await beaconchaSharingConsentReq.revalidate();
+    } catch (error) {
+      console.error("Error setting beaconcha consent:", error);
+      throw error;
+    }
+  };
 
   const networkStats: NetworkStats = {};
 
@@ -95,7 +116,8 @@ export function useNetworkStats() {
             "30days": 0.0123,
             "365days": 0.3321,
             efectivity: 99.9,
-            proposals: 3
+            proposals: 3,
+            beaconchaConsent: beaconchaSharingConsent?.[network] ?? false
           }
         }
       : {};
@@ -121,5 +143,5 @@ export function useNetworkStats() {
     return networkFeatures[network]?.logo || EthLogo;
   }
 
-  return { networkStats, clientsLoading, getNetworkLogo, validatorsLoading };
+  return { networkStats, clientsLoading, getNetworkLogo, validatorsLoading, rewardsLoading, beaconchaConsentSet };
 }

@@ -1,20 +1,20 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router";
+import { NavLink } from "react-router-dom";
+import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
+import { DashboardSupportedNetwork, Network, NetworkStatus, NodeStatus } from "@dappnode/types";
+import newTabProps from "utils/newTabProps";
+import { gweiToToken } from "utils/gweiToToken";
+import { capitalize } from "utils/strings";
 import Card from "components/Card";
 import Loading from "components/Loading";
-// import { ProgressBar } from "react-bootstrap";
+import Button from "components/Button";
+import Switch from "components/Switch";
+import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { HealthIcon } from "./icons/HealthIcon";
 import { BoltIcon } from "./icons/BoltIcon";
 import { RewardsIcon } from "./icons/RewardsIcon";
-import Button from "components/Button";
-import { useNavigate } from "react-router";
-import { basePath as stakersBasePath, relativePath as stakersPath } from "pages/stakers";
-import newTabProps from "utils/newTabProps";
-import { Network, NetworkStatus, NodeStatus } from "@dappnode/types";
-import { gweiToToken } from "utils/gweiToToken";
-import { capitalize } from "utils/strings";
-import { OverlayTrigger, ProgressBar, Tooltip } from "react-bootstrap";
 import { MdWarningAmber } from "react-icons/md";
-import { NavLink } from "react-router-dom";
 
 const NetworkCard = ({
   title,
@@ -235,14 +235,42 @@ export const ValidatorsCard = ({
   );
 };
 
-export const RewardsCard = () => {
+export const RewardsCard = ({
+  network,
+  data,
+  loading,
+  beaconchaConsentSet
+}: {
+  network: string;
+  data: NetworkStatus["rewards"];
+  loading: boolean;
+  beaconchaConsentSet: ({
+    network,
+    consent
+  }: {
+    network: DashboardSupportedNetwork;
+    consent: boolean;
+  }) => Promise<void>;
+}) => {
+  const [beaconchaConsent, setBeaconchaConsent] = useState<boolean>(!!data?.beaconchaConsent);
+
+  const handleSetBeaconchaConsent = async (checked: boolean) => {
+    await beaconchaConsentSet({ network: network as DashboardSupportedNetwork, consent: checked });
+    setBeaconchaConsent(checked);
+  };
+
   return (
     <NetworkCard title="REWARDS" icon={<RewardsIcon />}>
-      <div
-        style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "16px" }}
-      >
-        🚧 COMING SOON 🚧
-      </div>
+      {loading ? (
+        <Loading small />
+      ) : (
+        <div
+          style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", fontSize: "16px" }}
+        >
+          Beaconcha Consent:{" "}
+          <Switch checked={beaconchaConsent} onToggle={(checked) => handleSetBeaconchaConsent(checked)} />
+        </div>
+      )}
     </NetworkCard>
   );
 };

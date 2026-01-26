@@ -55,8 +55,7 @@ export async function initializeDb(): Promise<void> {
   if (db.ipfsGateway.get() === "http://ipfs.dappnode.io:8081") db.ipfsGateway.set(params.IPFS_REMOTE);
 
   /**
-   *
-   *
+   * Initialize telegram notifications settings
    */
 
   if (db.notifications.get() === null) {
